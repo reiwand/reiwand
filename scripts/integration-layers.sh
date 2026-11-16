@@ -51,7 +51,7 @@ ctl screen TEST-23 --size 160x90 --density 2 && sleep 2
 ctl set "$WORK/strata-3.png" -o TEST-23 --fit fill
 wait_for 60 is TEST-23 None || fail "applying again did not build the layers: $(ctl jobs)"
 leave
-for output in "${outputs[@]}"; do ctl release "$output"; done
+for shown in "${outputs[@]}"; do ctl release "$shown"; done
 for n in 0 1 2 3; do ctl edit parallax "$WORK/strata-$n.png" --off; done
 ctl config playback.software_parallax false
 echo "depth layer state checks passed"
