@@ -70,7 +70,7 @@ at the first step not done:
    Serving HTTPS itself needs a `REIWAND_PUBLIC_URL` that starts with `https://`. The choice takes
    effect when the setup is finished and at every later start.
 2. **Account**: the administrator. «Change» on a later step edits the same account.
-3. **Repository**: its name and «Online authors» (as `repo init --online-authors`). The root
+3. **Repository**: its name, its address name (`main` by default) and «Online authors» (as `repo init --online-authors`). The root
    secret key is shown once, in that page only (`Cache-Control: no-store`): it is never stored,
    logged or put in an address. It stays in memory until «I saved it» is marked; if the server
    restarts before that, the step offers to make the repository again. A repository made before
@@ -141,8 +141,11 @@ blobs/<sha256>.wpak  uploads waiting for review
 thumbs/<sha256>.jpg  640 px previews re-encoded by the validator
 held/<sha256>.wpak   removed or revoked packages (and their previews) for REIWAND_TAKEDOWN_DAYS, not served
 private/<user>/<id>  end-to-end encrypted private files of each account
-repo/                the static repository (docs/specs/repo.md) built with reiwand-format
+repo/                the static repository (docs/specs/repo.md) built with reiwand-format; the first repository, `main`
 keys/online.key      online signing key (0600); the root key never lives here
+repos/<name>/        the other repositories of the server, each with its own tree
+keys/<name>.online.key  their online keys (0600)
+db/reiwand.sqlite.before-vN-from-vM  copy kept once before a migration
 keys/mail.secret     password of the mail server (0600), only when mail is set up
 tls/cert.der, key.der  certificate and key of REIWAND_TLS=self-signed (0600)
 tmp/ logs/ backups/
@@ -187,7 +190,7 @@ notices per hour. Sync writes: 60 per minute per device.
 |--------|------|--------|
 | GET | `/healthz` | `ok` |
 | GET | `/readyz` | `200` or `503` with `{database, repository, index_fresh}` |
-| GET | `/.well-known/reiwand-server` | `{name, version, api: ["v1"], registration, sync: {end_to_end_default, plaintext_requires_confirmation, record_max_bytes, quota_bytes}, uploads: {max_bytes, per_day, licenses}, repository: {url, repo_id, entry_expires} \| null, legal: {notice, terms, privacy, contact}}` |
+| GET | `/.well-known/reiwand-server` | `{name, version, api: ["v1"], registration, sync: {end_to_end_default, plaintext_requires_confirmation, record_max_bytes, quota_bytes}, uploads: {max_bytes, per_day, licenses}, repository: {url, repo_id, entry_expires} \| null, repositories: [{name, url, repo_id, entry_expires}], legal: {notice, terms, privacy, contact}}` |
 
 ## Repository
 
@@ -199,6 +202,47 @@ notices per hour. Sync writes: 60 per minute per device.
 revoked answers `410`, and its preview is deleted unless a release still listed uses it. The share
 URL is `repository.url` of the discovery document
 (`https://example.org/repo/?fingerprint=…&repo_id=…`).
+
+### Several repositories
+
+One server hosts several repositories. Each has a name (1 to 32 lowercase letters, digits or
+hyphens), its own root and online keys, its own tree and its own signed index, and lives at
+`/r/<name>/<path>` with the same tree as above. The first repository is called `main`: it keeps the
+folder `repo/` and the key `keys/online.key`, and `/repo/<path>` is an alias of `/r/main/<path>`
+(its share URL keeps the old address). The others live in `repos/<name>/` with
+`keys/<name>.online.key`. Every repository is signed on its own and a client verifies each one
+against its own root key: the key of one never verifies another.
+
+`repository` of the discovery document is the first public repository, as before, and
+`repositories` lists all of them with the address of each. Package, version, vote and featured data
+belong to a repository (`(repo, id)`): the same package id can exist in two. Catalogue, package
+page, votes and featured have a route per repository, `/api/v1/r/<name>/catalog`,
+`/api/v1/r/<name>/packages/{id}`, `…/votes`, `…/admin/featured`; the routes without `r/<name>`
+answer for the first repository. An upload may carry `repo` (a name; the first when absent). The
+HTML package pages show the first repository only.
+
+Moderation stays per server: one team, one set of blocks, one queue. Accounts and tokens are
+shared. Private repositories and per-repository permissions do not exist.
+
+| Method | Path | Role | Answer |
+|--------|------|------|--------|
+| GET | `/api/v1/admin/repos` | admin | `{items}`: name, repo id, root version, share URL and address of each |
+| POST | `/api/v1/admin/repos` | admin | `{name, title?, require_author_signature?, online_authors?}` creates one and answers `{repository, root_key: {fingerprint, secret, shown_once}}`; the root secret key is shown this once and never stored (`409` if the name is taken) |
+| GET | `/api/v1/admin/repos/{repo}` | admin | State of one |
+
+`/admin/repos` lists them and creates one; the same is in setup step 3 for the first one and in
+`reiwand-server repo init|import|status --repo NAME` (default `main`; `status` without `--repo`
+lists all, `repo publish` signs all). The background job signs each repository on its own; a
+failure of one does not stop the others and turns the health row red.
+
+### Database versions and backups
+
+The database carries a version number. Opening an older one (from the previous version on) first
+keeps a copy, `db/reiwand.sqlite.before-vN-from-vM`, and then migrates it inside one transaction
+that checks the keys before it commits; a failure leaves the database untouched. A newer or
+unknown version is refused. `reiwand-server restore` accepts a backup of the previous version and
+migrates it; after restoring, every repository is marked to sign again. Backups include the
+`repos/` trees and their keys.
 
 Only the online key signs on the server, and only entries and their details: an approval adds the
 package with `reiwand_format::add`, a removal or revocation calls `reiwand_format::revoke`, and a
@@ -460,7 +504,7 @@ with the tone last seen (`health_seen`): a row that turns red or near sends one 
 not per check. Subjects carry only the name of the server and of the row. «Enviar un correo de
 prueba» (`POST /admin/mail/test`) sends at once and says whether it went out.
 
-A failed automatic signing is stored in `repo_state.failed_at` and `failed_raw`: the row «Firma del
+A failed automatic signing is stored in the `repos` row (`failed_at` and `failed_raw`): the row «Firma del
 índice» turns red with when and why until a signing works again.
 
 On the health page (`/admin`) the row «Firma del índice» appears only once the index was signed

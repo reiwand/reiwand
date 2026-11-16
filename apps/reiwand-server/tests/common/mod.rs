@@ -108,10 +108,19 @@ fn build(dir: &Path, manifest: Manifest) -> PathBuf {
 }
 
 pub async fn upload(server: &Server, who: &Who, wpak: &Path) -> Value {
+    upload_to(server, who, wpak, None).await
+}
+
+pub async fn upload_to(server: &Server, who: &Who, wpak: &Path, repo: Option<&str>) -> Value {
     let bytes = fs::read(wpak).unwrap();
     let sha = reiwand_format::sha256(&bytes[..]).unwrap();
     let (status, open) = server
-        .json(Method::POST, "/api/v1/uploads", who, Some(json!({"size": bytes.len(), "sha256": sha})))
+        .json(
+            Method::POST,
+            "/api/v1/uploads",
+            who,
+            Some(json!({"size": bytes.len(), "sha256": sha, "repo": repo})),
+        )
         .await;
     assert_eq!(status, StatusCode::CREATED, "{open}");
     let id = open["id"].as_str().unwrap().to_string();
