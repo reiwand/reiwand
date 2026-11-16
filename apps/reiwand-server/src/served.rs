@@ -5,10 +5,13 @@ use axum::extract::{Path as Route, State};
 use axum::http::{StatusCode, header};
 use axum::response::Response;
 use rusqlite::params;
+use std::collections::HashMap;
 use std::io::ErrorKind;
 use tokio_util::io::ReaderStream;
 
-pub async fn serve(State(app): St, Route(path): Route<String>) -> Res<Response> {
+pub async fn serve(State(app): St, Route(mut found): Route<HashMap<String, String>>) -> Res<Response> {
+    let path = found.remove("path").unwrap_or_default();
+    let repo = crate::scope::resolve(&app, found.get("repo").map_or("", String::as_str))?;
     let parts: Vec<&str> = path.split('/').collect();
     let public = matches!(
         parts[0],
@@ -23,14 +26,19 @@ pub async fn serve(State(app): St, Route(path): Route<String>) -> Res<Response> 
         return Err(Problem::missing("file"));
     }
     if let ["packages", id, file] = parts[..] {
-        let (id, version) = (id.to_string(), file.trim_end_matches(".wpak").to_string());
-        let sql = "SELECT EXISTS (SELECT 1 FROM versions WHERE package_id = ?1 AND version = ?2 \
+        let (id, version, name) =
+            (id.to_string(), file.trim_end_matches(".wpak").to_string(), repo.name.clone());
+        let sql = "SELECT EXISTS (SELECT 1 FROM versions WHERE repo = ?3 AND package_id = ?1 AND version = ?2 \
                    AND state IN ('removed', 'revoked'))";
-        if app.db.run(move |c| Ok(c.query_row(sql, params![id, version], |r| r.get::<_, bool>(0))?)).await? {
+        if app
+            .db
+            .run(move |c| Ok(c.query_row(sql, params![id, version, name], |r| r.get::<_, bool>(0))?))
+            .await?
+        {
             return Err(Problem::new(StatusCode::GONE, "withdrawn", "this package version was withdrawn"));
         }
     }
-    let file = match tokio::fs::File::open(app.repo.dir.join(&path)).await {
+    let file = match tokio::fs::File::open(repo.dir.join(&path)).await {
         Err(e) if e.kind() == ErrorKind::NotFound => return Err(Problem::missing("file")),
         file => file?,
     };

@@ -88,7 +88,7 @@ pub fn check(wpak: &Path, keys: &[String], require_signature: bool, thumb: &Path
     })
 }
 
-pub async fn validate(app: &App, user: i64, wpak: &Path, thumb: &Path) -> Res<Report> {
+pub async fn validate(app: &App, user: i64, upload: &str, wpak: &Path, thumb: &Path) -> Res<Report> {
     let _permit = app.validations.acquire().await.map_err(Problem::internal)?;
     let sql = "SELECT fingerprint, public_key FROM author_keys WHERE user_id = ?1";
     let keys = app.db.run(move |c| {
@@ -98,7 +98,12 @@ pub async fn validate(app: &App, user: i64, wpak: &Path, thumb: &Path) -> Res<Re
         Ok(rows.collect::<Result<Vec<_>, _>>()?)
     });
     let mut keys = keys.await?;
-    let roots = app.repo.authors();
+    let named = upload.to_string();
+    let named = app
+        .db
+        .run(move |c| Ok(crate::db::one::<String>(c, "SELECT repo FROM uploads WHERE id = ?1", [named])?))
+        .await?;
+    let roots = crate::scope::resolve(app, &named.unwrap_or_default())?.authors();
     if let Some((root_keys, _, false)) = &roots {
         keys.retain(|(fp, _)| root_keys.contains(fp));
     }

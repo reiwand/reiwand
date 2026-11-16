@@ -44,6 +44,8 @@ struct Open {
     sha256: String,
     #[serde(default)]
     visibility: Option<String>,
+    #[serde(default)]
+    repo: Option<String>,
 }
 
 pub(crate) fn listed(visibility: Option<&str>) -> Res<bool> {
@@ -57,9 +59,10 @@ pub(crate) fn listed(visibility: Option<&str>) -> Res<bool> {
 async fn open(State(app): St, auth: Auth, Input(o): Input<Open>) -> Res<impl IntoResponse> {
     auth.scope("upload")?;
     let shown = listed(o.visibility.as_deref())?;
+    let repo = crate::scope::resolve(&app, o.repo.as_deref().unwrap_or_default())?.name.clone();
     let id = start(&app, &auth, o.size, o.sha256, "open").await?;
-    let (key, sql) = (id.clone(), "UPDATE uploads SET listed = ?2 WHERE id = ?1");
-    app.db.run(move |c| Ok(c.execute(sql, params![key, shown])?)).await?;
+    let (key, sql) = (id.clone(), "UPDATE uploads SET listed = ?2, repo = ?3 WHERE id = ?1");
+    app.db.run(move |c| Ok(c.execute(sql, params![key, shown, repo])?)).await?;
     let url = app.cfg.url(&format!("/api/v1/uploads/{id}"));
     let visibility = if shown { "public" } else { "unlisted" };
     let opened = json!({"id": id, "put_url": url, "expires_at": now() + DAY, "visibility": visibility});

@@ -1,9 +1,10 @@
 use crate::db::rows;
 use crate::error::{Problem, Res};
+use crate::scope::{Scope, both};
 use crate::web::text;
 use crate::{Reply, Router, St};
 use axum::Json;
-use axum::extract::{Path, Query, State};
+use axum::extract::{Query, State};
 use axum::http::header;
 use axum::response::IntoResponse;
 use axum::routing::get;
@@ -16,28 +17,27 @@ use serde_json::{Value, json};
 
 const SELECT: &str = "SELECT v.id AS row, v.package_id AS id, v.version, v.kind, v.title, v.description, \
                       v.license, v.tags, v.authors, v.size, v.sha256, v.published_at, u.handle AS owner, \
-                      v.content, v.photosensitive, v.facets, p.hidden, v.listed, \
-                      (SELECT COALESCE(SUM(value = 1), 0) FROM votes WHERE package_id = v.package_id) AS up, \
-                      (SELECT COALESCE(SUM(value = -1), 0) FROM votes WHERE package_id = v.package_id) AS down, \
-                      EXISTS (SELECT 1 FROM featured f WHERE f.package_id = v.package_id) AS featured \
-                      FROM versions v JOIN packages p ON p.id = v.package_id \
+                      v.content, v.photosensitive, v.facets, p.hidden, v.listed, v.repo, \
+                      (SELECT COALESCE(SUM(value = 1), 0) FROM votes WHERE repo = v.repo AND package_id = v.package_id) AS up, \
+                      (SELECT COALESCE(SUM(value = -1), 0) FROM votes WHERE repo = v.repo AND package_id = v.package_id) AS down, \
+                      EXISTS (SELECT 1 FROM featured f WHERE f.repo = v.repo AND f.package_id = v.package_id) AS featured \
+                      FROM versions v JOIN packages p ON p.repo = v.repo AND p.id = v.package_id \
                       LEFT JOIN users u ON u.id = p.owner_id";
-const NEWEST: &str = " WHERE v.state = 'published' AND p.hidden IS NULL AND v.id = (SELECT w.id FROM versions w \
-                      WHERE w.package_id = v.package_id AND w.state = 'published' AND w.listed = 1 \
+const NEWEST: &str = " WHERE v.repo = ?10 AND v.state = 'published' AND p.hidden IS NULL AND v.id = (SELECT w.id FROM versions w \
+                      WHERE w.repo = v.repo AND w.package_id = v.package_id AND w.state = 'published' AND w.listed = 1 \
                       ORDER BY w.published_at DESC, w.id DESC LIMIT 1) \
                       AND (?1 = '' OR (?1 = 'm' AND v.id IN (SELECT rowid FROM search WHERE search MATCH ?2)) \
                       OR (?1 = 't' AND v.tags LIKE ?2 ESCAPE '!')) \
                       AND (?3 = '' OR v.kind = ?3) AND (v.published_at, v.id) < (?4, ?5) \
                       AND (?7 = '' OR v.content = ?7 OR (?7 = 'unrated' AND v.content IS NULL)) \
                       AND (?8 = '' OR EXISTS (SELECT 1 FROM json_each(v.facets) WHERE value = ?8)) \
-                      AND (?9 = '' OR EXISTS (SELECT 1 FROM featured f WHERE f.package_id = v.package_id)) \
+                      AND (?9 = '' OR EXISTS (SELECT 1 FROM featured f WHERE f.repo = v.repo AND f.package_id = v.package_id)) \
                       ORDER BY v.published_at DESC, v.id DESC LIMIT ?6";
 
 pub fn routes() -> Router {
-    Router::new()
-        .route("/api/v1/catalog", get(list))
-        .route("/api/v1/packages/{id}", get(package))
-        .route("/api/v1/packages/{id}/versions", get(versions))
+    let router = both(Router::new(), "/api/v1/catalog", get(list));
+    let router = both(router, "/api/v1/packages/{id}", get(package));
+    both(router, "/api/v1/packages/{id}/versions", get(versions))
 }
 
 #[derive(Deserialize, Default)]
@@ -66,7 +66,8 @@ fn shape(mut item: Value) -> Value {
     item["featured"] = (item["featured"] != 0).into();
     item["votes"] = json!({"up": item["up"], "down": item["down"]});
     let (id, version, sha) = (text(&item, "id"), text(&item, "version"), text(&item, "sha256"));
-    let (thumbnail, download) = (format!("/media/{sha}.jpg"), format!("/repo/packages/{id}/{version}.wpak"));
+    let (thumbnail, download) =
+        (format!("/media/{sha}.jpg"), format!("/r/{}/packages/{id}/{version}.wpak", text(&item, "repo")));
     (item["thumbnail"], item["download"]) = (thumbnail.into(), download.into());
     item.as_object_mut()
         .into_iter()
@@ -87,14 +88,15 @@ fn pattern(q: &str) -> (&'static str, String) {
     }
 }
 
-pub fn search(c: &Connection, s: &Search) -> Res<(Vec<Value>, Option<String>)> {
+pub fn search(c: &Connection, repo: &str, s: &Search) -> Res<(Vec<Value>, Option<String>)> {
     let limit = s.limit.unwrap_or(24).clamp(1, 100) as usize;
     let cursor = B64.decode(&s.cursor).ok().and_then(|b| String::from_utf8(b).ok()).unwrap_or_default();
     let after = cursor.split_once(':').and_then(|(a, b)| Some((a.parse().ok()?, b.parse().ok()?)));
     let (at, row): (i64, i64) = after.unwrap_or((i64::MAX, i64::MAX));
     let (mode, pattern) = pattern(&s.q);
     let featured = if s.featured.is_empty() || s.featured == "false" { "" } else { "1" };
-    let values = params![mode, pattern, s.kind, at, row, limit as i64 + 1, s.content, s.facet, featured];
+    let values =
+        params![mode, pattern, s.kind, at, row, limit as i64 + 1, s.content, s.facet, featured, repo];
     let mut found = rows(c, &format!("{SELECT}{NEWEST}"), values)?;
     let more = found.len() > limit;
     found.truncate(limit);
@@ -103,16 +105,16 @@ pub fn search(c: &Connection, s: &Search) -> Res<(Vec<Value>, Option<String>)> {
     Ok((found.into_iter().map(shape).collect(), next))
 }
 
-pub fn details(c: &Connection, id: &str) -> Res<(Value, Vec<Value>)> {
+pub fn details(c: &Connection, repo: &str, id: &str) -> Res<(Value, Vec<Value>)> {
     let sql = format!(
-        "{SELECT} WHERE v.package_id = ?1 AND v.state = 'published' ORDER BY v.published_at DESC, v.id DESC"
+        "{SELECT} WHERE v.repo = ?2 AND v.package_id = ?1 AND v.state = 'published' ORDER BY v.published_at DESC, v.id DESC"
     );
-    let versions: Vec<Value> = rows(c, &sql, [id])?.into_iter().map(shape).collect();
+    let versions: Vec<Value> = rows(c, &sql, [id, repo])?.into_iter().map(shape).collect();
     let latest = versions.first().cloned().ok_or_else(|| Problem::missing("package"))?;
     Ok((latest, versions))
 }
 
-async fn list(State(app): St, Query(s): Query<Search>) -> Res<impl IntoResponse> {
+async fn list(State(app): St, sc: Scope, Query(s): Query<Search>) -> Res<impl IntoResponse> {
     let encode = |text: &str| utf8_percent_encode(text, NON_ALPHANUMERIC).to_string();
     let filters = [
         ("q", encode(&s.q)),
@@ -122,22 +124,23 @@ async fn list(State(app): St, Query(s): Query<Search>) -> Res<impl IntoResponse>
         ("featured", encode(&s.featured)),
         ("limit", s.limit.map(|l| l.to_string()).unwrap_or_default()),
     ];
-    let (items, next) = app.db.run(move |c| search(c, &s)).await?;
+    let repo = sc.repo.clone();
+    let (items, next) = app.db.run(move |c| search(c, &sc.repo, &s)).await?;
     let link = next.as_ref().map(|cursor| {
         let rest: String =
             filters.iter().filter(|(_, v)| !v.is_empty()).map(|(k, v)| format!("&{k}={v}")).collect();
-        format!("</api/v1/catalog?cursor={cursor}{rest}>; rel=\"next\"")
+        format!("</api/v1/r/{repo}/catalog?cursor={cursor}{rest}>; rel=\"next\"")
     });
     Ok((link.map(|l| [(header::LINK, l)]), Json(json!({"items": items, "next_cursor": next}))))
 }
 
-async fn package(State(app): St, Path(id): Path<String>) -> Reply {
-    let (mut latest, versions) = app.db.run(move |c| details(c, &id)).await?;
+async fn package(State(app): St, sc: Scope) -> Reply {
+    let (mut latest, versions) = app.db.run(move |c| details(c, &sc.repo, &sc.id)).await?;
     latest["versions"] = versions.iter().map(|v| v["version"].clone()).collect();
     Ok(Json(latest))
 }
 
-async fn versions(State(app): St, Path(id): Path<String>) -> Reply {
-    let (_, versions) = app.db.run(move |c| details(c, &id)).await?;
+async fn versions(State(app): St, sc: Scope) -> Reply {
+    let (_, versions) = app.db.run(move |c| details(c, &sc.repo, &sc.id)).await?;
     Ok(Json(json!({"items": versions})))
 }

@@ -38,7 +38,8 @@ const FACETS: [&str; 8] =
 async fn home(State(app): St, auth: Option<Auth>, Query(s): Query<Search>) -> Res<Markup> {
     let (q, kind, rating, facet) = (s.q.clone(), s.kind.clone(), s.content.clone(), s.facet.clone());
     let picked = !s.featured.is_empty();
-    let (items, next) = app.db.run(move |c| search(c, &s)).await?;
+    let repo = crate::scope::first(&app);
+    let (items, next) = app.db.run(move |c| search(c, &repo, &s)).await?;
     let encode = |text: &str| utf8_percent_encode(text, NON_ALPHANUMERIC).to_string();
     let body = html! {
         form role="search" method="get" action="/" {
@@ -80,8 +81,8 @@ async fn home(State(app): St, auth: Option<Auth>, Query(s): Query<Search>) -> Re
 }
 
 async fn package(State(app): St, auth: Option<Auth>, Path(id): Path<String>) -> Res<Markup> {
-    let key = id.clone();
-    let (latest, versions) = app.db.run(move |c| details(c, &key)).await?;
+    let (key, repo) = (id.clone(), crate::scope::first(&app));
+    let (latest, versions) = app.db.run(move |c| details(c, &repo, &key)).await?;
     let (title, owner) = (text(&latest, "title"), latest["owner"].as_str().unwrap_or(t("a deleted account")));
     let render = if latest["content"].is_null() { markup::verbatim } else { markup::html };
     let description = render(text(&latest, "description"));

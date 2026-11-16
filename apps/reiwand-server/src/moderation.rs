@@ -14,18 +14,18 @@ use serde::Deserialize;
 use serde_json::{Value, json};
 
 pub fn routes() -> Router {
-    Router::new()
+    let router = Router::new()
         .route("/api/v1/mod/queue", get(queue))
         .route("/api/v1/mod/cases/{id}/decision", post(decision))
         .route("/api/v1/mod/blocklist", get(blocklist).post(block))
         .route("/api/v1/mod/blocklist/{sha256}", delete(unblock))
-        .route("/api/v1/mod/audit", get(audit_log))
-        .route("/api/v1/packages/{id}/reports", post(report))
+        .route("/api/v1/mod/audit", get(audit_log));
+    crate::scope::both(router, "/api/v1/packages/{id}/reports", post(report))
 }
 
 pub fn open_cases(c: &Connection) -> Res<Vec<Value>> {
     let sql = concat!(
-        "SELECT c.id, c.reason, c.detail, c.priority, c.created_at, v.package_id AS package, \
+        "SELECT c.id, c.reason, c.detail, c.priority, c.created_at, v.package_id AS package, v.repo, \
                v.version, v.title, v.kind, v.state, v.sha256, v.license, v.signer, v.asks, v.photosensitive, \
                v.content, u.handle AS uploader, \
                (SELECT m.state FROM mail_queue m WHERE m.case_id = c.id ORDER BY m.id DESC LIMIT 1) AS mailed, ",
@@ -57,7 +57,7 @@ struct Report {
 async fn report(
     State(app): St,
     client: Client,
-    Path(id): Path<String>,
+    sc: crate::scope::Scope,
     Input(r): Input<Report>,
 ) -> Res<impl IntoResponse> {
     app.limits.take(&REPORT, &client.key())?;
@@ -68,12 +68,12 @@ async fn report(
     )?;
     require(r.details.chars().count() <= 4000, "details: at most 4000 characters")?;
     let detail = format!("{}: {}", r.category, r.details.trim());
-    let latest = "SELECT id FROM versions WHERE package_id = ?1 AND state = 'published' \
+    let latest = "SELECT id FROM versions WHERE repo = ?2 AND package_id = ?1 AND state = 'published' \
                   ORDER BY published_at DESC LIMIT 1";
     let insert = "INSERT INTO cases (version_id, reason, detail, priority, created_at) \
                   VALUES (?1, 'report', ?2, 1, ?3)";
     let case = app.db.run(move |c| {
-        let version: Option<i64> = c.query_row(latest, [&id], |r| r.get(0)).optional()?;
+        let version: Option<i64> = c.query_row(latest, [&sc.id, &sc.repo], |r| r.get(0)).optional()?;
         c.execute(insert, params![version.ok_or_else(|| Problem::missing("package"))?, detail, now()])?;
         Ok(c.last_insert_rowid())
     });

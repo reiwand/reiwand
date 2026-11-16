@@ -22,7 +22,7 @@ fn state_text(state: &str) -> &str {
 fn change(v: &Value) -> Markup {
     let (id, version, now) = (text(v, "package"), text(v, "version"), text(v, "visibility"));
     let other = if now == "public" { "unlisted" } else { "public" };
-    html! { form method="post" action={ "/api/v1/me/packages/" (id) "/visibility?back=/account" } {
+    html! { form method="post" action={ "/api/v1/r/" (text(v, "repo")) "/me/packages/" (id) "/visibility?back=/account" } {
         input type="hidden" name="version" value=(version);
         input type="hidden" name="visibility" value=(other);
         button.boton { (tf("Make {}", &[&word(other)])) }

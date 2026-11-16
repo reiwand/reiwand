@@ -59,24 +59,28 @@ pub async fn record(app: &App, user: i64, upload: &str, sha: &str, size: i64, re
         serde_json::to_string(&report.tags)?,
         serde_json::to_string(&report.authors)?,
     );
+    let first = crate::scope::first(app);
     let stored = app.db.run(move |c| {
         let (tx, r) = (c.transaction()?, report);
-        let owner: Option<Option<i64>> = one(&tx, "SELECT owner_id FROM packages WHERE id = ?1", [&r.id])?;
+        let repo: String = one(&tx, "SELECT repo FROM uploads WHERE id = ?1", [&upload])?.unwrap_or_default();
+        let repo = if repo.is_empty() { first } else { repo };
+        let owner: Option<Option<i64>> =
+            one(&tx, "SELECT owner_id FROM packages WHERE repo = ?2 AND id = ?1", [&r.id, &repo])?;
         if owner.is_some_and(|o| o != Some(user)) {
             return Err(Problem::forbidden("this package id belongs to another account"));
         }
-        let sql = "INSERT OR IGNORE INTO packages (id, owner_id, created_at) VALUES (?1, ?2, ?3)";
-        tx.execute(sql, params![r.id, user, now()])?;
+        let sql = "INSERT OR IGNORE INTO packages (id, owner_id, created_at, repo) VALUES (?1, ?2, ?3, ?4)";
+        tx.execute(sql, params![r.id, user, now(), repo])?;
         let known =
-            rows(&tx, "SELECT version FROM versions WHERE package_id = ?1 AND state != 'rejected'", [&r.id])?;
+            rows(&tx, "SELECT version FROM versions WHERE repo = ?2 AND package_id = ?1 AND state != 'rejected'", [&r.id, &repo])?;
         let newest = known.iter().filter_map(|v| Version::parse(v["version"].as_str()?).ok()).max();
         if let Some(newest) = newest.filter(|n| *n >= version) {
             return Err(Problem::conflict("version", format!("upload a version newer than {newest}")));
         }
-        let sql = "INSERT INTO versions (package_id, version, sha256, size, kind, title, description, \
+        let sql = "INSERT INTO versions (repo, package_id, version, sha256, size, kind, title, description, \
                    license, tags, authors, state, uploaded_by, created_at, content, photosensitive, facets, \
                    signer, asks) \
-                   VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, 'pending', ?11, ?12, ?13, ?14, ?15, ?16, ?17)";
+                   VALUES (?18, ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, 'pending', ?11, ?12, ?13, ?14, ?15, ?16, ?17)";
         let (id, number, title, text, license, kind) =
             (r.id, r.version, r.title, r.description, r.license, r.kind.to_string());
         let (content, flashing, facets) = (r.content, r.photosensitive, serde_json::to_string(&r.facets)?);
@@ -98,7 +102,8 @@ pub async fn record(app: &App, user: i64, upload: &str, sha: &str, size: i64, re
             flashing,
             facets,
             signer,
-            asks
+            asks,
+            repo
         ];
         tx.execute(sql, values)?;
         let version = tx.last_insert_rowid();

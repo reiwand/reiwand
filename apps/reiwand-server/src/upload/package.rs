@@ -30,7 +30,7 @@ pub(super) async fn package(app: &App, form: &mut Multipart, id: &str, room: u64
         let next = tokio::time::timeout(wait, form.next_field()).await.map_err(late)?;
         let Some(mut field) = next.map_err(|e| Problem::bad(e.body_text()))? else { break };
         if field.name() != Some("package") {
-            let named = field.name() == Some("visibility");
+            let named = field.name().map(String::from);
             let skip = async {
                 let mut kept = Vec::new();
                 while let Some(chunk) = field.chunk().await.map_err(|e| Problem::bad(e.body_text()))? {
@@ -40,7 +40,12 @@ pub(super) async fn package(app: &App, form: &mut Multipart, id: &str, room: u64
                 Ok::<_, Problem>(kept)
             };
             let kept = tokio::time::timeout(wait, skip).await.map_err(late)??;
-            if named {
+            if named.as_deref() == Some("repo") {
+                let name = crate::scope::resolve(app, String::from_utf8_lossy(&kept).trim())?.name.clone();
+                let (key, sql) = (id.to_string(), "UPDATE uploads SET repo = ?2 WHERE id = ?1");
+                app.db.run(move |c| Ok(c.execute(sql, params![key, name])?)).await?;
+            }
+            if named.as_deref() == Some("visibility") {
                 let shown = super::listed(Some(String::from_utf8_lossy(&kept).trim()))?;
                 let (key, sql) = (id.to_string(), "UPDATE uploads SET listed = ?2 WHERE id = ?1");
                 app.db.run(move |c| Ok(c.execute(sql, params![key, shown])?)).await?;

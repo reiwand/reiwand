@@ -56,7 +56,7 @@ struct View {
 
 async fn render(app: &Arc<App>, auth: &Auth, view: View) -> Res<Response> {
     let facts = collect(app).await?;
-    let (info, settings) = (app.repo.info(&app.cfg), app.settings());
+    let (info, settings) = (app.repos.first().info(&app.cfg), app.settings());
     let featured =
         app.db.run(|c| one::<i64>(c, "SELECT COUNT(*) FROM featured", [])).await?.unwrap_or_default();
     let failed = view.failed.or_else(|| facts.sign_failed.as_ref().map(|f| f.1.clone()));

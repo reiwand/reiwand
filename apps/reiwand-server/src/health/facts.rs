@@ -97,7 +97,7 @@ type Later = (Option<i64>, Option<(i64, String)>);
 fn later(c: &mut rusqlite::Connection) -> Res<Later> {
     let report = "SELECT MAX(created_at) FROM cases WHERE state = 'open' AND reason IN ('report', 'notice')";
     let report = one::<Option<i64>>(c, report, [])?.flatten();
-    let failed = "SELECT failed_at, failed_raw FROM repo_state WHERE failed_at IS NOT NULL";
+    let failed = "SELECT failed_at, failed_raw FROM repos WHERE failed_at IS NOT NULL";
     let failed = rows(c, failed, [])?.into_iter().next().map(|r| {
         (r["failed_at"].as_i64().unwrap_or_default(), r["failed_raw"].as_str().unwrap_or_default().to_owned())
     });
@@ -105,9 +105,10 @@ fn later(c: &mut rusqlite::Connection) -> Res<Later> {
 }
 
 pub async fn collect(app: &App) -> Res<Facts> {
+    let first_repo = app.repos.first().name.clone();
     let (cases, reports, invites, first, packages, signed, published, full) = app
         .db
-        .run(|c| {
+        .run(move |c| {
             let n = |sql: &str| one::<i64>(c, sql, []).map(Option::unwrap_or_default);
             let first = one::<Option<i64>>(
                 c,
@@ -115,7 +116,8 @@ pub async fn collect(app: &App) -> Res<Facts> {
                 [now()],
             )?
             .flatten();
-            let signed = one::<i64>(c, "SELECT signed_at FROM repo_state", [])?.unwrap_or_default();
+            let signed = one::<i64>(c, "SELECT signed_at FROM repos WHERE name = ?1", [&first_repo])?
+                .unwrap_or_default();
             let published = one::<Option<i64>>(
                 c,
                 "SELECT MAX(published_at) FROM versions WHERE state = 'published'",
@@ -143,7 +145,7 @@ pub async fn collect(app: &App) -> Res<Facts> {
         )
     });
     let (last_report, sign_failed) = app.db.run(later).await?;
-    let info = app.repo.info(&app.cfg);
+    let info = app.repos.first().info(&app.cfg);
     Ok(Facts {
         cert: cert(app),
         sign: info.as_ref().and_then(|i| sign(app, i, signed)),

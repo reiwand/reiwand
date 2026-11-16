@@ -11,7 +11,7 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 const FORMAT: &str = "reiwand-server-backup/1";
-const TREES: [&str; 6] = ["blobs", "thumbs", "private", "held", "keys", "repo"];
+const TREES: [&str; 7] = ["blobs", "thumbs", "private", "held", "keys", "repo", "repos"];
 const FILES: &str = "SELECT 'blobs/' || sha256 || '.wpak' FROM versions WHERE state = 'pending' \
                      UNION SELECT 'thumbs/' || sha256 || '.jpg' FROM versions WHERE state IN ('pending', 'published') \
                      UNION SELECT 'private/' || user_id || '/' || id FROM sync_blobs WHERE received = size";
@@ -56,7 +56,7 @@ fn write(cfg: &Config, dest: &Path) -> Result<()> {
     for path in &missing {
         tracing::warn!("{path} is missing from the data directory and from this backup");
     }
-    for tree in ["held", "keys", "repo"] {
+    for tree in ["held", "keys", "repo", "repos"] {
         copy(&cfg.data.join(tree), &dest.join(tree), tree, &mut files)?;
     }
     let manifest = Manifest { format: FORMAT.into(), created_at: now(), files, missing };
@@ -125,19 +125,9 @@ pub fn restore(cfg: &Config, src: &Path, force: bool) -> Result<()> {
         "{} already holds a database: stop the server and pass --force to replace it",
         cfg.data.display()
     );
-    let repo = cfg.data.join("repo");
-    let root = |dir: &Path| fs::read(dir.join("root/1.json")).ok();
-    let same = root(&repo).is_some_and(|live| root(&src.join("repo")) == Some(live));
-    let seen = latest(&repo).filter(|_| same);
-    for item in fs::read_dir(&repo).into_iter().flatten() {
-        let item = item?;
-        let signed = ["root", "entry", "index", "revoked"].iter().any(|d| item.file_name() == *d);
-        match item.file_type()?.is_dir() {
-            _ if same && signed => {}
-            true => fs::remove_dir_all(item.path())?,
-            false => fs::remove_file(item.path())?,
-        }
-    }
+    let folders = folders(&cfg.data, src);
+    let seen: Vec<(String, Option<u64>)> =
+        folders.iter().map(|f| (f.clone(), clear(&cfg.data, src, f))).collect();
     for path in manifest.files.keys().filter(|p| *p != "reiwand.sqlite") {
         let target = cfg.data.join(path);
         DirBuilder::new().recursive(true).mode(0o700).create(target.parent().context("bad path")?)?;
@@ -150,11 +140,15 @@ pub fn restore(cfg: &Config, src: &Path, force: bool) -> Result<()> {
         let _ = fs::remove_file(format!("{}{suffix}", db.display()));
     }
     fs::rename(&staged, &db)?;
-    if let Some(n) = seen.filter(|n| latest(&repo).is_none_or(|r| r < *n)) {
-        fs::write(repo.join("entry/latest"), format!("{n}\n"))?;
+    for (folder, seen) in seen {
+        let repo = cfg.data.join(folder);
+        if let Some(n) = seen.filter(|n| latest(&repo).is_none_or(|r| r < *n)) {
+            fs::write(repo.join("entry/latest"), format!("{n}\n"))?;
+        }
     }
-    let conn = Connection::open(&db)?;
-    conn.execute("UPDATE repo_state SET dirty = 1", [])?;
+    let mut conn = Connection::open(&db)?;
+    crate::db::create(&mut conn)?;
+    conn.execute("UPDATE repos SET dirty = 1", [])?;
     conn.execute("UPDATE sync_heads SET seq = MAX(seq, ?1), min_seq = MAX(seq, ?1)", [now()])?;
     conn.execute("UPDATE sync_blobs SET received = 0 WHERE received < size", [])?;
     Ok(())
@@ -162,4 +156,33 @@ pub fn restore(cfg: &Config, src: &Path, force: bool) -> Result<()> {
 
 fn latest(repo: &Path) -> Option<u64> {
     fs::read_to_string(repo.join("entry/latest")).ok()?.trim().parse().ok()
+}
+
+fn folders(data: &Path, src: &Path) -> Vec<String> {
+    let mut found = vec!["repo".to_string()];
+    for base in [data, src] {
+        for item in fs::read_dir(base.join("repos")).into_iter().flatten().flatten() {
+            let folder = format!("repos/{}", item.file_name().to_string_lossy());
+            if !found.contains(&folder) {
+                found.push(folder);
+            }
+        }
+    }
+    found
+}
+
+fn clear(data: &Path, src: &Path, folder: &str) -> Option<u64> {
+    let repo = data.join(folder);
+    let root = |dir: &Path| fs::read(dir.join("root/1.json")).ok();
+    let same = root(&repo).is_some_and(|live| root(&src.join(folder)) == Some(live));
+    let seen = latest(&repo).filter(|_| same);
+    for item in fs::read_dir(&repo).into_iter().flatten().flatten() {
+        let signed = ["root", "entry", "index", "revoked"].iter().any(|d| item.file_name() == *d);
+        match item.file_type().is_ok_and(|t| t.is_dir()) {
+            _ if same && signed => {}
+            true => drop(fs::remove_dir_all(item.path())),
+            false => drop(fs::remove_file(item.path())),
+        }
+    }
+    seen
 }

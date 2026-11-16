@@ -1,6 +1,6 @@
-use crate::App;
 use crate::db::{DAY, HOUR, now};
 use crate::error::{Problem, Res};
+use crate::{App, repo::Repo};
 use reiwand_format::Published;
 use rusqlite::params;
 use std::fs;
@@ -29,27 +29,40 @@ pub fn spawn(app: Arc<App>) {
 }
 
 pub async fn republish(app: &Arc<App>, force: bool) -> Res<Option<Published>> {
-    if !app.repo.ready() {
-        return Ok(None);
+    let (mut first, mut failure) = (None, None);
+    for (n, repo) in app.repos.ready().into_iter().enumerate() {
+        match republish_one(app, repo, force).await {
+            Ok(published) if n == 0 => first = published,
+            Ok(_) => {}
+            Err(e) => failure = failure.or(Some(e)),
+        }
     }
-    let sql = "SELECT dirty, signed_at FROM repo_state";
+    failure.map_or(Ok(first), Err)
+}
+
+async fn republish_one(app: &Arc<App>, repo: Arc<Repo>, force: bool) -> Res<Option<Published>> {
+    let name = repo.name.clone();
+    let sql = "SELECT dirty, signed_at FROM repos WHERE name = ?1";
     let (dirty, signed) = app
         .db
-        .run(move |c| Ok(c.query_row(sql, [], |r| Ok((r.get::<_, bool>(0)?, r.get::<_, i64>(1)?)))?))
+        .run({
+            let name = name.clone();
+            move |c| Ok(c.query_row(sql, [name], |r| Ok((r.get::<_, bool>(0)?, r.get::<_, i64>(1)?)))?)
+        })
         .await?;
     let t = now();
     if !force && !dirty && t - signed < app.cfg.resign_hours as i64 * HOUR {
         return Ok(None);
     }
-    app.db.run(|c| Ok(c.execute("UPDATE repo_state SET dirty = 0", [])?)).await?;
-    let shared = app.clone();
-    let published =
-        tokio::task::spawn_blocking(move || shared.repo.publish(shared.cfg.entry_days, t)).await?;
-    let sql = "UPDATE repo_state SET dirty = MAX(dirty, ?1), signed_at = IIF(?1, signed_at, ?2), \
-               failed_at = IIF(?1, ?2, NULL), failed_raw = ?3";
+    let reset = name.clone();
+    app.db.run(move |c| Ok(c.execute("UPDATE repos SET dirty = 0 WHERE name = ?1", [reset])?)).await?;
+    let days = app.cfg.entry_days;
+    let published = tokio::task::spawn_blocking(move || repo.publish(days, t)).await?;
+    let sql = "UPDATE repos SET dirty = MAX(dirty, ?1), signed_at = IIF(?1, signed_at, ?2), \
+               failed_at = IIF(?1, ?2, NULL), failed_raw = ?3 WHERE name = ?4";
     let raw = published.as_ref().err().map(|e| format!("{e:#}"));
     let failed = raw.is_some();
-    app.db.run(move |c| Ok(c.execute(sql, params![failed, t, raw])?)).await?;
+    app.db.run(move |c| Ok(c.execute(sql, params![failed, t, raw, name])?)).await?;
     if failed {
         crate::mail::rewatch(app);
     }

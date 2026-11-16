@@ -131,10 +131,10 @@ fn backups_hold_exactly_the_files_their_database_names() {
     let (cfg, sha) = (app.cfg.clone(), "ab".repeat(32));
     let conn = rusqlite::Connection::open(cfg.data.join("db/reiwand.sqlite")).unwrap();
     let sql = "INSERT INTO users (handle, role, quota_bytes, created_at) VALUES ('ana', 'user', 1, 0);
-               INSERT INTO packages (id, owner_id, created_at) VALUES ('org.example.dawn', 1, 0);";
+               INSERT INTO packages (repo, id, owner_id, created_at) VALUES ('main', 'org.example.dawn', 1, 0);";
     conn.execute_batch(sql).unwrap();
-    let sql = "INSERT INTO versions (package_id, version, sha256, size, kind, title, description, license, tags, \
-               authors, state, uploaded_by, created_at) VALUES ('org.example.dawn', '1.0.0', ?1, 1, 'image', 't', \
+    let sql = "INSERT INTO versions (repo, package_id, version, sha256, size, kind, title, description, license, tags, \
+               authors, state, uploaded_by, created_at) VALUES ('main', 'org.example.dawn', '1.0.0', ?1, 1, 'image', 't', \
                'd', 'CC0-1.0', '[]', '[]', 'pending', 1, 0)";
     conn.execute(sql, [&sha]).unwrap();
     for name in
@@ -166,7 +166,7 @@ fn a_database_of_another_version_is_refused_and_left_untouched() {
     let path = dir.path().join("reiwand.sqlite");
     drop(crate::db::Db::open(&path).unwrap());
     let raw = rusqlite::Connection::open(&path).unwrap();
-    for other in [crate::db::SCHEMA_VERSION - 1, crate::db::SCHEMA_VERSION + 1] {
+    for other in [crate::db::MIN_SCHEMA - 1, crate::db::SCHEMA_VERSION + 1] {
         raw.pragma_update(None, "user_version", other).unwrap();
         let error = crate::db::Db::open(&path).err().unwrap().to_string();
         assert!(error.contains("another version of the program"), "{error}");
@@ -174,8 +174,6 @@ fn a_database_of_another_version_is_refused_and_left_untouched() {
         assert_eq!(kept, other);
     }
     raw.pragma_update(None, "user_version", crate::db::SCHEMA_VERSION).unwrap();
-    let state: i64 = raw.query_row("SELECT count(*) FROM repo_state", [], |r| r.get(0)).unwrap();
-    assert_eq!(state, 1);
     assert!(crate::db::Db::open(&path).is_ok());
     let other = dir.path().join("other.sqlite");
     rusqlite::Connection::open(&other).unwrap().execute_batch("CREATE TABLE x (y);").unwrap();
@@ -194,5 +192,5 @@ fn the_schema_is_the_one_earlier_builds_wrote() {
         .query_map([], |r| Ok(format!("-- {}\n{};\n", r.get::<_, String>(0)?, r.get::<_, String>(1)?)));
     let text = rows.unwrap().collect::<Result<Vec<_>, _>>().unwrap().join("\n");
     let hash: String = sha2::Sha256::digest(text.as_bytes()).iter().map(|b| format!("{b:02x}")).collect();
-    assert_eq!(hash, "48520840cb753eb20d05fa06f2bba9f53adf8b3e2fc24058eefd818dc634cebf");
+    assert_eq!(hash, "5952864292ff4cf4ca47467d70cd234965dc2b2fff7a10d0fb4efe827d0ae4fa");
 }

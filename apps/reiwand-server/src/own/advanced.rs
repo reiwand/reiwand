@@ -47,7 +47,7 @@ fn keys(app: &App, author: i64, list: &[Value]) -> Markup {
         .collect();
     html! {
         (subheading(t("Author keys")))
-        @if app.repo.online() {
+        @if app.repos.first().online() {
             p.texto { (tm("Public minisign keys that sign your packages. Clients trust the key that signed the first \
                 version they installed of each package, so a new key needs a rotation signed by the old \
                 one: {}", &[html! { code { "reiwand-ctl pack rotate-key OLD.key NEW.pub --author " (crate::repo::author(author)) } }])) }
@@ -59,7 +59,7 @@ fn keys(app: &App, author: i64, list: &[Value]) -> Markup {
             (field(t("Public key"), html! { input name="public_key" required; }, None, None))
             (form_actions(button(Kind::Plain, t("Add key"))))
         }
-        @if app.repo.online() {
+        @if app.repos.first().online() {
             form.formulario method="post" action="/api/v1/me/author-keys/rotate?back=/account" {
                 (field(t("Old key fingerprint"), html! { input name="from" required pattern="[0-9a-f]{64}"; }, None, None))
                 (field(t("New public key"), html! { input name="public_key" required; }, None, None))

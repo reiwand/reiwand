@@ -23,10 +23,10 @@ pub struct Shown {
 pub struct Band(RwLock<Option<Arc<Shown>>>);
 
 const NEWEST: &str = "SELECT v.id, v.sha256, v.title, u.handle, v.band_sheet FROM versions v \
-                      JOIN packages p ON p.id = v.package_id LEFT JOIN users u ON u.id = p.owner_id \
+                      JOIN packages p ON p.repo = v.repo AND p.id = v.package_id LEFT JOIN users u ON u.id = p.owner_id \
                       WHERE v.state = 'published' AND v.listed = 1 AND v.content = 'general' \
                       AND p.hidden IS NULL AND v.id = (SELECT w.id FROM versions w \
-                      WHERE w.package_id = v.package_id AND w.state = 'published' AND w.listed = 1 \
+                      WHERE w.repo = v.repo AND w.package_id = v.package_id AND w.state = 'published' AND w.listed = 1 \
                       ORDER BY w.published_at DESC, w.id DESC LIMIT 1) \
                       ORDER BY v.published_at DESC, v.id DESC LIMIT 1";
 

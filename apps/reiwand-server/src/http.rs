@@ -25,6 +25,7 @@ pub fn router(app: Arc<App>) -> Router {
         crate::mod_page::routes,
         crate::mod_case::routes,
         admin::routes,
+        crate::admin_repos::routes,
         crate::health::routes,
         crate::people::routes,
         sync::routes,
@@ -50,6 +51,7 @@ pub fn router(app: Arc<App>) -> Router {
         .route("/readyz", get(crate::discovery::ready))
         .route("/.well-known/reiwand-server", get(crate::discovery::discovery))
         .route("/repo/{*path}", get(served::serve))
+        .route("/r/{repo}/{*path}", get(served::serve))
         .fallback(|| async { Problem::missing("page") })
         .layer(middleware::from_fn_with_state(app.clone(), guard))
         .layer(DefaultBodyLimit::max(1 << 20))
@@ -126,7 +128,7 @@ async fn guard(State(app): St, req: Request, next: Next) -> Response {
                 .into_response()
         }),
     };
-    let api = ["/api/", "/repo/", "/.well-known/"].iter().any(|p| path.starts_with(p));
+    let api = ["/api/", "/repo/", "/r/", "/.well-known/"].iter().any(|p| path.starts_with(p));
     if form || !api {
         response = crate::result::screen(&app, response, form, back.as_deref()).await;
     }
@@ -142,8 +144,13 @@ async fn guard(State(app): St, req: Request, next: Next) -> Response {
 }
 
 fn secure(app: &App, method: &Method, path: &str, signed: bool, response: &mut Response) {
+    let scoped = path.strip_prefix("/api/v1/r/").and_then(|rest| rest.split_once('/')).map(|(_, rest)| rest);
+    let public = ["catalog", "packages/"].iter().any(|p| scoped.is_some_and(|rest| rest.starts_with(p)));
     let open = method == Method::GET
-        && ["/repo/", "/media/", "/api/v1/catalog", "/api/v1/packages/"].iter().any(|p| path.starts_with(p))
+        && (public
+            || ["/repo/", "/r/", "/media/", "/api/v1/catalog", "/api/v1/packages/"]
+                .iter()
+                .any(|p| path.starts_with(p)))
         && !path.ends_with("/reports");
     let page =
         response.headers().get(header::CONTENT_TYPE).is_some_and(|v| v.as_bytes().starts_with(b"text/html"));

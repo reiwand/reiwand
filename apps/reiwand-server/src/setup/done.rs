@@ -19,7 +19,12 @@ pub async fn screen(app: &App, auth: Option<Auth>) -> Res<Response> {
     let settings = app.settings();
     let home = settings.network == Network::Home;
     let svg = crate::qr::own_connect_svg(app, None).unwrap_or_default();
-    let repo = app.repo.info(&app.cfg).and_then(|v| v["url"].as_str().map(str::to_owned)).unwrap_or_default();
+    let repo = app
+        .repos
+        .first()
+        .info(&app.cfg)
+        .and_then(|v| v["url"].as_str().map(str::to_owned))
+        .unwrap_or_default();
     let name = settings.repo_name.clone().unwrap_or_else(|| t("Your wallpaper server").into());
     let line = html! {
         p.linea-estado {

@@ -81,15 +81,33 @@ CREATE TABLE author_keys (
   created_at INTEGER NOT NULL
 ) STRICT, WITHOUT ROWID;
 
-CREATE TABLE packages (
-  id TEXT PRIMARY KEY,
-  owner_id INTEGER REFERENCES users ON DELETE SET NULL,
+CREATE TABLE repos (
+  n INTEGER PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  folder TEXT NOT NULL UNIQUE,
+  online_key TEXT NOT NULL,
+  repo_id TEXT,
+  dirty INTEGER NOT NULL DEFAULT 1,
+  signed_at INTEGER NOT NULL DEFAULT 0,
+  failed_at INTEGER,
+  failed_raw TEXT,
   created_at INTEGER NOT NULL
-, hidden TEXT, hidden_at INTEGER) STRICT, WITHOUT ROWID;
+) STRICT;
+
+CREATE TABLE packages (
+  repo TEXT NOT NULL,
+  id TEXT NOT NULL,
+  owner_id INTEGER REFERENCES users ON DELETE SET NULL,
+  created_at INTEGER NOT NULL,
+  hidden TEXT,
+  hidden_at INTEGER,
+  PRIMARY KEY (repo, id)
+) STRICT, WITHOUT ROWID;
 
 CREATE TABLE versions (
   id INTEGER PRIMARY KEY,
-  package_id TEXT NOT NULL REFERENCES packages,
+  repo TEXT NOT NULL,
+  package_id TEXT NOT NULL,
   version TEXT NOT NULL,
   sha256 TEXT NOT NULL,
   size INTEGER NOT NULL,
@@ -102,8 +120,16 @@ CREATE TABLE versions (
   state TEXT NOT NULL CHECK (state IN ('pending', 'published', 'rejected', 'removed', 'revoked')),
   uploaded_by INTEGER REFERENCES users ON DELETE SET NULL,
   created_at INTEGER NOT NULL,
-  published_at INTEGER, content TEXT, photosensitive INTEGER, facets TEXT NOT NULL DEFAULT '[]', listed INTEGER NOT NULL DEFAULT 1, signer TEXT, asks TEXT NOT NULL DEFAULT '[]', band_sheet TEXT,
-  UNIQUE (package_id, version)
+  published_at INTEGER,
+  content TEXT,
+  photosensitive INTEGER,
+  facets TEXT NOT NULL DEFAULT '[]',
+  listed INTEGER NOT NULL DEFAULT 1,
+  signer TEXT,
+  asks TEXT NOT NULL DEFAULT '[]',
+  band_sheet TEXT,
+  UNIQUE (repo, package_id, version),
+  FOREIGN KEY (repo, package_id) REFERENCES packages
 ) STRICT;
 
 CREATE INDEX versions_feed ON versions(state, published_at DESC, id DESC);
@@ -120,7 +146,7 @@ CREATE TABLE uploads (
   version_id INTEGER REFERENCES versions ON DELETE SET NULL,
   created_at INTEGER NOT NULL,
   expires_at INTEGER NOT NULL
-, listed INTEGER NOT NULL DEFAULT 1) STRICT, WITHOUT ROWID;
+, listed INTEGER NOT NULL DEFAULT 1, repo TEXT NOT NULL DEFAULT '') STRICT, WITHOUT ROWID;
 
 CREATE INDEX uploads_user ON uploads(user_id, created_at);
 
@@ -178,14 +204,6 @@ CREATE TABLE audit (
 ) STRICT;
 
 CREATE INDEX audit_at ON audit(at);
-
-CREATE TABLE repo_state (
-  id INTEGER PRIMARY KEY CHECK (id = 1),
-  dirty INTEGER NOT NULL DEFAULT 1,
-  signed_at INTEGER NOT NULL DEFAULT 0
-, failed_at INTEGER, failed_raw TEXT) STRICT;
-
-INSERT INTO repo_state (id) VALUES (1);
 
 CREATE TABLE sync_heads (
   user_id INTEGER PRIMARY KEY REFERENCES users ON DELETE CASCADE,
@@ -254,11 +272,13 @@ CREATE TRIGGER search_removed AFTER DELETE ON versions BEGIN
 END;
 
 CREATE TABLE votes (
-  package_id TEXT NOT NULL REFERENCES packages ON DELETE CASCADE,
+  repo TEXT NOT NULL,
+  package_id TEXT NOT NULL,
   user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
   value INTEGER NOT NULL CHECK (value IN (-1, 1)),
   at INTEGER NOT NULL,
-  PRIMARY KEY (package_id, user_id)
+  PRIMARY KEY (repo, package_id, user_id),
+  FOREIGN KEY (repo, package_id) REFERENCES packages ON DELETE CASCADE
 ) STRICT, WITHOUT ROWID;
 
 CREATE INDEX votes_user ON votes(user_id, at);
@@ -271,9 +291,12 @@ CREATE TABLE vote_changes (
 CREATE INDEX vote_changes_user ON vote_changes(user_id, at);
 
 CREATE TABLE featured (
-  package_id TEXT PRIMARY KEY REFERENCES packages ON DELETE CASCADE,
+  repo TEXT NOT NULL,
+  package_id TEXT NOT NULL,
   note TEXT,
-  at INTEGER NOT NULL
+  at INTEGER NOT NULL,
+  PRIMARY KEY (repo, package_id),
+  FOREIGN KEY (repo, package_id) REFERENCES packages ON DELETE CASCADE
 ) STRICT, WITHOUT ROWID;
 
 CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL) STRICT, WITHOUT ROWID;

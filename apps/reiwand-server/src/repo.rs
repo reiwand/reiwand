@@ -13,18 +13,43 @@ use std::path::{Path, PathBuf};
 use std::sync::{Mutex, PoisonError};
 
 mod listed;
+mod manage;
 
 pub use listed::Shown;
+pub use manage::{import, import_repo, init, init_repo, status, status_repo, statuses, valid_name};
 
 pub struct Repo {
+    pub name: String,
     pub dir: PathBuf,
+    folder: String,
+    key_name: String,
     key: PathBuf,
     lock: Mutex<()>,
 }
 
 impl Repo {
-    pub fn new(data: &Path) -> Repo {
-        Repo { dir: data.join("repo"), key: data.join("keys/online.key"), lock: Mutex::new(()) }
+    pub fn at(data: &Path, name: &str, folder: &str, key_name: &str) -> Repo {
+        let (dir, key) = (data.join(folder), data.join(key_name));
+        Repo {
+            name: name.into(),
+            folder: folder.into(),
+            key_name: key_name.into(),
+            dir,
+            key,
+            lock: Mutex::new(()),
+        }
+    }
+
+    pub fn folder(&self) -> &str {
+        &self.folder
+    }
+
+    pub fn key_name(&self) -> &str {
+        &self.key_name
+    }
+
+    pub fn main(data: &Path) -> Repo {
+        Repo::at(data, "main", "repo", "keys/online.key")
     }
 
     pub fn ready(&self) -> bool {
@@ -124,9 +149,12 @@ impl Repo {
         let entry: Option<Entry> = entry.and_then(|bytes| serde_json::from_slice(&bytes).ok());
         let (entry_version, entry_expires) =
             (entry.as_ref().map(|e| e.version), entry.map(|e| e.expires.to_rfc3339()));
+        let base = if self.folder == "repo" { "/repo/".to_string() } else { format!("/r/{}/", self.name) };
         Some(json!({
-            "repo_id": root.repo_id, "root_version": root.version, "root_signed": root.complete,
-            "url": cfg.url(&format!("/repo/?{}", root.query)), "online_key": self.key.is_file(),
+            "name": self.name, "repo_id": root.repo_id, "root_version": root.version,
+            "root_signed": root.complete, "query": root.query,
+            "url": cfg.url(&format!("{base}?{}", root.query)),
+            "address": cfg.url(&format!("/r/{}/?{}", self.name, root.query)), "online_key": self.key.is_file(),
             "entry_version": entry_version, "entry_expires": entry_expires,
         }))
     }
@@ -136,61 +164,7 @@ pub fn author(user: i64) -> String {
     format!("u{user}")
 }
 
-pub fn init(cfg: &Config, name: &str, require_signature: bool, open: bool) -> anyhow::Result<Keypair> {
-    let repo = Repo::new(&cfg.data);
-    ensure!(!repo.dir.join("root/1.json").exists(), "a repository already exists");
-    let (root, online) = (keygen(None)?, keygen(None)?);
-    let (root_keys, online_keys) = (vec![root.public.clone()], vec![online.public.clone()]);
-    let settings = Settings {
-        name: name.into(),
-        root_keys,
-        online_keys,
-        require_author_signature: require_signature,
-        online_authors: open,
-        ..Settings::default()
-    };
-    reiwand_format::init(&repo.dir, &settings, now() / 1000)?;
-    reiwand_format::sign_root(&repo.dir, &Signer::new(&root.secret, None)?)?;
-    store_key(&repo.key, &online.secret)?;
-    Ok(root)
-}
-
-pub fn import(cfg: &Config, src: &Path, online: Option<&Path>) -> anyhow::Result<RootStatus> {
-    let repo = Repo::new(&cfg.data);
-    DirBuilder::new().recursive(true).mode(0o700).create(repo.dir.join("root"))?;
-    for item in fs::read_dir(src.join("root")).context("the source has no root folder")? {
-        let item = item?;
-        let (dest, bytes) = (repo.dir.join("root").join(item.file_name()), fs::read(item.path())?);
-        match fs::read(&dest) {
-            Ok(stored) => ensure!(stored == bytes, "{} differs from the stored copy", dest.display()),
-            Err(e) if e.kind() == ErrorKind::NotFound => fs::write(&dest, bytes)?,
-            Err(e) => return Err(e.into()),
-        }
-    }
-    if !repo.dir.join("catalog.json").exists() {
-        fs::copy(src.join("catalog.json"), repo.dir.join("catalog.json"))
-            .context("the source has no catalog.json")?;
-    }
-    let status = reiwand_format::status(&repo.dir)?;
-    ensure!(status.complete, "root {} is not signed by enough root keys", status.version);
-    if let Some(path) = online {
-        let secret = fs::read_to_string(path)?;
-        let signer = Signer::new(&secret, None).context("expected an unencrypted minisign secret key")?;
-        let keys = settings(&repo.dir)?.online_keys;
-        ensure!(
-            keys.iter().any(|k| fingerprint(k).is_ok_and(|f| f == signer.fingerprint)),
-            "the key is not the online key of the root"
-        );
-        store_key(&repo.key, &secret)?;
-    }
-    Ok(status)
-}
-
-pub fn status(cfg: &Config) -> anyhow::Result<Value> {
-    Repo::new(&cfg.data).info(cfg).context("no repository yet: run reiwand-server repo init")
-}
-
-fn store_key(path: &Path, secret: &str) -> anyhow::Result<()> {
+pub(crate) fn store_key(path: &Path, secret: &str) -> anyhow::Result<()> {
     DirBuilder::new().recursive(true).mode(0o700).create(path.parent().context("bad key path")?)?;
     let mut file = OpenOptions::new().write(true).create(true).truncate(true).mode(0o600).open(path)?;
     Ok(file.write_all(secret.as_bytes())?)

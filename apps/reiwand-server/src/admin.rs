@@ -110,7 +110,7 @@ pub async fn change_user(app: &crate::App, auth: &Auth, id: i64, e: Edit) -> Res
 
 async fn repo(State(app): St, auth: Auth) -> Reply {
     auth.at_least(Role::Admin)?;
-    Ok(Json(app.repo.info(&app.cfg).unwrap_or(Value::Null)))
+    Ok(Json(app.repos.first().info(&app.cfg).unwrap_or(Value::Null)))
 }
 
 async fn publish(State(app): St, auth: Auth) -> Reply {

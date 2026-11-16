@@ -86,7 +86,7 @@ pub async fn stage(app: &App, visit: bool) -> Res<Stage> {
     }
     let admin =
         app.db.run(|c| one::<i64>(c, "SELECT id FROM users WHERE role = 'admin' LIMIT 1", [])).await?;
-    Ok(match (admin, app.repo.ready(), settings.key_pending) {
+    Ok(match (admin, !app.repos.ready().is_empty(), settings.key_pending) {
         (None, _, _) => Stage::Account,
         (_, false, _) => Stage::Repository,
         (_, true, true) => Stage::Key,
@@ -144,7 +144,10 @@ impl App {
     pub(crate) async fn announce(&self) -> anyhow::Result<()> {
         let sql = "SELECT COUNT(*) FROM users WHERE role = 'admin'";
         let admins = self.db.run(move |c| Ok(one::<i64>(c, sql, [])?.unwrap_or_default())).await;
-        if !self.settings().done && admins.map_err(|e| anyhow::anyhow!(e.detail))? > 0 && self.repo.ready() {
+        if !self.settings().done
+            && admins.map_err(|e| anyhow::anyhow!(e.detail))? > 0
+            && !self.repos.ready().is_empty()
+        {
             self.change(|c| crate::settings::put(c, &[("setup", "done")]))
                 .await
                 .map_err(|e| anyhow::anyhow!(e.detail))?;

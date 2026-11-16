@@ -22,12 +22,13 @@ pub async fn decide(app: &Arc<App>, actor: Option<i64>, case: i64, d: Decision) 
     let reason = REASONS.iter().find(|(name, _)| *name == wanted).map(|(_, r)| *r);
     let reason = reason.ok_or_else(|| Problem::bad("reason: malware, license, takedown, broken or other"))?;
     let _turn = app.deciding.lock().await;
-    let sql = "SELECT c.state = 'open', v.id, v.package_id, v.version, v.state, v.sha256, v.uploaded_by \
+    let sql = "SELECT c.state = 'open', v.id, v.package_id, v.version, v.state, v.sha256, v.uploaded_by, v.repo \
                FROM cases c JOIN versions v ON v.id = c.version_id WHERE c.id = ?1";
-    let read =
-        |r: &rusqlite::Row| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?, r.get(6)?));
+    let read = |r: &rusqlite::Row| {
+        Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?, r.get(6)?, r.get(7)?))
+    };
     let row = app.db.run(move |c| Ok(c.query_row(sql, [case], read).optional()?)).await?;
-    let (open, version_id, package, version, state, sha, owner): (
+    let (open, version_id, package, version, state, sha, owner, repo_name): (
         bool,
         i64,
         String,
@@ -35,6 +36,7 @@ pub async fn decide(app: &Arc<App>, actor: Option<i64>, case: i64, d: Decision) 
         String,
         String,
         Option<i64>,
+        String,
     ) = row.ok_or_else(|| Problem::missing("case"))?;
     if !open {
         return Err(Problem::conflict("case_closed", "this case was already decided"));
@@ -52,10 +54,12 @@ pub async fn decide(app: &Arc<App>, actor: Option<i64>, case: i64, d: Decision) 
         true => Ok(Some(to)),
         false => Err(Problem::conflict("version_state", format!("the version is {state}, not {from}"))),
     };
-    let (shared, blob) = (app.clone(), app.cfg.data.join("blobs").join(format!("{sha}.wpak")));
+    let repo = crate::scope::resolve(app, &repo_name)?;
+    let repo_dir = repo.dir.clone();
+    let blob = app.cfg.data.join("blobs").join(format!("{sha}.wpak"));
     let held = |ext: &str| app.cfg.data.join("held").join(format!("{sha}.{ext}"));
     let (id, number, path) = (package.clone(), version.clone(), blob.clone());
-    let hidden = "SELECT p.hidden IS NOT NULL, v.listed = 0 FROM packages p JOIN versions v ON v.package_id = p.id \
+    let hidden = "SELECT p.hidden IS NOT NULL, v.listed = 0 FROM packages p JOIN versions v ON v.repo = p.repo AND v.package_id = p.id \
                   WHERE v.id = ?1";
     let read = |r: &rusqlite::Row| Ok((r.get(0)?, r.get(1)?));
     let (hidden, unlisted): (bool, bool) = app
@@ -65,7 +69,7 @@ pub async fn decide(app: &Arc<App>, actor: Option<i64>, case: i64, d: Decision) 
         .unwrap_or_default();
     let shown = crate::repo::Shown { hidden, unlisted };
     let next = match choice {
-        "approve" if !app.repo.ready() => {
+        "approve" if !repo.ready() => {
             return Err(Problem::conflict(
                 "no_repository",
                 "create the repository first: reiwand-server repo init",
@@ -73,7 +77,7 @@ pub async fn decide(app: &Arc<App>, actor: Option<i64>, case: i64, d: Decision) 
         }
         "approve" => {
             let next = needs("pending", "published")?;
-            tokio::task::spawn_blocking(move || shared.repo.add(&path, now(), shown)).await??;
+            tokio::task::spawn_blocking(move || repo.add(&path, now(), shown)).await??;
             next
         }
         "reject" => needs("pending", "rejected")?,
@@ -82,7 +86,7 @@ pub async fn decide(app: &Arc<App>, actor: Option<i64>, case: i64, d: Decision) 
                 if choice == "remove" { ("removed", "Withdrawn") } else { ("revoked", "Revoked") };
             let next = needs("published", to)?;
             let message = format!("{verb} by the moderators of this server.");
-            tokio::task::spawn_blocking(move || shared.repo.revoke(&id, &number, reason, &message)).await??;
+            tokio::task::spawn_blocking(move || repo.revoke(&id, &number, reason, &message)).await??;
             next
         }
         "restore" => {
@@ -94,7 +98,7 @@ pub async fn decide(app: &Arc<App>, actor: Option<i64>, case: i64, d: Decision) 
                     "the withdrawn file was deleted after its retention",
                 ));
             }
-            tokio::task::spawn_blocking(move || shared.repo.restore(&id, &number, &kept, t, shown)).await??;
+            tokio::task::spawn_blocking(move || repo.restore(&id, &number, &kept, t, shown)).await??;
             next
         }
         _ => None,
@@ -111,7 +115,7 @@ pub async fn decide(app: &Arc<App>, actor: Option<i64>, case: i64, d: Decision) 
                            SET state = ?2, published_at = IIF(?2 = 'published', ?3, published_at) \
                            WHERE id = ?1";
             tx.execute(sql, params![version_id, to, t])?;
-            tx.execute("UPDATE repo_state SET dirty = 1 WHERE ?1 != 'rejected'", [to])?;
+            tx.execute("UPDATE repos SET dirty = 1 WHERE name = ?2 AND ?1 != 'rejected'", [to, &repo_name])?;
         }
         let sql = "UPDATE cases \
                        SET state = ?2, decision = ?3, statement = ?4, decided_by = ?5, decided_at = ?6 \
@@ -130,7 +134,7 @@ pub async fn decide(app: &Arc<App>, actor: Option<i64>, case: i64, d: Decision) 
     let shown = shown.await?;
     let data = &app.cfg.data;
     let (package, thumb) = (
-        data.join("repo/packages").join(&package).join(format!("{version}.wpak")),
+        repo_dir.join("packages").join(&package).join(format!("{version}.wpak")),
         data.join("thumbs").join(format!("{sha}.jpg")),
     );
     match next {

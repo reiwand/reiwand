@@ -1,5 +1,6 @@
 mod account;
 mod admin;
+mod admin_repos;
 mod approval;
 mod assets;
 mod auth;
@@ -48,8 +49,10 @@ mod policies;
 pub mod qr;
 mod records;
 mod repo;
+mod repos;
 mod result;
 mod review;
+mod scope;
 mod served;
 mod serving;
 pub mod settings;
@@ -69,7 +72,7 @@ pub use backup::{backup, restore};
 pub use config::Config;
 pub use lang::missed_texts;
 pub use records::SYNC_FORMAT;
-pub use repo::{import, init, status};
+pub use repo::{import, import_repo, init, init_repo, status, status_repo, statuses};
 pub use validate::check;
 
 use axum::serve::{Listener, ListenerExt};
@@ -91,7 +94,7 @@ pub const VERSION: &str = match option_env!("REIWAND_VERSION") {
 pub struct App {
     pub cfg: Config,
     db: db::Db,
-    repo: repo::Repo,
+    repos: repos::Repos,
     limits: net::Limiter,
     hub: mailbox::Hub,
     clients: net::ClientLog,
@@ -116,11 +119,11 @@ impl App {
         let settings = db.read(|c| settings::load(c, &cfg))?;
         let band = db.read(|c| band::Band::open(c, &cfg.data));
         Ok(Arc::new(App {
+            db: db.clone(),
             door: door::Door::new(&cfg, &settings.network)?,
             settings: settings.into(),
             held: Default::default(),
-            db,
-            repo: repo::Repo::new(&cfg.data),
+            repos: repos::Repos::new(db.clone(), cfg.data.clone()),
             limits: net::Limiter::new(cfg.rate_limits),
             hub: mailbox::Hub::default(),
             clients: net::ClientLog::new(&cfg),

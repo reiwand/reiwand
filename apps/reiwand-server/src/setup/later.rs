@@ -16,6 +16,8 @@ use std::sync::PoisonError;
 pub struct Repository {
     name: String,
     #[serde(default)]
+    repo: Option<String>,
+    #[serde(default)]
     online_authors: Option<String>,
 }
 
@@ -25,12 +27,17 @@ pub async fn repository(State(app): St, headers: HeaderMap, Form(f): Form<Reposi
     if name.is_empty() || name.chars().count() > 80 {
         return refused(view::repository(&app, Some(&name)), StatusCode::UNPROCESSABLE_ENTITY);
     }
-    if app.repo.ready() {
+    if !app.repos.ready().is_empty() {
         return Ok(again());
     }
+    let slug = f.repo.as_deref().map(str::trim).filter(|s| !s.is_empty()).unwrap_or("main").to_owned();
+    if !crate::repo::valid_name(&slug) {
+        return refused(view::repository(&app, Some(&name)), StatusCode::UNPROCESSABLE_ENTITY);
+    }
     let (cfg, kept) = (app.cfg.clone(), name.clone());
-    let made =
-        tokio::task::spawn_blocking(move || crate::init(&cfg, &kept, false, f.online_authors.is_some()));
+    let made = tokio::task::spawn_blocking(move || {
+        crate::init_repo(&cfg, &slug, &kept, false, f.online_authors.is_some())
+    });
     let root = made
         .await
         .map_err(Problem::internal)?
@@ -62,8 +69,10 @@ pub async fn saved(State(app): St, headers: HeaderMap, Form(f): Form<Saved>) -> 
 pub async fn again_repo(app: &App) -> Res<()> {
     let data = app.cfg.data.clone();
     tokio::task::spawn_blocking(move || {
-        drop(std::fs::remove_dir_all(data.join("repo")));
-        drop(std::fs::remove_file(data.join("keys/online.key")));
+        for repo in crate::repos::load_data(&data) {
+            drop(std::fs::remove_dir_all(data.join(repo.folder())));
+            drop(std::fs::remove_file(data.join(repo.key_name())));
+        }
     })
     .await
     .map_err(Problem::internal)?;

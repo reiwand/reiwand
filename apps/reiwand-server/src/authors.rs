@@ -12,19 +12,20 @@ use serde_json::json;
 use std::sync::Arc;
 
 async fn dirty(app: &Arc<App>) -> Res<()> {
-    app.db.run(|c| Ok(c.execute("UPDATE repo_state SET dirty = 1", [])?)).await?;
+    let name = app.repos.first().name.clone();
+    app.db.run(move |c| Ok(c.execute("UPDATE repos SET dirty = 1 WHERE name = ?1", [name])?)).await?;
     app.changed().await;
     Ok(())
 }
 
 pub async fn publish(app: &Arc<App>, user: i64, add: Option<String>, gone: Option<String>) -> Res<()> {
-    if !app.repo.online() {
+    if !app.repos.first().online() {
         return Ok(());
     }
     let shared = app.clone();
     let changed = tokio::task::spawn_blocking(move || {
-        add.map(|key| shared.repo.register(user, &key)).transpose()?;
-        gone.map(|fp| shared.repo.drop_key(user, &fp)).transpose()
+        add.map(|key| shared.repos.first().register(user, &key)).transpose()?;
+        gone.map(|fp| shared.repos.first().drop_key(user, &fp)).transpose()
     });
     changed.await.map_err(Problem::internal)??;
     dirty(app).await
@@ -39,7 +40,7 @@ pub struct Rotate {
 
 pub async fn rotate(State(app): St, auth: Auth, Input(r): Input<Rotate>) -> Res<impl IntoResponse> {
     auth.scope("upload")?;
-    require(app.repo.online(), "this repository binds its authors in the root: ask its operator")?;
+    require(app.repos.first().online(), "this repository binds its authors in the root: ask its operator")?;
     let key = reiwand_format::public_key(&r.public_key).map_err(|e| Problem::bad(e.to_string()))?;
     let fp = reiwand_format::fingerprint(&key).map_err(|e| Problem::bad(e.to_string()))?;
     let (user, from) = (auth.user, r.from.clone());
@@ -47,8 +48,9 @@ pub async fn rotate(State(app): St, auth: Auth, Input(r): Input<Rotate>) -> Res<
     let owned = app.db.run(move |c| one::<i64>(c, sql, params![from, user])).await?;
     owned.ok_or_else(|| Problem::missing("author key"))?;
     let (shared, public) = (app.clone(), key.clone());
-    let rotated =
-        tokio::task::spawn_blocking(move || shared.repo.rotate(user, &r.from, &public, &r.signature));
+    let rotated = tokio::task::spawn_blocking(move || {
+        shared.repos.first().rotate(user, &r.from, &public, &r.signature)
+    });
     rotated.await.map_err(Problem::internal)??;
     let (sql, at, id) = (
         "INSERT INTO author_keys (fingerprint, user_id, public_key, created_at) \

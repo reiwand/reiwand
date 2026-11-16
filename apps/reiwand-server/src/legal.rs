@@ -135,16 +135,19 @@ async fn notice(State(app): St, auth: Option<Auth>, client: Client, Form(n): For
     let package = package.filter(|p| !p.is_empty()).map(String::from);
     let package =
         package.ok_or_else(|| Problem::bad("location: the address of a package page on this server"))?;
+    let repo =
+        n.location.split("/r/").nth(1).and_then(|r| r.split_once("/packages/")).map(|(r, _)| r.to_string());
+    let repo = crate::scope::resolve(&app, repo.as_deref().unwrap_or_default())?.name.clone();
     let (receipt, reason) = (hex(&random::<8>()), if n.kind == "counter" { "counter" } else { "notice" });
     let shown = receipt.clone();
-    let latest = "SELECT id FROM versions WHERE package_id = ?1 \
+    let latest = "SELECT id FROM versions WHERE repo = ?2 AND package_id = ?1 \
                   ORDER BY (state = 'published') DESC, created_at DESC";
     let case = "INSERT INTO cases (version_id, reason, detail, priority, created_at) \
                 VALUES (?1, ?2, ?3, ?4, ?5)";
     let notice = "INSERT INTO notices (id, case_id, kind, name, email, location, work, explanation, \
                   signature, received_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)";
     let stored = app.db.run(move |c| {
-        let version: i64 = one(c, latest, [&package])?.ok_or_else(|| Problem::missing("package"))?;
+        let version: i64 = one(c, latest, [&package, &repo])?.ok_or_else(|| Problem::missing("package"))?;
         c.execute(
             case,
             params![version, reason, format!("{}: {}", n.kind, n.explanation.trim()), priority, now()],

@@ -33,7 +33,7 @@ pub const DEVICE_ROW: &str = "DELETE FROM devices WHERE id = ?1 AND user_id = ?2
 const KEYS: &str = "SELECT fingerprint, public_key, created_at FROM author_keys WHERE user_id = ?1";
 const UPLOADS: &str = "SELECT id, state, errors, created_at FROM uploads WHERE user_id = ?1 \
                        AND state != 'done' ORDER BY created_at DESC LIMIT 50";
-const VERSIONS: &str = "SELECT v.package_id AS package, v.version, v.title, v.state, v.created_at, \
+const VERSIONS: &str = "SELECT v.repo, v.package_id AS package, v.version, v.title, v.state, v.created_at, \
                         v.published_at, CASE v.listed WHEN 0 THEN 'unlisted' ELSE 'public' END AS visibility, \
                         c.decision, c.statement FROM versions v \
                         LEFT JOIN cases c ON c.id = (SELECT id FROM cases WHERE version_id = v.id \

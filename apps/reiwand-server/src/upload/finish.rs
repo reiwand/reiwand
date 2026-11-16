@@ -58,7 +58,7 @@ pub(super) async fn finish(app: &Arc<App>, auth: &Auth, id: String) -> Reply {
     let busy = || Problem::conflict("upload_state", "the upload is not complete or was already finalized");
     let (size, sha) = waiting(app, auth.user, &id, "received").await?.ok_or_else(busy)?;
     let thumb = tmp(app, &format!("{id}.jpg"));
-    let checked = match validate(app, auth.user, &tmp(app, &id), &thumb).await {
+    let checked = match validate(app, auth.user, &id, &tmp(app, &id), &thumb).await {
         Ok(report) => record(app, auth.user, &id, &sha, size, report).await,
         Err(problem) => Err(problem),
     };
@@ -67,7 +67,7 @@ pub(super) async fn finish(app: &Arc<App>, auth: &Auth, id: String) -> Reply {
     let trusted = policy == Publish::All || (policy == Publish::Trusted && auth.role >= Role::Trusted);
     match checked {
         Err(problem) => fail(app, &id, &problem.detail).await,
-        Ok(case) if trusted && app.repo.ready() => {
+        Ok(case) if trusted && !app.repos.ready().is_empty() => {
             if let Err(problem) = approve(app, case).await {
                 tracing::warn!(detail = %problem.detail, "automatic publication failed");
             }

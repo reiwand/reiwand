@@ -37,9 +37,13 @@ pub fn repository(app: &App, name: Option<&str>) -> Markup {
                 (field(t("Repository name"), html! {
                     input name="name" required maxlength="80" value=[name] aria-invalid=[error.map(|_| "true")];
                 }, None, error))
-                (fold(t("Advanced"), checkbox(html! { input type="checkbox" name="online_authors" checked; },
+                (fold(t("Advanced"), html! {
+                    (field(t("Address name"), html! { input name="repo" value="main" maxlength="32" pattern="[a-z0-9][a-z0-9\\-]*"; },
+                        Some(t("Lowercase letters, digits and hyphens: it forms the address of the repository on this server.")), None))
+                    (checkbox(html! { input type="checkbox" name="online_authors" checked; },
                     t("Online authors"),
-                    Some(t("Each person adds their author keys from their account, without touching the root key."))), false))
+                    Some(t("Each person adds their author keys from their account, without touching the root key."))))
+                }, false))
                 div { (button(Kind::Primary, t("Create the repository"))) }
             }
         }

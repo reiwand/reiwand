@@ -57,8 +57,10 @@ enum Command {
 enum Repo {
     #[command(about = "Create the repository; prints the root secret key once, keep it offline")]
     Init {
-        #[arg(long)]
+        #[arg(long, help = "Display name of the repository")]
         name: String,
+        #[arg(long, default_value = "main", help = "Address name: the repository lives at /r/NAME/")]
+        repo: String,
         #[arg(long, help = "Accept only packages signed by an author the root lists")]
         require_author_signature: bool,
         #[arg(long, help = "Let accounts register author keys online, trusted per package on first install")]
@@ -67,12 +69,17 @@ enum Repo {
     #[command(about = "Import root files signed offline and, optionally, the online key")]
     Import {
         dir: PathBuf,
+        #[arg(long, default_value = "main", help = "Repository that receives the files")]
+        repo: String,
         #[arg(long)]
         online_key: Option<PathBuf>,
     },
-    #[command(about = "Show the repository state and its share URL")]
-    Status,
-    #[command(about = "Sign and publish the index now")]
+    #[command(about = "Show the state and share URL of a repository, or of all of them")]
+    Status {
+        #[arg(long, help = "Only this repository")]
+        repo: Option<String>,
+    },
+    #[command(about = "Sign and publish the index of every repository now")]
     Publish,
 }
 
@@ -123,21 +130,26 @@ fn run(command: Command) -> Result<String> {
         Command::Migrate => App::open(cfg).map(|_| "The database is ready".into()),
         Command::Healthcheck => healthcheck(cfg.listen.port()).map(|()| String::new()),
         Command::SetupToken => runtime()?.block_on(App::open(cfg)?.setup_token()),
-        Command::Repo(Repo::Init { name, require_author_signature, online_authors }) => {
+        Command::Repo(Repo::Init { name, repo, require_author_signature, online_authors }) => {
             App::open(cfg.clone())?;
-            let root = reiwand_server::init(&cfg, &name, require_author_signature, online_authors)?;
-            let status = reiwand_server::status(&cfg)?;
+            let root =
+                reiwand_server::init_repo(&cfg, &repo, &name, require_author_signature, online_authors)?;
+            let status = reiwand_server::status_repo(&cfg, &repo)?;
             Ok(format!(
                 "Root key fingerprint: {}\n\
                  Store this root secret key offline now, the server does not keep it:\n\n{}\n{status}",
                 root.fingerprint, root.secret
             ))
         }
-        Command::Repo(Repo::Import { dir, online_key }) => {
-            let status = reiwand_server::import(&cfg, &dir, online_key.as_deref())?;
+        Command::Repo(Repo::Import { dir, repo, online_key }) => {
+            let status = reiwand_server::import_repo(&cfg, &repo, &dir, online_key.as_deref())?;
             Ok(format!("Imported root {} of repository {}", status.version, status.repo_id))
         }
-        Command::Repo(Repo::Status) => Ok(reiwand_server::status(&cfg)?.to_string()),
+        Command::Repo(Repo::Status { repo }) => Ok(match repo {
+            Some(name) => reiwand_server::status_repo(&cfg, &name)?,
+            None => reiwand_server::statuses(&cfg)?,
+        }
+        .to_string()),
         Command::Repo(Repo::Publish) => {
             let version = runtime()?
                 .block_on(App::open(cfg)?.publish())?
