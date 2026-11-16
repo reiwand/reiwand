@@ -15,12 +15,18 @@ pub enum Remote {
         #[arg(long, help = JSON)]
         json: bool,
     },
-    #[command(about = "Add a repository by a URL or a folder that carries fingerprint= or repo_id=")]
+    #[command(about = "Add a repository by pasting its address (or a folder)")]
     Add {
         #[arg(
-            help = "URL of the repository, or a folder, followed by its anchor query (?fingerprint=... or ?repo_id=...)"
+            help = "Address of the repository, or a folder; an old address may carry ?fingerprint=... or ?repo_id=..."
         )]
         url: String,
+        #[arg(
+            long,
+            value_name = "FINGERPRINT",
+            help = "Trust the certificate of a home server that has its own, by the fingerprint the first attempt printed"
+        )]
+        trust_certificate: Option<String>,
         #[command(flatten)]
         wait: Wait,
     },
@@ -70,9 +76,14 @@ pub async fn run(client: &Client, command: Remote) -> Result<()> {
     let repos = &client.repos;
     match command {
         Remote::Ls { json } => show::reply(repos.list().await?, json, list)?,
-        Remote::Add { url, wait } => {
+        Remote::Add { url, trust_certificate, wait } => {
             let url = crate::address::repository(&url)?;
-            job(client, repos.add(&url).map_ok(|id| ((), id)), &wait).await?
+            match trust_certificate {
+                Some(print) => {
+                    job(client, repos.add_trusting(&url, &print).map_ok(|id| ((), id)), &wait).await?
+                }
+                None => job(client, repos.add(&url).map_ok(|id| ((), id)), &wait).await?,
+            }
         }
         Remote::Examples { wait } => job(client, repos.add_examples().map_ok(|id| ((), id)), &wait).await?,
         Remote::Refresh { repo, wait } => {
