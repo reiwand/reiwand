@@ -37,6 +37,17 @@ async fn sheet_and_fonts_are_served_by_the_server_itself() {
 }
 
 #[tokio::test]
+async fn the_tab_icon_is_served_and_linked_from_every_page() {
+    let server = start(&[]).await;
+    let (status, headers, svg) = get(&server, "/static/icon.svg", &Who::Nobody).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(headers["content-type"].to_str().unwrap().starts_with("image/svg+xml"));
+    assert!(svg.starts_with("<svg") && svg.contains("#c5162e"));
+    let (_, _, page) = get(&server, "/", &Who::Nobody).await;
+    assert!(page.contains("<link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/icon.svg\">"));
+}
+
+#[tokio::test]
 async fn pages_use_no_other_host_and_no_inline_code() {
     let server = start(&[]).await;
     let admin = server.admin().await;

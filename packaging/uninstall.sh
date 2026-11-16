@@ -17,7 +17,10 @@ rm -f "$PREFIX/bin/reiwandd" "$PREFIX/bin/reiwand-ctl" "$PREFIX/bin/reiwand-app"
   "$DATA_HOME/dbus-1/services/io.github.reiwand.Daemon.service" \
   "$DATA_HOME/dbus-1/services/io.github.reiwand.service" \
   "$DATA_HOME/applications/io.github.reiwand.desktop" \
-  "$DATA_HOME/icons/hicolor/scalable/apps/io.github.reiwand.svg"
+  "$DATA_HOME/icons/hicolor/scalable/apps/io.github.reiwand.svg" \
+  "$DATA_HOME/icons/hicolor/symbolic/apps/io.github.reiwand-symbolic.svg" \
+  "$DATA_HOME/icons/hicolor/symbolic/apps/io.github.reiwand-paused-symbolic.svg" \
+  "$DATA_HOME"/icons/hicolor/*x*/apps/io.github.reiwand.png
 rm -rf "$DATA_HOME/reiwand/kwin-pointer" "$DATA_HOME/reiwand/examples"
 rm -f "$DATA_HOME/reiwand/THIRD-PARTY-NOTICES"
 dbus-send --session --print-reply --dest=org.freedesktop.DBus /org/freedesktop/DBus \

@@ -5,7 +5,7 @@
         "Name": "Reiwand",
         "Description": "Animated and static wallpapers rendered by the Reiwand daemon",
         "Description[es]": "Fondos de pantalla animados y estáticos generados por el servicio de Reiwand",
-        "Icon": "preferences-desktop-wallpaper",
+        "Icon": "io.github.reiwand",
         "License": "GPL-3.0-or-later",
         "Version": "0.3.0",
         "Website": "https://github.com/reiwand/reiwand",

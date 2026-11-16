@@ -6,6 +6,7 @@ pub const CSP: &str = "default-src 'none'; script-src 'self'; style-src 'self'; 
                        img-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'";
 
 const STYLE: &str = include_str!("../assets/style.css");
+const ICON: &str = include_str!("../assets/icon.svg");
 const COPY: &str = include_str!("../assets/copy.js");
 const ONEST: &[u8] = include_bytes!("../assets/fonts/Onest.ttf");
 const RED_HAT_DISPLAY: &[u8] = include_bytes!("../assets/fonts/RedHatDisplay.ttf");
@@ -18,6 +19,12 @@ pub fn routes() -> Router {
         .route(
             "/static/style.css",
             get(|| async { ([(header::CONTENT_TYPE, "text/css"), (header::CACHE_CONTROL, SHORT)], STYLE) }),
+        )
+        .route(
+            "/static/icon.svg",
+            get(|| async {
+                ([(header::CONTENT_TYPE, "image/svg+xml"), (header::CACHE_CONTROL, LONG)], ICON)
+            }),
         )
         .route(
             "/static/copy.js",

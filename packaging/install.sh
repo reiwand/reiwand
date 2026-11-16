@@ -56,6 +56,14 @@ mkdir -p "$DATA_HOME/applications"
 sed "s|@BINDIR@|$BINDIR|g" "$HERE/packaging/dbus/$APP_ID.service" >"$DBUS_DIR/$APP_ID.service"
 sed "s|@BINDIR@|$BINDIR|g" "$HERE/packaging/desktop/$APP_ID.desktop" >"$DATA_HOME/applications/$APP_ID.desktop"
 install -Dm644 "$HERE/packaging/icons/$APP_ID.svg" "$DATA_HOME/icons/hicolor/scalable/apps/$APP_ID.svg"
+for name in "$APP_ID-symbolic" "$APP_ID-paused-symbolic"; do
+  install -Dm644 "$HERE/packaging/icons/$name.svg" "$DATA_HOME/icons/hicolor/symbolic/apps/$name.svg"
+done
+for png in "$HERE"/packaging/icons/hicolor/*/apps/"$APP_ID.png"; do
+  size=$(basename "$(dirname "$(dirname "$png")")")
+  install -Dm644 "$png" "$DATA_HOME/icons/hicolor/$size/apps/$APP_ID.png"
+done
+gtk-update-icon-cache -q -t "$DATA_HOME/icons/hicolor" 2>/dev/null || true
 reload_bus
 
 echo "Installing the KWin pointer script, loaded only while a scene follows the pointer"

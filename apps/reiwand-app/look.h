@@ -19,6 +19,7 @@ inline void installLook(const QString& style, const QString& theme)
     QIcon::setFallbackSearchPaths({});
     QIcon::setFallbackThemeName(theme);
     QIcon::setThemeName(theme);
+    QGuiApplication::setWindowIcon(QIcon(QStringLiteral(":/reiwand/pictures/icon.svg")));
     QQuickStyle::setStyle(style);
 }
 

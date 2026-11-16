@@ -62,7 +62,9 @@ pub fn write(here: &Path, out: &Path) -> PathBuf {
         file(&mut qrc, font, &here.join("fonts").join(font).canonicalize().unwrap());
     }
     qrc.push_str("</qresource>\n<qresource prefix=\"/reiwand/pictures\">\n");
-    file(&mut qrc, "example.jpg", &here.join("pictures/example.jpg").canonicalize().unwrap());
+    for picture in ["example.jpg", "icon.svg"] {
+        file(&mut qrc, picture, &here.join("pictures").join(picture).canonicalize().unwrap());
+    }
     qrc.push_str("</qresource>\n<qresource prefix=\"/qt/qml/io/github/reiwand/style\">\n");
     let mut style: Vec<_> = fs::read_dir(here.join("style")).unwrap().map(|e| e.unwrap().path()).collect();
     style.sort();

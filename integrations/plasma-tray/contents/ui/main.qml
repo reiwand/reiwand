@@ -10,7 +10,7 @@ PlasmoidItem {
     readonly property bool paused: daemon.current.paused === true
     property var asked: ({})
 
-    Plasmoid.icon: paused ? "media-playback-pause" : "preferences-desktop-wallpaper"
+    Plasmoid.icon: paused ? "io.github.reiwand-paused-symbolic" : "io.github.reiwand-symbolic"
     Plasmoid.status: consent.ask.inputs.length > 0 ? PlasmaCore.Types.NeedsAttentionStatus : PlasmaCore.Types.ActiveStatus
     toolTipMainText: "Reiwand"
     toolTipSubText: daemon.lastError || (paused ? i18n("Paused") : i18n("Playing"))

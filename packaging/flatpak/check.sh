@@ -36,6 +36,7 @@ grep -x "Exec=.* --command=/app/bin/reiwand-app --file-forwarding $app @@u %U @@
 grep -x "Icon=$app" "$desktop"
 if grep -q '^DBusActivatable=' "$desktop"; then exit 1; fi
 test -f "$exports/icons/hicolor/scalable/apps/$app.svg"
+test -f "$exports/icons/hicolor/48x48/apps/$app.png"
 grep -qF "content_attribute id=\"sex-nudity\"" "$files/share/metainfo/$app.metainfo.xml"
 test -s "$files/share/licenses/$app/THIRD-PARTY-NOTICES"
 grep -qF "<release version=\"${version%%+*}\"" "$files/share/metainfo/$app.metainfo.xml"

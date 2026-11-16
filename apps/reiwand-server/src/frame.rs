@@ -38,6 +38,7 @@ pub fn render(app: &App, nav: Markup, frame: Frame, body: Markup) -> Markup {
                 meta charset="utf-8";
                 meta name="viewport" content="width=device-width, initial-scale=1";
                 title { (frame.title) " · " (app.cfg.name) }
+                link rel="icon" type="image/svg+xml" href="/static/icon.svg";
                 link rel="stylesheet" href="/static/style.css";
                 @if let Some(s) = &shown { link rel="stylesheet" href={ "/band/" (s.sha) ".css" }; }
                 script src="/static/copy.js" defer {}

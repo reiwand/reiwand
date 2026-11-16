@@ -5,7 +5,7 @@
         "Name": "Reiwand",
         "Description": "Manage the wallpapers rendered by Reiwand",
         "Description[es]": "Gestionar los fondos de pantalla generados por Reiwand",
-        "Icon": "preferences-desktop-wallpaper",
+        "Icon": "io.github.reiwand-symbolic",
         "Category": "System Information",
         "EnabledByDefault": true,
         "License": "GPL-3.0-or-later",

@@ -40,7 +40,7 @@
         android:name=".Reiwand"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/backup"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="${label}"
         android:theme="@style/App">
 

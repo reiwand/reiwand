@@ -48,6 +48,15 @@ sed 's|@BINDIR@|%{_bindir}|g' packaging/dbus/io.github.reiwand.Daemon.service > 
 sed 's|@BINDIR@|%{_bindir}|g' packaging/dbus/io.github.reiwand.service > %{buildroot}%{_datadir}/dbus-1/services/io.github.reiwand.service
 sed 's|@BINDIR@|%{_bindir}|g' packaging/desktop/io.github.reiwand.desktop > %{buildroot}%{_datadir}/applications/io.github.reiwand.desktop
 install -Dm644 packaging/icons/io.github.reiwand.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/io.github.reiwand.svg
+%{_datadir}/icons/hicolor/symbolic/apps/io.github.reiwand-*symbolic.svg
+%{_datadir}/icons/hicolor/*/apps/io.github.reiwand.png
+for name in io.github.reiwand-symbolic io.github.reiwand-paused-symbolic; do
+  install -Dm644 packaging/icons/$name.svg %{buildroot}%{_datadir}/icons/hicolor/symbolic/apps/$name.svg
+done
+for png in packaging/icons/hicolor/*/apps/io.github.reiwand.png; do
+  size=$(basename "$(dirname "$(dirname "$png")")")
+  install -Dm644 "$png" "%{buildroot}%{_datadir}/icons/hicolor/$size/apps/io.github.reiwand.png"
+done
 cp -r plasma-wallpaper %{buildroot}%{_datadir}/plasma/wallpapers/io.github.reiwand
 cp -r plasma-tray %{buildroot}%{_datadir}/plasma/plasmoids/io.github.reiwand.tray
 mkdir -p %{buildroot}%{_datadir}/reiwand

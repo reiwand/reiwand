@@ -3,4 +3,4 @@
     android:description="@string/description"
     android:settingsActivity="io.github.reiwand.Main"
     android:showMetadataInPreview="false"
-    android:thumbnail="@drawable/ic_launcher" />
+    android:thumbnail="@mipmap/ic_launcher" />
