@@ -48,19 +48,19 @@ QtObject {
             "note": Capas.note(running),
             "progress": Capas.bar(running)
         });
-        must(cover.bar.visible && cover.bar.width > 0, "a cover whose layers are being built shows no bar");
+        must(Math.abs(cover.bar.value - 0.42) < 0.001 && cover.bar.width > 0, "a cover whose layers are being built shows no bar: value " + cover.bar.value + ", width " + cover.bar.width);
         cover.progress = Capas.bar(failed);
-        must(!cover.bar.visible, "a cover whose layers failed still shows a bar");
+        must(cover.bar.value < 0, "a cover whose layers failed still shows a bar: value " + cover.bar.value);
         cover.destroy();
         const card = Qt.createComponent("AhoraCapas.qml").createObject(frame, {
             "info": check.screen,
             "jobs": [job("running", 42)]
         });
-        must(card.visible && card.layers.visible && card.layers.text === Capas.note(running), "the screen's card does not show the layer state: " + card.layers.text);
-        must(card.bar.visible && card.bar.value > 0.41, "the screen's card shows no layer bar");
+        must(card.note === Capas.note(running) && card.layers.text === card.note, "the screen's card does not show the layer state: " + card.layers.text);
+        must(card.bar.value > 0.41, "the screen's card shows no layer bar: value " + card.bar.value);
         card.info = still(null);
         card.jobs = [];
-        must(!card.layers.visible && !card.bar.visible, "the screen's card keeps the layer state once the layers are built");
+        must(card.note === "" && card.bar.value < 0, "the screen's card keeps the layer state once the layers are built: " + card.note);
         card.destroy();
         const tasks = Qt.createComponent("AhoraTarea.qml").createObject(frame);
         must(tasks.pick([job("running", 42)]).length === 0, "the task line still lists the layer job");
