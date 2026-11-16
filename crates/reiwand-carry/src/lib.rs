@@ -1,3 +1,4 @@
+mod choice;
 mod device;
 mod error;
 mod merge;
@@ -7,9 +8,10 @@ mod safe;
 mod seal;
 mod write;
 
+pub use choice::{Change, ListMode, Local, Pick, Plan, Preview, Row};
 pub use device::{DEVICE_KEYS, is_device_local, portable};
 pub use error::{Error, Result};
-pub use merge::{Change, ListMode, Local, Pick, Plan, Preview, Row, plan, preview};
+pub use merge::{plan, preview};
 pub use model::{
     Content, Installed, Item, List, Manifest, OwnFile, Provider, Rating, Repository, Secrets, Session,
     Tagging,
