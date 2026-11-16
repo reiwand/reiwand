@@ -4,7 +4,7 @@ use reiwand_core::shortcuts::Shortcuts;
 use std::collections::{HashMap, HashSet};
 use std::sync::{Arc, Mutex};
 use zbus::message::Header;
-use zbus::zvariant::{OwnedObjectPath, OwnedValue, Value};
+use zbus::{OwnedObjectPath, OwnedVariant as OwnedValue, Variant as Value};
 
 #[derive(Default)]
 struct Seen {
