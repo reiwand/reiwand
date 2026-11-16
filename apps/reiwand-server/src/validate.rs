@@ -101,7 +101,7 @@ pub async fn validate(app: &App, user: i64, upload: &str, wpak: &Path, thumb: &P
     let named = upload.to_string();
     let named = app
         .db
-        .run(move |c| Ok(crate::db::one::<String>(c, "SELECT repo FROM uploads WHERE id = ?1", [named])?))
+        .run(move |c| crate::db::one::<String>(c, "SELECT repo FROM uploads WHERE id = ?1", [named]))
         .await?;
     let roots = crate::scope::resolve(app, &named.unwrap_or_default())?.authors();
     if let Some((root_keys, _, false)) = &roots {

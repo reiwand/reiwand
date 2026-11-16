@@ -1,13 +1,10 @@
 use crate::config::Config;
-use crate::db::now;
-use anyhow::{Context, ensure};
-use reiwand_format::{
-    Added, Entry, Keypair, Published, Reason, RootStatus, Settings, Signer, fingerprint, keygen, settings,
-};
+use anyhow::Context;
+use reiwand_format::{Added, Entry, Published, Reason, Signer, fingerprint, settings};
 use serde_json::{Value, json};
 use std::collections::HashSet;
 use std::fs::{self, DirBuilder, OpenOptions};
-use std::io::{ErrorKind, Write};
+use std::io::Write;
 use std::os::unix::fs::{DirBuilderExt, OpenOptionsExt};
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, PoisonError};

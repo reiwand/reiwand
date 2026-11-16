@@ -4,7 +4,7 @@ use crate::error::{Input, Problem};
 use crate::upload::listed;
 use crate::{Reply, Router, St};
 use axum::Json;
-use axum::extract::{Path, State};
+use axum::extract::State;
 use axum::routing::post;
 use rusqlite::params;
 use serde::Deserialize;

@@ -1,4 +1,4 @@
-use super::{Repo, store_key};
+use super::store_key;
 use crate::config::Config;
 use crate::db::now;
 use crate::repos;
