@@ -14,6 +14,10 @@ Coleccion {
 
     signal taken
 
+    function turn(dx, dy) {
+        wheel.turn(dx, dy);
+    }
+
     view: list
     activeFocusOnTab: true
     implicitHeight: list.contentItem.childrenRect.height + 2 * pad
@@ -38,6 +42,13 @@ Coleccion {
         keyNavigationEnabled: true
         boundsBehavior: Flickable.StopAtBounds
         model: row.model
+
+        Rueda {
+            id: wheel
+
+            fila: list
+            onMoved: row.activeFocus || row.forceActiveFocus()
+        }
 
         delegate: Item {
             id: slot

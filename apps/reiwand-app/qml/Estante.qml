@@ -9,35 +9,16 @@ Coleccion {
     property alias currentIndex: list.currentIndex
     readonly property Item ficha: list.currentItem?.ficha ?? null
     readonly property real place: Look.filete + Look.anillo + Look.tapa + Look.huecoEstante
-    readonly property bool turning: still.running
-    property real wheeled: 0
+    readonly property bool turning: wheel.turning
 
     function turn(dx, dy) {
-        const delta = dy !== 0 ? dy : dx;
-        if (delta === 0 || list.count === 0)
-            return;
-        if (wheeled * delta < 0)
-            wheeled = 0;
-        wheeled += delta;
-        still.restart();
-        while (Math.abs(wheeled) >= 120) {
-            const step = wheeled > 0 ? -1 : 1;
-            wheeled -= -step * 120;
-            list.currentIndex = Math.max(0, Math.min(list.count - 1, list.currentIndex + step));
-        }
+        wheel.turn(dx, dy);
     }
 
     view: list
     implicitHeight: Math.max(list.currentItem?.height ?? 0, Math.round(Look.tapaFoco * 9 / 16) + Look.e7 + Look.e4 + Look.filete + Look.anillo)
     Accessible.role: Accessible.List
     Accessible.name: label
-
-    Timer {
-        id: still
-
-        interval: 300
-        onTriggered: estante.wheeled = 0
-    }
 
     Item {
         x: -Look.margen
@@ -68,9 +49,10 @@ Coleccion {
             highlight: Item {
             }
 
-            WheelHandler {
-                target: null
-                onWheel: event => estante.turn(event.angleDelta.x, event.angleDelta.y)
+            Rueda {
+                id: wheel
+
+                fila: list
             }
             model: estante.model
             Keys.onPressed: event => estante.press(event)

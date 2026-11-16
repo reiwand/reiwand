@@ -71,6 +71,21 @@ QtObject {
         expect(!page.all && page.focused === page.recentRow && page.query === "", "Esc goes back from the grid to the row");
     }
 
+    function wheel(page) {
+        const single = page.rows.single;
+        const was = page.focused;
+        single.currentIndex = 0;
+        single.turn(0, -120);
+        single.turn(0, -60);
+        const one = [single.currentIndex, page.focused === single];
+        single.turn(0, -60);
+        single.turn(0, 120 * single.model.length);
+        expect(one.join() + "," + single.currentIndex === "1,true,0", "the wheel does not move a row of Create one card per notch, or does not make it the row in use: " + one.join() + "," + single.currentIndex);
+        single.currentIndex = 0;
+        was.forceActiveFocus();
+        expect(page.focused === was, "the row in use does not come back after the wheel check");
+    }
+
     function builtIn() {
         const real = Qt.createComponent("CreatePage.qml").createObject(host, {
                 "width": 2000
@@ -96,6 +111,7 @@ QtObject {
         expect(first.learn && first.atExamples, "a first visit with examples opens on the examples");
         expect(first.facts.learnModel.length === 1, "the examples are listed");
         builtIn();
+        wheel(empty);
         const tiles = empty.focused;
         tiles.currentIndex = 1;
         empty.foot.rename(true);

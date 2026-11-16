@@ -7,6 +7,7 @@ Column {
     id: band
 
     required property var page
+    readonly property bool scrolls: height > page.low.height - page.foot.height - Look.e4
     readonly property alias scene: scene
     readonly property alias single: single
     readonly property alias extra: extra
@@ -14,6 +15,18 @@ Column {
     readonly property real oneLine: bar.height + spacing + (page.learn ? examples.implicitHeight : Math.max(sceneGroup.implicitHeight, singleGroup.implicitHeight, extraGroup.implicitHeight))
 
     spacing: Look.e4
+
+    // Over the titles and the gaps of the band, the wheel moves through the row in use, unless the band
+    // is taller than its room and the wheel has to scroll it.
+    WheelHandler {
+        target: null
+        enabled: !band.scrolls
+        onWheel: event => {
+            const row = band.page.focused;
+            if (row && row.turn)
+                row.turn(event.angleDelta.x, event.angleDelta.y);
+        }
+    }
 
     RowLayout {
         id: bar
