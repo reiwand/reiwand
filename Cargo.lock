@@ -4283,6 +4283,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "reiwand-carry"
+version = "1.0.0"
+dependencies = [
+ "argon2",
+ "chacha20poly1305",
+ "getrandom 0.4.3",
+ "serde",
+ "serde_json",
+ "sha2 0.11.1",
+ "tempfile",
+ "thiserror 2.0.21",
+ "zeroize",
+ "zip",
+]
+
+[[package]]
 name = "reiwand-client"
 version = "1.0.0"
 dependencies = [
