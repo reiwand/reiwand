@@ -1,11 +1,14 @@
-use crate::{Device, Inpaint, Inpainter, Places, Settings, background, load, threads};
+use crate::build::fitted;
+use crate::{
+    CACHE_BYTES, Device, Inpaint, Inpainter, Places, Settings, background, layers, load, read, save, threads,
+};
 use anyhow::{Context, Result};
 use image::{GrayImage, RgbImage};
 use reiwand_core::Fill;
 use reiwand_core::edit::{Depth, Edit};
 use reiwand_core::message::said;
 use std::path::{Path, PathBuf};
-use std::sync::atomic::AtomicBool;
+use std::sync::atomic::{AtomicBool, Ordering::Relaxed};
 
 pub fn settings(places: &Places, edit: &Edit, fill: Option<Fill>) -> Settings {
     sized(places, edit, fill, crate::EDGE)
@@ -49,5 +52,38 @@ impl Places {
         };
         let inpaint: Option<&mut Inpaint<'_>> = (set.fill == Fill::Lama).then_some(&mut paint);
         self.build_layers((image, sha), (depth, set), inpaint, progress, stop)
+    }
+}
+
+impl Places {
+    pub fn build_layers(
+        &self,
+        (image, sha256): (&Path, &str),
+        (depth, set): (&Depth, &Settings),
+        inpaint: Option<&mut Inpaint<'_>>,
+        progress: &mut dyn FnMut(u64),
+        stop: &AtomicBool,
+    ) -> Result<PathBuf> {
+        let dest = self
+            .layer_set(image, sha256, depth, set)
+            .context(said("depth.the_image_has_no_depth", "the image has no depth map", &[]).local())?;
+        let map = read(
+            &self
+                .find(image, sha256, depth)
+                .context(said("depth.the_image_has_no_depth", "the image has no depth map", &[]).local())?,
+        )?;
+        progress(2);
+        let picture = fitted(crate::files::decode_edge(image, set.edge)?, set.edge);
+        let made = layers(&picture, &map, (depth, set), inpaint, progress, stop);
+        if let Err(e) = &made
+            && !stop.load(Relaxed)
+        {
+            crate::mark_failed(&dest, e);
+        }
+        let made = made?;
+        std::fs::remove_file(crate::failed_of(&dest)).ok();
+        save(&dest, &made)?;
+        self.trim(&dest, CACHE_BYTES)?;
+        Ok(dest)
     }
 }

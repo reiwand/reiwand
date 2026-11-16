@@ -4,16 +4,15 @@ use crate::fill::{push_pull, simple};
 use crate::guided::{Size, refine};
 use crate::matte::{Matte, matte};
 use crate::plan::{Plan, Region};
-use crate::stack::{Band, FORMAT, Info, Layers, Settings, save};
+use crate::stack::{Band, FORMAT, Info, Layers, Settings};
 use crate::windows::{Inpaint, lama};
-use crate::{CACHE_BYTES, Map, Places, adjust, read};
-use anyhow::{Context, Result, bail, ensure};
-use image::{Luma, RgbImage, Rgba, RgbaImage};
+use crate::{Map, adjust};
+use anyhow::{Result, bail, ensure};
+use image::{GrayImage, Luma, RgbImage, Rgba, RgbaImage};
 use reiwand_core::Fill;
 use reiwand_core::edit::Depth;
 use reiwand_core::message::said;
 use reiwand_core::travel::Reach;
-use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering::Relaxed};
 
 pub const VERSION: u32 = 2;
@@ -130,12 +129,25 @@ pub fn layers(
         ensure!(!stop.load(Relaxed), "cancelled");
         let region = plan.region(i);
         let edge = (i > 0).then(|| matte(picture, &plan.masks[i], &below, size));
-        images.push(one(&cx, &region, edge.as_ref(), inpaint.as_deref_mut(), stop)?);
+        let n = plan.parts.count() as u64;
+        let (from, to) = (10 + 90 * i as u64 / n, 10 + 90 * (i as u64 + 1) / n);
+        images.push(match inpaint.as_deref_mut() {
+            Some(paint) => {
+                let (crops, mut done) = (crate::windows::plan(size, &region.band).len() as u64 + 1, 0);
+                let mut counted = |image: &RgbImage, mask: &GrayImage| {
+                    done += 1;
+                    progress(from + (to - from) * done / crops);
+                    paint(image, mask)
+                };
+                one(&cx, &region, edge.as_ref(), Some(&mut counted), stop)?
+            }
+            None => one(&cx, &region, edge.as_ref(), None, stop)?,
+        });
         let pixels = region.band.iter().filter(|b| **b).count();
         bands.push(Band { layer: i, reach: region.reach, pixels });
         safe = safe.min(region.safe);
         below.iter_mut().zip(&plan.masks[i]).for_each(|(b, m)| *b |= *m);
-        progress(10 + 90 * (i as u64 + 1) / plan.parts.count() as u64);
+        progress(to);
     }
     let small = field_size(size);
     let fields: Vec<Map> = plan.fields.iter().map(|f| quantized(f, small)).collect();
@@ -154,37 +166,4 @@ pub fn layers(
         reach: Reach { shift: safe.max(0.0), low: low.clamp(0.0, 1.0), high: high.clamp(0.0, 1.0) },
     };
     Ok(Layers { info, images, fields })
-}
-
-impl Places {
-    pub fn build_layers(
-        &self,
-        (image, sha256): (&Path, &str),
-        (depth, set): (&Depth, &Settings),
-        inpaint: Option<&mut Inpaint<'_>>,
-        progress: &mut dyn FnMut(u64),
-        stop: &AtomicBool,
-    ) -> Result<PathBuf> {
-        let dest = self
-            .layer_set(image, sha256, depth, set)
-            .context(said("depth.the_image_has_no_depth", "the image has no depth map", &[]).local())?;
-        let map = read(
-            &self
-                .find(image, sha256, depth)
-                .context(said("depth.the_image_has_no_depth", "the image has no depth map", &[]).local())?,
-        )?;
-        progress(2);
-        let picture = fitted(crate::files::decode_edge(image, set.edge)?, set.edge);
-        let made = layers(&picture, &map, (depth, set), inpaint, progress, stop);
-        if let Err(e) = &made
-            && !stop.load(Relaxed)
-        {
-            crate::mark_failed(&dest, e);
-        }
-        let made = made?;
-        std::fs::remove_file(crate::failed_of(&dest)).ok();
-        save(&dest, &made)?;
-        self.trim(&dest, CACHE_BYTES)?;
-        Ok(dest)
-    }
 }
