@@ -101,6 +101,10 @@ Every error carries a readable English message. An error raised without a descri
 | `io.github.reiwand.Error.Newer` | A package needs a newer Reiwand: a newer manifest version, a `requires.engine` this version does not meet or a feature of `requires.features` it does not know (see `package.md`) |
 | `io.github.reiwand.Error.FlashingDisabled` | `Apply` of a package that flashes while `playback.allow_flashing` is off (`this wallpaper flashes and flashing wallpapers are disabled; allow flashing in the settings to play it`); turn the setting on and apply again |
 | `io.github.reiwand.Error.Offline` | A provider sync, a repository refresh or a package download could not reach its server: the connection failed or timed out (`no connection: …` for providers) |
+| `io.github.reiwand.Error.CertificateUnknown` | The server of a repository has a certificate from no known authority; the message carries its fingerprint, to confirm with `Repos1.AddTrusting` |
+| `io.github.reiwand.Error.CertificateChanged` | The server of a repository presents another certificate than the one pinned or confirmed; nothing is applied |
+| `io.github.reiwand.Error.SignatureChanged` | A refresh found another `repo_id` at the repository address, or a root that does not chain from the stored one; nothing is applied. `List` adds the warning `SignatureChanged` |
+| `io.github.reiwand.Error.NotARepository` | The address is a server, not a repository; the message names the page with its repositories |
 | `io.github.reiwand.Error.Untrusted` | A repository index or a package failed its check: a signature or key refused, a digest or size that does not match, an index older than the one already seen or that disagrees with it. A security sign, never a network failure |
 | `io.github.reiwand.Error.Unconfirmed` | `Grant`/`GrantPackage` from a caller that must be confirmed: the user is asked in a desktop notification; treat it as pending, not as a failure |
 | `org.freedesktop.DBus.Error.AccessDenied` | `Grant`/`GrantPackage` while the same question rests after the user answered *Not now*, closed the notification or left it unanswered (ten minutes, listed in `GetInputs().quiet`), or with no notification service to ask; `SetPointer` from a caller that may not report the pointer |
@@ -1658,7 +1662,7 @@ as `file_secrets`.
 
 Signed repositories of `.wpak` packages (see `repo.md`), kept in `~/.local/share/reiwand`.
 `repo` arguments take a full repository id or a unique prefix of at least 8 hex digits. Trust is
-anchored by the URL a repository is added with (`fingerprint=` and/or `repo_id=`); repository
+anchored by the first `root/1.json` read at the address it is added with (its hash is the `repo_id`; an old address may carry `fingerprint=` and/or `repo_id=` too); repository
 jobs (`repo_add`, `repo_refresh` and the download of `install`) run one at a time. Requests to
 a repository follow redirects only to its declared bases (the URL it was added with and the
 mirrors of its signed root), never from HTTPS to HTTP. Installed packages are imported into the
@@ -1676,10 +1680,26 @@ read; browsing and installing skip it, and the other repositories keep working.
 
 ### `Add(s url) → (t job)`
 
-Adds a repository whose URL carries its trust anchor. The URL is `https://`, `file://` or
-`http://` to this computer, without user information or fragment. `Exists` at once when its
+Adds a repository by its address. The URL is `https://` with a certificate valid for a public
+authority, `file://` or `http://` to this computer, without user information or fragment; any
+other `http://` is refused with `InvalidArgs`. The query anchor is optional.
+The job fails with `CertificateUnknown` when the server's certificate is not from a known
+authority (the message carries its SHA-256 fingerprint; nothing is pinned), with
+`CertificateChanged` when the origin is already pinned (or was just confirmed) and the server
+presents another one, and with `NotARepository` when the address is a server (it answers
+`/.well-known/reiwand-server` and has no `root/1.json`; the message names its repositories page). `Exists` at once when its
 `repo_id=` names an added repository, or when the job finds it already added; a `broken` one is
 replaced. The job verifies the repository fully and stores its signed state.
+
+### `AddTrusting(s url, s certificate) → (t job)`
+
+Like `Add`, for a home server with its own certificate: `certificate` is the lowercase SHA-256
+fingerprint that the failed `Add` reported as `CertificateUnknown`, which the user confirmed.
+The connection to that origin is accepted only with that certificate, and after the job succeeds
+the fingerprint is kept in `repo-pins.json`, per origin (`scheme://host:port`), for every later
+request to repositories at that origin. A different certificate later makes `Add` and `Refresh`
+fail with `CertificateChanged` and list the warning `CertificateChanged`; nothing is applied.
+A pin does not affect the sync server.
 
 ### `AddExamples() → (t job)`
 
@@ -3339,7 +3359,9 @@ struct SyncReport {
     scan: SourceScan,
 }
 struct SyncOutput { reports: Vec<SyncReport> }
-enum RepoWarning { RootExpiring, RootExpired, EntryExpiring, Stale }
+enum RepoWarning {
+    RootExpiring, RootExpired, EntryExpiring, Stale, SignatureChanged, CertificateChanged,
+}
 struct Repo {
     repo_id: String, url: String, name: String, hosts: Vec<String>, fingerprints: Vec<String>,
     root_version: u64, root_expires: Time, entry_version: u64, entry_expires: Time, checked: Time,

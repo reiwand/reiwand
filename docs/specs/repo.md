@@ -53,9 +53,21 @@ Mirrors copy immutable files first and `entry/latest` last.
 ## Identity and URL
 
 - `repo_id` is the SHA-256 of the exact bytes of `root/1.json`. It never changes.
-- Share URL: `https://example.org/wallpapers/?fingerprint=<root key fingerprint>&repo_id=<repo_id>`.
-  At least one of the two parameters is required. `fingerprint` must belong to a key of the
+- Address: `https://example.org/r/wallpapers`, pasted as it is. The first time, the client reads
+  `root/1.json`, checks that it is signed by its own root keys and keeps its hash as the `repo_id`
+  of the repository for good (the anchor); from then on every refresh must chain from that root.
+  The connection must have a certificate valid for a public authority. A home server with its own
+  certificate is added only after the user confirms its fingerprint, which is then pinned for that
+  server address alone (see `dbus.md`, `Repos1.AddTrusting`); a different certificate later is
+  refused and warned. Plain `http://` is accepted only for this computer.
+- Older share URL: `https://example.org/wallpapers/?fingerprint=<root key fingerprint>&repo_id=<repo_id>`
+  still works and then both parameters are checked: `fingerprint` must belong to a key of the
   `root` role of `root/1.json` that signed it; `repo_id` must equal its hash.
+- If a refresh finds another `repo_id` at the address, or a root that does not chain from the stored
+  one, nothing is applied and the repository shows the warning `SignatureChanged`.
+- An address that answers `/.well-known/reiwand-server` but has no `root/1.json` is a server, not a
+  repository: the add fails with `NotARepository`, naming the page where the server lists its
+  repositories (`repositories` of the discovery document, or the older `repository`).
 - `reiwand-ctl remote add` also takes a folder followed by the same query
   (`remote add carpeta/?fingerprint=…`): the CLI turns it into the `file://` URL of its absolute path, and
   the anchor rules are the same as for any URL.
