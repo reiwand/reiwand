@@ -3699,10 +3699,6 @@ msgid "expected 64 hex digits"
 msgstr "se esperaban 64 cifras hexadecimales"
 
 #: crates/reiwand-format/src/fetch.rs
-msgid "needs a fingerprint or repo_id query parameter"
-msgstr "necesita un parámetro fingerprint o repo_id"
-
-#: crates/reiwand-format/src/fetch.rs
 msgid "download size"
 msgstr "tamaño de la descarga"
 
@@ -4075,6 +4071,10 @@ msgstr "%1 no coincide con su hash o tamaño firmados"
 #: crates/reiwand-format/src/said.rs
 msgid "the fingerprint does not match the repository at %1"
 msgstr "la huella no coincide con el repositorio de %1"
+
+#: crates/reiwand-format/src/said.rs
+msgid "the signature of the repository at %1 changed; nothing was applied"
+msgstr "la firma del repositorio de %1 cambió; no se aplicó nada"
 
 #: crates/reiwand-format/src/said.rs
 msgid "%1 is revoked"

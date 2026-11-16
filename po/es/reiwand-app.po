@@ -12923,6 +12923,14 @@ msgid "The signed index expired"
 msgstr "El índice firmado ha caducado"
 
 #: apps/reiwand-app/qml/facade/LabelWords.qml
+msgid "The signature of this repository changed: nothing was applied"
+msgstr "La firma de este repositorio cambió: no se aplicó nada"
+
+#: apps/reiwand-app/qml/facade/LabelWords.qml
+msgid "The server's certificate changed: nothing was applied"
+msgstr "El certificado del servidor cambió: no se aplicó nada"
+
+#: apps/reiwand-app/qml/facade/LabelWords.qml
 msgid "License problem"
 msgstr "Problema de licencia"
 
