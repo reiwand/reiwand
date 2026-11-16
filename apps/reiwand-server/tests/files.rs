@@ -131,10 +131,10 @@ async fn the_catalog_searches_with_trigrams_and_falls_back_to_tags() {
     let server = start(&[]).await;
     let db = rusqlite::Connection::open(server.dir.path().join("data/db/reiwand.sqlite")).unwrap();
     let add = |id: &str, title: &str, tags: &str, state: &str| {
-        db.execute("INSERT INTO packages (id, created_at) VALUES (?1, 1)", [id]).unwrap();
-        let sql = "INSERT INTO versions (package_id, version, sha256, size, kind, title, description, license, \
+        db.execute("INSERT INTO packages (repo, id, created_at) VALUES ('main', ?1, 1)", [id]).unwrap();
+        let sql = "INSERT INTO versions (repo, package_id, version, sha256, size, kind, title, description, license, \
                    tags, authors, state, created_at, published_at) \
-                   VALUES (?1, '1.0.0', ?1, 1, 'image', ?2, 'A calm picture', 'CC0-1.0', ?3, '[]', ?4, 1, 1)";
+                   VALUES ('main', ?1, '1.0.0', ?1, 1, 'image', ?2, 'A calm picture', 'CC0-1.0', ?3, '[]', ?4, 1, 1)";
         db.execute(sql, [id, title, tags, state]).unwrap();
     };
     add("org.example.dew", "Morning dew", r#"["sky","garden"]"#, "published");

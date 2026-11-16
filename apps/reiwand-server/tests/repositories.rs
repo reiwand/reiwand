@@ -66,7 +66,7 @@ async fn two_repositories_have_their_own_keys_catalogue_and_votes() {
         follow(&server, "second", two["url"].as_str().unwrap()).await,
     );
     assert_eq!((a.packages, b.packages), (1, 1));
-    let client = server.dir.path().join("client-other");
+    let client = server.dir.path().join("client-second");
     let (c, d) = (client.clone(), client);
     tokio::task::spawn_blocking(move || install(&c, &HttpFetch, DUSK, now(), false, false))
         .await

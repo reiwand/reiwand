@@ -52,10 +52,12 @@ impl Repos {
 
     pub fn get(&self, name: &str) -> Option<Arc<Repo>> {
         let find = || self.all().into_iter().find(|r| r.name == name);
-        find().or_else(|| {
-            self.reload();
-            find()
-        })
+        find()
+            .or_else(|| {
+                self.reload();
+                find()
+            })
+            .or_else(|| (name == "main" && self.all().is_empty()).then(|| Arc::new(Repo::main(&self.data))))
     }
 
     pub fn first(&self) -> Arc<Repo> {
