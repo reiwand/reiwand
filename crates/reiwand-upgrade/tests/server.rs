@@ -23,11 +23,12 @@ fn old_data(data: &Path) {
     let conn = Connection::open(data.join("db/reiwand.sqlite")).unwrap();
     conn.execute_batch(OLD).unwrap();
     conn.execute_batch(ROWS).unwrap();
-    for (path, text) in
-        [("repo/a", "first"), ("repo/catalog.json", "{}"), ("keys/online.key", "secret")]
+    for (dir, name, text) in
+        [("repo", "root/1.json", "first"), ("repo", "catalog.json", "{}"), ("keys", "online.key", "secret")]
     {
-        fs::create_dir_all(data.join(path).parent().unwrap()).unwrap();
-        fs::write(data.join(path), text).unwrap();
+        let path = data.join(dir).join(name);
+        fs::create_dir_all(path.parent().unwrap()).unwrap();
+        fs::write(path, text).unwrap();
     }
 }
 
@@ -56,7 +57,7 @@ fn assert_kept(data: &Path) {
     assert_eq!(count(&conn, "SELECT count(*) FROM search WHERE search MATCH 'sunrise'"), 1);
     assert_eq!(count(&conn, "SELECT count(*) FROM pragma_foreign_key_check"), 0);
     assert_eq!(count(&conn, "SELECT count(*) FROM sqlite_master WHERE name = 'repo_state'"), 0);
-    assert_eq!(fs::read_to_string(data.join("repos/main/a")).unwrap(), "first");
+    assert_eq!(fs::read_to_string(data.join("repos/main").join("root/1.json")).unwrap(), "first");
     assert_eq!(fs::read_to_string(data.join("keys/main.online.key")).unwrap(), "secret");
     assert!(!data.join("repo").exists() && !data.join("keys/online.key").exists());
 }
