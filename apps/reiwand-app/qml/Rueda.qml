@@ -2,6 +2,7 @@ import QtQuick
 
 // The mouse wheel over a row of covers: one notch (120) moves to the next or the previous cover.
 // Fine wheels and touchpads send smaller steps; they add up until they make a notch.
+// Under Wayland a plain mouse wheel can arrive marked as a touchpad: the handler takes both.
 WheelHandler {
     id: wheel
 
@@ -35,5 +36,6 @@ WheelHandler {
     }
 
     target: null
+    acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
     onWheel: event => turn(event.angleDelta.x, event.angleDelta.y)
 }

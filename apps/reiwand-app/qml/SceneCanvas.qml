@@ -70,6 +70,7 @@ ColumnLayout {
         }
 
         WheelHandler {
+            acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
             onWheel: wheel => {
                 if (wheel.modifiers & Qt.ControlModifier)
                     canvas.zoom = Math.max(0.1, Math.min(16, canvas.zoom * (wheel.angleDelta.y > 0 ? 1.1 : 1 / 1.1)));

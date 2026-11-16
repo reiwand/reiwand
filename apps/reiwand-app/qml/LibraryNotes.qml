@@ -12,6 +12,7 @@ Column {
 
     WheelHandler {
         target: null
+        acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
         onWheel: event => page.all || page.covers.shelf.turn(event.angleDelta.x, event.angleDelta.y)
     }
 

@@ -131,7 +131,8 @@ inline void sendKey(int key, int modifiers)
 inline void sendWheel(double x, double y, int delta)
 {
     if (auto window = keyWindow()) {
-        static QPointingDevice mouse(QStringLiteral("probe"), 1, QInputDevice::DeviceType::Mouse, QPointingDevice::PointerType::Generic, QInputDevice::Capability::Scroll | QInputDevice::Capability::Position, 1, 3);
+        // as a mouse wheel arrives under Wayland: marked as a touchpad with a finger
+        static QPointingDevice mouse(QStringLiteral("probe"), 1, QInputDevice::DeviceType::TouchPad, QPointingDevice::PointerType::Finger, QInputDevice::Capability::Scroll | QInputDevice::Capability::Position, 1, 3);
         const QPointF at(x, y);
         QWheelEvent event(at, window->mapToGlobal(at), QPoint(), QPoint(0, delta), Qt::NoButton, Qt::NoModifier, Qt::NoScrollPhase, false, Qt::MouseEventNotSynthesized, &mouse);
         QCoreApplication::sendEvent(window, &event);

@@ -20,6 +20,7 @@ Column {
     // is taller than its room and the wheel has to scroll it.
     WheelHandler {
         target: null
+        acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
         enabled: !band.scrolls
         onWheel: event => {
             const row = band.page.focused;

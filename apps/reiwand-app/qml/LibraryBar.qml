@@ -152,6 +152,7 @@ Flow {
 
     WheelHandler {
         target: null
+        acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
         onWheel: event => bar.turned(event.angleDelta.x, event.angleDelta.y)
     }
 
