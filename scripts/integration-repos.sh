@@ -33,8 +33,10 @@ port=$(python3 -c "import socket; s = socket.socket(); s.bind(('127.0.0.1', 0));
 python3 -m http.server --bind 127.0.0.1 --directory "$site/repo" "$port" >"$WORK/http.log" 2>&1 & pids+=($!)
 wait_for 10 python3 -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:$port/entry/latest')" ||
   fail "the repository server did not start"
-if ctl remote add "http://127.0.0.1:$port/" 2>"$WORK/anchor.out"; then fail "a repository without anchor was added"; fi
-grep -q "fingerprint or repo_id" "$WORK/anchor.out" || fail "anchor message: $(cat "$WORK/anchor.out")"
+ctl remote add "http://127.0.0.1:$port/" --wait >/dev/null
+[ "$(ctl remote ls --json | jq_ "[x['repo_id'] == '${anchor##*repo_id=}' for x in r['repos']]")" = "[True]" ] ||
+  fail "a repository added by its plain address: $(ctl remote ls --json)"
+ctl remote rm "${anchor##*repo_id=}"
 repo=$(ctl remote add "http://127.0.0.1:$port/$anchor" --wait --json | jq_ "r['output']['repo_id']")
 [ "$(ctl remote ls --json | jq_ "[(x['name'], x['hosts'], x['packages'], x['stale']) for x in r['repos']]")" = \
   "[('Example', ['127.0.0.1'], 3, False)]" ] || fail "repositories: $(ctl remote ls --json)"
@@ -90,6 +92,7 @@ ctl remote add "$site/repo?$anchor" --wait >/dev/null
 [ "$(ctl remote ls --json | jq_ "[(x['name'], x['url'].startswith('file://')) for x in r['repos']]")" = "[('Example', True)]" ] ||
   fail "a repository added from a folder: $(ctl remote ls --json)"
 ctl remote rm "$(ctl remote ls --json | jq_ "r['repos'][0]['repo_id']")"
+source "$(dirname "$0")"/integration-repo-trust.sh
 echo "repository checks passed"
 looks() {
   read -r b g r _ < <("$BIN/probe" "$1" 3 | sed 's/.*center bgra \[\(.*\)\]/\1/; s/,/ /g')
