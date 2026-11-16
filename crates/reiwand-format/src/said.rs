@@ -42,6 +42,11 @@ impl Error {
             Error::Unanchored(r) => {
                 said("format.unanchored", "the fingerprint does not match the repository at %1", &[r])
             }
+            Error::Changed(r) => said(
+                "format.changed",
+                "the signature of the repository at %1 changed; nothing was applied",
+                &[r],
+            ),
             Error::Revoked(r) => said("format.revoked", "%1 is revoked", &[r]),
             Error::NotFound(r) => said("format.not_found", "%1 not found", &[r]),
             Error::Exists(r) => said("format.exists", "%1 already exists", &[r]),

@@ -26,7 +26,7 @@ pub struct HttpFetch {
     cancel: Arc<AtomicBool>,
     window: Duration,
     origins: Origins,
-    pinned: Option<(String, Client)>,
+    pinned: Vec<(String, Client)>,
 }
 
 impl HttpFetch {
@@ -44,7 +44,7 @@ impl HttpFetch {
         #[cfg(target_os = "android")]
         let builder = builder.tls_certs_only(reiwand_core::roots::certificates());
         let client = builder.connect_timeout(Duration::from_secs(10)).timeout(window).build()?;
-        Ok(Self { client, cancel, window, origins, pinned: None })
+        Ok(Self { client, cancel, window, origins, pinned: Vec::new() })
     }
 
     pub fn within(self, bases: &[String]) -> Self {
@@ -61,7 +61,9 @@ impl HttpFetch {
             Policy::custom(move |a| if origin(a.url()) == own { redirect(a, false) } else { a.stop() });
         let builder = reiwand_core::net::blocking().user_agent(AGENT).referer(false).redirect(policy);
         let builder = builder.tls_backend_preconfigured(tls).connect_timeout(Duration::from_secs(10));
-        self.pinned = Some((home, builder.timeout(self.window).build()?));
+        let client = builder.timeout(self.window).build()?;
+        self.pinned.retain(|(known, _)| *known != home);
+        self.pinned.push((home, client));
         Ok(self)
     }
 
@@ -95,9 +97,9 @@ impl Fetch for HttpFetch {
         let home = origin(&url);
         declared(&self.origins).insert(home.clone());
         let (tx, rx) = mpsc::sync_channel(4);
-        let client = match &self.pinned {
-            Some((pinned, client)) if *pinned == home => client,
-            _ => &self.client,
+        let client = match self.pinned.iter().find(|(pinned, _)| *pinned == home) {
+            Some((_, client)) => client,
+            None => &self.client,
         };
         let request = client.get(url);
         thread::Builder::new().name("fetch".into()).spawn(move || stream(request, max, &tx))?;

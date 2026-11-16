@@ -44,13 +44,13 @@ fn root_rotation_follows_the_chain() {
     let rotated = rotate_root(&repo.dir, &next, NOW + 10).unwrap();
     assert_eq!((rotated.version, rotated.complete), (2, false));
     assert!(!sign_root(&repo.dir, &signer(&root2)).unwrap().complete);
-    assert!(matches!(update_repo(&repo.data, &FileFetch, &id, NOW + 20), Err(Error::Signature(_))));
+    assert!(matches!(update_repo(&repo.data, &FileFetch, &id, NOW + 20), Err(Error::Changed(_))));
     assert_eq!(repos(&repo.data, NOW).unwrap()[0].root_version, 1);
     let root2_json = fs::read(repo.dir.join("root/2.json")).unwrap();
     let old_only = signer(&repo.root).sign(&root2_json, &comment("root", 2, &id)).unwrap();
     fs::write(repo.dir.join("root/2.json.minisig"), old_only).unwrap();
     assert!(!status(&repo.dir).unwrap().complete);
-    assert!(matches!(update_repo(&repo.data, &FileFetch, &id, NOW + 20), Err(Error::Signature(_))));
+    assert!(matches!(update_repo(&repo.data, &FileFetch, &id, NOW + 20), Err(Error::Changed(_))));
     assert!(sign_root(&repo.dir, &signer(&root2)).unwrap().complete);
     assert!(matches!(publish(&repo.dir, &signer(&repo.online), 7, NOW + 30), Err(Error::Invalid { .. })));
     publish(&repo.dir, &signer(&online2), 7, NOW + 30).unwrap();

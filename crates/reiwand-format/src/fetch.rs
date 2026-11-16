@@ -54,8 +54,6 @@ impl Anchor {
             require(hex64(&value), key, "expected 64 hex digits")?;
             *slot = Some(value);
         }
-        let anchored = anchor.fingerprint.is_some() || anchor.repo_id.is_some();
-        require(anchored, "url", "needs a fingerprint or repo_id query parameter")?;
         Ok(anchor)
     }
 }

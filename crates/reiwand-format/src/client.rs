@@ -4,7 +4,7 @@ use crate::fetch::bases;
 use crate::install::{records, save};
 use crate::store::{Snapshot, State, commit, load, locked, repo_dir};
 use crate::update::refresh;
-use crate::{Anchor, Error, Fetch, Installed, Result, Time, ensure, sha256_file};
+use crate::{Anchor, Error, Fetch, Installed, Result, Time, ensure, sha256, sha256_file};
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::fs;
@@ -71,7 +71,11 @@ pub fn update_repo<F: Fetch>(data: &Path, fetch: &F, repo_id: &str, now: i64) ->
     let gone = || Error::NotFound(format!("repository {repo_id}"));
     let old = locked(data, false, || Ok(repo_dir(data, repo_id)?.is_dir().then(|| load(data, repo_id))))?;
     let snap = match old.ok_or_else(gone)? {
-        Ok(old) => refresh(fetch, old.state, Some(old.root), &old.blobs, None, now)?,
+        Ok(old) => {
+            let hosts = old.state.bases.clone();
+            refresh(fetch, old.state, Some(old.root), &old.blobs, None, now)
+                .map_err(|e| other_signature(fetch, &hosts, repo_id, e))?
+        }
         Err(_) => recover(data, fetch, repo_id, now)?,
     };
     locked(data, true, || {
@@ -99,6 +103,19 @@ pub fn repos(data: &Path, now: i64) -> Result<Vec<RepoInfo>> {
 
 pub fn remove_repo(data: &Path, repo_id: &str) -> Result<()> {
     locked(data, true, || Ok(fs::remove_dir_all(repo_dir(data, repo_id)?)?))
+}
+
+fn other_signature(fetch: &dyn Fetch, hosts: &[String], repo_id: &str, e: Error) -> Error {
+    if matches!(e, Error::Io(_) | Error::Changed(_)) {
+        return e;
+    }
+    for base in hosts {
+        let first = fetch.get(base, "root/1.json", 512 << 10).ok().flatten();
+        if first.is_some_and(|json| sha256(&json[..]).is_ok_and(|id| id != repo_id)) {
+            return Error::Changed(base.clone());
+        }
+    }
+    e
 }
 
 fn absent(data: &Path, repo_id: &str) -> Result<()> {

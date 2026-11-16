@@ -101,12 +101,18 @@ impl Run<'_> {
             let next = first(&bases(&self.state, &root.value), |base| {
                 let path = format!("root/{version}.json");
                 let Some((json, sig)) = self.signed(base, &path, MAX_ROOT)? else { return Ok(None) };
-                let new: Root = serde_json::from_slice(&json)?;
-                new.check(version, &id)?;
-                let text = comment("root", version, &id);
-                root.value.meets(&root.value.roles.root, &json, &sig, &text)?;
-                new.meets(&new.roles.root, &json, &sig, &text)?;
-                Ok(Some(Doc { value: new, json, sig }))
+                let verified = || {
+                    let new: Root = serde_json::from_slice(&json)?;
+                    new.check(version, &id)?;
+                    let text = comment("root", version, &id);
+                    root.value.meets(&root.value.roles.root, &json, &sig, &text)?;
+                    new.meets(&new.roles.root, &json, &sig, &text)?;
+                    Ok(Doc { value: new, json: json.clone(), sig: sig.clone() })
+                };
+                verified().map(Some).map_err(|e: Error| match e {
+                    Error::Io(_) => e,
+                    _ => Error::Changed(base.to_owned()),
+                })
             })?;
             let Some(next) = next else { break };
             root = next;

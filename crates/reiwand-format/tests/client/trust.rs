@@ -72,13 +72,14 @@ fn ids_specs_and_urls_cannot_escape() {
     assert!(matches!(update_repo(&repo.data, &FileFetch, "../x", NOW), Err(Error::Invalid { .. })));
     assert!(matches!(remove_repo(&repo.data, ".."), Err(Error::Invalid { .. })));
     assert!(matches!(remove(&repo.data, "../x", None), Err(Error::NotFound(_))));
-    for url in [
-        "file:///example/repo/?repo_id=../../etc",
-        "file:///example/repo/?fingerprint=00",
-        "https://example.org/repo/",
-    ] {
+    for url in ["file:///example/repo/?repo_id=../../etc", "file:///example/repo/?fingerprint=00"] {
         assert!(matches!(Anchor::parse(url), Err(Error::Invalid { .. })), "{url}");
     }
+    let plain = Anchor::parse("https://example.org/repo").unwrap();
+    assert_eq!(
+        (plain.base.as_str(), plain.fingerprint, plain.repo_id),
+        ("https://example.org/repo/", None, None)
+    );
     let anchor = Anchor::parse(&format!("https://example.org/r?fingerprint={}", "AB".repeat(32))).unwrap();
     assert_eq!(
         (anchor.base.as_str(), anchor.fingerprint.unwrap()),
@@ -99,4 +100,33 @@ fn verify_reports_expiry() {
     assert!(verify(&FileFetch, &repo.url(), NOW + 8 * DAY).unwrap().stale);
     assert!(!repo.data.exists());
     assert!(matches!(publish(&repo.dir, &fixture::signer(&repo.root), 7, NOW), Err(Error::Invalid { .. })));
+}
+
+fn copy_over(from: &std::path::Path, to: &std::path::Path) {
+    for entry in fs::read_dir(from).unwrap().map(Result::unwrap) {
+        let target = to.join(entry.file_name());
+        if entry.file_type().unwrap().is_dir() {
+            fs::create_dir_all(&target).unwrap();
+            copy_over(&entry.path(), &target);
+        } else {
+            fs::copy(entry.path(), target).unwrap();
+        }
+    }
+}
+
+#[test]
+fn a_plain_address_is_anchored_by_its_first_root_and_a_changed_signature_applies_nothing() {
+    let repo = Repo::new();
+    repo.add(DAWN, "1.0.0");
+    repo.publish(NOW);
+    let added = add_repo(&repo.data, &FileFetch, &repo.url(), NOW).unwrap();
+    assert!(matches!(add_repo(&repo.data, &FileFetch, &repo.url(), NOW), Err(Error::Exists(_))));
+    let other = Repo::new();
+    other.add(DUSK, "1.0.0");
+    other.publish(NOW + 10);
+    copy_over(&other.dir, &repo.dir);
+    let refused = update_repo(&repo.data, &FileFetch, &added.repo_id, NOW + 20).unwrap_err();
+    assert!(matches!(refused, Error::Changed(_)), "{refused:?}");
+    let kept = repos(&repo.data, NOW + 20).unwrap();
+    assert_eq!((kept[0].repo_id.as_str(), kept[0].packages), (added.repo_id.as_str(), 1));
 }

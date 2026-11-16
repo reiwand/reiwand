@@ -9,10 +9,10 @@ fn anchors_must_match() {
     assert!(matches!(add_repo(&repo.data, &FileFetch, &wrong_id, NOW), Err(Error::Mismatch(_))));
     let wrong_key = format!("{base}?fingerprint={}", repo.online.fingerprint);
     assert!(matches!(add_repo(&repo.data, &FileFetch, &wrong_key, NOW), Err(Error::Unanchored(_))));
-    assert!(matches!(add_repo(&repo.data, &FileFetch, &base, NOW), Err(Error::Invalid { .. })));
     assert!(repos(&repo.data, NOW).unwrap().is_empty());
     let both = format!("{base}?fingerprint={}&repo_id={id}", repo.root.fingerprint);
     assert_eq!(add_repo(&repo.data, &FileFetch, &both, NOW).unwrap().repo_id, id);
+    assert!(matches!(add_repo(&repo.data, &FileFetch, &base, NOW), Err(Error::Exists(_))));
 }
 
 #[test]
