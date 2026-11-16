@@ -41,6 +41,10 @@ QtObject {
         page.open("more");
         same(page.route.length, 2, "the route of More");
         has(page.shown.item, App.tr("Keyboard shortcuts"), "More");
+        same(page.shown.item.unanswered(true, "refused"), true, "keys the desktop refused");
+        same(page.shown.item.unanswered(true, "unavailable"), true, "keys the desktop cannot give");
+        same(page.shown.item.unanswered(true, "bound"), false, "keys the desktop gave");
+        same(page.shown.item.unanswered(false, "refused"), false, "keys nobody asked for");
         same(SettingsFolder.joined(SettingsFolder.keys("LOGO+ALT+N")), "LOGO+ALT+N", "a shortcut read and written back");
     }
 

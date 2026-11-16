@@ -1389,6 +1389,12 @@ keys). A key press starts or moves a session on the only screen (on every screen
 and the preview window opens as said above. Where the desktop
 has no such portal (wlroots compositors, X11) the state is `unavailable` and the user binds
 `reiwand-ctl next --preview` and `reiwand-ctl prev --preview` to keys in the compositor.
+The daemon opens its own session-bus connection for this, so that the first portal call of that
+connection is `org.freedesktop.host.portal.Registry.Register` with the app id `io.github.reiwand` (the id of the
+installed desktop entry); a failed registration is logged at WARN. Outside Flatpak the portal refuses a
+connection that already talked to it, which is why the shared connection is not used. Settings reads the state
+with `GetBrowse` and, when it is `refused` or `unavailable`, says next to "Keyboard shortcuts" that the keys
+must be bound by hand to the two commands above.
 
 ## `io.github.reiwand.Profiles1`
 

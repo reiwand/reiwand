@@ -10,8 +10,34 @@ FocusScope {
     readonly property int cache: Number(options["library.thumb_cache_mb"] ?? 512)
     readonly property var cached: sizes.includes(cache) ? sizes : sizes.concat([cache]).sort((a, b) => a - b)
 
+    readonly property bool wanted: options["shortcuts.enabled"] === true
+    property string desk: ""
+    readonly property bool unmet: unanswered(wanted, desk)
+
+    function unanswered(on, state) {
+        return on && (state === "refused" || state === "unavailable");
+    }
+
     function flag(key, on) {
         App.act("SetOption", [key, String(on)]);
+    }
+
+    function look() {
+        if (!wanted) {
+            desk = "";
+            return;
+        }
+        App.query("GetBrowse", [""], "Playlists1", reply => part && (part.desk = reply.shortcuts ?? ""), error => part && (part.desk = ""));
+    }
+
+    onWantedChanged: look()
+    Component.onCompleted: look()
+
+    Timer {
+        interval: 1500
+        repeat: true
+        running: part.visible && part.wanted && part.desk !== "bound" && !part.unmet
+        onTriggered: part.look()
     }
 
     implicitHeight: filas.height
@@ -37,7 +63,8 @@ FocusScope {
 
         Fila {
             text: App.tr("Keyboard shortcuts")
-            note: App.tr("The desktop is asked for these two combinations")
+            note: part.unmet ? App.tr("The desktop did not give the keys: bind reiwand-ctl next --preview and reiwand-ctl prev --preview to your own keys") : App.tr("The desktop is asked for these two combinations")
+            noteTone: part.unmet ? "coral" : ""
             kind: "llave"
             checked: part.options["shortcuts.enabled"] === true
             value: checked ? App.tr("Yes") : App.tr("No")

@@ -18317,6 +18317,10 @@ msgid "The desktop is asked for these two combinations"
 msgstr "Se le piden al escritorio estas dos combinaciones"
 
 #: apps/reiwand-app/qml/SettingsMore.qml
+msgid "The desktop did not give the keys: bind reiwand-ctl next --preview and reiwand-ctl prev --preview to your own keys"
+msgstr "El escritorio no dio los atajos: ata reiwand-ctl next --preview y reiwand-ctl prev --preview a tus propias teclas"
+
+#: apps/reiwand-app/qml/SettingsMore.qml
 msgid "Where the desktop cannot give them, bind the commands of the terminal tool to your own keys."
 msgstr "Donde el escritorio no puede darlas, asigna los comandos de la herramienta de terminal a tus propias teclas."
 
