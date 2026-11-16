@@ -1,4 +1,5 @@
-use crate::files::{folder, read_png, sweep};
+use crate::build::MOST_EDGE;
+use crate::files::{folder, read_bounded, sweep};
 use crate::stack::{FORMAT, Info, Layers, fields_of, json};
 use anyhow::{Context, Result, ensure};
 use image::ExtendedColorType;
@@ -52,27 +53,36 @@ pub fn save(path: &Path, layers: &Layers) -> Result<()> {
     })
 }
 
+const MOST_LAYERS: u32 = reiwand_core::edit::MOST_CUTS as u32 + 1;
+const SLACK: u64 = 1 << 20;
+
+fn bytes((w, h): (u32, u32), each: u64) -> u64 {
+    u64::from(w) * u64::from(h) * each + SLACK
+}
+
 pub fn load(path: &Path) -> Result<Option<Layers>> {
     let Ok(text) = std::fs::read(json(path)) else { return Ok(None) };
     if !path.is_file() {
         return Ok(None);
     }
     let info: Info = serde_json::from_slice(&text)?;
+    let n = info.depths.len() as u32;
+    let side = |s: [u32; 2]| s.iter().all(|e| (1..=MOST_EDGE).contains(e));
     ensure!(
-        info.format == FORMAT && !info.depths.is_empty(),
+        info.format == FORMAT && (1..=MOST_LAYERS).contains(&n) && side(info.size) && side(info.field),
         "{}",
         said("depth.the_layer_set_is_not", "the layer set is not understood", &[]).local()
     );
-    let atlas = read_png(path)?.into_rgba8();
     let (w, h) = (info.size[0], info.size[1]);
+    let atlas = read_bounded(path, (w, h * n), bytes((w, h * n), 4))?.into_rgba8();
     ensure!(
         atlas.width() == w && atlas.height() == h * info.depths.len() as u32,
         "{}",
         said("depth.the_layer_set_is_torn", "the layer set is torn", &[]).local()
     );
     let cut = |k: u32| image::imageops::crop_imm(&atlas, 0, k * h, w, h).to_image();
-    let deep = read_png(&fields_of(path))?.into_luma16();
-    let (fw, fh, n) = (info.field[0], info.field[1], info.depths.len() as u32);
+    let (fw, fh) = (info.field[0], info.field[1]);
+    let deep = read_bounded(&fields_of(path), (fw, fh * n), bytes((fw, fh * n), 2))?.into_luma16();
     ensure!(
         deep.width() == fw && deep.height() == fh * n,
         "{}",

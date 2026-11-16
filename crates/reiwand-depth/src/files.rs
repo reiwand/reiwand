@@ -46,12 +46,15 @@ pub fn read(path: &Path) -> Result<Map> {
 }
 
 pub(crate) fn read_png(path: &Path) -> Result<image::DynamicImage> {
+    read_bounded(path, (MAX_EDGE, MAX_EDGE), MAX_BYTES)
+}
+
+pub(crate) fn read_bounded(path: &Path, (w, h): (u32, u32), bytes: u64) -> Result<image::DynamicImage> {
     let mut reader = ImageReader::open(path)
         .with_context(|| said("depth.cannot_open", "cannot open %1", &[&path.display()]).local())?
         .with_guessed_format()?;
     let mut limits = Limits::default();
-    (limits.max_image_width, limits.max_image_height, limits.max_alloc) =
-        (Some(MAX_EDGE), Some(MAX_EDGE), Some(MAX_BYTES));
+    (limits.max_image_width, limits.max_image_height, limits.max_alloc) = (Some(w), Some(h), Some(bytes));
     reader.limits(limits);
     reader
         .decode()
