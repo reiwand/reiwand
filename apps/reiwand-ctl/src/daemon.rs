@@ -42,6 +42,7 @@ pub async fn run(command: Command) -> Result<()> {
         Command::Reload => daemon.reload().await?,
         Command::Restart => crate::gpus::restart(client).await?,
         Command::RetryEffects => daemon.retry_effects().await?,
+        Command::RetryLayers { path } => daemon.retry_layers(&path_arg(&path)?).await?,
         Command::State { .. } => {
             let state = daemon.get_state().await?;
             println!("{state}");

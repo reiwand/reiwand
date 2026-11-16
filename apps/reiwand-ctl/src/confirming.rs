@@ -104,6 +104,7 @@ pub fn said(command: &Command) -> Option<String> {
         }
         Command::Reload => tr(told("settings reloaded")),
         Command::RetryEffects => tr(told("effects tried again")),
+        Command::RetryLayers { path } => fill(told("building the depth layers of %1 again"), &[path]),
         Command::Pause => tr(told("paused")),
         Command::Resume => tr(told("playing again")),
         Command::Volume { percent } => fill(told("volume %1 %"), &[percent]),

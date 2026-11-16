@@ -28,6 +28,7 @@ pub enum Still {
     BuildingSimple,
     Software,
     Failed,
+    Cancelled,
     Flat,
 }
 
@@ -40,6 +41,7 @@ impl Still {
             Still::BuildingSimple => "building_simple",
             Still::Software => "software",
             Still::Failed => "failed",
+            Still::Cancelled => "cancelled",
             Still::Flat => "flat",
         }
     }
@@ -72,6 +74,11 @@ impl Still {
             Still::Failed => {
                 said("still.failed", "The picture stays still: its depth layers could not be built.", &[])
             }
+            Still::Cancelled => said(
+                "still.cancelled",
+                "The picture stays still: building its depth layers was cancelled. Apply it again or try again to build them.",
+                &[],
+            ),
             Still::Flat => said(
                 "still.flat",
                 "The picture stays still: its depth gives no movement that would not stretch it.",

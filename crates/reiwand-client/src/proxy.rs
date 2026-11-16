@@ -55,6 +55,7 @@ pub trait Daemon1 {
     fn reload(&self) -> Result<()>;
     fn restart(&self) -> Result<()>;
     fn retry_effects(&self) -> Result<()>;
+    fn retry_layers(&self, path: &str) -> Result<()>;
     fn get_state(&self) -> Result<String>;
     fn get_schema(&self) -> Result<String>;
     fn wait_changed(&self, serial: u64, timeout_ms: u32) -> Result<(u64, Vec<String>)>;

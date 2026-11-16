@@ -798,6 +798,15 @@ because the helper that checks it crashed or ran out of memory or time, are read
 `Changed` names them under the `library` topic. `reiwand-ctl retry-effects` and the Try again button
 next to a left-out effect in the app and in the Plasma tray applet call it.
 
+### `RetryLayers(s path)`
+
+Builds again the depth layers of the picture at `path` (a path or a `file://` URI) after a build or
+a load failed or the person cancelled its `layers` job: it deletes the `.layers.failed` marks of
+that picture in the cache, forgets the failures and the cancellation the daemon keeps in memory
+and reconfigures the screens, so a screen that shows the picture with parallax on starts a new
+`layers` job. A picture that is on no screen only loses its marks. `reiwand-ctl retry-layers PATH`
+and Try again in the menu of the picture's cover in the app call it.
+
 ### `GetState() → (s json)`
 
 A `State` document (see "JSON model"). It never waits for the library: the library item, preset,
@@ -2770,7 +2779,10 @@ too, and when the depth model is not installed the app (the parallax tool, as so
 `reiwand-ctl edit parallax` and the phone say so with the download size and the action that downloads
 it, which only runs when the person asks. A failed build leaves
 `<SHA-256>-<key>.layers.failed` with the error beside the set, and the daemon does not try that
-set again until the cache or the edit changes. The job runs on its own thread at the lowest
+set again until the cache or the edit changes or `RetryLayers` is called; a set that cannot be read
+back (a torn or damaged file) is deleted and marked failed the same way, so it is never rebuilt in a
+loop. The job reports its progress from 0 to 100: 2 once the map is read, 10 once it is refined,
+then each layer in equal shares, advancing after every LaMa crop within a layer. The job runs on its own thread at the lowest
 priority, with at most four threads for LaMa, and reloads the screens when it ends. It works at the
 size the output needs, rounded up to 1024, 1920, 2560 or 3840 pixels on the long side (never above
 the picture; `reiwand-ctl` and the app build at 1920, the phone at 1920 at most), and computes:
@@ -3021,7 +3033,10 @@ while they wait for the library.
 batches of at most 256 files, imported files, analyzed items, provider downloads and download
 chunks). Finished steps stay: a cancelled scan keeps the batches it stored and marks nothing
 missing, and a package whose commit finished stays installed. Cancelling a finished job changes
-nothing.
+nothing. A cancelled `layers` job is not started again by the daemon on its own (when a screen
+is reconfigured, covered or uncovered): only when the picture is applied again (`SetWallpaper`,
+`Library1.Apply`), when a depth or parallax setting that is part of the key of the set changes, or
+with `RetryLayers`. The daemon keeps that in memory only.
 
 ## Thumbnails
 
@@ -3061,8 +3076,8 @@ removing, renaming or retyping something increases it. Times are Unix seconds; `
 spanning"), or `null` before `SetOutputInfo`. `calibrating` tells whether `ShowCalibration` shows
 its pattern.
 `parallax` tells whether the image moves in depth; while it does not and its edit asks for it, `still`
-says why (`no_model`, `no_map`, `edited`, `building`, `building_simple`, `failed` or
-`flat`, see "Depth layers"), else `null`; `building_simple` is a build that uses the simple fill
+says why (`no_model`, `no_map`, `edited`, `building`, `building_simple`, `failed`, `cancelled` or
+`flat`, see "Depth layers"), else `null`; `cancelled` follows a `CancelJob` of its `layers` job; `building_simple` is a build that uses the simple fill
 because LaMa is not installed. A picture whose layers are built but that the computer draws with its
 processor reports `software` until `playback.software_parallax` is set. `page_errors` lists the
 errors a web page wrote since it started (its console lines that are not plain logging, the latest

@@ -19,6 +19,17 @@ pub fn has_failed(set: &Path) -> bool {
 }
 
 impl Places {
+    pub fn unfail(&self, sha256: &str) -> usize {
+        let Some(sha) = crate::files::hashed(sha256) else { return 0 };
+        let prefix = format!("{sha}-");
+        let ours = |e: &std::fs::DirEntry| {
+            let name = e.file_name().to_string_lossy().into_owned();
+            name.starts_with(&prefix) && name.ends_with(".layers.failed")
+        };
+        let entries = std::fs::read_dir(self.cache.join("depth")).into_iter().flatten().flatten();
+        entries.filter(ours).filter(|e| std::fs::remove_file(e.path()).is_ok()).count()
+    }
+
     pub fn still(&self, (image, sha256): (&Path, &str), edit: &Edit, set: &Settings) -> Option<Still> {
         edit.moving()?;
         let depth = edit.depth.clone().unwrap_or_default();

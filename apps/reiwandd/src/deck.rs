@@ -1,24 +1,23 @@
 use crate::compositor::Deck;
 use crate::daemon::Daemon;
-use crate::error::failed;
-use image::{GrayImage, RgbImage};
+use anyhow::Context;
 use reiwand_core::Fill;
-use reiwand_core::edit::{Depth, Edit, Geometry};
-use reiwand_core::model::JobKind;
+use reiwand_core::edit::{Edit, Geometry};
 use reiwand_core::travel::Still;
-use reiwand_depth::{Device, Inpainter, Layers, Places, Settings};
-use serde_json::json;
+use reiwand_depth::{Layers, Places, Settings};
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Weak};
 
-const THREADS: usize = 4;
+mod making;
 
 #[derive(Default)]
 pub(crate) struct Memory {
     sets: HashMap<PathBuf, Weak<Layers>>,
     turned: HashMap<(PathBuf, String), Weak<Layers>>,
     failed: HashSet<PathBuf>,
+    building: HashMap<PathBuf, PathBuf>,
+    cancelled: HashSet<PathBuf>,
     still: HashMap<PathBuf, Still>,
     me: Weak<Daemon>,
 }
@@ -34,47 +33,46 @@ impl Memory {
             None => drop(self.still.remove(file)),
         }
     }
+
+    pub(crate) fn cancelled(&mut self, file: &Path) {
+        let sets = self.building.iter().filter(|(_, f)| *f == file).map(|(set, _)| set.clone());
+        let sets: Vec<PathBuf> = sets.collect();
+        self.cancelled.extend(sets);
+        self.mark(file, Some(Still::Cancelled));
+    }
+
+    pub(crate) fn again(&mut self, file: &Path) {
+        let building = &self.building;
+        self.cancelled.retain(|set| building.get(set).is_none_or(|f| f != file));
+    }
+
+    pub(crate) fn unfail(&mut self, file: &Path, sha: &str) {
+        let prefix = format!("{sha}-");
+        let own = |p: &PathBuf| p.file_name().is_some_and(|n| n.to_string_lossy().starts_with(&prefix));
+        self.failed.retain(|p| !own(p));
+        self.again(file);
+    }
 }
 
 pub(crate) fn start(daemon: &Arc<Daemon>) {
     daemon.state().decks.me = Arc::downgrade(daemon);
 }
 
-fn build(
-    places: &Places,
-    (file, sha): (&Path, &str),
-    (depth, set): (&Depth, &Settings),
-    ctl: &crate::jobs::Ctl,
-) -> anyhow::Result<PathBuf> {
-    let stop = ctl.flag();
-    let threads = reiwand_depth::threads().min(THREADS);
-    std::thread::scope(|scope| {
-        scope
-            .spawn(|| {
-                reiwand_depth::background();
-                let mut loaded = (set.fill == Fill::Lama)
-                    .then(|| Inpainter::open(places, None, threads, Device::Auto))
-                    .transpose()?;
-                let mut paint = |image: &RgbImage, mask: &GrayImage| match loaded.as_mut() {
-                    Some(l) => l.run(image, mask),
-                    None => anyhow::bail!("LaMa is not loaded"),
-                };
-                let inpaint: Option<&mut reiwand_depth::Inpaint<'_>> =
-                    (set.fill == Fill::Lama).then_some(&mut paint);
-                places.build_layers(
-                    (file, sha),
-                    (depth, set),
-                    inpaint,
-                    &mut |done| ctl.progress(done, 100),
-                    &stop,
-                )
-            })
-            .join()
-            .unwrap_or_else(|_| anyhow::bail!("the layer builder stopped"))
-    })
-}
-
 impl Daemon {
+    pub(crate) fn retry_layers(&self, path: &Path) -> anyhow::Result<()> {
+        let file = std::fs::canonicalize(path).with_context(|| crate::flatpak::not_found(path))?;
+        let sha = reiwand_core::edit::Source::read(&file, [0; 2])?.sha256;
+        let places = Places { data: self.store.data.clone(), cache: self.store.cache.clone() };
+        places.unfail(&sha);
+        {
+            let mut st = self.state();
+            st.decks.unfail(&file, &sha);
+            st.decks.again(path);
+        }
+        self.configure_all();
+        Ok(())
+    }
+
     pub(crate) fn deck_for(
         &self,
         file: &Path,
@@ -113,19 +111,25 @@ impl Daemon {
                     tracing::warn!("cannot use the depth layers of a picture");
                     tracing::debug!("{e:#}");
                     places.discard(&path);
+                    reiwand_depth::mark_failed(&path, &e);
+                    self.state().decks.failed.insert(path.clone());
                     None
                 }
             },
         };
         let Some(layers) = found else {
             let failed = self.state().decks.failed.contains(&path) || reiwand_depth::has_failed(&path);
+            let cancelled = self.state().decks.cancelled.contains(&path);
             let simple = set.fill == Fill::Simple && places.fill(Fill::Lama) == Fill::Simple;
-            self.build_deck(file, sha, (depth, set), path);
-            let still = match (failed, simple) {
-                (true, _) => Still::Failed,
-                (false, true) => Still::BuildingSimple,
-                (false, false) => Still::Building,
+            let still = match (failed, cancelled, simple) {
+                (true, ..) => Still::Failed,
+                (_, true, _) => Still::Cancelled,
+                (.., true) => Still::BuildingSimple,
+                _ => Still::Building,
             };
+            if !failed && !cancelled {
+                self.build_deck(file, sha, (depth, set), path);
+            }
             return Err(Some(still));
         };
         if !layers.info.reach.moves(layers.info.size[0]) {
@@ -152,29 +156,5 @@ impl Daemon {
         st.decks.turned.retain(|_, weak| weak.strong_count() > 0);
         st.decks.turned.insert(key, Arc::downgrade(&made));
         made
-    }
-
-    fn build_deck(&self, file: &Path, sha: &str, (depth, set): (Depth, Settings), path: PathBuf) {
-        if self.state().decks.failed.contains(&path) || reiwand_depth::has_failed(&path) {
-            return;
-        }
-        let (file, sha) = (file.to_owned(), sha.to_owned());
-        let Some(daemon) = self.state().decks.me.upgrade() else { return };
-        let target = file.to_string_lossy().into_owned();
-        daemon.start_job(JobKind::Layers, &target, move |d, ctl| {
-            let places = Places { data: d.store.data.clone(), cache: d.store.cache.clone() };
-            let built = build(&places, (&file, &sha), (&depth, &set), ctl);
-            if let Err(e) = &built {
-                if ctl.check().is_err() {
-                    return Err(crate::error::Error::Cancelled);
-                }
-                tracing::warn!("cannot build the depth layers of a picture");
-                tracing::debug!("{e:#}");
-                d.state().decks.failed.insert(path);
-            }
-            let made = built.map_err(|e| failed(format!("{e:#}")))?;
-            d.configure_all();
-            Ok(json!({"file": made, "fill": set.fill.as_str(), "layers": set.count}))
-        });
     }
 }

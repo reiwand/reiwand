@@ -50,6 +50,7 @@ pub const CALLS: &[(&str, &str, &str, &[&str])] = &[
     ("Daemon1", "Reload", "reload", &[]),
     ("Daemon1", "Restart", "restart", &[]),
     ("Daemon1", "RetryEffects", "retry-effects", &[]),
+    ("Daemon1", "RetryLayers", "retry-layers", &["PATH"]),
     ("Daemon1", "GetState", "state", &[]),
     ("Daemon1", "GetSchema", "schema", &[]),
     ("Daemon1", "WaitChanged", "wait", &["--serial", "--timeout"]),

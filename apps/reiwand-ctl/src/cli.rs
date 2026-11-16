@@ -64,6 +64,11 @@ pub enum Command {
     Restart,
     #[command(about = "Draw again the effects left out after they stopped the graphics card or a program")]
     RetryEffects,
+    #[command(about = "Build again the depth layers of a picture after they failed or were cancelled")]
+    RetryLayers {
+        #[arg(help = "Local image file, as a path or a file:// URI")]
+        path: String,
+    },
     #[command(about = "Print the daemon state as JSON")]
     State {
         #[arg(long, help = "Accepted for symmetry: the state is always JSON")]

@@ -143,6 +143,7 @@ impl Daemon {
         };
         let fit = fit.or_else(|| display(&item.path).fit);
         let _decoded = self.check_media(&item.path)?;
+        self.state().decks.again(&item.path);
         self.change_output(&output, |c| {
             c.set_image(&output, item.path.clone(), fit);
             background.as_deref().map_or(Ok(()), |color| c.set_background(&output, color))?;

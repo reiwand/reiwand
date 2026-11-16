@@ -89,10 +89,16 @@ impl Daemon {
         let cancel = |e: &mut Entry| {
             e.cancel.store(true, Ordering::Relaxed);
             let queued = e.job.state == JobState::Queued;
+            let layers =
+                (e.job.kind == JobKind::Layers && super::active(&e.job)).then(|| e.job.target.clone());
             e.job.state = if queued { JobState::Cancelled } else { e.job.state };
-            queued
+            (queued, layers)
         };
-        if self.jobs.with(id, cancel).unwrap_or(false) {
+        let (queued, layers) = self.jobs.with(id, cancel).unwrap_or_default();
+        if let Some(file) = layers {
+            self.state().decks.cancelled(std::path::Path::new(&file));
+        }
+        if queued {
             self.finish_job(id, Err(Error::Cancelled));
         }
         Ok(())

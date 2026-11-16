@@ -222,6 +222,11 @@ impl Service {
         self.d()?.render(|d| d.retry_effects()).await
     }
 
+    async fn retry_layers(&self, path: String) -> Result<()> {
+        let path = local_path(&path)?;
+        self.d()?.render(move |d| d.retry_layers(&path)).await
+    }
+
     #[zbus(out_args("json"))]
     async fn get_state(&self) -> Result<String> {
         Ok(self.d()?.state_json())

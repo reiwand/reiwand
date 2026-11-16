@@ -182,6 +182,7 @@ impl Daemon {
             return Err(InvalidArgs("import the package and use Library1.Apply".into()).into());
         }
         let _decoded = self.check_media(&path)?;
+        self.state().decks.again(&path);
         self.change_output(output, |c| {
             c.set_image(output, path, fit);
             Ok(())

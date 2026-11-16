@@ -51,6 +51,7 @@ fn still_reasons_have_words_and_messages() {
         Still::BuildingSimple,
         Still::Software,
         Still::Failed,
+        Still::Cancelled,
         Still::Flat,
     ] {
         let word = serde_json::to_value(still).unwrap();
