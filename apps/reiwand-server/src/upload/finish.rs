@@ -57,6 +57,13 @@ pub(super) async fn finalize(State(app): St, auth: Auth, Path(id): Path<String>)
 pub(super) async fn finish(app: &Arc<App>, auth: &Auth, id: String) -> Reply {
     let busy = || Problem::conflict("upload_state", "the upload is not complete or was already finalized");
     let (size, sha) = waiting(app, auth.user, &id, "received").await?.ok_or_else(busy)?;
+    let (key, sql) = (id.clone(), "SELECT repo FROM uploads WHERE id = ?1");
+    let repo = app.db.run(move |c| Ok(c.query_row(sql, [key], |r| r.get::<_, Option<String>>(0))?)).await?;
+    let repo = crate::scope::resolve(app, repo.as_deref().unwrap_or_default())?.name.clone();
+    if let Err(problem) = crate::access::publish(app, &repo, auth).await {
+        fail(app, &id, &problem.detail).await;
+        return Err(problem);
+    }
     let thumb = tmp(app, &format!("{id}.jpg"));
     let checked = match validate(app, auth.user, &id, &tmp(app, &id), &thumb).await {
         Ok(report) => record(app, auth.user, &id, &sha, size, report).await,

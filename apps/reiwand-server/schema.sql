@@ -91,8 +91,20 @@ CREATE TABLE repos (
   signed_at INTEGER NOT NULL DEFAULT 0,
   failed_at INTEGER,
   failed_raw TEXT,
-  created_at INTEGER NOT NULL
+  created_at INTEGER NOT NULL,
+  private INTEGER NOT NULL DEFAULT 0,
+  publishing TEXT NOT NULL DEFAULT 'open' CHECK (publishing IN ('open', 'members'))
 ) STRICT;
+
+CREATE TABLE repo_members (
+  repo TEXT NOT NULL REFERENCES repos(name) ON DELETE CASCADE ON UPDATE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+  may_read INTEGER NOT NULL DEFAULT 1,
+  may_publish INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (repo, user_id)
+) STRICT, WITHOUT ROWID;
+
+CREATE INDEX repo_members_user ON repo_members(user_id);
 
 CREATE TABLE packages (
   repo TEXT NOT NULL,

@@ -39,7 +39,7 @@ fn count(conn: &Connection, sql: &str) -> i64 {
 }
 
 fn assert_kept(conn: &Connection) {
-    assert_eq!(count(conn, "PRAGMA user_version"), 12);
+    assert_eq!(count(conn, "PRAGMA user_version"), 13);
     assert_eq!(count(conn, "SELECT count(*) FROM packages WHERE repo = 'main'"), 2);
     assert_eq!(count(conn, "SELECT count(*) FROM versions WHERE repo = 'main'"), 2);
     assert_eq!(count(conn, "SELECT id FROM versions WHERE package_id = 'org.example.dawn'"), 7);
@@ -52,6 +52,9 @@ fn assert_kept(conn: &Connection) {
     assert_eq!(count(conn, "SELECT count(*) FROM featured WHERE repo = 'main' AND note = 'start here'"), 1);
     assert_eq!(count(conn, "SELECT signed_at FROM repos WHERE name = 'main'"), 500);
     assert_eq!(count(conn, "SELECT count(*) FROM repos"), 1);
+    assert_eq!(count(conn, "SELECT private FROM repos WHERE name = 'main'"), 0);
+    assert_eq!(count(conn, "SELECT count(*) FROM repos WHERE publishing = 'open'"), 1);
+    assert_eq!(count(conn, "SELECT count(*) FROM repo_members"), 0);
     assert_eq!(count(conn, "SELECT count(*) FROM search WHERE search MATCH 'sunrise'"), 1);
     assert_eq!(count(conn, "SELECT rowid FROM search WHERE search MATCH 'sunrise'"), 7);
     assert_eq!(count(conn, "SELECT count(*) FROM pragma_foreign_key_check"), 0);
@@ -67,7 +70,7 @@ async fn a_database_of_the_previous_version_keeps_everything_and_leaves_a_copy()
     old_database(&path);
     drop(App::open(cfg.clone()).unwrap());
     assert_kept(&Connection::open(&path).unwrap());
-    let copy = cfg.data.join("db/reiwand.sqlite.before-v12-from-v11");
+    let copy = cfg.data.join("db/reiwand.sqlite.before-v13-from-v11");
     let before = Connection::open(&copy).unwrap();
     assert_eq!(count(&before, "PRAGMA user_version"), 11);
     assert_eq!(count(&before, "SELECT count(*) FROM votes"), 2);
@@ -93,8 +96,30 @@ async fn a_backup_of_the_previous_version_restores_and_migrates() {
     assert_eq!(count(&conn, "SELECT dirty FROM repos WHERE name = 'main'"), 1);
     drop(conn);
     let saved = reiwand_server::backup(&cfg, Some(dir.path().join("new-backup"))).unwrap();
-    assert_eq!(count(&Connection::open(saved.join("reiwand.sqlite")).unwrap(), "PRAGMA user_version"), 12);
+    assert_eq!(count(&Connection::open(saved.join("reiwand.sqlite")).unwrap(), "PRAGMA user_version"), 13);
     let again = config(&dir.path().join("again"));
     reiwand_server::restore(&again, &saved, false).unwrap();
     assert_kept(&Connection::open(again.data.join("db/reiwand.sqlite")).unwrap());
+}
+
+#[tokio::test]
+async fn a_database_of_the_version_before_private_repositories_keeps_everything_and_leaves_a_copy() {
+    let dir = tempfile::tempdir().unwrap();
+    let cfg = config(&dir.path().join("data"));
+    let path = cfg.data.join("db/reiwand.sqlite");
+    old_database(&path);
+    let conn = Connection::open(&path).unwrap();
+    conn.execute_batch("PRAGMA foreign_keys = OFF").unwrap();
+    conn.execute_batch(include_str!("../migrations/11-12.sql")).unwrap();
+    conn.execute_batch("PRAGMA user_version = 12").unwrap();
+    drop(conn);
+    drop(App::open(cfg.clone()).unwrap());
+    assert_kept(&Connection::open(&path).unwrap());
+    let before = Connection::open(cfg.data.join("db/reiwand.sqlite.before-v13-from-v12")).unwrap();
+    assert_eq!(count(&before, "PRAGMA user_version"), 12);
+    assert_eq!(count(&before, "SELECT count(*) FROM versions"), 2);
+    let conn = Connection::open(&path).unwrap();
+    conn.execute_batch("INSERT INTO repo_members (repo, user_id) VALUES ('main', 1)").unwrap();
+    assert_eq!(count(&conn, "SELECT may_read FROM repo_members"), 1);
+    assert_eq!(count(&conn, "SELECT may_publish FROM repo_members"), 0);
 }

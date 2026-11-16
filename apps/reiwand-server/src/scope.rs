@@ -1,4 +1,5 @@
 use crate::App;
+use crate::auth::Auth;
 use crate::error::Problem;
 use axum::extract::{FromRequestParts, RawPathParams};
 use axum::http::request::Parts;
@@ -19,6 +20,8 @@ impl FromRequestParts<Arc<App>> for Scope {
             Some(name) => app.repos.get(&name).ok_or_else(|| Problem::missing("repository"))?.name.clone(),
             None => app.repos.first().name.clone(),
         };
+        let auth = Option::<Auth>::from_request_parts(parts, app).await?;
+        crate::access::read(app, &repo, auth.as_ref()).await?;
         Ok(Scope { repo, id: get("id").unwrap_or_default() })
     }
 }

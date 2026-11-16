@@ -14,9 +14,10 @@ pub const HOUR: i64 = 60 * MINUTE;
 pub const DAY: i64 = 24 * HOUR;
 
 const SCHEMA: &str = include_str!("../schema.sql");
-pub const SCHEMA_VERSION: i64 = 12;
+pub const SCHEMA_VERSION: i64 = 13;
 pub const MIN_SCHEMA: i64 = 11;
-const MIGRATIONS: [&str; 1] = [include_str!("../migrations/11-12.sql")];
+const MIGRATIONS: [&str; 2] =
+    [include_str!("../migrations/11-12.sql"), include_str!("../migrations/12-13.sql")];
 
 pub fn now() -> i64 {
     SystemTime::now().duration_since(UNIX_EPOCH).map_or(0, |d| d.as_millis() as i64)

@@ -54,6 +54,8 @@ pub struct People {
     pub draft: Draft,
     pub revoke: Option<i64>,
     pub now: i64,
+    pub repos: Vec<super::rights::Repository>,
+    pub grants: Vec<super::rights::Grant>,
 }
 
 pub fn capital(text: &str) -> String {
@@ -172,5 +174,6 @@ pub fn body(p: &People) -> Markup {
             p.intro { (t("The role of each account is changed only here. Suspending an account closes its sessions.")) }
             (account_rows(p))
         }
+        @if !p.repos.is_empty() { (super::rights::section(p)) }
     }
 }

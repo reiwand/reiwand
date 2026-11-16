@@ -42,16 +42,17 @@ pub fn hidden(c: &Connection) -> Res<Vec<Value>> {
 pub fn history(c: &Connection, case: &Value) -> Res<Value> {
     let (user, current) = (case["uploader_id"].as_i64(), case["package"].as_str().unwrap_or_default());
     let Some(user) = user else { return Ok(json!({"known": false})) };
+    let (repo, version) =
+        (case["repo"].as_str().unwrap_or_default(), case["version"].as_str().unwrap_or_default());
+    let same = "NOT (repo = ?3 AND package_id = ?4 AND version = ?5)";
     let tally = |state: &str| {
-        let sql = "SELECT COUNT(*) FROM versions WHERE uploaded_by = ?1 AND state = ?2 \
-                   AND NOT (package_id = ?3 AND version = ?4)";
-        let version = case["version"].as_str().unwrap_or_default();
-        one::<i64>(c, sql, rusqlite::params![user, state, current, version]).map(Option::unwrap_or_default)
+        let sql = format!("SELECT COUNT(*) FROM versions WHERE uploaded_by = ?1 AND state = ?2 AND {same}");
+        one::<i64>(c, &sql, rusqlite::params![user, state, repo, current, version])
+            .map(Option::unwrap_or_default)
     };
-    let total =
-        "SELECT COUNT(*) FROM versions WHERE uploaded_by = ?1 AND NOT (package_id = ?2 AND version = ?3)";
-    let version = case["version"].as_str().unwrap_or_default();
-    let earlier = one::<i64>(c, total, rusqlite::params![user, current, version])?.unwrap_or_default();
+    let total = format!("SELECT COUNT(*) FROM versions WHERE uploaded_by = ?1 AND ?2 = ?2 AND {same}");
+    let earlier =
+        one::<i64>(c, &total, rusqlite::params![user, 1, repo, current, version])?.unwrap_or_default();
     let strikes = "SELECT COUNT(*) FROM strikes WHERE user_id = ?1 AND expires_at > ?2";
     let strikes = one::<i64>(c, strikes, rusqlite::params![user, now()])?.unwrap_or_default();
     let since = one::<i64>(c, "SELECT created_at FROM users WHERE id = ?1", [user])?.unwrap_or_default();
@@ -65,4 +66,35 @@ pub fn newer(c: &Connection, version_id: i64) -> Res<Option<String>> {
     let sql = "SELECT v2.version FROM versions v2 JOIN versions v ON v.id = ?1 \
                WHERE v2.repo = v.repo AND v2.package_id = v.package_id AND v2.id > v.id ORDER BY v2.id DESC LIMIT 1";
     one::<String>(c, sql, [version_id])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::history;
+    use serde_json::json;
+
+    #[test]
+    fn the_history_keeps_the_same_id_in_two_repositories_apart() {
+        let mut c = rusqlite::Connection::open_in_memory().unwrap();
+        crate::db::create(&mut c).unwrap();
+        c.pragma_update(None, "foreign_keys", "OFF").unwrap();
+        c.execute(
+            "INSERT INTO users (id, handle, role, quota_bytes, created_at) VALUES (1, 'ana', 'user', 1, 0)",
+            [],
+        )
+        .unwrap();
+        let sql = "INSERT INTO versions (repo, package_id, version, sha256, size, kind, title, description, license, \
+                   tags, authors, state, uploaded_by, created_at) VALUES (?1, 'org.example.a', ?2, 'x', 1, 'image', 't', 'd', \
+                   'CC0-1.0', '[]', '[]', ?3, 1, 1)";
+        for (repo, version, state) in [("main", "1.0.0", "published"), ("other", "1.0.0", "rejected")] {
+            c.execute(sql, rusqlite::params![repo, version, state]).unwrap();
+        }
+        let case = |repo: &str| json!({"uploader_id": 1, "package": "org.example.a", "version": "1.0.0", "repo": repo});
+        for repo in ["main", "other"] {
+            let found = history(&c, &case(repo)).unwrap();
+            assert_eq!(found["earlier"], 1, "{repo}: {found}");
+        }
+        let found = history(&c, &case("main")).unwrap();
+        assert_eq!((found["published"].as_i64(), found["rejected"].as_i64()), (Some(0), Some(1)));
+    }
 }

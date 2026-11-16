@@ -190,7 +190,7 @@ notices per hour. Sync writes: 60 per minute per device.
 |--------|------|--------|
 | GET | `/healthz` | `ok` |
 | GET | `/readyz` | `200` or `503` with `{database, repository, index_fresh}` |
-| GET | `/.well-known/reiwand-server` | `{name, version, api: ["v1"], registration, sync: {end_to_end_default, plaintext_requires_confirmation, record_max_bytes, quota_bytes}, uploads: {max_bytes, per_day, licenses}, repository: {url, repo_id, entry_expires} \| null, repositories: [{name, url, repo_id, entry_expires}], legal: {notice, terms, privacy, contact}}` |
+| GET | `/.well-known/reiwand-server` | `{name, version, api: ["v1"], registration, sync: {end_to_end_default, plaintext_requires_confirmation, record_max_bytes, quota_bytes}, uploads: {max_bytes, per_day, licenses}, repository: {url, repo_id, entry_expires} \| null, repositories: [{name, url, repo_id, entry_expires, private, publishing}], legal: {notice, terms, privacy, contact}}` |
 
 ## Repository
 
@@ -222,18 +222,51 @@ answer for the first repository. An upload may carry `repo` (a name; the first w
 HTML package pages show the first repository only.
 
 Moderation stays per server: one team, one set of blocks, one queue. Accounts and tokens are
-shared. Private repositories and per-repository permissions do not exist.
+shared; the history of a case counts the author's other versions in every repository, and leaves out the
+same package id of another repository.
 
 | Method | Path | Role | Answer |
 |--------|------|------|--------|
 | GET | `/api/v1/admin/repos` | admin | `{items}`: name, repo id, root version, share URL and address of each |
 | POST | `/api/v1/admin/repos` | admin | `{name, title?, require_author_signature?, online_authors?}` creates one and answers `{repository, root_key: {fingerprint, secret, shown_once}}`; the root secret key is shown this once and never stored (`409` if the name is taken) |
 | GET | `/api/v1/admin/repos/{repo}` | admin | State of one |
+| PATCH | `/api/v1/admin/repos/{repo}` | admin | `{private?, publishing?}`: `private` hides the repository from non-members; `publishing` is `open` (any account may upload for review, the default) or `members` |
+| GET | `/api/v1/admin/repos/{repo}/members` | admin | `{items: [{user, handle, may_read, may_publish}]}` |
+| PUT | `/api/v1/admin/repos/{repo}/members/{user}` | admin | `{may_read?, may_publish?}`; publishing implies reading; both false removes the member |
+| DELETE | `/api/v1/admin/repos/{repo}/members/{user}` | admin | `204` |
 
 `/admin/repos` lists them and creates one; the same is in setup step 3 for the first one and in
 `reiwand-server repo init|import|status --repo NAME` (default `main`; `status` without `--repo`
 lists all, `repo publish` signs all). The background job signs each repository on its own; a
 failure of one does not stop the others and turns the health row red.
+
+### Private repositories and rights
+
+A repository is public or private (`repos.private`). Members are rows of `repo_members (repo,
+user_id, may_read, may_publish)`; the admin sets them per account in the People page (section
+"Rights in repositories") or with the API above, and marks a repository private in `/admin/repos`.
+Administrators and moderators read every repository; only administrators publish everywhere.
+
+- Reading a private repository (`/r/<name>/…`, `/repo/…` when it is the first, and its catalogue,
+  package, versions, votes and featured routes) needs a bearer token or session of a member.
+  Anyone else, with or without a token, gets `401` with the JSON error code `account_needed`.
+  Any token scope reads it (the device token an app keeps works). Files of a private repository
+  carry `Cache-Control: private, no-cache`. Public repositories need no token, as before.
+- Publishing: an upload names `repo` (API field or web form field). It needs `may_publish` in a
+  private repository or in a public one set to `publishing: members`; otherwise `403` with code
+  `not_allowed`. The default for a public repository is `open`: any account may upload and the
+  upload waits for review or is published as the server's publishing policy says.
+- Discovery: `repositories` lists only the repositories the caller may read (so anonymous callers
+  never see private ones) and each item adds `private` and `publishing`. `GET
+  /.well-known/reiwand-server?repo=<name>` (also `r/<name>`, `/r/<name>/` or `repo` for the first)
+  answers one repository: `{name, private, publishing, registration}`, plus `url` (the repository
+  address) and `repo_id` when the caller may read it, so a client learns that it must ask for an
+  account before it adds a private repository. An unknown name is `404`.
+- `POST /api/v1/auth/session/copy` (body optional `{name}`): from a valid token or session it
+  issues a new, independent token of the same account (`201`, `{id, name, token, scopes,
+  expires_at}`), with only the `catalog:read` and `upload` scopes the source has, and the same
+  expiry (a year for a browser session). Each device that imports an account gets its own copy;
+  revoking one (`DELETE /api/v1/me/tokens/{id}` from the account page) leaves the others alone.
 
 ### Database versions and backups
 

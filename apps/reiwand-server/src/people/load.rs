@@ -30,6 +30,7 @@ pub async fn load(
             Ok((rows(c, &format!("{INVITES} ORDER BY expires_at"), [at])?, rows(c, &users_sql(), [0])?))
         })
         .await?;
+    let (repos, grants) = super::rights::load(app).await?;
     Ok(People {
         me: auth.user,
         invites: invites
@@ -58,6 +59,8 @@ pub async fn load(
         draft,
         revoke,
         now: at,
+        repos,
+        grants,
     })
 }
 

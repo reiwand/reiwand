@@ -1,4 +1,5 @@
 use crate::St;
+use crate::auth::Auth;
 use crate::error::{Problem, Res};
 use axum::body::Body;
 use axum::extract::{Path as Route, State};
@@ -9,9 +10,15 @@ use std::collections::HashMap;
 use std::io::ErrorKind;
 use tokio_util::io::ReaderStream;
 
-pub async fn serve(State(app): St, Route(mut found): Route<HashMap<String, String>>) -> Res<Response> {
+pub async fn serve(
+    State(app): St,
+    auth: Option<Auth>,
+    Route(mut found): Route<HashMap<String, String>>,
+) -> Res<Response> {
     let path = found.remove("path").unwrap_or_default();
     let repo = crate::scope::resolve(&app, found.get("repo").map_or("", String::as_str))?;
+    crate::access::read(&app, &repo.name, auth.as_ref()).await?;
+    let private = crate::access::is_private(&app, &repo.name).await;
     let parts: Vec<&str> = path.split('/').collect();
     let public = matches!(
         parts[0],
@@ -56,7 +63,13 @@ pub async fn serve(State(app): St, Route(mut found): Route<HashMap<String, Strin
         "minisig" | "latest" => "text/plain; charset=utf-8",
         _ => "application/octet-stream",
     };
-    let cache = if path == "entry/latest" { "no-cache" } else { "public, max-age=31536000, immutable" };
+    let cache = if private {
+        "private, no-cache"
+    } else if path == "entry/latest" {
+        "no-cache"
+    } else {
+        "public, max-age=31536000, immutable"
+    };
     let mut response =
         Response::builder().header(header::CONTENT_TYPE, kind).header(header::CACHE_CONTROL, cache);
     response = response.header(header::CONTENT_LENGTH, meta.len());

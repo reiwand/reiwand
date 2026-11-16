@@ -1,5 +1,6 @@
 mod invites;
 mod load;
+mod rights;
 mod view;
 
 use crate::admin::{Edit, change_user};
@@ -24,6 +25,7 @@ pub fn routes() -> Router {
         .route("/admin/personas/invites", post(create))
         .route("/admin/personas/invites/{id}/revoke", post(revoke))
         .route("/admin/personas/accounts/{id}", post(change))
+        .route("/admin/personas/accounts/{id}/rights", post(rights::change))
         .route("/admin/personas/access", post(access))
 }
 

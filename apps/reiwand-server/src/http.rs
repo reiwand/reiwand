@@ -26,6 +26,8 @@ pub fn router(app: Arc<App>) -> Router {
         crate::mod_case::routes,
         admin::routes,
         crate::admin_repos::routes,
+        crate::members::routes,
+        crate::session_copy::routes,
         crate::health::routes,
         crate::people::routes,
         sync::routes,

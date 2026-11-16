@@ -60,6 +60,7 @@ async fn open(State(app): St, auth: Auth, Input(o): Input<Open>) -> Res<impl Int
     auth.scope("upload")?;
     let shown = listed(o.visibility.as_deref())?;
     let repo = crate::scope::resolve(&app, o.repo.as_deref().unwrap_or_default())?.name.clone();
+    crate::access::publish(&app, &repo, &auth).await?;
     let id = start(&app, &auth, o.size, o.sha256, "open").await?;
     let (key, sql) = (id.clone(), "UPDATE uploads SET listed = ?2, repo = ?3 WHERE id = ?1");
     app.db.run(move |c| Ok(c.execute(sql, params![key, shown, repo])?)).await?;

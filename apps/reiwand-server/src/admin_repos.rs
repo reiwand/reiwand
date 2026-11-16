@@ -18,7 +18,7 @@ pub fn routes() -> Router {
     Router::new()
         .route("/admin/repos", get(screen))
         .route("/api/v1/admin/repos", get(list).post(create))
-        .route("/api/v1/admin/repos/{repo}", get(show))
+        .route("/api/v1/admin/repos/{repo}", get(show).patch(crate::members::settings))
 }
 
 #[derive(Deserialize)]
@@ -81,12 +81,40 @@ async fn screen(State(app): St, auth: Option<Auth>) -> Res<Response> {
         return Ok(Redirect::to("/login?next=/admin/repos").into_response());
     };
     let items = infos(&app).await;
+    let state: Vec<(String, bool, String)> = app
+        .db
+        .run(|c| {
+            let mut q = c.prepare("SELECT name, private, publishing FROM repos")?;
+            let found = q.query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?;
+            Ok(found.collect::<Result<Vec<_>, _>>()?)
+        })
+        .await?;
     let body = html! {
         p.texto { (t("Each repository has its own address and its own keys. Moderation and accounts are shared by all of them.")) }
-        table { tbody { @for i in &items { tr {
-            td { code { (text(i, "name")) } }
-            td { (crate::ui::copyable(text(i, "address"), t("Copy"), t("Copied"))) }
-        } } } }
+        p.texto { (t("A private repository shows only to the accounts you give read rights in the People page; publishing there needs publish rights.")) }
+        @for i in &items {
+            @let name = text(i, "name");
+            @let (private, mode) = state.iter().find(|s| s.0 == name).map_or((false, "open"), |s| (s.1, s.2.as_str()));
+            section.seccion {
+                h2 { code { (name) } }
+                (crate::ui::copyable(text(i, "address"), t("Copy"), t("Copied")))
+                form method={ "post" } action={ "/api/v1/admin/repos/" (name) "?_method=PATCH&back=/admin/repos" } {
+                    label { (t("Who can see it"))
+                        select name="private" {
+                            option value="false" selected[!private] { (t("Anyone")) }
+                            option value="true" selected[private] { (t("Only members")) }
+                        }
+                    }
+                    label { (t("Who can publish"))
+                        select name="publishing" {
+                            option value="open" selected[mode == "open"] { (t("Any account, for review")) }
+                            option value="members" selected[mode == "members"] { (t("Only members with publish rights")) }
+                        }
+                    }
+                    button { (t("Save")) }
+                }
+            }
+        }
         form method="post" action="/api/v1/admin/repos?back=/admin/repos" {
             label { (t("Address name")) input name="name" required maxlength="32" pattern="[a-z0-9][a-z0-9\\-]*"; }
             label { (t("Repository name")) input name="title" maxlength="80"; }
