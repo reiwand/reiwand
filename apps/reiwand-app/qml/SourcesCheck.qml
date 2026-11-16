@@ -90,7 +90,18 @@ QtObject {
             fail(found.join(" | "));
     }
 
+    function empty() {
+        const kept = page.providers;
+        page.apply([]);
+        page.open("list");
+        const found = [page.background.visible, page.starters.visible];
+        page.apply(kept);
+        if (found.join() !== "false,true")
+            fail("without sources the list hides the wallpaper behind the page background, or loses its starting cards: " + found.join());
+    }
+
     function exercise() {
+        empty();
         failing(false);
         failing(true);
         page.load();

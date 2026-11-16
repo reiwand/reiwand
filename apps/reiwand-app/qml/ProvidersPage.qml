@@ -23,6 +23,7 @@ Kirigami.Page {
     readonly property string leaf: view === "pick" ? App.tr("Add a source") : view === "add" ? App.tr("Add %1", SourceKinds.of(kind).name) : !!chosen.id ? SourceKinds.heading(chosen) : ""
     readonly property Item shown: body.shown
     readonly property alias cards: list
+    readonly property alias starters: kinds
     readonly property var route: view === "list" ? [] : view === "more" ? [App.tr("Sources"), leaf, App.tr("More options")].concat(level ? [SourceMoreWords.level(level)] : []) : [App.tr("Sources"), leaf]
     readonly property var keyHints: [{
             "keys": ["up", "down"],
@@ -168,10 +169,12 @@ Kirigami.Page {
         filer: dialogs.filer
     }
 
+    // the opaque page background belongs to the inner steps (add, details, more options), like Settings;
+    // the list, even without sources, shows the wallpaper like every other page of the menu
     Binding {
         target: page.background
         property: "visible"
-        value: page.bandLow === 0
+        value: page.view !== "list"
     }
 
     SourceDialogs {
