@@ -14,28 +14,29 @@ for n in range(4):
 PNG
 ctl config playback.software_parallax true
 outputs=()
+shows() { read -r _ _ _ node < <(ctl stream "TEST-2$1" 160 90) && consume "$node" && outputs+=("TEST-2$1"); }
 for n in 0 1 2 3; do
   ctl edit depth import "$WORK/strata-$n.png" "$WORK/strata-$n-depth.png" >/dev/null
   ctl edit parallax "$WORK/strata-$n.png" --source auto --steps 8
-  read -r _ _ _ node < <(ctl stream "TEST-2$n" 160 90)
-  consume "$node" && outputs+=("TEST-2$n")
 done
 still() { field "s['outputs']['$1'].get('still')"; }
 jobs_of() { ctl jobs --json | python3 -c "import json, sys; print(sum(j['kind'] == 'layers' and j['target'].endswith(sys.argv[1]) for j in json.load(sys.stdin)['jobs']))" "$1"; }
 active() { ctl jobs | grep -Eiq "queued|running"; }
 job_of() { ctl jobs --json | python3 -c "import json, sys; print(*[j['id'] for j in json.load(sys.stdin)['jobs'] if j['target'].endswith(sys.argv[1]) and j['state'] in ('queued', 'running')])" "$1"; }
-ctl set "$WORK/strata-0.png" -o TEST-20 --fit fill
+shows 0 && ctl set "$WORK/strata-0.png" -o TEST-20 --fit fill
 wait_for 60 eval '[ "$(still TEST-20)" = None ]' || fail "the daemon did not build the layers: $(ctl jobs)"
-ctl release TEST-20
+leave && outputs=()
 find "$XDG_CACHE_HOME" -name "*.layers.png" | while read -r set; do printf "not a png" >"$set"; done
-read -r _ _ _ node < <(ctl stream TEST-20 160 90) && consume "$node"
-ctl set "$WORK/strata-0.png" -o TEST-20 --fit fill
+stop_daemon "$daemon" && start_daemon "$WORK/restarted.log"
+shows 0 && ctl set "$WORK/strata-0.png" -o TEST-20 --fit fill
 wait_for 30 eval '[ "$(still TEST-20)" = failed ]' || fail "a set that cannot be read did not fail: $(ctl state)"
 ctl screen TEST-20 --size 160x90 --density 2 && sleep 2
 [ "$(still TEST-20)" = failed ] || fail "a set that cannot be read is not failed any more"
-[ "$(jobs_of strata-0.png)" = 1 ] || fail "a set that cannot be read was built again: $(ctl jobs)"
+[ "$(jobs_of strata-0.png)" = 0 ] || fail "a set that cannot be read was built again: $(ctl jobs)"
 ctl retry-layers "$WORK/strata-0.png"
 wait_for 60 eval '[ "$(still TEST-20)" = None ]' || fail "trying again did not build the layers: $(ctl jobs)"
+[ "$(jobs_of strata-0.png)" = 1 ] || fail "trying again did not build the layers once: $(ctl jobs)"
+for n in 1 2 3; do shows "$n"; done
 for n in 1 2 3; do ctl set "$WORK/strata-$n.png" -o "TEST-2$n" --fit fill; done
 job=$(job_of strata-3.png)
 [ -n "$job" ] || fail "the last picture has no layer job: $(ctl jobs)"
