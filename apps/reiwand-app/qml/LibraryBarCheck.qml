@@ -78,6 +78,23 @@ QtObject {
         page.bar.turned(0, 120);
         shelf.turn(0, 120 * library.total);
         must([one, shelf.currentIndex, shelf.turning].join() === "1,0,true", "the wheel does not move the shelf one wallpaper per notch: " + [one, shelf.currentIndex].join());
+        const cover = shelf.view.currentItem;
+        const at = cover.mapToItem(null, cover.width / 2, cover.height / 2);
+        App.backend.wheel(at.x, at.y, -120);
+        must(shelf.currentIndex === 1, "a real turn of the wheel over the shelf does not reach it: " + shelf.currentIndex + " under " + under(cover.Window.contentItem, at.x, at.y));
+        shelf.currentIndex = 0;
+    }
+
+    function under(item, x, y) {
+        const chain = [];
+        for (let here = item, p = Qt.point(x, y); here; ) {
+            chain.push(String(here).split("(")[0]);
+            const next = here.childAt(p.x, p.y);
+            if (next)
+                p = here.mapToItem(next, p.x, p.y);
+            here = next;
+        }
+        return chain.join(" > ");
     }
 
     function refill() {
