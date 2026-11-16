@@ -4222,6 +4222,7 @@ dependencies = [
  "reiwand-schedule",
  "reiwand-script",
  "reiwand-sync",
+ "reiwand-upgrade",
  "reqwest",
  "rquickjs",
  "rquickjs-sys",
@@ -4672,6 +4673,16 @@ dependencies = [
  "reiwand-scene",
  "tracing",
  "woff2-patched",
+]
+
+[[package]]
+name = "reiwand-upgrade"
+version = "1.0.0"
+dependencies = [
+ "anyhow",
+ "rusqlite",
+ "serde_json",
+ "tempfile",
 ]
 
 [[package]]

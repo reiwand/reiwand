@@ -1,0 +1,27 @@
+[package]
+name = "reiwand-upgrade"
+description = "One-time upgrade of stored Reiwand data (server, desktop, phone) to the layout the current programs expect"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lib]
+name = "reiwand_upgrade"
+
+[[bin]]
+name = "reiwand-upgrade"
+path = "src/main.rs"
+required-features = ["server"]
+
+[features]
+default = ["server"]
+server = ["dep:rusqlite"]
+
+[dependencies]
+anyhow.workspace = true
+rusqlite = { workspace = true, optional = true }
+serde_json.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

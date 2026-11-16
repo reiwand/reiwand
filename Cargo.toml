@@ -25,6 +25,7 @@ members = [
     "crates/reiwand-palette",
     "crates/reiwand-android",
     "crates/reiwand-qr",
+    "crates/reiwand-upgrade",
     "apps/reiwandd",
     "apps/reiwand-ctl",
     "apps/reiwand-app",
@@ -47,6 +48,7 @@ reiwand-pipewire = { path = "crates/reiwand-pipewire" }
 reiwand-video = { path = "crates/reiwand-video" }
 reiwand-mix = { path = "crates/reiwand-mix" }
 reiwand-format = { path = "crates/reiwand-format" }
+reiwand-upgrade = { path = "crates/reiwand-upgrade", default-features = false }
 reiwand-schedule = { path = "crates/reiwand-schedule" }
 reiwand-providers = { path = "crates/reiwand-providers" }
 reiwand-scene = { path = "crates/reiwand-scene" }
