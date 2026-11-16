@@ -1,0 +1,133 @@
+use super::looks::{far, turn};
+use crate::Renderer;
+use crate::scene::Image;
+use crate::scene::item::linear;
+use bytemuck::{Pod, Zeroable};
+use reiwand_scene::{Frames, Render, Scene, Stack};
+
+#[repr(C)]
+#[derive(Clone, Copy, Pod, Zeroable)]
+pub(super) struct Look {
+    pub(super) m0: [f32; 4],
+    pub(super) m1: [f32; 4],
+    pub(super) tint: [f32; 4],
+    pub(super) atlas: [f32; 4],
+    pub(super) trail: [f32; 4],
+    pub(super) shade: [f32; 4],
+    pub(super) extra: [f32; 4],
+    pub(super) cut: [f32; 4],
+    pub(super) turn: [f32; 4],
+    pub(super) deep: [f32; 4],
+    pub(super) strand: [f32; 4],
+    pub(super) cord: [f32; 4],
+    pub(super) light: [f32; 4],
+    pub(super) place: [f32; 4],
+    pub(super) bend: [f32; 4],
+    pub(super) hull: [[f32; 4]; 2],
+    pub(super) crops: [f32; 4],
+    pub(super) sizes: [[f32; 4]; 16],
+    pub(super) colors: [[f32; 4]; 64],
+    pub(super) seen: [[f32; 4]; 2],
+    pub(super) window: [f32; 4],
+}
+
+pub(super) struct Kit {
+    pub(super) id: String,
+    pub(super) system: usize,
+    pub(super) layer: Option<String>,
+    pub(super) look: Look,
+    pub(super) order: Option<(Stack, f32)>,
+    pub(super) trail: u32,
+    pub(super) long: bool,
+    pub(super) rope: Option<reiwand_scene::Rope>,
+    pub(super) tex: wgpu::BindGroup,
+    pub(super) stage: Option<(u64, wgpu::ShaderModule, std::sync::Arc<wgpu::naga::Module>)>,
+    pub(super) shader: Option<String>,
+    pub(super) refused: Option<(String, String)>,
+    pub(super) lit: Option<[wgpu::TextureView; 2]>,
+    pub(super) bend: Option<f32>,
+}
+
+type Sprite<'a> = (Option<(&'a str, Option<&'a Image>)>, &'a [[f32; 4]], Option<[[f32; 4]; 2]>);
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn kit(
+    r: &Renderer,
+    layout: &wgpu::BindGroupLayout,
+    (system, layer): (usize, Option<String>),
+    render: &Render,
+    scene: &Scene,
+    (sprite, cells, hull): Sprite,
+    white: &wgpu::TextureView,
+    srgb: bool,
+) -> Kit {
+    let (sizes, colors) = render.luts();
+    let atlas = match cells.len() {
+        0 => sprite.and_then(|(t, _)| scene.assets.get(t)?.atlas).unwrap_or([1, 1]),
+        n => [1, n.min(256) as u32],
+    };
+    let image = sprite.and_then(|(_, image)| image);
+    let own = scene.particles.values().nth(system);
+    let frames = match render.frames {
+        None => 0.0,
+        Some(Frames::Time) => 1.0,
+        Some(Frames::Life) => 2.0,
+        Some(Frames::Random) => 3.0,
+    };
+    let tone = |c: [f32; 4]| if srgb { c } else { [linear(c[0]), linear(c[1]), linear(c[2]), c[3]] };
+    let flag = |b: bool| f32::from(u8::from(b));
+    let stretch = render.stretch;
+    let look = Look {
+        tint: [1.0, flag(srgb), 1.0, flag(image.is_some())],
+        atlas: [atlas[1] as f32, atlas[0] as f32, frames, render.fps],
+        trail: [stretch.time, 0.0, 0.0, flag(render.mix)],
+        shade: [
+            1.0,
+            render.cycles.unwrap_or(1) as f32,
+            stretch.min.unwrap_or(0.0),
+            stretch.max.unwrap_or(1e9),
+        ],
+        extra: [flag(!cells.is_empty()), 0.0, 0.0, render.trail.as_ref().map_or(1.0, |t| t.width)],
+        cut: render.cutout.map_or([0.0, 1.0, 1.0, 0.0], |[a, b, o]| [a, b, o, 1.0]),
+        turn: turn(render),
+        deep: own.map_or([0.0; 4], |s| s.perspective.map_or([0.0; 4], |p| [p.focal.max(1.0), 0.0, 0.0, 1.0])),
+        strand: super::looks::strand(render),
+        cord: super::looks::cord(render),
+        sizes: std::array::from_fn(|i| std::array::from_fn(|j| sizes[i * 4 + j])),
+        colors: colors.map(tone),
+        hull: hull
+            .filter(|_| image.is_some() && cells.is_empty() && render.cutout.is_none())
+            .unwrap_or_default(),
+        ..Zeroable::zeroed()
+    };
+    let view = image.map_or(white, |i| &i.0.view);
+    let mut table = [[0.0f32; 4]; 256];
+    table.iter_mut().zip(cells).for_each(|(t, c)| *t = *c);
+    let rects = crate::filled::filled(
+        (&r.device, &r.queue),
+        "reiwand-scene particle frames",
+        bytemuck::cast_slice(&table),
+        wgpu::BufferUsages::UNIFORM,
+    );
+    let entries = [
+        wgpu::BindGroupEntry { binding: 0, resource: wgpu::BindingResource::TextureView(view) },
+        wgpu::BindGroupEntry { binding: 1, resource: rects.as_entire_binding() },
+    ];
+    let tex =
+        r.device.create_bind_group(&wgpu::BindGroupDescriptor { label: None, layout, entries: &entries });
+    let id = scene.particles.keys().nth(system).cloned().unwrap_or_default();
+    let largest = scene.particles.values().nth(system).map_or(1.0, |s| reiwand_scene::largest(s, render));
+    let order = render.order.map(|o| (o, largest)).or_else(|| far(scene, &id, own));
+    let trail = render.trail.as_ref().map_or(0, |t| if t.long() { t.kept().kept } else { t.length });
+    let long = render.trail.as_ref().is_some_and(|t| t.long());
+    let rope = render.rope;
+    let shader = render.shader.clone();
+    let (stage, refused, lit, bend) = (None, None, None, None);
+    let mut kit =
+        Kit { id, system, layer, look, order, trail, long, rope, tex, stage, shader, refused, lit, bend };
+    super::stage::stage(r, scene, &mut kit, render.shader.as_deref());
+    if kit.stage.is_some() {
+        kit.look.hull = Default::default();
+    }
+    kit
+}

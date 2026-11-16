@@ -1,0 +1,73 @@
+pragma Singleton
+import QtQuick
+import io.github.reiwand.app
+
+QtObject {
+    readonly property var words: [["title", App.tr("Title")], ["artist", App.tr("Artist")], ["album", App.tr("Album")], ["album_artist", App.tr("Album artist")], ["subtitle", App.tr("Subtitle")], ["genres", App.tr("Genres")], ["kind", App.tr("Kind")]]
+    readonly property var numbers: [["position", App.tr("Position")], ["duration", App.tr("Duration")], ["progress", App.tr("Progress")]]
+    readonly property var colors: [["primary", App.tr("Primary color of the cover")], ["secondary", App.tr("Secondary color of the cover")], ["tertiary", App.tr("Tertiary color of the cover")], ["text", App.tr("Text color readable over the primary")], ["contrast", App.tr("Black or white over the primary")]]
+    readonly property var playing: [["playing", App.tr("Playing")]]
+    readonly property var triggers: ({
+            "media:play": App.tr("When the media player starts playing"),
+            "media:pause": App.tr("When the media player stops playing"),
+            "media:track": App.tr("When a new track plays"),
+            "media:cover": App.tr("When a new cover arrives")
+        })
+
+    function trigger(option) {
+        const text = String(option);
+        const at = text.indexOf(":");
+        const kind = text.slice(0, Math.max(0, at));
+        const name = at < 0 ? "" : text.slice(at + 1);
+        const said = {
+            "event": App.tr("At the event %1", name),
+            "click": App.tr("When %1 is clicked or tapped", name),
+            "enter": App.tr("When the pointer enters %1", name),
+            "leave": App.tr("When the pointer leaves %1", name)
+        };
+        return name !== "" && said[kind] !== undefined ? said[kind] : SceneWords.label(option);
+    }
+
+    readonly property var originals: ["Night Drive", "Morning Light", "Evening Tide", "Open Road"]
+    readonly property var tracks: [App.tr("Night Drive"), App.tr("Morning Light"), App.tr("Evening Tide"), App.tr("Open Road")]
+
+    function nextTitle(title) {
+        const at = Math.max(tracks.indexOf(title), originals.indexOf(title));
+        return tracks[(at + 1) % tracks.length];
+    }
+
+    function clock(seconds) {
+        const s = Math.max(0, Math.floor(seconds));
+        const h = Math.floor(s / 3600);
+        const m = Math.floor(s / 60) % 60;
+        const tail = String(s % 60).padStart(2, "0");
+        return h > 0 ? h + ":" + String(m).padStart(2, "0") + ":" + tail : m + ":" + tail;
+    }
+
+    function sample(key, text) {
+        const m = SceneLook.media ?? SceneLook.sample;
+        const at = m.position ?? 0;
+        const length = m.duration ?? 0;
+        const progress = length > 0 ? Math.min(1, at / length) : 0;
+        switch (key) {
+        case "playing":
+            return m.playing ? App.tr("yes") : App.tr("no");
+        case "position":
+            return text ? clock(at) : String(Math.round(at));
+        case "duration":
+            return text ? clock(length) : String(Math.round(length));
+        case "progress":
+            return text ? Math.floor(progress * 100) + "%" : progress.toFixed(2);
+        case "kind":
+            return "music";
+        default:
+            return Array.isArray(m[key]) ? m[key].join(", ") : String(m[key] ?? "");
+        }
+    }
+
+    function sources(widget) {
+        const text = ["text", "texts", "markup"].includes(widget);
+        const found = text ? words.concat(numbers) : widget === "color" ? colors : widget === "bool" ? playing : ["number", "integer", "scalar"].includes(widget) ? playing.concat(numbers) : [];
+        return found.map(s => [s[0], s[1], widget === "color" ? "" : sample(s[0], text)]);
+    }
+}

@@ -1,0 +1,82 @@
+use crate::picture::{Picture, trouble, write};
+use reiwand_core::edit::Edit;
+use serde_json::json;
+use std::os::unix::fs::PermissionsExt;
+
+#[test]
+fn the_editor_draws_its_picture_on_the_gpu() {
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("grey.png");
+    image::RgbaImage::from_pixel(64, 32, image::Rgba([100, 100, 100, 255])).save(&file).unwrap();
+    let picture = match Picture::open(&file) {
+        Ok(picture) => picture,
+        Err(e) => return assert!(std::env::var_os("REIWAND_REQUIRE_GPU").is_none(), "GPU required: {e}"),
+    };
+    let mut edit = Edit::default();
+    let plain = picture.draw(&edit, (false, false)).unwrap();
+    assert_eq!(plain.dimensions(), (64, 32));
+    edit.set("ev", "2").unwrap();
+    edit.act(serde_json::from_value(json!({"crop": {"rect": "0,0,0.5,1", "rotate": 90}})).unwrap()).unwrap();
+    let (cropped, whole) =
+        (picture.draw(&edit, (false, false)).unwrap(), picture.draw(&edit, (true, false)).unwrap());
+    assert_eq!((cropped.dimensions(), whole.dimensions()), ((16, 64), (32, 64)));
+    assert_eq!(picture.draw(&edit, (true, true)).unwrap().dimensions(), (64, 32));
+    assert!(cropped.get_pixel(8, 32)[0] > plain.get_pixel(8, 16)[0] + 40);
+    let path = write(&cropped).unwrap();
+    let data = std::fs::read(&path).unwrap();
+    assert!(data.starts_with(b"P6\n16 64\n255\n") && data.len() == 13 + 16 * 64 * 3);
+    assert_eq!(std::fs::metadata(&path).unwrap().permissions().mode() & 0o777, 0o600);
+    std::fs::remove_file(path).unwrap();
+    assert!(!picture.lost());
+}
+
+#[test]
+fn the_editor_names_why_a_picture_cannot_be_drawn() {
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("broken.png");
+    std::fs::write(&file, b"not a picture").unwrap();
+    assert_eq!(trouble(&Picture::open(&file).err().unwrap()), "decode");
+    assert_eq!(trouble(&reiwand_render::RenderError::NoAdapter("none".into()).into()), "gpu");
+    assert_eq!(trouble(&reiwand_render::RenderError::DeviceLost("reset".into()).into()), "draw");
+}
+
+#[test]
+fn a_gesture_that_starts_without_a_change_still_makes_one_step() {
+    let (mut history, mut last, now) =
+        (reiwand_core::edit::History::default(), None, std::time::Instant::now());
+    let (before, mut after) = (Edit::default(), Edit::default());
+    let drag = |ms| ("set ev ".to_owned(), now + std::time::Duration::from_millis(ms));
+    crate::editsteps::step(&mut history, &mut last, (&before, &after), drag(0));
+    after.set("ev", "1").unwrap();
+    crate::editsteps::step(&mut history, &mut last, (&before, &after), drag(100));
+    let moved = after.clone();
+    after.set("ev", "1.5").unwrap();
+    crate::editsteps::step(&mut history, &mut last, (&moved, &after), drag(200));
+    assert_eq!(history.undo, [before]);
+}
+
+#[test]
+fn a_gesture_that_changes_nothing_never_joins_two_drags() {
+    let (mut history, mut last, now) =
+        (reiwand_core::edit::History::default(), None, std::time::Instant::now());
+    let (before, mut after) = (Edit::default(), Edit::default());
+    let drag = |ms| ("set ev ".to_owned(), now + std::time::Duration::from_millis(ms));
+    after.set("ev", "1").unwrap();
+    run(&mut history, &mut last, (&before, &after), drag(0));
+    run(&mut history, &mut last, (&after, &after), drag(1000));
+    let moved = after.clone();
+    after.set("ev", "1.5").unwrap();
+    run(&mut history, &mut last, (&moved, &after), drag(1100));
+    assert_eq!(history.undo, [before, moved]);
+}
+
+fn run(
+    history: &mut reiwand_core::edit::History,
+    last: &mut crate::editsteps::Last,
+    edits: (&Edit, &Edit),
+    (gesture, at): (String, std::time::Instant),
+) {
+    if crate::editsteps::step(history, last, edits, (gesture.clone(), at)) {
+        crate::editsteps::held(last, &gesture, at);
+    }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "water_ripple",
+  "name": { "en": "Water ripples" },
+  "category": "motion",
+  "description": { "en": "Simulates ripples on water that react to the pointer and clicks.", "es": "Simula ondas en el agua que reaccionan al puntero y a los clics." },
+  "uses": ["cursor"],
+  "mask_mode": "strength",
+  "params": [
+    { "id": "strength", "type": "float", "default": 32, "min": 0, "max": 256 },
+    { "id": "damping", "type": "float", "default": 0.96, "min": 0.5, "max": 0.97 },
+    { "id": "radius", "type": "float", "default": 24, "min": 1, "max": 256 },
+    { "id": "cursor", "type": "float", "default": 1, "min": 0, "max": 8 },
+    { "id": "click", "type": "float", "default": 1, "min": 0, "max": 8, "uses": "clicks" },
+    { "id": "beat", "type": "float", "default": 0, "min": 0, "max": 8, "uses": "audio" },
+    { "id": "specular", "type": "float", "default": 0.15, "min": 0, "max": 2 },
+    { "id": "perspective", "type": "float", "default": 0, "min": 0, "max": 1 },
+    { "id": "reflection", "type": "texture", "tools": ["gray"], "default": "" },
+    { "id": "tint", "type": "color", "default": "#ffffff" },
+    { "id": "walls", "type": "texture", "tools": ["gray"], "default": "" },
+    { "id": "speed", "type": "float", "default": 1, "min": 0, "max": 4 }
+  ],
+  "state": { "scale": 0.25, "settle": 4 },
+  "passes": [
+    { "entry": "fs_water_ripple_step", "scale": 0.25, "inputs": ["state", "asset:walls"], "output": "state" },
+    { "entry": "fs_water_ripple", "inputs": ["input", "state", "asset:reflection"] }
+  ],
+  "cost": { "taps": 3, "passes": 2, "scale": 1 },
+  "reach": "strength",
+  "quality": { "q1": { "scale": 0.5 } }
+}

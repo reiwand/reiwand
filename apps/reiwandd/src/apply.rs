@@ -1,0 +1,182 @@
+use crate::daemon::Daemon;
+use crate::error::{Error, Result, failed, invalid, not_found};
+use crate::jobs::now;
+use crate::look::display;
+use crate::store::private_dir;
+use crate::wallpaper::modified;
+use anyhow::Context;
+use image::RgbaImage;
+use reiwand_core::Fit;
+use reiwand_core::dbus::error::FLASHING;
+use reiwand_core::model::PresetValue;
+use reiwand_library::{Kind, Library};
+use std::io::Write;
+use std::os::unix::fs::MetadataExt;
+use std::path::{Path, PathBuf};
+use std::sync::Arc;
+
+pub fn target_output(output: &str) -> Result<String> {
+    let output = output.trim();
+    if output.len() > 128 || output.chars().any(char::is_control) || output.starts_with('@') {
+        return Err(invalid("invalid output name"));
+    }
+    Ok(output.to_owned())
+}
+
+pub fn parse_fit(fit: &str) -> Result<Option<Fit>> {
+    let fit = Some(fit.trim()).filter(|f| !f.is_empty()).map(str::parse::<Fit>).transpose();
+    fit.map_err(|e| invalid(e.to_string()))
+}
+
+fn find_preset(lib: &Library, item: &str, key: &str) -> Result<Option<(String, PresetValue)>> {
+    let key = key.trim();
+    if key.is_empty() {
+        return Ok(None);
+    }
+    let named = |list: Vec<reiwand_library::Preset>| {
+        list.into_iter().find(|p| p.name.eq_ignore_ascii_case(key) && p.package().is_none())
+    };
+    let found = match lib.preset(key) {
+        Ok(preset) => Some(preset),
+        Err(_) => named(lib.presets(Some(item))?).or(named(lib.presets(None)?)),
+    };
+    let found = crate::items::preset(found.ok_or_else(|| not_found(format!("preset {key:?} not found")))?);
+    Ok(Some((found.uid, found.value)))
+}
+
+pub enum Media {
+    Picture(PathBuf),
+    Video(PathBuf, Option<Arc<crate::sceneprops::Props>>),
+    Scene(Arc<crate::scenes::ScenePack>),
+    Web(Arc<crate::pages::WebPack>),
+}
+
+pub fn materialize(wpak: &Path, blob: &Path) -> anyhow::Result<bool> {
+    let mut package = crate::decode::open(wpak)?;
+    let video = match package.manifest.kind {
+        reiwand_format::Kind::Image => false,
+        reiwand_format::Kind::Video => true,
+        kind => anyhow::bail!("{kind} packages are not files"),
+    };
+    if !blob.is_file() {
+        let dir = blob.parent().unwrap_or(Path::new("."));
+        private_dir(dir)?;
+        let mut file = tempfile::Builder::new().prefix(".tmp-").tempfile_in(dir)?;
+        file.write_all(&package.read_file(&package.manifest.entry.clone())?)?;
+        file.persist(blob)?;
+    }
+    Ok(video)
+}
+
+impl Daemon {
+    pub fn blob(&self, path: &Path, mtime: i64, size: u64) -> PathBuf {
+        let identity = format!("{}\0{mtime}\0{size}", path.to_string_lossy());
+        let name = reiwand_format::sha256(identity.as_bytes()).unwrap_or_default();
+        self.store.cache.join("blobs").join(name)
+    }
+
+    pub fn media(&self, path: PathBuf) -> anyhow::Result<Media> {
+        if Kind::detect(&path) != Some(Kind::Package) {
+            return Ok(if reiwand_video::is_video(&path) {
+                Media::Video(path, None)
+            } else {
+                Media::Picture(path)
+            });
+        }
+        let revoked = self.state().installed.iter().any(|i| i.path == path && i.revoked.is_some());
+        anyhow::ensure!(!revoked, "the package is revoked");
+        match reiwand_format::peek(&path)?.kind {
+            reiwand_format::Kind::Scene => return self.scene_pack(&path).map(Media::Scene),
+            reiwand_format::Kind::Web => return self.web_pack(&path).map(Media::Web),
+            _ => {}
+        }
+        let meta = std::fs::metadata(&path)?;
+        let blob = self.blob(&path, meta.mtime(), meta.len());
+        Ok(match materialize(&path, &blob)? {
+            true => Media::Video(blob, self.video_props(&path).ok()),
+            false => Media::Picture(blob),
+        })
+    }
+
+    pub fn drop_blobs(&self, path: &Path, mtime: i64, size: u64) {
+        let blob = self.blob(path, mtime, size);
+        let name = blob.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+        let entries = std::fs::read_dir(self.store.cache.join("blobs")).into_iter().flatten().flatten();
+        let ours =
+            |e: &std::fs::DirEntry| e.file_name().to_string_lossy().split('.').next() == Some(name.as_str());
+        entries.filter(ours).for_each(|e| drop(std::fs::remove_file(e.path())));
+    }
+
+    pub fn apply(&self, uid: &str, output: &str, fit: &str, preset: &str) -> Result<()> {
+        let (output, fit) = (target_output(output)?, parse_fit(fit)?);
+        let _packages = crate::compositor::lock(&crate::packages::PACKAGES);
+        let (item, preset) =
+            self.store.read(|lib| Ok::<_, Error>((lib.item(uid)?, find_preset(lib, uid, preset)?)))?;
+        if item.missing {
+            return Err(failed(format!("the file of {uid} is missing")));
+        }
+        if let Some(error) = &item.meta.error {
+            return Err(failed(error.clone()));
+        }
+        let flashes = item.package.as_ref().is_some_and(|p| p.photosensitive == Some(true));
+        if flashes && !self.state().config.playback.allow_flashing {
+            return Err(Error::Named(FLASHING, crate::words::flashing_disabled()));
+        }
+        if let Some(package) = self.installed(&item).filter(|i| i.revoked.is_some()) {
+            let reason =
+                serde_json::to_value(package.revoked).ok().and_then(|v| v.as_str().map(String::from));
+            let reason = reason.unwrap_or_default();
+            return Err(failed(format!("{} {} is revoked ({reason})", package.id, package.version)));
+        }
+        if item.package.as_ref().is_some_and(|p| p.kind == "assets") {
+            return Err(failed("an assets package holds parts for scenes and is not a wallpaper"));
+        }
+        if item.package.as_ref().is_some_and(|p| p.kind == "preset") {
+            drop(_packages);
+            return self.apply_variant(&item, &output, fit.map_or(String::new(), |f| f.to_string()).as_str());
+        }
+        let (fit, background, preset) = match preset {
+            Some((uid, PresetValue { fit: preset_fit, background, .. })) => {
+                (fit.or(preset_fit), background, Some(uid))
+            }
+            None => (fit, None, None),
+        };
+        let fit = fit.or_else(|| display(&item.path).fit);
+        let _decoded = self.check_media(&item.path)?;
+        self.change_output(&output, |c| {
+            c.set_image(&output, item.path.clone(), fit);
+            background.as_deref().map_or(Ok(()), |color| c.set_background(&output, color))?;
+            match output.as_str() {
+                "" => c.default.preset = preset,
+                name => c.outputs.entry(name.into()).or_default().preset = preset,
+            }
+            Ok(())
+        })?;
+        let shown: Vec<String> = self
+            .state()
+            .outputs
+            .keys()
+            .filter(|o| !crate::drafts::virtual_output(o))
+            .filter(|o| output.is_empty() || **o == output)
+            .cloned()
+            .collect();
+        match self.store.write(|lib| shown.iter().try_for_each(|o| lib.mark_used(uid, o, now()))) {
+            Ok(()) => self.changes.changed("library", vec![uid.to_owned()]),
+            Err(e) => tracing::warn!("the wallpaper is shown, but its use was not recorded: {e}"),
+        }
+        Ok(())
+    }
+
+    pub fn check_media(&self, path: &Path) -> anyhow::Result<Option<Arc<RgbaImage>>> {
+        anyhow::ensure!(path.is_file(), "{} is not a file", path.display());
+        let file = match self.media(path.to_owned())? {
+            Media::Picture(file) => return Ok(Some(self.load_image(&file, modified(&file)?, None)?)),
+            Media::Scene(_) => return Ok(None),
+            Media::Web(_) => return crate::pages::available().map(|_| None).map_err(|e| anyhow::anyhow!(e)),
+            Media::Video(file, _) => file,
+        };
+        let size = reiwand_video::probe(&file).with_context(|| format!("cannot play {}", path.display()))?;
+        tracing::debug!(path = %path.display(), ?size, "video accepted");
+        Ok(None)
+    }
+}

@@ -1,0 +1,138 @@
+use crate::layers::{assets_of, walk};
+use crate::meta::{ORDER, TOP, adjust};
+use crate::schema::{MANIFEST, PROPERTY, at, branches, choose, deref, root_of};
+use reiwand_scene::{Descriptor, builtin};
+use serde::Serialize;
+use serde_json::{Value, json};
+use std::collections::BTreeMap;
+use std::path::Path;
+use std::sync::Arc;
+
+mod branches;
+mod rigrefs;
+mod walk;
+
+use walk::Walk;
+
+pub type Own = BTreeMap<String, Arc<Descriptor>>;
+static NONE: Own = BTreeMap::new();
+
+pub(crate) const SOURCES: [&str; 8] = ["keys", "prop", "audio", "cursor", "clock", "date", "script", "media"];
+const HIDDEN: [&str; 4] = ["type", "layers", "id", "schema"];
+#[derive(Debug, Clone, Default, PartialEq, Serialize)]
+pub struct Field {
+    pub pointer: String,
+    pub key: String,
+    pub widget: String,
+    pub value: Value,
+    pub default: Value,
+    pub set: bool,
+    pub options: Vec<Value>,
+    pub range: Value,
+    pub unit: String,
+    pub bindable: bool,
+    pub source: String,
+    pub depth: usize,
+    pub sample: Value,
+    pub shown: Value,
+    pub required: bool,
+    pub fixed: Vec<Value>,
+    pub title: String,
+    pub names: Vec<String>,
+    pub help: String,
+    pub dial: bool,
+    pub translatable: bool,
+}
+
+pub(crate) fn candidates(doc: &Value, reference: &str, pointer: &str) -> Vec<Value> {
+    if let Some(found) = crate::settings::candidates(doc, reference, pointer) {
+        return found;
+    }
+    let owner = pointer.strip_suffix("/parent").filter(|o| o.starts_with("/scene/layers/"));
+    if let Some(id) = owner.and_then(|o| doc.pointer(o)?["id"].as_str()).filter(|_| reference == "layer") {
+        return crate::seats::parents(doc, id).into_iter().map(Value::String).collect();
+    }
+    let keys =
+        |p: &str| doc.pointer(p).and_then(Value::as_object).map(|o| o.keys().map(|k| json!(k)).collect());
+    let ids = |p: &str| {
+        doc.pointer(p).and_then(Value::as_array).map(|l| l.iter().map(|t| t["id"].clone()).collect())
+    };
+    match reference {
+        "layer" => match pointer.strip_prefix("/scene/particles/").and_then(|p| p.split('/').next()) {
+            Some(id) => crate::swarms::sources(doc, &id.replace("~1", "/").replace("~0", "~")),
+            None => {
+                let template = pointer.strip_prefix("/scene/templates/").and_then(|p| p.split('/').next());
+                let own = template
+                    .and_then(|t| doc["scene"]["templates"].get(t.replace("~1", "/").replace("~0", "~")));
+                let wrapped = own.map(|l| json!({ "scene": { "layers": [l] } })).unwrap_or_default();
+                walk(&wrapped).into_iter().chain(walk(doc)).map(|(_, l)| l["id"].clone()).collect()
+            }
+        },
+        "system" => keys("/scene/particles").unwrap_or_default(),
+        "control" => crate::swarms::controls(doc, pointer),
+        "timeline" => ids("/scene/timelines").unwrap_or_default(),
+        "language" => crate::meta::languages(doc),
+        "effect" => {
+            let own =
+                doc["scene"]["effects"].as_object().into_iter().flat_map(|o| o.keys().map(|k| json!(k)));
+            builtin().iter().map(|d| json!(d.id)).chain(own).collect()
+        }
+        "video" if pointer.starts_with("/scene/") => {
+            let pools = keys("/scene/pools").unwrap_or_default();
+            assets_of(doc, "video").into_iter().map(|a| json!(a)).chain(pools).collect()
+        }
+        "image" if crate::films::takes(pointer) => crate::films::pictures(doc),
+        kind => assets_of(doc, kind).into_iter().map(|a| json!(a)).collect(),
+    }
+}
+
+pub fn fields_from(dir: Option<&Path>, doc: &Value, pointer: &str, time: f64, own: &Own) -> Vec<Field> {
+    let mut out = fields_in(dir, doc, pointer, own);
+    for f in &mut out {
+        f.shown = match f.source.as_str() {
+            "keys" => crate::kinded::shown(doc, &f.pointer, &f.value, time),
+            "" if f.set => f.value.clone(),
+            "" => f.default.clone(),
+            _ => Value::Null,
+        };
+    }
+    out
+}
+
+pub fn fields(doc: &Value, pointer: &str) -> Vec<Field> {
+    fields_in(None, doc, pointer, &NONE)
+}
+
+pub fn fields_in(dir: Option<&Path>, doc: &Value, pointer: &str, own: &Own) -> Vec<Field> {
+    let (Some((root, _)), Some(schema)) = (root_of(pointer), at(doc, pointer)) else { return Vec::new() };
+    let value = doc.pointer(pointer).cloned().unwrap_or_default();
+    let (hidden, order): (&[&str], &str) = match pointer {
+        "/manifest" => (&TOP, ORDER),
+        _ if std::ptr::eq(root, &*MANIFEST) => (&[], ORDER),
+        _ if std::ptr::eq(root, &*PROPERTY) => (&HIDDEN, crate::settings::ORDER),
+        _ => (&HIDDEN, ""),
+    };
+    let mut walk = Walk { dir, doc, own, root, hidden, order, out: Vec::new() };
+    let (mut resolved, _) = deref(root, &schema);
+    for _ in 0..3 {
+        let open = !resolved["properties"].is_object() && resolved.get("oneOf").is_none();
+        if !(value.is_object() && open && !branches(resolved).is_empty()) {
+            break;
+        }
+        resolved = deref(root, choose(root, resolved, &value)).0;
+    }
+    match resolved["properties"].is_object() || resolved.get("oneOf").is_some() {
+        true => walk.object(resolved, &value, pointer, 0),
+        false => walk.field(
+            &schema,
+            doc.pointer(pointer),
+            pointer.into(),
+            pointer.rsplit('/').next().unwrap_or(""),
+            0,
+        ),
+    }
+    crate::forms::extend(dir, doc, pointer, &mut walk.out);
+    walk.out.retain(|f| crate::meta::applies(doc, &f.pointer));
+    walk.out.iter_mut().for_each(|f| adjust(doc, f));
+    walk.out
+}

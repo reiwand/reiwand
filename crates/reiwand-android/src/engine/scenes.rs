@@ -1,0 +1,179 @@
+use super::fade::{Fading, Gone};
+use super::{Engine, FRAMES};
+use crate::Error;
+use crate::choice::{self, Shown};
+use crate::power::{self, Power};
+use crate::settings;
+use crate::stage::Stage;
+use ndk::native_window::NativeWindow;
+use reiwand_core::Fit;
+use reiwand_render::{Layer, RenderError};
+use std::path::Path;
+use std::sync::Arc;
+use std::sync::atomic::Ordering::Relaxed;
+
+impl Engine {
+    pub(super) fn stage(&mut self, shown: Option<&Shown>) {
+        let loaded = |s: &Shown| crate::variant::loaded(&s.path, s.preset.as_deref());
+        let next = match shown.filter(|shown| shown.scene).map(|shown| (&shown.uid, loaded(shown))) {
+            Some((uid, Ok(pack))) => match self.stage.as_mut() {
+                Some(stage)
+                    if stage.uid == *uid && stage.lock == self.lock && Arc::ptr_eq(&stage.pack, &pack) =>
+                {
+                    return stage.refresh();
+                }
+                _ => Some(Stage::on(uid.clone(), pack, (self.lock, self.preview))),
+            },
+            Some((_, Err(e))) => {
+                log::warn!("cannot show the scene: {e}");
+                None
+            }
+            None => None,
+        };
+        let old = std::mem::replace(&mut self.stage, next).filter(|old| old.image().is_some());
+        self.unreport();
+        let fades = !settings::look(self.lock).fade.is_zero() && shown.is_some() && self.fading.is_none();
+        if let Some(mut old) = old.filter(|_| fades) {
+            old.mute();
+            (self.fading, self.image) = (Some(Fading::new(Gone::Scene(Box::new(old)))), None);
+        }
+    }
+
+    pub(super) fn unreport(&self) {
+        if !self.preview && self.stage.is_none() {
+            crate::stage::report::forget(usize::from(self.lock));
+        }
+    }
+
+    pub(crate) fn clips(&mut self) -> Option<Vec<String>> {
+        let shown = choice::shown_on(self.preview, self.lock).filter(|shown| !shown.video);
+        if self.film.is_none() {
+            self.stage(shown.as_ref());
+        }
+        let mut paths: Vec<String> =
+            self.reels().iter().filter_map(|(_, path)| path.to_str().map(String::from)).collect();
+        paths.sort();
+        paths.dedup();
+        Some(paths)
+    }
+
+    pub(crate) fn clip(&mut self, path: &Path, open: bool) -> Result<Option<NativeWindow>, Error> {
+        if !open {
+            self.clips.close(path);
+            return Ok(None);
+        }
+        let wanted = self.reels().iter().any(|(_, p)| p == path);
+        wanted.then(|| self.clips.open(path)).transpose()
+    }
+
+    pub(crate) fn inputs(&self) -> i32 {
+        if let Some(handle) = self.paged {
+            return self.page_inputs(handle);
+        }
+        let [audio, touch] = self.stage.as_ref().map_or([false; 2], Stage::wants);
+        let films = self.film.is_some() || self.reels().iter().any(|(id, _)| id.starts_with('\0'));
+        let (moving, plays) = (Power::now().moving(), films || self.stage.as_ref().is_some_and(Stage::plays));
+        i32::from(audio && moving && crate::power::hears())
+            | (i32::from(touch) << 1)
+            | (i32::from(plays && moving) << 2)
+            | (i32::from(self.stage.as_ref().is_some_and(Stage::hears_media)) << 3)
+    }
+
+    pub(crate) fn touch(&mut self, x: f32, y: f32, down: bool) -> bool {
+        if let Some(handle) = self.paged.filter(|_| down && !self.lock) {
+            crate::opened::pressed(handle);
+        }
+        let at = [x / self.size.0 as f32, y / self.size.1 as f32].map(|v| v.clamp(0.0, 1.0));
+        self.stage.as_mut().is_some_and(|stage| stage.touch(at, down))
+    }
+
+    pub(crate) fn visible(&mut self, shown: bool) {
+        let was = !std::mem::replace(&mut self.hidden, !shown);
+        if !self.preview && was != shown {
+            crate::perf::spans::show(self.lock, shown);
+        }
+        if !shown {
+            self.forget_old_gpu();
+            self.hint(0);
+            self.stage.iter_mut().for_each(Stage::hide);
+        }
+    }
+
+    pub(crate) fn looped(&self, nanos: i64, ms: f32) {
+        if !self.preview {
+            crate::perf::looped(self.lock, nanos, ms);
+        }
+    }
+
+    pub(super) fn forget_old_gpu(&mut self) {
+        if self.target.as_ref().is_some_and(|(gpu, _)| !gpu.current()) {
+            (self.target, self.image, self.fading, self.raised, self.dirty) = (None, None, None, None, true);
+            self.checked = (0, 0, (0, 0));
+            self.stage.iter_mut().for_each(Stage::drop_view);
+            self.clips.forget();
+            crate::gpu::trim();
+        }
+    }
+
+    pub(super) fn shoot(
+        &mut self,
+        nanos: i64,
+        fps: u32,
+        power: Power,
+    ) -> Result<Option<(u32, i64)>, RenderError> {
+        let (Some(stage), Some((gpu, surface))) = (self.stage.as_mut(), self.target.as_mut()) else {
+            return Ok(None);
+        };
+        let tier = power::tier(gpu.renderer.software(), gpu.renderer.compute()).min(gpu.renderer.tier());
+        let lit = crate::hdr::light(&gpu.renderer, surface, power.charging, stage.top())?.0;
+        stage.light(lit);
+        stage.turn();
+        stage.reports = (!self.preview).then_some(usize::from(self.lock));
+        stage.measured = self.measured;
+        let wanted = stage.videos();
+        let headroom = if stage.top() { lit } else { 1.0 };
+        let videos = self.clips.frames(&gpu.renderer, (gpu.epoch, headroom), &wanted);
+        let shot =
+            stage.render(&gpu.renderer, (self.size, nanos, fps), (power, tier), &videos, self.dirty)?;
+        let (hint, delay) = (shot.fps, shot.delay);
+        if let Some(image) = shot.image {
+            let shown = Layer {
+                image: Some(image),
+                fit: Fit::Stretch,
+                background: [0; 3],
+                opacity: 1.0,
+                uv: None,
+                relief: None,
+                flip: [false; 2],
+                grade: self.look.grade,
+            };
+            let at = self.measured.then(std::time::Instant::now);
+            let presented =
+                crate::counted::gpu(|| gpu.renderer.present_layers(surface, self.size, &[shown], || {}));
+            if let Some(at) = at {
+                let ms = at.elapsed().as_secs_f32() * 1e3;
+                crate::perf::presented(ms, mode(surface.present_mode()), surface.latency());
+            }
+            self.dirty = !presented?;
+            if !self.dirty {
+                self.presented = nanos;
+                FRAMES.fetch_add(1, Relaxed);
+            }
+        }
+        let delay = stage.until_turn(delay);
+        if delay == 0 {
+            stage.rest();
+        }
+        Ok(Some((hint, delay)))
+    }
+}
+
+fn mode(mode: wgpu::PresentMode) -> &'static str {
+    match mode {
+        wgpu::PresentMode::Fifo => "fifo",
+        wgpu::PresentMode::FifoRelaxed => "fifo relaxed",
+        wgpu::PresentMode::Mailbox => "mailbox",
+        wgpu::PresentMode::Immediate => "immediate",
+        _ => "automatic",
+    }
+}

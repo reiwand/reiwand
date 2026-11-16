@@ -1,0 +1,86 @@
+use rquickjs::loader::{ImportAttributes, Loader, Resolver};
+use rquickjs::module::Declared;
+use rquickjs::{Ctx, Error, Module, Result};
+use std::collections::HashMap;
+
+const PARTS: [(&str, &str); 19] = [
+    ("reiwand", include_str!("js/prelude.js")),
+    ("reiwand/math", include_str!("js/math.js")),
+    ("reiwand:scalars", include_str!("js/scalars.js")),
+    ("reiwand:vectors", include_str!("js/vectors.js")),
+    ("reiwand:matrices", include_str!("js/matrices.js")),
+    ("reiwand:core", include_str!("js/core.js")),
+    ("reiwand:values", include_str!("js/values.js")),
+    ("reiwand:base", include_str!("js/base.js")),
+    ("reiwand:extras", include_str!("js/extras.js")),
+    ("reiwand:layers", include_str!("js/layers.js")),
+    ("reiwand:kin", include_str!("js/kin.js")),
+    ("reiwand:rigs", include_str!("js/rigs.js")),
+    ("reiwand:stage", include_str!("js/stage.js")),
+    ("reiwand:keep", include_str!("js/keep.js")),
+    ("reiwand:folders", include_str!("js/folders.js")),
+    ("reiwand:player", include_str!("js/player.js")),
+    ("reiwand:molds", include_str!("js/molds.js")),
+    ("reiwand:media", include_str!("js/media.js")),
+    ("reiwand:life", include_str!("js/life.js")),
+];
+
+#[derive(Clone)]
+pub(crate) struct Modules {
+    pub(crate) sources: HashMap<String, String>,
+}
+
+fn part(name: &str) -> Option<&'static str> {
+    PARTS.iter().find(|(n, _)| *n == name).map(|(_, s)| *s)
+}
+
+fn joined(base: &str, name: &str) -> String {
+    let mut parts: Vec<&str> = base.rsplit_once('/').map_or(Vec::new(), |(dir, _)| dir.split('/').collect());
+    for part in name.split('/') {
+        match part {
+            "." | "" => {}
+            ".." => {
+                parts.pop();
+            }
+            part => parts.push(part),
+        }
+    }
+    parts.join("/")
+}
+
+impl Resolver for Modules {
+    fn resolve<'js>(
+        &mut self,
+        _: &Ctx<'js>,
+        base: &str,
+        name: &str,
+        _: Option<ImportAttributes<'js>>,
+    ) -> Result<String> {
+        let refused = |why: &str| Err(Error::new_resolving_message(base, name, why));
+        let path = match name {
+            "reiwand" | "reiwand/math" => return Ok(name.to_owned()),
+            inner if part(base).is_some() && part(inner).is_some() => return Ok(name.to_owned()),
+            relative if relative.starts_with("./") || relative.starts_with("../") => joined(base, relative),
+            plain => plain.to_owned(),
+        };
+        match self.sources.contains_key(&path) && part(&path).is_none() {
+            true => Ok(path),
+            false => refused("only reiwand, reiwand/math and the scripts of the scene can be imported"),
+        }
+    }
+}
+
+impl Loader for Modules {
+    fn load<'js>(
+        &mut self,
+        ctx: &Ctx<'js>,
+        name: &str,
+        _: Option<ImportAttributes<'js>>,
+    ) -> Result<Module<'js, Declared>> {
+        let source = match part(name) {
+            Some(source) => source,
+            None => self.sources.get(name).ok_or_else(|| Error::new_loading(name))?,
+        };
+        Module::declare(ctx.clone(), name, source)
+    }
+}

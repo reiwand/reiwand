@@ -1,0 +1,163 @@
+use crate::actions::{locked, solo};
+use crate::canvas::gizmos;
+use crate::check::review;
+use crate::findings::Problem;
+use crate::layers::{KINDS, asset_kind, walk};
+use crate::ops::escape;
+use crate::project::Project;
+use crate::starters::STARTERS;
+use serde_json::{Value, json};
+
+fn tracks(value: &Value, pointer: &str, out: &mut Vec<(String, Value)>) {
+    match value {
+        Value::Object(map) if map.get("keys").is_some_and(Value::is_array) => {
+            out.push((pointer.into(), value.clone()))
+        }
+        Value::Object(map) => {
+            map.iter().for_each(|(k, v)| tracks(v, &format!("{pointer}/{}", escape(k)), out))
+        }
+        Value::Array(list) => {
+            list.iter().enumerate().for_each(|(i, v)| tracks(v, &format!("{pointer}/{i}"), out))
+        }
+        _ => {}
+    }
+}
+
+pub fn moving(project: &Project, time: f64) -> Value {
+    json!(shown_gizmos(project, &project.seen(), time))
+}
+
+fn shown_gizmos(project: &Project, seen: &Value, time: f64) -> Vec<crate::canvas::Gizmo> {
+    let mut shown = gizmos(&project.dir, seen, time);
+    shown.iter_mut().for_each(|g| g.pointer = crate::scope::shown(&g.pointer, project.scope.as_deref()));
+    shown
+}
+
+pub fn outline(project: &Project, time: f64, files: &[Problem]) -> Value {
+    let (doc, seen, scope) = (&project.doc, project.seen(), project.scope.as_deref());
+    let walked = walk(&seen).into_iter();
+    let all: Vec<_> =
+        walked.map(|(p, l)| (crate::scope::shown(&p, scope), l, p.matches("/layers/").count())).collect();
+    let (locked, solo) = (locked(doc), solo(doc));
+    let layers: Vec<Value> = all
+        .iter()
+        .map(|(pointer, l, depth)| {
+            let id = l["id"].as_str().unwrap_or_default();
+            let label = crate::starters::label(id).map_or_else(|| id.to_owned(), |m| m.local());
+            let hidden = l["visible"] == false || l["play"] == false;
+            json!({"id": id, "label": label, "type": l["type"], "pointer": pointer, "depth": depth - 1,
+                "hidden": hidden, "locked": locked.iter().any(|x| x == id), "solo": solo == Some(id),
+                "effects": l["effects"].as_array().map_or(0, Vec::len)})
+        })
+        .collect();
+    let layer_of = |pointer: &str| {
+        let owner =
+            all.iter().filter(|(p, ..)| pointer.starts_with(&format!("{p}/"))).max_by_key(|(p, ..)| p.len());
+        owner.map_or(Value::Null, |(_, l, _)| l["id"].clone())
+    };
+    let mut found = Vec::new();
+    tracks(&doc["scene"], "/scene", &mut found);
+    let tracks: Vec<Value> = found
+        .into_iter()
+        .map(|(pointer, v)| {
+            let key = pointer.rsplit('/').next().unwrap_or_default().to_owned();
+            json!({"pointer": pointer, "layer": layer_of(&pointer), "key": key, "keys": v["keys"], "timeline": v["timeline"], "base": v["base"]})
+        })
+        .collect();
+    let assets = doc.pointer("/scene/assets").and_then(Value::as_object).into_iter().flatten();
+    let assets: Vec<Value> = assets
+        .map(|(id, a)| {
+            let path = a["path"].as_str().unwrap_or_default();
+            let size = std::fs::metadata(project.dir.join(path)).map_or(0, |m| m.len());
+            let texture = crate::pictures::glance(&project.dir.join(path));
+            json!({"id": id, "path": path, "kind": asset_kind(path), "size": size, "media": a["media"], "pointer": format!("/scene/assets/{}", escape(id)),
+                "texture": texture.map(|t| json!({"hdr": t.hdr, "frames": t.frames, "cube": t.cube}))})
+        })
+        .collect();
+    let scripts = doc.pointer("/scene/scripts").and_then(Value::as_array).into_iter().flatten().enumerate();
+    let scripts: Vec<Value> = scripts
+        .map(|(i, s)| {
+            let path = s["path"].as_str().unwrap_or_default();
+            let meta = std::fs::metadata(project.dir.join(path)).ok();
+            let size = meta.as_ref().map_or(0, |m| m.len());
+            let stamp = crate::scripts::stamp(&project.dir, &json!({"scene": {"scripts": [s]}}));
+            json!({"path": path, "size": size, "pointer": format!("/scene/scripts/{i}"), "stamp": stamp, "entry": s})
+        })
+        .collect();
+    let package_effects = doc.pointer("/scene/effects").and_then(Value::as_object).into_iter().flatten();
+    let package_effects: Vec<Value> = package_effects
+        .map(|(id, e)| {
+            let size = ["descriptor", "wgsl"]
+                .into_iter()
+                .filter_map(|k| e[k].as_str())
+                .map(|p| std::fs::metadata(project.dir.join(p)).map_or(0, |m| m.len()))
+                .sum::<u64>();
+            json!({"id": id, "size": size, "pointer": format!("/scene/effects/{}", escape(id))})
+        })
+        .collect();
+    let timelines = doc["scene"]["timelines"].as_array().into_iter().flatten().enumerate();
+    let timelines: Vec<Value> = timelines
+        .map(|(i, t)| {
+            let counted = t["frames"].as_f64().zip(t["fps"].as_f64()).map(|(n, fps)| json!(n / fps.max(1.0)));
+            let duration = t.get("duration").cloned().or(counted).unwrap_or_default();
+            json!({"id": t["id"], "duration": duration, "loop": t["loop"], "pointer": format!("/scene/timelines/{i}")})
+        })
+        .collect();
+    let length = timelines.iter().filter_map(|t| t["duration"].as_f64()).fold(10.0, f64::max);
+    let mut problems = review(doc, Some(&project.dir));
+    problems.extend(
+        files
+            .iter()
+            .filter(|p| !problems.iter().any(|q| q.message == p.message))
+            .cloned()
+            .collect::<Vec<_>>(),
+    );
+    let systems: Vec<&String> =
+        doc["scene"]["particles"].as_object().map(|p| p.keys().collect()).unwrap_or_default();
+    problems.iter_mut().for_each(|p| p.message = p.said.local());
+    let (done, undone) = project.history.labels();
+    let step = |name: Option<&&str>| name.map(|n| crate::history::step(n).local());
+    let (undo, redo) = (step(done.last()), step(undone.first()));
+    let shown = shown_gizmos(project, &seen, time);
+    let outside: Vec<Value> = match scope {
+        Some(_) => walk(doc).into_iter().map(|(_, l)| json!({"id": l["id"], "type": l["type"]})).collect(),
+        None => Vec::new(),
+    };
+    let m = &doc["manifest"];
+    let title = crate::meta::title(doc, &reiwand_core::locale::languages());
+    json!({"title": title, "id": m["id"], "version": m["version"], "license": m["license"], "canvas": doc["scene"]["canvas"],
+        "v2": m["schema"] == reiwand_format::SCHEMA, "rating": m["content"]["rating"], "photosensitive": m["photosensitive"],
+        "layers": layers, "outside": outside, "gizmos": shown, "followed": crate::followed::followed(project, time), "camera2d": crate::seats::lens::frame(&seen, time), "probe": seen.pointer("/scene/ext/editor/probe"), "problems": problems, "assets": assets, "scripts": scripts, "templates": crate::templates::tree(&project.dir, doc),
+        "pools": crate::pools::list(doc)["pools"],
+        "package_effects": package_effects,
+        "properties": crate::listing::rows(doc), "presets": crate::listing::presets(doc),
+        "property_kinds": crate::props::PROPERTY_KINDS, "timelines": timelines, "tracks": tracks, "length": length, "systems": systems,
+        "history": {"done": done, "undone": undone, "undo": undo, "redo": redo}, "dirty": project.dirty(), "recoverable": project.pending.is_some(),
+        "kinds": KINDS, "screen_sizes": crate::action::SCREENS.map(|(name, size)| json!({"name": name, "size": size})), "starters": STARTERS, "easings": reiwand_scene::easings(),
+        "effects": reiwand_scene::builtin().iter().map(|d| d.id.as_str()).chain(own(doc)).collect::<Vec<_>>(),
+        "effect_names": names(project), "effect_catalog": catalog(project),
+        "kind": crate::pages::kind(doc), "page_starters": crate::pages::PAGE_STARTERS, "bundle_starters": crate::bundles::BUNDLE_STARTERS,
+        "files": if crate::pages::scened(doc) { Vec::new() } else { crate::pages::files(&project.dir, doc) }})
+}
+
+fn names(project: &Project) -> serde_json::Map<String, Value> {
+    let languages = reiwand_core::locale::languages();
+    let named = project.effects().into_values().filter(|d| !d.name.is_empty());
+    named
+        .map(|d| (d.id.clone(), json!(reiwand_scene::Text::Localized(d.name.clone()).pick(&languages))))
+        .collect()
+}
+
+pub fn catalog(project: &Project) -> Vec<Value> {
+    let languages = reiwand_core::locale::languages();
+    let entry = |d: &reiwand_scene::Descriptor| {
+        json!({"id": d.id, "category": d.category,
+            "description": d.description.as_ref().map(|t| t.pick(&languages)), "units": d.units()})
+    };
+    let own = project.effects();
+    reiwand_scene::builtin().iter().map(entry).chain(own.values().map(|d| entry(d.as_ref()))).collect()
+}
+
+fn own(doc: &Value) -> impl Iterator<Item = &str> {
+    doc["scene"]["effects"].as_object().into_iter().flat_map(|o| o.keys().map(String::as_str))
+}

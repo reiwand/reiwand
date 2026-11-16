@@ -1,0 +1,21 @@
+pub const TEXTS: super::Texts = &[
+    ("Repository", "Repositorio"),
+    ("Invitations", "Invitaciones"),
+    ("{} use left", "{} uso restante"),
+    ("{} uses left", "{} usos restantes"),
+    ("Revoke", "Revocar"),
+    ("Role", "Rol"),
+    ("Create invitation", "Crear invitación"),
+    ("Accounts", "Cuentas"),
+    ("Status", "Estado"),
+    ("Save", "Guardar"),
+    ("Featured packages", "Fondos destacados"),
+    (
+        "Featured packages are signed into the repository; clients show them apart in their catalog.",
+        "Los fondos destacados se firman en el repositorio; los clientes los muestran aparte en su catálogo.",
+    ),
+    ("Stop featuring", "Dejar de destacar"),
+    ("Package id", "Identificador del fondo"),
+    ("Note", "Nota"),
+    ("Feature", "Destacar"),
+];

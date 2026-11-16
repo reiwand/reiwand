@@ -1,0 +1,11 @@
+[package]
+name = "reiwand-rgb"
+description = "Client of the OpenRGB SDK protocol for Reiwand: devices, their lights and pictures spread over them"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+reiwand-core.workspace = true
+thiserror.workspace = true

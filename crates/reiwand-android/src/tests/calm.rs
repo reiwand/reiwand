@@ -1,0 +1,79 @@
+use super::*;
+
+fn blink(id: &str, photosensitive: bool) -> (String, std::path::PathBuf) {
+    let source = tempfile::tempdir().unwrap();
+    let opacity = json!({ "timeline": "blink", "keys": [[0, 0], [0.05, 1], [0.1, 0]] });
+    let layers = json!([{ "id": "flash", "type": "solid", "color": "#ffffff", "opacity": opacity }]);
+    let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32], "background": "#000000" },
+        "clock": { "poster_time": 0.03 }, "layers": layers,
+        "timelines": [{ "id": "blink", "duration": 0.1, "loop": "repeat" }] });
+    fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
+    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": id, "version": "1.0.0", "title": "Blink",
+        "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" },
+        "photosensitive": photosensitive, "origin": { "kind": "original" } });
+    fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
+    let built = source.path().join("blink.wpak");
+    reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();
+    let uid = store::store(&mut File::open(&built).unwrap(), "blink.wpak").unwrap().0;
+    let path = library::with(|lib| Ok(lib.item(&uid)?.path)).unwrap();
+    (uid, path)
+}
+
+pub(super) fn calmed() {
+    let (uid, path) = blink("org.example.blink", true);
+    let (glow, glowing) = blink("org.example.glow", false);
+    let power = power::Power {
+        charging: true,
+        saver: false,
+        low: false,
+        thermal: 0,
+        headroom: 0.0,
+        still: false,
+        percent: -1,
+    };
+    let still = power::Power { still: true, ..power };
+    if let Some(r) = renderer() {
+        let mut stage = Stage::new(uid.clone(), pack::load(&path).unwrap());
+        for n in 0..4 {
+            let shot =
+                stage.render(r, ((64, 32), n * 100_000_000, 60), (still, reiwand_scene::Tier::T3), &[], true);
+            let shot = shot.unwrap();
+            assert!(shot.fps == 0 && (1..=60_000).contains(&shot.delay), "reduced motion kept moving");
+        }
+        assert!(ask(json!({ "op": "confirm", "uid": uid, "what": "motion" }))["error"].is_string());
+        assert!(!Stage::new(uid.clone(), pack::load(&path).unwrap()).moving, "a flashing scene kept moving");
+        assert_eq!(ask(json!({ "op": "confirm", "uid": glow, "what": "motion" })), Value::Null);
+        let mut stage = Stage::new(glow.clone(), pack::load(&glowing).unwrap());
+        let fps =
+            stage.render(r, ((64, 32), 0, 60), (still, reiwand_scene::Tier::T3), &[], true).unwrap().fps;
+        assert!(stage.moving && fps > 0, "a scene allowed to move stayed still");
+        assert_eq!(ask(json!({ "op": "unconfirm", "uid": glow, "what": "motion" })), Value::Null);
+        stage.refresh();
+        let at = ((64, 32), 1_000_000, 60);
+        let fps = stage.render(r, at, (still, reiwand_scene::Tier::T3), &[], true).unwrap().fps;
+        assert!(!stage.moving && fps == 0, "a withdrawn choice kept the scene moving");
+        assert_eq!(settings::setting("playback.allow_flashing", Some("false")).unwrap(), "false");
+        assert!(power::guarded());
+        let mut stage = Stage::new(uid.clone(), pack::load(&path).unwrap());
+        for n in 0..240 {
+            stage
+                .render(
+                    r,
+                    ((64, 32), n * 1_000_000_000 / 60, 60),
+                    (power, reiwand_scene::Tier::T3),
+                    &[],
+                    true,
+                )
+                .unwrap();
+        }
+        assert_ne!(crate::stage::report::flashes(), "", "the guard let ten flashes a second through");
+        settings::setting("playback.allow_flashing", Some("true")).unwrap();
+        assert!(!power::guarded());
+    }
+    assert!(power::hears());
+    assert_eq!(settings::setting("playback.scene_capture", Some("false")).unwrap(), "false");
+    assert!(!power::hears(), "the switch did not stop the scenes from hearing");
+    settings::setting("playback.scene_capture", Some("true")).unwrap();
+    assert!(power::hears());
+    assert_eq!(ask(json!({ "op": "remove", "uids": [uid, glow] })), Value::Null);
+}

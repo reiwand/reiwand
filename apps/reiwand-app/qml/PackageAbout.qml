@@ -1,0 +1,183 @@
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC2
+import org.kde.kirigami as Kirigami
+import io.github.reiwand.app
+
+ColumnLayout {
+    id: about
+
+    required property var info
+    property string uid
+    property var pkg: null
+    readonly property bool styled: info.schema === "reiwand.wpak/2"
+    readonly property bool asks: !!pkg && pkg.flash_disabled === true
+    readonly property var works: (info.derived_from ?? []).map(w => w.title ? App.tr("%1 by %2", w.title, w.author) : w.author)
+
+    function words(list) {
+        return (list ?? []).map(Labels.value).join(", ");
+    }
+
+    Kirigami.InlineMessage {
+        Layout.fillWidth: true
+        visible: about.info.photosensitive === true
+        type: Kirigami.MessageType.Warning
+        text: about.asks ? App.tr("This wallpaper flashes or shows fast patterns that can trigger seizures in people with photosensitive epilepsy. It is disabled, and playlists skip it, until wallpapers that flash are allowed.") : App.tr("This wallpaper flashes or shows fast patterns that can trigger seizures in people with photosensitive epilepsy.")
+        actions: [
+            Kirigami.Action {
+                visible: about.asks && about.uid !== ""
+                text: App.tr("Allow wallpapers that flash…")
+                icon.name: "dialog-ok-apply"
+                onTriggered: allow.open()
+            }
+        ]
+    }
+
+    QQC2.Label {
+        Layout.fillWidth: true
+        visible: text !== ""
+        text: about.styled ? App.markup(about.info.description) : (about.info.description ?? "")
+        textFormat: about.styled ? Text.StyledText : Text.PlainText
+        wrapMode: Text.Wrap
+        onLinkActivated: link => browsing.ask(link, null)
+    }
+
+    Kirigami.FormLayout {
+        Layout.fillWidth: true
+
+        QQC2.Label {
+            Kirigami.FormData.label: App.tr("Rating:")
+            text: [Labels.value(about.info.content ?? "unrated"), about.words(about.info.descriptors)].filter(t => t).join(" · ")
+            textFormat: Text.PlainText
+        }
+
+        QQC2.Label {
+            Kirigami.FormData.label: App.tr("Origin:")
+            visible: !!about.info.origin
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+            text: [Labels.value(about.info.origin)].concat(about.works, about.info.provider ?? [], about.info.source_url ?? []).join("\n")
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
+        }
+
+        QQC2.Label {
+            Kirigami.FormData.label: App.tr("Authors:")
+            visible: text !== ""
+            text: (about.info.authors ?? []).join(", ")
+            textFormat: Text.PlainText
+        }
+
+        QQC2.Label {
+            Kirigami.FormData.label: App.tr("Credits:")
+            visible: text !== ""
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+            text: (about.info.credits ?? []).map(c => c.paths.join(", ") + ": " + c.attribution + " (" + c.license + ")" + (c.source ? " · " + c.source : "")).join("\n")
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
+        }
+
+        QQC2.Label {
+            Kirigami.FormData.label: App.tr("Uses:")
+            visible: text !== ""
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+            text: about.words(about.info.inputs)
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
+        }
+
+        QQC2.Label {
+            Kirigami.FormData.label: App.tr("Needs:")
+            visible: text !== ""
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+            text: (about.info.features ?? []).map(f => Labels.feature(f.name)).join("\n")
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
+        }
+
+        QQC2.Label {
+            Kirigami.FormData.label: App.tr("Made for:")
+            visible: text !== ""
+            text: about.words(about.info.platforms)
+            textFormat: Text.PlainText
+        }
+
+        QQC2.Label {
+            Kirigami.FormData.label: App.tr("Needs packages:")
+            visible: text !== ""
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+            text: (about.info.packages ?? []).join("\n")
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
+        }
+
+        QQC2.Label {
+            Kirigami.FormData.label: App.tr("Languages:")
+            visible: (about.info.languages ?? []).length > 1
+            text: (about.info.languages ?? []).join(", ")
+            textFormat: Text.PlainText
+        }
+
+        QQC2.Label {
+            Kirigami.FormData.label: App.tr("What's new:")
+            visible: text !== ""
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+            text: App.markup(about.info.changes)
+            textFormat: Text.StyledText
+            wrapMode: Text.Wrap
+            onLinkActivated: link => browsing.ask(link, null)
+        }
+    }
+
+    Flow {
+        Layout.fillWidth: true
+        spacing: Kirigami.Units.smallSpacing
+
+        Repeater {
+            model: about.info.links ?? []
+
+            delegate: QQC2.Button {
+                id: link
+
+                required property var modelData
+
+                text: Labels.value(modelData.kind)
+                icon.name: "internet-services"
+                onClicked: browsing.ask(modelData.url, link)
+            }
+        }
+    }
+
+    PanelChico {
+        id: allow
+
+        title: App.tr("Allow wallpapers that flash?")
+        text: App.tr("Wallpapers that flash or show fast patterns can trigger seizures in people with photosensitive epilepsy. Allow them only if that is safe for whoever sees your screens; every screen and playlist may then show them.")
+        quiet: App.tr("Cancel")
+        principal: App.tr("OK")
+        onAccepted: App.act("SetOption", ["playback.allow_flashing", "true"])
+    }
+
+    PanelChico {
+        id: browsing
+
+        property string url
+
+        function ask(link, from) {
+            url = link;
+            opener = from;
+            open();
+        }
+
+        title: App.tr("Open this address in the browser?")
+        quiet: App.tr("Cancel")
+        principal: App.tr("OK")
+        onAccepted: Qt.openUrlExternally(url)
+
+        QQC2.Label {
+            width: browsing.width - 2 * Look.e4
+            text: browsing.url
+            textFormat: Text.PlainText
+            wrapMode: Text.WrapAnywhere
+        }
+    }
+}

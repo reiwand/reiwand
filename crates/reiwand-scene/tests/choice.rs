@@ -1,0 +1,154 @@
+use reiwand_core::QualityChoice;
+use reiwand_scene::{Budget, Heat, Pilot, Quality, Runtime, SCHEMA, Scene, Tier, Why};
+use serde_json::json;
+use std::sync::Arc;
+use std::time::{Duration, Instant};
+
+fn runtime(layers: usize) -> Runtime {
+    let blur = |i: usize| json!({ "id": format!("b{i}"), "type": "adjustment", "effects": [{ "effect": "blur", "params": { "radius": 30 } }] });
+    let layers: Vec<_> = (0..layers).map(blur).collect();
+    let text = json!({ "schema": SCHEMA, "canvas": { "size": [960, 540] }, "layers": layers });
+    Runtime::new(Arc::new(Scene::from_json(&text.to_string()).unwrap()), Default::default())
+}
+
+fn strains(tier: Tier) -> [Budget; 5] {
+    let mains = Budget::new(tier, false, 60);
+    let battery = Budget::new(tier, true, 60);
+    let (saver, warm, hot) = (
+        Budget { saver: true, ..mains },
+        Budget { heat: Heat::Warm, ..mains },
+        Budget { heat: Heat::Hot, ..battery },
+    );
+    [mains, battery, saver, warm, hot]
+}
+
+fn levels(choice: &str, tier: Tier, runtime: &Runtime) -> Vec<(Quality, Why)> {
+    let choice = QualityChoice::parse(choice).unwrap();
+    strains(tier).into_iter().map(|b| Budget { choice, ..b }.level(runtime)).collect()
+}
+
+#[test]
+fn auto_keeps_the_automatic_choice_exactly() {
+    let (light, heavy) = (runtime(0), runtime(6));
+    for tier in [Tier::T0, Tier::T1, Tier::T2, Tier::T3] {
+        for scene in [&light, &heavy] {
+            let auto: Vec<_> = strains(tier).into_iter().map(|b| b.auto(scene)).collect();
+            assert_eq!(levels("auto", tier, scene), auto);
+            assert!(auto.iter().all(|(_, why)| *why != Why::User));
+        }
+    }
+    assert_eq!(Budget::new(Tier::T1, true, 60).quality(&light), Quality::Q1);
+}
+
+#[test]
+fn a_fixed_level_holds_on_battery_under_heat_and_over_cost() {
+    let heavy = runtime(6);
+    for tier in [Tier::T0, Tier::T2, Tier::T3] {
+        assert_eq!(levels("q3", tier, &heavy), vec![(Quality::Q3, Why::User); 5]);
+        assert_eq!(levels("q0", tier, &runtime(0)), vec![(Quality::Q0, Why::User); 5]);
+        let power = Budget { choice: QualityChoice::Fixed(2), heat: Heat::Hot, ..Budget::new(tier, true, 0) };
+        assert_eq!((power.quality(&heavy), power.steady()), (Quality::Q2, Quality::Q2));
+    }
+}
+
+#[test]
+fn a_floor_only_stops_the_automatic_choice_from_going_lower() {
+    let (light, heavy) = (runtime(0), runtime(6));
+    assert_eq!(levels("min-q2", Tier::T3, &light)[0], (Quality::Q3, Why::Full), "it can still go higher");
+    let floored = levels("min-q2", Tier::T3, &light);
+    assert_eq!(
+        floored[1..],
+        [
+            (Quality::Q2, Why::Battery),
+            (Quality::Q2, Why::User),
+            (Quality::Q2, Why::Heat),
+            (Quality::Q2, Why::User)
+        ]
+    );
+    assert_eq!(levels("min-q1", Tier::T0, &heavy), vec![(Quality::Q1, Why::User); 5]);
+    assert_eq!(levels("min-q2", Tier::T2, &heavy)[0], (Quality::Q2, Why::User));
+    let hot =
+        Budget { choice: QualityChoice::AtLeast(1), heat: Heat::Hot, ..Budget::new(Tier::T3, false, 0) };
+    assert_eq!(hot.steady(), Quality::Q1);
+}
+
+#[test]
+fn chosen_levels_above_what_the_card_holds_report_their_cost() {
+    let heavy = runtime(6);
+    let auto = Budget::new(Tier::T0, false, 60);
+    assert_eq!(auto.over(&heavy, Quality::Q3), None, "the automatic choice needs no note");
+    let fixed = Budget { choice: QualityChoice::Fixed(3), ..auto };
+    let (cost, budget) = fixed.over(&heavy, Quality::Q3).unwrap();
+    assert!(cost > budget && budget == Tier::T0.budget(), "{cost} {budget}");
+    assert_eq!(
+        Budget { choice: QualityChoice::Fixed(3), ..Budget::new(Tier::T3, false, 60) }
+            .over(&runtime(0), Quality::Q3),
+        None
+    );
+}
+
+#[test]
+fn only_the_automatic_choice_stops_a_scene_too_heavy_for_the_tier() {
+    let (heavy, light) = (runtime(120), runtime(0));
+    let budget = |choice: &str| Budget {
+        choice: QualityChoice::parse(choice).unwrap(),
+        ..Budget::new(Tier::T0, true, 60)
+    };
+    assert!(budget("auto").heavy(&heavy) && budget("auto").still(&heavy));
+    assert_eq!(budget("auto").automatic(&heavy, Quality::Q0), "still");
+    for choice in ["q0", "q3", "min-q1", "min-q2"] {
+        let power = Budget { saver: true, heat: Heat::Hot, ..budget(choice) };
+        assert!(!power.still(&heavy), "{choice} stopped the scene");
+        let (quality, why) = power.level(&heavy);
+        assert_eq!((quality, why), (Quality::from_level(power.choice.floor()), Why::User), "{choice}");
+        let (cost, most) = power.over(&heavy, quality).expect(choice);
+        assert!(cost > most && most == Tier::T0.budget(), "{choice} {cost} {most}");
+        assert_eq!(power.automatic(&heavy, quality), "stop", "{choice}");
+    }
+    let fixed = budget("q3");
+    assert_eq!((fixed.still(&light), fixed.automatic(&light, Quality::Q3)), (false, ""));
+    assert_eq!(budget("auto").automatic(&light, Quality::Q0), "");
+}
+
+#[test]
+fn a_chosen_level_over_the_budget_says_automatic_would_lower_it_when_it_fits_lower() {
+    let pond = runtime(4);
+    let power = Budget { choice: QualityChoice::Fixed(3), ..Budget::new(Tier::T0, false, 60) };
+    assert!(!power.heavy(&pond) && power.over(&pond, Quality::Q3).is_some());
+    assert_eq!(power.automatic(&pond, Quality::Q3), "lower");
+}
+
+#[test]
+fn slow_frames_never_take_the_level_below_the_floor() {
+    let (mut p, mut at) = (Pilot::default(), Instant::now());
+    let slow = |p: &mut Pilot, at: &mut Instant| {
+        (0..3600).for_each(|_| {
+            *at += Duration::from_micros(16_667);
+            p.feed(*at, 40.0, [16.7; 2], (Quality::Q3, true, false));
+        });
+    };
+    p.start(Quality::Q2, Quality::Q3);
+    slow(&mut p, &mut at);
+    assert_eq!(p.level((Quality::Q3, Why::Full), Why::Cost), (Quality::Q2, Why::Slow));
+    p.start(Quality::Q3, Quality::Q3);
+    slow(&mut p, &mut at);
+    assert_eq!(
+        p.level((Quality::Q3, Why::User), Why::User),
+        (Quality::Q3, Why::User),
+        "a fixed level never moves"
+    );
+    p.start(Quality::Q0, Quality::Q3);
+    slow(&mut p, &mut at);
+    assert_eq!(
+        p.level((Quality::Q3, Why::Full), Why::Cost).0,
+        Quality::Q0,
+        "without a floor it goes to the bottom"
+    );
+    p.start(Quality::Q1, Quality::Q1);
+    slow(&mut p, &mut at);
+    assert_eq!(
+        p.level((Quality::Q3, Why::Full), Why::User),
+        (Quality::Q1, Why::User),
+        "a floor that holds is the user's"
+    );
+}

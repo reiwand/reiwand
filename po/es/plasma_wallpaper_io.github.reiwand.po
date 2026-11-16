@@ -1,0 +1,37 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Reiwand\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-22 00:00+0000\n"
+"PO-Revision-Date: 2026-10-22 00:00+0000\n"
+"Last-Translator: Reiwand contributors\n"
+"Language-Team: Reiwand contributors\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: integrations/plasma-wallpaper/contents/ui/Stream.qml
+#, kde-format
+msgid "the daemon (reiwandd) is not running"
+msgstr "el servicio (reiwandd) no se está ejecutando"
+
+#: integrations/plasma-wallpaper/contents/ui/config.qml
+#, kde-format
+msgid ""
+"Reiwand is managed from its app, its icon in the system tray or the "
+"reiwand-ctl command."
+msgstr ""
+"Reiwand se gestiona desde su aplicación, su icono en la bandeja del "
+"sistema o la orden reiwand-ctl."
+
+#: integrations/plasma-wallpaper/contents/ui/config.qml
+#, kde-format
+msgid "Open Reiwand"
+msgstr "Abrir Reiwand"
+
+#: integrations/plasma-wallpaper/contents/ui/main.qml
+#, kde-format
+msgid "Reiwand: %1"
+msgstr "Reiwand: %1"

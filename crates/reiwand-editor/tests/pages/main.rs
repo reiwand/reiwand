@@ -1,0 +1,37 @@
+mod lights;
+mod media;
+mod needs;
+mod palette;
+mod settings;
+mod shots;
+mod web;
+
+use reiwand_editor::Project;
+use reiwand_editor::actions::Action;
+use reiwand_editor::starters::starter;
+use serde_json::{Value, json};
+use std::path::Path;
+use std::sync::OnceLock;
+use tempfile::TempDir;
+
+pub fn state() {
+    static STATE: OnceLock<TempDir> = OnceLock::new();
+    STATE.get_or_init(|| {
+        let dir = tempfile::tempdir().unwrap();
+        unsafe { std::env::set_var("XDG_STATE_HOME", dir.path()) };
+        dir
+    });
+}
+
+pub fn page(root: &Path) -> Project {
+    state();
+    Project::create(&root.join("page"), starter("web", "org.example.page", "Page", "en").unwrap()).unwrap()
+}
+
+pub fn act(project: &mut Project, action: Value) -> anyhow::Result<()> {
+    project.act(&serde_json::from_value::<Action>(action).unwrap()).map(drop)
+}
+
+pub fn manifest(project: &mut Project, edit: Value) -> anyhow::Result<()> {
+    act(project, json!({ "manifest": edit }))
+}

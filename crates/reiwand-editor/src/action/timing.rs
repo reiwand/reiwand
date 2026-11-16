@@ -1,0 +1,107 @@
+use reiwand_scene::Loop;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct KeyframeEdit {
+    pub pointer: String,
+    pub time: f64,
+    #[serde(default)]
+    pub value: Option<Value>,
+    #[serde(default)]
+    pub ease: Option<Value>,
+    #[serde(default)]
+    pub timeline: Option<String>,
+    #[serde(default)]
+    pub remove: bool,
+    #[serde(default)]
+    pub from: Option<f64>,
+    #[serde(default)]
+    pub base: Option<Value>,
+    #[serde(default)]
+    pub absolute: bool,
+    #[serde(default)]
+    pub in_handle: Option<[f64; 2]>,
+    #[serde(default)]
+    pub out_handle: Option<[f64; 2]>,
+    #[serde(default)]
+    pub straighten: bool,
+}
+
+impl KeyframeEdit {
+    pub fn at(pointer: &str, time: f64) -> Self {
+        KeyframeEdit {
+            pointer: pointer.into(),
+            time,
+            value: None,
+            ease: None,
+            timeline: None,
+            remove: false,
+            from: None,
+            base: None,
+            absolute: false,
+            in_handle: None,
+            out_handle: None,
+            straighten: false,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(default, deny_unknown_fields)]
+pub struct TimelineEdit {
+    pub id: String,
+    pub add: bool,
+    pub remove: bool,
+    pub to: Option<String>,
+    pub duration: Option<f64>,
+    pub fps: Option<f64>,
+    pub frames: Option<u32>,
+    pub wrap: Option<bool>,
+    #[serde(rename = "loop")]
+    pub repeat: Option<Loop>,
+    pub speed: Option<f64>,
+    pub delay: Option<f64>,
+    pub autoplay: Option<bool>,
+    pub trigger: Option<String>,
+    pub add_events: Vec<TimelineEvent>,
+    pub drop_events: Vec<String>,
+    pub clear_events: bool,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct TimelineEvent {
+    pub t: f64,
+    pub name: String,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(default, deny_unknown_fields)]
+pub struct KeyPick {
+    pub pointer: String,
+    pub times: Vec<f64>,
+    pub keys: Vec<Value>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(default, deny_unknown_fields)]
+pub struct KeysEdit {
+    pub picks: Vec<KeyPick>,
+    pub shift: f64,
+    pub scale: Option<f64>,
+    pub pivot: f64,
+    pub part: Option<usize>,
+    pub lift: f64,
+    pub value: Option<f64>,
+    pub value_scale: Option<f64>,
+    pub value_pivot: Option<f64>,
+    pub in_handle: Option<[f64; 2]>,
+    pub out_handle: Option<[f64; 2]>,
+    pub aligned: bool,
+    pub link: bool,
+    pub straighten: bool,
+    pub remove: bool,
+    pub at: Option<f64>,
+}

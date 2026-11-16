@@ -1,0 +1,143 @@
+use reiwand_scene::Blend;
+use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
+
+pub use super::grips::{ClockSet, Fit, Grip, SCREENS};
+pub use super::stage2d::{CameraHold, CanvasEdit, ShotEdit, ShotFormat};
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
+pub enum LayerEdit {
+    Transform {
+        layer: String,
+        #[serde(default)]
+        position: Option<[f64; 2]>,
+        #[serde(default)]
+        rotation: Option<f64>,
+        #[serde(default)]
+        scale: Option<[f64; 2]>,
+        #[serde(default)]
+        skew: Option<[f64; 2]>,
+        #[serde(default)]
+        origin: Option<[f64; 2]>,
+        #[serde(default)]
+        tilt: Option<[f64; 2]>,
+        #[serde(default)]
+        z: Option<f64>,
+        #[serde(default)]
+        size: Option<[f64; 2]>,
+        #[serde(default)]
+        at: Option<f64>,
+        #[serde(default)]
+        replace: bool,
+    },
+    Grip {
+        layer: String,
+        grip: Grip,
+        to: [f64; 2],
+        #[serde(default)]
+        snap: Option<f64>,
+        #[serde(default)]
+        at: Option<f64>,
+        #[serde(default)]
+        replace: bool,
+    },
+    Fit {
+        layer: String,
+        fit: Fit,
+        #[serde(default)]
+        at: Option<f64>,
+        #[serde(default)]
+        replace: bool,
+    },
+    Parent {
+        layer: String,
+        #[serde(default)]
+        parent: Option<String>,
+        #[serde(default)]
+        keep: bool,
+        #[serde(default)]
+        at: Option<f64>,
+        #[serde(default)]
+        replace: bool,
+    },
+    Blend {
+        layer: String,
+        blend: Blend,
+    },
+    Depth {
+        layer: String,
+        depth: [f64; 2],
+        #[serde(default)]
+        replace: bool,
+    },
+    Instance {
+        layer: String,
+        #[serde(default)]
+        values: Map<String, Value>,
+        #[serde(default)]
+        clear: bool,
+    },
+    Touch {
+        layer: String,
+        takes: Takes,
+        #[serde(default)]
+        alpha: Option<f64>,
+    },
+    Figure(super::FigureEdit),
+    Start(StartEdit),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum Takes {
+    Off,
+    All,
+    Alpha,
+}
+
+impl Takes {
+    pub fn name(self) -> &'static str {
+        match self {
+            Takes::Off => "off",
+            Takes::All => "all",
+            Takes::Alpha => "alpha",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum Forever {
+    Spin,
+    Drift,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
+pub enum StartEdit {
+    Clock {
+        #[serde(default)]
+        format: Option<String>,
+        #[serde(default)]
+        date: bool,
+        #[serde(default)]
+        id: Option<String>,
+        #[serde(default)]
+        into: Option<String>,
+        #[serde(default)]
+        size: Option<f64>,
+    },
+    Forever {
+        layer: String,
+        motion: Forever,
+        #[serde(default)]
+        seconds: Option<f64>,
+        #[serde(default)]
+        reverse: bool,
+        #[serde(default)]
+        by: Option<[f64; 2]>,
+        #[serde(default)]
+        back: Option<bool>,
+    },
+}

@@ -1,0 +1,87 @@
+{
+  "adapter": "llvmpipe (LLVM 20.1.2, 256 bits) (Vulkan)",
+  "depth": {
+    "allocations": 54.0,
+    "ms": 0.61
+  },
+  "picture": {
+    "allocations": 54.0,
+    "ms": 0.36
+  },
+  "scene-dusk": {
+    "allocations": 169.0,
+    "compiled": 0.0,
+    "created": 0.0,
+    "draws": 13.0,
+    "ms": 2.86,
+    "needed": 70.0,
+    "particles": 0.0,
+    "passes": 6.0,
+    "steps": 0.0,
+    "textures": 6.0
+  },
+  "scene-orbits": {
+    "allocations": 7.0,
+    "compiled": 0.0,
+    "created": 0.0,
+    "draws": 0.0,
+    "ms": 0.14,
+    "needed": 1.0,
+    "particles": 0.0,
+    "passes": 0.0,
+    "steps": 0.0,
+    "textures": 0.0
+  },
+  "scene-pond": {
+    "allocations": 6.0,
+    "compiled": 0.0,
+    "created": 0.0,
+    "draws": 0.0,
+    "ms": 0.22,
+    "needed": 1.0,
+    "particles": 0.0,
+    "passes": 0.0,
+    "steps": 0.0,
+    "textures": 0.0
+  },
+  "scene-pulse": {
+    "allocations": 6.0,
+    "compiled": 0.0,
+    "created": 0.0,
+    "draws": 0.0,
+    "ms": 0.31,
+    "needed": 1.0,
+    "particles": 0.0,
+    "passes": 0.0,
+    "steps": 0.0,
+    "textures": 0.0
+  },
+  "scene-snowfall": {
+    "allocations": 247.0,
+    "compiled": 0.0,
+    "created": 0.0,
+    "draws": 19.0,
+    "ms": 6.83,
+    "needed": 70.0,
+    "particles": 2000.0,
+    "passes": 10.0,
+    "steps": 59.0,
+    "textures": 6.0
+  },
+  "scene-solids": {
+    "allocations": 141.0,
+    "compiled": 0.0,
+    "created": 0.0,
+    "draws": 2.0,
+    "ms": 1.79,
+    "needed": 70.0,
+    "particles": 0.0,
+    "passes": 1.0,
+    "steps": 0.0,
+    "textures": 0.0
+  },
+  "video": {
+    "allocations": 54.0,
+    "ms": 0.46
+  }
+}

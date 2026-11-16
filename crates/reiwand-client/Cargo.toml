@@ -1,0 +1,22 @@
+[package]
+name = "reiwand-client"
+description = "D-Bus client of the Reiwand daemon"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+reiwand-core.workspace = true
+anyhow.workspace = true
+futures-util.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+zbus.workspace = true
+async-trait.workspace = true
+rustix = { workspace = true, features = ["net"] }
+tokio.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

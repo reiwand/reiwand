@@ -1,0 +1,108 @@
+# Piezas para elegir fondos
+
+Piezas QML compartidas de las pantallas donde una persona elige (biblioteca, explorar, listas,
+fuentes). Viven en `apps/reiwand-app/qml/` dentro del módulo de la app y solo usan los tokens de `Look`
+(ver `look.md`). Sus propiedades son datos y señales: nunca colores ni tamaños. Todas se manejan con
+el teclado y tienen nombre para las herramientas de accesibilidad.
+
+## Filtro
+
+Palabras de filtro con su cuenta; la actual lleva la marca del acento.
+
+- `words`: lista de `{ "text": …, "count": … }` (la cuenta es opcional).
+- `current`: índice de la palabra actual. `sections`: palabras más grandes, para las pestañas de una
+  pantalla de opciones. `label`: nombre del grupo para accesibilidad.
+- Señal `picked(index)`: la pantalla cambia `current`.
+- Teclado: Tab entra al grupo, flechas izquierda y derecha mueven el anillo de foco, Intro o Espacio
+  eligen.
+- No usar para acciones (eso es un botón en palabras) ni para más de una línea de opciones.
+
+## Buscar
+
+Campo de búsqueda con la lupa.
+
+- `text`, `placeholder`; señal `accepted()` con Intro.
+- No usar para escribir valores de un ajuste: eso es el campo de texto de una fila de opciones.
+
+## Tapa
+
+Una portada: cuadro 16:9 con la imagen, nombre y nota. La nota es la pieza `Nota`, recortada al
+ancho de la tapa; el filete de foco es el anillo común (`Anillo`).
+
+- `picture` (URL), `name`, `note`, `noteIcon` (nombre de ícono), `noteTone` (`""`, `"ambar"`,
+  `"coral"` o `"brote"`).
+- Estados: en reposo está atenuada; `lit` la agranda (salvo con `even`) y le pone el filete de foco;
+  el puntero encima aclara el velo; `off` la apaga (debe ir con su motivo en `note`); `inUse` pone
+  «En uso»; `choosing` muestra la marca de elegir y `chosen` la llena.
+- `even`: tamaño fijo dado por quien la contiene (rejilla); encendida no crece y muestra el nombre
+  en negrita.
+- Lo que se le pone como hijo aparece debajo de la tapa encendida y agrandada (la ficha).
+- Señales `tapped(modifiers)` y `doubleTapped()`.
+- La imagen carga fuera del hilo principal.
+- `moving` (URL): vista previa animada que se dibuja sobre la imagen mientras no está vacía; se
+  detiene con la ventana oculta. Quien la crea decide cuándo darla.
+- Normalmente no se usa sola: la crean `Estante` y `Rejilla`.
+
+## Ficha y FichaFija
+
+`Ficha`: título, pie y acciones de la tapa encendida, siempre debajo de ella. `FichaFija`: lo mismo
+en una línea fija al pie de «Ver todos», con las acciones a la derecha y una línea arriba.
+
+- `title`, `caption`; los hijos son las acciones (botones y la tecla Intro junto a la principal).
+- En `FichaFija` sin `title` las acciones ocupan la línea: así se le pone una `Seleccion`.
+- Una sola acción principal por ficha.
+
+## Uso
+
+La marca «En uso» de una tapa. Sin propiedades. Solo la pone la tapa.
+
+## Elegir y Seleccion
+
+`Elegir` es la marca redonda de una tapa cuando se eligen varias (`chosen`). `Seleccion` es la línea
+que toma el lugar de la ficha: «N elegidos» y sus acciones.
+
+- Si no entra en una línea, las acciones pasan a dos o más líneas en columnas.
+- `Seleccion.count`; los hijos son las acciones (la principal, las calladas, «Dejar de elegir» en
+  palabras y la tecla Esc).
+- Esc para dejar de elegir lo maneja la pantalla.
+
+## Estante
+
+La primera fila de una colección: tapas en reposo, una encendida y agrandada con su ficha debajo. Se
+sale por los dos bordes de la ventana: la pantalla lo pone en el margen de la página y le da el
+ancho hasta el borde derecho; por la izquierda las tapas se siguen dibujando `Look.margen` más allá
+de su lado izquierdo, así que al desplazarse se van bajo el borde de la ventana y no se cortan en el
+margen. La tapa encendida no pasa del margen de la página.
+
+- `model`: cualquier modelo de lista (o un arreglo de objetos). Los nombres de los roles se eligen
+  con `pictureRole` (`picture`), `nameRole` (`name`), `captionRole` (`caption`), `noteRole`,
+  `noteIconRole`, `noteToneRole`, `inUseRole` (`inUse`) y `offRole` (`off`). No conoce la biblioteca.
+- `currentIndex`: la tapa encendida. `currentName` y `currentCaption` la describen.
+- `actions`: componente con las acciones de la ficha. `selection`: componente que reemplaza a la
+  ficha mientras se elige y hay algo elegido.
+- `choosing`, `chosen` (lista de índices); `label` para accesibilidad.
+- Señales `activated(index)` (Intro o doble clic) y `toggled(index)` (Espacio o clic mientras se
+  elige, o Ctrl+clic). La pantalla actualiza `chosen`.
+- Vista animada: `movingOf` (función que recibe el índice y devuelve la URL o `""`) y la señal
+  `wanted(index)`, que avisa cuando el puntero entra en una tapa o la tapa encendida tiene el foco;
+  solo esa tapa recibe `movingOf(index)` y deja de moverse al perderlo. La pantalla pide la vista en
+  `wanted` y decide en `movingOf` si se mueve (batería, destellos).
+- Teclado: flechas izquierda y derecha mueven la tapa encendida y el estante la sigue.
+- Solo crea las tapas que se ven más una de reserva, y reutiliza las que salen de la vista.
+
+## Rejilla
+
+«Ver todos»: toda la colección en tapas del mismo tamaño, tantas columnas como entren.
+
+- Las mismas propiedades y señales que `Estante`, salvo `actions` y `selection`: la ficha de «Ver
+  todos» es una `FichaFija` que pone la pantalla, con `currentName` y `currentCaption`.
+- Flechas en las cuatro direcciones.
+- La pantalla le da alto; solo crea las filas visibles más una.
+
+## Límites
+
+- La imagen de una tapa (`Foto`) tiene las esquinas redondeadas solo cuando la ventana dibuja con
+  la tarjeta gráfica; con el dibujo por software quedan rectas.
+- Una tapa apagada se atenúa más; no pasa a gris.
+- La sombra de las tapas (`Sombra`) se ve solo cuando la ventana dibuja con la tarjeta gráfica.
+- Los botones de la ficha muestran su anillo de foco cuando se llega a ellos con Tab.

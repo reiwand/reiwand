@@ -1,0 +1,165 @@
+use crate::said;
+use crate::{Error, link, store, vault};
+use reiwand_sync::{Api, Clock, Kept, Peer, Replica, Secrets};
+use serde::{Deserialize, Serialize};
+use std::collections::{BTreeMap, BTreeSet};
+use std::sync::atomic::{AtomicBool, Ordering::Relaxed};
+use std::sync::{Mutex, PoisonError};
+use std::time::{Duration, Instant};
+
+const FILE: &str = "sync.json";
+
+static SAVED: Mutex<Option<Saved>> = Mutex::new(None);
+pub(crate) static CANCEL: AtomicBool = AtomicBool::new(false);
+
+#[derive(Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub(crate) struct Saved {
+    pub(crate) url: String,
+    pub(crate) name: String,
+    pub(crate) owner: Option<(String, i64)>,
+    pub(crate) handle: Option<String>,
+    pub(crate) device: Option<String>,
+    pub(crate) device_name: Option<String>,
+    pub(crate) label: String,
+    pub(crate) encrypted: Option<bool>,
+    pub(crate) plaintext: bool,
+    pub(crate) epoch: i64,
+    pub(crate) ready: bool,
+    pub(crate) stale: bool,
+    pub(crate) paused: bool,
+    pub(crate) sync_off: bool,
+    pub(crate) last_sync: Option<i64>,
+    pub(crate) last_error: Option<String>,
+    pub(crate) last_reply: Option<serde_json::Value>,
+    pub(crate) warning: Option<String>,
+    pub(crate) peers: Vec<Peer>,
+    pub(crate) pinned: Option<BTreeMap<String, String>>,
+    pub(crate) members: BTreeSet<String>,
+    pub(crate) clock: Clock,
+    pub(crate) replica: Replica,
+    pub(crate) links: BTreeMap<String, String>,
+    pub(crate) present: BTreeSet<String>,
+    pub(crate) names: String,
+    pub(crate) quarantine: BTreeMap<String, i64>,
+    pub(crate) kept: Kept,
+    pub(crate) unapplied: BTreeMap<String, i64>,
+    pub(crate) removed: BTreeMap<String, i64>,
+    pub(crate) outdated: bool,
+    pub(crate) recovery_stale: bool,
+    pub(crate) recovery: Option<i64>,
+    pub(crate) pin: Option<String>,
+    pub(crate) files: crate::private::Files,
+    pub(crate) offers: Vec<crate::repos::Offer>,
+    pub(crate) away: Vec<reiwand_core::model::Away>,
+    pub(crate) declined: BTreeSet<String>,
+    pub(crate) signed_out: bool,
+    pub(crate) repo_id: Option<String>,
+    pub(crate) repo_url: Option<String>,
+    pub(crate) repo_failed: Option<serde_json::Value>,
+}
+
+impl Saved {
+    pub(crate) fn user(&self) -> i64 {
+        self.owner.as_ref().map_or(0, |(_, user)| *user)
+    }
+
+    pub(crate) fn me(&self) -> String {
+        self.device.clone().unwrap_or_default()
+    }
+
+    pub(crate) fn label_of(&self, id: &str) -> Option<String> {
+        reiwand_sync::client::label_of(self.device.as_deref(), &self.label, &self.replica, id)
+    }
+
+    pub(crate) fn active(&self) -> bool {
+        self.device.is_some() && (self.ready || self.stale) && !self.paused && !self.sync_off
+    }
+
+    pub(crate) fn state(&self) -> &'static str {
+        match () {
+            _ if self.url.is_empty() => "none",
+            _ if link::shown().is_some() => "linking",
+            _ if self.device.is_none() => "unlinked",
+            _ if self.signed_out => "signed_out",
+            _ if self.sync_off => "connected",
+            _ if !self.ready => "needs_key",
+            _ if self.paused => "paused",
+            _ if self.last_error.is_some() => "error",
+            _ => "ready",
+        }
+    }
+}
+
+pub(crate) fn forget(removed: Vec<String>, at: i64) -> Result<(), Error> {
+    match read(|s| s.device.is_some()) {
+        true => update(|s| s.removed.extend(removed.into_iter().map(|r| (r, at)))),
+        false => Ok(()),
+    }
+}
+
+pub(crate) fn read<T>(look: impl FnOnce(&Saved) -> T) -> T {
+    held(|s| look(s))
+}
+
+pub(crate) fn held<T>(look: impl FnOnce(&mut Saved) -> T) -> T {
+    let mut saved = SAVED.lock().unwrap_or_else(PoisonError::into_inner);
+    let file = || std::fs::read(store::dir().ok()?.join(FILE)).ok();
+    look(
+        saved.get_or_insert_with(|| file().and_then(|b| serde_json::from_slice(&b).ok()).unwrap_or_default()),
+    )
+}
+
+pub(crate) fn update(change: impl FnOnce(&mut Saved)) -> Result<(), Error> {
+    let mut saved = read(Saved::clone);
+    change(&mut saved);
+    store::write(&store::dir()?.join(FILE), &serde_json::to_vec(&saved)?)?;
+    *SAVED.lock().unwrap_or_else(PoisonError::into_inner) = Some(saved);
+    Ok(())
+}
+
+pub(crate) fn linked() -> Result<(), Error> {
+    match read(|s| (s.url.is_empty(), s.device.is_some())) {
+        (true, _) => Err(said("android.add_server", "add a server first", &[])),
+        (false, false) => Err(said("android.link_phone_server", "link this phone to the server first", &[])),
+        _ => Ok(()),
+    }
+}
+
+pub(crate) fn api() -> Result<(Api, Secrets), Error> {
+    let secrets = vault::load()?;
+    let (url, pin) = read(|s| (s.url.clone(), s.pin.clone()));
+    Ok((crate::net::api(&url, pin.as_deref())?.with_token(&secrets.token), secrets))
+}
+
+pub(crate) async fn pause(seconds: u64) -> Result<(), Error> {
+    let until = Instant::now() + Duration::from_secs(seconds);
+    while Instant::now() < until {
+        if CANCEL.load(Relaxed) {
+            return Err(said("android.stopped", "stopped", &[]));
+        }
+        tokio::time::sleep(Duration::from_millis(200)).await;
+    }
+    Ok(())
+}
+
+pub(crate) fn active() -> bool {
+    read(Saved::active)
+}
+
+#[cfg(test)]
+#[test]
+fn a_connected_phone_does_not_sync_until_syncing_is_on() {
+    let mut saved = Saved {
+        url: "https://wallpapers.example.org".into(),
+        device: Some("d".into()),
+        ready: true,
+        sync_off: true,
+        ..Saved::default()
+    };
+    assert_eq!((saved.state(), saved.active()), ("connected", false));
+    saved.sync_off = false;
+    assert_eq!((saved.state(), saved.active()), ("ready", true));
+    saved.ready = false;
+    assert_eq!((saved.state(), saved.active()), ("needs_key", false));
+}

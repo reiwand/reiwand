@@ -1,0 +1,164 @@
+use crate::{Error, Facts, Manifest, Platform, Result, ensure, require};
+use reiwand_core::message::{Message, said};
+use reiwand_scene::{described, drawn, newer_params};
+use semver::{Prerelease, Version, VersionReq};
+
+pub use crate::facts::{BUILTIN, check, facts, notes, warnings};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Support {
+    Runs,
+    Without,
+    Refused,
+}
+
+use Support::{Refused as No, Runs as Yes, Without};
+
+pub use crate::scenery::SCENE;
+
+pub const REGISTRY: &[(&str, &str, [Support; 2])] = &[
+    ("inputs.audio", "reacts to the sound playing on the computer", [Yes, Yes]),
+    ("inputs.pointer", "follows the pointer", [Yes, Yes]),
+    ("inputs.clicks", "reacts to clicks", [Yes, Yes]),
+    ("inputs.media", "shows what the media player plays", [Yes, Yes]),
+    ("inputs.network", "connects to the network", [Yes, Yes]),
+    ("scripts", "runs scene scripts", [Yes, Yes]),
+    ("sound", "plays sound", [Yes, Yes]),
+    ("properties2", "has settings of the newer kinds", [Yes, Yes]),
+    ("folder", "shows pictures from a folder the user chooses", [Yes, Yes]),
+    ("user_videos", "plays videos the user chooses", [Yes, Yes]),
+    ("video_properties", "sets how its video plays", [Yes, Yes]),
+    ("web", "is a web page", [Yes, Yes]),
+    ("preset", "sets the values of another package", [Yes, Yes]),
+    ("assets", "holds resources for other packages", [No, No]),
+    ("packages", "needs other packages", [Yes, Yes]),
+    ("gpu", "says what graphics card it needs", [Yes, Yes]),
+    ("platforms", "names the devices it is made for", [Yes, Yes]),
+    ("locale_files", "keeps its texts in a file per language", [Yes, Yes]),
+    ("engine_strings", "names texts the engine translates", [Yes, Yes]),
+    ("origin2", "says that it was imported or where it was downloaded from", [Yes, Yes]),
+    ("credits2", "credits files to the package they come from", [Yes, Yes]),
+    ("display2", "sets the color around its picture or spreads over every screen", [Yes, Without]),
+    ("accent", "suggests an accent color for the desktop", [Yes, Yes]),
+    ("flip", "shows its picture or video mirrored", [Yes, Yes]),
+    ("playback2", "limits its frame rate, starts muted or plays once", [Yes, Yes]),
+    ("shortcut", "opens what the user chooses when clicked", [Yes, Yes]),
+    ("folder2", "reads the subfolders of a chosen folder or fewer of its files", [Yes, Yes]),
+    ("folder_lists", "lets its page list a chosen folder", [Yes, Yes]),
+    ("script_folders", "lets its scene scripts list a chosen folder", [Yes, Yes]),
+    ("quality_settings", "changes its settings when the device saves power", [Yes, Yes]),
+    ("ktx2", "uses compressed textures in the KTX2 format", [Yes, Yes]),
+    ("avif", "uses pictures in the AVIF format", [No, No]),
+    ("spanned_scenes", "spreads its scene over every screen", [Yes, Without]),
+];
+
+fn builtin_first(id: &str) -> bool {
+    BUILTIN.split_whitespace().any(|e| e == id)
+}
+
+pub fn all() -> impl Iterator<Item = &'static (&'static str, &'static str, [Support; 2])> {
+    REGISTRY.iter().chain(SCENE)
+}
+
+fn entry(name: &str) -> Option<&'static (&'static str, &'static str, [Support; 2])> {
+    all().find(|(n, ..)| *n == name)
+}
+
+fn effect(name: &str) -> Option<(&str, Option<&str>)> {
+    let rest = name.strip_prefix("effect.")?;
+    let (id, param) = rest.split_once('.').map_or((rest, None), |(id, p)| (id, Some(p)));
+    let known = match param {
+        None => !builtin_first(id) && described(id).is_some(),
+        Some(p) => builtin_first(id) && newer_params(id).any(|d| d.id == p),
+    };
+    known.then_some((id, param))
+}
+
+pub fn known(name: &str) -> bool {
+    entry(name).is_some() || effect(name).is_some()
+}
+
+pub fn explain(name: &str) -> String {
+    explained(name).to_string()
+}
+
+pub fn explained(name: &str) -> Message {
+    match (entry(name), effect(name)) {
+        (Some((_, why, _)), _) => said("format.feature_why", "%1", &[&why]).texts(&[1]),
+        (None, Some((id, Some(param)))) => {
+            said("format.effect_param", "sets %1 on the %2 effect", &[&param, &id])
+        }
+        _ => said("format.effect_use", "uses the %1 effect", &[&name.trim_start_matches("effect.")]),
+    }
+}
+
+fn feature(name: &str) -> Message {
+    let why = explained(name);
+    said("format.feature", "the feature %1 (%2)", &[&name, &why]).with(2, why)
+}
+
+pub(crate) fn listed(items: Vec<Message>) -> Option<Message> {
+    let mut items = items.into_iter();
+    let first = items.next()?;
+    let rest: Vec<Message> = items.collect();
+    let Some((last, middle)) = rest.split_last() else { return Some(first) };
+    let joined = middle.iter().fold(first, |acc, item| {
+        said("format.comma", "%1, %2", &[&acc, item]).with(1, acc.clone()).with(2, item.clone())
+    });
+    Some(said("format.and", "%1 and %2", &[&joined, last]).with(1, joined.clone()).with(2, last.clone()))
+}
+
+pub const CHOSEN: [&str; 1] = ["locale_files"];
+
+pub fn support(platform: Platform, name: &str) -> Support {
+    let effect = effect(name).map(|(id, param)| if drawn(id, param) { Yes } else { No });
+    entry(name).map_or(effect.unwrap_or(No), |(.., on)| on[platform as usize])
+}
+
+pub(crate) fn supported(engine: Option<&str>, features: &[String]) -> Result<()> {
+    if let Some(engine) = engine {
+        let wanted = VersionReq::parse(engine);
+        require(wanted.is_ok(), "requires.engine", "expected a version requirement such as >=0.6")?;
+        let mut version = Version::parse(reiwand_core::VERSION).unwrap_or(Version::new(0, 0, 0));
+        version.pre = Prerelease::EMPTY;
+        let ok = wanted.as_ref().is_ok_and(|w| w.matches(&version));
+        ensure(ok, || Error::Newer(said("format.engine", "Reiwand %1", &[&engine]).into()))?;
+    }
+    let unknown = |f: &String| said("format.unknown_feature", "the feature %1", &[f]).into();
+    features.iter().find(|f| !known(f)).map_or(Ok(()), |f| Err(Error::Newer(unknown(f))))
+}
+
+pub fn lacks<'a>(profile: &str, features: impl IntoIterator<Item = &'a String>) -> Vec<String> {
+    with(profile, Without, features)
+}
+
+pub fn refused<'a>(profile: &str, features: impl IntoIterator<Item = &'a String>) -> Vec<String> {
+    with(profile, No, features)
+}
+
+fn with<'a>(profile: &str, kind: Support, features: impl IntoIterator<Item = &'a String>) -> Vec<String> {
+    let Some(platform) = Platform::ALL.into_iter().find(|p| p.name() == profile) else { return Vec::new() };
+    features.into_iter().filter(|f| support(platform, f) == kind).cloned().collect()
+}
+
+pub fn playable(manifest: &Manifest, facts: &Facts, platform: Platform) -> Result<()> {
+    let allowed = manifest.platforms.is_empty() || manifest.platforms.contains(&platform);
+    let names: Vec<&str> = manifest.platforms.iter().map(|p| p.title()).collect();
+    ensure(allowed, || Error::Elsewhere(names.join(" and ")))?;
+    let missing = refused(platform.name(), &facts.features);
+    let many = missing.len() > 1;
+    let named = missing.iter().map(|f| {
+        if many {
+            said("format.named", "%1 (%2)", &[f, &explained(f)]).with(2, explained(f))
+        } else {
+            feature(f)
+        }
+    });
+    match listed(named.collect()) {
+        None => Ok(()),
+        Some(one) if !many => Err(Error::Newer(one.into())),
+        Some(all) => {
+            Err(Error::Newer(said("format.features", "the features %1", &[&all]).with(1, all).into()))
+        }
+    }
+}

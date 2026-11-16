@@ -1,0 +1,176 @@
+use super::placed::placed;
+use crate::action::{EDITOR, LightEdit, LightSet};
+use crate::ops::{Op, set};
+use anyhow::{Result, anyhow, ensure};
+use reiwand_core::message::said;
+use reiwand_scene::Beam;
+use serde_json::{Value, json};
+use std::path::Path;
+
+fn ranged(name: &str, v: f64, lo: f64, hi: f64) -> Result<f64> {
+    ensure!(
+        v.is_finite() && (lo..=hi).contains(&v),
+        said("editor.light_range", "%1 of a light goes from %2 to %3", &[&name, &lo, &hi])
+    );
+    Ok(v)
+}
+
+fn light(doc: &Value, id: &str) -> Result<(String, Beam)> {
+    let (path, layer) = crate::actions::layer(doc, id)?;
+    ensure!(layer["type"] == "light", said("editor.not_light", "%1 is not a light layer", &[&id]));
+    Ok((path, serde_json::from_value(layer["light"].clone()).unwrap_or_default()))
+}
+
+fn only(beam: Beam, wanted: Beam, field: &str) -> Result<()> {
+    ensure!(
+        beam == wanted,
+        said("editor.light_field", "only %1 lights take %2", &[&wanted_name(wanted), &field])
+    );
+    Ok(())
+}
+
+fn wanted_name(b: Beam) -> String {
+    serde_json::to_value(b).ok().and_then(|v| v.as_str().map(String::from)).unwrap_or_default()
+}
+
+pub(crate) fn change(dir: &Path, doc: &Value, s: &LightSet) -> Result<Vec<Op>> {
+    let (path, old) = light(doc, &s.layer)?;
+    let beam = s.light.unwrap_or(old);
+    let mut ops = Vec::new();
+    if s.light.is_some() {
+        ops.extend(set(doc, &format!("{path}/light"), json!(beam)));
+        let (spot, tube, airy) = (&[Beam::Spot][..], &[Beam::Tube][..], &[Beam::Point, Beam::Spot][..]);
+        let wrong = [("cone", spot), ("length", tube), ("texture", spot), ("volumetric", airy)];
+        let found = wrong
+            .into_iter()
+            .filter(|(f, k)| !k.contains(&beam) && doc.pointer(&format!("{path}/{f}")).is_some());
+        ops.extend(found.map(|(field, _)| Op::Remove { path: format!("{path}/{field}") }));
+    }
+    let mut animated = Vec::new();
+    if let Some(c) = &s.color {
+        serde_json::from_value::<reiwand_scene::Color>(c.clone())
+            .map_err(|_| anyhow!(said("editor.light_color", "a light color is #rrggbb or #rrggbbaa", &[])))?;
+        animated.push(("color", c.clone()));
+    }
+    let numbers =
+        [("intensity", s.intensity, 0.0, 100.0), ("radius", s.radius, 1.0, 1e5), ("z", s.z, -1e5, 1e5)];
+    for (name, v, lo, hi) in numbers {
+        if let Some(v) = v {
+            animated.push((name, json!(ranged(name, v, lo, hi)?)));
+        }
+    }
+    let mut put = |field: &str, v: Value| ops.extend(set(doc, &format!("{path}/{field}"), v));
+    if let Some([inner, outer]) = s.cone {
+        only(beam, Beam::Spot, "cone")?;
+        ranged("cone", inner, 0.0, 180.0)?;
+        put("cone", json!([inner, ranged("cone", outer, inner, 180.0)?]));
+    }
+    if let Some(v) = s.length {
+        only(beam, Beam::Tube, "length")?;
+        put("length", json!(ranged("length", v, 1.0, 1e5)?));
+    }
+    let mut moves = Vec::new();
+    if let Some(v) = s.tilt {
+        moves.push(("tilt", json!([ranged("tilt", v, -89.0, 89.0)?, 0])));
+    }
+    let t = s.time.unwrap_or(0.0);
+    ensure!(
+        t.is_finite() && t >= 0.0,
+        said("editor.time_must_more", "the time must be 0 or more seconds", &[])
+    );
+    if s.at.is_some() || s.aim.is_some() {
+        let found = placed(dir, doc, t).into_iter().find(|l| l.id == s.layer);
+        let p = found.ok_or_else(|| {
+            anyhow!(said("editor.light_unplaced", "the light %1 is not shown", &[&s.layer]))
+        })?;
+        let to_local = |q: [f64; 2]| p.parent.apply([q[0] as f32, q[1] as f32]);
+        let at = s.at.map_or_else(|| p.parent.apply(p.at()), to_local);
+        if s.at.is_some() {
+            moves.push(("position", json!(at.map(|v| (f64::from(v) * 100.0).round() / 100.0))));
+        }
+        if let Some(aim) = s.aim.map(to_local) {
+            let angle = (aim[1] - at[1]).atan2(aim[0] - at[0]).to_degrees() - p.base();
+            moves.push(("rotation", json!((f64::from(angle) * 100.0).round() / 100.0)));
+        }
+    }
+    let mut work = doc.clone();
+    for (field, v) in animated.iter().cloned().chain(moves.iter().map(|(f, v)| (*f, v.clone()))) {
+        let at =
+            if moves.iter().any(|(m, _)| *m == field) { format!("transform/{field}") } else { field.into() };
+        crate::shaping::keyed::write(&mut work, &format!("{path}/{at}"), v, s.time, s.replace)?;
+    }
+    let fields = animated.iter().map(|(f, _)| *f).chain((!moves.is_empty()).then_some("transform"));
+    for field in fields {
+        let at = format!("{path}/{field}");
+        ops.extend(set(doc, &at, work.pointer(&at).cloned().unwrap_or_default()));
+    }
+    Ok(ops)
+}
+
+fn listed(doc: &Value) -> Vec<String> {
+    let list = doc.pointer(&format!("{EDITOR}/lights/muted")).and_then(Value::as_array).into_iter().flatten();
+    list.filter_map(|v| v.as_str().map(String::from)).collect()
+}
+
+pub(crate) fn edit(dir: &Path, doc: &Value, e: &LightEdit) -> Result<Vec<Op>> {
+    Ok(match e {
+        LightEdit::Add { light, id, into, at } => {
+            let name = wanted_name(*light);
+            let id = id.clone().unwrap_or_else(|| crate::layers::unique(doc, &name));
+            let add = crate::actions::Action::AddLayer {
+                kind: "light".into(),
+                id: Some(id.clone()),
+                name: None,
+                source: Some(name),
+                into: into.clone(),
+                at: None,
+                file: None,
+            };
+            let mut ops = crate::actions::plan(doc, &add)?;
+            if let (Some(at), Some(Op::Add { value, .. })) = (at, ops.last_mut()) {
+                value["transform"]["position"] = json!(at);
+            }
+            ops
+        }
+        LightEdit::Set(s) => change(dir, doc, s)?,
+        LightEdit::Remove { layer } => {
+            light(doc, layer)?;
+            let mut ops =
+                crate::actions::plan(doc, &crate::actions::Action::RemoveLayer { id: layer.clone() })?;
+            let mut muted = listed(doc);
+            if muted.contains(layer) {
+                muted.retain(|m| m != layer);
+                ops.extend(set(doc, &format!("{EDITOR}/lights/muted"), json!(muted)));
+            }
+            if doc.pointer(&format!("{EDITOR}/lights/solo")) == Some(&json!(layer)) {
+                ops.push(Op::Remove { path: format!("{EDITOR}/lights/solo") });
+            }
+            ops
+        }
+        LightEdit::Solo { layer: Some(layer) } => {
+            light(doc, layer)?;
+            set(doc, &format!("{EDITOR}/lights/solo"), json!(layer))
+        }
+        LightEdit::Solo { layer: None } => match doc.pointer(&format!("{EDITOR}/lights/solo")) {
+            Some(_) => vec![Op::Remove { path: format!("{EDITOR}/lights/solo") }],
+            None => Vec::new(),
+        },
+        LightEdit::Volumetric { layer, density, samples, shafts, off } => {
+            let (path, beam) = light(doc, layer)?;
+            super::air::volumetric(doc, (&path, beam), (*density, *samples, *shafts), *off)?
+        }
+        LightEdit::Projection { layer, asset, from, off } => {
+            let (path, beam) = light(doc, layer)?;
+            super::cast::projection(dir, doc, (&path, beam), (asset.as_deref(), from.as_deref()), *off)?
+        }
+        LightEdit::Mute { layer, muted } => {
+            light(doc, layer)?;
+            let mut list = listed(doc);
+            list.retain(|m| m != layer);
+            if *muted {
+                list.push(layer.clone());
+            }
+            set(doc, &format!("{EDITOR}/lights/muted"), json!(list))
+        }
+    })
+}

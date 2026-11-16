@@ -1,0 +1,194 @@
+use reiwand_editor::Project;
+use reiwand_editor::actions::Action;
+use reiwand_editor::starters::starter;
+use serde_json::{Value, json};
+use std::sync::OnceLock;
+use tempfile::TempDir;
+
+fn state() {
+    static STATE: OnceLock<TempDir> = OnceLock::new();
+    STATE.get_or_init(|| {
+        let dir = tempfile::tempdir().unwrap();
+        unsafe { std::env::set_var("XDG_STATE_HOME", dir.path()) };
+        dir
+    });
+}
+
+fn act(project: &mut Project, action: Value) -> anyhow::Result<()> {
+    project.act(&serde_json::from_value::<Action>(action).unwrap()).map(drop)
+}
+
+#[test]
+fn masks_are_painted_per_channel_into_new_pictures_that_undo_restores() {
+    let root = tempfile::tempdir().unwrap();
+    state();
+    let dir = root.path().join("veil");
+    let mut project =
+        Project::create(&dir, starter("empty", "org.example.veil", "Veil", "en").unwrap()).unwrap();
+    let layer = json!([{ "id": "fill", "type": "solid", "color": "#ffffff", "effects": [{ "effect": "blend_gradient" }] }]);
+    act(&mut project, json!({ "set": { "pointer": "/scene/layers", "value": layer } })).unwrap();
+    let pointer = "/scene/layers/0/effects/0/params/map";
+    let stroke = |channel: Value, value: f32| {
+        json!({ "paint_mask": { "pointer": pointer, "channel": channel, "radius": 0.1, "value": value,
+            "points": [[0.4, 0.5], [0.6, 0.5]] } })
+    };
+    act(&mut project, stroke(json!(1), 1.0)).unwrap();
+    let id = project.doc.pointer(pointer).and_then(Value::as_str).unwrap().to_owned();
+    let path = |p: &Project| p.doc["scene"]["assets"][&id]["path"].as_str().unwrap().to_owned();
+    let first = path(&project);
+    assert_eq!(project.doc["scene"]["assets"][&id]["linear"], true);
+    let picture = image::open(dir.join(&first)).unwrap().into_rgba8();
+    let [r, g, b, a] = picture.get_pixel(256, 256).0;
+    assert!(g == 255 && r == 0 && b == 0 && a == 255, "{:?}", picture.get_pixel(256, 256));
+    assert_eq!(picture.get_pixel(10, 10).0, [0, 0, 0, 255]);
+    act(&mut project, stroke(Value::Null, 0.0)).unwrap();
+    let second = path(&project);
+    let erased = image::open(dir.join(&second)).unwrap().into_rgba8();
+    assert!(second != first && erased.get_pixel(256, 256).0 == [0, 0, 0, 255]);
+    act(&mut project, json!({ "undo": {} })).unwrap();
+    assert_eq!(path(&project), first);
+    let wrong = json!({ "paint_mask": { "pointer": "/scene/canvas/background", "radius": 0.1, "points": [[0.5, 0.5]] } });
+    assert!(act(&mut project, wrong).is_err());
+    let far =
+        json!({ "paint_mask": { "pointer": pointer, "channel": 5, "radius": 0.1, "points": [[0.5, 0.5]] } });
+    assert!(act(&mut project, far).is_err());
+    assert!(reiwand_editor::package::problems(&project.dir, &project.doc).iter().all(|p| p.warning));
+}
+
+#[test]
+fn a_new_mask_starts_from_the_paint_of_its_parameter() {
+    let root = tempfile::tempdir().unwrap();
+    state();
+    let dir = root.path().join("veil");
+    let mut project =
+        Project::create(&dir, starter("empty", "org.example.veil", "Veil", "en").unwrap()).unwrap();
+    let descriptor = json!({ "id": "veil", "name": { "en": "Veil" }, "cost": { "taps": 2 },
+        "passes": [{ "entry": "fs_veil", "inputs": ["previous", "asset:cover"] }],
+        "params": [{ "id": "cover", "type": "mask", "default": "", "channels": 3, "paint": "#ffffff" }] });
+    let wgsl = "@fragment fn fs_veil(in: VertexOut) -> @location(0) vec4<f32> {
+    return tap(in.uv) * sample(aux0, in.uv).g;
+}";
+    std::fs::write(root.path().join("veil.json"), descriptor.to_string()).unwrap();
+    std::fs::write(root.path().join("veil.wgsl"), wgsl).unwrap();
+    let import = Action::ImportEffect { descriptor: root.path().join("veil.json"), wgsl: None };
+    project.act(&import).unwrap();
+    let layer =
+        json!([{ "id": "fill", "type": "solid", "color": "#ffffff", "effects": [{ "effect": "veil" }] }]);
+    act(&mut project, json!({ "set": { "pointer": "/scene/layers", "value": layer } })).unwrap();
+    let pointer = "/scene/layers/0/effects/0/params/cover";
+    let stroke = json!({ "paint_mask": { "pointer": pointer, "channel": 1, "radius": 0.1, "value": 0,
+        "points": [[0.5, 0.5]] } });
+    act(&mut project, stroke).unwrap();
+    let id = project.doc.pointer(pointer).and_then(Value::as_str).unwrap().to_owned();
+    let path = project.doc["scene"]["assets"][&id]["path"].as_str().unwrap().to_owned();
+    let picture = image::open(dir.join(path)).unwrap().into_rgba8();
+    assert_eq!(picture.get_pixel(10, 10).0, [255; 4]);
+    assert_eq!(picture.get_pixel(256, 256).0, [255, 0, 255, 255]);
+}
+
+#[test]
+fn a_first_mask_on_a_ktx2_picture_is_written_as_ktx2() {
+    let root = tempfile::tempdir().unwrap();
+    state();
+    let dir = root.path().join("veil");
+    let mut project =
+        Project::create(&dir, starter("empty", "org.example.veil", "Veil", "en").unwrap()).unwrap();
+    let picture = image::RgbaImage::from_pixel(16, 16, image::Rgba([200, 100, 50, 255]));
+    let options = reiwand_ktx2::Options {
+        codec: reiwand_ktx2::Codec::Uastc,
+        quality: 40,
+        srgb: true,
+        mips: false,
+        repeat: false,
+    };
+    std::fs::create_dir_all(dir.join("assets")).unwrap();
+    std::fs::write(dir.join("assets/wall.ktx2"), reiwand_ktx2::encode(&picture, &options).unwrap()).unwrap();
+    act(
+        &mut project,
+        json!({ "set": { "pointer": "/scene/assets/wall", "value": { "path": "assets/wall.ktx2" } } }),
+    )
+    .unwrap();
+    let layer =
+        json!([{ "id": "w", "type": "image", "image": "wall", "effects": [{ "effect": "blend_gradient" }] }]);
+    act(&mut project, json!({ "set": { "pointer": "/scene/layers", "value": layer } })).unwrap();
+    let pointer = "/scene/layers/0/effects/0/params/map";
+    let stroke = json!({ "paint_mask": { "pointer": pointer, "channel": 1, "radius": 0.1, "value": 1.0,
+        "points": [[0.4, 0.5], [0.6, 0.5]] } });
+    act(&mut project, stroke).unwrap();
+    let id = project.doc.pointer(pointer).and_then(Value::as_str).unwrap().to_owned();
+    let path = project.doc["scene"]["assets"][&id]["path"].as_str().unwrap().to_owned();
+    assert!(path.starts_with("masks/") && path.ends_with(".ktx2"), "{path}");
+    let bytes = std::fs::read(dir.join(&path)).unwrap();
+    assert_eq!(reiwand_ktx2::quality(&bytes), Some(40), "the mask did not take the picture's quality");
+}
+
+#[test]
+fn strokes_on_a_ktx2_map_start_from_the_exact_picture_of_the_last_stroke() {
+    let root = tempfile::tempdir().unwrap();
+    state();
+    let dir = root.path().join("veil");
+    let mut project =
+        Project::create(&dir, starter("empty", "org.example.veil", "Veil", "en").unwrap()).unwrap();
+    let picture =
+        image::RgbaImage::from_fn(64, 64, |x, y| image::Rgba([(x * 4) as u8, (y * 4) as u8, 90, 255]));
+    let options = reiwand_ktx2::Options {
+        codec: reiwand_ktx2::Codec::Etc1s,
+        quality: 10,
+        srgb: true,
+        mips: false,
+        repeat: false,
+    };
+    std::fs::create_dir_all(dir.join("assets")).unwrap();
+    std::fs::write(dir.join("assets/wall.ktx2"), reiwand_ktx2::encode(&picture, &options).unwrap()).unwrap();
+    act(
+        &mut project,
+        json!({ "set": { "pointer": "/scene/assets/wall", "value": { "path": "assets/wall.ktx2" } } }),
+    )
+    .unwrap();
+    let layer = json!([{ "id": "w", "type": "image", "image": "wall", "lighting": {} }]);
+    act(&mut project, json!({ "set": { "pointer": "/scene/layers", "value": layer } })).unwrap();
+    let stroke = |x: f32| json!({ "paint_map": { "layer": "w", "map": "roughness", "radius": 0.05, "value": 0.3, "points": [[x, 0.5]] } });
+    act(&mut project, stroke(0.2)).unwrap();
+    let id = project.doc["scene"]["layers"][0]["lighting"]["roughness_map"].as_str().unwrap().to_owned();
+    let path = |p: &Project| dir.join(p.doc["scene"]["assets"][&id]["path"].as_str().unwrap());
+    let first = path(&project);
+    assert!(first.extension().is_some_and(|e| e == "ktx2"), "{first:?}");
+    let kept = reiwand_editor::pictures::exact(&first).expect("the painted map was not kept exact");
+    let decoded = reiwand_editor::pictures::raw(&first).unwrap().into_rgba8();
+    assert_eq!((kept.width(), kept.height()), (decoded.width(), decoded.height()));
+    act(&mut project, stroke(0.8)).unwrap();
+    let second = reiwand_editor::pictures::exact(&path(&project)).unwrap();
+    let left = |img: &image::RgbaImage| {
+        let half = img.width() / 2;
+        img.enumerate_pixels().filter(|(x, ..)| *x < half).map(|(.., p)| p.0).collect::<Vec<_>>()
+    };
+    assert_ne!(left(&decoded), left(&kept), "the file kept the stroke exactly, so nothing was tested");
+    assert_eq!(left(&second), left(&kept), "the second stroke started from the lossy file");
+    std::fs::write(&first, std::fs::read(path(&project)).unwrap()).unwrap();
+    assert!(
+        reiwand_editor::pictures::exact(&first).is_none() || first == path(&project),
+        "a rewritten file kept its exact copy"
+    );
+}
+
+#[test]
+fn a_flow_map_is_combed_along_the_stroke_from_a_still_picture() {
+    let root = tempfile::tempdir().unwrap();
+    state();
+    let dir = root.path().join("comb");
+    let mut project =
+        Project::create(&dir, starter("empty", "org.example.comb", "Comb", "en").unwrap()).unwrap();
+    let layer =
+        json!([{ "id": "fill", "type": "solid", "color": "#ffffff", "effects": [{ "effect": "shake" }] }]);
+    act(&mut project, json!({ "set": { "pointer": "/scene/layers", "value": layer } })).unwrap();
+    let pointer = "/scene/layers/0/effects/0/params/flow";
+    let comb = json!({ "comb_flow": { "pointer": pointer, "radius": 0.1, "hardness": 0.9,
+        "points": [[0.3, 0.5], [0.7, 0.5]] } });
+    act(&mut project, comb).unwrap();
+    let id = project.doc.pointer(pointer).and_then(Value::as_str).unwrap().to_owned();
+    let path = project.doc["scene"]["assets"][&id]["path"].as_str().unwrap().to_owned();
+    let picture = image::open(dir.join(path)).unwrap().into_rgba8();
+    let [r, g, b, a] = picture.get_pixel(256, 256).0;
+    assert!(r == 255 && g == 128 && b == 0 && a == 255, "{:?}", [r, g, b, a]);
+    assert_eq!(picture.get_pixel(10, 10).0, [128, 128, 0, 255]);
+}

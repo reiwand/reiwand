@@ -1,0 +1,756 @@
+act scene3d
+reiwand-ctl scene act DIR import '{"file":"figure.glb"}'
+reiwand-ctl scene act DIR scene3d '{"model":{"add":{"asset":"figure","id":"cube","at":[1,0,0]}}}'
+
+ask model_info
+reiwand-ctl scene act DIR import '{"file":"figure.glb"}'
+reiwand-ctl scene act DIR import '{"file":"model.glb"}'
+reiwand-ctl scene ask DIR model_info '{"asset":"figure"}'
+
+ask materials3d
+reiwand-ctl scene act DIR import '{"file":"model.glb"}'
+reiwand-ctl scene act DIR scene3d '{"model":{"add":{"asset":"model","id":"doll"}}}'
+reiwand-ctl scene ask DIR materials3d '{"layer":"doll"}'
+
+ask material_check
+reiwand-ctl scene act DIR scene3d '{"new_material":{"name":"glow"}}'
+reiwand-ctl scene ask DIR material_check '{"name":"glow"}'
+
+ask surface3d
+reiwand-ctl scene act DIR import '{"file":"model.glb"}'
+reiwand-ctl scene act DIR scene3d '{"model":{"add":{"asset":"model","id":"doll"}}}'
+reiwand-ctl scene ask DIR surface3d '{"at":[960,540]}'
+
+ask depth3d
+reiwand-ctl scene act DIR scene3d '{"group":{"id":"world"}}'
+reiwand-ctl scene act DIR add_layer '{"kind":"solid","id":"card","into":"world"}'
+reiwand-ctl scene act DIR scene3d '{"depth_test":{"layer":"card","on":true}}'
+reiwand-ctl scene ask DIR depth3d '{"layer":"card"}'
+
+ask stage3d
+reiwand-ctl scene act DIR import '{"file":"figure.glb"}'
+reiwand-ctl scene act DIR scene3d '{"model":{"add":{"asset":"figure","id":"cube"}}}'
+reiwand-ctl scene act DIR scene3d '{"view":{"orbit":[30,10]}}'
+reiwand-ctl scene ask DIR stage3d '{"time":0}'
+
+ask cost3d
+reiwand-ctl scene act DIR import '{"file":"model.glb"}'
+reiwand-ctl scene act DIR scene3d '{"model":{"add":{"asset":"model","id":"doll"}}}'
+reiwand-ctl scene ask DIR cost3d '{"quality":"q2"}'
+
+ask shadows3d
+reiwand-ctl scene act DIR import '{"file":"figure.glb"}'
+reiwand-ctl scene act DIR scene3d '{"model":{"add":{"asset":"figure","id":"cube"}}}'
+reiwand-ctl scene act DIR add_layer '{"kind":"light","id":"bulb"}'
+reiwand-ctl scene act DIR scene3d '{"shadows":{"layer":"bulb","on":true,"resolution":1024}}'
+reiwand-ctl scene ask DIR shadows3d '{"time":0}'
+
+ask paths3d
+reiwand-ctl scene act DIR import '{"file":"figure.glb"}'
+reiwand-ctl scene act DIR scene3d '{"model":{"add":{"asset":"figure","id":"cube"}}}'
+reiwand-ctl scene act DIR scene3d '{"path":{"add":{"id":"flight"}}}'
+reiwand-ctl scene ask DIR paths3d '{"time":1}'
+
+ask bone3d
+reiwand-ctl scene act DIR import '{"file":"model.glb"}'
+reiwand-ctl scene act DIR scene3d '{"model":{"add":{"asset":"model","id":"doll"}}}'
+reiwand-ctl scene act DIR clip '{"layer":"doll","id":"step","animation":"walk","add":true,"play":true}'
+reiwand-ctl scene ask DIR bone3d '{"layer":"doll","bone":"tip","turn":10}'
+
+ask bound3d
+reiwand-ctl scene act DIR import '{"file":"model.glb"}'
+reiwand-ctl scene act DIR scene3d '{"model":{"add":{"asset":"model","id":"doll"}}}'
+reiwand-ctl scene act DIR clip '{"layer":"doll","id":"step","animation":"walk","add":true,"play":true}'
+reiwand-ctl scene ask DIR bound3d '{"layer":"doll","bone":"tip","point":[1000,300]}'
+
+act set
+reiwand-ctl scene act DIR set '{"pointer":"/scene/canvas/background","value":"#112233"}'
+
+act add
+reiwand-ctl scene act DIR add '{"pointer":"/scene/layers/-","value":{"id":"backdrop","type":"solid","color":"#102030"}}'
+
+act remove
+reiwand-ctl scene act DIR add_layer '{"kind":"solid","id":"backdrop"}'
+reiwand-ctl scene act DIR remove '{"pointer":"/scene/layers/0/color"}'
+
+act move
+reiwand-ctl scene act DIR add_layer '{"kind":"solid","id":"backdrop"}'
+reiwand-ctl scene act DIR add_layer '{"kind":"text","id":"title"}'
+reiwand-ctl scene act DIR move '{"from":"/scene/layers/1","to":"/scene/layers/0"}'
+
+act add_layer
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+
+act remove_layer
+reiwand-ctl scene act DIR add_layer '{"kind":"solid","id":"backdrop"}'
+reiwand-ctl scene act DIR remove_layer '{"id":"backdrop"}'
+
+act duplicate_layer
+reiwand-ctl scene act DIR add_layer '{"kind":"text","id":"title"}'
+reiwand-ctl scene act DIR duplicate_layer '{"id":"title"}'
+
+act move_layer
+reiwand-ctl scene act DIR add_layer '{"kind":"group","id":"charm"}'
+reiwand-ctl scene act DIR add_layer '{"kind":"text","id":"title"}'
+reiwand-ctl scene act DIR move_layer '{"id":"title","to":0,"into":"charm"}'
+
+act group
+reiwand-ctl scene act DIR add_layer '{"kind":"solid","id":"backdrop"}'
+reiwand-ctl scene act DIR add_layer '{"kind":"text","id":"title"}'
+reiwand-ctl scene act DIR group '{"ids":["backdrop","title"],"id":"sign"}'
+
+act ungroup
+reiwand-ctl scene act DIR add_layer '{"kind":"group","id":"charm"}'
+reiwand-ctl scene act DIR ungroup '{"id":"charm"}'
+
+act hide
+reiwand-ctl scene act DIR add_layer '{"kind":"solid","id":"backdrop"}'
+reiwand-ctl scene act DIR hide '{"id":"backdrop","hidden":true}'
+
+act lock
+reiwand-ctl scene act DIR add_layer '{"kind":"solid","id":"backdrop"}'
+reiwand-ctl scene act DIR lock '{"id":"backdrop","locked":true}'
+
+act solo
+reiwand-ctl scene act DIR add_layer '{"kind":"solid","id":"backdrop"}'
+reiwand-ctl scene act DIR solo '{"id":"backdrop"}'
+
+act rename
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png","id":"sky"}'
+reiwand-ctl scene act DIR rename '{"kind":"layer","id":"sky","to":"backdrop"}'
+
+act paste
+reiwand-ctl scene act DIR paste '{"clip":{"layers":[{"id":"greet","type":"text","text":"Hello","size":96,"color":"#ffffff"}]}}'
+
+act rgb
+reiwand-ctl scene act DIR add_layer '{"kind":"adjustment","id":"setting"}'
+reiwand-ctl scene act DIR rgb '{"layer":"setting","on":true}'
+
+act layer
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png","id":"sky"}'
+reiwand-ctl scene act DIR layer '{"transform":{"layer":"sky","position":[400,300],"rotation":10,"scale":[1.5,1.5],"size":[800,600]}}'
+reiwand-ctl scene act DIR layer '{"start":{"clock":{"format":"HH:mm","id":"hora"}}}'
+reiwand-ctl scene act DIR layer '{"start":{"forever":{"layer":"sky","motion":"spin","seconds":30}}}'
+
+act import
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+
+act asset
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR asset '{"asset":"picture","ktx2":true,"codec":"etc1s","quality":50}'
+
+act sprites
+reiwand-ctl scene act DIR import '{"file":"sheet.png","id":"sheet"}'
+reiwand-ctl scene act DIR sprites '{"grid":{"asset":"sheet","columns":4,"rows":2}}'
+
+act film
+reiwand-ctl scene act DIR add_layer '{"kind":"video","file":"video.webm","id":"clip"}'
+reiwand-ctl scene act DIR film '{"trim":{"layer":"clip","start":0.1,"end":0.5}}'
+
+act import_assets
+reiwand-ctl scene new source
+reiwand-ctl scene act source add_layer '{"kind":"image","file":"picture.png","id":"sky"}'
+reiwand-ctl scene act source manifest '{"credit":{"paths":["assets/picture.png"],"license":"CC-BY-4.0","attribution":"Ana Perez"}}'
+reiwand-ctl pack new-assets source parts --part layer:sky --id org.example.parts --title Partes --license CC-BY-4.0 --attribution "Ana Perez"
+reiwand-ctl pack build parts -o parts.wpak
+reiwand-ctl scene act DIR import_assets '{"package":"parts.wpak","parts":["layer:sky"]}'
+
+act canvas
+reiwand-ctl scene act DIR canvas '{"size":{"size":[1280,720]}}'
+
+act effects
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+reiwand-ctl scene act DIR effects '{"add":{"layer":"image","effect":"blur","params":{"radius":6},"name":"soft","optional":true}}'
+
+act effect_rule
+reiwand-ctl scene act DIR shader '{"new":{"name":"glow","template":"color"}}'
+reiwand-ctl scene act DIR effect_rule '{"effect":"glow","param":"amount","uses":"audio"}'
+
+act paint_mask
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+reiwand-ctl scene act DIR effects '{"add":{"layer":"image","effect":"displace"}}'
+reiwand-ctl scene act DIR paint_mask '{"pointer":"/scene/layers/0/effects/0/params/map","points":[[0.2,0.3],[0.8,0.6]],"radius":0.1}'
+
+act comb_flow
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+reiwand-ctl scene act DIR effects '{"add":{"layer":"image","effect":"flow"}}'
+reiwand-ctl scene act DIR comb_flow '{"pointer":"/scene/layers/0/effects/0/params/map","points":[[0.2,0.3],[0.8,0.6]],"radius":0.1,"value":0.8}'
+
+act ramp
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+reiwand-ctl scene act DIR effects '{"add":{"layer":"image","effect":"fire"}}'
+reiwand-ctl scene act DIR ramp '{"stops":[{"at":0,"color":"#000000"},{"at":0.5,"color":"#ff6a00"},{"at":1,"color":"#ffff99"}],"pointer":"/scene/layers/0/effects/0/params/gradient"}'
+
+ask rules
+reiwand-ctl scene ask DIR rules '{"effect":"displace"}'
+
+ask effect_cost
+reiwand-ctl scene ask DIR effect_cost '{"effect":"blur"}'
+
+ask ramp
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+reiwand-ctl scene act DIR effects '{"add":{"layer":"image","effect":"fire"}}'
+reiwand-ctl scene act DIR ramp '{"stops":[{"at":0,"color":"#000000"},{"at":1,"color":"#ffff99"}],"pointer":"/scene/layers/0/effects/0/params/gradient"}'
+reiwand-ctl scene ask DIR ramp '"gradient"'
+
+ask depth_model
+reiwand-ctl scene ask DIR depth_model '{}'
+
+ask normals
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+reiwand-ctl scene ask DIR normals '{"layer":"image","strength":3,"blur":2}'
+
+ask map
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+reiwand-ctl scene act DIR paint_map '{"layer":"image","map":"emissive","points":[[0.5,0.5]],"radius":0.2,"hardness":1}'
+reiwand-ctl scene ask DIR map '{"layer":"image","map":"emissive"}'
+
+act mesh_from_picture
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+
+act mesh_depth
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR mesh_depth '{"layer":"mesh","points":[[0.3,0.5],[0.7,0.5]],"radius":0.2,"by":40}'
+
+act bone
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+
+act auto_weights
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"arm","parent":"root","at":[0.5,0.5]}'
+reiwand-ctl scene act DIR auto_weights '{"layer":"mesh"}'
+
+act weights
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"arm","parent":"root","at":[0.5,0.5]}'
+reiwand-ctl scene act DIR weights '{"layer":"mesh","bone":"arm","points":[[0.5,0.4],[0.5,0.6]],"mode":"add","by":0.8}'
+
+act clip
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR clip '{"layer":"mesh","id":"greet","add":true,"length":1.5,"loop":"pingpong","play":true}'
+
+act key
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"arm","parent":"root","at":[0.5,0.5]}'
+reiwand-ctl scene act DIR clip '{"layer":"mesh","id":"greet","add":true,"length":2}'
+reiwand-ctl scene act DIR key '{"layer":"mesh","clip":"greet","time":0,"bone":"arm","rotation":0}'
+
+act edit_keys
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"arm","parent":"root","at":[0.5,0.5]}'
+reiwand-ctl scene act DIR clip '{"layer":"mesh","id":"greet","add":true,"length":2}'
+reiwand-ctl scene act DIR key '{"layer":"mesh","clip":"greet","time":0,"bone":"arm","rotation":0}'
+reiwand-ctl scene act DIR key '{"layer":"mesh","clip":"greet","time":1,"bone":"arm","rotation":40}'
+reiwand-ctl scene act DIR key '{"layer":"mesh","clip":"greet","time":2,"bone":"arm","rotation":0}'
+reiwand-ctl scene act DIR edit_keys '{"picks":[{"pointer":"/scene/layers/0/clips/0/bones/arm/rotation","times":[1]}],"shift":0.5}'
+
+act clip_event
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR clip '{"layer":"mesh","id":"greet","add":true,"length":2}'
+reiwand-ctl scene act DIR clip_event '{"layer":"mesh","clip":"greet","name":"hello","time":0.5}'
+
+act shape_sculpt
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR shape_sculpt '{"layer":"mesh","shape":"smile","points":[[0.4,0.5],[0.6,0.5]],"mode":"push","by":20,"radius":0.2}'
+
+act expression
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR shape_sculpt '{"layer":"mesh","shape":"smile","points":[[0.4,0.5],[0.6,0.5]],"mode":"push","by":20,"radius":0.2}'
+reiwand-ctl scene act DIR expression '{"layer":"mesh","name":"happy","shapes":{"smile":1}}'
+
+act ik
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"arm","parent":"root","at":[0.5,0.5]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"hand","parent":"arm","at":[0.5,0.2]}'
+reiwand-ctl scene act DIR ik '{"layer":"mesh","root":"root","tip":"hand","target":[128,20]}'
+
+act physics
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"hand","parent":"root","at":[0.5,0.2]}'
+reiwand-ctl scene act DIR physics '{"layer":"mesh","bones":["hand"],"mode":"spring","stiffness":0.4,"gravity":2}'
+
+act collider
+reiwand-ctl scene act DIR add_layer '{"kind":"model","file":"model.glb","id":"doll"}'
+reiwand-ctl scene act DIR collider '{"layer":"doll","bone":"tip","shape":"capsule","radius":0.2}'
+
+act bone_rule
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"arm","parent":"root","at":[0.5,0.5]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"hand","parent":"arm","at":[0.5,0.2]}'
+reiwand-ctl scene act DIR bone_rule '{"layer":"mesh","bone":"hand","parent":"root","weight":0.5}'
+
+act wind
+reiwand-ctl scene act DIR wind '{"angle":0,"strength":300,"gusts":0.5}'
+
+act attach
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"hand","parent":"root","at":[0.5,0.2]}'
+reiwand-ctl scene act DIR add_layer '{"kind":"image","source":"picture","id":"hat"}'
+reiwand-ctl scene act DIR attach '{"layer":"hat","to":"mesh","bone":"hand","offset":[5,5],"inherit":["position","rotation"]}'
+
+act point
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR point '{"layer":"mesh","name":"ring","at":[0.5,0.2],"parent":"root"}'
+
+act parts
+reiwand-ctl scene act DIR add_layer '{"kind":"mesh","file":"pieces.glb","id":"body"}'
+reiwand-ctl scene act DIR parts '{"layer":"body","clip":{"chest":"legs"}}'
+
+act animate
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR clip '{"layer":"mesh","id":"greet","add":true}'
+reiwand-ctl scene act DIR animate '{"layer":{"layer":"mesh","add":"greet","weight":0.8,"rate":1.5}}'
+
+ask rig
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"arm","parent":"root","at":[0.5,0.5]}'
+reiwand-ctl scene ask DIR rig '{}' --layer mesh
+
+ask motion
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR clip '{"layer":"mesh","id":"greet","add":true,"length":2,"play":true}'
+reiwand-ctl scene ask DIR motion '{"layer":"mesh"}'
+
+ask outline
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh","cells":4}'
+reiwand-ctl scene ask DIR outline '{}' --layer mesh
+
+ask keys
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"arm","parent":"root","at":[0.5,0.5]}'
+reiwand-ctl scene act DIR clip '{"layer":"mesh","id":"greet","add":true,"length":2}'
+reiwand-ctl scene act DIR key '{"layer":"mesh","clip":"greet","time":1,"bone":"arm","rotation":40}'
+reiwand-ctl scene ask DIR keys '"greet"' --layer mesh
+
+ask pose
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"arm","parent":"root","at":[0.5,0.5]}'
+reiwand-ctl scene act DIR clip '{"layer":"mesh","id":"greet","add":true,"length":2}'
+reiwand-ctl scene act DIR key '{"layer":"mesh","clip":"greet","time":1,"bone":"arm","rotation":40}'
+reiwand-ctl scene ask DIR pose '{"clip":"greet","time":1}' --layer mesh
+
+ask weights
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"arm","parent":"root","at":[0.5,0.5]}'
+reiwand-ctl scene ask DIR weights '"arm"' --layer mesh
+
+ask handles
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"arm","parent":"root","at":[0.5,0.5]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"hand","parent":"arm","at":[0.5,0.2]}'
+reiwand-ctl scene act DIR ik '{"layer":"mesh","root":"root","tip":"hand","target":[128,20]}'
+reiwand-ctl scene act DIR physics '{"layer":"mesh","bones":["hand"],"gravity":1}'
+reiwand-ctl scene ask DIR handles '{}' --layer mesh
+
+ask script_calls
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR mesh_from_picture '{"image":"picture","id":"mesh"}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"root","at":[0.5,0.9]}'
+reiwand-ctl scene act DIR bone '{"layer":"mesh","name":"hand","parent":"root","at":[0.5,0.2]}'
+reiwand-ctl scene act DIR physics '{"layer":"mesh","bones":["hand"]}'
+reiwand-ctl scene ask DIR script_calls '{"layer":"mesh"}'
+
+ask wind
+reiwand-ctl scene act DIR wind '{"angle":90,"strength":200,"gusts":0.2}'
+reiwand-ctl scene ask DIR wind '{}'
+
+ask wander
+reiwand-ctl scene ask DIR wander '{"time":1.5}'
+
+act particles
+reiwand-ctl scene act DIR add_layer '{"kind":"particles","id":"sparks"}'
+reiwand-ctl scene act DIR particles '{"create":{"system":"smoke","from":"sparks"}}'
+
+act light
+reiwand-ctl scene act DIR light '{"add":{"light":"spot","id":"lamp","at":[960,300]}}'
+
+act lighting
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+reiwand-ctl scene act DIR lighting '{"layer":"image","roughness":0.3,"reflection":0.2,"emissive":1,"strength":0.9}'
+
+act normals
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+reiwand-ctl scene act DIR normals '{"layer":"image","strength":3,"blur":2,"id":"relief"}'
+
+act paint_map
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+reiwand-ctl scene act DIR paint_map '{"layer":"image","map":"roughness","points":[[0.2,0.2],[0.8,0.5]],"radius":0.1,"value":0.2}'
+
+act ambient
+reiwand-ctl scene act DIR ambient '{"ambient":"#202040","sky":"#8090ff"}'
+
+ask particles
+reiwand-ctl scene act DIR add_layer '{"kind":"particles","id":"sparks"}'
+reiwand-ctl scene ask DIR particles '{"layer":"sparks","time":1.5,"sound":0.5}' --layer sparks
+
+ask budget
+reiwand-ctl scene act DIR add_layer '{"kind":"particles","id":"sparks"}'
+reiwand-ctl scene ask DIR budget '{"layer":"sparks","time":1.5,"quality":"q2"}' --layer sparks
+
+ask swarm_light
+reiwand-ctl scene act DIR add_layer '{"kind":"particles","id":"sparks"}'
+reiwand-ctl scene ask DIR swarm_light '{"system":"sparks"}'
+
+ask lights
+reiwand-ctl scene act DIR light '{"add":{"light":"spot","id":"lamp"}}'
+reiwand-ctl scene ask DIR lights '{"time":0}'
+
+ask falloff
+reiwand-ctl scene act DIR light '{"add":{"light":"spot","id":"lamp"}}'
+reiwand-ctl scene ask DIR falloff '{"layer":"lamp","time":0}'
+
+ask lighting
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+reiwand-ctl scene act DIR lighting '{"layer":"image","roughness":0.3}'
+reiwand-ctl scene act DIR light '{"add":{"light":"point","id":"spot"}}'
+reiwand-ctl scene ask DIR lighting '{"time":0,"quality":"q2"}'
+
+ask air
+reiwand-ctl scene act DIR light '{"add":{"light":"point","id":"spot"}}'
+reiwand-ctl scene act DIR light '{"volumetric":{"layer":"spot","density":0.3}}'
+reiwand-ctl scene ask DIR air '{"layer":"spot","time":0}'
+
+ask projection
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+reiwand-ctl scene act DIR light '{"add":{"light":"spot","id":"lamp"}}'
+reiwand-ctl scene act DIR light '{"projection":{"layer":"lamp","asset":"picture"}}'
+reiwand-ctl scene ask DIR projection '{"layer":"lamp","time":0}'
+
+ask hemisphere
+reiwand-ctl scene act DIR ambient '{"ambient":"#202040","sky":"#8090ff"}'
+reiwand-ctl scene ask DIR hemisphere '{}'
+
+ask spread
+reiwand-ctl scene ask DIR spread '{"layout":"dual"}'
+
+ask sounds
+reiwand-ctl scene act DIR add_layer '{"kind":"sound","file":"sound.ogg","id":"breeze"}'
+reiwand-ctl scene act DIR set '{"pointer":"/scene/layers/0/play_on","value":"start"}'
+reiwand-ctl scene ask DIR sounds '{}'
+
+ask wave
+reiwand-ctl scene act DIR add_layer '{"kind":"sound","file":"sound.ogg"}'
+reiwand-ctl scene ask DIR wave '{"asset":"sound","buckets":8}'
+
+ask meter
+reiwand-ctl scene ask DIR meter '{"source":{"audio":[0,3],"of":16},"reading":{"listening":true,"raw":[[0.5,0.2,0.1,0.9],[0.5,0.2,0.1,0.9]],"loudness":0.5},"of":16}'
+
+ask response
+reiwand-ctl scene ask DIR response '{"smooth":{"up":0.05,"down":0.4}}'
+
+act keyframe
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png","id":"sky"}'
+reiwand-ctl scene act DIR keyframe '{"pointer":"/scene/layers/0/opacity","time":0,"value":0}'
+
+act timeline
+reiwand-ctl scene act DIR timeline '{"id":"lap","add":true,"duration":3}'
+
+act manifest
+reiwand-ctl scene act DIR manifest '{"origin":{"kind":"derived","derived_from":[{"author":"Ana Perez","title":"Aurora","url":"https://example.org/aurora","license":"CC-BY-4.0"}]}}'
+
+act translate
+reiwand-ctl scene act DIR translate '{"pointer":"/manifest/title","language":"es","text":"Mi escena"}'
+
+reiwand-ctl scene act DIR add_layer '{"kind":"text","id":"greeting"}'
+reiwand-ctl scene act DIR translate '{"pointer":"/scene/layers/0/text","language":"es","text":"Buenos días"}'
+
+act thumbnail
+reiwand-ctl scene act DIR thumbnail '{"file":"picture.png"}'
+
+act shot
+reiwand-ctl scene act DIR add_layer '{"kind":"solid"}'
+reiwand-ctl scene act DIR shot '{"still":{"time":1}}'
+
+act add_property
+reiwand-ctl scene act DIR add_property '{"kind":"group","id":"lights"}'
+
+act move_property
+reiwand-ctl scene act DIR add_property '{"kind":"slider","id":"glow"}'
+reiwand-ctl scene act DIR add_property '{"kind":"bool","id":"active"}'
+reiwand-ctl scene act DIR move_property '{"id":"active","to":0}'
+
+act rename_property
+reiwand-ctl scene act DIR add_property '{"kind":"slider","id":"glow"}'
+reiwand-ctl scene act DIR rename_property '{"id":"glow","to":"bulb"}'
+
+act remove_property
+reiwand-ctl scene act DIR add_property '{"kind":"slider","id":"glow"}'
+reiwand-ctl scene act DIR remove_property '{"id":"glow"}'
+
+act property
+reiwand-ctl scene act DIR add_property '{"kind":"slider","id":"bulb"}'
+reiwand-ctl scene act DIR property '{"id":"bulb","min":0,"max":10,"step":0.5,"default":3}'
+
+act condition
+reiwand-ctl scene act DIR add_property '{"kind":"bool","id":"active"}'
+reiwand-ctl scene act DIR add_property '{"kind":"combo","id":"style"}'
+reiwand-ctl scene act DIR add_property '{"kind":"slider","id":"level"}'
+reiwand-ctl scene act DIR condition '{"id":"level","text":"active && style == \"option_1\""}'
+
+act add_preset
+reiwand-ctl scene act DIR add_property '{"kind":"slider","id":"bulb"}'
+reiwand-ctl scene act DIR add_preset '{"id":"soft","label":"Soft"}'
+
+act import_script
+reiwand-ctl scene act DIR import_script '{"template":"empty"}'
+
+act script
+reiwand-ctl scene act DIR import_script '{"template":"empty"}'
+reiwand-ctl scene act DIR script '{"remove":{"path":"scripts/empty.js"}}'
+
+act uses
+reiwand-ctl scene act DIR import_script '{"template":"empty"}'
+reiwand-ctl scene act DIR uses '{"path":"scripts/empty.js","add":["timers","math"]}'
+
+act template
+reiwand-ctl scene act DIR add_layer '{"kind":"text","id":"a"}'
+reiwand-ctl scene act DIR add_layer '{"kind":"shape","id":"b"}'
+reiwand-ctl scene act DIR template '{"make":{"layers":["a","b"],"name":"pair"}}'
+
+act pool
+reiwand-ctl scene act DIR pool '{"id":"forms","add":true}'
+
+act shader
+reiwand-ctl scene act DIR shader '{"new":{"name":"shade"}}'
+
+act import_effect
+reiwand-ctl scene new source
+reiwand-ctl scene act source shader '{"new":{"name":"shade"}}'
+reiwand-ctl scene act DIR import_effect '{"descriptor":"source/effects/shade.json"}'
+
+act remove_effect
+reiwand-ctl scene act DIR shader '{"new":{"name":"shade"}}'
+reiwand-ctl scene act DIR remove_effect '{"effect":"shade"}'
+
+act undo
+reiwand-ctl scene act DIR add_layer '{"kind":"solid","id":"backdrop"}'
+reiwand-ctl scene act DIR undo '{}'
+
+act redo
+reiwand-ctl scene act DIR add_layer '{"kind":"solid","id":"backdrop"}'
+reiwand-ctl scene act DIR undo '{}'
+reiwand-ctl scene act DIR redo '{}'
+
+ask strings
+reiwand-ctl scene act DIR manifest '{"text":{"key":"greet","language":"en","text":"Hello"}}'
+reiwand-ctl scene act DIR manifest '{"text":{"key":"greet","language":"es","text":"Hello"}}'
+reiwand-ctl scene ask DIR strings '{}'
+
+ask credits
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene act DIR import '{"file":"sound.ogg"}'
+reiwand-ctl scene act DIR manifest '{"credit":{"paths":["assets/picture.png"],"license":"CC-BY-4.0","attribution":"Ana Perez"}}'
+reiwand-ctl scene ask DIR credits '{}'
+
+ask preset_steps
+reiwand-ctl scene new DIR --from preset
+reiwand-ctl scene ask DIR preset_steps '{}'
+
+ask flashes
+reiwand-ctl scene act DIR add_layer '{"kind":"solid"}'
+reiwand-ctl scene ask DIR flashes '{"run":true,"from":0,"seconds":1,"fps":5}'
+
+ask curves
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png","id":"sky"}'
+reiwand-ctl scene act DIR keyframe '{"pointer":"/scene/layers/0/opacity","time":0,"value":0}'
+reiwand-ctl scene act DIR keyframe '{"pointer":"/scene/layers/0/opacity","time":2,"value":1}'
+reiwand-ctl scene ask DIR curves '{"pointer":"/scene/layers/0/opacity","samples":3}'
+
+ask key_clip
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png","id":"sky"}'
+reiwand-ctl scene act DIR keyframe '{"pointer":"/scene/layers/0/opacity","time":0,"value":0.2}'
+reiwand-ctl scene act DIR keyframe '{"pointer":"/scene/layers/0/opacity","time":1,"value":1}'
+reiwand-ctl scene ask DIR key_clip '{"copy":[{"pointer":"/scene/layers/0/opacity","times":[0,1]}]}'
+
+ask fires
+reiwand-ctl scene act DIR timeline '{"id":"one","add":true,"add_events":[{"t":1,"name":"boom"}]}'
+reiwand-ctl scene act DIR timeline '{"id":"two","add":true,"trigger":"event:boom"}'
+reiwand-ctl scene act DIR add_layer '{"kind":"sound","file":"sound.ogg","id":"voice"}'
+reiwand-ctl scene act DIR set '{"pointer":"/scene/layers/0/play_on","value":"event:boom"}'
+reiwand-ctl scene ask DIR fires '"event:boom"'
+
+ask palette
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene ask DIR palette '"picture"'
+
+ask clocks
+reiwand-ctl scene act DIR add_layer '{"kind":"video","file":"video.webm","id":"clip"}'
+reiwand-ctl scene act DIR set '{"pointer":"/scene/layers/0/playback","value":{"own_clock":true,"rate":2}}'
+reiwand-ctl scene ask DIR clocks '{"time":0.25}'
+
+ask pools
+reiwand-ctl scene act DIR pool '{"id":"forms","add":true}'
+reiwand-ctl scene act DIR add_layer '{"kind":"shapes","source":"forms","id":"meshes"}'
+reiwand-ctl scene ask DIR pools '{}'
+
+ask uses
+reiwand-ctl scene act DIR import_script '{"template":"empty"}'
+reiwand-ctl scene act DIR script '{"write":{"path":"scripts/empty.js","text":"export function update() { scene.bloom; }\n"}}'
+reiwand-ctl scene ask DIR uses '{}'
+
+ask shader_source
+reiwand-ctl scene act DIR shader '{"new":{"name":"shade"}}'
+reiwand-ctl scene ask DIR shader_source '{"effect":"shade"}'
+
+ask shader_check
+reiwand-ctl scene act DIR shader '{"new":{"name":"shade"}}'
+reiwand-ctl scene ask DIR shader_check '{"effect":"shade"}'
+
+act depth_map
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+reiwand-ctl scene act DIR manifest '{"inputs":{"inputs":["pointer"],"add":true}}'
+reiwand-ctl scene act DIR effects '{"add":{"layer":"image","effect":"depth_parallax"}}'
+reiwand-ctl scene act DIR depth_map '{"asset":"picture","pointer":"/scene/layers/0/effects/0/params/depth"}'
+
+ask copy
+reiwand-ctl scene act DIR add_layer '{"kind":"solid","id":"backdrop"}'
+reiwand-ctl scene ask DIR copy '{"ids":["backdrop"]}'
+
+ask film
+reiwand-ctl scene act DIR add_layer '{"kind":"video","file":"video.webm","id":"clip"}'
+reiwand-ctl scene ask DIR film '{"layer":"clip","strip":3}'
+
+ask sprites
+reiwand-ctl scene act DIR import '{"file":"sheet.png","id":"sheet"}'
+reiwand-ctl scene act DIR sprites '{"grid":{"asset":"sheet","columns":4,"rows":2}}'
+reiwand-ctl scene ask DIR sprites '{"asset":"sheet"}'
+
+ask asset_uses
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png","id":"sky"}'
+reiwand-ctl scene ask DIR asset_uses '{"asset":"picture"}'
+
+ask unkept
+reiwand-ctl scene act DIR add_layer '{"kind":"solid","id":"backdrop"}'
+reiwand-ctl scene ask DIR unkept '{"id":"backdrop"}'
+
+ask script_uses
+reiwand-ctl scene act DIR import_script '{"template":"empty"}'
+reiwand-ctl scene ask DIR script_uses '{"name":"sparks"}'
+
+ask review
+reiwand-ctl scene ask DIR review '{}'
+
+ask signature
+reiwand-ctl scene ask DIR signature '{}'
+
+ask tried
+reiwand-ctl scene act DIR add_property '{"kind":"slider","id":"glow"}'
+reiwand-ctl scene ask DIR tried '{"values":{"glow":40}}'
+
+ask media
+reiwand-ctl scene new DIR --from image
+reiwand-ctl scene ask DIR media '{}'
+
+ask levels
+reiwand-ctl scene act DIR add_property '{"kind":"slider","id":"glow"}'
+reiwand-ctl scene ask DIR levels '{"property":"glow"}'
+
+ask base
+reiwand-ctl scene new source
+reiwand-ctl scene act source add_property '{"kind":"slider","id":"glow"}'
+reiwand-ctl scene new DIR --from preset
+reiwand-ctl scene ask DIR base '{"file":"source"}'
+
+ask bands
+reiwand-ctl scene ask DIR bands '{"of":16}'
+
+ask touch
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png","id":"sky"}'
+reiwand-ctl scene act DIR layer '{"touch":{"layer":"sky","takes":"alpha","alpha":0.5}}'
+reiwand-ctl scene ask DIR touch '{}'
+
+ask shape_handles
+reiwand-ctl scene act DIR add_layer '{"kind":"shape","id":"form"}'
+reiwand-ctl scene ask DIR shape_handles '{"layer":"form","time":0}'
+
+ask text_box
+reiwand-ctl scene act DIR add_layer '{"kind":"text","id":"title"}'
+reiwand-ctl scene ask DIR text_box '{"layer":"title","time":0}'
+
+ask font_list
+reiwand-ctl scene act DIR add_layer '{"kind":"text","id":"title"}'
+reiwand-ctl scene ask DIR font_list '{"layer":"title"}'
+
+ask clock_sample
+reiwand-ctl scene ask DIR clock_sample '{"pattern":"HH:mm","wall":0}'
+
+ask clock_help
+reiwand-ctl scene ask DIR clock_help '{"lang":"en","wall":0}'
+
+ask mask_view
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+reiwand-ctl scene act DIR effects '{"add":{"layer":"image","effect":"blur"}}'
+reiwand-ctl scene act DIR effects '{"mask":{"layer":"image","index":0,"shape":{"ellipse":{"size":[600,400]}},"feather":40}}'
+reiwand-ctl scene ask DIR mask_view '{"layer":"image","index":0,"time":0}'
+
+ask mask_picture
+reiwand-ctl scene act DIR import '{"file":"picture.png"}'
+reiwand-ctl scene ask DIR mask_picture '{"asset":"picture","channel":"luminance"}'
+
+ask effect_handles
+reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png"}'
+reiwand-ctl scene act DIR effects '{"add":{"layer":"image","effect":"blur_radial"}}'
+reiwand-ctl scene ask DIR effect_handles '{"layer":"image","index":0,"time":0}'
+
+ask capture_view
+reiwand-ctl scene act DIR add_layer '{"kind":"adjustment","id":"setting"}'
+reiwand-ctl scene act DIR layer '{"transform":{"layer":"setting","size":[400,300]}}'
+reiwand-ctl scene ask DIR capture_view '{"layer":"setting","time":0}'
+
+ask level
+reiwand-ctl scene ask DIR level '{"quality":"q2"}'
+
+ask history
+reiwand-ctl scene act DIR add_layer '{"kind":"solid","id":"backdrop"}'
+reiwand-ctl scene ask DIR history '{}'
+
+act transition
+reiwand-ctl scene act DIR transition '{"way":"in","make":true}'
+reiwand-ctl scene act DIR transition '{"way":"in","duration_ms":1500,"curve":[0.2,0.8,0.4,1]}'
+
+ask transition
+reiwand-ctl scene act DIR transition '{"way":"in","make":true}'
+reiwand-ctl scene ask DIR transition '{}'

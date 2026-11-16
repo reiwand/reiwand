@@ -1,0 +1,145 @@
+use crate::Color;
+use crate::content::white;
+use crate::value::Value;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+
+pub const MAX_LIGHTS: usize = 12;
+pub const MAX_PROJECTIONS: usize = 4;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum Beam {
+    #[default]
+    Point,
+    Spot,
+    Tube,
+    Directional,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct Light {
+    #[serde(default)]
+    pub light: Beam,
+    #[serde(default = "white")]
+    pub color: Value<Color>,
+    #[serde(default = "one")]
+    #[schemars(extend("x-range" = [0, 100]))]
+    pub intensity: Value<f32>,
+    #[serde(default = "reach")]
+    #[schemars(extend("x-unit" = "px", "x-range" = [1, 100000]))]
+    pub radius: Value<f32>,
+    #[serde(default = "height")]
+    #[schemars(extend("x-unit" = "px", "x-range" = [-100000, 100000]))]
+    pub z: Value<f32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[schemars(extend("x-unit" = "°", "x-range" = [0, 180]))]
+    pub cone: Option<[f32; 2]>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[schemars(extend("x-unit" = "px", "x-range" = [1, 100000]))]
+    pub length: Option<f32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub volumetric: Option<Volumetric>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[schemars(extend("x-ref" = "image"))]
+    pub texture: Option<Value<String>>,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub shadows: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[schemars(extend("x-unit" = "px", "x-range" = [256, 4096]))]
+    pub shadow_resolution: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[schemars(extend("x-range" = [0, 1]))]
+    pub shadow_bias: Option<f32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub position3d: Option<Value<crate::Vec3>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub aim3d: Option<Value<crate::Vec3>>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(default, deny_unknown_fields)]
+pub struct Volumetric {
+    #[schemars(extend("x-range" = [0, 1]))]
+    pub density: f32,
+    #[schemars(extend("x-range" = [4, 64]))]
+    pub samples: u32,
+    #[serde(skip_serializing_if = "none")]
+    #[schemars(extend("x-range" = [0, 1]))]
+    pub shafts: f32,
+}
+
+fn none(v: &f32) -> bool {
+    *v == 0.0
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(default, deny_unknown_fields)]
+pub struct Lighting {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schemars(extend("x-ref" = "image"))]
+    pub normal: Option<String>,
+    #[schemars(extend("x-range" = [0, 1]))]
+    pub roughness: Value<f32>,
+    #[schemars(extend("x-range" = [0, 1]))]
+    pub reflection: Value<f32>,
+    #[schemars(extend("x-range" = [0, 16]))]
+    pub emissive: Value<f32>,
+    #[schemars(extend("x-range" = [0, 1]))]
+    pub strength: Value<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schemars(extend("x-ref" = "image"))]
+    pub env: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schemars(extend("x-ref" = "image"))]
+    pub roughness_map: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schemars(extend("x-ref" = "image"))]
+    pub emissive_map: Option<String>,
+}
+
+impl Default for Volumetric {
+    fn default() -> Self {
+        Volumetric { density: 0.2, samples: 16, shafts: 0.0 }
+    }
+}
+
+impl Default for Lighting {
+    fn default() -> Self {
+        let [roughness, reflection, emissive, strength] = [0.5, 0.0, 0.0, 1.0].map(Value::Fixed);
+        let (normal, env, roughness_map, emissive_map) = Default::default();
+        Lighting { normal, roughness, reflection, emissive, strength, env, roughness_map, emissive_map }
+    }
+}
+
+fn one() -> Value<f32> {
+    Value::Fixed(1.0)
+}
+
+fn reach() -> Value<f32> {
+    Value::Fixed(512.0)
+}
+
+fn height() -> Value<f32> {
+    Value::Fixed(100.0)
+}
+
+impl crate::Quality {
+    pub fn air(self, tier: crate::Tier) -> Option<(f32, f32)> {
+        match self {
+            crate::Quality::Q0 => None,
+            crate::Quality::Q1 => Some((4.0, 0.5)),
+            _ if tier <= crate::Tier::T1 => Some((4.0, 1.0)),
+            _ => Some((2.0, 1.0)),
+        }
+    }
+
+    pub fn bend(self) -> Option<f32> {
+        match self {
+            crate::Quality::Q3 => Some(1.0),
+            crate::Quality::Q2 => Some(0.5),
+            _ => None,
+        }
+    }
+}

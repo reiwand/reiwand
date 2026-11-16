@@ -1,0 +1,176 @@
+package io.github.reiwand
+
+import androidx.activity.compose.setContent
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasScrollAction
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performTextInput
+import androidx.test.core.app.ActivityScenario
+import androidx.test.platform.app.InstrumentationRegistry
+import kotlinx.coroutines.runBlocking
+import org.json.JSONArray
+import org.json.JSONObject
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@CleanApp
+@RunWith(Baselined::class)
+class SourcesTest {
+    @get:Rule
+    val compose = createEmptyComposeRule()
+
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private var scenario: ActivityScenario<Main>? = null
+
+    @After
+    fun closed() {
+        scenario?.close()
+        runBlocking {
+            val left = (account("providers") as JSONObject).getJSONArray("providers")
+            (0 until left.length()).forEach { account("provider_remove", "id" to left.getJSONObject(it).getString("id"), "purge" to true) }
+        }
+    }
+
+    private fun shown(content: @androidx.compose.runtime.Composable (Main) -> Unit) {
+        storage()
+        scenario = ActivityScenario.launch(Main::class.java).onActivity { main -> main.setContent { content(main) } }
+    }
+
+    private fun text(id: Int, vararg args: Any) = compose.onNodeWithText(context.getString(id, *args))
+
+    private fun reached(text: String) = compose.onNode(hasScrollAction()).performScrollToNode(hasText(text)).let { compose.onNode(hasText(text)) }
+
+    private fun patient(done: () -> Boolean): Boolean {
+        val end = System.currentTimeMillis() + PATIENCE_MS
+        while (!done() && System.currentTimeMillis() < end) Thread.sleep(100)
+        return done()
+    }
+
+    private fun field(label: Int) = compose.onNode(hasContentDescription(context.getString(label)) and hasSetTextAction())
+
+    private fun providers() = runBlocking { account("providers") as JSONObject }.getJSONArray("providers")
+
+    @Test
+    fun anEmptyLibraryPointsToTheSourcesAndWithoutAnyServer() {
+        var opened = 0
+        shown { Empty(it, Hollow.LIBRARY) { opened++ } }
+        text(R.string.explore_repos).assertIsDisplayed().performClick()
+        assertEquals(1, opened)
+    }
+
+    @Test
+    fun theSourcesPageOffersPicturesAndRepositoriesWithNothingSetUp() {
+        shown { Sources(it) {} }
+        compose.onAllNodesWithText(context.getString(R.string.sources))[0].assertIsDisplayed()
+        text(R.string.providers).assertIsDisplayed()
+        reached(context.getString(kindTitle("bing"))).assertIsDisplayed()
+        reached(context.getString(R.string.repo_add_title)).assertIsDisplayed()
+        assertEquals(0, providers().length())
+        assertEquals(0, Updates.repos())
+    }
+
+    @Test
+    fun aRepositoryNeverAddsWithoutItsFingerprintAndSaysWhy() {
+        shown { main -> RepoAdd(main, { _, work -> main.act(false) { work() } }) {} }
+        field(R.string.repo_url).performTextInput("https://example.org/wallpapers/")
+        text(R.string.repo_add_url).performClick()
+        compose.waitUntil(TIMEOUT_MS) { compose.onAllNodes(hasText(context.getString(R.string.error_android_repo_needs_fingerprint))).fetchSemanticsNodes().isNotEmpty() }
+        text(R.string.repo_sent, "example.org").assertIsDisplayed()
+    }
+
+    private fun box(label: Int) = hasContentDescription(context.getString(label)) and hasSetTextAction()
+
+    private fun refused(url: String, print: String, marked: Int?, told: Int? = null) {
+        shown { Sources(it) {} }
+        reached(context.getString(R.string.repo_add_title)).performClick()
+        field(R.string.repo_url).performTextInput(url)
+        if (print.isNotEmpty()) field(R.string.repo_fingerprint).performTextInput(print)
+        compose.onNodeWithTag("repo_add").assertIsDisplayed().performClick()
+        val wrong = SemanticsMatcher.keyIsDefined(SemanticsProperties.Error)
+        val shown = patient {
+            if (marked == null) compose.onAllNodesWithTag("repo_problem").fetchSemanticsNodes().isNotEmpty()
+            else compose.onAllNodes(box(marked) and wrong).fetchSemanticsNodes().isNotEmpty()
+        }
+        assertTrue("the refusal is told where it belongs", shown)
+        listOf(R.string.repo_url, R.string.repo_fingerprint).filter { it != marked }.forEach { compose.onAllNodes(box(it) and wrong).assertCountEquals(0) }
+        if (marked != null) compose.onAllNodesWithTag("repo_problem").assertCountEquals(0)
+        told?.let { compose.onNode(hasText(context.getString(it))).assertExists() }
+        compose.onNode(hasText(url)).performScrollTo().assertIsDisplayed()
+        if (print.isNotEmpty()) compose.onNode(hasText(print)).performScrollTo().assertIsDisplayed()
+        assertEquals(0, Updates.repos())
+    }
+
+    @Test
+    fun aRefusedRepositoryKeepsItsMessageAndWhatWasTyped() {
+        val print = "ab".repeat(32)
+        refused("http://127.0.0.1:1/", print, null)
+    }
+
+    @Test
+    fun anAddressThatIsNotARepositoryKeepsItsMessageAndWhatWasTyped() {
+        Stalling().use { slow -> refused(slow.url, "cd".repeat(32), null) }
+    }
+
+    @Test
+    fun aFingerprintOfTheWrongLengthKeepsItsMessageAndWhatWasTyped() {
+        refused("https://example.net/wallpapers/", "abc123", R.string.repo_fingerprint, R.string.error_android_repo_fingerprint)
+    }
+
+    @Test
+    fun aPlainHttpAddressElsewhereIsToldUnderTheAddress() {
+        refused("http://example.org/wallpapers/", "ab".repeat(32), R.string.repo_url, R.string.error_android_repo_https)
+    }
+
+    @Test
+    fun aWrongAddressIsToldBeforeAMissingFingerprint() {
+        refused("http://example.org/wallpapers/", "", R.string.repo_url, R.string.error_android_repo_https)
+    }
+
+    @Test
+    fun aPictureSourceStaysOffAndSilentUntilTheUserTurnsItOn() {
+        FakeDav().use { dav ->
+            runBlocking {
+                account("provider_add", "kind" to "webdav", "options" to JSONObject().put("url", dav.url).put("user", "me"), "secret" to "pw", "on" to false)
+            }
+            shown { Sources(it) {} }
+            reached(context.getString(R.string.sent_dav, "127.0.0.1")).assertIsDisplayed()
+            text(R.string.provider_never).assertIsDisplayed()
+            reached(context.getString(R.string.provider_turn_on)).assertIsOff()
+            Thread.sleep(SILENCE_MS)
+            assertEquals("nothing is contacted while it is off", 0, dav.listings.get() + dav.downloads.get())
+            compose.onNode(hasText(context.getString(R.string.provider_turn_on))).performClick()
+            assertTrue(patient { dav.downloads.get() == 3 })
+            val counted = patient { providers().getJSONObject(0).optInt("count") == 3 }
+            assertTrue("what the source brought: ${providers()}", counted)
+            assertTrue(providers().getJSONObject(0).getBoolean("on"))
+            val brought = runBlocking { ask("items", "query" to "tag:from-webdav") as JSONArray }
+            assertEquals(3, brought.length())
+            runBlocking { account("provider_remove", "id" to "webdav", "purge" to true) }
+            assertEquals(0, (runBlocking { ask("items", "query" to "tag:from-webdav") } as JSONArray).length())
+        }
+    }
+
+    private companion object {
+        const val TIMEOUT_MS = 10_000L
+        const val SILENCE_MS = 1_000L
+        const val PATIENCE_MS = 120_000L
+    }
+}

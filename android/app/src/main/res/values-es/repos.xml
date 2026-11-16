@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="repos">Repositorios</string>
+    <string name="repo_offer">%1$s se añadió en otro equipo, con la clave %2$s.</string>
+    <string name="repo_add">Añadir</string>
+    <string name="repo_decline">Rechazar</string>
+    <string name="repo_examples">Fondos de ejemplo</string>
+    <string name="repo_packages">Paquetes: %1$d</string>
+    <string name="repo_url">Dirección del repositorio</string>
+    <string name="repo_add_url">Añadir el repositorio</string>
+    <string name="repo_browse">Explorar</string>
+    <string name="repo_search">Buscar paquetes</string>
+    <string name="repo_install">Instalar</string>
+    <string name="repo_installed">Instalado</string>
+    <string name="repo_updates">Actualizaciones</string>
+    <string name="repo_update_from">%1$s → %2$s</string>
+    <string name="repo_update">Actualizar</string>
+    <string name="repo_update_asks">No se actualiza sola: ahora pide %1$s</string>
+    <string name="repo_check">Buscar actualizaciones</string>
+    <string name="needs_failed">Este paquete quedó incompleto: no se pudo instalar %1$s, así que puede no funcionar.</string>
+    <string name="auto_update">Actualizar automáticamente los repositorios</string>
+    <string name="away_note">%1$s existe solo en otro equipo. Publicarlo en el servidor o en un repositorio lo hace disponible aquí.</string>
+    <string name="away_note_repo">%1$s viene del repositorio %2$s, que no está agregado en este dispositivo. Agregar el repositorio lo hace disponible aquí.</string>
+    <string name="repo_on_phone">En este teléfono</string>
+    <string name="repo_search_all">Buscar en los repositorios</string>
+    <string name="repo_manage_note">Añádelos, quítalos o actualízalos</string>
+</resources>

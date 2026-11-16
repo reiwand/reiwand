@@ -1,0 +1,93 @@
+{
+  "schema": "reiwand.scene/1",
+  "canvas": { "size": [1920, 1080], "fit": "fill", "background": "#0b1020", "blend_space": "linear" },
+  "clock": { "max_fps": 60, "poster_time": 3.0, "seed": 42 },
+  "assets": {
+    "sky": { "path": "assets/sky.png" },
+    "sky_dawn": { "path": "assets/sky-dawn.png" },
+    "lake": { "path": "assets/lake-mask.png", "linear": true },
+    "spark": { "path": "assets/spark.png", "atlas": [4, 4] },
+    "mono": { "path": "assets/mono.ttf" },
+    "sea": { "path": "assets/sea.webm" }
+  },
+  "layers": [
+    {
+      "id": "background",
+      "type": "image",
+      "image": { "prop": "style", "map": { "night": "sky", "dawn": "sky_dawn" } },
+      "effects": [
+        { "effect": "waves", "mask": { "texture": "lake" }, "params": { "amplitude": 4, "speed": 0.8 } },
+        { "effect": "blur", "enabled": { "prop": "soft" }, "params": { "radius": { "prop": "depth", "scale": 10 } } }
+      ]
+    },
+    {
+      "id": "sea",
+      "type": "video",
+      "video": "sea",
+      "opacity": 0.6,
+      "blend": "screen",
+      "transform": { "position": [960, 900], "scale": [1, 0.4] }
+    },
+    { "id": "sparks", "type": "particles", "system": "sparks", "blend": "add" },
+    {
+      "id": "clock",
+      "type": "text",
+      "font": "mono",
+      "size": 96,
+      "text": { "clock": "HH:mm" },
+      "color": { "prop": "text_color" },
+      "anchor": "bottom_right",
+      "transform": { "position": [-64, -64] },
+      "visible": { "prop": "show_clock" },
+      "opacity": { "timeline": "intro", "keys": [[0, 0, "out_cubic"], [1.5, 1]] }
+    },
+    {
+      "id": "badge",
+      "type": "group",
+      "opacity": 0.8,
+      "transform": { "position": [200, 200], "rotation": { "keys": [[0, 0], [10, 360]], "loop": "repeat" } },
+      "layers": [
+        { "id": "disc", "type": "shape", "shape": { "ellipse": { "size": [120, 120] } }, "fill": "#ff8800" },
+        {
+          "id": "ring",
+          "type": "shape",
+          "shape": { "ring": { "size": [140, 140], "width": 6 } },
+          "stroke": { "color": "#ffffff", "width": 2 },
+          "mask": { "layer": "disc", "channel": "a", "invert": true }
+        }
+      ]
+    },
+    {
+      "id": "bars",
+      "type": "spectrum",
+      "size": [800, 120],
+      "bands": 32,
+      "color": { "prop": "text_color" },
+      "anchor": "bottom",
+      "transform": { "position": [0, -40] },
+      "opacity": { "audio": "level", "scale": 0.8, "offset": 0.2, "clamp": [0, 1], "smooth": 0.2 }
+    },
+    {
+      "id": "post",
+      "type": "adjustment",
+      "effects": [
+        { "effect": "bloom", "params": { "intensity": { "audio": "bass", "scale": 0.8, "offset": 0.2 } } },
+        { "effect": "color_adjust", "params": { "saturation": 1.2 }, "optional": true }
+      ]
+    }
+  ],
+  "particles": {
+    "sparks": {
+      "capacity": 4000,
+      "seed": 7,
+      "prewarm": 2.0,
+      "emitters": [{ "shape": { "box": { "from": [0, 1080], "to": [1920, 1100] } }, "rate": { "prop": "density" }, "bursts": [{ "count": 40, "on": "beat" }] }],
+      "init": { "life": [2, 5], "speed": [40, 120], "angle": [250, 290], "size": [4, 12], "color": ["#ffd27a", "#ff7a3d"] },
+      "forces": [{ "gravity": [0, -20] }, { "turbulence": { "strength": 30, "scale": 0.004 } }, { "attractor": { "target": "cursor", "strength": 5000 } }, { "drag": 0.4 }],
+      "collide": [{ "bounds": "canvas", "bounce": 0.3 }],
+      "render": { "texture": "spark", "frames": "life", "size_over_life": [[0, 0], [0.1, 1], [1, 0]], "trail": { "length": 8, "width": 0.5 } }
+    }
+  },
+  "timelines": [{ "id": "intro", "duration": 1.5, "loop": "once", "autoplay": true }],
+  "scripts": [{ "path": "scripts/scene.js" }]
+}

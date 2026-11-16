@@ -1,0 +1,182 @@
+package io.github.reiwand
+
+import android.os.Handler
+import android.os.HandlerThread
+import android.os.SystemClock
+import android.view.Choreographer
+import android.view.Surface
+import java.util.concurrent.Callable
+import java.util.concurrent.FutureTask
+
+object Native {
+    init {
+        System.loadLibrary("reiwand_android")
+    }
+
+    external fun prepare(files: String)
+
+    external fun attach(surface: Surface, preview: Boolean, lock: Boolean, shown: Boolean): Long
+
+    external fun resize(engine: Long, width: Int, height: Int)
+
+    external fun offset(engine: Long, x: Float): Boolean
+
+    external fun video(engine: Long): String?
+
+    external fun page(engine: Long): String?
+
+    external fun serve(engine: Long, url: String): String
+
+    external fun heard(engine: Long, message: String): String?
+
+    external fun listen(engine: Long): String?
+
+    external fun draw(engine: Long, nanos: Long, force: Boolean, measured: Boolean): Long
+
+    external fun ended(engine: Long, path: String, over: Boolean): Boolean
+
+    external fun detach(engine: Long)
+
+    external fun power(charging: Boolean, saver: Boolean, low: Boolean, thermal: Int, headroom: Float, still: Boolean, percent: Int): Boolean
+
+    external fun display(hdr: Boolean, peak: Float, ratio: Float, refresh: Float)
+
+    external fun moving(): Boolean
+
+    external fun decoded(path: String, transfer: Int)
+
+    external fun parallax(engine: Long): Int
+
+    external fun tilt(x: Float, y: Float, z: Float, rotation: Int): Boolean
+
+    external fun turn(w: Float, x: Float, y: Float, z: Float, rotation: Int): Boolean
+
+    external fun still()
+
+    external fun device(lowRam: Boolean, performance: Int)
+
+    external fun screen(engine: Long, lock: Boolean)
+
+    external fun visible(engine: Long, shown: Boolean)
+
+    external fun inputs(engine: Long): Int
+
+    external fun touch(engine: Long, x: Float, y: Float, down: Boolean): Boolean
+
+    external fun hear(fft: ByteArray, rate: Int)
+
+    external fun playback(active: Boolean)
+
+    external fun media(told: String?, cover: IntArray?, width: Int, access: Boolean)
+
+    external fun reel(engine: Long): String?
+
+    external fun duck(gain: Float)
+
+    external fun opened(engine: Long): String?
+
+    external fun clips(engine: Long): String?
+
+    external fun film(engine: Long): String?
+
+    external fun clip(engine: Long, path: String, open: Boolean): Surface?
+
+    external fun steer(engine: Long): String?
+
+    external fun depth(request: String): String
+
+    external fun store(fd: Int, name: String): String?
+
+    external fun poster(item: String, pixels: IntArray, width: Int, size: IntArray, audio: Boolean)
+
+    external fun connectCode(text: String): String
+
+    external fun readCode(frame: ByteArray, size: IntArray): String
+
+    external fun tones(pixels: IntArray, width: Int): String
+
+    external fun library(request: String): String
+
+    external fun account(request: String): String
+
+
+    external fun commit(target: String): Boolean
+
+    external fun rotate(lock: Boolean): Boolean
+
+    external fun colors(preview: Boolean, lock: Boolean): IntArray?
+
+    external fun setting(key: String, value: String?): String
+
+    external fun diagnostics(): String
+
+    external fun trim()
+
+    external fun retry()
+
+    external fun finish()
+
+    external fun allocations(start: Boolean): Long
+
+    external fun perf(record: Boolean)
+
+    external fun performance(): String
+
+    external fun looped(engine: Long, nanos: Long, ms: Float)
+}
+
+object Render {
+    val handler = Handler(HandlerThread("reiwand-render").apply { start() }.looper)
+
+    fun post(block: () -> Unit) {
+        handler.post { block() }
+    }
+
+    fun <T> call(block: () -> T): T = FutureTask(Callable(block)).also { handler.post(it) }.get()
+
+    fun later(delay: Long, task: Runnable) {
+        handler.postDelayed(task, delay)
+    }
+
+    fun cancel(task: Runnable) = handler.removeCallbacks(task)
+}
+
+fun interface Draw {
+    fun frame(nanos: Long, measured: Boolean): Long
+}
+
+class Frames(
+    private val looped: (Long, Float) -> Unit = { _, _ -> },
+    private val draw: Draw,
+) : Choreographer.FrameCallback {
+    private var at = Long.MAX_VALUE
+
+    fun start() {
+        if (at > SystemClock.uptimeMillis() + SOON_MS) post(0L)
+    }
+
+    fun stop() {
+        Choreographer.getInstance().removeFrameCallback(this)
+        at = Long.MAX_VALUE
+    }
+
+    fun schedule(delay: Long, since: Long = System.nanoTime()) =
+        if (delay > 0L) post((delay - (System.nanoTime() - since) / NANOS_PER_MS).coerceAtLeast(0L)) else stop()
+
+    private fun post(delay: Long) {
+        stop()
+        Choreographer.getInstance().postFrameCallbackDelayed(this, delay)
+        at = SystemClock.uptimeMillis() + delay
+    }
+
+    override fun doFrame(frameTimeNanos: Long) {
+        val measured = Perf.on
+        val start = if (measured) System.nanoTime() else 0L
+        val delay = draw.frame(frameTimeNanos, measured)
+        if (measured) looped(frameTimeNanos, (System.nanoTime() - start) / NANOS_PER_MS.toFloat())
+        schedule(delay, frameTimeNanos)
+    }
+}
+
+private const val SOON_MS = 100L
+private const val NANOS_PER_MS = 1_000_000L

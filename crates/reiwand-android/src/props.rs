@@ -1,0 +1,190 @@
+use crate::library::with;
+use crate::pack::{self, Pack};
+use crate::repos::bundled;
+use crate::said;
+use crate::{Error, asks, chosen, opened, saved, settings, store, told};
+use reiwand_core::model::Input;
+use reiwand_scene::{Control, Property, Values};
+use serde::Deserialize;
+use serde_json::{Value, json};
+use std::collections::{BTreeMap, BTreeSet};
+use std::fs;
+use std::path::Path;
+use std::sync::Arc;
+
+pub(crate) const GRANTS: &str = "inputs.json";
+
+pub(crate) type Grants = BTreeMap<String, BTreeMap<String, BTreeSet<Input>>>;
+
+#[derive(Deserialize)]
+#[serde(tag = "op", rename_all = "snake_case")]
+pub(crate) enum Request {
+    Scene { uid: String, languages: Vec<String> },
+    Property { uid: String, key: String, value: Value },
+    Preset { uid: String, preset: String },
+    Reset { uid: String },
+    Grant { uid: String, input: String, on: bool },
+    Decide { uid: String, allow: Vec<String>, deny: Vec<String> },
+    Asks { uid: String },
+    Tell { uid: String },
+    Examples { dir: String },
+    ExamplesRepo { dir: String, stamp: i64, force: bool },
+    ExamplesDue { stamp: i64 },
+    Save { uid: String, name: String },
+    Rename { preset: String, name: String },
+    Forget { preset: String },
+    Export { uid: String, preset: String },
+    Import { uid: String, text: String, name: String },
+    Press { uid: String, key: String },
+    Secret { uid: String, key: String, text: String },
+    Choose { uid: String, key: String, fd: i32, name: String },
+    Folder { uid: String, key: String, tree: String },
+    Folded { uid: String, key: String },
+    Unchoose { uid: String, key: String },
+    Mirrors,
+    Mirrored,
+}
+
+pub(crate) fn request(request: Request) -> Result<Value, Error> {
+    let done = |result: Result<(), Error>| result.map(|()| Value::Null);
+    match request {
+        Request::Scene { uid, languages } => form(&*scene(&uid)?, &languages, &uid),
+        Request::Property { uid, key, value } => done(set(&*scene(&uid)?, &key, &value)),
+        Request::Preset { uid, preset } => {
+            let pack = scene(&uid)?;
+            done(saved::apply(&pack, &saved::chosen(&pack, &preset)?))
+        }
+        Request::Reset { uid } => done(change(&*scene(&uid)?, BTreeMap::clear)),
+        Request::Grant { uid, input, on } => done(asks::grant(&*scene(&uid)?, &input, on)),
+        Request::Decide { uid, allow, deny } => done(asks::decide(&*scene(&uid)?, &allow, &deny)),
+        Request::Asks { uid } => {
+            let pack = scene(&uid)?;
+            Ok(json!(asks::undecided(&pack, asks::wants(&pack, values(&pack)).1)))
+        }
+        Request::Tell { uid } => Ok(json!(told::tell(&*scene(&uid)?)?)),
+        Request::Examples { dir } => Ok(json!(pack::examples(Path::new(&dir))?)),
+        Request::ExamplesRepo { dir, stamp, force } => bundled::offer(Path::new(&dir), stamp, force),
+        Request::ExamplesDue { stamp } => Ok(json!(bundled::due(stamp)?)),
+        Request::Save { uid, name } => done(saved::save(&*scene(&uid)?, &name)),
+        Request::Rename { preset, name } => done(saved::rename(&preset, &name)),
+        Request::Forget { preset } => done(saved::forget(&preset)),
+        Request::Export { uid, preset } => Ok(json!(saved::export(&*scene(&uid)?, &preset)?)),
+        Request::Import { uid, text, name } => Ok(json!(saved::import(&*scene(&uid)?, &text, &name)?)),
+        Request::Press { uid, key } => done(saved::press(&*scene(&uid)?, &key)),
+        Request::Secret { uid, key, text } => done(saved::secret(&*scene(&uid)?, &key, &text)),
+        Request::Choose { uid, key, fd, name } => chosen::file(&*scene(&uid)?, &key, fd, &name),
+        Request::Folder { uid, key, tree } => chosen::folder(&*scene(&uid)?, &key, &tree),
+        Request::Folded { uid, key } => chosen::folded(&*scene(&uid)?, &key),
+        Request::Unchoose { uid, key } => chosen::clear(&*scene(&uid)?, &key),
+        Request::Mirrors => Ok(chosen::mirrors()),
+        Request::Mirrored => {
+            chosen::changed();
+            Ok(Value::Null)
+        }
+    }
+}
+
+fn scene(uid: &str) -> Result<Arc<Pack>, Error> {
+    pack::load(&with(|lib| Ok(lib.item(uid)?.path))?)
+}
+
+pub(crate) fn values(pack: &Pack) -> Values {
+    let config = settings::config();
+    let json = |table: &&BTreeMap<String, toml::Value>| -> Values {
+        table.iter().filter_map(|(k, v)| Some((k.clone(), serde_json::to_value(v).ok()?))).collect()
+    };
+    let layers: Vec<Values> = config.scene_values("", &pack.id).iter().map(json).collect();
+    reiwand_scene::effective(
+        &pack.properties,
+        &pack.tried.iter().map(|(values, _)| values).chain(&layers).collect::<Vec<_>>(),
+    )
+}
+
+pub(crate) fn grants() -> Grants {
+    let read = store::dir().ok().and_then(|dir| fs::read(dir.join(GRANTS)).ok());
+    read.and_then(|bytes| serde_json::from_slice(&bytes).ok()).unwrap_or_default()
+}
+
+pub(crate) fn held<'a>(grants: &'a Grants, pack: &Pack) -> Option<&'a BTreeSet<Input>> {
+    grants.get(&pack.id)?.get(&pack.key)
+}
+
+pub(crate) fn granted(pack: &Pack) -> [bool; 3] {
+    let grants = grants();
+    [Input::Audio, Input::Pointer, Input::Clicks]
+        .map(|input| held(&grants, pack).is_some_and(|g| g.contains(&input)))
+}
+
+pub(crate) fn allows(pack: &Pack, input: Input) -> bool {
+    held(&grants(), pack).is_some_and(|g| g.contains(&input))
+}
+
+pub(crate) fn allows_file(id: &str, path: &Path, input: Input) -> bool {
+    let grants = grants();
+    let Some(keys) = grants.get(id) else { return false };
+    pack::key::of(path).is_some_and(|key| keys.get(&key).is_some_and(|g| g.contains(&input)))
+}
+
+pub(crate) fn hears(pack: &Pack) -> bool {
+    let network = pack.web.as_ref().is_some_and(|w| !w.network.is_empty());
+    allows(pack, Input::Audio) && (!network || allows(pack, Input::AudioNetwork))
+}
+
+fn form(pack: &Pack, languages: &[String], uid: &str) -> Result<Value, Error> {
+    let values = values(pack);
+    let sounds = pack.scene.sounds().next().is_some();
+    let (length, probe) = crate::reel::clip(uid, pack.video.is_some());
+    let video = pack.video.as_ref().map(|m| m.video_properties(&crate::reel::labels(), length));
+    let props = video.unwrap_or_else(|| pack.properties.clone());
+    let languages: Vec<String> = languages.iter().cloned().chain(pack.locale.clone()).collect();
+    let (mut fields, presets) = reiwand_scene::form(&props, &pack.presets, &values, &languages);
+    let filled = saved::filled(pack);
+    fields.iter_mut().for_each(|f| f.filled = filled.contains(&f.key));
+    let (ran, wants) = asks::wants(pack, values);
+    let [audio, touch, taps] = granted(pack);
+    let (uses, media, network) = ([wants.audio, wants.touch, wants.taps], wants.media, wants.network);
+    Ok(json!({
+        "fields": fields, "presets": presets, "scripts": pack.web.is_none() && ran.scripts, "sounds": sounds,
+        "muted": settings::config().playback.muted,
+        "saved": saved::listed(pack)?, "web": crate::page::form(pack),
+        "uses": { "audio": uses[0], "touch": uses[1], "taps": uses[2], "media": media, "network": network },
+        "granted": { "audio": audio, "touch": touch, "taps": taps, "media": allows(pack, Input::Media),
+            "media_network": allows(pack, Input::MediaNetwork),
+            "audio_network": allows(pack, Input::AudioNetwork) },
+        "access": crate::playing::access(), "video": pack.video.is_some(), "length": length, "probe": probe,
+        "undecided": asks::undecided(pack, wants),
+    }))
+}
+
+pub(crate) fn change(
+    pack: &Pack,
+    edit: impl FnOnce(&mut BTreeMap<String, toml::Value>),
+) -> Result<(), Error> {
+    settings::update(|config| {
+        let section = config.scene_section("");
+        let values = section.entry(pack.id.clone()).or_default();
+        edit(values);
+        if values.is_empty() {
+            section.remove(&pack.id);
+        }
+        Ok(())
+    })
+}
+
+pub(crate) fn stored(value: &Value) -> Option<toml::Value> {
+    (!value.is_null()).then(|| toml::Value::try_from(value).ok()).flatten()
+}
+
+fn set(pack: &Pack, key: &str, value: &Value) -> Result<(), Error> {
+    let shortcut = |p: &&Property| {
+        matches!(p.control, Control::Shortcut {}) && (value.is_null() || opened::openable(value))
+    };
+    let property = pack.properties.get(key).filter(|p| p.holds_value() && (!p.personal() || shortcut(p)));
+    let property =
+        property.ok_or_else(|| said("android.property_set_here", "no property %1 to set here", &[&key]))?;
+    let checked = property.value(value).map_err(|e| said("android.property_value", "%1 %2", &[&key, &e]))?;
+    change(pack, |values| match stored(&checked) {
+        Some(value) => drop(values.insert(key.to_owned(), value)),
+        None => drop(values.remove(key)),
+    })
+}

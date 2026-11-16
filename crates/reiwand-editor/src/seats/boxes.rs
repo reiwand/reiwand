@@ -1,0 +1,63 @@
+use super::Seat;
+use crate::keys::value_at;
+use serde_json::Value;
+use std::path::Path;
+
+pub(crate) fn pair(value: &Value, fallback: [f64; 2]) -> [f64; 2] {
+    match value {
+        Value::Number(n) => [n.as_f64().unwrap_or(0.0); 2],
+        Value::Array(list) if list.len() == 2 => [0, 1].map(|i| list[i].as_f64().unwrap_or(fallback[i])),
+        _ => fallback,
+    }
+}
+
+pub(super) fn size(dir: &Path, doc: &Value, layer: &Value, canvas: [f64; 2], t: f64) -> [f64; 2] {
+    if layer.get("size").is_some_and(Value::is_array) {
+        return pair(&layer["size"], canvas);
+    }
+    let file =
+        |id: &Value| doc.pointer("/scene/assets")?.get(id.as_str()?)?["path"].as_str().map(|p| dir.join(p));
+    match layer["type"].as_str().unwrap_or_default() {
+        "image" => file(&value_at(&layer["image"], t))
+            .and_then(|f| crate::pictures::dimensions(f).ok())
+            .map(|(w, h)| [f64::from(w), f64::from(h)])
+            .or_else(|| crate::films::natural(dir, doc, layer))
+            .unwrap_or([512.0; 2]),
+        "video" => crate::films::natural(dir, doc, layer).unwrap_or([640.0, 360.0]),
+        "text" => crate::lettering::measure(dir, doc, layer, t).map_or_else(
+            || {
+                let em = layer["size"].as_f64().unwrap_or(48.0);
+                [em * 0.6, em * 1.2]
+            },
+            |m| m.size.map(f64::from),
+        ),
+        "shape" => crate::figures::first(layer)
+            .map_or([100.0; 2], |(kind, shape)| crate::figures::extent(kind, shape)),
+        _ => canvas,
+    }
+}
+
+pub(super) fn groups(seats: &mut [Seat]) {
+    for i in (0..seats.len()).rev() {
+        if seats[i].kind != "group" {
+            continue;
+        }
+        let inside = format!("{}/layers/", seats[i].pointer);
+        let back = seats[i].world.inverse();
+        let points: Vec<[f32; 2]> = seats
+            .iter()
+            .filter(|s| s.pointer.strip_prefix(&inside).is_some_and(|rest| !rest.contains('/')))
+            .flat_map(|s| s.outline())
+            .map(|p| back.apply(p.map(|v| v as f32)))
+            .collect();
+        let (lo, hi) = points.iter().fold(([f32::MAX; 2], [f32::MIN; 2]), |(lo, hi), p| {
+            ([lo[0].min(p[0]), lo[1].min(p[1])], [hi[0].max(p[0]), hi[1].max(p[1])])
+        });
+        let size = [0, 1].map(|k| f64::from(hi[k] - lo[k]));
+        let group = &mut seats[i];
+        (group.size, group.origin) = match points.is_empty() || size.iter().any(|s| *s <= 0.0) {
+            true => ([0.0; 2], [0.5; 2]),
+            false => (size, [0, 1].map(|k| -f64::from(lo[k]) / size[k])),
+        };
+    }
+}

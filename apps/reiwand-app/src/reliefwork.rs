@@ -1,0 +1,138 @@
+use crate::depthwork::sha;
+use anyhow::{Context, Result, bail};
+use image::{DynamicImage, RgbaImage};
+use reiwand_core::Fill;
+use reiwand_core::edit::{Depth, Edit, Parallax};
+use reiwand_depth::{
+    Device, Places, Preview, chart, coloured, histogram, load, outlines, settings, split, tint,
+};
+use serde_json::json;
+use std::path::{Path, PathBuf};
+use std::sync::atomic::AtomicBool;
+use std::sync::{Arc, Mutex};
+
+const OVERLAY_EDGE: u32 = 1024;
+const OUTLINE_EDGE: u32 = 512;
+const SURVEY_EDGE: u32 = 256;
+const BINS: usize = 64;
+const FRAME_EDGE: u32 = 480;
+
+static SEEN: Mutex<Option<(PathBuf, Arc<Preview>)>> = Mutex::new(None);
+
+pub struct Target {
+    pub image: PathBuf,
+    pub edit: Edit,
+    pub sha: String,
+}
+
+impl Target {
+    pub fn new(image: &Path, edit: &str) -> Result<Target> {
+        let edit = Edit::parse(edit).map_err(|e| anyhow::anyhow!(e.local()))?;
+        let sha = sha(image, &edit)?;
+        Ok(Target { image: image.to_owned(), edit, sha })
+    }
+
+    pub fn depth(&self) -> Depth {
+        self.edit.depth.clone().unwrap_or_default()
+    }
+
+    fn map(&self, places: &Places, edge: u32) -> Result<reiwand_depth::Map> {
+        let found = places.map(&self.image, &self.sha, &self.depth(), edge)?;
+        found.context("the picture has no depth map yet")
+    }
+}
+
+pub fn overlay(places: &Places, target: &Target, colour: bool) -> Result<RgbaImage> {
+    let map = target.map(places, OVERLAY_EDGE)?;
+    Ok(DynamicImage::ImageRgb8(coloured(&map, colour)).into_rgba8())
+}
+
+pub fn outline(places: &Places, target: &Target, cuts: &[f32]) -> Result<RgbaImage> {
+    Ok(outlines(&target.map(places, OUTLINE_EDGE)?, &target.depth(), cuts))
+}
+
+pub fn survey(places: &Places, target: &Target) -> Result<String> {
+    let (map, depth) = (target.map(places, SURVEY_EDGE)?, target.depth());
+    let set = settings(places, &target.edit, None);
+    let built = |fill| {
+        let set = reiwand_depth::Settings { fill, ..set };
+        places.layer_set(&target.image, &target.sha, &depth, &set).and_then(|p| load(&p).ok()?)
+    };
+    let current = built(set.fill);
+    let levels: Vec<f32> = map.pixels().map(|p| f32::from(p[0]) / 65535.0).collect();
+    let cuts = depth.cuts.clone();
+    let cuts = cuts.or_else(|| Some(current.as_ref()?.info.cuts.clone()));
+    let cuts = cuts.unwrap_or_else(|| split(&levels, set.count.clamp(1, 6)).cuts);
+    let bands = current.as_ref().map(|l| l.info.bands.iter().map(|b| b.pixels).collect::<Vec<_>>());
+    let still = places.still((&target.image, &target.sha), &target.edit, &set);
+    let regions = current.as_ref().map_or(0, |l| l.info.regions);
+    Ok(json!({
+        "histogram": histogram(&map, BINS), "cuts": cuts, "manual": depth.cuts.is_some(),
+        "fill": set.fill.as_str(), "built": current.is_some(), "bands": bands.unwrap_or_default(),
+        "sets": {"lama": built(Fill::Lama).is_some(), "simple": built(Fill::Simple).is_some()},
+        "lama": places.fill(Fill::Lama) == Fill::Lama,
+        "strokes": depth.strokes.len(), "marks": depth.fills.len(), "regions": regions,
+        "reach": current.as_ref().map(|l| l.info.reach.shift),
+        "moves": current.as_ref().map(|l| l.info.reach.moves(l.info.size[0])),
+        "joins": depth.joins.len(), "splits": depth.splits.len(), "shifts": depth.moves.len(),
+        "still": still.map(|s| reiwand_depth::still_note(places, s).local()).unwrap_or_default()
+    })
+    .to_string())
+}
+
+pub fn build(
+    places: &Places,
+    target: &Target,
+    fill: Option<Fill>,
+    stop: &AtomicBool,
+    progress: &mut dyn FnMut(u64),
+) -> Result<PathBuf> {
+    let set = settings(places, &target.edit, fill);
+    if let Some(wanted) = fill.filter(|f| *f != set.fill) {
+        bail!("{}", reiwand_core::travel::fill_missing(wanted == Fill::Lama).local());
+    }
+    let sets = (&target.depth(), &set);
+    places.ensure_layers((&target.image, &target.sha), sets, (Device::Auto, false), progress, stop)
+}
+
+pub fn layer(
+    places: &Places,
+    target: &Target,
+    (index, band): (usize, bool),
+    fill: Option<Fill>,
+) -> Result<RgbaImage> {
+    let (depth, set) = (target.depth(), settings(places, &target.edit, fill));
+    let path = places.layer_set(&target.image, &target.sha, &depth, &set);
+    let made =
+        load(&path.context("the picture has no depth map")?)?.context("the layers are not built yet")?;
+    let count = made.images.len();
+    let image = made.images.get(index).with_context(|| format!("the picture has {count} layers"))?;
+    if !band {
+        return Ok(image.clone());
+    }
+    let (found, _) = places.layer_band((&target.image, &target.sha), &depth, (&made.info, index))?;
+    Ok(tint(image, &found))
+}
+
+pub fn regions(places: &Places, target: &Target) -> Result<(RgbaImage, String)> {
+    let found = chart(&target.map(places, OUTLINE_EDGE)?, &target.depth());
+    let (w, h, cells) = found.grid();
+    let text = json!({"zones": found.zones, "notes": found.notes, "grid": {"w": w, "h": h, "cells": cells}})
+        .to_string();
+    Ok((found.painted(), text))
+}
+
+pub fn frame(places: &Places, target: &Target, pointer: [f32; 2]) -> Result<Option<RgbaImage>> {
+    let (depth, set) = (target.depth(), settings(places, &target.edit, None));
+    let Some(path) = places.layer_set(&target.image, &target.sha, &depth, &set) else { return Ok(None) };
+    let mut seen = SEEN.lock().unwrap_or_else(|e| e.into_inner());
+    if seen.as_ref().is_none_or(|(at, _)| *at != path) {
+        let Some(made) = load(&path)? else { return Ok(None) };
+        *seen = Some((path, Arc::new(Preview::new(&made, FRAME_EDGE))));
+    }
+    let preview = seen.as_ref().map(|(_, p)| p.clone()).context("no preview")?;
+    drop(seen);
+    let p = target.edit.parallax.clone().unwrap_or_default();
+    let Parallax { strength, focus, overscan, .. } = p;
+    Ok(Some(preview.frame(pointer, (strength, focus, overscan))))
+}

@@ -1,0 +1,87 @@
+import QtQuick
+import org.kde.plasma.plasmoid
+import org.kde.plasma.core as PlasmaCore
+import org.kde.plasma.workspace.dbus as DBus
+
+PlasmoidItem {
+    id: root
+
+    readonly property Daemon daemon: Daemon {}
+    readonly property bool paused: daemon.current.paused === true
+    property var asked: ({})
+
+    Plasmoid.icon: paused ? "media-playback-pause" : "preferences-desktop-wallpaper"
+    Plasmoid.status: consent.ask.inputs.length > 0 ? PlasmaCore.Types.NeedsAttentionStatus : PlasmaCore.Types.ActiveStatus
+    toolTipMainText: "Reiwand"
+    toolTipSubText: daemon.lastError || (paused ? i18n("Paused") : i18n("Playing"))
+    fullRepresentation: Panel {
+        daemon: root.daemon
+    }
+    Component.onCompleted: daemon.refresh()
+    onExpandedChanged: {
+        if (root.expanded)
+            daemon.refresh();
+    }
+
+    DBus.SignalWatcher {
+        service: "io.github.reiwand.Daemon"
+        path: "/io/github/reiwand/Daemon"
+        iface: "org.freedesktop.DBus.Properties"
+
+        function dbusPropertiesChanged() {
+            root.daemon.refresh("state");
+        }
+    }
+
+    DBus.SignalWatcher {
+        service: "io.github.reiwand.Daemon"
+        path: "/io/github/reiwand/Daemon"
+        iface: "io.github.reiwand.Daemon1"
+
+        function dbusChanged(topic, ids, serial) {
+            root.daemon.refresh(String(topic));
+            root.daemon.updated(String(topic), Array.from(ids));
+        }
+
+        function dbusJobProgress() {
+        }
+
+        function dbusJobFinished() {
+        }
+
+        function dbusStreamChanged() {
+        }
+    }
+
+    DBus.DBusServiceWatcher {
+        watchedService: "io.github.reiwand.Daemon"
+        onRegisteredChanged: {
+            if (!registered)
+                return;
+            root.daemon.refresh();
+            root.daemon.updated("library", []);
+        }
+    }
+
+    Consent {
+        id: consent
+
+        width: 0
+        height: 0
+        opacity: 0
+        daemon: root.daemon
+        inputs: root.daemon.inputs
+        onAskChanged: {
+            if (ask.scene === "" || root.asked[ask.scene])
+                return;
+            root.asked[ask.scene] = true;
+            root.expanded = true;
+        }
+    }
+
+    Timer {
+        interval: 8000
+        running: root.daemon.actionError !== ""
+        onTriggered: root.daemon.actionError = ""
+    }
+}

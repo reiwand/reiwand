@@ -1,0 +1,35 @@
+{
+  "schema": "reiwand.wpak/2",
+  "id": "io.github.reiwand.example.pulse",
+  "version": "1.3.0",
+  "default_locale": "en",
+  "title": { "en": "Pulse", "es": "Pulso" },
+  "description": { "en": "A ring and a spectrum that follow the sound playing on the computer, once you allow it, around the cover, title and artist of what the media player plays.\n\nIt **flashes with the beat**, and its glitches jump on strong beats.",
+                   "es": "Un anillo y un espectro que siguen el sonido que se reproduce en el equipo, cuando lo permites, alrededor de la carátula, el título y el artista de lo que suena en el reproductor.\n\n**Destella con el ritmo** y sus interferencias saltan en los golpes fuertes." },
+  "changes": { "en": "Says that nothing is playing where the title and artist go until a track plays.",
+              "es": "Dice que no suena nada donde van el título y el artista hasta que suena una pista." },
+  "authors": ["Reiwand contributors"],
+  "license": "CC0-1.0",
+  "origin": { "kind": "original" },
+  "content": { "rating": "general" },
+  "photosensitive": true,
+  "kind": "scene",
+  "entry": "scene.json",
+  "previews": { "thumbnail": "preview.jpg" },
+  "tags": ["example", "audio", "music", "media"],
+  "requires": { "features": ["inputs.audio", "inputs.media", "media_info"] },
+  "inputs": ["audio", "media"],
+  "properties": {
+    "note": { "type": "label", "label": { "en": "Allow audio for this scene to make it move with the sound, and the media player to show the cover and title of what plays.",
+                                          "es": "Permite el audio a esta escena para que se mueva con el sonido, y el reproductor multimedia para que muestre la carátula y el título de lo que suena." } },
+    "color": { "type": "color", "order": 1, "default": "#5ee7ff", "label": { "en": "Color", "es": "Color" } },
+    "show": { "type": "combo", "order": 2, "default": "both", "label": { "en": "Spectrum", "es": "Espectro" },
+              "options": [{ "value": "circle", "label": { "en": "Circle", "es": "Círculo" } },
+                          { "value": "bars", "label": { "en": "Bars", "es": "Barras" } },
+                          { "value": "both", "label": { "en": "Both", "es": "Ambos" } }] },
+    "glitch": { "type": "bool", "order": 3, "default": true, "label": { "en": "Glitch on beats", "es": "Interferencias con el ritmo" } }
+  },
+  "presets": [
+    { "id": "calm", "label": { "en": "Calm", "es": "Tranquilo" }, "values": { "show": "circle", "glitch": false, "color": "#9f8cff" } }
+  ]
+}

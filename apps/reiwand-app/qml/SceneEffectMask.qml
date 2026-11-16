@@ -1,0 +1,165 @@
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC2
+import io.github.reiwand.app
+
+ColumnLayout {
+    id: panel
+
+    required property var page
+    required property string pointer
+    readonly property var found: pointer.match(/^(.*\/layers\/\d+)(?:\/effects\/(\d+))?(\/mask(\/.*)?)?$/)
+    readonly property var owner: found ? (page.view.layers ?? []).find(item => item.pointer === found[1] && !["sound", "light"].includes(item.type)) ?? null : null
+    readonly property int index: found && found[2] !== undefined ? Number(found[2]) : -1
+    readonly property var mask: owner ? (page.view, JSON.parse(page.editor.value(found[1] + (index >= 0 ? "/effects/" + index : "") + "/mask") || "null")) : null
+    readonly property var gizmo: owner ? (page.gizmos ?? []).find(g => g.pointer === found[1]) ?? null : null
+    readonly property string source: mask === null ? "" : typeof mask === "string" ? "texture" : ["texture", "layer", "shape"].find(k => mask[k] !== undefined) ?? ""
+    readonly property string kind: source === "shape" ? Object.keys(mask.shape)[0] : ""
+    readonly property var images: (page.view.assets ?? []).filter(a => a.kind === "image" || a.kind === "video").map(a => a.id)
+    readonly property var others: (page.view.layers ?? []).filter(l => l.pointer !== (found ? found[1] : "") && l.type !== "sound").map(l => l.id)
+
+    function put(fields, gesture) {
+        page.run("effects", {
+                "mask": Object.assign({
+                        "layer": owner.id,
+                        "index": index >= 0 ? index : null
+                    }, fields)
+            }, gesture === true);
+    }
+
+    function count(n) {
+        const shape = Object.assign({}, mask.shape[kind]);
+        shape[kind === "polygon" ? "sides" : "points"] = n;
+        const next = {};
+        next[kind] = shape;
+        put({
+                "shape": next
+            });
+    }
+
+    function shaped(kind) {
+        const box = gizmo ? gizmo.size.map(v => Math.round(v / 2)) : [200, 200];
+        const side = Math.min(box[0], box[1]);
+        return ({
+                "rect": {
+                    "rect": {
+                        "size": box,
+                        "radius": 0
+                    }
+                },
+                "ellipse": {
+                    "ellipse": {
+                        "size": box
+                    }
+                },
+                "ring": {
+                    "ring": {
+                        "size": box,
+                        "width": Math.max(1, Math.round(side / 8))
+                    }
+                },
+                "polygon": {
+                    "polygon": {
+                        "sides": 6,
+                        "size": side
+                    }
+                },
+                "star": {
+                    "star": {
+                        "points": 5,
+                        "size": side,
+                        "inner": 0.5
+                    }
+                },
+                "line": {
+                    "line": {
+                        "to": [box[0], 0],
+                        "width": Math.max(1, Math.round(side / 10))
+                    }
+                }
+            })[kind];
+    }
+
+    visible: owner !== null
+
+    SceneValueRow {
+        text: App.tr("Mask")
+
+        QQC2.ComboBox {
+            Layout.fillWidth: true
+            Accessible.name: App.tr("Mask")
+            model: [App.tr("None"), App.tr("A picture"), App.tr("A layer"), App.tr("A shape")]
+            currentIndex: ["", "texture", "layer", "shape"].indexOf(panel.source)
+            onActivated: index => {
+                if (index === 0)
+                    panel.put({
+                            "off": true
+                        });
+                else if (index === 1 && panel.images.length > 0)
+                    panel.put({
+                            "texture": panel.images[0]
+                        });
+                else if (index === 2 && panel.others.length > 0)
+                    panel.put({
+                            "from": panel.others[0]
+                        });
+                else if (index === 3)
+                    panel.put({
+                            "shape": panel.shaped("ellipse")
+                        });
+            }
+        }
+    }
+
+    SceneValueRow {
+        visible: panel.source === "texture" || panel.source === "layer"
+        text: panel.source === "texture" ? App.tr("Picture") : App.tr("Layer")
+
+        QQC2.ComboBox {
+            Layout.fillWidth: true
+            Accessible.name: panel.source === "texture" ? App.tr("Picture") : App.tr("Layer")
+            model: panel.source === "texture" ? panel.images : panel.others
+            currentIndex: model.indexOf(panel.source === "texture" ? (typeof panel.mask === "string" ? panel.mask : panel.mask?.texture) : panel.mask?.layer)
+            onActivated: index => panel.put(panel.source === "texture" ? {
+                        "texture": panel.images[index]
+                    } : {
+                        "from": panel.others[index]
+                    })
+        }
+    }
+
+    SceneValueRow {
+        visible: panel.source === "shape"
+        text: App.tr("Shape")
+
+        QQC2.ComboBox {
+            Layout.fillWidth: true
+            Accessible.name: App.tr("Shape")
+            model: ["rect", "ellipse", "ring", "polygon", "star", "line"].map(k => SceneWords.value(k))
+            currentIndex: ["rect", "ellipse", "ring", "polygon", "star", "line"].indexOf(panel.kind)
+            onActivated: index => panel.put({
+                        "shape": panel.shaped(["rect", "ellipse", "ring", "polygon", "star", "line"][index])
+                    })
+        }
+    }
+
+    SceneMaskThumb {
+        visible: panel.source !== ""
+        active: visible
+        page: panel.page
+        layerId: panel.owner?.id ?? ""
+        index: panel.index
+    }
+
+    SceneEffectMaskTune {
+        Layout.fillWidth: true
+        panel: panel
+    }
+
+    QQC2.Label {
+        Layout.fillWidth: true
+        visible: panel.source !== ""
+        wrapMode: Text.Wrap
+        text: App.tr("The canvas shows the mask over the layer: drag the handles of a shape to size it and the dot past its edge to soften it.")
+    }
+}

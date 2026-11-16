@@ -1,0 +1,197 @@
+use crate::input::LayerOverride;
+use crate::resolve::Context;
+use crate::wake::wakes;
+use crate::{Affine, Color, Kind, Layer, Lean, Quality, Wake};
+use std::borrow::Cow;
+
+mod drawn;
+mod lamp3d;
+pub(crate) mod lamps;
+mod rest;
+mod shown;
+pub(crate) mod staged;
+
+pub use drawn::{Content, Draw, EffectDraw, Frame, Lit};
+pub use lamp3d::lamp3d;
+use shown::{content, masked, strength};
+pub use staged::paths::spline::centripetal;
+pub use staged::paths::{at_time as path_pose, period as path_period, play as play_paths, sequence};
+pub use staged::{
+    CHROMA_KEY, FUR_LAYERS, FUR_LENGTH, Flight, Look, MAX_PLANES, Placed, Shade, Stage3d, cross_key,
+    particle_plane,
+};
+
+pub(crate) fn walk<'a>(
+    cx: &Context<'a>,
+    layers: impl IntoIterator<Item = &'a Layer>,
+    parent: (Affine, Option<Lean>),
+    quality: Quality,
+    frame: &mut Frame<'a>,
+    canvas: [f32; 2],
+) {
+    for layer in layers.into_iter().filter(|l| l.flat()) {
+        let set = cx.script.layers.get(&layer.id).unwrap_or(&crate::input::UNSET);
+        let outer = cx.wake.replace(Wake::Idle);
+        let mut place = cx.place(layer, parent);
+        place.opacity = if layer.blend.faded() { place.opacity } else { 1.0 };
+        let (shown, at) = (place.visible && place.opacity > 0.0, frame.draws.len());
+        if shown || cx.mattes.contains(&layer.id) {
+            let placed = frame.placed.len();
+            emit(cx, layer, set, place, quality, frame, canvas);
+            frame.draws[at].hidden = !shown;
+            staged::after(cx, layer, (at, placed), frame, canvas);
+        }
+        cx.wake.set(outer.min(cx.wake.get()));
+    }
+}
+
+fn emit<'a>(
+    cx: &Context<'a>,
+    layer: &'a Layer,
+    set: &'a LayerOverride,
+    place: crate::kin::Place,
+    quality: Quality,
+    frame: &mut Frame<'a>,
+    canvas: [f32; 2],
+) {
+    let opacity = place.opacity;
+    let origin = crate::kin::origin_of(layer, set);
+    let mut content = content(cx, layer, set, canvas, quality);
+    if let (Content::Mesh { size, relief, .. }, Kind::Mesh(m)) = (&mut content, &layer.kind) {
+        *relief = m.depth.map(|d| cx.relief(&place, (origin, *size), d));
+    }
+    let playing = match &content {
+        Content::Image { asset, .. } => cx.playing.contains(asset.as_ref()) || cx.rolls(asset, false),
+        Content::Video { asset, .. } => !cx.scene.pools.contains_key(asset.as_ref()) && cx.rolls(asset, true),
+        _ => false,
+    };
+    if playing {
+        cx.pace.set(u32::MAX);
+    }
+    let start = frame.effects.len();
+    let mut paced = false;
+    let moves = playing || matches!(layer.kind, Kind::Particles { .. });
+    let controls = cx.script.effects.get(&layer.id);
+    for (i, effect) in layer.effects.iter().enumerate() {
+        let ctl = controls.and_then(|list| list.iter().find(|c| c.at == i));
+        let on = ctl.and_then(|c| c.enabled).unwrap_or_else(|| effect.enabled.get(cx));
+        let Some(d) = cx.scene.shader(&effect.effect).filter(|_| on) else { continue };
+        let Some((d, scale, frozen)) = d.drawn(quality, effect.optional) else { continue };
+        let found = |id: &str| {
+            let set = ctl.and_then(|c| c.params.get(id).cloned()).map(Cow::Owned);
+            set.or_else(|| {
+                effect.params.get(id).map(|v| match v {
+                    crate::Value::Fixed(p) => Cow::Borrowed(p),
+                    v => Cow::Owned(v.get(cx)),
+                })
+            })
+        };
+        let value = |id: &str| found(id).map(Cow::into_owned);
+        let slots = d.pack(|id| d.setting(quality, id, found(id)));
+        let key = std::ptr::from_ref(effect) as usize;
+        let wake = match (frozen, &d.state) {
+            (true, _) => Wake::Idle,
+            (false, Some(_)) => {
+                let stirring = moves || cx.wake.get() == Wake::Frame;
+                wakes(d, &slots, cx, quality).min(cx.stirred(key, stirring, d.settle(&slots)))
+            }
+            (false, None) => wakes(d, &slots, cx, quality),
+        };
+        (paced, _) = (paced || matches!(wake, Wake::At(_)), cx.paced(wake, d.min_fps));
+        let reach = d.reach.as_ref().and_then(|r| d.param(r)).map_or(0.0, |i| slots[i][0].abs());
+        let (mask, scale) = (effect.mask.as_ref(), scale * d.scale_at(quality));
+        let Some(chain) = rest::chain((cx.scene, layer, quality), i, (d, &slots), [cx.pointer, cx.glide])
+        else {
+            continue;
+        };
+        let (textures, emitters) = drawn::inputs(cx, d, effect, &found);
+        let mask_texture = masked(cx, mask);
+        let mask_strength = strength(cx, mask);
+        let follows = d.velocity.as_ref().and_then(|v| d.param(v)).is_some_and(|i| slots[i][0] != 0.0);
+        let velocity =
+            if follows { cx.velocity(key, [place.world.0[4], place.world.0[5]]) } else { [0.0; 2] };
+        if velocity != [0.0; 2] {
+            cx.note(Wake::Frame);
+        }
+        let variant = d.variant(effect, value);
+        let draw = EffectDraw {
+            variant,
+            frozen,
+            reset: ctl.map_or(0, |c| c.reset),
+            descriptor: d,
+            effect,
+            slots,
+            mask,
+            mask_texture,
+            mask_strength,
+            scale,
+            reach,
+            chain,
+            textures,
+            emitters,
+            velocity,
+        };
+        frame.effects.push(draw);
+    }
+    let effects = start..frame.effects.len();
+    let group = matches!(layer.kind, Kind::Group { .. });
+    let painted = shown::painted(layer);
+    let tint = set.color.map(Color).filter(|_| painted.is_some() || group).or(painted.map(|c| c.get(cx)));
+    let tint = tint.unwrap_or(Color([1.0; 4]));
+    let brightness = layer.brightness.as_ref().map_or(1.0, |b| b.get(cx).clamp(0.0, 16.0));
+    let tuned = match &layer.kind {
+        Kind::Particles { system, render, .. } => cx.scene.particles.get(system).map(|s| {
+            let glow = render.as_deref().unwrap_or(&s.render).brightness.as_ref();
+            (crate::particles::tuned(cx, Some(layer), s), glow.map_or(1.0, |b| b.get(cx).clamp(0.0, 16.0)))
+        }),
+        _ => None,
+    };
+    let (opacity, tint, brightness) = match tuned {
+        Some((t, glow)) => {
+            let c = t.color.unwrap_or([1.0; 4]);
+            let tint = Color(std::array::from_fn(|i| tint.0[i] * c[i]));
+            (opacity * t.alpha, tint, brightness * t.brightness * glow)
+        }
+        None => (opacity, tint, brightness),
+    };
+    let toned = tint != Color([1.0; 4]) || brightness != 1.0;
+    let isolate = !effects.is_empty()
+        || !layer.blend.fixed()
+        || layer.mask.is_some()
+        || layer.cache
+        || (group && (opacity < 1.0 || toned));
+    let index = frame.draws.len();
+    let (world, lean) = (place.world, place.lean);
+    let (blend, mask) = (layer.blend, layer.mask.as_ref());
+    let mask_strength = strength(cx, mask);
+    let draw = Draw {
+        layer,
+        end: index + 1,
+        world,
+        lean,
+        origin,
+        opacity,
+        blend,
+        mask,
+        mask_texture: masked(cx, mask),
+        mask_strength,
+        tint,
+        brightness,
+        effects,
+        content,
+        dynamic: false,
+        isolate,
+        hidden: false,
+        lit: layer.lighting.as_ref().map(|l| lamps::lighting(cx, l)),
+    };
+    frame.draws.push(draw);
+    walk(cx, layer.children(), (world, lean), quality, frame, canvas);
+    let moving = paced || moves || cx.wake.get() == Wake::Frame;
+    let children = frame.draws[index + 1..].iter().any(|d| d.dynamic);
+    if children {
+        layer.effects.iter().for_each(|e| _ = cx.stirred(std::ptr::from_ref(e) as usize, true, 0.0));
+    }
+    let end = frame.draws.len();
+    let draw = &mut frame.draws[index];
+    (draw.end, draw.dynamic) = (end, moving || children);
+}

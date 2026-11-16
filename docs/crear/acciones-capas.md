@@ -1,0 +1,1142 @@
+# Acciones: capas, recursos y lienzo
+
+Las acciones y preguntas para cambiar el documento, las capas, sus transformaciones, los recursos y el lienzo. Cómo llamarlas, cómo leer su salida y sus errores está en [acciones](acciones.md).
+
+## Acciones
+
+### Antes de empezar
+
+Todas las acciones de esta sección se llaman igual: `reiwand-ctl scene act CARPETA NOMBRE 'JSON'`. `CARPETA` es la carpeta de la escena (en los ejemplos, `mi-escena`) y `JSON` son los argumentos. Cada acción es un solo paso de **Deshacer**. Los archivos que se nombran (`foto.png`, `sonido.ogg`...) se buscan desde la carpeta en que ejecutas el comando.
+
+**El documento.** Una escena guarda dos partes. `/manifest` es la ficha del paquete (título, licencia, propiedades de usuario, presets). `/scene` es la escena: `/scene/layers` (capas), `/scene/assets` (recursos), `/scene/canvas` (lienzo), `/scene/timelines` (líneas de tiempo), `/scene/effects` (efectos del paquete), `/scene/scripts`, `/scene/templates`, `/scene/pools` y `/scene/particles`. Para ver cualquier parte: `reiwand-ctl scene show mi-escena RUTA`. Las rutas (JSON Pointer) empiezan por `/` y separan los niveles con `/`:
+
+| Ruta | Qué es |
+|------|--------|
+| `/scene/layers/0` | La primera capa de la lista, la de más abajo (la que se dibuja primero). |
+| `/scene/layers/0/opacity` | Un campo de esa capa. |
+| `/scene/layers/1/transform/position` | La posición de la segunda capa. |
+| `/scene/layers/2/layers/0` | La primera capa dentro de la capa 2, que es un grupo. |
+| `/scene/assets/foto/path` | El archivo del recurso `foto`. |
+| `/scene/canvas/size` | El tamaño del lienzo. |
+| `/manifest/title` | El título del paquete. |
+| `/manifest/properties/brillo` | La propiedad de usuario `brillo`. |
+
+**Ids.** Cada capa, recurso, sistema de partículas y línea de tiempo tiene un id de 1 a 32 letras minúsculas, dígitos o `_`. Capas, recursos y sistemas comparten un solo juego de nombres: no puede haber una capa y un recurso con el mismo id.
+
+**Coordenadas.** Salvo que se diga otra cosa, un punto `[x, y]` está en píxeles del lienzo, con `[0, 0]` arriba a la izquierda, `x` hacia la derecha e `y` hacia abajo. Los ángulos son grados en el sentido de las agujas del reloj. El tiempo es en segundos.
+
+**Valores que se animan.** Varias acciones de capa y de lienzo tienen `at` (un segundo) y `replace`. Si el campo ya tiene claves, `at` escribe una clave en ese segundo. Si el campo sigue otra fuente (una propiedad, el audio...), la acción se rechaza, salvo que pongas `"replace": true`, que lo sustituye por un valor fijo.
+
+**Copiar capas.** Copiar no es una pregunta de `scene ask`. Se hace con `reiwand-ctl scene ask CARPETA copy`, que imprime el texto que luego recibe `paste`.
+
+### Cambiar el documento a bajo nivel
+
+Estas cuatro acciones editan cualquier parte del documento por su ruta. No comprueban rangos ni nombres de campo: para saber si el resultado es válido, ejecuta `reiwand-ctl pack check mi-escena`. Las ventanas de la app hacen lo mismo con sus campos.
+
+#### `set`
+
+Escribe un valor en una ruta. Si en el camino faltan objetos, los crea. Si la ruta ya existe, reemplaza el valor.
+
+Se rechaza un valor de otra clase que el que había (un texto donde iba un número, por ejemplo). Un valor de la clase correcta que rompe una regla, como una opacidad de 7 o un recurso que no existe, se acepta, igual que en el editor mientras se está a medias de un cambio. La respuesta de la acción lo dice: `reiwand-ctl` imprime en la salida de errores una línea `problem: RUTA: MENSAJE` (o `warning:`) por cada problema que ese cambio añade, los mismos que enseña la lista de problemas del editor, y con `--json` los trae en `problems`. Sin líneas, el cambio no añadió ninguno.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `pointer` | texto (obligatorio) | Ruta del valor, por ejemplo `/scene/canvas/background`. |
+| `value` | cualquier valor JSON (obligatorio) | El valor nuevo: número, texto, lista u objeto. |
+
+```sh
+reiwand-ctl scene act mi-escena set '{"pointer":"/scene/canvas/background","value":"#112233"}'
+```
+
+#### `add`
+
+Inserta un valor en una lista o en un objeto. En una lista, el último nivel de la ruta es la posición (0 es el primero) o `-` para ponerlo al final. En un objeto, es el nombre del campo nuevo (si ya existía, lo reemplaza). Acepta y avisa de los problemas como [`set`](#set).
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `pointer` | texto (obligatorio) | Ruta donde insertar, por ejemplo `/scene/layers/-`. |
+| `value` | cualquier valor JSON (obligatorio) | Lo que se inserta. |
+
+```sh
+reiwand-ctl scene act mi-escena add '{"pointer":"/scene/layers/-","value":{"id":"fondo","type":"solid","color":"#102030"}}'
+```
+
+#### `remove`
+
+Quita el valor de una ruta. Falla si la ruta no existe.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `pointer` | texto (obligatorio) | Ruta de lo que se quita. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"solid","id":"fondo"}'
+reiwand-ctl scene act mi-escena remove '{"pointer":"/scene/layers/0/color"}'
+```
+
+#### `move`
+
+Mueve un valor de una ruta a otra, por ejemplo una capa a otra posición de la lista. No se puede mover un valor dentro de sí mismo.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `from` | texto (obligatorio) | Ruta de origen. |
+| `to` | texto (obligatorio) | Ruta de destino. En una lista, el último nivel es la posición. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"solid","id":"fondo"}'
+reiwand-ctl scene act mi-escena add_layer '{"kind":"text","id":"titulo"}'
+reiwand-ctl scene act mi-escena move '{"from":"/scene/layers/1","to":"/scene/layers/0"}'
+```
+
+### Capas
+
+Para mover, escalar o girar una capa mira [Colocar y dar forma a una capa](#colocar-y-dar-forma-a-una-capa). La lista de capas está en el panel de capas de la app.
+
+#### `add_layer`
+
+Añade una capa de un tipo, al final de la lista (arriba del todo) o donde se pida. Imprime el id de la capa nueva. En la app es **Añadir una capa**, y **Capa desde un archivo** importa el archivo en el mismo paso.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `kind` | texto (obligatorio) | Tipo de capa. Uno de los de la tabla de abajo. |
+| `id` | texto | Id de la capa. Si falta, sale de `name` o del tipo (`image`, `image_2`...). Si ya está en uso, la acción falla. |
+| `name` | texto | Nombre para construir el id. En una capa `text` es además el texto que muestra (por defecto, `Text`). |
+| `source` | texto | De dónde sale lo que muestra la capa. Ver abajo. |
+| `file` | texto | Archivo (ruta desde donde ejecutas el comando) que se importa como recurso y se usa en la capa nueva. Debe ser del tipo de la capa: imagen, video, sonido o `.glb`. Solo vale para `image`, `video`, `sound`, `mesh` y `model`. |
+| `into` | texto | Id de un grupo donde meter la capa. Sin él va a la lista principal. |
+| `at` | entero | Posición en la lista: 0 es abajo del todo. Si es mayor que el largo, va al final. |
+
+| `kind` | Qué crea | Qué es `source` |
+|--------|----------|------------------|
+| `image` | Una imagen. | Id de un recurso de imagen. Sin él, el primero que haya. |
+| `video` | Un video. | Id de un recurso de video. Sin él, el primero que haya. |
+| `sound` | Un sonido. | Id de un recurso de sonido. Sin él, el primero que haya. |
+| `text` | Un texto. | No se usa. |
+| `shape` | Una forma (rectángulo de 480 por 320 px). | No se usa. |
+| `solid` | Un color liso que llena el lienzo. | No se usa. |
+| `spectrum` | Un espectro del audio (960 por 240 px). | No se usa. |
+| `particles` | Una capa que dibuja un sistema de partículas. | Nombre del sistema. Si no existe, se crea uno con valores por defecto. Sin él, usa el id de la capa. |
+| `group` | Un grupo de capas. | No se usa. |
+| `adjustment` | Una capa de ajuste: sus efectos cambian lo que hay debajo. | No se usa. |
+| `mesh` | Una malla articulada de un archivo `.glb`. | Id de un recurso `.glb`. |
+| `model` | Un modelo 3D de un archivo `.glb`. | Id de un recurso `.glb`. |
+| `group3d` | Un grupo 3D. | No se usa. |
+| `light` | Una luz. | `point`, `spot`, `tube` o `directional`. Sin él, `point`. |
+| `shapes` | Formas que dibujan los scripts desde una reserva (`pool`). | Id de la reserva. Sin él, la primera. Antes hay que crear una con [`pool`](acciones-tiempo-y-paquete.md#pool). |
+
+Si pides un tipo que necesita un recurso y no hay ninguno, la acción dice qué importar primero.
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"image","file":"foto.png"}'
+reiwand-ctl scene act mi-escena add_layer '{"kind":"text","name":"Titulo","at":0}'
+reiwand-ctl scene act mi-escena add_layer '{"kind":"group","id":"adorno"}'
+reiwand-ctl scene act mi-escena add_layer '{"kind":"shape","into":"adorno"}'
+reiwand-ctl scene act mi-escena add_layer '{"kind":"light","source":"spot"}'
+```
+
+#### `remove_layer`
+
+Quita una capa y todo lo que la nombraba desde fuera: padres, máscaras, parámetros de efectos, ataduras a huesos, disparadores. Se rechaza mientras un sistema de partículas toma partículas de esa capa. En la app es **Quitar**.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `id` | texto (obligatorio) | Id de la capa. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"solid","id":"fondo"}'
+reiwand-ctl scene act mi-escena remove_layer '{"id":"fondo"}'
+```
+
+#### `duplicate_layer`
+
+Copia una capa justo encima de la original, con ids nuevos (`id_copy`). Si la capa es un grupo, copia también las de dentro. Imprime el id de la copia. Con `template` no hace una capa nueva: guarda la capa como plantilla para que un script la repita (ver [`template`](acciones-tiempo-y-paquete.md#template)). En la app es **Duplicar** y **Hacer plantilla**.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `id` | texto (obligatorio) | Id de la capa que se copia. |
+| `template` | sí/no | `true` la guarda en `/scene/templates` con el nombre `id_template` (o `id_template_2`...). Solo valen imagen, texto, forma, color liso, espectro, malla y grupo. Por defecto `false`. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"text","id":"titulo"}'
+reiwand-ctl scene act mi-escena duplicate_layer '{"id":"titulo"}'
+reiwand-ctl scene act mi-escena duplicate_layer '{"id":"titulo","template":true}'
+```
+
+#### `move_layer`
+
+Cambia una capa de lugar: a otra posición de su lista, o a otro grupo.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `id` | texto (obligatorio) | Id de la capa. |
+| `to` | entero (obligatorio) | Posición final en la lista de destino (0 es abajo del todo). Si es mayor que el largo, queda arriba del todo. |
+| `into` | texto | Id de un grupo de destino. Sin él, la capa pasa a la lista principal. |
+
+El grupo puede estar arriba o abajo de la capa en la lista. Un grupo no se puede meter dentro de sí mismo ni de lo que contiene: la acción se rechaza.
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"group","id":"adorno"}'
+reiwand-ctl scene act mi-escena add_layer '{"kind":"text","id":"titulo"}'
+reiwand-ctl scene act mi-escena move_layer '{"id":"titulo","to":0,"into":"adorno"}'
+reiwand-ctl scene act mi-escena move_layer '{"id":"titulo","to":0}'
+```
+
+#### `group`
+
+Mete varias capas en un grupo nuevo, que queda en el lugar de la más baja. Imprime el id del grupo.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `ids` | lista de textos (obligatorio) | Ids de las capas. Deben estar en la misma lista (todas en la principal o todas en el mismo grupo). |
+| `id` | texto | Id del grupo. Por defecto `group`, `group_2`... |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"solid","id":"fondo"}'
+reiwand-ctl scene act mi-escena add_layer '{"kind":"text","id":"titulo"}'
+reiwand-ctl scene act mi-escena group '{"ids":["fondo","titulo"],"id":"cartel"}'
+```
+
+#### `ungroup`
+
+Disuelve un grupo y deja sus capas en su lugar. Se rechaza si el grupo tiene algo propio que se perdería (opacidad, transformación, mezcla, máscara, efectos, parallax, visibilidad o recorte). En la app es **Desagrupar**.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `id` | texto (obligatorio) | Id del grupo. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"group","id":"adorno"}'
+reiwand-ctl scene act mi-escena ungroup '{"id":"adorno"}'
+```
+
+#### `hide`
+
+Oculta una capa o la vuelve a mostrar. En una capa de sonido silencia el sonido. Al ocultar guarda lo que valía antes y lo devuelve al mostrar.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `id` | texto (obligatorio) | Id de la capa. |
+| `hidden` | sí/no (obligatorio) | `true` oculta, `false` muestra. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"solid","id":"fondo"}'
+reiwand-ctl scene act mi-escena hide '{"id":"fondo","hidden":true}'
+reiwand-ctl scene act mi-escena hide '{"id":"fondo","hidden":false}'
+```
+
+#### `lock`
+
+Marca una capa como bloqueada, o quita la marca. La marca es del editor (queda en `/scene/ext/editor/locked`) y solo la respetan las asas y los arrastres del lienzo de la app: una capa bloqueada no se mueve ni se estira con el ratón. No protege nada más: las acciones (`set`, `layer`, `move_layer`, `remove_layer`...), los campos del inspector y los comandos de la terminal siguen cambiando una capa bloqueada. En la app es **Bloquear**.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `id` | texto (obligatorio) | Id de la capa. |
+| `locked` | sí/no (obligatorio) | `true` bloquea, `false` desbloquea. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"solid","id":"fondo"}'
+reiwand-ctl scene act mi-escena lock '{"id":"fondo","locked":true}'
+```
+
+#### `solo`
+
+Hace que las vistas previas del editor muestren solo una capa (y lo que la contiene), o todas otra vez. No cambia la escena que se guarda. En la app es **Solo**.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `id` | texto | Id de la capa que se queda sola. Sin él, termina el solo. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"solid","id":"fondo"}'
+reiwand-ctl scene act mi-escena solo '{"id":"fondo"}'
+reiwand-ctl scene act mi-escena solo '{}'
+```
+
+#### `rename`
+
+Cambia el id de una capa, línea de tiempo, recurso o sistema de partículas y corrige todo lo que lo nombra: padres, máscaras, parámetros de efectos, valores que siguen una línea de tiempo, campos que nombran un recurso, capas que usan un sistema. Los scripts no se reescriben: el comando imprime cada línea de script que nombra el id viejo para que la cambies a mano. En la app es **Cambiar el id de la capa** y **Cambiar el nombre…** en cada recurso.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `kind` | texto (obligatorio) | Qué se renombra: `layer`, `timeline`, `asset` o `system`. |
+| `id` | texto (obligatorio) | Id actual. |
+| `to` | texto (obligatorio) | Id nuevo: de 1 a 32 letras minúsculas, dígitos o `_`, y libre. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"image","file":"foto.png","id":"cielo"}'
+reiwand-ctl scene act mi-escena rename '{"kind":"layer","id":"cielo","to":"fondo"}'
+reiwand-ctl scene act mi-escena rename '{"kind":"asset","id":"foto","to":"paisaje"}'
+reiwand-ctl scene act mi-escena add_layer '{"kind":"particles","id":"polvo"}'
+reiwand-ctl scene act mi-escena rename '{"kind":"system","id":"polvo","to":"lluvia"}'
+reiwand-ctl scene act mi-escena timeline '{"id":"intro","add":true}'
+reiwand-ctl scene act mi-escena rename '{"kind":"timeline","id":"intro","to":"entrada"}'
+```
+
+#### `paste`
+
+Pega capas copiadas con `reiwand-ctl scene ask CARPETA copy`, en esta escena o en otra. Las capas llevan ids libres (el mismo id si está libre, si no `id_2`...); los recursos, sistemas y efectos que usan se añaden si faltan, con sus archivos. En la app son **Copiar las capas** y **Pegar las capas**.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `clip` | objeto (obligatorio) | Lo que imprime `scene ask CARPETA copy`: `layers` (las capas) y, si hacen falta, `assets`, `particles`, `effects` y `from` (la carpeta de la que se copiaron, para encontrar los archivos). |
+| `into` | texto | Id de un grupo donde pegar. |
+| `at` | entero | Posición donde pegar (0 es abajo del todo). Sin ella, arriba del todo. |
+
+```sh
+reiwand-ctl scene act mi-escena paste '{"clip":{"layers":[{"id":"saludo","type":"text","text":"Hola","size":96,"color":"#ffffff"}]}}'
+reiwand-ctl scene act mi-escena add_layer '{"kind":"group","id":"adorno"}'
+reiwand-ctl scene act mi-escena paste '{"clip":{"layers":[{"id":"saludo","type":"text","text":"Hola","size":96,"color":"#ffffff"}]},"into":"adorno","at":0}'
+```
+
+Para obtener un `clip` de verdad, copia una capa de la escena:
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"text","id":"saludo"}'
+reiwand-ctl scene ask mi-escena copy '{"ids":["saludo"]}'
+```
+
+#### `rgb`
+
+Hace que una capa de ajuste envíe lo que captura a la iluminación RGB de tu equipo, o que deje de hacerlo, y elige la zona que captura. Al activarlo pide el permiso `rgb` del paquete; al apagarlo (si ninguna otra capa lo usa) lo quita. Solo vale para capas `adjustment`.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de una capa de ajuste. |
+| `on` | sí/no | `true` envía a la iluminación RGB, `false` deja de enviar. |
+| `size` | lista de 2 números | Ancho y alto en píxeles de la zona alrededor de la capa (de 1 hasta el doble del lienzo). Si la capa no tiene posición, la pone en el medio del lienzo. |
+| `whole` | sí/no | `true` captura todo el lienzo (quita `size`). Por defecto `false`. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"adjustment","id":"ajuste"}'
+reiwand-ctl scene act mi-escena rgb '{"layer":"ajuste","on":true}'
+reiwand-ctl scene act mi-escena rgb '{"layer":"ajuste","size":[400,200]}'
+reiwand-ctl scene act mi-escena rgb '{"layer":"ajuste","whole":true}'
+```
+### Colocar y dar forma a una capa
+
+#### `layer`
+
+Una sola acción con varias variantes: se pasa un objeto con el nombre de la variante (`transform`, `grip`, `fit`, `parent`, `blend`, `depth`, `instance`, `touch`, `figure` o `start`) y dentro sus argumentos. Todas piden `layer`, el id de la capa, salvo `start` con `clock`, que crea una capa nueva. Lo que no se nombra se queda como estaba. Si un campo sigue una animación u otra fuente, ver «Valores que se animan» más arriba.
+
+##### variante `transform`
+
+Escribe a la vez posición, giro, escala, inclinación y tamaño de una capa. En la app son las asas del lienzo y los campos de transformación de la capa.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de la capa. |
+| `position` | lista de 2 números | Posición del punto de anclaje de la capa en el lienzo, en píxeles. |
+| `rotation` | número | Giro en grados, de -360 a 360. |
+| `scale` | lista de 2 números | Escala en `x` y en `y`; 1 es el tamaño original. |
+| `skew` | lista de 2 números | Sesgado en grados. |
+| `origin` | lista de 2 números | Punto de anclaje como fracción de la caja de la capa: `[0.5, 0.5]` es el centro, `[0, 0]` la esquina de arriba a la izquierda. |
+| `tilt` | lista de 2 números | Inclinación en 3D en grados, de -89 a 89, alrededor del ancho y del alto de la capa. |
+| `z` | número | Altura hacia el espectador, de -100000 a 100000. |
+| `size` | lista de 2 números | Ancho y alto de la caja en píxeles (más de 0). Solo capas de imagen, video, color liso, ajuste y espectro. |
+| `at` | número | Segundo en que se escribe, si el campo tiene claves. |
+| `replace` | sí/no | `true` escribe un valor fijo aunque el campo siga claves u otra fuente. Por defecto `false`. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"image","file":"foto.png","id":"cielo"}'
+reiwand-ctl scene act mi-escena layer '{"transform":{"layer":"cielo","position":[400,300],"rotation":10,"scale":[1.5,1.5],"size":[800,600]}}'
+```
+
+##### variante `grip`
+
+Hace lo que haría arrastrar un asa del lienzo hasta el punto `to`. Es la forma de repetir un gesto de la app desde la terminal: la acción calcula los números de posición, giro, escala o sesgado que dejan el asa en `to`, teniendo en cuenta los padres, grupos y la cámara.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de la capa. |
+| `grip` | texto u objeto (obligatorio) | Qué asa se arrastra. Ver la tabla de abajo. |
+| `to` | lista de 2 números (obligatorio) | Punto del lienzo en píxeles adonde llega el asa. Con `nudge` es el desplazamiento. |
+| `snap` | número | Distancia en píxeles. Con `move`, si un borde o el centro de la capa queda a menos de esta distancia de los bordes o el centro del lienzo o de otras capas, se pega. |
+| `at` | número | Segundo en que se escribe, si el campo tiene claves. |
+| `replace` | sí/no | Como en `transform`. |
+
+| `grip` | Qué hace |
+|--------|----------|
+| `"move"` | Pone el punto de anclaje de la capa en `to`. |
+| `"nudge"` | Mueve la capa por `to` (por ejemplo `[10, 0]`, diez píxeles a la derecha). |
+| `"turn"` | Gira la capa para que su parte de arriba apunte a `to`. |
+| `"origin"` | Mueve el punto de anclaje a `to` sin que la capa se mueva. |
+| `{"scale":{"corner":[1,1],"even":true}}` | Escala para que la esquina `corner` (fracciones de la caja: `[1,1]` abajo a la derecha, `[1,0.5]` el medio del borde derecho) caiga en `to`. Con `even`, mantiene la proporción. |
+| `{"skew":{"edge":[0.5,0]}}` | Sesga a lo largo del borde cuyo medio es `edge`, para que pase por `to`. |
+| `{"size":{"corner":[1,1]}}` | Para una capa de ajuste que captura una región: cambia `size` para que la esquina caiga en `to`. |
+| `{"tilt":{"axis":0}}` | Inclina la capa alrededor de su ancho (`axis` 0) o de su alto (`axis` 1) hasta acercar su borde a `to`. |
+| `"lift"` | Cambia `z` para acercar la capa a `to`. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"image","file":"foto.png","id":"cielo"}'
+reiwand-ctl scene act mi-escena layer '{"grip":{"layer":"cielo","grip":"move","to":[500,500],"snap":10}}'
+reiwand-ctl scene act mi-escena layer '{"grip":{"layer":"cielo","grip":"nudge","to":[10,0]}}'
+reiwand-ctl scene act mi-escena layer '{"grip":{"layer":"cielo","grip":"turn","to":[900,100]}}'
+reiwand-ctl scene act mi-escena layer '{"grip":{"layer":"cielo","grip":{"scale":{"corner":[1,1],"even":true}},"to":[900,700]}}'
+reiwand-ctl scene act mi-escena layer '{"grip":{"layer":"cielo","grip":{"skew":{"edge":[0.5,0]}},"to":[600,100]}}'
+reiwand-ctl scene act mi-escena layer '{"grip":{"layer":"cielo","grip":{"tilt":{"axis":0}},"to":[600,100]}}'
+reiwand-ctl scene act mi-escena layer '{"grip":{"layer":"cielo","grip":"lift","to":[600,100]}}'
+reiwand-ctl scene act mi-escena add_layer '{"kind":"adjustment","id":"ajuste"}'
+reiwand-ctl scene act mi-escena layer '{"grip":{"layer":"ajuste","grip":{"size":{"corner":[1,1]}},"to":[900,700]}}'
+```
+
+##### variante `fit`
+
+Escala y coloca la capa para que cubra el lienzo, quepa en él o lo llene deformándose. Mantiene el giro y el sesgado.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de la capa. |
+| `fit` | texto (obligatorio) | `cover` (cubre todo el lienzo, puede recortarse), `contain` (cabe entera) o `stretch` (llena el lienzo deformándose). |
+| `at`, `replace` | | Como en `transform`. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"image","file":"foto.png","id":"cielo"}'
+reiwand-ctl scene act mi-escena layer '{"fit":{"layer":"cielo","fit":"cover"}}'
+```
+
+##### variante `parent`
+
+Hace que una capa siga a otra (su padre): se mueve, gira y escala con ella. Se rechaza para la misma capa, para sonidos y luces, si el padre ya la sigue o está dentro de ella, y si la cadena pasa de 8 capas.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de la capa que sigue. |
+| `parent` | texto | Id del padre. Sin él, la capa deja de seguir a su padre. |
+| `keep` | sí/no | `true` reescribe posición, giro, sesgado y escala para que la capa se quede donde estaba. Por defecto `false`. |
+| `at`, `replace` | | Como en `transform`. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"image","file":"foto.png","id":"cielo"}'
+reiwand-ctl scene act mi-escena add_layer '{"kind":"text","id":"titulo"}'
+reiwand-ctl scene act mi-escena layer '{"parent":{"layer":"titulo","parent":"cielo","keep":true}}'
+reiwand-ctl scene act mi-escena layer '{"parent":{"layer":"titulo"}}'
+```
+
+##### variante `blend`
+
+Cambia el modo de mezcla de la capa con lo que hay debajo.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de la capa. |
+| `blend` | texto (obligatorio) | Uno de: `normal`, `add`, `multiply`, `screen`, `lighten`, `darken`, `overlay`, `soft_light`, `hard_light`, `difference`, `exclusion`, `color_dodge`, `color_burn`, `hue`, `saturation`, `color`, `luminosity`, `linear_burn`, `linear_dodge`, `darker_color`, `lighter_color`, `vivid_light`, `linear_light`, `pin_light`, `hard_mix`, `subtract`, `divide`, `reflect`, `glow`, `phoenix`, `average`, `negation`, `tint`, `diffuse_light`. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"image","file":"foto.png","id":"cielo"}'
+reiwand-ctl scene act mi-escena layer '{"blend":{"layer":"cielo","blend":"multiply"}}'
+```
+
+##### variante `depth`
+
+Pone la profundidad de parallax de la capa: cuánto se mueve con el puntero o la inclinación del teléfono. Si el paquete no declara la entrada `pointer`, la añade.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de la capa. |
+| `depth` | lista de 2 números (obligatorio) | Profundidad horizontal y vertical, cada una de -10 a 10. Si las dos son iguales se guarda un solo número; con `[0, 0]` se quita. |
+| `replace` | sí/no | `true` escribe un valor fijo aunque el parallax siga otra fuente. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"image","file":"foto.png","id":"cielo"}'
+reiwand-ctl scene act mi-escena layer '{"depth":{"layer":"cielo","depth":[2,1]}}'
+```
+
+##### variante `touch`
+
+Elige si una capa recibe el puntero (para clics y para que un script o un disparador sepa que se pasa por encima).
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de la capa. |
+| `takes` | texto (obligatorio) | `off` deja pasar el puntero, `all` lo toma en toda la caja, `alpha` solo donde la capa es opaca. |
+| `alpha` | número | Con `alpha`, cuán opaco debe ser un punto para tomar el puntero, de 0 a 1. Si falta, 0.5 o el valor que tenía. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"image","file":"foto.png","id":"cielo"}'
+reiwand-ctl scene act mi-escena layer '{"touch":{"layer":"cielo","takes":"alpha","alpha":0.3}}'
+```
+
+##### variante `instance`
+
+Cambia, solo para una capa de partículas, lo que hace el sistema que dibuja (a menos que el sistema bloquee esos ajustes).
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de una capa de partículas. |
+| `values` | objeto | Qué cambiar. Campos: `alpha`, `size`, `speed`, `life`, `time_scale` y `brightness` (multiplicadores), `count` (multiplica los nacimientos, de 0 a 4), `color` (un color) y `points` (puntos de control `p0` a `p7`: una lista de posiciones, o un objeto con los números 0 a 7 que solo cambia esos). Un campo en `null` vuelve a lo que dice el sistema. |
+| `clear` | sí/no | `true` quita todos los ajustes de la capa. Por defecto `false`. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"particles","id":"polvo"}'
+reiwand-ctl scene act mi-escena layer '{"instance":{"layer":"polvo","values":{"alpha":0.5,"size":2,"count":2,"speed":1.5,"brightness":1.2,"color":"#ffcc00"}}}'
+reiwand-ctl scene act mi-escena layer '{"instance":{"layer":"polvo","values":{"points":{"1":[100,100]}}}}'
+reiwand-ctl scene act mi-escena layer '{"instance":{"layer":"polvo","values":{"alpha":null}}}'
+reiwand-ctl scene act mi-escena layer '{"instance":{"layer":"polvo","clear":true}}'
+```
+
+##### variante `figure`
+
+Edita la figura de una capa de forma o de texto. Dentro de `figure` se elige una de cuatro cosas: `shape`, `stop`, `text_width` o `fonts`.
+
+###### `figure` con `shape`
+
+Hace lo que haría arrastrar un asa de la forma hasta el punto `to`.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de una capa de forma. |
+| `handle` | texto (obligatorio) | Nombre del asa. Según la forma: rectángulo `width`, `height`, `size`, `radius`; elipse `width`, `height`, `size`; anillo igual y `band` (el grosor); polígono `size`, `sides` (el número de lados); estrella `size`, `points` (las puntas), `inner` (la profundidad); línea `start`, `end`, `width`. Cualquier forma que no sea línea y tenga contorno: `stroke`. Si tiene degradado: `gradient_from`, `gradient_to`. |
+| `to` | lista de 2 números (obligatorio) | Punto del lienzo, en píxeles, adonde llega el asa. |
+| `even` | sí/no | Mantiene la proporción. Por defecto `false`. |
+| `at`, `replace` | | Como en `transform`. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"shape","id":"forma"}'
+reiwand-ctl scene act mi-escena layer '{"figure":{"shape":{"layer":"forma","handle":"radius","to":[1000,400]}}}'
+reiwand-ctl scene act mi-escena layer '{"figure":{"shape":{"layer":"forma","handle":"width","to":[1200,540],"even":true}}}'
+```
+
+###### `figure` con `stop`
+
+Edita los colores de un degradado de la forma (de 2 a 4 paradas, siempre en orden).
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de una capa de forma. |
+| `stop` | texto u objeto (obligatorio) | Qué hacer. Ver la tabla de abajo. |
+
+| `stop` | Qué hace |
+|--------|----------|
+| `{"make":{"radial":false}}` | Crea un degradado de dos paradas; con `"radial": true` es circular. |
+| `"clear"` | Quita el degradado. |
+| `{"add":{"at":0.5,"color":"#ff0000"}}` | Añade una parada en `at` (0 a 1) con un color; sin `color` toma el de la siguiente. |
+| `{"move":{"index":1,"at":0.3}}` | Mueve la parada número `index` (0 es la primera) a `at`. |
+| `{"color":{"index":0,"color":"#00ff00"}}` | Cambia el color de una parada. |
+| `{"remove":{"index":1}}` | Quita una parada. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"shape","id":"forma"}'
+reiwand-ctl scene act mi-escena layer '{"figure":{"stop":{"layer":"forma","stop":{"make":{"radial":false}}}}}'
+reiwand-ctl scene act mi-escena layer '{"figure":{"stop":{"layer":"forma","stop":{"add":{"at":0.5,"color":"#ff0000"}}}}}'
+reiwand-ctl scene act mi-escena layer '{"figure":{"stop":{"layer":"forma","stop":{"move":{"index":1,"at":0.3}}}}}'
+reiwand-ctl scene act mi-escena layer '{"figure":{"stop":{"layer":"forma","stop":{"color":{"index":0,"color":"#00ff00"}}}}}'
+reiwand-ctl scene act mi-escena layer '{"figure":{"stop":{"layer":"forma","stop":{"remove":{"index":1}}}}}'
+reiwand-ctl scene act mi-escena layer '{"figure":{"stop":{"layer":"forma","stop":"clear"}}}'
+```
+
+###### `figure` con `text_width`
+
+Fija el ancho de un texto de varias líneas moviendo su borde derecho a `to` sin mover el izquierdo.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de una capa de texto. |
+| `to` | lista de 2 números | Punto del lienzo adonde llega el borde derecho. |
+| `remove` | sí/no | `true` quita el ancho fijo. Por defecto `false`. |
+| `at`, `replace` | | Como en `transform`. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"text","id":"texto"}'
+reiwand-ctl scene act mi-escena layer '{"figure":{"text_width":{"layer":"texto","to":[1400,540]}}}'
+reiwand-ctl scene act mi-escena layer '{"figure":{"text_width":{"layer":"texto","remove":true}}}'
+```
+
+###### `figure` con `fonts`
+
+Elige la tipografía de un texto y las de reserva, que se usan para las letras que la principal no tiene.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de una capa de texto. |
+| `font` | texto | Nombre de la fuente; una cadena vacía la quita. |
+| `fallback` | lista de textos | Fuentes de reserva, en orden, hasta 8. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"text","id":"texto"}'
+reiwand-ctl scene act mi-escena layer '{"figure":{"fonts":{"layer":"texto","font":"serif","fallback":["sans-serif"]}}}'
+```
+### Recursos
+
+Los recursos son los archivos de la escena: imágenes, videos, sonidos, fuentes, tablas de color `.cube` y modelos `.glb`. Viven en la carpeta `assets/` y se declaran en `/scene/assets`. La lista está en el panel **Recursos** de la app. Para efectos y scripts que se importan como archivos, mira [Shaders](acciones.md) y [Scripts y plantillas](acciones.md).
+
+##### variante `start`
+
+Puntos de partida ya hechos para lo que más se pide: un reloj o una fecha, y un movimiento que no se acaba. Dentro de `start` se elige `clock` o `forever`.
+
+###### `start` con `clock`
+
+Añade una capa de texto que muestra la hora o la fecha del equipo y se actualiza sola. Es lo mismo que escribir `{ "clock": "HH:mm" }` o `{ "date": "EEEE d MMMM yyyy" }` en el texto de una capa; escribir `{time}` no hace nada, porque el texto que se escribe sale tal cual.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `format` | texto | El formato de la hora o de la fecha, como `HH:mm`, `hh:mm a` o `d MMMM yyyy` (las letras están en [escena](escena.md#reloj-y-fechas), y la consulta `clock_help` las lista con un ejemplo). Si falta, `HH:mm` para la hora y `EEEE d MMMM yyyy` para la fecha. Hasta 64 caracteres. |
+| `date` | sí/no | `true` muestra una fecha (`date`) en lugar de la hora (`clock`). Por defecto `false`. |
+| `id` | texto | Id de la capa. Si falta, `clock` o `date` con un número si ya existe. |
+| `into` | texto | Id de un grupo donde meter la capa. |
+| `size` | número | Tamaño del texto, de 1 a 4000 píxeles. Por defecto 160. |
+
+```sh
+reiwand-ctl scene act mi-escena layer '{"start":{"clock":{"format":"HH:mm","id":"hora"}}}'
+reiwand-ctl scene act mi-escena layer '{"start":{"clock":{"date":true,"id":"fecha","size":80}}}'
+```
+
+###### `start` con `forever`
+
+Hace que una capa gire o se desplace sin parar, sin construir claves a mano: escribe en su giro o en su posición dos claves lineales con `loop`, que repite o va y vuelve.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de la capa. |
+| `motion` | texto (obligatorio) | `spin` da una vuelta completa cada `seconds` y empieza otra; `drift` la desplaza `by` píxeles y la devuelve. |
+| `seconds` | número | Lo que dura una vuelta (`spin`) o un trayecto (`drift`), de 0,5 a 86400 segundos. Por defecto 20. |
+| `reverse` | sí/no | Gira en sentido contrario, o se desplaza al otro lado. Por defecto `false`. |
+| `by` | lista de 2 números | Solo con `drift`: cuánto se desplaza, en píxeles del lienzo. Por defecto `[200, 0]`. |
+| `back` | sí/no | Solo con `drift`: `true` (por defecto) va y vuelve suavemente; `false` salta al principio y repite el trayecto. |
+
+Parte del giro o de la posición que la capa tiene ahora (sin posición, el centro del lienzo) y reemplaza las claves que hubiera. Si el giro o la posición siguen otra fuente (el sonido, una propiedad…), la acción lo rechaza: fija antes un valor con `transform` y `replace`.
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"shape","id":"rueda"}'
+reiwand-ctl scene act mi-escena layer '{"start":{"forever":{"layer":"rueda","motion":"spin","seconds":12}}}'
+reiwand-ctl scene act mi-escena add_layer '{"kind":"shape","id":"nube"}'
+reiwand-ctl scene act mi-escena layer '{"start":{"forever":{"layer":"nube","motion":"drift","by":[300,0],"seconds":30}}}'
+```
+
+#### `import`
+
+Copia un archivo a `assets/` y lo declara como recurso. Imprime el id del recurso (por defecto, el nombre del archivo sin extensión). Si ya hay un archivo igual en `assets/`, lo reutiliza. Admite imágenes, videos, sonidos, fuentes, tablas `.cube` y `.glb`.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `file` | texto (obligatorio) | Archivo que se copia, con su ruta desde donde ejecutas el comando. |
+| `id` | texto | Id del recurso. Si ya existe, la acción falla. |
+| `linear` | sí/no | `true` si la imagen guarda datos (un mapa de normales, una máscara) y no colores; así no se corrige su color. Solo para imágenes. Por defecto `false`. |
+| `atlas` | lista de 2 enteros | `[filas, columnas]` de una hoja de sprites regular, de 1 a 256 cada una. Solo para imágenes. Para cortes irregulares usa [`sprites`](#sprites). |
+
+```sh
+reiwand-ctl scene act mi-escena import '{"file":"foto.png"}'
+reiwand-ctl scene act mi-escena import '{"file":"foto.png","id":"mapa","linear":true}'
+reiwand-ctl scene act mi-escena import '{"file":"hoja.png","id":"hoja","atlas":[2,4]}'
+reiwand-ctl scene act mi-escena import '{"file":"sonido.ogg"}'
+reiwand-ctl scene act mi-escena import '{"file":"modelo.glb","id":"modelo"}'
+reiwand-ctl scene act mi-escena import '{"file":"video.webm"}'
+```
+
+#### `asset`
+
+Cambia cómo se guarda un recurso de imagen. Hace una de tres cosas, según los argumentos: convertirlo a textura comprimida (KTX2), hacerlo la portada de lo que reproduce el reproductor de medios, o mostrar esa portada en un campo de la escena. En la app, **Convertir a KTX2…** está en cada imagen del panel **Recursos**.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `asset` | texto (obligatorio) | Id del recurso. |
+| `ktx2` | sí/no | `true` convierte la imagen en textura KTX2 con sus mipmaps, escribe `assets/NOMBRE.ktx2` y apunta el recurso a ese archivo. No sirve en una imagen que ya es KTX2. Por defecto `false`. |
+| `codec` | texto | Con `ktx2`: `uastc` (más nítido, es lo normal) o `etc1s` (más pequeño). |
+| `quality` | entero | Con `ktx2`: calidad de 1 a 100. Por defecto 80. |
+| `cube` | sí/no | Con `ktx2`: la imagen es un panorama y se convierte en un cubo de seis caras. |
+| `faces` | lista de 6 textos | Con `ktx2`: ids de seis imágenes cuadradas del mismo tamaño (`+X`, `-X`, `+Y`, `-Y`, `+Z`, `-Z`, en ese orden) que forman un cubo. Se escribe sobre `asset`. No se combina con `cube`. |
+| `cover` | texto | `current` hace del recurso la portada de lo que suena ahora, `previous` la de lo que sonó antes, y `none` lo vuelve una imagen normal. |
+| `placeholder` | texto | Con `cover`: la imagen fija que se ve mientras no hay portada (un id de recurso o un archivo de la carpeta). Es obligatoria si el recurso es nuevo. |
+| `field` | texto | Con `cover` (`current` o `previous`): ruta de un campo de la escena, como `/scene/layers/0/image`. Pone allí la portada, y si no hay ninguna la crea con el nombre `asset`. |
+
+```sh
+reiwand-ctl scene act mi-escena import '{"file":"foto.png"}'
+reiwand-ctl scene act mi-escena asset '{"asset":"foto","ktx2":true,"codec":"etc1s","quality":50}'
+reiwand-ctl scene act mi-escena import '{"file":"foto.png","id":"panorama"}'
+reiwand-ctl scene act mi-escena asset '{"asset":"panorama","ktx2":true,"cube":true}'
+reiwand-ctl scene act mi-escena import '{"file":"foto.png","id":"portada"}'
+reiwand-ctl scene act mi-escena asset '{"asset":"portada","cover":"current","placeholder":"foto"}'
+reiwand-ctl scene act mi-escena add_layer '{"kind":"image","source":"foto","id":"cielo"}'
+reiwand-ctl scene act mi-escena asset '{"asset":"anterior","cover":"previous","placeholder":"foto","field":"/scene/layers/0/image"}'
+```
+
+#### `sprites`
+
+Corta una imagen en cuadros para una animación: con una rejilla o con rectángulos dibujados a mano. Una capa de imagen que use el recurso reproduce los cuadros. Una variante por gesto; todas piden `asset`, el id de una imagen. Un recurso tiene como máximo 256 cuadros. Un rectángulo es `[x, y, ancho, alto]` en píxeles de la imagen, y debe caber dentro de ella.
+
+##### variante `grid`
+
+Corta una rejilla regular. Reemplaza los cuadros anteriores.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `asset` | texto (obligatorio) | Id de la imagen. |
+| `columns` | entero (obligatorio) | Columnas de la rejilla. |
+| `rows` | entero (obligatorio) | Filas de la rejilla. |
+| `count` | entero | Cuántos cuadros usar; por defecto todos. |
+| `margin` | entero | Borde de la imagen sin usar, en píxeles. Por defecto 0. |
+| `spacing` | entero | Espacio entre cuadros, en píxeles. Por defecto 0. |
+| `order` | texto | Orden de lectura: `rows` (por filas), `columns` (por columnas), `rows_reversed`, `columns_reversed`. Por defecto `rows`. |
+
+```sh
+reiwand-ctl scene act mi-escena import '{"file":"hoja.png","id":"hoja"}'
+reiwand-ctl scene act mi-escena sprites '{"grid":{"asset":"hoja","columns":4,"rows":2}}'
+reiwand-ctl scene act mi-escena sprites '{"grid":{"asset":"hoja","columns":4,"rows":2,"count":6,"order":"columns"}}'
+```
+
+##### variante `rects`
+
+Define todos los cuadros a la vez con rectángulos.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `asset` | texto (obligatorio) | Id de la imagen. |
+| `rects` | lista de listas de 4 enteros (obligatorio) | Los cuadros, en orden. |
+
+```sh
+reiwand-ctl scene act mi-escena import '{"file":"hoja.png","id":"hoja"}'
+reiwand-ctl scene act mi-escena sprites '{"rects":{"asset":"hoja","rects":[[0,0,100,90],[100,0,100,90]]}}'
+```
+
+##### variante `add`
+
+Añade un cuadro al final.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `asset` | texto (obligatorio) | Id de la imagen. |
+| `rect` | lista de 4 enteros (obligatorio) | El cuadro nuevo. |
+
+```sh
+reiwand-ctl scene act mi-escena import '{"file":"hoja.png","id":"hoja"}'
+reiwand-ctl scene act mi-escena sprites '{"add":{"asset":"hoja","rect":[200,0,100,90]}}'
+```
+
+##### variante `change`
+
+Cambia el rectángulo de un cuadro.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `asset` | texto (obligatorio) | Id de la imagen. |
+| `index` | entero (obligatorio) | Número del cuadro (0 es el primero). |
+| `rect` | lista de 4 enteros (obligatorio) | El rectángulo nuevo. |
+
+```sh
+reiwand-ctl scene act mi-escena import '{"file":"hoja.png","id":"hoja"}'
+reiwand-ctl scene act mi-escena sprites '{"grid":{"asset":"hoja","columns":4,"rows":2}}'
+reiwand-ctl scene act mi-escena sprites '{"change":{"asset":"hoja","index":0,"rect":[0,0,50,50]}}'
+```
+
+##### variante `remove`
+
+Quita un cuadro.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `asset` | texto (obligatorio) | Id de la imagen. |
+| `index` | entero (obligatorio) | Número del cuadro. |
+
+```sh
+reiwand-ctl scene act mi-escena import '{"file":"hoja.png","id":"hoja"}'
+reiwand-ctl scene act mi-escena sprites '{"grid":{"asset":"hoja","columns":4,"rows":2}}'
+reiwand-ctl scene act mi-escena sprites '{"remove":{"asset":"hoja","index":1}}'
+```
+
+##### variante `reorder`
+
+Mueve un cuadro a otra posición.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `asset` | texto (obligatorio) | Id de la imagen. |
+| `from` | entero (obligatorio) | Posición actual. |
+| `to` | entero (obligatorio) | Posición nueva. |
+
+```sh
+reiwand-ctl scene act mi-escena import '{"file":"hoja.png","id":"hoja"}'
+reiwand-ctl scene act mi-escena sprites '{"grid":{"asset":"hoja","columns":4,"rows":2}}'
+reiwand-ctl scene act mi-escena sprites '{"reorder":{"asset":"hoja","from":0,"to":2}}'
+```
+
+##### variante `play`
+
+Fija cómo se reproducen los cuadros.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `asset` | texto (obligatorio) | Id de la imagen. |
+| `fps` | número | Cuadros por segundo, de 0.1 a 120. |
+| `frames` | entero | Cuántos cuadros se reproducen, de 1 al número de cuadros. |
+
+```sh
+reiwand-ctl scene act mi-escena import '{"file":"hoja.png","id":"hoja"}'
+reiwand-ctl scene act mi-escena sprites '{"grid":{"asset":"hoja","columns":4,"rows":2}}'
+reiwand-ctl scene act mi-escena sprites '{"play":{"asset":"hoja","fps":12,"frames":6}}'
+```
+
+##### variante `clear`
+
+Quita el corte: la imagen vuelve a ser una imagen normal.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `asset` | texto (obligatorio) | Id de la imagen. |
+
+```sh
+reiwand-ctl scene act mi-escena import '{"file":"hoja.png","id":"hoja"}'
+reiwand-ctl scene act mi-escena sprites '{"grid":{"asset":"hoja","columns":4,"rows":2}}'
+reiwand-ctl scene act mi-escena sprites '{"clear":{"asset":"hoja"}}'
+```
+
+#### `film`
+
+Ajusta una capa de video (o una capa de imagen que muestra un video): recortarlo, cambiar su velocidad o dar a su caja el tamaño real del video. Tres variantes.
+
+##### variante `trim`
+
+Reproduce solo una parte del video. La parte debe caer dentro del video y durar al menos 0.05 s.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de la capa. |
+| `start` | número (obligatorio) | Segundo donde empieza. |
+| `end` | número | Segundo donde termina. Sin él, hasta el final. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"video","file":"video.webm","id":"clip"}'
+reiwand-ctl scene act mi-escena film '{"trim":{"layer":"clip","start":0.1,"end":0.5}}'
+```
+
+##### variante `rate`
+
+Cambia la velocidad.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de la capa. |
+| `rate` | número (obligatorio) | Velocidad de 0 a 4; 1 es la normal. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"video","file":"video.webm","id":"clip"}'
+reiwand-ctl scene act mi-escena film '{"rate":{"layer":"clip","rate":0.5}}'
+```
+
+##### variante `fit`
+
+Pone en `size` el tamaño real del video.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `layer` | texto (obligatorio) | Id de la capa. |
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"video","file":"video.webm","id":"clip"}'
+reiwand-ctl scene act mi-escena film '{"fit":{"layer":"clip"}}'
+```
+
+#### `import_assets`
+
+Copia partes de otro paquete de recursos (un `.wpak` de tipo recursos) a la escena. Las partes van a `assets/ID-VERSION/`, se renombran si sus ids ya existen, quedan acreditadas con su licencia y autor, y el paquete se anota en el origen de la escena como obra derivada. Imprime los ids que añadió.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `package` | texto (obligatorio) | Archivo `.wpak` del paquete de recursos. |
+| `parts` | lista de textos | Qué partes traer: `layer:ID`, `particles:ID`, `script:RUTA` o `effect:ID`. Vacía (por defecto), todas. |
+
+```sh
+reiwand-ctl scene new origen
+reiwand-ctl scene act origen add_layer '{"kind":"image","file":"foto.png","id":"cielo"}'
+reiwand-ctl scene act origen manifest '{"credit":{"paths":["assets/foto.png"],"license":"CC-BY-4.0","attribution":"Ana Perez"}}'
+reiwand-ctl pack new-assets origen partes --part layer:cielo --id org.example.partes --title Partes --license CC-BY-4.0 --attribution "Ana Perez"
+reiwand-ctl pack build partes -o partes.wpak
+reiwand-ctl scene new mi-escena
+reiwand-ctl scene act mi-escena import_assets '{"package":"partes.wpak","parts":["layer:cielo"]}'
+```
+
+### Lienzo
+
+#### `canvas`
+
+Cambia el lienzo: su tamaño, el reloj, el brillo, el parallax, la cámara 2D y las ayudas de la vista previa. Es una sola acción con varias variantes. En la app, casi todo está en el inspector del lienzo y en el menú **Lienzo y reloj**.
+
+##### variante `size`
+
+Fija el tamaño de referencia del lienzo.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `size` | lista de 2 enteros (obligatorio) | Ancho y alto en píxeles, de 1 a 16384 cada uno. |
+
+```sh
+reiwand-ctl scene act mi-escena canvas '{"size":{"size":[1280,720]}}'
+```
+
+##### variante `clock`
+
+Fija el cuadro que se muestra donde no hay movimiento y la semilla de lo aleatorio.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `poster` | número | Segundo del cuadro fijo (la imagen de la escena sin movimiento), de 0 a 86400. |
+| `seed` | entero | Semilla de los efectos procedurales: con la misma, siempre sale igual. |
+| `fresh` | sí/no | `true` hace que cada inicio use una semilla nueva. No se combina con `seed`. Por defecto `false`. |
+
+```sh
+reiwand-ctl scene act mi-escena canvas '{"clock":{"poster":2.5,"seed":7}}'
+reiwand-ctl scene act mi-escena canvas '{"clock":{"fresh":true}}'
+```
+
+##### variante `bloom`
+
+Hace que lo brillante «brille» (resplandor). Lo que no se nombra empieza con los valores por defecto la primera vez.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `threshold` | número | Desde qué brillo empieza el resplandor, de 0 a 4. Por defecto 0.8. |
+| `strength` | número | Fuerza, de 0 a 8. Por defecto 1. |
+| `radius` | número | Alcance en píxeles, de 0 a 128. Por defecto 16. |
+| `tint` | texto | Color del resplandor, como `#ffddaa`. |
+| `hdr` | lista de 2 números o `"none"` | `[umbral, fuerza]` del resplandor de colores más brillantes que el blanco (umbral de 0 a 16, fuerza de 0 a 8); `"none"` lo quita. |
+| `off` | sí/no | `true` quita el resplandor. Por defecto `false`. |
+
+```sh
+reiwand-ctl scene act mi-escena canvas '{"bloom":{"threshold":0.8,"strength":0.6,"radius":8,"tint":"#ffddaa"}}'
+reiwand-ctl scene act mi-escena canvas '{"bloom":{"hdr":[1.5,0.5]}}'
+reiwand-ctl scene act mi-escena canvas '{"bloom":{"hdr":"none"}}'
+reiwand-ctl scene act mi-escena canvas '{"bloom":{"off":true}}'
+```
+
+##### variante `parallax`
+
+Hace que la escena se desplace en profundidad según el puntero o la inclinación de un teléfono. Cuánto se mueve cada capa lo decide su profundidad (ver `depth` en [`layer`](#layer)).
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `amount` | número | Fuerza general, de 0 a 4. |
+| `delay` | número | Retraso suave en segundos, de 0 a 2. |
+| `pointer` | número | Cuánto manda el puntero, de 0 a 1. |
+| `gyro` | sí/no | `true` también usa la inclinación del teléfono. |
+| `offset` | lista de 2 números | Desplazamiento fijo, de -1 a 1 en cada dirección. |
+| `off` | sí/no | `true` quita el parallax. Por defecto `false`. |
+
+```sh
+reiwand-ctl scene act mi-escena canvas '{"parallax":{"amount":1.5,"delay":0.2,"pointer":1,"gyro":true}}'
+reiwand-ctl scene act mi-escena canvas '{"parallax":{"off":true}}'
+```
+
+##### variante `camera`
+
+Pone la cámara 2D de la escena (la crea si falta).
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `center` | lista de 2 números | Punto del lienzo, en píxeles, que queda en el centro de lo que se ve. |
+| `zoom` | número | Zoom de 0.1 a 10. |
+| `rotation` | número | Giro en grados, de -360 a 360. |
+| `at` | número | Segundo en que se escribe, si el campo tiene claves. |
+| `replace` | sí/no | Como en `transform` de [`layer`](#layer). |
+| `off` | sí/no | `true` quita la cámara. Por defecto `false`. |
+
+```sh
+reiwand-ctl scene act mi-escena canvas '{"camera":{"center":[960,540],"zoom":1.5,"rotation":5}}'
+reiwand-ctl scene act mi-escena canvas '{"camera":{"off":true}}'
+```
+
+##### variante `camera_grip`
+
+Hace lo que haría arrastrar un asa de la cámara en el lienzo, hasta el punto `to`.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `hold` | texto u objeto (obligatorio) | `"move"` pone en `to` el medio de lo que ve la cámara; `{"zoom":{"corner":[1,1]}}` ajusta el zoom para que la esquina `corner` de la pantalla (fracciones) quede sobre la línea del centro a `to`; `"turn"` gira la cámara para que su arriba apunte a `to`. |
+| `to` | lista de 2 números (obligatorio) | Punto del lienzo en píxeles. |
+| `at`, `replace` | | Como en `camera`. |
+
+```sh
+reiwand-ctl scene act mi-escena canvas '{"camera_grip":{"hold":"move","to":[800,500]}}'
+reiwand-ctl scene act mi-escena canvas '{"camera_grip":{"hold":{"zoom":{"corner":[1,1]}},"to":[1500,900]}}'
+reiwand-ctl scene act mi-escena canvas '{"camera_grip":{"hold":"turn","to":[1500,100]}}'
+```
+
+##### variante `camera_view`
+
+Hace que la vista previa muestre toda la escena con el marco de la cámara. Solo cambia la vista del editor.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `whole` | sí/no (obligatorio) | `true` muestra toda la escena, `false` vuelve a lo que ve la cámara. |
+
+```sh
+reiwand-ctl scene act mi-escena canvas '{"camera_view":{"whole":true}}'
+```
+
+##### variante `probe`
+
+Simula un puntero y una inclinación de teléfono en la vista previa, para ver cómo se mueve el parallax. Solo cambia la vista del editor.
+
+| Argumento | Tipo | Qué significa |
+|-----------|------|---------------|
+| `pointer` | lista de 2 números | Posición simulada del puntero como fracción del lienzo, de 0 a 1 en cada lado. |
+| `tilt` | lista de 2 números | Inclinación simulada, de -1 a 1 en cada lado. |
+| `off` | sí/no | `true` quita la simulación. Por defecto `false`. |
+
+```sh
+reiwand-ctl scene act mi-escena canvas '{"probe":{"pointer":[0.7,0.3],"tilt":[0.2,0]}}'
+reiwand-ctl scene act mi-escena canvas '{"probe":{"off":true}}'
+```
+
+## Preguntas
+
+### Antes de empezar
+
+Las preguntas se hacen con `reiwand-ctl scene ask CARPETA NOMBRE 'JSON'` y contestan con JSON; no cambian nada. Las reglas de ids, rutas y coordenadas son las de [las acciones](#antes-de-empezar). Las que tratan de una capa aceptan también `--layer ID` cuando los argumentos no la nombran.
+
+### Capas, recursos y vídeo
+
+#### `copy`
+
+Contesta con las capas que se copian y todo lo que necesitan: los recursos, los sistemas de partículas y los efectos de paquete que usan. Es el texto que la acción [`paste`](#paste) pega, en la misma escena o en otra. En la app, **Copiar** del menú de capas.
+
+| Argumento | Tipo | Qué significa |
+|---|---|---|
+| `ids` | lista de textos | (obligatorio) Ids de las capas que se copian. |
+
+La respuesta tiene `from` (la carpeta de la escena de la que sale), `layers`, `assets`, `particles` y `effects`. Si un id no existe, trae `error`. Desde la terminal hay también `reiwand-ctl scene ask CARPETA copy`.
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"solid","id":"fondo"}'
+reiwand-ctl scene ask mi-escena copy '{"ids":["fondo"]}'
+```
+
+#### `unkept`
+
+Dice qué capas cambiarían de sitio si se quitara una capa o un grupo: las que la tienen de padre y cuya posición no se puede conservar sin ella. La app lo usa para avisar antes de quitar.
+
+| Argumento | Tipo | Qué significa |
+|---|---|---|
+| `id` | texto | Id de la capa o del grupo. Si falta, se usa `--layer`. |
+
+La respuesta es `{"layers": [...]}` con los ids de esas capas. La lista vacía quiere decir que quitarla no mueve nada.
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"solid","id":"fondo"}'
+reiwand-ctl scene ask mi-escena unkept '{"id":"fondo"}'
+```
+
+#### `asset_uses`
+
+Dice dónde usa la escena un recurso: cada ruta del documento que lo nombra y la capa a la que pertenece. Sirve para saber si se puede quitar un recurso sin romper nada.
+
+| Argumento | Tipo | Qué significa |
+|---|---|---|
+| `asset` | texto | (obligatorio) Id del recurso. |
+
+La respuesta tiene `asset` y `uses`, una lista de `{pointer, layer}` donde `layer` es `{id, type}` o `null` si el uso no es de una capa (por ejemplo, el de una propiedad).
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"image","file":"foto.png","id":"cielo"}'
+reiwand-ctl scene ask mi-escena asset_uses '{"asset":"foto"}'
+```
+
+#### `film`
+
+Contesta con el vídeo de una capa de vídeo: su archivo, tamaño, largo, el recorte, la velocidad y si la velocidad tiene claves. Sirve para ver qué parte del vídeo se muestra. En la app, el recorte del vídeo de la capa.
+
+| Argumento | Tipo | Qué significa |
+|---|---|---|
+| `layer` | texto | (obligatorio) Id de la capa de vídeo. |
+| `strip` | entero | Cuántas miniaturas pedir, repartidas por el largo. Por defecto 0, ninguna. |
+
+La respuesta tiene `layer`, `pointer`, `asset`, `file`, `size`, `length` (en segundos), `start`, `end`, `rate`, `loop` y `keyed`. Con `strip`, trae también `strip`, una lista de `{at, file}` con la miniatura de cada instante. Si la capa no existe o no tiene vídeo, la respuesta es `null`.
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"video","file":"video.webm","id":"clip"}'
+reiwand-ctl scene ask mi-escena film '{"layer":"clip","strip":3}'
+```
+
+#### `sprites`
+
+Contesta con los cuadros en que está cortada una imagen: los rectángulos, el atlas, la velocidad y las duraciones. Se escriben con la acción [`sprites`](#sprites). En la app, el cortador de hojas de cuadros.
+
+| Argumento | Tipo | Qué significa |
+|---|---|---|
+| `asset` | texto | (obligatorio) Id de la imagen. |
+
+La respuesta tiene `asset`, `file`, `size`, `rects` (cada rectángulo `[x, y, ancho, alto]` en píxeles), `atlas`, `fps`, `frames`, `durations` y `most` (el máximo de cuadros). Si el recurso no es una imagen, es `null`.
+
+```sh
+reiwand-ctl scene act mi-escena import '{"file":"hoja.png","id":"hoja"}'
+reiwand-ctl scene act mi-escena sprites '{"grid":{"asset":"hoja","columns":4,"rows":2}}'
+reiwand-ctl scene ask mi-escena sprites '{"asset":"hoja"}'
+```
+
+#### `touch`
+
+Contesta con las capas que reciben el puntero y cómo lo reciben: los huesos con zona de toque y las capas con `touch` distinto de `off`. Se escribe con la variante `touch` de [`layer`](#layer).
+
+No lleva argumentos: se pasa `{}`.
+
+La respuesta es `{"layers": [...]}`, y cada capa trae `id`, `pointer`, `takes` (`all` o `alpha`), `alpha` (el umbral) y `bones` (cuántas zonas de hueso tiene).
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"image","file":"foto.png","id":"cielo"}'
+reiwand-ctl scene act mi-escena layer '{"touch":{"layer":"cielo","takes":"alpha","alpha":0.5}}'
+reiwand-ctl scene ask mi-escena touch '{}'
+```
+
+### Formas, texto y zonas
+
+#### `shape_handles`
+
+Contesta con las asas que se ven sobre el lienzo para dar forma a una capa de forma, y con los extremos de su degradado. Las mueve la variante `shape` de [`layer`](#layer) (con `figure`). En la app, las asas de la forma.
+
+| Argumento | Tipo | Qué significa |
+|---|---|---|
+| `layer` | texto | (obligatorio) Id de la capa de forma. |
+| `time` | número | Segundo en que se mide dónde está la capa. Por defecto 0. |
+
+La respuesta tiene `kind` (el tipo de forma), `handles` (cada asa con `name`, `kind`, `u`, su lugar dentro de la forma, y `at`, su lugar en el lienzo) y `gradient` (`radial`, `stops`, `from` y `to`, o `null` sin degradado). Si la capa no es una forma, es `null`.
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"shape","id":"forma"}'
+reiwand-ctl scene ask mi-escena shape_handles '{"layer":"forma","time":0}'
+```
+
+#### `text_box`
+
+Contesta con la caja que ocupa el texto de una capa de texto: su tamaño, cuántas líneas tiene, el asa del ancho y las esquinas. En la app, el asa del ancho del texto.
+
+| Argumento | Tipo | Qué significa |
+|---|---|---|
+| `layer` | texto | (obligatorio) Id de la capa de texto. |
+| `time` | número | Segundo en que se mide. Por defecto 0. |
+
+La respuesta tiene `size`, `lines`, `widest` (la línea más ancha), `wrapped` (si el texto se parte por un ancho), `width`, `handle` y `corners`. Si la capa no es de texto, es `null`.
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"text","id":"titulo"}'
+reiwand-ctl scene ask mi-escena text_box '{"layer":"titulo","time":0}'
+```
+
+#### `font_list`
+
+Contesta con las tipografías que puede usar una capa de texto y con la cadena que ya eligió. En la app, el selector de tipografías.
+
+| Argumento | Tipo | Qué significa |
+|---|---|---|
+| `layer` | texto | (obligatorio) Id de la capa de texto. |
+
+La respuesta tiene `chain` (las tipografías elegidas, en orden), `package` (las que trae el paquete), `system` (las del sistema), `generic` (`sans-serif`, `serif` y `monospace`) y `most` (cuántas puede tener la cadena).
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"text","id":"titulo"}'
+reiwand-ctl scene ask mi-escena font_list '{"layer":"titulo"}'
+```
+
+#### `capture_view`
+
+Contesta con la zona que captura una capa de ajuste, para dibujar sus asas sobre el lienzo. Sirve con la acción [`rgb`](#rgb), que envía esa zona a la iluminación RGB.
+
+| Argumento | Tipo | Qué significa |
+|---|---|---|
+| `layer` | texto | (obligatorio) Id de la capa de ajuste, que tiene que tener `size`. |
+| `time` | número | Segundo en que se mide. Por defecto 0. |
+
+La respuesta tiene `size`, `max` (el mayor tamaño que se admite), `over` (si el tamaño pasa de ese máximo), `redraw`, `zone` y `limit` (las cuatro esquinas de la zona y del límite), `drawn` y `handles` (cada asa con su `corner` y su lugar `at`). Si la capa no es de ajuste o no tiene `size`, es `null`.
+
+```sh
+reiwand-ctl scene act mi-escena add_layer '{"kind":"adjustment","id":"ajuste"}'
+reiwand-ctl scene act mi-escena layer '{"transform":{"layer":"ajuste","size":[400,300]}}'
+reiwand-ctl scene ask mi-escena capture_view '{"layer":"ajuste","time":0}'
+```

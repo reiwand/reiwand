@@ -1,0 +1,116 @@
+use crate::told::{fill, told, tr};
+use anyhow::{Context, Result, anyhow, ensure};
+use image::{Rgba, RgbaImage, imageops};
+use reiwand_core::layout::Monitor;
+use reiwand_core::spread::{bounds, checked, rects, sized};
+use reiwand_editor::Project;
+use reiwand_render::{Renderer, SceneAssets};
+use std::collections::BTreeMap;
+use std::path::{Component, Path, PathBuf};
+
+pub const EDGE: u32 = 1600;
+const FRAME: Rgba<u8> = Rgba([24, 24, 24, 255]);
+
+async fn mine() -> Result<Vec<Monitor>> {
+    let client = reiwand_client::Client::connect().await?;
+    let state: reiwand_core::model::State = reiwand_client::parse(&client.daemon.get_state().await?)?;
+    let placed = state.outputs.into_iter().filter_map(|(id, o)| Some(Monitor { id, mm: o.mm? }));
+    Ok(placed.collect())
+}
+
+const SPREAD: &str =
+    "Write the scene over two or three screens side by side, two stacked or yours, without a desktop";
+
+#[derive(clap::Args, Debug)]
+pub struct Span {
+    #[arg(long, value_parser = ["dual", "triple", "vertical", "mine"], requires = "out", help = SPREAD)]
+    pub layout: Option<String>,
+    #[arg(long, requires = "layout", help = "Picture file of --layout: .png, .jpg, .webp or .avif")]
+    pub out: Option<PathBuf>,
+    #[arg(long, requires = "layout", value_parser = bezel, help = "Frame of each simulated screen in millimetres, 0 to 100; the layout.bezel_mm setting without it")]
+    pub bezel: Option<f64>,
+    #[arg(long, requires = "layout", value_parser = reiwand_core::spread::screen, help = "Size of each simulated screen: WIDTHxHEIGHT in millimetres, or a diagonal such as 24in or 34in@21:9 (16:9 without a ratio); 527x296 without it")]
+    pub screen: Option<[f64; 2]>,
+}
+
+fn monitors(layout: &str, bezel: f64, screen: [f64; 2]) -> Result<Vec<Monitor>> {
+    if layout != "mine" {
+        return sized(layout, bezel, screen).ok_or_else(|| {
+            anyhow!("{}", fill(told("%1 is not dual, triple, vertical or mine"), &[&layout]))
+        });
+    }
+    let runtime = tokio::runtime::Builder::new_current_thread().enable_all().build()?;
+    let placed = runtime.block_on(mine())?;
+    ensure!(!placed.is_empty(), "{}", tr(told("the desktop has not told where its screens are yet")));
+    checked(placed).map_err(|e| anyhow!(e))
+}
+
+fn inside(path: &str) -> bool {
+    Path::new(path).components().all(|c| matches!(c, Component::Normal(_)))
+}
+
+fn poster(dir: &Path, edge: u32, time: Option<f64>) -> Result<RgbaImage> {
+    let project = Project::open(dir)?;
+    let scene = reiwand_editor::reach::parse(&project.doc, &project.dir, true)?;
+    let read = |path: &str| match inside(path) {
+        true => std::fs::read(project.dir.join(path)).map_err(|e| format!("{path}: {e}")),
+        false => Err(fill(told("%1 is outside the scene folder"), &[&path])),
+    };
+    let assets = SceneAssets::read(&scene, read).map_err(|e| anyhow!(e))?;
+    let assets =
+        assets.with_scripts(&scene, reiwand_editor::reach::reader(&project.dir)).map_err(|e| anyhow!(e))?;
+    let properties: BTreeMap<String, reiwand_format::Property> =
+        serde_json::from_value(project.doc["manifest"]["properties"].clone()).unwrap_or_default();
+    let props = reiwand_scene::effective(&properties, &[]);
+    let renderer = Renderer::new()?;
+    let time = time.unwrap_or(f64::from(scene.clock.poster_time));
+    Ok(renderer.still(&scene, &assets, &props, (reiwand_render::local_wall(), "en"), (edge, time))?)
+}
+
+pub fn compose(canvas: &RgbaImage, monitors: &[Monitor], edge: u32) -> RgbaImage {
+    let [x0, y0, w, h] = bounds(monitors);
+    let scale = f64::from(edge) / w.max(h);
+    let side = |v: f64| (v * scale).round().max(1.0) as u32;
+    let mut out = RgbaImage::from_pixel(side(w), side(h), FRAME);
+    let size = [canvas.width(), canvas.height()];
+    for ((_, [x, y, cw, ch]), m) in rects(monitors, size).into_iter().zip(monitors) {
+        let (px, py) = (x.max(0.0) as u32, y.max(0.0) as u32);
+        let crop = imageops::crop_imm(canvas, px, py, cw.round().max(1.0) as u32, ch.round().max(1.0) as u32);
+        let part = imageops::resize(&crop.to_image(), side(m.mm[2]), side(m.mm[3]), imageops::Triangle);
+        let at = |v: f64, o: f64| ((v - o) * scale).round() as i64;
+        imageops::overlay(&mut out, &part, at(m.mm[0], x0), at(m.mm[1], y0));
+    }
+    out
+}
+
+pub fn preview(dir: &Path, span: &Span, time: Option<f64>) -> Result<()> {
+    let (Some(layout), Some(out)) = (&span.layout, &span.out) else {
+        return Err(anyhow!("{}", tr(told("--layout needs --out"))));
+    };
+    let config = || reiwand_core::Config::default_path().and_then(|p| reiwand_core::Config::load(&p));
+    let bezel = span.bezel.unwrap_or_else(|| config().map_or(0.0, |c| c.layout.bezel_mm));
+    let screen = span.screen.unwrap_or(reiwand_core::spread::SCREEN_MM);
+    let monitors = monitors(layout, bezel, screen)?;
+    let canvas = poster(dir, EDGE * 2, time)?;
+    let image = compose(&canvas, &monitors, EDGE);
+    reiwand_render::save(&image, out, 95)
+        .with_context(|| fill(told("cannot write %1"), &[&out.display()]))?;
+    println!("{}", out.display());
+    Ok(())
+}
+
+pub(crate) fn second(text: &str) -> Result<f64, String> {
+    let most = f64::from(reiwand_scene::MAX_POSTER_TIME);
+    let time: f64 = text.parse().map_err(|_| fill(told("%1 is not a number of seconds"), &[&text]))?;
+    let fits = time.is_finite() && time <= most;
+    fits.then_some(time)
+        .ok_or_else(|| fill(told("the time is a finite number of seconds up to %1, not %2"), &[&most, &text]))
+}
+
+pub(crate) fn bezel(text: &str) -> Result<f64, String> {
+    let most = reiwand_core::Layout::MAX_BEZEL_MM;
+    let mm: f64 = text.parse().map_err(|_| fill(told("%1 is not a number of millimetres"), &[&text]))?;
+    (mm.is_finite() && (0.0..=most).contains(&mm))
+        .then_some(mm)
+        .ok_or_else(|| fill(told("the frame is 0 to %1 mm, not %2"), &[&most, &text]))
+}

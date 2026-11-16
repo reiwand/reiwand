@@ -1,0 +1,195 @@
+use crate::Usage;
+use crate::cli::{JSON, Wait};
+use crate::daemon::job;
+use crate::input::{pairs, secret};
+use crate::show::{self, bytes, list, table, text, when};
+use crate::told::{fill, told, tr};
+use anyhow::{Context, Result, ensure};
+use clap::Subcommand;
+use futures_util::TryFutureExt;
+use reiwand_client::{Client, explain, parse};
+use reiwand_core::model::{ProvidersReply, Schema, SecretField};
+use std::collections::HashMap;
+use std::time::Duration;
+
+const SECRET_STDIN: &str = "Read the secret from the first line of standard input instead of asking";
+const PATIENCE: Duration = Duration::from_secs(120);
+const SECRETS: [&str; 4] = ["password", "api_key", "token", "secret"];
+
+#[derive(Subcommand, Debug)]
+pub enum Provider {
+    #[command(about = "List the providers")]
+    Ls {
+        #[arg(long, help = JSON)]
+        json: bool,
+    },
+    #[command(about = "Add a provider, asking for its password or API key; prints its library source uid")]
+    Add {
+        #[arg(help = "Provider id: a lowercase letter, then lowercase letters, digits, - or _")]
+        id: String,
+        #[arg(help = "bing, apod, wikimedia, wallhaven, webdav, nextcloud or immich")]
+        kind: String,
+        #[arg(value_name = "KEY=VALUE", help = "Options of the kind; see reiwand-ctl schema")]
+        options: Vec<String>,
+        #[arg(long, help = "Add the provider without a secret")]
+        no_secret: bool,
+        #[arg(long, help = SECRET_STDIN)]
+        secret_stdin: bool,
+    },
+    #[command(about = "Change one option of a provider")]
+    Set {
+        #[arg(help = "Id of the provider")]
+        id: String,
+        #[arg(help = "Option to change")]
+        key: String,
+        #[arg(help = "New value of the option")]
+        value: String,
+    },
+    #[command(about = "Store the password or API key of a provider in the keyring")]
+    Secret {
+        #[arg(help = "Id of the provider")]
+        id: String,
+        #[arg(long, help = SECRET_STDIN)]
+        secret_stdin: bool,
+    },
+    #[command(
+        about = "Choose where this computer keeps every secret: the system keyring or a private file",
+        long_about = "Choose where this computer keeps every secret (provider passwords and API keys, the \
+                      access to the sync server): the system keyring or a private file in the data folder, \
+                      for computers with no keyring. Whoever can read your files can then use them. \
+                      Secrets move in both directions without removing anything. Without a value, it \
+                      shows where they are now."
+    )]
+    Store {
+        #[arg(value_parser = ["keyring", "file"], help = "Where to keep them; empty shows where they are")]
+        store: Option<String>,
+    },
+    #[command(about = "Delete the stored password or API key of a provider")]
+    ForgetSecret {
+        #[arg(help = "Id of the provider")]
+        id: String,
+    },
+    #[command(about = "Download new wallpapers of a provider, or of every provider when omitted")]
+    Sync {
+        #[arg(help = "Id of the provider; every provider when left out")]
+        id: Option<String>,
+        #[command(flatten)]
+        wait: Wait,
+    },
+    #[command(
+        subcommand,
+        about = "Wallhaven providers: one flag per search option, collections and reseeding"
+    )]
+    Wallhaven(Box<crate::wallhaven::Wallhaven>),
+    #[command(about = "Remove a provider and its items")]
+    Rm {
+        #[arg(help = "Id of the provider")]
+        id: String,
+        #[arg(long, help = "Also delete the downloaded files")]
+        purge: bool,
+    },
+    #[command(about = "Delete the photos a provider brought and keep the provider")]
+    ClearCache {
+        #[arg(help = "Id of the provider")]
+        id: String,
+    },
+}
+
+pub async fn run(client: &Client, command: Provider) -> Result<()> {
+    let providers = &client.providers;
+    match command {
+        Provider::Ls { json } => show::reply(providers.list().await?, json, list_providers)?,
+        Provider::Add { id, kind, options, no_secret, secret_stdin } => {
+            add(client, &id, &kind, pairs(&options)?, (no_secret, secret_stdin)).await?
+        }
+        Provider::Set { id, key, value } => {
+            public(&key)?;
+            let had = has_secret(client, &id).await?;
+            providers.set(&id, &key, &value).await?;
+            if had && !has_secret(client, &id).await? {
+                eprintln!(
+                    "{}",
+                    fill(
+                        told(
+                            "the secret of %1 was deleted; store a new one with reiwand-ctl provider secret %2"
+                        ),
+                        &[&id, &id]
+                    )
+                );
+            }
+        }
+        Provider::Secret { id, secret_stdin } => {
+            let secret = secret(&fill(told("secret of %1: "), &[&id]), secret_stdin)?;
+            ensure!(!secret.is_empty(), Usage(tr(told("the secret is empty"))));
+            patient(providers.set_secret(&id, &secret)).await?
+        }
+        Provider::Store { store } => crate::storing::run(client, store.as_deref()).await?,
+        Provider::ForgetSecret { id } => providers.forget_secret(&id).await?,
+        Provider::Sync { id, wait } => {
+            job(client, providers.sync(id.as_deref().unwrap_or("")).map_ok(|id| ((), id)), &wait).await?
+        }
+        Provider::Wallhaven(command) => crate::wallhaven::run(client, *command).await?,
+        Provider::Rm { id, purge } => providers.remove(&id, purge).await?,
+        Provider::ClearCache { id } => providers.clear_cache(&id).await?,
+    }
+    Ok(())
+}
+
+pub async fn add(
+    client: &Client,
+    id: &str,
+    kind: &str,
+    options: HashMap<&str, &str>,
+    (no_secret, secret_stdin): (bool, bool),
+) -> Result<()> {
+    let schema: Schema = parse(&client.daemon.get_schema().await?)?;
+    let kinds = || list(schema.providers.iter().map(|p| &p.kind));
+    let known = schema.providers.iter().find(|p| p.kind == kind);
+    let unknown = || Usage(fill(told("unknown provider kind %1; the kinds are %2"), &[&kind, &kinds()]));
+    let known = known.ok_or_else(unknown)?;
+    options.keys().try_for_each(|key| public(key))?;
+    let secret = known.secret.as_ref().filter(|_| !no_secret).map(|f| ask(f, id, kind, secret_stdin));
+    let secret = secret.transpose()?.unwrap_or_default();
+    println!("{}", patient(client.providers.add(id, kind, options, &secret)).await?);
+    Ok(())
+}
+
+fn public(key: &str) -> Result<()> {
+    ensure!(
+        !SECRETS.contains(&key),
+        Usage(fill(told("%1 is a secret; it is asked for, never given as an argument"), &[&key]))
+    );
+    Ok(())
+}
+
+fn ask(field: &SecretField, id: &str, kind: &str, stdin: bool) -> Result<String> {
+    let optional = if field.required { String::new() } else { tr(told(" (empty for none)")) };
+    let secret = secret(&format!("{} of {id}{optional}: ", field.name.replace('_', " ")), stdin)?;
+    let hint = fill(told("%1 needs its %2; use --no-secret to add it without one"), &[&kind, &field.name]);
+    ensure!(!field.required || !secret.is_empty(), Usage(hint));
+    Ok(secret)
+}
+
+pub async fn patient<T>(call: impl Future<Output = zbus::Result<T>>) -> Result<T> {
+    let answer = tokio::time::timeout(PATIENCE, call).await;
+    answer.context(tr(told("reiwandd did not answer within 120 s")))?.map_err(explain)
+}
+
+async fn has_secret(client: &Client, id: &str) -> Result<bool> {
+    let reply: ProvidersReply = parse(&client.providers.list().await?)?;
+    Ok(reply.providers.iter().any(|p| p.id == id && p.has_secret))
+}
+
+pub fn list_providers(reply: ProvidersReply) -> String {
+    let plain: Vec<String> = reply.providers.iter().filter(|p| p.plain_http).map(|p| p.id.clone()).collect();
+    let rows = reply.providers.into_iter().map(|p| {
+        let (state, items, cache) = (text(&p.state), p.items.to_string(), bytes(p.cache_bytes));
+        let orphan = p
+            .orphan_secret
+            .then_some(tr(told("an older secret waits in the locked keyring until it is unlocked")));
+        let error = p.last_error.into_iter().chain(orphan).collect::<Vec<_>>().join(", ");
+        vec![p.id, p.kind, state, items, cache, when(p.last_sync), when(p.next_sync), error]
+    });
+    let notes = crate::storing::notes(&reply.store, reply.keyring_found, &plain);
+    table(&["PROVIDER", "KIND", "STATE", "ITEMS", "CACHE", "SYNCED", "NEXT", "ERROR"], rows) + &notes
+}

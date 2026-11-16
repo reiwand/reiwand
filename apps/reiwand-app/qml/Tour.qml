@@ -1,0 +1,147 @@
+import QtQuick
+import io.github.reiwand.app
+
+Timer {
+    id: tour
+
+    required property var host
+    property int step: 0
+    property var opened: null
+    property bool edited: false
+    property bool imaged: false
+    property int parked: -1
+
+    function owns(at) {
+        const name = host.names[at - 1];
+        return name === "scenes" || App.backend.claim("page." + name);
+    }
+
+    function keeps(page) {
+        const shown = host.pageStack.currentItem;
+        host.activate(page);
+        if (host.pageStack.currentItem !== shown)
+            throw new Error("a request for the " + page + " page replaced the page shown");
+    }
+
+    readonly property KeyWalk walking: KeyWalk {
+        host: tour.host
+    }
+    readonly property KeyProbe probing: KeyProbe {
+        host: tour.host
+        walk: tour.walking
+    }
+    readonly property SceneKeysCheck editing: SceneKeysCheck {
+        host: tour.host
+        walk: tour.walking
+    }
+    readonly property StallOpenCheck opening: StallOpenCheck {
+        host: tour.host
+    }
+    readonly property LibraryFlipCheck flipping: LibraryFlipCheck {
+        host: tour.host
+    }
+
+    interval: 300
+    repeat: true
+    running: App.checking
+    onTriggered: {
+        if (Object.keys(App.pending).length > 0 || probing.running || editing.running || opening.running || flipping.running)
+            return;
+        if (!probing.finished)
+            return probing.begin();
+        if (!editing.finished)
+            return editing.begin();
+        if (!opening.finished)
+            return opening.begin();
+        if (!flipping.finished)
+            return flipping.begin();
+        if (host.pageStack.currentItem?.exercising)
+            return;
+        const resumed = parked >= 0;
+        const at = resumed ? parked : step++;
+        parked = -1;
+        if (!resumed && at > 0 && at <= host.pages.length && owns(at)) {
+            walking.check(host.names[at - 1]);
+            if (["playlists", "repos"].includes(host.names[at - 1]))
+                Qt.createComponent("AhoraTapCheck.qml").createObject(host, {
+                    "host": host
+                }).start();
+            host.pageStack.currentItem.keys?.();
+            host.pageStack.currentItem.exercise?.();
+            if (host.pageStack.currentItem?.exercising)
+                return parked = at;
+        }
+        if (at < host.pages.length) {
+            host.showPage(at);
+            keeps(host.names[at]);
+        } else if (at === host.pages.length) {
+            if (App.backend.claim("look"))
+                Qt.createComponent("LookCheck.qml").createObject(host, {
+                    "host": host
+                }).exercise();
+            if (App.backend.claim("shell"))
+                Qt.createComponent("ShellCheck.qml").createObject(host, {
+                    "host": host
+                }).exercise();
+            if (App.backend.claim("create"))
+                Qt.createComponent("CreateCheck.qml").createObject(host, {
+                    "host": host
+                }).exercise();
+            if (App.backend.claim("preview"))
+                Qt.createComponent("PreviewCheck.qml").createObject(host, {
+                    "host": host
+                }).start();
+            if (App.backend.claim("ahora"))
+                Qt.createComponent("AhoraCheck.qml").createObject(host, {
+                    "host": host
+                }).start();
+            if (App.backend.claim("lists.remove"))
+                Qt.createComponent("ListaQuitarCheck.qml").createObject(host, {
+                    "host": host
+                }).start();
+            if (App.backend.claim("repo"))
+                Qt.createComponent("RepoCheck.qml").createObject(host, {
+                    "host": host
+                }).start();
+            if (App.backend.claim("shelf"))
+                Qt.createComponent("PublishRepoCheck.qml").createObject(host, {
+                    "host": host
+                }).start();
+            if (App.backend.claim("upload"))
+                Qt.createComponent("PublishUploadCheck.qml").createObject(host, {
+                    "host": host
+                }).start();
+            if (App.backend.claim("reach"))
+                Qt.createComponent("PublishReachCheck.qml").createObject(host, {
+                    "host": host
+                }).start();
+            return;
+        } else if (at === host.pages.length + 1) {
+            imaged = App.backend.claim("image");
+            if (!imaged)
+                return;
+            return App.query("GetItem", [""], "Library1", reply => {
+                if (!host)
+                    return;
+                App.edit(reply.item);
+                opened = host.pageStack.currentItem;
+            });
+        } else if (imaged && (opened?.editor?.ready !== true || host.pageStack.currentItem !== opened)) {
+            return;
+        } else if (imaged && !edited) {
+            edited = true;
+        } else if (host.waiting > 0) {
+            return;
+        } else {
+            stop();
+            Qt.quit();
+            if (!imaged)
+                return;
+            if (opened.editor.dirty !== true)
+                throw new Error("the editor has no unsaved edits to keep");
+            return keeps("settings");
+        }
+        if (imaged && at > host.pages.length + 1)
+            host.pageStack.currentItem.exercise?.();
+    }
+}

@@ -1,0 +1,191 @@
+package io.github.reiwand
+
+import android.graphics.Color
+import androidx.test.platform.app.InstrumentationRegistry
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicInteger
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@RunWith(Baselined::class)
+class RenderTest {
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val frames = AtomicInteger()
+    private val pixel = AtomicInteger()
+    private val seen = CopyOnWriteArrayList<Int>()
+    private val edges = CopyOnWriteArrayList<Int>()
+    private val readers = Readers("reader")
+    private val reader = readers.make(SIDE)
+    private val painter = Painter(false, Videos(context), Tilt(blind(context)), Hearing(context), Pages(context))
+
+    @Before
+    fun attach() {
+        choose(CHOSEN)
+        readers.listen(reader) { source ->
+            generateSequence { runCatching { source.acquireNextImage() }.getOrNull() }.forEach { image ->
+                image.use {
+                    val plane = it.planes[0]
+                    val at = SIDE / 2 * plane.rowStride + SIDE / 2 * plane.pixelStride
+                    val color = { from: Int -> (0..2).map { i -> plane.buffer.get(from + i).toInt() and 0xff }.let { (r, g, b) -> Color.rgb(r, g, b) } }
+                    edges += color(2 * plane.rowStride + SIDE / 2 * plane.pixelStride)
+                    seen += color(at).also(pixel::set)
+                    frames.incrementAndGet()
+                }
+            }
+        }
+        Render.call(::reattach)
+    }
+
+    @After
+    fun detach() {
+        Render.call { painter.detach() }
+        readers.close()
+    }
+
+    @Test
+    fun drawsTheChosenImage() {
+        Render.call { painter.show(true) }
+        assertTrue(waitFor { frames.get() > 0 })
+        same(CHOSEN, pixel.get())
+    }
+
+    @Test
+    fun aNewSurfaceShowsAChangedChoiceWithoutFading() {
+        Device.setting("transition.kind", "fade")
+        Device.setting("transition.less_motion", "never")
+        Render.call { painter.show(true) }
+        assertTrue(waitFor { frames.get() > 0 })
+        Render.call { painter.detach() }
+        choose(OTHER)
+        val start = seen.size
+        Render.call {
+            reattach()
+            painter.show(true)
+        }
+        assertTrue(waitFor { seen.size > start })
+        same(OTHER, seen[start])
+    }
+
+    @Test
+    fun heicAndAvifPhotosDraw() = listOf("blue-64x32.heic", "blue-64x32.avif").forEach { name ->
+        assertEquals(name, IMAGE, install(fixture(name)))
+        val start = seen.size
+        Render.call {
+            Wallpaper.reload(false)
+            painter.show(true)
+            painter.wake()
+        }
+        assertTrue(name, waitFor { seen.size > start && near(OTHER, seen.last(), LOSSY) })
+    }
+
+    @Test
+    fun wholePictureVideosKeepTheirBars() = fitted {
+        film()
+        val filmed = waitFor { seen.isNotEmpty() && near(FILMED, seen.last(), LOSSY) }
+        assertTrue("drew ${seen.lastOrNull()?.let(::hex)} after ${Native.diagnostics()}", filmed)
+        assertTrue(hex(edges.last()), near(Color.BLACK, edges.last(), LOSSY))
+    }
+
+    @Test
+    fun videosFadeInOverPictures() {
+        Device.setting("transition.kind", "fade")
+        Device.setting("transition.less_motion", "never")
+        Render.call { painter.show(true) }
+        assertTrue(waitFor { seen.isNotEmpty() && near(CHOSEN, seen.last(), TOLERANCE.toInt()) })
+        assertEquals(VIDEO, install(fixture(CLIP)))
+        Render.call {
+            Wallpaper.reload(false)
+            painter.refresh()
+        }
+        assertTrue("a frame mixes the picture and the video", waitFor { seen.any(::mixed) })
+    }
+
+    @Test
+    fun aVideoShownOnANewSurfaceFadesIntoTheNextPicture() = fitted {
+        Device.setting("transition.kind", "fade")
+        Device.setting("transition.less_motion", "never")
+        film()
+        Render.call {
+            painter.detach()
+            reattach()
+        }
+        assertTrue(waitFor { seen.isNotEmpty() && near(FILMED, seen.last(), LOSSY) })
+        val start = seen.size
+        choose(CHOSEN)
+        Render.call {
+            Wallpaper.reload(false)
+            painter.refresh()
+        }
+        assertTrue("the video faded out", waitFor { seen.drop(start).any(::mixed) })
+    }
+
+    private fun reattach() {
+        painter.attach(reader.surface)
+        painter.resize(SIDE, SIDE, 0)
+    }
+
+    private fun film() {
+        assertEquals(VIDEO, install(fixture(CLIP)))
+        Render.call {
+            Wallpaper.reload(false)
+            painter.refresh()
+            painter.show(true)
+        }
+    }
+
+    private fun fitted(test: () -> Unit) = try {
+        Native.setting("fit", "fit")
+        test()
+    } finally {
+        Native.setting("fit", "fill")
+    }
+
+    private fun mixed(drawn: Int) = Color.red(drawn) >= 0xc0 && Color.green(drawn) in 0x30..0x54
+
+    private fun same(expected: Int, drawn: Int) = listOf(16, 8, 0).forEach { shift ->
+        assertEquals((expected shr shift and 0xff).toFloat(), (drawn shr shift and 0xff).toFloat(), TOLERANCE)
+    }
+
+    @Test
+    fun staticImagesDrawNothingMore() {
+        Render.call { painter.show(true) }
+        assertTrue(waitFor { frames.get() > 0 })
+        assertEquals(settled(), quiet())
+    }
+
+    @Test
+    fun hiddenWallpapersStopDrawing() {
+        Render.call { painter.show(true) }
+        assertTrue(waitFor { frames.get() > 0 })
+        choose(Color.rgb(20, 60, 180))
+        Render.call {
+            Wallpaper.reload(false)
+            painter.wake()
+        }
+        assertTrue(waitFor { frames.get() > 1 })
+        Render.call { painter.show(false) }
+        assertEquals(settled(), quiet())
+        Render.call { painter.offset(0f) }
+        assertEquals(settled(), quiet())
+    }
+
+    private fun choose(color: Int) = assertEquals(IMAGE, install(still(color)))
+
+    private fun settled() = settled(frames)
+
+    private fun quiet() = quiet(frames)
+
+    private companion object {
+        const val SIDE = 64
+        const val CHOSEN = 0xffc86428.toInt()
+        const val OTHER = 0xff2864c8.toInt()
+        const val FILMED = 0xffd02060.toInt()
+        const val CLIP = "magenta-64x32.webm"
+        const val TOLERANCE = 3f
+        const val LOSSY = 16
+    }
+}

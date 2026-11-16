@@ -1,0 +1,190 @@
+mod about;
+mod admin;
+mod archive;
+mod asks;
+mod authors;
+mod broken;
+mod browse;
+mod build;
+#[cfg(feature = "sign")]
+mod bundled;
+mod catalog;
+mod charter;
+mod check;
+mod client;
+mod closer;
+mod contents;
+mod display;
+mod download;
+mod entry;
+mod facts;
+mod featured;
+pub mod features;
+mod fetch;
+mod index;
+mod install;
+#[cfg(feature = "sign")]
+mod keys;
+mod license;
+mod licenses;
+mod locale;
+mod manifest;
+pub mod media;
+mod meta;
+mod names;
+mod needs;
+mod online;
+mod origin;
+pub mod page;
+mod parts;
+#[cfg(feature = "sign")]
+mod publish;
+mod read;
+mod refusal;
+mod release;
+mod renames;
+mod repo;
+mod said;
+mod scenery;
+mod scenetexts;
+mod settings;
+mod shape;
+mod sign;
+mod source;
+pub mod stall;
+mod store;
+mod update;
+mod validate;
+pub mod values;
+mod video;
+mod web;
+
+#[cfg(feature = "sign")]
+pub use admin::sign_root;
+pub use admin::{RootStatus, init, rotate_root, status};
+pub use archive::{extract, peek, thumbnail};
+pub use asks::asks;
+pub use authors::{AUTHORS_FORMAT, Authors, ONLINE, OnlineAuthor, Rotation, Trusted, rotation_text};
+pub use browse::{Item, browse, browse_with};
+pub use build::{build, build_staged, build_with, sha256, sha256_file};
+#[cfg(feature = "sign")]
+pub use bundled::{Bundled, bundled};
+pub use catalog::{Added, add, hide, list, revoke, revoke_key, unrevoke};
+pub use charter::{Charter, key_text};
+pub use client::{Outcome, RepoInfo, Update, add_repo, remove_repo, repos, update_repo, verify};
+pub use closer::{PHONE_BYTES, PHONE_PIXELS, PHONE_SIDE, phone_note};
+pub use display::{Accent, Display, Flip, Follow, FrameRate, Span};
+pub use download::{animated, preview, previews, release};
+pub use entry::{Blob, ENTRY_FORMAT, Entry, Pin};
+pub use facts::Facts;
+pub use featured::{FEATURED_FORMAT, Featured, MAX_FEATURED, Pick, feature, featured};
+pub use fetch::{Anchor, Fetch, FileFetch};
+pub use index::{
+    KINDS_FORMAT, KeyRevocation, Listing, REVOKED_FORMAT, Reason, Revocation, Revoked, Shard, shard_of,
+};
+pub use install::{Installed, current, install, installed, remove};
+#[cfg(feature = "sign")]
+pub use keys::{Keypair, Signer, keygen, sign_source};
+pub use license::{Derivatives, derivatives};
+pub use licenses::{KNOWN as KNOWN_LICENSES, condition as license_condition, describe as describe_license};
+pub use locale::{ENGINE, LOCALE, MAX_LOCALE_FILE, locale_file, valid_tag};
+pub use manifest::{Kind, Manifest, SCHEMA, Strings, manifest_schema};
+pub use meta::{Content, Credit, Descriptor, Links, Previews, Rating, Source};
+pub use names::{MAX_ASKED, MAX_VOTED, valid_id, vote_queries, voted};
+pub use needs::{Dependency, Gpu, Input, Network, Permissions, Platform, Requires, origin};
+#[cfg(feature = "sign")]
+pub use online::sign_rotation;
+pub use online::{anchors, drop_author_key, register_author, rotate_author};
+pub use origin::{Ancestor, Origin, OriginKind, PROVIDER_LICENSES, Provider};
+pub use parts::{MAX_PARTS, PART_KINDS, Part, exists, parts};
+#[cfg(feature = "sign")]
+pub use publish::{Published, publish};
+pub use read::{Package, open, read};
+pub use refusal::Refusal;
+pub use reiwand_core::markup;
+pub use reiwand_scene::{Choice, Condition, Control, Preset, Property, Scene, Slider, Text};
+pub use release::{Needs, Preview, Rated, Release, Wanted};
+pub use renames::{Renames, rename_json};
+pub use repo::{Author, Key, Policy, ROOT_FORMAT, Role, Roles, Root, Time, comment};
+pub use settings::{Settings, settings};
+pub use sign::{
+    fingerprint, manifest_comment, manifest_note, noted_hash, public_key, source_digest, threshold,
+    verify_blocks, verify_package,
+};
+pub use source::{Folder, fill, inspect, locale_names, with_strings};
+pub use stall::{Shelved, Stocked, stock};
+pub use validate::{FileEntry, Limits, MANIFEST, SIGNATURE, check_path, validate};
+pub use video::{Playback, VIDEO_PROPERTIES};
+pub use web::{PresetFile, Web, kept_allowance, web_notice, web_restrict};
+
+use std::path::PathBuf;
+
+pub type Result<T, E = Error> = std::result::Result<T, E>;
+
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error("{}", self.message())]
+    Io(#[from] std::io::Error),
+    #[error("{}", self.message())]
+    Zip(#[from] zip::result::ZipError),
+    #[error("{}", self.message())]
+    Json(#[from] serde_json::Error),
+    #[error("{}", self.message())]
+    Invalid { field: String, reason: Refusal },
+    #[error("{}", self.message())]
+    UnsafePath(String),
+    #[error("{}", self.message())]
+    Duplicate(String),
+    #[error("{}", self.message())]
+    Symlink(String),
+    #[error("{}", self.message())]
+    Missing(String),
+    #[error("{}", self.message())]
+    Extension { path: String, kind: Kind },
+    #[error("{}", self.message())]
+    Limit { what: &'static str, actual: u64, limit: u64 },
+    #[error("{}", self.message())]
+    Unsupported(String, &'static str),
+    #[error("{}", self.message())]
+    SizeMismatch(String),
+    #[error("{}", self.message())]
+    Blocked(PathBuf),
+    #[error("{}", self.message())]
+    Signature(String),
+    #[error("{}", self.message())]
+    Key(String),
+    #[error("{}", self.message())]
+    Expired(String),
+    #[error("{}", self.message())]
+    Stale(String),
+    #[error("{}", self.message())]
+    Rollback(String),
+    #[error("{}", self.message())]
+    Equivocation(u64),
+    #[error("{}", self.message())]
+    Mismatch(String),
+    #[error("{}", self.message())]
+    Unanchored(String),
+    #[error("{}", self.message())]
+    Revoked(String),
+    #[error("{}", self.message())]
+    NotFound(String),
+    #[error("{}", self.message())]
+    Exists(String),
+    #[error("{}", self.message())]
+    Newer(Refusal),
+    #[error("{}", self.message())]
+    Elsewhere(String),
+}
+
+pub(crate) fn ensure(ok: bool, error: impl FnOnce() -> Error) -> Result<()> {
+    if ok { Ok(()) } else { Err(error()) }
+}
+
+pub(crate) fn refuse(field: &str, reason: reiwand_core::message::Message) -> Error {
+    Error::Invalid { field: field.into(), reason: reason.into() }
+}
+
+pub(crate) fn require(ok: bool, field: &str, reason: &str) -> Result<()> {
+    ensure(ok, || Error::Invalid { field: field.into(), reason: reason.into() })
+}

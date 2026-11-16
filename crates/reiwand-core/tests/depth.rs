@@ -1,0 +1,178 @@
+use reiwand_core::Fill;
+use reiwand_core::edit::{Depth, Edit, Mask, Motion, Parallax};
+use reiwand_core::motion::{Spring, Tilt, Turn, aim, gravity, mount_matrix, orbit};
+use serde_json::{Value, json};
+
+fn act(edit: &mut Edit, action: Value) -> Result<(), String> {
+    edit.act(serde_json::from_value(action).unwrap()).map_err(|e| e.to_string())
+}
+
+#[test]
+fn depth_and_parallax_sections_round_trip_and_are_checked() {
+    let text = r#"{"version": 1,
+      "masks": {"back": {"type": "depth", "range": [0.0, 0.35], "soft": 0.05}},
+      "ops": [{"id": "bl", "type": "blur", "radius": 18, "mask": "back"}],
+      "depth": {"model": "depth-anything-v2-small", "input": 518, "near": 0.98, "far": 0.02, "gamma": 1.0, "smooth": 2, "dilate": 3},
+      "parallax": {"source": "pointer", "strength": 0.025, "focus": 0.3, "steps": 16, "smoothing_ms": 150, "overscan": 1.04}}"#;
+    let edit = Edit::parse(text).unwrap();
+    assert_eq!(edit.masks["back"], Mask::Depth { range: [0.0, 0.35], soft: 0.05, invert: false });
+    assert_eq!(edit.parallax.as_ref().map(|p| (p.source, p.enabled)), Some((Motion::Pointer, true)));
+    assert_eq!(Edit::parse(&edit.to_json()).unwrap(), edit);
+    assert!(edit.needs_depth() && edit.moving().is_some() && !Edit::default().needs_depth());
+    let broken = |path: &str, value: &str| {
+        let mut e = edit.clone();
+        e.set(path, value).unwrap_err().to_string()
+    };
+    assert_eq!(broken("parallax.strength", "0.2"), "parallax.strength: 0.2 is out of range 0 to 0.03");
+    assert_eq!(broken("parallax.steps", "12"), "parallax.steps: use 1, 8, 16 or 32");
+    assert_eq!(broken("depth.input", "500"), "depth.input: use a multiple of 14 from 196 to 1036");
+    assert_eq!(broken("depth.model", "depth-anything-v2-large"), "depth.model: use depth-anything-v2-small");
+    assert!(Edit::parse(r#"{"version": 1, "parallax": {"source": "gyro"}}"#).is_err());
+}
+
+#[test]
+fn actions_adjust_depth_and_parallax() {
+    let mut e = Edit::default();
+    act(&mut e, json!({"depth": {"near": 0.9, "dilate": 5}})).unwrap();
+    assert_eq!(e.depth, Some(Depth { near: 0.9, dilate: 5, ..Depth::default() }));
+    act(&mut e, json!({"parallax": {"source": "accelerometer", "steps": 32}})).unwrap();
+    let p = e.parallax.clone().unwrap();
+    assert_eq!((p.source, p.steps, p.strength, p.enabled), (Motion::Accelerometer, 32, 0.02, true));
+    act(&mut e, json!({"parallax": {"off": true}})).unwrap();
+    assert!(e.moving().is_none() && !e.needs_depth());
+    assert!(
+        act(&mut e, json!({"parallax": {"source": "mouse"}})).unwrap_err().to_string().contains("not auto")
+    );
+    assert!(act(&mut e, json!({"parallax": {"steps": 3}})).is_err());
+    assert_eq!((p.fill(), p.layers(), p.fill, p.layers), (Fill::standard(), 5, None, None));
+    assert!(!serde_json::to_string(&p).unwrap().contains("fill"));
+    act(&mut e, json!({"parallax": {"fill": "simple", "layers": 6}})).unwrap();
+    let p = e.parallax.clone().unwrap();
+    assert_eq!((p.fill(), p.layers(), p.enabled), (Fill::Simple, 6, true));
+    let back = Edit::parse(&serde_json::to_string(&e).unwrap()).unwrap();
+    assert_eq!(back.parallax, e.parallax);
+    act(&mut e, json!({"parallax": {"strength": 0.01}})).unwrap();
+    assert_eq!(e.parallax.as_ref().map(|p| (p.fill, p.layers)), Some((Some(Fill::Simple), Some(6))));
+    for bad in [json!({"fill": "off"}), json!({"layers": 7}), json!({"layers": 3})] {
+        assert!(act(&mut e, json!({ "parallax": bad })).is_err());
+    }
+    assert!(e.set("parallax.layers", "9").is_err());
+    act(&mut e, json!({"mask": {"name": "far", "spec": "depth:0,0.4"}})).unwrap();
+    assert_eq!(e.masks["far"].spec().as_deref(), Some("depth:0,0.4,0.1"));
+    e.set("parallax.focus", "0.6").unwrap();
+    assert_eq!(e.parallax.as_ref().map(|p| p.focus), Some(0.6));
+    let mut fresh = Edit::default();
+    fresh.set("parallax.strength", "0.01").unwrap();
+    assert_eq!(fresh.parallax, Some(Parallax { strength: 0.01, ..Parallax::default() }));
+    act(&mut e, json!({"reset": {}})).unwrap();
+    assert!(e.is_empty());
+}
+
+#[test]
+fn the_spring_settles_on_its_goal_without_overshoot() {
+    let mut spring = Spring::default();
+    let mut steps = 0;
+    while spring.step([1.0, -0.5], 0.15, 1.0 / 30.0) {
+        assert!(spring.at[0] <= 1.0 + 1e-6 && spring.at[1] >= -0.5 - 1e-6, "{spring:?}");
+        steps += 1;
+    }
+    assert_eq!(spring.at, [1.0, -0.5]);
+    assert!((10..60).contains(&steps), "{steps}");
+    assert!(!spring.step([1.0, -0.5], 0.15, 1.0 / 30.0) && spring.settled([1.0, -0.5]));
+    let mut quick = Spring::default();
+    quick.step([1.0, 0.0], 0.0, 1.0 / 30.0);
+    assert_eq!(quick.at, [1.0, 0.0]);
+}
+
+#[test]
+fn the_orbit_is_slow_and_bounded() {
+    let samples: Vec<[f32; 2]> = (0..600).map(|i| orbit(i as f32 / 10.0)).collect();
+    assert!(samples.iter().all(|p| p[0].abs() <= 1.0 && p[1].abs() <= 0.7));
+    assert!(samples.windows(2).all(|w| (w[1][0] - w[0][0]).abs() < 0.05));
+}
+
+#[test]
+fn iio_values_become_a_recentred_tilt() {
+    let matrix = mount_matrix("0, 1, 0; -1, 0, 0; 0, 0, 1").unwrap();
+    let g = gravity([100.0, 0.0, 980.0], 0.01, &matrix);
+    assert!(g.iter().zip([0.0, -1.0, 9.8]).all(|(a, b)| (a - b).abs() < 1e-4), "{g:?}");
+    assert!(mount_matrix("1, 0; 0, 1").is_none() && mount_matrix("a, 0, 0; 0, 1, 0; 0, 0, 1").is_none());
+    let mut tilt = Tilt::default();
+    assert_eq!(tilt.follow([0.0, 0.0, 9.8], 0.03), [0.0, 0.0]);
+    let tipped = tilt.follow([2.5, 0.0, 9.5], 0.03);
+    assert!(tipped[0] > 0.5 && tipped[1].abs() < 1e-3, "{tipped:?}");
+    let later = (0..1000).fold(tipped, |_, _| tilt.follow([2.5, 0.0, 9.5], 0.03));
+    assert!(later[0].abs() < 0.01, "{later:?}");
+}
+
+#[test]
+fn turning_the_phone_moves_like_tilting_it_and_recentres() {
+    let around = |axis: [f32; 3], angle: f32| {
+        let (s, c) = (angle / 2.0).sin_cos();
+        [c, axis[0] * s, axis[1] * s, axis[2] * s]
+    };
+    let close = |a: [f32; 2], b: [f32; 2]| a.iter().zip(b).all(|(a, b)| (a - b).abs() < 0.02);
+    let (mut turn, mut tilt) = (Turn::default(), Tilt::default());
+    assert_eq!(turn.follow([1.0, 0.0, 0.0, 0.0], 0.03), [0.0; 3]);
+    tilt.follow([0.0, 0.0, 1.0], 0.03);
+    let yaw = aim(turn.follow(around([0.0, 1.0, 0.0], 0.1), 0.0));
+    let tipped = tilt.follow([-(0.1f32).sin(), 0.0, (0.1f32).cos()], 0.0);
+    assert!(close(yaw, tipped) && close(yaw, [-0.4, 0.0]), "{yaw:?} {tipped:?}");
+    let pitch = aim(turn.follow(around([1.0, 0.0, 0.0], 0.1), 0.0));
+    assert!(close(pitch, [0.0, 0.4]), "{pitch:?}");
+    let flipped = around([1.0, 0.0, 0.0], 0.1).map(|v| -v);
+    assert!(close(aim(turn.follow(flipped, 0.0)), [0.0, 0.4]));
+    assert_eq!(aim(turn.follow(around([0.0, 1.0, 0.0], 1.0), 0.0)), [-1.0, 0.0]);
+    assert_eq!(turn.follow([0.0; 4], 0.03), [0.0; 3]);
+    let held = around([0.0, 1.0, 0.0], 0.2);
+    let later = (0..1000).fold([0.0; 3], |_, _| turn.follow(held, 0.03));
+    assert!(later.iter().all(|v| v.abs() < 0.01), "{later:?}");
+}
+
+#[test]
+fn strokes_cuts_and_fill_marks_are_edit_actions_that_round_trip() {
+    let mut e = Edit::default();
+    let brush =
+        json!({"depth_brush": {"points": "0.2,0.2;0.6,0.4", "by": 0.3, "lower": true, "radius": 0.1}});
+    act(&mut e, brush).unwrap();
+    act(&mut e, json!({"depth_brush": {"points": "0.5,0.5"}})).unwrap();
+    let strokes = e.depth.clone().unwrap().strokes;
+    assert_eq!(strokes.len(), 2);
+    assert_eq!((strokes[0].by, strokes[0].radius, strokes[0].falloff), (-0.3, 0.1, 0.5));
+    assert_eq!((strokes[1].by, strokes[1].points.clone()), (0.1, vec![[0.5, 0.5]]));
+    let both = json!({"depth_brush": {"points": "0.5,0.5", "raise": true, "lower": true}});
+    assert!(act(&mut e, both).unwrap_err().to_string().contains("choose one"));
+    assert!(act(&mut e, json!({"depth_brush": {}})).unwrap_err().to_string().contains("give a stroke"));
+    assert!(act(&mut e, json!({"depth_brush": {"points": "0.5"}})).is_err());
+    assert!(act(&mut e, json!({"depth_brush": {"points": "1.5,0.5"}})).is_err());
+    assert!(act(&mut e, json!({"depth_brush": {"points": "0.5,0.5", "radius": 0}})).is_err());
+    act(&mut e, json!({"depth_cuts": {"cuts": "0.2,0.45,0.7"}})).unwrap();
+    assert_eq!(e.depth.as_ref().unwrap().cuts, Some(vec![0.2, 0.45, 0.7]));
+    for bad in ["0.5,0.2", "0.001,0.5", "0.1,0.2,0.3,0.4,0.5,0.6", "a,b", "0.5,0.502"] {
+        assert!(act(&mut e, json!({"depth_cuts": {"cuts": bad}})).is_err(), "{bad}");
+    }
+    act(&mut e, json!({"fill_mask": {"points": "0.3,0.3;0.4,0.3", "refill": true}})).unwrap();
+    act(&mut e, json!({"fill_mask": {"points": "0.8,0.8", "protect": true, "radius": 0.2}})).unwrap();
+    let fills = e.depth.clone().unwrap().fills;
+    assert_eq!((fills[0].by, fills[1].by, fills[1].radius), (1.0, -1.0, 0.2));
+    assert!(
+        act(&mut e, json!({"fill_mask": {"points": "0.8,0.8"}}))
+            .unwrap_err()
+            .to_string()
+            .contains("--refill")
+    );
+    assert_eq!(Edit::parse(&e.to_json()).unwrap(), e);
+    act(&mut e, json!({"fill_mask": {"clear": true}})).unwrap();
+    act(&mut e, json!({"depth_brush": {"clear": true}})).unwrap();
+    act(&mut e, json!({"depth_cuts": {"auto": true}})).unwrap();
+    assert_eq!(e.depth, Some(Depth::default()));
+    let plain = serde_json::to_value(Depth::default()).unwrap();
+    assert!(["cuts", "strokes", "fills"].iter().all(|k| plain.get(k).is_none()));
+    let many = vec!["0.1,0.1"; 1000].join(";");
+    for _ in 0..3 {
+        act(&mut e, json!({"depth_brush": {"points": many}})).unwrap();
+    }
+    assert!(
+        act(&mut e, json!({"depth_brush": {"points": many}})).unwrap_err().to_string().contains("at most")
+    );
+}

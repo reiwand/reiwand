@@ -1,0 +1,199 @@
+mod counted;
+mod crossing;
+mod feed;
+mod frames;
+mod guard;
+mod hidden;
+mod iio;
+mod light;
+mod motion;
+mod movie;
+mod output;
+mod pages;
+mod parallax;
+mod pictures;
+mod players;
+mod power;
+mod pushed;
+mod reels;
+mod relays;
+mod scene;
+mod scripts;
+mod slot;
+mod snap;
+mod speakers;
+mod spec;
+mod state;
+mod status;
+mod steer;
+pub(crate) mod stops;
+mod surface;
+
+use crate::fatal;
+pub use counted::Counted;
+pub use light::Hdr;
+pub use output::Tone;
+use reiwand_pipewire::Exporter;
+use reiwand_render::{RenderError, Renderer, TargetLimits};
+use reiwand_wayland::Window;
+pub use snap::Taken;
+pub use spec::*;
+use state::State;
+pub use status::*;
+use std::collections::BTreeMap;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, Mutex, MutexGuard, mpsc};
+use std::thread::JoinHandle;
+
+enum Command {
+    Configure(String, (u32, u32), Spec),
+    Remove(String),
+    Attach(String, Window),
+    Frame(String),
+    Repaint(String),
+    Region(String),
+    Backdrop(String),
+    SetActive(String, bool, (bool, bool)),
+    Settings(Settings),
+    Calm(bool),
+    Power(bool),
+    Lowest(bool),
+    Saver(bool),
+    Locked(bool),
+    Press(String, String),
+    Fire(String, String),
+    Retry,
+    Again(String),
+    Count(String, mpsc::Sender<Option<Counted>>),
+    Snap(String, mpsc::Sender<snap::Taken>),
+    Wake,
+    Settle(mpsc::Sender<()>),
+    Clear(std::path::PathBuf, mpsc::Sender<std::io::Result<()>>),
+    Quit,
+}
+
+pub struct Compositor {
+    tx: mpsc::Sender<Command>,
+    status: Arc<Mutex<BTreeMap<String, OutputStatus>>>,
+    limits: TargetLimits,
+    calm: AtomicBool,
+    thread: Option<JoinHandle<()>>,
+}
+
+impl Compositor {
+    pub fn start(
+        renderer: &'static Renderer,
+        exporter: Arc<Exporter>,
+        settings: Settings,
+        on_status: impl Fn(Vec<String>, bool) + Send + 'static,
+    ) -> std::io::Result<Self> {
+        renderer.on_device_lost(|reason| stops::lost(&format!("the GPU device was lost ({reason})")));
+        let limits = renderer.limits();
+        let (tx, rx) = mpsc::channel();
+        let status = Arc::new(Mutex::new(BTreeMap::new()));
+        let mut state = State::new(renderer, exporter, settings, tx.clone(), status.clone());
+        state.on_status = Box::new(on_status);
+        let thread =
+            std::thread::Builder::new().name("reiwand-render".into()).spawn(move || state.run(&rx))?;
+        Ok(Self { tx, status, limits, calm: AtomicBool::new(false), thread: Some(thread) })
+    }
+
+    pub fn check_target(&self, width: u32, height: u32) -> Result<(), RenderError> {
+        self.limits.check(width, height)
+    }
+
+    pub fn max_edge(&self) -> u32 {
+        self.limits.max_edge
+    }
+
+    pub fn configure(&self, output: &str, size: (u32, u32), spec: Spec) {
+        match self.check_target(size.0, size.1) {
+            Ok(()) => self.send(Command::Configure(output.into(), size, spec)),
+            Err(e) => tracing::warn!(output, "cannot render this output: {e}"),
+        }
+    }
+
+    pub fn remove(&self, output: &str) {
+        self.send(Command::Remove(output.into()))
+    }
+
+    pub fn attach(&self, output: &str, window: Window) {
+        self.send(Command::Attach(output.into(), window))
+    }
+
+    pub fn set_active(&self, output: &str, active: bool, covered: (bool, bool)) {
+        self.send(Command::SetActive(output.into(), active, covered))
+    }
+
+    pub fn set_settings(&self, settings: Settings) {
+        self.send(Command::Settings(settings))
+    }
+
+    pub fn calm(&self, calm: bool) {
+        self.calm.store(calm, Ordering::Relaxed);
+        self.send(Command::Calm(calm))
+    }
+
+    pub fn calmed(&self) -> bool {
+        self.calm.load(Ordering::Relaxed)
+    }
+
+    pub fn set_power(&self, on_battery: bool) {
+        self.send(Command::Power(on_battery))
+    }
+
+    pub fn set_lowest(&self, lowest: bool) {
+        self.send(Command::Lowest(lowest))
+    }
+
+    pub fn set_saver(&self, saver: bool) {
+        self.send(Command::Saver(saver))
+    }
+
+    pub fn set_locked(&self, locked: bool) {
+        self.send(Command::Locked(locked))
+    }
+
+    pub fn retry_effects(&self) {
+        self.send(Command::Retry)
+    }
+
+    pub fn restart_particles(&self, output: &str) {
+        self.send(Command::Again(output.into()))
+    }
+
+    pub fn status(&self) -> BTreeMap<String, OutputStatus> {
+        lock(&self.status).clone()
+    }
+
+    pub fn settled(&self) {
+        let (done, wait) = mpsc::channel();
+        self.send(Command::Settle(done));
+        wait.recv_timeout(std::time::Duration::from_secs(2)).ok();
+    }
+
+    pub fn stop(&self) {
+        let _ = self.tx.send(Command::Quit);
+    }
+
+    pub fn running(&self) -> bool {
+        self.thread.as_ref().is_some_and(|thread| !thread.is_finished())
+    }
+
+    fn send(&self, command: Command) {
+        if self.tx.send(command).is_err() {
+            fatal("the render thread stopped");
+        }
+    }
+}
+
+impl Drop for Compositor {
+    fn drop(&mut self) {
+        let _ = self.tx.send(Command::Quit);
+        self.thread.take().map(JoinHandle::join);
+    }
+}
+
+pub fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
+    mutex.lock().unwrap_or_else(|e| e.into_inner())
+}

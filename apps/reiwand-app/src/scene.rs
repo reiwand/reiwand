@@ -1,0 +1,176 @@
+#[cxx_qt::bridge]
+pub mod qobject {
+    unsafe extern "C++" {
+        include!("cxx-qt-lib/qstring.h");
+        type QString = cxx_qt_lib::QString;
+    }
+
+    #[auto_cxx_name]
+    extern "RustQt" {
+        #[qobject]
+        #[qml_element]
+        #[qproperty(QString, folder)]
+        #[qproperty(QString, view)]
+        #[qproperty(QString, gizmos)]
+        #[qproperty(QString, fields)]
+        #[qproperty(QString, selected)]
+        #[qproperty(QString, error)]
+        #[qproperty(QString, output)]
+        #[qproperty(QString, placed)]
+        #[qproperty(QString, look)]
+        #[qproperty(QString, levels)]
+        #[qproperty(QString, split)]
+        #[qproperty(u32, node)]
+        #[qproperty(f64, serial)]
+        #[qproperty(f64, time)]
+        #[qproperty(bool, playing)]
+        #[qproperty(bool, ready)]
+        #[qproperty(bool, dirty)]
+        #[qproperty(bool, live)]
+        #[qproperty(bool, busy)]
+        #[qproperty(bool, sweeping)]
+        type SceneEditor = super::SceneEditorRust;
+
+        #[qinvokable]
+        fn create(self: Pin<&mut SceneEditor>, folder: &QString, starter: &QString, title: &QString);
+        #[qinvokable]
+        fn open(self: Pin<&mut SceneEditor>, folder: &QString, package: &QString);
+        #[qinvokable]
+        fn copy_facts(self: &SceneEditor, package: &QString) -> QString;
+        #[qinvokable]
+        fn examples(self: &SceneEditor) -> QString;
+        #[qinvokable]
+        fn example_package(self: &SceneEditor, name: &QString) -> QString;
+        #[qinvokable]
+        fn copy_lineage(self: &SceneEditor, package: &QString) -> QString;
+        #[qinvokable]
+        fn copy_into(
+            self: &SceneEditor,
+            package: &QString,
+            folder: &QString,
+            id: &QString,
+            mine: bool,
+        ) -> QString;
+        #[qinvokable]
+        fn run(self: Pin<&mut SceneEditor>, action: &QString, args: &QString, gesture: bool);
+        #[qinvokable]
+        fn pass_time(self: &SceneEditor, ms: i32);
+        #[qinvokable]
+        fn hold(self: Pin<&mut SceneEditor>, on: bool);
+        #[qinvokable]
+        fn select(self: Pin<&mut SceneEditor>, pointer: &QString);
+        #[qinvokable]
+        fn inspect(self: &SceneEditor, pointer: &QString) -> QString;
+        #[qinvokable]
+        fn count(self: &SceneEditor, pointer: &QString) -> i32;
+        #[qinvokable]
+        fn value(self: &SceneEditor, pointer: &QString) -> QString;
+        #[qinvokable]
+        fn condition(self: &SceneEditor, pointer: &QString, text: &QString) -> QString;
+        #[qinvokable]
+        fn scripts(self: &SceneEditor, id: &QString) -> QString;
+        #[qinvokable]
+        fn code(self: &SceneEditor, query: &QString, args: &QString) -> QString;
+        #[qinvokable]
+        fn watch(self: Pin<&mut SceneEditor>);
+        #[qinvokable]
+        fn rig(self: &SceneEditor, id: &QString, query: &QString) -> QString;
+        #[qinvokable]
+        fn save(self: Pin<&mut SceneEditor>);
+        #[qinvokable]
+        fn recover(self: Pin<&mut SceneEditor>, keep: bool);
+        #[qinvokable]
+        fn diverged(self: &SceneEditor) -> bool;
+        #[qinvokable]
+        fn follow_folder(self: Pin<&mut SceneEditor>);
+        #[qinvokable]
+        fn settle_outside(self: Pin<&mut SceneEditor>, choice: &QString, folder: &QString);
+        #[qinvokable]
+        fn prune(self: Pin<&mut SceneEditor>);
+        #[qinvokable]
+        fn autosave(self: Pin<&mut SceneEditor>);
+        #[qinvokable]
+        fn build(self: Pin<&mut SceneEditor>, out: &QString, key: &QString, password: &QString);
+        #[qinvokable]
+        fn apply(self: Pin<&mut SceneEditor>, output: &QString);
+        #[qinvokable]
+        fn seek(self: Pin<&mut SceneEditor>, time: f64, playing: bool);
+        #[qinvokable]
+        fn attach(self: Pin<&mut SceneEditor>, edge: u32);
+        #[qinvokable]
+        fn cover(self: Pin<&mut SceneEditor>, covered: bool);
+        #[qinvokable]
+        fn halve(self: Pin<&mut SceneEditor>, on: bool);
+        #[qinvokable]
+        fn simulate_media(self: Pin<&mut SceneEditor>, file: &QString);
+        #[qinvokable]
+        fn fire(self: Pin<&mut SceneEditor>, trigger: &QString);
+        #[qinvokable]
+        fn touch(self: Pin<&mut SceneEditor>, x: f64, y: f64, buttons: u32);
+        #[qinvokable]
+        fn hear(self: Pin<&mut SceneEditor>, on: bool);
+        #[qinvokable]
+        fn sweep(self: Pin<&mut SceneEditor>, on: bool);
+        #[qinvokable]
+        fn wave(self: Pin<&mut SceneEditor>, asset: &QString, buckets: i32);
+        #[qinvokable]
+        fn preview(self: Pin<&mut SceneEditor>, live: bool, on: &QString);
+        #[qinvokable]
+        fn render(self: Pin<&mut SceneEditor>, out: &QString, spec: &QString);
+        #[qinvokable]
+        fn folder_for(self: &SceneEditor, name: &QString) -> QString;
+        #[qinvokable]
+        fn kind_of(self: &SceneEditor, folder: &QString, package: &QString) -> QString;
+        #[qsignal]
+        fn finished(self: Pin<&mut SceneEditor>, message: QString);
+        #[qsignal]
+        fn rendered(self: Pin<&mut SceneEditor>, files: QString);
+        #[qsignal]
+        fn waved(self: Pin<&mut SceneEditor>, asset: QString, wave: QString);
+    }
+
+    impl cxx_qt::Threading for SceneEditor {}
+}
+
+use cxx_qt_lib::QString;
+use reiwand_editor::{Action, Problem, Project};
+
+#[derive(Default)]
+pub struct SceneEditorRust {
+    pub folder: QString,
+    pub view: QString,
+    pub gizmos: QString,
+    pub stale: u64,
+    pub fields: QString,
+    pub selected: QString,
+    pub error: QString,
+    pub output: QString,
+    pub placed: QString,
+    pub look: QString,
+    pub levels: QString,
+    pub split: QString,
+    pub halves: crate::scenesplit::Halves,
+    pub sweeping: bool,
+    pub node: u32,
+    pub serial: f64,
+    pub time: f64,
+    pub playing: bool,
+    pub ready: bool,
+    pub dirty: bool,
+    pub live: bool,
+    pub busy: bool,
+    pub project: Option<Project>,
+    pub imports: Vec<Action>,
+    pub report: Vec<String>,
+    pub watched: u64,
+    pub seen: u64,
+    pub files: Vec<Problem>,
+    pub persisted: String,
+    pub sending: bool,
+    pub queued: bool,
+    pub sent: u64,
+    pub shown: bool,
+    pub desk: String,
+    pub attached: (u32, u32),
+    pub edge: u32,
+}

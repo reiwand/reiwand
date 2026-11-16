@@ -1,0 +1,199 @@
+import QtQuick
+import QtQuick.Controls as QQC2
+import io.github.reiwand.app
+
+QQC2.ToolButton {
+    id: bind
+
+    required property var page
+    required property var field
+    readonly property var keys: field.source === "keys" ? field.value.keys ?? [] : []
+    readonly property bool here: keys.some(key => Math.abs(key[0] - page.editor.time) < 0.001)
+    readonly property bool listed: field.widget === "emitters"
+
+    function bound(source) {
+        page.run("set", {
+                "pointer": field.pointer,
+                "value": source
+            });
+    }
+
+    function sourced(request) {
+        const base = field.source === "audio" || field.source === "cursor" ? field.value : ({});
+        const reply = JSON.parse(page.editor.rig("", JSON.stringify({
+                    "bands": Object.assign({
+                        "base": base
+                    }, request)
+                })) || "null");
+        if (reply?.source)
+            bound(reply.source);
+    }
+
+    function follow(prop) {
+        if (!listed)
+            return bound({
+                    "prop": prop.id
+                });
+        const now = JSON.parse(page.editor.value(prop.pointer + "/default") || "null");
+        const map = {};
+        map[now === null ? "null" : String(now)] = field.shown ?? field.default;
+        bound({
+                "prop": prop.id,
+                "map": map
+            });
+    }
+
+    function key(remove) {
+        page.run("keyframe", {
+                "pointer": field.pointer,
+                "time": page.editor.time,
+                "value": remove ? undefined : (field.shown ?? field.default),
+                "remove": remove
+            });
+    }
+
+    text: field.source === "keys" ? (here ? "◆" : "◈") : (field.source ? "⛓" : "◇")
+    QQC2.ToolTip.text: field.source ? App.tr("Follows %1", SceneWords.binding(field.value)) : App.tr("Fixed value")
+    QQC2.ToolTip.visible: hovered
+    onClicked: menu.popup()
+
+    SceneBandPicker {
+        id: bands
+
+        page: bind.page
+        onChosen: source => bind.bound(source)
+    }
+
+    SceneBindMeter {
+        id: meter
+
+        page: bind.page
+        source: bind.field.value ?? ({})
+    }
+
+    QQC2.Menu {
+        id: menu
+
+        QQC2.MenuItem {
+            text: App.tr("Keyframe here")
+            enabled: !bind.field.source || bind.field.source === "keys"
+            onTriggered: bind.key(false)
+        }
+
+        QQC2.MenuItem {
+            text: App.tr("Remove the keyframe here")
+            enabled: bind.here
+            onTriggered: bind.key(true)
+        }
+
+        QQC2.MenuItem {
+            text: App.tr("Edit the source…")
+            enabled: bind.field.source !== ""
+            onTriggered: bind.page.editor.select(bind.field.pointer)
+        }
+
+        QQC2.MenuItem {
+            text: App.tr("Text while nothing plays…")
+            visible: bind.field.source === "media" && SceneMediaWords.words.some(word => word[0] === bind.field.value?.media)
+            height: visible ? implicitHeight : 0
+            onTriggered: {
+                if (bind.field.value.placeholder === undefined)
+                    bind.page.run("set", {
+                            "pointer": bind.field.pointer + "/placeholder",
+                            "value": ""
+                        });
+                bind.page.editor.select(bind.field.pointer);
+            }
+        }
+
+        QQC2.MenuItem {
+            text: App.tr("Fixed value")
+            enabled: bind.field.source !== ""
+            onTriggered: bind.bound(bind.field.source === "keys" ? bind.field.shown : bind.field.default)
+        }
+
+        QQC2.Menu {
+            title: App.tr("Follow a user property")
+
+            SceneRepeater {
+                id: choices
+
+                rows: (bind.page.view.properties ?? []).filter(p => !["button", "group", "label", "divider"].includes(p.type))
+
+                delegate: QQC2.MenuItem {
+                    required property int index
+                    readonly property var modelData: choices.rows[index]
+
+                    text: modelData.label
+                    onTriggered: bind.follow(modelData)
+                }
+            }
+        }
+
+        SceneBindScript {
+            page: bind.page
+            enabled: !bind.listed
+            onChosen: source => bind.bound(source)
+        }
+
+        SceneBindTry {
+            page: bind.page
+            field: bind.field
+            onWatch: meter.open()
+        }
+
+        SceneBindSound {
+            enabled: !bind.listed
+            onPicked: request => bind.sourced(request)
+            onRanged: {
+                bands.base = bind.field.source === "audio" ? bind.field.value : ({});
+                bands.open();
+            }
+        }
+
+        QQC2.Menu {
+            title: App.tr("Follow the media player")
+            enabled: media.count > 0 && !bind.listed
+
+            SceneRepeater {
+                id: media
+
+                rows: SceneMediaWords.sources(bind.field.widget)
+
+                delegate: QQC2.MenuItem {
+                    required property int index
+                    readonly property var modelData: media.rows[index]
+
+                    text: modelData[2] !== "" ? App.tr("%1 (now %2)", modelData[1], modelData[2]) : modelData[1]
+                    onTriggered: bind.bound({
+                            "media": modelData[0]
+                        })
+                }
+            }
+        }
+
+        SceneBindTime {
+            page: bind.page
+            field: bind.field
+            onPicked: source => bind.bound(source)
+        }
+
+        QQC2.Menu {
+            title: App.tr("Follow the pointer")
+            enabled: !bind.listed
+
+            Repeater {
+                model: [["x", App.tr("Horizontal position")], ["y", App.tr("Vertical position")], ["inside", App.tr("Over the screen")], ["speed", App.tr("Speed")]]
+
+                delegate: QQC2.MenuItem {
+                    required property var modelData
+
+                    text: modelData[1]
+                    onTriggered: bind.sourced({
+                            "direction": modelData[0]
+                        })
+                }
+            }
+        }
+    }
+}

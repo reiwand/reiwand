@@ -1,0 +1,190 @@
+use super::super::item::{Item, Rect, invert, ndc};
+use super::super::pipes::Mode;
+use super::super::pool::BUDGET;
+use super::super::{Op, Src};
+use super::{Painter, Target};
+use reiwand_scene::{Blend, Content, Layer};
+use std::ops::Range;
+
+impl<'a> Painter<'a, '_, '_> {
+    pub(crate) fn run(&mut self, canvas: Src, background: [f64; 4], keep: bool) {
+        self.spend();
+        let frame = self.frame;
+        let draws = &frame.draws;
+        let (mut static_end, mut i, mut fed) = (0, 0, 0u64);
+        let first = self.first_air();
+        while !self.frame.keep
+            && i < draws.len().min(first)
+            && !draws[i].dynamic
+            && !self.holds_air(i..draws[i].end)
+            && !self.shifting(i..draws[i].end)
+        {
+            let (key, moving) = self.feeding(i..draws[i].end);
+            if moving {
+                break;
+            }
+            (i, fed) = (draws[i].end, fed.rotate_left(7) ^ key);
+            static_end = i;
+        }
+        let root = Target { src: canvas, rect: self.full };
+        self.aired = 0;
+        let (origin, size) =
+            self.clip.map_or(([0, 0], self.full.size()), |c| ([c.x as u32, c.y as u32], c.size()));
+        if static_end == 0 {
+            match self.clip {
+                _ if keep => {}
+                Some(_) => self.fill(canvas, background),
+                None => self.ops.push(Op::Clear(canvas, background)),
+            }
+        } else {
+            let key = self.digest(0..static_end, (self.full, background.map(f64::to_bits), fed));
+            if self.caches.get(&0).is_none_or(|c| c.key != key) {
+                self.cache(0, key, self.full.size());
+                self.ops.push(Op::Clear(Src::Cache(0), background));
+                self.list(0..static_end, Target { src: Src::Cache(0), rect: self.full }, false);
+            } else {
+                self.reused += 1;
+            }
+            self.kept.push(0);
+            match self.clip {
+                Some(_) => {
+                    self.ops.push(Op::Copy { from: Src::Cache(0), to: canvas, origin, size, at: origin })
+                }
+                None => self.blit(Src::Cache(0), canvas),
+            }
+        }
+        self.list(static_end..draws.len(), root, false);
+        self.air_until(usize::MAX, root);
+        self.unshare();
+    }
+
+    fn blit(&mut self, from: Src, to: Src) {
+        let full = self.full;
+        let mut item =
+            Item { quad: [0.0, 0.0, 1.0, 1.0], uv: [0.0, 0.0, 1.0, 1.0], color: [1.0; 4], ..Item::default() };
+        (item.m0, item.m1) = ndc(full, full.affine());
+        let slot = self.pool.push(&item);
+        self.ops.push(Op::Clear(to, [0.0; 4]));
+        let tex = [from, Src::White, Src::Clear];
+        self.ops.push(Op::Draw { target: to, entry: "fs_texture", mode: Mode::Replace, slot, tex });
+    }
+
+    pub(crate) fn list(&mut self, range: Range<usize>, target: Target, clip: bool) {
+        let mut i = range.start;
+        while i < range.end {
+            self.air_until(i, target);
+            let frame = self.frame;
+            let d = &frame.draws[i];
+            let atop = clip && i > range.start;
+            match &d.content {
+                _ if d.hidden => {}
+                Content::Group { .. } if self.plain(i) => self.list(i + 1..d.end, target, false),
+                _ if self.skip(i, target) => {}
+                Content::Adjustment => self.adjust(i, target),
+                Content::Group { .. } => self.apart(i, target, atop),
+                _ if !d.effects.is_empty() || d.layer.cache || self.baking(i) => self.apart(i, target, atop),
+                _ => self.direct(i, target, (d.opacity, d.blend, d.mask), atop),
+            }
+            i = d.end;
+        }
+        self.air_closing(range, target);
+    }
+
+    pub(crate) fn apart(&mut self, i: usize, target: Target, atop: bool) {
+        if self.reads_below(i) {
+            return self.beneath(i, target, atop);
+        }
+        if let Some((src, rect)) = self.isolate(i) {
+            self.composite(i, src, rect, target, atop);
+            self.release(src);
+        }
+    }
+
+    pub(crate) fn isolate(&mut self, i: usize) -> Option<(Src, Rect)> {
+        let own = self.lean(i).and(self.frame.draws[i].lean).map(|l| (l, l.inverse()));
+        let outer = own.map(|own| self.flat.replace(Some(own)));
+        let out = self.isolated(i);
+        outer.into_iter().for_each(|o| self.flat.set(o));
+        out
+    }
+
+    fn isolated(&mut self, i: usize) -> Option<(Src, Rect)> {
+        let frame = self.frame;
+        let d = &frame.draws[i];
+        let (rect, dense, size) = self.fitted(i, self.extent(i)?.pixels(self.full)?);
+        let id = d.layer as *const Layer as usize;
+        let (fed, moving) = self.feeding(i..d.end);
+        let still = !d.dynamic && self.backdrop.is_none() && !moving && !self.shifting(i..d.end);
+        let still = still && !self.holds_air(i..d.end);
+        let key = still.then(|| self.digest(i..d.end, (rect, self.srgb, fed, dense.to_bits(), size)));
+        if key.is_some() && self.caches.get(&id).map(|c| c.key) == key {
+            self.reused += 1;
+            self.kept.push(id);
+            return Some((Src::Cache(id), rect));
+        }
+        let outer = std::mem::replace(&mut self.density, dense);
+        let layer = self.geometry(i).map_or(rect.affine(), |(size, _)| self.local(i, size));
+        let uv = invert(layer).then(rect.affine());
+        let Some(out) = self.read_straight(i, size, rect, uv).or_else(|| self.drawn_apart(i, size, rect, uv))
+        else {
+            self.density = outer;
+            return None;
+        };
+        self.density = outer;
+        let room = self.caches.values().map(|c| c.tex.bytes()).sum::<u64>() < BUDGET;
+        let Some(key) = key.filter(|_| room) else { return Some((out, rect)) };
+        let size = self.size_of(out);
+        self.cache(id, key, size);
+        self.kept.push(id);
+        self.ops.push(Op::Copy { from: out, to: Src::Cache(id), origin: [0, 0], size, at: [0, 0] });
+        self.release(out);
+        Some((Src::Cache(id), rect))
+    }
+
+    pub(crate) fn size_of(&self, src: Src) -> (u32, u32) {
+        match src {
+            _ if self.virt.is_some_and(|v| v.0 == src) => self.virt.map_or((1, 1), |v| v.1),
+            Src::Pool(i) => self.pool.busy[i].0.size(),
+            Src::Ext(i) => self.exts[i].size(),
+            Src::Cache(k) => self.caches.get(&k).map_or((1, 1), |c| c.tex.size()),
+            Src::State(k, side) => self.states.get(&k).map_or((1, 1), |s| s.tex[side].size()),
+            Src::White | Src::Clear | Src::Lut(_) | Src::Void => (1, 1),
+            Src::Canvas => self.full.size(),
+        }
+    }
+
+    fn read_straight(
+        &mut self,
+        i: usize,
+        size: (u32, u32),
+        rect: Rect,
+        uv: reiwand_scene::Affine,
+    ) -> Option<Src> {
+        let (picture, view) = self.pictured(i, uv)?;
+        self.virt = Some((picture, size, view));
+        let out = self.effects(i, picture, rect, uv);
+        self.virt = None;
+        (out != picture).then_some(out)
+    }
+
+    fn drawn_apart(
+        &mut self,
+        i: usize,
+        size: (u32, u32),
+        rect: Rect,
+        uv: reiwand_scene::Affine,
+    ) -> Option<Src> {
+        let src = self.hold(i, size)?;
+        self.ops.push(Op::Clear(src, [0.0; 4]));
+        let target = Target { src, rect };
+        match self.frame.draws[i].content {
+            Content::Group { clip } => self.list(i + 1..self.frame.draws[i].end, target, clip),
+            _ => self.direct(i, target, (1.0, Blend::Normal, None), false),
+        }
+        let out = self.effects(i, src, rect, uv);
+        if out != src {
+            self.release(src);
+        }
+        Some(out)
+    }
+}

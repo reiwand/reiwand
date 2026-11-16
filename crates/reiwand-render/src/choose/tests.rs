@@ -1,0 +1,146 @@
+use super::listing::extra;
+use super::{Fallback, kind, pick, settle};
+use crate::RenderError;
+use reiwand_core::GpuChoice;
+use wgpu::{Backend, Backends, DeviceType};
+
+fn card(name: &str, t: DeviceType, b: Backend) -> super::Card {
+    (name.into(), t, b, String::new())
+}
+
+fn desk() -> Vec<super::Card> {
+    vec![
+        card("Example Integrated Graphics (RADV)", DeviceType::IntegratedGpu, Backend::Gl),
+        card("Example Integrated Graphics (RADV)", DeviceType::IntegratedGpu, Backend::Vulkan),
+        card("Example Dedicated Graphics A", DeviceType::DiscreteGpu, Backend::Vulkan),
+        card("Example Dedicated Graphics B", DeviceType::DiscreteGpu, Backend::Vulkan),
+        card("Virtio-GPU Venus", DeviceType::VirtualGpu, Backend::Vulkan),
+        card("llvmpipe (LLVM 19.1.7, 256 bits)", DeviceType::Cpu, Backend::Gl),
+        card("llvmpipe (LLVM 19.1.7, 256 bits)", DeviceType::Cpu, Backend::Vulkan),
+        card("Unknown", DeviceType::Other, Backend::Vulkan),
+    ]
+}
+
+#[test]
+fn a_graphics_card_is_chosen_by_kind_or_by_part_of_its_name() {
+    let all = desk();
+    let named = |part: &str| pick(&GpuChoice::Named(part.into()), &all);
+    assert_eq!(pick(&GpuChoice::Auto, &all), None, "the automatic choice is left to the old path");
+    assert_eq!(pick(&GpuChoice::Integrated, &all), Some(1), "Vulkan comes before OpenGL ES");
+    assert_eq!(pick(&GpuChoice::Dedicated, &all), Some(2), "the first of two dedicated cards");
+    assert_eq!(pick(&GpuChoice::Software, &all), Some(6));
+    assert_eq!(
+        [named("graphics b"), named("example dedicated"), named("DEDICATED GRAPHICS A"), named("radv")],
+        [3, 2, 2, 1].map(Some)
+    );
+    assert_eq!([named("venus"), named("Unknown")], [Some(4), Some(7)]);
+    assert_eq!(named("Example missing card"), None, "a missing name finds nothing");
+    let laptop = vec![all[0].clone(), all[5].clone()];
+    assert_eq!(pick(&GpuChoice::Software, &laptop), Some(1), "OpenGL ES when Vulkan has none");
+    assert_eq!(
+        [pick(&GpuChoice::Dedicated, &laptop), pick(&GpuChoice::Integrated, &laptop)],
+        [None, Some(0)]
+    );
+    assert_eq!(pick(&GpuChoice::Dedicated, &[]), None);
+    let kinds = all.iter().map(|(_, t, ..)| kind(*t)).collect::<Vec<_>>();
+    assert_eq!(
+        kinds,
+        ["integrated", "integrated", "dedicated", "dedicated", "virtual", "software", "software", "other"]
+    );
+}
+
+#[test]
+fn a_chosen_card_that_cannot_open_falls_back_to_the_automatic_choice() {
+    let failed = Some(Err::<u8, _>(RenderError::Device("no device for these limits".into())));
+    assert_eq!(settle(failed, "dedicated"), Err(Fallback::Unusable));
+    assert_eq!(settle(None::<Result<u8, RenderError>>, "Example missing card"), Err(Fallback::Missing));
+    assert_eq!(settle(Some(Ok(7)), "dedicated"), Ok(7));
+}
+
+#[test]
+fn a_backend_limit_keeps_other_drivers_unloaded_when_listing_cards() {
+    assert_eq!(extra(Backend::Gl, Some(Backends::GL)), None, "WGPU_BACKEND=gl never loads Vulkan");
+    assert_eq!(extra(Backend::Gl, None), Some(Backends::VULKAN));
+    assert_eq!(extra(Backend::Vulkan, None), None);
+    assert_eq!(extra(Backend::Vulkan, Some(Backends::VULKAN)), None);
+}
+
+#[test]
+fn two_identical_cards_are_told_apart_by_their_pci_bus() {
+    let twin = |bus: &str| {
+        ("Example Dedicated Graphics".to_owned(), DeviceType::DiscreteGpu, Backend::Vulkan, bus.to_owned())
+    };
+    let all = vec![
+        twin("0000:03:00.0"),
+        twin("0000:04:00.0"),
+        card("Example Soft", DeviceType::Cpu, Backend::Vulkan),
+    ];
+    let on = |bus: &str| pick(&GpuChoice::parse(&format!("pci:{bus}")).unwrap(), &all);
+    assert_eq!(
+        [on("0000:04:00.0"), on("0000:03:00.0"), on("0000:04:00.0".to_uppercase().as_str())],
+        [Some(1), Some(0), Some(1)]
+    );
+    assert_eq!(on("0000:05:00.0"), None, "a card on another bus was taken");
+    assert_eq!(
+        pick(&GpuChoice::parse("Example Dedicated").unwrap(), &all),
+        Some(0),
+        "a name takes the first twin"
+    );
+    assert_eq!(
+        pick(&GpuChoice::parse("pci:0").unwrap(), &[card("Example", DeviceType::Cpu, Backend::Gl)]),
+        None
+    );
+}
+
+fn node(sys: &std::path::Path, device: &str, dev: (u64, u64), kind: &str) {
+    let dir = sys.join(format!("devices/pci0000:00/0000:00:01.1/{device}/drm/{kind}"));
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::create_dir_all(sys.join("dev/char")).unwrap();
+    std::os::unix::fs::symlink(&dir, sys.join(format!("dev/char/{}:{}", dev.0, dev.1))).unwrap();
+}
+
+fn made(major: u64, minor: u64) -> u64 {
+    ((major & 0xfff) << 8) | ((major & !0xfff) << 32) | (minor & 0xff) | ((minor & !0xff) << 12)
+}
+
+#[test]
+fn the_card_the_compositor_renders_with_is_found_by_the_pci_bus_behind_its_device_number() {
+    let sys = tempfile::tempdir().unwrap();
+    node(sys.path(), "0000:03:00.0", (226, 128), "renderD128");
+    node(sys.path(), "0000:00:02.0", (226, 129), "renderD129");
+    node(sys.path(), "0000:0A:00.0", (4095, 70000), "card9");
+    let bus = |dev| super::compositor::bus_in(sys.path(), dev);
+    assert_eq!(bus(made(226, 128)).as_deref(), Some("0000:03:00.0"));
+    assert_eq!(bus(made(226, 129)).as_deref(), Some("0000:00:02.0"));
+    assert_eq!(bus(made(4095, 70000)).as_deref(), Some("0000:0a:00.0"), "device numbers above 8 bits");
+    assert_eq!(bus(made(226, 130)), None, "a node that is not there");
+}
+
+#[test]
+fn only_the_automatic_choice_follows_the_compositor() {
+    let guided = |choice: &GpuChoice, bus| super::compositor::guided(choice, bus);
+    let bus = Some("0000:03:00.0");
+    assert_eq!(guided(&GpuChoice::Auto, bus), Some(GpuChoice::Bus("pci:0000:03:00.0".into())));
+    assert_eq!(guided(&GpuChoice::Auto, None), None, "the old rule when the compositor does not say");
+    for forced in [GpuChoice::Integrated, GpuChoice::Dedicated, GpuChoice::Named("radv".into())] {
+        assert_eq!(guided(&forced, bus), None, "{forced:?} is the choice of the user");
+    }
+    let cards = vec![
+        (
+            "Example Integrated Graphics".into(),
+            DeviceType::IntegratedGpu,
+            Backend::Vulkan,
+            "0000:00:02.0".into(),
+        ),
+        ("Example Dedicated Graphics".into(), DeviceType::DiscreteGpu, Backend::Gl, "0000:03:00.0".into()),
+        (
+            "Example Dedicated Graphics".into(),
+            DeviceType::DiscreteGpu,
+            Backend::Vulkan,
+            "0000:03:00.0".into(),
+        ),
+    ];
+    let wanted = guided(&GpuChoice::Auto, bus).unwrap();
+    assert_eq!(pick(&wanted, &cards), Some(2), "the card on that bus, through Vulkan");
+    assert_eq!(pick(&guided(&GpuChoice::Auto, Some("0000:09:00.0")).unwrap(), &cards), None);
+}

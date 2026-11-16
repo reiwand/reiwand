@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.reiwand.Reiwand</id>
+  <name>Reiwand</name>
+  <summary>Animated and static wallpapers for KDE Plasma</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <developer id="io.github.reiwand">
+    <name>Reiwand contributors</name>
+  </developer>
+  <description>
+    <p>
+      Images, looping videos and scenes as wallpapers, with transitions, one wallpaper per screen
+      and automatic pausing. A daemon renders each screen on the GPU and KDE Plasma shows it through
+      a wallpaper plugin. The app organizes the library, playlists, profiles and online sources and
+      edits images and scenes; the system tray icon offers the basics and reiwand-ctl manages
+      everything from a terminal.
+    </p>
+    <p>
+      Flatpak cannot install the Plasma wallpaper plugin and tray icon. After installing or
+      updating, run <code>flatpak run --command=reiwand-plasma io.github.reiwand.Reiwand | sh</code>
+      to install them from this package with kpackagetool6.
+    </p>
+  </description>
+  <launchable type="desktop-id">io.github.reiwand.Reiwand.desktop</launchable>
+  <url type="homepage">https://github.com/reiwand/reiwand</url>
+  <categories>
+    <category>Settings</category>
+    <category>DesktopSettings</category>
+  </categories>
+  <provides>
+    <binary>reiwand-app</binary>
+    <binary>reiwandd</binary>
+    <binary>reiwand-ctl</binary>
+    <binary>reiwand-plasma</binary>
+    <dbus type="user">io.github.reiwand</dbus>
+    <dbus type="user">io.github.reiwand.Daemon</dbus>
+  </provides>
+  <content_rating type="oars-1.1">
+    <content_attribute id="violence-realistic">intense</content_attribute>
+    <content_attribute id="violence-bloodshed">intense</content_attribute>
+    <content_attribute id="sex-nudity">intense</content_attribute>
+    <content_attribute id="sex-themes">intense</content_attribute>
+    <content_attribute id="language-profanity">intense</content_attribute>
+  </content_rating>
+</component>

@@ -1,0 +1,8 @@
+services:
+  reiwand:
+    build:
+      context: .
+      dockerfile: apps/reiwand-server/Dockerfile
+      args: [REIWAND_VERSION]
+    image: reiwand-server:local
+    pull_policy: build

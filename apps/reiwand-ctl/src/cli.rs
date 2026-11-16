@@ -1,0 +1,195 @@
+pub use crate::args::{FIT, ITEM, JSON, OUTPUT, Out, Page, Wait};
+use crate::{edit::Edits, inputs::Inputs, library::Lib, models::Models, presets::Preset, profiles::Profile};
+use crate::{pack::Pack, pkg::Pkg, playlists::Playlist, props::Prop, providers::Provider};
+use crate::{remote::Remote, repo::Repo, scoped::SceneArgs, server::Server};
+use clap::{Parser, Subcommand};
+use reiwand_core::Fit;
+
+#[derive(Parser, Debug)]
+#[command(name = "reiwand-ctl", version = reiwand_core::VERSION, about = "Control the Reiwand daemon")]
+pub struct Cli {
+    #[command(subcommand)]
+    pub command: Command,
+}
+
+#[derive(Subcommand, Debug)]
+pub enum Command {
+    #[command(about = "Set the wallpaper: an image or a video")]
+    Set {
+        #[arg(help = "Local image or video file, as a path or a file:// URI")]
+        path: String,
+        #[arg(short, long, default_value = "", help = OUTPUT)]
+        output: String,
+        #[arg(short, long, help = FIT)]
+        fit: Option<Fit>,
+    },
+    #[command(about = "Remove the wallpaper and give the screen back to the desktop; restore brings it back")]
+    Clear(Out),
+    #[command(about = "In Plasma, switch the screens back to Plasma's own wallpaper type")]
+    PlasmaBack,
+    #[command(about = "Bring back the wallpaper that clear removed")]
+    Restore(Out),
+    #[command(about = "Change only the placement of the current wallpaper")]
+    Fit {
+        #[arg(help = FIT)]
+        fit: Fit,
+        #[arg(short, long, default_value = "", help = OUTPUT)]
+        output: String,
+    },
+    #[command(about = "Set the color shown around and behind the wallpaper")]
+    Background {
+        #[arg(help = "Color as #rrggbb")]
+        color: String,
+        #[arg(short, long, default_value = "", help = OUTPUT)]
+        output: String,
+    },
+    #[command(about = "Color the wallpaper of a screen with a look and adjustments; none clears it")]
+    Filter(crate::filtering::FilterArgs),
+    #[command(about = "Change a setting, or list them all without arguments")]
+    Config {
+        #[arg(help = "Setting such as transition.kind; see the list without arguments")]
+        key: Option<String>,
+        #[arg(help = "New value of the setting")]
+        value: Option<String>,
+        #[arg(long, help = "Print the settings as a JSON object")]
+        json: bool,
+    },
+    #[command(about = "List the graphics cards and the one in use, or choose the one the daemon starts with")]
+    Gpu(crate::gpus::GpuArgs),
+    #[command(about = "Show the quality of each screen and why, or keep it automatic, fixed or floored")]
+    Quality(crate::levels::QualityArgs),
+    #[command(about = "Re-read the configuration file")]
+    Reload,
+    #[command(about = "Start the daemon again, through systemd if it runs it, for a new card or surface")]
+    Restart,
+    #[command(about = "Draw again the effects left out after they stopped the graphics card or a program")]
+    RetryEffects,
+    #[command(about = "Print the daemon state as JSON")]
+    State {
+        #[arg(long, help = "Accepted for symmetry: the state is always JSON")]
+        json: bool,
+    },
+    #[command(
+        about = "Show a pattern of lines and circles over the screens to check where they are; setting layout.monitors.<screen> to X,Y,W,H in millimetres places one by hand and layout.follow.<output> to another output shows the same part"
+    )]
+    Calibrate {
+        #[arg(value_parser = ["on", "off"], help = "Show the pattern or hide it")]
+        state: String,
+    },
+    #[command(about = "Pause animated wallpapers")]
+    Pause,
+    #[command(about = "Resume animated wallpapers")]
+    Resume,
+    #[command(about = "Pause or resume animated wallpapers")]
+    Toggle,
+    #[command(about = "Private mode: cut all network of the program, or give it back")]
+    Private(crate::network::Private),
+    #[command(about = "Set the volume of videos and scenes with sound, 0 to 100, and unmute them")]
+    Volume {
+        #[arg(value_parser = clap::value_parser!(u8).range(0..=100), help = "Volume in percent")]
+        percent: u8,
+    },
+    #[command(about = "Play, silence or lower the sound of the wallpaper of a screen; print what each has")]
+    Sound(crate::hearing::Hearing),
+    #[command(about = "Mute videos and scenes with sound")]
+    Mute,
+    #[command(about = "Unmute videos and scenes with sound")]
+    Unmute,
+    #[command(about = "Create the stream of an output and print its node id and serial")]
+    Stream(crate::args::Streaming),
+    #[command(about = "Release a stream created with the stream command")]
+    Release {
+        #[arg(help = "Name of the output of the stream")]
+        output: String,
+    },
+    #[command(about = "Tell the daemon where a screen sits, for wallpapers that span screens")]
+    Screen(crate::args::Placement),
+    #[command(about = "Report whether a window covers an output")]
+    Covered(crate::args::Cover),
+    #[command(about = "Describe the settings, rules, provider kinds and search keys of the daemon")]
+    Schema {
+        #[arg(long, help = JSON)]
+        json: bool,
+    },
+    #[command(about = "Print changes and job events as they happen")]
+    Watch {
+        #[arg(long, help = "Print one JSON object per line")]
+        json: bool,
+    },
+    #[command(about = "Wait for a change and print the new serial and the changed topics")]
+    Wait {
+        #[arg(long, help = "Serial to wait from; the current one when omitted")]
+        serial: Option<u64>,
+        #[arg(long, default_value_t = 20000, help = "Milliseconds to wait, at most 20000")]
+        timeout: u32,
+        #[arg(long, help = "Print the result as JSON")]
+        json: bool,
+    },
+    #[command(about = "List running, queued and recently finished jobs")]
+    Jobs {
+        #[arg(long, help = JSON)]
+        json: bool,
+    },
+    #[command(about = "Show a job")]
+    Job {
+        #[arg(help = "Id of the job")]
+        id: u64,
+        #[arg(long, help = JSON)]
+        json: bool,
+    },
+    #[command(about = "Cancel a queued or running job")]
+    Cancel {
+        #[arg(help = "Id of the job")]
+        id: u64,
+    },
+    #[command(subcommand, about = "Settings of the scene or video package shown on an output")]
+    Prop(Prop),
+    #[command(
+        about = "Create, edit, build and benchmark scenes; needs no daemon except for preview and apply"
+    )]
+    Scene(SceneArgs),
+    #[command(subcommand, about = "Library folders, items, tags and thumbnails")]
+    Lib(Lib),
+    #[command(subcommand, about = "Placement presets of items, and global presets")]
+    Preset(Preset),
+    #[command(subcommand, about = "Playlists and their rotation")]
+    Playlist(Playlist),
+    #[command(flatten)]
+    Browsing(crate::browsing::Browsing),
+    #[command(subcommand, about = "Profiles: saved assignments of every output")]
+    Profile(Profile),
+    #[command(subcommand, about = "Online sources of wallpapers")]
+    Provider(Provider),
+    #[command(subcommand, about = "Package repositories added to this computer")]
+    Remote(Remote),
+    #[command(subcommand, about = "Packages of the added repositories")]
+    Pkg(Pkg),
+    #[command(subcommand, about = "Audio, pointer and other inputs of scenes and pages: grants and state")]
+    Input(Inputs),
+    #[command(
+        subcommand,
+        about = "The self-hosted server: link, end-to-end encrypted sync and uploads",
+        after_long_help = crate::account::NAMES
+    )]
+    Server(Server),
+    #[command(subcommand, about = "Edit images, keeping their files; needs no daemon but for preview")]
+    Edit(Edits),
+    #[command(subcommand, about = "RGB lighting through an OpenRGB server: status, devices and a test")]
+    Rgb(crate::rgb::Rgb),
+    #[command(subcommand, about = "Whether the media player is read now, and for which screens")]
+    Media(crate::media::Media),
+    #[command(subcommand, about = "Download, check and remove the depth model and runtime; needs no daemon")]
+    Models(Models),
+    #[command(subcommand, about = "Build, sign and check .wpak packages; needs no daemon")]
+    Pack(Pack),
+    #[command(name = "connect-code", about = "Print and draw the server connect code; needs no daemon")]
+    ConnectCode(crate::connecting::Connect),
+    #[command(subcommand, about = "Operate a package repository; needs no daemon")]
+    Repo(Repo),
+    #[command(
+        about = "Moderate a self-hosted server with a personal token (REIWAND_SERVER_TOKEN); needs no daemon"
+    )]
+    Moderate(crate::moderate::Moderate),
+    #[command(about = "Print the licenses of the libraries, fonts, icons and models the program carries")]
+    Licenses,
+}

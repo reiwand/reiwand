@@ -1,0 +1,18 @@
+[package]
+name = "reiwand-qr"
+description = "The text a connect-to-this-server code carries, and its QR drawing, for Reiwand"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[features]
+read = ["dep:rqrr"]
+
+[dependencies]
+qrcodegen.workspace = true
+rqrr = { workspace = true, optional = true }
+thiserror.workspace = true
+
+[dev-dependencies]
+rqrr.workspace = true

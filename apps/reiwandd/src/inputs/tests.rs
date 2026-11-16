@@ -1,0 +1,179 @@
+use super::{Bound, Control, Grants, Hub, View, pace};
+use crate::compositor::lock;
+use crate::inputs::{load, load_bound};
+use crate::inputs1::scene_id;
+use reiwand_core::model::{Input, SceneInputs};
+use reiwand_scene::{MAX_PRESSES, PointerState, Press};
+use std::os::unix::fs::PermissionsExt;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicU32, Ordering::SeqCst};
+use std::time::{Duration, Instant};
+
+mod gates;
+mod orders;
+mod previews;
+mod shown;
+
+const SEA: &str = "org.example.sea";
+
+fn hub(wakes: Arc<AtomicU32>) -> Arc<Hub> {
+    let wake = move || {
+        wakes.fetch_add(1, SeqCst);
+    };
+    Arc::new(Hub::new(Default::default(), Arc::new(wake), Arc::new(|| {})))
+}
+
+fn mode(path: &std::path::Path) -> u32 {
+    std::fs::metadata(path).unwrap().permissions().mode() & 0o777
+}
+
+fn scene(scene: &str, key: &str, audio: bool, pointer: bool) -> SceneInputs {
+    let (scene, key, title, granted) = (scene.into(), key.into(), String::new(), Default::default());
+    let media = false;
+    SceneInputs {
+        scene,
+        audio,
+        pointer,
+        clicks: false,
+        network: false,
+        rgb: false,
+        media,
+        title,
+        key,
+        granted,
+        without: Default::default(),
+        undecided: Default::default(),
+    }
+}
+
+fn bound(key: &str, inputs: &[Input]) -> Bound {
+    Bound::from([(SEA.into(), Grants::from([(key.into(), inputs.iter().copied().collect())]))])
+}
+
+fn showing(hub: &Hub, output: &str, key: &str) {
+    lock(&hub.control).shown.insert(output.into(), scene(SEA, key, true, true));
+}
+
+#[test]
+fn permissions_are_stored_privately_and_can_be_revoked() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("data").join("inputs.json");
+    let hub = hub(Arc::default());
+    assert!(
+        hub.grant(&path, SEA, "sha256:aa", Input::Audio).is_err(),
+        "granted to a scene that is not shown"
+    );
+    showing(&hub, "DP-1", "sha256:aa");
+    hub.grant(&path, SEA, "sha256:aa", Input::Audio).unwrap();
+    hub.grant(&path, SEA, "sha256:aa", Input::Pointer).unwrap();
+    assert_eq!(load_bound(&path), bound("sha256:aa", &[Input::Audio, Input::Pointer]));
+    assert_eq!((mode(&path), mode(path.parent().unwrap())), (0o600, 0o700));
+    hub.revoke(&path, SEA, Input::Audio).unwrap();
+    assert_eq!(load_bound(&path), bound("sha256:aa", &[Input::Pointer]));
+    hub.revoke(&path, SEA, Input::Pointer).unwrap();
+    hub.revoke(&path, SEA, Input::Pointer).unwrap();
+    assert_eq!((load_bound(&path), std::fs::read_to_string(&path).unwrap()), (Bound::new(), "{}".into()));
+    std::fs::write(&path, "not json").unwrap();
+    assert_eq!(load_bound(&path), Bound::new());
+}
+
+#[test]
+fn a_package_with_the_same_id_does_not_inherit_its_grants() {
+    let dir = tempfile::tempdir().unwrap();
+    let (path, hub) = (dir.path().join("inputs.json"), hub(Arc::default()));
+    showing(&hub, "DP-1", "key:signer");
+    assert_eq!(lock(&hub.control).package(SEA, None).unwrap().0, "key:signer");
+    hub.grant(&path, SEA, "key:signer", Input::Audio).unwrap();
+    showing(&hub, "DP-2", "sha256:other");
+    assert!(lock(&hub.control).package(SEA, None).is_err(), "a bare id chose one of two packages");
+    assert!(hub.grant(&path, SEA, "sha256:gone", Input::Pointer).is_err(), "granted to a package not shown");
+    hub.grant(&path, SEA, "key:signer", Input::Pointer).unwrap();
+    let control = lock(&hub.control);
+    assert!(control.allows("DP-1", Input::Audio) && !control.allows("DP-2", Input::Audio));
+    assert_eq!(control.granted(SEA, "key:signer"), [Input::Audio, Input::Pointer].into());
+    assert_eq!(control.granted(SEA, "sha256:other"), Default::default());
+    drop(control);
+}
+
+#[test]
+fn declining_is_remembered_until_the_input_is_granted() {
+    let dir = tempfile::tempdir().unwrap();
+    let (path, hub) = (dir.path().join("inputs.json"), hub(Arc::default()));
+    let declined = crate::inputs::declined_path(&path);
+    hub.revoke(&path, SEA, Input::Audio).unwrap();
+    assert_eq!(load(&declined), Grants::from([(SEA.into(), [Input::Audio].into())]));
+    assert_eq!((lock(&hub.control).declined.clone(), mode(&declined)), (load(&declined), 0o600));
+    showing(&hub, "DP-1", "sha256:aa");
+    hub.grant(&path, SEA, "sha256:aa", Input::Audio).unwrap();
+    assert_eq!(load(&declined), Grants::new());
+    assert_eq!(load_bound(&path), bound("sha256:aa", &[Input::Audio]));
+}
+
+#[test]
+fn a_change_of_the_lights_permission_wakes_the_renderer_at_once() {
+    let dir = tempfile::tempdir().unwrap();
+    let wakes = Arc::new(AtomicU32::new(0));
+    let (path, hub) = (dir.path().join("inputs.json"), hub(wakes.clone()));
+    showing(&hub, "DP-1", "sha256:aa");
+    hub.grant(&path, SEA, "sha256:aa", Input::Rgb).unwrap();
+    assert_eq!(wakes.load(SeqCst), 1, "a granted light did not wake the renderer");
+    hub.grant(&path, SEA, "sha256:aa", Input::Rgb).unwrap();
+    hub.grant(&path, SEA, "sha256:aa", Input::Clicks).unwrap();
+    assert_eq!(wakes.load(SeqCst), 1, "an unchanged grant or another input woke the renderer");
+    hub.revoke(&path, SEA, Input::Rgb).unwrap();
+    assert_eq!(wakes.load(SeqCst), 2, "a revoked light did not wake the renderer");
+}
+
+#[test]
+fn a_declined_question_spares_the_twins_and_old_clients_see_the_shown_package() {
+    let dir = tempfile::tempdir().unwrap();
+    let (path, hub) = (dir.path().join("inputs.json"), hub(Arc::default()));
+    let reported = || crate::inputs::reported(&lock(&hub.control));
+    showing(&hub, "DP-1", "key:signer");
+    hub.grant(&path, SEA, "key:signer", Input::Audio).unwrap();
+    showing(&hub, "DP-1", "sha256:twin");
+    assert_eq!(reported(), Grants::new(), "a twin was reported as allowed");
+    hub.decline(&path, SEA, "sha256:twin", Input::Audio).unwrap();
+    assert_eq!(load_bound(&path), bound("key:signer", &[Input::Audio]), "the decline revoked a twin");
+    assert_eq!(lock(&hub.control).declined, Grants::from([(SEA.into(), [Input::Audio].into())]));
+    showing(&hub, "DP-1", "key:signer");
+    assert_eq!(reported(), Grants::from([(SEA.into(), [Input::Audio].into())]));
+    lock(&hub.control).shown.clear();
+    assert_eq!(reported(), Grants::from([(SEA.into(), [Input::Audio].into())]), "a grant was hidden");
+}
+
+#[test]
+fn a_page_that_reaches_the_network_hears_the_player_only_after_a_second_confirmation() {
+    let mut control = Control::default();
+    let page = |network| SceneInputs { media: true, network, ..scene(SEA, "k", false, false) };
+    control.shown.insert("A".into(), page(true));
+    control.grants = bound("k", &[Input::Media]);
+    assert!(!control.allows("A", Input::Media), "media alone does not reach a page with the network");
+    assert!(!control.allows("A", Input::MediaNetwork));
+    control.grants = bound("k", &[Input::Media, Input::MediaNetwork]);
+    assert!(control.allows("A", Input::Media) && control.allows("A", Input::MediaNetwork));
+    control.grants = bound("k", &[Input::MediaNetwork]);
+    assert!(!control.allows("A", Input::Media), "the second confirmation never stands alone");
+    control.shown.insert("A".into(), page(false));
+    control.grants = bound("k", &[Input::Media]);
+    assert!(control.allows("A", Input::Media) && !control.allows("A", Input::MediaNetwork));
+    assert_eq!(Input::parse("media_network"), Some(Input::MediaNetwork));
+}
+
+#[test]
+fn a_page_that_reaches_the_network_hears_only_after_a_second_confirmation() {
+    let mut control = Control::default();
+    let page = |network| SceneInputs { network, ..scene(SEA, "k", true, false) };
+    control.shown.insert("A".into(), page(true));
+    control.grants = bound("k", &[Input::Audio]);
+    assert!(!control.allows("A", Input::Audio), "audio alone does not reach a page with the network");
+    assert!(!control.allows("A", Input::AudioNetwork));
+    control.grants = bound("k", &[Input::Audio, Input::AudioNetwork]);
+    assert!(control.allows("A", Input::Audio) && control.allows("A", Input::AudioNetwork));
+    control.grants = bound("k", &[Input::AudioNetwork]);
+    assert!(!control.allows("A", Input::Audio), "the second confirmation never stands alone");
+    control.shown.insert("A".into(), page(false));
+    control.grants = bound("k", &[Input::Audio]);
+    assert!(control.allows("A", Input::Audio) && !control.allows("A", Input::AudioNetwork));
+    assert_eq!(Input::parse("audio_network"), Some(Input::AudioNetwork));
+}

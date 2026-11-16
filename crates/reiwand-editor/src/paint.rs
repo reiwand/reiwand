@@ -1,0 +1,118 @@
+use crate::layers::unique;
+use crate::ops::{Op, escape, set};
+use anyhow::{Result, ensure};
+use image::{Rgba, RgbaImage};
+use reiwand_core::message::said;
+use reiwand_scene::{Param, Scene};
+use serde_json::{Value, json};
+use std::path::Path;
+
+const SIDE: u32 = 512;
+pub(crate) const POINTS: usize = 4096;
+
+pub struct Stroke<'a> {
+    pub pointer: &'a str,
+    pub channel: Option<usize>,
+    pub radius: f32,
+    pub hardness: f32,
+    pub value: f32,
+    pub points: &'a [[f32; 2]],
+    pub direction: bool,
+}
+
+pub(crate) fn paint(dir: &Path, doc: &Value, s: &Stroke) -> Result<Vec<Op>> {
+    let param =
+        s.pointer.starts_with("/scene/") && s.pointer.contains("/effects/") && s.pointer.contains("/params/");
+    ensure!(param, said("editor.paint_param", "masks are painted on a parameter of an effect", &[]));
+    let fits = (1..=POINTS).contains(&s.points.len()) && s.channel.is_none_or(|c| c < 4);
+    ensure!(
+        fits,
+        said("editor.paint_stroke", "a stroke has 1 to %1 points and a channel from 0 to 3", &[&POINTS])
+    );
+    let asset = |id: &str| format!("/scene/assets/{}", escape(id));
+    let named = doc.pointer(s.pointer).and_then(Value::as_str).filter(|id| doc.pointer(&asset(id)).is_some());
+    let shared = named.is_some_and(|id| {
+        let uses = crate::gallery::uses(doc, id);
+        uses["uses"].as_array().is_some_and(|u| u.iter().any(|row| row["pointer"] != s.pointer))
+    });
+    let id = named
+        .filter(|_| !shared)
+        .map_or_else(|| unique(doc, s.pointer.rsplit('/').next().unwrap_or("mask")), String::from);
+    let path = named.and_then(|id| doc.pointer(&format!("{}/path", asset(id)))?.as_str());
+    let old = named.and_then(|id| crate::pictures::asset(dir, doc, id).ok()).map(|i| i.into_rgba8());
+    let mut picture = old
+        .unwrap_or_else(|| RgbaImage::from_pixel(SIDE, SIDE, Rgba(blank(dir, doc, s.pointer, s.direction))));
+    stroke(&mut picture, s);
+    let layer = s.pointer.rsplit_once("/effects/").and_then(|(at, _)| doc.pointer(at));
+    let image = layer.and_then(|l| l["image"].as_str()).filter(|i| doc.pointer(&asset(i)).is_some());
+    let like = path.or_else(|| doc.pointer(&format!("{}/path", asset(image?)))?.as_str());
+    let saved = crate::pictures::store(dir, ("masks", &id), &picture, like.map(|p| dir.join(p)).as_deref())?;
+    let mut ops = set(doc, &asset(&id), json!({ "path": saved, "linear": true }));
+    ops.extend(set(doc, s.pointer, json!(id)));
+    Ok(ops)
+}
+
+fn blank(dir: &Path, doc: &Value, pointer: &str, still: bool) -> [u8; 4] {
+    let painted = || {
+        let (at, id) = pointer.rsplit_once("/params/")?;
+        let name = doc.pointer(&format!("{at}/effect"))?.as_str()?;
+        let mut scene = serde_json::from_value::<Scene>(doc["scene"].clone()).ok()?;
+        crate::cache::read_files(&mut scene, dir);
+        let byte = |v: f32| (v.clamp(0.0, 1.0) * 255.0).round() as u8;
+        match scene.effect(name)?.params.iter().find(|p| p.id == id)?.paint.as_ref()? {
+            Param::Color(c) => Some(c.0.map(byte)),
+            Param::Number(n) => Some([byte(*n); 4]),
+            _ => None,
+        }
+    };
+    painted().unwrap_or(if still { [128, 128, 128, 255] } else { [0, 0, 0, 255] })
+}
+
+pub(crate) fn stroke(picture: &mut RgbaImage, s: &Stroke) {
+    let (w, h) = picture.dimensions();
+    let r = s.radius.clamp(0.001, 0.5) * w.min(h) as f32;
+    let soft = r * s.hardness.clamp(0.0, 0.99);
+    let mut cover = vec![(0.0f32, [0.0f32; 2]); (w * h) as usize];
+    let first = s.points[0];
+    let pairs = s.points.windows(2).map(|p| (p[0], p[1])).chain([(first, first)]);
+    for (a, b) in pairs {
+        let (a, b) = ([a[0] * w as f32, a[1] * h as f32], [b[0] * w as f32, b[1] * h as f32]);
+        let (x0, x1) = ((a[0].min(b[0]) - r).max(0.0) as u32, ((a[0].max(b[0]) + r).ceil() as u32).min(w));
+        let (y0, y1) = ((a[1].min(b[1]) - r).max(0.0) as u32, ((a[1].max(b[1]) + r).ceil() as u32).min(h));
+        let ab = [b[0] - a[0], b[1] - a[1]];
+        let long = (ab[0] * ab[0] + ab[1] * ab[1]).max(1e-6);
+        if s.direction && long < 1e-3 {
+            continue;
+        }
+        let aim = [ab[0] / long.sqrt(), ab[1] / long.sqrt()];
+        for y in y0..y1 {
+            for x in x0..x1 {
+                let p = [x as f32 + 0.5 - a[0], y as f32 + 0.5 - a[1]];
+                let t = ((p[0] * ab[0] + p[1] * ab[1]) / long).clamp(0.0, 1.0);
+                let d = (p[0] - ab[0] * t).hypot(p[1] - ab[1] * t);
+                let k = 1.0 - ((d - soft) / (r - soft).max(1e-3)).clamp(0.0, 1.0);
+                let c = &mut cover[(y * w + x) as usize];
+                let k = k * k * (3.0 - 2.0 * k);
+                if k > c.0 {
+                    *c = (k, aim);
+                }
+            }
+        }
+    }
+    let value = s.value.clamp(0.0, 1.0);
+    let channels = s.channel.map_or(0..3, |c| c..c + 1);
+    for (pixel, (k, aim)) in picture.pixels_mut().zip(cover).filter(|(_, (k, _))| *k > 0.0) {
+        let target = |c: usize| match s.direction {
+            true => (0.5 + 0.5 * aim.get(c).copied().unwrap_or(0.0) * value) * 255.0,
+            false => value * 255.0,
+        };
+        let painted = if s.direction { 0..2 } else { channels.clone() };
+        for c in painted {
+            let old = f32::from(pixel.0[c]);
+            pixel.0[c] = (old + (target(c) - old) * k).round() as u8;
+        }
+        if s.direction {
+            pixel.0[3] = 255;
+        }
+    }
+}

@@ -1,0 +1,28 @@
+[package]
+name = "reiwand-scene"
+description = "Animated layered scene model for Reiwand"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+reiwand-core.workspace = true
+reiwand-palette.workspace = true
+bytemuck.workspace = true
+half.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+thiserror.workspace = true
+naga.workspace = true
+sha2.workspace = true
+libc.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[[test]]
+name = "helper"
+path = "tests/helper/main.rs"
+harness = false

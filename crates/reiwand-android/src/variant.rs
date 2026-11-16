@@ -1,0 +1,158 @@
+use crate::library::with;
+use crate::pack::Pack;
+use crate::{Error, pack, props, repos, said, store};
+use reiwand_format::{Dependency, Limits};
+use reiwand_library::{Item, Library};
+use reiwand_scene::{Property, Values};
+use semver::{Version, VersionReq};
+use serde_json::json;
+use std::collections::BTreeMap;
+use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex, PoisonError, Weak};
+
+const DEPTH: u32 = 4;
+
+type Tried = ((String, PathBuf), pack::Stamp, Weak<Pack>);
+
+static TRIED: Mutex<Vec<Tried>> = Mutex::new(Vec::new());
+
+fn version(item: &Item) -> Option<Version> {
+    Version::parse(&item.package.as_ref()?.version).ok()
+}
+
+fn wanted(dependency: &Dependency) -> Result<VersionReq, Error> {
+    VersionReq::parse(&dependency.version).map_err(|e| {
+        said("android.version_range", "%1 is not a version range: %2", &[&dependency.version, &e])
+    })
+}
+
+fn found_in(lib: &Library, dependency: &Dependency, any: bool) -> Result<Option<Item>, Error> {
+    let wanted = wanted(dependency)?;
+    let usable = |i: &Item| {
+        i.package.as_ref().is_some_and(|p| any || (p.kind != "preset" && p.kind != "assets"))
+            && version(i).is_some_and(|v| wanted.matches(&v))
+    };
+    Ok(lib.packages_of(&dependency.id)?.into_iter().filter(usable).max_by_key(version))
+}
+
+pub(crate) fn present(lib: &Library, dependency: &Dependency) -> Result<Option<Item>, Error> {
+    found_in(lib, dependency, false)
+}
+
+pub(crate) fn based(item: &Item) -> Result<Option<Dependency>, Error> {
+    if item.package.as_ref().is_none_or(|p| p.kind != "preset") {
+        return Ok(None);
+    }
+    Ok(Some(reiwand_format::open(&item.path, &Limits::phone())?.preset()?.base))
+}
+
+pub(crate) fn preset(lib: &Library, uid: &str) -> Result<Option<String>, Error> {
+    let Some(base) = based(&lib.item(uid)?)? else { return Ok(None) };
+    let needs = || {
+        said("android.preset_needs", "this preset needs %1 %2; install it first", &[&base.id, &base.version])
+    };
+    present(lib, &base)?.map(|base| Some(base.uid)).ok_or_else(needs)
+}
+
+fn chosen(path: &Path, properties: &BTreeMap<String, Property>) -> Result<Values, Error> {
+    let mut package = reiwand_format::open(path, &Limits::phone())?;
+    let chosen = reiwand_format::values::chosen(&package.preset()?, properties);
+    chosen.warnings.iter().for_each(|w| log::warn!("{}: {w}", package.manifest.id));
+    let mut values = chosen.values;
+    let dir = store::dir()?.join("presets").join(&package.manifest.id);
+    for (id, file) in chosen.files {
+        let ext = Path::new(&file).extension().and_then(|e| e.to_str()).unwrap_or("bin");
+        let kept = dir.join(format!("{id}.{ext}"));
+        std::fs::create_dir_all(&dir)?;
+        let bytes = package.read_file(&file)?;
+        if std::fs::read(&kept).ok().as_deref() != Some(bytes.as_slice()) {
+            store::write(&kept, &bytes)?;
+        }
+        values.insert(id, json!(kept));
+    }
+    Ok(values)
+}
+
+pub(crate) fn apply(uid: &str) -> Result<String, Error> {
+    let Some(base) = with(|lib| preset(lib, uid))? else { return Ok(uid.to_owned()) };
+    let pack = pack::load(&with(|lib| Ok(lib.item(&base)?.path))?)?;
+    let values = chosen(&with(|lib| Ok(lib.item(uid)?.path))?, &pack.properties)?;
+    props::change(&pack, |kept| {
+        kept.extend(values.iter().filter_map(|(k, v)| Some((k.clone(), props::stored(v)?))))
+    })?;
+    Ok(base)
+}
+
+pub(crate) fn loaded(path: &Path, preset: Option<&str>) -> Result<Arc<Pack>, Error> {
+    let base = pack::load(path)?;
+    let Some(preset) = preset else { return Ok(base) };
+    let key = (preset.to_owned(), path.to_path_buf());
+    let current = with(|lib| Ok(lib.item(preset)?.path))?;
+    let mut tried = TRIED.lock().unwrap_or_else(PoisonError::into_inner);
+    tried.retain(|(.., made)| made.strong_count() > 0);
+    let on = |pack: &Arc<Pack>| pack.tried.as_ref().is_some_and(|(_, on)| Arc::ptr_eq(on, &base));
+    let same = |stamp: &pack::Stamp| pack::stamp(&stamp.0).is_ok_and(|now| now == *stamp);
+    let found = tried.iter().filter(|(k, stamp, _)| *k == key && stamp.0 == current && same(stamp));
+    if let Some(pack) = found.filter_map(|(.., made)| made.upgrade()).find(on) {
+        return Ok(pack);
+    }
+    let stamp = pack::stamp(&current)?;
+    let values = chosen(&stamp.0, &base.properties)?;
+    let pack = Arc::new(Pack { tried: Some((values, Arc::clone(&base))), ..Pack::clone(&base) });
+    tried.push((key, stamp, Arc::downgrade(&pack)));
+    Ok(pack)
+}
+
+pub(crate) type Fetch<'a> = dyn FnMut(&Dependency) -> Result<(String, PathBuf), Error> + 'a;
+
+#[derive(Debug, Default, PartialEq)]
+pub(crate) struct Needs {
+    pub(crate) installed: Vec<String>,
+    pub(crate) failed: Vec<String>,
+}
+
+pub(crate) fn needed(repo: &str, path: &Path, depth: u32) -> Needs {
+    needing(path, depth, &mut |dependency| {
+        matching(Some(repo), dependency).and_then(|spec| repos::fetched(&spec))
+    })
+}
+
+pub(crate) fn needing(path: &Path, depth: u32, fetch: &mut Fetch) -> Needs {
+    let mut found = Needs::default();
+    if depth >= DEPTH {
+        return found;
+    }
+    let needs = reiwand_format::peek(path).map(|m| m.dependencies().to_vec()).unwrap_or_default();
+    let missing = |d: &&Dependency| !with(|lib| found_in(lib, d, true)).is_ok_and(|found| found.is_some());
+    for dependency in needs.iter().filter(missing) {
+        match fetch(dependency) {
+            Ok((uid, path)) => {
+                let deeper = needing(&path, depth + 1, fetch);
+                found.installed.extend(deeper.installed);
+                found.failed.extend(deeper.failed);
+                found.installed.push(uid);
+            }
+            Err(e) => {
+                log::warn!("cannot install {} that a package needs: {e}", dependency.id);
+                found.failed.push(dependency.id.clone());
+            }
+        }
+    }
+    found
+}
+
+pub(crate) fn matching(repo: Option<&str>, dependency: &Dependency) -> Result<String, Error> {
+    let wanted = wanted(dependency)?;
+    let offers = reiwand_format::browse_with(&repos::dir()?, &dependency.id, true)?;
+    let best = offers
+        .into_iter()
+        .filter(|o| o.id == dependency.id && repo.is_none_or(|r| o.repo_id == r))
+        .find_map(|o| {
+            let v =
+                o.versions.iter().filter_map(|v| Version::parse(v).ok()).filter(|v| wanted.matches(v)).max();
+            v.map(|v| format!("{}/{}@{v}", o.repo_id, dependency.id))
+        });
+    let missing =
+        || said("android.no_release", "no release of %1 matches %2", &[&dependency.id, &dependency.version]);
+    best.ok_or_else(missing)
+}

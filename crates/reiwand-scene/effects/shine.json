@@ -1,0 +1,34 @@
+{
+  "id": "shine",
+  "name": { "en": "Shine" },
+  "category": "light",
+  "description": { "en": "Sweeps a shine or glint band across the picture.", "es": "Pasa una franja de brillo por encima de la imagen." },
+  "min_fps": 30,
+  "mask_mode": "strength",
+  "params": [
+    { "id": "angle", "type": "float", "unit": "degrees", "default": 30, "min": -360, "max": 360 },
+    { "id": "width", "type": "float", "default": 0.12, "min": 0, "max": 1 },
+    { "id": "softness", "type": "float", "default": 0.6, "min": 0, "max": 1 },
+    { "id": "intensity", "type": "float", "default": 0.4, "min": 0, "max": 4 },
+    { "id": "color", "type": "color", "default": "#ffffff" },
+    { "id": "speed", "type": "float", "default": 0.25, "min": -4, "max": 4, "uses": "time" },
+    { "id": "gap", "type": "float", "default": 1, "min": 0, "max": 8 },
+    { "id": "phase", "type": "float", "default": 0, "min": 0, "max": 1 },
+    { "id": "blend", "type": "blend", "default": "add" },
+    { "id": "gradient", "type": "texture", "tools": ["ramp"], "default": "" },
+    {
+      "id": "style",
+      "type": "enum",
+      "default": 0,
+      "values": [
+        { "value": 0, "label": { "en": "Line", "es": "Línea" } },
+        { "value": 1, "label": { "en": "Double line", "es": "Línea doble" } },
+        { "value": 2, "label": { "en": "Ring", "es": "Anillo" } },
+        { "value": 3, "label": { "en": "Glint", "es": "Destello" } }
+      ]
+    }
+  ],
+  "passes": [{ "entry": "fs_shine", "inputs": ["previous", "asset:gradient"] }],
+  "fuse": "color",
+  "pace": { "sweep": ["speed", "gap", "phase"] }
+}

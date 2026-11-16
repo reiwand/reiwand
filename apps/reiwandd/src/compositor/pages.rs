@@ -1,0 +1,194 @@
+use super::state::State;
+use crate::pages::PageSpec;
+use reiwand_web::{Folder, Settings, Start, ToWeb, token};
+use serde_json::{Map, Value as Json, json};
+use std::path::PathBuf;
+use std::time::{Duration, Instant};
+
+mod console;
+mod ending;
+mod feed;
+mod frames;
+mod heard;
+mod keys;
+#[cfg(test)]
+mod lit;
+mod slot;
+pub(super) mod snap;
+#[cfg(test)]
+pub(super) mod tests;
+mod view;
+
+pub(super) use ending::settle;
+use keys::Views;
+pub(super) use keys::level;
+pub(super) use slot::PageSlot;
+use view::ViewSlot;
+
+const SCAN: Duration = Duration::from_secs(5);
+const GRACE: Duration = Duration::from_secs(2);
+
+pub(super) fn values(
+    spec: &PageSpec,
+    salt: &[u8; 32],
+    quality: reiwand_scene::Quality,
+) -> (Map<String, Json>, Vec<(String, PathBuf)>) {
+    let files: Vec<(String, PathBuf)> =
+        spec.files.iter().map(|(prop, path)| (token(prop, salt, path), path.clone())).collect();
+    let mut tuned = spec.pack.leveling.tuned(&spec.values, quality);
+    if !spec.pack.own_volume {
+        tuned.remove(reiwand_scene::VOLUME);
+    }
+    let mut values: Map<String, Json> = tuned.into_iter().collect();
+    for (id, value) in values.iter_mut() {
+        let file = spec.files.iter().position(|(prop, _)| prop == id).map(|i| json!(files[i].0));
+        let folder =
+            spec.folders.iter().any(|(prop, ..)| prop == id).then(|| json!(format!("wpak-user://{id}/")));
+        let hidden = reiwand_scene::veiled(spec.pack.props.properties.get(id), value);
+        if let Some(token) = file.or(folder).or(hidden) {
+            *value = token;
+        } else if value.as_str().is_some_and(|v| v.starts_with('/')) {
+            *value = Json::Null;
+        }
+    }
+    (values, files)
+}
+
+pub(super) fn folders(spec: &PageSpec, salt: &[u8; 32]) -> Vec<Folder> {
+    let listed = |(prop, dir, all): &(String, PathBuf, bool)| {
+        let property = spec.pack.props.properties.get(prop)?;
+        let files =
+            crate::picks::files(dir, property).into_iter().map(|p| (token(prop, salt, &p), p)).collect();
+        Some(Folder { prop: prop.clone(), all: *all, files })
+    };
+    spec.folders.iter().filter_map(listed).collect()
+}
+
+pub(super) fn language(spec: &PageSpec) -> (String, &Json) {
+    match spec.privacy.language {
+        true => (
+            reiwand_core::locale::bcp47(spec.pack.props.languages.first().map_or("", String::as_str)),
+            &spec.pack.shape,
+        ),
+        false => (crate::pages::PLAIN.into(), &spec.pack.plain),
+    }
+}
+
+impl State {
+    fn start(&self, slot: &PageSlot) -> Start {
+        let (spec, privacy) = (&slot.spec, slot.spec.privacy);
+        let (properties, files) = values(spec, &slot.salt, level(self.power, spec));
+        let device = self.page_device(slot);
+        let shared = slot.shared && device.is_some();
+        Start {
+            package: spec.pack.path.clone(),
+            id: spec.pack.props.id.clone(),
+            entry: spec.pack.entry.clone(),
+            preload: spec.pack.preload.clone(),
+            background: spec.pack.background,
+            network: if privacy.network { spec.pack.network.clone() } else { Vec::new() },
+            storage: spec.storage.clone().filter(|dir| crate::pages::within(dir, spec.pack.storage_kib)),
+            languages: reiwand_web::languages(&reiwand_core::locale::languages(), !privacy.language),
+            mask_gpu: !privacy.gpu,
+            device,
+            modifiers: if shared { self.renderer.page_modifiers() } else { Vec::new() },
+            properties,
+            shape: language(spec).1.clone(),
+            settings: self.page_settings(slot),
+            allowed: Default::default(),
+            folders: folders(spec, &slot.salt),
+            files,
+        }
+    }
+
+    fn page_device(&self, slot: &PageSlot) -> Option<String> {
+        let hardware = !slot.hidden && !self.renderer.software();
+        let node = hardware.then(|| self.renderer.render_node()).flatten();
+        crate::pages::helper().and_then(|program| reiwand_web::device(&program, node))
+    }
+
+    fn page_settings(&self, slot: &PageSlot) -> Settings {
+        let fps = slot.views.values().map(|v| v.fps).max().unwrap_or(30).max(1);
+        let silent = self.settings.muted || self.locked;
+        let own = slot
+            .spec
+            .values
+            .get(reiwand_scene::VOLUME)
+            .and_then(Json::as_f64)
+            .filter(|_| !slot.spec.pack.own_volume);
+        let own = own.map_or(1.0, |v| v.clamp(0.0, 100.0) / 100.0);
+        let volume =
+            if silent { 0.0 } else { self.settings.volume * self.settings.duck * own * slot.spec.heard };
+        let quality = level(self.power, &slot.spec) as u8;
+        Settings { fps, quality, locale: language(&slot.spec).0, volume }
+    }
+
+    pub(super) fn sync_pages(&mut self) {
+        let (now, wanted) = (Instant::now(), self.wanted());
+        keys::rekey(&mut self.pages, &wanted);
+        for (path, (spec, views)) in wanted {
+            let renew = self.pages.get(&path).is_none_or(|s| {
+                let old = (s.spec.privacy, &s.spec.pack.key, &s.spec.storage);
+                old != (spec.privacy, &spec.pack.key, &spec.storage)
+            });
+            if renew {
+                self.pages.insert(path.clone(), PageSlot::new(spec.clone(), now));
+            }
+            let Some(mut slot) = self.pages.remove(&path) else { continue };
+            slot.spec = spec;
+            self.sync_views(&mut slot, &views, now);
+            if slot.starts(now) {
+                let start = self.start(&slot);
+                if start.device.is_none() && !slot.hidden {
+                    tracing::info!("the graphics card cannot draw web pages, drawing them in memory");
+                    slot.hidden = true;
+                }
+                slot.full = slot.spec.storage.is_some() && start.storage.is_none();
+                slot.spawn(start, &self.tx, now);
+                if slot.full {
+                    tracing::warn!("the web page keeps more than it declared and keeps nothing this time");
+                    slot.error = Some(crate::words::web_full());
+                }
+            }
+            if slot.link.is_some() {
+                self.sync_link(&mut slot, now);
+            }
+            self.pages.insert(path, slot);
+        }
+    }
+
+    fn sync_views(&self, slot: &mut PageSlot, views: &Views, now: Instant) {
+        let gone: Vec<String> =
+            slot.views.keys().filter(|n| !views.iter().any(|v| &v.0 == *n)).cloned().collect();
+        let mut out: Vec<ToWeb> = gone
+            .iter()
+            .filter_map(|n| slot.views.remove(n))
+            .filter(|v| v.opened)
+            .map(|v| ToWeb::Close(v.id))
+            .collect();
+        for (name, size, (active, watched), fps, spec) in views {
+            if !slot.views.contains_key(name) {
+                slot.views.insert(name.clone(), ViewSlot::new(slot.next, *size));
+                slot.next += 1;
+            }
+            let view = slot.views.get_mut(name).expect("inserted above");
+            let unseen = *view.unseen.get_or_insert(now);
+            if *watched {
+                view.unseen = None;
+            }
+            let visible = &(*active && (*watched || now < unseen + GRACE));
+            if view.opened && view.size != *size {
+                out.push(ToWeb::Resize { view: view.id, size: *size, scale: 1.0 });
+            }
+            if view.opened && view.visible != Some(*visible) {
+                out.push(ToWeb::Visible { view: view.id, visible: *visible });
+                view.visible = Some(*visible);
+            }
+            if view.opened && view.fps != *fps {
+                out.push(ToWeb::Fps { view: view.id, fps: *fps });
+            }
+            (view.size, view.fps, view.live, view.spec) = (*size, *fps, *visible, Some(spec.clone()));
+        }
+        out.iter().for_each(|m| slot.send(m));
+    }
+}

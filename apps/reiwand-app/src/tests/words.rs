@@ -1,0 +1,171 @@
+use super::tables::{Words, tables};
+use reiwand_editor::actions::plan;
+use reiwand_editor::inspect::fields_from;
+use reiwand_editor::layers::{KINDS, asset_kind, walk};
+use reiwand_editor::ops::{apply, set};
+use reiwand_editor::schema::{PROPERTY, branches, sample};
+use reiwand_editor::starters::{STARTERS, starter};
+use reiwand_editor::{Action, Field};
+use serde_json::{Value, json};
+use std::collections::BTreeSet;
+
+fn menus(words: &Words) -> Vec<(String, Option<String>)> {
+    let kind = |k: &str| words.get("S.kinds", k).or_else(|| words.label(k, ""));
+    let mut out: Vec<_> = KINDS.iter().chain(&STARTERS).map(|&k| (k.to_owned(), kind(k))).collect();
+    out.extend(
+        ["a.png", "a.webm", "a.ogg", "a.ttf", "a.cube", "a.txt"].map(|p| (p.into(), kind(asset_kind(p)))),
+    );
+    out.extend(reiwand_scene::builtin().iter().map(|d| (d.id.clone(), words.get("S.effects", &d.id))));
+    for e in reiwand_scene::easings() {
+        let curve = e.rsplit_once('_').map(|(_, c)| c).filter(|_| words.easing(&e).is_some());
+        out.extend(curve.map(|c| (e.clone(), words.get("S.curves", c))));
+        out.push((e.clone(), words.easing(&e).or_else(|| words.value(&e))));
+    }
+    let types = branches(&PROPERTY).iter().filter_map(|b| b.pointer("/properties/type/const")?.as_str());
+    out.extend(types.map(|t| (t.into(), words.label(t, ""))));
+    out.extend(
+        reiwand_format::features::REGISTRY.iter().map(|(f, _, _)| ((*f).into(), words.get("L.features", f))),
+    );
+    out
+}
+
+fn document(name: &str) -> Value {
+    let mut doc = starter(name, "org.example.words", "Words", "en").unwrap();
+    let assets = [
+        ("pic", "a.png"),
+        ("clip", "a.webm"),
+        ("tone", "a.ogg"),
+        ("face", "a.ttf"),
+        ("grade", "a.cube"),
+        ("rig", "a.glb"),
+    ];
+    for (id, path) in assets {
+        let ops = set(&doc, &format!("/scene/assets/{id}"), json!({"path": format!("assets/{path}")}));
+        apply(&mut doc, &ops).unwrap();
+    }
+    let pool = json!({"type": "mesh", "max": 4, "max_vertices": 64});
+    let ops = set(&doc, "/scene/pools/bars", pool);
+    apply(&mut doc, &ops).unwrap();
+    for kind in KINDS {
+        let source =
+            [("image", "pic"), ("video", "clip"), ("sound", "tone"), ("mesh", "rig"), ("shapes", "bars")]
+                .into_iter()
+                .find(|(k, _)| *k == kind);
+        let source = source.map(|(_, s)| s.to_owned());
+        let layer = Action::AddLayer {
+            kind: kind.into(),
+            id: None,
+            name: None,
+            source,
+            into: None,
+            at: None,
+            file: None,
+        };
+        let ops = plan(&doc, &layer);
+        apply(&mut doc, &ops.unwrap()).unwrap();
+    }
+    for (i, branch) in branches(&PROPERTY).iter().enumerate() {
+        let ops = set(&doc, &format!("/manifest/properties/p{i}"), sample(&PROPERTY, branch));
+        apply(&mut doc, &ops).unwrap();
+    }
+    doc
+}
+
+fn explore(doc: &Value, pointer: &str, seen: &mut BTreeSet<String>, shown: &mut Vec<Field>) {
+    let shape: Vec<&str> =
+        pointer.split('/').map(|t| if t.parse::<u32>().is_ok() { "#" } else { t }).collect();
+    let at = doc.pointer(pointer).cloned().unwrap_or_default();
+    let keys: Vec<&String> = at.as_object().map(|o| o.keys().collect()).unwrap_or_default();
+    if shape.len() > 12 || !seen.insert(format!("{shape:?} {keys:?} {}", at["type"])) {
+        return;
+    }
+    for field in fields_from(None, doc, pointer, 0.0, &Default::default()) {
+        let samples: Vec<Value> = match (field.widget.as_str(), field.set) {
+            ("variant", _) => {
+                field.sample.as_object().map(|o| o.values().cloned().collect()).unwrap_or_default()
+            }
+            ("group", false) => vec![field.sample.clone()],
+            ("list", false) => vec![json!([field.sample])],
+            ("group" | "list", true) => vec![field.value.clone()],
+            _ => Vec::new(),
+        };
+        let bound = (field.bindable && !seen.contains("bound")).then(|| json!({"audio": "bass"}));
+        for value in samples.into_iter().chain(bound).filter(|v| !v.is_null()) {
+            let mut copy = doc.clone();
+            if apply(&mut copy, &set(doc, &field.pointer, value.clone())).is_ok() {
+                let before = shown.len();
+                explore(&copy, &field.pointer, seen, shown);
+                let inner = format!("{}/", field.pointer);
+                if value.get("audio").is_some()
+                    && shown[before..].iter().any(|f| f.pointer.starts_with(&inner))
+                {
+                    seen.insert("bound".into());
+                }
+                let items = value.as_array().map_or(0, Vec::len);
+                (0..items).for_each(|i| explore(&copy, &format!("{}/{i}", field.pointer), seen, shown));
+            }
+        }
+        shown.push(field);
+    }
+}
+
+#[test]
+fn every_value_and_label_the_scene_editor_shows_is_translated() {
+    let (words, spanish) = (Words(tables()), crate::tr::catalog(&["es".to_owned()]));
+    let (mut seen, mut shown) = (BTreeSet::new(), Vec::new());
+    for doc in STARTERS.map(document) {
+        let properties = doc["manifest"]["properties"].as_object().unwrap().keys();
+        let systems = doc["scene"]["particles"].as_object().into_iter().flat_map(|p| p.keys());
+        let mut roots: Vec<String> = walk(&doc).into_iter().map(|(pointer, _)| pointer).collect();
+        roots.extend(["/scene".into(), "/manifest".into()]);
+        roots.extend(properties.map(|p| format!("/manifest/properties/{p}")));
+        roots.extend(systems.map(|s| format!("/scene/particles/{s}")));
+        roots.iter().for_each(|root| explore(&doc, root, &mut seen, &mut shown));
+    }
+    let mut wanted = menus(&words);
+    for f in &shown {
+        let parent = f.pointer.rsplit('/').nth(1).unwrap_or_default();
+        if f.key.parse::<u32>().is_err() {
+            wanted.push((f.pointer.clone(), words.label(&f.key, parent)));
+        }
+        let named =
+            ["enum", "variant", "flags", "integer", "number", "ref:effect"].contains(&f.widget.as_str());
+        for option in f.options.iter().filter_map(Value::as_str) {
+            let language = option.split('-').next().unwrap_or_default();
+            let text = match f.widget.as_str() {
+                "ref:language" => words.get("M.languages", language),
+                _ if !named => continue,
+                _ if f.key == "inputs" => words.get("M.inputs", option).or_else(|| words.value(option)),
+                _ => words.value(option),
+            };
+            wanted.push((format!("{} {option}", f.pointer), text));
+        }
+        let free = f.widget.starts_with("ref:") && f.widget != "ref:effect";
+        match (f.shown.as_str(), f.widget.as_str()) {
+            (Some(raw), "json") => wanted.push((format!("{} shows the raw value {raw:?}", f.pointer), None)),
+            (
+                _,
+                "text" | "multiline" | "format" | "texts" | "markup" | "color" | "rgb" | "lines"
+                | "package:license",
+            ) => {}
+            (Some(text), _) if !free && !text.is_empty() => {
+                wanted.push((format!("{} {text}", f.pointer), words.value(text)))
+            }
+            _ => {}
+        }
+    }
+    let values: BTreeSet<&str> =
+        shown.iter().flat_map(|f| f.options.iter().filter_map(Value::as_str)).collect();
+    assert!(
+        ["ellipse", "soft_light", "bloom", "luminance", "edge", "inside", "average", "pingpong"]
+            .iter()
+            .all(|v| values.contains(v)),
+        "{values:?}"
+    );
+    let missing: BTreeSet<String> = wanted
+        .into_iter()
+        .filter(|(_, id)| id.as_ref().and_then(|id| spanish.get(id)).is_none_or(String::is_empty))
+        .map(|(what, id)| format!("{what} ({})", id.unwrap_or_default()))
+        .collect();
+    assert!(missing.is_empty(), "the scene editor shows these without a Spanish translation: {missing:#?}");
+}

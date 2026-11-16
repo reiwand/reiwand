@@ -1,0 +1,158 @@
+use crate::ops::{Op, apply, set};
+use reiwand_format::features::facts;
+use reiwand_format::{Facts, Input, Manifest, Requires, Scene, Text};
+use serde::Deserialize;
+use serde_json::{Value, json};
+use std::collections::BTreeSet;
+use std::path::Path;
+
+pub const TOP: [&str; 9] =
+    ["schema", "kind", "entry", "properties", "preview", "playback", "web", "permissions", "presets"];
+pub const ORDER: &str = "title description changes version id authors license content rating descriptors \
+    photosensitive origin kind derived_from credits preview previews thumbnail animated links homepage source \
+    support donate tags inputs platforms display accent requires features engine packages default_locale presets";
+
+pub fn applies(doc: &Value, pointer: &str) -> bool {
+    let scene = doc["manifest"]["kind"] == "scene";
+    let framing: &[&str] = match doc["manifest"]["kind"].as_str() {
+        Some("scene") => &["fit", "zoom", "position", "background", "flip"],
+        Some("image") => &["zoom", "position"],
+        _ => &[],
+    };
+    let playing: &[&str] = if scene { &["speed", "start", "end", "loop"] } else { &[] };
+    let key = |prefix: &str| pointer.strip_prefix(prefix).and_then(|k| k.split('/').next());
+    let shown = key("/manifest/display/").is_none_or(|k| !framing.contains(&k))
+        && key("/manifest/playback/").is_none_or(|k| !playing.contains(&k));
+    !crate::rgb::kept(doc, pointer) && (shown || doc.pointer(pointer).is_some())
+}
+
+pub fn adjust(doc: &Value, field: &mut crate::Field) {
+    match field.pointer.as_str() {
+        "/manifest/inputs" => field.fixed = used(doc),
+        "/manifest/default_locale" => field.required = true,
+        "/manifest/photosensitive" if field.widget == "bool" => field.widget = "package:flashes".into(),
+        "/manifest/strings" => field.widget = "package:strings".into(),
+        "/manifest/credits" => field.widget = "package:credits".into(),
+        "/manifest/license" => {
+            field.widget = "package:license".into();
+            let summary =
+                |id: &str| json!({ "id": id, "summary": reiwand_format::describe_license(id).local() });
+            let mut options: Vec<Value> =
+                reiwand_format::KNOWN_LICENSES.iter().map(|id| summary(id)).collect();
+            options.push(json!({ "id": "", "summary": reiwand_format::describe_license("-").local() }));
+            field.options = options;
+        }
+        "/manifest/requires/features" => {
+            field.options = reiwand_format::features::CHOSEN.map(Value::from).to_vec()
+        }
+        "/manifest/display/accent" => {
+            let props = doc["manifest"]["properties"].as_object().into_iter().flatten();
+            field.widget = "accent".into();
+            field.options = props.filter(|(_, p)| p["type"] == "color").map(|(id, _)| json!(id)).collect();
+        }
+        "/manifest/playback/max_fps" => {
+            field.widget = "framerate".into();
+            field.range = json!([1, 240]);
+        }
+        _ => crate::settings::adjust(doc, field),
+    }
+}
+
+pub fn facts_of(doc: &Value, dir: Option<&Path>) -> Option<(Manifest, Facts)> {
+    let manifest = read(doc, dir).ok()?;
+    let found = found(doc, &manifest, &doc["scene"], dir)?;
+    Some((manifest, found))
+}
+
+pub fn read(doc: &Value, dir: Option<&Path>) -> reiwand_format::Result<Manifest> {
+    let manifest = Manifest::deserialize(&doc["manifest"])?;
+    dir.map_or(Ok(manifest.clone()), |dir| crate::cache::with_strings(dir, manifest))
+}
+
+fn found(doc: &Value, manifest: &Manifest, json: &Value, dir: Option<&Path>) -> Option<Facts> {
+    if !crate::pages::scened(doc) {
+        return Some(facts(manifest, None, None));
+    }
+    let mut scene = Scene::deserialize(json).ok()?;
+    if let Some(dir) = dir {
+        crate::cache::read_files(&mut scene, dir);
+    }
+    Some(facts(manifest, Some(&scene), None))
+}
+
+pub fn detected(doc: &Value, dir: Option<&Path>) -> BTreeSet<Input> {
+    let declared = doc["manifest"]["inputs"].as_array().into_iter().flatten();
+    let detectable = declared.filter_map(Value::as_str).any(|i| ["audio", "pointer", "clicks"].contains(&i));
+    detectable.then(|| facts_of(doc, dir).map(|(_, f)| f.inputs)).flatten().unwrap_or_default()
+}
+
+pub fn sync(doc: &Value, before: &BTreeSet<Input>, dir: Option<&Path>) -> Vec<Op> {
+    let mut ops = synced(doc, &doc["scene"], before, dir);
+    ops.extend(crate::rgb::permission(doc));
+    ops
+}
+
+fn synced(doc: &Value, scene: &Value, before: &BTreeSet<Input>, dir: Option<&Path>) -> Vec<Op> {
+    let Ok(mut manifest) = read(doc, dir) else { return Vec::new() };
+    let Some(found) = found(doc, &manifest, scene, dir) else { return Vec::new() };
+    let gone = |i: &Input| before.contains(i) && !found.inputs.contains(i);
+    let dropped: Vec<String> =
+        manifest.inputs.iter().filter(|i| gone(i)).map(|i| format!("inputs.{}", i.name())).collect();
+    manifest.inputs.retain(|i| !gone(i));
+    manifest.inputs.extend(found.inputs.iter().copied());
+    manifest.inputs.sort();
+    manifest.inputs.dedup();
+    let features: Vec<String> = found.features.into_iter().filter(|f| !dropped.contains(f)).collect();
+    let added = doc["manifest"]["requires"] == json!({});
+    let old = Requires { features: Vec::new(), ..manifest.requires.take().unwrap_or_default() };
+    let kept = added || old != Requires::default() || !features.is_empty();
+    manifest.requires = kept.then_some(Requires { features, ..old });
+    let want = serde_json::to_value(&manifest).unwrap_or_default();
+    let (mut ops, path) = (Vec::new(), |key: &str| format!("/manifest/{key}"));
+    for key in ["inputs", "requires"] {
+        match (doc["manifest"].get(key), want.get(key)) {
+            (now, Some(next)) if now != Some(next) => ops.extend(set(doc, &path(key), next.clone())),
+            (Some(_), None) => ops.push(Op::Remove { path: path(key) }),
+            _ => {}
+        }
+    }
+    ops
+}
+
+pub fn cancels(doc: &Value, ops: &[Op], dir: Option<&Path>) -> bool {
+    let computed = |p: &str| ["/manifest/inputs", "/manifest/requires"].iter().any(|s| p.starts_with(s));
+    if !ops.iter().flat_map(Op::paths).all(computed) {
+        return false;
+    }
+    let mut probe = json!({"manifest": doc["manifest"].clone()});
+    if apply(&mut probe, ops).is_err() {
+        return false;
+    }
+    let follow = synced(&probe, &doc["scene"], &BTreeSet::new(), dir);
+    apply(&mut probe, &follow).is_ok() && probe["manifest"] == doc["manifest"]
+}
+
+pub fn used(doc: &Value) -> Vec<Value> {
+    let found = facts_of(doc, None).map(|(_, f)| f.inputs).unwrap_or_default();
+    found.into_iter().map(|i| json!(i.name())).collect()
+}
+
+pub fn title(doc: &Value, languages: &[String]) -> String {
+    match Manifest::deserialize(&doc["manifest"]) {
+        Ok(manifest) => manifest.title_in(languages),
+        Err(_) => Text::deserialize(&doc["manifest"]["title"]).map(|t| t.pick(languages)).unwrap_or_default(),
+    }
+}
+
+pub fn languages(doc: &Value) -> Vec<Value> {
+    let current = doc["manifest"]["default_locale"].as_str().map(String::from);
+    let used = Manifest::deserialize(&doc["manifest"]).map(|m| m.locales()).unwrap_or_default();
+    let mut out: Vec<String> = Vec::new();
+    for language in current.into_iter().chain(used).chain([crate::starters::locale()]) {
+        if !out.iter().any(|o| reiwand_scene::tag(o) == reiwand_scene::tag(&language)) {
+            out.push(language);
+        }
+    }
+    out.sort();
+    out.into_iter().map(Value::from).collect()
+}

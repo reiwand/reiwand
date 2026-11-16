@@ -1,0 +1,194 @@
+use crate::daemon::Daemon;
+use crate::error::{Result, failed};
+use std::sync::{Arc, Weak};
+use zeroize::Zeroizing;
+
+pub struct Sync(pub Weak<Daemon>);
+
+impl Sync {
+    fn d(&self) -> Result<Arc<Daemon>> {
+        self.0.upgrade().ok_or_else(|| failed("the daemon is stopping"))
+    }
+}
+
+#[zbus::interface(name = "io.github.reiwand.Sync1")]
+impl Sync {
+    #[zbus(out_args("job"))]
+    async fn add_server(&self, url: String) -> Result<u64> {
+        self.d()?.run(move |d| d.add_server(&url, None)).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn add_pinned_server(&self, url: String, fingerprint: String) -> Result<u64> {
+        self.d()?.run(move |d| d.add_server(&url, Some(&fingerprint))).await
+    }
+
+    #[zbus(out_args("user_code", "verification_uri", "job"))]
+    async fn link(&self, name: String, plaintext: bool) -> Result<(String, String, u64)> {
+        self.d()?.run(move |d| d.link_device(&name, plaintext, true)).await
+    }
+
+    #[zbus(out_args("user_code", "verification_uri", "job"))]
+    async fn connect(&self, name: String) -> Result<(String, String, u64)> {
+        self.d()?.run(move |d| d.link_device(&name, false, false)).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn set_syncing(&self, on: bool, plaintext: bool) -> Result<u64> {
+        self.d()?.run(move |d| d.set_syncing(on, plaintext)).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn preview_code(&self, user_code: String) -> Result<u64> {
+        self.d()?.run(move |d| d.preview_code(&user_code)).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn approve_device(&self, user_code: String, password: String) -> Result<u64> {
+        let password = Zeroizing::new(password);
+        self.d()?.run(move |d| d.approve_with(&user_code, password)).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn revoke_device(&self, device: String, password: String) -> Result<u64> {
+        let password = Zeroizing::new(password);
+        self.d()?.run(move |d| d.revoke_device(&device, password).inspect_err(|e| d.track_access(e))).await
+    }
+
+    #[zbus(out_args("json"))]
+    async fn get_status(&self) -> Result<String> {
+        self.d()?.run(|d| d.account_status()).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn sync_now(&self) -> Result<u64> {
+        self.d()?.run(|d| d.sync_now()).await
+    }
+
+    async fn set_paused(&self, paused: bool) -> Result<()> {
+        self.d()?.run(move |d| d.set_sync_paused(paused)).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn join(&self, device: String) -> Result<u64> {
+        self.d()?.run(move |d| d.join(&device).inspect_err(|e| d.track_access(e))).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn share_key(&self, device: String) -> Result<u64> {
+        self.d()?.run(move |d| d.share_key(&device).inspect_err(|e| d.track_access(e))).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn confirm_share(&self, device: String, code: String) -> Result<u64> {
+        self.d()?.run(move |d| d.confirm_share(&device, &code)).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn rotate(&self) -> Result<u64> {
+        self.d()?.run(|d| d.rotate_now()).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn reset(&self) -> Result<u64> {
+        self.d()?.run(|d| d.reset_sync()).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn confirm_repo(&self, repo: String, add: bool) -> Result<u64> {
+        self.d()?.run(move |d| d.confirm_repo(&repo, add)).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn set_escrow(&self, passphrase: String) -> Result<u64> {
+        let passphrase = Zeroizing::new(passphrase);
+        self.d()?.run(move |d| d.set_escrow(passphrase)).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn restore(&self, passphrase: String) -> Result<u64> {
+        let passphrase = Zeroizing::new(passphrase);
+        self.d()?.run(move |d| d.restore(passphrase)).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn share_files(&self, targets: Vec<String>, share: bool) -> Result<u64> {
+        self.d()?.run(move |d| d.share_files(&targets, share)).await
+    }
+
+    #[zbus(out_args("json"))]
+    async fn list_files(&self) -> Result<String> {
+        self.d()?.run(|d| d.list_files()).await
+    }
+
+    #[zbus(out_args("json"))]
+    async fn list_away(&self) -> Result<String> {
+        self.d()?.run(|d| d.list_away()).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn fetch_file(&self, file: String) -> Result<u64> {
+        self.d()?.run(move |d| d.fetch_file(&file)).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn upload(&self, path: String) -> Result<u64> {
+        self.d()?.run(move |d| d.upload(&path, "public")).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn upload_as(&self, path: String, visibility: String) -> Result<u64> {
+        self.d()?.run(move |d| d.upload(&path, &visibility)).await
+    }
+
+    #[zbus(out_args("json"))]
+    async fn list_packages(&self) -> Result<String> {
+        self.d()?.run(|d| d.own_packages()).await
+    }
+
+    #[zbus(out_args("json"))]
+    async fn list_author_keys(&self) -> Result<String> {
+        self.d()?.run(|d| d.list_author_keys()).await
+    }
+
+    #[zbus(out_args("fingerprint"))]
+    async fn add_author_key(&self, public_key: String) -> Result<String> {
+        self.d()?.run(move |d| d.add_author_key(&public_key)).await
+    }
+
+    #[zbus(out_args("fingerprint"))]
+    async fn rotate_author_key(&self, from: String, public_key: String, signature: String) -> Result<String> {
+        self.d()?.run(move |d| d.rotate_author_key(&from, &public_key, &signature)).await
+    }
+
+    async fn remove_author_key(&self, fingerprint: String) -> Result<()> {
+        self.d()?.run(move |d| d.remove_author_key(&fingerprint)).await
+    }
+
+    #[zbus(out_args("json"))]
+    async fn list_uploads(&self) -> Result<String> {
+        self.d()?.run(|d| d.list_uploads()).await
+    }
+
+    async fn cancel_upload(&self, id: String) -> Result<()> {
+        self.d()?.run(move |d| d.cancel_upload(&id)).await
+    }
+
+    #[zbus(out_args("json"))]
+    async fn vote(&self, id: String, vote: String) -> Result<String> {
+        self.d()?.run(move |d| d.vote(&id, &vote)).await
+    }
+
+    #[zbus(out_args("json"))]
+    async fn get_votes(&self, ids: Vec<String>) -> Result<String> {
+        self.d()?.run(move |d| d.votes(&ids)).await
+    }
+
+    async fn set_visibility(&self, id: String, version: String, visibility: String) -> Result<()> {
+        self.d()?.run(move |d| d.set_visibility(&id, &version, &visibility)).await
+    }
+
+    async fn remove_server(&self, wipe: bool) -> Result<()> {
+        self.d()?.run(move |d| d.remove_server(wipe)).await
+    }
+}

@@ -1,0 +1,270 @@
+# Crear escenas
+
+Una **escena** es un fondo de pantalla animado que tú dibujas con capas: imágenes, formas, texto,
+partículas, luces, modelos 3D, sonido. Se mueve con el tiempo, con el sonido que suena, con el
+puntero o con lo que el usuario elija en sus ajustes. Esta guía enseña a hacer una desde cero,
+sin saber nada del programa.
+
+Una escena es una carpeta con tres cosas:
+
+```
+mi-escena/
+  manifest.json   el nombre, el autor, la licencia y las propiedades de usuario
+  scene.json      las capas y todo lo que se mueve
+  assets/         las imágenes, sonidos, fuentes y modelos
+```
+
+Los dos archivos son de texto (JSON) y los puedes escribir a mano. Hay tres formas de hacer la
+misma escena, y puedes mezclarlas: las tres cambian los mismos archivos.
+
+- **A mano**, con un editor de texto. `reiwand-ctl pack check` dice qué está mal y dónde.
+- **Con el editor de la app**: la página *Escenas* de `reiwand-app`. Es el camino más cómodo para
+  colocar capas con el ratón y mover valores en una línea de tiempo.
+- **Con la terminal**: las órdenes `reiwand-ctl scene ...`. Sirven para hacer en un guion lo mismo
+  que hace el editor.
+
+## Qué necesitas
+
+- El programa instalado: la app (`reiwand-app`), el servicio que dibuja los fondos y la orden
+  `reiwand-ctl`.
+- Una imagen tuya, PNG, JPEG o WebP, para el tutorial (aquí se llama `cielo.png`).
+- Un editor de texto, si vas a escribir a mano.
+
+La mayoría de las órdenes de `reiwand-ctl scene` no necesitan el servicio en marcha: crean,
+cambian, comprueban y miden la escena. Solo la vista previa en el escritorio lo necesita.
+
+## Las páginas de esta guía
+
+| Página | De qué trata |
+|--------|--------------|
+| [LEEME.md](LEEME.md) | Esta página: qué es una escena y tu primera escena. |
+| [escena.md](escena.md) | El archivo entero: lienzo, reloj, recursos, costo y calidad, valores que se mueven, entradas. |
+| [capas.md](capas.md) | Cada tipo de capa, con ejemplo y tabla de campos. |
+| [efectos.md](efectos.md) | Los efectos que trae el programa, las máscaras y cómo escribir un efecto propio. |
+| [particulas-y-sonido.md](particulas-y-sonido.md) | Sistemas de partículas, sonido y reacción al sonido. |
+| [propiedades.md](propiedades.md) | Propiedades de usuario, preajustes y traducciones. |
+| [3d.md](3d.md) | Luces, modelos 3D, sombras, cámara y profundidad. |
+| [mallas.md](mallas.md) | Imágenes dobladas por un esqueleto, clips, física y cinemática inversa. |
+| [editor.md](editor.md) | El editor de la app, herramienta por herramienta. |
+| [acciones.md](acciones.md) | Las acciones del editor, que se invocan con `reiwand-ctl scene act`. |
+| [scripts.md](scripts.md) | Código JavaScript para lo que no se puede describir con valores. |
+| [paquete.md](paquete.md) | El manifiesto, firmar, empaquetar y publicar. |
+| [transiciones.md](transiciones.md) | Crear y probar la transición propia de un fondo, y sus límites. |
+| [cli.md](cli.md) | Las órdenes de `reiwand-ctl` para crear, medir y publicar. |
+
+Todos los ejemplos completos están en la carpeta [`ejemplos/`](ejemplos/), una carpeta de escena
+por ejemplo. Cada una se comprueba con `reiwand-ctl pack check` y puedes abrirla en el editor o
+copiarla y cambiarla.
+
+| Ejemplo | Qué enseña |
+|---------|------------|
+| [`primera-escena`](ejemplos/primera-escena/) | El tutorial de abajo. |
+| [`lienzo-y-reloj`](ejemplos/lienzo-y-reloj/) | Lienzo, paralaje, resplandor, cámara, reloj, hora y fecha. |
+| [`formas`](ejemplos/formas/), [`texto`](ejemplos/texto/), [`video`](ejemplos/video/), [`grupos-y-mascaras`](ejemplos/grupos-y-mascaras/) | Las capas. |
+| [`animacion-e-interaccion`](ejemplos/animacion-e-interaccion/) | Hojas de dibujos, clics y sonido que salta con un evento. |
+| [`valores`](ejemplos/valores/) | Valores que siguen el sonido, el puntero, el reloj y claves. |
+| [`efectos-apilados`](ejemplos/efectos-apilados/), [`efecto-propio`](ejemplos/efecto-propio/), [`transicion-propia`](ejemplos/transicion-propia/) | Efectos, máscaras, efectos propios y una transición propia. |
+| [`particulas`](ejemplos/particulas/), [`particulas-avanzadas`](ejemplos/particulas-avanzadas/), [`sonido`](ejemplos/sonido/) | Partículas y sonido. |
+| [`propiedades`](ejemplos/propiedades/) | Todos los tipos de propiedad de usuario, preajustes y traducciones. |
+| [`luces`](ejemplos/luces/), [`modelo-3d`](ejemplos/modelo-3d/), [`profundidad`](ejemplos/profundidad/), [`malla-con-huesos`](ejemplos/malla-con-huesos/) | Luces, 3D, profundidad y huesos. |
+
+## Tu primera escena
+
+Vas a hacer una escena con una imagen de fondo que ondula suavemente, un sol que cruza la pantalla
+y un ajuste para que el usuario elija el color del sol. Para cada paso hay dos caminos: la orden
+de `reiwand-ctl` y dónde está en el editor. El resultado final es la carpeta
+[`ejemplos/primera-escena`](ejemplos/primera-escena/).
+
+Pon `cielo.png` en la carpeta donde vas a trabajar: puede ser cualquier imagen tuya con ese nombre
+o la que trae la carpeta del ejemplo, `ejemplos/primera-escena/assets/cielo.png`. En el editor no
+importa el nombre: elegirás el archivo que tengas.
+
+### 1. Crear la escena
+
+```
+reiwand-ctl scene new mi-escena --title "Mi primera escena"
+```
+
+*Editor:* página *Escenas*, escribe el título, elige la carpeta y pulsa el punto de partida *Vacía*.
+
+Se crea la carpeta `mi-escena` con un `manifest.json`, una `scene.json` sin capas y una carpeta
+`assets/`. El lienzo mide 1920 por 1080: es el tamaño de referencia con el que colocas todo, y
+el programa lo ajusta a cada pantalla. El paquete recibe el id `org.example.mi-escena` (el nombre de
+la carpeta); es el que usan órdenes como `input grant` y conviene cambiarlo antes de publicar.
+
+### 2. Una capa de imagen
+
+```
+reiwand-ctl scene act mi-escena add_layer '{"kind":"image","name":"Fondo","file":"cielo.png"}'
+reiwand-ctl scene act mi-escena layer '{"transform":{"layer":"fondo","size":[1920,1080]}}'
+```
+
+*Editor:* *Añadir una capa* > *Capa desde un archivo* > *Imagen…* y elige tu imagen (también puedes soltar
+el archivo en la lista *Capas*, donde dice «Suelta los archivos para añadirlos como capas», si tu
+gestor de archivos permite arrastrar). La capa nace con el id `image`: abajo a la izquierda del inspector está el botón
+del lápiz (*Cambiar el id de la capa*, solo lo dice al pasar el ratón); escribe `fondo`. Luego, en el inspector de la capa, baja, pasada la mitad, hasta *Reproducción* y
+en *Tamaño* pon 1920 por 1080 (antes vale 0 por 0, y la imagen ya llena el lienzo).
+
+La primera orden copia la imagen a `assets/` como recurso `cielo`, añade una capa que la enseña e
+imprime su id: `fondo`. Sin `size`, una imagen se ve de su tamaño real y centrada, y casi nunca es
+el del lienzo: con `size` se estira hasta llenarlo, y hay que ponerlo en cada capa de imagen. Cada
+capa tiene un id, hecho del nombre, que las demás órdenes usan para nombrarla. Capas, recursos,
+sistemas de partículas y líneas de tiempo comparten los ids, así que, si el recurso ya se llamaba
+como la capa (`--file fondo.png --name Fondo`), la capa se llama `fondo_2`: lee siempre el id que
+imprime la orden (`cli.md`, «`scene act CARPETA add`»).
+
+### 3. Una capa que se mueve
+
+Primero una forma, un círculo amarillo:
+
+```
+reiwand-ctl scene act mi-escena add_layer '{"kind":"shape","name":"Sol"}'
+reiwand-ctl scene act mi-escena set '{"pointer":"/scene/layers/1/shape","value":{"ellipse":{"size":[220,220]}}}'
+```
+
+*Editor:* *Añadir una capa*, tipo *Forma*; la capa nace con el id `forma` y un rectángulo: con el lápiz
+de *Cambiar el id de la capa* llámala `sol`. Más abajo en el inspector, en *Forma*, elige *Elipse* (nace de 220 por 220;
+cambia su tamaño si quieres) y deja el relleno azul de momento: lo cambias en el paso 5.
+
+Después una línea de tiempo que dure 12 segundos y vaya y vuelva, y dos fotogramas clave de la
+posición del sol, uno al principio y otro al final:
+
+```
+reiwand-ctl scene act mi-escena timeline '{"id":"vuelta","add":true,"duration":12,"loop":"pingpong"}'
+reiwand-ctl scene act mi-escena keyframe '{"pointer":"/scene/layers/1/transform/position","time":0,"value":[260,820],"ease":"in_out_sine","timeline":"vuelta"}'
+reiwand-ctl scene act mi-escena keyframe '{"pointer":"/scene/layers/1/transform/position","time":12,"value":[1660,260],"timeline":"vuelta"}'
+```
+
+*Editor:* en la barra de abajo, *Líneas de tiempo* > *Añadir una línea de tiempo* (el menú se cierra
+sin más aviso; al abrirlo otra vez verás `timeline_1 · 5 s`). Esa línea de tiempo nace con el id
+`timeline_1`: en su submenú, *Cambiar el nombre…* y llámala `vuelta`. En el mismo submenú, *Editar la
+línea de tiempo y sus eventos…* abre un cuadro: en *Segundos* pon 12 y en *Se reproduce* elige
+*Ida y vuelta*. Con el cabezal en 0, pulsa el rombo de *Posición* de la capa del sol
+(*Fotograma clave aquí*): la posición sin tocar vale el centro del lienzo, así que el fotograma
+nace ahí. Solo entonces aparece en la franja de tiempo una fila *sol · Posición* con un
+desplegable que dice *Reloj de la escena*: elige en él `vuelta`. Escribe 260 y 820 en *Posición* o
+arrastra el sol abajo a la izquierda. Lleva el cabezal a 12 y escribe 1660 y 260, o arrastra el sol
+arriba a la derecha.
+
+Las capas se cuentan desde 0 desde abajo, y por eso el sol, la segunda, es `/scene/layers/1`. Para ver
+lo que hay en cualquier sitio: `reiwand-ctl scene show mi-escena /scene/layers/1`. El puntero empieza
+por `/scene` (lo de `scene.json`) o por `/manifest` (lo de `manifest.json`); `/layers` solo no existe.
+
+La posición es un punto del lienzo en píxeles con el origen arriba a la izquierda. `pingpong`
+es el valor de `--loop` (y de `loop` en `scene.json`) que hace que la línea de tiempo vaya y vuelva sin
+parar, y es lo que el editor llama *Ida y vuelta*; `in_out_sine` suaviza el principio del trayecto.
+
+### 4. Un efecto
+
+Un efecto cambia cómo se ve una capa. `waves` hace ondular el cielo:
+
+```
+reiwand-ctl scene act mi-escena effects '{"add":{"layer":"fondo","effect":"waves","params":{"amplitude":6,"frequency":3}}}'
+```
+
+*Editor:* elige la capa del cielo, *Añadir un efecto* y *Ondas*. Para ajustarlo, en *Efectos*
+del inspector abre el desplegable *Editar…* y elige *Elemento 1* (el efecto no muestra su nombre
+aquí): pon *Amplitud* 6 y *Frecuencia* 3. En la orden, `amplitude` y `frequency` son los ids de esos
+parámetros en `scene.json`.
+
+Los efectos están en [efectos.md](efectos.md).
+
+### 5. Una propiedad de usuario
+
+Una propiedad de usuario es algo que la persona que usa tu fondo puede cambiar sin tocar nada
+más. Esta deja elegir el color del sol:
+
+```
+reiwand-ctl scene act mi-escena add_property '{"kind":"color","id":"color_sol","label":"Color del sol"}'
+reiwand-ctl scene act mi-escena property '{"id":"color_sol","default":"#ffd23f"}'
+reiwand-ctl scene act mi-escena set '{"pointer":"/scene/layers/1/fill","value":{"prop":"color_sol"}}'
+```
+
+*Editor:* pestaña *Paquete*, *Propiedades de usuario*, *Añadir una propiedad* de tipo *Color*:
+nace con el id `color_1`; con *Cambiar el nombre…* llámala `color_sol`, y ponle la etiqueta
+«Color del sol» y el valor por defecto `#ffd23f`. En *Color de relleno* de la capa del sol, pulsa el
+rombo y elige *Seguir una propiedad de usuario* y la propiedad. El relleno queda como
+`{ "prop": "color_sol" }`, sin más datos, y el sol se ve del color de la propiedad.
+
+La propiedad se declara en `manifest.json` y la capa la sigue con `{ "prop": "color_sol" }`.
+
+### 6. Comprobar
+
+```
+reiwand-ctl pack check mi-escena
+```
+
+*Editor:* el panel de problemas, que se actualiza mientras trabajas y dice *Sin problemas* cuando
+todo está bien. Pulsa *Guardar* antes de ver la escena.
+
+No imprime nada si todo está bien. Si algo está mal, dice la ruta del campo y qué esperaba. Esta
+orden termina con error cuando hay problemas, y por eso sirve en guiones. Si la escena tiene
+scripts (`scripts.md`), también los compila sin ejecutarlos y dice, con el archivo y la línea, un
+error de sintaxis o un script que falta.
+
+### 7. Verla
+
+```
+reiwand-ctl scene preview mi-escena
+```
+
+*Editor:* *Ver en el escritorio*, junto al lienzo.
+
+Muestra la escena en el escritorio durante 60 segundos sin aplicarla como fondo, y necesita el
+servicio en marcha. Sin él, puedes construir el paquete y dibujar un fotograma:
+
+```
+reiwand-ctl pack build mi-escena -o mi.wpak
+reiwand-ctl scene bench mi.wpak --frames 360 --shot cuadro.png
+```
+
+`bench` dibuja la escena fuera de pantalla, dice cuánto cuesta cada fotograma y guarda el último
+como imagen: con `--frames 360` es el instante 6 s a 60 fotogramas por segundo, cuando el sol va a
+la mitad.
+
+`bench` no ejecuta los scripts. Para ver una escena con scripts sin escritorio, y a una hora fija,
+usa `reiwand-ctl scene render mi-escena -o vista.png --time-of-day 15:42` (`cli.md`, «`scene render`»).
+Una escena con partículas se ve vacía en el primer cuadro si su sistema no tiene `prewarm`
+(`particulas-y-sonido.md`).
+
+Para aplicarla de verdad como fondo: `reiwand-ctl scene apply mi-escena`, que al final dice qué mostró y
+dónde (`applied: Mi primera escena 0.1.0 on DP-1, quality Q3`), y para quitarla,
+`reiwand-ctl clear` (y `reiwand-ctl restore` la trae de vuelta). Si cambias la escena, aplícala otra vez:
+no hace falta subir la versión, pero tarda en verse mientras el demonio construye y carga.
+
+### Y ahora
+
+La escena que acabas de hacer es la carpeta [`ejemplos/primera-escena`](ejemplos/primera-escena/);
+su `scene.json` entero es:
+
+```json
+{
+  "schema": "reiwand.scene/1",
+  "canvas": { "size": [1920, 1080], "fit": "fill", "background": "#000000" },
+  "clock": { "max_fps": "display" },
+  "assets": { "cielo": { "path": "assets/cielo.png" } },
+  "layers": [
+    { "id": "fondo", "type": "image", "image": "cielo", "size": [1920, 1080],
+      "effects": [{ "effect": "waves", "params": { "amplitude": 6, "frequency": 3 } }] },
+    { "id": "sol", "type": "shape", "shape": { "ellipse": { "size": [220, 220] } },
+      "fill": { "prop": "color_sol" },
+      "transform": { "position": { "timeline": "vuelta",
+        "keys": [[0, [260, 820], "in_out_sine"], [12, [1660, 260]]] } } }
+  ],
+  "timelines": [{ "id": "vuelta", "duration": 12, "loop": "pingpong" }]
+}
+```
+
+Sigue con [escena.md](escena.md) para el resto del archivo, con [capas.md](capas.md) para los
+tipos de capa y con [paquete.md](paquete.md) cuando quieras dar nombre, licencia y firma a tu
+trabajo y compartirlo.
+
+## Tres cosas que conviene saber desde el principio
+
+1. **Los colores** se escriben `"#rrggbb"` o `"#rrggbbaa"`, siempre con 6 u 8 cifras.
+2. **Un valor puede moverse.** Casi cualquier número, color, texto o interruptor puede ser un valor
+   fijo o un objeto con una fuente: una propiedad (`{ "prop": ... }`), fotogramas clave
+   (`{ "keys": ... }`), el sonido (`{ "audio": ... }`), el puntero (`{ "cursor": ... }`) o el reloj
+   (`{ "clock": ... }`). Está en [escena.md](escena.md).
+3. **Las escenas corren en teléfonos.** Cada fotograma cuesta trabajo; [escena.md](escena.md) explica
+   cómo estimarlo y bajarlo.

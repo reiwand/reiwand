@@ -1,0 +1,66 @@
+use super::{B, PARTICLE, Stacked, Store, Swarms, buffer, module};
+use crate::Renderer;
+use reiwand_scene::{Cloud, Stack, stacked};
+use wgpu::Buffer;
+
+impl Swarms {
+    pub(super) fn sorting(&self, r: &Renderer) -> [wgpu::ComputePipeline; 3] {
+        let module = module(r, include_str!("sort.wgsl"));
+        let layouts = [Some(&self.layouts[3])];
+        let desc =
+            wgpu::PipelineLayoutDescriptor { label: None, bind_group_layouts: &layouts, immediate_size: 0 };
+        let layout = r.device.create_pipeline_layout(&desc);
+        ["tally", "scan", "scatter"].map(|entry| {
+            r.device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
+                label: Some(entry),
+                layout: Some(&layout),
+                module: &module,
+                entry_point: Some(entry),
+                compilation_options: Default::default(),
+                cache: None,
+            })
+        })
+    }
+
+    pub(super) fn stacked(
+        &self,
+        r: &Renderer,
+        (particles, alloc): (&Buffer, u32),
+        order: Stack,
+        size: f32,
+    ) -> Stacked {
+        let sorted = buffer(r, u64::from(alloc) * PARTICLE, B::VERTEX | B::STORAGE | B::COPY_DST);
+        let gpu = self.gpu.then(|| {
+            let bins = buffer(r, 4096, B::STORAGE);
+            let key = [order as u32, alloc, size.to_bits(), self.canvas[1].to_bits()];
+            let key = crate::filled::filled(
+                (&r.device, &r.queue),
+                "reiwand-scene particle order",
+                bytemuck::cast_slice(&key),
+                B::UNIFORM,
+            );
+            let parts = [particles, &sorted, &bins, &key];
+            let entries: Vec<_> = parts
+                .iter()
+                .enumerate()
+                .map(|(b, buffer)| wgpu::BindGroupEntry {
+                    binding: b as u32,
+                    resource: buffer.as_entire_binding(),
+                })
+                .collect();
+            let desc = wgpu::BindGroupDescriptor { label: None, layout: &self.layouts[3], entries: &entries };
+            let group = r.device.create_bind_group(&desc);
+            (bins, group)
+        });
+        Stacked { order, size, sorted, gpu, cpu: Vec::new() }
+    }
+}
+
+pub(super) fn stack(r: &Renderer, height: f32, stores: &mut [Store], clouds: &[Cloud]) {
+    for (store, cloud) in stores.iter_mut().zip(clouds) {
+        for st in &mut store.stacks {
+            stacked(&cloud.particles, (st.order, st.size, height), &mut st.cpu);
+            r.queue.write_buffer(&st.sorted, 0, bytemuck::cast_slice(&st.cpu));
+        }
+    }
+}

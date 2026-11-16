@@ -1,0 +1,75 @@
+app-id: io.github.reiwand.Reiwand
+runtime: org.kde.Platform
+runtime-version: '6.11'
+sdk: org.kde.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.llvm22
+command: reiwand-app
+rename-desktop-file: io.github.reiwand.desktop
+rename-icon: io.github.reiwand
+copy-icon: true
+finish-args:
+  - --device=dri
+  - --share=network
+  - --share=ipc
+  - --filesystem=xdg-run/pipewire-0:ro
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --own-name=io.github.reiwand
+  - --own-name=io.github.reiwand.Daemon
+  - --talk-name=org.freedesktop.ScreenSaver
+  - --talk-name=org.freedesktop.secrets
+  - --talk-name=org.kde.KWin
+  - --talk-name=org.freedesktop.Notifications
+  - --system-talk-name=org.freedesktop.UPower
+  - --system-talk-name=org.freedesktop.login1
+  - --filesystem=xdg-pictures:ro
+  - --filesystem=xdg-videos:ro
+  - --filesystem=xdg-download:ro
+  - --filesystem=xdg-data/reiwand/edits:create
+modules:
+  - name: reiwand
+    buildsystem: simple
+    build-options:
+      append-path: /run/build/reiwand/rust/bin:/usr/lib/sdk/llvm22/bin
+      prepend-ld-library-path: /usr/lib/sdk/llvm22/lib
+      cflags: -ffile-prefix-map=/run/build/reiwand=/src
+      cxxflags: -ffile-prefix-map=/run/build/reiwand=/src
+      env:
+        CARGO_HOME: /run/build/reiwand/cargo
+        RUSTFLAGS: --remap-path-prefix=/run/build/reiwand=/src --remap-path-prefix=/run/build/reiwand/cargo=/cargo
+    build-commands:
+      - pkg-config --atleast-version=1.24 gstreamer-1.0
+      - rust-dist/install.sh --prefix=/run/build/reiwand/rust --components=rustc,cargo,rust-std-$FLATPAK_ARCH-unknown-linux-gnu --disable-ldconfig
+      - REIWAND_VERSION=$(cat VERSION 2>/dev/null) cargo build --release --offline --locked -p reiwandd -p reiwand-ctl -p reiwand-web -p reiwand-app
+      - install -Dm755 -t /app/bin target/release/reiwandd target/release/reiwand-ctl target/release/reiwand-web target/release/reiwand-app
+      - install -Dm755 packaging/flatpak/reiwand-plasma.sh /app/bin/reiwand-plasma
+      - scripts/translations.sh build
+      - install -d /app/share/plasma/wallpapers /app/share/plasma/plasmoids /app/share/dbus-1/services /app/share/applications /app/share/reiwand
+      - cp -r integrations/kwin-pointer /app/share/reiwand/kwin-pointer
+      - cp -r integrations/plasma-wallpaper /app/share/plasma/wallpapers/io.github.reiwand
+      - cp -r integrations/plasma-tray /app/share/plasma/plasmoids/io.github.reiwand.tray
+      - scripts/plasma-assets.sh /app/share/plasma/plasmoids/io.github.reiwand.tray
+      - for f in packaging/dbus/*.service; do sed 's|@BINDIR@|/app/bin|' "$f" > "/app/share/dbus-1/services/${f##*/}"; done
+      - sed -e 's|@BINDIR@|/app/bin|' -e '/^DBusActivatable=/d' packaging/desktop/io.github.reiwand.desktop > /app/share/applications/io.github.reiwand.desktop
+      - install -Dm644 -t /app/share/icons/hicolor/scalable/apps packaging/icons/io.github.reiwand.svg
+      - install -Dm644 -t /app/share/metainfo packaging/flatpak/io.github.reiwand.Reiwand.metainfo.xml
+      - install -Dm644 -t /app/share/reiwand/examples scenes/LICENSE
+      - install -Dm644 -t /app/share/licenses/io.github.reiwand.Reiwand LICENSE packaging/THIRD-PARTY-NOTICES
+      - for scene in scenes/*/; do target/release/reiwand-ctl pack build "$scene" -o "/app/share/reiwand/examples/$(basename "$scene").wpak"; done
+    sources:
+      - type: dir
+        path: ../../target/flatpak-src
+      - type: archive
+        only-arches:
+          - x86_64
+        url: https://static.rust-lang.org/dist/rust-1.99.1-x86_64-unknown-linux-gnu.tar.xz
+        sha256: 231fcae47ee950621374725b5fc3b5441d2fbda2955ac45dd7dc816d8876cfe7
+        dest: rust-dist
+      - type: archive
+        only-arches:
+          - aarch64
+        url: https://static.rust-lang.org/dist/rust-1.99.1-aarch64-unknown-linux-gnu.tar.xz
+        sha256: a48fb1e853be56ce9b8e2751f5464dbd5e16440cd81e237920f3a5e7e806333e
+        dest: rust-dist
+      - cargo-sources.json

@@ -1,0 +1,198 @@
+use crate::cli::{ITEM, JSON, Page, Wait};
+use crate::daemon::job;
+use crate::input::{one, path_arg, resolve, strs};
+use crate::items::{details, search, sources, tags};
+use crate::show;
+use anyhow::Result;
+use clap::{ArgGroup, Subcommand};
+use futures_util::TryFutureExt;
+use reiwand_client::Client;
+
+const DECISIONS: [&str; 6] = ["mature", "motion", "hide_zone", "hide_language", "hide_gpu", "hide_storage"];
+
+#[derive(Subcommand, Debug)]
+pub enum Lib {
+    #[command(about = "Add a folder and scan it; prints the source uid, then the job id")]
+    Add {
+        #[arg(help = "Folder to add as a library source")]
+        dir: String,
+        #[arg(long, help = "Leave out subfolders")]
+        no_recursive: bool,
+        #[command(flatten)]
+        wait: Wait,
+    },
+    #[command(about = "List the library folders")]
+    Sources {
+        #[arg(long, help = JSON)]
+        json: bool,
+    },
+    #[command(about = "Scan one folder, or every folder when omitted")]
+    Scan {
+        #[arg(
+            help = "Library folder to scan, by the id that lib sources shows or its path; every folder when left out"
+        )]
+        source: Option<String>,
+        #[command(flatten)]
+        wait: Wait,
+    },
+    #[command(about = "Remove a folder and its items from the library")]
+    Unsource {
+        #[arg(help = "Library folder to stop watching: the id that lib sources shows, or its path")]
+        source: String,
+    },
+    #[command(about = "Import image, video or package files")]
+    Import {
+        #[arg(required = true, value_name = "FILE", help = "Files to copy into the library")]
+        files: Vec<String>,
+        #[arg(long, help = "Copy the files into the library first")]
+        copy: bool,
+        #[command(flatten)]
+        wait: Wait,
+    },
+    #[command(about = "Remove items from the library")]
+    Rm {
+        #[arg(required = true, value_name = "ITEM", help = ITEM)]
+        items: Vec<String>,
+        #[arg(long, help = "Also delete the imported copies")]
+        delete_files: bool,
+    },
+    #[command(about = "Search the library; see reiwand-ctl schema for the query keys")]
+    Search {
+        #[arg(default_value = "", help = "Search words and keys such as kind:scene; everything when empty")]
+        query: String,
+        #[command(flatten)]
+        page: Page,
+        #[arg(long, help = JSON)]
+        json: bool,
+    },
+    #[command(about = "Show an item")]
+    Show {
+        #[arg(value_name = "ITEM", help = ITEM)]
+        item: String,
+        #[arg(long, help = JSON)]
+        json: bool,
+    },
+    #[command(about = "Change the title of an item")]
+    Title {
+        #[arg(value_name = "ITEM", help = ITEM)]
+        item: String,
+        #[arg(help = "New title")]
+        title: String,
+    },
+    #[command(about = "Rate items from 0 to 5")]
+    Rate {
+        #[arg(value_parser = clap::value_parser!(u32).range(0..=5), help = "Rating from 0 to 5")]
+        rating: u32,
+        #[arg(required = true, value_name = "ITEM", help = ITEM)]
+        items: Vec<String>,
+    },
+    #[command(about = "Mark items as favorites")]
+    Fav {
+        #[arg(required = true, value_name = "ITEM", help = ITEM)]
+        items: Vec<String>,
+        #[arg(long, help = "Unmark them instead")]
+        off: bool,
+    },
+    #[command(about = "Add or remove tags", group(ArgGroup::new("change").required(true).multiple(true)))]
+    Tag {
+        #[arg(required = true, value_name = "ITEM", help = ITEM)]
+        items: Vec<String>,
+        #[arg(long, value_name = "TAG", group = "change", help = "Tag to add; repeat for several")]
+        add: Vec<String>,
+        #[arg(long, value_name = "TAG", group = "change", help = "Tag to remove; repeat for several")]
+        remove: Vec<String>,
+    },
+    #[command(about = "List the tags with their item counts")]
+    Tags {
+        #[arg(long, help = JSON)]
+        json: bool,
+    },
+    #[command(about = "Rename a tag, merging it into an existing one")]
+    Retag {
+        #[arg(help = "Tag to rename")]
+        from: String,
+        #[arg(help = "New name of the tag")]
+        to: String,
+    },
+    #[command(about = "Print the path of the thumbnail of an item, creating it when needed")]
+    Thumb {
+        #[arg(value_name = "ITEM", help = ITEM)]
+        item: String,
+        #[arg(
+            long, default_value = "512", value_parser = ["256", "512", "1024"],
+            help = "Edge of the thumbnail in pixels"
+        )]
+        size: String,
+    },
+    #[command(
+        about = "Show mature thumbnails of packages, let scenes keep moving when the desktop asks for reduced motion, or hide the time zone, the language, the graphics card or storage from a web page"
+    )]
+    Confirm {
+        #[arg(value_parser = DECISIONS, help = "What to allow")]
+        what: String,
+        #[arg(required = true, value_name = "ITEM", help = ITEM)]
+        items: Vec<String>,
+    },
+    #[command(about = "Withdraw a decision made with lib confirm")]
+    Unconfirm {
+        #[arg(value_parser = DECISIONS, help = "What to ask again before allowing")]
+        what: String,
+        #[arg(required = true, value_name = "ITEM", help = ITEM)]
+        items: Vec<String>,
+    },
+    #[command(about = "Delete what the web pages of these packages stored on this computer")]
+    ClearData {
+        #[arg(required = true, value_name = "ITEM", help = ITEM)]
+        items: Vec<String>,
+    },
+    #[command(about = "Show an item on the outputs")]
+    Apply(crate::applying::Applying),
+}
+
+pub async fn run(client: &Client, command: Lib) -> Result<()> {
+    let lib = &client.library;
+    match command {
+        Lib::Add { dir, no_recursive, wait } => {
+            let dir = path_arg(&dir)?;
+            let start = lib.add_source(&dir, !no_recursive).inspect_ok(|(source, _)| println!("{source}"));
+            job(client, start.map_ok(|(_, id)| ((), id)), &wait).await?
+        }
+        Lib::Sources { json } => show::reply(lib.list_sources().await?, json, sources)?,
+        Lib::Scan { source, wait } => {
+            let source = crate::sourcing::scanned(client, source).await?;
+            job(client, lib.rescan(&source).map_ok(|id| ((), id)), &wait).await?
+        }
+        Lib::Unsource { source } => crate::sourcing::unsource(client, &source).await?,
+        Lib::Import { files, copy, wait } => {
+            let paths = files.iter().map(|file| path_arg(file)).collect::<Result<Vec<_>>>()?;
+            job(client, lib.import(&strs(&paths), copy).map_ok(|id| ((), id)), &wait).await?
+        }
+        Lib::Rm { items, delete_files } => {
+            lib.remove(&strs(&resolve(client, &items).await?), delete_files).await?
+        }
+        Lib::Search { query, page, json } => {
+            show::reply(lib.search(&query, page.offset, page.limit).await?, json, search)?
+        }
+        Lib::Show { item, json } => {
+            show::reply(lib.get_item(&one(client, &item).await?).await?, json, details)?
+        }
+        Lib::Title { item, title } => lib.set_title(&one(client, &item).await?, &title).await?,
+        Lib::Rate { rating, items } => lib.set_rating(&strs(&resolve(client, &items).await?), rating).await?,
+        Lib::Fav { items, off } => lib.set_favorite(&strs(&resolve(client, &items).await?), !off).await?,
+        Lib::Tag { items, add, remove } => {
+            lib.set_tags(&strs(&resolve(client, &items).await?), &strs(&add), &strs(&remove)).await?
+        }
+        Lib::Tags { json } => show::reply(lib.list_tags().await?, json, tags)?,
+        Lib::Retag { from, to } => lib.rename_tag(&from, &to).await?,
+        Lib::Thumb { item, size } => {
+            println!("{}", lib.thumbnail(&one(client, &item).await?, size.parse()?).await?)
+        }
+        Lib::Confirm { what, items } => lib.confirm(&strs(&resolve(client, &items).await?), &what).await?,
+        Lib::Unconfirm { what, items } => {
+            lib.unconfirm(&strs(&resolve(client, &items).await?), &what).await?
+        }
+        Lib::ClearData { items } => lib.clear_data(&strs(&resolve(client, &items).await?)).await?,
+        Lib::Apply(applying) => applying.run(client).await?,
+    }
+    Ok(())
+}

@@ -1,0 +1,106 @@
+use crate::show::{clean, table};
+use crate::told::{fill, told, tr};
+use anyhow::Result;
+use clap::Args;
+use futures_util::StreamExt;
+use reiwand_client::Client;
+use reiwand_core::LayerNamespace;
+use reiwand_core::model::{LayerShellState, State};
+use serde_json::json;
+
+#[derive(Args, Debug)]
+pub struct GpuArgs {
+    #[arg(
+        help = "Choose the card: auto, integrated, dedicated, software, part of its name or pci: and its bus id to tell identical cards apart; list the cards without it"
+    )]
+    pub choice: Option<String>,
+    #[arg(long, help = crate::cli::JSON)]
+    pub json: bool,
+}
+
+pub const LATER: &str = told("the change takes effect the next time the daemon starts (reiwand-ctl restart)");
+
+pub async fn restart(client: &Client) -> Result<()> {
+    let bus = zbus::fdo::DBusProxy::new(&client.bus).await?;
+    let mut owners = bus.receive_name_owner_changed_with_args(&[(0, reiwand_core::dbus::BUS_NAME)]).await?;
+    let name = reiwand_core::dbus::BUS_NAME.try_into()?;
+    let before = bus.get_name_owner(name).await.ok().map(|owner| owner.to_string());
+    client.daemon.restart().await?;
+    let back = async {
+        while let Some(signal) = owners.next().await {
+            let Ok(args) = signal.args() else { continue };
+            let now = args.new_owner.as_ref().map(ToString::to_string);
+            if now.is_some() && now != before {
+                return true;
+            }
+        }
+        false
+    };
+    let started = tokio::time::timeout(std::time::Duration::from_secs(30), back).await;
+    anyhow::ensure!(
+        matches!(started, Ok(true)),
+        "{}",
+        tr(told("the daemon did not start again within 30 seconds"))
+    );
+    let state: State = serde_json::from_str(&client.daemon.get_state().await?)?;
+    println!("{}", fill(told("the daemon started again on %1"), &[&clean(&state.adapter)]));
+    Ok(())
+}
+
+pub async fn run(client: &Client, args: GpuArgs) -> Result<()> {
+    if let Some(choice) = &args.choice {
+        client.daemon.set_option("render.gpu", choice).await?;
+    }
+    let state: State = serde_json::from_str(&client.daemon.get_state().await?)?;
+    let chosen = state.options.get("render.gpu").and_then(|v| v.as_str()).unwrap_or("auto").to_owned();
+    if args.json {
+        let reply = json!({ "gpu": chosen, "adapters": state.adapters, "warning": state.gpu_warning,
+            "note": state.gpu_note, "restart": state.gpu_restart, "tier": state.tier, "tier_measured": state.tier_measured });
+        println!("{reply}");
+        return Ok(());
+    }
+    let rows = state.adapters.iter().map(|a| {
+        let used = if a.used { "*" } else { "" };
+        let bus = if a.bus.is_empty() { "-".into() } else { format!("pci:{}", a.bus) };
+        let desktop = if a.compositor { "*" } else { "" };
+        vec![used.into(), desktop.into(), a.name.clone(), a.kind.clone(), a.backend.clone(), bus]
+    });
+    print!("{}", table(&["USED", "DESKTOP", "NAME", "KIND", "BACKEND", "BUS"], rows));
+    println!("{}", fill(told("render.gpu = %1"), &[&clean(&chosen)]));
+    if let Some(warning) = &state.gpu_warning {
+        println!("{}", fill(told("warning: %1"), &[&clean(warning)]));
+    }
+    if let Some(note) = &state.gpu_note {
+        println!("{}", fill(told("note: %1"), &[&clean(note)]));
+    }
+    if state.gpu_restart {
+        println!("{}", tr(LATER));
+    }
+    Ok(())
+}
+
+pub async fn notice(client: &Client, key: &str) -> Result<()> {
+    if key != "render.gpu" && key != LayerNamespace::KEY {
+        return Ok(());
+    }
+    let state: State = serde_json::from_str(&client.daemon.get_state().await?)?;
+    if key == "render.gpu" && state.gpu_restart {
+        println!("{}", tr(LATER));
+    }
+    if key == LayerNamespace::KEY {
+        in_use(&state.layer_shell);
+    }
+    Ok(())
+}
+
+pub fn in_use(layer: &LayerShellState) {
+    if layer.restart {
+        println!("{}", tr(LATER));
+    }
+    if let Some(namespace) = layer.namespace.as_deref() {
+        println!("{}", fill(told("in use: %1 (from %2)"), &[&clean(namespace), &clean(&layer.from)]));
+        if let Some(ignored) = &layer.ignored {
+            println!("{}", fill(told("warning: %1"), &[&clean(ignored)]));
+        }
+    }
+}

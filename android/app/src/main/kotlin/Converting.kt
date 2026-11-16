@@ -1,0 +1,183 @@
+package io.github.reiwand
+
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.Uri
+import android.os.Handler
+import android.os.Looper
+import android.os.ParcelFileDescriptor
+import android.os.PowerManager
+import android.widget.Toast
+import androidx.annotation.OptIn
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.core.content.ContextCompat
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MimeTypes
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.effect.Presentation
+import androidx.media3.transformer.Composition
+import androidx.media3.transformer.EditedMediaItem
+import androidx.media3.transformer.EditedMediaItemSequence
+import androidx.media3.transformer.Effects
+import androidx.media3.transformer.ExportException
+import androidx.media3.transformer.ExportResult
+import androidx.media3.transformer.ProgressHolder
+import androidx.media3.transformer.Transformer
+import java.io.File
+import kotlin.concurrent.thread
+import org.json.JSONObject
+
+class Conversion(val uid: String, val path: String, val title: String, val keep: Boolean, val size: Pair<Int, Int>, val asked: Boolean = true) {
+    var target = ""
+}
+
+@OptIn(UnstableApi::class)
+object Converting {
+    val progress = mutableStateMapOf<String, Float>()
+    val names = mutableMapOf<String, String>()
+    private val main = Handler(Looper.getMainLooper())
+    private val queue = ArrayDeque<Conversion>()
+    private var running: Pair<Conversion, Transformer>? = null
+    private var app: Context? = null
+    private var watching = false
+    private const val POLL_MS = 500L
+    private val saver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (Convert.saving(context)) saved(context)
+        }
+    }
+
+    @Volatile
+    var asking: (() -> Unit)? = null
+
+    @Volatile
+    var finished: ((String) -> Unit)? = null
+
+    private fun library(op: String, uid: String): String? =
+        answer(Native::library, op, arrayOf("uid" to uid)) as? String
+
+    fun busy() = progress.isNotEmpty()
+
+    private fun stopRunning() {
+        (running?.first ?: queue.firstOrNull())?.let { stop(it.uid) }
+    }
+
+    private fun shown() {
+        val context = app ?: return
+        val now = running?.first ?: queue.firstOrNull()
+        val left = progress.size - 1
+        Notice.update(context, now?.uid.takeIf { busy() }, now?.title.orEmpty(), ((progress[now?.uid] ?: 0f) * 100).toInt(), left, ::stopRunning)
+    }
+
+    fun resume(context: Context) = Pending.all(context).forEach { conversion ->
+        val current = runCatching { (answer(Native::library, "item", arrayOf("uid" to conversion.uid)) as JSONObject).optString("path") }.getOrDefault("")
+        if (current == conversion.path && File(conversion.path).isFile) offer(context, conversion) else Pending.remove(context, conversion.uid)
+    }
+
+    fun offer(context: Context, conversion: Conversion) {
+        Pending.add(context, conversion)
+        Keeper.keep(context)
+        queued(context, conversion)
+    }
+
+    private fun queued(context: Context, conversion: Conversion) = main.post {
+        if (conversion.uid in progress) return@post
+        app = context.applicationContext
+        if (Notice.mustAsk(context)) asking?.invoke()
+        names[conversion.uid] = conversion.title
+        progress[conversion.uid] = 0f
+        queue += conversion
+        next()
+        shown()
+    }
+
+    fun stop(uid: String) = main.post {
+        if (queue.removeAll { it.uid == uid }) {
+            progress.remove(uid)
+            app?.let { Pending.remove(it, uid) }
+            shown()
+        }
+        val (conversion, transformer) = running?.takeIf { it.first.uid == uid } ?: return@post
+        transformer.cancel()
+        settle(conversion, false)
+    }
+
+    private fun saved(context: Context) {
+        val skipped = queue.filter { !it.asked }
+        queue.removeAll(skipped)
+        val stopping = running?.takeIf { !it.first.asked }
+        skipped.forEach { settle(it, false) }
+        stopping?.let { (conversion, transformer) ->
+            transformer.cancel()
+            settle(conversion, false)
+        }
+        if (skipped.isNotEmpty() || stopping != null) Toast.makeText(context, R.string.convert_saver, Toast.LENGTH_LONG).show()
+    }
+
+    private fun watch(context: Context, on: Boolean) {
+        if (on == watching) return
+        watching = on
+        if (on) ContextCompat.registerReceiver(context, saver, IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED), ContextCompat.RECEIVER_NOT_EXPORTED)
+        else runCatching { context.unregisterReceiver(saver) }
+    }
+
+    private fun next() {
+        val context = app ?: return
+        if (running != null) return
+        if (Convert.saving(context)) saved(context)
+        val conversion = queue.removeFirstOrNull() ?: return watch(context, false)
+        watch(context, true)
+        val target = runCatching { library("convert_to", conversion.uid) }.getOrNull() ?: return settle(conversion, false)
+        val transformer = Transformer.Builder(context).setVideoMimeType(MimeTypes.VIDEO_H264).addListener(object : Transformer.Listener {
+            override fun onCompleted(composition: Composition, result: ExportResult) = settle(conversion, true)
+
+            override fun onError(composition: Composition, result: ExportResult, error: ExportException) = settle(conversion, false)
+        }).build()
+        val (width, height) = conversion.size
+        val effects = Effects(emptyList(), listOf(Presentation.createForWidthAndHeight(width, height, Presentation.LAYOUT_SCALE_TO_FIT)))
+        val item = EditedMediaItem.Builder(MediaItem.fromUri(Uri.fromFile(File(conversion.path)))).setEffects(effects).build()
+        running = conversion to transformer
+        conversion.target = target
+        val sequence = EditedMediaItemSequence.Builder(item).build()
+        transformer.start(Composition.Builder(sequence).setHdrMode(Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL).build(), target)
+        main.postDelayed(poll, POLL_MS)
+    }
+
+    private val poll = object : Runnable {
+        override fun run() {
+            val (conversion, transformer) = running ?: return
+            val holder = ProgressHolder()
+            if (transformer.getProgress(holder) == Transformer.PROGRESS_STATE_AVAILABLE) progress[conversion.uid] = holder.progress / 100f
+            shown()
+            main.postDelayed(this, POLL_MS)
+        }
+    }
+
+    private fun settle(conversion: Conversion, made: Boolean) {
+        if (running?.first === conversion) running = null
+        app?.let { Pending.remove(it, conversion.uid) }
+        main.removeCallbacks(poll)
+        thread(isDaemon = true) {
+            val placed = made && runCatching { place(conversion) }.getOrDefault(false)
+            if (placed) Render.post { Wallpaper.reload(false) } else runCatching { library("unconverted", conversion.uid) }
+            main.post {
+                progress.remove(conversion.uid)
+                finished?.invoke(conversion.uid)
+                next()
+                shown()
+            }
+        }
+    }
+
+    private fun place(conversion: Conversion): Boolean {
+        if (!conversion.keep) return library("converted", conversion.uid)?.let { path -> poster(conversion.uid) { setDataSource(path) } } != null
+        val made = File(conversion.target)
+        val name = app?.getString(R.string.converted_name, conversion.title) + ".mp4"
+        val stored = ParcelFileDescriptor.open(made, ParcelFileDescriptor.MODE_READ_ONLY).use { JSONObject(Native.store(it.fd, name)!!) }
+        poster(stored.getString("uid")) { setDataSource(made.path) }
+        runCatching { library("unconverted", conversion.uid) }
+        return true
+    }
+}

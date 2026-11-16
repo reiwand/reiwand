@@ -1,0 +1,17 @@
+/target
+/target-ci
+/dist
+/integrations/*/contents/locale
+/packaging/flatpak/cargo-sources.json
+/apps/reiwand-app/.qmlls.ini
+/android/.gradle
+/android/.kotlin
+/android/build
+/android/app/build
+/android/local.properties
+*.keystore
+*~
+/.env
+/data
+/integrations/plasma-tray/contents/look
+__pycache__/

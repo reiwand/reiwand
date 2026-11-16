@@ -1,0 +1,158 @@
+use crate::input::LayerOverride;
+use crate::resolve::Context;
+use crate::{Affine, Inherit, Kind, Layer, Lean, MAX_DEPTH, Scene, Wake};
+use std::collections::HashMap;
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct Place {
+    pub(crate) world: Affine,
+    pub(crate) frame: Affine,
+    pub(crate) lean: Option<Lean>,
+    pub(crate) around: Option<Lean>,
+    pub(crate) visible: bool,
+    pub(crate) opacity: f32,
+}
+
+pub(crate) fn homes<'a>(top: impl Iterator<Item = &'a Layer>) -> HashMap<String, String> {
+    let (mut found, mut stack) = (HashMap::new(), top.collect::<Vec<_>>());
+    while let Some(group) = stack.pop() {
+        found.extend(group.children().iter().map(|l| (l.id.clone(), group.id.clone())));
+        stack.extend(group.children());
+    }
+    found
+}
+
+impl Scene {
+    pub fn tilts(&self) -> bool {
+        let gyro = self.canvas.parallax.as_ref().is_some_and(|g| g.gyro);
+        gyro && self
+            .any_layer(|l| !l.parallax.is_zero() || l.effects.iter().any(|e| e.effect == "depth_parallax"))
+    }
+}
+
+pub(crate) fn origin_of(layer: &Layer, set: &LayerOverride) -> [f32; 2] {
+    let valign = match &layer.kind {
+        Kind::Text(text) => text.valign.unwrap_or_default().fraction(),
+        _ => 0.5,
+    };
+    set.origin.or(layer.transform.origin).or(layer.anchor.map(|a| a.fraction())).unwrap_or([0.5, valign])
+}
+
+pub(crate) fn parent_of<'a>(layer: &'a Layer, set: &'a LayerOverride) -> Option<&'a String> {
+    match &set.parent {
+        Some(p) if p.is_empty() => None,
+        Some(p) => Some(p),
+        None => layer.parent.as_ref(),
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub(crate) struct Eased {
+    pub(crate) amount: f32,
+    pub(crate) pointer: f32,
+    pub(crate) offset: [f32; 2],
+    pub(crate) gyro: bool,
+}
+
+pub(crate) fn glide(cx: &Context) -> Eased {
+    let set = cx.script.stage.and_then(|s| s.parallax).unwrap_or_default();
+    let base = cx.scene.canvas.parallax.as_ref();
+    let get = |v: Option<&crate::Value<f32>>| v.map_or(1.0, |v| v.get(cx));
+    Eased {
+        amount: set.amount.unwrap_or_else(|| get(base.map(|g| &g.amount))),
+        pointer: set.pointer.unwrap_or_else(|| get(base.map(|g| &g.pointer))),
+        offset: set.offset.unwrap_or_else(|| base.map_or([0.0; 2], |g| g.offset.get(cx).0)),
+        gyro: base.is_some_and(|g| g.gyro),
+    }
+}
+
+fn follows(layer: &Layer, set: &LayerOverride, what: Inherit) -> bool {
+    let default = matches!(what, Inherit::Transform | Inherit::Visible);
+    parent_of(layer, set).is_some() && layer.inherit.as_ref().map_or(default, |list| list.contains(&what))
+}
+
+impl Context<'_> {
+    pub(crate) fn place(&self, layer: &Layer, outer: (Affine, Option<Lean>)) -> Place {
+        self.placed(layer, Some(outer), 0)
+    }
+
+    pub(crate) fn placement(&self, layer: &Layer) -> Place {
+        self.placed(layer, None, 0)
+    }
+
+    pub(crate) fn world(&self, layer: &Layer) -> Affine {
+        self.camera.inverse().then(self.placed(layer, None, 0).world)
+    }
+
+    pub(crate) fn placed(&self, layer: &Layer, outer: Option<(Affine, Option<Lean>)>, depth: usize) -> Place {
+        let key = std::ptr::from_ref(layer) as usize;
+        if let Some(found) = self.places.borrow().get(&key) {
+            return *found;
+        }
+        let set = self.script.layers.get(&layer.id).unwrap_or(&crate::input::UNSET);
+        let by_id = |id: &String| {
+            let found = self.find(id).filter(|_| depth < 2 * MAX_DEPTH);
+            found.map(|l| self.placed(l, None, depth + 1))
+        };
+        let parent = parent_of(layer, set).and_then(by_id);
+        let home = || self.homes.get(&layer.id).and_then(by_id).map(|p| (p.world, p.lean));
+        let follows = |what| follows(layer, set, what);
+        let pinned = layer.attach.as_ref().filter(|_| set.parent.is_none());
+        let pinned = pinned.and_then(|a| self.pinned(a, depth));
+        let (base, around) = match parent.filter(|_| follows(Inherit::Transform)) {
+            Some(p) => (p.world, p.lean),
+            None => {
+                pinned.map(|(w, lean, _)| (w, lean)).or(outer).or_else(home).unwrap_or((self.camera, None))
+            }
+        };
+        let mut visible = set.visible.unwrap_or_else(|| layer.visible.get(self));
+        let mut opacity = set.opacity.unwrap_or_else(|| layer.opacity.get(self)).clamp(0.0, 1.0);
+        visible &= pinned.is_none_or(|p| p.2);
+        if let Some(p) = parent {
+            visible &= p.visible || !follows(Inherit::Visible);
+            opacity *= if follows(Inherit::Opacity) { p.opacity } else { 1.0 };
+        }
+        let (seat, own) = self.local(layer, set);
+        let frame = base.then(seat);
+        let world = frame.then(own);
+        let place = Place { world, frame, lean: self.lean(layer, world, around), around, visible, opacity };
+        self.places.borrow_mut().insert(key, place);
+        place
+    }
+
+    fn local(&self, layer: &Layer, set: &LayerOverride) -> (Affine, Affine) {
+        let (t, view, canvas) = (&layer.transform, self.view, self.canvas);
+        let base = layer.anchor.map_or([0.0; 2], |a| {
+            let [fx, fy] = a.fraction();
+            [view[0] + fx * view[2], view[1] + fy * view[3]]
+        });
+        let free = layer.anchor.is_some()
+            || (layer.attach.is_some() && set.parent.is_none())
+            || follows(layer, set, Inherit::Transform)
+            || matches!(layer.kind, Kind::Group { .. } | Kind::Adjustment { .. });
+        let center = if free { [0.0; 2] } else { [canvas[0] / 2.0, canvas[1] / 2.0] };
+        let position = set.position.unwrap_or_else(|| t.position.as_ref().map_or(center, |p| p.get(self).0));
+        let shift = self.shift(set.parallax.unwrap_or_else(|| layer.parallax.0.get(self).0));
+        let seat = Affine::translate([0, 1].map(|i| base[i] + shift[i] * canvas[i]));
+        let own = Affine::translate(position)
+            .then(Affine::rotate(set.rotation.unwrap_or_else(|| t.rotation.get(self))))
+            .then(Affine::skew(set.skew.unwrap_or_else(|| t.skew.get(self).0)))
+            .then(Affine::scale(set.scale.unwrap_or_else(|| t.scale.get(self).0)));
+        (seat, own)
+    }
+
+    fn shift(&self, depth: [f32; 2]) -> [f32; 2] {
+        if depth == [0.0; 2] || self.still {
+            return [0.0; 2];
+        }
+        let glide = glide(self);
+        let tilt = if glide.gyro { self.tilt } else { [0.0; 2] };
+        if glide.pointer > 0.0 && self.glide.moving() {
+            self.note(Wake::Frame);
+        }
+        [0, 1].map(|i| {
+            let offset = (self.glide.smooth[i] - 0.5) * glide.pointer + (glide.offset[i] + tilt[i]) * 0.5;
+            offset * glide.amount * depth[i]
+        })
+    }
+}

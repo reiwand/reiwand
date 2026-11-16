@@ -1,0 +1,191 @@
+use crate::actions::{Action, plan};
+use crate::history::History;
+use crate::meta::{cancels, detected, sync};
+use crate::ops::Op;
+use crate::session::write;
+use anyhow::{Result, bail, ensure};
+use reiwand_core::message::said;
+use reiwand_format::{MANIFEST, check_path, sha256};
+use serde_json::{Value, json};
+use std::fs;
+use std::path::{Path, PathBuf};
+
+pub struct Project {
+    pub dir: PathBuf,
+    pub doc: Value,
+    pub history: History,
+    pub base: String,
+    pub pending: Option<(Value, History)>,
+    pub scope: Option<String>,
+    recorded: Option<u64>,
+}
+
+pub fn stamp(doc: &Value) -> String {
+    sha256(doc.to_string().as_bytes()).unwrap_or_default()
+}
+
+pub use crate::skew::{now, skip_clock};
+
+pub fn entry(doc: &Value) -> Result<String> {
+    let entry = doc["manifest"]["entry"].as_str().unwrap_or("scene.json").to_owned();
+    check_path(&entry)?;
+    ensure!(
+        entry != MANIFEST && entry.ends_with(".json"),
+        said("editor.entry_not_scene", "the entry %1 is not a scene file", &[&entry])
+    );
+    Ok(entry)
+}
+
+pub fn read(dir: &Path) -> Result<Value> {
+    let load = |name: &str| -> Result<Value> {
+        let text = fs::read_to_string(dir.join(name))
+            .map_err(|e| said("editor.cannot_read", "cannot read %1: %2", &[&name, &e]))?;
+        serde_json::from_str(&text)
+            .map_err(|e| said("editor.not_json", "%1 is not valid JSON: %2", &[&name, &e]).into())
+    };
+    let manifest = load(MANIFEST)?;
+    if !crate::pages::scened(&json!({"manifest": manifest})) {
+        return crate::presets::attach(dir, json!({"manifest": manifest}));
+    }
+    let scene = load(&entry(&json!({"manifest": manifest}))?)?;
+    Ok(json!({"manifest": manifest, "scene": scene}))
+}
+
+impl Project {
+    pub fn open(dir: &Path) -> Result<Project> {
+        let doc = read(dir)?;
+        let base = stamp(&doc);
+        let (history, pending) = match crate::session::saved(dir).filter(|s| s.files == base) {
+            Some(s) if s.doc == doc => (s.history, None),
+            Some(s) => (History::default(), Some((s.doc, s.history))),
+            None => (History::default(), None),
+        };
+        let scope = crate::scope::picked();
+        let mut project = Project { dir: dir.to_owned(), doc, history, base, pending, scope, recorded: None };
+        project.bring_back();
+        if project.history.done.is_empty() && project.history.saved.is_none() {
+            project.history.mark_saved();
+        }
+        Ok(project)
+    }
+
+    pub fn create(dir: &Path, doc: Value) -> Result<Project> {
+        let empty = !dir.exists() || fs::read_dir(dir)?.next().is_none();
+        ensure!(empty, said("editor.not_empty_folder", "%1 is not an empty folder", &[&(dir.display())]));
+        fs::create_dir_all(if crate::pages::scened(&doc) { dir.join("assets") } else { dir.to_owned() })?;
+        let (history, base) = (History::default(), String::new());
+        let mut project =
+            Project { dir: dir.to_owned(), doc, history, base, pending: None, scope: None, recorded: None };
+        project.write_files()?;
+        crate::pages::seed(dir, &project.doc)?;
+        project.history.mark_saved();
+        project.persist()?;
+        Ok(project)
+    }
+
+    fn write_files(&mut self) -> Result<()> {
+        let pretty = |v: &Value| serde_json::to_string_pretty(v).map(|t| t + "\n");
+        write(&self.dir.join(MANIFEST), &pretty(&self.doc["manifest"])?, 0o644)?;
+        if crate::pages::scened(&self.doc) {
+            write(&self.dir.join(entry(&self.doc)?), &pretty(&self.doc["scene"])?, 0o644)?;
+        }
+        crate::presets::write(&self.dir, &self.doc)?;
+        self.base = stamp(&self.doc);
+        Ok(())
+    }
+
+    pub fn act(&mut self, action: &Action) -> Result<Vec<Op>> {
+        self.step(action, false)
+    }
+
+    pub fn drag(&mut self, action: &Action) -> Result<Vec<Op>> {
+        self.step(action, true)
+    }
+
+    pub fn hold(&mut self, on: bool) {
+        let history = &mut self.history;
+        history.begun = false;
+        history.open = on;
+    }
+
+    pub fn held(&mut self) {
+        if let Some(stamp) = self.recorded.take() {
+            self.history.held(stamp, now());
+        }
+    }
+
+    fn step(&mut self, action: &Action, gesture: bool) -> Result<Vec<Op>> {
+        let at = now();
+        self.recorded = None;
+        self.ready()?;
+        let ops = match action {
+            Action::Undo {} | Action::Redo {} => {
+                let moved = match action {
+                    Action::Undo {} => self.history.undo(&mut self.doc)?,
+                    _ => self.history.redo(&mut self.doc)?,
+                };
+                self.bring_back();
+                let moved = Ok(moved.map(|(_, o)| o).unwrap_or_default());
+                return moved.inspect(|o| crate::scripts::restore(&self.dir, &self.doc, o));
+            }
+            action => {
+                let scope = self.scope.as_deref().filter(|_| !crate::outside::whole(action));
+                let seen = crate::scope::seen(&self.doc, scope)?;
+                let ops = crate::outside::within(&self.doc, scope, || {
+                    match crate::files::act(&self.dir, &seen, action) {
+                        Some(ops) => ops,
+                        None => plan(&seen, action),
+                    }
+                })?;
+                crate::scope::ops(ops, scope)?
+            }
+        };
+        let done = self.commit(&action.name(), ops, gesture, at);
+        if matches!(action, Action::Thumbnail { .. } | Action::Shot(_)) {
+            self.tuck();
+        }
+        done
+    }
+
+    pub fn record(&mut self, label: &str, ops: Vec<Op>) -> Result<Vec<Op>> {
+        self.ready()?;
+        self.commit(label, ops, false, now())
+    }
+
+    fn commit(&mut self, label: &str, ops: Vec<Op>, gesture: bool, at: u64) -> Result<Vec<Op>> {
+        let dir = Some(self.dir.as_path());
+        if ops.is_empty() || cancels(&self.doc, &ops, dir) {
+            return Ok(Vec::new());
+        }
+        let before = detected(&self.doc, dir);
+        let mut done = self.history.record(&mut self.doc, label, ops, at, gesture)?;
+        self.recorded = gesture.then_some(at);
+        for _ in 0..2 {
+            match sync(&self.doc, &before, dir) {
+                follow if follow.is_empty() => break,
+                follow => done.extend(self.history.extend(&mut self.doc, follow)?),
+            }
+        }
+        Ok(done)
+    }
+
+    pub fn save(&mut self) -> Result<()> {
+        self.ready()?;
+        let disk = read(&self.dir).map(|d| stamp(&d)).unwrap_or_default();
+        if disk != self.base {
+            bail!(said(
+                "editor.files_changed_outside",
+                "the files of %1 changed outside the editor; open the folder again",
+                &[&(self.dir.display())]
+            ));
+        }
+        self.write_files()?;
+        self.history.mark_saved();
+        self.tuck();
+        self.persist()
+    }
+
+    pub fn dirty(&self) -> bool {
+        stamp(&self.doc) != self.base
+    }
+}

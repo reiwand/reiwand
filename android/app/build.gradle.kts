@@ -1,0 +1,123 @@
+import java.security.KeyStore
+import javax.inject.Inject
+
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.compose)
+}
+
+val rustLibs = layout.buildDirectory.dir("rustJniLibs").get().asFile.path
+val workspace = rootDir.parentFile
+val keystore = providers.environmentVariable("REIWAND_KEYSTORE")
+val keystorePassword = providers.environmentVariable("REIWAND_KEYSTORE_PASSWORD")
+val testSuffix = providers.gradleProperty("testSuffix").orNull?.takeIf { it.isNotBlank() }
+val abis = providers.gradleProperty("abis").getOrElse("arm64-v8a,x86_64").split(',')
+val home = providers.systemProperty("user.home").get()
+val remaps = listOf(
+    providers.environmentVariable("CARGO_HOME").getOrElse("$home/.cargo") to "/cargo",
+    providers.environmentVariable("RUSTUP_HOME").getOrElse("$home/.rustup") to "/rustup",
+    home to "/build",
+    workspace.path to "/src",
+)
+
+android {
+    namespace = "io.github.reiwand"
+    compileSdk = 37
+    defaultConfig {
+        applicationId = "io.github.reiwand"
+        minSdk = 31
+        targetSdk = 36
+        versionCode = providers.gradleProperty("versionCode").getOrElse("1").toInt()
+        versionName = providers.gradleProperty("versionName").orNull ?: workspace.resolve("Cargo.toml").useLines { lines ->
+            lines.first { it.startsWith("version = ") }.substringAfter('"').substringBefore('"')
+        }
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        applicationIdSuffix = testSuffix?.let { ".$it" }
+        manifestPlaceholders["profileable"] = (testSuffix != null).toString()
+        manifestPlaceholders["label"] = testSuffix?.let { "Reiwand $it" } ?: "@string/app_name"
+    }
+    splits.abi {
+        isEnable = true
+        reset()
+        include(*abis.toTypedArray())
+        isUniversalApk = abis.size > 1
+    }
+    val signing = if (keystore.isPresent) signingConfigs.create("release") {
+        storeFile = file(keystore.get())
+        storePassword = keystorePassword.get()
+        keyAlias = KeyStore.getInstance(storeFile, keystorePassword.get().toCharArray()).aliases().nextElement()
+        keyPassword = keystorePassword.get()
+    } else signingConfigs.getByName("debug")
+    buildTypes.getByName("debug") { signingConfig = signing }
+    buildTypes.getByName("release") {
+        signingConfig = signing
+        isMinifyEnabled = true
+        isShrinkResources = true
+        proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "keep.pro")
+    }
+    buildFeatures { compose = true }
+    sourceSets.named("main") {
+        jniLibs.directories += rustLibs
+        assets.directories += workspace.resolve("crates/reiwand-depth/licenses").path
+    }
+    sourceSets.named("androidTest") { assets.directories += workspace.resolve("tests/fixtures").path }
+    packaging {
+        jniLibs {
+            keepDebugSymbols += "**/*.so"
+            excludes += (listOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64", "riscv64") - abis).map { "lib/$it/**" }
+            useLegacyPackaging = true
+        }
+    }
+}
+
+dependencies {
+    implementation(platform(libs.compose.bom))
+    implementation(libs.activity.compose)
+    implementation(libs.compose.material3)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.transformer)
+    implementation(libs.media3.effect)
+    implementation(libs.work.runtime)
+    implementation(libs.webkit)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.test.runner)
+    androidTestImplementation(libs.test.junit)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.test)
+    debugImplementation(libs.compose.test.manifest)
+}
+
+val cargo = tasks.register<Exec>("cargo") {
+    workingDir = workspace
+    environment("CARGO_ENCODED_RUSTFLAGS", remaps.joinToString("\u001f") { (from, to) -> "--remap-path-prefix=$from=$to" })
+    environment("CFLAGS", remaps.joinToString(" ") { (from, to) -> "-ffile-prefix-map=$from=$to" })
+    commandLine(
+        listOf("cargo", "ndk") + abis.flatMap { listOf("-t", it) } +
+            listOf("-P", "31", "-o", rustLibs, "build", "-p", "reiwand-android", "--release", "--locked"),
+    )
+}
+
+abstract class Examples : DefaultTask() {
+    @get:InputDirectory
+    abstract val scenes: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val assets: DirectoryProperty
+
+    @get:Inject
+    abstract val files: FileSystemOperations
+
+    @TaskAction
+    fun copy() {
+        files.sync {
+            from(scenes) { into("scenes") }
+            into(assets)
+        }
+    }
+}
+
+val examples = tasks.register<Examples>("examples") { scenes.set(workspace.resolve("scenes")) }
+
+androidComponents.onVariants { it.sources.assets?.addGeneratedSourceDirectory(examples, Examples::assets) }
+
+tasks.named("preBuild") { dependsOn(cargo) }

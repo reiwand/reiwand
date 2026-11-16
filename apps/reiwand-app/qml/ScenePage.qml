@@ -1,0 +1,149 @@
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC2
+import org.kde.kirigami as Kirigami
+import io.github.reiwand.app
+
+Kirigami.Page {
+    id: page
+
+    required property string folder
+    property string starter
+    property string heading
+    property string source
+    property bool exercised: App.checking
+    property bool exercising: false
+    property alias editor: editor
+    property alias layout: area.layout
+    property alias builder: builder
+    property alias use: use
+    property alias settings: area.settings
+    property alias layers: area.layers
+    property string spot
+    property var picked: []
+    property bool moving
+    property bool overwrite
+    property bool magnets: true
+    property string picking
+    property var brush: null
+    property var emitterEntry: ({})
+    property bool lightBoxes
+    readonly property SceneMeshState mesh: SceneMeshState {
+        page: page
+    }
+    property string notice
+    readonly property var scenePage: page
+    property Component topBar: builder.shown ? null : sceneTop
+    property Component sceneTop: Component {
+        SceneTop {
+            page: scenePage
+        }
+    }
+    property real clock: editor.time
+    property real heard: 0
+    readonly property var view: JSON.parse(editor.view || "{}")
+    readonly property SceneGizmoList held: SceneGizmoList {
+        editor: page.editor
+    }
+    readonly property var gizmos: held.list
+    onViewChanged: SceneWords.own = view.effect_names ?? ({})
+    readonly property var fields: JSON.parse(editor.fields || "[]")
+    readonly property SceneShown shown: SceneShown {
+        page: page
+    }
+
+    function run(action, args, gesture) {
+        editor.run(action, JSON.stringify(args ?? {}), gesture === true);
+    }
+
+    function change(pointer, value, gesture) {
+        const keyed = (view.tracks ?? []).some(track => track.pointer === pointer);
+        const args = keyed ? {
+            "time": editor.time
+        } : {};
+        run(keyed ? "keyframe" : "set", Object.assign(args, {
+                    "pointer": pointer,
+                    "value": value
+                }), gesture);
+    }
+
+    function jump(pointer) {
+        const own = (view.layers ?? []).concat(view.properties ?? [], view.presets ?? []).some(item => item.pointer === pointer);
+        const parent = pointer.split("/").slice(0, -1).join("/").replace(/\/(params|values)$/, "");
+        editor.select(own || parent.split("/").length < 3 ? pointer : parent);
+        spot = pointer;
+    }
+
+    title: builder.shown ? builder.title : view.title ?? ""
+    actions: builder.shown ? builder.actions : []
+    padding: 0
+    background: Rectangle {
+        color: Look.noche
+    }
+    Component.onCompleted: {
+        starter ? editor.create(folder, starter, heading) : editor.open(folder, source);
+        if (!exercised)
+            return;
+        page.exercising = true;
+        checking.check = Qt.createComponent("SceneCheck.qml").createObject(page, {
+            "page": page
+        });
+        checking.start();
+    }
+
+    Timer {
+        id: checking
+
+        property var check: null
+
+        interval: 0
+        onTriggered: {
+            try {
+                check.exercise();
+            } finally {
+                page.exercising = false;
+            }
+        }
+    }
+
+    SceneEditor {
+        id: editor
+
+        onFinished: message => use.placing ? use.placed(message) : page.notice = message
+    }
+
+    SceneUse {
+        id: use
+
+        page: page
+    }
+
+    Timer {
+        interval: 30000
+        running: editor.ready
+        repeat: true
+        onTriggered: editor.autosave()
+    }
+
+    Connections {
+        target: page.Window.window
+
+        function onVisibilityChanged(visibility) {
+            editor.cover(visibility === Window.Minimized || visibility === Window.Hidden);
+        }
+    }
+
+    SceneDocks {
+        id: area
+
+        anchors.fill: parent
+        enabled: editor.ready
+        page: page
+    }
+
+    Publish {
+        id: builder
+
+        page: page
+    }
+}

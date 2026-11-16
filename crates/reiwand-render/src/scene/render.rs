@@ -1,0 +1,200 @@
+use super::damage::Damage;
+use super::item::{Rect, frame_data, linear};
+use super::paint::Painter;
+use super::{SceneStats, SceneView, Src, TEXT_FRAMES, encode, pipes, timed};
+use crate::texture::GpuImage;
+use crate::{RenderError, Renderer};
+use reiwand_scene::{Frame, Quality, Runtime};
+use std::hash::{Hash, Hasher};
+
+mod targets;
+
+use targets::{resolve, retarget};
+
+impl Renderer {
+    pub fn render_scene<'v>(
+        &self,
+        view: &'v mut SceneView,
+        runtime: &Runtime,
+        frame: &Frame<'_>,
+        size: (u32, u32),
+        quality: Quality,
+        videos: &[(&str, &GpuImage)],
+    ) -> Result<&'v GpuImage, RenderError> {
+        self.check_target(size.0, size.1)?;
+        self.judge(view, frame);
+        view.pace(self);
+        view.pool.send_ahead(&self.queue);
+        self.molds(view, runtime)?;
+        let data = frame_data(runtime, frame, size, view.srgb, quality);
+        self.queue.write_buffer(&view.uniform, 0, bytemuck::bytes_of(&data));
+        self.figures(view, (runtime, frame), videos, view.screen(size).0)?;
+        let created = (view.pool.created, pipes::compiled(0));
+        let format = targets::output_format(view);
+        if view.target.as_ref().is_none_or(|(t, out)| t.size() != size || out.format != format) {
+            retarget(self, view, size);
+        }
+        let screen = view.screen(size);
+        view.pool.glow.update(&self.queue, frame, screen, (view.srgb, &view.images), self.light_cap());
+        view.note_dropped(frame, self.light_cap());
+        self.shrunk(view, frame, screen);
+        let mut scratch = std::mem::take(&mut view.scratch);
+        scratch.reset(frame.draws.len(), runtime);
+        self.rasters(view, frame, screen, &mut scratch.texts);
+        self.emitted(view, frame);
+        let v = &mut *view;
+        let (srgb, format, state_format) = (v.srgb, v.format, v.state_format);
+        let full = Rect { x: 0.0, y: 0.0, w: size.0 as f32, h: size.1 as f32 };
+        let mut painter = Painter {
+            r: self,
+            frame,
+            pool: &mut v.pool,
+            caches: &mut v.caches,
+            states: &mut v.states,
+            images: &v.images,
+            samplings: &v.samplings,
+            luts: &v.luts,
+            texts: &scratch.texts,
+            rasters: &v.texts,
+            videos,
+            molds: &v.molds,
+            skins: &v.skins,
+            solids: &v.solids,
+            exts: &mut scratch.exts,
+            screen,
+            stage: screen.then(reiwand_scene::Affine::scale(v.canvas.map(|v| v as f32))),
+            full,
+            clip: None,
+            moment: {
+                let mut h = std::hash::DefaultHasher::new();
+                bytemuck::bytes_of(&super::item::FrameData { dt: 0.0, ..data }).hash(&mut h);
+                h.finish()
+            },
+            srgb,
+            format,
+            state_format,
+            ops: &mut scratch.ops,
+            reused: 0,
+            kept: &mut scratch.kept,
+            outputs: &mut scratch.outputs,
+            lease: &mut v._lease,
+            swarms: v.swarms.as_mut(),
+            refused: &mut v.refused,
+            drawn: &mut scratch.drawn,
+            sets: &mut scratch.sets,
+            made: &mut scratch.made,
+            isolated: &mut scratch.isolated,
+            chains: &mut scratch.chains,
+            paints: &v.paints,
+            more: super::stops::frame(runtime),
+            backdrop: None,
+            flocks: &scratch.flocks,
+            flat: std::cell::Cell::new(None),
+            aired: 0,
+            density: 1.0,
+            virt: None,
+        };
+        if frame.draws.iter().any(|d| !d.layer.solid.is_off()) {
+            painter.hitboxes(&v.sources, &mut v.covers, &mut v.hitboxes);
+        } else if !v.hitboxes.0.is_empty() {
+            v.hitboxes = Default::default();
+        }
+        let c = frame.background.0;
+        let background = if srgb { c } else { [linear(c[0]), linear(c[1]), linear(c[2]), c[3]] };
+        let stamp = {
+            let mut h = std::hash::DefaultHasher::new();
+            (size, background.map(f32::to_bits), quality as u8, srgb).hash(&mut h);
+            h.finish()
+        };
+        let damage = painter.damage(&v.marks, &mut scratch.marks, v.stamp != stamp);
+        let fresh = std::mem::replace(&mut v.stamp, stamp) != stamp;
+        let part = matches!(damage, Damage::Part(_)) && (v.trimmed || frame.keep);
+        let damage = if part { Damage::Full } else { damage };
+        std::mem::swap(&mut v.marks, &mut scratch.marks);
+        v.region = match damage {
+            Damage::Full => None,
+            Damage::Part(r) => Some(reiwand_core::Region {
+                x: r.x as u32,
+                y: r.y as u32,
+                width: r.w as u32,
+                height: r.h as u32,
+            }),
+            Damage::Clean => Some(reiwand_core::Region::default()),
+        };
+        let clean = damage == Damage::Clean;
+        if let Some(swarms) = painter.swarms.as_deref_mut() {
+            let sim = if clean { super::clock::Sim::Off } else { v.clock.sim(self) };
+            let stamp = if let super::clock::Sim::Stamps(set) = &sim { Some(set) } else { None };
+            let ahead = &mut *painter.pool;
+            let stamped = self.scoped(|| swarms.run(self, runtime, frame, quality, (stamp, ahead)))??;
+            v.clock.simmed(self, sim, stamped);
+        }
+        if clean {
+            let particles = painter.swarms.as_ref().map_or(0, |s| s.slots());
+            let in_flight = super::flight::flying(v.id);
+            let gpu_us = (v.clock.gpu_ms * 1000.0) as u32;
+            v.stats = SceneStats { particles, in_flight, gpu_us, ..SceneStats::default() };
+            v.pool.send_ahead(&self.queue);
+            v.pool.end_frame();
+            super::flight::idle(v.id);
+            v.scratch = scratch;
+            return Ok(&view.target.as_ref().expect("created above").1);
+        }
+        let keep = frame.keep && !fresh && !v.trimmed;
+        v.trimmed = false;
+        painter.clip = if let Damage::Part(rect) = damage { Some(rect) } else { None };
+        painter.run(Src::Canvas, background.map(f64::from), keep);
+        let (clip, reused) = (painter.clip, painter.reused);
+        super::gather::gather(&mut scratch.ops, &scratch.sets);
+        let (trial, drawn) = (super::flight::trial(v.id), !scratch.drawn.is_empty());
+        let timing = v.clock.start(self, &scratch.ops, trial, drawn);
+        let serial = super::flight::sending(self, v.id, &scratch.drawn)
+            .map_err(|keys| timed::stuck(&mut v.refused, frame, keys))?;
+        let quiet = self.quiet(timing);
+        let (pool, kept) = (&mut v.pool, &scratch.kept);
+        v.caches.extract_if(|id, _| !kept.contains(id)).for_each(|(_, c)| pool.give(c.tex));
+        let apart = v.target.as_ref().is_some_and(|(canvas, out)| canvas.id != out.id);
+        let resolve = apart.then(|| resolve(pool, srgb, (v.tone, v.split, v.headroom)));
+        pool.upload(&self.device, &self.queue, self.pipes(), &v.uniform);
+        v.swarms.iter_mut().for_each(|s| s.upload(self, &v.uniform));
+        let (canvas, output) = v.target.as_ref().expect("created above");
+        let (caches, states, luts, swarms) = (&v.caches, &v.states, &v.luts, v.swarms.as_ref());
+        let (exts, sets) = (&scratch.exts, &scratch.sets);
+        let scissor = clip.map(|c| [c.x as u32, c.y as u32, c.w as u32, c.h as u32]);
+        let sources = encode::Sources { caches, states, luts, exts, canvas, output, swarms, scissor, sets };
+        let (clock, at) = ((&v.clock, timing), (v.id, serial, v.timed));
+        let encoded = self.scoped(|| self.encode_scene(pool, &sources, &scratch.ops, resolve, clock, at));
+        let index = encoded.as_ref().ok().map(|(_, index, _)| index.clone());
+        super::flight::sent(self, v.id, serial, index)
+            .map_err(|keys| timed::stuck(&mut v.refused, frame, keys))?;
+        if let Err(e) = &encoded {
+            let ids = frame.effects.iter().filter(|e| scratch.drawn.contains(&e.descriptor.key));
+            ids.for_each(|d| drop(v.refused.insert(d.descriptor.id.clone(), e.to_string())));
+        }
+        let (mut counted, index, at) = encoded?;
+        if quiet {
+            self.watch((&mut v.clock, &mut v.refused), frame, &scratch.drawn, (index, at));
+        }
+        let painted = pool.frame;
+        let old = |_: &usize, sim: &mut super::state::Sim| painted - sim.used >= TEXT_FRAMES;
+        v.states.extract_if(old).for_each(|(_, sim)| sim.tex.into_iter().for_each(|t| pool.give(t)));
+        pool.end_frame();
+        let now = pool.frame;
+        v.texts.retain(|_, r| now - r.used < TEXT_FRAMES);
+        counted.compiled = pipes::compiled(0).wrapping_sub(created.1);
+        (counted.created, counted.reused, counted.textures) =
+            (pool.created - created.0 + counted.compiled, reused, pool.textures() as u32);
+        counted.damage = clip.map_or(100, |c| ((c.w * c.h * 100.0) / (full.w * full.h)).ceil() as u32);
+        if let Some(s) = swarms {
+            (counted.created, counted.steps) = (counted.created + s.created, s.steps);
+            (counted.particles, counted.sim_us) = (s.slots(), s.micros);
+        }
+        v.swarms.iter_mut().for_each(|s| s.sent());
+        counted.in_flight = super::flight::flying(v.id);
+        (counted.gpu_us, counted.sim_gpu_us) =
+            ((v.clock.gpu_ms * 1000.0) as u32, (v.clock.sim_ms * 1000.0) as u32);
+        v.stats = counted;
+        v.scratch = scratch;
+        Ok(&view.target.as_ref().expect("created above").1)
+    }
+}

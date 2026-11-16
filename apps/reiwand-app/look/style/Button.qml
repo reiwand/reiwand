@@ -1,0 +1,108 @@
+import QtQuick
+import QtQuick.Controls.impl
+import QtQuick.Templates as T
+import io.github.reiwand.app
+
+T.Button {
+    id: control
+
+    readonly property bool principal: highlighted
+    readonly property bool palabra: flat && !highlighted
+    readonly property color fondo: palette.highlight
+    readonly property color hondo: Qt.colorEqual(fondo, Look.luna) ? Look.lunaHonda : control.mix(fondo, Look.noche, 0.2)
+    readonly property color tinta: !enabled ? (principal ? Look.bruma : Look.brumaBaja) : principal ? Look.noche : Look.escarcha
+
+    property bool settling: false
+    property bool reshown: false
+    property bool placed: false
+
+    function regrip() {
+        if (!placed)
+            return;
+        if (!visible) {
+            reshown = true;
+            return;
+        }
+        settling = true;
+        calm.restart();
+    }
+
+    function mix(a, b, amount) {
+        return Qt.rgba(a.r + (b.r - a.r) * amount, a.g + (b.g - a.g) * amount, a.b + (b.b - a.b) * amount, 1);
+    }
+
+    onTextChanged: regrip()
+    onVisibleChanged: {
+        if (visible && reshown) {
+            reshown = false;
+            regrip();
+        }
+    }
+    Component.onCompleted: placed = true
+    Keys.onPressed: event => {
+        if (settling && [Qt.Key_Return, Qt.Key_Enter, Qt.Key_Space, Qt.Key_Select].includes(event.key))
+            event.accepted = true;
+    }
+
+    Timer {
+        id: calm
+
+        interval: 500
+        onTriggered: control.settling = false
+    }
+
+    z: visualFocus ? 1 : 0
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset, implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset, implicitContentHeight + topPadding + bottomPadding)
+    leftPadding: palabra ? 2 : Look.e4
+    rightPadding: palabra ? 2 : principal ? 20 : Look.e4
+    topPadding: 0
+    bottomPadding: 0
+    spacing: 9
+    font.family: principal ? Look.letraTitulo : Look.letraTexto
+    font.pixelSize: principal ? Look.tBoton : Look.tCuerpo
+    font.weight: principal ? Font.Bold : palabra ? Font.DemiBold : Font.Medium
+    font.underline: palabra && enabled && hovered && !visualFocus
+    icon.width: 18
+    icon.height: 18
+    icon.color: palabra ? (enabled ? Look.bruma : Look.brumaBaja) : tinta
+    transform: Translate {
+        y: control.down && !control.palabra ? 1 : 0
+    }
+
+    contentItem: IconLabel {
+        spacing: control.spacing
+        mirrored: control.mirrored
+        display: control.display
+        icon: control.icon
+        text: control.text
+        font: control.font
+        color: control.tinta
+    }
+
+    background: Rectangle {
+        implicitHeight: Look.altoControl
+        radius: Look.radio
+        border.width: control.principal || control.palabra ? 0 : Look.linea
+        border.color: control.checked ? Look.bruma : Look.nocheLinea
+        color: {
+            if (control.palabra)
+                return "transparent";
+            if (control.principal)
+                return !control.enabled ? Look.nocheLinea : control.down ? control.hondo : control.hovered ? control.mix(control.fondo, Look.escarcha, 0.12) : control.fondo;
+            if (!control.enabled)
+                return "transparent";
+            return control.down ? Look.noche : control.hovered || control.checked ? Look.nocheLinea : Look.nocheAlta;
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            enabled: control.settling
+        }
+
+        FocusRing {
+            corner: Look.radio
+            visible: control.visualFocus
+        }
+    }
+}

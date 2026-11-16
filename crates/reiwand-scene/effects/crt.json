@@ -1,0 +1,17 @@
+{
+  "id": "crt",
+  "name": { "en": "CRT screen" },
+  "category": "stylize",
+  "description": { "en": "Simulates an old CRT screen with scanlines and curvature.", "es": "Imita una pantalla antigua de tubo, con líneas y curvatura." },
+  "mask_mode": "strength",
+  "params": [
+    { "id": "curvature", "type": "float", "default": 0.1, "min": 0, "max": 1 },
+    { "id": "pitch", "type": "float", "default": 4, "min": 2, "max": 64 },
+    { "id": "scan", "type": "float", "default": 0.3, "min": 0, "max": 1 },
+    { "id": "phosphor", "type": "float", "default": 0.15, "min": 0, "max": 1 },
+    { "id": "vignette", "type": "float", "default": 0.25, "min": 0, "max": 1 },
+    { "id": "glow", "type": "float", "default": 0.15, "min": 0, "max": 1 }
+  ],
+  "passes": [{ "entry": "fs_crt" }],
+  "quality": { "q1": { "params": { "glow": 0 } } }
+}

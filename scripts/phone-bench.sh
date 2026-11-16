@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+set -euo pipefail
+usage() {
+  cat >&2 <<'EOF'
+usage: REIWAND_ADB_SERIAL=<serial> scripts/phone-bench.sh build
+       REIWAND_ADB_SERIAL=<serial> scripts/phone-bench.sh copy FILE.wpak...
+       REIWAND_ADB_SERIAL=<serial> scripts/phone-bench.sh run NAME.wpak [bench options]
+       REIWAND_ADB_SERIAL=<serial> scripts/phone-bench.sh costs
+       REIWAND_ADB_SERIAL=<serial> scripts/phone-bench.sh clean
+Renders a scene package offscreen on a phone over adb, through the renderer of the live wallpaper,
+and prints its report as JSON with the battery temperature before and after the run.
+Options of run: --level q0|q1|q2|q3|auto|fitted, --frames N, --paced SECONDS, --fps N, --size WxH,
+--passes, --overlap, --pace detail|smooth (how --level auto may halve the rate, detail by default),
+--shot FILE.png. costs builds the render tests for the phone and runs the measurement of what the
+3D stage costs there (the_3d_stage_costs_on_this_gpu): the time of a unit and of the models and
+shadow map passes for growing triangle counts. Environment: ADB (default adb), REIWAND_ABI (arm64-v8a, the
+default, or x86_64 for an emulator), REIWAND_PHONE_DIR (default
+/data/local/tmp/reiwand-bench), REIWAND_COOL (wait until the battery is under this many degrees, default
+36), REIWAND_AWAKE_TRIES (checks five minutes apart while the screen is on, default 6).
+EOF
+  exit 2
+}
+cd "$(dirname "$0")/.."
+[ $# -ge 1 ] || usage
+: "${REIWAND_ADB_SERIAL:?set REIWAND_ADB_SERIAL to the serial of the phone (adb devices)}"
+ADB=${ADB:-adb}
+DIR=${REIWAND_PHONE_DIR:-/data/local/tmp/reiwand-bench}
+COOL=${REIWAND_COOL:-36}
+TRIES=${REIWAND_AWAKE_TRIES:-6}
+ABI=${REIWAND_ABI:-arm64-v8a}
+case $ABI in
+  arm64-v8a) TRIPLE=aarch64-linux-android ;;
+  x86_64) TRIPLE=x86_64-linux-android ;;
+  *) echo "REIWAND_ABI takes arm64-v8a or x86_64, not $ABI" >&2; exit 2 ;;
+esac
+BIN=${CARGO_TARGET_DIR:-target}/$TRIPLE/release/examples/bench
+shell() { "$ADB" -s "$REIWAND_ADB_SERIAL" shell "$@"; }
+send() {
+  local size n=0
+  size=$(wc -c <"$1")
+  "$ADB" -s "$REIWAND_ADB_SERIAL" exec-in "cat > '$2'" <"$1"
+  until [ "$(shell stat -c %s "$2" | tr -d '\r')" = "$size" ]; do
+    n=$((n + 1))
+    [ "$n" -le 60 ] || { echo "$2 did not arrive whole" >&2; exit 1; }
+    sleep 1
+  done
+}
+ndk() {
+  local home=$HOME src=$PWD cargo_home rustup_home flags
+  cargo_home=${CARGO_HOME:-$home/.cargo} rustup_home=${RUSTUP_HOME:-$home/.rustup}
+  flags=$(printf -- '--remap-path-prefix=%s=/cargo\x1f--remap-path-prefix=%s=/rustup\x1f--remap-path-prefix=%s=/build\x1f--remap-path-prefix=%s=/src' \
+    "$cargo_home" "$rustup_home" "$home" "$src")
+  CARGO_ENCODED_RUSTFLAGS=$flags \
+    CFLAGS="-ffile-prefix-map=$cargo_home=/cargo -ffile-prefix-map=$rustup_home=/rustup -ffile-prefix-map=$home=/build -ffile-prefix-map=$src=/src" \
+    cargo ndk -t "$ABI" -P 31 "$@"
+}
+tenths() { shell dumpsys battery | sed -n 's/^ *temperature: *\([0-9]*\).*/\1/p' | head -1; }
+degrees() { local t; t=$(tenths); printf '%d.%d' "$((t / 10))" "$((t % 10))"; }
+thermal() { shell dumpsys thermalservice | sed -n 's/^ *Thermal Status: *\([0-9]*\).*/\1/p' | head -1; }
+awake() { shell dumpsys power | grep -q 'mWakefulness=Awake'; }
+asleep() {
+  local n=0
+  while awake; do
+    n=$((n + 1))
+    [ "$n" -le "$TRIES" ] || { echo "the screen of the phone stayed on, nothing measured" >&2; exit 3; }
+    echo "the screen of the phone is on, waiting five minutes ($n of $TRIES)" >&2
+    sleep 300
+  done
+}
+cool() {
+  local limit
+  limit=$(awk -v c="$COOL" 'BEGIN { printf "%d", c * 10 }')
+  while [ "$(tenths)" -ge "$limit" ]; do
+    echo "battery at $(degrees) °C, waiting under $COOL °C" >&2
+    sleep 30
+  done
+}
+case $1 in
+  build)
+    ndk build -p reiwand-android --release --locked --example bench
+    ;;
+  costs)
+    exe=$(ndk test -p reiwand-render --test all --release --locked --no-run --message-format=json |
+      sed -n 's/.*"executable":"\([^"]*\)".*/\1/p' | tail -1)
+    [ -n "$exe" ] || { echo "the render tests did not build" >&2; exit 1; }
+    shell mkdir -p "$DIR"
+    send "$exe" "$DIR/models"
+    shell chmod 755 "$DIR/models"
+    cool
+    shell "cd $DIR && REIWAND_REQUIRE_GPU=1 ./models costed --ignored --nocapture --test-threads=1"
+    ;;
+  copy)
+    shift
+    [ -x "$BIN" ] || { echo "build the bench first: $0 build" >&2; exit 1; }
+    shell mkdir -p "$DIR/files"
+    send "$BIN" "$DIR/bench"
+    shell chmod 755 "$DIR/bench"
+    for f in "$@"; do send "$f" "$DIR/$(basename "$f")"; done
+    shell ls -l "$DIR"
+    ;;
+  run)
+    shift
+    [ $# -ge 1 ] || usage
+    name=$1
+    shift
+    asleep
+    cool
+    before=$(degrees)
+    status=$(thermal)
+    report=$(shell "cd $DIR && ./bench $DIR/files $DIR/$name $*")
+    after=$(degrees)
+    later=$(thermal)
+    printf '{"battery_c_before": %s, "battery_c_after": %s, "thermal_before": %s, "thermal_after": %s, "report": %s}\n' \
+      "$before" "$after" "${status:-null}" "${later:-null}" "$report"
+    ;;
+  clean)
+    shell rm -r "$DIR"
+    ;;
+  *) usage ;;
+esac

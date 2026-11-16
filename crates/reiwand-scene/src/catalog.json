@@ -1,0 +1,94 @@
+{
+  "params": {
+    "bloom": [
+      { "id": "tint", "type": "color", "default": "#ffffff" }
+    ],
+    "blur": [
+      { "id": "blend", "type": "blend", "default": "normal" },
+      { "id": "amount", "type": "float", "default": 1, "min": 0, "max": 1 }
+    ],
+    "blur_motion": [
+      { "id": "follow", "type": "bool", "default": false },
+      { "id": "shutter", "type": "float", "default": 0.05, "min": 0, "max": 0.5 }
+    ],
+    "chromatic_aberration": [
+      { "id": "mode", "type": "enum", "default": 0, "values": [
+        { "value": 0, "label": { "en": "Expansion", "es": "Expansión" } }, { "value": 1, "label": { "en": "Directional", "es": "Direccional" } },
+        { "value": 2, "label": { "en": "Radial", "es": "Radial" } }, { "value": 3, "label": { "en": "Barrel", "es": "Barril" } }] },
+      { "id": "angle", "type": "float", "default": 0, "min": -360, "max": 360 }
+    ],
+    "depth_parallax": [
+      { "id": "scale", "type": "vec2", "default": [1, 1], "min": -1, "max": 1 },
+      { "id": "smooth", "type": "bool", "default": false }
+    ],
+    "film_grain": [
+      { "id": "mono", "type": "bool", "default": false },
+      { "id": "bias", "type": "float", "default": 0, "min": -1, "max": 1 },
+      { "id": "blend", "type": "blend", "default": "overlay" }
+    ],
+    "flow": [
+      { "id": "noise", "type": "bool", "default": false },
+      { "id": "phase", "type": "texture", "default": "" }
+    ],
+    "god_rays": [
+      { "id": "mode", "type": "enum", "default": 0, "values": [
+        { "value": 0, "label": { "en": "Radial", "es": "Radial" } }, { "value": 1, "label": { "en": "Directional", "es": "Direccional" } },
+        { "value": 2, "label": { "en": "Star", "es": "Estrella" } }] },
+      { "id": "angle", "type": "float", "default": 90, "min": -360, "max": 360 },
+      { "id": "noise", "type": "float", "default": 0, "min": 0, "max": 1, "uses": "time" },
+      { "id": "edges", "type": "int", "default": 6, "min": 2, "max": 16 }
+    ],
+    "iris": [{ "id": "background", "type": "bool", "default": false }],
+    "lens_distort": [{ "id": "background", "type": "bool", "default": false }],
+    "reflection": [{ "id": "angle", "type": "float", "default": 0, "min": -360, "max": 360 }],
+    "scroll": [
+      { "id": "repeat_x", "type": "bool", "default": true },
+      { "id": "repeat_y", "type": "bool", "default": true }
+    ],
+    "shake": [
+      { "id": "noise", "type": "float", "default": 0, "min": 0, "max": 1 },
+      { "id": "friction", "type": "float", "default": 0, "min": 0, "max": 1 },
+      { "id": "bounds", "type": "vec2", "default": [1, 1], "min": 0, "max": 1 },
+      { "id": "phase", "type": "texture", "default": "", "tool": "gray" },
+      { "id": "flow", "type": "texture", "default": "", "tool": "flow", "paint": "#808000" },
+      { "id": "motion", "type": "enum", "default": 0, "values": [
+        { "value": 0, "label": { "en": "Noise", "es": "Ruido" } }, { "value": 1, "label": { "en": "Periodic push", "es": "Empuje periódico" } }] },
+      { "id": "side", "type": "enum", "default": 0, "values": [
+        { "value": 0, "label": { "en": "Both ways", "es": "A los dos lados" } }, { "value": 1, "label": { "en": "Forward", "es": "Hacia adelante" } },
+        { "value": 2, "label": { "en": "Backward", "es": "Hacia atrás" } }] }
+    ],
+    "shine": [
+      { "id": "blend", "type": "blend", "default": "add" },
+      { "id": "gradient", "type": "texture", "default": "" },
+      { "id": "style", "type": "enum", "default": 0, "values": [
+        { "value": 0, "label": { "en": "Line", "es": "Línea" } }, { "value": 1, "label": { "en": "Double line", "es": "Línea doble" } },
+        { "value": 2, "label": { "en": "Ring", "es": "Anillo" } }, { "value": 3, "label": { "en": "Glint", "es": "Destello" } }] }
+    ],
+    "sway": [
+      { "id": "double", "type": "bool", "default": false },
+      { "id": "phase", "type": "texture", "default": "" },
+      { "id": "foliage", "type": "bool", "default": false },
+      { "id": "ratio", "type": "float", "default": 1, "min": 0.1, "max": 10 }
+    ],
+    "twirl": [
+      { "id": "aspect", "type": "float", "default": 1, "min": 0.1, "max": 10 },
+      { "id": "inner", "type": "float", "default": 0, "min": 0, "max": 1 },
+      { "id": "noise", "type": "float", "default": 0, "min": 0, "max": 1 },
+      { "id": "repeat", "type": "bool", "default": false }
+    ],
+    "water_ripple": [
+      { "id": "perspective", "type": "float", "default": 0, "min": 0, "max": 1 },
+      { "id": "reflection", "type": "texture", "default": "" },
+      { "id": "tint", "type": "color", "default": "#ffffff" },
+      { "id": "walls", "type": "texture", "default": "" },
+      { "id": "speed", "type": "float", "default": 1, "min": 0, "max": 4 }
+    ],
+    "waves": [
+      { "id": "count", "type": "int", "default": 1, "min": 1, "max": 2 },
+      { "id": "angle2", "type": "float", "default": 90, "min": -360, "max": 360 },
+      { "id": "perspective", "type": "float", "default": 0, "min": 0, "max": 1 },
+      { "id": "phase", "type": "texture", "default": "" }
+    ]
+  },
+  "effects": []
+}

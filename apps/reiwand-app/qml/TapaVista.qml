@@ -1,0 +1,39 @@
+import QtQuick
+import io.github.reiwand.app
+
+Tapa {
+    required property var model
+    required property int index
+    required property var from
+    readonly property string caption: String(from.role(model, from.captionRole) ?? "")
+    readonly property bool wants: hovered || lit && from.activeFocus
+    readonly property bool scene: from.role(model, "kind") === "scene"
+    readonly property bool hidden: from.role(model, "flashing") === true || from.role(model, "mature") === true
+    readonly property bool broken: from.role(model, "missing") === true || String(from.role(model, "broken") ?? "") !== ""
+
+    picture: from.role(model, from.pictureRole) ?? ""
+    pictures: from.role(model, from.picturesRole) ?? []
+    moving: wants && from.movingOf ? from.movingOf(index) : ""
+    liveUid: scene && !hidden && !broken ? String(from.role(model, "uid") ?? "") : ""
+    live: !from.view.moving && from.turning !== true
+    name: String(from.role(model, "provider") ?? "") !== "" ? Names.of(model) : from.role(model, from.nameRole) ?? ""
+    icon: from.iconRole === "" ? "" : from.role(model, from.iconRole) ?? ""
+    note: from.role(model, from.noteRole) ?? ""
+    noteIcon: from.role(model, from.noteIconRole) ?? ""
+    noteTone: from.role(model, from.noteToneRole) ?? ""
+    inUse: from.role(model, from.inUseRole) === true
+    usedOn: String(from.role(model, from.usedOnRole) ?? "")
+    listed: from.listedOf ? from.listedOf(String(from.role(model, "uid") ?? "")) : ""
+    off: from.role(model, from.offRole) === true
+    lit: index >= 0 && index === from.view.currentIndex
+    choosing: from.choosing
+    choosable: from.choosable
+    chosen: from.chosen.indexOf(index) >= 0
+    onTapped: modifiers => from.tap(index, modifiers)
+    onDoubleTapped: from.activated(index)
+    onAskedMenu: {
+        from.tap(index, 0);
+        from.asked(index, this);
+    }
+    onWantsChanged: wants && from.wanted(index)
+}

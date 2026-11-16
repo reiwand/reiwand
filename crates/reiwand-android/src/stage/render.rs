@@ -1,0 +1,188 @@
+use super::report::{self, wall};
+use super::sounded::soonest;
+use super::{RETRIES, Shot, Stage};
+use crate::acting::Sent;
+use crate::hearing;
+use crate::power::{Power, delay_ms};
+use reiwand_render::{GpuImage, RenderError, Renderer, SceneView};
+use reiwand_scene::{Budget, Content, FlashGuard, Quality, Tier, Wake};
+use std::sync::atomic::Ordering::Relaxed;
+
+const LISTEN_MS: i64 = 250;
+const QUIET_MS: i64 = 2_000;
+const MAX_GAP: f64 = 600.0;
+const DAY_MS: f64 = 86_400_000.0;
+const SLACK_NS: i64 = 2_000_000;
+
+impl Stage {
+    pub(crate) fn render<'a>(
+        &'a mut self,
+        r: &Renderer,
+        (size, nanos, cap): ((u32, u32), i64, u32),
+        (power, tier): (Power, Tier),
+        videos: &[(&str, &GpuImage)],
+        force: bool,
+    ) -> Result<Shot<'a>, RenderError> {
+        let started = self.measured.then(std::time::Instant::now);
+        let (choice, saver) = (crate::power::choice(), power.saver);
+        let budget = Budget { choice, saver, ..Budget::new(tier, !power.charging, cap.max(1)) };
+        self.runtime.set_battery(!power.charging);
+        self.runtime.set_magnify(self.runtime.scene.magnify(size));
+        self.runtime.set_device(tier, true);
+        self.heavy = budget.choice.is_auto() && (budget.crowded(&self.runtime) || self.pilot.stalled());
+        let turned = std::mem::replace(&mut self.posed, self.heavy) != self.heavy;
+        if turned && self.heavy {
+            self.runtime.seek(f64::from(self.runtime.scene.clock.poster_time));
+        }
+        let calm = power.still && !self.heavy && !self.moving;
+        if std::mem::replace(&mut self.calmed, calm) != calm && calm {
+            self.runtime.seek(f64::from(self.runtime.scene.clock.poster_time));
+        }
+        if crate::power::guarded() != self.guard.is_some() {
+            self.guard =
+                crate::power::guarded().then(|| Box::new((FlashGuard::default(), Vec::new(), nanos)));
+            if let Some(slot) = self.reports {
+                report::mark(slot, 1, 0);
+            }
+        }
+        let speed = self.guard.as_ref().map_or(1.0, |g| g.0.speed());
+        let still = cap == 0 || self.heavy || calm || speed == 0.0;
+        let dt = self.tick.filter(|_| !still).map_or(0.0, |t| ((nanos - t) as f64 / 1e9).clamp(0.0, MAX_GAP));
+        self.tick = (!still).then_some(nanos);
+        self.runtime.advance(dt * speed);
+        let hearing = self.listen(power, still);
+        let [listens, feels] = self.wants();
+        let allowed = self.allowed();
+        let listens = listens && power.moving() && !still;
+        let hears = listens && hearing::live();
+        let idle = match () {
+            _ if hears => LISTEN_MS,
+            _ if listens && hearing::playing() => QUIET_MS,
+            _ => 0,
+        };
+        let heard = hears && self.runtime.set_audio(hearing::frame());
+        let played = self.hear_media();
+        let buttons = if allowed.0 && allowed.1 { self.touch.1 } else { 0 };
+        let pointer = self.runtime.pointer().follow(self.touch.0, buttons, dt as f32);
+        let felt = feels && self.runtime.set_pointer(pointer);
+        let sent = Sent {
+            properties: &self.pack.properties,
+            view: self.rect,
+            screen: [size.0, size.1],
+            fps: self.fps,
+            quality: self.quality as u8,
+            listens: hears,
+        };
+        let acted = !still && self.acting.step(&mut self.runtime, sent);
+        self.opening();
+        if std::mem::take(&mut self.acting.moved) {
+            self.gather();
+        }
+        self.extras.timed(&mut self.runtime);
+        let asked = power.still && !self.moving;
+        let stilled = std::mem::replace(&mut self.stilled, asked) != asked;
+        let calmed = stilled && self.runtime.set_reduced_motion(asked);
+        let tipped = self.runtime.set_tilt(crate::tilt::goal(self.offset, std::time::Instant::now()));
+        self.runtime.set_wall(wall());
+        let ((quality, why), ceiling) = self.steer(budget, power, tier);
+        let fps = if still { 0 } else { budget.timed_fps(&self.runtime, 0) };
+        let retried = RETRIES.load(Relaxed);
+        if std::mem::replace(&mut self.retried, retried) != retried {
+            self.touch.2 = true;
+            if self.view.as_mut().is_some_and(SceneView::retry) {
+                self.view = None;
+            }
+        }
+        let due = self.due.is_some_and(|due| nanos >= due - SLACK_NS) || std::mem::take(&mut self.touch.2);
+        if !(force
+            || turned
+            || due
+            || heard
+            || played
+            || felt
+            || acted
+            || tipped
+            || calmed
+            || quality != self.quality
+            || self.view.is_none())
+        {
+            let left = self.due.map(|due| ((due - nanos) / 1_000_000).max(1));
+            let delay = soonest(left.unwrap_or(idle), hearing);
+            return Ok(Shot { image: None, fps: self.fps, delay });
+        }
+        if std::mem::replace(&mut self.quality, quality) != quality && self.runtime.set_quality(quality) {
+            self.restock = true;
+            self.acting.reprops();
+        }
+        if let Some(view) = self.view.as_mut().filter(|_| std::mem::take(&mut self.restock)) {
+            r.refresh_scene(view, (&self.pack.scene, self.runtime.props()), &self.assets)?;
+        }
+        if self.view.is_none() {
+            self.view = Some(r.scene_view(&self.pack.scene, &self.assets, self.runtime.props())?);
+        }
+        let view = self.view.as_mut().expect("created above");
+        view.time_passes(self.measured);
+        let inner = view.inner(r, size, quality);
+        self.rect = view.view(inner);
+        let presses = std::mem::take(&mut self.presses);
+        if self.runtime.point(view.hitboxes(), self.rect, &presses, allowed) {
+            self.acting.touched(&mut self.runtime);
+        }
+        let frame = self.runtime.frame_in(std::mem::take(&mut self.spare), self.rect, quality);
+        let playing =
+            power.moving() && frame.draws.iter().any(|d| matches!(d.content, Content::Video { .. }));
+        let wake = match frame.wake {
+            wake if calm => self.runtime.calmed(wake),
+            _ if still => Wake::Idle,
+            _ if playing => Wake::Frame,
+            wake => self.acting.wake(wake, &self.runtime),
+        };
+        let interval = delay_ms(fps);
+        let delay = match wake {
+            Wake::Frame => interval,
+            Wake::At(seconds) => ((seconds * 1000.0).clamp(0.0, DAY_MS) as i64).max(interval),
+            Wake::Idle => idle,
+        };
+        let ahead = if wake == Wake::Frame { 0 } else { delay * 1_000_000 };
+        self.due = (delay > 0 && wake != Wake::Idle).then_some(nanos + ahead);
+        self.fps = if wake == Wake::Frame { fps } else { 0 };
+        let measured = crate::counted::gpu(|| r.luma(view, self.guard.as_deref_mut().map(|g| &mut g.1)))?;
+        if let Some((guard, luma, start)) = self.guard.as_deref_mut().filter(|_| measured) {
+            let calming = match guard.watch((nanos - *start) as f64 / 1e9, luma) {
+                reiwand_scene::Calming::Steady => 0,
+                reiwand_scene::Calming::Slowed(_) => 1,
+                reiwand_scene::Calming::Paused => 2,
+            };
+            if let Some(slot) = self.reports {
+                report::mark(slot, 1, calming);
+            }
+        }
+        let staged = started.map(|s| s.elapsed().as_secs_f32() * 1e3);
+        let rendered =
+            crate::counted::gpu(|| r.render_scene(view, &self.runtime, &frame, inner, quality, videos))
+                .map(drop);
+        if let Some((started, staged)) = started.zip(staged) {
+            let times = (staged, started.elapsed().as_secs_f32() * 1e3 - staged);
+            crate::perf::staged(times, (tier, quality, why), (inner, size), (fps, cap), view.stats());
+        }
+        self.spare = frame.spare();
+        let (samples, gpu_ms) = view.gpu_time();
+        if std::mem::replace(&mut self.samples, samples) != samples && !still {
+            let raises = !power.saver && power.ceiling() == Quality::Q3;
+            let halves = crate::power::halves() && budget.choice.fixed().is_none();
+            let full = cap * self.pilot.pace();
+            let rate = |cap: u32| Budget { max_fps: cap.max(1), ..budget }.timed_fps(&self.runtime, 0);
+            let periods = reiwand_scene::periods(halves, [rate(full), rate(reiwand_scene::halved(full))]);
+            let at = std::time::Instant::now();
+            self.pilot.feed(at, gpu_ms as f32, periods, (ceiling, raises, budget.choice.is_auto()));
+        }
+        if let Some(slot) = self.reports {
+            report::mark(slot, 0, view.gpu_particles().map_or(0, |gpu| if gpu { 1 } else { 2 }));
+            report::leave(slot, view.left_key(), || view.left());
+        }
+        rendered?;
+        let view: &'a SceneView = view;
+        let image = view.image().expect("rendered above");
+        Ok(Shot { image: Some(image), fps: self.fps, delay: soonest(delay, hearing) })
+    }
+}

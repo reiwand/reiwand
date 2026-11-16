@@ -1,0 +1,160 @@
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC2
+import io.github.reiwand.app
+
+Column {
+    id: band
+
+    required property var page
+    readonly property alias scene: scene
+    readonly property alias single: single
+    readonly property alias extra: extra
+    readonly property alias learn: learn
+    readonly property real oneLine: bar.height + spacing + (page.learn ? examples.implicitHeight : Math.max(sceneGroup.implicitHeight, singleGroup.implicitHeight, extraGroup.implicitHeight))
+
+    spacing: Look.e4
+
+    RowLayout {
+        id: bar
+
+        property real roomy: 0
+        readonly property bool tight: width > 0 && width < roomy
+
+        width: parent.width
+        spacing: Look.e5
+        onImplicitWidthChanged: {
+            if (!tight || implicitWidth > roomy)
+                roomy = implicitWidth;
+        }
+
+        Filtro {
+            label: App.tr("How to start")
+            current: band.page.learn ? 1 : 0
+            words: [{
+                    "text": App.tr("Start a new one")
+                }, {
+                    "text": App.tr("Learn from an example"),
+                    "count": band.page.scenes.length
+                }]
+            onPicked: index => {
+                band.page.learn = index === 1;
+                band.page.focused = index === 1 ? learn : scene;
+            }
+        }
+
+        Item {
+            Layout.fillWidth: true
+        }
+
+        QQC2.Button {
+            text: App.tr("Open a project…")
+            display: bar.tight ? QQC2.AbstractButton.IconOnly : QQC2.AbstractButton.TextBesideIcon
+            QQC2.ToolTip.text: App.tr("Choose the folder of a project that is not in this list: the folder that holds its manifest.json.")
+            QQC2.ToolTip.visible: hovered || activeFocus
+            Accessible.description: QQC2.ToolTip.text
+            icon.name: "folder-open"
+            onClicked: band.page.pickFolder()
+        }
+    }
+
+    Flow {
+        visible: !band.page.learn
+        width: parent.width
+        spacing: Look.e7
+
+        Column {
+            id: sceneGroup
+
+            spacing: Look.e2
+
+            CreateHead {
+                text: App.tr("A scene")
+                small: App.tr("layers, effects, animation")
+            }
+
+            CreateRow {
+                id: scene
+
+                width: Math.min(band.width, contentWidth)
+                height: implicitHeight
+                label: App.tr("A scene")
+                model: band.page.facts.sceneModel
+                active: band.page.focused === scene
+                onTaken: band.page.focused = scene
+                onActivated: band.page.act(scene)
+            }
+        }
+
+        Column {
+            id: singleGroup
+
+            spacing: Look.e2
+
+            CreateHead {
+                text: App.tr("A single-file wallpaper")
+                small: App.tr("picture, video or page")
+            }
+
+            CreateRow {
+                id: single
+
+                width: Math.min(band.width, contentWidth)
+                height: implicitHeight
+                label: App.tr("A single-file wallpaper")
+                model: band.page.facts.singleModel
+                active: band.page.focused === single
+                onTaken: band.page.focused = single
+                onActivated: band.page.act(single)
+            }
+        }
+
+        Column {
+            id: extraGroup
+
+            spacing: Look.e2
+
+            CreateHead {
+                text: App.tr("To reuse")
+                small: App.tr("settings or parts for other wallpapers")
+            }
+
+            CreateRow {
+                id: extra
+
+                width: Math.min(band.width, contentWidth)
+                height: implicitHeight
+                label: App.tr("To reuse")
+                model: band.page.facts.moreModel
+                active: band.page.focused === extra
+                onTaken: band.page.focused = extra
+                onActivated: band.page.act(extra)
+            }
+        }
+    }
+
+    Column {
+        id: examples
+
+        visible: band.page.learn
+        width: parent.width
+        spacing: Look.e2
+
+        CreateHead {
+            text: App.tr("Example scenes")
+            small: App.tr("built into the app, to copy and change")
+        }
+
+        CreateRow {
+            id: learn
+
+            width: parent.width
+            height: implicitHeight
+            label: App.tr("Example scenes")
+            model: band.page.facts.learnModel
+            active: band.page.focused === learn
+            onTaken: band.page.focused = learn
+            onActivated: band.page.act(learn)
+        }
+    }
+}

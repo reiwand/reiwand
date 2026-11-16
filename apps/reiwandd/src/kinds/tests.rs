@@ -1,0 +1,97 @@
+use super::*;
+
+fn options(pairs: &[(&str, &str)]) -> Options {
+    pairs.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect()
+}
+
+fn refused(kind: &str, pairs: &[(&str, &str)]) -> String {
+    effective(&kind_of(kind).unwrap(), &options(pairs)).unwrap_err().to_string()
+}
+
+#[test]
+fn options_are_validated_and_completed_with_defaults() {
+    let bing = effective(&kind_of("bing").unwrap(), &options(&[("count", "3")])).unwrap();
+    assert_eq!(
+        bing,
+        options(&[
+            ("cache_mb", "1024"),
+            ("count", "3"),
+            ("market", "en-US"),
+            ("refresh", "12h"),
+            ("uhd", "true")
+        ])
+    );
+    let immich = options(&[("server", "http://127.0.0.1:2283"), ("album", "0d6a-11"), ("refresh", "0s")]);
+    assert!(effective(&kind_of("immich").unwrap(), &immich).is_ok());
+    assert!(refused("bing", &[("count", "9")]).contains("from 1 to 8"));
+    assert!(refused("bing", &[("refresh", "5m")]).contains("15m to 30d"));
+    assert!(refused("bing", &[("password", "x")]).contains("is a secret"));
+    assert!(refused("bing", &[("base", "x")]).contains("no option base"));
+    assert!(refused("webdav", &[("url", "https://example.org/dav")]).contains("needs the option user"));
+    assert!(refused("wallhaven", &[("purity", "123")]).contains("3 digits"));
+    for url in ["https://me:pw@example.org/dav", "https://example.org/dav?token=1", "https://example.org/#x"]
+    {
+        assert!(refused("webdav", &[("url", url), ("user", "me")]).contains("not in the URL"), "{url}");
+    }
+    let plain = [("url", "http://example.org/dav"), ("user", "me")];
+    let plain = effective(&kind_of("webdav").unwrap(), &options(&plain)).unwrap();
+    assert!(plain_http(&plain) && !plain_http(&options(&[("url", "http://127.0.0.1/dav")])));
+    assert!(!plain_http(&options(&[("url", "https://example.org/dav")])));
+    assert!(refused("webdav", &[("url", "ftp://example.org/dav"), ("user", "me")]).contains("http"));
+    assert!(kind_of("local").is_err() && check_id("Photos").is_err() && check_id("photos-2_x").is_ok());
+}
+
+#[test]
+fn entries_round_trip_through_the_configuration() {
+    let kind = kind_of("nextcloud").unwrap();
+    let given = options(&[("server", "https://cloud.example.org"), ("user", "me"), ("cache_mb", "64")]);
+    let table = table(&kind, &given);
+    assert_eq!(table.get("cache_mb").and_then(toml::Value::as_integer), Some(64));
+    let (known, read, options) = entry(&table).unwrap();
+    assert_eq!((known.kind.as_str(), read, options["folder"].as_str()), ("nextcloud", given, ""));
+    assert_eq!(hosts(&kind, &options), ["cloud.example.org"]);
+    let mut written = table.clone();
+    written.as_table_mut().unwrap().insert("password".into(), "hunter2".into());
+    let error = entry(&written).unwrap_err();
+    assert!(error.contains("is a secret") && !error.contains("hunter2"), "{error}");
+}
+
+#[test]
+fn wallhaven_options_are_checked_alone_and_together() {
+    let kind = kind_of("wallhaven").unwrap();
+    let all = [
+        ("ratios", "16x9,landscape"),
+        ("resolutions", "1920x1080,2560x1440"),
+        ("colors", "660000,ffffff"),
+        ("sorting", "hot"),
+        ("order", "asc"),
+        ("top_range", "1y"),
+        ("similar", "94x38z"),
+        ("page", "3"),
+        ("pages", "2"),
+        ("max_items", "48"),
+    ];
+    let given = options(&all);
+    let read = effective(&kind, &given).unwrap();
+    assert!(all.iter().all(|(key, value)| read[*key] == *value) && read["categories"] == "111");
+    for (key, value, hint) in [
+        ("ratios", "wide", "ratios"),
+        ("colors", "123456", "palette"),
+        ("resolutions", "big", "sizes"),
+        ("sorting", "newest", "toplist"),
+        ("top_range", "2d", "1d"),
+        ("pages", "11", "from 1 to 10"),
+        ("collection", "12", "USER/ID"),
+        ("tag", "anime", "number"),
+        ("purity", "10", "3 digits"),
+    ] {
+        assert!(refused("wallhaven", &[(key, value)]).contains(hint), "{key}");
+    }
+    assert!(refused("wallhaven", &[("similar", "94x38z"), ("query", "sea")]).contains("cannot be combined"));
+    assert!(
+        refused("wallhaven", &[("collection", "alice/7"), ("uploader", "bob")]).contains("takes no search")
+    );
+    assert!(refused("wallhaven", &[("seed", "ABC123")]).contains("no option seed"));
+    let kinds = reiwand_core::model::FieldKind::Palette;
+    assert!(kind.options.iter().any(|field| field.kind == kinds && field.values.len() == 29));
+}

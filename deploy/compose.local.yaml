@@ -1,0 +1,4 @@
+services:
+  reiwand:
+    image: reiwand-server:local
+    pull_policy: never

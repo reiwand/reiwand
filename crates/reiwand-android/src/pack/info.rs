@@ -1,0 +1,115 @@
+use super::{IMAGES, Preview, decode, folder, open};
+use crate::{Error, said, store};
+use image::RgbaImage;
+use reiwand_format::{Kind, Package};
+use reiwand_render::SceneAssets;
+use reiwand_scene::Scene;
+use std::fs;
+use std::io::BufReader;
+use std::path::{Path, PathBuf};
+
+const POSTER: u32 = 512;
+
+pub(crate) fn check(path: &Path) -> Result<Preview, Error> {
+    let mut package = open(path)?;
+    let thumbnail = package.manifest.thumbnail().cloned().map(|p| package.read_file(&p)).transpose()?;
+    let thumbnail = thumbnail.and_then(|bytes| decode(bytes).ok());
+    match package.manifest.kind {
+        Kind::Scene => {
+            let scene = package.scene()?;
+            let [width, height] = scene.canvas.size;
+            Ok((thumbnail.or_else(|| drawn(&mut package, &scene)), Some((width, height))))
+        }
+        Kind::Image => {
+            let picture = decode(package.read_file(&package.manifest.entry.clone())?)?;
+            let size = Some(picture.dimensions());
+            Ok((Some(thumbnail.unwrap_or(picture)), size))
+        }
+        _ => Ok((thumbnail, None)),
+    }
+}
+
+pub(crate) fn media(item: &reiwand_library::Item) -> Result<(PathBuf, &'static str), Error> {
+    let kind = match (item.kind, item.package.as_ref().map(|p| p.kind.as_str())) {
+        (reiwand_library::Kind::Video, _) | (_, Some("video")) => "video",
+        (reiwand_library::Kind::Package, Some("image")) | (reiwand_library::Kind::Image, _) => "image",
+        (_, Some("web")) => "web",
+        _ => "scene",
+    };
+    match item.kind == reiwand_library::Kind::Package && !matches!(kind, "scene" | "web") {
+        true => Ok((entry(&item.path)?, kind)),
+        false => Ok((item.path.clone(), kind)),
+    }
+}
+
+pub(crate) fn entry(path: &Path) -> Result<PathBuf, Error> {
+    let entry = |p: &PathBuf| p.file_stem().is_some_and(|stem| stem == "entry");
+    let kept = fs::read_dir(folder(path)?).ok().and_then(|d| d.flatten().map(|e| e.path()).find(entry));
+    if let Some(kept) = kept {
+        return Ok(kept);
+    }
+    let mut package = open(path)?;
+    let name = package.manifest.entry.clone();
+    let kind = super::extension(&name);
+    let picture = package.manifest.kind == Kind::Image && IMAGES.contains(&kind.as_str());
+    if !picture && !(package.manifest.kind == Kind::Video && super::VIDEOS.contains(&kind.as_str())) {
+        let title = package.manifest.title_in(&[]);
+        return Err(said("android.not_a_file", "%1 is not a picture or video package", &[&title]));
+    }
+    let file = folder(path)?.join(format!("entry.{kind}"));
+    fs::create_dir_all(folder(path)?)?;
+    let mut part = tempfile::NamedTempFile::new_in(folder(path)?)?;
+    package.copy_file(&name, part.as_file_mut())?;
+    part.as_file().sync_all()?;
+    Ok(part.persist(&file).map(|_| file).map_err(|e| e.error)?)
+}
+
+fn drawn(package: &mut Package<BufReader<fs::File>>, scene: &Scene) -> Option<RgbaImage> {
+    let assets = SceneAssets::read(scene, |path| package.read_file(path).map_err(|e| e.to_string())).ok()?;
+    let props = reiwand_scene::effective(&package.manifest.properties, &[]);
+    let lang = package.manifest.scene_locale_in(scene, &crate::library::languages());
+    let clock = (crate::stage::report::wall(), lang.as_str());
+    reiwand_render::Renderer::shared().ok()?.poster(scene, &assets, &props, clock, POSTER).ok()
+}
+
+pub(crate) fn about(path: &Path, languages: &[String]) -> Option<reiwand_core::model::About> {
+    let mut about = reiwand_format::peek(path).ok()?.about(languages);
+    about.description = reiwand_core::markup::plain(&about.description);
+    about.changes = reiwand_core::markup::plain(&about.changes);
+    Some(about)
+}
+
+pub(crate) fn lacks(path: &Path, facets: &[String]) -> Vec<String> {
+    let listed = reiwand_format::peek(path).map(|m| m.features().to_vec()).unwrap_or_default();
+    let mut found = reiwand_format::features::lacks("android", listed.iter().chain(facets));
+    found.extend(
+        facets.iter().any(|f| f == "compute").then(|| "gpu".to_owned()).filter(|_| !crate::power::computes()),
+    );
+    found.sort();
+    found.dedup();
+    found
+}
+
+pub(crate) fn examples(dir: &Path) -> Result<Vec<String>, Error> {
+    let built = tempfile::tempdir_in(store::dir()?)?;
+    let stored = |wpak: PathBuf| -> Result<String, Error> {
+        let name = wpak.file_stem().and_then(|n| n.to_str()).unwrap_or("scene");
+        Ok(store::store(&mut fs::File::open(&wpak)?, name)?.0)
+    };
+    crate::repos::bundled::built(dir, built.path())?.into_iter().map(stored).collect()
+}
+
+pub(crate) fn animated(uid: &str, path: &Path) -> Option<String> {
+    let manifest = reiwand_format::peek(path).ok()?;
+    let name = manifest.animated()?;
+    let ext = Path::new(name).extension()?.to_str()?.to_ascii_lowercase();
+    (ext == "gif" || ext == "webp").then_some(())?;
+    let file = store::thumb_file(uid, &format!("animated.{ext}")).ok()?;
+    if !file.is_file() {
+        let data =
+            reiwand_format::open(path, &reiwand_format::Limits::default()).ok()?.read_file(name).ok()?;
+        let part = file.with_extension("part");
+        fs::write(&part, data).and_then(|()| fs::rename(&part, &file)).ok()?;
+    }
+    Some(file.to_string_lossy().into_owned())
+}

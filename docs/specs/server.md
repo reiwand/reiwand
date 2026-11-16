@@ -1,0 +1,659 @@
+# Self-hosted server
+
+`reiwand-server` is one binary that serves a signed package repository, a web catalog, accounts,
+uploads with moderation, and device sync for one community or household. It keeps every byte
+of state in one data directory, makes no outgoing connection the operator did not
+configure, and sends no telemetry.
+
+## Running
+
+```sh
+cp .env.sample .env                          # set REIWAND_PUBLIC_URL, the only required variable
+docker compose up -d                         # pulls the published image
+docker compose logs reiwand | grep setup        # one-time token for the setup assistant at /setup
+```
+
+| Command | Effect |
+|---------|--------|
+| `serve` (default) | Run the server; the database is created first when it is missing |
+| `migrate` | Create the database if it is missing, check its version and exit; a database made by another version of the program is refused and left untouched |
+| `healthcheck` | Exit 0 when `GET /healthz` on the local port answers 200 (the image `HEALTHCHECK`); with `REIWAND_TLS=self-signed`, when the port accepts a connection |
+| `setup-token` | Print a one-time token (24 h) that opens the setup assistant at `/setup`; once the setup is finished it opens nothing |
+| `fingerprint` | Print the lowercase hex SHA-256 of the certificate served with `REIWAND_TLS=self-signed`, making it first when there is none |
+| `repo init --name N [--require-author-signature] [--online-authors]` | Create the repository: a root key and an online key. The root secret key is printed once and never stored. `--online-authors` lets accounts register author keys online (below) |
+| `repo import DIR [--online-key FILE]` | Import `root/<N>.json` files signed offline (and `catalog.json` the first time) plus the online key |
+| `repo status`, `repo publish` | Show the repository and its share URL; sign and publish now |
+| `backup [DIR]` | Snapshot the database with `VACUUM INTO`, copy the blobs, thumbnails and complete private files that the snapshot names (a file deleted meanwhile takes a new snapshot, up to three times; files missing from two snapshots in a row are listed as `missing` in the manifest with a warning), the withdrawn packages, the keys and the repository; default `DIR` is `<data>/backups/<UTC time>`, removed again when the backup fails |
+| `restore DIR [--force] [--advance N]` | Check every checksum, `PRAGMA integrity_check` and that the snapshot has this version's schema, restore with the server stopped, then publish `N` (default 1) new index versions. Signed root and index files newer than the snapshot stay, so index numbers are never reused; after losing the data directory, pass an `N` that goes past the last version clients saw. Sync heads jump to the restore time in milliseconds, so every device downloads its records again (`410 resync`), and unfinished private files start again from the first byte |
+
+The image builds from base images pinned by digest, has no shell and runs as root by default, like a plain image;
+whoever wants another user adds a `user:` line to `compose.yaml`. `./data` (mounted as `/data`) holds everything, so a backup is a copy of that folder.
+`compose.yaml` pulls `ghcr.io/reiwand/reiwand-server:${REIWAND_VERSION:-latest}`; to build from the
+checkout instead, add the override: `docker compose -f compose.yaml -f deploy/compose.build.yaml up -d --build`.
+
+The server closes any connection whose request headers do not arrive within 10 seconds (fixed value, idle keep-alive connections included).
+
+TLS is left to a reverse proxy of the operator's choice. It must pass `Host`, `X-Forwarded-For` and
+`X-Forwarded-Proto`; by default the server believes `X-Forwarded-For` only from loopback and, inside a
+container, from the gateway of its network, which is where a proxy of the same host arrives through
+the published port. Any other client, a device of the home network included, is counted by its own
+address and cannot pick another one with that header; a proxy elsewhere (another container of the
+compose network, another machine) is named in `REIWAND_TRUSTED_PROXIES`. `deploy/nginx/reiwand.conf` is an Nginx example: it allows
+bodies up to the default `REIWAND_PACKAGE_MAX_MIB`, uses HTTP/1.1 upstream, streams uploads, and serves
+`/api/v1/sync/events` (server-sent events) unbuffered with a long read timeout. The server uses no
+WebSockets.
+
+Each release also pushes the image to `ghcr.io/<owner>/reiwand-server` (`linux/amd64`, tags
+`<version>` and `latest`) with BuildKit SPDX SBOMs of the image and of the build stage and a
+provenance attestation, signs its digest with cosign keyless from the release workflow
+(`scripts/server-image.sh`) and adds a signed SPDX attestation (`cosign attest --type spdxjson`) of
+the Rust dependencies in the sources it was built from. Check both with `cosign verify` and
+`cosign verify-attestation --type spdxjson` against the identity
+`https://github.com/<owner>/reiwand/.github/workflows/ci.yml@refs/heads/master` and the
+issuer `https://token.actions.githubusercontent.com`, then pin that digest in `compose.yaml` in place of the tag
+(`image: ghcr.io/<owner>/reiwand-server@sha256:<digest>`).
+
+### First setup
+
+Until it is set up, the server writes `the server is not set up yet: open <url>/setup and enter the
+one-time setup token …` at every start. `/setup` asks for that token and then walks four steps;
+each one is stored as soon as it is sent, so closing the browser or restarting the server resumes
+at the first step not done:
+
+1. **Network**: «Only at home» (the server makes its own certificate, as `REIWAND_TLS=self-signed`,
+   and announces itself with mDNS, as `REIWAND_ADVERTISE=true`) or «I have my certificate» with the
+   paths of a PEM certificate chain and its PEM private key inside the server. Both paths empty
+   means a reverse proxy in front holds the certificate. Before storing the paths the server reads
+   both files and checks that the certificate is in force, that it names the host of
+   `REIWAND_PUBLIC_URL` (DNS name, `*.` wildcard or IP address) and that the key is the one of the
+   certificate; each wrong file is marked with the reason, and the raw errors are under «Details».
+   Serving HTTPS itself needs a `REIWAND_PUBLIC_URL` that starts with `https://`. The choice takes
+   effect when the setup is finished and at every later start.
+2. **Account**: the administrator. «Change» on a later step edits the same account.
+3. **Repository**: its name and «Online authors» (as `repo init --online-authors`). The root
+   secret key is shown once, in that page only (`Cache-Control: no-store`): it is never stored,
+   logged or put in an address. It stays in memory until «I saved it» is marked; if the server
+   restarts before that, the step offers to make the repository again. A repository made before
+   with `repo init` or `repo import` skips this step.
+4. **Who gets in**: «Closed», «By invitation» or «Open», stored as the registration and
+   publishing choices below. The page also makes the first invitation (one use, 7 days) and shows
+   it once as a link and a QR code; choosing «Closed» deletes it.
+
+«Finish» stores the choices, applies the network choice and deletes every setup token and setup
+visit. From then on `/setup` shows the «Done» screen to administrators (QR code for the phone,
+the web address, the repository address with its fingerprint, how to upload) and sends everyone
+else to the catalog; no request to `/setup` can make another administrator or repository, and
+new setup tokens are refused. A server whose database already has an administrator and a
+repository counts as set up when it starts.
+
+The setup visit is a cookie `reiwand-setup` (`__Host-reiwand-setup` on HTTPS), 24 h, stored as a
+digest; the token form shares the login rate limit.
+
+### Stored settings
+
+The registration choice, the publishing choice and the network choice live in the database.
+The variables `REIWAND_REGISTRATION`, `REIWAND_AUTO_PUBLISH`, `REIWAND_TLS` and `REIWAND_ADVERTISE` only give
+the starting value: once a choice is stored it wins over them. «Closed» and «By invitation»
+publish every upload at once (`all`); «Open» publishes only from trusted accounts (`trusted`).
+
+### Configuration
+
+Every setting is an environment variable (`.env` next to `compose.yaml` is read, and `.env.sample` lists
+them all; `REIWAND_VERSION` and `REIWAND_BIND` only select the image tag and the published address). `NAME_FILE`
+reads the value of `NAME` from a file, for secrets.
+
+| Variable | Default | Meaning |
+|----------|---------|---------|
+| `REIWAND_PUBLIC_URL` | `http://localhost:8080` | External URL; `https://` enables HSTS and the `__Host-reiwand` cookie |
+| `REIWAND_LISTEN` | `0.0.0.0:8080` | Listen address |
+| `REIWAND_DATA` | `/data` | Data directory |
+| `REIWAND_TRUSTED_PROXIES` | `127.0.0.0/8,::1` and, in a container, its gateway | Advanced: CIDRs whose `X-Forwarded-For` is believed, read right to left; setting it replaces the list, so loopback must be named again if wanted |
+| `REIWAND_NAME` | `reiwand` | Instance name |
+| `REIWAND_REGISTRATION` | `invite` | `closed`, `invite` or `open`, until the setup stores a choice |
+| `REIWAND_AUTO_PUBLISH` | `trusted` | Publish uploads without review: `never`, `trusted` (role trusted and above) or `all`, until the setup stores a choice |
+| `REIWAND_LICENSES` | `CC0-1.0,CC-BY-4.0,CC-BY-SA-4.0` | SPDX ids accepted in uploads |
+| `REIWAND_PACKAGE_MAX_MIB`, `REIWAND_USER_QUOTA_MIB` | `256`, `2048` | Package size and storage per account |
+| `REIWAND_UPLOADS_PER_DAY` | `20` | Upload sessions per account and day |
+| `REIWAND_SYNC_QUOTA_MIB` | `64` | Sync records per account |
+| `REIWAND_FILES_QUOTA_MIB` | `1024` | Private files per account |
+| `REIWAND_ENTRY_DAYS` | `7` | Lifetime of each signed index (1 to 14, capped by the root) |
+| `REIWAND_RESIGN_HOURS` | `24` | Re-sign the index at least this often (at most half the index lifetime) |
+| `REIWAND_PUBLISH_DELAY_SECS` | `30` | Wait after a moderation decision before signing, to batch changes |
+| `REIWAND_LEGAL_OPERATOR`, `REIWAND_LEGAL_CONTACT`, `REIWAND_LEGAL_JURISDICTION`, `REIWAND_LEGAL_DMCA_AGENT` | empty | Shown on `/legal` and in the terms |
+| `REIWAND_LOG_CLIENTS` | `off` | Abuse log of client addresses: `off`, `prefix` (IPv4 /24, IPv6 /48) or `full` (address and user agent) |
+| `REIWAND_LOG_CLIENTS_DAYS` | `7` | Days the abuse log keeps (1 to 30) |
+| `REIWAND_NOTICE_DAYS` | `180` | Days a legal notice keeps the sender's name, email and signature (1 to 730) |
+| `REIWAND_TAKEDOWN_DAYS` | `90` | Days a removed or revoked package stays in `held/` as evidence and for a counter-notice (1 to 3650) |
+| `REIWAND_RATE_LIMITS` | `true` | In-memory rate limits |
+| `REIWAND_TLS` | `off` | `self-signed` serves HTTPS itself with a certificate of its own, made on the first start in `tls/` (ECDSA P-256, valid for the host of `REIWAND_PUBLIC_URL` and `localhost`); clients reach it only by its pinned fingerprint. The same port still answers plain HTTP from loopback (the health check) and redirects plain requests from elsewhere to `REIWAND_PUBLIC_URL`. Until the setup stores a network choice |
+| `REIWAND_ADVERTISE` | `false` | Announce the server on the local network with mDNS as `_reiwand._tcp`, instance `reiwand-<6 random hex digits>` drawn at every start, TXT `v=0`; nothing else about the server, the account or the devices is announced |
+| `REIWAND_LOG` | `info` | Log filter |
+
+Logs go to standard output and never contain addresses, user agents, tokens, bodies or emails.
+With `REIWAND_LOG_CLIENTS` the server writes `logs/clients-<date>.jsonl` (`at`, `ip`, `agent`,
+`method`, `route`, `status`) and deletes files older than the retention.
+
+### Data directory
+
+```
+db/reiwand.sqlite      accounts, packages, moderation, sync records (WAL)
+blobs/<sha256>.wpak  uploads waiting for review
+thumbs/<sha256>.jpg  640 px previews re-encoded by the validator
+held/<sha256>.wpak   removed or revoked packages (and their previews) for REIWAND_TAKEDOWN_DAYS, not served
+private/<user>/<id>  end-to-end encrypted private files of each account
+repo/                the static repository (docs/specs/repo.md) built with reiwand-format
+keys/online.key      online signing key (0600); the root key never lives here
+keys/mail.secret     password of the mail server (0600), only when mail is set up
+tls/cert.der, key.der  certificate and key of REIWAND_TLS=self-signed (0600)
+tmp/ logs/ backups/
+```
+
+## Conventions
+
+- JSON in UTF-8. Times are Unix milliseconds unless they belong to repository files.
+- Errors are `application/problem+json`: `{type: "about:blank", title, status, code, detail}`.
+  `code` is stable (`invalid`, `malformed`, `unauthorized`, `forbidden`, `not_found`,
+  `rate_limited`, `handle_taken`, `version`, `epoch_mismatch`, `resync`, …).
+- `429` responses carry `Retry-After`.
+- Authentication is `Authorization: Bearer reiwand_<kind>_<64 hex>_<8 hex CRC-32>` (kinds `d`
+  device, `p` personal) or the session cookie of the web site. The server stores SHA-256 of
+  tokens and sessions only; revocation is immediate.
+- Scopes: `catalog:read`, `upload`, `sync`, `mod`, `admin`. Device tokens get `upload sync`: only
+  account sessions manage devices (a device may still sign itself out, and approve or remove another
+  one with the account password: `POST /api/v1/me/devices/{id}/revoke {password}`). Personal tokens
+  are created on the web site; `mod` and `admin` need the role and expire within 90 days. Web
+  sessions have every scope of the role. A token acts with the lower of its role and its scopes
+  everywhere, the web pages included: without `admin` it is at most `moderator`, without `mod`
+  either at most `trusted`, so a device token of an administrator cannot open the administration.
+- Roles: `user`, `trusted`, `moderator`, `admin`.
+- Requests with a cookie and an unsafe method must be same-origin (`Sec-Fetch-Site` and
+  `Origin` are checked); bearer requests are exempt.
+- Request bodies are limited to 1 MiB, 6 MiB for sync changes and 8 MiB for a piece of a private
+  file; uploads stream without limit up to the declared size. Answers stay small: a page of sync changes holds at most 4 MiB of
+  payloads (always one change), the mailbox at most 1 MiB of bodies. Requests time out after 30 s except uploads, private file pieces, moderation decisions and event streams.
+- Every form endpoint also accepts `application/x-www-form-urlencoded`; with `?back=/path` the
+  answer is an HTML page. `POST …?_method=DELETE|PATCH` stands for those methods in forms.
+- Public reads (`/repo/`, `/media/`, `/api/v1/catalog`, `/api/v1/packages/…`) send
+  `Access-Control-Allow-Origin: *`; nothing else allows cross-origin use.
+
+Rate limits per client address (IPv6 per /64): 20 requests/s with bursts of 50 overall; 5 per
+minute for login, registration, setup, device code start and every password check
+of a signed-in account; 10 failed logins or password checks per account in 15 minutes; 5 reports or
+notices per hour. Sync writes: 60 per minute per device.
+
+## Discovery and health
+
+| Method | Path | Answer |
+|--------|------|--------|
+| GET | `/healthz` | `ok` |
+| GET | `/readyz` | `200` or `503` with `{database, repository, index_fresh}` |
+| GET | `/.well-known/reiwand-server` | `{name, version, api: ["v1"], registration, sync: {end_to_end_default, plaintext_requires_confirmation, record_max_bytes, quota_bytes}, uploads: {max_bytes, per_day, licenses}, repository: {url, repo_id, entry_expires} \| null, legal: {notice, terms, privacy, contact}}` |
+
+## Repository
+
+`/repo/<path>` serves the tree of `docs/specs/repo.md`: `root/<N>.json[.minisig]`, `entry/latest`,
+`entry/<N>.json[.minisig]`, `index/<sha256>.json`,
+`revoked/<sha256>.json`, `authors/<sha256>.json`, `featured/<sha256>.json`, `previews/<sha256>.<ext>` and
+`packages/<id>/<version>.wpak`.
+`entry/latest` is `no-cache`; everything else is immutable. A package that moderators removed or
+revoked answers `410`, and its preview is deleted unless a release still listed uses it. The share
+URL is `repository.url` of the discovery document
+(`https://example.org/repo/?fingerprint=…&repo_id=…`).
+
+Only the online key signs on the server, and only entries and their details: an approval adds the
+package with `reiwand_format::add`, a removal or revocation calls `reiwand_format::revoke`, and a
+background job calls `reiwand_format::publish` with a lifetime of `REIWAND_ENTRY_DAYS` after changes and
+at least every `REIWAND_RESIGN_HOURS`. Packages are either unsigned (when the root does not require
+author signatures) or signed by an author key that the uploader registered and that the root lists
+or, in a repository created with `--online-authors`, that the online authors file lists.
+`--online-authors` alone does not make signatures required: without `--require-author-signature`
+a package that was never signed is accepted and clients install it as unsigned, whatever the
+uploading client checked. Once a version of a package is published, `reiwand_format::add` refuses a
+later version with another author or without a signature (the upload stays in review and the
+repository keeps serving the signed versions), and clients that have it refuse an unsigned release.
+
+### Online authors
+
+With `--online-authors` the root sets `policy.authors = "online"`. Every account is the author
+`u<account id>`; the keys it registers at `/api/v1/me/author-keys` go into the operator catalog and
+into `authors/<sha256>.json`, which the next entry pins (`docs/specs/repo.md`). A new key for
+packages already published needs a rotation signed by an earlier key of the account:
+`reiwand-ctl pack rotate-key OLD.key NEW.pub --author u<id>` prints the signature, and
+`POST /api/v1/me/author-keys/rotate` (or the form of `/account`) stores it with the new key. The
+desktop does the same without the web page: `reiwand-ctl server author-key list|add|rotate|remove`, or
+*Author keys* in *Account* (`ListAuthorKeys`, `AddAuthorKey`, `RotateAuthorKey` and `RemoveAuthorKey`
+of `Sync1`, `dbus.md`), and `reiwand-ctl server uploads [--cancel ID]` or *Uploads that did not finish*
+in *Account* list and cancel the upload sessions that `/api/v1/me/packages` returns in `uploads`. Clients
+trust, for each package, the key that signed the first version they installed and accept a later
+version only from that key or a key that a chain of rotations reaches; authors that the root lists
+keep priority over online ones with the same id. So whoever steals the online key can list new
+authors and new packages, but not update a package that a client already installed.
+
+Clients must treat the catalog API as hints and resolve `(id, version, sha256, size)` against
+the verified shards before installing.
+
+## Catalog
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/v1/catalog?q=&kind=&content=&facet=&cursor=&limit=` | — | Newest published and listed version of each package that the moderators did not hide; `q` matches title, description, tags and id; `kind` is `image`, `video`, `scene` or `web`; `content` is `general`, `mature` or `unrated` (packages of the first manifest version); `facet` is one facet the package must have (`mature` included); `limit` 1 to 100 (24) |
+| GET | `/api/v1/packages/{id}` | — | Latest version plus `versions: [string]` |
+| GET | `/api/v1/packages/{id}/versions` | — | `{items: [item]}` |
+| POST | `/api/v1/packages/{id}/reports` | — | `{category: copyright\|illegal\|malware\|mature\|spam\|other, details}` → `201 {case}` |
+| GET | `/media/{sha256}.jpg` | — | Thumbnail of a pending or published version |
+| GET | `/band/{sha256}.css` | — | Tones of the band for the version on its cover (`404` for any other version) |
+| POST | `/api/v1/packages/{id}/vote` | session or token | `{vote: up\|down\|none}` → `{id, up, down, mine}`; one vote per account and package, at most 60 changes an hour (`429`), `404` for a package that is not published |
+| GET | `/api/v1/packages/{id}/vote` | session or token | `{id, up, down, mine}` |
+| GET | `/api/v1/votes?ids=` | — | `{items: {id: {up, down, mine?}}}` for at most 100 package ids separated by commas; `mine` (`up`, `down` or `none`) only with a session |
+
+`featured=true` keeps the packages the operator features. `votes` is `{up, down}`: counts of the
+votes of accounts, unsigned hints that are not part of the repository. The server keeps one vote per
+account and package to count it once and lets each account read only its own; it never lists who
+voted and keeps no record of installs or downloads. The page of a package shows the counts, the
+note when it is featured and, for a signed-in visitor, buttons to vote up, down or withdraw the vote.
+The desktop app and the phone vote with the token of the device and read the counts with
+`/api/v1/votes`, which adds `mine` for that account; both skip the counts while `repos.vote_counts`
+is off. They ask and vote only for packages of the repository the server announces (its `repo_id`
+in `/.well-known/reiwand-server`): ids of packages from other repositories never reach the server, and
+rows of other repositories show no counts and no vote buttons.
+
+Every page of the server draws, behind the menu and the title, the cover of the newest version
+that a visitor without an account sees in the catalog: published, listed, newest listed version of
+a package the moderators did not hide, and rated for everybody (`content` is `general`; mature and
+unrated versions never reach the band, which the sign-in page shows too). The page links its
+thumbnail (`/media/{sha256}.jpg`) and a stylesheet of the same server (`/band/{sha256}.css`) that
+sets the tones of the page; both addresses carry the version, so browsers keep them for a year and
+fetch new ones when the newest version changes. A credit line under the title names the wallpaper
+and its owner. The tones are worked out once from the thumbnail, the first time that version is
+on the band, and stored with it; the veil over the cover grows with the cover until the title, the
+menu and the status line read at 4.5:1 or more over its brightest part (95th percentile). With no
+such version, or with a thumbnail that cannot be read, pages draw the plain band in the default
+tones. The setup assistant draws the plain band until the first wallpaper is published.
+
+Search uses an SQLite FTS5 index with the trigram tokenizer (without diacritics) over the id,
+title, description and tags of published versions, kept up to date by triggers: every word of `q`
+with at least 3 characters must appear as a substring, in any case and with or without accents;
+a `q` without such a word matches tags that start with it.
+
+Item: `{id, version, kind, title, description, license, tags, authors, size, sha256, published_at,
+owner, thumbnail, download, content, photosensitive, facets, hidden, listed, featured, votes}` (`thumbnail` and `download` are
+paths; `content` and `photosensitive` are `null` for packages of the first manifest version; `hidden`
+is the moderators' reason, or `null`, and only `/api/v1/packages/…` answers hidden packages; `listed` is
+`false` for an unlisted version, which only `/api/v1/packages/…` and the page of the package show, with a
+note that it is unlisted). Titles and
+descriptions are those of the package's default language. The web catalog filters by rating and
+facet as well, shows the description with its markup (as written for packages of the first manifest
+version), a warning on the page of a photosensitive package and the previews of mature packages
+blurred until the visitor selects them, one package at a time, without JavaScript; the web site
+keeps no choice, so the blur comes back on every visit. The list answer is `{items,
+next_cursor}` with `Link: <…>; rel="next"` when there is more.
+
+## Accounts
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/v1/auth/register` | — | `{handle, password, invite}` → `201 {id, handle}` |
+| POST | `/api/v1/auth/login` | — | `{handle, password, device: {platform, enc_key?, sig_key?}}` → device token (below) |
+| POST | `/api/v1/auth/logout` | token or session | Revokes the token or ends the session → `204` |
+| GET | `/api/v1/me` | any | `{id, handle, role, created_at, quota_bytes, used_bytes}` |
+| DELETE | `/api/v1/me` | session | `{password}` → deletes the account and everything it owns → `204` |
+| POST | `/api/v1/me/password` | session | `{current, new, devices?}`; see below |
+| GET | `/api/v1/me/export` | session | Profile, devices, tokens, keys, versions, uploads, sync head and records |
+| GET, POST | `/api/v1/me/tokens` | any, session | List; create `{name, scopes: "upload sync", days?}` → `201 {id, token, scopes, expires_at}` (shown once) |
+| DELETE | `/api/v1/me/tokens/{id}` | session | Revoke a personal token |
+| GET | `/api/v1/me/devices` | any | `{items: [{id, name, platform, enc_key, sig_key, created_at, seen_at}]}` |
+| DELETE | `/api/v1/me/devices/{id}` | session, or the device itself | Revoke a device, its tokens, its mailbox and its event stream; asks for a key rotation |
+| GET, POST | `/api/v1/me/author-keys` | any, `upload` | List; add `{public_key}` (minisign public key file or line) → `201 {fingerprint}` |
+| POST | `/api/v1/me/author-keys/rotate` | `upload` | `{from, public_key, signature}`: hand an online author over from a registered key to a new one → `201 {fingerprint}` |
+| DELETE | `/api/v1/me/author-keys/{fingerprint}` | `upload` | Remove |
+| GET | `/api/v1/me/packages` | `upload` | `{items: [{package, version, title, state, created_at, published_at, decision, statement}], uploads: [{id, state, errors, created_at}]}` |
+
+Handles are 3 to 32 of `a-z 0-9 _ -`; passwords 10 to 256 characters without the handle,
+hashed with Argon2id (19 MiB, 2 passes). A new password revokes every session (the answer sets a
+new session cookie with `204`), every personal token and every approved device code of the
+account; with `devices: true` it also revokes every device and asks for a key rotation, so devices
+link again and get the sync key from a device that holds it or from the escrow. The password of an
+account without one can only be set from a session signed in within the last 10
+minutes, and so can such an account be deleted. The web site adds `/login`, `/register`, `/setup`,
+`/link` and `/account`.
+
+Devices are named on the server `Device 1`, `Device 2`… and never by the client: the real name
+travels inside the encrypted `device` sync record. `platform` is `linux`, `android` or
+`other`; `enc_key` (X25519) and `sig_key` (Ed25519) are base64 of 32 bytes.
+
+Device token answer: `{token, device_id, device_name, scopes}`.
+
+### Device enrollment
+
+For devices without a keyboard or accounts without a password (RFC 8628 style):
+
+1. `POST /api/v1/auth/device/start {platform, enc_key?, sig_key?, client?}` (`client`: at most 64
+   characters naming the client software) →
+   `{device_code, user_code: "BCDF-GHJK", verification_uri, verification_uri_complete, interval: 5, expires_in: 600}`.
+2. The device shows `user_code` (and a QR code of `verification_uri_complete`).
+3. The user approves at `/link`, or another device calls
+   `POST /api/v1/auth/device/approve {user_code, approve: true|false, password}`: a session approves
+   without `password`; a device token needs the password of the
+   account (checked like a sign-in, `401 bad_credentials` when wrong), so a stolen device token
+   cannot add devices, and an account without a password approves at `/link`. Before that,
+   `POST /api/v1/auth/device/preview {user_code}` (a session, or any device token) answers what the
+   pending request sent, `{platform, client, requested_at, expires_at}`, and never an address;
+   `/link` shows the same with the warning to approve only a code shown on the user's own screen.
+4. The device polls `POST /api/v1/auth/device/token {device_code}` no faster than `interval`.
+   Answers `400` with `code` `authorization_pending`, `slow_down` (add 5 s), `expired_token`,
+   `access_denied` or `invalid_grant`, or `200` with the device token.
+
+## Uploads
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/v1/uploads` | `upload` | `{size, sha256, visibility?}` → `201 {id, put_url, expires_at, visibility}`; `visibility` is `public` (the default) or `unlisted`; checks blocklist, strikes, daily limit, two open sessions and quota first |
+| PUT | `/api/v1/uploads/{id}` | `upload` | Body is the `.wpak`; `Content-Length` must equal `size`; size and SHA-256 are checked while streaming; one request at a time per upload (`429`) |
+| POST | `/api/v1/uploads/{id}/finalize` | `upload` | Validates and returns the status |
+| GET | `/api/v1/uploads/{id}` | `upload` | Status |
+| DELETE | `/api/v1/uploads/{id}` | `upload` | Cancel an unfinished upload → `204` |
+| POST | `/api/v1/me/packages/{id}/visibility` | `upload` | `{visibility: public\|unlisted, version?}` sets every version of a package of this account, or one, → `{id, version, visibility}`; `404` for a package of another account or an unknown version |
+| POST | `/upload` | session | `multipart/form-data` field `package`, and an optional `visibility` before it, for the web site; strikes, daily limit, open uploads and quota are checked and an open upload session is reserved before the package is read, the blocklist right after; at most 8 fields, others up to 4 KiB, 30 s each |
+
+An unlisted version is published, signed and served like any other, with `listed: false` in its
+release of the repository (`repo.md`): the catalog, its search and the web site's lists leave it out,
+while its page, the package API and installing it by id keep working. Clients that do not know the
+field never see it, since first-version shards leave unlisted releases out. Unlisted is not private:
+the detailed shards list every release with its title, description and id, and anyone can read the
+repository, so the account page, the upload dialog of the app and the page of the package say so and
+point to sync or an own repository for private wallpapers. Clients ask for
+`unlisted` only when the answer of `POST /api/v1/uploads` repeats it, and cancel the upload otherwise,
+so that a server without unlisted uploads never publishes a package openly. `/api/v1/me/packages`
+gives each version its `visibility`, and the account page has the picker on the upload form and a
+button per version; every change is audited and the repository is published again.
+
+Status: `{id, state, errors: [string], package, version}` with `state` one of `open`,
+`received`, `failed`, `pending_review`, `published`, `rejected`, `removed`, `revoked`.
+
+Validation runs `reiwand-server validate` in a child process limited to 1 GiB of address space
+and 60 s of CPU, two at a time. It opens the package with `reiwand_format::open` (strict ZIP
+profile and manifest rules), verifies `manifest.json.minisig` against the uploader's author
+keys that the root also lists, or every registered key of the uploader with online authors (required
+when the root demands signatures), keeps the rating of packages rated `mature` (`content` and the
+facet `mature`), refuses `imported` packages and provider packages
+under other licenses than those `package.md` allows them, and decodes the
+thumbnail (`previews.thumbnail`, or `preview` in the first manifest version) (PNG, JPEG, WebP, GIF or BMP, at most 16384 px) into a JPEG thumbnail. The
+server then checks the licence list, that the id belongs to the uploader (the first uploader
+owns it) and that the version is newer than every earlier one. Accepted versions wait for
+review unless `REIWAND_AUTO_PUBLISH` publishes them.
+
+## Moderation and administration
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/v1/mod/queue` | moderator | Open cases, highest priority first: `{items: [{id, reason, detail, priority, created_at, package, version, title, state, sha256, uploader}]}` |
+| POST | `/api/v1/mod/cases/{id}/decision` | moderator | `{decision, statement, reason?, strike?}` |
+| GET, POST | `/api/v1/mod/blocklist` | moderator | List; add `{sha256, reason}` |
+| DELETE | `/api/v1/mod/blocklist/{sha256}` | moderator | Remove |
+| GET | `/api/v1/mod/hidden` | moderator | Hidden packages: `{items: [{id, reason, hidden_at}]}` |
+| POST | `/api/v1/mod/hidden` | moderator | `{id, reason}` (at least 10 characters) hides a package → `{id, hidden: true}` |
+| DELETE | `/api/v1/mod/hidden/{id}` | moderator | Shows it again → `{id, hidden: false}` |
+| GET | `/api/v1/mod/audit` | admin | Last 500 actions |
+| GET, POST | `/api/v1/admin/invites` | admin | List; create `{role, uses?, days?}` → `201 {id, code, url, …}` |
+| DELETE | `/api/v1/admin/invites/{id}` | admin | Revoke |
+| GET | `/api/v1/admin/users` | admin | Accounts |
+| PATCH | `/api/v1/admin/users/{id}` | admin | `{role?, status?: active\|suspended, quota_mib?}` |
+| GET, PATCH | `/api/v1/admin/settings` | admin | Stored settings `{registration, auto_publish, network, advertise, setup_done, public_url}`; change `{registration?, auto_publish?}` |
+| GET | `/api/v1/admin/repo` | admin | Repository state |
+| POST | `/api/v1/admin/repo/publish` | admin | Sign now → `{entry_version, expires, packages}` |
+| GET, POST | `/api/v1/admin/featured` | admin | List; feature `{id, note?}` (a published package, at most 64, a note of at most 200 characters on one line) |
+| DELETE | `/api/v1/admin/featured/{id}` | admin | Stop featuring it; both are audited, signed into the repository (`repo.md`) and listed on `/admin/featured` |
+| GET | `/api/v1/admin/transparency` | admin | CSV counts of notices, cases and decisions, without personal data |
+
+Decisions: `approve` (pending → published), `reject` (pending → rejected, the file and its
+thumbnail are deleted), `remove` (published → removed: revoked with reason `takedown`, downloads
+answer `410`), `revoke` (published → revoked with `reason` `malware`, `license`, `takedown`,
+`broken` or `other`), `restore` (removed or revoked → published again, for a counter-notice:
+the revocation is withdrawn with `reiwand_format::unrevoke`) and `dismiss`. Removing or revoking
+moves the package file, and the thumbnail unless another pending or published version uses it,
+out of the public tree into `held/`, kept for `REIWAND_TAKEDOWN_DAYS` (also in backups); `restore`
+answers `409 deleted` after that. Hiding takes every version of a package out of the catalog, its search and the web site's lists,
+without revoking anything: `/packages/{id}` and the package API still answer with the reason, the
+repository keeps serving the files and marks the releases `hidden` in the second-version shards, so
+clients leave the package out of browsing unless it is installed and keep installing and updating
+it for whoever has it. Versions uploaded later stay hidden. `/mod` lists hidden packages and hides
+or shows them, `reiwand-ctl moderate --server URL hide ID --reason …`, `unhide ID` and `hidden` do the
+same with a personal token that has the `mod` scope (`REIWAND_SERVER_TOKEN`). Every change is audited.
+Nobody approves, restores or dismisses a case of their own
+upload (`403`); restrictive decisions on one's own upload are allowed. Restrictive decisions need a `statement` of at least 10
+characters, which the uploader sees in `/api/v1/me/packages`. `strike: true` adds a strike;
+three strikes within a year suspend uploads. Every decision is audited. Approving or rejecting a
+pending version answers `409 superseded` once a newer version of the package was uploaded;
+dismissing such a case is still accepted (it only closes the case, the version stays pending). Cases come from
+uploads (priority 0), reports (1), copyright notices and counter-notices (2) and notices of
+illegal content (3).
+
+### Mail
+
+The server sends mail only after the administrator sets it up in the fold of the health row
+«Correo» (`POST /admin/mail`, administrators only; anyone else is sent to `/login` and nothing is
+stored). While it is off nothing is sent and nothing is queued. The settings live in the
+`settings` table under `mail_host`, `mail_port`, `mail_security` (`starttls`, `tls` or `none`),
+`mail_user`, `mail_from`, `mail_to` and `mail_lang` (the language of the administrator who saved
+them, used for every mail); the password goes to `keys/mail.secret` (0600), is never shown again,
+never logged and an empty password field keeps the stored one. «Apagar el correo»
+first asks in the row of the mail (`/admin?mail=off`): the question says what is lost, and only
+its danger button (`action=off`) drops the keys, the password and every mail still waiting;
+«Cancelar» goes back to `/admin` and keeps everything. There is a single
+notice address (`mail_to`) for who moderates and who administers: accounts carry no address.
+
+Mails wait in the table `mail_queue` (`topic` `case`, `health` or `test`, `case_id`, `subject`,
+`body`, `state` `queued`, `sent` or `failed`, `tries`, `next_at`, `created_at`, `sent_at`). A
+background job sends what is due and retries a failure after 1 min, 5 min, 30 min, 2 h and 8 h;
+after the sixth try the mail is `failed`. The last result is kept in `mail_sent_at`,
+`mail_failed_at`, `mail_failed_why` (`password`, `reach`, `secure`, `address`, `other`, said in a
+person's words on the row) and `mail_failed_raw` (the raw answer of the mail server, under
+«Detalles»). Another part of the server asks for a mail with
+`mail::enqueue(app, topic, case, |setup| (subject, body))`: the closure runs in the language of
+the mail and nothing is queued when mail is off.
+
+What is sent: each case of priority 1 or more (reports, notices, counter-notices) sends one mail
+with a link to the case and nothing about who sent it; the line of the case in `/mod` says whether
+the notice went out, is on its way or did not go out. Every 15 minutes, and at once after an
+automatic signing fails, the rows certificate, index signature, last backup and disk are compared
+with the tone last seen (`health_seen`): a row that turns red or near sends one mail per change,
+not per check. Subjects carry only the name of the server and of the row. «Enviar un correo de
+prueba» (`POST /admin/mail/test`) sends at once and says whether it went out.
+
+A failed automatic signing is stored in `repo_state.failed_at` and `failed_raw`: the row «Firma del
+índice» turns red with when and why until a signing works again.
+
+On the health page (`/admin`) the row «Firma del índice» appears only once the index was signed
+for the first time (after the publish delay of the first upload). Under «Para los teléfonos» the
+QR carries the address and, on a home network, the fingerprint of the certificate, while the
+address one can copy below it is the repository address for the desktop app, whose `fingerprint`
+is that of the repository key: two fingerprints, each right for its use. On a Spanish page, a
+detail the server gives only in English is kept under the fold «Detalles» of the error notice; on
+an English page it is shown as it is.
+
+## Legal pages
+
+`/legal` (operator, contact, jurisdiction, copyright agent), `/legal/terms`,
+`/legal/privacy`, `/legal/content`, `/legal/notice` (form covering copyright and other illegal
+content; answers with a receipt number), `/legal/notice/{receipt}` (state of the decision) and
+`/legal/counter-notice`. The pages use no JavaScript and no third-party resources. A notice keeps
+the sender's name, email and signature for `REIWAND_NOTICE_DAYS`, then only its content.
+
+## Sync
+
+Sync stores the latest state of each item per account. The server never interprets payloads.
+
+A client is at one of two levels. **Connected** (`Sync1.Connect`, `reiwand-ctl server connect`, the
+phone op `{"op":"connect","label"}`) holds a device token and uses the repositories of the account,
+the catalog, installs and votes, and never calls `/api/v1/sync/*`: it sends and receives nothing of
+the library, asks for no sync key, and its state is `connected` with no warning. **Syncing**
+(`Sync1.SetSyncing(true, plaintext)`, `reiwand-ctl server syncing on`, the phone op
+`{"op":"syncing","on":true,"plaintext"}`) sets sync up or joins it, as linking did. Turning it off
+cancels sync, pairing and file jobs and keeps the device, its token and its sync key, so turning it
+on again needs no new pairing. It deletes nothing: the device keeps the key of the account and the
+records it already received, and the server keeps the synced data. On the phone it takes effect at
+once; on the desktop it is a short job (`Sync1.SetSyncing(false, …)` returns its id). `Sync1.Link` and the phone op `link` do both steps at once. Sync,
+pairing, key rotation, escrow, files and reset answer `syncing is off` while connected.
+
+On a local network without a public name, `REIWAND_TLS=self-signed` and `REIWAND_ADVERTISE=true` let
+a computer of the house run the server for its devices: the phone finds `_reiwand._tcp` with the
+system's network service discovery, and every client refuses the certificate until the user
+gives its fingerprint (`reiwand-server fingerprint`, also logged at start), compared once and pinned
+from then on for every request to that server, including the event stream. A pin replaces the
+check of the authorities and of the name, never the TLS handshake signatures.
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/v1/sync/state` | device | `{seq, min_seq, epoch, encrypted, key_id, rotate, used_bytes, quota_bytes, warning, escrow, files_bytes, files_quota_bytes, format}` (`escrow` tells whether one is stored, `format` is the newest sync format that wrote to the account); `404 sync_not_set_up` before setup |
+| POST | `/api/v1/sync/setup` | device | `{encrypted: true, key_id?}` (default) or `{encrypted: false, confirm_plaintext: true, key_id?}` → `201` state |
+| GET | `/api/v1/sync/changes?since=&limit=` | device | `{seq, min_seq, epoch, more, changes: [{collection, item, seq, epoch, device, deleted, payload}]}`; `410 resync` when `0 < since < min_seq` or `since > seq` |
+| POST | `/api/v1/sync/changes` | device | `{epoch, format, changes: [{collection, item, base, deleted, payload}]}` (at most 500) → `{seq, results}`; `409 client_too_old` when `format` (0 when missing) is below the account's, `422` when it is above the newest the server knows |
+| POST | `/api/v1/sync/epoch` | device | Key epochs, below → state |
+| POST | `/api/v1/sync/reset` | `sync` | `{confirm: "reset"}` deletes every record, private file and escrow → `204` |
+| GET, PUT | `/api/v1/sync/escrow` | device | `{escrow: base64 \| null}`, at most 4 KiB, only with encryption |
+| GET | `/api/v1/sync/blobs?after=` | device | Private files by id after `after`, 1000 per page: `{items: [{id, size, received, created_at}], more, used_bytes, quota_bytes}` |
+| POST | `/api/v1/sync/blobs/{id}` | device | `{size}` opens or finds the file → `{id, size, received}`; `409 size` for another size, `413 quota` |
+| PUT | `/api/v1/sync/blobs/{id}?offset=` | device | Body: the next bytes at `offset`, which must equal `received` (`409 offset`), with a `Content-Length` of 1 byte to 8 MiB (`411 length`), streamed to disk within 2 minutes; one piece per file and four per account at a time (`429`) → `{id, size, received}` |
+| GET | `/api/v1/sync/blobs/{id}?offset=&length=` | device | Bytes of a complete file, at most 8 MiB per request (`409 incomplete` before) |
+| DELETE | `/api/v1/sync/blobs/{id}` | device | Delete → `204` |
+| GET | `/api/v1/sync/events` | device | Server-sent events, one stream per device |
+
+Collections: `repos`, `library`, `playlists`, `settings` and `device`.
+
+Private files are opaque files of at most the account's files quota, named by 64 lowercase hex
+digits, only in encrypted accounts. A file is uploaded in pieces and resumes at `received`;
+incomplete files are deleted after 7 days. When the server holds fewer bytes of a file than
+`received` (after a restore), it lowers `received` to what it holds. Clients encrypt them in 64 KiB segments with keys the
+server never sees, and name them with a keyed hash so that one account stores identical files once
+(see `Sync1` in `dbus.md`). Payloads are base64, at most 256 KiB each; a tombstone is `deleted: true` without
+payload and is purged after 180 days, which raises `min_seq`.
+
+Sync format: clients send the version of the record format they write (`format`, 1 in this
+version). The account keeps the highest one that wrote to it and refuses writes of a lower one with
+`409 client_too_old`, and refuses a `format` above the newest it knows with `422`, so no device
+can lock the others out with a format that does not exist; a device with an old version never uploads old item names or records
+without the fields it does not know; it keeps reading until it is updated, and clients show a
+translated message. Records keep the fields and top-level keys that a version does not know when it
+merges them.
+
+Writes use optimistic concurrency per item. `base` is the `seq` of the item the client last saw
+(0 for a new item). A matching base is stored with `seq = head + 1` and answers
+`{item, status: "ok", seq}`; otherwise the answer is `{item, status: "conflict", current:
+{seq, epoch, device, deleted, payload}}`, except that a retry of the same device's own last write
+(same payload hash) answers `ok`. A different `epoch` refuses the batch with `409
+epoch_mismatch`; going over the quota answers `413 quota` and stores nothing. A tombstone for an
+item that already is one answers `ok` with its `seq` and writes nothing.
+
+Key epochs: `key_id` (32 lowercase hex digits) names the key of the current epoch without
+revealing it. `{epoch: current + 1, key_id}` starts a rotation and clears `rotate`; from then on
+writes need the new epoch. `{epoch: current, done: true}` finishes it: records of older epochs are
+deleted. `{epoch: current, key_id}` repeats the start (same `key_id`) or records the key id of an
+account that has none. Anything else answers `409 epoch_mismatch`. Revoking a device sets
+`rotate`, which asks the remaining devices to rotate.
+
+Events: `event: seq` with `{"seq": n}` after any write, `event: mail` with `{"id": n}` for the
+receiving device, `event: epoch` with `{"epoch": n}` after a rotation step or a revoked device
+(`-1` after a reset). The stream of a revoked device ends.
+Keep-alive comments arrive every 25 s.
+
+### End-to-end encryption
+
+Encryption is the default and plain-text sync exists only as an explicit opt-out that the
+server labels with a warning. Clients keep a random 32-byte sync key `SK` that never reaches
+the server:
+
+- `K_rec = HKDF-SHA256(SK, info = "reiwand-sync/records/v1" ‖ epoch)` encrypts records, and the
+  first 16 bytes of `HKDF-SHA256(SK, info = "reiwand-sync/key-id/v1")` in hex are its `key_id`.
+- `K_id`, 32 random bytes that travel with `SK` and stay across rotations, names items (accounts
+  set up before it existed keep `HKDF-SHA256(SK, info = "reiwand-sync/ids/v1")`). `library` items are
+  `hex(HMAC-SHA-256(K_id, repo_id ‖ 0x00 ‖ package id))` (or `blob:` and a hash for private
+  files); the server accepts only 64 lowercase hex digits there, in both modes. Other items
+  are random ids or keyed hashes of at most 64 characters of `A-Z a-z 0-9 _ -`.
+- A record is `0x01 ‖ nonce (24) ‖ XChaCha20-Poly1305(K_rec, nonce, pad256(json), aad)` with
+  `aad = "reiwand-sync/1" ‖ user id ‖ epoch ‖ collection ‖ 0x00 ‖ item`. The plaintext is padded
+  to a multiple of 256 bytes, so in an encrypted account the server refuses payloads unless
+  `len = 41 + 256·k` with `k ≥ 1` and the first byte is 1.
+- The JSON inside carries a hybrid logical clock; clients reject clocks older than the last
+  one seen for an item.
+
+What the server still sees: accounts, generic device names and platforms, public keys,
+collection names, item ids, padded sizes, times and sequence numbers, and the sizes of private
+files.
+
+Recovery escrow (optional): `PUT /api/v1/sync/escrow` stores `SK` and `K_id` sealed with
+XChaCha20-Poly1305 under a key that Argon2id (256 MiB, 3 passes) derives from a passphrase of at
+least 20 characters; the escrow names its costs, salt and epoch, and the server cannot open it but
+can try passphrases offline (format in `Sync1.SetEscrow` of `dbus.md`). A device without any other
+device left links, fetches the escrow and opens it with the passphrase. A revoked device may know
+the passphrase, so after a revocation the escrow is left at its old epoch (stale): clients say so
+and refuse the old passphrase when it is set again, by trying it on the stored escrow.
+
+Deletions: removing a library item on a device (an imported or private file, or the last version of
+a package) writes a record whose deletion clock is newer than its fields; the other devices remove
+the item too (an item of a watched folder whose file is still there stays), and never upload it
+again unless it was added after the deletion. A deletion record older than 90 days becomes a
+server tombstone (`deleted: true`), which the server purges after 180 days.
+A device that stays away longer than that downloads everything again (`410 resync`) and cannot tell a purged
+deletion from records the server lost, so it uploads what it still has: an item deleted elsewhere in the meantime
+comes back and can be deleted again.
+
+What item names reveal: library items are named with the keyed hash `K_id`, which survives key
+rotations. A device that once held `K_id`, a revoked one included, and holds the same file or knows
+the package can compute its name and see that the account stores it. Clients explain this where
+private files are shared.
+
+Key rotation: a device makes `SK'`, starts the next epoch with its `key_id`, re-encrypts and
+uploads every record with the new epoch, finishes the epoch, and sends `SK'` through the mailbox
+to the devices whose public keys it pinned in a code comparison, which pass it on to theirs; the
+public keys the server lists are never trusted for this, and every other device joins again.
+
+### Mailbox
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/v1/mailbox` | device | `{to_device, kind: key-share\|apply\|send\|ping, body: base64}` → `201 {id}` |
+| GET | `/api/v1/mailbox?after=` | device | Messages for this device: `{items: [{id, from_device, kind, body, created_at}], more}` |
+| DELETE | `/api/v1/mailbox/{id}` | device | Acknowledge → `204` |
+
+Bodies hold at most 64 KiB; a device keeps at most 100 pending messages for 7 days. A new
+device receives `SK` and `K_id` as a `key-share` sealed with HPKE (RFC 9180, auth mode, DHKEM
+X25519, HKDF-SHA256, ChaCha20-Poly1305) to its `enc_key`, after a commit-then-reveal exchange of
+nonces through the mailbox and a code derived from both public keys and both nonces that the
+user compares on both screens (see `Sync1.Join` in `dbus.md`).
+
+## Operating a public server
+
+This is guidance for the person who runs an instance open to others, not legal advice. A server
+used only by one household or one person needs none of it. What applies to you depends on where you
+live, where your users are and whether the service is offered for money; ask someone qualified.
+
+What the server does for you:
+
+- It publishes `/legal` with the operator, the single contact point, the jurisdiction and the
+  copyright agent, and it carries the same values into the terms. It shows only what you set.
+- It has the notice form (`/legal/notice`) that covers copyright and other illegal content, a
+  receipt number, a page for the state of each decision, the counter-notice form and the
+  moderation queue with its decisions (see "Moderation and administration").
+- It keeps an audit of every moderation action, the removal of held files after
+  `REIWAND_TAKEDOWN_DAYS`, and the notice data for `REIWAND_NOTICE_DAYS`. `/api/v1/admin/transparency`
+  gives counts without personal data for any report you owe.
+
+What only you can do:
+
+1. Fill `REIWAND_LEGAL_OPERATOR`, `REIWAND_LEGAL_CONTACT`, `REIWAND_LEGAL_JURISDICTION` and
+   `REIWAND_LEGAL_DMCA_AGENT`. Empty fields leave `/legal` incomplete. Use a contact address that
+   someone reads: authorities and users both write to it.
+2. Where a safe harbour for copyright notices applies to you (the United States, for example),
+   register the copyright agent with the competent office and keep that registration current. The
+   server only prints the agent's name on `/legal`; it does not register anyone.
+3. Where the law asks a service offered in a region to name a legal representative there and you
+   operate from outside it, appoint one and list it in the contact field. The server cannot do it.
+4. Answer notices within the time your law gives. Take down with the `remove` or `revoke` decision,
+   write the statement of reasons the uploader will see, restore after a valid counter-notice, and
+   use the strike option for repeat infringers. Keep the log: do not delete the audit.
+5. Keep the moderation log and the notice data as long as your law asks, and no longer than
+   `REIWAND_NOTICE_DAYS` allows for personal data; set that value on purpose.
+6. If you learn of content that threatens someone's life or safety, or of sexual abuse of children,
+   remove it at once and report it to the authorities yourself. The server has no automatic report.
+7. Publish terms and a privacy statement you can stand behind; the generated pages are a starting
+   point you must read and adapt.

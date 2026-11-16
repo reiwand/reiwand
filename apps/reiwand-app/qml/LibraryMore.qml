@@ -1,0 +1,152 @@
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC2
+import io.github.reiwand.app
+
+ColumnLayout {
+    id: more
+
+    required property var page
+    readonly property var host: page.host
+    readonly property var pkg: host.pkg
+
+    spacing: Look.e3
+
+    ScenePermisos {
+        Layout.fillWidth: true
+        uid: more.host.uid
+    }
+
+    Seccion {
+        visible: sound.item !== ""
+        text: App.tr("This scene")
+    }
+
+    SoundPicker {
+        id: sound
+
+        Layout.fillWidth: true
+        daemon: App
+        item: more.host.item.kind === "video" || (!!more.pkg && ["video", "scene", "web"].includes(more.pkg.kind)) ? more.host.uid : ""
+    }
+
+    SceneQualityRow {
+        Layout.fillWidth: true
+        uid: more.host.uid
+    }
+
+    ItemCopyButton {
+        drawer: more.host
+    }
+
+    QQC2.TextField {
+        Layout.fillWidth: true
+        text: Names.of(more.host.item)
+        onAccepted: App.act("SetTitle", [more.host.uid, text], "Library1")
+    }
+
+    Stars {
+        rating: more.host.item.rating ?? 0
+        onRated: stars => App.act("SetRating", [[more.host.uid], stars], "Library1")
+    }
+
+    ItemExtras {
+        Layout.fillWidth: true
+        host: more.host
+    }
+
+    Seccion {
+        text: App.tr("Details")
+    }
+
+    ItemKin {
+        Layout.fillWidth: true
+        host: more.host
+    }
+
+    PackageAbout {
+        Layout.fillWidth: true
+        visible: !!more.host.details.about
+        info: more.host.details.about ?? {}
+        uid: more.host.uid
+        pkg: more.pkg
+    }
+
+    ItemFacts {
+        Layout.fillWidth: true
+        host: more.host
+    }
+
+    Fila {
+        Layout.fillWidth: true
+        visible: !!more.pkg && more.pkg.kind === "scene" && more.pkg.photosensitive !== true
+        kind: "llave"
+        text: App.tr("Keep moving")
+        note: App.tr("Even when the desktop asks for reduced motion")
+        checked: !!more.pkg && (more.pkg.confirmed ?? []).includes("motion")
+        value: checked ? App.tr("On") : App.tr("Off")
+        onToggled: {
+            App.act(checked ? "Confirm" : "Unconfirm", [[more.host.uid], "motion"], "Library1");
+            checked = Qt.binding(() => !!more.pkg && (more.pkg.confirmed ?? []).includes("motion"));
+        }
+    }
+
+    WebPrivacy {
+        Layout.fillWidth: true
+        uid: more.host.uid
+        pkg: more.pkg
+    }
+
+    QQC2.Button {
+        id: trying
+
+        visible: !!more.pkg && more.pkg.kind === "web"
+        enabled: !!more.pkg && !more.pkg.unshown
+        text: App.tr("Try the page and its lights…")
+        icon.name: "lightbulb"
+        onClicked: {
+            lights.opener = trying;
+            lights.start(more.host.uid);
+        }
+    }
+
+    PageLights {
+        id: lights
+    }
+
+    RowLayout {
+        spacing: Look.e3
+
+        QQC2.Button {
+            text: App.tr("Edit…")
+            icon.name: "pencil-simple"
+            visible: more.host.item.kind === "image" && !more.host.item.missing
+            onClicked: App.edit(more.host.item)
+        }
+
+        QQC2.Button {
+            id: remove
+
+            flat: true
+            text: App.tr("Remove from the library…")
+            icon.name: "trash"
+            onClicked: confirm.open()
+        }
+    }
+
+    PanelChico {
+        id: confirm
+
+        opener: remove
+        title: App.tr("Remove “%1” from the library?", Names.of(more.host.item))
+        text: App.tr("The file stays where it is.")
+        principal: App.tr("Remove")
+        principalIcon: "trash"
+        borra: true
+        onAccepted: {
+            App.act("Remove", [[more.host.uid], false], "Library1");
+            more.page.routeBack();
+            more.page.routeBack();
+        }
+    }
+}

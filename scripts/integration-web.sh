@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+set -euo pipefail
+pages=$WORK/pages
+mkdir -p "$pages"
+from() { python3 -c "import json, sys; r = json.load(sys.stdin); print(eval(sys.argv[1]))" "$1"; }
+uid() { ctl lib search "" --json | from "[i['uid'] for i in r['items'] if (i['package'] or {}).get('id') == '$1'][0]"; }
+pixel() { "$BIN/probe" "$1" 3 2>/dev/null | grep "center bgra \[$2, 255\]" >/dev/null; }
+seen() { wait_for 20 pixel "$@" || fail "stream $1 shows $("$BIN/probe" "$1" 3 2>&1 | tail -n 1), expected bgra $2"; }
+helpers() { pgrep -u "$(id -u)" -f "$BIN/reiwand-web" | grep -c . || true; }
+alive() { ps -e -o pgid=,stat= | awk -v g="$group" '$1 == g && $2 !~ /^Z/' | grep -c . || true; }
+stopped() { [ "$(helpers)" = 0 ] && [ "$(alive)" = 0 ]; }
+helper() { field "s['outputs']['TEST-W'].get('helper')"; }
+fresh() { group=$(helper) && [ "$group" != None ] && [ "$group" != "$1" ] && [ "$(helpers)" = 1 ]; }
+ctl pack build "$ROOT/tests/fixtures/tint" -o "$pages/tint.wpak" >/dev/null
+ctl pack build "$ROOT/scenes/lights" -o "$pages/lights.wpak" >/dev/null
+ctl lib import "$pages/tint.wpak" "$pages/lights.wpak" --wait >/dev/null
+tint=$(uid org.example.tint)
+lights=$(uid io.github.reiwand.example.lights)
+[ "$(ctl lib show "$lights" --json | from "r['item']['package']['exposes']")" = "['zone', 'language', 'gpu', 'storage']" ] ||
+  fail "exposed by the example page: $(ctl lib show "$lights" --json)"
+ctl lib show "$lights" | grep "^privacy = This web wallpaper uses your time zone" >/dev/null || fail "no privacy notice in lib show"
+read -r _ _ _ web < <(ctl stream TEST-W 320 180)
+if ! "$BIN/reiwand-web" --check >/dev/null 2>&1; then
+  [ "${REIWAND_REQUIRE_WEB:-0}" != 1 ] || fail "REIWAND_REQUIRE_WEB=1 but web wallpapers cannot run here"
+  ctl lib show "$tint" | grep "^not shown here = Web wallpapers cannot be shown here: " >/dev/null ||
+    fail "the library did not warn before applying: $(ctl lib show "$tint")"
+  [ "$(ctl lib search "" --json | from "[i['package']['unshown'] is not None for i in r['items'] if (i['package'] or {}).get('kind') == 'web']")" = "[True, True]" ] ||
+    fail "library items of web pages did not say they cannot be shown"
+  if ctl lib apply "$tint" -o TEST-W 2>"$pages/refused"; then fail "a web wallpaper was applied without its helper"; fi
+  grep -q "Web wallpapers cannot be shown here: .*\(WPE WebKit\|reiwand-web\)" "$pages/refused" || fail "unclear refusal: $(cat "$pages/refused")"
+  ctl release TEST-W
+  echo "web wallpapers refused with a reason where the web engine is missing"
+else
+  if ctl lib show "$tint" | grep "^not shown here" >/dev/null; then fail "a web page was said not to show where it does"; fi
+  ctl lib apply "$tint" -o TEST-W 2>"$pages/notice"
+  grep -q "This web wallpaper uses your time zone, your language, what your graphics card can do and data it keeps" "$pages/notice" ||
+    fail "no privacy notice on apply: $(cat "$pages/notice")"
+  expect "s['outputs']['TEST-W']['kind']" web
+  seen "$web" "255, 0, 0"
+  [ "$(helpers)" = 1 ] || fail "$(helpers) web helpers run for one page"
+  ctl prop set tint '#00ff00' -o TEST-W
+  seen "$web" "0, 255, 0"
+  drawn=$(field "s['outputs']['TEST-W']['decode'], s['outputs']['TEST-W']['sandbox']")
+  echo "web page drawn (decode, sandbox): $drawn"
+  [[ $drawn != *"''"* ]] || fail "no frame or sandbox state: $drawn"
+  source "$(dirname "$0")"/integration-web-quality.sh
+  source "$(dirname "$0")"/integration-web-pace.sh
+  ctl lib confirm hide_zone "$tint"
+  [ "$(ctl lib show "$tint" --json | from "r['item']['package']['exposes']")" = "['language', 'gpu', 'storage']" ] ||
+    fail "the time zone is still exposed"
+  seen "$web" "0, 255, 0"
+  [ -d "$XDG_DATA_HOME/reiwand/web/org.example.tint" ] || fail "the page kept no storage"
+  touch "$XDG_DATA_HOME/reiwand/web/org.example.tint/kept"
+  old=$(helper)
+  ctl lib clear-data "$tint"
+  [ ! -e "$XDG_DATA_HOME/reiwand/web/org.example.tint/kept" ] || fail "the data of the page stayed"
+  wait_for 10 fresh "$old" || fail "the page did not start again after its data was cleared: $(helper)"
+  seen "$web" "0, 255, 0"
+  source "$(dirname "$0")"/integration-web-keep.sh
+  source "$(dirname "$0")"/integration-web-errors.sh
+  ctl lib apply "$tint" -o TEST-W 2>/dev/null
+  seen "$web" "0, 255, 0"
+  old=$(helper)
+  [ "$old" != None ] || fail "the state names no web helper for the page"
+  ctl pack build "$ROOT/tests/fixtures/glow" -o "$pages/glow.wpak" >/dev/null && ctl lib import "$pages/glow.wpak" --wait >/dev/null
+  "$BIN/probe" "$web" 60 --hold >/dev/null 2>&1 & watcher=$!; pids+=("$watcher")
+  source "$(dirname "$0")"/integration-openrgb.sh
+  ctl config rgb.server "127.0.0.1:$openrgb" >/dev/null
+  ctl config rgb.enabled true && ctl lib apply "$(uid org.example.glow-page)" -o TEST-W 2>/dev/null
+  if wait_for 3 ctl rgb strip -o TEST-W 2>/dev/null; then fail "a page sent colors without the grant"; fi
+  ctl input grant org.example.glow-page rgb
+  lit() { [ "$(ctl rgb strip -o TEST-W --json 2>/dev/null | from "r['width'], r['height'], r['colors']")" = "(2, 1, ['#00ff00', '#00ff00'])" ]; }
+  wait_for 10 lit || fail "the page sent no colors with rgb.setImage: $(ctl rgb status)"
+  painted() { ctl rgb status --json | from "r['frames']"; }
+  sends() { local before; before=$(painted); sleep 1; [ "$(painted)" -gt "$before" ]; }
+  ctl rgb covered follow >/dev/null && ctl covered TEST-W true && expect "s['outputs']['TEST-W']['active']" False
+  wait_for 10 sends || fail "the lights stopped following a covered page: $(ctl rgb status)"
+  frames() { field "s['outputs']['TEST-W']['page_frames']"; }
+  runs() { local before; before=$(frames); sleep 1; test "$(frames)" "$1" "$before"; }
+  wait_for 10 runs -gt || fail "a covered page the lights follow did not keep running: $(ctl state)"
+  ctl config rgb.server "127.0.0.1:1" >/dev/null
+  wait_for 15 runs = || fail "a covered page kept running for lights no server receives: $(ctl rgb status)"
+  ctl config rgb.server "127.0.0.1:$openrgb" >/dev/null
+  wait_for 30 sends || fail "the lights did not follow the covered page once the server came back: $(ctl rgb status)"
+  ctl rgb covered pause >/dev/null && sleep 0.5
+  before=$(painted) && sleep 1
+  [ "$(painted)" = "$before" ] || fail "a covered page sent colors while the lights pause"
+  ctl covered TEST-W false
+  wait_for 10 sends || fail "the lights did not follow the page once shown again"
+  kill "$watcher" 2>/dev/null || true; wait "$watcher" 2>/dev/null || true
+  seen "$web" "0, 255, 0"
+  ctl config rgb.enabled false
+  seen "$web" "255, 0, 0"
+  ctl config rgb.enabled true && ctl input revoke org.example.glow-page rgb
+  seen "$web" "255, 0, 0"
+  ctl config rgb.enabled false
+  read -r _ _ _ pv < <(ctl stream preview:page-lights 160 90)
+  ctl lib apply "$(uid org.example.glow-page)" -o preview:page-lights 2>/dev/null
+  previewed() { "$BIN/probe" "$pv" 3 >/dev/null 2>&1; [ "$(ctl rgb strip -o preview:page-lights --json 2>/dev/null | from "r['colors']")" = "['#00ff00', '#00ff00']" ]; }
+  wait_for 20 previewed || fail "a page preview showed no strip with the lights off and no grant"
+  seen "$pv" "0, 255, 0"
+  if grep -q "page-lights" "$XDG_CONFIG_HOME/reiwand/config.toml"; then fail "a live preview reached the saved settings"; fi
+  ctl release preview:page-lights
+  source "$(dirname "$0")"/integration-web-preview.sh
+  source "$(dirname "$0")"/integration-web-capture.sh
+  ctl lib apply "$lights" -o TEST-W 2>/dev/null
+  expect "s['outputs']['TEST-W']['kind'], s['outputs']['TEST-W']['error']" "('web', None)"
+  wait_for 10 fresh "$old" || fail "no single new web helper runs for the example page: $(helper), $(helpers) running"
+  group=$(helper)
+  ctl release TEST-W
+  wait_for 10 stopped || fail "the web helper or its engine outlived its page: $(pgrep -a -g "$group")"
+  echo "web wallpaper checks passed"
+fi

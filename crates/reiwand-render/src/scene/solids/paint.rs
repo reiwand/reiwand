@@ -1,0 +1,190 @@
+use super::super::SceneView;
+use super::super::profile::Profile;
+use super::calls::{plan, put, rooms, sized};
+use super::dress::drawn;
+use super::uniform::scene3;
+use super::{GpuModel, SCENE_SLOT, Staged};
+use crate::{RenderError, Renderer};
+use reiwand_scene::{Drafted, Frame, MAX_PLANES, Stage3d};
+use std::collections::HashMap;
+use std::hash::{DefaultHasher, Hash, Hasher};
+
+fn drafted(d: &Drafted) -> u64 {
+    let mut h = DefaultHasher::new();
+    d.only.hash(&mut h);
+    (u64::from(d.debug3d) << 56) ^ if d.debug3d > 0 { h.finish() >> 8 } else { 0 }
+}
+
+impl Renderer {
+    pub(crate) fn figures(
+        &self,
+        view: &mut SceneView,
+        (runtime, frame): (&reiwand_scene::Runtime, &Frame<'_>),
+        videos: &[(&str, &crate::texture::GpuImage)],
+        scale: [f32; 6],
+    ) -> Result<(), RenderError> {
+        let reach = scale[0].abs().max(scale[3].abs());
+        view.pool.profile = super::super::profile::Profile::begin(&self.device, view.timed);
+        self.skins(view, (runtime, frame), videos, reach)?;
+        self.solid_stages(view, (&runtime.scene, frame), reach)
+    }
+
+    pub(crate) fn solid_stages(
+        &self,
+        view: &mut SceneView,
+        (scene, frame): (&reiwand_scene::Scene, &Frame<'_>),
+        scale: f32,
+    ) -> Result<(), RenderError> {
+        let edge = self.max_edge();
+        let hdr = view.hdr;
+        for stage in &frame.stages {
+            let size = sized(stage.size, scale, frame, edge);
+            let room = rooms(frame, stage);
+            let fits = view.solids.get(stage.layer).is_some_and(|s| {
+                s.size == size
+                    && s.slices.len() == stage.slices
+                    && s.room >= room.0
+                    && s.draw_room >= room.1
+                    && s.bone_room >= room.2
+                    && s.hdr == hdr
+            });
+            if !fits {
+                view.solids.insert(stage.layer.to_string(), self.staged(size, stage.slices, hdr, room));
+            }
+            let key = stage.key ^ drafted(&view.debug3d);
+            let ready = |s: &Staged| s.key == key && s.renders > 0 && (s.seen.is_some() || !stage.seen);
+            if view.solids.get(stage.layer).is_some_and(ready) {
+                continue;
+            }
+            for p in &frame.placed[stage.models.clone()] {
+                if let std::collections::hash_map::Entry::Vacant(e) = view.models.entry(p.model.digest) {
+                    e.insert(self.scoped(|| self.gpu_model(p.model))?);
+                }
+                self.dress(&mut view.models, p, &view.images);
+            }
+            let env = frame.placed[stage.models.clone()].iter().find_map(|p| p.env);
+            let source = env.and_then(|e| view.images.get(e)).map(|i| &i.0);
+            if let (Some(e), Some(source)) = (env, source)
+                && view.envs.get(e).is_none_or(|(id, _)| *id != source.id)
+            {
+                let made = self.env_map(source);
+                view.envs.insert(e.to_string(), (source.id, made));
+            }
+            let map = env.and_then(|e| view.envs.get(e)).map(|(_, m)| m);
+            let staged = view.solids.get_mut(stage.layer).expect("made above");
+            self.pictured(staged, (&view.models, &view.images), frame, stage);
+            let env_view = map.unwrap_or(&self.solids().white);
+            let (env_map, refused) = (map.is_some(), &mut view.refused);
+            let timed = &mut view.pool.profile;
+            let done = self.scoped(|| {
+                plan(staged, frame, stage, &view.debug3d);
+                self.material_pipes(scene, staged, refused);
+                let with = (&view.models, env_view, &view.uniform);
+                self.paint_stage(staged, with, (frame, stage), env_map, timed.as_mut())
+            })?;
+            view.pool.defer(done);
+            staged.key = key;
+            staged.renders += 1;
+        }
+        view.solids.retain(|k, _| frame.stages.iter().any(|s| s.layer == k.as_str()));
+        view.models.retain(|d, _| frame.placed.iter().any(|p| p.model.digest == *d || drawn(p) == *d));
+        view.envs.retain(|k, _| frame.placed.iter().any(|p| p.env == Some(k.as_str())));
+        Ok(())
+    }
+
+    fn paint_stage(
+        &self,
+        staged: &mut Staged,
+        (models, env, uniform): (&HashMap<u64, GpuModel>, &crate::texture::GpuImage, &wgpu::Buffer),
+        (frame, stage): (&Frame<'_>, &Stage3d<'_>),
+        env_map: bool,
+        mut timed: Option<&mut Profile>,
+    ) -> wgpu::CommandBuffer {
+        let shadows = self.shadow_plan(frame, stage);
+        let mut bytes = std::mem::take(&mut staged.bytes);
+        bytes.clear();
+        let eyes = [Some(stage.eye), stage.cross.map(|c| c.0)];
+        for (e, eye) in eyes.iter().enumerate() {
+            let Some(eye) = eye else { continue };
+            for k in 0..stage.slices {
+                let mut s = scene3(frame, (stage, eye), k, env_map, self.light_cap());
+                shadows
+                    .iter()
+                    .flatten()
+                    .enumerate()
+                    .for_each(|(i, p)| s.lights[p.lamp].more[2] = i as f32 + 1.0);
+                put(&mut bytes, (e * (MAX_PLANES + 1) + k) as u64 * SCENE_SLOT, &s);
+            }
+        }
+        staged.bytes = bytes;
+        self.shadow_slots(staged, (frame, stage), &shadows, env_map);
+        self.queue.write_buffer(&staged.scene, 0, &staged.bytes);
+        for (buffer, data) in [
+            (&staged.objects, &staged.objects_bytes),
+            (&staged.finishes, &staged.finish_bytes),
+            (&staged.bones, &staged.bone_bytes),
+            (&staged.draws, &staged.draw_bytes),
+        ] {
+            if !data.is_empty() {
+                self.queue.write_buffer(buffer, 0, data);
+            }
+        }
+        let due = self.shadow_maps(staged, frame, stage, &shadows);
+        if staged.groups.is_none() {
+            staged.cross_groups.clear();
+        }
+        self.stage_groups(staged, env, uniform);
+        for p in &frame.placed[stage.models.clone()] {
+            if let Some(gpu) = models.get(&drawn(p)) {
+                self.object_group(staged, drawn(p), gpu);
+            }
+        }
+        let mut encoder = self.device.create_command_encoder(&Default::default());
+        let (w, h) = staged.size;
+        let mut span = |encoder: &mut wgpu::CommandEncoder, what: &str, open: bool| {
+            if let Some(p) = timed.as_mut() {
+                match open {
+                    true => p.start(encoder, || format!("3d {what} {w}x{h} of a stage")),
+                    false => p.end(encoder),
+                }
+            }
+        };
+        let shadows = due.contains(&true);
+        span(&mut encoder, "shadow maps", shadows);
+        self.shadow_passes(&mut encoder, staged, models, due);
+        span(&mut encoder, "shadow maps", false);
+        if stage.seen {
+            span(&mut encoder, "depth for particles", true);
+            self.seen_pass(&mut encoder, staged, models);
+            span(&mut encoder, "depth for particles", false);
+        }
+        span(&mut encoder, "models", true);
+        for k in 0..stage.slices {
+            self.stage_pass(&mut encoder, staged, models, (k, 0));
+        }
+        span(&mut encoder, "models", false);
+        if let Some((_, f)) = stage.cross {
+            if staged.cross.len() != stage.slices {
+                staged.cross = self.slice_images(staged.size, staged.hdr, stage.slices);
+                (staged.cross_groups, staged.cross_key) = (Vec::new(), 0);
+            }
+            if staged.cross_groups.len() != stage.slices {
+                staged.cross_groups = staged.cross.iter().map(|c| self.mix_group(c)).collect();
+            }
+            let key = reiwand_scene::cross_key(stage).unwrap_or_default();
+            let fresh = std::mem::replace(&mut staged.cross_key, key) != key;
+            staged.cross_renders += u64::from(fresh);
+            span(&mut encoder, "second camera and cross-fade", true);
+            for k in 0..stage.slices {
+                if fresh {
+                    self.stage_pass(&mut encoder, staged, models, (k, 1));
+                }
+                self.mix_slices(&mut encoder, &staged.cross_groups[k], &staged.slices[k], f);
+            }
+            span(&mut encoder, "second camera and cross-fade", false);
+        } else {
+            staged.cross_key = 0;
+        }
+        encoder.finish()
+    }
+}

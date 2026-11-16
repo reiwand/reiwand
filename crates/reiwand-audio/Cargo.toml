@@ -1,0 +1,16 @@
+[package]
+name = "reiwand-audio"
+description = "Audio capture and spectrum analysis for Reiwand scenes"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+reiwand-scene.workspace = true
+realfft.workspace = true
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+pipewire.workspace = true
+rtrb.workspace = true
+tracing.workspace = true

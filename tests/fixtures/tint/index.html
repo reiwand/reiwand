@@ -1,0 +1,11 @@
+<!doctype html>
+<html>
+<body style="margin:0">
+<script>
+reiwand.onProperties((changed) => {
+  if (changed.tint) document.body.style.background = changed.tint.hex;
+  localStorage.setItem("tint", reiwand.properties.tint.hex);
+});
+</script>
+</body>
+</html>

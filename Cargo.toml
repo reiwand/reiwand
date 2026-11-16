@@ -1,0 +1,198 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/reiwand-core",
+    "crates/reiwand-render",
+    "crates/reiwand-pipewire",
+    "crates/reiwand-video",
+    "crates/reiwand-mix",
+    "crates/reiwand-format",
+    "crates/reiwand-schedule",
+    "crates/reiwand-providers",
+    "crates/reiwand-scene",
+    "crates/reiwand-type",
+    "crates/reiwand-library",
+    "crates/reiwand-client",
+    "crates/reiwand-wayland",
+    "crates/reiwand-depth",
+    "crates/reiwand-audio",
+    "crates/reiwand-script",
+    "crates/reiwand-sync",
+    "crates/reiwand-editor",
+    "crates/reiwand-ktx2",
+    "crates/reiwand-rgb",
+    "crates/reiwand-palette",
+    "crates/reiwand-android",
+    "crates/reiwand-qr",
+    "apps/reiwandd",
+    "apps/reiwand-ctl",
+    "apps/reiwand-app",
+    "apps/reiwand-server",
+    "apps/reiwand-web",
+]
+exclude = ["vendor/naga"]
+
+[workspace.package]
+version = "1.0.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+rust-version = "1.99"
+repository = "https://github.com/reiwand/reiwand"
+
+[workspace.dependencies]
+reiwand-core = { path = "crates/reiwand-core" }
+reiwand-render = { path = "crates/reiwand-render" }
+reiwand-pipewire = { path = "crates/reiwand-pipewire" }
+reiwand-video = { path = "crates/reiwand-video" }
+reiwand-mix = { path = "crates/reiwand-mix" }
+reiwand-format = { path = "crates/reiwand-format" }
+reiwand-schedule = { path = "crates/reiwand-schedule" }
+reiwand-providers = { path = "crates/reiwand-providers" }
+reiwand-scene = { path = "crates/reiwand-scene" }
+reiwand-type = { path = "crates/reiwand-type" }
+reiwand-library = { path = "crates/reiwand-library" }
+reiwand-client = { path = "crates/reiwand-client" }
+reiwand-wayland = { path = "crates/reiwand-wayland" }
+reiwand-depth = { path = "crates/reiwand-depth", default-features = false }
+reiwand-audio = { path = "crates/reiwand-audio" }
+reiwand-script = { path = "crates/reiwand-script" }
+reiwand-sync = { path = "crates/reiwand-sync" }
+reiwand-editor = { path = "crates/reiwand-editor" }
+reiwand-ktx2 = { path = "crates/reiwand-ktx2" }
+reiwand-rgb = { path = "crates/reiwand-rgb" }
+reiwand-palette = { path = "crates/reiwand-palette" }
+reiwand-qr = { path = "crates/reiwand-qr" }
+qrcodegen = "=1.8.0"
+rqrr = { version = "=0.11.0", default-features = false }
+reiwand-web = { path = "apps/reiwand-web" }
+cxx = "1"
+cxx-qt = "=0.10.0"
+cxx-qt-lib = { version = "=0.10.0", features = ["qt_gui", "qt_qml", "qt_quickcontrols"] }
+cxx-qt-build = "=0.10.0"
+zeroize = "1"
+anyhow = "1"
+thiserror = "2"
+rustix = { version = "1", features = ["event", "fs", "mm"] }
+futures-util = { version = "0.3", default-features = false }
+zip = { version = "9", default-features = false, features = ["deflate"] }
+sha2 = "0.11"
+rusqlite = { version = "0.40", features = ["bundled"] }
+ulid = "3"
+base64 = "0.23"
+minisign-verify = "0.3"
+minisign = "0.10"
+semver = "1"
+tempfile = "3"
+chrono = { version = "0.4.41", default-features = false, features = ["std", "serde"] }
+jiff = { version = "0.2.38", default-features = false, features = ["std", "tzdb-zoneinfo"] }
+async-trait = "0.1"
+reqwest = { version = "0.13", default-features = false, features = ["rustls", "json", "query"] }
+webpki-root-certs = "1"
+tower-layer = "=0.3.3"
+tower-service = "=0.3.3"
+roxmltree = "0.21"
+percent-encoding = "2"
+wiremock = "0.6"
+tokio-rustls = { version = "0.26.6", default-features = false }
+rcgen = { version = "0.14.10", default-features = false, features = ["aws_lc_rs", "pem"] }
+x509-parser = { version = "0.18.1", default-features = false }
+mdns-sd = { version = "=0.21.5", default-features = false }
+lettre = { version = "=0.11.23", default-features = false, features = ["smtp-transport", "builder", "tokio1-rustls", "aws-lc-rs", "rustls-platform-verifier"] }
+gstreamer = { version = "0.25", features = ["v1_18"] }
+gstreamer-app = "0.25"
+gstreamer-video = { version = "0.25", features = ["v1_18"] }
+gstreamer-allocators = "0.25"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["float_roundtrip"] }
+serde_path_to_error = "0.1.20"
+schemars = "1.2.3"
+toml = "1"
+toml_edit = "=0.25.17"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "sync", "signal", "time"] }
+zbus = { version = "6", default-features = false, features = ["tokio", "service", "proxy"] }
+wgpu = "30"
+ash = "0.38"
+naga = { version = "30", features = ["wgsl-in"] }
+pollster = "1"
+bytemuck = { version = "1", features = ["derive"] }
+half = "2"
+ab_glyph = "0.2.32"
+fontdb = "0.24"
+woff2-patched = "0.4.0"
+brotli = { version = "7.0.0", default-features = false, features = ["std"] }
+brotli-decompressor = { version = "4.0.3", default-features = false, features = ["std"] }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp", "gif", "bmp", "hdr", "exr"] }
+jpeg-decoder = { version = "0.3.2", default-features = false }
+basisu = { version = "=0.1.0", default-features = false, features = ["std", "zstd"] }
+basisu_c_sys = { version = "=0.9.1", features = ["encoder", "extra"] }
+texture2ddecoder = "=0.1.2"
+pipewire = { version = "0.10", features = ["v0_3_65"] }
+clap = { version = "4", features = ["derive"] }
+rpassword = "7"
+dirs = "7"
+blake3 = "1"
+libc = "0.2"
+libloading = "0.8.9"
+smithay-client-toolkit = { version = "0.21.1", default-features = false, features = ["system"] }
+raw-window-handle = "0.6"
+jni = "0.22.4"
+ndk = { version = "0.9", default-features = false }
+ndk-sys = { version = "0.6.0", default-features = false }
+log = "0.4"
+wayland-backend = { version = "0.3", features = ["dlopen"] }
+wayland-scanner = "0.31"
+axum = { version = "0.8.9", features = ["multipart"] }
+hyper-util = { version = "=0.1.21", features = ["server-auto", "server-graceful", "service", "http1", "tokio"] }
+maud = { version = "0.27", features = ["axum"] }
+argon2 = "0.6"
+getrandom = "0.4"
+tokio-util = { version = "0.7", features = ["io"] }
+x11rb = { version = "0.14", default-features = false, features = ["dl-libxcb", "randr", "shape"] }
+ort = { version = "=2.0.0-rc.15", default-features = false, features = ["std", "load-dynamic", "cuda"] }
+flate2 = "1"
+tar = { version = "0.4", default-features = false }
+realfft = "3.5"
+rtrb = "0.4"
+rquickjs = { version = "0.14", features = ["loader"] }
+rquickjs-sys = "0.14"
+chacha20poly1305 = "0.11"
+hkdf = "0.13"
+hmac = "0.13"
+hpke = { version = "0.14.1", default-features = false, features = ["alloc", "x25519", "chacha", "hkdfsha2", "getrandom"] }
+
+[patch.crates-io]
+naga = { path = "vendor/naga" }
+
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false
+
+[profile.dev.package.basisu]
+opt-level = 2
+
+[profile.dev.package.basisu_c_sys]
+opt-level = 2
+
+[profile.release]
+lto = "thin"
+codegen-units = 4
+strip = true
+
+[profile.dev.package.scrypt]
+opt-level = 3
+
+[profile.dev.package.argon2]
+opt-level = 3
+
+[profile.dev.package.blake2]
+opt-level = 3
+
+[profile.dev.package.rustfft]
+opt-level = 3
+
+[profile.dev.package.rquickjs-sys]
+opt-level = 2

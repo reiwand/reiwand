@@ -1,0 +1,2633 @@
+# Scene format
+
+A scene package is a `.wpak` package (see `package.md` for packages and their manifest, `repo.md`
+for repositories) whose manifest has `"kind": "scene"` and `"entry": "scene.json"`. The scene
+lists its assets by package path; every path must be in the package. `reiwand-ctl pack build` and
+every reader check the scene: unknown fields, broken references and out-of-range values are refused
+with the JSON path of the field, such as `/layers/2/effects/0/params/radius is 300, expected
+0..=128`. The model lives in
+`crates/reiwand-scene`; `reiwand-ctl scene bench <file.wpak>` renders a package offscreen and reports
+what each frame costs, how long the scene takes to load and draw its first frame, and the GPU and
+main memory it holds (`--screens 2` shows it on two screens at once; `--passes` times each render
+pass with GPU timestamps, where the GPU has them inside command encoders, every 15th frame, and lists
+the passes from the dearest, the passes of each 3D group among them (`3d shadow maps`, `3d depth for
+particles`, `3d models` and `3d second camera and cross-fade`, with the size of the group's picture), as the performance report of the phone does; `--shot frame.png` saves
+the last frame, so two builds can be compared picture by picture; `--quality auto` steers the level
+by measured GPU time as the phone does, starting where the phone would and listing every step;
+`--paced 30` renders in real time at `--fps` for 30 seconds, with at most two frames on the GPU like
+the swapchain of the phone, and reports the rate it held and the slots it missed; it does not time
+the particle steps apart, so the CPU never waits for the GPU there). The same bench runs on a phone:
+`scripts/phone-bench.sh build` cross-compiles the `bench` example of `crates/reiwand-android` for arm64
+(or x86_64 for an emulator with `REIWAND_ABI=x86_64`) with the NDK and the same path remaps as the Gradle build of the app, so both share one cache, `copy FILE.wpak...` copies it and the packages to
+`/data/local/tmp/reiwand-bench` (nothing else on the phone is touched and no app is installed), and
+`run NAME.wpak --level q3 --passes` or `--level auto --paced 30` (with `--pace smooth`, the
+automatic level never halves the rate; `detail`, the default, as `playback.auto_pace`) loads the package the way the
+live wallpaper does (phone limits, properties, tier from its GPU, 1440x3040 unless `--size` says
+otherwise) and prints the report as JSON with the battery temperature and thermal status before
+and after. The serial of the phone comes from `REIWAND_ADB_SERIAL`; each run waits while the screen is
+on (five-minute checks, `REIWAND_AWAKE_TRIES` of them) and until the battery is under `REIWAND_COOL`
+degrees (36 by default).
+
+```json
+{
+  "schema": "reiwand.scene/1",
+  "canvas": { "size": [1920, 1080], "fit": "fill", "background": "#0b1020", "blend_space": "linear" },
+  "clock": { "max_fps": 60, "poster_time": 3.0, "seed": 42 },
+  "assets": { "sky": { "path": "assets/sky.png" }, "mono": { "path": "assets/mono.ttf" } },
+  "layers": [
+    { "id": "sky", "type": "image", "image": { "prop": "style", "map": { "night": "sky" } },
+      "effects": [{ "effect": "waves", "mask": { "texture": "lake" }, "params": { "amplitude": 4 } }] },
+    { "id": "clock", "type": "text", "font": "mono", "size": 96, "text": { "clock": "HH:mm" },
+      "anchor": "bottom_right", "transform": { "position": [-64, -64] },
+      "opacity": { "timeline": "intro", "keys": [[0, 0, "out_cubic"], [1.5, 1]] } }
+  ],
+  "timelines": [{ "id": "intro", "duration": 1.5, "loop": "once" }]
+}
+```
+
+## Canvas, clock and assets
+
+- `canvas.size` is the reference size in pixels (`1..=16384`); coordinates have their origin at
+  the top left and angles are clockwise degrees. `fit` places the canvas on each screen (`fill`,
+  `fit`, `stretch`, `center`). `background` is `#rrggbb[aa]`.
+  `blend_space` is `linear` (default) or `srgb`, which mixes encoded values as most editors do.
+- `clock.max_fps` caps the frame rate (`1..=240`, or `"display"`, also `0`, to follow the refresh
+  rate of each output for motion that gains from it; default 60), `poster_time` is the instant
+  shown where motion is not wanted or where the device cannot run the scene even at its lowest
+  quality level, and the one drawn as the library thumbnail of a package without a preview picture (with clocks and
+dates at the local time it is drawn), `seed` feeds procedural effects; `"seed": null` picks a new seed each time the
+  scene starts, so its random patterns differ every time (`fresh_seed`, which every platform runs).
+  Reaching an instant far into the scene (a poster or a held preview, up to a day) runs the
+  timelines, videos and bones step by step but poses the bones every step only in the last 10
+  seconds (before that, once every 10 minutes), so the
+  springs of the bones settle as they would after a long pause; a looping timeline keeps its place
+  exact however long it plays.
+- `assets` maps at most 256 ids (`[a-z0-9_]{1,32}`) to `{ "path", "linear", "atlas" }`. Images
+  (PNG, JPEG, WebP, GIF, BMP), fonts (TTF, OTF), videos (WebM, MP4, MKV, stored uncompressed),
+  sounds (Ogg Vorbis, Opus, FLAC or WAV, see "Sound") and color lookup tables (`.cube`,
+  `LUT_3D_SIZE` 2 to 65, domain 0 to 1, at most 16 MiB each and 64 MiB of table data per scene; a
+  file named by several ids is read once) are used.
+  `linear` marks data images such as depth or flow maps, which are read without color decoding.
+  `scene.json` is at most 8 MiB and the images of a scene at most 512 MiB once decoded.
+
+The fields below came after the first version of the scene format. Each one names a feature of
+`requires.features` (the table in `package.md`), which `reiwand-ctl pack build` fills in; an engine
+that cannot draw a feature yet refuses the whole package with `this package needs a newer version
+of Reiwand: it uses the feature …` instead of drawing it wrongly or leaving it out, and keeps
+its thumbnail and details in the library. Scenes without them read and draw as before.
+
+| `canvas` field | Meaning | Feature |
+|----------------|---------|---------|
+| `parallax` | `{ "amount" (0 to 4, default 1), "delay" (0 to 2 s, default 0.15), "pointer" (0 to 1, default 1), "offset" ([x, y], −1 to 1 each, default [0, 0]), "gyro" }`; `amount`, `pointer` and `offset` may be bound like any value, so a property, a timeline or the sound may move the parallax while the pointer still moves it too (`parallax_values`): how far and how softly layers with a `parallax` follow the pointer, how much the pointer counts and whether the tilt of the phone moves them too (on Android, through the same motion sensors as picture parallax, only while the scene is shown; the phone has no pointer, so there every scene with parallax layers follows the tilt as if `gyro` were on, or the launcher pages when the phone has no motion sensor, and neither moves them with the battery saver on); `pointer: 0` needs no pointer; a layer moves by its `parallax` times the canvas size times `amount` times the offset of the pointer from the middle (−0.5 to 0.5) times `pointer`, plus half the tilt and half the `offset`, so `offset` `[1, 0]` moves layers as the pointer at the right edge would; scripts may set `amount`, `delay`, `pointer` and `offset` of `scene.parallax`; where the system asks for reduced motion, layers stay in place and neither the pointer nor the tilt moves them | `parallax2` |
+| `camera` | `{ "center", "zoom" (0.1 to 10), "rotation", "shake" }` moves, zooms and turns the whole scene as one transform without extra passes: the point `center` of the canvas (its middle by default) shows at the middle, `zoom` times larger and turned clockwise by `rotation` degrees; `shake` is `{ "enabled", "amplitude" (0 to 1000 px), "roughness" (0 to 1), "speed" (0 to 60 Hz) }`, a smooth noise of the scene time (four octaves, each weighed by `roughness` against the one before) that moves the scene by at most `amplitude` pixels and asks for a frame every frame while it runs; it is turned off where motion is reduced and at the lowest quality level, and the scene then stands still; all of them may be bound | `camera` |
+| `bloom` | `{ "threshold" (0 to 4), "strength" (0 to 8), "radius" (0 to 128 px), "tint", "hdr": { "threshold" (0 to 16), "strength" (0 to 8) } }`, a glow of the bright parts drawn after everything else, with the `bloom` effect and its `tint` over the whole canvas, as an adjustment layer at the top would; the `hdr` threshold and strength replace the plain ones at level `q3`, and at `q2` on mains power; it costs like that effect (the bright parts at half size, the blur at a quarter, and the glow added onto the canvas by blending, without a copy of the canvas), is dropped where the effect is, is left out while its strength is zero and is drawn only when something below it changed | `bloom` |
+| `hdr`, `tonemap` | `hdr: true` keeps colors brighter than white in 16-bit intermediate images (in either blend space, on every tier and on phones, wherever the graphics card can draw and blend them; cards that cannot keep 8 bits and still apply the tone map) and draws models in 16 bits, and `tonemap` (`none`, `aces` or `agx`, only with `hdr`) maps them to the screen in one last pass at every quality level; `none` keeps the picture of a scene without `hdr`. On a screen with HDR output (`playback.hdr` in `dbus.md`, `COLOR_MODE_HDR` and an extended-range surface on phones with Android 14 or later) the last pass keeps 16 bits and, instead of `aces` or `agx`, bends what is brighter than 0.8 of white softly toward the peak of that screen (its brightest white over its reference white), keeping hue and midtones; `none` passes the colors on | `hdr` |
+| `clear` | `false` draws every frame over the previous one, which leaves trails: the canvas is filled with `background` only when the view starts or changes size, and no layer is kept as a still picture; each frame that changes is drawn whole instead of only the part that changed, so it costs more | `keep_frame` |
+| `perspective` | distance of the viewer in pixels (100 to 100000) for layers tilted with `transform.tilt` and moved with `transform.z`; without it the distance at which the canvas height fills the `fov` of `camera3d`, or 45° | `tilt` |
+| `ambient`, `sky` | colors of the light around the scene and from above, for lit layers | `ambient_light` |
+| `wind` | `[x, y]` pixels per second, may be bound: the wind that moves bones with `physics` and models with the `foliage` material | `bone_physics` |
+| `gusts` | 0 to 1 (0.35 when unset): how much of `wind` comes and goes in gusts, from a steady wind at 0 to one that drops to nothing between gusts at 1 | `bone_physics` |
+
+The scene may also set `audio: { "attack" (0.001 to 2 s), "release" (0.01 to 10 s), "gain": "auto" |
+"fixed" }`, how fast audio values rise and fall and whether they follow the system volume
+(`fixed`) or adjust themselves (`auto`, the default) (`audio_response`).
+
+| Asset field | Meaning | Feature |
+|-------------|---------|---------|
+| `filter` | `linear` or `nearest` (sharp pixels) sampling of a picture | `texture_options` |
+| `wrap` | `clamp`, `repeat` or `mirror` outside the picture: with `repeat` or `mirror`, an `image` layer whose `size` is larger than the picture (or than one frame of a sheet) fills it with copies at the picture's own size instead of stretching it | `texture_options` |
+| `mipmaps` | `true` or `false` overrides whether smaller copies are made for pictures drawn smaller than they are; by default they are made once, the first time a picture is drawn at less than three quarters of its size | `texture_options` |
+| `atlas`, `rects` | a sprite sheet as `[rows, columns]` of equal cells (as for particles) or as at most 256 `[x, y, width, height]` rectangles in pixels, not both | `animated_textures` with the fields below |
+| `frames` | how many cells play (1 to the number of cells, at most 256) | `animated_textures` |
+| `fps`, `durations` | 0.1 to 120 frames a second, or one duration per frame (0.001 to 60 s), not both | `animated_textures` |
+| `animated` | `true` plays the frames of an animated GIF or WebP with their own durations (at most 256 frames and 64 MiB once decoded; a frame shorter than 20 ms lasts 100 ms, as in browsers) | `animated_textures` |
+| `face` | which font of a `.ttc` or `.otc` collection (0 to 255) | `fonts2` |
+| `media` | `current` or `previous`: the cover of what the media player plays now or played before, usable wherever a picture is; `path` is then the picture shown while nothing plays | `media_info` |
+| `shapes` | on a `.glb`, at most 64 blend shapes sculpted beside the model, each name of a shape to the path of its file (`WPSH`, then the version 1 and the count as 32-bit little-endian numbers, then per vertex its node and primitive as 16-bit numbers, its vertex as a 32-bit number and the change of its place and normal as six 32-bit floats, in the space of the primitive); a model takes them as blend shapes of the file, animated or not (a still model that has any is posed), with the weight 0 until `shapes` or keys set one; the bytes of the files count in the 128 MiB of meshes of a scene; a name the file already has is refused | `model_animation` |
+
+An `image` layer that shows a sheet plays its frames on the scene clock, so that every layer showing
+the same sheet at the same rate shows the same frame; its `playback` sets the rate, the range, whether
+it loops and the frame (`layer_playback`). A sheet without `fps` or `durations` shows its first frame. The scene asks for a frame only when the next frame of a shown
+sheet is due, never while the layer is hidden, and the lowest quality level shows the first frame of
+the range without moving.
+
+Each picture is decoded once and uploaded once per GPU, and every screen that shows the scene
+draws from that one texture. Once a picture is on the GPU its decoded copy leaves main memory; the
+engine reads it again from the package only when no screen holds the texture any more. Every
+shader and pipeline a scene needs is built when the scene loads, never during a frame, and a frame
+hands the textures of a finished layer to the next layer that needs one of the same size, so a
+steady frame creates nothing and makes no allocations of its own. Evaluating a frame allocates
+nothing either: `Runtime::frame_in` takes the lists of the previous frame back (`Frame::spare`).
+On the phone a scene script that changes layers each frame still makes a few allocations per changed layer
+on the drawing thread (the copy of its answer and the layer names it reads back: about 15 a frame for the
+four planets of the `orbits` example); the phone test bounds them at 16 a frame.
+
+Each video asset has one decoder, shared by every layer, mask and effect that shows it on every
+screen. The first layer of the scene that shows the asset, as a `video` layer or as the picture of
+an `image` layer, steers it with its `playback`: `rate` (a video plays from 0.1 to 4 times, and its
+time, its end and what scripts read follow the rate it plays at; 0 holds the video), `playing`,
+`loop` (on by default), `start` and `end` in seconds. The time of a video runs on the scene clock
+while it plays and something shows it: a video that no visible layer, mask or effect shows waits
+where it is and its decoder pauses, as for a paused or finished video, and none of them asks for
+frames. Without `loop` the video stops at `end`, or at its own end (read from the header of its
+WebM, MKV or MP4 file), and tells scripts. On battery its decoder runs no faster than the frame rate
+of the scene, which `clock.max_fps` caps. On the phone the decoder is the platform's MediaCodec,
+through the system player, which plays only the part between `start` and `end`.
+
+Fonts may also be TrueType or OpenType collections (`.ttc`, `.otc`) and compressed `.woff2` files
+(`fonts2`). Videos may be used as masks, effect textures and the picture of a spot light
+(`video_textures`), and wherever a picture is; sounds may also be MP3 (see "Sound"). Pictures may
+also be KTX2 textures (`ktx2`, see "KTX2 textures"). Meshes and models are binary glTF 2.0
+files (`.glb`, at most 64 MiB each; FBX or OBJ convert to it with common 3D tools): readers read
+only the header and the JSON part of each file once (at most 4 MiB, and 16 MiB for all the models
+of a scene), refuse files that load anything from outside themselves or require an extension other
+than `KHR_materials_emissive_strength`, `KHR_materials_unlit`, `KHR_mesh_quantization` and
+`KHR_texture_transform` (model layers draw the offset, rotation, scale and `texCoord` of each map,
+read the first two sets of texture coordinates, `TEXCOORD_0` and `TEXCOORD_1`, and sample each
+texture with the wrap (repeat, clamp or mirror) and the filters (nearest or linear, with or
+without mipmaps) of its sampler; the editor warns about a map that reads a third set, drawn with the
+first), skins of more than 256 bones, more than 64 blend shapes per primitive,
+more than 65 536 nodes or 4096 meshes, materials, animations or skins, more than 262 144 list
+entries for all the models of a scene (buffer views have a cap of their own, 262 144 per file, and
+do not count there), pictures shown by textures whose distinct byte ranges together pass the size
+of the file (pictures no texture shows are never read, and a model keeps its pictures as ranges of
+the file it read instead of copies) and more than 2 000 000 triangles, and read the names of its nodes (attachment points), skin joints
+(bones), meshes (parts), materials, blend shapes (`extras.targetNames`, or `shape_<n>`) and
+animations with their length, against which every name the scene gives is checked. Unnamed
+elements are called `node_<n>`, `mesh_<n>`, `material_<n>` and `animation_<n>`.
+
+
+### KTX2 textures
+
+A picture asset may be a `.ktx2` file holding a Basis Universal texture: ETC1S, UASTC or XUASTC of
+low dynamic range, or UASTC HDR (4 × 4 or 6 × 6) of high dynamic range; one picture, an array of
+up to 256 frames (layers, or the frames of an ETC1S video) or a cube map of six square faces; at
+most 16 384 pixels a side, 15 levels and 256 MiB. Once read, the engine transcodes it to the
+compressed format the graphics card reads best: BC7 on desktop cards, ASTC 4 × 4 on most phones,
+ETC2 on older phones, and uncompressed RGBA where none of them is offered. An HDR texture keeps its
+light past white: BC6H on desktop cards, ASTC HDR where the card reads it and half floats
+elsewhere; it gains range on canvases with `hdr` and is clamped at white on others and wherever
+the CPU reads it. The frames of an array are laid out in a grid of ⌈√n⌉ columns, the same grid as
+an animated GIF: `atlas` and `playback.frame` pick one, and `animated: true` plays them with the
+frame times of the file: the own time of each frame under the key `reiwandFrameTimes` (a 32-bit count of milliseconds per frame, written when the frames differ), else the one of `KTXanimData` (1/24 s without one). A cube map becomes an equirectangular
+panorama twice as wide as high (`+Z` in the middle, `+Y` up, `+X` to the right), uncompressed, so it
+fits wherever a panorama does, such as the `env` of `lighting`. A side that is not a multiple of 4
+pixels stays compressed: the texture is padded to whole blocks and every reader of the picture samples only the real pixels:
+layers, sprite frames, particles, the masks of layers and effects, normal, roughness and emissive maps,
+reflections and projected pictures through its crop, and molds, meshes, the maps of particles, the
+reflections of models and the textures of effects through an uncompressed copy of the real pixels; the mipmaps whose blocks no longer line up with the
+padded texture are left out, and the frames of an array whose sides are not a multiple of 4 are
+kept uncompressed. The levels of the file are its mipmaps: the first level no larger than the largest texture the card
+takes is drawn, `mipmaps: false` keeps only that one, and a file of one level is mipped like any
+other picture. `linear`, `filter`, `wrap`, `atlas` and the frames of a sprite sheet apply as to
+other pictures. The file stays packed in memory and only becomes plain pixels
+when the CPU needs them (pointer tests against its alpha, particles shaped by it), so a scene of
+KTX2 pictures takes about a quarter of the video memory of the same pictures in PNG. The 512 MiB that
+the pictures of a scene may take once decoded counts them as uncompressed, as on cards that get
+RGBA. Picture packages may use a `.ktx2` entry too; it is shown uncompressed, and an HDR one keeps its light above white on screens with HDR output (`playback.hdr` in `dbus.md`) unless it has photo edits.
+
+KTX2 files are made where scenes are made: Convert to KTX2 in the desktop editor and `reiwand-ctl
+scene asset --ktx2`, with the Basis Universal encoder: a picture becomes a texture, an animation an array
+that keeps the delay of each frame, a Radiance `.hdr` or OpenEXR `.exr` picture (pictures of a scene too,
+drawn on the desktop and the phone with their light clamped at white and encoded in sRGB, so that they look as their KTX2 texture does, or kept as plain values when the asset is `linear`; six faces that mix such pictures with 8-bit ones take the 8-bit ones as sRGB light) a UASTC HDR texture, and a panorama or six square faces a cube map. The phone only reads them: it has no scene
+editor, and its app carries the transcoder written in Rust but not the C++ encoder, which would add
+a C++ toolchain to the phone build and several megabytes to the app for a tool it has no screen
+for. Packages made on the desktop play on the phone with the same files.
+## Cost and frame rate
+
+The engine estimates what each frame of a scene costs before it draws it, without the GPU. A unit
+is one full-screen pass that reads one texel per pixel. Each layer adds the units of its effects
+(taps × passes × scale², at the size the quality level gives them), one unit when it is drawn
+apart (effects, masks, `cache`, blend modes that are not `normal`, `add`, `multiply` or `screen`)
+and two more when its blend mode copies what lies below it, all multiplied by the share of the
+canvas the layer is drawn over. That share is the area the effects actually cover, clipped to the
+canvas: an adjustment layer covers its whole target (the canvas, or its group, which an adjustment
+layer widens to the canvas) whatever `size` it declares; a group covers the bounding box of its
+layers, not the sum of their areas; any other layer covers the box around its `size` (an image or
+video without one, text, particles and lights count as the whole canvas) moved, turned, skewed and
+scaled by fixed transforms of its own and its groups, grown by the `reach` of its effects. A layer
+whose place can change while it plays (a bound or animated `position`, `rotation`, `skew` or
+`scale`, a `tilt`, an `anchor`, `parallax`, a `parent`, an `attach`, a bound `reach`, or any script
+in the scene) counts as the whole canvas. A
+layer that masks or feeds others adds one more unit times its share, once however many read it,
+since it is drawn on its own at most once a frame. Particles add their overdraw, `canvas.bloom` adds the units of its effect over the whole canvas, a
+`canvas.camera` makes every layer count as the whole canvas, and every frame costs 1.5 units for composing and copying.
+An image, video or mesh layer with effects runs them at the density of its picture: its target holds
+at most one texel of the picture per pixel of the screen, so a picture that the screen magnifies
+(a 2560×1440 canvas filling a 1440×3040 phone shows each texel on 2.1 pixels) runs its effects on
+its own texels and the composite scales the result up, as it scales the picture itself. At Q3 an
+image that is neither turned nor stretched lines its target up with its texels, so the picture is
+copied as it is and only the effects change; a turned image or a mesh keeps one and a half times
+that density. Lower levels multiply the density by 0.75 at Q2, 0.6 at Q1 and 0.5 at Q0, also on a
+screen that does not magnify the canvas. The canvas itself renders at full size at Q3 and half size
+at Q0; at Q2 it renders at one pixel per canvas unit, between three quarters and full size, and at Q1
+at 0.85 pixels per unit, between 0.6 and three quarters, so a screen that magnifies the canvas draws
+fewer pixels that hold no more detail. The cost counts each such layer at that density, from the
+magnification of the screen (pixels per canvas unit), the fixed scale of the layer and one texel
+per unit of its `size`. A scene
+that costs more at level `q2` than the 8 units of older integrated and phone GPUs gets a warning
+from `reiwand-ctl pack check`, `pack build` and the scene editor, since those devices show it with
+fewer details. The quality level is the highest whose cost fits the budget of the device: 4, 8, 16
+or 40 units for the tiers of software rendering or GPUs without compute shaders, older integrated
+and phone GPUs (Intel HD and UHD, AMD Vega and other older APUs, Mali-G up to G710, Adreno 5xx and
+6xx, or less than 4 GiB of memory), newer integrated GPUs and discrete GPUs. With the automatic choice, a scene over budget at the
+lowest level stays at `poster_time`.
+
+The tier starts from the model of the graphics card, as above. The first time a program renders
+scenes with a graphics card and driver, it times a short render: frames of 16 passes over a
+1920×1080 target, each reading a texture of that size, for about 300 ms, and the time of a unit is
+taken from the fastest quarter of the frames. A unit of at most 0.2 ms gives the tier of discrete
+GPUs, 0.5 ms that of newer integrated GPUs, 2 ms that of older integrated and phone GPUs, and slower
+ones the lowest tier; the measure moves the tier of the model by one step at most, up or down, and
+less than 4 GiB of memory or textures smaller than 8192 pixels still cap it.
+Software rendering and GPUs without compute shaders keep the lowest tier without a measure. The
+result is kept in `gpu-tier.json` in the state folder (`$XDG_STATE_HOME/reiwand/`, shared by
+the daemon and `reiwand-ctl scene bench`) or in the files of the phone, with the name, ids and backend
+of the adapter and the version of its driver, and it is measured again when any of them changes.
+The file keeps the last card at its top level and up to seven other cards in `others`, so a
+computer that switches between two cards (`render.gpu` in `dbus.md`) measures each of them once.
+A measure that lowered the tier, which a busy start can cause, is taken again on the next starts,
+three times in all, and the fastest one counts (`runs` in the file).
+`GetState().tier` (`"t0"` to `"t3"`) and `tier_measured` tell the result, and the phone lists it
+among its diagnostics. A phone takes the tier of its GPU and this measure, at most that of newer
+integrated GPUs, and the lowest tier when Android marks it as a low-memory device. Its settings can
+record the performance of the shown wallpaper: while that switch is on, each frame that the home
+or the lock screen presents while it is visible (never a preview) keeps its time, the delay of its
+callback after the vsync, the time of the whole frame loop, the processor time of the scene, of
+encoding and of presenting, its GPU time, passes, draws, allocations and the refresh rate of the
+display, and every 15th frame times each pass, as `reiwand-ctl scene bench --passes` does. A button
+copies a report of the last 30 seconds for the screen shown last: it gives the frames presented,
+the seconds the screen was shown (from the moment it became visible to the moment it was hidden,
+while any engine showed it) and the seconds it was animating (between frames of the same run,
+since hiding the wallpaper starts a new run), and the rate both per second shown and per second
+animating, so a wallpaper that stays still while shown lowers the first one. It also gives the level, its
+reason, the render and screen sizes, the rate, its cap and the present mode. With the switch off a
+frame costs one atomic read and nothing is measured.
+
+While a scene plays, the GPU time of its frames (measured as described below) moves the quality
+level. The desktop daemon and the phone steer by measured time alone, with the same controller
+(`Pilot` in `crates/reiwand-scene/src/pilot.rs`): its ceiling is `q3` (one step under the tier level
+with power saving, lower while warm or hot, and never above the `cap` of the package), and the
+level the cost model fits is only where it starts, before any frame is measured. On the desktop
+the level never rises on battery, with power saving or while the GPU or CPU is warm, and the
+reason stays the one of the start (`battery`, `saver` or `heat`) while the level holds there; the
+phone also rises on battery. It keeps the GPU times of the last 32 frames and,
+from the 12th on, averages those between half and twice their median, so a few spikes do not
+count, against the frame interval of the rate it plays at (the user's cap or the display rate).
+When the average stays over 85 % of the interval for 2 seconds the level goes one step down; when
+it stays under half of the interval for 6 seconds (once the level above was measured: when the
+average times the ratio measured there fits three quarters of the interval), one step up, unless the power source, power saving or heat hold it. Two changes are at least 5 seconds apart, the window
+starts again after each, and a step up that comes back down within 30 seconds doubles the wait for
+the next one, up to four times; one that holds for 30 seconds halves it again, so a level measured
+too dear is not tried again while the scene costs the same. Under `auto` a scene whose frames take
+more than twice the interval at the lowest level for 2 seconds stays at `poster_time` until the
+choice changes or the scene is loaded again, with the notice of a still scene (`quality_auto` is
+`still`): on the phone the cost model never stops a scene, only the model triangle limit and that
+measurement do; the desktop also keeps still a scene whose estimate at `q0` is over the budget of
+the tier. The phone settings, the app, the tray and `reiwand-ctl quality` (from `GetState`, see `dbus.md`) show the measured average
+against the interval and the last decision (`model`, `steady`, `climbed`, `dropped`, `top`, `held`,
+`still`, `halved` or `doubled`), and `--quality auto` of `reiwand-ctl scene bench` and `--level auto`
+of the phone bench report the same under `auto` (`frame_ms`, `period_ms`, `step`, `still`, `pace`,
+`pace_fps` and every change of level or pace). The pilot decides a pair, the level and a pace
+divisor, and the interval it judges is the one of the pace in use. The divisor is 1 (the pace of
+the user's cap or the display) or 2 (half of it: 30 frames a second on a 60 Hz display), and the
+pace never goes under 30 frames a second, so a cap under 60 stays whole. With `playback.auto_pace`
+at `detail`, the default, a level above that does not fit the whole interval, but whose predicted
+average fits three quarters of the doubled one, is climbed to at half pace; a level at half pace
+that averages under half of the whole interval for 6 seconds goes back to the whole pace before
+any level goes up; and an overload halves the pace before it drops a level while the level is above
+`q0`, and drops a level once the pace is already halved. `smooth` never changes the pace. The same
+waits, cool-downs and bounce guards apply to the pace (a pace that flips again within two minutes
+doubles the wait before it returns to whole, up to four times), a level the user fixes never
+changes its pace, and the user's cap bounds it (half pace halves the cap). On the phone the halved
+pace presents every second vsync of Choreographer, the skipped ones do no work, and the measured
+time stays the GPU time of each frame drawn; on the desktop the halved pace halves the rate the
+daemon schedules the frames of that output at. The frame rate otherwise never depends on the level
+(60 on battery unless the user sets another cap). It
+presents through three swapchain images (latency 2), so the GPU draws a frame while the next one is
+recorded.
+Two changes are at least 5 seconds apart. The quality only moves on devices that time their frames,
+which all do, with timestamps or by waiting (see below). `GetState().outputs[x].quality` and
+`quality_reason` tell the level and why it is below the highest; the app, the tray and the phone
+show both, translated.
+
+The user can take the level out of these hands with `playback.quality` (see `SetOption` in
+`dbus.md`): `auto`, the default, is everything above; `q0` to `q3` fix the level, and `min-q1` or
+`min-q2` keep the automatic choice but never let it go below that level. A level the user sets
+always holds, also on battery, with power saving, while the device is warm and when the scene costs
+more than the tier holds: only the frame rate still follows the tier, the power source and the
+temperature, so a heavy scene shows fewer frames a second instead of fewer details. Above a floor,
+the automatic choice and the GPU time of the frames move the level as usual. The reason is then
+`user`, and when the frames measured at the chosen level take more than 85 % of their interval
+(before 12 frames are measured: when the level costs more than the budget of the tier) the app
+(next to the quality choice in the settings and on each screen that shows the scene), the tray, the
+phone (under its quality setting) and `reiwand-ctl quality` and `reiwand-ctl state` warn: the measured
+time against the interval and the rate it allows (or the cost against the budget), that frames may
+drop and battery use rise, and whether the automatic choice would lower the level or keep the scene
+still. Frames measured to fit silence the estimate. Only the automatic choice stops a scene: a scene
+over budget even at the lowest level (on the desktop), one measured far too slow there, or with more
+model triangles than the
+tier draws, stays at `poster_time` under `auto`
+and plays at the chosen level under `q0` to `q3`, and at the floor (or higher, when it fits) under
+`min-q1` and `min-q2`; clients say so too, and for a scene heavy only in model triangles, whose
+cost fits, they warn that it draws more model triangles than the device holds and that the
+automatic choice would keep it still. Only the hard limits that protect memory and the driver
+stay with every choice: the model data and triangles a scene may load, texture sizes, and the
+effects left out by the hard budget below or after they stopped the GPU, which the warning counts.
+The phone keeps its own value, and stopping on battery saver or at a critical temperature still
+stops it.
+
+Every view of a scene also holds a hard budget, whatever the quality level: each effect use, built
+in or packaged, does its units (at the highest level, four times for an effect with a `state`, which
+may run four steps a frame) times the share it covers times the megapixels drawn, at least half a
+unit, and the uses together may do at most 2 000, 4 000, 8 000 or 16 000 of those units a frame on
+the four tiers; at most 16 uses with a `state` may run in a scene. The engine adds the uses in the
+order of the layers, a group before its layers, and leaves out each use that does not fit with
+`the effect <id> on <layer> was left out: the effects of the scene would do more than <limit> units
+of work a frame on this GPU` (or `... the scene has more than 16 effects that keep a state`). When
+the scene loads, before it builds anything, it leaves out only the uses that cannot fit at any size
+(past the 16 stateful uses, or past the limit at half a unit each), so a package effect whose uses
+are all left out is never built; it counts the work whenever the size a view draws at changes, at
+that size and over the part of the canvas the screen shows, so a large canvas shown on a small
+output keeps the effects that fit there. The state textures of all uses together may hold at most
+512 MiB, beside the 512 MiB of textures a frame may borrow; a use whose state would go past it is
+left out with `its state textures would take the scene past 512 MiB`. A frame may borrow at most
+512 MiB of textures, or four full frames of the output if that is more, and a view holds at most
+1 GiB of textures in all, or its states, its cached layers and its target plus the frame's share
+and two full frames more if that is more (so an 8K output keeps its effects): before it makes
+another texture it drops the ones it used longest ago, then the cached layers this frame has not
+drawn, and a use whose texture still does not fit is left out with `its textures would take more
+than the <n> MiB of textures this view may hold` (or `... a frame may borrow`). Layers draw into textures
+whose sides grow in steps of an eighth of a power of two (at least 64 pixels), so a zooming layer
+reuses a few sizes. The first pass that writes a target of a package effect clears
+it as it draws instead of in a pass of its own, and an adjustment layer reads what is below it
+directly instead of a copy. `reiwand-ctl scene bench` prints these notes after its
+numbers.
+
+On GPUs that draw in tiles, as those of phones do, every render pass costs a fixed share of the
+frame on its own, about a millisecond on a phone at 60 Hz, more than its pixels or the size of its
+texels do, so the engine draws fewer of them there. The first effect of an image, video or mesh
+layer reads the picture where it lies, through the mapping between its target and the layer, instead
+of a copy of the layer drawn first into a target of its own; it does so when that effect is a single
+pass that reads only the previous result (a fused chain of built-in effects, or an effect without a
+state, render targets, a copy, a blend of its own or a mix by its mask), no effect of the layer
+reads `input` or `source`, and the layer has no mask, light, tint or brightness of its own, is not
+turned in 3D, shows its whole picture without tiling and blends in linear space. A hidden mesh layer
+placed and sized like the layer whose effect it masks or feeds is read from its posed mesh instead
+of being drawn into a target for that effect. The picture is then resampled once instead of twice,
+which changes only the softness of its edges. Effects that fuse into one pass (`fs_chain`) stay
+fused when the quality level leaves out an effect between them, on every GPU.
+
+A frame reaches the GPU in one submission: posed meshes, molds, 3D models and the particle
+simulation are recorded with the passes of the frame instead of being sent on their own, so the
+frame time that the quality levels and `reiwand-ctl scene bench` read covers them too. Mesh layers
+that share a rig, a pose, a size and the size of their target, without relief, clipped parts or a
+video, are posed together in one pass with one target each, up to four. Layers that blend with
+`add`, `multiply`, `screen` or `exclusion` use the blend unit of the GPU; every other mode
+(`lighten`, `darken`, `overlay` and the rest) reads what lies under the layer from a copy, which
+ends the pass of its target and starts another, about a millisecond on a phone for each such layer
+at the top of the canvas. No fixed blend gives `lighten` or `darken` exactly for a partly
+transparent layer, so an author counting passes on phones gets more from `add` or `screen` when the
+look allows it.
+
+On battery the level drops one step, which lowers resolution and effects, not the rate: the rate
+follows the display up to 60 frames per second unless the user chose a rate (`playback.max_fps`,
+on the phone its rate on battery, 60 by default), which then holds as on mains power; power saving
+(the `power-saver` profile on Linux, battery saver on Android) drops one step more and caps
+`display` at 30. A GPU or CPU within 20 °C of its critical temperature (95 °C when its driver
+reports none) drops one level and caps the rate at 30; within 10 °C, or once the system starts
+throttling it, it falls to the lowest level and 15 frames per second. Other sensors, such as
+drives, memory or network cards, do not count, and GPUs whose driver exposes no sensor are not read. Where the system asks for
+reduced motion, the scene stays at `poster_time`: parallax, camera shake and timelines stop, and
+the frame is drawn again only once a minute, so that clocks and dates stay right.
+
+Each frame redraws only what changed: the layers that moved, appeared, disappeared or changed,
+both where they were and where they are, plus adjustment layers with effects that read around a
+pixel when a change reaches them. When that covers less than half of the screen, the rest of the
+previous frame is kept; when nothing changed, nothing is drawn, and on the desktop the frame is not
+composed onto the screen or sent to a stream either, unless a stream would otherwise go without
+frames. Layer masks that use other layers redraw everything. Particles count as changed only when
+their simulation took a step, so a held scene or particles at rest leave the damage to what moves,
+and a view whose memory was freed while the scene stood still stays clean until something changes,
+when it redraws everything.
+
+On the desktop the damage of the scene, grown by a pixel for filtering and scaled to the output,
+also limits what is composed and sent. A PipeWire stream in shared memory composes and reads back
+only that rectangle and copies into each buffer the rectangles of every frame it missed (a buffer
+older than the last eight frames, or one that was never drawn, gets everything); a stream in GPU
+memory draws into each buffer only what changed since that buffer was last drawn, keeping the rest
+of its pixels between frames. Both kinds of buffer carry `SPA_META_VideoDamage` with the rectangle
+that changed since the previous buffer sent (a resent frame carries none), for consumers that read
+it. Transitions, parallax and framed scenes compose the whole frame. Screens drawn through the
+graphics API (Wayland and X11 surfaces, the phone) still compose every frame whole, because the
+API exposes neither the age of the buffer it hands out nor a partial present; the scene behind
+them keeps redrawing only what changed.
+
+While the user leaves `playback.allow_flashing` off, the engine measures the brightness of each frame on
+a 32 × 18 grid. A flash is a pair of opposite changes of at least 10 % of the full brightness, the
+darker side below 80 %, in at least a thirty-sixth of the grid at once (about a quarter of the
+central field of view); when a scene flashes more than three times a second, it plays slower until
+it flashes at most three times, down to a quarter of its speed, and if it still flashes faster it
+stops at its current frame. The guard measures every frame that changed: the grid is drawn by a
+small pass recorded in the frame's own submission and read back from the GPU one frame later, so
+drawing never waits for it and the guard adds no submission of its own. Since the setting is off by
+default, the guard runs by default.
+
+## Layers
+
+Every layer has a unique `id` (among the layers) and a `type`. The scene only requires the ids of
+layers to differ from each other, but the editor takes the ids of layers, assets and particle
+systems as one namespace: a new layer, asset or system never reuses the id of another of them
+(it adds a number to a name in use) and it refuses an explicit id that any of the three already
+holds. Keep them apart in hand-written scenes too. A layer may set `transform` (`position`, `scale`,
+`rotation`, `skew`, `origin`), `anchor` (`top_left` … `bottom_right`: the position is then
+relative to that point of the visible part of the canvas), `opacity`, `visible`, `blend`, `mask`,
+`effects` (at most 16), `parallax` (moves the layer with the pointer), `solid` and `cache`.
+Layers without `anchor` are centered on the canvas by default and `origin` is a fraction of the
+layer's own box (default `[0.5, 0.5]`, or the anchor point).
+
+| `type` | Fields |
+|--------|--------|
+| `group` | `layers`, `clip` (later children only show where the first one is) |
+| `image` | `image` (asset id), `size` |
+| `video` | `video` (asset id, or a value such as `{ "prop", "map" }`), `size`; plays in a loop |
+| `text` | `text` (a text, a value, or a text per language such as `{ "en": "Hi", "es": "Hola" }`, which lists `text_languages`; the language is the one the player was given, whole and then its base, then the default language of the package, then `en`; each language is a tag such as `es` or `pt-BR`, its text is not empty and the manifest needs a text in its `default_locale`), `font` (asset id or system family), `size`, `color`, `align` |
+| `shape` | `shape` (`rect` with `radius`, `ellipse`, `ring`, `polygon`, `star`, `line`), `fill`, `gradient` (`radial`, `from`, `to`, 2 to 4 `stops`), `stroke` (`color`, `width`) |
+| `spectrum` | `size`, `style` (`bars`, `circle`, `wave`), `bands` (16, 32 or 64), `channel`, `color`, `gap` |
+| `solid` | `color`, `size` (the canvas by default) |
+| `particles` | `system`, a key of `particles` (see below) |
+| `sound` | `sound` (asset id), `loop`, `play`, `volume`, `pan`, `fade_in`, `fade_out` (see "Sound"); no visual field |
+| `light` | see "Lights"; draws nothing itself |
+| `adjustment` | only `effects`, applied to everything below it; `size`, `redraw` and `rgb`, see below |
+| `mesh` | a picture bent by a skeleton, see "Meshes" |
+| `model` | a 3D model, see "Models and 3D" |
+
+`blend` is `normal`, `add`, `multiply`, `screen`, `lighten`, `darken`, `overlay`, `soft_light`,
+`hard_light`, `difference`, `exclusion`, `color_dodge`, `color_burn`, `hue`, `saturation`,
+`color` or `luminosity`. Composition uses premultiplied alpha. `mask` is an asset id or
+`{ "texture" | "layer" | "shape", "channel", "invert", "feather", "strength" }`: textures and layers mask by
+luminance or alpha (`r`, `g`, `b`, `a`, `luminance`; without `channel`, a texture mask reads luminance and a layer or shape mask reads alpha), shapes by their outline. A layer used as a
+mask (or a group holding one) may set `visible: false`: it is then not drawn but still masks. At
+most 256 layers nested at most 8 levels; masks may not refer to each other in a cycle.
+
+`blend` also takes these modes, computed per channel on the backdrop B and the layer S, both from
+0 to 1, before the usual premultiplied composition (`blend_modes2`): `linear_burn` max(0, B + S − 1),
+`linear_dodge` min(1, B + S), `darker_color` and `lighter_color` (the whole color of B or S with the
+lower or higher luminance), `vivid_light` (color burn with 2S below one half, color dodge with
+2S − 1 above), `linear_light` clamp(B + 2S − 1), `pin_light` (min(B, 2S) below one half, max(B,
+2S − 1) above), `hard_mix` (1 where B + S ≥ 1, else 0), `subtract` max(0, B − S), `divide` (1 where S
+is 0, else min(1, B / S)), `reflect` (1 where S is 1, else min(1, B² / (1 − S))), `glow` (reflect with
+B and S swapped), `phoenix` min(B, S) − max(B, S) + 1, `average` (B + S) / 2, `negation`
+1 − |1 − B − S|, `tint` max(B.r, B.g, B.b) × S, the layer color at the brightness of the backdrop,
+and `diffuse_light` B + B × S, the layer as a light falling on the backdrop. `hue`, `saturation`,
+`color` and `luminosity` swap the hue, saturation or lightness of B in HSL. Results are not clipped
+at 1 while mixing, so `add` and `diffuse_light` keep light above white for later layers and for
+`canvas.hdr` (a scene blending in linear space draws in 16 bits only when one of its layers uses
+them or `canvas.hdr` is on, and in 8-bit sRGB otherwise); only the final picture is clipped. `darker_color` and `lighter_color` ignore the
+layer `opacity`.
+
+| Layer field | Meaning | Feature |
+|-------------|---------|---------|
+| `brightness` | 0 to 16 (default 1), multiplies the color of the layer; above 1 it only shows with `canvas.hdr` | `layer_color` |
+| `color` | on `image`, `video`, `particles` and `group` layers, a color that multiplies the layer (white by default); a group applies it to its children together | `layer_color` |
+| `parent` | the id of another drawn layer whose transform moves, turns and scales this one without changing the drawing order; the position of the layer is then relative to the position of its parent, in its turned and scaled frame (at the parent's position by default), instead of to its group; chains go at most 8 deep and never back to themselves | `parent` |
+| `inherit` | what follows the parent: `transform`, `visible` and `opacity` (default `transform` and `visible`), only with `parent` | `parent` |
+| `transform.tilt` | `[x, y]` degrees (−89 to 89) of tilt in depth around the position of the layer, seen with `canvas.perspective`: a positive `x` turns the bottom edge towards the viewer, a positive `y` the left edge | `tilt` |
+| `transform.z` | pixels towards the viewer (−100000 to 100000); a layer at or behind the viewer is not drawn | `tilt` |
+| `parallax` | `[x, y]` (−10 to 10 each), with a different depth per axis, or a binding to a property, a timeline, the sound or anything a value may follow | `parallax2` when the two differ, `parallax_values` when bound |
+| `lighting` | on `image`, `video`, `text`, `mesh`, `model` and `particles` layers, `{ "normal", "roughness", "roughness_map", "reflection", "env", "emissive", "emissive_map", "strength" }`: how the layer takes the light of `light` layers (see "Lights"); on `particles` layers it also names `particle_lighting` | `lighting2d` |
+| `playback` | on `image` layers showing moving pictures or videos and on `video` layers, `{ "rate" (0 to 16; a video plays at 0 or from 0.1 to 4), "playing", "loop", "start", "end" (seconds), "frame", "own_clock" }`; `frame` picks a frame of a sprite sheet and may be bound to keyframes, the pointer, the audio or a script; layers that show the same video share one clock, led by the first of them, and a `video` layer with `own_clock: true` plays its video on a clock of its own, with its own rate, range, play and pause, seeks of scripts and decoder (`video_clocks`), so each such layer costs one more decoder; a video picked by a property through a `map` keeps one own clock per video of the map (each runs while it is shown, and the seeks, rate and pauses of scripts reach all of them), and a video a `file` property that may hold a video (it accepts `video`, or its `default_asset` is a video) picks at run time (`{ "prop": "<id>" }`) keeps one own clock, `<id>@<layer>`, for whatever file the user picks, with a decoder of its own on the desktop and the phone; `own_clock: true` anywhere else (an image layer, a video bound without a `map` to a property that is no `file` or to a `file` property that only takes pictures, or a video layer showing a geometry pool) is refused, and the editor offers the switch only where it applies; its timeline shows a lane for each own clock, with a strip of frames of the video, the range of the video as a bar whose grips trim `start` and `end`, its speed, loop and play switches and a mark where the clock is at the playhead, and `reiwand-ctl scene ask CARPETA clocks` prints the same | `layer_playback`, `video_clocks` |
+| mask `strength` | 0 to 1 (default 1), weakens the mask: m′ = mix(1, m, strength) | `mask_strength` |
+| adjustment `size` | `[width, height]` in pixels (at most twice the canvas): only that rectangle around the layer position (placed by `origin`, without the rotation, skew or scale of the layer) is captured and its effects change only that part, and `redraw: true` draws what was captured again with the whole transform of the layer, its opacity, blend mode and mask, as a magnifier or a mirror; without `size` the whole canvas is captured and turned around its middle. A capture is one copy of the rectangle and one pass more, and any change in the scene redraws the whole frame | `capture` |
+| adjustment `rgb` | `true` sends what the layer captures, shrunk to at most 64 × 16 (keeping its shape), to the RGB lighting of the computer, at most 30 times a second and only when the frame changes; with `size` that region (placed like the capture), without it the whole canvas; the picture below is not changed; the manifest must set `permissions.rgb`, the user must allow `rgb` for the package and turn RGB lighting on (`package.md`) | `rgb` |
+| `attach` | `{ "layer", "bone" \| "point", "offset": [x, y], "inherit" }`: follows a bone or a node of a `mesh` or `model` layer instead of a `parent`, as posed in the same frame; `inherit` lists `position`, `rotation` and `scale` (all by default; without `position` the layer stays on the origin of the mesh layer, and what it does not take from the bone it still takes from the camera, which zooms and turns it like the rest of the scene); `offset` is in pixels along the bone; the layer hides with its mesh layer, and its own `transform` applies on top as under a parent; a layer may not follow itself, through other attachments either | `attach` |
+| `solid` | `true` or `{ "alpha" (0 to 1) }`: the layer takes the pointer for `click:`, `enter:` and `leave:` triggers and script pointer events, over its box or, with `alpha`, only where it is at least that opaque (pictures by the alpha of their pixels, the other kinds by their color and opacity); a solid group takes the pointer over the boxes of its layers; layers are tested from the top down, as they were drawn in the last frame, with their transforms, parents and parallax, and hidden layers never take it | `layer_events` with `alpha` |
+| `depth_test` | inside a group with `space: 3d`, a flat layer hides behind the models in front of it instead of covering them | `model3d` |
+
+A layer with `tilt` or `z` is drawn as a projected quadrilateral: one 3 × 3 projective transform
+instead of the flat one, so the GPU spreads its picture with the right perspective and it costs
+nothing more. The projection follows the camera, so zooming the camera zooms a tilted layer as a
+picture of it. The effects of a tilted layer run in its own plane before it is projected, and its
+mask leans with it. A tilted group is drawn apart first (one more pass over its box) and then
+projected, and its layers lean with it; a layer tilted inside a tilted group turns in the plane of the group as one rigid body seen by one camera (its tilt and `z` are 3D turns and moves within that plane, and the group's tilt then turns both), never as a picture of a picture. The pointer finds a tilted
+layer where it shows.
+
+### Text
+
+A `text` layer also takes these fields:
+
+| Field | Meaning | Feature |
+|-------|---------|---------|
+| `fallback` | at most 8 more fonts (asset ids or system families) tried in order for characters `font` lacks; only `sans-serif`, `serif` and `monospace` are sure to exist, and content never sees the list of installed fonts | `fonts2` |
+| `valign` | `top`, `center` (default) or `bottom`: which edge of the text stays at the layer position while lines come and go (the vertical part of the default `origin`) | `text_layout` |
+| `wrap` | `{ "width" (1 to 16384 px), "lines" (1 to 1000), "ellipsis" }` breaks lines at that width (after spaces and hyphens, between the letters of Chinese, Japanese and Korean, and inside a word longer than the line), keeps at most `lines` of them and ends a cut text with an ellipsis; `align` then works within that width | `text_layout` |
+| `line_height` | 0.5 to 4 times the size | `text_layout` |
+| `background` | `{ "color", "padding": [x, y], "radius" }`, a box behind the text | `text_layout` |
+| `padding` | 0 to 1024 px of margin around the text for its effects | `text_layout` |
+| `letter_spacing` | −100 to 1000 px between letters | `text_styles` |
+| `outline` | `{ "color", "width" (0 to 64 px) }` | `text_styles` |
+| `shadow` | `{ "color", "offset": [x, y], "blur" (0 to 64 px) }` | `text_styles` |
+| `blur` | 0 to 64 px | `text_styles` |
+| `render` | `auto` (default), `raster` or `sdf`, which draws from a distance field so that the size can change without drawing the letters again | `text_styles` with `sdf` |
+
+Outline, shadow, blur and letter spacing may be bound like other values.
+
+Outlines, shadows and blurs are drawn from a distance field: the letters are drawn once, the GPU
+spreads their edges into distances with a jump flood (a few passes over a texture of the text, made
+once each time the text, its layout or the room of its styles changes), and the shader draws the
+fill, the outline, the shadow and the blur from it, so a change of their colors, widths, offsets or
+blurs changes only numbers. With `render: auto` a text with a style uses the field at a reference
+size (twice its size, from 16 to 256 pixels), so it grows and shrinks without being drawn again;
+`raster` draws it again at its size on the screen, as plain texts are, and `sdf` uses the field
+even without a style. The texture keeps room around the letters for the widest style, rounded up to
+a power of two, so animating a style within that room draws nothing again. At the lowest quality
+level shadows blur at most 4 pixels. The GPU makes the field in plain 8-bit textures, which every
+GPU can draw into, packing each offset and each distance into two channels (16 bits), so styled
+texts look the same on GPUs without 16-bit float textures and the processor never builds it.
+
+A text is laid out again only when its text, size on screen or layout changes; its color, the color of
+its background and its position never lay it out again. Each character comes from the first font of
+`font` and `fallback` that has it, then from the system `sans-serif`; letters are placed one after
+another with the kerning of their font, without joining or reordering them, so scripts that need
+shaping (Arabic, Indic scripts) or right-to-left text do not show correctly yet. A font file is at most
+32 MiB, also once a `.woff2` is unpacked; a font that cannot be read is replaced by the system one.
+
+### Lights
+
+A `light` layer lights the layers that have `lighting` (`lights`); it draws nothing, so it takes only
+`id`, `type`, `transform` (its position, its rotation for the direction of spot, tube and directional
+lights, and `tilt`), `anchor`, `visible`, `parent`, `inherit` and these fields. It follows parents,
+groups and bones (`attach`) and animates with keyframes like other layers. A scene has at most 12
+lights; on T0 and T1 devices (phones and older computers) only the first 8 in the order of the layers
+light anything, and the others are named in the notes of what was left out (`the layer … was left
+out`), as the effects are.
+
+| Field | Meaning |
+|-------|---------|
+| `light` | `point` (default), `spot`, `tube` or `directional` |
+| `color`, `intensity` | the color (white by default) and 0 to 100 (default 1); both may be bound |
+| `radius` | 1 to 100000 px (default 512), where the light ends; may be bound |
+| `z` | height above the canvas, −100000 to 100000 px (default 100); may be bound |
+| `cone` | spot lights only: `[inner, outer]` angles from 0 to 180 degrees (default `[30, 60]`), full in the middle and dark past the outer angle |
+| `length` | tube lights only: 1 to 100000 px (default 256) |
+| `volumetric` | point and spot lights only: `{ "density" (0 to 1, default 0.2), "samples" (4 to 64, default 16), "shafts" (0 to 1, default 0) }` lights the air (`volumetric_lights`), see below |
+| `texture` | spot lights only: the asset id of a picture or video, or `{ "layer": id }`, that the light projects (`light_textures`); at most 4 spot lights of a scene project, see below |
+| `shadows` | point, spot and directional lights: `true` casts shadows of models on models whose materials take them; at most 2 lights per scene (`shadows`), see "Models and 3D" |
+| `shadow_resolution` | with `shadows`: 256 to 4096 pixels a side of its map (for point lights, of each of its six faces) instead of the size picked for its kind |
+| `shadow_bias` | with `shadows`: 0 to 1 (default 0.2), how far surfaces lift away from their own shadow; raise it against stripes, lower it when shadows leave their casters |
+| `position3d` | `[x, y, z]` in the units of the models (may be keyed or bound): where the light stands among the models, in the space of every 3D group and lone model; without it the light stands on the plane of the camera (see "Models"). Flat layers keep using the place of the light layer |
+| `aim3d` | `[x, y, z]` (may be keyed or bound): the point a spot or directional light shines at, or the direction of a tube, among the models; without it the heading of the layer, turned with the camera, gives the direction |
+
+A spot or directional light with no rotation points down the canvas and turns clockwise with
+`rotation`; the first number of `transform.tilt` (−89 to 89 degrees) dips it into the canvas, so
+`[90, 0]` would point straight at it. A tube light lies along the x axis of its layer, `length`
+long, and lights like a row of point lights. The light of a point, spot or tube light fades as
+(1 − d²/r²)² with the distance d in three dimensions, `z` included, and ends at the radius r; a
+directional light reaches everywhere with the same strength.
+
+Each pixel of a lit layer adds, for every light, the color of the light times its intensity, its
+fade, its cone and the cosine between the normal of the pixel and the direction to the light, and a
+highlight that is sharp on smooth surfaces and spread out on rough ones; the ambient light comes on
+top, the color of `canvas.ambient` on surfaces facing down and of `canvas.sky` (the ambient one when
+unset) on surfaces facing up, and black when neither is set. A layer without a normal map faces the
+viewer, and so takes the mix of both halfway. A layer turned with `tilt` or lifted with `z` is lit in its own plane: its normal, and the normal map laid over it, turn with the plane, and each pixel takes the distance to the light from where the plane holds it in depth (as if seen straight on, without the narrowing of the perspective), so a wall turned away from a lamp darkens and its near edge takes more light than its far one; a mesh layer is lit like a picture of its posed parts, in the plane of its box. `lighting` takes:
+
+| Field | Meaning |
+|-------|---------|
+| `normal` | a `linear` normal map: red to the right, green up and blue towards the viewer, from 0 to 1 for −1 to 1, laid over the layer as its picture is and turned with the layer |
+| `roughness`, `roughness_map` | 0 to 1 (default 0.5), times the red of a `linear` gray picture |
+| `reflection`, `env` | 0 to 1 (default 0): how much of `env`, a picture read by the normal as a sphere, the layer reflects; without `env` it reflects what is drawn below it, moved by its normals |
+| `emissive`, `emissive_map` | light of its own from 0 to 16 (default 0), times the red of a `linear` gray picture; it shows even in the dark |
+| `strength` | 0 to 1 (default 1): how much of the lit color replaces the plain one |
+
+The numbers may be bound. Lighting is worked out in the same pass that draws the layer, for at most
+12 lights and only where a light reaches. While the lights stay still, lit layers are drawn once and
+kept like other still layers; when one moves, only the box its radius covers is drawn again. At the
+lowest quality level the lighting is worked out once, when the scene starts, the level or the size
+of the screen changes or the scene is loaded again, and lit layers are kept as still pictures: lights that move stay where they started and ask for no
+frames. Scripts read and set `scene.ambient` and `scene.sky` as colors, like `scene.background`.
+
+A `volumetric` light glows in the air within its radius, added where the light layer is among the
+layers: the layers below it show through the glow and the layers above it cover it. Inside a group
+drawn apart (with effects, a mask, an opacity under 1 or a cache) the glow goes between the children
+of the group, where the light is, and the group is then drawn again each frame instead of kept; the
+picture of such a group, and of a tilted group, takes in the whole glow of its lights, and a tilted
+group leans the glow with its layers; when a script reorders the layers the glow follows the new order. Each pixel
+gathers, at `samples` points on the line from the pixel towards the light, the fade, the cone and
+the projected picture of the light there; `density` is the part of the line it walks and also how
+strongly the air glows, and the glow fades to nothing at the radius. With `shafts`, each of those
+points also takes how bright the layers below the light are there, so their dark parts hold back the
+glow and cast shafts: 0 leaves the glow as it is and 1 lets only bright parts glow. Dark and bright
+are measured against the brightest of five points around the light, so a background that is evenly
+dark still glows and only what is darker than around the light holds it back. The shafts read a copy
+of the layers below made at the size of the air, not of the screen. The air is worked
+out at half the size of the screen (Q3 and Q2) or a quarter (Q1, and on T0 and T1 devices), with
+half the samples at Q1, and not at all at Q0; it is kept while the light and, with `shafts`, the
+layers below it stay still, and drawn again only in the box of its radius when one of them moves.
+
+A spot light with a `texture` multiplies its color by the picture, which fills the outer cone as a
+projector does, upright and seen from behind the light. A video plays on and asks for frames while it
+plays; a `{ "layer": id }` projects that layer as it is drawn, with its effects, even when it is
+hidden (`layer_textures`). The projected layer must not take light itself, hold or read a layer that
+does, or the scene is refused as a loop. Lit layers and the glowing air take the projected picture,
+while lit particles take only the color of the spot; layers lit by a still picture stay kept, a video or a moving layer redraws them in
+the box of the light.
+
+### Meshes
+
+A `mesh` layer (`mesh`) draws a binary glTF of flat parts (positions with an optional depth, UVs and,
+for bending, `JOINTS_0` and `WEIGHTS_0` with a skin) bent by its skeleton, such as a character cut
+into limbs. A scene has at most 16 `mesh` and `model` layers. The editor cuts such a mesh out of a
+picture of the scene, along a grid or its outline, and places its bones (see `editor.md`).
+
+Positions are in pixels from the middle of the box the layer fills, x to the right and y up as glTF
+writes them, and UVs start at the top left of the picture. Every node of the file is a joint: the
+bones of skins, the nodes that carry a mesh without a skin, which then move as one piece, and
+nodes without a mesh, such as attachment points (the editor marks the ones it places with
+`extras.point`), which follow their parent and never count as the end of a bone. The rest pose is the transform of each node; vertices
+follow at most 4 bones whose weights add up to 1 (within 0.02, then made exact). The engine skins
+the vertices on the GPU into a picture of the box at the pixels it covers on the screen, with its transform, parents and camera, up to the pixels of
+its picture (half of them at the lowest quality and three quarters at the next; a mesh drawn larger
+than its box is skinned in steps of half an octave). When the skin has fewer than about three
+quarters of the pixels of its texture on each side, the texture gets mipmaps and is read with
+trilinear filtering, so the edges of a character stay smooth at the lowest quality instead of
+showing steps, and draws that picture like
+any other layer, with its transform, effects, masks and blend mode; it draws it again only when the
+pose, the blend shapes, the order of the parts or a video texture changed, and a still or settled
+skeleton asks for no frames. A hidden `mesh` layer that masks or feeds an effect of another layer is
+posed and drawn every frame like a shown one, so a mask that is a mesh follows its clips. A picture mask of a `mesh` layer, its own `mask` or the `mask` of one of its effects, is read over the sheet, not over the box: the engine adds, when the scene loads, one hidden copy of the mesh for each such picture, with the picture as its texture and without tint, light, mask or effects, and points the mask at it with the channel it had (luminance by default), so a mask painted over the picture of the mesh stays on the same parts as they move. Each copy costs one more posed mesh of the size of the layer, drawn in the same pass as the mesh it copies, and counts in the cost like a layer that masks others, but not among the 16 `mesh` and `model` layers; each copy spawned from a template with such a mask brings its own hidden copies, and the bones a script drives on the original are driven alike on its copies. Parts that lie out of the box in the rest pose get a margin of skin around the box, up to half of the box on each side, so they are not cut; parts that a pose moves further out than the rest pose are cut at the edge of that margin, so `size` leaves them
+room.
+
+Files are refused that have a bone cycle or a node with two parents, a vertex whose weights do not
+add up to 1 or that follows a bone of no skin, an index out of its vertices, a value that is not a
+number, sparse values out of their buffer views or with indices that are not whole numbers or name no element (sparse accessors are read: their values replace those of the elements they name, over zeros when the accessor has no buffer view of its own), primitives other than triangles (strips and fans are read as triangles),
+animation keys out of order, a mesh that names a blend shape twice, more than 1 024 nodes, 65 536
+vertices, 1 048 576 triangle corners (three for each triangle, strips and fans included), 256 bones
+and parts, 64 drawn primitives, 524 288 blend shape vertices or 4 194 304 animation values, or 128 MiB
+of meshes for all the mesh layers of a scene; meshes are read whole, once, when the scene is, and a
+file is refused as soon as it passes a limit.
+
+| Field | Meaning |
+|-------|---------|
+| `mesh` | the `.glb` asset |
+| `texture` | a picture or video asset (or bound value) that replaces the textures of the file; without it, each part shows the picture of its own material (up to 64 pictures a file; parts without one show the first), or white without any: several pictures are packed side by side into one atlas when the scene loads, shrunk together when they would not fit the largest texture of the GPU, and the texture coordinates of each part are moved into its picture; a picture that repeats over its part (coordinates outside 0 to 1, up to 4 repeats each way) is tiled in the atlas following the wrap mode of the sampler of its texture in the file, per direction (repeat, mirrored repeat, or clamp to the edge, which tiles nothing; repeat when the file names no sampler); beyond 4 repeats each way the last tile's edge is shown; the base color of each material multiplies its parts |
+| `size`, `color` | the box in pixels the mesh fills (the canvas by default) and a color that multiplies it |
+| `parts` | per part (mesh name of the file): `order` (−1000 to 1000, may follow keyframes with `step`), `clip_to` (another part it only shows over) and `visible`; parts are drawn by `order` (0 by default), in the order of the file when it is the same |
+| `depth` | `{ "scale" (0 to 10, 1 by default), "cull", "sort" }`: how far the depth of the vertices (z of the file, towards the viewer, in pixels) pushes them with the perspective of `canvas.perspective` or of the 3D camera, also under `transform.tilt` and under the tilts of the groups and parents around the layer, always along the face of the layer as all of them turn it, and whether triangles seen from behind (turning clockwise on screen) are hidden; with `depth` nearer vertices also cover farther ones whatever the order of their parts, and parts at the same depth keep their order, a later part covering the soft pixels of an earlier one as it does without `depth`; the opaque pixels of every part are drawn first, writing depth, and the soft ones (alpha below 1) after them, tested against that depth without writing it, so a soft edge never hides what lies behind it as a halo whatever the order of the parts, even where parts span each other's depth or cut through each other; `sort` (on by default, `false` keeps the order of the file and of `parts`) draws the parts from back to front each frame by the average depth of their vertices as posed, blend shapes included (a part cut to another one goes with it), so soft pixels over soft pixels blend in order, at no cost while depth is off; without `depth` the depth of vertices is ignored |
+| `clips` | at most 64 `{ "id", "animation", "from", "to", "loop", "events", "bones", "shapes", "order" }`: a stretch of an animation of the file (the first one without `animation`, unless the clip has keys of its own) in seconds within its length (a clip with keys of its own and no `animation` lasts until its last key, or until a later `to`, holding its last keys), played `repeat` (default), `pingpong` or `once`, with named `events` (seconds from the start of the clip) that fire like those of timelines each time a playing clip passes them, both ways for `pingpong`, start what `event:<name>` triggers and reach scripts as `timelineEvent` with the timeline `<layer>#<clip>`, and keys of its own on the same seconds (below) |
+| `animations` | at most 16 animation layers `{ "clip", "weight" (0 to 1), "rate" (0 to 16), "additive", "blend_in", "blend_out" (0 to 10 s), "enabled", "bones" }`, mixed in order: replacing layers first, then additive ones; `bones` limits a layer to those bones; bones without a track keep their rest pose |
+| `ik` | at most 16 chains `{ "chain" (2 to 8 bones, each hanging from the one before), "target", "limits": { "<bone>": [min, max] }, "weight", "bend": "clockwise" \| "counterclockwise" }` (the way every joint of the chain bends); `target` is a point in pixels of the box from its top left (which may be bound), `"cursor"`, `"bone:<name>"` (any node of the file) or `"layer:<id>"`; see "Reaching and swinging" (`ik`) |
+| `physics` | at most 64 `{ "bone", "mode": "spring" \| "rigid" \| "rope", "stiffness", "damping", "inertia" (0 to 1, 0.5 by default), "wind" (0 to 1), "gravity" (−10 to 10), "rotation": [min, max] degrees, "translation": [min, max] px }`; see "Reaching and swinging" (`bone_physics`) |
+| `colliders` | at most 8 `{ "bone", "shape": "capsule" \| "sphere", "radius" (0 to 100), "offset": [x, y, z] }`: a capsule along a bone or a sphere at its head that keeps the bones of the bodies of `physics` (those of other bones) out, in units of the model on a `model` and in pixels on a `mesh` (where only x and y count); the first two count at the second lowest quality and none at the lowest (`bone_physics`) |
+| `rules` | at most 64 `{ "bone", "parent", "weight" }`: moves a bone over to another parent as `weight` goes from 0 to 1, keeping its pose, as a sword passing from a rock to a hand (`bone_rules`) |
+| `shapes`, `expressions` | weights from 0 to 1 of the blend shapes of the file, and at most 64 expressions `{ "<name>": { "<shape>": weight (−1 to 1) } }` whose names `shapes` may also set; at most 8 shapes act at once on each part, the heaviest (`blend_shapes`) |
+| `hit` | bones whose area takes the pointer for scripts, which then learn the bone that was touched (`layer_events`): the layer takes the pointer like a `solid` one, and each event carries the listed bone that bends the drawn triangle under the pointer, or the listed bone it hangs from, else `null` |
+
+The keys of a clip are lists of `[time, value]` keyframes with an optional easing, as in timelines:
+
+| Key | Meaning |
+|-----|---------|
+| `bones` | per bone (a node of the file): `rotation` in degrees clockwise, `position` `[x, y]` in pixels with y down in the space of its parent, and `scale` `[x, y]`, each added to its rest pose; they replace the tracks of the file for that bone |
+| `shapes` | per blend shape: its weight (−1 to 1) |
+| `order` | per part: the `order` it takes while the clip plays, rounded to whole numbers; `parts.<name>.order` still wins when set |
+
+A replacing layer moves each bone from what the layers before it left towards its own pose by its
+weight; rotations are blended along the shorter way and normalized. An additive layer adds what its
+clip moves away from the rest pose, times its weight. The weight of a layer also follows its fade:
+it grows over `blend_in` when the layer starts or is enabled and falls over `blend_out` when it is
+disabled, stopped or, for `once`, when it ends, so two layers that swap `enabled` cross-fade. A layer
+plays while it is shown and weighs more than nothing; a `once` clip then holds its last pose and
+tells scripts that it ended. Blend shapes follow the same mix (the tracks of the file named `weights`
+and the `shapes` of clips), and `shapes` and the expressions they name add to it. A `rules` entry
+blends the place the bone would have under its own parent with the place it would have under the new
+one, which keeps the place it had when the rule began to weigh (`bone_rules`); a rule may not close a
+loop of parents. Cutouts use a stencil: a part with `clip_to` only shows where the part it follows
+was drawn, as last drawn. The pose is worked out at most once per frame, only for shown layers, with
+no allocation per frame; at the lowest quality moving skeletons ask for at most 30 frames a second.
+
+```json
+{ "id": "fox", "type": "mesh", "mesh": "fox", "size": [600, 900],
+  "clips": [{ "id": "idle", "animation": "idle", "events": [{ "t": 1.2, "name": "blink" }] },
+            { "id": "wave", "loop": "pingpong", "bones": { "arm": { "rotation": [[0, 0], [0.8, 35, "in_out_sine"]] } },
+              "order": { "tail": [[0, 1]] } }],
+  "animations": [{ "clip": "idle" }, { "clip": "wave", "bones": ["arm", "hand"], "blend_in": 0.3 }],
+  "ik": [{ "chain": ["neck", "head"], "target": "cursor", "limits": { "head": [-30, 30] } }],
+  "physics": [{ "bone": "tail", "mode": "rope", "wind": 0.6 }],
+  "shapes": { "smile": { "prop": "mood" } } }
+```
+
+#### Reaching and swinging
+
+Each frame the pose is worked out in this order: the animation layers, the `rules`, the `ik`
+chains in their order, what scripts set (see "Bones, blend shapes and attachments"), and the
+`physics`. Rotations of bones are measured in degrees clockwise from their rest pose, as in clips.
+
+A chain turns its bones so that its end (where the first child of its last bone starts, leaving
+out nodes marked `extras.point`, or as far again along the last bone when it has none) reaches the
+target; bodies of `physics` take the end of their bone, and ropes their links, the same way. Chains of two bones are solved
+exactly, bending at their middle joint the way `bend` says; when `limits` stop one of their bones,
+up to 10 rounds then turn each bone towards the target within its limits, so limits that only allow
+the other side bend the middle joint that way. A longer chain takes at most 10 rounds that turn each
+bone towards the target from the end back without letting any joint bend the other way, starting
+from its pose, so the curl of its clips stays while it reaches. When that pose is straight or already
+bends a joint the other way, the chain first curls into an even arc, every joint turning the way
+`bend` says by the same angle, that reaches the target; when the rounds from the pose miss a target
+within reach, the same frame tries again from that arc. A joint whose `limits` leave no room on the
+`bend` side turns within its limits only, the other way, as in chains of two bones; a chain with
+such a joint takes no arc. Each frame starts from its own pose, so a chain reaches the same way
+live, after a seek or after a restart; a frame whose pose, limits and target are those of the frame
+before takes its turns again without running any round. A target out of reach
+stretches the chain towards it. `limits` keep each listed bone within `[min,
+max]` degrees of its rest pose and `weight` blends the turns with the pose. `"cursor"` follows the
+pointer only while the scene may read it (the pointer input, told to the user like any other use of
+the pointer); without it the chain keeps its pose. `"layer:<id>"` follows the position of that layer.
+
+Bodies of `physics` take one step per drawn frame, as long as the frame interval (1/120 s at
+120 fps, 1/60 s at 60, 1/30 s at 30), on battery as well, so the motion matches at any of those
+rates; a frame interval longer than 1/30 s is split into equal steps of at most 1/30 s, and a frame
+catches up at most a quarter second, dropping longer gaps. Each step follows the pose of the
+parent along the time it covers. A `spring` pulls the end of
+its bone back to where the pose puts it (`stiffness`), a `rigid` bone swings like a pendulum held
+loosely to its pose, and a `rope` links the bone and its first children (those without a body of
+their own, at most 8 links) into a chain that hangs and sways. `inertia` is how much a body stays
+behind when its parent moves, `damping` how fast it calms down, `gravity` pulls down (98 pixels per
+second squared for each unit), `wind` is how much `canvas.wind` (in pixels a second, with gusts
+taken at the time each step stands for, so they blow alike at every frame rate) pushes it, `rotation` bounds how far each link turns from its pose and `translation` lets the head of
+the bone itself move that many pixels each way. A body that has not moved for half a second, while
+its pose and the wind stay still, asks for no frames; at the lowest quality bodies keep the pose
+of the animation and ask for nothing. Scripts can push bones with `impulse`.
+
+### Models and 3D
+
+A `model` layer (`model3d`) draws a binary glTF model with metallic-roughness materials. Alone it
+renders into its own box (`size`, the canvas by default) with depth, and then composes like any
+layer, with its effects, masks, blending and `transform`; a `group` with `space: "3d"` renders all its
+models in one pass with a shared depth into a box the size of the canvas, placed where a child of the
+group without a `transform` would be, which then composes as one layer in the place of the group. Models
+also take `clips`, `animations`, `ik`, `physics`, `rules`, `shapes`, `expressions` and `hit` as meshes
+do (`model_animation`, see "Animated models" below), and:
+
+| Field | Meaning |
+|-------|---------|
+| `model` | the `.glb` asset |
+| `position`, `rotation`, `scale` | three numbers each (or one for all three), in the units of the model and degrees (turned around x, then y, then z), which may be bound |
+| `root_motion` | `true` lets the animation of the root move the layer; needs `clips` |
+| `env` | a picture reflected by the materials, read as an equirectangular panorama: blurred for the light around and sharper for shiny materials; the lowest quality keeps only the light around |
+| `materials` | per material name of the file, at most 64 of `{ "shader", "color", "emissive", "lit", "double_sided", "cast_shadows", "receive_shadows", "cull": "back" \| "front" \| "none", "depth_test", "depth_write", "blend": "opaque" \| "mask" \| "blend" \| "add", "maps", "params" }` |
+
+The materials of the file give the color, metal, roughness, normal, occlusion and glow maps with their
+factors (`KHR_materials_emissive_strength` multiplies the glow), the alpha mode and cutoff, and both
+sides; `KHR_materials_unlit` draws a material without light. A material of the scene multiplies its
+color by `color`, replaces the glow by `emissive`, picks `shader` and overrides the rest; `lit: false`
+draws it unlit, `blend` or an `opacity` below 1 draws it after the opaque ones, farthest first.
+Primitives without a material take a white one. Textures may be PNG, JPEG or WebP pictures of at most
+4096 pixels; phones and the T0 and T1 tiers draw them at most 2048 pixels wide.
+
+`shader` is `pbr` (default, `params` `metallic`, `roughness`, `occlusion` 0 to 1 and `normal_scale`
+0 to 10), `unlit`, `fur` (`layers` 1 to 32, `length` 0 to 100, `density` 0 to 1), `foliage`
+(`strength` and `speed` 0 to 10, swaying with `canvas.wind`), `chroma` (`key` color, `threshold` and
+`softness` 0 to 1) or the id of a package effect with `stage: "material"` (`material_shaders` for all
+but `pbr` and `unlit`); `fur` also takes `comb_x`, `comb_y` and `comb_z` from −1 to 1, and all but `unlit`
+take the numbers of `pbr`. Shadows of lights and materials name `shadows`; both `cast_shadows` and
+`receive_shadows` are `true` unless set, which changes nothing until a light casts shadows.
+`maps` replaces maps of the file with pictures of the scene: `{ "base", "orm", "normal",
+"occlusion", "emissive" }` (and gives fur its `comb` map), each the id of a picture asset; a replaced map keeps the texture
+coordinates, the transform and the sampler of the slot it replaces (the first set unmoved,
+repeated and smooth where the file had no map) and should be `linear` for
+`orm`, `normal` and `occlusion`. A picture that is not loaded leaves the map of the file.
+
+- **`fur`** draws its primitives again as shells pushed out along the normal, `layers` of them (12 by
+  default) at Q3, three quarters at Q2, half at Q1 and a quarter at Q0 (at least one); `length` is how
+  far the outer shell stands, in hundredths of the radius of the model (10 by default), `density` how
+  close the strands grow (0.5), and the comb bends them towards that direction of the model, more at the
+  tips. `maps.comb` names a `linear` picture over the first texture coordinates that combs each place
+  on its own: its red, green and blue are the direction in the space of the model (0.5 is none, 0 and 1
+  are −1 and 1) and its alpha how much it replaces the comb of the material; the vertex stage of the shells
+  reads one texel of it per vertex (of a 1-pixel picture without a comb map), at every quality level and
+  tier. Strands thin out towards the
+  tips and shade darker at their roots; the shells are cut, not blended, so they need no sorting.
+- **`foliage`** sways the vertices with `canvas.wind`: the red of the vertex colors (`COLOR_0`) of the
+  file says how much each vertex moves (black stays), or, without vertex colors, the height within the
+  model. `strength` (1 by default) scales the sway, which reaches a twentieth of the radius of the model
+  for a wind of 100 pixels a second, and `speed` (1) its pace. Without wind, at the lowest quality or
+  when the wind stays still at nothing, foliage stays still and asks for no frames.
+- **`chroma`** makes the colors close to `key` (green by default, an sRGB color like the others,
+  compared with the color of the surface in linear light) transparent: closer than `threshold`
+  (0.4) is cut, and the cut fades over `softness` (0.1) beyond it.
+- **A material shader of the package** (`stage: "material"`, checked and limited like every package
+  shader) gives `fn material(s: Surface) -> Surface`, which runs for each pixel after the maps are read
+  and before the light, and may change the place, normal, color, glow, roughness, metal and occlusion.
+  It may read `frame`, `param(0u)` to `param(7u)` (its parameters in their order, set by `params`), the
+  noise and color helpers, but no pictures. A shader that cannot be built is drawn as `pbr`, and the
+  stage renders again each frame while it reads time, audio or the pointer.
+
+Shadows are maps the models are drawn into from the light: 2 048 pixels a side for a directional light,
+fitted around the models of the stage, 1 024 for a spot light within its cone and a cube of six faces of 512 for a
+point light (read as one cube map, so its edges filter across faces without seams), all at most 4 096 (1 024 on phones, 2 048 on T2) and half of that at the lowest quality;
+`shadow_resolution` picks another size within those caps. Each pixel of a material that takes shadows
+reads its map four times around its place and blends them (percentage closer filtering), lifted along its
+normal by `shadow_bias`. Desktop computers (T3) draw shadows of the first 2 lights that cast them, T2 of
+the first one, and T0 and T1 of none. A map is drawn again only when its light, a caster, a pose or a
+swaying material changes, so a moving camera over still models reuses it. Primitives drawn with `blend`
+or `add` and materials with `cast_shadows: false` cast none; cut-out (`mask`) primitives cast a
+shadow only where they are drawn, since the map pass reads the alpha of their color map, a cost
+only they pay. Fur casts the shadow of its length at Q2 and Q3: each shadow map draws its skin and
+one more shell at six tenths of the length, cut to its `density` (as many triangles again as the
+skin for each face of the map, only when the map is drawn again); at Q0 and Q1 it casts its skin only.
+
+Light layers light the models as they light flat layers: each light without `position3d` stands on
+the plane through the point the camera looks at, under the point of the box where it is drawn, moved
+toward the viewer by its `z`, with its radius and length in pixels of that plane; a light with
+`position3d` stands at that point among the models whatever the camera does, so it can stand behind or
+beside a model, and with `aim3d` a spot or a directional light shines from it toward that point (its
+radius and length are still pixels of the plane through the point the camera looks at). Both cost
+nothing more at any quality level: the place of each light is worked out once a frame on the CPU.
+Directional lights shine along their heading, and the light around and from above (`canvas.ambient` and `canvas.sky`) comes from below and
+from the up of the camera. At most 12 lights count (8 on T0 and T1). A scene without lights, light
+around or sky and without `env` lights its models with a soft light from above the camera on the left,
+so that a model never shows black.
+
+A flat layer inside a 3D group is drawn in front of the models in its order unless it sets
+`depth_test`: it then stands on the plane through the point the camera looks at, moved toward the
+viewer by its `transform.z` in pixels of that plane, so that models in front of the plane cover it.
+The models are drawn in slices between such planes, at most 4 different ones (more layers share the
+nearest), and the layers between their slices. Particle layers count as flat layers there: with
+`depth_test` a system without `perspective` stands on its plane. A system with `perspective` takes
+no plane: each particle stands at the depth of its own place, the plane of the layer times
+`(f + z) / f`, and hides pixel by pixel behind the models in front of it. For that the stage also
+draws the depth of its opaque models once into a picture of its own size (one more pass of their
+triangles, without colors, only while such a layer is in the group, and kept while nothing moves),
+which the particles read; lit particles (`render.lit` or a layer with `lighting`) , particles with a shader of their own,
+refracting particles, trails (short and long, each point at the depth its particle had when it
+was marked) and ropes (each knot at the depth of its particle) read it too. Refracting particles hide their bending where a nearer model
+covers them, but the picture they bend is the finished picture of the group, which holds no depth:
+where a visible particle sits beside a nearer model its offsets can still pull in a few pixels of that
+model. Child systems, at any depth of the family, are drawn with their layer and tested the same
+way. Systems without `perspective` stand on the plane of the layer as before, and so does every system at the lowest quality, which skips that pass. A plain group inside a 3D group (no
+effects, mask, other blend, opacity below 1, color, brightness, `clip`, tilt, `z` or `depth_test`)
+lets its layers join the slices one by one, and a plain 3D group inside another 3D group, directly or
+through plain groups, shares its depth: its models and its flat layers are drawn with those of the
+outer group, with the camera and the box of the outer group. A 3D group inside another that is not
+plain still draws its own picture, and the models of the outer one then draw alone.
+
+A model whose values do not move renders once and its picture is kept; a 3D group renders again only
+when a model, the camera, a light, the light around or the size changes, so that a still scene asks
+for no frames. The work of a model counts the triangles it draws, fur shells included, toward the
+cost of the scene, and again for each shadow map they are drawn into (the first two lights with
+`shadows`, six maps for a point light). How many triangles make a unit depends on the device: the
+tier of discrete GPUs on a computer (T3) counts one unit for every 200 000, the ratio measured on a
+discrete graphics card, where 60 000 triangles took 0.29 units (a full-screen pass of 1920×1080 at
+0.016 ms) and a directional shadow map about as much as the triangles themselves. Phones, whatever
+their tier, and the lower tiers that phones reach (T0, T1 and T2, also on computers) keep the more
+prudent one unit for every 60 000 until the same measurement exists for a phone. The editor, the
+validator and `pack check` warn with the prudent unit; the daemon, the phone and `reiwand-ctl scene bench`
+choose the quality with the unit of their device. The test `the_3d_stage_costs_on_this_gpu` of
+`crates/reiwand-render/tests/models` (run with `--ignored`) prints those numbers for any graphics card,
+and `scripts/phone-bench.sh costs` builds it for a phone and runs it there over adb. Device tiers take at most 50 000 triangles (T0), 150 000
+(T1), 500 000 (T2) and 2 000 000 (T3), skins of at most 256 bones and shadows of 0, 0, 1 and 2 lights;
+the editor and the validator tell which tiers a scene fits. A tier shows the poster of a scene whose
+models draw more triangles than it takes at the lowest quality, where fur keeps a quarter of its
+shells; other heavy scenes run there at a lower quality, or as their poster when even the lowest
+costs too much. A model inside a 3D group with an `opacity` below 1 is drawn see-through, blended in
+linear light after the opaque models, farthest first: its depth is drawn first, so only its nearest
+surface shows and its own hidden faces and parts stay hidden, at the cost of drawing its triangles
+twice; the lowest quality skips that depth and lets them show through. A lone model keeps its depth and
+is faded as a whole.
+
+`camera3d` at the root of the scene (`camera3d`) is the camera of models, 3D groups and tilted
+layers: `fov` (1 to 179 degrees, may be bound), `near` and `far` planes, `eye`, `center` (both may be
+bound) and `up`; `paths` (at most 16 `{ "id", "keys", "ease", "loop" }`, each with 2 to 256 keys `{
+"t", "eye", "center", "up", "fov" }`, where `t`, `eye` and `center` are required, in increasing time) play one after another or at random
+(`order`), joined by a `fade` `{ "to": "black" | "cross", "duration" (0 to 10 s) }`.
+Without `camera3d` the camera stands at `[0, 0, 5]`, looks at the origin with `up` `[0, 1, 0]`, a
+`fov` of 60 degrees, `near` 0.1 and `far` 1000; depth is reversed (1 near, 0 far) in 32-bit floats.
+Scripts that use `camera` read `scene.camera3d` and set `{ "fov", "eye", "center", "up" }` for the next
+frame (`fov` 1 to 179, points within a million units); what they set wins over the paths.
+
+Paths (`camera_paths`) fly the camera through their keys on a centripetal Catmull-Rom curve, which
+passes through each key and never loops on keys close together; `up` and `fov` follow the same curve,
+and keys without them keep those of the camera. An open path holds its first key until its first `t`
+and lasts until its last key; a path with `loop` closes back on its first key one mean gap after its
+last key, without a jump in place or heading, and `ease` shapes the time along one pass. One open path
+plays once and holds its last key, asking for no more frames; one looping path loops for good; several
+paths play one after another, each once (a looping one for one turn), `sequential` in their order or
+`random` in a new order each round, and then start again. `fade` joins them: `black` darkens the last
+half of `duration` of a path and brightens the first half of the next one (the whole picture of the
+scene fades to black, flat layers included, as one black layer over everything that costs one
+full-canvas draw at every quality level and only while it is not clear), and `cross` draws the last
+`duration` of a path over the start of the next one, mixing both pictures of the models: the start of
+the next path is rendered once and kept while its models, lights and camera stay the same, so a cross
+fade costs one more render of the models when it begins and one mix a slice each frame. Moving paths ask
+for frames, within `max_fps` and at most 30 a second at the lowest quality, and `scene bench` counts as
+needed only the frames that pace asks for.
+
+#### Animated models
+
+A model with any of `clips`, `animations`, `ik`, `physics`, `rules`, `shapes`, `expressions` or
+`root_motion` (`model_animation`) is read with its skeleton: the joints of its skins and the nodes that
+carry meshes become bones, and its vertices stay in the space of their skin (at most 4 bones a vertex,
+weights adding up to 1 within 0.02) or of their node. Clips, animation layers (weight, rate, additive
+layers, fades and bone masks), rules, blend shapes and expressions work as on meshes, mixing the
+animations of the file; the keys of a clip may also give a bone `angles` (degrees around x, then y, then
+z) and `shift` (in units of the model, along x, y and z) added to its rest pose. The palette is worked out
+on the CPU at most once a frame and only for models that are shown, and the GPU skins each vertex with
+it in the vertex shader; blend shapes of the file (positions, normals and, when the file gives them, tangents, so that relief
+maps light a changed shape right) are mixed there too, the 8 heaviest for each primitive; a primitive
+whose shapes carry tangents keeps three values a vertex for each shape instead of two. A model without
+any of these fields bakes the weights its file sets for each mesh (or node) into its vertices once, when
+it is read, and costs nothing more while it plays. A still skinned model draws its rest pose, as the file places it. At most
+256 bones and parts, 1 024 nodes and 4 194 304 blend shape values a model.
+
+`physics` swings bones in the plane of x and y of the model, counting one unit of the model as 100
+pixels for `gravity`, `wind` and `translation`, and freezes at the lowest quality, where bones keep the
+pose of their animation. Chains of `ik` on models take every target meshes take: `bone:` of the model, and a point `[x, y]` in
+pixels of the box of the layer, `layer:` and `cursor`, which are seen through the camera and met on the
+plane through the root of the chain that faces it, then reached in the plane of x and y of the model. With `root_motion`, the root
+bone (the first bone, from the top of the skeleton, that an animation of the file moves) keeps the pose it
+has when its clips start, and what the clips do to it moves the layer instead, along x, y and z and turning
+where the clips turn it, adding up each turn of a repeating clip so that a walk walks on and a turning walk
+walks a circle. Every playing animation layer moves the layer by its weight and fade, mixed as their poses
+are: a layer replaces the motion of those before it by its weight and an additive one adds its own, and a
+layer whose bone mask leaves the root out moves nothing. The work is a few samples and products of the
+root bone per playing layer and frame, the same at every quality and tier, with nothing allocated.
+A model that moves in its stage renders the stage again only on the frames where its pose changed.
+
+## Values
+
+Every number, color, flag, text and image of a layer may be a literal or an object with exactly
+one source:
+
+| Source | Example |
+|--------|---------|
+| User property | `{ "prop": "style", "map": { "night": "sky" } }` |
+| Keyframes | `{ "keys": [[0, 0], [2, 1, "in_out_sine"]], "timeline": "intro", "loop": "repeat" }` |
+| Audio | `{ "audio": "bass" }`, `{ "audio": 3, "channel": "left" }` |
+| Pointer | `{ "cursor": "x" }` (`x`, `y`, `inside`, `speed`) |
+| Clock | `{ "clock": "HH:mm:ss a" }` (text only: `HH`, `H`, `hh`, `h`, `mm`, `m`, `ss`, `s`, `a`) |
+| Script | `{ "script": "scripts/spin.js" }`; with `"fn": "pulse"` and `"params": { "speed": 2 }` a module serves many values (`scripts2`, see "Scripts") |
+| Media player | `{ "media": "title" }` (`media_info`, see below) |
+
+Non-literal values accept `scale`, `offset`, `clamp: [min, max]`, `invert` and `smooth` (seconds).
+Audio values go from 0 to 1: each of the 64 bands per channel (40 Hz to 16 kHz, spaced evenly in
+pitch) is its level in decibels above −70 dB, relative to the loudest band of the last seconds, so
+that quiet and loud music both fill the range (`gain: "fixed"` measures it from full scale instead);
+`bass`, `mid` and `treble` average the bands below 250 Hz, up to 4 kHz and above, `level` is the
+loudness of the whole sound and `beat` is 1 on a beat. Values rise within 20 ms and fall within
+200 ms unless the scene sets `audio`. The order is `bounds`, `exponent`, `invert`, `scale`,
+`offset`, `clamp` and then `smooth`; `bounds` and `exponent` also shape properties, the pointer and
+scripts, and an `exponent` keeps the sign of negative values.
+Easings are `linear`, `step`, `hold`, `in_`, `out_` or `in_out_` followed by `sine`, `quad`,
+`cubic`, `quart`, `quint`, `expo`, `circ`, `back`, `elastic` or `bounce`, or a cubic Bézier
+`[x1, y1, x2, y2]`. Colors interpolate in the OKLab space, lightness, chroma and hue apart, the hue
+along the shorter way round, so that red to green passes through orange and not through a dark
+olive, and a grey takes the hue of the other end; a color field mixes this way however its keys are written, as `"#rrggbb"` or `"#rrggbbaa"`.
+
+`timelines` (at most 64) have `id`, `duration`, `loop` (`once`, `repeat`, `pingpong`), `speed`
+(−100 to 100; below zero the timeline runs backwards from its start without `delay`, so a loop
+plays from its end and one that plays `once` ends at once), `delay`, `autoplay` and `trigger` (`start`, `beat` or `prop:<id>`, which also fires when the
+`button` setting `id` is pressed). Instead of `duration` (seconds), a timeline may count `frames`
+at `fps` (1 to 240) frames a second, both together and never with `duration`; keys stay in
+seconds (`timeline_frames`, which every platform runs). `wrap: true`, only on a timeline that loops
+with `repeat`, blends the values from their last key back to their first one before the loop
+starts again: the stretch from the last key to the first key of the next pass is one more segment
+with the easing of the last key, so a value with keys at 1 s and 3 s on a 4 s timeline goes from
+the last value back to the first between 3 s and 5 s (`timeline_wrap`, which every platform runs). The scene
+clock only runs while the output is shown and active, keeps real time while a still scene waits
+(up to ten minutes between frames, in steps of at most 0.1 s), and never catches up after a pause.
+
+Newer values add these forms, each with its feature:
+
+| Form | Example | Feature |
+|------|---------|---------|
+| Keyframe handles | `[2, 1, { "in": [0.5, 0], "out": [0.5, 0.2] }]`: Bézier handles in time and value around a key of a number, the time of each within the neighbouring segment; `out: [dt, dv]` is the point (t + dt, v + dv) and `in: [dt, dv]` the point (t − dt, v − dv), so equal handles make a smooth key and `dv: 0` a flat one; a side without a handle points a third of the way to the next key. Keys of positions, sizes, colors and other lists of numbers take handles too: there `dv` is a share of the way between the two keys (0 at the first, 1 at the second), so the curve shapes how fast every part moves at once and the value between is the usual blend of the two keys at that share; when both keys of a segment of such a field are written as one number (a pair or triple taken from one number, such as a `scale` of `2`), `dv` is in value units as for a number, every part follows that one curve and the key is written back as the number it was; a side may also be a list of `[dt, dv]`, one for each part (`"out": [[0.5, 0], [0.2, 30]]` for the x and the y of a position, up to four for the red, green, blue and alpha of a color, which then mix channel by channel instead of in OKLab), each in the units of its own part like the handle of a number, so the tracks of a value are shaped independently and even a part that does not change between the two keys can bend; a part missing from the list points a third of the way, and when one side of a segment is a list and the other a single pair, that pair is read as the same share of the way for every part; texts and switches take no handles | `tangents` |
+| Parts on their own | `{ "x": { "keys": [[0, 0], [2, 100]] }, "y": { "cursor": "y", "scale": 100 } }` for a position, `r`, `g`, `b`, `a` for a color; each part is a value of its own and a missing part is that of `base`, or 0 (alpha 1) | `tracks` |
+| Relative | `{ "keys": [[0, 0], [1, 30]], "base": 120 }` adds the animation to `base` (numbers, positions and colors, part by part; a lone number in an effect or script parameter is added to both parts of a pair and to the red, green and blue of a color, and the alpha of a sum stays within 0 to 1) | `relative_values` |
+| Time as a number | `{ "clock": "day" }` from 0 at midnight to almost 1 before the next; also `hour` (0 to 23), `minute` and `second` (0 to 59), `weekday` (1 for Monday to 7 for Sunday) and `month` (1 to 12), all in local time; a value that follows `day` changes at most once a minute, or every `clock.step` seconds (1 to 3600), and the others when they change | `clock_values` |
+| Dates | `{ "date": "EEEE d 'de' MMMM yyyy" }` (text only) with `yyyy`, `yy`, `MMMM`, `MMM`, `MM`, `M`, `dd`, `d`, `EEEE`, `EEE`, `D` (day of the year) and `w` (ISO week) besides the tokens of a clock, names in the language of the package (English or Spanish, English for the others); text between single quotes stays as written and `''` writes a quote; a text without hours, minutes or seconds changes at midnight. A `clock` text keeps only the tokens of the time, and every other letter stays as written | `clock_dates` |
+| Frequency ranges | `{ "audio": [0, 3], "of": 16, "reduce": "max" }` follows bands 0 to 3 of 16 (`of` is 16, 32 or 64, default 64, also for a single band) and takes their `mean` (default) or `max` | `audio_ranges` |
+| Shaping | `bounds: [a, b]` maps a value to (x − a) / (b − a) clamped to 0 to 1, `exponent` (0.1 to 10) raises it, both before `scale` and `offset`; `smooth: { "up", "down" }` rises and falls at different speeds | `shaping` |
+| Layer as texture | `{ "layer": "<id>" }` for a `texture` or `mask` parameter of an effect: the layer is drawn on its own (even with `visible: false`) and fed to the effect aligned with the screen, so that each point of the effect reads the point of that layer above it, at the size the effect's layer has on the screen; it is drawn again only when that layer changes, and each one costs as much as a layer drawn on its own; layers may not feed themselves through other layers, masks or groups | `layer_textures` |
+
+Timelines may name `events`, at most 64 `{ "t", "name" }` with `t` within the duration and names
+of `[a-z0-9_]{1,32}`; each fires once per pass, also when a frame skips over it (on a `pingpong`
+timeline once each way), in the order of their time. A `trigger` or a `play_on` of `event:<name>`
+starts on it, as if it had started at the very moment of the event even when the frame came later,
+so its own events up to that frame, those at 0 included, fire in the same frame, and scripts receive it (`timeline_events`, which every platform runs). A still scene wakes for the
+next event only when a trigger, a sound or a script that the platform runs listens to its name. Clips of meshes and models
+name events the same way.
+
+Triggers may also be `click:<layer>`, `enter:<layer>` and `leave:<layer>` for a layer that is
+`solid` or has `hit` bones, evaluated without scripts (`layer_events`; `click:` needs the `clicks`
+input, the others `pointer`): a click is a press and a release of any button both on the layer,
+which keeps the pointer from the press until the release (so dragging off it and letting go is no
+click), and `enter`/`leave` follow the topmost solid layer under the pointer. They also start sounds
+whose `play_on` names them. Pointer events never make extra frames: they are worked out when the
+scene draws a frame for the pointer it already follows, and a still pointer makes none. And `media:play` (the media player starts playing), `media:pause` (it pauses or stops, or the
+player goes away while it played), `media:track` (a new track, also the first one the scene sees)
+or `media:cover` (a new cover) (`media_info`, input `media`), evaluated without scripts when the
+reading of the player changes, never while the package lacks the grant or no player is there.
+
+`media` values follow what the media player of the computer plays, only while the scene is shown,
+the package declares `media` and the user allows it: the texts `title`, `artist`, `album`,
+`album_artist`, `subtitle`, `genres` and `kind`; the numbers `position`, `duration` (seconds) and
+`progress` (0 to 1); `playing` as a flag or number; and the colors `primary`, `secondary` and
+`tertiary` of the cover, `text` (readable over the primary color) and `contrast` (black or white).
+Texts show their `placeholder` while nothing plays or the grant is missing, and are empty without
+one: a text, or a map from language to text picked like the texts of the manifest by the language
+of the screen, at most 512 characters each, only beside a `media` text value (`media_info`);
+colors are those of the placeholder of the cover. The numbers also fit
+texts, written `m:ss` (`h:mm:ss` from an hour) for `position` and `duration` and as a whole
+percentage for `progress`. The position runs on from the last reading of the player at its rate,
+and starts again from where the player says it jumped (`Seeked`), without asking the player while
+it plays: a number that follows `position` or `progress` asks for at most 30 frames a second and a
+text one frame a second, only while the track plays and the scene is shown; paused, stopped or at
+the end of the track they wake nothing. An asset with `media: current` shows the
+cover of the track and one with `media: previous` the cover of the track before it (both still
+pictures, usable wherever a picture is: image layers, masks, effects, particles); `path` is the
+placeholder shown until a cover arrives, while nothing plays, without the grant and when the
+cover cannot be read. Covers are read once per track (the last eight fetched from the internet are
+kept in memory by address while `media.remote_covers` stays on, so they are not fetched again), also when a new track keeps the address of
+the one before (a cover with the same bytes stays the same cover), from `file://` addresses of at
+most 16 MiB or, only with `media.remote_covers` on (`dbus.md`), from `http` and `https` addresses
+of at most 4 MiB within 5 seconds, pictures of more than 4096 pixels a side are refused, and JPEG covers are decoded already scaled down by the decoder (at most 1/8 of each side, never below 256 pixels on the long side) instead of at full size; they
+are reduced in memory to at most 256 pixels on the longer side in
+sRGB, keeping their shape, and never written to disk. A layer that shows a cover keeps its `size`,
+so a square `size` suits most covers. The colors are worked out once per cover: the three
+most common colors of the cover reduced to 64 × 64 (k-means of three in OKLab, transparent pixels
+left out), the most common first; `text` is the secondary or tertiary color with a WCAG contrast of
+at least 4.5 against the primary one, the higher one first, and otherwise white or black;
+`contrast` is white or black, whichever contrasts more with the primary color. Without a cover
+they are the colors of the placeholder of the first `current` cover asset, or dark greys with white
+text when there is none; `smooth` eases between them part by part.
+
+## Effects
+
+An effect use is `{ "effect", "enabled", "mask", "params", "optional" }`. The built-in effects are
+the descriptors in `crates/reiwand-scene/effects/`, which list every parameter with its type, range
+and default. `texture` parameters take the id of an image asset and `lut` parameters the id of a
+`.cube` asset, both as literals, and a `texture` parameter may also take a layer (`{ "layer" }`,
+see "Values"). The mask of an effect takes a texture, a layer or a shape, like the mask of a layer,
+with `channel`, `invert`, `feather` and `strength`; a layer or shape mask (`effect_masks`) is drawn
+over the box of the layer, so a shape is centered on it and sized in its pixels, and a layer masks
+the effect where it lies on the screen. At lower quality levels (on battery, with software
+rendering or when the frame budget is exceeded) medium and heavy effects run their inner passes at
+half or a quarter of their size, use the cheaper settings of their descriptor or are dropped,
+`optional` ones first; the pass that writes the result of an effect keeps its full size. An effect
+dropped at the current level needs no input, and neither does one whose `enabled` or input
+parameter is bound to a property that currently turns it off.
+
+Positions such as `center` and `source` are fractions of the layer (of the canvas on an adjustment
+layer, which also places its masks and images there), and a `follow` flag hands them to the pointer
+while it is on the output and eases them back within a quarter second after it leaves.
+`tilt_shift` blurs outside a band, or by depth when `depth` names an image. `depth_parallax` shifts
+each point by `(depth - focus) × strength` pixels, times `scale` on each axis (−1 to 1, so a parallax may move less or the other way up and down than across), towards the pointer (`follow`; with `smooth` the pointer as `canvas.parallax` eases it, with its `delay`, so the depth moves together with the parallax of the layers) or along a slow
+orbit (`orbit`, which also takes over while the pointer is away), searching its `depth` image (a
+`linear` asset, bright is near) in 8 to 24 `steps` (16 by default; 24 costs half as much again at Q3 only), at most 12 at Q2 and 8 at Q1, so that near
+parts slide over far ones without tearing; `overscan` enlarges the layer to keep its edges out of
+sight (still pictures with a parallax of their own use depth layers computed once instead, in which what a near object uncovers is filled with background; see "Depth layers" in `dbus.md`). While it would move nothing (no orbit, no `overscan` and the pointer away, centred or not
+followed, or a `strength` of zero) the frame leaves it out, so it costs no pass; the phone, whose
+pointer only follows touches, shows it this way most of the time. Still images with a depth map
+move with the same search. `glitch` stays still until
+`bursts` or `beat` is set (a beat keeps it on for `length` seconds), and `film_grain` only changes
+over time with an `fps` above zero. `blur_motion` streaks along `angle` for `length` pixels, or,
+with `follow`, along the way the layer moved: its speed in canvas pixels per second times
+`shutter` seconds, at most `length` pixels; the scene draws one more frame once the layer stops so
+that the streak goes away.
+
+Blurs and distortions treat the edges of the screen like the edges of the picture: a layer that
+reaches past the screen, or fills it, keeps the color of its outermost visible pixels instead of
+fading into the empty space around it, on all four sides.
+
+`tint` mixes `color` into the layer with a `blend` mode (multiply by default) by `amount` (0 to 1,
+times the alpha of the color), or with `mode: 1` colorizes it: the color takes the brightness of each
+point and `blend` does not apply. `blend_texture` blends `texture` (a picture or a layer) over the
+layer with `blend` by `amount` times the alpha of the texture, placed on the layer, moved by `offset`
+and repeated by `scale` (fractions of the layer); a layer may chain several, each one a pass, and the
+effect never makes the layer more opaque. `light_shafts` draws beams of its own, made of noise
+across their direction: `direction` 0 sends them along `angle` (degrees, 90 downwards), 1 from
+`center` and 2 from the corner of the layer nearest to `center`; `exponent` and `smoothness` (0 hard
+edges, 1 soft) shape them, `feather` fades their far end, `intensity` multiplies them and `color` or a
+`gradient` (read from the start of the beams to their end) colors them. They add light, so they also
+show on a transparent `solid` layer, and the scene only draws new frames for them while `speed` is
+not zero.
+
+### Writing an effect
+
+A built-in effect is two files in `crates/reiwand-scene/effects/`, found when the crate is built:
+`<id>.json`, its descriptor, and `<id>.wgsl`, its fragment entry points. Nothing else changes.
+
+```json
+{
+  "id": "nudge",
+  "name": { "en": "Nudge" },
+  "params": [{ "id": "distance", "type": "float", "default": 8, "min": -64, "max": 64 }],
+  "mask_mode": "strength",
+  "fuse": "uv",
+  "reach": "distance"
+}
+```
+
+```wgsl
+fn uv_nudge(uv: vec2<f32>) -> vec2<f32> {
+    return uv - px(param(0u).x) * vec2<f32>(1.0, 0.0) * mask_at(uv);
+}
+```
+
+| Field | Meaning |
+|-------|---------|
+| `category` | a word such as `blur`, `color`, `distort`, `light`, `motion`, `blend`, `stylize` or `transform` (any other word falls back to its capitalized form); groups the effect in the catalog browser of the editor and in `reiwand-ctl scene catalog` |
+| `description` | a short `Text` (plain, or per locale like `name`) of what the effect does, shown next to its cost in the catalog browser and in `reiwand-ctl scene catalog` |
+| `uses` | `time`, `cursor`, `audio`: the scene keeps rendering while time runs, the pointer moves or sound plays; otherwise the effect costs nothing after its first frame |
+| `pace` | when a time effect changes: `{ "rate": "<float parameter>" }` (that many times a second), `{ "sweep": ["<speed>", "<gap>", "<phase>"] }` (a band crosses the layer once every `1 + gap` turns and waits off it in between), `{ "steps": [<high>, <low>] }` (1 to 240 times a second, the second number at Q0) or `"outside"` (only while the pointer is off the output); the scene then sleeps until the picture changes |
+| `mask_mode` | `mix` (default) blends the result with the input by the mask; with `strength` the shader scales itself by `mask_at(uv)`, as distortions should, and must leave the picture as it is where the mask is zero: a single-pass effect masked by a picture (not a layer or a shape, not inverted, feathered or weakened) is then drawn only over the box of the lit texels of its mask channel, grown by `reach` and kept inside the visible part of the layer, and left out while that box is off screen |
+| `params` | at most 16 of `float`, `vec2`, `color`, `bool`, `texture` and `lut`, with `id`, `default`, `min`, `max` and `uses` (`time`, `cursor`, `clicks` or `audio`; clicks come with the pointer), an input needed only while the parameter is not zero (a `follow` flag needs the pointer only when set, a `vec2` while either part is not zero), and `tools`, the editor tools that make the picture of a `texture` or `mask` parameter (`ramp`: a gradient stops editor that writes a ramp image, `gray`: a grey brush, `flow`: a direction brush for flow maps, `depth`: make a depth map) or `["table"]` on a `lut`; without `tools` the editor picks them by the id (`gradient` and `ramp` get `ramp`, `phase`, `walls` and `reflection` get `gray`, `map` gets `gray` and `flow`, `depth` gets `gray` and `depth`, a `lut` gets `table`), and the built-in effects declare theirs; parameter *n* is `param(nu)`, in `.x`, `.xy` or `.rgba` (linear) |
+| `passes` | `{ "entry", "scale", "inputs", "output" }`; `scale` is a fraction of the layer size, and lower quality levels shrink every pass but the last; `inputs` (default `["previous"]`) name `previous`, `input`, `source` (the layer before its effects), `mask`, `pass:N`, `state`, `backdrop` (what is already drawn under the layer, which then draws on its own) or `asset:<texture parameter>`, bound to `input_tex` and then `aux0` to `aux3` |
+| `cost` | `{ "taps", "passes", "scale" }`; taps × passes × scale² units, light up to 1, medium up to 6, heavy above |
+| `min_fps` | 1 to 240: the frame rate at which the effect still looks smooth; while the only things that move in a scene are effects that declare it, the scene runs at the highest of their `min_fps` instead of the full rate (never above the usual limits) |
+| `velocity` | a `bool` parameter that, when set, gives the shader the speed of the layer in `fx.velocity.xy` (canvas pixels per second) and keeps the scene drawing while it moves |
+| `fuse` | `uv` or `color` for single-pass effects, see below |
+| `reach` | a float parameter, in pixels, by which the effect grows the layer bounds |
+| `bounded` | texture or mask parameters outside whose lit texels (any of red, green and blue above zero) the effect leaves the picture as it is; the engine then draws a single-pass effect only over the box of those texels, grown by `reach` |
+| `state` | `{ "scale", "settle", "fade" }`, persistent textures for simulations, see below |
+| `solve` | `homography`: the first four parameters are `vec2` corners (top left, top right, bottom right, bottom left, as fractions of the layer) and the three slots after the parameters hold the rows of the matrix that takes a layer point back to the unit square; such an effect is not fused |
+| `quality` | overrides per level, `{ "q1": { "params": { "taps": 8 }, "scale": 0.5 } }`, applied at that level and below; a number is an upper limit for the value the scene sets, other values replace it, `scale` shrinks the inner passes and the state, and `"freeze": true` keeps an effect that would be dropped at that level: its state stops and it shows its last picture without asking for frames |
+| `lighter` | a cheaper variant of the effect for low quality levels, `{ "passes": [...], "cost": {...}, "up_to": "q1" }`, see "Lighter variants" below |
+
+#### Lighter variants
+
+```json
+"lighter": {
+  "passes": [{ "entry": "fs_blur_lite", "scale": 0.5 }, { "entry": "fs_blur_lite_mix", "inputs": ["previous", "input"] }],
+  "cost": { "taps": 2, "passes": 2, "scale": 0.5 },
+  "up_to": "q0"
+}
+```
+
+An effect may carry a lighter variant that the engine draws instead of leaving the effect out, so
+that a heavy scene still looks close to itself on a slow device. Its `passes` are entry points of
+the same shader file, written as the passes of the effect are (same inputs, targets, state and
+limits); its `cost` is its own, and both the declared cost and, for a package effect, the measured
+one must be lower than those of the effect, or the reader refuses the descriptor. Everything else
+(parameters, mask mode, `reach`, `state`, `quality` overrides, `uses`) is that of the effect. An
+effect that is fused (`fuse`) cannot have one. A descriptor without `lighter` behaves as before.
+
+At each quality level the engine picks one form of each use, the same at an automatic level and at
+one the user fixed: at `up_to` and below (if it is given) the variant whenever it fits that level;
+otherwise the full effect when it fits the level, and the variant where the level would leave the
+effect out (medium effects at Q0, `optional` ones at Q1, as in the table of costs below); an effect
+whose variant does not fit either keeps its `freeze` or is left out as before. The hard budget of a
+view tries the variant of a use that does not fit before it leaves the use out, and notes it as
+`the effect <id> on <layer> was drawn with its lighter variant: <reason>` instead of `... was left
+out: <reason>`; `reiwand-ctl pack check` prints the same notes. The cost of a scene at a level counts
+the form drawn there. Pipelines of variants are built when the scene loads, as those of the full
+effects are, and choosing one allocates nothing while frames are drawn. The editor shows the form
+each level draws in the cost of an effect (the query `effect_cost` gives `form`: `full`,
+`lighter`, `frozen` or `out`, per level). A package effect with a lighter variant names the feature
+`lighter_effects`.
+
+Every shader starts from one prelude. `frame` holds `time`, `dt`, `resolution`, `cursor` and
+`cursor_delta` (fractions of the output), `buttons` (the pressed pointer buttons as a bit mask),
+`inside` (1 while the pointer is on the output), `presence` (`inside` eased over a quarter second),
+`bass`, `mid`, `treble`, `level`, `beat`,
+`since_beat` (seconds since the last beat), `seed`,
+`quality`, 64 audio bands (`band(i)`) and `glide` (the pointer as `canvas.parallax` eases it with its `delay`, from −1 to 1 on each axis, 0 in the middle; reading it needs the pointer). The samplers are `samp` (clamped) and `wrap` (repeating);
+`lut_tex` is the 3D texture of the first `lut` parameter, read with `lut(rgb)`. Helpers: `tap(uv)`,
+`sample(t, uv)`, `px(pixels)`, `mask_at(uv)`, `layer_uv(uv)` and its inverse `from_layer(uv)`,
+`asset_at(t, uv)` (an asset placed on the layer, such as a depth map), `cursor_uv()`,
+`screen_uv(uv)`, `to_linear` and `from_linear` (they convert between the values the effect reads and linear light according to `canvas.blend_space`: with `linear`, the default, the values already are linear and both return their input unchanged; with `srgb` they decode and encode the sRGB curve), `straight`, `oklab`, `from_oklab`, `gauss`, `hash`,
+`hash2`, `noise1`, `value_noise`, `gradient_noise`, `fbm(p, octaves)`, `bayer(pixel)`,
+`layer_extent()` (the size of the layer in output pixels), `time_phase(t, uv)` (the brightness of a
+`phase` picture at that point), `outside_layer(uv)` (the point, or `OUTSIDE_UV` when it is off the
+layer; a `uv_<id>` function that returns `OUTSIDE_UV` leaves that point transparent) and
+`relief(depth, sampler, uv, shift, focus, steps)`, the depth search of `depth_parallax`.
+`fx.texel` is the size of the first input, `fx.info.z` the pass index, `fx.area` the effect
+rectangle in output pixels, `fx.clip` the part of it that is on the screen (as fractions, where
+`sample` and `tap` stop reading) and `fx.velocity` the speed of the layer when the descriptor
+names a `velocity` parameter. Effects may not declare bindings of their own.
+
+An effect with `fuse` defines `fn uv_<id>(uv) -> vec2<f32>`, where its output reads its input, or
+`fn color_<id>(color, uv) -> vec4<f32>` on premultiplied colors, and gets the single pass
+`fs_<id>`. Consecutive light fused effects of a layer without masks and with a fixed `enabled` run
+as one generated pass, compiled when the scene loads, so their helper functions start with the
+effect id.
+
+`"state": { "scale": 0.25, "settle": 3 }` gives the effect two textures (16-bit float where the GPU
+allows) at that fraction of the layer size, kept between frames. A pass with `"output": "state"`
+writes the next one once per 1/60 s of scene time (at most four times a frame, so a simulation
+keeps its speed at any frame rate; `fx.info.y` counts these steps) and `state` reads the latest.
+They start transparent, restart when the layer size changes and are dropped when the scene leaves,
+stops or pauses. `settle` keeps rendering that many
+seconds after the pointer moves, a button is pressed or the sound stops, so ripples fade before the
+scene goes still, and also after the layer or the effects before it last changed. `fade` names a
+float parameter by which the state is kept each step: the scene then also renders until a picture
+kept that way has faded below 1/512 (at most 60 s). In a built-in effect, passes with `"output":
+"step"` before the pass that writes the state run with it on each step, into 16-bit textures of
+their own, so that a simulation can solve in several passes; package effects use targets instead.
+
+`cargo test -p reiwand-scene` checks every descriptor and compiles its shader. A GPU test for an
+effect goes in `crates/reiwand-render/tests/effects/<id>.rs`, also found automatically:
+
+```rust
+use super::*;
+
+#[test]
+fn nudge_moves_the_image() {
+    let Some(out) = Fx::new("nudge", json!({ "distance": 8 })).input(halves(RED, BLUE)).shot() else { return };
+    out.check(&[((36, 16), RED), ((44, 16), BLUE)]);
+}
+```
+
+`Fx::chain(effects)`, `.adjust()` (effects on an adjustment layer), `.image(id, image, linear)`,
+`.lut(id, text)` and `.quality(level)` set up the scene. `.run()` returns a `Run` whose `runtime`
+(time, audio) and `pointer([x, y])` change between `shot()`s, and whose `stats()` count passes and
+new textures. A `Shot` has `at`, `check`, `mean` and `diff`.
+
+### Package effects
+
+A package may bring at most 32 effects of its own (`custom_effects`): `effects` in `scene.json`
+maps an id (`[a-z0-9_]{1,32}`, not the id of a built-in effect) to `{ "descriptor": "<path>.json",
+"wgsl": "<path>.wgsl" }`, two files of the package of at most 64 KiB each (256 KiB of shaders for
+all of them), and layers use the id
+like any effect. Readers parse the descriptor with the fields above, require its `cost`, compile
+the shader with the contract below and refuse it with `/effects/<id>: <reason>` when it does not
+compile, lacks an entry point or an `override` its options name, or declares bindings of its own;
+then they check every use of it like the uses of built-in effects. The inputs an effect needs are
+found in the compiled shader (reading `frame.time`, the pointer or the audio, also through helper
+functions) and added to its `uses`, so that the scene asks for them without the author listing
+them. Package descriptors may also use `stage`: `material` for the shader of a model material, whose
+WGSL defines `fn material(s: Surface) -> Surface`, or `particle` for a particle renderer
+(`render.shader`), whose WGSL defines `fn particle(p: Sprite) -> Sprite` for each corner of each
+particle; such descriptors have no passes, and the scene may only use them where their stage fits.
+`Surface` has `position`, `normal`, `uv`, `albedo`, `emissive`, `roughness`, `metallic` and
+`occlusion`; `Sprite` has `position`, `velocity`, `corner`, `uv`, `color`, `size`, `rotation`, `age`
+and `life`. A material shader has at most 8 parameters (`param(0u)` to `param(7u)`), none of them a
+`lut`, `mask` or `emitters`, and samples up to 4 images: its `texture` parameters, in the order the
+descriptor lists them, are read with `image0(uv)` to `image3(uv)` (a repeating, filtered read of
+the picture, each counted as a texture read of the stage function in its cost). A material of the
+scene names each image by the id of a picture asset of the package or `white`, `black`, `noise` or
+`normal_flat`, as a literal (not bound to a property); one it does not name reads the `default`
+of the descriptor. Readers also build a material shader the way the 3D renderer does, with only
+`frame`, `param`, the images and the helpers of the material prelude, and refuse it with
+`it does not build as a material shader: wgsl:<line>:<column>: <reason>` when it uses what only
+layer effects have (`input_tex`, `sample`, `tap`, `mask_at` and the like). A material shader the
+graphics card still cannot build is left out like an effect: its models are shaded with `pbr`
+and `left_out` names it (`the effect <id> was left out: its models are shaded with pbr instead,
+since <reason>`). Package descriptors may also use:
+
+| Field | Meaning |
+|-------|---------|
+| `params` | at most 24; besides the kinds above, `emitters` (a list of at most 64 point and line emitters, given to the shader as a picture of three texels each, read with `textureLoad`, and its count in the slot, 0 while no emitter has a strength above 0; the list may be keyframed, where two keys with as many emitters blend each emitter of the same shape and a point that becomes a line jumps, follow a property through a `map` of lists, or be set by a script, but follows no sound, pointer or other number), `int` (whole numbers), `enum` (with `values`: 1 to 64 `{ "value", "label" }`), `blend` (one of the 34 blend modes, given to the shader as its number in the order of the list), `position` (a point of the layer the editor lets the author place; any parameter may also have `unit`: `degrees`, which makes a `float` an angle the editor turns on a dial on the canvas) and `mask` (a picture painted per channel, with `channels` 1, 3 or 4 and `paint`, the color or number a mask without a picture has); a `texture` may name its authoring tool with `tool`: `gray`, painted in grey with the mask brush, or `flow`, a flow map whose red and green hold a direction (0.5 is still, alpha 0 leaves the picture unread) painted with a comb that points each texel along the stroke drawn over it); a `texture` or `mask` whose value (its `default`, the value an effect use gives it or a value of its `map`) names no asset but is `white`, `black`, `noise` or `normal_flat` reads that generic picture, and the editor offers those four next to the assets; every parameter may have a `label` and a `help` per language, of at most 256 characters, and `yields_to`, another parameter that, while not zero, takes over: this one then asks for no input of its `uses`, and `waits_for`, another parameter that must not be zero for this one to ask for the input of its `uses` (the emitters of `fluid` wait for its `strength`, so a fluid at strength 0 rests once it settles) |
+| `targets` | at most 8 named textures `{ "scale" (0 to 2 of the layer size), "format" }` with `rgba8` (default) or `rgba16f`, kept between passes of one frame |
+| `options` | at most 8 variants `{ "id", "values", "default", "when_bound" }`, each a WGSL `override` of the shader with 1 to 16 whole numbers or flags; a use sets them through `params`, as literals or bound to a property, and every combination it may need (at most 8 per use) is built when the scene loads, never during a frame; `when_bound` turns an option on while the named texture parameter has a picture |
+| `compose` | `true` draws the layer over what lies below it first; the effect reads that picture as its input and its result replaces the layer's box on the scene |
+| pass `target` | writes the pass into that target instead of the next texture; targets start transparent each frame, so passes that write them with a `blend` add up |
+| pass `copy` | a pass without a shader that copies one input (`"copy": "target:history"`) into its output, resizing it when the sizes differ |
+| pass `swap` | a pass without a shader that exchanges two targets of the same scale and format (`"swap": ["front", "back"]`), for ping-pong passes |
+| pass `blend` | `replace`, `normal`, `add` or `multiply` onto its output, to accumulate without a copy |
+| pass `vertex`, `grid` | a vertex entry point and a grid of 1 to 64 cells a side over the layer, to bend it (`vertex_effects`) |
+| pass `inputs` | at most 9, also `backdrop` (what is already drawn under the layer, which then draws on its own), `target:<name>` and `asset:<mask parameter>`; they are bound to `input_tex` and then `aux0` to `aux7` |
+
+A package effect has at most 16 passes. Its shader is checked for the work it can do before anything
+reaches the graphics driver, on a thread of its own with a 64 MiB stack, so that no shader can
+exhaust the stack of the program that reads it. Before naga parses it, a scan of its text refuses
+an expression more than 256 operations deep (`a + a + ...`, unary signs, member accesses, indices
+that follow a bracket such as `a[0][0]`, `else if` chains and the brackets around them all count; a
+number ends before a `.` that a letter follows), more than 64 nested brackets of any kind and more
+than 4 096 arguments to calls and constructors in the whole shader; a `//` comment ends at every
+line break WGSL knows (`\n`, `\r`, vertical tab, form feed, U+0085, U+2028, U+2029) and the
+Unicode blank space WGSL allows counts as blank. The same limits hold again on the parsed shader,
+whatever its text: an expression more than 256 operations deep (a named `let` starts a new one),
+more than 64 nested blocks and more than 4 096 arguments and constructor parts are refused.
+Then: at most 32 768 expressions; every loop counts an `i32` or `u32`
+variable from a literal start to a limit that is a literal, a constant, an `override` with listed
+`options`, or `min(x, <literal>)`, steps it once in the loop's `continuing` part by a literal or a
+constant of at least 1 and never writes it elsewhere inside the loop (`for (var i = 0u; i < 16u;
+i++)` qualifies; float counters, steps that come from an `override` or `min`, `while` loops, `break
+if` and counters passed to functions or compared through a conversion do not); a conversion
+such as `u32(m)` in a start or a limit counts only when the value it converts is known and fits the
+new type unchanged, and `bitcast` never counts; the start, the limit and the value the counter has
+when the loop ends must fit its type, so `i >= 0u` counting down, `i <= 4294967295u` or
+`u32(-1i)` are refused; a loop runs at most 1 024 times. Every entry point is weighed in scalar
+operations a pixel, nested loops and called functions included: one per scalar of a value an
+expression computes, loads or stores and one per statement, a matrix product as rows × columns ×
+the shared size, `sin`, `exp`, `sqrt`, `normalize` and the like as four, an integer division or
+remainder as 32 and a float remainder as four per component, a texture read as 16 and
+a call as all of the function it calls; the statements of a loop before its condition count once
+more than its rounds, since they run once more. A read or a write at a computed index into a function or
+`private` array or matrix that the shader writes element by element or passes by pointer costs
+F × min(F, 1 024) / 32 more, where F is the size in bytes of all the arrays the shader indexes that
+way together (32 768 for 1 KiB): such arrays leave the registers, and a scattered access to them
+costs as much as thousands of operations; a read at a computed index into a `const`, into a
+variable only ever written whole, or into an array value costs as much as a texture read;
+a function never receives a pointer into a function variable or to an element picked that way. An
+entry point, and the `material` or `particle` function of a stage effect, may run at most 1 048 576
+operations a pixel, and may be at most 32 768 operations long once every call counts the whole
+function it calls again, since drivers copy called functions into their callers; the passes of an
+effect together, vertex entries included, are at most 131 072 operations long. Function and
+`private` variables, every array and structure value the shader computes (call results, loads,
+constructors and arguments included, all counted at once) and the deepest chain of calls may keep
+at most 8 KiB a pixel. Across the whole shader, every function included even if nothing calls
+it, the values that start at zero (variables without a value and empty constructors such as
+`array<vec4<f32>, 64>()`) are at most 64 KiB together, since some drivers receive each of them
+written out element by element. The
+check is an early, readable refusal, not the only safeguard: the engine also builds every package
+shader with a hidden counter in each of its loops, so any loop stops after 1 024 rounds each time
+it starts, and every loop a pixel runs stops once the loops of that pixel have made 65 536 rounds
+together, whatever the check concluded. Option values must fit the type of their `override`.
+Targets are at most twice the layer size and never larger than the largest texture of the device,
+and parameters fill 24 slots (`param(0u)` to `param(23u)`). The descriptor's `cost` counts at least
+one unit for each pass that draws, times the square of its scale, nine times for a pass with a
+`grid` (twice for a grid of one cell), whose operations and texture reads count nine times too, one unit for every four texture reads its shader can make a pixel and one unit for
+every 512 operations, loops and the stage function of a `material` or `particle` effect included,
+whatever the descriptor says; its numbers must be finite and
+at least 0. A layer whose effects read `backdrop` adds two units for the copy, and four for a
+`compose` effect. The engine shrinks every triangle a vertex entry draws, around its middle, to at
+most three cells of the grid a side, so a grid that stretches its cells over the layer draws each
+pixel nine times on average at most; a vertex entry that bends the grid moves its cells freely.
+
+On the desktop, the daemon and its workers, the app with its editor, `reiwand-ctl` and `reiwand-server`
+run that check (the scan of the text, naga's parse and validation, the limits above and the rewrite
+that adds the loop counters) in a short-lived helper first: a copy of their own program
+(`/proc/self/exe`, so it still works after an upgrade replaced the file) started with the hidden
+argument `--reiwand-check-shader` and an empty environment, which limits itself to 1 GiB of address
+space, 4 seconds of processor time and no core file (or the lower hard limits it inherited; when it
+cannot lower them it refuses with `the checker could not limit itself: <error>`) before it reads the id, the descriptor and the
+shader on its standard input, and answers with the hash of what it checked and its refusal, if any.
+It is killed after 10 seconds. The daemon's workers, which lower their own priority, start the
+helper from a thread that keeps the priority they started with. Only when the helper accepted exactly those files does the program
+check them again itself (which also gives the descriptor its measures), and only effects that passed
+that check are ever built for the graphics card. A refusal of the helper refuses the package with
+the same reason; a helper that crashes, runs out of memory or processor time, takes too long or
+does not start refuses it with `its shader could not be checked: the checker ...`, without a
+strike, since the program itself never ran the check. Verdicts are kept by a SHA-256 of the program
+version, the limits, the id, the descriptor and the shader, in memory and in `checked-effects`
+beside `stopped-effects` (lines `<hash> ok` or `<hash> refused <reason as a JSON string>`, the
+4 096 used last, rewritten under a lock and renamed into place, with up to 4 096 kept in memory), so the helper runs once for each version
+of an effect, when it is first read, and a new release checks every effect again; failures of the
+helper are kept nowhere, and the daemon reads the library packages they refused again when it starts
+and on `RetryEffects`. The phone keeps the check in its own process, bounded by the limits of naga's
+constant evaluation.
+
+At start-up, the first opening of a foreign library is serialised in the whole process, because the
+graphics driver and a codec plug-in take the dynamic loader's lock and the driver's own lock in
+opposite orders, and two threads doing one each would wait for each other for ever (the daemon
+starts the renderer and the first video on different threads). The one-time paths that may open such
+a library run under one lock (`reiwand_core::loader::serialised`): creating the graphics instance,
+asking for an adapter or a device, listing adapters, creating the first video element or pipeline,
+and loading the depth model runtime. Starting video support also opens the plug-ins of hardware codecs
+right then, under that lock, instead of on the first thread that needs one. The lock is never taken
+per frame.
+
+The engine builds every pass and every variant a use may need when the scene loads, each inside an
+error scope of the graphics driver, on up to four threads beside the one that draws, and waits for
+them at most 10 seconds. On OpenGL ES, whose driver serves one context to one thread at a time, those
+threads build each shader first in a context of their own on the same driver, and only a shader
+that built there in time is built again in the context that draws, on its thread; the same goes for
+the pipelines of particle shaders. So a slow or broken shader is left out on OpenGL ES exactly as
+on Vulkan, and never holds the context that draws. Material shaders (`stage: "material"`) follow
+the same rule when a 3D stage first draws them: the shader and the pipelines its draws need are
+built on a thread beside the one that draws (on OpenGL ES first in a context of their own), waited
+for at most the same 10 seconds, and one that is not built in time is left out with `its models are
+shaded with pbr instead, since its shader took more than 10 s to build` and struck like a slow
+effect; the stage then shades with `pbr` and does not try it again while it lives. A material
+pipeline is never built on the drawing thread outside that wait. The package shaders a scene builds may be at most 262 144 operations long
+together, each pass counted once for each variant built; the effects past that are left out. An
+effect the driver refuses, or whose shader is not built in time, is left out and the layer is drawn
+without it; so is every package effect drawn in a frame the driver rejects. Only the variants built
+then are drawn: an option value a property binding does not map draws the built variant of the
+lowest mapped value, and a use whose variant is missing is left out with `its shader was not built
+for these option values` instead of building on the thread that draws. A program that ends cleanly
+while a package shader still builds (the daemon on `SIGTERM`, its workers, the app, `reiwand-ctl`)
+stops the other builds, waits at most a second for the driver and then exits at once, without the
+exit handlers that would race the driver.
+
+Each view keeps at most two frames on the GPU: before it sends a frame it waits for the one two frames
+back. A frame with package effects, or of a view with effects on trial, may take at most 10 seconds,
+and so may every other wait for the GPU while such a frame was sent less than 20 seconds before and
+has not been seen to finish, such as composing it into a stream; other frames and waits may take 10 seconds on a GPU and, with software
+rendering, 10 seconds times 32 divided by the number of cores, between 10 and 60 seconds (20 with 16
+cores, 40 with 8, 60 with 4 or fewer; `LP_NUM_THREADS` counts when set). A frame with package effects still running after its
+limit leaves out the package effects of the
+frames of that view still on the GPU and of its trials, with `it kept the graphics card busy for more
+than 10 s`, counts a strike for each and fails with the GPU stopped. With software rendering a scene
+draws at most a megapixel per core (an 8K screen with two cores draws a 1080p frame, scaled up), and
+when a measured frame takes more than an eighth of its limit the view draws the next ones at 70 % of
+the size, down to a quarter, growing back the same way once frames take less than a sixteenth of
+that, so a legitimate heavy frame never reaches the limit. The engine also measures the GPU time of
+every frame and of each effect: where the device can write timestamps it times the whole frame, the
+particle simulation and sorting sent before it, the posed meshes, molds and the 3D stages (models,
+shadow maps and the depth read by particles) sent with it, and each run of passes of one effect, built in or
+packaged, on every frame (31 runs a frame; a frame
+with more takes turns among them, and then shares the time of the frame not spent in timed built-in
+effects among the timed package effects by their part of the timed time), and reads the times back
+when the frame has finished, without waiting for it, in the order they were sent. The GPU time of a
+frame is what it adds: the union of the spans of its particle submission and of the frame, cut at
+the end of the frame before, so neither the wait behind a frame still on the GPU (with two or three
+frames in flight the span of a frame holds the tail of the one before) nor passes that run side by
+side on tile-based GPUs count twice. When the timed runs of a frame add up to more than that, as
+they do where passes overlap, they are scaled down to it before any effect is judged, so the runs
+only share the frame among the effects and never decide alone. `reiwand-ctl scene bench` shows it as
+`gpu_ms`, the old span sum (first to last timestamp of the frame plus its particles) as `span_ms`,
+and the particle part in its simulation line.
+Elsewhere it waits for the GPU before and after every fifteenth frame of a scene that draws (and
+around its particle simulation), every frame with package effects of a trial or while one of them is
+suspected, and counts the whole frame. When the package effects of a frame take more than 400, 60, 40
+or 30 ms on the four tiers on their own (a fifth more than a frame at 30 or 40 frames a second, so
+effects right at the limit are not left out by noise), the package effects that take the most of it,
+until the rest of their time fits, are left out with `it is
+too slow for this graphics card: a frame took <total> ms on it, <n> ms of them in this effect, and it
+allows <limit> ms` once that happened on three frames within 8 seconds, cheap frames in between or
+not, or at once for an effect over four times the limit (and 100 ms), whatever the rest of the frame
+costs. Built-in effects are timed but never left out, and what layers and built-in effects cost never
+counts against a package effect: the quality level is what makes such a frame fit. Without timestamps only a frame over a second (and four
+times the limit) leaves its package effects out. A slow effect is left out for as long as the program runs, also in its other views,
+and counts no strike: it may run well at another size or on another day. Only a frame that keeps
+the GPU busy for 10 s, a lost GPU or a crash counts strikes. The desktop reports it
+in `GetState().outputs[x].left_out` while the scene keeps playing, so the app, the tray and
+`reiwand-ctl state` show `the effect <id> was left out: <reason>` as a note, and the phone lists it
+among its diagnostics.
+
+Package effects that stop the graphics card or the program count strikes, by a hash of their
+descriptor and shader, in `stopped-effects` in the cache folder of the desktop (the daemon, its
+workers, the app and `reiwand-ctl` share it) or in the files of the phone. The newest 1024 effects
+with one strike are kept, and the newest 4096 blocked ones; single strikes never push out a blocked
+effect. Before a program checks a package shader for the first time (after the helper accepted it, so only its own check counts) it writes
+`<hash> trying <process>` there and removes the line once the check ends; before it builds the effect for a scene
+it writes the line again and removes it once the first three frames that follow have finished on the
+GPU, once a second has passed since the first one finished with no frame on the GPU (a still scene
+draws once), or once the scene stops drawing. Each process that writes such a line holds a lock on a file named
+after it in `stopped-effects.trials` beside the book for as long as it runs, so processes in other
+pid namespaces (separate sandboxes sharing the cache folder) see each other's trials alive. A line
+whose process no longer holds its lock counts as a strike the next time any of them reads the file,
+so a crash, an abort, an out-of-memory kill or a hang the user ends while an effect is checked,
+built or first drawn counts like a lost GPU. A clean exit (the daemon stopped or its display server
+gone, a worker, the app or `reiwand-ctl` ending) removes the lines of the process first. A running
+process reads the file again whenever it changes, so a block set by another process holds at once.
+When the GPU stops (the device is lost, or runs out of memory, or a resource it made turns out
+invalid) while frames are in flight, the effects of the frames that had not finished count a
+strike, not those of outputs whose frames had (each frame is followed until the GPU reports it
+done); a shader still building after 10 seconds counts one too. An effect with
+two strikes is no longer checked (`its shader is not checked again`, so the package is refused) or
+built (`the graphics card or the program stopped twice while it built or drew this effect`); an
+effect that reaches two strikes while it is drawn is left out with `the graphics card or the
+program stopped while it drew this effect`. A single strike is forgotten after a day, since a
+suspend or a driver reset also stops the GPU. `reiwand-ctl retry-effects`, `RetryEffects` on D-Bus, Try
+again next to the note in the app or Try the left-out effects again among the diagnostics of the
+phone forget them and draw the scenes again, building every effect that was left out (also those
+whose shader took too long to build, the driver refused or was too slow, which are measured
+again); library packages refused
+because a shader was not checked again are read again (also each time the daemon starts), and a
+refusal from the book is never kept in the cache of checked shaders. A new version of the effect has
+another hash and runs again.
+
+Layers with a `compose` effect or a pass that reads `backdrop`, built-in or not, and layers whose
+effects take a layer as texture or mask are drawn again whenever anything in the scene changes, since
+what lies below them or the layer they read is part of their picture. A layer that feeds others is
+drawn once a frame however many effects read it, and a change to it, hidden or not, or to a layer it
+reads in turn, redraws the layers that read it.
+
+The contract is the prelude above plus `aux4` to `aux7` (eight auxiliary textures in all), `mask_rgb(i, uv)` (every
+channel of `aux<i>` placed on the layer, for `mask` parameters, which the scene editor paints one channel at a time), `PI`,
+`tex_size(i)` (size in pixels of `aux<i>`), `daytime()` (0 at midnight to 1, in steps of a
+minute), `parallax()` (the current parallax shift, before each layer's own depth), `cursor_last()`
+(the pointer one frame earlier, in fractions of the output), `grid_uv(i)` (the corner of the grid
+that vertex `i` of a pass with `grid` draws, six vertices a cell), `grid_position(uv)` (that point
+of the layer as a clip-space position), `layer_color()` (the tint of the layer times its
+brightness, linear) and `layer_alpha()` (its opacity),
+`band_left(i)` and `band_right(i)` (64 bands per channel), `band_of(i, n)`, `band_left_of(i, n)`
+and `band_right_of(i, n)` (band `i` of 16, 32 or 64, mixed or per channel), `rotate2(v, degrees)`, `greyscale(rgb)`, `hsv(rgb)`, `from_hsv(hsv)` and `blend_mode(mode, b,
+s, amount)`, which blends straight colors with any of the blend modes. A vertex entry point returns
+`VertexOut(position, uv)`, usually `VertexOut(grid_position(bent), grid_uv(i))`. `CONTRACT` in
+`crates/reiwand-scene` holds it, and package shaders are checked against it whole. Package effects run
+the same WGSL on every platform.
+
+The scene editor imports an effect with its two files (`reiwand-ctl scene act <dir>
+import_effect '{"descriptor":"descriptor.json","wgsl":"shader.wgsl"}'`, or Import an effect in the app), copies them to
+`effects/<id>.json` and `effects/<id>.wgsl`, refuses them with the reason when they fail the checks
+above, and then lists the effect among the ones a layer can add. Its parameters become controls in
+the inspector with their localized `label`, sliders within `min` and `max`, choices for `enum` and
+`blend`, and may be bound to properties, keyframes or scripts like any parameter.
+
+### Package transitions
+
+A scene may bring its own transition, for when it comes in and, if it wants, for when it leaves.
+It is declared in `scene.json` under `transition`, with up to two passages, `in` and `out`; each
+passage names its own two files, a descriptor and a shader, like a package effect:
+
+```json
+"transition": {
+  "in": {
+    "descriptor": "transitions/porthole.json",
+    "wgsl": "transitions/porthole.wgsl",
+    "duration_ms": 1200,
+    "curve": "in_out_sine",
+    "params": { "soft": 0.2 }
+  }
+}
+```
+
+```json
+{
+  "id": "porthole",
+  "stage": "transition",
+  "cost": { "taps": 1, "passes": 1, "scale": 1 },
+  "params": [{ "id": "soft", "type": "float", "default": 0.1, "min": 0, "max": 1 }]
+}
+```
+
+```wgsl
+fn transition(c: Crossing) -> Crossing {
+    var o = c;
+    let soft = param(0u).x;
+    let d = length((c.uv - 0.5) * vec2<f32>(c.resolution.x / c.resolution.y, 1.0)) / 0.75;
+    let k = smoothstep(c.progress * (1.0 + soft) - soft, c.progress * (1.0 + soft), d);
+    o.color = mix(after(c.uv), before(c.uv), k);
+    return o;
+}
+```
+
+The shader defines `fn transition(c: Crossing) -> Crossing`, called once per pixel of each screen
+for every frame of the transition. `Crossing` carries `uv` (0 to 1, top left origin), `resolution`
+in pixels, `progress` (0 to 1, already shaped by the curve), `quality` (0 to 3, the level the screen
+draws at) and `color`, which arrives as the plain fade of the two pictures. `before(uv)` samples the
+picture that was showing and `after(uv)` the one that comes in; `param(i)` reads the parameters in
+the order of the descriptor, and the shared helpers of package effects (`TAU`, `LUMA`, the Oklab,
+noise and dither functions) are there too. The color the shader leaves is drawn opaque. For an
+`out` passage, `before` is this scene and `after` is a plain picture in the background color of the
+wallpaper that comes next.
+
+`duration_ms` goes from 100 to 10000 (1000 when it is missing); `curve` takes the easing names of
+keyframes (`in_out_sine`, a cubic Bézier…) (`linear` when it is missing) and its result is kept between 0 and 1; `params` holds
+literal values for at most 24 parameters, each one named in the descriptor and of its type. The
+descriptor has the `transition` stage and goes through every check of package effects: the
+sandboxed shader, the declared cost compared with the measured one, the strikes. A transition takes
+no picture, lut, mask or emitter parameter, and it may cost at most 8 units, so it is never
+heavier than a medium effect; it plays at the quality levels where an optional effect of its class
+plays (a light one everywhere, a medium one only at levels 2 and 3).
+
+A transition is not part of the picture: one that fails its checks does not refuse the scene. The
+check of the package (`reiwand-ctl pack check`) lists the reason in words, the log notes it, and the
+screen uses the plain fade of the settings instead. The transition chosen in the settings still
+rules over it: `transition.kind` (or `transition.kind.<output>` for one screen) is `own` by
+default, which plays the wallpaper's transition; `fade` always gives the plain fade and `none` a
+cut. `transition.less_motion` (`system` by default, `always`, `never`) turns every transition into
+the plain fade while it reduces, and `none` stays a cut. The state of each screen says which one
+played at its last change and why (`own`, `chosen`, `reduced`, `fallen`, `plain`).
+When a wallpaper with an `out` passage gives way to one with an `in` passage, `out` plays first
+and `in` after it, each with its own duration; the work exists only while a transition plays and
+each screen plays its own. The shaders of the passage are built away from the drawing while the
+new wallpaper loads, within the same build limit as package effects (the log says
+when it is passed); the passage starts once they are ready, so it always plays from its first
+frame, and the old wallpaper stays on screen meanwhile. A build that fails or passes the limit
+gives the plain fade.
+
+The phone plays package transitions with the same engine (feature `transition` is `yes` there).
+Its choice is `transition.kind` for the screen (`own`, `fade`, `none`). Less motion on the phone
+(the system's «remove animations», or `transition.less_motion` set to `always`) turns every change
+into a cut, not a fade. With battery saver or a low battery away from the charger the wallpaper
+stands still and every change is a cut; below the battery level where the lowest quality is used
+the wallpaper's transition gives way to the plain fade. A passage that does
+not play at the quality the screen draws at is left out and the other one, if any, still plays; a
+transition that fails its checks, does not build in time or fails to draw gives the plain fade,
+logged and never shown to the person. A change of wallpaper while a passage plays drops the
+passage and the plain fade carries on to the last choice. The two wallpapers and the passage's
+textures are released the moment the change ends.
+
+### Newer effects and parameters
+
+The effects and parameters below came after the first built-in set. Each names a feature:
+`effect.<id>` for an effect, `effect.<id>.<parameter>` for a newer parameter of an older effect, so
+that older engines refuse a package that uses one with the newer-version message instead of an
+unknown name; every engine that knows them draws them on every platform. Package effects may not
+take their ids. Positions are fractions of the layer, `blend` parameters take any of the 34 blend
+modes, `phase` parameters are `linear` pictures whose brightness shifts the time of each point (by
+a whole cycle at full brightness, by eight steps of the noise for `shake`) so that neighbouring
+parts do not move together, and `gradient` parameters are pictures of one row read from left to
+right. An effect that has a `phase` picture is not fused with its neighbours. Costs are the units
+of "Cost and frame rate": light effects run at every quality level, medium ones are dropped at Q0
+(and at Q1 when `optional`), heavy ones run their inner passes at a quarter of their size at Q1;
+effects with a lighter variant draw it where they would be dropped (`blur` and `bloom`, below);
+the quality level falls on battery, with software rendering or when frames take too long, so these
+rules are also what a phone or a laptop on battery draws.
+
+| Effect | What it does | Parameters | Cost and lower levels |
+|--------|--------------|------------|-----------------------|
+| `blend_gradient` | mixes in another picture through a gradient map, from left to right without one | `texture`, `map` (textures), `progress`, `softness` (0 to 1) | light |
+| `caustics` | moving light patterns of water | `color`, `scale` (0.1 to 16), `speed` (0 to 8, needs time while not zero), `strength` (0 to 4), `perspective` (0 to 1) | light; one layer of pattern instead of two at Q0 |
+| `displace` | bends the layer by a normal map (`mode` 0, refracted through its slope) or an offset map (`mode` 1, 0.5 still), repeated over the layer, or by built-in noise without one | `map`, `mode`, `scale` (0.1 to 16), `strength` (0 to 256 px), `scroll` (−4 to 4 a second, needs time while not zero), `ratio` (0.1 to 10, wider than tall) | light |
+| `electric` | thin crackling lines where two drifting noises meet | `color_a`, `color_b`, `bounds` (0 to 1, where lines start and are full), `scale` (0.1 to 16), `smoothness` (0 to 1), `speed` (0 to 8, needs time while not zero), `multiply` (0 to 8), `blend` (`add`) | light; changes 30 times a second and asks for a frame only then, 15 times at Q0 |
+| `fire` | lifts and flickers flames already in the picture, and colors them by brightness with a `gradient` | `speed` (0 to 8, needs time while not zero), `strength` (0 to 64 px), `scale` (0.1 to 16), `gradient` | light |
+| `fluid` | smoke, fire or liquid simulated over the layer, from any number of point and line emitters and the pointer | `render` (0 gradient, 1 emitter color, 2 the picture itself, 3 distortion only), `gradient`, `color`, `velocity_decay`, `dye_decay` (0 to 1, kept each 1/60 s), `push` (0 to 8, needs the pointer while not zero), `emitters` (at most 64 `{ "from", "to", "angle", "strength" }`: a point at `from`, or a line from `from` to `to`, in fractions of the layer from −2 to 4, pushing towards `angle` (−360 to 360, −90 is up, the default) with `strength` (0 to 64); the list may be keyframed, follow a property through a `map` or be set by a script; any emitter with a strength above 0 needs time while `strength` is not 0), `strength` (0 to 8, default 1, scales every emitter and may be bound), `blend`, `perspective` (0 to 1), `opaque`; the editor places emitters with handles on the canvas, and a grip at the end of each direction line turns it and sets its strength; for a list that follows a property through a `map` the canvas shows and edits the list of the current value of the property, or the one *Place these emitters on the canvas* picks in the inspector, and every list takes the ends of each emitter typed as `x, y` | heavy: a state of a quarter of the layer, 20 pressure steps every 1/60 s (8 at Q1, where the state is halved); frozen at Q0, where it shows its last state and asks for no frames; draws only while it emits, the pointer pushes it, or for 6 s after |
+| `glitter` | short star-shaped sparkles in a grid of cells | `density` (0 to 1), `size` (0.5 to 16 px), `speed` (0 to 8 new patterns a second, the scene sleeps in between), `color` | light; cells twice as large at Q0 |
+| `lens_flare` | a core, a halo and ghosts along the line from a light to the middle | `source`, `follow` (needs the pointer when set), `intensity` (0 to 4), `ghosts` (0 to 8), `halo` (0 to 1), `color` | medium |
+| `local_contrast` | deepens contrast around edges (unsharp mask) | `radius` (1 to 64 px), `amount` (0 to 4), `luma_only` (on by default: colors keep their hue) | medium, two blur passes at half size; best marked `optional` |
+| `pulse` | makes brightness, color, opacity or a tinted light beat in time, with noise, or with a band of sound | `what` (0 brightness, 1 color, 2 opacity, 3 a tinted light added like a dodge: each color becomes `color × tint_low + color × tint_high × level`, the level running between `bounds` with the beat, so `tint_low` white keeps the picture and `tint_high` adds its light on top), `speed` (0 to 16 beats a second, needs time while not zero and no band drives the beat; a band replaces it), `bounds` (0 to 4, the level at the low and the high of a beat), `tint_low`, `tint_high`, `noise` (0 to 1, needs time while not zero), `noise_speed` (0 to 16), `phase`, `audio_band` (0 off, or a band 1 to 64 whose level drives the beat; needs sound only then) | light |
+| `reveal` | shows another picture through a circle or an ellipse that may follow the pointer | `texture`, `shape` (0 circle, 1 ellipse), `radius`, `softness` (0 to 1), `follow` (needs the pointer when set), `invert`, `center` | light |
+| `spin` | turns the part of the layer around a center, fading out towards `radius` | `center`, `angle` (−360 to 360), `speed` (−720 to 720 °/s, needs time while not zero), `radius` (0 to 2, of the longer side) | light |
+| `trail` | keeps fading copies of what the effects before it drew, the same at any frame rate | `persistence` (0 to 0.99, kept each 1/60 s) | medium, a state of the layer's size; draws while the layer or the effects before it change and until the copies have faded |
+| `transform` | moves, scales, turns or skews the layer after the effects before it, within its box | `offset` (−2 to 2), `scale` (0.01 to 16), `angle` (−360 to 360), `skew` (−89 to 89), `pivot` | light |
+| `vhs` | a rolling tracking line, torn rows, snow, streaks and color fringes of a worn tape | `strength` (0 to 2: past 1 the tears, fringes and snow keep growing), `speed` (0 to 8, needs time while not zero), `noise` (0 to 1, the snow), `aberration` (0 to 16 px), `band` (0 to 1, the rolling line with its torn rows and the slow bend of the picture; 0 turns them off), `artifacts` (0 to 3, short bright streaks of a damaged tape, 24 new ones a second), `invert` (the streaks invert the colors under them instead of brightening them) | light |
+
+| Effect | Newer parameters |
+|--------|------------------|
+| `bloom` | `tint` (white) colors the glow, as `canvas.bloom` does; it blurs at a quarter of the layer size, and on an adjustment layer at full opacity it adds the glow onto what lies below by blending instead of copying the result back; a lighter variant (1 unit instead of 3) gathers the bright parts with nine taps at a quarter of the size in one pass and adds them in a second, drawn at Q0 and at Q1 when `optional` instead of dropping the glow, also for `canvas.bloom` |
+| `blur` | `blend` (`normal`) and `amount` (0 to 1) mix the blurred picture back into the sharp one; a lighter variant (1 unit instead of 6) blurs with nine taps at half the size and scales the result up, drawn at Q0 and at Q1 when `optional` instead of leaving the picture sharp |
+| `blur_motion` | `follow`, `shutter` (0 to 0.5 s) |
+| `chromatic_aberration` | `mode` (0 grows with the distance from `center`, 1 the same shift along `angle`, 2 the same shift away from `center`, 3 grows with the square of the distance), `angle` (−360 to 360) |
+| `depth_parallax` | `scale` (−1 to 1 on each axis, 1 by default; a vector handle on the canvas), `smooth` (follows the pointer as `canvas.parallax` eases it) |
+| `film_grain` | `mono` (black and white film), `bias` (−1 to 1, more grain in dark or bright parts), `blend` (`overlay`, the lightness grain as before; any other mode blends a grey noise) |
+| `flow` | `noise` (a built-in flow field when no map is given, as long as `direction`), `phase` |
+| `god_rays` | `mode` (0 radial, 1 along `angle`, 2 a star of `edges` rays from every bright part, at most 8 at Q1), `angle` (−360 to 360), `noise` (0 to 1, a flicker that needs time while not zero), `edges` (2 to 16) |
+| `iris`, `lens_distort` | `background`: where the layer moved away it shows what lies behind instead of its edge |
+| `reflection` | `angle` (−360 to 360) turns the mirror line around its middle |
+| `scroll` | `repeat_x`, `repeat_y`: off, the picture leaves that side instead of coming back |
+| `shake` | `noise` (0 to 1, jerkier), `friction` (0 to 1, longer near rest), `bounds` (0 to 1 of `strength` on each axis), `phase`, `flow` (a flow map painted with the comb: each point moves along its own direction instead of `direction`, by the first axis of the shake), `motion` (0 noise, as before; 1 a periodic push, once every 1/`speed` seconds, that `friction` makes sharper and longer at rest: a smooth shove that returns, not the sawtooth of the equivalent effect of a package, which a migration keeps as that package effect), `side` (0 both ways around the rest position; 1 only forward along the direction or the flow; 2 only backward, so a leg kicks one way and comes back) |
+| `shine` | `blend` (`add`, as before), `gradient` (read across the band), `style` (0 a line, as before; 1 a double line, a thinner one at 60 % trailing the first; 2 a ring that grows from the middle of the layer and ignores `angle`; 3 a glint, a star with a bright core and four rays that travels along `angle`), picked in the editor from drawings of each style |
+| `sway` | `double` (a second, slower wave over the first), `phase`, `foliage` (each point trembles along x and y by `amplitude` pixels at most, as leaves do: four sines of the time at unrelated rates on each axis, their phase from the place of the point, `spread` and the `phase` picture; it replaces the bend and the swing and moves the whole layer, so a mask picks the leaves), `ratio` (0.1 to 10, how much wider than tall the trembling is) |
+| `twirl` | `aspect` (0.1 to 10, an ellipse), `inner` (0 to 1, turned whole inside), `noise` (0 to 1), `repeat` (wraps the picture around instead of stretching its edge) |
+| `water_ripple` | `perspective` (0 to 1, smaller waves towards the top), `reflection` (a picture seen in the slopes), `tint` (colors the moving water), `walls` (a picture where the water stays still), `speed` (0 to 4) |
+| `waves` | `count` (1 or 2), `angle2` (−360 to 360, of the second wave), `perspective` (0 to 1), `phase` |
+
+The values left at their defaults draw exactly what the effects drew before them.
+
+## Sound
+
+```json
+{ "id": "gusts", "type": "sound", "sound": "wind", "loop": true, "fade_in": 3, "fade_out": 3,
+  "play": { "prop": "wind", "map": { "calm": false, "breeze": true } },
+  "volume": { "timeline": "storm", "keys": [[0, 0.4], [20, 1, "in_out_sine"], [40, 0.4]] }, "pan": -0.3 }
+```
+
+A `sound` layer plays a sound asset: `.ogg` (Vorbis or Opus), `.opus`, `.flac` or `.wav`, mono or
+stereo, sampled at 8 to 192 kHz, at most 8 MiB and 60 s long, and at most 180 s for all the sounds
+of a scene together; the package reader checks the headers and the daemon stops decoding a sound
+that goes on longer than its header says (an MP3 without a length in its header may last up to the
+60 s). A scene has at most 8 sound layers, which mix together.
+
+Sound follows the time of the scene. Each layer knows how long ago the scene started it: since the
+scene started for a `play` that is always on, since the key that turned it on for `play` keyframes
+(on a looping timeline, since the start of the pass), since the trigger for `play_on`, and since it
+turned on for the rest. The sound plays at that point of its clip or of its list, so a loop that
+drifts more than 60 ms from the scene jumps back in step with a 5 ms fade, a scene that resumes
+plays from where its timelines are, and a sound started again starts over. A layer keyed on a
+timeline that is paused or has ended keeps playing on, and jumps back to the timeline when it plays
+again; a timeline started late or sought starts its sounds at its position, not from zero. The
+engine re-aligns playing sounds with the scene once a second. About 50 ms pass between the scene and
+the speaker (the soundtrack asks PipeWire for 20 ms periods and keeps about 20 ms queued); positions
+are counted from the playing position of the audio output, plus one 20 ms PipeWire period when the
+sound goes to PipeWire, so the queue does not shift sounds.
+
+| Field | Meaning |
+|-------|---------|
+| `loop` | `true` (default) repeats the sound without a gap; `false` plays it once each time `play` turns on |
+| `play` | starts the sound when it turns on and stops it when it turns off (default `true`); the sound plays from the point the scene says, see above |
+| `volume` | `0` to `1` (default `1`); changes glide over 20 ms, so keyframed curves sound smooth |
+| `pan` | `-1` (left) to `1` (right), default `0`, gliding like `volume` |
+| `fade_in`, `fade_out` | seconds (`0` to `60`) the sound takes to rise when it starts and to fall when it stops |
+
+Newer sound layers may also use (`sound2`):
+
+| Field | Meaning |
+|-------|---------|
+| `sound` as MP3 | `.mp3` files (MPEG Layer III) whose first frame follows the ID3 tag, checked like the others; only a file named `.mp3` is read as MP3 |
+| `sounds` | instead of `sound`, a list of 1 to 16 sound assets |
+| `mode` | with `sounds`: `sequence` (default, in order) or `random` (picked with the scene seed) |
+| `pause` | `[min, max]` seconds (0 to 600) of silence between clips, picked with the scene seed |
+| `stream` | `true` plays the files as they are read instead of from memory, for long sounds: at most 32 MiB and 10 minutes each and 64 MiB for all the streamed sounds of a scene, outside the 180 s of the others |
+| `play_on` | a trigger (`start`, `beat`, `prop:<id>`, `event:<name>`, `click:<layer>`, `enter:<layer>`, `leave:<layer>` or `media:<what>`, as for timelines) that starts the sound, always under the user's volume and mute |
+
+A layer has either `sound` or `sounds`. With `loop: false`, `sequence` plays the list once and
+`random` one clip each time it starts. `random` never plays the same clip twice in a row when the
+list has more than one, and the clips and pauses it picks follow the scene seed, so the same scene
+with a fixed `clock.seed` plays the same order. A streamed sound is decoded a little ahead of where
+it plays, and the next streamed clip of a list starts decoding 1.5 s before its turn, so lists and
+loops of long sounds play without gaps; nothing of a stream is kept once it has played. `play_on`
+starts the sound again each time its trigger fires; `play` still mutes it while it is off. The
+desktop and the phone play these sounds (the phone decodes them with the codecs of the system when they
+first sound, reads a `stream` sound as it plays and keeps about 0.2 s between the scene and the speaker).
+
+`play`, `volume` and `pan` may be literals or follow a user property or keyframes on the scene
+clock, which a timeline triggered by a property or a beat can drive; they never follow the audio
+analysis, the pointer, a clock text or a script, so a scene cannot hear its own sound. Values that
+change over time are read at the frame rate of the output without rendering a frame. A sound layer
+draws nothing, takes none of the visual fields (`transform`, `opacity`, `effects` and so on) and
+cannot be a mask.
+
+Every scene with sound has a `volume` user property, a slider from 0 to 100 % (100 by default)
+added automatically; a manifest may declare it to change its label, default or order, as long as
+it stays a slider within 0 to 100. Scenes start muted like videos and follow `playback.muted` and
+`playback.volume`; only one output plays the sound of a scene shown on several outputs, and nothing
+plays on the lock screen (see "Scene sound" in `dbus.md`). On the phone the sound plays only while the
+wallpaper is shown on the home screen (not on the lock screen or in a preview), pauses with the scene
+when battery saver, a low battery or heat stop it, follows `playback.duck` and releases its audio output
+5 s after every layer has stopped; a scene that has sound layers gets its `volume` setting there too. The
+settings of the app set `playback.volume` with a slider in steps of 5 % under the sound switch; the
+output asks for the power-saving mode of AAudio and the timing of the sound subtracts the frames it
+still holds.
+
+## Particles
+
+`particles` maps at most 8 ids to systems, which hold at most 200 000 particles together. A
+`particles` layer draws one system; several layers may draw the same system, which then moves only
+once per frame and shares its budget between them. Positions are canvas pixels, and the transform of the layer moves, turns and
+scales the whole system around the canvas center.
+
+```json
+"particles": {
+  "sparks": {
+    "capacity": 4000, "seed": 7, "prewarm": 2.0,
+    "emitters": [{ "shape": { "box": { "from": [0, 1080], "to": [1920, 1100] } }, "rate": { "prop": "density" },
+                   "bursts": [{ "count": 40, "on": "beat" }] }],
+    "init": { "life": [2, 5], "speed": [40, 120], "angle": [250, 290], "size": [4, 12], "color": ["#ffd27a", "#ff7a3d"] },
+    "forces": [{ "gravity": [0, -20] }, { "turbulence": { "strength": 30, "scale": 0.004 } },
+               { "attractor": { "target": "cursor", "strength": 5000 } }, { "drag": 0.4 }],
+    "collide": [{ "bounds": "canvas", "bounce": 0.3 }],
+    "render": { "texture": "spark", "frames": "life", "size_over_life": [[0, 0], [0.1, 1], [1, 0]],
+                "trail": { "length": 8, "width": 0.5 } }
+  }
+}
+```
+
+| Field | Meaning |
+|-------|---------|
+| `capacity`, `seed`, `prewarm` | 1 to 200 000 particles; the seed of the system, mixed with `clock.seed`; seconds simulated when the system first shows (at most 10) |
+| `emitters` | at most 4 of `{ "shape", "rate", "bursts", "follow", "inherit" }`. Shapes are `{ "point": [x, y] }`, `{ "box": { "from": [x0, y0], "to": [x1, y1], "inner"?, "at"? } }`, `{ "circle": { "center", "radius", "inner" } }` (a ring when `inner` is above 0), `{ "line": [[x0, y0], [x1, y1]] }`, `"edge"` (the border of the canvas) and `{ "mask": { "texture", "threshold" } }` (where the alpha of an image stretched over the canvas is above `threshold`, 0.5 by default). `rate` is particles per second and may be bound like any value. `bursts` is a list of at most 8 independent bursts, each emitting `count` particles: `on` each `beat` or `click`; otherwise once `at` seconds (0 by default) after the emitter starts and, with `every`, again every that many seconds. The list of one burst the older scenes wrote as `burst` is now written `bursts: [{ ... }]`. `follow: "cursor"` moves the shape with the pointer and `inherit` adds that fraction of the pointer velocity |
+| `init` | `[min, max]` ranges picked for each particle: `life` (seconds), `speed` (pixels per second), `angle` (clockwise degrees, 0 to the right), `size` (pixels), `rotation`, `spin` (degrees per second), `frame` (first atlas frame) and `color` (two colors mixed at random) |
+| `forces` | at most 8 of `{ "gravity": [x, y] }`, `{ "drag": k }`, `{ "turbulence": { "strength", "scale" } }` (curl noise), `{ "attractor": { "target", "strength" } }` (negative strengths repel), `{ "vortex": { "center", "strength" } }`, `{ "orbit": { "center", "strength" } }` and `{ "noise": strength }`. Gravity and strengths may be bound, as in `{ "noise": { "audio": "bass", "scale": 300 } }`. Targets and centers are a point or `"cursor"`, which pulls nothing while the pointer is away |
+| `collide` | at most 4 of `{ "bounds", "bounce", "friction", "kill" }` where `bounds` is `"canvas"`, `{ "plane": { "point", "normal" } }` (particles stay on the side the normal points to) or `{ "circle": { "center", "radius" } }` (particles stay outside). `bounce` and `friction` go from 0 to 1 and `kill` removes a particle when it touches |
+| `render` | `texture` (an image asset, split into frames by its `atlas: [rows, columns]`), `frames` (`time` at `fps`, `life` or `random`), `mix` (blends one frame into the next), `size_over_life` and `color_over_life` (`[t, value]` keys from 0 to 1, at most 64, that multiply size and color), `stretch` (`{ "time", "min", "max" }`: seconds of motion a particle is stretched along, and the pixel limits) and `trail` (`length` from 1 to 16 steps, `width` from 0 to 1). Without a texture particles are soft discs. The layer's `blend` (`add` suits glowing particles), `opacity`, `mask` and effects apply |
+
+The simulation advances in fixed steps of 1/60 s, at most 15 per frame; a longer frame takes 15
+equal steps up to a second, so particles keep real time down to one frame per second and never
+catch up more than a second, and the same seed and the same frames give the same particles. While
+no particle lives and none is emitted, the system skips ahead to its next timed burst. A paused
+scene frees its particles and starts them again, prewarmed, when it resumes. It runs in compute shaders
+on the GPU, and on the CPU with software rendering or where compute shaders are missing. Particles
+only move while their layer is shown and the scene runs, and a scene keeps rendering only while
+particles live, are emitted or wait for their next timed burst. A scene holds at most 2 000
+particles with software rendering, 5 000 on other devices without compute shaders and 10 000,
+50 000 or 200 000 on the GPU depending on the device; the budget is shared by capacity, particles
+are drawn smaller where they would cover the screen more than 1, 1.5, 3 or 6 times over, and trails
+are limited to 0, 4, 8 or 16 steps. Lower quality levels let only 75 %, 50 % or 25 % of the
+particles be born and halve or drop trails. `reiwand-ctl scene bench` reports where particles run,
+their slots, how many are alive at the end, the steps per frame and the simulation time after the
+warm-up frames. When they run on the processor, the state of the output says `"particles": "cpu"`
+(`"gpu"` otherwise) and the app, the tray, `reiwand-ctl` after showing the scene and the settings of
+the phone say so, because fewer of them are shown.
+
+### Newer particle fields
+
+Systems may also use these fields. Most name `particles2`, which also covers scenes beyond the
+older limits: up to 32 systems, 8 emitters, 16 forces and 8 colliders per system and 30 s of
+`prewarm`. Control points are named `p0` to `p7`: `p0` is the origin of the system unless `points`
+sets it, and every other name must be one of `points`. Targets and centers of forces, `around`,
+`between` and `init.inherit` take a point, `"cursor"` or a control point.
+
+| Field | Meaning | Feature |
+|-------|---------|---------|
+| `space` | `local` (default) or `world`: in `world` the transform of the layer and of control points only places particles when they are born | `particles2` |
+| `points` | at most 8 control points `{ "at" (may be bound), "follow": "cursor", "space", "angle" }`, `at` or `follow` | `particles2` |
+| `lock` | settings layers may not change through `instance` (`alpha`, `size`, `count`, `speed`, `life`, `time_scale`, `brightness`, `color`, `points`) | `particles2` |
+| emitter `duration`, `delay` | seconds after which the emitter stops (0 never) and before it starts (0 to 86400) | `particles2` |
+| emitter `periodic` | `{ "on": [min, max], "off": [min, max] }` seconds of emission and pause, picked from the seed | `particles2` |
+| emitter `max_per_step`, `audio_gate` | at most that many births per 1/60 s step (1 to 1000), and no births while the sound is silent | `particles2` |
+| shape `box` | also `{ "from", "to", "inner": [w, h], "at" }`, a hollow box around a control point | `particles2` |
+| shape `circle` | also `scale: [x, y]` (0.01 to 100), `sign: [x, y]` (−1, 0 or 1: half or quarter circles) and `at` | `particles2` |
+| shape `layer` | `{ "id", "threshold", "color", "inherit", "jitter", "refresh": "static" \| "on_change" }` births where a layer is opaque, taking its color and motion | `particle_layers` |
+| shape `around` | `{ "at", "count" (1 to 4096), "arc", "radius", "speed", "mode": "repeat" \| "mirror", "restart" }` births in turn around a point | `particle_fields` |
+| shape `between` | `{ "from", "to", "count", "span", "mode", "arc": { "amount", "side" }, "taper": { "position", "speed", "size" } }` births along a line or arc between two points | `particle_fields` |
+| `init` ranges | each range may add an exponent `[min, max, exponent]` (0.1 to 10) that leans the pick to one end; `color` too | `particles2` |
+| `init.alpha`, `hsv`, `palette` | an opacity range of its own; `{ "hue": [0, 360], "steps", "sat", "val" }`; or `{ "colors" (1 to 10), "noise": [h, s, v] }` (not both), which replace `color` | `particles2` |
+| `init.gradient` | at most 8 `[t, color]` stops in order, read at a random place (leaned by the exponent of `color`) and replacing `color`; not with `hsv` or `palette` | `particles2` |
+| `init.velocity`, `radial`, `inherit` | `[[vx0, vy0], [vx1, vy1], exponent?]` replacing `speed` and `angle`; a speed away from the center of the shape; `{ "from" (cursor or control point), "speed": [min, max] }` | `particles2` |
+| `init.turbulent`, `offset_noise`, `remap` | turbulent starting velocity `{ "forward", "scale", "noise_speed", "offset", "speed", "phase", "audio" }`; a fractal offset of the birth `{ "distance", "scale", "sign", "octaves" (1 to 6), "noise_scale", "noise_speed" }`; at most 8 `{ "input", "in", "clamp_in", "output", "out", "clamp_out", "op", "wave" }` that map `daytime`, `runtime`, `life`, `age`, `speed`, `random`, `distance:pN`, `audio:<band>` or `cursor:x\|y` onto `size`, `alpha`, `color`, `speed`, `life`, `rotation`, `spin` or `frame` with `set`, `mul`, `add` or `sub` and an optional `sine` or `noise` wave | `particle_fields` |
+| `perspective`, `init.depth`, `init.depth_speed` | `{ "focal" (1 to 100000 px) }` and depth ranges in pixels, which need `perspective` | `particle_depth` |
+| force `window` | `[in_start, in_end, out_start, out_end]` fractions of the life, in order, in which any force fades in and out | `particles2` |
+| forces | `{ "oscillate": { "what": "position" \| "alpha" \| "size", "freq", "scale", "phase", "mask" } }`, `{ "cap": speed }`, `{ "torque": k }`, `{ "spin_drag": k }`, `{ "slow_near": { "target", "inner", "outer", "factor" } }`; `attractor`, `vortex` and `orbit` take `radius` and `falloff` (`constant`, `linear`, `inverse_square`), `vortex` also `inner`, `outer` and `ring: { "radius", "width", "pull" }`, `turbulence` also `speed`, `time_scale` and `mask` | `particles2` |
+| forces | `{ "keep_distance": { "target", "distance", "strength" } }` (−1000 to 1000), `{ "keep_between": { "from", "to", "strength" } }`, `{ "remap": { … } }` applied every step (input `age` too) | `particle_steering` |
+| force `boids` | `{ "radius" (1 to 10000), "separation", "alignment", "cohesion" (0 to 10), "max_speed" }` flocking, for systems of at most 8192 particles | `boids` |
+| collider `mask` | `{ "mask": { "texture", "threshold" } }`, the part of an image stretched over the canvas whose alpha is above `threshold` (0.5 by default), which particles bounce off or die on | `particles2` |
+| colliders | `{ "box": { "from", "to", "inside" } }`, `{ "segment": { "from", "to" } }`, `circle` with `inside`, and `stick: true` | `particle_collisions` |
+| collider `layer` | `{ "layer": { "id" } }`, the opaque shape of a layer | `particle_collisions` |
+| `children` | at most 4 `{ "system", "on": "static" \| "spawn" \| "death" \| "follow", "probability", "max", "offset", "angle", "scale" (0 to 100), "points_from", "inherit", "follow_inherit" }`: other systems born with or from each particle, at most two levels deep and never back to themselves; `inherit` copies `color`, `size`, `alpha` or `velocity`, every step with `follow_inherit` on `follow` children; a collider that `kill`s counts as a death | `particle_children` |
+| render `brightness`, `cycles`, `stretch` | 0 to 16, may be bound; repeats the frames that many times per life (1 to 64, with `frames: life`); `stretch` takes `min` and `max` in pixels, and `min` equal to `max` only turns a sprite along its motion | `particles2` |
+| render `order` | `newest`, `oldest`, `largest`, `smallest` or `lowest`: the particles drawn on top; others are drawn in no set order | `particles2` |
+| render `rope`, `trail` | `{ "subdivide" (0 to 7), "width", "uv_scale", "uv_scroll", "smooth" }` joins particles in birth order; trails of up to 64 steps with `segments`, `subdivide`, `uv_scale`, `uv_scroll` and `textured` | `particle_ropes` |
+| render `cutout`, `orient`, `angle` | `[start, end, opacity]` remaps the alpha of the texture; `screen`, `velocity` or `fixed` with `angle` | `particle_looks` |
+| render `lit`, `normal`, `refract` | `lit` lights the sprites with the scene ask CARPETA lights`z`, lights the back); a spot with a `texture` casts its picture (image, video or layer) on them as it does on a lit layer, at the cost of one more texture read per lit pixel and spot with a picture, the same at every level; `normal` is a `linear` normal map laid over each sprite and turned with it; the `lighting` block of the layer, when set, lights them too and gives `strength` and `emissive`. `refract`: `{ "normal", "amount" }` (0 to 1) draws the sprites only as a bend of what is behind them, by the normal map, up to `amount` times half the size of a sprite; it works at full size at Q3, at half size at Q2 and leaves the sprites out at Q1 and Q0; a device without a blendable half-float target leaves it out too and names the layer in the notes of what was left out. Trails, long trails and ropes are lit and refract too, as a flat surface facing the viewer for the light and as a round tube across their width for the bend (their normal map is not read); sprites drawn with a particle shader take the light and the bend after their own `particle` function, with one more pipeline per shader and blend for each, built only when the layer is lit or refracts. A lit trail or rope costs the same light loop per pixel as a lit sprite, and a refracting one draws once more into the bend target at the size of the level, like the sprites | `particle_lighting` |
+| render `shader` | a package effect with `stage: "particle"` | `particle_shaders` |
+
+The newer fields behave as follows.
+
+- **World space.** A `world` system moves in canvas pixels: the transform of its layer places,
+  turns and scales particles, their speed and their shapes when they are born, and they are drawn
+  without it, so moving the layer afterwards leaves them where they are. Gravity and the other
+  forces act along the directions of the canvas, and targets, colliders and control points of the
+  layer move with it. Each layer that draws a `world` system moves particles of its own.
+- **Control points.** `at` is in pixels of the layer, or of the canvas with `space: world`; a point
+  that follows the cursor goes back to the center of the canvas when the pointer leaves. A shape
+  with `at` is drawn around that point, turned by its `angle`. The `points` of a layer's `instance`
+  and the `point(n, [x, y])` of scripts move points `p0` to `p7` for that layer; a `null` entry
+  of `points` leaves that point to the system.
+- **Shapes.** `inner` cuts a box of that size out of the middle of a `box`, which births fill evenly.
+  `scale` stretches a `circle` into an ellipse and `sign` keeps its positive (1) or negative (−1)
+  half along x and along y.
+- **Starting values.** A range `[min, max, exponent]` picks `min + (max − min) · u^exponent`.
+  `alpha` replaces the alpha of the color. `hsv` picks the hue in degrees (with `steps`, one of that
+  many hues from one end of the range to the other), the saturation and the value from 0 to 1
+  (`[1, 1]` when left out, as the editor shows them);
+  `palette` picks one of its colors and moves its hue by up to `noise[0]` half turns and its
+  saturation and value by up to `noise[1]` and `noise[2]`. `radial` adds a speed away from the center
+  of the shape (the center of the canvas for `edge` and `mask`, the direction of `angle` for a
+  `point`), and `inherit` adds the velocity of the pointer or of a control point, times a number
+  picked from `speed`.
+- **Forces.** `window` fades a force in between its first two fractions of the life and out between
+  the last two. `attractor`, `vortex` and `orbit` weaken with distance as the inverse square, the
+  inverse and not at all by default; with a `radius` they do nothing beyond it and weaken as
+  `1 − d / radius` (`linear`) or its square (`inverse_square`). A `vortex` with `inner` and `outer`
+  turns fully inside `inner` and fades out at `outer`, and its `ring` pulls particles toward a circle
+  of that `radius` with `pull`, fully at `width` pixels away. `turbulence` scrolls its noise `speed`
+  pixels per second to the right, changes it `time_scale` times as fast and scales its x and y by
+  `mask`. La fuerza `turbulence` usa un ruido periódico de 256 celdas y su fase la envuelve el
+  anfitrión, por lo que no salta con el reloj encendido durante días; con `smooth` y `gyro`,
+  `depth_parallax` también sigue la inclinación del teléfono. `oscillate` picks a frequency, a scale and a phase for each particle and moves it around
+  where it would be without drifting (x and y a quarter of a turn apart, scaled by `mask`), fades its
+  alpha by up to the scale or grows and shrinks its size by that fraction. `cap` limits the speed,
+  `torque` adds degrees per second to the spin each second, `spin_drag` slows the spin and
+  `slow_near` multiplies the speed every 1/60 s by `factor` near its target, fading to no effect
+  between `inner` and `outer`.
+- **Emitters.** `delay` and `duration` count from the start of the system or from the last
+  `play()`; a finished emitter, with no particle alive, lets the scene sleep. `periodic` alternates
+  emission and pause for times picked from the seed. One-time bursts fire whenever the emitter
+  starts: at first, after its `delay`, at each `periodic` window and after `play()`. `max_per_step`
+  keeps the rest of the births for the next steps.
+- **Children.** `static` children emit on their own around the origin of their parent. `spawn` and
+  `death` children start the one-time bursts of their emitters (one particle when they have none, at
+  most 1000) where each particle is born or dies, in the same step, and `follow` children are born
+  `rate` times a second at each living particle, ride along with it unless their system is `world`,
+  and die with it. Shapes of children are placed around the particle, moved by `offset` and turned
+  by `angle`; `scale` also scales their sizes. `probability` is drawn once per particle and `max`
+  limits the children born in a step; at most 1024 births and 1024 deaths of a system start children
+  in a step. `points_from` takes the control points of the parent. A child that is born from its
+  parent (`spawn`, `death` or `follow`) cannot start particles from a `layer`.
+- **Children in depth.** A child of a system with `perspective` that has `perspective` of its own is
+  born at the depth of its parent plus its own `init.depth`, and a `follow` child moves in depth
+  with its parent; with `velocity` in `inherit` it also adds the speed in depth of its parent to its
+  own `init.depth_speed` (and takes it every step with `follow_inherit`); a child without `perspective` is born where its parent is drawn, at
+  `f / (f + z)` times its size and inherited speed, and a `follow` child moves as far as its parent
+  is drawn to move.
+- **Instances.** `alpha`, `size`, `brightness` and `color` multiply the look of the layer; `count` is
+  the fraction of births and slots it keeps, `speed` and `life` multiply the starting speed and life
+  and `time_scale` the speed of its time. A layer whose `instance` sets `count`, `speed`, `life`,
+  `time_scale` or `points` moves particles of its own; the others share them. A system may `lock`
+  what layers and scripts may not change.
+- **Looks.** `render.brightness` multiplies the color with the brightness of the layer, `cycles`
+  repeats the frames over the life and the `stretch` range limits how long a particle is drawn along
+  its motion, in pixels.
+- **Frames.** A texture whose asset has `rects` draws each frame from its own rectangle, so frames
+  may differ in size; an animated picture is split into its own frames the same way.
+- **Gradients.** `init.gradient` picks a color between the two stops around a random place and the
+  first or last color outside them.
+- **Trails.** `render.trail` keeps the last `length` positions of each particle, one per 1/60 s
+  step, and draws a ribbon through them that is `width` times as wide as the particle was there and
+  fades to nothing at its end, with the color and size the particle had there. It holds 16 bytes
+  per particle and kept position, at most 16 steps for trails that are not long (4, 8 or 16 by device class, none with software rendering
+  or on the CPU of the weakest devices, half of them or none at lower quality levels) and at most
+  1 048 576 points per system. A layer with a `render` of its own draws as many of the kept
+positions as its own `trail` asks for, or none.
+- **Order.** `render.order` draws the particles from the bottom up in 256 steps of age, size or
+  height, which matters with the `normal` blend; it costs a pass over the particles after each
+  step that moved them.
+- **Masks.** A `mask` collider turns the image into a field of distances, at most 16 384 cells over
+  the canvas (the image itself when it is smaller), and pushes particles out of the opaque part
+  along it, at the place where they went in. It works on world and local systems alike, in pixels
+  of the canvas, and reads the image once when the scene loads.
+- **Perspective.** With `perspective`, each particle keeps a depth `z` picked from `init.depth`
+  that changes by `init.depth_speed` pixels a second, while forces stay flat. A particle is drawn at
+  `c + (p - c) · f / (f + z)` and `f / (f + z)` times its size, where `c` is the center of the canvas
+  and `f` the `focal` length, so positive depths go away and negative ones come closer; a particle
+  at `z <= 1 - f` is behind the eye and is not drawn. Trails follow the drawn positions. Under the
+  `normal` blend and without `render.order`, particles are drawn from the farthest to the nearest
+  (in 256 steps of depth, on the GPU and on the CPU); `add` needs no order.
+- **Cutouts.** `render.cutout: [start, end, opacity]` turns the alpha `a` of the texture (or of the
+  soft disc) into `clamp((a - start) / (end - start), 0, 1) · opacity` before the alpha of the
+  particle multiplies it, so a soft texture becomes a hard edge at `start`..`end`.
+- **Orientation.** `render.orient` draws a sprite turned by its `rotation` (`screen`, the default),
+  along its motion (`velocity`) or at `angle` degrees on the screen whatever the rotation of the
+  particle and of the layer (`fixed`). World systems never turn with their layer.
+- **Emission from a layer.** The `layer` shape draws the layer `id` (an image, a text, a mesh, a
+  group, with its effects) once, at most 256 pixels on its longer side (512 when it covers more than
+  1 024 pixels), keeps the opaque pixels whose alpha is above `threshold` (at most 4 096 of them,
+  evenly picked) and births particles there with its color when `color` is set. The pixels are
+  read again only when the drawing of the layer changes and `refresh` is `on_change`, at most four
+  times a second; between readings they follow the position, turn and scale of the layer, and
+  `inherit` adds the speed of the layer where each particle is born. `jitter` spreads births over
+  that many pixels. The layer cannot hold the system it feeds, and while it was never drawn no
+  particle is born.
+- **Turbulent start.** `init.turbulent` replaces `speed` and `angle`: each particle starts at a speed
+  picked from `speed`, along `forward` degrees turned by up to `scale` half turns by a smooth noise
+  read at `phase + noise_speed · t + offset · u + s` (`t` the time of the system, `u` a number picked per
+  particle, so `offset` spreads the directions of the particles born together, and `s` a whole number
+  below 1024 taken from the `seed` of the system mixed with `clock.seed`, so each seed reads another
+  stretch of the noise); with `audio` the
+  level of that band multiplies `phase`. The noise is read again from its start every 4 096 units,
+  so a long run never loses precision.
+- **Fractal offset.** `init.offset_noise` moves each birth by up to `distance` pixels along the
+  `fbm` of the shader helpers with `octaves` octaves, read at the place of birth times `scale` per
+  100 pixels, drifting `noise_speed` units a second, and moved for each particle by `noise_scale`
+  (0 keeps neighbors together, larger values scatter them); `sign` keeps the offset on one side as
+  for circles. The drift also starts again every 4 096 units.
+- **Around a point.** `around` births on a circle of `radius` around `at` (`p0` by default), one
+  place after another in birth order: `count` places over `arc` degrees (the last one meets the
+  first on a full turn), turning `speed` degrees a second with the angle of the control point.
+  `mirror` goes back and forth instead of starting again, and `restart` starts the sequence again
+  whenever the emitter starts.
+- **Between two points.** `between` births along the line from `from` to `to` in birth order, at
+  `count` places over the first `span` of it, back and forth with `mirror`. `arc.amount` bows the
+  line by that fraction of its length to the left (negative to the right), `arc.side` scales the
+  bow or, at 0, picks a side for each round of `count` births. `taper` shrinks births toward the
+  ends: full size at `position`, moving `speed` lengths a second, and `size` times as large at the
+  ends.
+- **Remaps.** `init.remap` maps an input onto a starting value when a particle is born, in order:
+  `x` from `in` becomes `t = (x - in[0]) / (in[1] - in[0])` (clamped to 0..1 with `clamp_in`),
+  shaped by `sine` (`0.5 + 0.5 sin(2π t)`) or `noise`, mapped onto `out` (clamped with `clamp_out`)
+  and `set`, multiplied, added or subtracted to `size`, `alpha`, `color` (its red, green and blue),
+  `speed` (the length of the velocity), `life`, `rotation`, `spin` or `frame`. `daytime` goes from 0
+  at local midnight to 1, `runtime` counts the seconds of the system (with a `noise` wave it starts again every 4 096 periods), `life` and `speed` are the
+  picked ones, `random` is new for each particle and each remap, `distance:pN` is the distance in
+  pixels to a control point, `audio:<band>` a band or its name and `cursor:x|y` the pointer across the
+  screen from 0 to 1 (0.5 while it is away), which needs the pointer as any pointer input does.
+- **Particle shaders.** `render.shader` names a package effect with `stage: "particle"`, checked and
+  limited like every package shader. Its `fn particle(p: Sprite) -> Sprite` runs for each corner of
+  each sprite with the center, velocity, corner, uv, color, size, rotation (degrees), age and life,
+  and may change all of them; the engine then draws the corner. It may read `frame` and the noise
+  and color helpers. A shader that cannot be built is left out like any other package effect and
+  the particles are drawn without it. Its module and pipelines are built away from drawing within
+  the build time of package shaders, its time on the GPU counts like the time of a package effect,
+  and one that takes too long to build, stopped the graphics card or is too slow is left out for the
+  run the same way. Ropes and trails are drawn as usual.
+- **Keeping distance.** `keep_distance` pulls each particle toward its target or pushes it away, as
+  a spring that rests `distance` pixels from it: the acceleration is `strength · (d − distance)` along
+  the line to the target, in pixels a second squared for each pixel. `keep_between` pulls each particle
+  toward the nearest point of the segment from `from` to `to` by `strength` times its distance from
+  it. Neither damps the motion, so a `drag` settles particles on the ring or the line.
+- **Remap operators.** A `remap` force applies the mapping of `init.remap` every 1/60 s step, with
+  the `age` of the particle as one more input and `random` fixed for each particle and force. `set`
+  replaces the value, `add` and `sub` add or subtract the mapped value each second and `mul`
+  multiplies it by the mapped value each second (`v · y^dt`). The `window` of the force fades it in
+  and out: `set` then moves the value only that fraction of the way.
+- **Flocks.** `boids` steers each particle with its neighbors closer than `radius`: `separation`
+  pushes it away from them (their mean direction away, fading to nothing at `radius`, times
+  `radius`), `alignment` turns its velocity toward their mean velocity and `cohesion` pulls it toward
+  their mean position, each in pixels a second squared; `max_speed` (0 for none) caps its speed.
+  Neighbors are found in a hash grid of cells `radius` pixels wide rebuilt every step (in compute
+  shaders on the GPU, on the CPU in the order of the particles; the GPU fills a cell in any order,
+  so where a cell holds more neighbors than count the two paths may pick different ones), and at
+  most 32 of them count at quality 3 and 2, 16 at quality 1 and 8 at quality 0, or 8 and 16 on the
+  two lower device tiers; a particle looks at no more than four times that many. Neighbors at the
+  same place count too and push each pair apart along a direction picked for the pair, so a flock
+  born at one point spreads out. The first `boids`
+  force of a system sets the flock, which holds at most 8 192 particles, and 2 000 on the CPU.
+- **Colliders.** `box` keeps particles out of the box, or inside it with `inside`; it turns and
+  scales with the layer. `segment` stops particles crossing the line from `from` to `to` from either
+  side; particles that go around its ends pass. `circle` with `inside` keeps particles within the
+  circle. `layer` keeps particles out of the opaque part (alpha above 0.5) of a layer that does not
+  hold the system: the engine draws the layer as for emission, turns it into a field of at most
+  128 × 128 distances, rebuilt only when the drawing of the layer changes (at most four times a
+  second), and the field follows the position, turn and scale of the layer between readings; while it
+  was never drawn nothing collides. `stick` stops a particle where it touches and keeps it there
+  until it dies, without forces or other colliders. `kill` ends the particle where it touches, which
+  starts the `death` children of the system like any other death.
+- **Ropes.** `render.rope` joins the living particles of a system's own emitters into one strip in
+  the order they were born, from the newest, with `subdivide` (0 to 7) points between two particles
+  on a Catmull-Rom curve (`smooth`, the default) or a straight line. It is `width` pixels wide, times
+  `size_over_life` and the size an `oscillate` force gives, and takes the color of the particles
+  with `color_over_life`. With a `texture`, the strip shows it along its length: `uv_scale` times per
+  particle, moving `uv_scroll` times a second. The strip is built by a compute shader after the last
+  step of a frame (and the same way on the CPU), with at most 4 096 segments (1 024 and 2 048 on the
+  two lower device tiers) and fewer points between particles at quality 1 (half) and 0 (none). Ropes
+  are not drawn for systems born from other particles. One particle emitted per step
+  (`max_per_step: 1`) keeps the rope even.
+- **Long trails.** A trail longer than 16 steps, or with `segments`, `subdivide`, `uv_scale`,
+  `uv_scroll` or `textured`, keeps `segments + 1` positions (`length` without `segments`), one every
+  `(length − 1) / segments` steps, so it covers `length` steps with fewer points, and draws a smooth
+  ribbon through them with `subdivide` (0 to 7) points between two kept positions. It keeps at most
+  64 positions, 32 or 16 on the middle device tiers and none on the lowest, spacing them further
+  apart when it keeps fewer; quality 2, 1 and 0 draw half, a quarter or none of them, and quality 1
+  and 0 fewer points between them. With `textured` and a texture, the ribbon shows it along its
+  length, `uv_scale` times from head to tail, moving `uv_scroll` times a second.
+- **Limits.** A scene simulates at most 64 systems, counting children and layers with particles of
+  their own, and their capacities share the 200 000 particles. `prewarm` runs in steps of 1/15 s,
+  at most 30 million particle steps for the whole scene, and stops once it takes more than 200 ms.
+  A child never starts more particles in a step than it has room for.
+
+A `particles` layer may also set `instance` (`alpha`, `size`, `count`, `speed`, `life`, `time_scale`,
+`brightness`, `color` and `points`, which may be bound and multiply or move what the system does for
+that layer only, unless the system locks them; `count`, 0 to 4, multiplies the births and the room of the system, and above 1 the layer reserves that many times its `capacity` when the scene loads: the literal value, the upper end of the `clamp` of a binding, or 4 for a binding without one, so a count bound to a property should clamp it) and a `render` of its own that replaces the one of
+the system (`particles2`). Each end of the `init` ranges of numbers (`life`, `speed`, `angle`,
+`size`, `rotation`, `spin`, `frame`, `alpha`, `radial`, `depth`, `depth_speed`) and the numbers of
+emitter shapes (`radius` and `inner` of `circle`, `threshold` of `layer`, `arc`, `radius` and
+`speed` of `around`, `span` of `between`) may be bound like any value, for instance
+`"size": [2, { "audio": "bass", "scale": 8 }]` (`particle_values`), and are read every frame and
+kept within the limits of the field; colors, velocities and the `threshold` of `mask`, read when the
+scene loads, stay literal. Births may also follow the sound or the pointer through the `rate` of the emitter, the
+`instance` multipliers of the layer or control points.
+## User properties and presets
+
+User properties (settings) are declared in the manifest, under `properties` (id → definition), and
+scenes refer to them by id. Each has a `type` and may set `label`, `help`, `group`, `visible_if`,
+`enabled_if`, `order`, `icon` and, for sliders, combos and flags, `quality`:
+
+| `type` | Fields | Value |
+|--------|--------|-------|
+| `color` | `default`, `alpha` | `#rrggbb` or `#rrggbbaa` |
+| `slider` | `min`, `max`, `default`, `step`, `decimals` (0 to 6), `integer`, `unit`, `editable`, `log` | number, clamped to the range, aligned to the step and rounded to the decimals |
+| `bool` | `default` | `true` or `false` |
+| `combo` | `options` (values or `{ "value", "label", "icon" }`, at most 64), `default` | one of the option values: texts, numbers or `true` and `false`, all of one kind |
+| `text` | `default`, `max_len` (≤ 1024), `multiline`, `secret` | text |
+| `file` | `accept` (`image`, `video`), `default_asset` | absolute path of a file chosen by the user, or `null` |
+| `folder` | `accept`, `pick` (`random`, `sequence`), `every` (10 to 86400 s), `mode` (`one`, `all`), `max_files` (1 to 1000, default 1000), `recursive` (0 to 2 levels of subfolders, default 0) | absolute path of a folder chosen by the user, or `null` |
+| `shortcut` | | what the user chose to open: `{"uri": "https://…"}`, `{"file": "/…"}`, `{"folder": "/…"}` or `{"app": "<desktop id>"}`, or `null` |
+| `button` | | none; pressing it is an event |
+| `group` | `collapsed` | none; the properties that name it are listed under it |
+| `label`, `divider` | | none; a line of text, or a line across the form with an optional label (a divider without one shows no text) |
+
+A slider without `step` moves in steps of its decimals, which come from `decimals`, else from
+`step` and the decimals of `min` and `max` (the most of the three), else two (none for `integer`);
+its value is always rounded to them. `min` and `max` are always accepted as they are, even when
+they are not on the grid of `step` (`max` 0.175 with `step` 0.01 keeps 0.175), and no rounding
+takes a value out of the range. `editable` adds a box to
+type the number and `log` spreads the range logarithmically (it needs `min > 0`). `order` is any
+number: properties sort by it and then by id, and the members of a group follow it in their own
+order; a group cannot be in another group. An option of a combo with an empty label shows its value.
+On the phone a `color` opens a mixer with red, green and blue sliders (and opacity with `alpha`)
+and a box for the hex code; a `multiline` text is a box of several lines saved with its own button,
+and `max_len` stops the typing at that length and counts the characters typed against it.
+`icon` is one of `appointment-soon`, `audio-volume-high`, `audio-volume-muted`, `audio-x-generic`,
+`camera-photo`, `dialog-information`, `document-open`, `edit-find`, `emblem-favorite`, `folder`,
+`go-home`, `image-x-generic`, `input-keyboard`, `input-mouse`, `media-playback-start`,
+`media-playlist-repeat`, `media-playlist-shuffle`, `preferences-desktop-theme`,
+`preferences-system`, `text-x-generic`, `video-display`, `video-x-generic`, `view-refresh`,
+`weather-clear`, `weather-clear-night`, `weather-few-clouds`, `weather-overcast`, `weather-showers`,
+`weather-snow`, `weather-storm`, `x-office-calendar` or `zoom-in`, symbolic icons of the desktop
+theme; other names of `[a-z0-9-]` are accepted and not shown, so that newer versions can add icons.
+Packages never bring their own icons.
+
+`visible_if` hides a property and `enabled_if` greys it out while a condition does not hold, and a
+group's conditions apply to its members. A condition is a map `{ "<other id>": value }` (all must
+match) or an expression of a small language, never code: property ids, numbers, texts in `'…'` or
+`"…"`, `true`, `false`, `==`, `!=`, `<`, `<=`, `>`, `>=`, `&&`, `||`, `!` and parentheses, such as
+`"mood == 2 || speed > 1.5"`. An expression has at most 256 characters and 8 levels of nesting;
+it may compare a property only with a value of the same kind (`<` and the like only numbers), and
+the validator refuses unknown ids, properties without a value, conditions that are not true or
+false and conditions that depend on themselves through other properties.
+
+A `button` holds no value: pressing it (`PressSceneButton`, `reiwand-ctl prop press`) starts the
+timelines whose `trigger` is `prop:<id>` and shows the press to the scripts for one frame, and it
+cannot be pressed while its `enabled_if` or that of its group does not hold. Only a property that
+holds a value may be followed with `{ "prop" }`, and a `trigger` `prop:<id>` names a button or such
+a property. A `secret` text has no default and is kept in the Secret Service on the desktop and
+sealed by the Android keystore on the phone, never in `config.toml`, logs, presets, exported
+settings or sync; a scene reads it as an empty text, since only content allowed to use the network
+may receive it.
+
+A `file` chosen by the user replaces the asset named by `default_asset` wherever the scene uses it
+(image and video layers, masks, effect textures and particle textures), and also shows wherever
+`{ "prop": "<id>" }` names the property, with or without `default_asset`. Images are decoded like
+the scene's own; with `accept: ["video"]` a video plays in image and video layers without sound,
+in a loop and paused with the scene, while masks, effect textures and particles keep the package's
+own asset. Image and video layers, the `texture` parameters of effects, the `texture` of masks and
+the `render.texture` of particles take `{ "prop", "map" }`, so that a combo or a flag switches
+between assets of the package (variants), and `{ "prop": "<id>" }` of a `file`; `reiwand-ctl pack
+check` warns when the images of the variants of one place do not share one proportion. A new
+choice replaces only the textures it touches: the clock, the timelines, the particles (unless
+their own texture changed) and the scripts of the scene go on. A `folder` shows one of its
+images (or videos, with `accept`) in an image layer bound to it with `{ "prop": "<id>" }`, picked
+at random or in order and changed every `every` seconds while the scene is shown; only the folder
+itself is read (and `recursive` levels of its subfolders), without following links out of it or
+reading hidden files, at most `max_files` of them in name order, and nothing is read while the scene is not shown, paused, covered or behind the lock screen: a
+turn missed then happens once when the scene shows again. Files and folders are chosen by the user
+through the file chooser, are never set by presets and never travel with exported settings or sync.
+`mode: all` lets web pages list every file of the folder (`files`, `onFiles`, `web.md`), where
+`one` only gives them one file at a time (`randomFile`); scene scripts list it with `folder(prop)`
+(see "Scripts"), which needs the feature `script_folders`.
+
+A `shortcut` holds what the user chose to open from the wallpaper: an `https://` address of at
+most 2048 characters (opened through the OpenURI portal of the desktop, which may ask first), a
+file or a folder (chosen through the file chooser and opened through the same portal, which gets
+it as an open file) or an application by its desktop id (`[A-Za-z0-9._-]`, at most 255 characters),
+never a command. On the phone a file or a folder is the one the user picked with the system document picker, kept as a `content://` address with read permission that survives restarts (`{"file": "content://…"}` or `{"folder": "content://…"}`), and it is opened through the same view intent as the other targets. Only the user sets it (`SetSceneProperty`, `reiwand-ctl prop set open
+'{"uri": "https://example.org"}'`, or the app's control under *Scene settings*), never the author, a
+preset or sync, and `SetSceneProperty` refuses a file or folder that does not exist, an application that is not installed
+and an address that is not one (`CheckShortcut` asks the same without storing it, and `ListApplications`
+lists the installed applications the app offers as a picker; `reiwand-ctl prop apps` and `prop
+check-shortcut` do the same). It stays in
+`config.toml` on this computer. An application is looked up as `applications/<id>.desktop` in the
+data folders of the desktop: one that is hidden or runs in a terminal is refused, a `DBusActivatable`
+one is activated through `org.freedesktop.Application`, and any other is started from its `Exec`
+line without a shell and without its field codes; applications open only outside the Flatpak. The
+content never sees the target, only `true` when one is set and `null` otherwise: a script calls `openShortcut(prop)` inside the handler of a real
+`click` of a layer and a page calls `reiwand.openShortcut(prop)`; the daemon opens it only within 2 s
+of a click that reached the scene or page on a screen that takes clicks, for a package that holds
+the `clicks` grant, at most once a second per screen, and only for a `shortcut` property of the
+package shown there. On the phone the user chooses an installed app (one the launcher lists, by its
+package name) or an `https://` address from the page of the package (files and folders stay on the
+desktop), and the app opens it with Android only within 2 s of a tap on the home screen, for a
+package that holds the taps grant, at most once a second, never from the lock screen or a preview. `quality` maps
+quality levels (`q0` to `q3`, `q3` the highest) to a value of the property: on that level and the
+lower ones the value is at most that one for a slider and exactly that one for a combo or a flag,
+as the scene, its scripts and web pages see it (the stored value does not change), so a
+power-saving mode turns itself on
+with the battery.
+
+`presets` is a list of `{ "id", "label", "values" }`; a preset cannot set files, folders, secrets
+or buttons. Values are changed through `GetSceneProperties`, `SetSceneProperty`,
+`ApplyScenePreset` and `ResetSceneProperties` (`dbus.md`) or `reiwand-ctl prop`, and stored in
+`config.toml`, once for every screen or per screen: a screen without values of its own follows
+and changes the shared ones until it gets its own copy (`ShareSceneValues`, `reiwand-ctl prop share`,
+*Same settings on every screen* in the app), which it keeps even when emptied by a reset. The
+user can also save the current values as a preset of their own, rename, delete, export it to a
+small file and import it back (`{"format": "wpak-values/1", "package", "version", "values"}`); saved
+presets belong to the package id, survive updates and travel with sync. A stored value whose
+property no longer exists, changed its type or falls outside its range after an update of the
+package is ignored for the default, with a warning in the log, in `GetSceneProperties`
+(`warnings`) and in `reiwand-ctl prop ls`. Labels, help, option labels and preset labels are text or
+`{ "<language>": text }` or `"@key"` of the manifest's `strings`; the newer kinds and fields above
+need the feature `properties2` (`folder` and `user_videos` for folders and
+videos chosen by the user, `folder2` for `max_files` and `recursive`, `folder_lists` for
+`mode: all` in web pages and `script_folders` in scenes, `shortcut` and `quality_settings`; `package.md` says which platforms run each). The app shows these forms under *Scene settings* for each screen on its
+Settings page, and the Android app on the page of the scene. The scenes in the `scenes/` folder of
+the repository are examples of this format, dedicated to the public domain.
+
+## Inputs
+
+Audio analysis, the pointer and script outputs reach the renderer as plain structures of
+`reiwand-scene`: `AudioFrame` (64 bands per channel and their average, `bass`, `mid`, `treble`,
+`level`, `beat`, `silent`; all zero while audio is off), `PointerState` (position, smoothed
+position, velocity, buttons, `inside`, in fractions of the screen) and `ScriptOutputs` (values of
+script sources, layer and effect overrides, copies of templates and their order, timeline,
+particle and sound commands, the next timer, console lines and stopped modules), with the presses
+(`Press`: a place and the buttons held after it, at most 16 between two frames) that the scene
+turns into pointer events of its `solid` layers (`Touch`). A scene only renders again for an input it
+uses. The pointer follows the reported position with a critically damped spring that settles in
+about 0.15 s and returns to the center when the pointer leaves the screen. Audio and the pointer
+need the user's grant for the scene (`dbus.md`, `Inputs1`), which the app and the tray ask for once
+when such a scene is shown; a `reiwand.wpak/2` manifest declares them in `inputs`
+(`package.md`), and a scene of such a package receives only the inputs its manifest declares. What
+the media player plays (`media` values, cover assets, `media:` triggers and scripts that declare
+it) is the `media` input, and clicks on `solid` layers the `clicks` input. Clicks are off on every
+screen until the user turns them on for that screen as well as granting them to the package, they
+come only from the compositor or the desktop (never from another program), and keys never reach a
+scene. On phones a tap on the home screen is a click, with the package's *React to taps* switch.
+
+## Scripts
+
+`scripts` lists at most 64 JavaScript modules of the package (`{ "path": "scripts/spin.js" }`; more
+than 16 name `scripts2`), each path once, at most 1 MiB together: `pack build`, every reader and the
+engine refuse more. The syntax check of `pack check`, `scene validate` and the problem list of the
+editor compiles the modules without running them, inside the program that checks, with the same 32 MiB and stack
+limits, only when they are at most 1 MiB together, and once per change of their text; a module made
+to be slow to compile (tens of thousands of declarations) can still take a few seconds then. On the computer all the modules of a scene share one process, also when several
+screens show the scene with the same settings, and on phones one thread: it has no files, network or other processes, 32 MiB of memory, a
+256 KiB stack, 100 ms to load and to run the first frame, and 4 ms of CPU per frame for all the
+modules together. Results reach the next frame, so a slow script never holds up rendering, and what
+a frame sends to the scripts is written in place: numbers and the 64 bands of each channel go as
+they are, the user settings only when they change. What the scripts send back is not compared as
+text: each layer field, effect setting, particle or sound control a script writes is compared with
+the value it holds, and only the parts that changed (single layers, or the values the modules
+returned, compared in depth) go back, so a frame in which nothing changed sends nothing; after a
+frame that failed everything is sent again. Every module gets that frame object itself.
+
+The problem list of the editor, `reiwand-ctl pack check` compile every module
+without running it (`reiwand_editor::scriptcheck`, with the engine the scenes use): a syntax error is a problem
+with the file and line (`scripts/spin.js:4: …`), and so is a `scripts` entry whose file is not in the folder.
+
+### Lifecycle
+
+A module may export these functions; the engine calls each one inside the time of a frame:
+
+| Export | When |
+|--------|------|
+| `init(ctx)` | once, at the first frame, with `ctx.params` (the defaults of the module's `params`) and `ctx.engine` |
+| `update(frame)` | every frame while the screen is shown; what it returns is the value of `{ "script": "<its path>" }` sources. `frame` has `time`, `dt`, `props`, `audio`, `cursor`, `actions`, `wall`, `zone`, `timelines` and `events` |
+| `destroy()` | when the scene stops |
+| `resize({ screen, canvas })` | when the size or the turn of the screen changes |
+| `properties(changed)` | at the first frame with every user setting, then with the ones that changed |
+| `settings({ language, fps, quality })` | at the first frame, then when the frame rate or the quality changes |
+| `timelineEvent(e)` | for each `{ timeline, name, t }` of timeline and clip events |
+| `mediaStatus({ enabled })` | at the first frame, then when the user grants or takes back `media` for the package (modules that declare `media`) |
+| `mediaPlayback({ state })` | when the player starts (`playing`), pauses (`paused`) or stops or goes away (`stopped`) |
+| `mediaProperties({ title, artist, album, album_artist, subtitle, genres, kind })` | when a new track arrives or its texts change, also to empty texts when it ends |
+| `mediaThumbnail({ has_cover, colors })` | when a new cover arrives or goes away; `colors` holds `primary`, `secondary`, `tertiary`, `text` and `contrast` as `{ r, g, b, a }` (those of the placeholder while there is no cover, `null` without them) and never the picture itself |
+| `mediaTimeline({ position, duration, rate })` | when a track starts, its length or rate changes, or the player jumps (the position is not where it would have run on to); seconds |
+
+A scene whose modules export no `update` and bind no value with `fn` to an `update` only runs its
+scripts for events: timers, settings, properties, timeline events and pointer events, and draws no
+frame for them otherwise. Once the results of busy scripts stay the same for 30 frames and nothing
+else moves, the scene runs its scripts only twice a second, or at its next timer, until a result
+changes again.
+
+A value `{ "script", "fn", "params" }` binds one value to one function of a module, so a module serves
+many values. `fn` names an export other than the functions above: a function called every frame as
+`fn(value, ctx)`, or an object with `init(value, ctx)` (first frame) and `update(value, ctx)` (every
+frame). `value` is what it returned last time (`null` at first), and `ctx` has `path` (the JSON
+Pointer of the value in `scene.json`), `layer` (the id of the layer that holds it), `key` and
+`params` (the module's `params` with the binding's own on top). What it returns is the value, added to
+`base` and shaped like any source. `params` without `fn` is refused.
+
+```js
+import { scene, audio, setInterval, console } from "reiwand";
+import { Vec2, smoothstep } from "reiwand/math";
+
+const bands = audio.buffers(32);
+const bars = [];
+export function init({ params }) {
+    for (let i = 0; i < 32; i++) bars.push(scene.spawn("bar", { position: [40 + i * 60, 900] }));
+    setInterval(() => console.log("loudest band", bands.average.indexOf(Math.max(...bands.average))), 5000);
+}
+export function update() {
+    bars.forEach((bar, i) => (bar.scale = [1, 0.1 + smoothstep(0, 1, bands.average[i]) * 4]));
+}
+export const sway = (value, { params }) => Math.sin(scene.layer("tree").rotation + params.speed);
+```
+
+### The `reiwand` module
+
+| Part | What it gives |
+|------|---------------|
+| `engine` | `time`, `dt`, `daytime` (0 at local midnight to almost 1), `fps`, `quality` (0 to 3), `locale` and `language`, which always hold the same value (the language picked among the package's languages, as for its texts, in lowercase, or `""`), `canvas` and `screen` (`[w, h]`, without names of outputs or monitors), `device` (`desktop` or `mobile`), `mode` (`wallpaper`, `lockscreen`, `screensaver`, `editor` or `preview`) and `orientation` (`landscape` or `portrait`) |
+| `time` | `format(pattern, date)`: the date (`date` or now) with the tokens of `date` values in the language of `engine.locale`, such as `time.format("EEEE d 'de' MMMM")`; `Date` uses the local time zone of the computer, also after it changes, without reading any file |
+| `props` | `get(id)` (a chosen file or folder reads `"wpak-user://<id>"`, never its path, and `null` while none is chosen), `all()`, `label(id)` (the label of the chosen option of a combo in that language), `color(id)` (`{ r, g, b, a }` from 0 to 1) and `pressed(id)` (a button was pressed since the last frame); scripts never write settings |
+| `audio` | `bass`, `mid`, `treble`, `level`, `beat`, `bands(16 \| 32 \| 64, "left" \| "right" \| "average")` (a new array) and `buffers(16 \| 32 \| 64)`: `{ left, right, average }` as `Float32Array`s that the engine fills in place before each frame |
+| `input` | `cursor`: `x`, `y` (fractions of the screen), `inside`, `buttons`, `left`, `scene` (canvas pixels) and `screen` (screen pixels); `buttons` and `left` stay 0 without the `clicks` input |
+| `sound(id)` | a sound layer of the scene (`uses: ["sounds"]`, `script_sounds`): `play()` (from where `pause()` left it, or from the start), `pause()`, `stop()` (back to the start), `playing` and `volume` (0 to 1, multiplied by the volume of the layer and the user's). The first call takes the sound over from its `play_on`; the layer's own `play` and the user's mute still silence it. The phone obeys them like the desktop |
+| `scene` | `layer(id)`, `layers()` (the ids of the top-level layers in drawing order), `spawn(template, options)`, `destroy(id)` and `order(id, index)`, and `mesh(pool)`, `camera`, `camera3d`, `parallax`, `bloom` and `background` (see below) |
+| `storage` | `get`, `set`, `delete`, `clear` and `keys` of what the scripts keep (see below) |
+| `folder(prop)` | the pictures of a folder the user chose (see below) |
+| `media` | what the media player plays (`uses: ["media"]` or a media event, input `media`): `enabled`, `state` (`playing`, `paused` or `stopped`), `playing`, the texts `title`, `artist`, `album`, `album_artist`, `subtitle`, `genres` and `kind`, `has_cover`, `colors` (as in `mediaThumbnail`), `position` (running on from the last reading at its `rate`, without new frames), `duration`, `rate`, `progress` (0 to 1) and `snapshot()`, a frozen copy of all of them. Without the grant it reads `enabled: false`, `stopped` and empty texts; it never carries the cover or the name of the player, and the engine never logs it. Reading it from a module that does not declare it throws |
+| `timeline(id)` | `play()`, `pause()`, `reverse()`, `stop()`, `seek(t)`, `speed` (−100 to 100; below zero the timeline runs backwards like after `reverse()`, and one that plays `once` ends at its start), `time`, `duration`, `playing` and `on(name, handler)` for its events and `ended` |
+| `particles(layer)` | `play`, `pause` (no births, particles keep moving), `stop` (removes them until `play`), `playing`, `emit(n)` (1 to 1000), `point(n, [x, y])`, `from(n, id)` and `wall(n, id)` (emitter or collider `n`, 0 to 7, of kind `layer` takes the picture of layer `id`, any layer a frame draws, a copy of a template included, instead of the one its system names, until `null` gives it back) and the `instance` fields `alpha`, `size`, `count`, `speed`, `life`, `time_scale`, `brightness` and `color`, which last until changed |
+| `shared` | an object shared by all the modules of the scene: at most 256 values, each a frozen copy of what was set (numbers, strings, booleans, arrays, typed arrays and objects of them, at most 65536 items and 32 levels in all), so a value changes by setting it again; getters, functions and other prototypes are refused; modules may also `import` each other with relative paths (`./lib/bands.js`), among the files of `scripts` |
+| `setTimeout(fn, ms)`, `setInterval(fn, ms)` | timers on the scene act CARPETA canvas`clearTimeout` and `clearInterval` call it), run at the start of a frame, at most once a frame each, without making up for missed periods and never under 16 ms; at most 64 wait at once, they wait while the scene is paused, and the scene sleeps until the next one |
+| `console` | `log`, `info`, `warn`, `error` and `debug`: at most 20 lines a second of at most 512 characters, to the log of the engine at debug level and to the editor |
+
+`scene.layer(id)` returns the same handle every time; the first 64 layers a script reads, or asks
+for while it loads or in `init`, report their evaluated values every frame (a layer read for the
+first time later reads what the script wrote until the next frame). Reading `position`, `scale`, `rotation`, `skew`, `origin`,
+`opacity`, `visible`, `color`, `parallax`, `size` (the box of pictures, videos, solids and spectra,
+the points of a text), `text`, `font` or `align` gives what the script wrote, or else the value the
+scene evaluated at the last frame; `id`, `name`, `type` and `initial` (the layer as `scene.json` writes
+it, its children by id) describe it. Writing those fields lasts until the script writes them again or
+calls `reset(field)` (`reset()` clears them all); vectors take arrays, `{ x, y }` or `reiwand/math`
+vectors, colors also `{ r, g, b, a }` or `"#rrggbb"`, and `scale` and `parallax` a single number. The
+engine bounds what it receives: positions and sizes to 100000 pixels, scales to 1000, `skew` to
+±89°, `origin` and `parallax` to ±10, `opacity` and colors to 0..1, texts to 4096 characters and their
+points to 1..2048, and fonts to the fonts the scene names or `sans-serif`, `serif` and `monospace`.
+`layer.on(event, handler)` handles the pointer events of the layer (see the declarations): each
+handler gets `{ type, layer, local, scene, bone }`, `local` in pixels of the layer from its top left corner
+(of the group for a solid group), `scene` in canvas pixels and `bone` the touched bone of a `mesh`
+layer that lists `hit` bones (else `null`). `enter`, `leave` and `move` follow
+the topmost solid layer under the pointer; `down` goes to that layer, which then takes `move` and
+`up` until every button is released, also off it, and `click` follows an `up` on the layer that took
+the `down`. They reach the scripts in the next frame, at most 64 a frame.
+
+`layer.video` controls the video the layer shows (`uses: ["animations"]`): `play()` (from `start`
+once it ended), `pause()`, `stop()` (back to `start`, paused), `seek(seconds)` (at most one jump a
+frame: the last `seek` of a frame counts), `time`, `duration` (`undefined` while it is not known),
+`playing`, `rate` (0 to 16, read and written), `volume` (0 to 1, 1 by default, read and written: it
+scales the sound of the video under the volume of the videos of the package and the general volume;
+layers that share a clock share it; the videos inside a scene play without sound on the phone, so there it
+changes nothing) and `on("ended", handler)`, called with `{ layer,
+name }` in the frame after a video without `loop` reaches its end. Calls take the video over from the
+`playback` of the layer until the scene starts again.
+
+`layer.anim(clip)` controls the animation layers of a `mesh` layer that play the clip with that id
+(`uses: ["animations"]`): `play()` (from the start once a `once` clip ended, fading in over its
+`blend_in`), `pause()`, `stop()` (back to the start, fading out over its `blend_out`), `seek(seconds)`
+(within the clip), `rate` (0 to 16), `weight` (0 to 1, the last one the script set, 1 before), `time`,
+`duration`, `playing` and `on("ended", handler)`, called with `{ layer, clip, name }` in the frame
+after a `once` clip ends. A clip that no animation layer plays gets a replacing one, at weight 1,
+the first time a script calls it. Calls take the layer over from its `rate`, `weight` and
+`enabled` until the scene starts again; animations run before the scripts of the next frame.
+
+Bones, blend shapes and attachments of a `mesh` or a `model` layer take `uses: ["animations"]` too. `layer.bones`
+lists its bones (every node of its file) and `layer.bone(name)` returns a handle with `name`,
+`parent`, `rotation` (degrees clockwise), `position` (`[x, y]` pixels, y down, in the space of its
+parent) and `scale`, measured from the rest pose like the keys of clips, and `worldPosition` (pixels
+of the box of the layer from its top left) and `worldRotation`; reading gives what the script set
+or the pose of the last frame. Writing sets the bone for the next frame after the animations, rules
+and chains and before the bodies of `physics`, so a bone with a body springs back once let go;
+writing `worldPosition` or `worldRotation` replaces the local `position` and `rotation` and the other
+way round, and `reset()` lets the bone go. `layer.shape(name, weight)` sets a blend shape or
+expression (−1 to 1) instead of what `shapes` gives it and `layer.shape(name)` reads what the script
+set; `layer.impulse(bone, [vx, vy])` pushes the end of a bone that has a body by that speed in pixels
+a second, once. `layer.hit(x, y)` names the bone nearest to that point of the box (among `hit` when
+it lists any) and `layer.attachment(name)` gives `{ matrix, origin, angle, uv }` of a bone or node:
+its frame in canvas pixels (`[a, b, c, d, e, f]`), where it is, its angle in degrees clockwise and
+its place as fractions of the box. A layer that reads bones reports their pose every frame, at
+most 256 of them; the engine bounds positions to 100000 pixels, scales to 1000 and impulses to 16 a
+frame.
+On a `model` layer the same calls work on the bones of its skeleton, in pixels of its box with the layer
+centered on it (a pixel is 0.01 units of the model, the same as `impulse`), and the model keeps its depth:
+a bone moved with `position` or `worldPosition` slides in the plane of x and y and keeps its z. A model
+needs `clips`, `physics`, `ik` or `root_motion` to have a skeleton a script can move; a still model has none.
+
+`layer.effect(index or name)` controls one effect of the layer: `enabled`, `set(parameter, value)`
+(numbers, vectors, colors, switches, blend modes and emitter lists, checked against the effect's
+description and clamped to its range, where an emitter list takes at most 64 `{ from, to, angle,
+strength }` and clamps each field to its range; pictures cannot be changed), `get(parameter)`, `reset()` (clears what an effect
+with `state` keeps) and `index`, `name` and `effect`. What a script sets lasts until changed, and the
+inputs of the scene count every effect of a scene whose scripts use `effects` as shown.
+
+### Parents, the camera, shapes, storage and folders
+
+With `hierarchy`, `layer.parent` is the id of the layer it follows (its `parent`, or the group that
+holds it) or `null`, `layer.children` the ids of the layers that follow it or that its group holds,
+and `layer.world` a `reiwand/math` `Mat3` from the pixels of the layer to canvas pixels, without the
+camera, as the scene evaluated it at the last frame. `layer.setParent(id, keep)` makes a layer follow
+another layer of the scene (`null` to follow none) without changing the order of drawing, as `parent`
+does in `scene.json`; with `keep` the layer stays where it is, its position, rotation and scale
+turned into ones relative to the new parent. A layer cannot follow itself or one that follows it, nor
+more than 8 parents deep: the call throws and the engine drops such a parent too. `lookAt(from, to)`
+of `reiwand/math` gives the angle in degrees that turns a layer at `from` towards `to`.
+
+With `camera`, `scene.camera` (`{ center, zoom, rotation, shake: { enabled, amplitude, roughness,
+speed } }`), `scene.camera3d` (`{ fov, eye, center, up }`), `scene.parallax` (`{ amount, delay, pointer, offset }`), `scene.bloom` (`{ threshold, strength, radius,
+tint }`), `scene.background`, `scene.ambient` and `scene.sky` (colors) read what the scene sets in
+`canvas` and what the script wrote; writing an object changes only the fields it names, within the ranges of `canvas`, and `null`
+gives the field back to the scene. The camera is the same transformation as `canvas.camera`, without
+passes, and its shake stays still with *reduce motion* and at Q0. Bloom also reaches a scene whose
+`canvas` sets no `bloom`: writing it adds the glow of `canvas.bloom` with the defaults of that object
+for the fields it does not name (threshold 0.8, strength 1, radius 16, white), kept only while the
+script keeps it (`null` takes it away again), dropped at Q0 and given its plain set on battery like
+the glow a scene declares; until a script writes it nothing is added and nothing costs more.
+
+With `geometry`, `scene.mesh(pool)` gives a pool of `pools`: `create({ vertices, indices, format,
+visible })` adds a shape and returns it, with `update(fields)`, `destroy()`, `id` and `alive`;
+`shapes` lists them and `clear()` removes them. `vertices` is a `Float32Array` or an array of numbers
+in pixels of the pool, by vertex `x, y` (`format: "xy"`), `x, y, u, v` (`"xyuv"`, the default), `x, y,
+r, g, b, a` (`"xyrgba"`) or `x, y, u, v, r, g, b, a` (`"xyuvrgba"`), colors from 0 to 1 that tint
+`texture` (white without one); `indices` (a `Uint32Array` or numbers, three a triangle, at most six a
+vertex) default to the vertices in order. A pool holds at most `max` shapes and `max_vertices`
+vertices, the shapes of a frame take at most 1 MiB, and the engine drops a pool whose shapes name a
+vertex that is not there or a number that is not finite. The shapes are drawn into a picture of the
+pool of `size` (`[w, h]`, 1 to 4096, the canvas by default) that a `video` layer shows with `"video":
+"<pool id>"`, so they take the place, transform, effects, masks and blending of that layer; a pool
+that does not change draws nothing again and asks for no frames, and what the scripts send is binary,
+not text.
+
+With `storage`, `storage.get(key, scope)`, `set(key, value, scope)`, `delete(key, scope)`,
+`clear(scope)` and `keys(scope)` keep JSON values for the package (`"package"`, the default) or for
+the screen (`"output"`), at most 64 KiB in each scope: `set` throws past that or for a value that is
+not JSON. They are kept on the device only (never synced or exported), in a file of the package
+(mode 0600) that is written at most every 5 s and when the scene stops, and removed with the package;
+a scene whose scripts use storage runs one script process per screen. The screens showing a package
+share its `package` scope: what one stores reaches the scripts of the others on their next frame,
+and each keeps its own `output` scope (at most 16 screens, the one used longest ago going first;
+on the phone the home screen and the lock screen are two screens, each with its own `output` scope).
+Previews in the editor read what is kept but never write it.
+
+With `folders`, `folder(prop, options)` lists a `folder` property with `mode: all`: `files` are opaque
+ids of its pictures, and also of its videos with `options.videos: true` when the property `accept`s
+`video` (an id changes when its file is
+written again), `name(id)` the name of the file, `kind(id)` `"image"` or `"video"`, and
+`on("added" | "removed" | "changed", handler)` gets `{ prop, files }` (`changed` as `[old, new]`
+pairs, only of the files that `folder` lists) when the folder changes: while the scene is shown, the
+desktop watches the chosen folder and its listed subfolders for change notices and reads them again,
+away from the thread that draws, once the notices settle (half a second after the last one, at most
+5 s after the first, so a copy of many files is read once), leaving out hidden files that sync tools
+write while they work; a hidden scene drops the watch and looks once when shown again. A folder that
+is missing, removed or moved is awaited in the nearest folder above it that exists and watched again
+when it comes back, and subfolders nobody may read are left out, as the listing leaves them out.
+Only where the system gives no change notices, on a network file system (a user space file system
+counts when it reaches the network, such as `sshfs` or `rclone`, not a local disk or a vault), or
+when a folder holds more than 8 192 subfolders to watch, it looks every 2 s while the scene is shown. The phone lists its copy of the chosen folder again only when the
+copy changes, which it makes again when the system says the folder changed. `show(layer, id)` makes an image layer show that picture, or a `video` layer play that video
+with a decoder of its own that only runs while the scene is shown, on a clock of its own that follows
+the `playback` of the layer and that `layer.video` (play, pause, seek, rate, volume, `ended`) controls like the
+videos of the package, with its sound at the volume of the videos of the package on the desktop (the
+phone plays the videos inside a scene without sound, folder videos too), instead of its own
+(`null` gives it back), at most eight files at once, any of them videos; a video on another
+kind of layer throws. Scripts never see paths, and the phone lists the folder the user chose in the same way.
+
+`templates` maps at most 64 ids to layers that scripts with `layers` copy into the scene, validated
+like the other layers (`script_layers`); a template id may not be the id of a layer, a template holds
+at most 256 layers with its children, and templates are pictures, texts, shapes, solids, spectra,
+meshes and groups of them. Each copy of a `mesh` gets a puppet of its own, with the bones, clips,
+physics, IK and attachments of a mesh layer of the scene (scripts drive it by the id of the copy), at
+most 64 puppets in a scene, and the puppet goes with the copy. An `attach`, a `parent`, an IK target
+`layer:<id>`, the `mask.layer` of a layer or of an effect, or an effect parameter fed by `{ "layer" }`
+inside a template may name a layer of the same template, which each copy turns into its own
+`<copy>.<child>` (so a badge pinned to a bone follows the bone of its own copy and a mask cuts its
+own copy), or a layer of the scene; pointer hits on the bones of a copied mesh name the bone of that
+copy; particle systems are scene-wide, so a particle source written in the scene names a layer of the
+scene, and a script points the layer source of an emitter or a layer collider of one particles layer
+at any layer, a layer of a copy included, with `particles(layer).from(n, id)` and `.wall(n, id)`; the editor's *Make a template* (`reiwand-ctl scene act CARPETA duplicate_layer`)
+copies the layer under a free name, `<id>_template` or the next `<id>_template_<n>`, and the layers bar
+of the editor shows one template alone on the canvas, as a copy of it draws, with the layers panel,
+the canvas handles (move, bones, chains, weights, points, attachments) and every layer action on the
+layers of that template, named by their own ids (`reiwand-ctl scene --inside TEMPLATE …` likewise). `scene.spawn(template, options)` adds a
+copy on top of the layers (or at `options.at`, 0 being the bottom) with the id `options.id` (letters,
+digits, `_` and `-`, at most 64) or `<template>_<n>`, sets the fields `options` names and returns its
+handle; the children of a copied group are `<id>.<child>`. `destroy()` removes it, `scene.order(id,
+index)` moves a top-level layer, and at most 256 copies live at once, and only while the layers of
+the scene and of every copy, children included, are at most 512: `spawn` throws past that and the
+engine drops what goes beyond it. Copies count as layers of the scene for the inputs it uses and for
+its cost, and are drawn with the same resources as the other layers: pictures share the texture of
+their asset and equal texts one raster.
+
+The `reiwand/math` module, written for this engine, has `Vec2`, `Vec3` and `Vec4` (`add`, `sub`, `mul`,
+`div`, `min`, `max`, `clamp`, `scale`, `negate`, `abs`, `floor`, `ceil`, `round`, `dot`, `length`,
+`lengthSquared`, `normalize`, `distance`, `mix`, `lerp`, `reflect`, `project`, `equals`, `isZero`,
+`toArray` and, by size, `cross`, `angle`, `rotate` and `perpendicular`), `Mat3` (2D, with
+`translation`, `rotation`, `scaling`, `transformPoint`, `transformVector` and `decompose`) and `Mat4`
+(`translation`, `scaling`, `rotationX/Y/Z`, `fromEuler`, `perspective`, `lookAt`, `transformPoint`,
+`transformVector` and `decompose`), both with `multiply`, `transpose`, `determinant`, `invert`,
+`equals` and `get(row, col)`, and `clamp`, `mix`, `smoothstep`, `step`, `fract`, `remap`, `degrees`,
+`radians`, `angleDelta`, `mixAngle`, `angleVector`, `vectorAngle`, `lookAt`, `rgbToHsv` and `hsvToRgb` (hue
+from 0 to 1). Vectors and colors go in and out as these classes or as arrays.
+
+`Math.random` follows `clock.seed`, and `clock.seed: null` gives it a new seed on every start.
+Scripts never see paths, device names, the battery or the list of fonts.
+
+### When a script fails
+
+A function that throws writes the error to the console and the frame goes on with the other modules;
+a module whose functions throw in three frames in a row stops alone, with its timers, and the
+screen reports "A script of this scene stopped and the scene goes on without it: <module>: <error>"
+in the language of the desktop, as does `reiwand-ctl state`. A module that does not load stops the same
+way. A frame that runs out of time or memory fails as a whole, and after three such frames in a row
+the scripts of the scene are off and the screen says so; the scene keeps drawing without them. On
+phones the scripts run in a thread of their own with the same limits, and the diagnostics of the app
+say when a module stopped or the scripts are off.
+
+### Script declarations
+
+Each entry of `scripts` may declare what its module needs from the engine, so that an engine without
+it refuses the package instead of running the module wrongly, and so that its inputs are known
+without reading its text. `reiwand-ctl scene act CARPETA import_script` and the editor propose them from the
+module's exports, imports and calls.
+
+| Field | Meaning |
+|-------|---------|
+| `events` | the functions the module exports and the events it handles, each once: the lifecycle above (`update` is the only one older engines call), the pointer events of `solid` layers and `hit` bones `click`, `down`, `up` (input `clicks`), `enter`, `leave` and `move` (input `pointer`), delivered with `scene.layer(id).on(event, handler)` as `{ type, layer, local, scene }` with the touched bone, and `mediaStatus`, `mediaPlayback`, `mediaProperties`, `mediaThumbnail` and `mediaTimeline` (input `media`) |
+| `uses` | the parts of the `reiwand` module it uses, each once: `audio`, `pointer` and `clicks` (those inputs), `timers`, `layers` (`spawn`, `destroy` and `order`; `script_layers`), `effects`, `particles` (it names `particles2` and gives each particles layer particles of its own), `math`, `console`, `shared`, `media` (the `media` object and its colors, input `media`; `media_info`, which engines run later), `storage` (`storage`; `script_storage`), `geometry` (`scene.mesh(pool)`; needs `pools`; `script_geometry`), `sounds` (`sound(id)` with `play`, `pause`, `stop`, `playing` and `volume`; `script_sounds`), `animations` (`layer.video`, `layer.anim(clip)` and, on `mesh` and `model` layers, `layer.bone(name)`, `bones`, `shape`, `impulse`, `hit` and `attachment`; texture frames and model clips come with the layers that have them; `script_animations`), `camera` (`scene.camera`, `camera3d`, `parallax`, `background`, `ambient` and `sky`; `script_camera`), `bloom` (`scene.bloom`, which may turn on a glow the scene does not declare; `script_camera`; the static cost of the scene, `reiwand-ctl pack check` and the cost per level of the editor count that glow at every level, while the running scene counts it only while a script asks for it; the editor adds `bloom` to the uses of a script that writes `.bloom`), `shortcuts` (`openShortcut(prop)`, which asks to open what the user chose for that `shortcut` property and returns `true` only inside the handler of a `click`, at most four properties a frame; see "User properties and presets"; `script_shortcuts`), `hierarchy` (`layer.parent`, `layer.children`, `layer.world` and `layer.setParent(id, keep)`; `script_hierarchy`) and `folders` (`folder(prop)`; `script_folders`), described in "Parents, the camera, shapes, storage and folders" |
+| `params` | at most 32 settings of the module `{ "type": "number" \| "bool" \| "text" \| "color" \| "vec2", "default", "min", "max" }` that values bound to it with `fn` and `params` fill in; ids `[a-z0-9_]{1,32}`. They live only here: the module does not export them, `scene act CARPETA import_script` does not propose them and keeps them when it imports the module again, and the `script` action of the editor writes them |
+
+Any event but `update`, any part but `audio`, `pointer` and `clicks`, and `params` name `scripts2`;
+handling pointer events needs a `solid` layer or `hit` bones. A module must declare `timers`,
+`layers` and `effects` to use them: the engine refuses the call otherwise. A module that declares
+nothing gets the same interface; its uses and inputs are those of what it imports from `reiwand`
+(`audio` the sound and `input` the pointer, never words that only appear in its comments or texts),
+and the editor lists what it uses without declaring. Effect uses may carry a `name` (`[a-z0-9_]{1,32}`, unique in their layer) by which scripts find
+them (`scripts2`). `pools` maps at most 16 ids to `{ "type": "mesh", "max" (1 to 256 shapes),
+"max_vertices" (3 to 65536), "texture", "size" }`, the shapes scripts with `geometry` may build
+(`script_geometry`).
+
+```json
+"scripts": [{ "path": "scripts/bars.js", "events": ["init", "update", "click"], "uses": ["audio", "layers"],
+              "params": { "speed": { "type": "number", "default": 1, "min": 0, "max": 4 } } }],
+"templates": { "bar": { "id": "bar", "type": "solid", "color": "#ffffff", "size": [8, 100] } }
+```
+
+## Rebuilding a scene by hand
+
+An author who rebuilds a wallpaper made with another program writes its parts with these fields;
+the scene format has a field for each of them, and the features above say which ones an engine
+draws today.
+
+| The original has | In `scene.json` |
+|------------------|-----------------|
+| layers placed by their center with Y up from the bottom left, angles in counterclockwise radians and opacity from 0 to 100 | `transform.position` with `origin: [0.5, 0.5]`, y = canvas height − y, degrees = −radians × 180 / π, `opacity` / 100 |
+| a scene of one picture without effects | a package of `kind: image` |
+| a full-screen layer that applies effects to what is below it | an `adjustment` layer; with a region and its own transform, `size` and `redraw` |
+| a flat color layer | a `solid` layer |
+| an orthographic projection of a given size and the user's alignment | `canvas.size` and `canvas.fit` (`fill` covers the screen) |
+| a parent that moves a layer without grouping it | `parent` and `inherit` |
+| a layer color and a brightness above 1 | `color` and `brightness` (with `canvas.hdr`, so that light above white is kept) |
+| a texture without mipmaps, with sharp pixels or repeated outside its edges | the asset's `mipmaps`, `filter: nearest` and `wrap` |
+| a sprite sheet or an animated GIF that plays by itself | the asset's `atlas` or `rects` with `fps` or `durations`, or `animated: true` |
+| a text with a maximum width and number of rows, vertical alignment or an opaque background | `wrap` (`width`, `lines`, `ellipsis`), `valign`, `line_height`, `background` and `padding` of the text |
+| a font collection | the `.ttc` asset with `face` |
+| a clock or a date written by a script | `{ "clock" }` and `{ "date" }` values, which wake the scene only when the text changes |
+| the time of day used as a number | `{ "clock": "day" }`, or `engine.daytime` in scripts |
+| keyframes with Bézier handles, or each axis animated on its own | keys with `{ "in", "out" }` and `{ "x", "y" }` or `{ "r", "g", "b", "a" }` parts |
+| an animation added to the value it starts from | `base` of the value |
+| camera parallax with an amount, a delay and a share for the pointer, and a depth per axis | `canvas.parallax` and `parallax: [x, y]` of the layers |
+| the blending of a material or of particles | the layer's `blend` |
+| colors mixed as encoded values | `canvas.blend_space: srgb` |
+| an effect mask painted in an editor | the effect's `mask`, a `linear` picture |
+| an effect masked by another layer or by a shape | the effect's `mask` with `layer` or `shape` |
+| an effect that reads what another layer draws | a `texture` parameter set to `{ "layer" }` |
+| an effect that copies what lies below the layer | a pass that reads `backdrop` |
+| blend modes such as linear light, pin light, hard mix or divide | `blend` of the layer, and `blend_mode()` in shaders |
+| several properties moved by one animation | the same `timeline` on each value |
+| an animation that counts frames | `frames` and `fps` of the timeline |
+| a looping animation that blends its end into its start | `wrap: true` on a `repeat` timeline |
+| named moments of an animation that show layers, play sounds or start other animations | `events` of the timeline, and `trigger` or `play_on` of `event:<name>`; scripts get them through `timelineEvent` |
+| a script that changes the rate of an animation, stops it or reads the frame it is on | `timeline(id).speed`, `stop()`, `time` and `duration` (a frame is `time` × `fps`), and `on("ended", …)` |
+| a sound object with several files played in turn or at random, with silences between them | `sounds` with `mode` and `pause` |
+| background music, a whole song or MP3 files | `.mp3` assets, and `stream: true` for anything longer than 60 s |
+| a sound played by an animation event | `play_on: "event:<name>"` |
+| a text measured in points | `size` in pixels, points × 4 / 3 |
+| a texture chosen with a checkbox or a list | `{ "prop", "map" }` of a `bool` or `combo` property |
+| a texture the user replaces | a `file` property with `default_asset` |
+| shader variants chosen before compiling | `options` of a package effect |
+| shader uniforms shown as controls | `params` of a package effect |
+| per-instance overrides of a particle system | `instance` of the `particles` layer, which may be bound to sound or the pointer |
+| changes over the life of a particle | `render.size_over_life`, `color_over_life` and `init.alpha` |
+| a deformable picture with bones | a `mesh` layer with a `.glb` exported from a rigging tool |
+| a 3D model in FBX or OBJ | a `model` layer with the model converted to `.glb` |
+| a wallpaper that runs a program | a `web` package exported with WebGL or WebAssembly; packages never run programs |
+
+### Effects with an equivalent
+
+Effects that other programs ship as built-ins become these effects. The built-in effects are written
+from scratch, with the parameters written here, so an imported value is converted rather than copied.
+Positions are fractions of the layer counted from the top left, angles are degrees that turn
+clockwise, and sizes are pixels of the layer unless the row says otherwise; a value given as a
+fraction of the picture becomes pixels when multiplied by the width of the layer, and an angle
+counted counterclockwise changes its sign.
+
+| The original effect | Built-in effect | Parameters to convert |
+|---------------------|-----------------|-----------------------|
+| a blur of the whole layer | `blur` | `radius` in pixels |
+| a blur away from a center | `blur_radial` | `center`, `strength` (0 to 1) |
+| a blur along a direction | `blur_motion` | `angle`, `length` in pixels |
+| a color made transparent | `chroma_key` | `key`, `tolerance`, `softness` |
+| edge detection | `edges` | `threshold`, `width` in pixels, `color` |
+| a fisheye or lens bulge | `lens_distort` | `k1` (above 0 bulges), `center` |
+| a four-point perspective | `perspective` | `top_left`, `top_right`, `bottom_right`, `bottom_left` |
+| a shake | `shake` | `strength` in pixels, `speed`, `direction` |
+| eyes that move | `iris` | `range` in pixels, `center` |
+| water that flows along a painted map | `flow` | `map` (a `linear` picture), `strength` in pixels, `speed` |
+| parallax from a depth map | `depth_parallax` | `depth` (a `linear` picture, bright is near), `strength` in pixels, `focus` |
+| a mirrored reflection | `reflection` | `line` (from the top), `opacity` |
+| drifting clouds | `clouds` | `size` and `speed` in pixels, `coverage` |
+| an opacity mask painted on the layer | the layer's `mask` | `texture`, `strength` |
+| foliage that sways | `sway` | `amplitude` in pixels, `pivot`, `speed` |
+| a line of light that crosses the layer again and again | `shine` | `angle`, `width` (fraction of the layer), `speed` (crossings a second), `gap` |
+| rays from the bright parts of the picture | `god_rays` | `source`, `exposure`, `decay` |
+| color fringes | `chromatic_aberration` | `amount` in pixels |
+| film grain | `film_grain` | `amount`, `size` in pixels |
+| a twirl | `twirl` | `angle`, `radius` in pixels, `center` |
+| a picture that scrolls | `scroll` | `speed` in layers a second |
+| water waves | `waves` | `amplitude` in canvas pixels, not layer pixels (a layer drawn at scale 3 with amplitude 20 still moves the picture by about 20 pixels of the canvas), `frequency` (waves across the layer), `speed`, `direction` |
+| ripples where the pointer touches water | `water_ripple` | `strength`, `radius` in pixels |
+| a tint with a blend mode | `tint` | `color`, `blend`, `amount` |
+| up to six pictures or layers blended with modes | `blend_texture`, one use each | `texture` (an asset or `{ "layer" }`), `blend`, `amount` |
+| animated beams of light | `light_shafts` | `direction`, `angle`, `center`, `color`, `gradient`, `exponent`, `intensity`, `feather`, `smoothness`, `speed` |
+
+A test reads this table and checks that every effect and parameter in it exists.
+
+### Porting a shader to WGSL
+
+Package shaders are written in WGSL and nothing else: the engine never compiles GLSL or HLSL. An
+effect of another program becomes one package effect: its passes, render targets and copies become
+`passes`, `targets`, `copy` and `swap`, its compile-time switches `options`, its uniforms `params`,
+and its fragment and vertex programs entry points of one `.wgsl` file. The rules of thumb:
+
+- Write one `@fragment` function per pass, `fn fs_<name>(in: VertexOut) -> @location(0)
+  vec4<f32>`, and return the color instead of writing `gl_FragColor` or an `out` variable. Colors
+  are premultiplied by alpha; `straight(c)` undoes it.
+- Coordinates go from (0, 0) at the top left to (1, 1) at the bottom right, in `in.uv`. Flip `y`
+  where the original counts from the bottom (`1.0 - uv.y`).
+- Move what the original computes per vertex but is affine (offsets, scales, rotations of the
+  coordinates) into the fragment entry point; keep a `vertex` entry with a `grid` only to bend the
+  layer itself.
+- Turn every `#ifdef`, `#if` or combo into an `override` with `options`, or into an `if` on a
+  parameter when it changes at run time, and every texture slot into an `inputs` entry and a
+  `texture` parameter.
+- Give every loop a literal limit: `for (var i = 0u; i < min(count, 32u); i++)`.
+
+| HLSL or GLSL | WGSL |
+|--------------|------|
+| `float`, `float2`, `vec3`, `half4`, `int2`, `bool` | `f32`, `vec2<f32>`, `vec3<f32>`, `vec4<f32>`, `vec2<i32>`, `bool` |
+| `float2x2`, `mat3` | `mat2x2<f32>`, `mat3x3<f32>` |
+| `mul(m, v)` in HLSL, `m * v` in GLSL | `v * m` for an HLSL matrix written by rows, `m * v` for a GLSL one |
+| `frac(x)` | `fract(x)` |
+| `saturate(x)` | `clamp(x, 0.0, 1.0)` |
+| `lerp(a, b, t)` | `mix(a, b, t)` |
+| `fmod(a, b)` (HLSL, truncated) | `a - b * trunc(a / b)` |
+| `mod(a, b)` (GLSL, floored) | `a - b * floor(a / b)` |
+| `atan2(y, x)`, GLSL `atan(y, x)` | `atan2(y, x)` |
+| `rsqrt`, `inversesqrt` | `inverseSqrt` |
+| `ddx`, `ddy`, `dFdx`, `dFdy` | `dpdx`, `dpdy` |
+| `tex2D(s, uv)`, `texture(s, uv)`, `texture2D` | `sample(aux0, uv)`, or `tap(uv)` for the layer itself |
+| `tex2Dlod`, `textureLod` | `textureSampleLevel(t, samp, uv, level)` |
+| `discard` / `clip(x)` | `discard` / `if x < 0.0 { discard; }` |
+| `static const`, `#define N 8` | `const N: u32 = 8u;` |
+| a uniform shown as a slider, color or point | a `float`, `color` or `position` parameter read with `param(n)` |
+| a combo or `#define` chosen before compiling | an `override` named by `options` |
+| the time and the time since the last frame | `frame.time`, `frame.dt` |
+| the time of day from 0 to 1 | `daytime()` |
+| the pointer and its previous position | `frame.cursor`, `cursor_last()`, or `cursor_uv()` on the layer |
+| the size of the screen and of a texture | `frame.resolution`, `tex_size(i)` and `fx.texel` |
+| 16, 32 or 64 bands of sound, per channel | `band_of(i, 16u)`, `band_left_of(i, 16u)`, `band_right_of(i, 32u)`, `band_left(i)`, `band_right(i)` |
+| the parallax shift | `parallax()` |
+| the layer's color and opacity | `layer_color()`, `layer_alpha()` |
+| greyscale, HSV, 2D rotation and blending helpers | `greyscale`, `hsv`, `from_hsv`, `rotate2`, `blend_mode` |
+
+Package shaders declare no bindings of their own: the input, the mask and up to eight more textures
+come through `inputs` and `params`. `reiwand-ctl scene act CARPETA import_effect` checks the result the same way a
+package reader does and says what to change.

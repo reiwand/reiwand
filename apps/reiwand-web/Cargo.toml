@@ -1,0 +1,22 @@
+[package]
+name = "reiwand-web"
+description = "Isolated helper of Reiwand that renders web wallpapers"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+libloading.workspace = true
+rustix = { workspace = true, features = ["net", "pipe"] }
+serde.workspace = true
+serde_json.workspace = true
+blake3.workspace = true
+reiwand-format.workspace = true
+zip.workspace = true
+libc.workspace = true
+
+[dev-dependencies]
+base64.workspace = true
+image.workspace = true
+tempfile.workspace = true

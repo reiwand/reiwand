@@ -1,0 +1,196 @@
+use crate::{Error, Kind, Result};
+use reiwand_core::message::{Message, said};
+use reiwand_schedule::parse_interval;
+use rusqlite::types::Value;
+
+const COLOR_DISTANCE: i64 = 3 * 40 * 40;
+const TAGGED: &str =
+    "i.id IN (SELECT it.item_id FROM item_tags it JOIN tags t ON t.id = it.tag_id WHERE t.name = ?)";
+const LISTED: &str = "i.id IN (SELECT pi.item_id FROM playlist_items pi JOIN playlists p ON p.id = pi.playlist_id \
+    WHERE (p.uid = ? OR p.name = ?) AND p.query IS NULL)";
+const COLOR: &str = "(((i.color >> 16) & 255) - ?) * (((i.color >> 16) & 255) - ?) \
+    + (((i.color >> 8) & 255) - ?) * (((i.color >> 8) & 255) - ?) + ((i.color & 255) - ?) * ((i.color & 255) - ?) <= ?";
+const SIZES: [(&str, i64, i64); 6] = [
+    ("8k", 7680, 4320),
+    ("5k", 5120, 2880),
+    ("4k", 3840, 2160),
+    ("1440p", 2560, 1440),
+    ("1080p", 1920, 1080),
+    ("720p", 1280, 720),
+];
+const ORIENTATIONS: [(&str, &str); 3] = [
+    ("portrait", "i.height > i.width"),
+    ("landscape", "i.width > i.height"),
+    ("square", "i.width = i.height"),
+];
+const FACETED: &str = "' ' || i.facets || ' ' LIKE '% ' || ? || ' %'";
+const PROVIDED: &str = "coalesce(i.source_id IN (SELECT id FROM sources WHERE kind = 'provider'), 0) = ?";
+pub(crate) const MAX_UIDS: usize = 500;
+fn keys() -> [(&'static str, Message); 21] {
+    [
+        ("tag", said("library.key_tag", "a tag name", &[])),
+        ("kind", said("library.key_kind", "image, video, package, scene or assets", &[])),
+        ("fav", said("library.key_fav", "nothing, yes or no", &[])),
+        (
+            "rating",
+            said("library.key_rating", "a rating from 0 to 5 with an optional >=, <=, >, < or =", &[]),
+        ),
+        ("res", said("library.key_res", "a size like >=3840x2160, 4k, 1440p or 1080p", &[])),
+        ("orient", said("library.key_orient", "portrait, landscape or square", &[])),
+        ("dur", said("library.key_dur", "a duration like <30s, >2m or <=1h", &[])),
+        ("audio", said("library.key_audio", "yes or no", &[])),
+        ("source", said("library.key_source", "a source id", &[])),
+        ("provider", said("library.key_provider", "yes or no", &[])),
+        ("in", said("library.key_in", "a manual playlist uid or name", &[])),
+        (
+            "folder",
+            said(
+                "library.key_folder",
+                "an absolute folder path: the items inside it and its subfolders",
+                &[],
+            ),
+        ),
+        ("added", said("library.key_added", "an age like <7d", &[])),
+        ("used", said("library.key_used", "never or an age like <7d", &[])),
+        ("missing", said("library.key_missing", "nothing, yes or no", &[])),
+        ("color", said("library.key_color", "a color like #3366ff", &[])),
+        ("content", said("library.key_content", "general, mature or unrated", &[])),
+        (
+            "facet",
+            said(
+                "library.key_facet",
+                "a package facet such as audio, pointer, sound, customizable, photosensitive or 4k",
+                &[],
+            ),
+        ),
+        (
+            "sort",
+            said(
+                "library.key_sort",
+                "added, title, rating, used, random or random:<seed>, with a - suffix for descending",
+                &[],
+            ),
+        ),
+        ("uid", said("library.key_uid", "up to 500 item uids separated by commas", &[])),
+        (
+            "first",
+            said(
+                "library.key_first",
+                "up to 500 item uids separated by commas, shown first in that order",
+                &[],
+            ),
+        ),
+    ]
+}
+
+pub fn query_keys() -> Vec<(&'static str, String)> {
+    keys().into_iter().map(|(key, hint)| (key, hint.local())).collect()
+}
+
+pub(crate) fn invalid(key: &str, value: &str) -> Error {
+    let expected = keys().into_iter().find(|(k, _)| *k == key).map(|(_, hint)| hint.local());
+    let invalid = said(
+        "library.invalid_value",
+        "invalid value in \"%1:%2\", expected %3",
+        &[&key, &value, &expected.unwrap_or_default()],
+    );
+    Error::query(invalid)
+}
+
+pub(crate) fn condition(key: &str, value: &str, now: i64) -> Result<(String, Vec<Value>)> {
+    if !keys().iter().any(|(k, _)| *k == key) {
+        let known: Vec<&str> = keys().iter().map(|(k, _)| *k).collect();
+        let unknown = said(
+            "library.unknown_key",
+            "unknown key \"%1:\", expected one of %2",
+            &[&key, &known.join(", ")],
+        );
+        return Err(Error::query(unknown));
+    }
+    parse(key, value, now).ok_or_else(|| invalid(key, value))
+}
+
+fn parse(key: &str, value: &str, now: i64) -> Option<(String, Vec<Value>)> {
+    let lower = value.to_ascii_lowercase();
+    let (op, rest) = comparison(&lower);
+    let int = |n: i64| vec![Value::Integer(n)];
+    let text = |text: &str| vec![Value::Text(text.into())];
+    let (sql, params) = match key {
+        "tag" | "in" | "source" | "audio" | "facet" | "uid" | "folder" if value.is_empty() => return None,
+        "uid" => {
+            let uids: Vec<Value> =
+                value.split(',').filter(|u| !u.is_empty()).map(|u| Value::Text(u.into())).collect();
+            let marks = vec!["?"; uids.len()].join(", ");
+            (uids.len() <= MAX_UIDS).then_some(())?;
+            (format!("i.uid IN ({marks})"), uids)
+        }
+        "facet" => (FACETED.into(), text(&lower)),
+        "content" if lower == "unrated" => ("i.kind = 'package' AND i.content IS NULL".into(), vec![]),
+        "content" if ["general", "mature"].contains(&lower.as_str()) => {
+            ("i.content = ?".into(), text(&lower))
+        }
+        "tag" => (TAGGED.into(), text(value)),
+        "in" => (LISTED.into(), [text(value), text(value)].concat()),
+        "folder" => {
+            let prefix = format!("{}/", value.trim_end_matches('/'));
+            (
+                "substr(i.path, 1, ?) = ?".into(),
+                vec![Value::Integer(prefix.chars().count() as i64), Value::Text(prefix)],
+            )
+        }
+        "source" => ("i.source_id = (SELECT id FROM sources WHERE uid = ?)".into(), text(value)),
+        "provider" => (PROVIDED.into(), int(flag(&lower)?)),
+        "kind" if ["scene", "web", "assets"].contains(&lower.as_str()) => {
+            ("i.pkg_type = ?".into(), text(&lower))
+        }
+        "kind" => ("i.kind = ?".into(), text(lower.parse::<Kind>().ok()?.as_str())),
+        "fav" => ("i.favorite = ?".into(), int(flag(&lower)?)),
+        "missing" => ("i.missing = ?".into(), int(flag(&lower)?)),
+        "audio" => ("i.audio = ?".into(), int(flag(&lower)?)),
+        "orient" => (ORIENTATIONS.iter().find(|(name, _)| *name == lower)?.1.into(), vec![]),
+        "rating" => (
+            format!("i.rating {} ?", op.unwrap_or("=")),
+            int(rest.parse().ok().filter(|n| (0..=5).contains(n))?),
+        ),
+        "dur" => {
+            let millis = parse_interval(rest)?.as_millis().try_into().ok()?;
+            (format!("i.duration_ms {} ?", op.unwrap_or("<=")), int(millis))
+        }
+        "used" if lower == "never" => ("i.used_at IS NULL".into(), vec![]),
+        "added" | "used" => {
+            let column = if key == "added" { "i.added_at" } else { "i.used_at" };
+            let age = parse_interval(rest)?.as_secs().try_into().ok()?;
+            (format!("? - {column} {} ?", op.unwrap_or("<=")), vec![Value::Integer(now), Value::Integer(age)])
+        }
+        "res" => {
+            let named = SIZES.iter().find(|(name, ..)| *name == rest).map(|(_, w, h)| (*w, *h));
+            let parsed = || rest.split_once('x').and_then(|(w, h)| Some((w.parse().ok()?, h.parse().ok()?)));
+            let ((w, h), op) = (named.or_else(parsed)?, op.unwrap_or(">="));
+            (format!("i.width {op} ? AND i.height {op} ?"), vec![Value::Integer(w), Value::Integer(h)])
+        }
+        "color" => {
+            let hex = lower.strip_prefix('#').unwrap_or(&lower);
+            let hex = Some(hex).filter(|h| h.len() == 6 && h.chars().all(|c| c.is_ascii_hexdigit()))?;
+            let rgb = i64::from_str_radix(hex, 16).ok()?;
+            let [r, g, b] = [rgb >> 16, (rgb >> 8) & 255, rgb & 255];
+            (COLOR.into(), [r, r, g, g, b, b, COLOR_DISTANCE].map(Value::Integer).to_vec())
+        }
+        _ => return None,
+    };
+    Some((sql, params))
+}
+
+fn comparison(value: &str) -> (Option<&'static str>, &str) {
+    [">=", "<=", ">", "<", "="]
+        .into_iter()
+        .find_map(|op| value.strip_prefix(op).map(|rest| (Some(op), rest)))
+        .unwrap_or((None, value))
+}
+
+fn flag(value: &str) -> Option<i64> {
+    match value {
+        "" | "yes" | "true" => Some(1),
+        "no" | "false" => Some(0),
+        _ => None,
+    }
+}

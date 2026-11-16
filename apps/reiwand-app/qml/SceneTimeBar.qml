@@ -1,0 +1,75 @@
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC2
+import io.github.reiwand.app
+
+QQC2.ToolBar {
+    id: bar
+
+    required property var timeline
+
+    function curve() {
+        curves.open();
+    }
+
+    RowLayout {
+        anchors.fill: parent
+
+        QQC2.ToolButton {
+            icon.name: timeline.page.editor.playing ? "media-playback-pause" : "media-playback-start"
+            text: timeline.page.editor.playing ? App.tr("Pause") : App.tr("Play")
+            display: QQC2.AbstractButton.IconOnly
+            onClicked: timeline.seek(timeline.page.clock, !timeline.page.editor.playing)
+        }
+
+        QQC2.Label {
+            text: App.tr("%1 s", timeline.page.clock.toFixed(2))
+        }
+
+        SceneSlider {
+            Layout.fillWidth: true
+            from: 0
+            to: timeline.length
+            value: timeline.page.clock
+            onMoved: timeline.seek(value, false)
+        }
+
+        QQC2.ComboBox {
+            enabled: timeline.picked !== null
+            model: timeline.easings.map(ease => SceneWords.easing(ease))
+            currentIndex: timeline.picked ? Math.max(0, timeline.easings.indexOf(timeline.picked[2] ?? "linear")) : 0
+            onActivated: index => timeline.edit(timeline.easings[index], false)
+        }
+
+        QQC2.ToolButton {
+            icon.name: "edit-delete"
+            text: App.tr("Remove the keyframe")
+            display: QQC2.AbstractButton.IconOnly
+            enabled: timeline.picked !== null
+            onClicked: {
+                timeline.edit(undefined, true);
+                timeline.chosen = null;
+            }
+        }
+
+        QQC2.ToolButton {
+            icon.name: "draw-bezier-curves"
+            text: App.tr("Curve and base of the keyframe")
+            display: QQC2.AbstractButton.IconOnly
+            enabled: timeline.picked !== null
+            onClicked: curves.open()
+
+            SceneKeyCurve {
+                id: curves
+
+                timeline: bar.timeline
+            }
+        }
+
+        SceneGraphButton {
+            page: bar.timeline.page
+            now: bar.timeline.page.clock
+            sources: SceneGraphSources.tracks(bar.timeline.tracks, bar.timeline.chosen)
+        }
+    }
+}

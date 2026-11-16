@@ -1,0 +1,39 @@
+[package]
+name = "reiwand-app"
+description = "Desktop app of Reiwand"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+reiwand-core.workspace = true
+reiwand-client.workspace = true
+reiwand-depth = { workspace = true, features = ["fetch", "infer"] }
+reiwand-editor.workspace = true
+reiwand-format.workspace = true
+reiwand-render = { workspace = true, features = ["avif"] }
+reiwand-scene.workspace = true
+reiwand-palette.workspace = true
+reiwand-qr.workspace = true
+base64.workspace = true
+dirs.workspace = true
+anyhow.workspace = true
+cxx.workspace = true
+cxx-qt.workspace = true
+cxx-qt-lib.workspace = true
+libc.workspace = true
+futures-util.workspace = true
+image.workspace = true
+percent-encoding.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+zbus.workspace = true
+zeroize.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[build-dependencies]
+cxx-qt-build.workspace = true

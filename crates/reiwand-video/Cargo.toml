@@ -1,0 +1,21 @@
+[package]
+name = "reiwand-video"
+description = "Looping video playback for Reiwand, decoded with GStreamer"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+reiwand-core.workspace = true
+reiwand-scene.workspace = true
+reiwand-mix.workspace = true
+gstreamer.workspace = true
+gstreamer-app.workspace = true
+gstreamer-video.workspace = true
+gstreamer-allocators.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

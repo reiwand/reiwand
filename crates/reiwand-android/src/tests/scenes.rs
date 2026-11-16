@@ -1,0 +1,189 @@
+use super::{FIXTURES, acting, ask, calm, cued, flight, looks, open, renderer, saved, stopped};
+use crate::stage::Stage;
+use crate::{choice, hearing, library, pack, power, store};
+use reiwand_library::Kind;
+use serde_json::{Value, json};
+use std::collections::BTreeSet;
+use std::fs::{self, File};
+use std::path::Path;
+
+pub(super) fn scenes() {
+    let examples = super::bundled::drawn_examples();
+    let added = ask(json!({ "op": "examples", "dir": examples }));
+    let uids: Vec<String> = serde_json::from_value(added.clone()).unwrap_or_else(|_| panic!("{added}"));
+    assert_eq!(uids.len(), 6);
+    let listed = ask(json!({ "op": "items", "query": "kind:scene" }));
+    let titles: BTreeSet<_> =
+        listed.as_array().unwrap().iter().map(|i| i["title"].as_str().unwrap()).collect();
+    assert!(titles.contains("Pulse") && titles.contains("Snowfall"), "{titles:?}");
+    super::steady::frames();
+    let pulse = listed.as_array().unwrap().iter().find(|i| i["title"] == "Pulse").unwrap();
+    let (pulse, path) =
+        (pulse["uid"].as_str().unwrap().to_owned(), pulse["path"].as_str().unwrap().to_owned());
+    assert!(listed.as_array().unwrap().iter().all(|i| i["thumb"].is_string() && i["width"].is_u64()));
+    let refused = ask(json!({ "op": "pick", "choice": { "item": pulse } }));
+    assert!(refused["error"].as_str().unwrap().contains("flashes"), "{refused}");
+    let about = ask(json!({ "op": "item", "uid": pulse, "languages": ["es_ES"] }));
+    assert_eq!(
+        (&about["package"]["photosensitive"], &about["about"]["title"], &about["title"]),
+        (&json!(true), &json!("Pulso"), &json!("Pulso"))
+    );
+    let spanish = ask(json!({ "op": "items", "query": "kind:scene", "languages": ["es_ES"] }));
+    let titles: BTreeSet<_> =
+        spanish.as_array().unwrap().iter().map(|i| i["title"].as_str().unwrap()).collect();
+    assert!(titles.contains("Pulso") && titles.contains("Colinas al atardecer"), "{titles:?}");
+    let mix = ask(json!({ "op": "create", "name": "Nombres" })).as_str().unwrap().to_owned();
+    ask(json!({ "op": "add", "playlist": mix, "items": [pulse] }));
+    assert_eq!(ask(json!({ "op": "entries", "playlist": mix }))[0]["title"], "Pulso");
+    ask(json!({ "op": "delete", "playlist": mix }));
+    let lacks = |title: &str| {
+        let found = listed.as_array().unwrap().iter().find(|i| i["title"] == title).unwrap();
+        ask(json!({ "op": "item", "uid": found["uid"] }))["lacks"].clone()
+    };
+    assert_eq!([lacks("Orbits"), lacks("Snowfall"), lacks("Pulse")], [json!([]), json!([]), json!([])]);
+    assert!(
+        about["about"]["description"].as_str().unwrap().contains("\n\nDestella con el ritmo y"),
+        "{about}"
+    );
+    assert_eq!(ask(json!({ "op": "item", "uid": pulse }))["package"]["flash_disabled"], json!(true));
+    assert!(ask(json!({ "op": "pick", "choice": { "item": pulse } }))["error"].is_string());
+    crate::settings::setting("playback.allow_flashing", Some("true")).unwrap();
+    assert_eq!(ask(json!({ "op": "item", "uid": pulse }))["package"]["flash_disabled"], json!(false));
+    assert_eq!(ask(json!({ "op": "pick", "choice": { "item": pulse } })), Value::Null);
+    ask(json!({ "op": "pick", "choice": null }));
+    let dusk = listed.as_array().unwrap().iter().find(|i| i["title"] == "Dusk hills").unwrap();
+    let dusk = ask(json!({ "op": "scene", "uid": dusk["uid"], "languages": ["es"] }));
+    let labels: Vec<&str> =
+        dusk["fields"].as_array().unwrap().iter().filter_map(|f| f["label"].as_str()).collect();
+    assert!(labels.contains(&"Momento del día") && !labels.iter().any(|l| l.starts_with('@')), "{labels:?}");
+    let form = ask(json!({ "op": "scene", "uid": pulse, "languages": ["es"] }));
+    assert_eq!((&form["uses"]["audio"], &form["granted"]["audio"]), (&json!(true), &json!(false)));
+    let field = form["fields"].as_array().unwrap()[0].clone();
+    let key = field["key"].as_str().unwrap().to_owned();
+    assert!(
+        ask(json!({ "op": "property", "uid": pulse, "key": "nothing", "value": 1 }))["error"].is_string()
+    );
+    super::played::pulse_shows_what_plays(&pulse, &path);
+    let scene = pack::load(Path::new(&path)).unwrap();
+    let mut stage = Stage::new(pulse.clone(), scene);
+    assert_eq!(stage.wants(), [false, false]);
+    let charging = crate::power::Power {
+        charging: true,
+        saver: false,
+        low: false,
+        thermal: 0,
+        headroom: 0.0,
+        still: false,
+        percent: -1,
+    };
+    let r = renderer();
+    let draw = |stage: &mut Stage, nanos: i64, cap: u32, force: bool| {
+        let r = r.as_ref()?;
+        let shot = stage
+            .render(r, ((64, 128), nanos, cap), (charging, reiwand_scene::Tier::T1), &[], force)
+            .unwrap();
+        Some((shot.image.map(|i| i.size()), shot.fps, shot.delay))
+    };
+    if let Some(first) = draw(&mut stage, 0, 60, true) {
+        assert!(
+            first.0.is_some_and(|(w, h)| w <= 64 && h <= 128) && (first.1, first.2) == (0, 0),
+            "{first:?}"
+        );
+        assert_eq!(draw(&mut stage, 1_000_000, 60, false).map(|shot| shot.0), Some(None));
+    }
+    super::asked::one_question(&pulse);
+    super::asked::told_once(&pulse);
+    assert_eq!(ask(json!({ "op": "grant", "uid": pulse, "input": "audio", "on": true })), Value::Null);
+    assert!(ask(json!({ "op": "grant", "uid": pulse, "input": "camera", "on": true }))["error"].is_string());
+    assert_eq!(ask(json!({ "op": "scene", "uid": pulse, "languages": [] }))["granted"]["audio"], json!(true));
+    super::asked::twin_inherits_nothing(&pulse);
+    stage.refresh();
+    assert_eq!(stage.wants(), [true, false]);
+    let mut fft = [0i8; hearing::MAX_CAPTURE];
+    hearing::hear(&fft, 44_100);
+    assert!(!hearing::live());
+    if let Some(silent) = draw(&mut stage, 1_000_000, 60, false) {
+        assert_eq!(silent.2, 0, "silence lets the scene rest");
+        hearing::playback(true);
+        assert_eq!(draw(&mut stage, 1_000_000, 60, false).map(|shot| shot.2), Some(2_000));
+        hearing::playback(false);
+    }
+    if let Some(r) = r.as_ref() {
+        super::hushed::silence_and_pace_changes_let_a_sound_scene_rest(&mut stage, r, charging);
+    }
+    fft[46] = 100;
+    hearing::hear(&fft, 44_100);
+    assert!(hearing::live());
+    if let Some(heard) = draw(&mut stage, 2_000_000, 60, false) {
+        assert!(heard.0.is_some() && heard.1 > 0 && heard.2 > 0, "sound wakes the scene: {heard:?}");
+        let still = draw(&mut stage, 3_000_000_000, 0, true).unwrap();
+        assert_eq!((still.0.is_some(), still.1), (true, 0));
+    }
+    if field["kind"] == "slider" || field["kind"] == "bool" {
+        let value =
+            if field["kind"] == "bool" { json!(field["value"] != json!(true)) } else { field["max"].clone() };
+        assert_eq!(ask(json!({ "op": "property", "uid": pulse, "key": key, "value": value })), Value::Null);
+        let changed = ask(json!({ "op": "scene", "uid": pulse, "languages": [] }));
+        assert_eq!(changed["fields"][0]["value"], value);
+        assert_eq!(ask(json!({ "op": "reset", "uid": pulse })), Value::Null);
+    }
+    let videos = Path::new(FIXTURES).join("magenta-64x32.webm");
+    let source = tempfile::tempdir().unwrap();
+    fs::copy(&videos, source.path().join("clip.webm")).unwrap();
+    let layers = json!([{ "id": "clip", "type": "video", "video": "clip" },
+        { "id": "own", "type": "video", "video": "clip", "playback": { "own_clock": true } },
+        { "id": "picked", "type": "video", "video": { "prop": "pick" }, "playback": { "own_clock": true } }]);
+    let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "clip": { "path": "clip.webm" } }, "layers": layers });
+    fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
+    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.clip", "version": "1.0.0", "title": "Clip", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" }, "photosensitive": false, "origin": { "kind": "original" },
+        "properties": { "pick": { "type": "file", "accept": ["video"], "default_asset": "clip" } } });
+    fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
+    let built = source.path().join("clip.wpak");
+    reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();
+    let (clip, kind) = store::store(&mut File::open(&built).unwrap(), "clip.wpak").unwrap();
+    assert_eq!(kind, Kind::Package);
+    let stored = library::with(|lib| Ok(lib.item(&clip)?)).unwrap();
+    let loaded = pack::load(&stored.path).unwrap();
+    let mut playing = Stage::new(clip.clone(), loaded.clone());
+    assert!(playing.plays());
+    if let Some(shot) = draw(&mut playing, 0, 60, true) {
+        assert!(shot.1 > 0 && shot.2 > 0, "a video layer keeps the scene drawing: {shot:?}");
+    }
+    let extracted = &loaded.videos[0].1;
+    assert_eq!(
+        (loaded.videos[0].0.as_str(), fs::read(extracted).unwrap()),
+        ("clip", fs::read(&videos).unwrap())
+    );
+    let lane = loaded.videos.iter().find(|(id, _)| id == "clip@own").map(|(_, f)| f.clone()).unwrap();
+    assert!(lane != *extracted && fs::read(&lane).unwrap() == fs::read(extracted).unwrap(), "{lane:?}");
+    assert!(fs::symlink_metadata(&lane).unwrap().file_type().is_symlink(), "the own clock links the file");
+    let picked = loaded.videos.iter().find(|(id, _)| id == "pick@picked").map(|(_, f)| f.clone());
+    assert!(
+        picked.is_some_and(|f| fs::read(f).unwrap() == fs::read(extracted).unwrap()),
+        "{:?}",
+        loaded.videos
+    );
+    ask(json!({ "op": "pick", "choice": { "item": clip } }));
+    assert!(choice::shown(true).is_some_and(|s| s.scene && !s.video));
+    ask(json!({ "op": "pick", "choice": null }));
+    assert_eq!(ask(json!({ "op": "remove", "uids": [clip] })), Value::Null);
+    assert!(!extracted.exists() && !stored.path.exists());
+    let image = store::store(&mut open("green-64x32.png"), "green.png").unwrap().0;
+    let bad = library::with(|lib| Ok(lib.item(&image)?.path)).unwrap();
+    assert!(pack::load(&bad).is_err());
+    saved::saved_settings();
+    cued::cued();
+    acting::scripted();
+    acting::shortcuts_open_only_after_a_press();
+    calm::calmed();
+    stopped::only_automatic_stops_heavy_scenes();
+    stopped::the_engine_follows_the_pace_the_pilot_chose();
+    flight::flown();
+    looks::drawn();
+    super::bundled::the_examples_come_as_a_repository_that_stays_removed(&examples);
+    super::previewed::repository_previews_come_from_that_repository_once_and_within_a_bound();
+    super::pinned::the_servers_own_certificate_is_trusted_only_for_its_own_origin();
+    super::sounded::scene_sounds_play_pause_and_release();
+    super::sounded::a_one_shot_sound_pauses_when_it_ends_and_is_dropped_later();
+    power::device(false, 0);
+}

@@ -1,0 +1,141 @@
+package io.github.reiwand
+
+import android.graphics.PixelFormat
+import android.hardware.HardwareBuffer
+import android.media.ImageReader
+import android.os.Handler
+import android.os.HandlerThread
+import androidx.test.platform.app.InstrumentationRegistry
+import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
+import kotlinx.coroutines.runBlocking
+import org.json.JSONArray
+import org.json.JSONObject
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@RunWith(Baselined::class)
+class ScenePagesTest : SceneBase() {
+    @Test
+    fun aChosenQualityHoldsWhateverThePower() {
+        assertEquals("auto", Native.setting("playback.quality", null))
+        try {
+            assertEquals("q3", Native.setting("playback.quality", "q3"))
+            show("Snowfall")
+            val chosen = { JSONObject(Native.diagnostics()).let { it.optString("quality") to it.optString("reason") } }
+            assertTrue("the level: ${chosen()}", waitFor { chosen() == ("Q3" to "user") })
+        } finally {
+            Native.setting("playback.quality", "auto")
+        }
+    }
+
+    @Test
+    fun pagesGetTheirItemAndProperties() = runBlocking {
+        val uid = show("Snowfall")
+        assertEquals("Snowfall", Item(ask("item", "uid" to uid) as JSONObject).title)
+        assertTrue((ask("scene", "uid" to uid, "languages" to listOf("en")) as JSONObject).has("fields"))
+    }
+
+    @Test
+    fun ratedScenesWaitForConsent() = runBlocking {
+        val dir = File(storage(), "rated/flash").apply { mkdirs() }
+        val id = "org.example.flash${System.currentTimeMillis()}"
+        File(dir, "scene.json").writeText(FLASH_SCENE)
+        File(dir, "manifest.json").writeText(FLASH_MANIFEST.replace("org.example.flash", id))
+        Native.library(JSONObject().put("op", "examples").put("dir", dir.parent).toString())
+        val uid = find("Flash")
+        suspend fun item() = Item(ask("item", "uid" to uid, "languages" to listOf("es")) as JSONObject)
+        assertTrue(item().mature && item().flashing && item().about == "Destellos rápidos.")
+        assertTrue(item().title == "Destello" && item().lacks.isEmpty())
+        val pick = JSONObject(mapOf("op" to "pick", "choice" to choice("item", uid))).toString()
+        assertTrue(JSONObject(Native.library(pick)).getString("error").contains("flashes"))
+        Device.setting("playback.allow_flashing", "true")
+        assertTrue(item().mature && !item().flashing)
+        ask("confirm", "uid" to uid, "what" to "mature")
+        assertTrue(!item().mature)
+        assertEquals("null", Native.library(pick))
+    }
+
+    @Test
+    fun buttonsRedrawAndSettingsTravelAsFiles() = runBlocking {
+        val dir = File(storage(), "knobs/knobs").apply { mkdirs() }
+        File(dir, "scene.json").writeText(KNOBS_SCENE)
+        File(dir, "manifest.json").writeText(KNOBS_MANIFEST)
+        Native.library(JSONObject().put("op", "examples").put("dir", dir.parent).toString())
+        val uid = show("Knobs")
+        val left = (ask("scene", "uid" to uid, "languages" to listOf("en")) as JSONObject).getJSONArray("saved")
+        (0 until left.length()).forEach { ask("forget", "preset" to left.getJSONObject(it).getString("value")) }
+        assertTrue(waitFor { frames.get() > 0 })
+        val before = settled(frames)
+        ask("press", "uid" to uid, "key" to "again")
+        Render.post(painter::refresh)
+        assertTrue(quiet(frames) > before)
+        ask("secret", "uid" to uid, "key" to "token", "text" to "hunter2")
+        ask("property", "uid" to uid, "key" to "mood", "value" to 2)
+        ask("save", "uid" to uid, "name" to "Storm")
+        val text = ask("export", "uid" to uid, "preset" to "Storm") as String
+        assertTrue(!text.contains("hunter2") && JSONObject(text).getJSONObject("values").getInt("mood") == 2)
+        ask("reset", "uid" to uid)
+        assertEquals(0, (ask("import", "uid" to uid, "text" to text, "name" to "") as JSONArray).length())
+        val form = ask("scene", "uid" to uid, "languages" to listOf("en")) as JSONObject
+        val fields = form.getJSONArray("fields").let { list -> (0 until list.length()).map(list::getJSONObject) }
+        assertTrue(fields.first { it.getString("key") == "token" }.getBoolean("filled"))
+        assertEquals(1, form.getJSONArray("saved").length())
+        assertEquals(0, (ask("import", "uid" to uid, "text" to text, "name" to "Copy") as JSONArray).length())
+        val named = (ask("scene", "uid" to uid, "languages" to listOf("en")) as JSONObject).getJSONArray("saved")
+        assertEquals(listOf("Copy", "Storm"), (0 until named.length()).map { named.getJSONObject(it).getString("label") }.sorted())
+        assertTrue(Item(ask("item", "uid" to uid) as JSONObject).lacks.isEmpty())
+    }
+
+    @Test
+    fun webPagesAreAddedAndShownAsPages() = runBlocking {
+        val dir = File(storage(), "pages/page").apply { mkdirs() }
+        File(dir, "index.html").writeText("<!doctype html><title>Page</title>")
+        File(dir, "manifest.json").writeText(PAGE_MANIFEST)
+        val uid = JSONArray(Native.library(JSONObject().put("op", "examples").put("dir", dir.parent).toString())).getString(0)
+        val item = Item(ask("item", "uid" to uid) as JSONObject)
+        assertTrue(item.web && item.scene && item.lacks.isEmpty())
+        assertEquals(listOf("zone", "language", "gpu"), item.exposes)
+        assertTrue(context.notice(item.exposes)!!.contains("your time zone, your language and the model of your graphics chip"))
+        ask("remove", "uids" to listOf(uid))
+        val webs = JSONArray(Native.library(JSONObject().put("op", "items").put("query", "kind:web").toString()))
+        val lights = (0 until webs.length()).map(webs::getJSONObject).first { it.getString("title") == "Lights" }
+        assertEquals(listOf("zone", "language", "gpu", "storage"), Item(lights).exposes)
+    }
+
+    @Test
+    fun scenesWithLightsLitAirAndShadowsAreAccepted() {
+        val dir = File(storage(), "lamps/lamp").apply { mkdirs() }
+        val all = listOf(LAMP_SCENE to LAMP_MANIFEST, FOG_SCENE to FOG_MANIFEST, SHADOW_SCENE to SHADOW_MANIFEST)
+        for ((scene, manifest) in all) {
+            File(dir, "scene.json").writeText(scene)
+            File(dir, "manifest.json").writeText(manifest)
+            val lit = Native.library(JSONObject().put("op", "examples").put("dir", dir.parent).toString())
+            assertTrue(lit, lit.startsWith("["))
+        }
+    }
+
+    @Test
+    fun scenesWithModelsAndCameraPathsAreDrawn() {
+        val dir = File(storage(), "stages/stage").apply { mkdirs() }
+        for ((scene, manifest) in listOf(STAGE_SCENE to STAGE_MANIFEST, FLOWN_SCENE to FLOWN_MANIFEST)) {
+            File(dir, "scene.json").writeText(scene)
+            File(dir, "manifest.json").writeText(manifest)
+            val shown = Native.library(JSONObject().put("op", "examples").put("dir", dir.parent).toString())
+            assertTrue(shown, shown.startsWith("["))
+        }
+    }
+
+    @Test
+    fun scenesWithTheNewerEffectsAndParametersAreAccepted() {
+        val dir = File(storage(), "shafts/shafts").apply { mkdirs() }
+        File(dir, "scene.json").writeText(SHAFTS_SCENE)
+        File(dir, "manifest.json").writeText(SHAFTS_MANIFEST)
+        val reply = Native.library(JSONObject().put("op", "examples").put("dir", dir.parent).toString())
+        assertTrue(reply, reply.startsWith("["))
+    }
+}

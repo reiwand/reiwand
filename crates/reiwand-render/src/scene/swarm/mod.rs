@@ -1,0 +1,165 @@
+mod bent;
+mod binds;
+mod census;
+mod chart;
+mod dispatch;
+mod fence;
+mod flight;
+mod hull;
+mod kit;
+mod lamp;
+mod lamped;
+mod looks;
+mod maps;
+mod paint;
+mod seen;
+mod setup;
+mod show;
+pub(crate) use lamp::{Lamp, Lamps};
+pub(crate) use setup::sprites;
+pub use step::set_step_budget;
+mod sort;
+mod sprite;
+mod stage;
+mod stages;
+pub(crate) mod staging;
+mod step;
+mod store;
+mod strands;
+mod texels;
+
+use super::SceneView;
+use super::pipes::Mode;
+use crate::Renderer;
+use binds::{buffer, module};
+use kit::{Kit, Look};
+use reiwand_scene::{Bake, Blend, Cloud, Quality, Stack};
+use std::collections::HashMap;
+use wgpu::{BindGroup, BindGroupLayout, Buffer, BufferUsages as B};
+
+const CHUNK: usize = 16;
+const SIM: u64 = 3584;
+const LOOK: u64 = 1792;
+const PARTICLE: u64 = 96;
+
+#[derive(Default)]
+struct Stamp {
+    set: Option<wgpu::QuerySet>,
+    begun: bool,
+    open: Option<wgpu::CommandEncoder>,
+    done: Vec<wgpu::CommandBuffer>,
+}
+
+struct Store {
+    particles: Buffer,
+    gpu: Option<(Buffer, Buffer, BindGroup)>,
+    trail: Option<Buffer>,
+    stacks: Vec<Stacked>,
+    rope: Option<Buffer>,
+    flock: Option<BindGroup>,
+    twine: Option<BindGroup>,
+}
+
+struct Stacked {
+    order: Stack,
+    size: f32,
+    sorted: Buffer,
+    gpu: Option<(Buffer, BindGroup)>,
+    cpu: Vec<reiwand_scene::Particle>,
+}
+
+struct Flight {
+    points: Buffer,
+    stores: Vec<Store>,
+    clouds: Vec<Cloud>,
+    sims: Vec<reiwand_scene::Sim>,
+}
+
+struct Herd {
+    bake: Bake,
+    world: bool,
+}
+
+pub(crate) struct Swarms {
+    pub(crate) canvas: [f32; 2],
+    pub(crate) steps: u32,
+    pub(crate) micros: u32,
+    pub(crate) created: u32,
+    serial: u64,
+    pub(crate) shown: bool,
+    gpu: bool,
+    profile: bool,
+    kits: Vec<Kit>,
+    herds: Vec<Herd>,
+    pub(crate) sprites: Vec<Option<String>>,
+    flights: Vec<Option<Flight>>,
+    marks: Vec<(u64, u32)>,
+    module: wgpu::ShaderModule,
+    layouts: [BindGroupLayout; 7],
+    compute: Option<[wgpu::ComputePipeline; 3]>,
+    flocking: Option<[wgpu::ComputePipeline; 5]>,
+    twining: Option<wgpu::ComputePipeline>,
+    sorts: Option<[wgpu::ComputePipeline; 3]>,
+    pipelines: HashMap<Mode, wgpu::RenderPipeline>,
+    lits: HashMap<(Mode, usize), wgpu::RenderPipeline>,
+    seen: Vec<Option<wgpu::TextureView>>,
+    peeks: Vec<(wgpu::TextureView, BindGroup)>,
+    blank: wgpu::TextureView,
+    bends: [Option<wgpu::RenderPipeline>; 4],
+    ribbons: HashMap<Mode, wgpu::RenderPipeline>,
+    cords: HashMap<Mode, [wgpu::RenderPipeline; 2]>,
+    format: wgpu::TextureFormat,
+    sampler: wgpu::Sampler,
+    looks: Vec<Look>,
+    kitted: Vec<usize>,
+    looked: Option<(Buffer, BindGroup)>,
+    bytes: Vec<u8>,
+    quality: Quality,
+    none: Buffer,
+    stamp: Stamp,
+    maps: Vec<maps::Map>,
+    stages: HashMap<(Mode, u64, usize), wgpu::RenderPipeline>,
+    framing: BindGroupLayout,
+    framed: Option<BindGroup>,
+}
+
+pub(super) fn compute(r: &Renderer) -> bool {
+    let flags = r.gpu.get_downlevel_capabilities().flags;
+    let limits = r.device.limits();
+    flags.contains(wgpu::DownlevelFlags::COMPUTE_SHADERS)
+        && limits.max_storage_buffers_per_shader_stage >= 4
+        && limits.max_uniform_buffer_binding_size >= SIM
+}
+
+fn mode(blend: Blend, atop: bool) -> Mode {
+    super::pipes::fixed(blend, atop).unwrap_or(Mode::Normal)
+}
+
+impl SceneView {
+    pub fn gpu_particles(&self) -> Option<bool> {
+        self.swarms.as_ref().map(|s| s.gpu)
+    }
+
+    pub fn set_gpu_particles(&mut self, r: &Renderer, gpu: bool) -> bool {
+        let Some(swarms) = self.swarms.as_mut().filter(|_| compute(r) || !gpu) else { return false };
+        swarms.prepare(r, gpu);
+        true
+    }
+
+    pub fn set_particle_trails(&mut self, r: &Renderer, tier: reiwand_scene::Tier) {
+        if let Some(swarms) = self.swarms.as_mut() {
+            swarms.herds.iter_mut().for_each(|h| h.bake.retrail(tier));
+            swarms.prepare(r, swarms.gpu);
+        }
+    }
+
+    pub fn profile_particles(&mut self, on: bool) {
+        self.swarms.iter_mut().for_each(|s| s.profile = on);
+    }
+}
+
+impl Swarms {
+    pub(crate) fn world(&self, flock: usize) -> bool {
+        self.herds.get(flock).is_some_and(|h| h.world)
+    }
+}

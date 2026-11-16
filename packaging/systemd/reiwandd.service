@@ -1,0 +1,29 @@
+[Unit]
+Description=reiwand wallpaper daemon
+Documentation=https://github.com/reiwand/reiwand
+PartOf=graphical-session.target
+After=graphical-session.target pipewire.service
+Wants=pipewire.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=dbus
+BusName=io.github.reiwand.Daemon
+ExecStart=@BINDIR@/reiwandd
+Restart=on-failure
+RestartSec=2
+UMask=0077
+LimitCORE=0
+NoNewPrivileges=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+RestrictNamespaces=yes
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6
+SystemCallArchitectures=native
+SystemCallFilter=@system-service @sandbox
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=graphical-session.target

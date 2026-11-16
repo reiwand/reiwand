@@ -1,0 +1,155 @@
+use super::lit::lit_layer;
+use crate::action::{MapStroke, NormalsMake};
+use crate::ops::{Op, escape, set};
+use crate::paint::{POINTS, Stroke, stroke};
+use anyhow::{Result, ensure};
+use image::{Rgba, RgbaImage, imageops};
+use reiwand_core::message::said;
+use serde_json::{Value, json};
+use std::path::Path;
+
+const SHOWN: u32 = 256;
+const SIDE: u32 = 512;
+const LIGHT: [f32; 3] = [-1.0, 1.0, 1.2];
+
+fn path_of<'a>(doc: &'a Value, id: &str) -> Option<&'a str> {
+    doc.pointer(&format!("/scene/assets/{}/path", escape(id))).and_then(Value::as_str)
+}
+
+fn made(dir: &Path, doc: &Value, m: &NormalsMake) -> Result<(String, Option<String>, RgbaImage)> {
+    let fits = |v: f32, hi: f32| v.is_finite() && (0.0..=hi).contains(&v);
+    ensure!(
+        fits(m.strength, reiwand_depth::MAX_STRENGTH) && fits(m.blur, reiwand_depth::MAX_BLUR),
+        said(
+            "editor.normals_range",
+            "strength goes from 0 to %1 and blur from 0 to %2",
+            &[&reiwand_depth::MAX_STRENGTH, &reiwand_depth::MAX_BLUR]
+        )
+    );
+    let from = super::source::source(dir, doc, m)?;
+    Ok((from.id, from.path, reiwand_depth::normals(&from.picture, m.strength, m.blur)))
+}
+
+fn saved(dir: &Path, (folder, name): (&str, &str), image: &RgbaImage, like: Option<&str>) -> Result<String> {
+    crate::pictures::store(dir, (folder, name), image, like.map(|p| dir.join(p)).as_deref())
+}
+
+fn with(doc: &Value, layer: &str, field: &str, id: &str) -> Result<Vec<Op>> {
+    let (path, l) = lit_layer(doc, layer)?;
+    let mut block = l["lighting"].as_object().cloned().unwrap_or_default();
+    block.insert(field.into(), json!(id));
+    Ok(set(doc, &format!("{path}/lighting"), Value::Object(block)))
+}
+
+pub(crate) fn normals(dir: &Path, doc: &Value, m: &NormalsMake) -> Result<Vec<Op>> {
+    if let Some(layer) = &m.layer {
+        lit_layer(doc, layer)?;
+    }
+    if let Some(id) = m.id.as_deref() {
+        let asset = doc.pointer(&format!("/scene/assets/{}", escape(id)));
+        let ours =
+            |a: &Value| a["linear"] == true && path_of(doc, id).is_some_and(|p| p.starts_with("normals/"));
+        ensure!(
+            asset.is_none_or(ours),
+            said("editor.normals_taken", "%1 already names another asset", &[&id])
+        );
+    }
+    let (from, like, image) = made(dir, doc, m)?;
+    let base =
+        m.id.clone().unwrap_or_else(|| format!("{}_normals", from.chars().take(24).collect::<String>()));
+    let id = if m.id.is_some() { base } else { crate::layers::unique(doc, &base) };
+    let path = saved(dir, ("normals", &id), &image, like.as_deref())?;
+    let mut ops =
+        set(doc, &format!("/scene/assets/{}", escape(&id)), json!({ "path": path, "linear": true }));
+    if let Some(layer) = &m.layer {
+        ops.extend(with(doc, layer, "normal", &id)?);
+    }
+    Ok(ops)
+}
+
+fn small(image: &RgbaImage) -> RgbaImage {
+    let k = SHOWN as f32 / image.width().max(image.height()) as f32;
+    if k >= 1.0 {
+        return image.clone();
+    }
+    let (w, h) = ((image.width() as f32 * k).max(1.0) as u32, (image.height() as f32 * k).max(1.0) as u32);
+    imageops::resize(image, w, h, imageops::FilterType::Triangle)
+}
+
+pub fn preview(dir: &Path, doc: &Value, m: &NormalsMake) -> Value {
+    let Ok((from, _, image)) = made(dir, doc, m) else { return Value::Null };
+    let shown = small(&image);
+    json!({ "from": from, "size": [shown.width(), shown.height()], "normals": crate::rigs::url(&shown),
+        "relief": crate::rigs::url(&reiwand_depth::relief(&shown, LIGHT)),
+        "sphere": crate::rigs::url(&reiwand_depth::sphere(96, LIGHT)) })
+}
+
+fn blank(dir: &Path, doc: &Value, layer: &Value, white: bool) -> RgbaImage {
+    let found = layer["image"]
+        .as_str()
+        .and_then(|id| path_of(doc, id))
+        .and_then(|p| crate::pictures::dimensions(dir.join(p)).ok());
+    let (w, h) = found.map_or((SIDE, SIDE), |(w, h)| {
+        let k = (SIDE as f32 / w.max(h) as f32).min(1.0);
+        (((w as f32 * k) as u32).max(1), ((h as f32 * k) as u32).max(1))
+    });
+    let v = if white { 255 } else { 0 };
+    RgbaImage::from_pixel(w, h, Rgba([v, v, v, 255]))
+}
+
+fn own_map(doc: &Value, id: &str, here: &str) -> bool {
+    let linear = doc.pointer(&format!("/scene/assets/{}/linear", escape(id))) == Some(&json!(true));
+    let painted = path_of(doc, id).is_some_and(|p| p.starts_with("maps/"));
+    linear && painted && super::data::only_at(doc, id, here)
+}
+
+pub(crate) fn paint(dir: &Path, doc: &Value, s: &MapStroke) -> Result<Vec<Op>> {
+    let (at, layer) = lit_layer(doc, &s.layer)?;
+    let fits = (1..=POINTS).contains(&s.points.len()) && s.points.iter().flatten().all(|v| v.is_finite());
+    ensure!(
+        fits,
+        said("editor.paint_stroke", "a stroke has 1 to %1 points and a channel from 0 to 3", &[&POINTS])
+    );
+    let field = s.map.field();
+    let named = layer["lighting"][field].as_str().filter(|id| path_of(doc, id).is_some());
+    let old = named.and_then(|id| crate::pictures::asset(dir, doc, id).ok()).map(|i| i.into_rgba8());
+    let mut picture = old.unwrap_or_else(|| blank(dir, doc, layer, field == "roughness_map"));
+    let pointer = format!("/scene/layers/{}", s.layer);
+    let brush = Stroke {
+        pointer: &pointer,
+        channel: None,
+        radius: s.radius,
+        hardness: s.hardness,
+        value: s.value,
+        points: &s.points,
+        direction: false,
+    };
+    stroke(&mut picture, &brush);
+    let here = format!("{at}/lighting/{field}");
+    let id = named.filter(|id| own_map(doc, id, &here)).map_or_else(
+        || crate::layers::unique(doc, &format!("{}_{}", s.layer, &field[..field.len() - 4])),
+        String::from,
+    );
+    let like = named
+        .and_then(|id| path_of(doc, id))
+        .or_else(|| layer["image"].as_str().and_then(|i| path_of(doc, i)));
+    let path = saved(dir, ("maps", &id), &picture, like)?;
+    let mut ops =
+        set(doc, &format!("/scene/assets/{}", escape(&id)), json!({ "path": path, "linear": true }));
+    ops.extend(with(doc, &s.layer, field, &id)?);
+    Ok(ops)
+}
+
+pub fn heat(dir: &Path, doc: &Value, layer: &str, field: &str) -> Value {
+    let Ok((_, l)) = crate::actions::layer(doc, layer) else { return Value::Null };
+    let Some(id) = l["lighting"][field].as_str() else { return json!({ "map": null }) };
+    let Some(image) = crate::pictures::asset(dir, doc, id).ok() else {
+        return Value::Null;
+    };
+    let mut shown = small(&image.into_rgba8());
+    shown.pixels_mut().for_each(|p| {
+        let [r, g, b] = crate::rigs::heat_rgb(f32::from(p.0[0]) / 255.0);
+        *p = Rgba([r, g, b, 255]);
+    });
+    json!({ "map": id, "size": [shown.width(), shown.height()], "heat": crate::rigs::url(&shown) })
+}

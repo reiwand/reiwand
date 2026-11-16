@@ -1,0 +1,165 @@
+use super::view::ViewSlot;
+use super::*;
+use crate::pages::{PLAIN, Privacy, WebPack, shape};
+use crate::sceneprops::Props;
+use rustix::fs::{MemfdFlags, SealFlags, fcntl_add_seals, ftruncate, memfd_create};
+use std::sync::Arc;
+
+fn spec(language: bool) -> PageSpec {
+    page(language, json!({}))
+}
+
+pub(in crate::compositor) fn page(language: bool, more: Json) -> PageSpec {
+    let mut properties = json!({"mood": {"type": "combo", "default": "calm", "label": "Mood",
+        "options": [{"value": "calm", "label": {"en": "Calm", "es": "Calma"}}]}});
+    properties.as_object_mut().unwrap().extend(more.as_object().unwrap().clone());
+    let properties = serde_json::from_value(properties).unwrap();
+    let languages = vec!["es_AR.UTF-8".to_owned(), "en".to_owned()];
+    let props = Props {
+        path: "/p.wpak".into(),
+        id: "org.example.page".into(),
+        version: "1.0.0".into(),
+        title: "Page".into(),
+        kind: "web",
+        languages: languages.clone(),
+        properties,
+        presets: Vec::new(),
+        authored: Default::default(),
+    };
+    let (shape, plain) = (shape(&props, &languages), shape(&props, &[PLAIN.into(), "en".into()]));
+    let pack = WebPack {
+        path: "/p.wpak".into(),
+        leveling: reiwand_scene::Leveling::of(&props.properties),
+        props: Arc::new(props),
+        entry: "index.html".into(),
+        preload: None,
+        background: [0; 3],
+        network: Vec::new(),
+        uses: [false; 5],
+        storage_kib: 0,
+        key: "k".into(),
+        shape,
+        plain,
+        own_volume: false,
+        max_fps: 0,
+    };
+    let privacy = Privacy { language, ..Privacy::default() };
+    let (files, folders, values) = (Vec::new(), Vec::new(), Default::default());
+    PageSpec {
+        pack: Arc::new(pack),
+        values,
+        privacy,
+        files,
+        folders,
+        storage: None,
+        quality: None,
+        drafted: false,
+        heard: 1.0,
+    }
+}
+
+#[test]
+fn a_page_that_may_not_see_the_language_gets_plain_english() {
+    let (shown, hidden) = (spec(true), spec(false));
+    let (locale, shape) = language(&shown);
+    assert_eq!((locale.as_str(), &shape["labels"]["mood"]["calm"]), ("es-AR", &json!("Calma")));
+    let (locale, shape) = language(&hidden);
+    assert_eq!((locale.as_str(), &shape["labels"]["mood"]["calm"]), ("en-US", &json!("Calm")));
+}
+
+#[test]
+fn frames_are_read_only_from_sealed_buffers_of_their_size() {
+    let made = |len: u64, seal: bool| {
+        let fd = memfd_create("frames", MemfdFlags::ALLOW_SEALING).unwrap();
+        ftruncate(&fd, len).unwrap();
+        if seal {
+            fcntl_add_seals(&fd, SealFlags::SHRINK | SealFlags::GROW).unwrap();
+        }
+        fd
+    };
+    let mut view = ViewSlot::new(1, (4, 4));
+    assert!(view.map(&made(128, true), (4, 4), 16).is_ok());
+    assert!(view.map(&made(128, false), (4, 4), 16).is_err());
+    assert!(view.map(&made(64, true), (4, 4), 16).is_err());
+}
+
+#[test]
+fn pages_get_values_tuned_to_the_quality_level_without_the_volume_the_engine_added() {
+    let tuned =
+        json!({"rate": {"type": "slider", "min": 0, "max": 60, "default": 60, "quality": {"q1": 15}}});
+    let mut page = page(true, tuned);
+    page.values = serde_json::from_value(json!({"rate": 60, "volume": 40, "mood": "calm"})).unwrap();
+    let at = |q| values(&page, &[0; 32], q).0;
+    assert_eq!(Json::Object(at(reiwand_scene::Quality::Q3)), json!({"rate": 60, "mood": "calm"}));
+    assert_eq!(at(reiwand_scene::Quality::Q1)["rate"], json!(15));
+}
+
+#[test]
+fn pages_never_see_where_a_shortcut_leads() {
+    let mut page = page(true, json!({"open": {"type": "shortcut"}, "away": {"type": "shortcut"}}));
+    page.values = serde_json::from_value(json!({"open": {"uri": "https://example.org/private"}})).unwrap();
+    let shown = Json::Object(values(&page, &[0; 32], reiwand_scene::Quality::Q3).0);
+    assert!(shown["open"] == json!(true) && shown.get("away").is_none_or(Json::is_null));
+    assert!(!shown.to_string().contains("example.org"));
+}
+
+fn slow_helper(data: &std::path::Path) -> (Arc<reiwand_web::Link>, std::process::Child) {
+    let script =
+        "(while :; do touch \"$0/alive\"; sleep 0.01; done) & cat <&3 >/dev/null; sleep 0.3; kill $!";
+    let shell = std::path::Path::new("/bin/sh");
+    let (link, child) = reiwand_web::spawn(shell, Default::default(), |c| {
+        c.arg("-c").arg(script).arg(data);
+    })
+    .unwrap();
+    (Arc::new(link), child)
+}
+
+fn quiet(data: &std::path::Path) -> bool {
+    let until = Instant::now() + Duration::from_secs(5);
+    while ending::busy(data) && Instant::now() < until {
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    !ending::busy(data)
+}
+
+#[test]
+fn a_page_stops_without_waiting_and_starts_again_only_once_its_helper_left_its_data() {
+    let root = tempfile::tempdir().unwrap();
+    let data = root.path().join("data");
+    std::fs::create_dir(&data).unwrap();
+    let (link, child) = slow_helper(&data);
+    let group = child.id();
+    let mut slot = PageSlot::new(spec(true), Instant::now());
+    (slot.spec.storage, slot.link, slot.child) = (Some(data.clone()), Some(link), Some(child));
+    let started = Instant::now();
+    slot.stop();
+    assert!(started.elapsed() < Duration::from_millis(100), "{:?}", started.elapsed());
+    let now = Instant::now();
+    slot.due = Some(now);
+    assert!(!slot.starts(now) && slot.due.is_some_and(|due| due > now));
+    assert!(quiet(&data) && reiwand_web::members(group).is_empty());
+    let now = Instant::now();
+    slot.due = Some(now);
+    assert!(slot.starts(now) && slot.due.is_none());
+}
+
+#[test]
+fn clearing_the_data_of_a_page_waits_for_its_helper_and_then_removes_it() {
+    let root = tempfile::tempdir().unwrap();
+    let data = root.path().join("data");
+    std::fs::create_dir(&data).unwrap();
+    let (link, child) = slow_helper(&data);
+    let group = child.id();
+    let mut slot = PageSlot::new(spec(true), Instant::now());
+    (slot.spec.storage, slot.link, slot.child) = (Some(data.clone()), Some(link), Some(child));
+    drop(slot);
+    let (done, answer) = std::sync::mpsc::channel();
+    let started = Instant::now();
+    ending::clear(data.clone(), done);
+    assert!(started.elapsed() < Duration::from_millis(100), "{:?}", started.elapsed());
+    answer.recv_timeout(Duration::from_secs(10)).unwrap().unwrap();
+    assert!(reiwand_web::members(group).is_empty() && !data.exists());
+    std::thread::sleep(Duration::from_millis(50));
+    assert!(!data.exists(), "nothing writes into the data of a page once it is cleared");
+    assert!(quiet(&data));
+}

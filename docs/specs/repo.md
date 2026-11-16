@@ -1,0 +1,355 @@
+# Signed repositories
+
+A repository is a static tree of files that any web server, file share or `file://` path can
+serve. Every file the client trusts is either signed with minisign (Ed25519, prehashed `ED`
+signatures only) or pinned by SHA-256 from a signed file. Mirrors and servers are never
+trusted. The reference implementation lives in `reiwand-format` (verification always, key
+generation and signing behind the `sign` feature).
+
+## Keys and roles
+
+| Role | Signs | Threshold | Default lifetime |
+|------|-------|-----------|------------------|
+| `root` | `root/<N>.json` | t of n, 1 to 8 keys | 365 days (30 to 1096) |
+| `online` | `entry/<N>.json` | 1 | 7 days, at most `policy.entry_max_days` (1 to 90, default 14) |
+| author | `manifest.json` inside a package | 1 | no expiry; revoked through `revoked` |
+| online author | the same, listed in `authors/<sha256>.json` instead of the root | 1 | the same |
+
+- A key is identified by its fingerprint: lowercase hex SHA-256 of the 32 Ed25519 public key
+  bytes (bytes 10..42 of the decoded minisign public key). The minisign key id is only a hint.
+- A key belongs to at most one role or author. Root keys stay offline.
+
+## Signature files
+
+`<file>.minisig` holds 1 to 16 standard four-line minisign blocks, concatenated. A file with
+one block verifies with stock minisign tools.
+
+- Every block must parse and carry the same trusted comment, or the whole file is rejected.
+- Each block is tried against every key of the role; the threshold counts distinct key
+  fingerprints, never blocks.
+- Trusted comments bind role, version and repository: `wpak-repo root <N> <repo_id>`,
+  `wpak-repo entry <N> <repo_id>`,
+  `wpak manifest <id> <version> files:<digest>` for package authors and `wpak-author-rotate <author> <from> <to>`
+  for the rotations of online authors (signed text and trusted comment alike).
+
+## Layout
+
+```
+root/<N>.json, root/<N>.json.minisig    immutable, never deleted
+entry/<N>.json, entry/<N>.json.minisig  immutable
+entry/latest                            "<N>\n", unsigned hint, the only mutable file
+index/<sha256>.json                     shards, immutable
+revoked/<sha256>.json                   revocations, immutable
+featured/<sha256>.json                  packages the operator features, immutable, optional
+authors/<sha256>.json                   online authors, immutable, only with policy.authors = online
+previews/<sha256>.<ext>                 preview images copied from packages
+packages/<id>/<version>.wpak            packages, immutable once published
+catalog.json                            operator state, not used by clients
+```
+
+Serve `entry/latest` with `Cache-Control: no-cache` and everything else as immutable.
+Mirrors copy immutable files first and `entry/latest` last.
+
+## Identity and URL
+
+- `repo_id` is the SHA-256 of the exact bytes of `root/1.json`. It never changes.
+- Share URL: `https://example.org/wallpapers/?fingerprint=<root key fingerprint>&repo_id=<repo_id>`.
+  At least one of the two parameters is required. `fingerprint` must belong to a key of the
+  `root` role of `root/1.json` that signed it; `repo_id` must equal its hash.
+- `reiwand-ctl remote add` also takes a folder followed by the same query
+  (`remote add carpeta/?fingerprint=…`): the CLI turns it into the `file://` URL of its absolute path, and
+  the anchor rules are the same as for any URL.
+- The query is stripped before any request. A package is identified by `(repo_id, id)`.
+
+## Formats
+
+All metadata is compact JSON with fixed field order; unknown fields are rejected, except in
+the releases of the shards, whose readers ignore fields and
+values they do not know (also inside `content` and `requires`; an unknown rating counts as
+`mature`). Times are RFC 3339 UTC (`2027-01-15T08:00:00Z`).
+
+`root/<N>.json` (at most 512 KiB):
+
+| Field | Rule |
+|-------|------|
+| `format` | `wpak-repo-root/1.0` |
+| `genesis` | `null` in version 1, the `repo_id` after |
+| `version` | equals `N` |
+| `expires`, `name` | expiry and display name |
+| `keys` | map of fingerprint to `{"minisign": "<base64 public key>"}`; fingerprints must match |
+| `roles` | `{"root": {keys, threshold}, "online": {keys, threshold}}` |
+| `authors` | `[{"id": "[a-z][a-z0-9_-]{0,31}", "keys": [fingerprint…]}]`, unique ids |
+| `policy` | `{require_author_signature, max_package_size, entry_max_days}` and, only when it is not the default `root`, `authors: "online"`; roots without it keep their bytes, and versions of Reiwand before online authors refuse roots that set it |
+| `mirrors` | at most 16 `https://` or `file://` base URLs; `file://` mirrors are used only by clients that added the repository itself from a `file://` URL or a folder, and skipped for repositories fetched over the network |
+
+`entry/<N>.json` (at most 128 KiB): `format` (`wpak-repo-entry/1.0`), `repo_id`, `version`
+(= `N`), `timestamp`, `expires` (`0 < expires - timestamp ≤ entry_max_days`), `root`
+(`{version, sha256}` of the current root), `shard_bits` (0 to 8), `shards` (exactly
+`2^shard_bits` `{sha256, size}` in shard order), `revoked` (`{sha256, size}`) and, exactly when the
+root sets `policy.authors = "online"`, `authors` (`{sha256, size}` of the online authors file), and,
+when the operator features packages, `featured` (`{sha256, size}` of the featured file). Each of
+these files is at most 32 MiB and all of them together at most 256 MiB: clients refuse an entry that
+lists more before downloading anything, and `publish` refuses to write one.
+
+`index/<sha256>.json`: `format` (`wpak-repo-shard/3.0`), `repo_id`, `shard` (its position) and
+`packages`: `[{id, author, versions: [release…]}]`, with every release of every package. A package
+belongs to the shard given by the first `shard_bits` bits of SHA-256 of its id, so every id appears
+once in the repository. Ids follow the manifest rules; versions are canonical SemVer, unique and
+ascending. A release holds `version`, `kind`, `title`, `description`, `tags`, `license`, `authors`,
+`size`, `sha256` (whole `.wpak`), `manifest_sha256`, `preview` (`{sha256, size, ext}` or `null`),
+`published`, `schema`, its `default_locale`, `changes`, `content`, `photosensitive`, `requires`
+(with the `packages` it needs), the `facets` the repository computed, `animated` (the animated
+preview, like `preview`), `platforms` and, for a preset, the id of its `base`, so that clients can
+filter before downloading; `title`, `description` and `changes` are text or `{language: text}` with
+every `@key` resolved. A client skips the
+releases whose `kind` it does not know, and a package left with none, so that a kind added later
+never stops it from reading the rest of the shard; the fields it does not know in a release are
+ignored, while the signed hashes still cover them.
+
+A release may carry `hidden: true`: the moderators of the repository
+took the package out of browsing. Clients leave it out of `browse` unless a version is installed,
+and keep installing and updating it.
+
+A release may also carry `listed: false`: the version is unlisted. Clients
+leave it out of `browse` and its search unless a version of the package is installed, and install it
+when asked by id. `reiwand-ctl repo add --unlisted` adds versions unlisted, and `repo unlist DIR ID [--version V]`
+and `repo list-again` change it for a package or one version; publish next. Unlisting is not the
+moderators' `hidden` flag (`reiwand_format::hide`), which no subcommand of `repo` sets.
+
+The desktop app operates a static repository from the *Static repository* tab of *Repositories*: it
+opens the folder (name, `repo_id` and `stock(dir)`: each package with its author, whether it is
+featured and its note, and each version with its title, whether it is listed and whether it is
+revoked), adds `.wpak` files with *Add unlisted* as `repo add --unlisted` does, unlists or lists
+again a package or one version and features (with an optional note) or unfeatures a package, each
+after a confirmation that says what the CLI says, through the same `reiwand_format` functions. *Publish…*
+takes a secret key file of an online key, its password when it has one, and the days until the index
+expires (7 by default), and calls `publish` as `reiwand-ctl repo publish` does. The same tab revokes a
+package or one version with a reason and a message (`stall::revoked`, as `repo revoke`), withdraws a
+revocation (`stall::unrevoked`, as `repo unrevoke DIR ID [--version V]`, which `unrevoke` the whole
+package without a version) and, from *Author keys…*, revokes an author key by its fingerprint
+(`stall::key_revoked`, as `repo revoke-key`). *New repository…* writes `root/1.json` in an empty
+folder from a name, root and online `.pub` files, the root threshold, an author with its keys and the
+policy (`stall::made` with a `reiwand_format::Charter`, as `repo init`); *Root…* shows the version of the
+root, how many root keys signed it of its threshold and the anchor query, signs it with a root key file
+and its password (`stall::root_signed`, as `repo sign-root`) and *Rotate the root…* writes the next
+root with other keys, removed or added authors and another policy (`stall::rotated`, as `repo
+rotate-root`). `stall::opened` also answers the root status, the fingerprints of the root, online and
+author keys, the revoked keys and the policy. Every change to the
+catalog runs off the window thread, one after another, and answers when done; the page shows that it
+is busy meanwhile and keeps the other changes and *Open* disabled until then. The phone has no tool to create, sign or
+publish a repository: it is a client only. From *Repositories* in *Sources* it adds a repository by
+its address and its fingerprint, or accepts once a proposal that arrives from another device with its
+key; it reads the signed index (see *Client update*), browses its packages in *Explore* with their
+previews, installs them checked against that index (see *Package installation*) and checks them for
+updates.
+
+`featured/<sha256>.json` (optional): `format` (`wpak-repo-featured/1.0`), `repo_id` and `items`: at
+most 64 `{id, note?}`, ids of packages of the repository, each once, with a note of at most 200
+characters on one line without `<` or `>`. The entry cites it as `featured` (`{sha256, size}`), so the
+online signature covers it.
+Clients mark these packages as featured when browsing and list them first. Nothing in a manifest can
+feature a package: only the operator does, with `reiwand-ctl repo feature DIR ID [--note TEXT]` and
+`repo unfeature DIR ID` (`feature(dir, id, note, on)`), then `publish`.
+
+`authors/<sha256>.json` (only with online authors): `format` (`wpak-repo-authors/1.0`), `repo_id`
+and `authors`: `[{id, keys: {fingerprint: {minisign}}, rotations: [{from, to, sig}]}]`, ids as in
+the root and unique, `to` listed in `keys`, `sig` a minisign block of the key `from` over
+`wpak-author-rotate <id> <from> <to>`. The entry signed by the `online` key pins it, so it is
+signed indirectly.
+
+`revoked/<sha256>.json`: `format` (`wpak-repo-revoked/1.0`), `repo_id`, `packages`
+(`[{id, versions, reason, message}]`, `"*"` revokes every version) and `keys`
+(`[{fingerprint, reason}]`). Reasons: `malware`, `license`, `takedown`, `broken`, `other`.
+A revoked key invalidates every signature it made even while a root still lists it.
+
+## Package signatures
+
+An author signs the exact bytes of `manifest.json`; the signature is stored in the package as
+`manifest.json.minisig` with the trusted comment `wpak manifest <id> <version> files:<digest>`,
+where `<digest>` is the SHA-256 of one line `<sha256 of the file> <path>` per file of the package
+except the signature, sorted by path. Verifiers compute the digest from the package they hold, so
+a signed manifest moved into a package with other files (by a mirror, a stolen online key or an
+uploader) no longer verifies, and a grant kept for the signing key (`dbus.md`, `Inputs1`) never
+passes to other content. The manifest part can be checked by hand with
+`minisign -Vm manifest.json -p author.pub`.
+
+## Online authors
+
+A root with `policy.authors = "online"` lets authors register without a root ceremony, as a
+server with open registration needs. The authors that the root lists keep priority: an online
+author with the id of a root author is never used, and `register_author` refuses such ids and keys
+that belong to the root or to another author. Because the online key alone vouches for the
+authors file, the client trusts each package on first use: `install` records in
+`<data>/anchors.json` the fingerprint and public key that signed the first version it installed of
+`(repo_id, id)`, and accepts a later version (or another version installed again) only when the
+same key signed it or a chain of rotations from the anchored key reaches the new one, each signed
+by its `from` key and none from a revoked key; the anchor then moves to the new key. A package
+whose author is in the root needs no anchor, but once a signed version of `(repo_id, id)` is
+installed, `install` refuses an unsigned release, an online author for a package installed from an
+author of the root, and another author of the root than the one that signed the installed versions;
+a release from an author of the root drops the anchor. Whoever steals the online key can therefore publish new
+authors and new packages, but not update a package already installed; a stolen author key is
+revoked through `revoked`.
+
+## Operator workflow
+
+| Step | Function |
+|------|----------|
+| Create keys (`root`, a backup root key, `online`, authors) | `keygen(password)` |
+| Write `root/1.json` | `init(dir, settings, now)` |
+| Add root signatures until the threshold is met | `sign_root(dir, signer)` |
+| Sign a package source before building it | `sign_source(dir, signer)` |
+| Add a package (validated, never `imported`, provider packages under their licenses only, signature checked against root authors, preview copied) | `add(dir, wpak, author, now)` |
+| Revoke a package version or a key, or withdraw the revocation of a version | `revoke(dir, id, version, reason, message)`, `revoke_key(dir, fingerprint, reason)`, `unrevoke(dir, id, version)` |
+| Hide every version of a package from browsing, or show it again | `hide(dir, id, hidden)` |
+| Unlist a package or one version, or list it again | `list(dir, id, version, listed)` |
+| Feature a package with an optional note, or stop featuring it | `feature(dir, id, note, on)` |
+| With online authors: register an author key, hand an author over to a new key, drop a key that no rotation names | `register_author(dir, id, key)`, `rotate_author(dir, id, from, key, sig)` with `sign_rotation(signer, id, key)`, `drop_author_key(dir, id, fingerprint)` |
+| Write shards, revocations and the next entry; repeat before expiry | `publish(dir, online, lifetime_days, now)` |
+| Replace keys or policy: write `root/<N+1>.json`, then sign with the old and the new root threshold, then publish with the current online key | `rotate_root(dir, settings, now)`, `sign_root`, `publish` |
+| Check a tree as a client would, without storing anything | `verify(fetch, url_or_dir, now)` |
+
+`status(dir)` reports the signers of the newest root, whether it is complete and the share
+URL query. `settings(dir)` returns the current settings for editing before a rotation, with the
+lifetime the current root was written with: `init` and `rotate_root` keep `root_days` in
+`catalog.json`, and a catalog without it means 365. A `Charter` changes those settings: the keys it
+names for an author replace the keys that author had, `removed` drops authors before that, and
+`mirrors` replaces the mirrors when present, so an empty list drops them all
+(`repo rotate-root --no-mirrors`) and a missing one keeps them.
+
+## Client update
+
+Each step that fails for a base (network, size, hash, signature or format) is retried on the
+next base: the user URL first, then the root mirrors. If every base fails nothing is stored. A
+cancelled transfer (`io::ErrorKind::Interrupted`) stops at once without trying further bases.
+
+1. `T = max(now, max_timestamp)`.
+2. First contact: fetch `root/1.json`, check the anchor, `genesis`, `version` and its own root
+   threshold.
+3. Walk `root/N+1.json` while it exists (at most 64 per run). Each must meet the threshold of
+   the previous root and of itself. If the `online` keys changed, reset the entry state.
+4. Abort if the current root expired (`Expired`, possible freeze attack). Installed packages
+   keep working.
+5. Read `entry/latest` (at most 32 bytes), start at `max(latest, last seen)` and probe up to 16
+   newer entries.
+6. The entry must meet the `online` threshold, pin the current root by version and hash, have
+   a valid lifetime, a timestamp not older than the last one and not more than 24 hours after
+   `T`. The same version with different bytes is an equivocation.
+7. If `expires ≤ T` the repository is stale: it is shown as such, installs need confirmation
+   and revocations still apply. `repos(data, now)` recomputes staleness and expiry warnings at
+   every call with the same `T`, so listings and installs agree.
+8. Fetch every shard, the revocation list and the files the entry cites not already
+   cached, cut at the declared size, check size and SHA-256, then parse them.
+9. Under the exclusive lock, read the stored state again: when another process stored a newer
+   root or entry meanwhile, keep it and report it instead (nothing is ever rolled back); the same
+   entry version with other bytes is an equivocation. Otherwise store root, entry, shards
+   and revocations, then `state.json`, and drop unreferenced shards.
+10. Apply revocations to installed packages and list available updates (newer SemVer, not
+    revoked).
+
+## Package installation
+
+1. Resolve `id[@version]` (optionally `<repo_id>/id[@version]`) against verified shards only.
+2. Refuse ids installed from another repository, expired roots, stale
+   repositories without confirmation and revoked versions. Without an explicit version nothing
+   is downgraded; an explicit version older than the newest installed one needs confirmation.
+3. Refuse a release whose declared size exceeds `policy.max_package_size` or what a package may
+   hold (2 GiB of files plus 64 MiB), before anything is downloaded. Download
+   `packages/<id>/<version>.wpak` from the bases in order into a temporary file in
+   `<data>/packages/<id>/`, cut at the declared size, and check size and SHA-256.
+4. Validate the package, check `id`, `version`, `kind`, `license` and `manifest_sha256` against
+   the release, and check the author signature when the root requires it or the listing names
+   an author (key bound to that author in the root, or in the online authors file when the root
+   allows them, and not revoked).
+5. Under the exclusive lock, re-read `installed.json` and the repository, check that it is still
+   there and that neither the version nor the signing key is revoked, check the anchor of an online
+   author (above), then rename into place and record it. `current(data, repo_id, id, version)` repeats that check for an installed record, so
+   a caller can check again right before it activates the package.
+
+`preview(data, fetch, repo_id, id, version, dest)` downloads `previews/<sha256>.<ext>` of a
+release from the bases in order, cut at the signed size, checks SHA-256 and writes `dest`
+(`0600`) atomically. It returns `false` when the release has no preview. `release(data, repo_id,
+id, version)` returns any listed release, so callers can cache the preview of every version by its
+hash, and `previews(data, repo_id)` lists the preview hashes of every release of a repository, to
+delete them with it.
+
+## Broken repositories
+
+A folder under `<data>/repos/` whose snapshot cannot be read (no `state.json`, or a damaged or
+missing file) is reported by `repos` with `broken` set to the reason; `browse` and `install` skip
+it, so the other repositories keep working. `update_repo` fetches it again, anchored on its
+`repo_id`, from the address kept in its `state.json` or else from the network mirrors of its
+stored root, keeping the stored entry version and timestamps when they can be read, so it cannot
+be rolled back either. When no address is left, `add_repo` with its URL repairs it and
+`remove_repo` deletes it.
+
+## Client storage
+
+```
+<data>/repos/<repo_id>/state.json             versions, hashes, max_timestamp, online keys, stale
+<data>/repos/<repo_id>/root.json[.minisig]    current verified root
+<data>/repos/<repo_id>/entry.json[.minisig]   current verified entry
+<data>/repos/<repo_id>/blobs/<sha256>.json    verified shards and revocations
+<data>/packages/<id>/<version>.wpak           installed packages
+<data>/installed.json                         origin, hash, signer and revocation of each package
+<data>/anchors.json                           first signing key of each package of an online author
+<data>/.repos.lock                            flock serializing writers
+```
+
+Files are written to a temporary file in the same directory, synced and renamed. Files are
+`0600` and directories `0700`. Nothing is stored before it is verified. Committing a snapshot,
+removing a repository and saving `installed.json` hold an exclusive `flock` on
+`<data>/.repos.lock`; reading snapshots or `installed.json` holds a shared one. `browse` and
+`install` read every snapshot and `installed.json` under one shared lock, so they never mix a
+catalogue with an older or newer list of installed packages. Each `browse` item carries the
+display name of its repository. Downloads finish
+before the lock is taken, so readers never wait for the network.
+
+## Bundled example repository
+
+The example wallpapers that come with the program are a repository that is already added, so that
+a new installation has something to explore without any server. The packages are the `.wpak` files
+every way of installing carries: `reiwand/examples/` under the user data folder (`install.sh`
+and the tarball) or under `/usr/share` or `/app/share` (RPM, Flatpak); the phone builds them from
+the scene folders of its assets.
+
+`reiwand_format::bundled(repo, keys, name, packages, now)` makes and keeps that repository. No key
+is in the source tree or in a package: the first run creates two passwordless minisign keys (root
+and online) in a folder of mode `0700` beside the repository, signs `root/1.json`, adds the
+packages and publishes. The repository is local, so its trust is the folder the daemon owns, like
+the library; its anchor is the `file://` address with `fingerprint=` and `repo_id=` that
+`status` prints. It is signed again on later runs, never at build time, because a signed index
+cannot outlive `entry_max_days` (90 for this repository) and a build is older than that on
+most machines. Each run adds the packages whose `id` and version are not in it, publishes a new
+index when anything changed or fewer than 45 days remain, and writes a new root (signed by the
+same key) when fewer than 90 days remain of its 1096. A package whose version is already
+published with other content is refused, so a change to an example bumps its version.
+
+- Desktop: the daemon runs it at startup and once a day, adds the repository when it is not added
+  and refreshes it when it changed. `examples-repo.json` in the data folder remembers its
+  `repo_id` and whether the user removed it. After `Repos1.Remove` it is not added again, and
+  `Repos1.AddExamples` (`reiwand-ctl remote examples`) adds it again; the repository folder and the
+  keys are kept, so it keeps its `repo_id`. `Repos1.List` marks it `bundled: true`; a screen uses
+  that, not the name, to give it its own name and icon. A program update only has to replace the
+  packages in the shipped folder.
+- Phone: `examples_due` and `examples_repo` do the same from the assets; the app asks at start
+  and the repository is built again only when the app was updated, apart from renewing its index
+  without unpacking anything. The repository list marks it `bundled`. Removing it is remembered;
+  the *Add the example scenes* action adds it again, besides importing the scenes as before.
+- It is never synced, because only repositories added with `https://` or loopback `http://` are.
+
+## Network interface
+
+The library does no networking. Callers implement `Fetch::get(base, path, max)`, returning
+at most `max + 1` bytes or `None` when the file does not exist, and may override
+`Fetch::copy` to stream packages. `FileFetch` serves `file://` URLs and plain paths. Requests
+carry no cookies or identifiers.
+
+`reiwand_providers::HttpFetch` is the blocking HTTP implementation: a generic `User-Agent`, no
+cookies or `Referer`, `https://` or `http://` to a loopback host only (redirects included, never
+from HTTPS to HTTP), redirects only to the origins of the bases it was asked to read or given with
+`within(bases)` (a repository's URL and the mirrors of its signed root), `file://` URLs and plain
+paths copied locally in chunks of 64 KiB, a 10 s connect timeout, and an abort
+(`io::ErrorKind::TimedOut`) when less than 8 KiB arrive in 30 s. The transfer runs on its own
+thread; a shared cancel flag, checked for every chunk and at least every 100 ms while waiting for
+the server, fails the transfer with `io::ErrorKind::Interrupted` at once, local copies included.

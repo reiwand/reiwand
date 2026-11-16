@@ -1,0 +1,100 @@
+use serde_json::Value;
+use std::path::Path;
+use std::process::{Command, Output};
+
+fn run(args: &[&str]) -> Output {
+    Command::new(env!("CARGO_BIN_EXE_reiwand-ctl")).args(args).output().unwrap()
+}
+
+fn ok(args: &[&str]) -> String {
+    let out = run(args);
+    assert!(out.status.success(), "{args:?}: {}", String::from_utf8_lossy(&out.stderr));
+    String::from_utf8(out.stdout).unwrap()
+}
+
+#[test]
+fn check_explains_what_a_package_needs() {
+    let pulse = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../scenes/pulse");
+    let shown = ok(&["pack", "check", pulse.to_str().unwrap()]);
+    for line in [
+        "rating = general",
+        "photosensitive = yes",
+        "inputs = audio, media",
+        "needs = inputs.audio (reacts to the sound playing on the computer), inputs.media (shows what the media player plays), media_info (shows the title, cover or progress of what the media player plays)",
+        "languages = en, es",
+    ] {
+        assert!(shown.lines().any(|l| l == line), "{line}: {shown}");
+    }
+    let tmp = tempfile::tempdir().unwrap();
+    let src = tmp.path().join("src");
+    std::fs::create_dir(&src).unwrap();
+    std::fs::copy(pulse.join("scene.json"), src.join("scene.json")).unwrap();
+    std::fs::create_dir(src.join("assets")).unwrap();
+    std::fs::copy(pulse.join("assets/cover.png"), src.join("assets/cover.png")).unwrap();
+    let manifest = r##"{"schema": "reiwand.wpak/2", "id": "org.example.beat", "version": "1.0.0",
+        "title": "Beat", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json",
+        "content": {"rating": "mature", "descriptors": ["violence"]}, "photosensitive": true,
+        "origin": {"kind": "original"}, "inputs": ["audio", "media"],
+        "requires": {"features": ["inputs.audio", "inputs.media", "media_info"]},
+        "properties": {"color": {"type": "color", "default": "#ffffff"}, "show": {"type": "combo",
+        "default": "both", "options": ["circle", "bars", "both"]}, "glitch": {"type": "bool", "default": true}}}"##;
+    std::fs::write(src.join("manifest.json"), manifest).unwrap();
+    let path = src.to_str().unwrap();
+    let new: Value = serde_json::from_str(&ok(&["pack", "check", path, "--json"])).unwrap();
+    assert_eq!(
+        (&new["rating"], &new["reasons"], &new["inputs"], &new["declared"], &new["missing"]),
+        (
+            &serde_json::json!("mature"),
+            &serde_json::json!(["violence"]),
+            &serde_json::json!(["audio", "media"]),
+            &serde_json::json!(["inputs.audio", "inputs.media", "media_info"]),
+            &serde_json::json!([])
+        )
+    );
+    std::fs::create_dir(src.join("locale")).unwrap();
+    std::fs::write(src.join("locale/fr.json"), r#"{"Good morning": "Bonjour"}"#).unwrap();
+    let built = tmp.path().join("beat.wpak");
+    let out = run(&["pack", "build", path, "-o", built.to_str().unwrap()]);
+    let said = String::from_utf8_lossy(&out.stderr);
+    assert!(
+        out.status.success() && said.starts_with("note: locale/fr.json ") && !said.contains("+="),
+        "{said}"
+    );
+    assert!(ok(&["pack", "check", built.to_str().unwrap()]).contains("rating = mature (violence)"));
+}
+
+#[test]
+fn paths_of_file_and_folder_settings_become_absolute() {
+    let tmp = tempfile::tempdir().unwrap();
+    let base = tmp.path().canonicalize().unwrap();
+    std::fs::create_dir_all(base.join("2024/pics")).unwrap();
+    let path = |text: &str| reiwand_ctl::props::path(text, &base).unwrap();
+    let quoted = |p: &Path| serde_json::to_string(p.to_str().unwrap()).unwrap();
+    assert_eq!(path("2024"), quoted(&base.join("2024")));
+    assert_eq!(path(r#""2024/pics""#), quoted(&base.join("2024/pics")));
+    assert_eq!(path("/srv/a b.png"), r#""/srv/a b.png""#);
+    assert!(reiwand_ctl::props::path("missing.png", &base).is_err());
+    for empty in ["", " ", r#""""#, r#"" ""#] {
+        assert!(reiwand_ctl::props::path(empty, &base).is_err(), "{empty:?}");
+    }
+}
+
+#[test]
+fn the_examples_use_file_folder_and_video_settings() {
+    let scenes = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../scenes");
+    let manifest = |name: &str| {
+        let text = std::fs::read(scenes.join(name).join("manifest.json")).unwrap();
+        reiwand_format::Manifest::from_json(&text).unwrap()
+    };
+    let (orbits, snowfall) = (manifest("orbits"), manifest("snowfall"));
+    let backdrop = &orbits.properties["backdrop"];
+    assert!(matches!(backdrop.control, reiwand_scene::Control::File { .. }));
+    assert!(backdrop.accepts("video") && backdrop.accepts("image"));
+    assert!(orbits.features().iter().any(|f| f == "user_videos"));
+    let photos = &snowfall.properties["photos"];
+    assert!(matches!(photos.control, reiwand_scene::Control::Folder { .. }) && photos.accepts("image"));
+    for name in ["orbits", "snowfall"] {
+        let checked = run(&["pack", "check", scenes.join(name).to_str().unwrap()]);
+        assert!(checked.status.success(), "{name}: {}", String::from_utf8_lossy(&checked.stderr));
+    }
+}

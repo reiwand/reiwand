@@ -1,0 +1,174 @@
+use crate::depthwork::{Target, Work, run};
+use crate::reliefwork::{Target as Shot, build, layer, outline, overlay, survey};
+use image::{GrayImage, Luma, Rgb, RgbImage};
+use reiwand_core::Fill;
+use reiwand_core::edit::{Depth, Edit, Parallax, Source, Touch};
+use reiwand_depth::Places;
+use serde_json::Value;
+use std::sync::atomic::AtomicBool;
+
+#[test]
+fn depth_work_reports_assets_maps_and_failures() {
+    let dir = tempfile::tempdir().unwrap();
+    let places = Places { data: dir.path().join("data"), cache: dir.path().join("cache") };
+    let image = dir.path().join("dunes.png");
+    RgbImage::from_pixel(8, 4, Rgb([90, 80, 70])).save(&image).unwrap();
+    let target = || Target {
+        image: image.clone(),
+        sha: String::new(),
+        depth: Depth::default(),
+        device: Default::default(),
+    };
+    let (stop, mut stages) = (AtomicBool::new(false), Vec::new());
+    let (shown, failed) = run(&places, target(), Work::Open, &stop, &mut |s, _| stages.push(s.to_owned()));
+    let assets: Vec<Value> = serde_json::from_str(&shown.assets).unwrap();
+    assert_eq!(
+        (assets[0]["id"].as_str(), assets[0]["size"].as_str()),
+        (Some("depth-anything-v2-small"), Some("99.1 MB"))
+    );
+    assert!(!shown.ready && shown.map.is_empty() && shown.sha.len() == 64 && failed.is_none());
+    let own = dir.path().join("own.png");
+    GrayImage::from_pixel(8, 4, Luma([200])).save(&own).unwrap();
+    let (shown, failed) = run(&places, target(), Work::Adopt(own.clone()), &stop, &mut |_, _| {});
+    assert!(failed.is_none() && shown.map.ends_with("dunes.png.depth.png"), "{failed:?} {}", shown.map);
+    let (grey, red) = (Depth { near: 0.5, ..Depth::default() }, Depth::default());
+    for (depth, colour, pixel) in [(grey, false, [100u8, 100, 100]), (red, true, [251, 104, 25])] {
+        let look = crate::depthwork::look(&places, (&image, &shown.sha), &depth, colour).unwrap();
+        let bytes = std::fs::read(&look).unwrap();
+        std::fs::remove_file(&look).unwrap();
+        assert!(bytes.starts_with(b"P6\n8 4\n255\n"));
+        let shown = RgbImage::from_raw(8, 4, bytes[11..].to_vec()).unwrap();
+        let near = shown.get_pixel(4, 2).0.iter().zip(pixel).all(|(a, b)| a.abs_diff(b) <= 3);
+        assert!(near && shown.dimensions() == (8, 4), "{:?} {:?}", shown.get_pixel(4, 2), shown.dimensions());
+    }
+    let (_, failed) = run(&places, target(), Work::Install(own), &stop, &mut |_, _| {});
+    assert!(failed.unwrap().contains("neither the depth model nor ONNX Runtime"));
+    assert!(stages.is_empty());
+}
+
+pub(super) fn setup(depth: Depth) -> (tempfile::TempDir, Places, Shot) {
+    let dir = tempfile::tempdir().unwrap();
+    let image = dir.path().join("hills.png");
+    let near = |x: u32, y: u32| (21..32).contains(&x) && (14..28).contains(&y);
+    RgbImage::from_fn(64, 48, |x, y| Rgb(if near(x, y) { [220, 30, 30] } else { [30, 160, 50] }))
+        .save(&image)
+        .unwrap();
+    GrayImage::from_fn(64, 48, |x, y| Luma([if near(x, y) { 230 } else { 30 }]))
+        .save(reiwand_depth::beside(&image))
+        .unwrap();
+    let places = Places { data: dir.path().join("data"), cache: dir.path().join("cache") };
+    let source = Source::read(&image, [64, 48]).unwrap();
+    let edit = Edit { source, depth: Some(depth), ..Edit::default() };
+    let target = Shot::new(&image, &edit.to_json()).unwrap();
+    (dir, places, target)
+}
+
+#[test]
+fn the_depth_views_show_the_strokes_the_cuts_and_the_survey() {
+    let stroke = Touch { points: vec![[0.9, 0.9]], radius: 0.05, falloff: 0.0, by: 0.9 };
+    let (_dir, places, target) = setup(Depth { strokes: vec![stroke], ..Depth::default() });
+    let seen = overlay(&places, &target, false).unwrap();
+    assert_eq!(seen.dimensions(), (64, 48));
+    assert!(seen.get_pixel(58, 43)[0] > 200 && seen.get_pixel(5, 5)[0] < 60);
+    let edges = outline(&places, &target, &[0.5]).unwrap();
+    assert!(edges.pixels().any(|p| p[3] == 255) && edges.get_pixel(5, 5)[3] == 40);
+    let info: Value = serde_json::from_str(&survey(&places, &target).unwrap()).unwrap();
+    assert_eq!(
+        (info["histogram"].as_array().map(Vec::len), info["manual"].as_bool()),
+        (Some(64), Some(false))
+    );
+    assert_eq!(
+        (info["strokes"].as_u64(), info["built"].as_bool(), info["marks"].as_u64()),
+        (Some(1), Some(false), Some(0))
+    );
+    assert!(info["cuts"].as_array().is_some_and(|c| !c.is_empty()));
+}
+
+fn choosing(target: &Shot, fill: Fill, layers: u8) -> Shot {
+    let mut edit = target.edit.clone();
+    edit.parallax = Some(Parallax { fill: Some(fill), layers: Some(layers), ..Parallax::default() });
+    Shot::new(&target.image, &edit.to_json()).unwrap()
+}
+
+#[test]
+fn two_pictures_with_different_choices_keep_their_own_layer_sets() {
+    let (_dir, places, plain) = setup(Depth::default());
+    let band = |x: u32| x / 9;
+    RgbImage::from_fn(64, 48, |x, _| {
+        Rgb([(band(x) * 40) as u8, 255 - (band(x) * 30) as u8, (band(x) * 7 % 3 * 90) as u8])
+    })
+    .save(&plain.image)
+    .unwrap();
+    GrayImage::from_fn(64, 48, |x, _| Luma([(band(x) * 40 + 10) as u8]))
+        .save(reiwand_depth::beside(&plain.image))
+        .unwrap();
+    let (few, many) = (choosing(&plain, Fill::Simple, 4), choosing(&plain, Fill::Simple, 6));
+    let stop = AtomicBool::new(false);
+    let first = build(&places, &few, None, &stop, &mut |_| {}).unwrap();
+    let second = build(&places, &many, None, &stop, &mut |_| {}).unwrap();
+    assert_ne!(first, second);
+    assert!(first.is_file() && second.is_file());
+    let count = |path: &std::path::Path| reiwand_depth::load(path).unwrap().unwrap().images.len();
+    assert_eq!((count(&first), count(&second)), (4, 6));
+    assert_eq!(build(&places, &few, None, &stop, &mut |_| {}).unwrap(), first);
+    assert_eq!(build(&places, &many, None, &stop, &mut |_| {}).unwrap(), second);
+    assert!(first.is_file() && second.is_file());
+    let standard = build(&places, &plain, None, &stop, &mut |_| {}).unwrap();
+    assert!(![&first, &second].contains(&&standard));
+    assert_eq!(count(&standard), 5);
+}
+
+#[test]
+fn a_layer_is_built_on_demand_and_its_band_is_highlighted() {
+    let cuts = Depth { cuts: Some(vec![0.5]), ..Depth::default() };
+    let (_dir, places, target) = setup(cuts);
+    let stop = AtomicBool::new(false);
+    let path = build(&places, &target, Some(Fill::Simple), &stop, &mut |_| {}).unwrap();
+    assert!(path.is_file());
+    let plain = layer(&places, &target, (0, false), Some(Fill::Simple)).unwrap();
+    let marked = layer(&places, &target, (0, true), Some(Fill::Simple)).unwrap();
+    assert_eq!(plain.dimensions(), (64, 48));
+    assert!(plain.pixels().zip(marked.pixels()).any(|(a, b)| a != b));
+    assert!(layer(&places, &target, (5, false), Some(Fill::Simple)).is_err());
+    let info: Value = serde_json::from_str(&survey(&places, &target).unwrap()).unwrap();
+    assert_eq!(
+        (info["manual"].as_bool(), info["cuts"][0].as_f64().map(|c| (c * 10.0).round())),
+        (Some(true), Some(5.0))
+    );
+}
+
+#[test]
+fn the_layer_sets_are_counted_cleared_and_lama_is_checked_and_removed() {
+    let dir = tempfile::tempdir().unwrap();
+    let places = Places { data: dir.path().join("data"), cache: dir.path().join("cache") };
+    let target = || Target {
+        image: dir.path().join("none.png"),
+        sha: "ab".repeat(32),
+        depth: Depth::default(),
+        device: Default::default(),
+    };
+    let info = reiwand_depth::Info {
+        format: 2,
+        size: [2, 2],
+        field: [1, 1],
+        depths: vec![0.5],
+        ..Default::default()
+    };
+    let fields = vec![reiwand_depth::Map::new(1, 1)];
+    let made = reiwand_depth::Layers { info, images: vec![image::RgbaImage::new(2, 2)], fields };
+    reiwand_depth::save(
+        &places.cache.join("depth").join(format!("{}-0123456789abcdef.layers.png", "ab".repeat(32))),
+        &made,
+    )
+    .unwrap();
+    let stop = AtomicBool::new(false);
+    let (shown, failed) = run(&places, target(), Work::Open, &stop, &mut |_, _| {});
+    let kept: Value = serde_json::from_str(&shown.layers).unwrap();
+    assert!(failed.is_none() && kept["sets"] == 1 && kept["bytes"].as_u64() > Some(0), "{kept}");
+    let (shown, failed) = run(&places, target(), Work::CheckLama, &stop, &mut |_, _| {});
+    assert!(failed.unwrap().contains("missing or damaged") && shown.note.is_empty());
+    let (_, failed) = run(&places, target(), Work::DropLama, &stop, &mut |_, _| {});
+    assert!(failed.is_none());
+    let (shown, failed) = run(&places, target(), Work::Rebuild, &stop, &mut |_, _| {});
+    assert!(failed.is_none() && serde_json::from_str::<Value>(&shown.layers).unwrap()["sets"] == 0);
+}

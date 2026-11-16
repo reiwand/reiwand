@@ -1,0 +1,199 @@
+#![cfg_attr(not(target_os = "android"), allow(dead_code))]
+
+mod accent;
+mod account;
+mod acting;
+mod address;
+mod apply;
+mod asks;
+mod away;
+mod bench;
+mod blanked;
+mod blend;
+#[cfg(target_os = "android")]
+mod bridge;
+#[cfg(target_os = "android")]
+mod calls;
+mod choice;
+mod chosen;
+#[cfg(target_os = "android")]
+mod clips;
+mod connect;
+mod converted;
+mod counted;
+mod cycle;
+mod depth;
+#[cfg(target_os = "android")]
+mod engine;
+mod escrow;
+#[cfg(target_os = "android")]
+mod exports;
+mod extras;
+mod framing;
+#[cfg(target_os = "android")]
+mod gpu;
+mod graded;
+mod hdr;
+mod hearing;
+#[cfg(target_os = "android")]
+mod heif;
+mod keeping;
+mod keys;
+mod kin;
+mod level;
+mod library;
+mod link;
+mod listen;
+mod local;
+mod media;
+mod net;
+mod opened;
+mod own_sound;
+mod pack;
+mod page;
+mod pairing;
+mod perf;
+mod playing;
+mod power;
+mod private;
+mod props;
+mod providers;
+#[cfg(target_os = "android")]
+mod recorded;
+mod reel;
+#[cfg(target_os = "android")]
+mod relief;
+mod reply;
+mod repos;
+mod revoking;
+mod saved;
+#[cfg(any(target_os = "android", test))]
+mod scan;
+mod server;
+mod settings;
+mod shade;
+mod side;
+mod sound;
+mod stage;
+mod state;
+mod store;
+#[cfg(test)]
+mod tests;
+mod tilt;
+mod told;
+mod updates;
+mod variant;
+mod vault;
+mod votes;
+
+pub mod host {
+    use crate::{Error, account, depth, library, settings, store};
+    use serde_json::json;
+
+    pub fn prepare(files: &str) -> Result<(), String> {
+        store::prepare(files).map_err(|e| e.to_string())
+    }
+
+    pub fn account(request: &str) -> String {
+        account::request(request)
+    }
+
+    pub fn library(request: &str) -> String {
+        library::request(request, true)
+    }
+
+    pub fn depth(request: &str) -> String {
+        depth::request(request)
+    }
+
+    pub fn import(path: &str) -> String {
+        let stored = std::fs::File::open(path).map_err(Error::from);
+        let stored = stored.and_then(|mut file| store::store(&mut file, path));
+        stored.map_or_else(|e| e.reply(), |(uid, _)| json!(uid)).to_string()
+    }
+
+    pub fn setting(key: &str, value: Option<&str>) -> String {
+        settings::setting(key, value).unwrap_or_else(|e| e.to_string())
+    }
+
+    pub fn bench(path: &str, args: &[String]) -> String {
+        let report = match path {
+            "ceiling" => crate::bench::ceiling(args),
+            _ => crate::bench::run(std::path::Path::new(path), args),
+        };
+        report.unwrap_or_else(|e| json!({ "error": e })).to_string()
+    }
+}
+
+#[derive(Debug, thiserror::Error)]
+pub(crate) enum Error {
+    #[cfg(target_os = "android")]
+    #[error(transparent)]
+    Jni(#[from] jni::errors::Error),
+    #[cfg(target_os = "android")]
+    #[error(transparent)]
+    Render(#[from] reiwand_render::RenderError),
+    #[error(transparent)]
+    Io(#[from] std::io::Error),
+    #[error(transparent)]
+    Library(#[from] reiwand_library::Error),
+    #[error(transparent)]
+    Config(#[from] reiwand_core::ConfigError),
+    #[error(transparent)]
+    Image(#[from] image::ImageError),
+    #[error(transparent)]
+    Json(#[from] serde_json::Error),
+    #[error("{0:#}")]
+    Depth(#[from] anyhow::Error),
+    #[error(transparent)]
+    Sync(#[from] reiwand_sync::Error),
+    #[error("{0}")]
+    Said(#[from] reiwand_core::message::Message),
+    #[error("not a supported image or video: {0}")]
+    Unreadable(String),
+    #[error(transparent)]
+    Format(#[from] reiwand_format::Error),
+    #[error("{0}")]
+    Setting(String),
+    #[cfg(target_os = "android")]
+    #[error("the surface has no native window")]
+    Window,
+    #[error("the app storage is not known yet")]
+    Unprepared,
+}
+
+pub(crate) fn said(id: &'static str, text: &'static str, args: &[&dyn std::fmt::Display]) -> Error {
+    Error::Said(reiwand_core::message::said(id, text, args))
+}
+
+#[cfg(target_os = "android")]
+#[link(name = "log")]
+unsafe extern "C" {
+    fn __android_log_write(
+        priority: std::ffi::c_int,
+        tag: *const std::ffi::c_char,
+        text: *const std::ffi::c_char,
+    ) -> std::ffi::c_int;
+}
+
+#[cfg(target_os = "android")]
+struct Logcat;
+
+#[cfg(target_os = "android")]
+impl log::Log for Logcat {
+    fn enabled(&self, metadata: &log::Metadata<'_>) -> bool {
+        metadata.level() <= log::Level::Info
+    }
+
+    fn log(&self, record: &log::Record<'_>) {
+        if self.enabled(record.metadata())
+            && let Ok(text) = std::ffi::CString::new(record.args().to_string())
+        {
+            unsafe {
+                __android_log_write(7 - record.level() as std::ffi::c_int, c"reiwand".as_ptr(), text.as_ptr())
+            };
+        }
+    }
+
+    fn flush(&self) {}
+}
