@@ -58,7 +58,7 @@ model! {
     pub struct SyncOutput { pub reports: Vec<SyncReport> }
 
     #[derive(Copy, Eq, Hash)]
-    pub enum RepoWarning { RootExpiring, RootExpired, EntryExpiring, Stale, #[serde(other)] Unknown }
+    pub enum RepoWarning { RootExpiring, RootExpired, EntryExpiring, Stale, SignatureChanged, CertificateChanged, #[serde(other)] Unknown }
 
     pub struct Repo {
         pub repo_id: String,

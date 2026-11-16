@@ -80,7 +80,7 @@ impl Daemon {
         let sound = known.iter().any(|r| r.repo_id == bundle.repo_id && r.broken.is_none());
         self.examples_keep(&Record { repo_id: bundle.repo_id.clone(), declined: false });
         if !sound {
-            drop(self.add_repo(&bundle.url));
+            drop(self.add_repo(&bundle.url, ""));
         } else if bundle.changed {
             self.refresh_job(&bundle.repo_id);
         }
@@ -89,6 +89,6 @@ impl Daemon {
     pub fn add_examples(self: &Arc<Self>) -> Result<u64> {
         let bundle = self.examples_bundle()?;
         self.examples_keep(&Record { repo_id: bundle.repo_id, declined: false });
-        self.add_repo(&bundle.url)
+        self.add_repo(&bundle.url, "")
     }
 }

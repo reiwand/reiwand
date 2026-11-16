@@ -1,36 +1,24 @@
 use crate::compositor::lock;
 use crate::daemon::Daemon;
-use crate::error::{Error, Result, failed, invalid, not_found};
+use crate::error::{Error, Result, invalid, not_found};
 use crate::items::reply;
 use crate::jobs::{Ctl, now};
-use crate::kinds::{local, parse_url};
-use reiwand_core::dbus::error::EXISTS;
+use reiwand_core::dbus::error::{CERTIFICATE_CHANGED, EXISTS, SIGNATURE_CHANGED};
 use reiwand_core::model::{JobKind, MODEL, RefreshOutput, Repo, RepoWarning, ReposReply, Update};
 use reiwand_format::{Anchor, RepoInfo};
-use reiwand_providers::HttpFetch;
 use serde_json::Value;
 use settle::{Settled, settle, vanished};
 use std::sync::Arc;
 
+mod adding;
 mod named;
+pub(crate) mod pins;
+use pins::fetcher_trusting;
+pub use pins::{fetcher, pinned};
 mod settle;
 
 pub fn newer(a: &str, b: &str) -> bool {
     semver::Version::parse(a).ok() > semver::Version::parse(b).ok()
-}
-
-pub fn fetcher(d: &Daemon, ctl: &Ctl, bases: &[String]) -> Result<HttpFetch> {
-    pinned(d, HttpFetch::new(ctl.flag()).map_err(|e| failed(e.to_string()))?.within(bases))
-}
-
-pub fn pinned(d: &Daemon, fetch: HttpFetch) -> Result<HttpFetch> {
-    match d.server_pin() {
-        Some((url, pin)) => {
-            let tls = reiwand_sync::pinned_tls(&pin).map_err(|e| failed(e.to_string()))?;
-            fetch.pinned(&url, tls).map_err(|e| failed(e.to_string()))
-        }
-        None => Ok(fetch),
-    }
 }
 
 fn warning(text: &str) -> RepoWarning {
@@ -49,6 +37,11 @@ impl Daemon {
         let hosts = info.hosts.iter().map(|base| host(base).unwrap_or_else(|| base.clone())).collect();
         let (last_error_name, last_error) =
             lock(&self.remote.repo_errors).get(&info.repo_id).cloned().unzip();
+        let changed = match last_error_name.as_deref() {
+            Some(SIGNATURE_CHANGED) => Some(RepoWarning::SignatureChanged),
+            Some(CERTIFICATE_CHANGED) => Some(RepoWarning::CertificateChanged),
+            _ => None,
+        };
         let added = info.url.split('?').next().unwrap_or_default();
         let jobs = [
             (JobKind::RepoRefresh, info.repo_id.as_str()),
@@ -68,7 +61,7 @@ impl Daemon {
             checked: info.checked.timestamp(),
             stale: info.stale,
             packages: info.packages as u32,
-            warnings: info.warnings.iter().map(|w| warning(w)).collect(),
+            warnings: info.warnings.iter().map(|w| warning(w)).chain(changed).collect(),
             last_error,
             last_error_name,
             job,
@@ -107,20 +100,25 @@ impl Daemon {
         vanished(&lock(&self.remote.removing), &self.store.data, id)
     }
 
-    pub fn add_repo(self: &Arc<Self>, url: &str) -> Result<u64> {
-        let parsed = parse_url(url, true)?;
-        if !(matches!(parsed.scheme(), "https" | "file") || parsed.scheme() == "http" && local(&parsed)) {
-            return Err(invalid("use an https:// or file:// URL, or http:// to this computer"));
-        }
+    pub fn add_repo(self: &Arc<Self>, url: &str, trust: &str) -> Result<u64> {
+        adding::checked(url, trust)?;
         let anchor = Anchor::parse(url)?;
         let known = reiwand_format::repos(&self.store.data, now())?;
         let sound = |id: &String| known.iter().any(|r| &r.repo_id == id && r.broken.is_none());
         if let Some(id) = anchor.repo_id.filter(sound) {
             return Err(Error::Named(EXISTS, format!("repository {id} is already added")));
         }
-        let (url, target) = (url.to_owned(), url.split('?').next().unwrap_or_default());
-        Ok(self.start_job(JobKind::RepoAdd, target, move |d, ctl| {
-            let info = reiwand_format::add_repo(&d.store.data, &fetcher(d, ctl, &[])?, &url, now())?;
+        let (url, trust) = (url.to_owned(), trust.to_ascii_lowercase());
+        let target = url.split('?').next().unwrap_or_default().to_owned();
+        Ok(self.start_job(JobKind::RepoAdd, &target, move |d, ctl| {
+            let site = pins::origin(&url);
+            let extra = site.as_deref().filter(|_| !trust.is_empty()).map(|s| (s, trust.as_str()));
+            let fetch = fetcher_trusting(d, ctl, &[], extra)?;
+            let info = reiwand_format::add_repo(&d.store.data, &fetch, &url, now())
+                .map_err(|e| d.explain_add(&url, &trust, e, ctl))?;
+            if let (Some(site), false) = (&site, trust.is_empty()) {
+                d.pin_origin(site, &trust)?;
+            }
             lock(&d.remote.repo_errors).remove(&info.repo_id);
             tracing::info!(repo = &info.repo_id[..8], "repository added");
             d.changes.changed("repos", vec![info.repo_id.clone()]);
@@ -149,7 +147,9 @@ impl Daemon {
         for id in ids {
             let bases = known.iter().find(|r| r.repo_id == id).map_or(&[][..], |r| &r.hosts);
             let updated = ctl.check().and_then(|()| {
-                Ok(reiwand_format::update_repo(&self.store.data, &fetcher(self, ctl, bases)?, &id, now())?)
+                let fetch = fetcher(self, ctl, bases)?;
+                reiwand_format::update_repo(&self.store.data, &fetch, &id, now())
+                    .map_err(|e| adding::explain_refresh(bases, e))
             });
             match settle(updated, || self.gone(&id)) {
                 Settled::Done(outcome) => {

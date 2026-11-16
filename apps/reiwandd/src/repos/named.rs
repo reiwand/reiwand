@@ -1,5 +1,5 @@
 use crate::error::{Error, failed, invalid, not_found};
-use reiwand_core::dbus::error::{EXISTS, NEWER, OFFLINE, STALE, UNTRUSTED};
+use reiwand_core::dbus::error::{EXISTS, NEWER, OFFLINE, SIGNATURE_CHANGED, STALE, UNTRUSTED};
 
 impl From<reiwand_format::Error> for Error {
     fn from(e: reiwand_format::Error) -> Self {
@@ -10,6 +10,7 @@ impl From<reiwand_format::Error> for Error {
             F::Invalid { reason, .. } => invalid(reason),
             F::UnsafePath(_) => invalid(e.to_string()),
             F::Stale(_) => Error::Named(STALE, e.to_string()),
+            F::Changed(_) => Error::Named(SIGNATURE_CHANGED, e.to_string()),
             F::Newer(_) => Error::Named(NEWER, e.to_string()),
             F::Io(io) if io.kind() == std::io::ErrorKind::Interrupted => Error::Cancelled,
             F::Io(ref io) if unreachable(io.kind()) => Error::Named(OFFLINE, e.to_string()),
@@ -55,6 +56,7 @@ mod tests {
         assert_eq!(name(reiwand_format::Error::Signature("bad".into())), UNTRUSTED);
         assert_eq!(name(reiwand_format::Error::SizeMismatch("a.wpak".into())), UNTRUSTED);
         assert_eq!(name(reiwand_format::Error::Rollback("index".into())), UNTRUSTED);
+        assert_eq!(name(reiwand_format::Error::Changed("a".into())), SIGNATURE_CHANGED);
         assert_eq!(name(gone(io::ErrorKind::Other)), "org.freedesktop.DBus.Error.Failed");
         assert!(matches!(Error::from(gone(io::ErrorKind::Interrupted)), Error::Cancelled));
     }

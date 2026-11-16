@@ -23,7 +23,12 @@ impl Repos {
 
     #[zbus(out_args("job"))]
     async fn add(&self, url: String) -> Result<u64> {
-        self.d()?.run(move |d| d.add_repo(&url)).await
+        self.d()?.run(move |d| d.add_repo(&url, "")).await
+    }
+
+    #[zbus(out_args("job"))]
+    async fn add_trusting(&self, url: String, certificate: String) -> Result<u64> {
+        self.d()?.run(move |d| d.add_repo(&url, &certificate)).await
     }
 
     #[zbus(out_args("job"))]

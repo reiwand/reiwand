@@ -83,6 +83,8 @@ QtObject {
             "root_expired": App.tr("The signing keys expired: nothing can be installed or updated from it"),
             "entry_expiring": App.tr("The signed index expires soon"),
             "stale": App.tr("The signed index expired"),
+            "signature_changed": App.tr("The signature of this repository changed: nothing was applied"),
+            "certificate_changed": App.tr("The server's certificate changed: nothing was applied"),
             "malware": App.tr("Malware"),
             "license": App.tr("License problem"),
             "takedown": App.tr("Taken down"),

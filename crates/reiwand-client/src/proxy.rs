@@ -160,6 +160,7 @@ pub trait Providers1 {
 pub trait Repos1 {
     fn list(&self) -> Result<String>;
     fn add(&self, url: &str) -> Result<u64>;
+    fn add_trusting(&self, url: &str, certificate: &str) -> Result<u64>;
     fn add_examples(&self) -> Result<u64>;
     fn refresh(&self, repo: &str) -> Result<u64>;
     fn remove(&self, repo: &str, uninstall: bool) -> Result<()>;

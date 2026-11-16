@@ -37,6 +37,10 @@ pub mod error {
     pub const FLASHING: &str = "io.github.reiwand.Error.FlashingDisabled";
     pub const OFFLINE: &str = "io.github.reiwand.Error.Offline";
     pub const UNTRUSTED: &str = "io.github.reiwand.Error.Untrusted";
+    pub const CERTIFICATE_UNKNOWN: &str = "io.github.reiwand.Error.CertificateUnknown";
+    pub const CERTIFICATE_CHANGED: &str = "io.github.reiwand.Error.CertificateChanged";
+    pub const SIGNATURE_CHANGED: &str = "io.github.reiwand.Error.SignatureChanged";
+    pub const NOT_A_REPOSITORY: &str = "io.github.reiwand.Error.NotARepository";
 
     const SILENT: &str = "failed without giving a reason";
 

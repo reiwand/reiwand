@@ -155,8 +155,9 @@ impl Daemon {
             _ => None,
         };
         let repo = self.saved().repo_url.clone();
-        if let Some(Err(e)) =
-            repo.map(|url| self.add_repo(&url)).filter(|r| r.as_ref().is_err_and(|e| e.parts().0 != EXISTS))
+        if let Some(Err(e)) = repo
+            .map(|url| self.add_repo(&url, ""))
+            .filter(|r| r.as_ref().is_err_and(|e| e.parts().0 != EXISTS))
         {
             tracing::warn!("the repository of the server could not be added: {e}");
         }

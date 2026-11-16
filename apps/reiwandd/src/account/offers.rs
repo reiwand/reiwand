@@ -107,6 +107,6 @@ impl Daemon {
                 s.declined.insert(key.clone());
             }
         })?;
-        if add { self.add_repo(&url) } else { Ok(0) }
+        if add { self.add_repo(&url, "") } else { Ok(0) }
     }
 }
