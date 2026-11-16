@@ -95,6 +95,9 @@ fn advanced(extras: &Extras) -> Markup {
         Row::new(html! { (t("Audit log")) })
             .value(html! { (t("Every moderation decision, with date and reason")) })
             .action(link_button(Kind::Plain, "/api/v1/mod/audit", t("Open"))),
+        Row::new(html! { (t("Repositories")) })
+            .value(html! { (t("Create and manage the repositories this server hosts")) })
+            .action(link_button(Kind::Plain, "/admin/repos", t("Open"))),
         Row::new(html! { (t("Featured wallpapers")) })
             .value(html! { (tf("{}, they are signed into the repository", &[&extras.featured])) })
             .action(link_button(Kind::Plain, "/admin/featured", t("Open"))),

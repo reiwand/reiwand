@@ -1,5 +1,9 @@
 pub const TEXTS: super::Texts = &[
     ("Repositories", "Repositorios"),
+    (
+        "Create and manage the repositories this server hosts",
+        "Crear y administrar los repositorios de este servidor",
+    ),
     ("Address name", "Nombre en la dirección"),
     (
         "Lowercase letters, digits and hyphens: it forms the address of the repository on this server.",
