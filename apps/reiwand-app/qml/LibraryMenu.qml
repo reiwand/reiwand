@@ -35,7 +35,7 @@ Item {
         if (retry)
             found.push({
                 "kind": "retry",
-                "text": App.tr("Try again"),
+                "text": App.trc("layers", "Try again"),
                 "icon": "arrow-clockwise"
             });
         return found;

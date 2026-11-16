@@ -20766,5 +20766,10 @@ msgid ""
 "again or choose Try again in its menu in the library to build them."
 msgstr ""
 "La imagen queda quieta: se canceló la creación de sus capas de profundidad. "
-"Vuelve a aplicarla o elige Probar de nuevo en su menú de la biblioteca para "
-"crearlas."
+"Vuelve a aplicarla o elige Volver a intentar en su menú de la biblioteca "
+"para crearlas."
+
+#: apps/reiwand-app/qml/LibraryMenu.qml apps/reiwand-app/qml/LibraryMenuCheck.qml
+msgctxt "layers"
+msgid "Try again"
+msgstr "Volver a intentar"

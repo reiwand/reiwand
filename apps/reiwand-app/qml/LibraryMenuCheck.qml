@@ -55,7 +55,7 @@ QtObject {
         const retry = menu.picks.find(p => p.kind === "retry");
         menu.destroy();
         must(!plain, "a picture whose layers did not fail offers to try them again");
-        must(retry && retry.text === App.tr("Try again"), "a picture whose layers failed does not offer to try again");
+        must(retry && retry.text === App.trc("layers", "Try again"), "a picture whose layers failed does not offer to try again");
     }
 
     function exercise() {
