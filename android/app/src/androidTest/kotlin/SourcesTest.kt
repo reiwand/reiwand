@@ -1,10 +1,12 @@
 package io.github.reiwand
 
 import androidx.activity.compose.setContent
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasScrollAction
@@ -18,6 +20,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextInput
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
@@ -91,7 +94,7 @@ class SourcesTest {
     fun aRepositoryNeverAddsWithoutItsFingerprintAndSaysWhy() {
         shown { main -> RepoAdd(main, { _, work -> main.act(false) { work() } }) {} }
         field(R.string.repo_url).performTextInput("https://example.org/wallpapers/")
-        text(R.string.repo_add_url).performClick()
+        text(R.string.repo_add_url).assertIsEnabled().performSemanticsAction(SemanticsActions.OnClick)
         compose.waitUntil(TIMEOUT_MS) { compose.onAllNodes(hasText(context.getString(R.string.error_android_repo_needs_fingerprint))).fetchSemanticsNodes().isNotEmpty() }
         text(R.string.repo_sent, "example.org").assertIsDisplayed()
     }
@@ -103,7 +106,7 @@ class SourcesTest {
         reached(context.getString(R.string.repo_add_title)).performClick()
         field(R.string.repo_url).performTextInput(url)
         if (print.isNotEmpty()) field(R.string.repo_fingerprint).performTextInput(print)
-        compose.onNodeWithTag("repo_add").assertIsDisplayed().performClick()
+        compose.onNodeWithTag("repo_add").assertIsEnabled().performSemanticsAction(SemanticsActions.OnClick)
         val wrong = SemanticsMatcher.keyIsDefined(SemanticsProperties.Error)
         val shown = patient {
             if (marked == null) compose.onAllNodesWithTag("repo_problem").fetchSemanticsNodes().isNotEmpty()
