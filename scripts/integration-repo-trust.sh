@@ -43,7 +43,7 @@ mkdir -p "$other"
 ln -s "$site/repo" "$tls/r/wallpapers"
 mkdir -p "$tls/srv" "$tls/.well-known"
 public=$(free_port) home=$(free_port)
-printf '{"name": "Home", "repositories": "https://127.0.0.1:%s/repositories"}' "$public" >"$tls/.well-known/reiwand-server"
+printf '{"name": "Home", "repositories": [{"name": "wallpapers", "url": "https://127.0.0.1:%s/r/wallpapers"}]}' "$public" >"$tls/.well-known/reiwand-server"
 python3 "$tls/serve.py" "$public" "$tls" "$tls/public.pem" "$tls/public.key" >"$WORK/tls-public.log" 2>&1 & pids+=($!)
 python3 "$tls/serve.py" "$home" "$tls" "$tls/home.pem" "$tls/home.key" >"$WORK/tls-home.log" 2>&1 & homed=$!; pids+=("$homed")
 wait_for 10 serving "https://127.0.0.1:$public/r/wallpapers/entry/latest" "$tls/ca.pem" || fail "the https repository did not start"
@@ -63,7 +63,7 @@ failing "http://example.org/r/wallpapers"
 grep -q "use an https" "$WORK/trust.out" || fail "plain http to another host: $(cat "$WORK/trust.out")"
 failing "https://127.0.0.1:$public/srv"
 grep -q "this is a server, not a repository" "$WORK/trust.out" || fail "a server address: $(cat "$WORK/trust.out")"
-grep -q "https://127.0.0.1:$public/repositories" "$WORK/trust.out" || fail "the repositories page: $(cat "$WORK/trust.out")"
+grep -q "wallpapers (https://127.0.0.1:$public/r/wallpapers)" "$WORK/trust.out" || fail "the repositories of the server: $(cat "$WORK/trust.out")"
 failing "https://127.0.0.1:$home/r/wallpapers"
 grep -q "not from a known authority" "$WORK/trust.out" || fail "an unknown certificate: $(cat "$WORK/trust.out")"
 print=$(sed -n 's/.*fingerprint is \([0-9a-f]\{64\}\).*/\1/p' "$WORK/trust.out")

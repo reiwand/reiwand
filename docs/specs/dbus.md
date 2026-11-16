@@ -104,7 +104,7 @@ Every error carries a readable English message. An error raised without a descri
 | `io.github.reiwand.Error.CertificateUnknown` | The server of a repository has a certificate from no known authority; the message carries its fingerprint, to confirm with `Repos1.AddTrusting` |
 | `io.github.reiwand.Error.CertificateChanged` | The server of a repository presents another certificate than the one pinned or confirmed; nothing is applied |
 | `io.github.reiwand.Error.SignatureChanged` | A refresh found another `repo_id` at the repository address, or a root that does not chain from the stored one; nothing is applied. `List` adds the warning `SignatureChanged` |
-| `io.github.reiwand.Error.NotARepository` | The address is a server, not a repository; the message names the page with its repositories |
+| `io.github.reiwand.Error.NotARepository` | The address is a server, not a repository; the message lists the addresses of its public repositories (from discovery `repositories`) |
 | `io.github.reiwand.Error.Untrusted` | A repository index or a package failed its check: a signature or key refused, a digest or size that does not match, an index older than the one already seen or that disagrees with it. A security sign, never a network failure |
 | `io.github.reiwand.Error.Unconfirmed` | `Grant`/`GrantPackage` from a caller that must be confirmed: the user is asked in a desktop notification; treat it as pending, not as a failure |
 | `org.freedesktop.DBus.Error.AccessDenied` | `Grant`/`GrantPackage` while the same question rests after the user answered *Not now*, closed the notification or left it unanswered (ten minutes, listed in `GetInputs().quiet`), or with no notification service to ask; `SetPointer` from a caller that may not report the pointer |

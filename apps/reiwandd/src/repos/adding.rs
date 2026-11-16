@@ -66,20 +66,22 @@ impl Daemon {
         let fetch = crate::repos::fetcher(self, ctl, &[format!("{site}/")]).ok()?;
         let body = fetch.get(&format!("{site}/"), ".well-known/reiwand-server", 256 << 10).ok()??;
         let found: Value = serde_json::from_slice(&body).ok()?;
-        let repositories = &found["repositories"];
-        let page = [repositories, &repositories["page"], &repositories["url"], &found["repositories_page"]]
-            .iter()
-            .find_map(|v| v.as_str().map(String::from));
+        // discovery lists the public repositories as {name, url, ...} (docs/specs/server.md, Discovery)
+        let listed: Vec<String> = found["repositories"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(|r| Some(format!("{} ({})", r["name"].as_str()?, r["url"].as_str()?)))
+            .take(5)
+            .collect();
         let named = found["name"].as_str().unwrap_or(site);
-        Some(match (page, found["repository"]["url"].as_str()) {
-            (Some(page), _) => {
-                format!("this is a server, not a repository: {named} lists its repositories at {page}")
-            }
-            (None, _) if !repositories.is_null() => format!(
-                "this is a server, not a repository: {named} lists its repositories at {site}/repositories"
+        Some(match (listed.is_empty(), found["repository"]["url"].as_str()) {
+            (false, _) => format!(
+                "this is a server, not a repository: paste the address of one of its repositories: {}",
+                listed.join(", ")
             ),
-            (None, Some(own)) => format!("this is a server, not a repository: its repository is at {own}"),
-            (None, None) => format!("this is a server, not a repository: {named} has no repository yet"),
+            (true, Some(own)) => format!("this is a server, not a repository: its repository is at {own}"),
+            (true, None) => format!("this is a server, not a repository: {named} has no public repository"),
         })
     }
 }
