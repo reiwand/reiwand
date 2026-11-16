@@ -42,7 +42,24 @@ QtObject {
         return found.join("|");
     }
 
+    function retried() {
+        const menu = Qt.createComponent("LibraryMenu.qml").createObject(page, {
+            "page": made("image", "")
+        });
+        menu.entry = made("image", "").entry;
+        const plain = menu.picks.some(p => p.kind === "retry");
+        menu.layering = {
+            "state": "failed",
+            "file": "/pictures/hill.png"
+        };
+        const retry = menu.picks.find(p => p.kind === "retry");
+        menu.destroy();
+        must(!plain, "a picture whose layers did not fail offers to try them again");
+        must(retry && retry.text === App.tr("Try again"), "a picture whose layers failed does not offer to try again");
+    }
+
     function exercise() {
+        retried();
         const scene = offered("scene", "");
         must(scene === ["true", "true", App.tr("Edit a copy…"), "false"].join("|"), "a scene of the library does not offer to edit a copy on its card and its menu: " + scene);
         const picture = offered("image", "");

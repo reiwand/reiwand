@@ -20743,3 +20743,28 @@ msgstr "Bibliotecas, fuentes e íconos"
 #: apps/reiwand-app/qml/SourceCard.qml
 msgid "The photos belong to their authors. Use them as a wallpaper; do not publish them."
 msgstr "Las fotos son de sus autores. Úsalas como fondo de pantalla; no las publiques."
+
+#: apps/reiwand-app/qml/CapasCheck.qml apps/reiwand-app/qml/facade/Capas.qml
+msgid "Generating layers · %1 %"
+msgstr "Generando capas · %1 %"
+
+#: apps/reiwand-app/qml/CapasCheck.qml apps/reiwand-app/qml/facade/Capas.qml
+msgid "Waiting to generate layers"
+msgstr "Esperando para generar las capas"
+
+#: apps/reiwand-app/qml/CapasCheck.qml apps/reiwand-app/qml/facade/Capas.qml
+msgid "Could not generate the layers"
+msgstr "No se pudieron generar las capas"
+
+#: apps/reiwand-app/qml/facade/LabelWords.qml
+msgid "Depth layers"
+msgstr "Capas de profundidad"
+
+#: apps/reiwand-app/qml/OutputNotes.qml
+msgid ""
+"The picture stays still: building its depth layers was cancelled. Apply it "
+"again or choose Try again in its menu in the library to build them."
+msgstr ""
+"La imagen queda quieta: se canceló la creación de sus capas de profundidad. "
+"Vuelve a aplicarla o elige Probar de nuevo en su menú de la biblioteca para "
+"crearlas."

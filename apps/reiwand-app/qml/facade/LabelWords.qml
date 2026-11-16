@@ -61,6 +61,7 @@ QtObject {
             "link": App.tr("Device link"),
             "account_sync": App.tr("Server sync"),
             "upload": App.tr("Transfer with the server"),
+            "layers": App.tr("Depth layers"),
             "unlinked": App.tr("Not linked"),
             "linking": App.tr("Waiting for approval"),
             "connected": App.tr("Connected, not syncing"),

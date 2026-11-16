@@ -9,7 +9,7 @@ Column {
     readonly property var shown: pick(App.jobs)
 
     function pick(jobs) {
-        return jobs.filter(job => job.state === "queued" || job.state === "running" || (job.state === "failed" && dismissed.indexOf(job.id) < 0 && !jobs.some(later => later.id > job.id && later.kind === job.kind && later.target === job.target)));
+        return jobs.filter(job => job.kind !== "layers").filter(job => job.state === "queued" || job.state === "running" || (job.state === "failed" && dismissed.indexOf(job.id) < 0 && !jobs.some(later => later.id > job.id && later.kind === job.kind && later.target === job.target)));
     }
 
     spacing: Look.e1

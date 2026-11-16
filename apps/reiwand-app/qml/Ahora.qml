@@ -127,12 +127,9 @@ Column {
         color: Look.escarcha
     }
 
-    Estado {
+    AhoraCapas {
         anchors.right: parent.right
-        topPadding: Look.e3
-        visible: !ahora.none && ahora.info.quality_auto === "still"
-        tone: "ambar"
-        text: App.tr("Still at its poster")
+        info: ahora.none ? ({}) : ahora.info
     }
 
     Text {

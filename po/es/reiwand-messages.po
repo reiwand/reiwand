@@ -5856,3 +5856,11 @@ msgstr "el efecto de la transición no funciona: %1"
 #: crates/reiwand-editor/src/steps.rs
 msgid "Edit the transition"
 msgstr "Editar la transición"
+
+#: crates/reiwand-core/src/edit/travel.rs
+msgid ""
+"The picture stays still: building its depth layers was cancelled. Apply it "
+"again or try again to build them."
+msgstr ""
+"La imagen queda quieta: se canceló la creación de sus capas de profundidad. "
+"Vuelve a aplicarla o inténtalo de nuevo para crearlas."

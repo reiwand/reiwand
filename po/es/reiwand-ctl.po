@@ -6605,3 +6605,18 @@ msgid ""
 msgstr ""
 "Imprimir las licencias de las bibliotecas, fuentes, íconos y modelos que "
 "incluye el programa"
+
+#: apps/reiwand-ctl/src/cli.rs
+msgid ""
+"Build again the depth layers of a picture after they failed or were cancelled"
+msgstr ""
+"Volver a crear las capas de profundidad de una imagen que fallaron o se "
+"cancelaron"
+
+#: apps/reiwand-ctl/src/cli.rs
+msgid "Local image file, as a path or a file:// URI"
+msgstr "Imagen local, como ruta o URI file://"
+
+#: apps/reiwand-ctl/src/confirming.rs
+msgid "building the depth layers of %1 again"
+msgstr "volviendo a crear las capas de profundidad de %1"

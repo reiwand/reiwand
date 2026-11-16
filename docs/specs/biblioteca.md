@@ -47,6 +47,16 @@ La Biblioteca muestra los fondos guardados sobre la imagen del fondo en uso.
   pantalla donde está.
 - Una nota en la tapa avisa de un archivo que falta o está dañado, de un fondo retirado por su repositorio
   o de uno con destellos (apagado hasta que el usuario lo permita).
+- Mientras el escritorio crea las capas de profundidad de una imagen en pantalla, su tapa lo dice en
+  todos los listados: «Esperando para generar las capas» en la cola y «Generando capas · N %» con una
+  barra fina en el borde de abajo mientras avanza (con LaMa avanza por cada recorte que rellena).
+  Si no se pudieron generar, la nota sale en tono de error y el menú de la tapa (también con la tecla
+  de menú) ofrece «Probar de nuevo» (`RetryLayers`, `reiwand-ctl retry-layers RUTA`); lo mismo si el
+  usuario canceló la creación. Al terminar la nota desaparece. La tarjeta de la pantalla en «Ahora»
+  muestra el mismo estado y la misma barra, y la línea de tareas ya no lista estas creaciones. Una
+  creación cancelada no vuelve a empezar sola: solo al aplicar la imagen otra vez, al cambiar un
+  ajuste de profundidad o de paralaje que cambie el juego de capas, o con «Probar de nuevo»; el
+  estado cancelado vive solo en memoria y se olvida al reiniciar el servicio.
 - La barra de arriba filtra por Todos, Escenas, Imágenes, Vídeos, Web, De fuentes y Favoritos; cada
   palabra lleva su número de fondos y solo se ven las clases que tienen alguno (Todos y Favoritos
   siempre, también en 0). «De fuentes» son las fotos que trajo una fuente de fotos; «Imágenes» son

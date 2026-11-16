@@ -21,7 +21,9 @@ Item {
     property bool choosable
     property bool chosen
     property bool even
+    property real progress: -1
     readonly property alias hovered: area.containsMouse
+    readonly property alias bar: bar
     default property alias below: under.data
 
     signal tapped(int modifiers)
@@ -62,25 +64,10 @@ Item {
             kind: tapa.lit ? "foco" : "tapa"
         }
 
-        Grid {
+        TapaMosaico {
             anchors.fill: parent
-            visible: tapa.pictures.length > 1
-            columns: 2
-            spacing: Look.linea * 2
-
-            Repeater {
-                model: tapa.pictures.length > 1 ? tapa.pictures.slice(0, 4) : []
-
-                delegate: Foto {
-                    required property string modelData
-
-                    width: (tapa.width - Look.linea * 2) / 2
-                    height: (square.height - Look.linea * 2) / 2
-                    source: modelData
-                    sourceSize.width: Look.tapa
-                    opacity: tapa.off ? Look.tapaApagada : 1
-                }
-            }
+            pictures: tapa.pictures
+            off: tapa.off
         }
 
         Foto {
@@ -124,6 +111,15 @@ Item {
             visible: !tapa.lit
             color: Look.noche
             opacity: tapa.chosen ? Look.veloTapaElegida : tapa.hovered ? Look.veloTapaSobre : Look.veloTapa
+        }
+
+        Barra {
+            id: bar
+
+            x: Look.radio
+            y: parent.height - height - Look.linea * 2
+            width: parent.width - Look.radio * 2
+            value: tapa.progress
         }
 
         Anillo {

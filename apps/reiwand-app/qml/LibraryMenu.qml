@@ -9,24 +9,37 @@ Item {
     readonly property alias list: list
     readonly property alias scene: scene
     readonly property bool hurt: !!entry && (entry.missing === true || String(entry.broken ?? "") !== "")
-    readonly property var picks: entry === null ? [] : [
-        {
-            "kind": "set",
-            "text": hurt ? App.tr("Show in folder") : App.tr("Set as wallpaper"),
-            "icon": hurt ? "folder-open" : "image"
-        },
-        {
-            "kind": "options",
-            "text": App.tr("Options"),
-            "icon": "caret-right"
-        },
-        {
-            "kind": "copy",
-            "text": App.tr("Edit a copy…"),
-            "icon": "edit-copy",
-            "off": entry.kind !== "scene" || hurt
-        }
-    ]
+    property var layering: entry === null ? null : Capas.of(String(entry.uid ?? ""))
+    readonly property bool retry: !!layering && (layering.state === "failed" || layering.state === "cancelled")
+    readonly property var picks: entry === null ? [] : offered(hurt, retry)
+
+    function offered(hurt, retry) {
+        const found = [
+            {
+                "kind": "set",
+                "text": hurt ? App.tr("Show in folder") : App.tr("Set as wallpaper"),
+                "icon": hurt ? "folder-open" : "image"
+            },
+            {
+                "kind": "options",
+                "text": App.tr("Options"),
+                "icon": "caret-right"
+            },
+            {
+                "kind": "copy",
+                "text": App.tr("Edit a copy…"),
+                "icon": "edit-copy",
+                "off": menu.entry.kind !== "scene" || hurt
+            }
+        ];
+        if (retry)
+            found.push({
+                "kind": "retry",
+                "text": App.tr("Try again"),
+                "icon": "arrow-clockwise"
+            });
+        return found;
+    }
 
     function copy(uid) {
         scene.start(uid);
@@ -58,6 +71,8 @@ Item {
                 menu.page.open(menu.entry.uid);
             else if (kind === "copy")
                 menu.copy(menu.entry.uid);
+            else if (kind === "retry")
+                App.act("RetryLayers", [menu.layering.file]);
         }
     }
 }

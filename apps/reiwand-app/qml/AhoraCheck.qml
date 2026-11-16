@@ -42,6 +42,11 @@ Timer {
         const shown = tasks.pick([failed(10, "daily"), failed(11, "space"), failed(12, "daily"), failed(13, "space"), failed(14, "daily")]).map(job => job.id);
         tasks.destroy();
         must(shown.join(",") === "13,14", "a task that keeps failing shows one line per attempt: " + shown.join(","));
+        const layers = Qt.createComponent("CapasCheck.qml").createObject(frame, {
+            "frame": frame
+        });
+        layers.exercise();
+        layers.destroy();
     }
 
     function notice() {

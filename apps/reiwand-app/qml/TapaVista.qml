@@ -10,6 +10,8 @@ Tapa {
     readonly property bool scene: from.role(model, "kind") === "scene"
     readonly property bool hidden: from.role(model, "flashing") === true || from.role(model, "mature") === true
     readonly property bool broken: from.role(model, "missing") === true || String(from.role(model, "broken") ?? "") !== ""
+    readonly property var layering: Capas.of(String(from.role(model, "uid") ?? ""))
+    readonly property string layerNote: Capas.note(layering)
 
     picture: from.role(model, from.pictureRole) ?? ""
     pictures: from.role(model, from.picturesRole) ?? []
@@ -18,9 +20,10 @@ Tapa {
     live: !from.view.moving && from.turning !== true
     name: String(from.role(model, "provider") ?? "") !== "" ? Names.of(model) : from.role(model, from.nameRole) ?? ""
     icon: from.iconRole === "" ? "" : from.role(model, from.iconRole) ?? ""
-    note: from.role(model, from.noteRole) ?? ""
-    noteIcon: from.role(model, from.noteIconRole) ?? ""
-    noteTone: from.role(model, from.noteToneRole) ?? ""
+    note: layerNote !== "" ? layerNote : from.role(model, from.noteRole) ?? ""
+    noteIcon: layerNote !== "" ? Capas.icon(layering) : from.role(model, from.noteIconRole) ?? ""
+    noteTone: layerNote !== "" ? Capas.tone(layering) : from.role(model, from.noteToneRole) ?? ""
+    progress: Capas.bar(layering)
     inUse: from.role(model, from.inUseRole) === true
     usedOn: String(from.role(model, from.usedOnRole) ?? "")
     listed: from.listedOf ? from.listedOf(String(from.role(model, "uid") ?? "")) : ""
