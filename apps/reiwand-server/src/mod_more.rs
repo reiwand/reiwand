@@ -12,7 +12,7 @@ pub fn withdrawn(items: &[Value]) -> Markup {
             "by {} · withdrawn {} · {}",
             &[&text(h, "owner"), &ago(h["hidden_at"].as_i64().unwrap_or(0)), &text(h, "reason")],
         );
-        let back = html! { form method="post" action={ "/api/v1/mod/hidden/" (text(h, "id")) "?_method=DELETE&back=/mod" } {
+        let back = html! { form method="post" action={ "/api/v1/r/" (text(h, "repo")) "/mod/hidden/" (text(h, "id")) "?_method=DELETE&back=/mod" } {
             (button(Kind::Plain, t("Return to the catalog")))
         } };
         let row = Row::new(name).value(html! { (line) }).action(back);
@@ -28,13 +28,13 @@ pub fn withdrawn(items: &[Value]) -> Markup {
     } }
 }
 
-pub fn more() -> Markup {
+pub fn more(repo: &str) -> Markup {
     html! { details.mas.grande.seccion {
         summary { (t("More")) " " span.ayuda { (t("withdraw by identifier, blocked files")) } }
         div.mas-cuerpo {
             (subheading(t("Withdraw a wallpaper by its identifier")))
             p.texto { (t("For a wallpaper that did not arrive as a case.")) }
-            form.formulario method="post" action="/api/v1/mod/hidden?back=/mod" {
+            form.formulario method="post" action={ "/api/v1/r/" (repo) "/mod/hidden?back=/mod" } {
                 div.campo { label for="hide-id" { (t("Wallpaper identifier")) } input id="hide-id" name="id" required placeholder="org.example.dawn"; }
                 div.campo { label for="hide-why" { (t("Reason sent to the author")) }
                     input id="hide-why" name="reason" required minlength="10";

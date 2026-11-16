@@ -166,10 +166,11 @@ fn a_database_of_another_version_is_refused_and_left_untouched() {
     let path = dir.path().join("reiwand.sqlite");
     drop(crate::db::Db::open(&path).unwrap());
     let raw = rusqlite::Connection::open(&path).unwrap();
-    for other in [crate::db::MIN_SCHEMA - 1, crate::db::SCHEMA_VERSION + 1] {
+    for other in [crate::db::SCHEMA_VERSION - 3, crate::db::SCHEMA_VERSION - 1, crate::db::SCHEMA_VERSION + 1]
+    {
         raw.pragma_update(None, "user_version", other).unwrap();
         let error = crate::db::Db::open(&path).err().unwrap().to_string();
-        assert!(error.contains("another version of the program"), "{error}");
+        assert!(error.contains("reiwand-upgrade server --data"), "{error}");
         let kept: i64 = raw.pragma_query_value(None, "user_version", |r| r.get(0)).unwrap();
         assert_eq!(kept, other);
     }

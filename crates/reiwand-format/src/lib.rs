@@ -56,6 +56,7 @@ mod store;
 mod update;
 mod validate;
 pub mod values;
+mod version;
 mod video;
 mod web;
 
@@ -90,7 +91,7 @@ pub use licenses::{KNOWN as KNOWN_LICENSES, condition as license_condition, desc
 pub use locale::{ENGINE, LOCALE, MAX_LOCALE_FILE, locale_file, valid_tag};
 pub use manifest::{Kind, Manifest, SCHEMA, Strings, manifest_schema};
 pub use meta::{Content, Credit, Descriptor, Links, Previews, Rating, Source};
-pub use names::{MAX_ASKED, MAX_VOTED, valid_id, vote_queries, voted};
+pub use names::{MAX_ASKED, MAX_VOTED, server_repo_name, valid_id, vote_queries, voted};
 pub use needs::{Dependency, Gpu, Input, Network, Permissions, Platform, Requires, origin};
 #[cfg(feature = "sign")]
 pub use online::sign_rotation;
@@ -114,6 +115,7 @@ pub use sign::{
 pub use source::{Folder, fill, inspect, locale_names, with_strings};
 pub use stall::{Shelved, Stocked, stock};
 pub use validate::{FileEntry, Limits, MANIFEST, SIGNATURE, check_path, validate};
+pub use version::{DATA_VERSION, check_data};
 pub use video::{Playback, VIDEO_PROPERTIES};
 pub use web::{PresetFile, Web, kept_allowance, web_notice, web_restrict};
 
@@ -164,7 +166,7 @@ pub enum Error {
     #[error("{}", self.message())]
     Mismatch(String),
     #[error("{}", self.message())]
-    Unanchored(String),
+    Upgrade(String),
     #[error("{}", self.message())]
     Changed(String),
     #[error("{}", self.message())]

@@ -1,4 +1,3 @@
-use crate::repo::hex64;
 use crate::store::State;
 use crate::validate::within;
 use crate::{Error, Result, Root, require};
@@ -35,26 +34,18 @@ impl Fetch for FileFetch {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Anchor {
     pub base: String,
-    pub fingerprint: Option<String>,
     pub repo_id: Option<String>,
 }
 
 impl Anchor {
     pub fn parse(url: &str) -> Result<Self> {
         let (base, query) = url.split_once('?').unwrap_or((url, ""));
-        let mut anchor =
-            Anchor { base: format!("{}/", base.trim_end_matches('/')), fingerprint: None, repo_id: None };
-        for (key, value) in query.split('&').filter_map(|pair| pair.split_once('=')) {
-            let slot = match key {
-                "fingerprint" => &mut anchor.fingerprint,
-                "repo_id" => &mut anchor.repo_id,
-                _ => continue,
-            };
-            let value = value.to_ascii_lowercase();
-            require(hex64(&value), key, "expected 64 hex digits")?;
-            *slot = Some(value);
-        }
-        Ok(anchor)
+        require(
+            query.is_empty(),
+            "address",
+            "a repository address has no parameters: use the plain address, without ?fingerprint= or ?repo_id=",
+        )?;
+        Ok(Anchor { base: format!("{}/", base.trim_end_matches('/')), repo_id: None })
     }
 }
 

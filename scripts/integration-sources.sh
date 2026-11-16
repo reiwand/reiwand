@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
-declare anchor kr port site
+declare kr port site
 mkdir -p "$site/next"
 cp "$site/src/image.png" "$site/next/image.png"
 cp "$ROOT/tests/fixtures/bands-640x180.png" "$site/next/preview.png"
 sed 's/"1.0.0"/"1.1.0"/' "$site/src/manifest.json" >"$site/next/manifest.json"
 (cd "$site" && ctl pack build next -o dawn-next.wpak >/dev/null && ctl repo add repo dawn-next.wpak >/dev/null &&
   ctl repo publish repo --key online.key >/dev/null)
-repo=$(ctl remote add "http://127.0.0.1:$port/$anchor" --wait --json | jq_ "r['output']['repo_id']")
+repo=$(ctl remote add "http://127.0.0.1:$port/" --wait --json | jq_ "r['output']['repo_id']")
 fetched() { grep -c 'GET /previews/' "$WORK/http.log" || true; }
 old=$(ctl pkg preview "${repo:0:8}/org.example.dawn@1.0.0")
 new=$(ctl pkg preview "${repo:0:8}/org.example.dawn")
@@ -23,7 +23,7 @@ rm "$state"
 ctl remote ls | grep "broken, refresh or remove it" >/dev/null || fail "remote ls hides the broken repository"
 ctl pkg search sky >/dev/null || fail "a broken repository stopped browsing"
 if ctl remote refresh "${repo:0:8}" --wait >/dev/null 2>&1; then fail "a repository without an address was refreshed"; fi
-ctl remote add "http://127.0.0.1:$port/$anchor" --wait >/dev/null
+ctl remote add "http://127.0.0.1:$port/" --wait >/dev/null
 [ "$(ctl remote ls --json | jq_ "[(r['broken'], r['last_error'], r['packages']) for r in r['repos']]")" = "[(None, None, 4)]" ] ||
   fail "adding a broken repository again did not repair it: $(ctl remote ls --json)"
 ctl pkg reveal "${repo:0:8}/org.example.dawn"

@@ -48,7 +48,7 @@ pub enum Repo {
         #[arg(long, help = "Print the result as JSON")]
         json: bool,
     },
-    #[command(about = "Print the signing state of the root and the query that anchors the repository")]
+    #[command(about = "Print the signing state of the root and the address of the repository")]
     Status {
         #[arg(help = "Repository folder")]
         dir: PathBuf,
@@ -169,7 +169,7 @@ pub enum Repo {
     },
     #[command(about = "Verify a published repository as a client would, installing nothing")]
     Verify {
-        #[arg(value_name = "URL|DIR", help = "URL of the repository with its anchor query, or its folder")]
+        #[arg(value_name = "URL|DIR", help = "URL of the repository, or its folder")]
         url: String,
         #[arg(long, help = "Print the result as JSON")]
         json: bool,

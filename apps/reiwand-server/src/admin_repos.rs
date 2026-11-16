@@ -97,7 +97,7 @@ async fn screen(State(app): St, auth: Option<Auth>) -> Res<Response> {
             @let (private, mode) = state.iter().find(|s| s.0 == name).map_or((false, "open"), |s| (s.1, s.2.as_str()));
             section.seccion {
                 h2 { code { (name) } }
-                (crate::ui::copyable(text(i, "address"), t("Copy"), t("Copied")))
+                (crate::ui::copyable(text(i, "url"), t("Copy"), t("Copied")))
                 form method={ "post" } action={ "/api/v1/admin/repos/" (name) "?_method=PATCH&back=/admin/repos" } {
                     label { (t("Who can see it"))
                         select name="private" {

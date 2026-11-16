@@ -11,7 +11,7 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 const FORMAT: &str = "reiwand-server-backup/1";
-const TREES: [&str; 7] = ["blobs", "thumbs", "private", "held", "keys", "repo", "repos"];
+const TREES: [&str; 6] = ["blobs", "thumbs", "private", "held", "keys", "repos"];
 const FILES: &str = "SELECT 'blobs/' || sha256 || '.wpak' FROM versions WHERE state = 'pending' \
                      UNION SELECT 'thumbs/' || sha256 || '.jpg' FROM versions WHERE state IN ('pending', 'published') \
                      UNION SELECT 'private/' || user_id || '/' || id FROM sync_blobs WHERE received = size";
@@ -56,7 +56,7 @@ fn write(cfg: &Config, dest: &Path) -> Result<()> {
     for path in &missing {
         tracing::warn!("{path} is missing from the data directory and from this backup");
     }
-    for tree in ["held", "keys", "repo", "repos"] {
+    for tree in ["held", "keys", "repos"] {
         copy(&cfg.data.join(tree), &dest.join(tree), tree, &mut files)?;
     }
     let manifest = Manifest { format: FORMAT.into(), created_at: now(), files, missing };
@@ -159,7 +159,7 @@ fn latest(repo: &Path) -> Option<u64> {
 }
 
 fn folders(data: &Path, src: &Path) -> Vec<String> {
-    let mut found = vec!["repo".to_string()];
+    let mut found = Vec::new();
     for base in [data, src] {
         for item in fs::read_dir(base.join("repos")).into_iter().flatten().flatten() {
             let folder = format!("repos/{}", item.file_name().to_string_lossy());

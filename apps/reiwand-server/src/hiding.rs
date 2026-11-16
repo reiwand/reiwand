@@ -1,29 +1,33 @@
 use crate::auth::{Auth, Role};
 use crate::db::{audit, changed, now};
 use crate::error::{Input, Problem, require};
-use crate::scope::{Scope, both, resolve};
+use crate::scope::{Scope, at, resolve};
 use crate::{Reply, Router, St};
 use axum::Json;
 use axum::extract::State;
-use axum::routing::{delete, get};
+use axum::routing::{delete, get, post};
 use rusqlite::params;
 use serde::Deserialize;
 use serde_json::json;
 
 pub fn routes() -> Router {
-    let router = Router::new().route(
+    let router = Router::new().route("/api/v1/mod/hidden", get(hidden));
+    let router = at(
+        router,
         "/api/v1/mod/hidden",
-        get(hidden).post(|s: St, a: Auth, Input(h): Input<Hide>| hide(s, a, h, true)),
+        post(|s: St, a: Auth, sc: Scope, Input(h): Input<Hide>| {
+            hide(s, a, Hide { repo: sc.repo, ..h }, true)
+        }),
     );
     let gone = delete(|s: St, a: Auth, sc: Scope| {
         hide(s, a, Hide { repo: sc.repo, id: sc.id, reason: String::new() }, false)
     });
-    both(router, "/api/v1/mod/hidden/{id}", gone)
+    at(router, "/api/v1/mod/hidden/{id}", gone)
 }
 
 #[derive(Deserialize)]
 pub struct Hide {
-    #[serde(default)]
+    #[serde(default, skip_deserializing)]
     repo: String,
     id: String,
     #[serde(default)]

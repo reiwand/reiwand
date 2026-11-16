@@ -17,9 +17,7 @@ pub enum Remote {
     },
     #[command(about = "Add a repository by pasting its address (or a folder)")]
     Add {
-        #[arg(
-            help = "Address of the repository, or a folder; an old address may carry ?fingerprint=... or ?repo_id=..."
-        )]
+        #[arg(help = "Address of the repository, or a folder")]
         url: String,
         #[arg(
             long,

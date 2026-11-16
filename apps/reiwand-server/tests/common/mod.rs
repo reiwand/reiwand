@@ -108,7 +108,7 @@ fn build(dir: &Path, manifest: Manifest) -> PathBuf {
 }
 
 pub async fn upload(server: &Server, who: &Who, wpak: &Path) -> Value {
-    upload_to(server, who, wpak, None).await
+    upload_to(server, who, wpak, Some("main")).await
 }
 
 pub async fn upload_to(server: &Server, who: &Who, wpak: &Path, repo: Option<&str>) -> Value {

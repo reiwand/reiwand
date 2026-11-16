@@ -16,10 +16,8 @@ impl FromRequestParts<Arc<App>> for Scope {
     async fn from_request_parts(parts: &mut Parts, app: &Arc<App>) -> Result<Scope, Problem> {
         let params = RawPathParams::from_request_parts(parts, app).await.map_err(Problem::internal)?;
         let get = |key: &str| params.iter().find(|(k, _)| *k == key).map(|(_, v)| v.to_string());
-        let repo = match get("repo") {
-            Some(name) => app.repos.get(&name).ok_or_else(|| Problem::missing("repository"))?.name.clone(),
-            None => app.repos.first().name.clone(),
-        };
+        let name = get("repo").ok_or_else(|| Problem::missing("repository"))?;
+        let repo = app.repos.get(&name).ok_or_else(|| Problem::missing("repository"))?.name.clone();
         let auth = Option::<Auth>::from_request_parts(parts, app).await?;
         crate::access::read(app, &repo, auth.as_ref()).await?;
         Ok(Scope { repo, id: get("id").unwrap_or_default() })
@@ -31,17 +29,9 @@ pub fn first(app: &App) -> String {
 }
 
 pub fn resolve(app: &App, name: &str) -> Result<Arc<crate::repo::Repo>, Problem> {
-    match name {
-        "" => Ok(app.repos.first()),
-        name => app.repos.get(name).ok_or_else(|| Problem::missing("repository")),
-    }
+    app.repos.get(name).ok_or_else(|| Problem::missing("repository"))
 }
 
-pub fn both(
-    router: crate::Router,
-    path: &str,
-    method: axum::routing::MethodRouter<Arc<App>>,
-) -> crate::Router {
-    let scoped = path.replacen("/api/v1/", "/api/v1/r/{repo}/", 1);
-    router.route(path, method.clone()).route(&scoped, method)
+pub fn at(router: crate::Router, path: &str, method: axum::routing::MethodRouter<Arc<App>>) -> crate::Router {
+    router.route(&path.replacen("/api/v1/", "/api/v1/r/{repo}/", 1), method)
 }

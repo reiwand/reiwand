@@ -120,7 +120,7 @@ async fn package(State(app): St, auth: Option<Auth>, Path(id): Path<String>) -> 
         h2 { (t("Versions")) }
         ul { @for v in &versions { li { a href=(text(v, "download")) { (text(v, "version")) } } } }
         h2 { (t("Report this wallpaper")) }
-        form.formulario method="post" action={ "/api/v1/packages/" (id) "/reports?back=/packages/" (id) } {
+        form.formulario method="post" action={ "/api/v1/r/" (text(&latest, "repo")) "/packages/" (id) "/reports?back=/packages/" (id) } {
             label { (t("Reason")) select name="category" {
                 @for c in ["copyright", "illegal", "malware", "mature", "spam", "other"] {
                     option value=(c) { (word(c)) }

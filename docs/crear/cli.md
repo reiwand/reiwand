@@ -434,9 +434,9 @@ repositorio». Aquí van sus comandos. Ninguno necesita el demonio.
 
 | Comando | Qué hace |
 |---------|----------|
-| `repo init DIR --name N --root-key raiz.pub --online-key enlinea.pub [--author ID=autor.pub]` | Crea el repositorio en una carpeta vacía y escribe `root/1.json`. Imprime su estado (`repo_id`, `signers`, `complete`, `anchor`, `address`). |
+| `repo init DIR --name N --root-key raiz.pub --online-key enlinea.pub [--author ID=autor.pub]` | Crea el repositorio en una carpeta vacía y escribe `root/1.json`. Imprime su estado (`repo_id`, `signers`, `complete`, `address`). |
 | `repo sign-root DIR --key raiz.key` | Firma la raíz más nueva con una clave raíz. Hasta que `complete = true`, el repositorio no sirve. |
-| `repo status DIR` | Imprime el estado de firma de la raíz, la consulta de anclaje (`?fingerprint=…&repo_id=…`) y `address`, la dirección completa de la carpeta que se pega en *Añadir un repositorio* o en `remote add`. |
+| `repo status DIR` | Imprime el estado de firma de la raíz y `address`, la dirección simple de la carpeta que se pega en *Añadir un repositorio* o en `remote add`. |
 | `repo add DIR paquete.wpak… [--author ID] [--unlisted]` | Añade paquetes al catálogo; después hay que publicar. Imprime `id versión sha256=… author=…`. |
 | `repo publish DIR --key enlinea.key [--days N]` | Firma y escribe el índice. Imprime `index N published with M packages; it expires FECHA`. |
 | `repo refresh DIR --key enlinea.key [--days N]` | Vuelve a firmar el índice sin cambios con una caducidad nueva. |
@@ -455,7 +455,7 @@ otro contenido».
 Para probarlo como lo haría otro equipo (con demonio):
 
 ```
-reiwand-ctl remote add 'file:///ruta/a/mi-repo/?fingerprint=<huella>&repo_id=<id>' --wait
+reiwand-ctl remote add 'file:///ruta/a/mi-repo/' --wait
 reiwand-ctl pkg search reloj
 reiwand-ctl pkg install org.example.reloj --wait
 ```
@@ -466,9 +466,7 @@ job 2 install done: org.example.reloj 1.0.0
 Installed org.example.reloj 1.0.0.
 ```
 
-La dirección es la línea `address` de `repo status`; también vale la carpeta con la misma consulta
-(`reiwand-ctl remote add 'mi-repo/?fingerprint=…&repo_id=…'`). Una carpeta sin esa consulta se rechaza
-con `needs a fingerprint or repo_id query parameter`. Sin `--wait`, `remote add` y `pkg install`
+La dirección es la línea `address` de `repo status`; también vale la carpeta (`reiwand-ctl remote add mi-repo`). Una dirección con `?fingerprint=` o `?repo_id=` (de la versión 1.x) se rechaza: la huella de la raíz se aprende al agregar el repositorio. Sin `--wait`, `remote add` y `pkg install`
 solo imprimen el número del trabajo.
 
 ### Servidor propio

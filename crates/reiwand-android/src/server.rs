@@ -49,12 +49,8 @@ pub(crate) async fn add(url: &str, fingerprint: Option<&str>) -> Result<Value, E
     }
     let name: String =
         found["name"].as_str().unwrap_or_default().chars().filter(|c| !c.is_control()).take(128).collect();
-    let repo_id = Some(announced(&found, &url));
-    let repo_url = repo_id
-        .as_ref()
-        .filter(|id| !id.is_empty())
-        .and(found["repository"]["url"].as_str())
-        .map(String::from);
+    let (repo_id, repo_url) = announced(&found, &url);
+    let repo_id = Some(repo_id);
     update(|s| {
         (s.url, s.name, s.pin, s.repo_id, s.repo_url) = (url, name.clone(), pin, repo_id, repo_url);
         s.repo_failed = None;
@@ -62,10 +58,12 @@ pub(crate) async fn add(url: &str, fingerprint: Option<&str>) -> Result<Value, E
     Ok(json!({"name": name, "registration": found["registration"]}))
 }
 
-pub(crate) fn announced(found: &Value, url: &str) -> String {
-    let repo = found["repository"]["url"].as_str().filter(|r| same_origin(r, url));
-    let id = found["repository"]["repo_id"].as_str().filter(|_| repo.is_some()).unwrap_or_default();
-    id.chars().take(128).filter(|c| !c.is_control()).collect()
+pub(crate) fn announced(found: &Value, url: &str) -> (String, Option<String>) {
+    let listed = found["repositories"].as_array().into_iter().flatten();
+    let first = { listed }.find(|r| r["url"].as_str().is_some_and(|repo| same_origin(repo, url)));
+    let id = first.and_then(|r| r["repo_id"].as_str()).unwrap_or_default();
+    let id: String = id.chars().take(128).filter(|c| !c.is_control()).collect();
+    (id, first.and_then(|r| r["url"].as_str()).map(String::from))
 }
 
 pub(crate) async fn repository() -> Result<Option<String>, Error> {
@@ -74,7 +72,14 @@ pub(crate) async fn repository() -> Result<Option<String>, Error> {
     }
     let (url, pin) = read(|s| (s.url.clone(), s.pin.clone()));
     let found = crate::net::api(&url, pin.as_deref())?.get("/.well-known/reiwand-server").await?;
-    let id = announced(&found, &url);
-    update(|s| s.repo_id = Some(id.clone()))?;
+    let (id, repo_url) = announced(&found, &url);
+    update(|s| (s.repo_id, s.repo_url) = (Some(id.clone()), repo_url))?;
     Ok(Some(id).filter(|r| !r.is_empty()))
+}
+
+pub(crate) fn repo_name() -> Result<String, Error> {
+    let url = read(|s| s.repo_url.clone());
+    let name = url.as_deref().and_then(reiwand_format::server_repo_name);
+    name.map(String::from)
+        .ok_or_else(|| said("android.vote_elsewhere", "this server has no repository to vote in", &[]))
 }

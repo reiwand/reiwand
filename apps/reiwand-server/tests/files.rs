@@ -141,7 +141,8 @@ async fn the_catalog_searches_with_trigrams_and_falls_back_to_tags() {
     add("org.example.glow", "Évening glow", r#"["dusk"]"#, "published");
     add("org.example.harbor", "Harbor lights", r#"["sea"]"#, "pending");
     let found = async |q: &str| {
-        let (_, page) = server.json(Method::GET, &format!("/api/v1/catalog?q={q}"), &Who::Nobody, None).await;
+        let (_, page) =
+            server.json(Method::GET, &format!("/api/v1/r/main/catalog?q={q}"), &Who::Nobody, None).await;
         let items = page["items"].as_array().cloned().unwrap_or_default();
         items.iter().map(|i| i["id"].as_str().unwrap().to_string()).collect::<Vec<_>>()
     };

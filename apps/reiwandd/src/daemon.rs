@@ -82,6 +82,7 @@ pub struct Daemon {
 impl Daemon {
     pub fn new(config_path: PathBuf, display: Option<reiwand_render::Display>) -> anyhow::Result<Self> {
         let store = Store::open();
+        reiwand_format::check_data(&store.data)?;
         let closed = || Config { models: Models { allow_download: false }, ..Config::default() };
         let (config, config_error) = load(&config_path, &store, true)
             .map_or_else(|e| (closed(), Some(e.to_string())), |config| (config, None));

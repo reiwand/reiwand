@@ -57,13 +57,15 @@ impl Repos {
                 self.reload();
                 find()
             })
-            .or_else(|| (name == "main" && self.all().is_empty()).then(|| Arc::new(Repo::main(&self.data))))
+            .or_else(|| {
+                (name == "main" && self.all().is_empty()).then(|| Arc::new(Repo::named(&self.data, "main")))
+            })
     }
 
     pub fn first(&self) -> Arc<Repo> {
         let all = self.all();
         let ready = all.iter().find(|r| r.ready()).or(all.first());
-        ready.cloned().unwrap_or_else(|| Arc::new(Repo::main(&self.data)))
+        ready.cloned().unwrap_or_else(|| Arc::new(Repo::named(&self.data, "main")))
     }
 }
 
@@ -81,10 +83,7 @@ pub fn prepare(cfg: &Config, name: &str) -> anyhow::Result<Repo> {
     if let Some(found) = load(cfg)?.into_iter().find(|r| r.name == name) {
         return Ok(found);
     }
-    Ok(match name {
-        "main" => Repo::main(&cfg.data),
-        _ => Repo::at(&cfg.data, name, &format!("repos/{name}"), &format!("keys/{name}.online.key")),
-    })
+    Ok(Repo::named(&cfg.data, name))
 }
 
 pub fn record(cfg: &Config, repo: &Repo) -> anyhow::Result<()> {
@@ -99,5 +98,5 @@ pub fn record(cfg: &Config, repo: &Repo) -> anyhow::Result<()> {
 pub fn load_data(data: &Path) -> Vec<Repo> {
     let path = data.join("db/reiwand.sqlite");
     let found = Connection::open(path).and_then(|c| read(&c, data));
-    found.unwrap_or_else(|_| vec![Repo::main(data)])
+    found.unwrap_or_else(|_| vec![Repo::named(data, "main")])
 }

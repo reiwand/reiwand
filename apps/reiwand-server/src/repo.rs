@@ -45,8 +45,8 @@ impl Repo {
         &self.key_name
     }
 
-    pub fn main(data: &Path) -> Repo {
-        Repo::at(data, "main", "repo", "keys/online.key")
+    pub fn named(data: &Path, name: &str) -> Repo {
+        Repo::at(data, name, &format!("repos/{name}"), &format!("keys/{name}.online.key"))
     }
 
     pub fn ready(&self) -> bool {
@@ -146,12 +146,10 @@ impl Repo {
         let entry: Option<Entry> = entry.and_then(|bytes| serde_json::from_slice(&bytes).ok());
         let (entry_version, entry_expires) =
             (entry.as_ref().map(|e| e.version), entry.map(|e| e.expires.to_rfc3339()));
-        let base = if self.folder == "repo" { "/repo/".to_string() } else { format!("/r/{}/", self.name) };
+        let address = cfg.url(&format!("/r/{}/", self.name));
         Some(json!({
             "name": self.name, "repo_id": root.repo_id, "root_version": root.version,
-            "root_signed": root.complete, "query": root.query,
-            "url": cfg.url(&format!("{base}?{}", root.query)),
-            "address": cfg.url(&format!("/r/{}/?{}", self.name, root.query)), "online_key": self.key.is_file(),
+            "root_signed": root.complete, "url": address, "online_key": self.key.is_file(),
             "entry_version": entry_version, "entry_expires": entry_expires,
         }))
     }

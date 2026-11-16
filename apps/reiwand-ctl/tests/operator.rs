@@ -23,7 +23,7 @@ fn operator_commands_parse() {
             r#"Pack(RotateKey { old: "old.key", new: "new.pub", author: "u7" })"#,
         ),
         (
-            "moderate --server https://example.org hide org.example.dawn --reason spam-reason",
+            "moderate --server https://example.org hide org.example.dawn --repo main --reason spam-reason",
             r#"Moderate(Moderate { server: "https://example.org", action: Hide { id: "org.example.dawn", reason: "spam-reason" } })"#,
         ),
         ("pack check src --json", r#"Pack(Check { path: "src", json: true })"#),

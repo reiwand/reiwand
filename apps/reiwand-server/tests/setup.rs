@@ -87,8 +87,7 @@ async fn the_assistant_walks_every_step_in_both_languages() {
             .await;
     let code = invite.split("/register?invite=").nth(1).unwrap().split('<').next().unwrap().to_owned();
     assert_eq!(post(&server, "/setup/access", &visit, &[("access", "invite")]).await, StatusCode::SEE_OTHER);
-    let listo =
-        ["Go to Administration", "Repository address, with its fingerprint", "/repo/?fingerprint=", "as ana"];
+    let listo = ["Go to Administration", "Repository address", "/r/main/", "as ana"];
     both(&server, &visit, &listo, &["Listo: tu servidor ya reparte fondos.", "Ir a Administración"]).await;
     let body = json!({"handle": "bea", "password": "a long enough password", "invite": code});
     assert_eq!(

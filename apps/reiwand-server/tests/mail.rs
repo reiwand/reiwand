@@ -127,7 +127,7 @@ async fn a_report_mails_who_moderates_without_the_reporter_and_the_queue_says_so
     let inbox = listen().await;
     save(&server, &admin, &settings(&inbox.port.to_string())).await;
     let report = json!({"category": "malware", "details": "sent by bob@example.org"});
-    let path = format!("/api/v1/packages/{DAWN}/reports");
+    let path = format!("/api/v1/r/main/packages/{DAWN}/reports");
     assert_eq!(server.json(Method::POST, &path, &Who::Nobody, Some(report)).await.0, StatusCode::CREATED);
     let mails = arrived(&inbox, 1).await;
     let mail = mails.iter().find(|m| m.contains("a new report to review")).expect("the case mail");

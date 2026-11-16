@@ -28,15 +28,15 @@ test "$(step -d access=closed "$URL/setup/access")" = 303
 test "$(step --data-urlencode "token=$token" "$URL/setup")" = 403
 rm -f "$jar"
 docker compose exec -T reiwand reiwand-server repo publish
-latest=$(curl -fsS "$URL/repo/entry/latest")
-curl -fsS "$URL/repo/entry/$latest.json.minisig" > /dev/null
-curl -fsS "$URL/repo/entry/$latest.json" > /dev/null
+latest=$(curl -fsS "$URL/r/main/entry/latest")
+curl -fsS "$URL/r/main/entry/$latest.json.minisig" > /dev/null
+curl -fsS "$URL/r/main/entry/$latest.json" > /dev/null
 
 docker compose exec -T reiwand reiwand-server backup /data/backups/smoke
 docker compose stop reiwand
 docker compose run --rm -T reiwand restore /data/backups/smoke --force
 docker compose up -d --wait reiwand
-test "$(curl -fsS "$URL/repo/entry/latest")" -gt "$latest"
+test "$(curl -fsS "$URL/r/main/entry/latest")" -gt "$latest"
 
 login='{"handle":"admin","password":"'"$PASSWORD"'","device":{"platform":"linux"}}'
 status=$(curl -s -o /dev/null -w '%{http_code}' -H 'content-type: application/json' -d "$login" "$URL/api/v1/auth/login")

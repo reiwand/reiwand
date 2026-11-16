@@ -52,11 +52,17 @@ fn upload_row(u: &Value) -> Row {
     Row::new(html! { (tf("Upload {}", &[&text(u, "id")])) }).value(value)
 }
 
-pub fn upload_form(lit: bool) -> Markup {
+pub fn upload_form(targets: &[String], lit: bool) -> Markup {
     html! {
         form.formulario method="post" action="/upload?back=/account" enctype="multipart/form-data" {
             (subheading(t("Upload a wallpaper")))
             div.campos-linea {
+                div.campo {
+                    label for="repositorio" { (t("Repository")) }
+                    select #repositorio name="repo" {
+                        @for name in targets { option value=(name) { (name) } }
+                    }
+                }
                 div.campo {
                     label for="visibilidad" { (t("Visibility")) }
                     select #visibilidad name="visibility" {
@@ -78,13 +84,13 @@ pub fn upload_form(lit: bool) -> Markup {
     }
 }
 
-pub fn works(versions: &[Value], uploads: &[Value], lit: bool) -> Markup {
+pub fn works(versions: &[Value], uploads: &[Value], targets: &[String], lit: bool) -> Markup {
     let items: Vec<Row> = versions.iter().map(version_row).chain(uploads.iter().map(upload_row)).collect();
     html! {
         section.seccion aria-labelledby="fondos" {
             h2 #fondos { (t("Your wallpapers")) }
             @if items.is_empty() { p.texto { (t("You have not uploaded any yet.")) } } @else { (rows(items, false)) }
-            (upload_form(lit))
+            (upload_form(targets, lit))
         }
     }
 }

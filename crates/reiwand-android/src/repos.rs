@@ -132,18 +132,14 @@ pub(crate) fn confirm(repo: &str, add_it: bool) -> Result<Value, Error> {
     let offer = offers.iter().find(matches).cloned();
     let offer = offer
         .ok_or_else(|| said("android.no_repo_offer", "no repository %1 waits for a decision", &[&repo]))?;
-    if !Anchor::parse(&offer.url).is_ok_and(|a| a.repo_id.is_none_or(|id| id == offer.repo_id)) {
+    if Anchor::parse(&offer.url).is_err() {
         return Err(said(
             "android.repo_other",
-            "the synced address names another repository; it was not added",
+            "the synced address is not a plain repository address; it was not added",
             &[],
         ));
     }
-    let glue = if offer.url.contains('?') { "&" } else { "?" };
-    let url = match offer.url.contains("repo_id=") {
-        true => offer.url.clone(),
-        false => format!("{}{glue}repo_id={}", offer.url, offer.repo_id),
-    };
+    let url = offer.url.clone();
     let added = if add_it { add(&url)? } else { Value::Null };
     let key = format!("repos/{}", offer.id);
     update(|s| {

@@ -14,7 +14,7 @@ async fn votes_are_counted_without_voters_and_featured_packages_are_marked() {
     let ana = server.user(&admin, "ana", "user").await;
     let bob = server.user(&admin, "bob", "user").await;
     upload(&server, &ana, &package(server.dir.path(), DAWN, "1.0.0")).await;
-    let path = format!("/api/v1/packages/{DAWN}/vote");
+    let path = format!("/api/v1/r/main/packages/{DAWN}/vote");
     assert_eq!(
         server.json(Method::POST, &path, &Who::Nobody, Some(json!({"vote": "up"}))).await.0,
         StatusCode::UNAUTHORIZED
@@ -23,7 +23,7 @@ async fn votes_are_counted_without_voters_and_featured_packages_are_marked() {
         server.json(Method::POST, &path, &ana, Some(json!({"vote": "sideways"}))).await.0,
         StatusCode::UNPROCESSABLE_ENTITY
     );
-    let missing = "/api/v1/packages/org.example.none/vote";
+    let missing = "/api/v1/r/main/packages/org.example.none/vote";
     assert_eq!(
         server.json(Method::POST, missing, &ana, Some(json!({"vote": "up"}))).await.0,
         StatusCode::NOT_FOUND
@@ -36,13 +36,14 @@ async fn votes_are_counted_without_voters_and_featured_packages_are_marked() {
         (Some(1), Some(1), Some("down"))
     );
     assert!(counted.get("voters").is_none() && !counted.to_string().contains("ana"));
-    let (_, catalog) = server.json(Method::GET, "/api/v1/catalog", &Who::Nobody, None).await;
+    let (_, catalog) = server.json(Method::GET, "/api/v1/r/main/catalog", &Who::Nobody, None).await;
     assert_eq!(catalog["items"][0]["votes"], json!({"up": 1, "down": 1}), "{catalog}");
-    let (_, many) = server.json(Method::GET, &format!("/api/v1/votes?ids={DAWN}"), &Who::Nobody, None).await;
+    let (_, many) =
+        server.json(Method::GET, &format!("/api/v1/r/main/votes?ids={DAWN}"), &Who::Nobody, None).await;
     assert_eq!(many["items"][DAWN], json!({"up": 1, "down": 1}));
-    let (_, own) = server.json(Method::GET, &format!("/api/v1/votes?ids={DAWN}"), &bob, None).await;
+    let (_, own) = server.json(Method::GET, &format!("/api/v1/r/main/votes?ids={DAWN}"), &bob, None).await;
     assert_eq!(own["items"][DAWN], json!({"up": 1, "down": 1, "mine": "down"}));
-    let bad = server.json(Method::GET, "/api/v1/votes?ids=Not%20An%20Id", &Who::Nobody, None).await.0;
+    let bad = server.json(Method::GET, "/api/v1/r/main/votes?ids=Not%20An%20Id", &Who::Nobody, None).await.0;
     assert_eq!(bad, StatusCode::UNPROCESSABLE_ENTITY);
     server.json(Method::POST, &path, &bob, Some(json!({"vote": "none"}))).await;
     let (_, mine) = server.json(Method::GET, &path, &bob, None).await;
@@ -54,18 +55,19 @@ async fn votes_are_counted_without_voters_and_featured_packages_are_marked() {
     assert_eq!(limited, StatusCode::TOO_MANY_REQUESTS);
     let feature = json!({"id": DAWN, "note": "Calm mornings"});
     assert_eq!(
-        server.json(Method::POST, "/api/v1/admin/featured", &ana, Some(feature.clone())).await.0,
+        server.json(Method::POST, "/api/v1/r/main/admin/featured", &ana, Some(feature.clone())).await.0,
         StatusCode::FORBIDDEN
     );
     let long = json!({"id": DAWN, "note": "x".repeat(201)});
     assert_eq!(
-        server.json(Method::POST, "/api/v1/admin/featured", &admin, Some(long)).await.0,
+        server.json(Method::POST, "/api/v1/r/main/admin/featured", &admin, Some(long)).await.0,
         StatusCode::UNPROCESSABLE_ENTITY
     );
-    let (status, _) = server.json(Method::POST, "/api/v1/admin/featured", &admin, Some(feature)).await;
+    let (status, _) = server.json(Method::POST, "/api/v1/r/main/admin/featured", &admin, Some(feature)).await;
     assert_eq!(status, StatusCode::OK);
     server.json(Method::POST, "/api/v1/admin/repo/publish", &admin, None).await;
-    let (_, picked) = server.json(Method::GET, "/api/v1/catalog?featured=true", &Who::Nobody, None).await;
+    let (_, picked) =
+        server.json(Method::GET, "/api/v1/r/main/catalog?featured=true", &Who::Nobody, None).await;
     assert_eq!(
         (picked["items"][0]["id"].as_str(), picked["items"][0]["featured"].as_bool()),
         (Some(DAWN), Some(true))
@@ -73,13 +75,14 @@ async fn votes_are_counted_without_voters_and_featured_packages_are_marked() {
     let page = server.call(Method::GET, &format!("/packages/{DAWN}"), &Who::Nobody).send().await.unwrap();
     assert!(page.text().await.unwrap().contains("Featured by this server"));
     let get = async |path: String| server.call(Method::GET, &path, &Who::Nobody).send().await.unwrap();
-    let latest = get("/repo/entry/latest".into()).await.text().await.unwrap();
-    let entry = get(format!("/repo/entry/{}.json", latest.trim())).await.text().await.unwrap();
+    let latest = get("/r/main/entry/latest".into()).await.text().await.unwrap();
+    let entry = get(format!("/r/main/entry/{}.json", latest.trim())).await.text().await.unwrap();
     let entry: serde_json::Value = serde_json::from_str(&entry).unwrap();
-    let blob = format!("/repo/featured/{}.json", entry["featured"]["sha256"].as_str().unwrap());
+    let blob = format!("/r/main/featured/{}.json", entry["featured"]["sha256"].as_str().unwrap());
     assert_eq!(get(blob).await.status(), StatusCode::OK);
-    let gone = format!("/api/v1/admin/featured/{DAWN}");
+    let gone = format!("/api/v1/r/main/admin/featured/{DAWN}");
     assert_eq!(server.call(Method::DELETE, &gone, &admin).send().await.unwrap().status(), StatusCode::OK);
-    let (_, picked) = server.json(Method::GET, "/api/v1/catalog?featured=true", &Who::Nobody, None).await;
+    let (_, picked) =
+        server.json(Method::GET, "/api/v1/r/main/catalog?featured=true", &Who::Nobody, None).await;
     assert!(picked["items"].as_array().unwrap().is_empty());
 }

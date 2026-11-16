@@ -54,10 +54,8 @@ fn readers_wait_for_commits_and_repositories_are_added_once() {
     let repo = Repo::new();
     repo.add(DAWN, "1.0.0");
     repo.publish(NOW);
-    let repo_id = add_repo(&repo.data, &FileFetch, &repo.url(), NOW).unwrap().repo_id;
-    let (fetch, again) = (Counting::default(), format!("{}?repo_id={repo_id}", file_url(&repo.dir)));
-    assert!(matches!(add_repo(&repo.data, &fetch, &again, NOW), Err(Error::Exists(_))));
-    assert!(fetch.0.borrow().is_empty());
+    add_repo(&repo.data, &FileFetch, &repo.url(), NOW).unwrap();
+    assert!(matches!(add_repo(&repo.data, &FileFetch, &repo.url(), NOW), Err(Error::Exists(_))));
     let commit = hold(&repo.data, true);
     let data = repo.data.clone();
     let reader = thread::spawn(move || (repos(&data, NOW).unwrap().len(), installed(&data).unwrap().len()));

@@ -16,7 +16,7 @@ docker compose logs reiwand | grep setup        # one-time token for the setup a
 | Command | Effect |
 |---------|--------|
 | `serve` (default) | Run the server; the database is created first when it is missing |
-| `migrate` | Create the database if it is missing, check its version and exit; a database made by another version of the program is refused and left untouched |
+| `prepare` | Create the database if it is missing, check its version and exit; a database made by another version of the program is refused and left untouched |
 | `healthcheck` | Exit 0 when `GET /healthz` on the local port answers 200 (the image `HEALTHCHECK`); with `REIWAND_TLS=self-signed`, when the port accepts a connection |
 | `setup-token` | Print a one-time token (24 h) that opens the setup assistant at `/setup`; once the setup is finished it opens nothing |
 | `fingerprint` | Print the lowercase hex SHA-256 of the certificate served with `REIWAND_TLS=self-signed`, making it first when there is none |
@@ -141,11 +141,9 @@ blobs/<sha256>.wpak  uploads waiting for review
 thumbs/<sha256>.jpg  640 px previews re-encoded by the validator
 held/<sha256>.wpak   removed or revoked packages (and their previews) for REIWAND_TAKEDOWN_DAYS, not served
 private/<user>/<id>  end-to-end encrypted private files of each account
-repo/                the static repository (docs/specs/repo.md) built with reiwand-format; the first repository, `main`
-keys/online.key      online signing key (0600); the root key never lives here
-repos/<name>/        the other repositories of the server, each with its own tree
-keys/<name>.online.key  their online keys (0600)
-db/reiwand.sqlite.before-vN-from-vM  copy kept once before a migration
+repos/<name>/        each repository of the server (docs/specs/repo.md), built with reiwand-format; the first one is `main`
+keys/<name>.online.key  its online signing key (0600); the root key never lives here
+db/reiwand.sqlite.before-vN-from-vM  copy kept once by reiwand-upgrade before it changes the database
 keys/mail.secret     password of the mail server (0600), only when mail is set up
 tls/cert.der, key.der  certificate and key of REIWAND_TLS=self-signed (0600)
 tmp/ logs/ backups/
@@ -176,7 +174,7 @@ tmp/ logs/ backups/
   payloads (always one change), the mailbox at most 1 MiB of bodies. Requests time out after 30 s except uploads, private file pieces, moderation decisions and event streams.
 - Every form endpoint also accepts `application/x-www-form-urlencoded`; with `?back=/path` the
   answer is an HTML page. `POST …?_method=DELETE|PATCH` stands for those methods in forms.
-- Public reads (`/repo/`, `/media/`, `/api/v1/catalog`, `/api/v1/packages/…`) send
+- Public reads (`/r/<name>/`, `/media/`, `/api/v1/r/<name>/catalog`, `/api/v1/r/<name>/packages/…`) send
   `Access-Control-Allow-Origin: *`; nothing else allows cross-origin use.
 
 Rate limits per client address (IPv6 per /64): 20 requests/s with bursts of 50 overall; 5 per
@@ -190,36 +188,33 @@ notices per hour. Sync writes: 60 per minute per device.
 |--------|------|--------|
 | GET | `/healthz` | `ok` |
 | GET | `/readyz` | `200` or `503` with `{database, repository, index_fresh}` |
-| GET | `/.well-known/reiwand-server` | `{name, version, api: ["v1"], registration, sync: {end_to_end_default, plaintext_requires_confirmation, record_max_bytes, quota_bytes}, uploads: {max_bytes, per_day, licenses}, repository: {url, repo_id, entry_expires} \| null, repositories: [{name, url, repo_id, entry_expires, private, publishing}], legal: {notice, terms, privacy, contact}}` |
+| GET | `/.well-known/reiwand-server` | `{name, version, api: ["v1"], registration, sync: {end_to_end_default, plaintext_requires_confirmation, record_max_bytes, quota_bytes}, uploads: {max_bytes, per_day, licenses}, repositories: [{name, url, repo_id, entry_expires, private, publishing}], legal: {notice, terms, privacy, contact}}` |
 
 ## Repository
 
-`/repo/<path>` serves the tree of `docs/specs/repo.md`: `root/<N>.json[.minisig]`, `entry/latest`,
+`/r/<name>/<path>` serves the tree of `docs/specs/repo.md`: `root/<N>.json[.minisig]`, `entry/latest`,
 `entry/<N>.json[.minisig]`, `index/<sha256>.json`,
 `revoked/<sha256>.json`, `authors/<sha256>.json`, `featured/<sha256>.json`, `previews/<sha256>.<ext>` and
 `packages/<id>/<version>.wpak`.
 `entry/latest` is `no-cache`; everything else is immutable. A package that moderators removed or
 revoked answers `410`, and its preview is deleted unless a release still listed uses it. The share
-URL is `repository.url` of the discovery document
-(`https://example.org/repo/?fingerprint=…&repo_id=…`).
+URL is the `url` of the repository in the discovery document (`https://example.org/r/main/`): a plain
+address, with no parameters; a client learns the root key on its first contact.
 
 ### Several repositories
 
 One server hosts several repositories. Each has a name (1 to 32 lowercase letters, digits or
 hyphens), its own root and online keys, its own tree and its own signed index, and lives at
-`/r/<name>/<path>` with the same tree as above. The first repository is called `main`: it keeps the
-folder `repo/` and the key `keys/online.key`, and `/repo/<path>` is an alias of `/r/main/<path>`
-(its share URL keeps the old address). The others live in `repos/<name>/` with
-`keys/<name>.online.key`. Every repository is signed on its own and a client verifies each one
+`/r/<name>/<path>` with the same tree as above. The first repository is called `main`. Every one lives in
+`repos/<name>/` with `keys/<name>.online.key`; nothing is special about the first. Every repository is signed on its own and a client verifies each one
 against its own root key: the key of one never verifies another.
 
-`repository` of the discovery document is the first public repository, as before, and
-`repositories` lists all of them with the address of each. Package, version, vote and featured data
+`repositories` of the discovery document lists all of them with the address of each. Package, version, vote and featured data
 belong to a repository (`(repo, id)`): the same package id can exist in two. Catalogue, package
 page, votes and featured have a route per repository, `/api/v1/r/<name>/catalog`,
-`/api/v1/r/<name>/packages/{id}`, `…/votes`, `…/admin/featured`; the routes without `r/<name>`
-answer for the first repository. An upload may carry `repo` (a name; the first when absent). The
-HTML package pages show the first repository only.
+`/api/v1/r/<name>/packages/{id}`, `…/votes`, `…/admin/featured`; there is no route without `r/<name>`
+for them (it answers `404`). An upload must carry `repo` (a name; `422` without it). The HTML home and
+package pages show the first repository only.
 
 Moderation stays per server: one team, one set of blocks, one queue. Accounts and tokens are
 shared; the history of a case counts the author's other versions in every repository, and leaves out the
@@ -247,7 +242,7 @@ user_id, may_read, may_publish)`; the admin sets them per account in the People 
 "Rights in repositories") or with the API above, and marks a repository private in `/admin/repos`.
 Administrators and moderators read every repository; only administrators publish everywhere.
 
-- Reading a private repository (`/r/<name>/…`, `/repo/…` when it is the first, and its catalogue,
+- Reading a private repository (`/r/<name>/…` and its catalogue,
   package, versions, votes and featured routes) needs a bearer token or session of a member.
   Anyone else, with or without a token, gets `401` with the JSON error code `account_needed`.
   Any token scope reads it (the device token an app keeps works). Files of a private repository
@@ -270,12 +265,23 @@ Administrators and moderators read every repository; only administrators publish
 
 ### Database versions and backups
 
-The database carries a version number. Opening an older one (from the previous version on) first
-keeps a copy, `db/reiwand.sqlite.before-vN-from-vM`, and then migrates it inside one transaction
-that checks the keys before it commits; a failure leaves the database untouched. A newer or
-unknown version is refused. `reiwand-server restore` accepts a backup of the previous version and
-migrates it; after restoring, every repository is marked to sign again. Backups include the
-`repos/` trees and their keys.
+The database carries a version number (`user_version`, 14 in 2.0). The server knows only that version:
+it refuses to open any other and names the migration (`reiwand-upgrade server --data DIR`). It contains
+no code for older databases or layouts. `reiwand-server restore` takes a backup of the current version
+only; to restore an older one, run `reiwand-upgrade server` on the restored folder first. After restoring,
+every repository is marked to sign again. Backups include the `repos/` trees and their keys.
+
+### Upgrading from 1.x
+
+The migration is the separate program `reiwand-upgrade` (crate `crates/reiwand-upgrade`), which runs once
+and is safe to run again. `reiwand-upgrade server --data DIR` keeps a copy of the database
+(`db/reiwand.sqlite.before-v14-from-vM`), applies the schema steps in one transaction that checks the
+keys before it commits, moves the old first repository from `repo/` to `repos/main/` and its key from
+`keys/online.key` to `keys/main.online.key`, and leaves everything else where it was. The server image
+runs it in its entrypoint before `serve`; outside the image run it yourself while the server is stopped.
+Clients of 1.x that follow the first repository by its old address (`/repo/…?fingerprint=…`) are moved
+to `/r/main/` by `reiwand-upgrade client` when they upgrade; a share URL with `?fingerprint=` or
+`?repo_id=` from an old link is refused with a message that says to use the plain address.
 
 Only the online key signs on the server, and only entries and their details: an approval adds the
 package with `reiwand_format::add`, a removal or revocation calls `reiwand_format::revoke`, and a
@@ -313,15 +319,15 @@ the verified shards before installing.
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| GET | `/api/v1/catalog?q=&kind=&content=&facet=&cursor=&limit=` | — | Newest published and listed version of each package that the moderators did not hide; `q` matches title, description, tags and id; `kind` is `image`, `video`, `scene` or `web`; `content` is `general`, `mature` or `unrated` (packages of the first manifest version); `facet` is one facet the package must have (`mature` included); `limit` 1 to 100 (24) |
-| GET | `/api/v1/packages/{id}` | — | Latest version plus `versions: [string]` |
-| GET | `/api/v1/packages/{id}/versions` | — | `{items: [item]}` |
-| POST | `/api/v1/packages/{id}/reports` | — | `{category: copyright\|illegal\|malware\|mature\|spam\|other, details}` → `201 {case}` |
+| GET | `/api/v1/r/{repo}/catalog?q=&kind=&content=&facet=&cursor=&limit=` | — | Newest published and listed version of each package that the moderators did not hide; `q` matches title, description, tags and id; `kind` is `image`, `video`, `scene` or `web`; `content` is `general`, `mature` or `unrated` (packages of the first manifest version); `facet` is one facet the package must have (`mature` included); `limit` 1 to 100 (24) |
+| GET | `/api/v1/r/{repo}/packages/{id}` | — | Latest version plus `versions: [string]` |
+| GET | `/api/v1/r/{repo}/packages/{id}/versions` | — | `{items: [item]}` |
+| POST | `/api/v1/r/{repo}/packages/{id}/reports` | — | `{category: copyright\|illegal\|malware\|mature\|spam\|other, details}` → `201 {case}` |
 | GET | `/media/{sha256}.jpg` | — | Thumbnail of a pending or published version |
 | GET | `/band/{sha256}.css` | — | Tones of the band for the version on its cover (`404` for any other version) |
-| POST | `/api/v1/packages/{id}/vote` | session or token | `{vote: up\|down\|none}` → `{id, up, down, mine}`; one vote per account and package, at most 60 changes an hour (`429`), `404` for a package that is not published |
-| GET | `/api/v1/packages/{id}/vote` | session or token | `{id, up, down, mine}` |
-| GET | `/api/v1/votes?ids=` | — | `{items: {id: {up, down, mine?}}}` for at most 100 package ids separated by commas; `mine` (`up`, `down` or `none`) only with a session |
+| POST | `/api/v1/r/{repo}/packages/{id}/vote` | session or token | `{vote: up\|down\|none}` → `{id, up, down, mine}`; one vote per account and package, at most 60 changes an hour (`429`), `404` for a package that is not published |
+| GET | `/api/v1/r/{repo}/packages/{id}/vote` | session or token | `{id, up, down, mine}` |
+| GET | `/api/v1/r/{repo}/votes?ids=` | — | `{items: {id: {up, down, mine?}}}` for at most 100 package ids separated by commas; `mine` (`up`, `down` or `none`) only with a session |
 
 `featured=true` keeps the packages the operator features. `votes` is `{up, down}`: counts of the
 votes of accounts, unsigned hints that are not part of the repository. The server keeps one vote per
@@ -329,7 +335,7 @@ account and package to count it once and lets each account read only its own; it
 voted and keeps no record of installs or downloads. The page of a package shows the counts, the
 note when it is featured and, for a signed-in visitor, buttons to vote up, down or withdraw the vote.
 The desktop app and the phone vote with the token of the device and read the counts with
-`/api/v1/votes`, which adds `mine` for that account; both skip the counts while `repos.vote_counts`
+`/api/v1/r/{repo}/votes`, which adds `mine` for that account; both skip the counts while `repos.vote_counts`
 is off. They ask and vote only for packages of the repository the server announces (its `repo_id`
 in `/.well-known/reiwand-server`): ids of packages from other repositories never reach the server, and
 rows of other repositories show no counts and no vote buttons.
@@ -355,8 +361,8 @@ a `q` without such a word matches tags that start with it.
 Item: `{id, version, kind, title, description, license, tags, authors, size, sha256, published_at,
 owner, thumbnail, download, content, photosensitive, facets, hidden, listed, featured, votes}` (`thumbnail` and `download` are
 paths; `content` and `photosensitive` are `null` for packages of the first manifest version; `hidden`
-is the moderators' reason, or `null`, and only `/api/v1/packages/…` answers hidden packages; `listed` is
-`false` for an unlisted version, which only `/api/v1/packages/…` and the page of the package show, with a
+is the moderators' reason, or `null`, and only `/api/v1/r/{repo}/packages/…` answers hidden packages; `listed` is
+`false` for an unlisted version, which only `/api/v1/r/{repo}/packages/…` and the page of the package show, with a
 note that it is unlisted). Titles and
 descriptions are those of the package's default language. The web catalog filters by rating and
 facet as well, shows the description with its markup (as written for packages of the first manifest
@@ -429,7 +435,7 @@ For devices without a keyboard or accounts without a password (RFC 8628 style):
 | POST | `/api/v1/uploads/{id}/finalize` | `upload` | Validates and returns the status |
 | GET | `/api/v1/uploads/{id}` | `upload` | Status |
 | DELETE | `/api/v1/uploads/{id}` | `upload` | Cancel an unfinished upload → `204` |
-| POST | `/api/v1/me/packages/{id}/visibility` | `upload` | `{visibility: public\|unlisted, version?}` sets every version of a package of this account, or one, → `{id, version, visibility}`; `404` for a package of another account or an unknown version |
+| POST | `/api/v1/r/{repo}/me/packages/{id}/visibility` | `upload` | `{visibility: public\|unlisted, version?}` sets every version of a package of this account, or one, → `{id, version, visibility}`; `404` for a package of another account or an unknown version |
 | POST | `/upload` | session | `multipart/form-data` field `package`, and an optional `visibility` before it, for the web site; strikes, daily limit, open uploads and quota are checked and an open upload session is reserved before the package is read, the blocklist right after; at most 8 fields, others up to 4 KiB, 30 s each |
 
 An unlisted version is published, signed and served like any other, with `listed: false` in its
@@ -467,9 +473,9 @@ review unless `REIWAND_AUTO_PUBLISH` publishes them.
 | POST | `/api/v1/mod/cases/{id}/decision` | moderator | `{decision, statement, reason?, strike?}` |
 | GET, POST | `/api/v1/mod/blocklist` | moderator | List; add `{sha256, reason}` |
 | DELETE | `/api/v1/mod/blocklist/{sha256}` | moderator | Remove |
-| GET | `/api/v1/mod/hidden` | moderator | Hidden packages: `{items: [{id, reason, hidden_at}]}` |
-| POST | `/api/v1/mod/hidden` | moderator | `{id, reason}` (at least 10 characters) hides a package → `{id, hidden: true}` |
-| DELETE | `/api/v1/mod/hidden/{id}` | moderator | Shows it again → `{id, hidden: false}` |
+| GET | `/api/v1/mod/hidden` | moderator | Hidden packages: `{items: [{repo, id, reason, hidden_at}]}, every repository` |
+| POST | `/api/v1/r/{repo}/mod/hidden` | moderator | `{id, reason}` (at least 10 characters) hides a package → `{id, hidden: true}` |
+| DELETE | `/api/v1/r/{repo}/mod/hidden/{id}` | moderator | Shows it again → `{id, hidden: false}` |
 | GET | `/api/v1/mod/audit` | admin | Last 500 actions |
 | GET, POST | `/api/v1/admin/invites` | admin | List; create `{role, uses?, days?}` → `201 {id, code, url, …}` |
 | DELETE | `/api/v1/admin/invites/{id}` | admin | Revoke |
@@ -478,8 +484,8 @@ review unless `REIWAND_AUTO_PUBLISH` publishes them.
 | GET, PATCH | `/api/v1/admin/settings` | admin | Stored settings `{registration, auto_publish, network, advertise, setup_done, public_url}`; change `{registration?, auto_publish?}` |
 | GET | `/api/v1/admin/repo` | admin | Repository state |
 | POST | `/api/v1/admin/repo/publish` | admin | Sign now → `{entry_version, expires, packages}` |
-| GET, POST | `/api/v1/admin/featured` | admin | List; feature `{id, note?}` (a published package, at most 64, a note of at most 200 characters on one line) |
-| DELETE | `/api/v1/admin/featured/{id}` | admin | Stop featuring it; both are audited, signed into the repository (`repo.md`) and listed on `/admin/featured` |
+| GET, POST | `/api/v1/r/{repo}/admin/featured` | admin | List; feature `{id, note?}` (a published package, at most 64, a note of at most 200 characters on one line) |
+| DELETE | `/api/v1/r/{repo}/admin/featured/{id}` | admin | Stop featuring it; both are audited, signed into the repository (`repo.md`) and listed on `/admin/featured` |
 | GET | `/api/v1/admin/transparency` | admin | CSV counts of notices, cases and decisions, without personal data |
 
 Decisions: `approve` (pending → published), `reject` (pending → rejected, the file and its

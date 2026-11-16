@@ -45,7 +45,7 @@ async fn an_unsigned_update_of_a_signed_online_package_is_never_served() {
     let bare = package(server.dir.path(), DAWN, "1.1.0");
     let held = upload(&server, &ana, &bare).await;
     assert_eq!(held["state"], "pending_review", "{held}");
-    let repo = server.dir.path().join("data/repo");
+    let repo = server.dir.path().join("data/repos/main");
     let refused = reiwand_format::add(&repo, &bare, None, later(1));
     assert!(matches!(&refused, Err(e) if e.to_string().contains("differs from the author")), "{refused:?}");
     server.json(Method::POST, "/api/v1/admin/repo/publish", &admin, None).await;

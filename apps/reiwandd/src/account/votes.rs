@@ -11,6 +11,12 @@ impl Daemon {
         saved.repo_id.clone().filter(|_| !saved.url.is_empty())
     }
 
+    pub(super) fn server_repo_name(&self) -> Result<String> {
+        let saved = self.saved();
+        let name = saved.repo_url.as_deref().and_then(reiwand_format::server_repo_name);
+        name.map(String::from).ok_or_else(|| invalid("the linked server has no repository"))
+    }
+
     pub fn vote(&self, spec: &str, vote: &str) -> Result<String> {
         let specs = [spec.to_owned()];
         let found = reiwand_format::voted(&specs, self.server_repo().as_deref());
@@ -18,9 +24,11 @@ impl Daemon {
             return Err(invalid("give a package id or REPO/ID and up, down or none"));
         };
         let Some((_, id)) = asked.first() else { return Err(invalid(ELSEWHERE)) };
+        let name = self.server_repo_name()?;
         let (api, _) = self.account_api(true)?;
         let body = json!({ "vote": vote });
-        let found = block_on(api.post(&format!("/api/v1/packages/{id}/vote"), body)).map_err(sync_error)?;
+        let found =
+            block_on(api.post(&format!("/api/v1/r/{name}/packages/{id}/vote"), body)).map_err(sync_error)?;
         Ok(found.to_string())
     }
 
@@ -34,8 +42,9 @@ impl Daemon {
             return Ok(none);
         }
         let Ok((api, _)) = self.account_api(false) else { return Ok(none) };
+        let Ok(name) = self.server_repo_name() else { return Ok(none) };
         let mut found = Map::new();
-        for query in reiwand_format::vote_queries(&asked) {
+        for query in reiwand_format::vote_queries(&name, &asked) {
             let page = block_on(api.get(&query)).map_err(sync_error)?;
             found.extend(page["items"].as_object().cloned().unwrap_or_default());
         }

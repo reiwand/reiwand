@@ -76,7 +76,7 @@
     <string name="error_android_records_decrypted_sync">%1$s registros no se pueden descifrar con esta clave de sincronización; desde ahora se saltan</string>
     <string name="error_android_refused">No se permite: %1$s</string>
     <string name="error_android_repo_https">La dirección de un repositorio empieza por https://. http:// solo vale para una dirección de este mismo teléfono (localhost o 127.0.0.1).</string>
-    <string name="error_android_repo_other">La dirección sincronizada nombra otro repositorio; no se añadió</string>
+    <string name="error_android_repo_other">La dirección sincronizada no es una dirección simple de repositorio; no se añadió</string>
     <string name="error_android_rotate_plain">La sincronización no está cifrada: una clave nueva no protegería nada</string>
     <string name="error_android_rotated_elsewhere">Otro dispositivo cambió la clave antes</string>
     <string name="error_android_rotation_interval">indica un tiempo mayor que cero</string>

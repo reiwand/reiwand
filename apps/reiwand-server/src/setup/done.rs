@@ -55,7 +55,7 @@ pub async fn screen(app: &App, auth: Option<Auth>) -> Res<Response> {
                 span.texto { (t("In the desktop app, paste the repository address below.")) }
             }))
             (rows(vec![web], true))
-            h3.subtitulo { (t("Repository address, with its fingerprint")) }
+            h3.subtitulo { (t("Repository address")) }
             (copyable(&repo, t("Copy"), t("Copied")))
         }
         section.seccion aria-labelledby="sub" {

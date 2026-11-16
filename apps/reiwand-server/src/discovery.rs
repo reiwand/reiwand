@@ -29,7 +29,7 @@ pub struct Ask {
 
 fn wanted(text: &str) -> &str {
     let text = text.trim_matches('/');
-    text.strip_prefix("r/").unwrap_or(if text == "repo" { "" } else { text })
+    text.strip_prefix("r/").unwrap_or(text)
 }
 
 async fn one(app: &crate::App, auth: Option<&Auth>, text: &str) -> Res<Value> {
@@ -42,7 +42,7 @@ async fn one(app: &crate::App, auth: Option<&Auth>, text: &str) -> Res<Value> {
     });
     if rights.may_read {
         let info = repo.info(&app.cfg).ok_or_else(|| Problem::missing("repository"))?;
-        found["url"] = info["address"].clone();
+        found["url"] = info["url"].clone();
         found["repo_id"] = info["repo_id"].clone();
     }
     Ok(found)
@@ -60,9 +60,6 @@ pub async fn discovery(State(app): St, auth: Option<Auth>, Query(ask): Query<Ask
         .into_iter()
         .filter(|r| seen.iter().any(|(n, k)| k.may_read && r["name"].as_str() == Some(n)))
         .collect();
-    let short =
-        |r: &Value| json!({"url": r["url"], "repo_id": r["repo_id"], "entry_expires": r["entry_expires"]});
-    let repo = infos.first().map(short);
     let repositories: Vec<Value> = infos
         .iter()
         .map(|r| {
@@ -70,7 +67,7 @@ pub async fn discovery(State(app): St, auth: Option<Auth>, Query(ask): Query<Ask
                 .iter()
                 .find(|(n, _)| r["name"].as_str() == Some(n))
                 .map_or((false, "open"), |(_, k)| (k.private, mode(k)));
-            json!({"name": r["name"], "url": r["address"], "repo_id": r["repo_id"], "entry_expires": r["entry_expires"], "private": private, "publishing": publishing})
+            json!({"name": r["name"], "url": r["url"], "repo_id": r["repo_id"], "entry_expires": r["entry_expires"], "private": private, "publishing": publishing})
         })
         .collect();
     let registration = format!("{:?}", app.settings().registration).to_lowercase();
@@ -84,7 +81,7 @@ pub async fn discovery(State(app): St, auth: Option<Auth>, Query(ask): Query<Ask
     });
     Ok(Json(json!({
         "name": c.name, "version": crate::VERSION, "api": ["v1"], "registration": registration,
-        "sync": sync, "repository": repo, "repositories": repositories, "legal": legal,
+        "sync": sync, "repositories": repositories, "legal": legal,
         "uploads": {"max_bytes": c.package_max, "per_day": c.uploads_per_day, "licenses": c.licenses},
     })))
 }

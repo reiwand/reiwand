@@ -60,18 +60,17 @@ Mirrors copy immutable files first and `entry/latest` last.
   certificate is added only after the user confirms its fingerprint, which is then pinned for that
   server address alone (see `dbus.md`, `Repos1.AddTrusting`); a different certificate later is
   refused and warned. Plain `http://` is accepted only for this computer.
-- Older share URL: `https://example.org/wallpapers/?fingerprint=<root key fingerprint>&repo_id=<repo_id>`
-  still works and then both parameters are checked: `fingerprint` must belong to a key of the
-  `root` role of `root/1.json` that signed it; `repo_id` must equal its hash.
+- An address has no parameters. One with `?fingerprint=` or `?repo_id=` (from a 1.x link) is refused with
+  a message that says to use the plain address; `reiwand-upgrade client` rewrites the addresses a 1.x
+  install already stored.
 - If a refresh finds another `repo_id` at the address, or a root that does not chain from the stored
   one, nothing is applied and the repository shows the warning `SignatureChanged`.
 - An address that answers `/.well-known/reiwand-server` but has no `root/1.json` is a server, not a
   repository: the add fails with `NotARepository`, naming the page where the server lists its
-  repositories (`repositories` of the discovery document, or the older `repository`).
-- `reiwand-ctl remote add` also takes a folder followed by the same query
-  (`remote add carpeta/?fingerprint=…`): the CLI turns it into the `file://` URL of its absolute path, and
-  the anchor rules are the same as for any URL.
-- The query is stripped before any request. A package is identified by `(repo_id, id)`.
+  repositories  (`repositories` of the discovery document).
+- `reiwand-ctl remote add` also takes a folder (`remote add carpeta`): the CLI turns it into the `file://`
+  URL of its absolute path, and the anchor rules are the same as for any URL.
+- A package is identified by `(repo_id, id)`.
 
 ## Formats
 
@@ -142,7 +141,7 @@ package without a version) and, from *Author keys…*, revokes an author key by 
 (`stall::key_revoked`, as `repo revoke-key`). *New repository…* writes `root/1.json` in an empty
 folder from a name, root and online `.pub` files, the root threshold, an author with its keys and the
 policy (`stall::made` with a `reiwand_format::Charter`, as `repo init`); *Root…* shows the version of the
-root, how many root keys signed it of its threshold and the anchor query, signs it with a root key file
+root, how many root keys signed it of its threshold and its address, signs it with a root key file
 and its password (`stall::root_signed`, as `repo sign-root`) and *Rotate the root…* writes the next
 root with other keys, removed or added authors and another policy (`stall::rotated`, as `repo
 rotate-root`). `stall::opened` also answers the root status, the fingerprints of the root, online and
@@ -306,7 +305,12 @@ be rolled back either. When no address is left, `add_repo` with its URL repairs 
 <data>/installed.json                         origin, hash, signer and revocation of each package
 <data>/anchors.json                           first signing key of each package of an online author
 <data>/.repos.lock                            flock serializing writers
+<data>/format-version                         number of the stored format (2)
 ```
+
+The client knows only the current format. A data folder without `format-version` that already holds
+repositories, or with another number, is refused with a message that names `reiwand-upgrade client
+--data <data>`; an empty folder is marked as current. See *Upgrading from 1.x* below.
 
 Files are written to a temporary file in the same directory, synced and renamed. Files are
 `0600` and directories `0700`. Nothing is stored before it is verified. Committing a snapshot,
@@ -329,7 +333,7 @@ the scene folders of its assets.
 is in the source tree or in a package: the first run creates two passwordless minisign keys (root
 and online) in a folder of mode `0700` beside the repository, signs `root/1.json`, adds the
 packages and publishes. The repository is local, so its trust is the folder the daemon owns, like
-the library; its anchor is the `file://` address with `fingerprint=` and `repo_id=` that
+the library; its address is the plain `file://` one that
 `status` prints. It is signed again on later runs, never at build time, because a signed index
 cannot outlive `entry_max_days` (90 for this repository) and a build is older than that on
 most machines. Each run adds the packages whose `id` and version are not in it, publishes a new
@@ -365,3 +369,15 @@ paths copied locally in chunks of 64 KiB, a 10 s connect timeout, and an abort
 (`io::ErrorKind::TimedOut`) when less than 8 KiB arrive in 30 s. The transfer runs on its own
 thread; a shared cancel flag, checked for every chunk and at least every 100 ms while waiting for
 the server, fails the transfer with `io::ErrorKind::Interrupted` at once, local copies included.
+
+## Upgrading from 1.x
+
+`reiwand-upgrade client --data DIR` (crate `crates/reiwand-upgrade`) runs once on a data folder of 1.x
+and is safe to run again. It strips `?fingerprint=` and `?repo_id=` from every stored repository
+address (`repos/<id>/state.json`), moves the address a 1.x server gave out for its first repository
+(`https://host/repo/`) to `https://host/r/main/` in the stored addresses and mirrors, does the same for the
+server repository and the repository offers of `sync.json`, and writes `format-version`. Nothing is
+downloaded; the repository keeps its `repo_id`, so installed packages stay linked to it. A repository
+that a static host serves under `/repo/` and was added with a `?fingerprint=` address is moved as well,
+and has to be added again by hand. The desktop installers, the user service (`ExecStartPre`, which also covers the RPM) and the Flatpak launcher
+run it before the daemon starts; the phone runs it when the app is replaced.

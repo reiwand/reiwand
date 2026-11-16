@@ -180,7 +180,7 @@ fn provider_and_package_commands_parse() {
         ("provider rm photos --purge", r#"Provider(Rm { id: "photos", purge: true })"#.into()),
         ("provider clear-cache photos", r#"Provider(ClearCache { id: "photos" })"#.into()),
         ("remote ls", "Remote(Ls { json: false })".into()),
-        ("remote add https://example.org/repo?fingerprint=ab --trust-certificate ab --wait --json", format!(r#"Remote(Add {{ url: "https://example.org/repo?fingerprint=ab", trust_certificate: Some("ab"), {wait} }})"#)),
+        ("remote add https://example.org/repo --trust-certificate ab --wait --json", format!(r#"Remote(Add {{ url: "https://example.org/repo", trust_certificate: Some("ab"), {wait} }})"#)),
         ("remote refresh 0123abcd", r#"Remote(Refresh { repo: Some("0123abcd"), wait: Wait { wait: false, json: false } })"#.into()),
         ("remote rm 0123abcd --uninstall", r#"Remote(Rm { repo: "0123abcd", uninstall: true })"#.into()),
         ("pkg search dawn --limit 5", r#"Pkg(Search { query: "dawn", page: Page { offset: 0, limit: 5 }, json: false })"#.into()),

@@ -323,7 +323,7 @@ reiwand-ctl playlist start Mar && reiwand-ctl next    # rotar una lista y avanza
 reiwand-ctl profile save Escritorio                # guardar lo que muestra cada pantalla
 reiwand-ctl provider add diario bing               # una fuente en línea
 reiwand-ctl provider wallhaven add arte --ratios 16x9,landscape --colors 660000 --sorting random --no-secret
-reiwand-ctl remote add 'https://example.org/repo/?fingerprint=…'
+reiwand-ctl remote add 'https://example.org/r/fondos/'
 reiwand-ctl pkg install org.example.dawn --wait    # instalar un paquete de un repositorio
 reiwand-ctl jobs | watch | schema                  # trabajos, cambios en vivo, claves válidas
 reiwand-ctl input decide org.example.dawn -a audio,pointer -x network   # una respuesta para todo lo que pide la escena

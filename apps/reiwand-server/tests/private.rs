@@ -69,7 +69,7 @@ async fn a_private_repository_answers_only_its_members() {
     }
     let (_, found) = status(&server, "/api/v1/r/vault/catalog", &ana).await;
     assert_eq!(found["items"].as_array().unwrap().len(), 1, "{found}");
-    assert_eq!(status(&server, "/repo/entry/latest", &Who::Nobody).await.0, StatusCode::OK);
+    assert_eq!(status(&server, "/r/main/entry/latest", &Who::Nobody).await.0, StatusCode::OK);
     let names = |v: &Value| {
         v["repositories"].as_array().unwrap().iter().map(|r| r["name"].clone()).collect::<Vec<_>>()
     };
@@ -104,7 +104,7 @@ async fn publishing_into_a_public_repository_can_be_limited_to_members() {
     let admin = server.admin().await;
     server.user(&admin, "ana", "user").await;
     let (ana, _) = server.device("ana").await;
-    let body = json!({"size": 10, "sha256": "0".repeat(64)});
+    let body = json!({"size": 10, "sha256": "0".repeat(64), "repo": "main"});
     assert_eq!(
         server.json(Method::POST, "/api/v1/uploads", &ana, Some(body.clone())).await.0,
         StatusCode::CREATED
@@ -117,7 +117,7 @@ async fn publishing_into_a_public_repository_can_be_limited_to_members() {
     let path = "/api/v1/uploads";
     let (code, found) = server.json(Method::POST, path, &ana, Some(body.clone())).await;
     assert_eq!((code, found["code"].clone()), (StatusCode::FORBIDDEN, json!("not_allowed")));
-    assert_eq!(status(&server, "/api/v1/catalog", &Who::Nobody).await.0, StatusCode::OK);
+    assert_eq!(status(&server, "/api/v1/r/main/catalog", &Who::Nobody).await.0, StatusCode::OK);
     let put = format!("/api/v1/admin/repos/main/members/{}", id(&server, "ana"));
     server.json(Method::PUT, &put, &admin, Some(json!({"may_publish": true}))).await;
     assert_eq!(server.json(Method::POST, path, &ana, Some(body)).await.0, StatusCode::CREATED);

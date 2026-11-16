@@ -4,16 +4,12 @@ use fixture::{NOW, Repo};
 use reiwand_format::{Error, FileFetch, add_repo};
 
 #[test]
-fn a_wrong_fingerprint_says_it_does_not_match_the_repository() {
+fn an_address_with_a_fingerprint_is_refused_and_says_to_use_the_plain_one() {
     let repo = Repo::with(|_, _| {});
     repo.publish(NOW);
-    let right = repo.url();
-    let (base, print) = right.split_once("?fingerprint=").unwrap();
-    let last = print.chars().last().unwrap();
-    let flipped = if last == '0' { '1' } else { '0' };
-    let wrong = format!("{base}?fingerprint={}{flipped}", &print[..print.len() - 1]);
-    let refused = add_repo(&repo.data, &FileFetch, &wrong, NOW).unwrap_err();
-    assert!(matches!(refused, Error::Unanchored(_)), "{refused}");
-    assert!(refused.to_string().contains("does not match the repository at"), "{refused}");
-    assert!(add_repo(&repo.data, &FileFetch, &right, NOW).is_ok());
+    let old = format!("{}?fingerprint={}", repo.url(), repo.root.fingerprint);
+    let refused = add_repo(&repo.data, &FileFetch, &old, NOW).unwrap_err();
+    assert!(matches!(refused, Error::Invalid { .. }), "{refused}");
+    assert!(refused.to_string().contains("plain address"), "{refused}");
+    assert!(add_repo(&repo.data, &FileFetch, &repo.url(), NOW).is_ok());
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-declare WORK site anchor daemon
+declare WORK site rid daemon
 tls=$WORK/tls
 mkdir -p "$tls/r"
 openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -keyout "$tls/ca.key" -out "$tls/ca.pem" \
@@ -49,7 +49,7 @@ python3 "$tls/serve.py" "$home" "$tls" "$tls/home.pem" "$tls/home.key" >"$WORK/t
 wait_for 10 serving "https://127.0.0.1:$public/r/wallpapers/entry/latest" "$tls/ca.pem" || fail "the https repository did not start"
 stop_daemon "$daemon" "$WORK/reiwandd.log"
 SSL_CERT_FILE=$tls/ca.pem start_daemon "$WORK/trust.log"
-repo_id=${anchor##*repo_id=}; repo_id=${repo_id%%[!0-9a-f]*}
+repo_id=$rid
 listed() { ctl remote ls --json | jq_ "$1"; }
 failing() {
   if ctl remote add "$@" --wait >"$WORK/trust.out" 2>&1; then fail "added: $*: $(cat "$WORK/trust.out")"; fi

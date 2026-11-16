@@ -59,7 +59,9 @@ pub(super) async fn finish(app: &Arc<App>, auth: &Auth, id: String) -> Reply {
     let (size, sha) = waiting(app, auth.user, &id, "received").await?.ok_or_else(busy)?;
     let (key, sql) = (id.clone(), "SELECT repo FROM uploads WHERE id = ?1");
     let repo = app.db.run(move |c| Ok(c.query_row(sql, [key], |r| r.get::<_, Option<String>>(0))?)).await?;
-    let repo = crate::scope::resolve(app, repo.as_deref().unwrap_or_default())?.name.clone();
+    let repo = repo.filter(|r| !r.is_empty());
+    let repo = repo.ok_or_else(|| Problem::bad("repo: name the repository to publish to"))?;
+    let repo = crate::scope::resolve(app, &repo)?.name.clone();
     if let Err(problem) = crate::access::publish(app, &repo, auth).await {
         fail(app, &id, &problem.detail).await;
         return Err(problem);

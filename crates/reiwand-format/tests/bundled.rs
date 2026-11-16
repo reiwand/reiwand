@@ -10,7 +10,7 @@ fn a_bundled_repository_is_added_updated_and_renewed_without_a_key_in_the_source
         (work.tmp.path().join("bundle"), work.tmp.path().join("keys"), work.data.clone());
     let dawn = work.package(DAWN, "1.0.0", None);
     let first = bundled(&repo, &keys, "Examples", std::slice::from_ref(&dawn), NOW).unwrap();
-    assert!(first.changed && first.url.starts_with("file://") && first.url.contains(&first.repo_id));
+    assert!(first.changed && first.url.starts_with("file://") && !first.url.contains('?'));
     let info = add_repo(&data, &FileFetch, &first.url, NOW).unwrap();
     assert_eq!(
         (info.name.as_str(), info.packages, info.repo_id.as_str()),

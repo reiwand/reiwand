@@ -24,14 +24,14 @@ async fn unlisted_uploads_stay_out_of_the_catalog_but_keep_their_link() {
         StatusCode::UNPROCESSABLE_ENTITY
     );
     let part = Part::bytes(bytes).file_name("noon.wpak");
-    let form = Form::new().text("visibility", "unlisted").part("package", part);
+    let form = Form::new().text("repo", "main").text("visibility", "unlisted").part("package", part);
     let page = server.call(Method::POST, "/upload?back=/account", &ana).multipart(form).send().await.unwrap();
     assert_eq!(page.status(), StatusCode::OK);
     server.json(Method::POST, "/api/v1/admin/repo/publish", &admin, None).await;
-    let (_, catalog) = server.json(Method::GET, "/api/v1/catalog?q=noon", &Who::Nobody, None).await;
+    let (_, catalog) = server.json(Method::GET, "/api/v1/r/main/catalog?q=noon", &Who::Nobody, None).await;
     assert!(catalog["items"].as_array().unwrap().is_empty(), "{catalog}");
     let (status, item) =
-        server.json(Method::GET, &format!("/api/v1/packages/{NOON}"), &Who::Nobody, None).await;
+        server.json(Method::GET, &format!("/api/v1/r/main/packages/{NOON}"), &Who::Nobody, None).await;
     assert_eq!((status, item["listed"].as_bool()), (StatusCode::OK, Some(false)), "{item}");
     let shown = server.call(Method::GET, &format!("/packages/{NOON}"), &Who::Nobody).send().await.unwrap();
     assert!(shown.text().await.unwrap().contains("Unlisted"));
@@ -47,7 +47,7 @@ async fn unlisted_uploads_stay_out_of_the_catalog_but_keep_their_link() {
         hidden
     });
     assert!(found.await.unwrap(), "an unlisted package was browsed");
-    let path = format!("/api/v1/me/packages/{NOON}/visibility");
+    let path = format!("/api/v1/r/main/me/packages/{NOON}/visibility");
     let bob = server.user(&admin, "bob", "user").await;
     let public = json!({"visibility": "public"});
     assert_eq!(server.json(Method::POST, &path, &bob, Some(public.clone())).await.0, StatusCode::NOT_FOUND);
@@ -58,7 +58,7 @@ async fn unlisted_uploads_stay_out_of_the_catalog_but_keep_their_link() {
     let (status, set) = server.json(Method::POST, &path, &ana, Some(public)).await;
     assert_eq!((status, set["visibility"].as_str()), (StatusCode::OK, Some("public")), "{set}");
     server.json(Method::POST, "/api/v1/admin/repo/publish", &admin, None).await;
-    let (_, catalog) = server.json(Method::GET, "/api/v1/catalog?q=noon", &Who::Nobody, None).await;
+    let (_, catalog) = server.json(Method::GET, "/api/v1/r/main/catalog?q=noon", &Who::Nobody, None).await;
     assert_eq!(catalog["items"][0]["id"], NOON, "{catalog}");
 }
 

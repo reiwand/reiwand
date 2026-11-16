@@ -35,6 +35,6 @@ async fn discovery_health_and_legal_pages() {
         (StatusCode::NOT_FOUND, true)
     );
     let (status, problem) =
-        server.json(Method::GET, "/api/v1/packages/org.example.none", &Who::Nobody, None).await;
+        server.json(Method::GET, "/api/v1/r/main/packages/org.example.none", &Who::Nobody, None).await;
     assert_eq!((status, problem["code"].as_str()), (StatusCode::NOT_FOUND, Some("not_found")));
 }

@@ -29,7 +29,7 @@ async fn backup_and_restore_keep_accounts_packages_and_the_signed_index() {
     let files = manifest["files"].as_object().unwrap();
     assert!(
         files.contains_key("reiwand.sqlite")
-            && files.contains_key("keys/online.key")
+            && files.contains_key("keys/main.online.key")
             && files.keys().any(|k| k.starts_with("thumbs/"))
     );
     let target = server.dir.path().join("restored");
@@ -43,7 +43,7 @@ async fn backup_and_restore_keep_accounts_packages_and_the_signed_index() {
     tokio::spawn(app.serve(listener));
     let http = reqwest::Client::new();
     let item: Value = http
-        .get(format!("{url}/api/v1/packages/org.example.dawn"))
+        .get(format!("{url}/api/v1/r/main/packages/org.example.dawn"))
         .send()
         .await
         .unwrap()
@@ -62,13 +62,15 @@ async fn backup_and_restore_keep_accounts_packages_and_the_signed_index() {
     assert_eq!(pull(1).send().await.unwrap().status(), StatusCode::GONE);
     let fresh: Value = pull(0).send().await.unwrap().json().await.unwrap();
     assert!(fresh["changes"].as_array().unwrap().len() == 1 && fresh["seq"].as_i64().unwrap() > 1, "{fresh}");
-    let latest = http.get(format!("{url}/repo/entry/latest")).send().await.unwrap();
+    let latest = http.get(format!("{url}/r/main/entry/latest")).send().await.unwrap();
     assert_eq!(latest.headers()["cache-control"], "no-cache");
     let seen = latest.text().await.unwrap().trim().parse::<u64>().unwrap();
     assert!(seen > before);
     reiwand_server::restore(&cfg, &snapshot, true).unwrap();
-    let kept = fs::read_to_string(target.join("repo/entry/latest")).unwrap();
-    assert!(kept.trim() == seen.to_string() && target.join(format!("repo/entry/{seen}.json")).is_file());
+    let kept = fs::read_to_string(target.join("repos/main/entry/latest")).unwrap();
+    assert!(
+        kept.trim() == seen.to_string() && target.join(format!("repos/main/entry/{seen}.json")).is_file()
+    );
     let damaged = snapshot.join("reiwand.sqlite");
     fs::write(&damaged, b"broken").unwrap();
     let other = Config { data: server.dir.path().join("other"), ..server.cfg.clone() };

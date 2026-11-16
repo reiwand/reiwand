@@ -46,9 +46,8 @@ refused() {
   grep -q 'private mode is on' "$here/out" || fail "$name did not say private mode is on: $(tail -n 3 "$here/out")"
   echo "private: refused $name"
 }
-anchor="?fingerprint=$(printf 'ab%.0s' {1..32})"
-refused "adding a repository by link" ctl remote add "http://127.0.0.1:$port/$anchor" --wait
-refused "adding a repository by name" ctl remote add "https://reiwand-private.invalid:$port/$anchor" --wait
+refused "adding a repository by link" ctl remote add "http://127.0.0.1:$port/" --wait
+refused "adding a repository by name" ctl remote add "https://reiwand-private.invalid:$port/" --wait
 ctl provider store file >/dev/null
 printf 'hunter2\n' | ctl provider add dav webdav "url=http://127.0.0.1:$port/dav/" user=me refresh=0s cache_mb=16 --secret-stdin >/dev/null ||
   fail "a source could not be added in private mode"
@@ -69,7 +68,7 @@ ctl provider sync dav --wait >"$here/out" 2>&1 || true
 wait_for 10 reached || fail "a source did not reach its listener with private mode off: $(tail -n 3 "$here/out")"
 mark=$(sent)
 left() { [ "$(sent)" -gt "$mark" ]; }
-timeout 20 "$BIN/reiwand-ctl" remote add "https://reiwand-private.invalid:$port/$anchor" --wait >/dev/null 2>&1 || true
+timeout 20 "$BIN/reiwand-ctl" remote add "https://reiwand-private.invalid:$port/" --wait >/dev/null 2>&1 || true
 wait_for 10 left || fail "a name lookup did not leave with private mode off, so the packet count proves nothing"
 echo "private: off, $(hits) connections reached the listener and $(($(sent) - mark)) packets left"
 stop_daemon "$daemon" "$here/reiwandd.log"

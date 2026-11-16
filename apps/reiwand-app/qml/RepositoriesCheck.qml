@@ -40,12 +40,12 @@ QtObject {
         page.repos = [page.repos[1]];
         expect(!page.examples, "without the examples the page must offer them again");
         const shown = Qt.createComponent("RepoAddress.qml").createObject(page, {
-            "text": "file:///repo/?fingerprint=ab&repo_id=cd"
+            "text": "file:///repo/"
         });
         shown.copy();
         const board = Qt.createQmlObject("import QtQuick; TextEdit { visible: false }", page);
         board.paste();
-        expect(shown.copied && board.text === "file:///repo/?fingerprint=ab&repo_id=cd", "the repository address was not copied: " + board.text);
+        expect(shown.copied && board.text === "file:///repo/", "the repository address was not copied: " + board.text);
         board.destroy();
         shown.destroy();
         page.load();

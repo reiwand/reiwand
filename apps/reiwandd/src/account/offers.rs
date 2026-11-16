@@ -86,20 +86,10 @@ impl Daemon {
         let matches = |o: &&RepoOffer| o.id == repo || (repo.len() >= 8 && o.repo_id.starts_with(&repo));
         let offer = offers.iter().find(matches).cloned();
         let offer = offer.ok_or_else(|| not_found(format!("no repository {repo} waits for a decision")))?;
-        let anchored =
-            Anchor::parse(&offer.url).is_ok_and(|a| a.repo_id.is_none_or(|id| id == offer.repo_id));
-        if !anchored {
-            return Err(invalid("the synced address names another repository; it was not added"));
+        if Anchor::parse(&offer.url).is_err() {
+            return Err(invalid("the synced address is not a plain repository address; it was not added"));
         }
-        let url = match offer.url.contains("repo_id=") {
-            true => offer.url.clone(),
-            false => format!(
-                "{}{}repo_id={}",
-                offer.url,
-                if offer.url.contains('?') { "&" } else { "?" },
-                offer.repo_id
-            ),
-        };
+        let url = offer.url.clone();
         let key = format!("repos/{}", offer.id);
         self.update(|s| {
             s.offers.retain(|o| o.id != offer.id);

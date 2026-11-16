@@ -164,7 +164,7 @@ async fn a_failed_automatic_signing_turns_the_row_red_and_mails_the_administrato
     rewatch(&app);
     watch(&app).await.unwrap();
     assert_eq!(health_mails(&app).await, 0);
-    std::fs::write(app.cfg.data.join("keys/online.key"), "not a key").unwrap();
+    std::fs::write(app.cfg.data.join("keys/main.online.key"), "not a key").unwrap();
     assert!(crate::jobs::republish(&app, true).await.is_err());
     let facts = crate::health::collect(&app).await.unwrap();
     assert!(facts.sign_failed.as_ref().is_some_and(|(_, raw)| !raw.is_empty()));

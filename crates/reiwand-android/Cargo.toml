@@ -24,6 +24,7 @@ reiwand-schedule.workspace = true
 reiwand-palette.workspace = true
 reiwand-qr = { workspace = true, features = ["read"] }
 reiwand-sync.workspace = true
+reiwand-upgrade.workspace = true
 anyhow.workspace = true
 base64.workspace = true
 chrono = { workspace = true, features = ["clock"] }

@@ -3,7 +3,7 @@ use crate::daemon::Daemon;
 use crate::error::{Error, Result, invalid, not_found};
 use crate::items::reply;
 use crate::jobs::{Ctl, now};
-use reiwand_core::dbus::error::{CERTIFICATE_CHANGED, EXISTS, SIGNATURE_CHANGED};
+use reiwand_core::dbus::error::{CERTIFICATE_CHANGED, SIGNATURE_CHANGED};
 use reiwand_core::model::{JobKind, MODEL, RefreshOutput, Repo, RepoWarning, ReposReply, Update};
 use reiwand_format::{Anchor, RepoInfo};
 use serde_json::Value;
@@ -102,14 +102,9 @@ impl Daemon {
 
     pub fn add_repo(self: &Arc<Self>, url: &str, trust: &str) -> Result<u64> {
         adding::checked(url, trust)?;
-        let anchor = Anchor::parse(url)?;
-        let known = reiwand_format::repos(&self.store.data, now())?;
-        let sound = |id: &String| known.iter().any(|r| &r.repo_id == id && r.broken.is_none());
-        if let Some(id) = anchor.repo_id.filter(sound) {
-            return Err(Error::Named(EXISTS, format!("repository {id} is already added")));
-        }
+        Anchor::parse(url)?;
         let (url, trust) = (url.to_owned(), trust.to_ascii_lowercase());
-        let target = url.split('?').next().unwrap_or_default().to_owned();
+        let target = url.clone();
         Ok(self.start_job(JobKind::RepoAdd, &target, move |d, ctl| {
             let site = pins::origin(&url);
             let extra = site.as_deref().filter(|_| !trust.is_empty()).map(|s| (s, trust.as_str()));

@@ -35,7 +35,7 @@ fn item() -> Value {
 const REPO: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
 
 fn repo() -> Value {
-    json!({"repo_id": REPO, "url": "https://example.org/repo/?fingerprint=ab", "name": "Example wallpapers",
+    json!({"repo_id": REPO, "url": "https://example.org/repo/", "name": "Example wallpapers",
         "hosts": ["example.org"], "fingerprints": [], "root_version": 1, "root_expires": 0, "entry_version": 3,
         "entry_expires": 0, "checked": 0, "stale": true, "packages": 2, "warnings": ["stale", "root_expiring"],
         "last_error": null, "job": null})

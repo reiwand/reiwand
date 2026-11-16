@@ -114,7 +114,6 @@ pub(super) fn root(status: &RootStatus, json: bool) -> Result<()> {
         ("signers", if status.signers.is_empty() { "-".into() } else { list(&status.signers) }),
         ("threshold", status.threshold.to_string()),
         ("complete", status.complete.to_string()),
-        ("anchor", format!("?{}", status.query)),
         ("address", status.address.clone()),
     ]);
     either(status, json, text.trim_end().into())

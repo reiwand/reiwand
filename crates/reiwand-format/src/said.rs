@@ -39,9 +39,11 @@ impl Error {
                 said("format.equivocation", "entry %1 was published twice with different content", &[n])
             }
             Error::Mismatch(r) => said("format.mismatch", "%1 does not match its signed hash or size", &[r]),
-            Error::Unanchored(r) => {
-                said("format.unanchored", "the fingerprint does not match the repository at %1", &[r])
-            }
+            Error::Upgrade(r) => said(
+                "format.upgrade",
+                "the stored repositories were made by an older version: run reiwand-upgrade client --data \"%1\" once",
+                &[r],
+            ),
             Error::Changed(r) => said(
                 "format.changed",
                 "the signature of the repository at %1 changed; nothing was applied",

@@ -39,7 +39,7 @@ async fn online_authors_register_rotate_and_survive_a_stolen_online_key() {
     assert_eq!(published["state"], "published", "{published}");
     server.json(Method::POST, "/api/v1/admin/repo/publish", &admin, None).await;
     let url = reiwand_server::status(&server.cfg).unwrap()["url"].as_str().unwrap().to_string();
-    let (data, repo) = (server.dir.path().join("client"), server.dir.path().join("data/repo"));
+    let (data, repo) = (server.dir.path().join("client"), server.dir.path().join("data/repos/main"));
     let repo_id = {
         let (data, url, fp) = (data.clone(), url.clone(), first.fingerprint.clone());
         tokio::task::spawn_blocking(move || {
@@ -59,7 +59,7 @@ async fn online_authors_register_rotate_and_survive_a_stolen_online_key() {
     reiwand_format::register_author(&repo, &author, &thief.public).unwrap();
     add(&repo, &signed(server.dir.path(), "1.1.0", &thief), None, later(0)).unwrap();
     let online =
-        Signer::new(&fs::read_to_string(server.dir.path().join("data/keys/online.key")).unwrap(), None);
+        Signer::new(&fs::read_to_string(server.dir.path().join("data/keys/main.online.key")).unwrap(), None);
     reiwand_format::publish(&repo, &online.unwrap(), 7, later(0)).unwrap();
     let refused = {
         let (data, repo_id) = (data.clone(), repo_id.clone());

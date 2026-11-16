@@ -139,7 +139,7 @@ async fn an_upload_cut_short_leaves_no_partial_file_and_can_be_retried() {
     let (device, _) = server.device("ana").await;
     let data: Vec<u8> = (0..400_000u32).map(|n| (n % 251) as u8).collect();
     let sha = reiwand_format::sha256(&data[..]).unwrap();
-    let opened = json!({"size": data.len(), "sha256": sha});
+    let opened = json!({"size": data.len(), "sha256": sha, "repo": "main"});
     let (status, open) = server.json(Method::POST, "/api/v1/uploads", &device, Some(opened)).await;
     assert_eq!(status, StatusCode::CREATED, "{open}");
     let id = open["id"].as_str().unwrap().to_string();

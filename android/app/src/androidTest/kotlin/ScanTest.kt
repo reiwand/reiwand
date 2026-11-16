@@ -36,7 +36,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 private const val PRINT = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-private const val REPO = "https://example.org/wallpapers/?fingerprint=$PRINT"
+private const val REPO = "https://example.org/wallpapers/"
 
 private class Fed(private val picture: String?, private val allow: Boolean) : Lens {
     override fun present(context: Context) = true

@@ -32,11 +32,13 @@ async fn moderators_never_judge_their_own_uploads_and_refused_files_leave_the_di
     assert!(!blob.exists() && !thumb.exists());
     let dusk = fs::read(package(server.dir.path(), "org.example.dusk", "1.0.0")).unwrap();
     let noisy = Form::new()
+        .text("repo", "main")
         .text("note", "x".repeat(10_000))
         .part("package", Part::bytes(dusk.clone()).file_name("dusk.wpak"));
     let refused = server.call(Method::POST, "/upload", &mia).multipart(noisy).send().await.unwrap();
     assert_eq!(refused.status(), StatusCode::UNPROCESSABLE_ENTITY);
-    let form = || Form::new().part("package", Part::bytes(dusk.clone()).file_name("dusk.wpak"));
+    let form =
+        || Form::new().text("repo", "main").part("package", Part::bytes(dusk.clone()).file_name("dusk.wpak"));
     let sent = server.call(Method::POST, "/upload", &mia).multipart(form()).send().await.unwrap();
     assert_eq!((sent.status(), content_type(&sent).starts_with("text/html")), (StatusCode::OK, true));
     let late = server.call(Method::POST, "/upload", &mia).multipart(form()).send().await.unwrap();
@@ -53,7 +55,7 @@ async fn withdrawn_packages_stay_held_and_a_counter_notice_restores_them() {
     let shared = upload(&server, &ana, &package(server.dir.path(), "org.example.dawn", "1.0.0")).await;
     assert_eq!((own["state"].as_str(), shared["state"].as_str()), (Some("published"), Some("published")));
     let notice = |kind: &'static str, id: &'static str| {
-        let location = format!("{}/packages/{id}", server.url);
+        let location = format!("{}/r/main/packages/{id}", server.url);
         let fields = [
             ("kind", kind.to_string()),
             ("location", location),
@@ -90,7 +92,7 @@ async fn withdrawn_packages_stay_held_and_a_counter_notice_restores_them() {
     assert_eq!(notice("copyright", "org.example.dawn").await.unwrap().status(), StatusCode::OK);
     assert_eq!(decide(case("org.example.dawn").await, "remove").await.0, StatusCode::OK);
     let data = server.dir.path().join("data");
-    let public = data.join("repo/packages/org.example.dawn/1.0.0.wpak");
+    let public = data.join("repos/main/packages/org.example.dawn/1.0.0.wpak");
     let held: Vec<String> = fs::read_dir(data.join("held"))
         .unwrap()
         .map(|e| e.unwrap().file_name().into_string().unwrap())
@@ -103,7 +105,8 @@ async fn withdrawn_packages_stay_held_and_a_counter_notice_restores_them() {
     let (status, restored) = decide(case("org.example.dawn").await, "restore").await;
     assert_eq!((status, restored["state"].as_str()), (StatusCode::OK, Some("published")), "{restored}");
     assert!(public.is_file());
-    let (_, item) = server.json(Method::GET, "/api/v1/packages/org.example.dawn", &Who::Nobody, None).await;
+    let (_, item) =
+        server.json(Method::GET, "/api/v1/r/main/packages/org.example.dawn", &Who::Nobody, None).await;
     assert_eq!(item["version"], "1.0.0");
     for entry in fs::read_dir(data.join("held")).unwrap() {
         fs::remove_file(entry.unwrap().path()).unwrap();

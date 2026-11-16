@@ -20,7 +20,7 @@ pub fn routes() -> Router {
         .route("/api/v1/mod/blocklist", get(blocklist).post(block))
         .route("/api/v1/mod/blocklist/{sha256}", delete(unblock))
         .route("/api/v1/mod/audit", get(audit_log));
-    crate::scope::both(router, "/api/v1/packages/{id}/reports", post(report))
+    crate::scope::at(router, "/api/v1/packages/{id}/reports", post(report))
 }
 
 pub fn open_cases(c: &Connection) -> Res<Vec<Value>> {

@@ -56,11 +56,17 @@ pub(crate) fn valid_license(expr: &str) -> bool {
 pub const MAX_VOTED: usize = 100;
 pub const MAX_ASKED: usize = 1000;
 
-pub fn vote_queries(asked: &[(&str, &str)]) -> Vec<String> {
+pub fn server_repo_name(url: &str) -> Option<&str> {
+    let path = url.split(['?', '#']).next()?.split_once("://")?.1.split_once('/')?.1;
+    let name = path.strip_prefix("r/")?.split('/').next()?;
+    Some(name).filter(|n| !n.is_empty())
+}
+
+pub fn vote_queries(name: &str, asked: &[(&str, &str)]) -> Vec<String> {
     let mut ids: Vec<&str> = asked.iter().map(|(_, id)| *id).collect();
     ids.sort_unstable();
     ids.dedup();
-    ids.chunks(MAX_VOTED).map(|chunk| format!("/api/v1/votes?ids={}", chunk.join(","))).collect()
+    ids.chunks(MAX_VOTED).map(|chunk| format!("/api/v1/r/{name}/votes?ids={}", chunk.join(","))).collect()
 }
 
 pub fn voted<'a>(specs: &'a [String], server: Option<&str>) -> Option<Vec<(&'a str, &'a str)>> {

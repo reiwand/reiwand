@@ -150,6 +150,16 @@ lista todas con su valor por defecto); `VARIABLE_FILE` lee el valor de un archiv
 La lista completa de variables y la API HTTP están en
 [`docs/specs/server.md`](../specs/server.md).
 
+## Actualizar desde 1.x
+
+El servidor 2.0.0 solo atiende `/api/v1/r/<nombre>/…`: ya no existen `/repo/`, las rutas sin nombre de
+repositorio ni el campo `repository` del descubrimiento, y los envíos exigen `repo`. La imagen
+ejecuta `reiwand-upgrade server --data /data` antes de arrancar: guarda una copia de la base
+(`db/reiwand.sqlite.before-v14-from-vN`), pasa el primer repositorio a `repos/main/` y su clave en línea a
+`keys/main.online.key`, y no pierde nada. Quien lo ejecuta sin la imagen lo hace con el servidor parado;
+si el servidor encuentra datos de una versión anterior, se niega a arrancar y nombra ese comando.
+Los equipos que seguían el primer repositorio por `/repo/` pasan a `/r/main/` al actualizarse.
+
 ## Enlazar los equipos
 
 El servicio de cada equipo se enlaza con el servidor desde *Cuenta* en la app o con la CLI:
@@ -247,7 +257,7 @@ paquete o una versión con su motivo y un mensaje (`repo revoke`) y retira la re
 unrevoke`), y *Claves de autor…* revoca una clave de autor por su huella (`repo revoke-key`).
 *Repositorio nuevo…* crea uno en una carpeta vacía con su nombre, las claves raíz y en línea (archivos
 `.pub`), cuántas claves raíz deben firmar, un autor con sus claves y la política (`repo init`); *Raíz…*
-muestra la versión de la raíz, cuántas claves la firmaron y la consulta que la ancla, la firma con un
+muestra la versión de la raíz, cuántas claves la firmaron y la dirección del repositorio, la firma con un
 archivo de clave raíz y su contraseña (`repo sign-root`) y *Rotar la raíz…* escribe la siguiente con
 otras claves, autores quitados o añadidos y otra política (`repo rotate-root`). Las claves que das para
 un autor reemplazan las que tenía, así una clave filtrada deja de valer (`--author ID=PUB`, repetible

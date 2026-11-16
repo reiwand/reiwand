@@ -44,6 +44,7 @@ install -Dm755 "$HERE/bin/reiwandd" "$BINDIR/reiwandd"
 install -Dm755 "$HERE/bin/reiwand-ctl" "$BINDIR/reiwand-ctl"
 install -Dm755 "$HERE/bin/reiwand-app" "$BINDIR/reiwand-app"
 install -Dm755 "$HERE/bin/reiwand-web" "$BINDIR/reiwand-web"
+install -Dm755 "$HERE/bin/reiwand-upgrade" "$BINDIR/reiwand-upgrade"
 
 echo "Installing the user service"
 mkdir -p "$UNIT_DIR" "$DBUS_DIR"
@@ -95,6 +96,8 @@ if command -v kpackagetool6 >/dev/null 2>&1; then
 else
   echo "kpackagetool6 not found: skipping the Plasma plugin and tray icon"
 fi
+
+"$BINDIR/reiwand-upgrade" client
 
 if command -v systemctl >/dev/null 2>&1 && systemctl --user show-environment >/dev/null 2>&1; then
   systemctl --user daemon-reload

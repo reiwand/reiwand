@@ -2,7 +2,7 @@ use crate::auth::Auth;
 use crate::db::{HOUR, now};
 use crate::error::{Input, Problem, Res};
 use crate::lang::t;
-use crate::scope::{Scope, both};
+use crate::scope::{Scope, at};
 use crate::{Reply, Router, St};
 use axum::Json;
 use axum::extract::{Query, State};
@@ -16,8 +16,8 @@ const COUNTS: &str = "SELECT COALESCE(SUM(value = 1), 0), COALESCE(SUM(value = -
                       WHERE repo = ?2 AND package_id = ?1";
 
 pub fn routes() -> Router {
-    let router = both(Router::new(), "/api/v1/packages/{id}/vote", get(mine).post(vote));
-    both(router, "/api/v1/votes", get(counts))
+    let router = at(Router::new(), "/api/v1/packages/{id}/vote", get(mine).post(vote));
+    at(router, "/api/v1/votes", get(counts))
 }
 
 #[derive(Deserialize)]
@@ -121,7 +121,7 @@ pub fn ballot(id: &str, latest: &Value, signed: bool) -> maud::Markup {
             "▲ " (up) " · ▼ " (down) " " (t("votes, counted without any list of who voted."))
         }
         @if signed { @for (vote, label) in [("up", t("Vote up")), ("down", t("Vote down")), ("none", t("Withdraw my vote"))] {
-            form.inline method="post" action={ "/api/v1/packages/" (id) "/vote?back=/packages/" (id) } {
+            form.inline method="post" action={ "/api/v1/r/" (crate::web::text(latest, "repo")) "/packages/" (id) "/vote?back=/packages/" (id) } {
                 input type="hidden" name="vote" value=(vote);
                 (crate::ui::button(crate::ui::Kind::Plain, label))
             }

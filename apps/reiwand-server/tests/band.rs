@@ -37,7 +37,7 @@ async fn cover(server: &Server) -> Option<String> {
 }
 
 async fn sha_of(server: &Server, admin: &Who, id: &str) -> String {
-    let (_, item) = server.json(Method::GET, &format!("/api/v1/packages/{id}"), admin, None).await;
+    let (_, item) = server.json(Method::GET, &format!("/api/v1/r/main/packages/{id}"), admin, None).await;
     let versions = item["versions"].as_array().cloned().unwrap_or_default();
     versions.iter().chain([&item]).find_map(|v| v["sha256"].as_str()).unwrap().to_string()
 }
@@ -100,7 +100,7 @@ async fn the_band_shows_the_newest_wallpaper_a_visitor_sees() {
     decide(&server, &admin, "org.example.noon", "upload", "approve").await;
     let noon = sha_of(&server, &admin, "org.example.noon").await;
     assert_eq!(cover(&server).await.as_deref(), Some(noon.as_str()), "a newer wallpaper");
-    let path = "/api/v1/me/packages/org.example.noon/visibility";
+    let path = "/api/v1/r/main/me/packages/org.example.noon/visibility";
     let unlisted = json!({"visibility": "unlisted"});
     assert_eq!(server.json(Method::POST, path, &ana, Some(unlisted)).await.0, StatusCode::OK);
     assert_eq!(cover(&server).await.as_deref(), Some(dawn.as_str()), "unlisted");
@@ -109,13 +109,16 @@ async fn the_band_shows_the_newest_wallpaper_a_visitor_sees() {
     decide(&server, &admin, "org.example.pond", "upload", "approve").await;
     assert_ne!(cover(&server).await.as_deref(), Some(dawn.as_str()));
     let report = json!({"category": "spam", "details": "Not a wallpaper."});
-    let path = "/api/v1/packages/org.example.pond/reports";
+    let path = "/api/v1/r/main/packages/org.example.pond/reports";
     server.json(Method::POST, path, &Who::Nobody, Some(report)).await;
     decide(&server, &admin, "org.example.pond", "report", "remove").await;
     assert_eq!(cover(&server).await.as_deref(), Some(dawn.as_str()), "removed");
 
     let hide = json!({"id": "org.example.dawn", "reason": "Shown by mistake in the catalog."});
-    assert_eq!(server.json(Method::POST, "/api/v1/mod/hidden", &admin, Some(hide)).await.0, StatusCode::OK);
+    assert_eq!(
+        server.json(Method::POST, "/api/v1/r/main/mod/hidden", &admin, Some(hide)).await.0,
+        StatusCode::OK
+    );
     assert_eq!(cover(&server).await, None, "hidden");
 }
 

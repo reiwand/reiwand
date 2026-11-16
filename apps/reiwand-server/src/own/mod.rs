@@ -45,13 +45,20 @@ pub async fn account(State(app): St, auth: Option<Auth>, Query(ask): Query<Ask>)
         Some(&tf("you use {} of {} for wallpapers", &[&size(used), &size(quota)])),
     );
     let phone = phone::phone(&app, fresh);
+    let names = app.repos.ready().iter().map(|r| r.name.clone()).collect();
+    let targets: Vec<String> = crate::access::visible(&app, Some(&auth), names)
+        .await
+        .into_iter()
+        .filter(|(_, rights)| rights.may_publish)
+        .map(|(name, _)| name)
+        .collect();
     let body = html! {
         @if fresh {
             (empty(t("Your account is ready."), html! { (t("To have the home wallpapers on your phone, read the \
                 code below with the app. If you make wallpapers, upload them from here.")) }))
             (phone)
         }
-        (works::works(&versions, &uploads, !fresh && !asking))
+        (works::works(&versions, &uploads, &targets, !fresh && !asking))
         (devices::devices(&app, &devices, if asking { &ask.remove } else { "" }, sync.as_ref()))
         @if !fresh { (phone) }
         (security::security())

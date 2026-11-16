@@ -40,5 +40,5 @@ test -f "$exports/icons/hicolor/48x48/apps/$app.png"
 grep -qF "content_attribute id=\"sex-nudity\"" "$files/share/metainfo/$app.metainfo.xml"
 test -s "$files/share/licenses/$app/THIRD-PARTY-NOTICES"
 grep -qF "<release version=\"${version%%+*}\"" "$files/share/metainfo/$app.metainfo.xml"
-ls "$files/bin/reiwandd" "$files/bin/reiwand-ctl" "$files/bin/reiwand-app" "$files/bin/reiwand-web"
+ls "$files/bin/reiwandd" "$files/bin/reiwand-ctl" "$files/bin/reiwand-app" "$files/bin/reiwand-web" "$files/bin/reiwand-upgrade" "$files/bin/reiwand-launch"
 if grep -l -E '/run/build|/(home|root)/' "$files"/bin/reiwand*; then exit 1; fi

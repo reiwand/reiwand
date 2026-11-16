@@ -4,7 +4,7 @@ use crate::fetch::bases;
 use crate::install::{records, save};
 use crate::store::{Snapshot, State, commit, load, locked, repo_dir};
 use crate::update::refresh;
-use crate::{Anchor, Error, Fetch, Installed, Result, Time, ensure, sha256, sha256_file};
+use crate::{Anchor, Error, Fetch, Installed, Result, Time, ensure, sha256};
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::fs;
@@ -45,20 +45,12 @@ pub struct Outcome {
 }
 
 pub fn verify<F: Fetch>(fetch: &F, url: &str, now: i64) -> Result<RepoInfo> {
-    let anchor = match Anchor::parse(url) {
-        Err(_) if !url.contains('?') => {
-            let dir = Path::new(url.strip_prefix("file://").unwrap_or(url));
-            let repo_id = Some(sha256_file(dir.join("root/1.json"))?);
-            Anchor { base: format!("{}/", url.trim_end_matches('/')), fingerprint: None, repo_id }
-        }
-        anchor => anchor?,
-    };
+    let anchor = Anchor::parse(url)?;
     Ok(info(&contact(fetch, url, &anchor, now)?, now))
 }
 
 pub fn add_repo<F: Fetch>(data: &Path, fetch: &F, url: &str, now: i64) -> Result<RepoInfo> {
     let anchor = Anchor::parse(url)?;
-    anchor.repo_id.as_ref().map_or(Ok(()), |id| absent(data, id))?;
     let snap = contact(fetch, url, &anchor, now)?;
     locked(data, true, || {
         absent(data, &snap.state.repo_id)?;

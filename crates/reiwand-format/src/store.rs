@@ -80,6 +80,9 @@ pub(crate) fn place(dest: &Path, private: bool, fill: impl FnOnce(&mut File) -> 
 }
 
 pub(crate) fn locked<T>(data: &Path, exclusive: bool, run: impl FnOnce() -> Result<T>) -> Result<T> {
+    if exclusive || data.exists() {
+        crate::check_data(data)?;
+    }
     if exclusive {
         DirBuilder::new().recursive(true).mode(0o700).create(data)?;
     }

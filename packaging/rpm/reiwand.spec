@@ -41,7 +41,7 @@ one. They appear in the library, can be removed from it, and leave it with this 
 %autosetup -n reiwand-%{reiwand_version}-x86_64-linux
 
 %install
-install -Dm755 -t %{buildroot}%{_bindir} bin/reiwandd bin/reiwand-ctl bin/reiwand-app bin/reiwand-web
+install -Dm755 -t %{buildroot}%{_bindir} bin/reiwandd bin/reiwand-ctl bin/reiwand-app bin/reiwand-web bin/reiwand-upgrade
 mkdir -p %{buildroot}%{_userunitdir} %{buildroot}%{_datadir}/dbus-1/services %{buildroot}%{_datadir}/plasma/wallpapers %{buildroot}%{_datadir}/plasma/plasmoids %{buildroot}%{_datadir}/applications
 sed 's|@BINDIR@|%{_bindir}|g' packaging/systemd/reiwandd.service > %{buildroot}%{_userunitdir}/reiwandd.service
 sed 's|@BINDIR@|%{_bindir}|g' packaging/dbus/io.github.reiwand.Daemon.service > %{buildroot}%{_datadir}/dbus-1/services/io.github.reiwand.Daemon.service
@@ -68,6 +68,7 @@ install -Dm644 -t %{buildroot}%{_datadir}/reiwand/examples examples/*.wpak
 %doc README.md
 %{_bindir}/reiwandd
 %{_bindir}/reiwand-ctl
+%{_bindir}/reiwand-upgrade
 %{_bindir}/reiwand-app
 %{_bindir}/reiwand-web
 %{_userunitdir}/reiwandd.service

@@ -10,6 +10,7 @@ StartLimitBurst=5
 [Service]
 Type=dbus
 BusName=io.github.reiwand.Daemon
+ExecStartPre=@BINDIR@/reiwand-upgrade client
 ExecStart=@BINDIR@/reiwandd
 Restart=on-failure
 RestartSec=2

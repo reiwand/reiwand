@@ -16,7 +16,7 @@ fn now() -> i64 {
 #[tokio::test(flavor = "multi_thread")]
 async fn upload_review_publish_and_install_with_a_verifying_client() {
     let server = start(&[]).await;
-    let root = reiwand_server::init(&server.cfg, "Example wallpapers", false, false).unwrap();
+    reiwand_server::init(&server.cfg, "Example wallpapers", false, false).unwrap();
     let admin = server.admin().await;
     let ana = server.user(&admin, "ana", "user").await;
     let wpak = package(server.dir.path(), DAWN, "1.0.0");
@@ -26,7 +26,7 @@ async fn upload_review_publish_and_install_with_a_verifying_client() {
         (Some("pending_review"), Some(DAWN)),
         "{status}"
     );
-    let (_, catalog) = server.json(Method::GET, "/api/v1/catalog", &Who::Nobody, None).await;
+    let (_, catalog) = server.json(Method::GET, "/api/v1/r/main/catalog", &Who::Nobody, None).await;
     assert!(catalog["items"].as_array().unwrap().is_empty());
     let (status, queue) = server.json(Method::GET, "/api/v1/mod/queue", &admin, None).await;
     assert_eq!(status, StatusCode::OK);
@@ -51,13 +51,12 @@ async fn upload_review_publish_and_install_with_a_verifying_client() {
     assert_eq!((status, decided["state"].as_str()), (StatusCode::OK, Some("published")), "{decided}");
     let (status, published) = server.json(Method::POST, "/api/v1/admin/repo/publish", &admin, None).await;
     assert_eq!(status, StatusCode::OK, "{published}");
-    let (_, catalog) = server.json(Method::GET, "/api/v1/catalog?q=dawn", &Who::Nobody, None).await;
+    let (_, catalog) = server.json(Method::GET, "/api/v1/r/main/catalog?q=dawn", &Who::Nobody, None).await;
     assert_eq!(catalog["items"][0]["id"], DAWN);
     let home = server.call(Method::GET, "/?q=Dawn", &Who::Nobody).send().await.unwrap().text().await.unwrap();
     assert!(home.contains("Dawn 1.0.0"));
     let info = reiwand_server::status(&server.cfg).unwrap();
     let url = info["url"].as_str().unwrap().to_string();
-    assert!(url.contains(&root.fingerprint));
     let data = server.dir.path().join("client");
     let (client, check) = (data.clone(), url.clone());
     let added = tokio::task::spawn_blocking(move || add_repo(&client, &HttpFetch, &check, now()))
@@ -78,13 +77,18 @@ async fn upload_review_publish_and_install_with_a_verifying_client() {
     assert!(stolen["errors"][0].as_str().unwrap().contains("another account"), "{stolen}");
     let preview =
         reiwand_format::sha256_file(server.dir.path().join(format!("src-{DAWN}-1.0.0/preview.png")));
-    let preview = format!("/repo/previews/{}.png", preview.unwrap());
+    let preview = format!("/r/main/previews/{}.png", preview.unwrap());
     let shown = server.call(Method::GET, &preview, &Who::Nobody).send().await.unwrap();
     assert_eq!(shown.status(), StatusCode::OK);
     let report = json!({"category": "malware", "details": "hidden payload"});
     assert_eq!(
         server
-            .json(Method::POST, &format!("/api/v1/packages/{DAWN}/reports"), &Who::Nobody, Some(report))
+            .json(
+                Method::POST,
+                &format!("/api/v1/r/main/packages/{DAWN}/reports"),
+                &Who::Nobody,
+                Some(report)
+            )
             .await
             .0,
         StatusCode::CREATED
@@ -107,7 +111,7 @@ async fn upload_review_publish_and_install_with_a_verifying_client() {
     );
     server.json(Method::POST, "/api/v1/admin/repo/publish", &admin, None).await;
     let gone = server
-        .call(Method::GET, &format!("/repo/packages/{DAWN}/1.0.0.wpak"), &Who::Nobody)
+        .call(Method::GET, &format!("/r/main/packages/{DAWN}/1.0.0.wpak"), &Who::Nobody)
         .send()
         .await
         .unwrap();
@@ -150,8 +154,14 @@ async fn signatures_blocklist_and_web_uploads() {
         StatusCode::CREATED
     );
     let size = fs::metadata(&plain).unwrap().len();
-    let (status, _) =
-        server.json(Method::POST, "/api/v1/uploads", &ana, Some(json!({"size": size, "sha256": sha}))).await;
+    let (status, _) = server
+        .json(
+            Method::POST,
+            "/api/v1/uploads",
+            &ana,
+            Some(json!({"size": size, "sha256": sha, "repo": "main"})),
+        )
+        .await;
     assert_eq!(status, StatusCode::FORBIDDEN);
     assert_eq!(
         server
@@ -165,13 +175,14 @@ async fn signatures_blocklist_and_web_uploads() {
     let part = Part::bytes(fs::read(&plain).unwrap()).file_name("dusk.wpak");
     let page = server
         .call(Method::POST, "/upload?back=/account", &ana)
-        .multipart(Form::new().part("package", part))
+        .multipart(Form::new().text("repo", "main").part("package", part))
         .send()
         .await
         .unwrap();
     assert_eq!((page.status(), content_type(&page).starts_with("text/html")), (StatusCode::OK, true));
     assert!(page.text().await.unwrap().contains("published"));
-    let (_, item) = server.json(Method::GET, "/api/v1/packages/org.example.dusk", &Who::Nobody, None).await;
+    let (_, item) =
+        server.json(Method::GET, "/api/v1/r/main/packages/org.example.dusk", &Who::Nobody, None).await;
     assert_eq!(item["owner"], "ana");
     let page = server
         .call(Method::GET, "/packages/org.example.dusk", &Who::Nobody)

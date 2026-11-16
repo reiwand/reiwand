@@ -19,12 +19,11 @@ MANIFEST
   "$BIN/reiwand-ctl" repo add repo lagoon.wpak >/dev/null
   "$BIN/reiwand-ctl" repo publish repo --key online.key >/dev/null
 )
-anchor=$("$BIN/reiwand-ctl" repo status "$site/repo" | sed -n 's/^anchor = //p')
 sport=$(python3 -c "import socket; s = socket.socket(); s.bind(('127.0.0.1', 0)); print(s.getsockname()[1])")
 python3 -m http.server --bind 127.0.0.1 --directory "$site/repo" "$sport" >"$WORK/http.log" 2>&1 & pids+=($!)
 wait_for 10 python3 -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:$sport/entry/latest')" ||
   fail "the repository of the studio did not start"
-a remote add "http://127.0.0.1:$sport/$anchor" --wait >/dev/null
+a remote add "http://127.0.0.1:$sport/" --wait >/dev/null
 a server sync --wait >/dev/null
 b server sync --wait >/dev/null
 offers() { b server status --json | jq_ "[o['id'] for o in r['account']['offers'] if o['name'] == 'Studio']"; }

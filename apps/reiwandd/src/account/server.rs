@@ -51,12 +51,14 @@ impl Daemon {
         if !found["api"].as_array().is_some_and(|api| api.contains(&json!("v1"))) {
             return Err(failed("this address does not serve a Reiwand server"));
         }
-        let repo = found["repository"]["url"].as_str().filter(|repo| same_origin(repo, url));
+        let listed = found["repositories"].as_array().into_iter().flatten();
+        let first = { listed }.find(|r| r["url"].as_str().is_some_and(|repo| same_origin(repo, url)));
+        let repo = first.and_then(|r| r["url"].as_str());
         let name = found["name"].as_str().unwrap_or_default().chars().filter(|c| !c.is_control()).take(128);
         self.update(|s| {
             (s.url, s.name, s.pin) = (url.to_owned(), name.collect(), pin);
             s.repo_url = repo.map(String::from);
-            s.repo_id = found["repository"]["repo_id"].as_str().filter(|_| repo.is_some()).map(String::from);
+            s.repo_id = first.and_then(|r| r["repo_id"].as_str()).map(String::from);
         })?;
         Ok(json!({"name": found["name"], "registration": found["registration"], "repository": repo}))
     }

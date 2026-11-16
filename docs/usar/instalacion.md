@@ -68,6 +68,23 @@ KWindowSystem y plasma-workspace; en Debian y Ubuntu vienen en `qml6-module-org-
 Kirigami y el estilo de escritorio de KDE (`qml6-module-org-kde-kirigami` y
 `qml6-module-org-kde-qqc2desktopstyle`).
 
+## Actualizar desde 1.x
+
+La versión 2.0.0 ya no entiende los formatos de la 1.x dentro de los programas: un programa aparte,
+`reiwand-upgrade`, los convierte una sola vez y se puede repetir sin riesgo.
+
+- Escritorio: `install.sh`, el servicio de usuario (también con el paquete RPM) y el Flatpak lo
+  ejecutan solos antes de que arranque el demonio. A mano: `reiwand-upgrade client`.
+- Teléfono: la app lo ejecuta sola al actualizarse. Quita las huellas de las direcciones guardadas de
+  repositorios y no descarga nada.
+- Servidor: la imagen lo ejecuta al arrancar; sin la imagen, `reiwand-upgrade server --data DIR` con el
+  servidor parado. Antes guarda una copia de la base junto a ella.
+
+Si un programa se niega a arrancar diciendo que los datos son de una versión anterior, ejecuta ese
+comando. Las direcciones de la 1.x con `?fingerprint=` o `?repo_id=` ya no se aceptan: usa la dirección
+simple del repositorio. Una dirección sincronizada de un repositorio que un servidor 1.x daba en `/repo/`
+pasa a `/r/main/`.
+
 ## Versiones
 
 Las versiones siguen Semantic Versioning 2.0.0 de forma estricta. GitVersion las calcula en la CI

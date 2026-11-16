@@ -19,7 +19,7 @@ async fn mature_uploads_carry_their_label_and_the_catalog_filters_by_rating_and_
     upload(&server, &ana, &package(server.dir.path(), "org.example.dawn", "1.0.0")).await;
     upload(&server, &ana, &package(server.dir.path(), "org.example.noon", "1.0.0")).await;
     let early = json!({"id": "org.example.noon", "reason": "Hidden before it was approved."});
-    let (status, _) = server.json(Method::POST, "/api/v1/mod/hidden", &admin, Some(early)).await;
+    let (status, _) = server.json(Method::POST, "/api/v1/r/main/mod/hidden", &admin, Some(early)).await;
     assert_eq!(status, StatusCode::OK);
     let (_, queue) = server.json(Method::GET, "/api/v1/mod/queue", &admin, None).await;
     for case in queue["items"].as_array().unwrap().iter().map(|c| c["id"].as_i64().unwrap()) {
@@ -32,7 +32,7 @@ async fn mature_uploads_carry_their_label_and_the_catalog_filters_by_rating_and_
         let server = &server;
         async move {
             let (_, found) =
-                server.json(Method::GET, &format!("/api/v1/catalog{query}"), &Who::Nobody, None).await;
+                server.json(Method::GET, &format!("/api/v1/r/main/catalog{query}"), &Who::Nobody, None).await;
             found["items"]
                 .as_array()
                 .unwrap()
@@ -52,19 +52,23 @@ async fn mature_uploads_carry_their_label_and_the_catalog_filters_by_rating_and_
     let page = server.call(Method::GET, "/packages/org.example.dusk", &Who::Nobody).send().await.unwrap();
     assert!(!page.text().await.unwrap().contains("class=\"veil\""));
     let hide = json!({"id": "org.example.dawn", "reason": "Shown by mistake in the catalog."});
-    let (status, _) = server.json(Method::POST, "/api/v1/mod/hidden", &admin, Some(hide.clone())).await;
+    let (status, _) =
+        server.json(Method::POST, "/api/v1/r/main/mod/hidden", &admin, Some(hide.clone())).await;
     assert_eq!(status, StatusCode::OK);
-    let (status, _) = server.json(Method::POST, "/api/v1/mod/hidden", &ana, Some(hide)).await;
+    let (status, _) = server.json(Method::POST, "/api/v1/r/main/mod/hidden", &ana, Some(hide)).await;
     assert_eq!(status, StatusCode::FORBIDDEN);
     assert_eq!(ids("").await, ["org.example.dusk", "org.example.night"]);
     assert_eq!(ids("?q=dawn").await, ["org.example.dusk", "org.example.night"]);
-    let (_, hidden) = server.json(Method::GET, "/api/v1/packages/org.example.dawn", &Who::Nobody, None).await;
+    let (_, hidden) =
+        server.json(Method::GET, "/api/v1/r/main/packages/org.example.dawn", &Who::Nobody, None).await;
     assert_eq!(hidden["hidden"], "Shown by mistake in the catalog.", "{hidden}");
     let (_, listed) = server.json(Method::GET, "/api/v1/mod/hidden", &admin, None).await;
     assert_eq!(listed["items"][0]["id"], "org.example.dawn", "{listed}");
-    let (status, _) = server.json(Method::DELETE, "/api/v1/mod/hidden/org.example.night", &admin, None).await;
+    let (status, _) =
+        server.json(Method::DELETE, "/api/v1/r/main/mod/hidden/org.example.night", &admin, None).await;
     assert_eq!(status, StatusCode::NOT_FOUND);
-    let (_, dusk) = server.json(Method::GET, "/api/v1/packages/org.example.dusk", &Who::Nobody, None).await;
+    let (_, dusk) =
+        server.json(Method::GET, "/api/v1/r/main/packages/org.example.dusk", &Who::Nobody, None).await;
     assert_eq!((&dusk["content"], &dusk["photosensitive"]), (&json!("general"), &json!(true)), "{dusk}");
     assert_eq!(dusk["facets"], json!(["android", "desktop", "landscape", "photosensitive"]));
     let page = server.call(Method::GET, "/packages/org.example.dusk", &Who::Nobody).send().await.unwrap();
@@ -82,7 +86,8 @@ async fn mature_uploads_carry_their_label_and_the_catalog_filters_by_rating_and_
     let rated: Vec<_> = found.iter().map(|i| (i.id.as_str(), i.release.photosensitive)).collect();
     assert_eq!(rated, [("org.example.dusk", Some(true)), ("org.example.night", Some(true))]);
     assert!(found[1].release.content.as_ref().is_some_and(|c| c.mature()));
-    let (status, _) = server.json(Method::DELETE, "/api/v1/mod/hidden/org.example.dawn", &admin, None).await;
+    let (status, _) =
+        server.json(Method::DELETE, "/api/v1/r/main/mod/hidden/org.example.dawn", &admin, None).await;
     assert_eq!(status, StatusCode::OK);
     assert_eq!(ids("?q=dawn").await.len(), 3);
 }

@@ -36,7 +36,7 @@ pub(crate) fn counts(ids: &[String]) -> Result<Value, Error> {
         return Ok(none(&repo));
     }
     let mut found = Map::new();
-    for query in reiwand_format::vote_queries(&asked) {
+    for query in reiwand_format::vote_queries(&server::repo_name()?, &asked) {
         found.extend(answer(query, None)?["items"].as_object().cloned().unwrap_or_default());
     }
     let count = |id: &str| found.get(id).cloned().unwrap_or(Value::Null);
@@ -61,5 +61,5 @@ pub(crate) fn cast(id: &str, vote: &str) -> Result<Value, Error> {
             &[],
         ));
     };
-    answer(format!("/api/v1/packages/{id}/vote"), Some(json!({ "vote": vote })))
+    answer(format!("/api/v1/r/{}/packages/{id}/vote", server::repo_name()?), Some(json!({ "vote": vote })))
 }

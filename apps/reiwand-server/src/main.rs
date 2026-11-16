@@ -22,7 +22,7 @@ enum Command {
     #[command(about = "Run the server (the default)")]
     Serve,
     #[command(about = "Create the database if it is missing, check its version and exit")]
-    Migrate,
+    Prepare,
     #[command(about = "Exit with 0 when the local server answers /healthz")]
     Healthcheck,
     #[command(about = "Print a new one-time token that creates an administrator at /setup")]
@@ -127,7 +127,7 @@ fn run(command: Command) -> Result<String> {
         Command::Fingerprint => {
             Ok(lan::fingerprint(&lan::certificate(&cfg.data, &lan::host(&cfg.public_url))?.0))
         }
-        Command::Migrate => App::open(cfg).map(|_| "The database is ready".into()),
+        Command::Prepare => App::open(cfg).map(|_| "The database is ready".into()),
         Command::Healthcheck => healthcheck(cfg.listen.port()).map(|()| String::new()),
         Command::SetupToken => runtime()?.block_on(App::open(cfg)?.setup_token()),
         Command::Repo(Repo::Init { name, repo, require_author_signature, online_authors }) => {

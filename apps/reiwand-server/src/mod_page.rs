@@ -135,7 +135,7 @@ pub async fn screen(app: &App, auth: &Auth, lead: Lead, cases: Vec<Value>) -> Re
             }
             (queue(&cases, allowed))
             (withdrawn(&items))
-            (more())
+            (more(&crate::scope::first(app)))
         },
     };
     Ok(page_in(app, Some(auth), Frame::new(t("Review")).line(line), "/mod", body))

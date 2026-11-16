@@ -25,6 +25,8 @@ pub enum Action {
     Hide {
         #[arg(help = "Package id")]
         id: String,
+        #[arg(long, help = "Name of the repository of the server that holds it")]
+        repo: String,
         #[arg(long, help = "Reason the author sees, at least 10 characters")]
         reason: String,
     },
@@ -32,6 +34,8 @@ pub enum Action {
     Unhide {
         #[arg(help = "Package id")]
         id: String,
+        #[arg(long, help = "Name of the repository of the server that holds it")]
+        repo: String,
     },
     #[command(about = "List the hidden packages and why")]
     Hidden {
@@ -46,12 +50,19 @@ pub async fn run(m: Moderate) -> Result<()> {
         Err(_) => secret(&tr(told("Personal token of a moderator with the mod scope: ")), false)?,
     };
     let api = Api::new(&m.server)?.with_token(token.trim());
-    let path = |id: &str| format!("/api/v1/mod/hidden/{}", utf8_percent_encode(id, NON_ALPHANUMERIC));
+    let path = |repo: &str, id: &str| {
+        format!(
+            "/api/v1/r/{}/mod/hidden/{}",
+            utf8_percent_encode(repo, NON_ALPHANUMERIC),
+            utf8_percent_encode(id, NON_ALPHANUMERIC)
+        )
+    };
     match m.action {
-        Action::Hide { id, reason } => {
-            drop(api.post("/api/v1/mod/hidden", json!({"id": id, "reason": reason})).await?)
+        Action::Hide { id, repo, reason } => {
+            let at = format!("/api/v1/r/{}/mod/hidden", utf8_percent_encode(&repo, NON_ALPHANUMERIC));
+            drop(api.post(&at, json!({"id": id, "reason": reason})).await?)
         }
-        Action::Unhide { id } => drop(api.call(Method::DELETE, &path(&id), None).await?),
+        Action::Unhide { id, repo } => drop(api.call(Method::DELETE, &path(&repo, &id), None).await?),
         Action::Hidden { json: true } => println!("{}", api.get("/api/v1/mod/hidden").await?),
         Action::Hidden { json: false } => {
             let list = api.get("/api/v1/mod/hidden").await?;

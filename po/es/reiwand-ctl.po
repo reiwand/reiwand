@@ -4199,12 +4199,8 @@ msgid "Add a repository by pasting its address (or a folder)"
 msgstr "Añadir un repositorio pegando su dirección (o una carpeta)"
 
 #: apps/reiwand-ctl/src/remote.rs
-msgid ""
-"Address of the repository, or a folder; an old address may carry ?"
-"fingerprint=... or ?repo_id=..."
-msgstr ""
-"Dirección del repositorio, o una carpeta; una dirección antigua puede llevar "
-"?fingerprint=... o ?repo_id=..."
+msgid "Address of the repository, or a folder"
+msgstr "Dirección del repositorio, o una carpeta"
 
 #: apps/reiwand-ctl/src/remote.rs
 msgid ""
@@ -4457,10 +4453,8 @@ msgid "Secret key file"
 msgstr "Archivo de clave secreta"
 
 #: apps/reiwand-ctl/src/repo.rs
-msgid ""
-"Print the signing state of the root and the query that anchors the repository"
-msgstr ""
-"Imprimir el estado de firma de la raíz y la consulta que ancla el repositorio"
+msgid "Print the signing state of the root and the address of the repository"
+msgstr "Imprimir el estado de firma de la raíz y la dirección del repositorio"
 
 #: apps/reiwand-ctl/src/repo.rs
 msgid "Add packages to the catalog; publish them next"
@@ -4595,9 +4589,13 @@ msgstr ""
 "Verificar un repositorio publicado como lo haría un cliente, sin instalar "
 "nada"
 
+#: apps/reiwand-ctl/src/moderate.rs
+msgid "Name of the repository of the server that holds it"
+msgstr "Nombre del repositorio del servidor que lo guarda"
+
 #: apps/reiwand-ctl/src/repo.rs
-msgid "URL of the repository with its anchor query, or its folder"
-msgstr "URL del repositorio con su consulta de anclaje, o su carpeta"
+msgid "URL of the repository, or its folder"
+msgstr "URL del repositorio, o su carpeta"
 
 #: apps/reiwand-ctl/src/repo.rs
 msgid "Secret file of an online key"

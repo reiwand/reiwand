@@ -115,7 +115,7 @@ pub struct App {
 
 impl App {
     pub fn open(cfg: Config) -> anyhow::Result<Arc<App>> {
-        for dir in ["db", "blobs", "thumbs", "held", "tmp", "keys", "repo", "logs", "backups"] {
+        for dir in ["db", "blobs", "thumbs", "held", "tmp", "keys", "repos", "logs", "backups"] {
             DirBuilder::new().recursive(true).mode(0o700).create(cfg.data.join(dir))?;
         }
         let db = db::Db::open(&cfg.data.join("db/reiwand.sqlite"))?;

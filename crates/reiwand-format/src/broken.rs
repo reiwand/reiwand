@@ -57,7 +57,7 @@ pub(crate) fn recover(data: &Path, fetch: &dyn Fetch, repo_id: &str, now: i64) -
     let lost = || Error::Missing(format!("the address of repository {repo_id}; add it again or remove it"));
     ensure(!state.bases.is_empty(), lost)?;
     let (anchor, floor) = (state.bases[0].clone(), state.root_version);
-    let anchor = Anchor { base: anchor, fingerprint: None, repo_id: Some(repo_id.into()) };
+    let anchor = Anchor { base: anchor, repo_id: Some(repo_id.into()) };
     let snap = refresh(fetch, state, None, &BTreeMap::new(), Some(&anchor), now)?;
     let older = || {
         Error::Rollback(format!(
@@ -74,7 +74,7 @@ fn seed(dir: &Path, repo_id: &str, root: Option<&Root>) -> State {
         let mirrors = root.map_or(&[][..], |r| &r.mirrors[..]).iter();
         let bases: Vec<String> =
             mirrors.filter(|m| !local(m)).map(|m| format!("{}/", m.trim_end_matches('/'))).collect();
-        let url = bases.first().map(|b| format!("{b}?repo_id={repo_id}")).unwrap_or_default();
+        let url = bases.first().cloned().unwrap_or_default();
         State { url, bases, repo_id: repo_id.into(), ..State::default() }
     })
 }

@@ -5864,3 +5864,19 @@ msgid ""
 msgstr ""
 "La imagen queda quieta: se canceló la creación de sus capas de profundidad. "
 "Vuelve a aplicarla o inténtalo de nuevo para crearlas."
+
+#: crates/reiwand-format/src/fetch.rs
+msgid ""
+"a repository address has no parameters: use the plain address, without "
+"?fingerprint= or ?repo_id="
+msgstr ""
+"una dirección de repositorio no lleva parámetros: usa la dirección simple, "
+"sin ?fingerprint= ni ?repo_id="
+
+#: crates/reiwand-format/src/said.rs
+msgid ""
+"the stored repositories were made by an older version: run reiwand-upgrade "
+"client --data \"%1\" once"
+msgstr ""
+"los repositorios guardados los hizo una versión anterior: ejecuta una vez "
+"reiwand-upgrade client --data \"%1\""

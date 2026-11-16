@@ -66,7 +66,6 @@ impl Daemon {
         let fetch = crate::repos::fetcher(self, ctl, &[format!("{site}/")]).ok()?;
         let body = fetch.get(&format!("{site}/"), ".well-known/reiwand-server", 256 << 10).ok()??;
         let found: Value = serde_json::from_slice(&body).ok()?;
-        // discovery lists the public repositories as {name, url, ...} (docs/specs/server.md, Discovery)
         let listed: Vec<String> = found["repositories"]
             .as_array()
             .into_iter()
@@ -75,13 +74,12 @@ impl Daemon {
             .take(5)
             .collect();
         let named = found["name"].as_str().unwrap_or(site);
-        Some(match (listed.is_empty(), found["repository"]["url"].as_str()) {
-            (false, _) => format!(
+        Some(match listed.is_empty() {
+            false => format!(
                 "this is a server, not a repository: paste the address of one of its repositories: {}",
                 listed.join(", ")
             ),
-            (true, Some(own)) => format!("this is a server, not a repository: its repository is at {own}"),
-            (true, None) => format!("this is a server, not a repository: {named} has no public repository"),
+            true => format!("this is a server, not a repository: {named} has no public repository"),
         })
     }
 }

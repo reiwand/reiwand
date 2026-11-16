@@ -72,19 +72,15 @@ fn ids_specs_and_urls_cannot_escape() {
     assert!(matches!(update_repo(&repo.data, &FileFetch, "../x", NOW), Err(Error::Invalid { .. })));
     assert!(matches!(remove_repo(&repo.data, ".."), Err(Error::Invalid { .. })));
     assert!(matches!(remove(&repo.data, "../x", None), Err(Error::NotFound(_))));
-    for url in ["file:///example/repo/?repo_id=../../etc", "file:///example/repo/?fingerprint=00"] {
+    for url in [
+        "file:///example/repo/?repo_id=../../etc",
+        "file:///example/repo/?fingerprint=00",
+        &format!("https://example.org/r?fingerprint={}", "ab".repeat(32)),
+    ] {
         assert!(matches!(Anchor::parse(url), Err(Error::Invalid { .. })), "{url}");
     }
     let plain = Anchor::parse("https://example.org/repo").unwrap();
-    assert_eq!(
-        (plain.base.as_str(), plain.fingerprint, plain.repo_id),
-        ("https://example.org/repo/", None, None)
-    );
-    let anchor = Anchor::parse(&format!("https://example.org/r?fingerprint={}", "AB".repeat(32))).unwrap();
-    assert_eq!(
-        (anchor.base.as_str(), anchor.fingerprint.unwrap()),
-        ("https://example.org/r/", "ab".repeat(32))
-    );
+    assert_eq!((plain.base.as_str(), plain.repo_id), ("https://example.org/repo/", None));
 }
 
 #[test]

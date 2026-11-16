@@ -1,6 +1,6 @@
 use crate::db::rows;
 use crate::error::{Problem, Res};
-use crate::scope::{Scope, both};
+use crate::scope::{Scope, at};
 use crate::web::text;
 use crate::{Reply, Router, St};
 use axum::Json;
@@ -35,9 +35,9 @@ const NEWEST: &str = " WHERE v.repo = ?10 AND v.state = 'published' AND p.hidden
                       ORDER BY v.published_at DESC, v.id DESC LIMIT ?6";
 
 pub fn routes() -> Router {
-    let router = both(Router::new(), "/api/v1/catalog", get(list));
-    let router = both(router, "/api/v1/packages/{id}", get(package));
-    both(router, "/api/v1/packages/{id}/versions", get(versions))
+    let router = at(Router::new(), "/api/v1/catalog", get(list));
+    let router = at(router, "/api/v1/packages/{id}", get(package));
+    at(router, "/api/v1/packages/{id}/versions", get(versions))
 }
 
 #[derive(Deserialize, Default)]

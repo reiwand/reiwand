@@ -11,7 +11,7 @@ use serde::Deserialize;
 use serde_json::json;
 
 pub fn routes() -> Router {
-    crate::scope::both(Router::new(), "/api/v1/me/packages/{id}/visibility", post(set))
+    crate::scope::at(Router::new(), "/api/v1/me/packages/{id}/visibility", post(set))
 }
 
 #[derive(Deserialize)]

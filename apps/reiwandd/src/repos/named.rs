@@ -19,8 +19,7 @@ impl From<reiwand_format::Error> for Error {
             | F::Mismatch(_)
             | F::SizeMismatch(_)
             | F::Rollback(_)
-            | F::Equivocation(_)
-            | F::Unanchored(_) => Error::Named(UNTRUSTED, e.to_string()),
+            | F::Equivocation(_) => Error::Named(UNTRUSTED, e.to_string()),
             e => failed(e.to_string()),
         }
     }

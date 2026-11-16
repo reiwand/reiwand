@@ -35,17 +35,20 @@ impl Daemon {
         if !reiwand_format::valid_id(id) || !matches!(visibility, "public" | "unlisted") {
             return Err(invalid("give a package id and public or unlisted"));
         }
+        let name = self.server_repo_name()?;
         let (api, _) = self.account_api(true)?;
         let version = Some(version).filter(|v| !v.is_empty());
         let body = json!({"visibility": visibility, "version": version});
-        block_on(api.post(&format!("/api/v1/me/packages/{id}/visibility"), body)).map_err(sync_error)?;
+        block_on(api.post(&format!("/api/v1/r/{name}/me/packages/{id}/visibility"), body))
+            .map_err(sync_error)?;
         Ok(())
     }
 
     fn send_package(&self, path: &Path, size: u64, visibility: &str, ctl: &Ctl) -> Result<Value> {
+        let name = self.server_repo_name()?;
         let (api, _) = self.account_api(true)?;
         let sha256 = reiwand_format::sha256_file(path)?;
-        let asked = json!({"size": size, "sha256": sha256, "visibility": visibility});
+        let asked = json!({"size": size, "sha256": sha256, "visibility": visibility, "repo": name});
         let opened = block_on(api.post("/api/v1/uploads", asked)).map_err(sync_error)?;
         let id = opened["id"].as_str().unwrap_or_default().to_owned();
         if visibility != "public" && opened["visibility"] != visibility {

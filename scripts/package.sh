@@ -21,7 +21,7 @@ SRC=$STAGE/src
 D=$STAGE/$NAME
 mkdir -p "$SRC" "$D/bin" "$D/packaging"
 git -C "$ROOT" archive HEAD integrations packaging scenes scripts/plasma-assets.sh apps/reiwand-app/look apps/reiwand-app/qml/facade/Look.qml LICENSE README.md | tar -x -C "$SRC"
-for bin in reiwandd reiwand-ctl reiwand-app reiwand-web; do
+for bin in reiwandd reiwand-ctl reiwand-app reiwand-web reiwand-upgrade; do
   install -m755 "$BIN/$bin" "$D/bin/"
   objcopy --remove-section=.comment "$D/bin/$bin"
 done

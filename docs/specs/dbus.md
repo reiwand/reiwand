@@ -1662,7 +1662,7 @@ as `file_secrets`.
 
 Signed repositories of `.wpak` packages (see `repo.md`), kept in `~/.local/share/reiwand`.
 `repo` arguments take a full repository id or a unique prefix of at least 8 hex digits. Trust is
-anchored by the first `root/1.json` read at the address it is added with (its hash is the `repo_id`; an old address may carry `fingerprint=` and/or `repo_id=` too); repository
+anchored by the first `root/1.json` read at the address it is added with (its hash is the `repo_id`; an address has no parameters); repository
 jobs (`repo_add`, `repo_refresh` and the download of `install`) run one at a time. Requests to
 a repository follow redirects only to its declared bases (the URL it was added with and the
 mirrors of its signed root), never from HTTPS to HTTP. Installed packages are imported into the
@@ -1682,13 +1682,12 @@ read; browsing and installing skip it, and the other repositories keep working.
 
 Adds a repository by its address. The URL is `https://` with a certificate valid for a public
 authority, `file://` or `http://` to this computer, without user information or fragment; any
-other `http://` is refused with `InvalidArgs`. The query anchor is optional.
+other `http://` is refused with `InvalidArgs`; so is an address with a query (`?fingerprint=`, `?repo_id=`), with a message that says to use the plain address.
 The job fails with `CertificateUnknown` when the server's certificate is not from a known
 authority (the message carries its SHA-256 fingerprint; nothing is pinned), with
 `CertificateChanged` when the origin is already pinned (or was just confirmed) and the server
 presents another one, and with `NotARepository` when the address is a server (it answers
-`/.well-known/reiwand-server` and has no `root/1.json`; the message names its repositories page). `Exists` at once when its
-`repo_id=` names an added repository, or when the job finds it already added; a `broken` one is
+`/.well-known/reiwand-server` and has no `root/1.json`; the message names its repositories page). `Exists` when the job finds it already added; a `broken` one is
 replaced. The job verifies the repository fully and stores its signed state.
 
 ### `AddTrusting(s url, s certificate) → (t job)`
@@ -1807,6 +1806,17 @@ them next to the update and leave the package out of their "update all" action.
 
 A preview queued by `RequestPreviews` is ready, or could not be made (`path = ""`: unknown
 package, no preview, or a failed download or check).
+
+### Upgrading from 1.x
+
+The daemon knows only the current format of `~/.local/share/reiwand` (`format-version`, 2). When the
+folder holds repositories of 1.x it refuses to start and logs "the stored repositories were made by an
+older version: run reiwand-upgrade client --data DIR once". `reiwand-upgrade client --data DIR` rewrites
+the stored addresses (no `?fingerprint=` or `?repo_id=`; the first repository of a server moves from
+`/repo/` to `/r/main/`) and the account file `sync.json` once, and is safe to run again. The packaged
+installers (`install.sh`, the RPM `%posttrans`, the tarball script) and the Flatpak launcher run it before
+the daemon starts; on the phone the app runs it when it is replaced. The daemon, `reiwand-ctl` and the
+app contain no reader of the old format.
 
 ## `io.github.reiwand.Inputs1`
 
@@ -2189,7 +2199,7 @@ synced `device` record names the key the server lists.
 | `settings` | keyed hash of the section | every option except `playback.volume`, `playback.muted`, `playback.software_parallax`, `library.thumb_cache_mb` and `models.allow_download`; options and sections this version does not know are kept as synced |
 | `settings` | keyed hash | `kind` (`profile` or `preset`) and the profile or preset, with items, playlists and presets named by their synced ids; the options of a profile leave out the settings above that stay on each device, and a received profile keeps their values from this computer |
 | `device` | device id | `name`, `platform`, `key` (base64 of the public X25519 key); never applied, shown in `devices[].label` |
-| `repos` | keyed hash of the repo id | `url` (with its trust anchor), `repo_id`, `name`, `fingerprints` of the repositories added with an `https://` or loopback `http://` URL; a new one is only offered (`offers`) until `ConfirmRepo` |
+| `repos` | keyed hash of the repo id | `url` (plain), `repo_id`, `name`, `fingerprints` of the repositories added with an `https://` or loopback `http://` URL; a new one is only offered (`offers`) until `ConfirmRepo` |
 
 Every record holds per field a value and a hybrid logical clock (milliseconds, counter, device);
 a sync pulls the changes since the last head, merges each record field by field with the later
@@ -2466,9 +2476,9 @@ confirmation first. Every other device has to `Join` again.
 
 Decides on a repository that another device synced and that waits in `offers`; `repo` is its offer
 `id` or at least the first 8 digits of its `repo_id`. With `add`, returns the `repo_add` job of
-`Repos1.Add` with the synced URL, its trust anchor completed with `repo_id=`; without it the offer
+`Repos1.Add` with the synced URL; without it the offer
 is declined on this computer, returns `0`, and is not offered again. `NotFound` when no such offer
-waits, `InvalidArgs` when the URL names another repository than the record.
+waits, `InvalidArgs` when the URL is not a plain repository address (for instance one with `?fingerprint=` synced by a 1.x install).
 
 ### `SetEscrow(s passphrase) → (t job)`
 
@@ -2593,7 +2603,7 @@ cannot be one.
 ### `Vote(s id, s vote) → (s json)`
 
 Sends `up`, `down` or `none` for the package `id` to the linked server with this device's token
-(`POST /api/v1/packages/{id}/vote`) and answers `{id, up, down, mine}`. `id` is a package id of the
+(`POST /api/v1/r/{repo}/packages/{id}/vote`, the repository named in the address of the server's repository) and answers `{id, up, down, mine}`. `id` is a package id of the
 repository of the linked server, or `repo_id/id`. The server keeps only the counts
 and the vote of this account. `InvalidArgs` for another vote, an id that is not a package id, or a
 `repo_id` that is not the one of the linked server's repository (nothing is sent).

@@ -6,15 +6,16 @@ RUN sh apps/reiwand-server/skeleton.sh /skeleton
 FROM docker.io/library/rust:1.99-alpine@sha256:3ea887915f261f273d6a24efdfdb92665dee12199923e57870453644fe4ae5c9 AS dependencies
 WORKDIR /src
 COPY --from=plan /skeleton .
-RUN cargo build --release --locked -p reiwand-server
+RUN cargo build --release --locked -p reiwand-server -p reiwand-upgrade
 
 FROM dependencies AS build
 ARG REIWAND_VERSION
 ARG BUILDKIT_SBOM_SCAN_STAGE=true
 COPY . .
 RUN find apps crates -name '*.rs' -exec touch {} + \
-    && cargo build --release --locked -p reiwand-server \
+    && cargo build --release --locked -p reiwand-server -p reiwand-upgrade \
     && install -D -m 0755 target/release/reiwand-server /out/reiwand-server \
+    && install -D -m 0755 target/release/reiwand-upgrade /out/reiwand-upgrade \
     && install -d -m 0700 /out/data \
     && install -m 0644 packaging/THIRD-PARTY-NOTICES LICENSE /out/ \
     && rm -rf target "$CARGO_HOME/registry"
@@ -24,7 +25,7 @@ LABEL org.opencontainers.image.title="reiwand-server" \
       org.opencontainers.image.description="Self-hosted Reiwand server" \
       org.opencontainers.image.licenses="GPL-3.0-or-later" \
       org.opencontainers.image.source="https://github.com/reiwand/reiwand"
-COPY --from=build /out/reiwand-server /usr/local/bin/reiwand-server
+COPY --from=build /out/reiwand-server /out/reiwand-upgrade /usr/local/bin/
 COPY --from=build /out/data /data
 COPY --from=build /out/THIRD-PARTY-NOTICES /out/LICENSE /usr/share/licenses/reiwand-server/
 ENV REIWAND_DATA=/data REIWAND_LISTEN=0.0.0.0:8080
@@ -32,5 +33,5 @@ USER 0:0
 VOLUME ["/data"]
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 CMD ["/usr/local/bin/reiwand-server", "healthcheck"]
-ENTRYPOINT ["/usr/local/bin/reiwand-server"]
+ENTRYPOINT ["/usr/local/bin/reiwand-upgrade", "server", "--data", "/data", "--then", "/usr/local/bin/reiwand-server"]
 CMD ["serve"]

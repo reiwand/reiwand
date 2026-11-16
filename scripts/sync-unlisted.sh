@@ -11,7 +11,7 @@ case_id=$(review "$URL/api/v1/mod/queue" | jq_ "r['items'][0]['id']")
 review -d '{"decision": "approve", "statement": "Looks fine to publish."}' "$URL/api/v1/mod/cases/$case_id/decision" >/dev/null
 api -X POST "$URL/api/v1/admin/repo/publish" >/dev/null
 a server packages | grep 'org.example.noon 1.0.0 published unlisted' >/dev/null || fail "own packages: $(a server packages)"
-[ "$(curl -fsS "$URL/api/v1/catalog?q=noon" | jq_ "len(r['items'])")" = 0 ] || fail "the catalog lists an unlisted package"
+[ "$(curl -fsS "$URL/api/v1/r/main/catalog?q=noon" | jq_ "len(r['items'])")" = 0 ] || fail "the catalog lists an unlisted package"
 a remote refresh --wait >/dev/null
 [ "$(a pkg search noon --json | jq_ "len(r['packages'])")" = 0 ] || fail "a client browses an unlisted package"
 a pkg install org.example.noon --wait >/dev/null || fail "the link of an unlisted package does not install"
@@ -19,12 +19,12 @@ a pkg uninstall org.example.noon
 if a server visibility org.example.nope public 2>/dev/null; then fail "another package changed visibility"; fi
 a server visibility org.example.noon public
 api -X POST "$URL/api/v1/admin/repo/publish" >/dev/null
-[ "$(curl -fsS "$URL/api/v1/catalog?q=noon" | jq_ "len(r['items'])")" = 1 ] || fail "a public package is not listed"
+[ "$(curl -fsS "$URL/api/v1/r/main/catalog?q=noon" | jq_ "len(r['items'])")" = 1 ] || fail "a public package is not listed"
 if a remote vote org.example.noon sideways 2>/dev/null; then fail "a vote other than up, down or none was sent"; fi
 a remote vote org.example.noon up | grep '"up":1' >/dev/null || fail "the vote was not counted"
 a remote vote org.example.noon down | grep '"down":1,.*"up":0' >/dev/null || fail "a changed vote was counted twice"
 a remote votes org.example.noon | grep '"down":1,"mine":"down","up":0' >/dev/null || fail "counts: $(a remote votes org.example.noon)"
-curl -fsS "$URL/api/v1/catalog?q=noon" | grep '"votes":{"down":1,"up":0}' >/dev/null || fail "the catalog has no counts"
+curl -fsS "$URL/api/v1/r/main/catalog?q=noon" | grep '"votes":{"down":1,"up":0}' >/dev/null || fail "the catalog has no counts"
 server_repo=$(a remote votes org.example.noon | jq_ "r['repo_id']")
 other=$(printf '%064d' 7)
 a remote votes "$server_repo/org.example.noon" | jq_ "r['items']['$server_repo/org.example.noon']['down']" | grep -x 1 >/dev/null ||

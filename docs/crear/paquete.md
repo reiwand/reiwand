@@ -434,8 +434,7 @@ version = 1
 signers = <huella de la clave raíz>
 threshold = 1
 complete = true
-anchor = ?fingerprint=<huella de la clave raíz>&repo_id=<id>
-address = file:///ruta/a/mi-repo/?fingerprint=<huella de la clave raíz>&repo_id=<id>
+address = file:///ruta/a/mi-repo/
 ```
 
 `address` es la dirección completa de la carpeta, tal como se pega en *Añadir un repositorio* o en
@@ -476,24 +475,23 @@ confirmación. `--days` cambia lo que dura (hasta `entry_max_days`).
 
 Copia la carpeta entera a cualquier servidor de archivos estáticos. Sirve `entry/latest` con
 `Cache-Control: no-cache` y todo lo demás como inmutable. Para que otros lo agreguen, dales la
-dirección con la consulta que imprime `repo status`:
+dirección simple que imprime `repo status`:
 
 ```
-https://example.org/fondos/?fingerprint=<huella de la clave raíz>&repo_id=<id>
+https://example.org/fondos/
 ```
 
 Quien la reciba la agrega con `reiwand-ctl remote add 'DIRECCIÓN'` o desde *Repositorios* en la app.
-Para probarlo en tu equipo, una dirección `file://` con la misma consulta sirve:
+Para probarlo en tu equipo, una dirección `file://` sirve:
 
 ```
-reiwand-ctl remote add 'file:///ruta/a/mi-repo/?fingerprint=…&repo_id=…' --wait
+reiwand-ctl remote add 'file:///ruta/a/mi-repo/' --wait
 reiwand-ctl pkg search reloj
 reiwand-ctl pkg install org.example.reloj
 ```
 
 (Con el demonio en marcha, y con `--wait` en `pkg install` para que diga `Installed org.example.reloj
-1.0.0.`. `remote add` también acepta la carpeta con la misma consulta, `'mi-repo/?fingerprint=…&repo_id=…'`;
-una carpeta sin consulta falla con «needs a fingerprint or repo_id query parameter».)
+1.0.0.`. `remote add` también acepta la carpeta, `mi-repo`; una dirección con `?fingerprint=` o `?repo_id=` de la versión 1.x se rechaza.)
 
 ### Actualizar un paquete publicado
 

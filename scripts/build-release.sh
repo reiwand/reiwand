@@ -11,5 +11,5 @@ export CFLAGS="-ffile-prefix-map=$CARGO_HOME=/cargo -ffile-prefix-map=$HOME=/bui
 export CXXFLAGS=$CFLAGS
 only=()
 for bin in "$@"; do only+=(--bin "$bin"); done
-env -u SOURCE_DATE_EPOCH cargo build --release --locked --timings -p reiwandd -p reiwand-ctl -p reiwand-app -p reiwand-web \
+env -u SOURCE_DATE_EPOCH cargo build --release --locked --timings -p reiwandd -p reiwand-ctl -p reiwand-app -p reiwand-web -p reiwand-upgrade \
   "${only[@]}" --manifest-path "$ROOT/Cargo.toml"

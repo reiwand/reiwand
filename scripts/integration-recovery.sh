@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-declare anchor daemon output port
+declare daemon output port
 restored() {
   read -r _ _ _ serial < <(ctl stream TEST-1 320 180) || return 1
   [ -z "${1:-}" ] || [ "$serial" = "$1" ] || return 1
@@ -166,7 +166,7 @@ ctl provider rm twin
 kill "$kr"
 wait "$kr" 2>/dev/null || true
 echo "keyring and orphan secret checks passed"
-repo=$(ctl remote add "http://127.0.0.1:$port/$anchor" --wait --json | jq_ "r['output']['repo_id']")
+repo=$(ctl remote add "http://127.0.0.1:$port/" --wait --json | jq_ "r['output']['repo_id']")
 ctl stream TEST-12 160 90 >/dev/null
 dawn() { ctl pkg ls --json | jq_ "len([p for p in r['packages'] if p['id'] == 'org.example.dawn'])"; }
 for _ in 1 2 3; do

@@ -1,4 +1,4 @@
-use reiwand_format::{MAX_ASKED, MAX_VOTED, vote_queries, voted};
+use reiwand_format::{MAX_ASKED, MAX_VOTED, server_repo_name, vote_queries, voted};
 
 #[test]
 fn only_packages_of_the_server_repository_are_voted_on() {
@@ -34,11 +34,19 @@ fn the_packages_of_the_server_get_counts_however_many_other_rows_come_first() {
     specs.extend((0..150).map(|i| format!("{server}/org.example.ours{i}")));
     let asked = voted(&specs, Some(&server)).unwrap();
     assert_eq!(asked.len(), 150, "rows of the server after 300 others were dropped");
-    let queries = vote_queries(&asked);
+    let queries = vote_queries("main", &asked);
     assert_eq!(queries.len(), 2, "more than {MAX_VOTED} ids went in one request");
     let ids: Vec<&str> =
-        queries.iter().flat_map(|q| q.trim_start_matches("/api/v1/votes?ids=").split(',')).collect();
+        queries.iter().flat_map(|q| q.trim_start_matches("/api/v1/r/main/votes?ids=").split(',')).collect();
     assert_eq!(ids.len(), 150);
     assert!(ids.iter().all(|id| id.starts_with("org.example.ours")), "{ids:?}");
-    assert!(vote_queries(&[]).is_empty());
+    assert!(vote_queries("main", &[]).is_empty());
+}
+
+#[test]
+fn the_repository_name_is_read_from_its_address_on_the_server() {
+    assert_eq!(server_repo_name("https://h.example/r/main/"), Some("main"));
+    assert_eq!(server_repo_name("https://h.example:8443/r/second"), Some("second"));
+    assert_eq!(server_repo_name("https://h.example/repo/"), None);
+    assert_eq!(server_repo_name("https://h.example/"), None);
 }

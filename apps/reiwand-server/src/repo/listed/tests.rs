@@ -48,7 +48,7 @@ fn an_unlisted_or_hidden_approval_is_added_that_way_in_one_locked_step() {
     let data = dir.path().join("data").to_string_lossy().into_owned();
     let cfg = Config::from_vars(|key| (key == "REIWAND_DATA").then(|| data.clone())).unwrap();
     init(&cfg, "Example wallpapers", false, false).unwrap();
-    let repo = Repo::main(&cfg.data);
+    let repo = Repo::named(&cfg.data, "main");
     let now = 1_700_000_000_000;
     repo.add(&package(dir.path(), "org.example.noon"), now, Shown { hidden: false, unlisted: true }).unwrap();
     assert_eq!(release(&repo, "org.example.noon")["listed"], Value::Bool(false));

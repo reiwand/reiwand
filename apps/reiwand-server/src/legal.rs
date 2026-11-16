@@ -95,7 +95,7 @@ async fn form(State(app): St, auth: Option<Auth>, counter: bool) -> Markup {
             }
             label { (t("Exact address of the package page"))
                 input type="url" name="location" required
-                    placeholder="https://example.org/packages/org.example.name"; }
+                    placeholder="https://example.org/r/main/packages/org.example.name"; }
             label { (t("Explanation")) textarea name="explanation" rows="5" required minlength="20" {} }
             label { (t("Your name")) input name="name" autocomplete="name" required; }
             label { (t("Your email")) input type="email" name="email" autocomplete="email" required; }
@@ -137,7 +137,8 @@ async fn notice(State(app): St, auth: Option<Auth>, client: Client, Form(n): For
         package.ok_or_else(|| Problem::bad("location: the address of a package page on this server"))?;
     let repo =
         n.location.split("/r/").nth(1).and_then(|r| r.split_once("/packages/")).map(|(r, _)| r.to_string());
-    let repo = crate::scope::resolve(&app, repo.as_deref().unwrap_or_default())?.name.clone();
+    let repo = repo.ok_or_else(|| Problem::bad("location: the address of a package page of a repository"))?;
+    let repo = crate::scope::resolve(&app, &repo)?.name.clone();
     let (receipt, reason) = (hex(&random::<8>()), if n.kind == "counter" { "counter" } else { "notice" });
     let shown = receipt.clone();
     let latest = "SELECT id FROM versions WHERE repo = ?2 AND package_id = ?1 \

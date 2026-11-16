@@ -4,7 +4,7 @@ runtime-version: '6.11'
 sdk: org.kde.Sdk
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.llvm22
-command: reiwand-app
+command: reiwand-launch
 rename-desktop-file: io.github.reiwand.desktop
 rename-icon: io.github.reiwand
 copy-icon: true
@@ -41,9 +41,10 @@ modules:
     build-commands:
       - pkg-config --atleast-version=1.24 gstreamer-1.0
       - rust-dist/install.sh --prefix=/run/build/reiwand/rust --components=rustc,cargo,rust-std-$FLATPAK_ARCH-unknown-linux-gnu --disable-ldconfig
-      - REIWAND_VERSION=$(cat VERSION 2>/dev/null) cargo build --release --offline --locked -p reiwandd -p reiwand-ctl -p reiwand-web -p reiwand-app
-      - install -Dm755 -t /app/bin target/release/reiwandd target/release/reiwand-ctl target/release/reiwand-web target/release/reiwand-app
+      - REIWAND_VERSION=$(cat VERSION 2>/dev/null) cargo build --release --offline --locked -p reiwandd -p reiwand-ctl -p reiwand-web -p reiwand-app -p reiwand-upgrade
+      - install -Dm755 -t /app/bin target/release/reiwandd target/release/reiwand-ctl target/release/reiwand-web target/release/reiwand-app target/release/reiwand-upgrade
       - install -Dm755 packaging/flatpak/reiwand-plasma.sh /app/bin/reiwand-plasma
+      - install -Dm755 packaging/flatpak/reiwand-launch.sh /app/bin/reiwand-launch
       - scripts/translations.sh build
       - install -d /app/share/plasma/wallpapers /app/share/plasma/plasmoids /app/share/dbus-1/services /app/share/applications /app/share/reiwand
       - cp -r integrations/kwin-pointer /app/share/reiwand/kwin-pointer
@@ -51,6 +52,7 @@ modules:
       - cp -r integrations/plasma-tray /app/share/plasma/plasmoids/io.github.reiwand.tray
       - scripts/plasma-assets.sh /app/share/plasma/plasmoids/io.github.reiwand.tray
       - for f in packaging/dbus/*.service; do sed 's|@BINDIR@|/app/bin|' "$f" > "/app/share/dbus-1/services/${f##*/}"; done
+      - sed -i 's|^Exec=/app/bin/|Exec=/app/bin/reiwand-launch /app/bin/|' /app/share/dbus-1/services/io.github.reiwand.Daemon.service /app/share/dbus-1/services/io.github.reiwand.service
       - sed -e 's|@BINDIR@|/app/bin|' -e '/^DBusActivatable=/d' packaging/desktop/io.github.reiwand.desktop > /app/share/applications/io.github.reiwand.desktop
       - install -Dm644 -t /app/share/icons/hicolor/scalable/apps packaging/icons/io.github.reiwand.svg
       - for png in packaging/icons/hicolor/*/apps/io.github.reiwand.png; do size=$(basename "$(dirname "$(dirname "$png")")"); install -Dm644 -t "/app/share/icons/hicolor/$size/apps" "$png"; done

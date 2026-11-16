@@ -11,6 +11,8 @@ use ndk::native_window::NativeWindow;
 use std::ptr::with_exposed_provenance_mut;
 use std::time::Instant;
 
+mod upgraded;
+
 pub(crate) fn on<'a, T: Default + 'a>(
     env: &mut EnvUnowned<'a>,
     work: impl FnOnce(&mut Env<'a>) -> Result<T, Error>,

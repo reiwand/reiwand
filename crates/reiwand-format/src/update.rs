@@ -84,9 +84,7 @@ impl Run<'_> {
             })?;
             let root: Root = serde_json::from_slice(&json)?;
             root.check(1, &id)?;
-            let signers = root.meets(&root.roles.root, &json, &sig, &comment("root", 1, &id))?;
-            let anchored = anchor.fingerprint.as_ref().is_none_or(|fp| signers.contains(fp));
-            ensure(anchored, || Error::Unanchored(base.to_owned()))?;
+            root.meets(&root.roles.root, &json, &sig, &comment("root", 1, &id))?;
             Ok(Some(Doc { value: root, json, sig }))
         })?;
         let root = root.ok_or_else(|| Error::Missing("root/1.json".into()))?;

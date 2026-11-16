@@ -13,7 +13,6 @@ pub struct RootStatus {
     pub signers: Vec<String>,
     pub threshold: usize,
     pub complete: bool,
-    pub query: String,
     pub address: String,
 }
 
@@ -65,11 +64,8 @@ pub fn status(dir: &Path) -> Result<RootStatus> {
     }
     let sets: Vec<BTreeSet<String>> = roots.iter().map(signed).collect();
     let complete = roots.iter().zip(&sets).all(|(r, s)| s.len() >= r.roles.root.threshold);
-    let anchor = load(dir, 1)?.roles.root.keys.first().cloned().unwrap_or_default();
-    let query = format!("fingerprint={anchor}&repo_id={repo_id}");
     Ok(RootStatus {
-        address: address(dir, &query),
-        query,
+        address: address(dir),
         signers: sets.into_iter().flatten().collect::<BTreeSet<_>>().into_iter().collect(),
         threshold: roots[0].roles.root.threshold,
         repo_id,
@@ -78,9 +74,9 @@ pub fn status(dir: &Path) -> Result<RootStatus> {
     })
 }
 
-fn address(dir: &Path, query: &str) -> String {
+fn address(dir: &Path) -> String {
     let path = fs::canonicalize(dir).unwrap_or_else(|_| dir.to_path_buf());
-    format!("file://{}/?{query}", path.to_string_lossy().trim_end_matches('/'))
+    format!("file://{}/", path.to_string_lossy().trim_end_matches('/'))
 }
 
 pub(crate) fn latest(dir: &Path) -> Result<(String, u64)> {

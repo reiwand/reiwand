@@ -70,7 +70,7 @@ pub const TEXTS: super::Texts = &[
         "En la app de escritorio, pega la dirección del repositorio de abajo.",
     ),
     ("The web", "La web"),
-    ("Repository address, with its fingerprint", "Dirección del repositorio, con su huella"),
+    ("Repository address", "Dirección del repositorio"),
     ("Copied", "Copiado"),
     ("Copy", "Copiar"),
     ("Advanced", "Avanzado"),

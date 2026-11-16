@@ -2,7 +2,7 @@ use crate::auth::{Auth, Role};
 use crate::db::{audit, changed, now, rows};
 use crate::error::{Input, Problem, Res, require};
 use crate::lang::t;
-use crate::scope::{Scope, both, resolve};
+use crate::scope::{Scope, at, resolve};
 use crate::web::{page, text};
 use crate::{Reply, Router, St};
 use axum::Json;
@@ -25,13 +25,13 @@ pub fn routes() -> Router {
     let one = delete(|s: St, a: Auth, sc: Scope| {
         set(s, a, Feature { repo: sc.repo, id: sc.id, note: String::new() }, false)
     });
-    let router = both(router, "/api/v1/admin/featured", all);
-    both(router, "/api/v1/admin/featured/{id}", one)
+    let router = at(router, "/api/v1/admin/featured", all);
+    at(router, "/api/v1/admin/featured/{id}", one)
 }
 
 #[derive(Deserialize)]
 pub struct Feature {
-    #[serde(default)]
+    #[serde(default, skip_deserializing)]
     repo: String,
     id: String,
     #[serde(default)]
@@ -100,11 +100,13 @@ async fn screen(State(app): St, auth: Option<Auth>) -> Res<Response> {
                 button { (t("Stop featuring")) }
             } }
         } } } }
-        form method="post" action="/api/v1/admin/featured?back=/admin/featured" {
-            label { (t("Repository")) input name="repo" placeholder=(crate::scope::first(&app)); }
-            label { (t("Package id")) input name="id" required; }
-            label { (t("Note")) input name="note" maxlength="200"; }
-            button { (t("Feature")) }
+        @for repo in app.repos.ready() {
+            form method="post" action={ "/api/v1/r/" (repo.name) "/admin/featured?back=/admin/featured" } {
+                h3 { (repo.name) }
+                label { (t("Package id")) input name="id" required; }
+                label { (t("Note")) input name="note" maxlength="200"; }
+                button { (t("Feature")) }
+            }
         }
     };
     Ok(page(&app, Some(&auth), "/admin", t("Featured packages"), body).into_response())

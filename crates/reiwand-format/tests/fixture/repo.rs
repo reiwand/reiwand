@@ -34,7 +34,7 @@ impl Repo {
     }
 
     pub fn url_at(&self, dir: &Path) -> String {
-        format!("{}?fingerprint={}", file_url(dir), self.root.fingerprint)
+        file_url(dir)
     }
 
     pub fn package(&self, id: &str, version: &str, key: Option<&Keypair>) -> PathBuf {

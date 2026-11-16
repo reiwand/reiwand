@@ -14,10 +14,7 @@ pub const HOUR: i64 = 60 * MINUTE;
 pub const DAY: i64 = 24 * HOUR;
 
 const SCHEMA: &str = include_str!("../schema.sql");
-pub const SCHEMA_VERSION: i64 = 13;
-pub const MIN_SCHEMA: i64 = 11;
-const MIGRATIONS: [&str; 2] =
-    [include_str!("../migrations/11-12.sql"), include_str!("../migrations/12-13.sql")];
+pub const SCHEMA_VERSION: i64 = 14;
 
 pub fn now() -> i64 {
     SystemTime::now().duration_since(UNIX_EPOCH).map_or(0, |d| d.as_millis() as i64)
@@ -28,9 +25,6 @@ pub struct Db(Arc<Mutex<Connection>>);
 
 impl Db {
     pub fn open(path: &Path) -> anyhow::Result<Db> {
-        if path.exists() {
-            backup_before_migrating(path)?;
-        }
         let mut conn = Connection::open(path)?;
         conn.pragma_update(None, "journal_mode", "WAL")?;
         for (name, value) in [
@@ -65,50 +59,20 @@ impl Db {
 }
 
 pub fn create(conn: &mut Connection) -> anyhow::Result<()> {
-    conn.pragma_update(None, "foreign_keys", "OFF")?;
-    let done = migrate(conn);
-    conn.pragma_update(None, "foreign_keys", "ON")?;
-    done
-}
-
-fn migrate(conn: &mut Connection) -> anyhow::Result<()> {
     let tx = conn.transaction()?;
     let empty: bool = tx.query_row("SELECT count(*) = 0 FROM sqlite_master", [], |r| r.get(0))?;
-    let found = version(&tx)?;
-    match found {
+    match version(&tx)? {
         SCHEMA_VERSION => return Ok(()),
         0 if empty => tx.execute_batch(SCHEMA)?,
-        MIN_SCHEMA..SCHEMA_VERSION => {
-            for step in found..SCHEMA_VERSION {
-                tx.execute_batch(MIGRATIONS[(step - MIN_SCHEMA) as usize])?;
-            }
-            let broken: i64 =
-                tx.query_row("SELECT count(*) FROM pragma_foreign_key_check", [], |r| r.get(0))?;
-            anyhow::ensure!(broken == 0, "the migration left {broken} rows without their parent");
-            tracing::info!(from = found, to = SCHEMA_VERSION, "migrated the database");
-        }
         other => return Err(foreign(other)),
     }
     tx.pragma_update(None, "user_version", SCHEMA_VERSION)?;
     Ok(tx.commit()?)
 }
 
-fn backup_before_migrating(path: &Path) -> anyhow::Result<()> {
-    let conn = Connection::open(path)?;
-    let found = version(&conn)?;
-    if (MIN_SCHEMA..SCHEMA_VERSION).contains(&found) {
-        let copy = path.with_extension(format!("sqlite.before-v{SCHEMA_VERSION}-from-v{found}"));
-        if !copy.exists() {
-            conn.execute("VACUUM INTO ?1", [copy.to_string_lossy().as_ref()])?;
-            tracing::info!(copy = %copy.display(), "kept a copy of the database before migrating it");
-        }
-    }
-    Ok(())
-}
-
 pub fn check(conn: &Connection) -> anyhow::Result<()> {
     match version(conn)? {
-        MIN_SCHEMA..=SCHEMA_VERSION => Ok(()),
+        SCHEMA_VERSION => Ok(()),
         other => Err(foreign(other)),
     }
 }
@@ -119,8 +83,9 @@ fn version(conn: &Connection) -> rusqlite::Result<i64> {
 
 fn foreign(found: i64) -> anyhow::Error {
     let message = format!(
-        "the database was made by another version of the program (schema {found}, this one reads \
-         {MIN_SCHEMA} to {SCHEMA_VERSION}) and is not supported; it was left untouched"
+        "the database has schema {found} but this program reads {SCHEMA_VERSION}; if it was made by version \
+         1.x run `reiwand-upgrade server --data <data folder>` once (the server image does it at start); \
+         the database was left untouched"
     );
     tracing::error!("{message}");
     anyhow::anyhow!(message)

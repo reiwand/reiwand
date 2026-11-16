@@ -1,17 +1,14 @@
 use super::*;
 
 #[test]
-fn anchors_must_match() {
+fn a_repository_is_added_once() {
     let repo = Repo::new();
     repo.publish(NOW);
     let (base, id) = (file_url(&repo.dir), status(&repo.dir).unwrap().repo_id);
-    let wrong_id = format!("{base}?repo_id={}", "0".repeat(64));
-    assert!(matches!(add_repo(&repo.data, &FileFetch, &wrong_id, NOW), Err(Error::Mismatch(_))));
-    let wrong_key = format!("{base}?fingerprint={}", repo.online.fingerprint);
-    assert!(matches!(add_repo(&repo.data, &FileFetch, &wrong_key, NOW), Err(Error::Unanchored(_))));
+    let old = format!("{base}?repo_id={}", "0".repeat(64));
+    assert!(matches!(add_repo(&repo.data, &FileFetch, &old, NOW), Err(Error::Invalid { .. })));
     assert!(repos(&repo.data, NOW).unwrap().is_empty());
-    let both = format!("{base}?fingerprint={}&repo_id={id}", repo.root.fingerprint);
-    assert_eq!(add_repo(&repo.data, &FileFetch, &both, NOW).unwrap().repo_id, id);
+    assert_eq!(add_repo(&repo.data, &FileFetch, &base, NOW).unwrap().repo_id, id);
     assert!(matches!(add_repo(&repo.data, &FileFetch, &base, NOW), Err(Error::Exists(_))));
 }
 

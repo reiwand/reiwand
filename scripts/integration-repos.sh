@@ -28,16 +28,16 @@ json.dump(m, open(sys.argv[1], 'w'))" dusk/manifest.json
   ctl repo add repo night.wpak >/dev/null
   ctl repo publish repo --key online.key >/dev/null
 )
-anchor=$(ctl repo status "$site/repo" | sed -n 's/^anchor = //p')
+rid=$(ctl repo status "$site/repo" | sed -n 's/^repo_id = //p')
 port=$(python3 -c "import socket; s = socket.socket(); s.bind(('127.0.0.1', 0)); print(s.getsockname()[1])")
 python3 -m http.server --bind 127.0.0.1 --directory "$site/repo" "$port" >"$WORK/http.log" 2>&1 & pids+=($!)
 wait_for 10 python3 -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:$port/entry/latest')" ||
   fail "the repository server did not start"
 ctl remote add "http://127.0.0.1:$port/" --wait >/dev/null
-[ "$(ctl remote ls --json | jq_ "[x['repo_id'] == '${anchor##*repo_id=}' for x in r['repos']]")" = "[True]" ] ||
+[ "$(ctl remote ls --json | jq_ "[x['repo_id'] == '$rid' for x in r['repos']]")" = "[True]" ] ||
   fail "a repository added by its plain address: $(ctl remote ls --json)"
-ctl remote rm "${anchor##*repo_id=}"
-repo=$(ctl remote add "http://127.0.0.1:$port/$anchor" --wait --json | jq_ "r['output']['repo_id']")
+ctl remote rm "$rid"
+repo=$(ctl remote add "http://127.0.0.1:$port/" --wait --json | jq_ "r['output']['repo_id']")
 [ "$(ctl remote ls --json | jq_ "[(x['name'], x['hosts'], x['packages'], x['stale']) for x in r['repos']]")" = \
   "[('Example', ['127.0.0.1'], 3, False)]" ] || fail "repositories: $(ctl remote ls --json)"
 [ "$(ctl pkg search sky --json | jq_ "[(p['id'], p['version'], p['preview'], p['repo_name']) for p in r['packages']]")" = \
@@ -78,7 +78,7 @@ source "$(dirname "$0")"/integration-rotation.sh
 python3 -c "import socket, time; s = socket.socket(); s.bind(('127.0.0.1', 0)); s.listen(8)
 print(s.getsockname()[1], flush=True); time.sleep(600)" >"$WORK/stall.port" & pids+=($!)
 wait_for 5 test -s "$WORK/stall.port" || fail "the stalled server did not start"
-stalled=$(bus Repos1 Add s "http://127.0.0.1:$(cat "$WORK/stall.port")/?fingerprint=$(printf '%064d' 0)" | out "d[0]")
+stalled=$(bus Repos1 Add s "http://127.0.0.1:$(cat "$WORK/stall.port")/" | out "d[0]")
 running() { [ "$(reply "r['job']['state']" Daemon1 GetJob t "$1")" = running ]; }
 wait_for 10 running "$stalled" || fail "the stalled repository job: $(bus Daemon1 GetJob t "$stalled")"
 SECONDS=0
@@ -88,7 +88,7 @@ bus Daemon1 CancelJob t "$stalled" >/dev/null
 [ "$(ctl remote ls --json | jq_ "len(r['repos'])")" = 0 ] || fail "the repository was kept"
 [ ! -e "$preview" ] || fail "the preview was kept with its repository"
 [ ! -e "$moving" ] || fail "the animated preview was kept with its repository"
-ctl remote add "$site/repo?$anchor" --wait >/dev/null
+ctl remote add "$site/repo" --wait >/dev/null
 [ "$(ctl remote ls --json | jq_ "[(x['name'], x['url'].startswith('file://')) for x in r['repos']]")" = "[('Example', True)]" ] ||
   fail "a repository added from a folder: $(ctl remote ls --json)"
 ctl remote rm "$(ctl remote ls --json | jq_ "r['repos'][0]['repo_id']")"

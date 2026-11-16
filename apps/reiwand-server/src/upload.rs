@@ -59,7 +59,9 @@ pub(crate) fn listed(visibility: Option<&str>) -> Res<bool> {
 async fn open(State(app): St, auth: Auth, Input(o): Input<Open>) -> Res<impl IntoResponse> {
     auth.scope("upload")?;
     let shown = listed(o.visibility.as_deref())?;
-    let repo = crate::scope::resolve(&app, o.repo.as_deref().unwrap_or_default())?.name.clone();
+    let repo = o.repo.as_deref().filter(|r| !r.is_empty());
+    let repo = repo.ok_or_else(|| Problem::bad("repo: name the repository to publish to"))?;
+    let repo = crate::scope::resolve(&app, repo)?.name.clone();
     crate::access::publish(&app, &repo, &auth).await?;
     let id = start(&app, &auth, o.size, o.sha256, "open").await?;
     let (key, sql) = (id.clone(), "UPDATE uploads SET listed = ?2, repo = ?3 WHERE id = ?1");

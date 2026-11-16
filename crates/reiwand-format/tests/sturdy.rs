@@ -126,7 +126,7 @@ fn file_mirrors_serve_only_local_repositories() {
     let net = repo.copy("net");
     fs::remove_dir_all(net.join("packages")).unwrap();
     let fetch = Net(net, RefCell::default());
-    let url = format!("https://repo.test/?fingerprint={}", repo.root.fingerprint);
+    let url = "https://repo.test/".to_string();
     let info = add_repo(&repo.data, &fetch, &url, NOW).unwrap();
     assert_eq!(info.hosts, ["https://repo.test/"]);
     assert!(matches!(install(&repo.data, &fetch, DAWN, NOW, false, false), Err(Error::Missing(_))));
