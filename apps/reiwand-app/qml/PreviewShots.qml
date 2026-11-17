@@ -2,7 +2,7 @@ import QtQuick
 import org.kde.kirigami as Kirigami
 import io.github.reiwand.app
 
-Timer {
+Item {
     id: shots
 
     required property var preview
@@ -74,28 +74,30 @@ Timer {
         preview.show();
     }
 
-    interval: 900
-    repeat: true
-    running: true
-    onTriggered: {
-        if (step % 2 === 1) {
-            snap(plan[(step - 1) / 2][0]);
-        } else if (step / 2 < plan.length) {
-            const row = plan[step / 2];
-            const name = row[0], dark = row[1], count = row[2], at = row[3], blank = row[4], hover = row[5];
-            dress(dark);
-            if (name.startsWith("error"))
-                preview.fail({
-                    "message": "The service did not answer in time."
-                });
-            else
-                preview.take(state(count, at, blank));
-            if (hover)
-                Qt.callLater(() => preview.panel.reel.card(1).hovered = true);
-        } else {
-            Qt.exit(0);
+    Timer {
+        interval: 900
+        repeat: true
+        running: true
+        onTriggered: {
+            if (step % 2 === 1) {
+                snap(plan[(step - 1) / 2][0]);
+            } else if (step / 2 < plan.length) {
+                const row = plan[step / 2];
+                const name = row[0], dark = row[1], count = row[2], at = row[3], blank = row[4], hover = row[5];
+                dress(dark);
+                if (name.startsWith("error"))
+                    preview.fail({
+                        "message": "The service did not answer in time."
+                    });
+                else
+                    preview.take(state(count, at, blank));
+                if (hover)
+                    Qt.callLater(() => preview.panel.reel.card(1).hovered = true);
+            } else {
+                Qt.exit(0);
+            }
+            step++;
         }
-        step++;
     }
 
     Image {

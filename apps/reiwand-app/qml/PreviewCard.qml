@@ -34,7 +34,7 @@ Item {
     }
 
     x: home + centre - width / 2
-    y: parent.height - height
+    y: Math.round((parent.height - height) / 2)
     width: span
     height: Math.round(span / aspect)
     opacity: !shown || gone || reach === 3 ? 0 : middle ? 1 : hovered ? 1 : reach === 1 ? PreviewLook.cercaOpaca : PreviewLook.lejosOpaca
