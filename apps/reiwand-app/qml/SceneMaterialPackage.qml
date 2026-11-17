@@ -26,7 +26,7 @@ ColumnLayout {
     }
 
     function current(p) {
-        return shade.params[p.id] ?? p.default;
+        return shade.params[p.id] ?? p.prefill;
     }
 
     SceneRepeater {
