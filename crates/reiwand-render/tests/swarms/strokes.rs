@@ -16,10 +16,10 @@ fn length(pixels: &[u8], y: u32) -> u32 {
 fn relative_stretch_scales_the_side_and_may_be_shorter_than_it() {
     let Some(r) = renderer() else { return };
     let systems = json!({
-        "none": lone(10.0, json!({ "mode": "add", "time": 0, "min": 0, "max": 0 })),
-        "added": lone(30.0, json!({ "mode": "add", "time": 0.1, "min": 0, "max": 100 })),
-        "long": lone(50.0, json!({ "mode": "relative", "time": 0.05, "min": 0, "max": 10 })),
-        "short": lone(70.0, json!({ "mode": "relative", "time": 0.01, "min": 0, "max": 10 })) });
+        "none": lone(10.0, json!({ "mode": "add", "depth": "flat", "time": 0, "min": 0, "max": 0 })),
+        "added": lone(30.0, json!({ "mode": "add", "depth": "flat", "time": 0.1, "min": 0, "max": 100 })),
+        "long": lone(50.0, json!({ "mode": "relative", "depth": "flat", "time": 0.05, "min": 0, "max": 10 })),
+        "short": lone(70.0, json!({ "mode": "relative", "depth": "flat", "time": 0.01, "min": 0, "max": 10 })) });
     let layers = json!(
         ["none", "added", "long", "short"]
             .map(|id| json!({ "id": id, "type": "particles", "system": id, "blend": "add" }))
@@ -53,6 +53,33 @@ fn oscillating_from_the_floor_agrees_on_both_paths() {
         assert!(found[0].len() > 50);
         for (c, g) in found[0].iter().zip(&found[1]) {
             assert!(c.look.iter().zip(g.look).all(|(a, b)| (a - b).abs() < 0.02), "{c:?} {g:?}");
+        }
+    }
+}
+
+fn dropped(y: f32, z: f32, depth: &str) -> Value {
+    json!({ "capacity": 8, "seed": 5, "perspective": { "focal": 100 },
+        "emitters": [{ "shape": { "point": [75, y] }, "bursts": [{ "count": 1 }] }],
+        "init": { "life": [30, 30], "velocity": [[60, 0], [60, 0]], "size": [6, 6], "depth": [z, z],
+            "color": ["#ffffff", "#ffffff"] },
+        "render": { "stretch": { "mode": "add", "depth": depth, "time": 0.1, "min": 0, "max": 100 } } })
+}
+
+#[test]
+fn projected_stretch_follows_the_motion_on_screen() {
+    let Some(r) = renderer() else { return };
+    let layers = json!(
+        ["near", "far"].map(|id| json!({ "id": id, "type": "particles", "system": id, "blend": "add" }))
+    );
+    for (depth, wanted) in [("flat", [18, 9]), ("projected", [24, 4])] {
+        let systems = json!({ "near": dropped(30.0, -50.0, depth), "far": dropped(80.0, 100.0, depth) });
+        for gpu in [false, true] {
+            let Some(mut run) = Run::new(r, systems.clone(), layers.clone(), gpu) else { return };
+            run.frame(r, 0.0);
+            let pixels = (0..6).map(|_| run.frame(r, 1.0 / 30.0)).last().unwrap();
+            let rows = [20, 60].map(|y| length(&pixels, y));
+            let near = |a: u32, b: u32| a.abs_diff(b) <= 2;
+            assert!(near(rows[0], wanted[0]) && near(rows[1], wanted[1]), "{depth} gpu {gpu}: {rows:?}");
         }
     }
 }

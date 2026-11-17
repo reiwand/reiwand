@@ -1,5 +1,5 @@
 use super::seed::{Carry, Hsv, OffsetNoise, Palette, Remap, Turbulent};
-use super::{EmitShape, Periodic, Spread, is_zero};
+use super::{EmitShape, Periodic, Spread, Tilt, is_zero};
 use crate::Color;
 use crate::value::Value;
 use schemars::JsonSchema;
@@ -108,6 +108,8 @@ pub struct Init {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "px/s"))]
     pub depth_speed: Option<Spread<f32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tilt: Option<Tilt>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub remap: Vec<Remap>,
 }
@@ -119,7 +121,7 @@ impl Default for Init {
         let [life, speed, angle, size] =
             [[1.0, 2.0], [10.0, 40.0], [0.0, 360.0], [2.0, 6.0]].map(Spread::from);
         let (alpha, hsv, palette, velocity, radial, inherit, turbulent, offset_noise) = Default::default();
-        let (depth, depth_speed, remap) = Default::default();
+        let (depth, depth_speed, tilt, remap) = Default::default();
         Init {
             life,
             speed,
@@ -140,6 +142,7 @@ impl Default for Init {
             offset_noise,
             depth,
             depth_speed,
+            tilt,
             remap,
         }
     }

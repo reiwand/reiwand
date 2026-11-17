@@ -7,7 +7,7 @@ use reiwand_core::message::said;
 use reiwand_scene::{Child, Frames, Moment};
 use serde_json::{Map, Value, json};
 
-const RANGES: [&str; 16] = [
+const RANGES: [&str; 17] = [
     "life",
     "speed",
     "angle",
@@ -24,9 +24,10 @@ const RANGES: [&str; 16] = [
     "gradient",
     "depth",
     "depth_speed",
+    "tilt",
 ];
 const TINTS: [&str; 3] = ["hsv", "palette", "gradient"];
-const CLEARED: [&str; 6] = ["alpha", "velocity", "radial", "hsv", "palette", "gradient"];
+const CLEARED: [&str; 7] = ["alpha", "velocity", "radial", "hsv", "palette", "gradient", "tilt"];
 
 fn object(doc: &Value, at: &str) -> Map<String, Value> {
     doc.pointer(at).and_then(Value::as_object).cloned().unwrap_or_default()

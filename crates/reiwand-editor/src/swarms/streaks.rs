@@ -10,14 +10,36 @@ fn mean(range: &Value) -> f64 {
     (end(0) + end(1)) / 2.0
 }
 
+fn drop(system: &Value, s: &Value, speed: f64, z: f64) -> Value {
+    let focal = system["perspective"]["focal"].as_f64().unwrap_or(0.0);
+    let k = if focal > 0.0 && focal + z > 1.0 { focal / (focal + z) } else { 1.0 };
+    let num = |key: &str| s[key].as_f64().unwrap_or(0.0);
+    let side = mean(&system["init"]["size"]) * k;
+    let near = if s["depth"] == "projected" { k } else { 1.0 };
+    let reach = (num("time") * speed * near).clamp(num("min") * near, num("max").max(num("min")) * near);
+    let long = if s["mode"] == "relative" {
+        side * (num("time") * speed).clamp(num("min"), num("max").max(num("min")))
+    } else {
+        side + reach
+    };
+    json!({ "z": z, "k": k, "side": side, "long": long })
+}
+
 pub(super) fn stretch(system: &Value, render: &Value) -> Value {
     let Some(s) = render.get("stretch").filter(|s| s.is_object()) else { return Value::Null };
     let (speed, side) = (mean(&system["init"]["speed"]), mean(&system["init"]["size"]));
     let num = |k: &str| s[k].as_f64().unwrap_or(0.0);
     let reach = (num("time") * speed).clamp(num("min"), num("max").max(num("min")));
     let long = if s["mode"] == "relative" { side * reach } else { side + reach };
-    json!({ "mode": s["mode"], "time": num("time"), "min": num("min"), "max": num("max"),
-        "speed": speed, "side": side, "long": long })
+    let depth = &system["init"]["depth"];
+    let (z0, z1) = (depth[0].as_f64().unwrap_or(0.0), depth[1].as_f64().unwrap_or(0.0));
+    let drops: Vec<Value> = if system["perspective"].is_object() {
+        [z0.min(z1), z0.max(z1)].map(|z| drop(system, s, speed, z)).into()
+    } else {
+        Vec::new()
+    };
+    json!({ "mode": s["mode"], "depth": s["depth"], "time": num("time"), "min": num("min"), "max": num("max"),
+        "speed": speed, "side": side, "long": long, "drops": drops })
 }
 
 fn wave(what: &str, from: &str, scale: [f64; 2], u: f64, turn: f64) -> f64 {

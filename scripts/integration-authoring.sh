@@ -33,7 +33,7 @@ ctl scene act "$craft" particles '{"child": {"child": {"max": 3, "on": "spawn", 
 ctl scene act "$craft" particles '{"child": {"index": 0, "remove": true, "system": "dust"}}' || fail "the child was not removed"
 ctl scene act "$craft" particles '{"over": {"size": [[0, 1], [0.5, 2], [1, 0]], "system": "dust"}}' || fail "the size over life was not set"
 ctl scene act "$craft" particles '{"over": {"color": [[0, "#ffffff"], [1, "#ff000000"]], "system": "dust"}}' || fail "the color over life was not set"
-ctl scene act "$craft" particles '{"render": {"brightness": 2.5, "fps": 8, "frames": "random", "mix": true, "stretch": {"max": 40, "min": 2, "mode": "add", "time": 0.1}, "system": "dust"}}' ||
+ctl scene act "$craft" particles '{"render": {"brightness": 2.5, "fps": 8, "frames": "random", "mix": true, "stretch": {"max": 40, "min": 2, "depth": "flat", "mode": "add", "time": 0.1}, "system": "dust"}}' ||
   fail "the look of the particles was not set"
 ctl scene act "$craft" particles '{"create": {"system": "lone"}}' || fail "no lone system was created"
 ctl scene act "$craft" particles '{"delete": {"system": "lone"}}' || fail "a lone system was not deleted"

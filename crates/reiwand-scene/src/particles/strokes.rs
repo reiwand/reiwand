@@ -26,10 +26,18 @@ pub enum StretchMode {
     Relative,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum StretchDepth {
+    Flat,
+    Projected,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Stretch {
     pub mode: StretchMode,
+    pub depth: StretchDepth,
     pub time: f32,
     pub min: f32,
     pub max: f32,

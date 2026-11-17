@@ -100,6 +100,7 @@ impl Check<'_> {
                 self.issues.push(Issue::Type(format!("{p}/{name}")));
             }
         }
+        self.tilted(p, i);
         self.count(&format!("{p}/remap"), i.remap.len(), MAX_REMAPS);
         i.remap
             .iter()

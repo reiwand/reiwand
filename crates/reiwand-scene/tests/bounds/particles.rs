@@ -104,7 +104,10 @@ fn particle_systems_name_their_broken_fields() {
             format!("{f}/render/trail/length is 100, expected 1..=64"),
         ),
         (
-            vec![(format!("{f}/render/stretch"), json!({ "mode": "add", "time": 1, "min": 50, "max": 10 }))],
+            vec![(
+                format!("{f}/render/stretch"),
+                json!({ "mode": "add", "depth": "flat", "time": 1, "min": 50, "max": 10 }),
+            )],
             format!("{f}/render/stretch/max is 10"),
         ),
         (vec![(format!("{f}/render/rope/subdivide"), json!(9))], format!("{f}/render/rope/subdivide is 9")),

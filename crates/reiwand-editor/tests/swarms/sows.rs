@@ -68,7 +68,7 @@ fn children_curves_and_the_render_look_are_edited() {
     );
     edit(&mut p, "over", json!({"size": []})).unwrap();
     assert!(system(&p)["render"].get("size_over_life").is_none());
-    let look = json!({"stretch": {"mode": "add", "time": 0.1, "min": 0, "max": 40}, "frames": "random", "fps": 8, "mix": true, "brightness": 3});
+    let look = json!({"stretch": {"mode": "add", "depth": "flat", "time": 0.1, "min": 0, "max": 40}, "frames": "random", "fps": 8, "mix": true, "brightness": 3});
     edit(&mut p, "render", look).unwrap();
     let r = &system(&p)["render"];
     assert_eq!((&r["frames"], &r["brightness"], &r["mix"]), (&json!("random"), &json!(3.0), &json!(true)));

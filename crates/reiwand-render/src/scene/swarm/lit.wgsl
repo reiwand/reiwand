@@ -10,6 +10,12 @@ fn turned(t: vec2<f32>, turn: vec4<f32>) -> vec2<f32> {
     return t.x * turn.xy - t.y * vec2<f32>(-turn.y, turn.x);
 }
 
+fn tilted_normal(t: vec3<f32>, a: vec4<f32>) -> vec3<f32> {
+    let ex = vec3<f32>(a.z, 0.0, -a.w);
+    let ey = vec3<f32>(0.0, a.x, a.y);
+    return normalize(t.x * ex + t.y * ey + t.z * cross(ex, ey));
+}
+
 fn lamp_lit(c: vec4<f32>, n: vec3<f32>, p: vec2<f32>) -> vec4<f32> {
     if c.a <= 1e-5 {
         return c;
@@ -32,11 +38,15 @@ fn lamp_lit(c: vec4<f32>, n: vec3<f32>, p: vec2<f32>) -> vec4<f32> {
 
 @fragment
 fn fs_lit_particle(in: Corner) -> @location(0) vec4<f32> {
-    var n = vec3<f32>(0.0, 0.0, 1.0);
+    var t = vec3<f32>(0.0, 0.0, 1.0);
     if look.light.y > 0.5 {
-        let t = textureSampleLevel(normal_map, samp, in.uv * look.crops.xy, 0.0).xyz * 2.0 - 1.0;
-        n = normalize(vec3<f32>(turned(t.xy, in.turn), max(t.z, 0.0) + 1e-3));
+        let m = textureSampleLevel(normal_map, samp, in.uv * look.crops.xy, 0.0).xyz * 2.0 - 1.0;
+        t = vec3<f32>(m.xy, max(m.z, 0.0) + 1e-3);
     }
+    if look.tilt[2].x > 0.5 {
+        t = tilted_normal(t, in.tilt);
+    }
+    let n = normalize(vec3<f32>(turned(t.xy, in.turn), t.z));
     return lamp_lit(painted(in), n, in.position.xy + look.place.xy);
 }
 

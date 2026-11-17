@@ -21,6 +21,7 @@ struct Look {
     seen_a: vec4<f32>,
     seen_b: vec4<f32>,
     window: vec4<f32>,
+    tilt: array<vec4<f32>, 3>,
 };
 
 struct Corner {
@@ -30,6 +31,7 @@ struct Corner {
     @location(2) @interpolate(flat) frames: vec3<f32>,
     @location(3) @interpolate(flat) turn: vec4<f32>,
     @location(4) @interpolate(flat) scale: f32,
+    @location(5) @interpolate(flat) tilt: vec4<f32>,
 };
 
 @group(0) @binding(0) var<uniform> look: Look;
@@ -69,6 +71,23 @@ fn hull_corner(v: u32) -> vec2<f32> {
     return at[min(v, 7u)];
 }
 
+fn tilt_unit(seed: u32, key: u32) -> f32 {
+    let s = (seed ^ (key * 2654435761u)) * 747796405u + 2891336453u;
+    let w = ((s >> ((s >> 28u) + 4u)) ^ s) * 277803737u;
+    return f32(((w >> 22u) ^ w) >> 8u) / 16777216.0;
+}
+
+fn tilt_fold(a: f32) -> vec2<f32> {
+    let c = cos(a);
+    return vec2<f32>(abs(c), sin(a) * select(1.0, -1.0, c < 0.0));
+}
+
+fn tilt_of(seed: u32, age: f32) -> vec4<f32> {
+    let u = vec4<f32>(tilt_unit(seed, 1u), tilt_unit(seed, 2u), tilt_unit(seed, 3u), tilt_unit(seed, 4u));
+    let angle = mix(look.tilt[0].xy, look.tilt[0].zw, u.xy) + mix(look.tilt[1].xy, look.tilt[1].zw, u.zw) * age;
+    return vec4<f32>(tilt_fold(angle.x), tilt_fold(angle.y));
+}
+
 @vertex
 fn vs_particle(
     @builtin(vertex_index) v: u32,
@@ -93,7 +112,8 @@ fn vs_particle(
     let speed = length(a.zw);
     let relative = look.trail.y > 0.5;
     let turned = !relative && look.shade.z > 0.0 && look.shade.z == look.shade.w;
-    let reach = clamp(look.trail.x * speed, look.shade.z, look.shade.w);
+    let near = select(1.0, k, look.trail.z > 0.5 && !relative);
+    let reach = clamp(look.trail.x * speed * near, look.shade.z * near, look.shade.w * near);
     var tail = select(reach, 0.0, turned || speed <= 0.0);
     var axis = vec2<f32>(cos(radians(b.w)), sin(radians(b.w)));
     if (tail > 0.0 || turned || relative || look.turn.x == 1.0) && speed > 0.0 {
@@ -111,7 +131,15 @@ fn vs_particle(
     let turn = vec2<f32>(cos(radians(s.rotation)), sin(radians(s.rotation)));
     tail = select(tail, s.size * (reach - 1.0), relative);
     let along = mix(-0.5 * s.size - tail, 0.5 * s.size, s.corner.x);
-    let p = vec3<f32>(s.position + turn * along + vec2<f32>(-turn.y, turn.x) * (s.corner.y - 0.5) * s.size, 1.0);
+    var off = vec2<f32>(along, (s.corner.y - 0.5) * s.size);
+    if look.tilt[2].x > 0.5 {
+        let a = tilt_of(bitcast<u32>(c.z), b.x);
+        let reach_z = -off.x * a.w + off.y * a.y;
+        let f = select(1.0, 1.0 / max(1.0 + reach_z / look.deep.x, 0.1), look.deep.w > 0.5);
+        off = vec2<f32>(off.x * a.z, off.y * a.x) * f;
+        out.tilt = a;
+    }
+    let p = vec3<f32>(s.position + turn * off.x + vec2<f32>(-turn.y, turn.x) * off.y, 1.0);
     out.position = vec4<f32>(dot(look.m0.xyz, p), dot(look.m1.xyz, p), 0.0, 1.0);
     out.uv = s.uv;
     out.color = s.color;

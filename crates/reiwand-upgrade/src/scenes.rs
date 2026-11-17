@@ -56,6 +56,7 @@ fn give(v: &mut Value) -> bool {
                         fields,
                         &[
                             ("mode", json!("add")),
+                            ("depth", json!("flat")),
                             ("time", json!(0)),
                             ("min", json!(0)),
                             ("max", json!(10000)),

@@ -1,4 +1,4 @@
-use super::{MAX_CURVE, Render, StretchMode};
+use super::{MAX_CURVE, Render, StretchDepth, StretchMode};
 use crate::effects::Stage;
 use crate::validate::{Check, Issue};
 
@@ -7,7 +7,12 @@ impl Check<'_> {
         let wide = r.brightness.is_some()
             || r.order.is_some()
             || r.cycles.is_some()
-            || r.stretch.is_some_and(|s| s.mode == StretchMode::Relative || s.min > 0.0 || s.max < 1e4);
+            || r.stretch.is_some_and(|s| {
+                s.mode == StretchMode::Relative
+                    || s.depth == StretchDepth::Projected
+                    || s.min > 0.0
+                    || s.max < 1e4
+            });
         self.uses(wide, "particles2");
         r.brightness.iter().for_each(|b| self.number(&format!("{p}/brightness"), b, 0.0, 16.0));
         if let Some(n) = r.cycles {

@@ -45,9 +45,11 @@ fn stretch_and_oscillate_need_every_field_and_position_has_no_floor() {
     let refused = |patch: Json| Scene::from_json(&scene(with(sparks(), patch), true)).is_err();
     let stretch = |s: Json| json!({ "render": { "stretch": s } });
     assert!(refused(stretch(json!({ "time": 0.1, "min": 0, "max": 9 }))));
-    assert!(refused(stretch(json!({ "mode": "add", "time": 0.1, "max": 9 }))));
-    assert!(refused(stretch(json!({ "mode": "wide", "time": 0.1, "min": 0, "max": 9 }))));
-    assert!(!refused(stretch(json!({ "mode": "relative", "time": 0.1, "min": 0, "max": 9 }))));
+    assert!(refused(stretch(json!({ "mode": "add", "depth": "flat", "time": 0.1, "max": 9 }))));
+    assert!(refused(stretch(json!({ "mode": "wide", "depth": "flat", "time": 0.1, "min": 0, "max": 9 }))));
+    assert!(!refused(stretch(
+        json!({ "mode": "relative", "depth": "flat", "time": 0.1, "min": 0, "max": 9 })
+    )));
     let wave = |o: Json| json!({ "forces": [{ "oscillate": o }] });
     assert!(refused(wave(json!({ "what": "alpha", "freq": [1, 2], "scale": [0.2, 1] }))));
     assert!(!refused(wave(json!({ "what": "alpha", "from": "floor", "freq": [1, 2], "scale": [0.2, 1] }))));

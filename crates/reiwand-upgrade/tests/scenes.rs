@@ -28,5 +28,17 @@ fn oscillate_and_stretch_keep_today_behaviour() {
         "render": {"stretch": {"time": 0.1, "max": 40}}}}});
     let s = &upgraded("scenes-wave", scene)["particles"]["s"];
     assert_eq!(s["forces"][0]["oscillate"]["from"], "top");
-    assert_eq!(s["render"]["stretch"], json!({"mode": "add", "time": 0.1, "min": 0, "max": 40}));
+    assert_eq!(
+        s["render"]["stretch"],
+        json!({"mode": "add", "depth": "flat", "time": 0.1, "min": 0, "max": 40})
+    );
+}
+
+#[test]
+fn a_stretch_with_a_mode_gains_the_flat_depth() {
+    let scene = json!({"particles": {"s": {
+        "render": {"stretch": {"mode": "relative", "time": 0.1, "min": 0, "max": 4}}}}});
+    let s = &upgraded("scenes-depth", scene)["particles"]["s"];
+    assert_eq!(s["render"]["stretch"]["depth"], "flat");
+    assert_eq!(s["render"]["stretch"]["mode"], "relative");
 }

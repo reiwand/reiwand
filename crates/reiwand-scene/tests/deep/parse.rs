@@ -22,7 +22,7 @@ fn every_advanced_field_parses_validates_and_names_its_feature() {
     );
     assert_eq!(
         fireworks.render.stretch,
-        Some(Stretch { mode: StretchMode::Add, time: 0.1, min: 2.0, max: 40.0 })
+        Some(Stretch { mode: StretchMode::Add, depth: StretchDepth::Flat, time: 0.1, min: 2.0, max: 40.0 })
     );
     let EmitShape::Box(area) = fireworks.emitters[0].shape else { panic!("no box") };
     assert_eq!((area.inner, area.at), (Some([50.0, 50.0]), Some(Handle(1))));
@@ -41,7 +41,7 @@ fn advanced_fields_round_trip_and_older_forms_still_read() {
     assert_eq!(written["particles"]["fireworks"]["forces"][0]["window"], json!([0.0, 0.1, 0.8, 1.0]));
     assert_eq!(written["layers"][2]["space"], json!("3d"));
     let old = json!({ "capacity": 10, "emitters": [{ "shape": { "box": { "from": [0.0, 0.0], "to": [10.0, 10.0] } }, "rate": 1 }],
-        "init": { "life": [1, 2] }, "render": { "stretch": { "mode": "relative", "time": 0.5, "min": 0, "max": 9 } }, "forces": [{ "drag": 0.1 }] });
+        "init": { "life": [1, 2] }, "render": { "stretch": { "mode": "relative", "depth": "flat", "time": 0.5, "min": 0, "max": 9 } }, "forces": [{ "drag": 0.1 }] });
     let system: System = serde_json::from_value(old.clone()).unwrap();
     assert_eq!(serde_json::to_value(&system).unwrap()["emitters"][0]["shape"], old["emitters"][0]["shape"]);
     assert_eq!((system.init.life.ends, system.render.stretch.map(|s| s.time)), ([1.0, 2.0], Some(0.5)));
