@@ -30,7 +30,7 @@ fun Import(main: Main, close: () -> Unit) {
     var task by rememberSaveable { mutableStateOf(false) }
     val working = stringResource(R.string.carry_working)
     val look = {
-        main.act(false) {
+        main.act {
             task = true
             problem = null
             try {
@@ -45,7 +45,7 @@ fun Import(main: Main, close: () -> Unit) {
         }
     }
     val open = rememberLauncherForActivityResult(OpenDocument()) { uri ->
-        if (uri != null) main.act(false) {
+        if (uri != null) main.act {
             report = null
             preview = null
             password = ""
@@ -64,7 +64,7 @@ fun Import(main: Main, close: () -> Unit) {
             report != null -> Action(close, Modifier.weight(1f)) { Text(stringResource(R.string.carry_done)) }
             shown != null -> Action({
                 val take = JSONArray(shown.optJSONArray("rows").objects().map { it.getString("section") }.filter { it !in off })
-                main.act(false) {
+                main.act {
                     task = true
                     try {
                         report = account("carry_import", "path" to main.carryFile().path, "password" to password, "take" to take, "lists" to if (both) "both" else "join") as JSONObject
@@ -77,7 +77,7 @@ fun Import(main: Main, close: () -> Unit) {
                     }
                 }
             }, Modifier.weight(1f).testTag("carry_apply"), enabled = !task && !cut) { Text(stringResource(R.string.carry_import)) }
-            asked -> Action(look, Modifier.weight(1f).testTag("carry_open"), enabled = password.isNotEmpty() && !task) { Text(stringResource(R.string.carry_open)) }
+            asked -> Action({ look() }, Modifier.weight(1f).testTag("carry_open"), enabled = password.isNotEmpty() && !task) { Text(stringResource(R.string.carry_open)) }
             else -> Action({ open.launch(arrayOf("*/*")) }, Modifier.weight(1f).testTag("carry_choose"), enabled = !task) { Text(stringResource(R.string.carry_choose)) }
         }
     }) {

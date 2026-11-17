@@ -3,7 +3,7 @@ use crate::exports::on;
 use crate::power::Power;
 use crate::settings::{self, BACKEND};
 use crate::{account, choice, depth, gpu, library, stage, store};
-use jni::objects::{JByteArray, JIntArray, JObject, JString};
+use jni::objects::{JIntArray, JObject, JString};
 use jni::refs::Reference;
 use jni::sys::{jboolean, jint, jlong};
 use jni::{EnvUnowned, jni_mangle};

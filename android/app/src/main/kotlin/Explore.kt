@@ -49,7 +49,7 @@ fun Explore(main: Main, back: () -> Unit, manage: () -> Unit) {
     val cut = cut()
     val shelves = repos.optJSONArray("repos").objects().map { repo -> repo to found.objects().filter { it.getString("repo_id") == repo.getString("repo_id") } }
     val install = { item: JSONObject ->
-        main.act(false) {
+        main.act {
             main.complete(account("install", "repo_id" to item.getString("repo_id"), "id" to item.getString("id")))
             installed++
         }

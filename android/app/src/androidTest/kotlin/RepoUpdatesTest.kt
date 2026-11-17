@@ -36,7 +36,7 @@ class RepoUpdatesTest {
     @Test
     fun withoutRepositoriesTheCheckSaysEverythingIsUpToDate() {
         var ran = 0
-        shown { main -> RepoUpdates(main) { _, work -> ran++; main.act(false) { work() } } }
+        shown { main -> RepoUpdates(main) { _, work -> ran++; main.act { work() } } }
         compose.onNodeWithText(context.getString(R.string.repo_check)).assertIsDisplayed().performClick()
         compose.waitUntil(TIMEOUT_MS) { ran > 0 }
         compose.waitUntil(TIMEOUT_MS) { compose.onAllNodes(hasTestTag("all_updated"), true).fetchSemanticsNodes().isNotEmpty() }

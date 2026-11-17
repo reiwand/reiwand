@@ -36,10 +36,10 @@ private fun Linked(main: Main, rec: JSONObject, changed: () -> Unit) = Column(Mo
     Setting(name, sub = host(rec.getString("server")))
     rec.optJSONArray("repos").objects().forEach { repo ->
         Setting(host(repo.getString("url")), Modifier.testTag("unlink"), sub = stringResource(R.string.account_unlink), onClick = {
-            main.act(false) { account("unlink_account", "url" to repo.getString("url")); changed() }
+            main.act { account("unlink_account", "url" to repo.getString("url")); changed() }
         })
     }
-    WordAction({ main.act(false) { account("remove_account", "account" to rec.getString("id")); changed() } }, Modifier.testTag("remove_account")) {
+    WordAction({ main.act { account("remove_account", "account" to rec.getString("id")); changed() } }, Modifier.testTag("remove_account")) {
         Text(stringResource(R.string.account_remove))
     }
 }

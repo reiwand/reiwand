@@ -22,7 +22,7 @@ fun Export(main: Main, close: () -> Unit) {
     val working = stringResource(R.string.carry_working)
     var task by rememberSaveable { mutableStateOf(false) }
     val save = rememberLauncherForActivityResult(CreateDocument(CARRY_TYPE)) { uri ->
-        if (uri != null) main.act(false) {
+        if (uri != null) main.act {
             task = true
             problem = null
             try {

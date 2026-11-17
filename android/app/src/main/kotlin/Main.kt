@@ -138,9 +138,9 @@ class Main : ComponentActivity() {
         Render.post { Wallpaper.reload(false) }
     }
 
-    fun act(edit: Boolean = true, work: suspend () -> Unit) = scope.launch {
+    fun act(work: suspend () -> Unit) = scope.launch {
         runCatching { work() }.onFailure(::toast)
-        changed(edit)
+        changed()
     }
 
     fun unpick(choice: JSONObject) {

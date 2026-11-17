@@ -66,7 +66,7 @@ fun Entries(main: Main, uid: String, open: (String) -> Unit, close: () -> Unit) 
             Schedule(rules, save)
             list?.let { Smart(it, keep) }
             Row(Modifier.padding(horizontal = Measure.margin, vertical = Measure.e4), Arrangement.spacedBy(Measure.e2), Alignment.CenterVertically) {
-                Action({ main.act(false) { ask("pick", "choice" to choice("playlist", uid)); main.setWallpaper() } }, enabled = items.isNotEmpty()) {
+                Action({ main.act { ask("pick", "choice" to choice("playlist", uid)); main.setWallpaper() } }, enabled = items.isNotEmpty()) {
                     Text(stringResource(R.string.apply))
                 }
                 WordAction({ sheet = DELETE }) { Text(stringResource(R.string.delete), color = tones.coral) }

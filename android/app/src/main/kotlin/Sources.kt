@@ -26,7 +26,7 @@ fun Sources(main: Main, close: (() -> Unit)? = null, start: String = "", library
     var adding by rememberSaveable { mutableStateOf(start.isNotEmpty()) }
     val providers by loaded(JSONObject(), changes, main.revision.intValue) { account("providers") as? JSONObject ?: JSONObject() }
     val run: Run = { waiting, work ->
-        main.act(false) {
+        main.act {
             task = waiting
             try {
                 work()

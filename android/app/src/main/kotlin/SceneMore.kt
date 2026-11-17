@@ -33,7 +33,7 @@ fun SceneMore(main: Main, uid: String, form: JSONObject, modifier: Modifier = Mo
     var exporting by remember(uid) { mutableStateOf("") }
     var imported by remember(uid) { mutableStateOf<String?>(null) }
     val writing = rememberLauncherForActivityResult(CreateDocument(JSON)) { target ->
-        target?.let { main.act(false) {
+        target?.let { main.act {
             val text = ask("export", "uid" to uid, "preset" to exporting) as String
             withContext(Dispatchers.IO) { context.contentResolver.openOutputStream(it)?.use { out -> out.write(text.toByteArray()) } }
         } }
@@ -46,7 +46,7 @@ fun SceneMore(main: Main, uid: String, form: JSONObject, modifier: Modifier = Mo
         if (warnings.length() > 0) main.toast(skipped.format((0 until warnings.length()).joinToString { warnings.getString(it) }))
     }
     val reading = rememberLauncherForActivityResult(OpenDocument()) { source -> source?.let { main.act { bring(read(it), "") } } }
-    val keeping = rememberLauncherForActivityResult(OpenDocument()) { source -> source?.let { main.act(false) { imported = read(it) } } }
+    val keeping = rememberLauncherForActivityResult(OpenDocument()) { source -> source?.let { main.act { imported = read(it) } } }
     Column(modifier) {
         if (form.optBoolean("sounds") && form.optBoolean("muted")) Text(stringResource(R.string.sounds_muted), Modifier.padding(16.dp, 4.dp), style = MaterialTheme.typography.bodySmall)
         val saved = options(form.optJSONArray("saved"))

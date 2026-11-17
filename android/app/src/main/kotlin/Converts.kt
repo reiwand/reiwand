@@ -43,7 +43,7 @@ fun ConvertVideo(main: Main, item: Item) {
     val plan by loaded<Pair<Int, Int>?>(null, item.path, converting) { Convert.plan(item.path) }
     if (converting) return Conversions(item.uid)
     plan ?: return
-    val start = { keep: Boolean -> main.act(false) { withContext(Dispatchers.IO) { main.convert(item.uid, item.title, asked = true, keep = keep) } }.let { } }
+    val start = { keep: Boolean -> main.act { withContext(Dispatchers.IO) { main.convert(item.uid, item.title, asked = true, keep = keep) } }.let { } }
     Note(stringResource(R.string.convert_note))
     Row(Modifier.padding(16.dp, 4.dp), Arrangement.spacedBy(8.dp)) {
         Action({ start(false) }) { Text(stringResource(R.string.convert_now)) }

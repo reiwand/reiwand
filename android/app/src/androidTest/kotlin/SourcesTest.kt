@@ -93,7 +93,7 @@ class SourcesTest {
 
     @Test
     fun aRepositoryIsAddedFromOneAddressField() {
-        shown { main -> RepoAdd(main, { _, work -> main.act(false) { work() } }) {} }
+        shown { main -> RepoAdd(main, { _, work -> main.act { work() } }) {} }
         compose.onAllNodes(hasSetTextAction()).assertCountEquals(1)
         text(R.string.repo_add_url).assertIsNotEnabled()
         field(R.string.repo_url).performTextInput("https://example.org/wallpapers/")

@@ -28,7 +28,7 @@ fun SceneControls(main: Main, uid: String, form: JSONObject, undecided: List<Str
     val refused = stringResource(R.string.microphone_needed)
     var flipped by remember(uid) { mutableStateOf(setOf<String>()) }
     val set: (String, Any?) -> Unit = { key, value -> main.act { ask("property", "uid" to uid, "key" to key, "value" to value) } }
-    val grant = { input: String, on: Boolean -> main.act(false) { ask("grant", "uid" to uid, "input" to input, "on" to on) } }
+    val grant = { input: String, on: Boolean -> main.act { ask("grant", "uid" to uid, "input" to input, "on" to on) } }
     val microphone = rememberLauncherForActivityResult(RequestPermission()) { if (it) grant("audio", true) else main.toast(refused) }
     val chooser = rememberChooser(main, uid)
     Column(modifier) {
@@ -42,7 +42,7 @@ fun SceneControls(main: Main, uid: String, form: JSONObject, undecided: List<Str
         if (touched.isNotEmpty() && touched.none { it in undecided }) {
             val label = stringResource(if ("touch" in touched) R.string.react_touch else R.string.react_taps)
             Toggle(label, touched.any { granted?.optBoolean(it) == true }) { on ->
-                main.act(false) { ask("decide", "uid" to uid, "allow" to if (on) touched else emptyList(), "deny" to if (on) emptyList() else touched) }
+                main.act { ask("decide", "uid" to uid, "allow" to if (on) touched else emptyList(), "deny" to if (on) emptyList() else touched) }
             }
         }
         if (open("media")) MediaGrants(form) { input, on -> grant(input, on) }

@@ -59,7 +59,7 @@ private fun deciding(main: Main, uid: String, undecided: List<String>): (String,
     val send = { input: String, allow: Boolean ->
         val inputs = if (input == "touch" && "taps" in undecided) listOf("touch", "taps") else listOf(input)
         val (yes, no) = if (allow) inputs to emptyList<String>() else emptyList<String>() to inputs
-        main.act(false) { ask("decide", "uid" to uid, "allow" to yes, "deny" to no) }
+        main.act { ask("decide", "uid" to uid, "allow" to yes, "deny" to no) }
         Unit
     }
     val microphone = rememberLauncherForActivityResult(RequestPermission()) { if (it) send("audio", true) else main.toast(refused) }

@@ -159,7 +159,6 @@ source "$(dirname "$0")"/sync-unlisted.sh
 source "$(dirname "$0")"/sync-author.sh
 source "$(dirname "$0")"/sync-files.sh
 source "$(dirname "$0")"/sync-keys.sh
-source "$(dirname "$0")"/sync-phone.sh
 source "$(dirname "$0")"/sync-devices.sh
 source "$(dirname "$0")"/sync-connect.sh
 

@@ -90,7 +90,7 @@ private fun Card(main: Main, item: Item, focused: Boolean, inUse: Boolean, open:
         Text(item.title, Modifier.padding(top = Measure.e3), tones.frost, style = Type.row, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text(if (inUse) stringResource(R.string.lib_stays) else facts(item), Modifier.padding(top = 2.dp), tones.mist, style = Type.foot, maxLines = 2)
         if (item.flashing) StateLine(stringResource(R.string.flashes_barred), Tone.Amber, Modifier.padding(top = 2.dp))
-        if (!inUse) Action({ main.act(false) { ask("pick", "choice" to choice("item", item.uid)); main.setWallpaper() } }, Modifier.padding(top = Measure.e3).fillMaxWidth().testTag("shelf_apply"), enabled = !item.flashing) {
+        if (!inUse) Action({ main.act { ask("pick", "choice" to choice("item", item.uid)); main.setWallpaper() } }, Modifier.padding(top = Measure.e3).fillMaxWidth().testTag("shelf_apply"), enabled = !item.flashing) {
             Glyph(Ph.Image, null, Modifier.padding(end = Measure.e2), size = Measure.iconSmall)
             Text(stringResource(R.string.apply))
         }

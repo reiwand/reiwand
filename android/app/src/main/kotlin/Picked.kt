@@ -46,7 +46,7 @@ fun ChosenBar(main: Main, chosen: SnapshotStateList<String>, playlist: String?, 
         Deed(Ph.Heart, stringResource(R.string.favorite)) { done { ask("favorite", "uids" to uids, "favorite" to true) } }
         Deed(Ph.DotsThree, stringResource(R.string.lib_more)) { sheet = "more" }
         if (playlist == null) Action({
-            main.act(false) {
+            main.act {
                 val uid = ask("rotate", "name" to rotation, "items" to uids, "every" to HOURLY) as String
                 val name = playlists().firstOrNull { it.uid == uid }?.name ?: rotation
                 chosen.clear()

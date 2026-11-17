@@ -135,14 +135,11 @@ class LibraryLookTest {
     }
 
     @Test
-    fun theHomeLineShowsOnlyWhenLinkedAndOnline() {
-        var name by mutableStateOf<String?>(null)
-        shown { Top(name, {}, {}) }
+    fun theHomeLineHasSearchAndAddOnly() {
+        shown { Top({}, {}) }
         compose.onNodeWithTag("connected").assertDoesNotExist()
         compose.onNodeWithContentDescription(context.getString(R.string.search)).assertIsDisplayed()
         compose.onNodeWithContentDescription(context.getString(R.string.choose)).assertIsDisplayed()
-        name = "casa"
-        text(R.string.lib_connected_to, "casa").assertIsDisplayed()
     }
 
     @Test

@@ -55,10 +55,10 @@ fun WebPrivacy(main: Main, uid: String, web: JSONObject?) {
         }
     }
     if (web.optBoolean("network")) Toggle(stringResource(R.string.web_reach), web.optBoolean("online")) { on ->
-        main.act(false) { ask("grant", "uid" to uid, "input" to "network", "on" to on) }
+        main.act { ask("grant", "uid" to uid, "input" to "network", "on" to on) }
     }
     if (web.optBoolean("storage")) WordAction({
-        main.act(false) {
+        main.act {
             ask("clear_data", "uid" to uid)
             main.toast(cleared)
         }

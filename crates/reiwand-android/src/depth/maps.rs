@@ -2,25 +2,9 @@ use super::{EDGE, EDITS, Raise, found, loaded, places};
 use crate::{Error, store};
 use reiwand_core::edit::{self, Depth, Edit};
 use reiwand_depth::{Map, adjust, beside, read, shrink};
-use serde_json::Value;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
-
-pub(crate) fn shared(item: &reiwand_library::Item) -> Option<Edit> {
-    let edits = store::dir().ok()?.join(EDITS);
-    let found = (item.kind == reiwand_library::Kind::Image).then(|| edit::load(&item.path, &edits));
-    found?.ok()?.map(|(_, edit)| edit)
-}
-
-pub(crate) fn adopt(item: &reiwand_library::Item, synced: Option<&Value>, keep: bool) -> Result<(), Error> {
-    if item.kind == reiwand_library::Kind::Image
-        && edit::adopt(synced, &item.path, &store::dir()?.join(EDITS), keep).map_err(Error::Said)?
-    {
-        store::changed();
-    }
-    Ok(())
-}
 
 pub(crate) fn stamped(image: &Path, edit: &Edit) -> Option<(PathBuf, SystemTime)> {
     found(image, edit).and_then(|path| Some((path.clone(), fs::metadata(&path).ok()?.modified().ok()?)))

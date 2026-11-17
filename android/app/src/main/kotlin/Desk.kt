@@ -10,4 +10,6 @@ fun JSONObject.text(key: String): String? = if (isNull(key)) null else getString
 fun host(url: String) = url.substringAfter("://").substringBefore('/').ifEmpty { url }
 
 @Composable
-fun Waiting(main: Main, text: String) = Progress(text, null) { main.act(false) { account("cancel") } }
+fun Waiting(main: Main, text: String) = Progress(text, null) { main.act { account("cancel") } }
+
+fun size(bytes: Long) = if (bytes >= 1_000_000) "%.1f MB".format(bytes / 1e6) else "%d KB".format((bytes + 999) / 1000)

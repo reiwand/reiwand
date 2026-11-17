@@ -38,7 +38,6 @@ fun About(main: Main, uid: String, item: Item, form: JSONObject, open: (String) 
     item.lacks.mapNotNull(LACKS::get).map { stringResource(it) }.takeIf { it.isNotEmpty() }?.let { Note(it.joinToString(" ")) }
     Kin(main, uid, open)
     item.takeIf { it.video || it.scene || it.web }?.let { OwnSound(main, it) }
-    if (!item.scene) Kept(main, uid)
     item.takeIf { it.scene && !it.web && !it.flashes }?.let { shown ->
         Toggle(stringResource(R.string.keep_moving), shown.moving) {
             main.act { ask(if (it) "confirm" else "unconfirm", "uid" to uid, "what" to "motion") }
