@@ -63,7 +63,7 @@ PanelChico {
         });
         stage = "working";
         jobs.reset();
-        App.carry("ImportChosen", path, secret, choices, reply => dialog && jobs.started(reply[0]), error => dialog && dialog.refused(error.name, error.message));
+        App.carry("ImportChosen", path, secret, choices, reply => dialog && dialog.stage === "working" && jobs.started(reply[0]), error => dialog && dialog.refused(error.name, error.message));
     }
 
     function finished(output) {

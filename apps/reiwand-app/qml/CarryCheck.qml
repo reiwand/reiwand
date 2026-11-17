@@ -110,8 +110,9 @@ QtObject {
         press(Qt.Key_Space);
         expect(!into.choose.rows.get(1).checked && !into.choose.conflicting, "Space must untick the section and drop the question about lists");
         press(Qt.Key_Space);
-        into.choose.both.toggle();
+        into.choose.both.click();
         expect(into.choose.mode === "both", "keeping both must be chosen");
+        into.choose.list.forceActiveFocus(Qt.TabFocusReason);
         press(Qt.Key_Down);
         press(Qt.Key_Down);
         press(Qt.Key_Space);
