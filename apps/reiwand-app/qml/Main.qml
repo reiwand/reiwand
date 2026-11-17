@@ -63,8 +63,7 @@ Kirigami.ApplicationWindow {
     }
 
     function reach(index) {
-        if (index === current && pageStack.currentItem)
-            return;
+        if (index === current && pageStack.currentItem) return;
         showPage(index);
         Qt.callLater(() => shell && shell.arrive());
     }
