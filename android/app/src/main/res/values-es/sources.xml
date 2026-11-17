@@ -73,14 +73,9 @@
     <string name="repo_nothing">No hay nada que mostrar. Prueba otras palabras de búsqueda o actualiza los repositorios.</string>
     <string name="repo_checking">Comprobando el repositorio…</string>
     <string name="repo_add_title">Añadir un repositorio</string>
-    <string name="repo_about">Pega la dirección completa que comparte quien publica (la que copia la app de escritorio): ya trae la huella y no hace falta nada más. La huella nombra la clave que firma el repositorio; el teléfono solo lo acepta si responde con exactamente esa clave, así nadie por el medio puede cambiar los paquetes.</string>
+    <string name="repo_about">Pega la dirección de un repositorio o de un servidor. Un repositorio público se añade al instante; uno privado pide iniciar sesión; un servidor muestra sus repositorios para elegir uno.</string>
     <string name="repo_url_example">https://ejemplo.org/fondos/</string>
-    <string name="repo_fingerprint">Huella (solo si la dirección no la trae)</string>
-    <string name="repo_fingerprint_help">64 letras y números; los espacios no importan.</string>
     <string name="repo_sent">Al añadirlo se conecta con %1$s y lee su lista de paquetes. Ese sitio ve la dirección de internet de este teléfono.</string>
-    <string name="repo_server_code">Este código es de un servidor: al conectarte a él llegan sus repositorios.</string>
-    <string name="repo_camera_missing">Este teléfono no tiene cámara: escribe o pega la dirección del repositorio.</string>
-    <string name="repo_camera_refused">Sin permiso para la cámara no se puede leer el código: escribe o pega la dirección del repositorio.</string>
     <plurals name="provider_got">
         <item quantity="one">Se añadió %1$d imagen nueva a tu biblioteca.</item>
         <item quantity="other">Se añadieron %1$d imágenes nuevas a tu biblioteca.</item>

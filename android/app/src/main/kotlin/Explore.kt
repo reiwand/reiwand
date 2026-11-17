@@ -40,13 +40,12 @@ import org.json.JSONObject
 private val COVER = 150.dp
 
 @Composable
-fun Explore(main: Main, back: () -> Unit, manage: () -> Unit, connect: () -> Unit) {
+fun Explore(main: Main, back: () -> Unit, manage: () -> Unit) {
     var query by rememberSaveable { mutableStateOf("") }
     var installed by remember { mutableIntStateOf(0) }
     val revision = main.revision.intValue
     val repos by loaded(JSONObject(), revision, installed) { account("repos") as? JSONObject ?: JSONObject() }
     val found by loaded(JSONArray(), query, installed, revision) { account("browse", "query" to query) as? JSONArray ?: JSONArray() }
-    val status by loaded(JSONObject(), revision) { Sync.status() }
     val cut = cut()
     val shelves = repos.optJSONArray("repos").objects().map { repo -> repo to found.objects().filter { it.getString("repo_id") == repo.getString("repo_id") } }
     val install = { item: JSONObject ->
@@ -64,14 +63,6 @@ fun Explore(main: Main, back: () -> Unit, manage: () -> Unit, connect: () -> Uni
             item(key = repo.getString("repo_id")) { Packages(repo, packages, manage, install.takeIf { !cut || repo.optBoolean("bundled") }) }
         }
         if (shelves.all { it.second.isEmpty() }) item(key = "nothing") { Note(stringResource(R.string.repo_nothing)) }
-        if (linkedName(status, true) == null) item(key = "server") {
-            Column {
-                Group(stringResource(R.string.your_server))
-                Setting(stringResource(R.string.connect_block), Modifier.testTag("connect_server"), stringResource(R.string.connect_server_note), enabled = !cut, onClick = connect) {
-                    Glyph(Ph.CaretRight, null, tint = tones.mist, size = Measure.iconSmall)
-                }
-            }
-        }
         item(key = "manage") {
             Setting(stringResource(R.string.sources), Modifier.testTag("manage_repos"), stringResource(R.string.repo_manage_note), onClick = manage) {
                 Glyph(Ph.CaretRight, null, tint = tones.mist, size = Measure.iconSmall)

@@ -74,10 +74,10 @@ object Mirrors {
     }
 
     fun waiting(): OneTimeWorkRequest =
-        OneTimeWorkRequest.Builder(Remirror::class.java).setConstraints(Sync.constraints()).setInputData(workDataOf(WAITING to true)).build()
+        OneTimeWorkRequest.Builder(Remirror::class.java).setConstraints(Network.constraints()).setInputData(workDataOf(WAITING to true)).build()
 
     fun daily(): PeriodicWorkRequest =
-        PeriodicWorkRequest.Builder(Remirror::class.java, 1, TimeUnit.DAYS).setConstraints(Sync.constraints()).setInputData(workDataOf(WAITING to true)).build()
+        PeriodicWorkRequest.Builder(Remirror::class.java, 1, TimeUnit.DAYS).setConstraints(Network.constraints()).setInputData(workDataOf(WAITING to true)).build()
 
     fun later(context: Context, plans: List<JSONObject>) {
         if (plans.any { !local(it) }) WorkManager.getInstance(context).enqueueUniqueWork(CLOUD, ExistingWorkPolicy.KEEP, waiting())

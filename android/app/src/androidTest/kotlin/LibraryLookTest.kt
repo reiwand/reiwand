@@ -136,11 +136,6 @@ class LibraryLookTest {
 
     @Test
     fun theHomeLineShowsOnlyWhenLinkedAndOnline() {
-        val linked = JSONObject().put("state", "connected").put("name", "casa")
-        assertEquals("casa", linkedName(linked, true))
-        assertNull(linkedName(linked, false))
-        assertNull(linkedName(JSONObject().put("state", "error").put("name", "casa"), true))
-        assertEquals("example.org", linkedName(JSONObject().put("state", "ready").put("url", "https://example.org/x"), true))
         var name by mutableStateOf<String?>(null)
         shown { Top(name, {}, {}) }
         compose.onNodeWithTag("connected").assertDoesNotExist()

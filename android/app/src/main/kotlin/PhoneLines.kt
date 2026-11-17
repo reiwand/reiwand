@@ -20,8 +20,8 @@ private val NOTICES = listOf("third-party-notices", "onnxruntime", "onnxruntime-
 
 val PHONE = listOf(
     Line(R.string.mobile_data, Block.Phone) { k ->
-        Switch(stringResource(R.string.mobile_data), k.on(Sync.NETWORK, "any"), stringResource(R.string.mobile_data_sub)) {
-            k.set(Sync.NETWORK, if (it) "any" else "unmetered")
+        Switch(stringResource(R.string.mobile_data), k.on(Network.SETTING, "any"), stringResource(R.string.mobile_data_sub)) {
+            k.set(Network.SETTING, if (it) "any" else "unmetered")
         }
     },
     Line(R.string.allow_download, Block.Phone) { k ->

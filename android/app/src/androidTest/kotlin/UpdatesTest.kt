@@ -108,7 +108,7 @@ class UpdatesTest {
         val states = { work.getWorkInfosForUniqueWork(Updates.WORK).get().map { it.state } }
         try {
             Updates.counted = { 1 }
-            Sync.network(context)
+            Network.changed(context)
             assertTrue("a change of network rules schedules it", waitFor { states() == listOf(WorkInfo.State.ENQUEUED) })
             work.cancelUniqueWork(Updates.WORK).result.get()
             assertTrue(waitFor { states().all { it == WorkInfo.State.CANCELLED } })

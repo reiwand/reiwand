@@ -2,6 +2,7 @@ package io.github.reiwand
 
 import android.app.Activity
 import android.content.pm.ActivityInfo
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -31,6 +32,7 @@ class Main : ComponentActivity() {
     val revision = mutableIntStateOf(0)
     val importing = mutableIntStateOf(0)
     val imports = mutableIntStateOf(0)
+    val pendingAddress = mutableStateOf("")
     private val playing = lazy { Videos(applicationContext) }
     val videos by playing
     val tilt by lazy { Tilt(applicationContext) }
@@ -40,7 +42,6 @@ class Main : ComponentActivity() {
     val pages by paging
     private val power by lazy { Power(applicationContext) }
     private val scope = MainScope()
-    private val synced = { runOnUiThread { changed(false) } }
     private val pick = registerForActivityResult(PickMultipleVisualMedia()) { store(it) }
     private val files = registerForActivityResult(OpenMultipleDocuments()) { store(it) }
     private val folder = registerForActivityResult(OpenDocumentTree()) { uri -> uri?.let(::importFolder) }
@@ -58,20 +59,29 @@ class Main : ComponentActivity() {
         enableEdgeToEdge(DARK_BARS, DARK_BARS)
         Native.prepare(noBackupFilesDir.path)
         Unveil.load()
-        Heard.applied = synced
         Converting.finished = conversions
         Converting.asking = noticed
         if (savedInstanceState == null) {
-            Sync.soon(this, 0)
             thread(isDaemon = true) {
                 remirror(); runCatching { examples(this, false) }; runOnUiThread { revision.intValue++ }
                 Updates.found(Updates.count())
             }
         }
+        addressOf(intent)
         setContent {
             App(this)
             NoticeAsk(this)
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        addressOf(intent)
+    }
+
+    private fun addressOf(intent: Intent?) {
+        val link = intent?.data?.takeIf { it.scheme == "reiwand" && it.host == "add" } ?: return
+        link.getQueryParameter("url")?.let { pendingAddress.value = it }
     }
 
     override fun onStart() {
@@ -81,18 +91,15 @@ class Main : ComponentActivity() {
             window.colorMode = if (lit) ActivityInfo.COLOR_MODE_HDR else ActivityInfo.COLOR_MODE_DEFAULT
         }
         power.show(this, true)
-        Heard.want(this, this, true)
     }
 
     override fun onStop() {
-        Heard.want(this, this, false)
         power.show(this, false)
         super.onStop()
     }
 
     override fun onDestroy() {
         scope.cancel()
-        if (Heard.applied === synced) Heard.applied = null
         if (Converting.finished === conversions) Converting.finished = null
         if (Converting.asking === noticed) Converting.asking = null
         forget()
@@ -125,11 +132,10 @@ class Main : ComponentActivity() {
         }
     }
 
-    fun changed(edit: Boolean = true) {
+    fun changed() {
         revision.intValue++
         runCatching { Pages.forget() }
         Render.post { Wallpaper.reload(false) }
-        if (edit) Sync.soon(this, EDITS)
     }
 
     fun act(edit: Boolean = true, work: suspend () -> Unit) = scope.launch {
@@ -189,5 +195,4 @@ class Main : ComponentActivity() {
     fun name(uri: Uri) = titled(uri)
 }
 
-private const val EDITS = 30L
 private const val REFRESH = 10

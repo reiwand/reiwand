@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="account_remove">Quitar esta cuenta</string>
+    <string name="account_unlink">Dejar de usarla en este repositorio</string>
+    <string name="accounts_group">Cuentas</string>
+    <string name="accounts_none">No hay cuentas. Se crea una al iniciar sesión en un repositorio privado.</string>
+    <string name="carry_choose">Elegir un archivo</string>
+    <string name="carry_done">Listo</string>
+    <string name="carry_export">Exportar la configuración</string>
+    <string name="carry_export_note">El archivo trae las secciones de abajo. Tus fondos propios lo hacen más grande.</string>
+    <string name="carry_export_sub">Guarda tus repositorios, listas y ajustes en un archivo</string>
+    <string name="carry_exported">El archivo se guardó.</string>
+    <string name="carry_favourites">Favoritos</string>
+    <string name="carry_group">Archivo de configuración</string>
+    <string name="carry_import">Importar una configuración</string>
+    <string name="carry_import_note">Elige un archivo exportado por Reiwand en este u otro dispositivo. Solo se añade lo que marques; lo que ya tienes se queda.</string>
+    <string name="carry_import_sub">Añade lo que trae un archivo; nada se reemplaza</string>
+    <string name="carry_imported">El archivo se importó.</string>
+    <string name="carry_installed">Fondos instalados</string>
+    <string name="carry_lists">Listas</string>
+    <string name="carry_lists_both">Conservar las dos listas cuando un nombre se repite</string>
+    <string name="carry_open">Abrir el archivo</string>
+    <string name="carry_own">Tus fondos propios</string>
+    <string name="carry_password">Contraseña</string>
+    <string name="carry_providers">Proveedores</string>
+    <string name="carry_ratings">Valoraciones</string>
+    <string name="carry_repositories">Repositorios</string>
+    <string name="carry_row">%1$d nuevos, %2$d ya están</string>
+    <string name="carry_secrets">Contraseñas y claves</string>
+    <string name="carry_secrets_note">Las contraseñas y claves se guardan solo cifradas con la contraseña que elijas aquí. Guárdala: sin ella no se pueden recuperar.</string>
+    <string name="carry_sessions_note">Las sesiones de cuenta no se importan: vuelve a iniciar sesión en los repositorios privados.</string>
+    <string name="carry_settings">Ajustes</string>
+    <string name="carry_tags">Etiquetas</string>
+    <string name="carry_unreadable">Este archivo no se puede leer.</string>
+    <string name="carry_working">Trabajando…</string>
+    <string name="repo_private">%1$s es privado: inicia sesión con una cuenta para abrirlo.</string>
+    <string name="repo_server_note">Esta dirección es un servidor. Elige el repositorio que quieres añadir.</string>
+    <string name="repo_server_pick">Repositorios del servidor</string>
+    <string name="repo_trust">Confiar en este certificado</string>
+    <string name="repo_trust_ask">El certificado de %1$s no es de una autoridad conocida. Su huella es %2$s. Confía solo si sabes que es el correcto.</string>
+    <string name="sign_in_browser">Iniciar sesión con el navegador</string>
+    <string name="sign_in_code">Código: %1$s</string>
+    <string name="sign_in_waiting">Esperando que apruebes el código en el navegador…</string>
+    <string name="use_account">Usar la cuenta %1$s</string>
+    <string name="use_other_account">Usar otra cuenta</string>
+</resources>

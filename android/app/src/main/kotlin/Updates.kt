@@ -54,7 +54,6 @@ object Updates {
     var counted: () -> Int = { repos() }
 
     suspend fun settled(context: Context) {
-        Sync.schedule(context)
         withContext(NonCancellable + Dispatchers.IO) { schedule(context) }
     }
 
@@ -64,7 +63,7 @@ object Updates {
             work.cancelUniqueWork(WORK)
             return
         }
-        val request = PeriodicWorkRequest.Builder(RepoCheck::class.java, 1, TimeUnit.DAYS).setConstraints(Sync.constraints()).build()
+        val request = PeriodicWorkRequest.Builder(RepoCheck::class.java, 1, TimeUnit.DAYS).setConstraints(Network.constraints()).build()
         work.enqueueUniquePeriodicWork(WORK, ExistingPeriodicWorkPolicy.UPDATE, request)
     }
 }

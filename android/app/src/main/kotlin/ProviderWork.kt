@@ -39,7 +39,7 @@ object ProviderWork {
             return
         }
         val request = PeriodicWorkRequest.Builder(ProviderCheck::class.java, HOURS, TimeUnit.HOURS)
-            .setConstraints(Sync.constraints())
+            .setConstraints(Network.constraints())
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.MINUTES)
             .build()
         work.enqueueUniquePeriodicWork(WORK, ExistingPeriodicWorkPolicy.UPDATE, request)

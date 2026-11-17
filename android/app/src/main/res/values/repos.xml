@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="repos">Repositories</string>
-    <string name="repo_offer">%1$s was added on another device, with the key %2$s.</string>
     <string name="repo_add">Add</string>
-    <string name="repo_decline">Decline</string>
     <string name="repo_examples">Example wallpapers</string>
     <string name="repo_packages">Packages: %1$d</string>
     <string name="repo_url">Repository address</string>
@@ -19,8 +17,6 @@
     <string name="repo_check">Check for updates</string>
     <string name="needs_failed">This package is incomplete: %1$s could not be installed, so it may not work.</string>
     <string name="auto_update">Update repositories automatically</string>
-    <string name="away_note">%1$s exists only on another device. Publishing it to the server or to a repository makes it available here.</string>
-    <string name="away_note_repo">%1$s comes from the repository %2$s, which is not added on this device. Adding the repository makes it available here.</string>
     <string name="repo_on_phone">On this phone</string>
     <string name="repo_search_all">Search the repositories</string>
     <string name="repo_manage_note">Add, remove or update them</string>

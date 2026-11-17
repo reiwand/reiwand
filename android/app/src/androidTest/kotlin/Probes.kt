@@ -45,7 +45,7 @@ object Probes {
 
     private val KEYS = listOf(
         "transition.kind", "transition.less_motion", "fit", "playback.quality", "playback.allow_flashing", "playback.duck", "playback.muted",
-        "sync_network", "sync_listen", "video_convert", "repos.auto_refresh",
+        "sync_network", "video_convert", "repos.auto_refresh",
     )
     private val FOREIGN = listOf("Aw", "WebView", "com.google")
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
@@ -113,7 +113,6 @@ object Probes {
             Probe(NOTICES, ::noticesAllowed, { if (it) Device.notifications(true) }),
             Probe("notifications", { manager.activeNotifications.map { it.id }.sorted() }, { manager.cancelAll() }),
             Probe("conversions", { Converting.progress.keys.sorted() }, { Converting.progress.keys.forEach(Converting::stop) }),
-            Probe("hearing channel", { Heard.listening }, {}),
             Probe("open activities", { live() }, { finish() }),
             Probe(PREFERENCES, { prefs() }, ::reset),
         )

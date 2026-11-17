@@ -72,7 +72,6 @@ fun Library(main: Main, sources: () -> Unit, explore: () -> Unit, back: () -> Un
     val revision = main.revision.intValue
     val items by loaded<List<Item>?>(null, revision, query, languages) { fetch("items", "query" to query, "languages" to languages) }
     val now by loaded<Showing?>(null, revision, languages) { showing(languages) }
-    val linked by loaded<String?>(null, revision) { linkedName(Sync.status(), context.online()) }
     chosen.follow(items)
     val reset = {
         text = ""
@@ -90,7 +89,7 @@ fun Library(main: Main, sources: () -> Unit, explore: () -> Unit, back: () -> Un
         runCatching { focus.requestFocus() }
     }
     Column {
-        if (chosen.isEmpty()) Top(linked, { if (searching && text.isEmpty()) searching = false else searching = true }, { adding = true }, searching)
+        if (chosen.isEmpty()) Top({ if (searching && text.isEmpty()) searching = false else searching = true }, { adding = true }, searching)
         else Selecting(main, chosen, items.orEmpty().map(Item::uid), bar = false)
         val shown = items.orEmpty()
         val inUse = now?.item?.uid
@@ -111,7 +110,6 @@ fun Library(main: Main, sources: () -> Unit, explore: () -> Unit, back: () -> Un
                         filter = FILTERS.indexOfFirst { it.second == picked }
                     }
                     Importing(main)
-                    if (query.isEmpty()) AwayNotes(main)
                     if (items?.isEmpty() == true) Empty(main, hollow(kind, searched), searched, reset, explore)
                 }
             }

@@ -6,8 +6,7 @@ palabras: Biblioteca, Listas y Ajustes. Detrás se ve el fondo que tienes puesto
 
 ## Biblioteca
 
-- Arriba, a la izquierda, «Conectado a …» (solo con servidor vinculado y red); a la derecha, la
-  búsqueda y «Añadir».
+- Arriba, a la derecha, la búsqueda y «Añadir».
 - Debajo, la tarjeta del fondo en uso: dónde está puesto, el título, sus datos, «Opciones» y
   «Favorito». Luego la cuadrícula de portadas; la del fondo en uso dice «En uso».
 - Un fondo con destellos lleva una línea ámbar bajo el nombre y no se pone mientras estén
@@ -53,12 +52,12 @@ Se abre al tocar una portada.
 ## Ajustes
 
 Cuatro bloques con un buscador («Buscar en Ajustes»): Privacidad, Fondos, Pantalla y Teléfono, con
-la cuenta como primera fila.
+las cuentas como primera fila.
 
 - **Calidad**: Automática, Ahorrar batería o Máxima; los siete niveles están en «Más opciones».
   Un nivel fijo manda siempre.
 - **Actualizar automáticamente los repositorios** y «Actualizar todo».
-- Datos móviles para sincronizar y descargas del modelo de profundidad, apagados hasta que los
+- Datos móviles para repositorios y descargas del modelo de profundidad, apagados hasta que los
   permitas.
 - Contenido para adultos y destellos.
 - «Volumen de vídeos, escenas y páginas».
@@ -66,22 +65,27 @@ la cuenta como primera fila.
 ## Repositorios y fuentes
 
 Desde Explorar (la pantalla de ejemplos de la biblioteca vacía, o la lista de repositorios)
-instalas paquetes. «Repositorios» te deja añadir uno por dirección, también con «Escanear el código
-QR». Solo valen direcciones https://, o http:// del propio teléfono. En «Imágenes de internet»
+instalas paquetes. «Repositorios» te deja añadir uno con una sola dirección, sin huella ni QR. Uno público se añade
+al instante. Uno privado pide una cuenta: «Usar la cuenta X», «Usar otra cuenta» o iniciar sesión con un
+código en el navegador; la cuenta se liga a ese repositorio y su clave solo se envía a su servidor.
+Si el servidor tiene un certificado propio, se te muestra su huella para que confíes en ella. Si la
+dirección es de un servidor, se listan sus repositorios para elegir uno. Un enlace
+`reiwand://add?url=…` abre este diálogo con la dirección escrita. Solo valen direcciones https://, o
+http:// del propio teléfono. En «Imágenes de internet»
 añades fuentes (imagen del día de Bing, NASA o Wikimedia, Wallhaven, WebDAV, Nextcloud, Immich);
 nada se descarga hasta que la enciendes con «Descargar de internet».
 
-## Cuenta y vincular el teléfono
+## Cuentas y archivo de configuración
 
-Con «Conectar al servidor» pegas la dirección, escaneas su código QR o eliges el servidor que
-aparece «En tu red». Al conectar, tu servidor te da sus repositorios. «Sincronizar mi biblioteca
-con la computadora» mantiene biblioteca y ajustes iguales en ambos. Para dar la clave de
-sincronización a otro dispositivo, compara que las dos pantallas muestren las mismas cifras antes de
-pulsar «Coinciden». «Aprobar un dispositivo» aprueba solo un código que muestre tu propio
-dispositivo nuevo. «Quitar el servidor» deja la biblioteca en este teléfono.
+Ajustes › «Cuenta» lista las cuentas con sus repositorios; puedes dejar de usar una en un repositorio
+o quitarla. Allí mismo, «Exportar la configuración» guarda en un archivo (con el selector de archivos
+del sistema) las secciones que marques; las contraseñas solo salen si lo marcas, cifradas con la
+contraseña que elijas. «Importar una configuración» abre un archivo exportado en el teléfono o en el
+escritorio, muestra qué trae y solo añade lo que marques, sin reemplazar nada. Con listas repetidas
+puedes unirlas o conservar las dos. Las sesiones de cuenta no viajan: se inicia sesión de nuevo.
 
 ## Modo privado
 
 Ajustes › Privacidad › «Modo privado». Corta toda la red del teléfono: sin repositorios, carátulas,
-fuentes, servidor ni computadora. Lo local sigue igual. Las pantallas de red muestran «Modo
+fuentes ni computadora. Lo local sigue igual. Las pantallas de red muestran «Modo
 privado: la red está cortada.» con «Desactivar».

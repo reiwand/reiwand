@@ -10,7 +10,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performScrollToNode
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.work.WorkManager
 import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 import org.json.JSONObject
@@ -45,8 +44,7 @@ class PrivateModeTest {
     private fun refused(answer: Any?) = (answer as? JSONObject)?.optString("id") == "android.private_mode"
 
     private fun everyAction(): List<Boolean> = listOf(
-        refused(asked("op" to "add_anchored", "url" to "http://${listener.base}/", "fingerprint" to "a".repeat(64))),
-        refused(asked("op" to "add", "url" to "http://${listener.base}")),
+        refused(asked("op" to "add_repo", "url" to "http://${listener.base}/")),
         asked("op" to "refresh_repos", "force" to true) is JSONArray,
         runCatching { Net.https("https://${listener.base}/").connect() }.isFailure,
         Updates.check(context).toString().contains("Success"),
@@ -61,14 +59,12 @@ class PrivateModeTest {
     fun nothingLeavesWhileThePhoneIsPrivate() {
         storage()
         Net.choose(true)
-        assertEquals(listOf(true, true, true, true, true), everyAction())
-        Sync.soon(context, 0)
-        assertTrue(WorkManager.getInstance(context).getWorkInfosForUniqueWork("sync-soon").get().isEmpty())
+        assertEquals(listOf(true, true, true, true), everyAction())
         val line = context.getString(R.string.private_mode_line)
         shown { main -> RepoAdd(main, { _, work -> runBlocking { work() } }) {} }
         compose.onNodeWithText(line).assertExists()
         compose.onNodeWithTag("repo_add").assertIsNotEnabled()
-        shown { main -> Explore(main, {}, {}, {}) }
+        shown { main -> Explore(main, {}, {}) }
         compose.onNodeWithTag("private_line").assertExists()
         Thread.sleep(1000)
         assertEquals("connections while private", 0, listener.seen.get())
@@ -81,7 +77,7 @@ class PrivateModeTest {
         runCatching { compose.onNodeWithTag("sources").performScrollToNode(hasTestTag(tag)) }.isSuccess
     }
 
-    private fun sourcesControls(on: Boolean) = listOf("repo_check", "connect_server").forEach { tag ->
+    private fun sourcesControls(on: Boolean) = listOf("repo_check").forEach { tag ->
         reached(tag)
         compose.onNodeWithTag(tag).apply { if (on) assertIsEnabled() else assertIsNotEnabled() }
     }
@@ -90,7 +86,7 @@ class PrivateModeTest {
     fun theSourcesListTurnsItsNetworkControlsOff() {
         storage()
         Net.choose(true)
-        shown { main -> Sources(main, connect = {}) {} }
+        shown { main -> Sources(main) {} }
         sourcesControls(false)
         Net.choose(false)
         compose.waitForIdle()

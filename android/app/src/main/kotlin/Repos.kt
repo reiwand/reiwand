@@ -42,10 +42,10 @@ fun repoName(bundled: Boolean, name: String) = if (bundled) stringResource(R.str
 fun JSONArray?.objects() = this?.let { list -> List(list.length(), list::getJSONObject) }.orEmpty()
 
 @Composable
-fun Repos(main: Main, status: JSONObject, run: Run, add: () -> Unit) {
+fun Repos(main: Main, run: Run, add: () -> Unit) {
     var changed by remember { mutableIntStateOf(0) }
     var exploring by remember { mutableStateOf(false) }
-    val shown by loaded(JSONObject(), changed, status.optInt("offers"), status.optLong("last_sync")) {
+    val shown by loaded(JSONObject(), changed) {
         account("repos") as? JSONObject ?: JSONObject()
     }
     fun act(work: suspend () -> Unit) = run("") {
@@ -57,19 +57,6 @@ fun Repos(main: Main, status: JSONObject, run: Run, add: () -> Unit) {
     Group(stringResource(R.string.repos))
     CutLine()
     if (shown.optJSONArray("repos").objects().isEmpty()) Note(stringResource(R.string.repos_none))
-    shown.optJSONArray("offers").objects().forEach { offer ->
-        val key = offer.optJSONArray("fingerprints")?.optString(0).orEmpty().take(16)
-        ListItem(
-            headlineContent = { Text(stringResource(R.string.repo_offer, offer.getString("name"), key)) },
-            supportingContent = { Text(offer.getString("url").substringBefore('?')) },
-            trailingContent = {
-                Row {
-                    WordAction({ act { account("offer", "repo" to offer.getString("id"), "add" to true) } }, enabled = !cut) { Text(stringResource(R.string.repo_add)) }
-                    WordAction({ act { account("offer", "repo" to offer.getString("id"), "add" to false) } }) { Text(stringResource(R.string.repo_decline)) }
-                }
-            },
-        )
-    }
     shown.optJSONArray("repos").objects().forEach { repo ->
         ListItem(
             headlineContent = { Text(repoName(repo.optBoolean("bundled"), repo.getString("name"))) },

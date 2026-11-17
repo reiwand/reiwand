@@ -43,7 +43,7 @@ fun CutLine(modifier: Modifier = Modifier) {
             scope.launch {
                 withContext(Dispatchers.IO) {
                     Net.choose(false)
-                    Sync.network(context)
+                    Network.changed(context)
                 }
                 Render.post { Wallpaper.reload(false) }
             }

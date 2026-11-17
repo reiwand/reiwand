@@ -61,9 +61,7 @@ pub(crate) enum Request {
 pub(crate) fn request(request: Request) -> Result<Value, Error> {
     match request {
         Request::Preview { path, password } => preview::preview(&path, &password),
-        Request::Export { path, own, secrets, password } => {
-            export::export(&path, own, secrets, &password)
-        }
+        Request::Export { path, own, secrets, password } => export::export(&path, own, secrets, &password),
         Request::Import { path, password, take, lists, suffix } => {
             let pick = pick(take.as_deref(), lists.as_deref(), suffix.as_deref())?;
             apply::import(&path, &password, &pick)

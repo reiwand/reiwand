@@ -92,14 +92,11 @@ class FirstRunTest {
         compose.onNodeWithTag("explore").performClick()
         shows("explore_page")
         shows("offered")
-        compose.onNodeWithTag("explore_page").performScrollToNode(hasTestTag("connect_server"))
-        compose.onNodeWithTag("connect_server").assertIsDisplayed()
         compose.onNodeWithTag("explore_page").performScrollToNode(hasTestTag("manage_repos"))
         compose.onNodeWithTag("manage_repos").performClick()
         shows("sources")
         val name = bundledName()
         compose.waitUntil(TIMEOUT_MS) { compose.onAllNodes(hasText(name)).fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithTag("connect_server").assertIsDisplayed()
     }
 
     @Test
@@ -118,20 +115,6 @@ class FirstRunTest {
         shows("explore")
         val photo = Uri.fromFile(still(0xff3a5a7a.toInt()))
         placed { scenario?.onActivity { it.store(listOf(photo)) } }
-    }
-
-    @Test
-    fun theServerIsOneStepAwayFromTheRepositories() {
-        opened()
-        shows("explore")
-        compose.onNodeWithTag("explore").performClick()
-        shows("explore_page")
-        compose.onNodeWithTag("explore_page").performScrollToNode(hasTestTag("connect_server"))
-        compose.onNodeWithTag("connect_server").performClick()
-        shows("address")
-        shows("scan")
-        scenario?.onActivity { it.onBackPressedDispatcher.onBackPressed() }
-        shows("explore_page")
     }
 
     @Test

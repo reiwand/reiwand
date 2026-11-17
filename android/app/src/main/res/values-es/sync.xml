@@ -1,35 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="phone_label">Nombre de este teléfono</string>
-    <string name="this_phone">Teléfono</string>
-    <string name="waiting_join">Esperando a %s: allí, comparte la clave de sincronización con este teléfono.</string>
-    <string name="waiting_share">Esperando a %s: allí, elige obtener la clave de este teléfono.</string>
-    <string name="waiting_key">Esperando la clave de %s.</string>
-    <string name="key_received">La clave de sincronización llegó de %s</string>
-    <string name="key_sent">La clave de sincronización se envió a %s</string>
     <string name="sync_now">Sincronizar ahora</string>
-    <string name="pause_sync">Pausar la sincronización</string>
     <string name="mobile_data">Usar también datos móviles en segundo plano</string>
-    <string name="listen_shown">Escuchar los cambios mientras se ve el fondo</string>
-    <string name="listen_shown_note">Llegan en segundos mientras se ve la app o el fondo, con las redes y la batería de la sincronización de cada hora; si no, en la sincronización de cada hora, y en cuanto el fondo vuelve a verse.</string>
-    <string name="approve_device">Aprobar un dispositivo</string>
-    <string name="approve_warning">Aprueba solo un código que muestre en pantalla tu propio dispositivo nuevo. Quien te envía un código intenta entrar en tu cuenta.</string>
     <string name="device_code">Código del dispositivo nuevo</string>
-    <string name="look_up">Buscar</string>
-    <string name="approve">Es mi dispositivo: aprobar</string>
     <string name="asked">Un dispositivo con %1$s y %2$s pidió este código el %3$s.</string>
-    <string name="unnamed">un programa sin nombre</string>
     <string name="approved">Dispositivo aprobado</string>
-    <string name="remove_server_question">¿Quitar el servidor? Este teléfono deja de sincronizar y el servidor lo olvida. La biblioteca de este teléfono se queda.</string>
-    <string name="conflict">%1$s (conflicto)</string>
-    <string name="account_password">Contraseña de la cuenta</string>
-    <string name="approve_password">Para aprobar hace falta la contraseña de la cuenta.</string>
-    <string name="outdated">Esta cuenta se sincroniza con una versión más nueva de Reiwand: actualiza la app para seguir sincronizando.</string>
-    <string name="cert_title">Certificado del servidor</string>
-    <string name="cert_question">Este servidor usa un certificado propio. Confía en él solo si esta huella es la que muestra el servidor con reiwand-server fingerprint:</string>
-    <string name="lan_found">En tu red</string>
-    <string name="cert_trust">Confiar en él</string>
-    <string name="checking_server">Comprobando el servidor…</string>
-    <string name="revoked">Se revocó %1$s</string>
-    <string name="signed_out">El servidor ya no acepta este teléfono: lo revocaron desde otro dispositivo o lo quitaron de la cuenta. Quita el servidor aquí y vincula el teléfono otra vez para seguir sincronizando.</string>
 </resources>

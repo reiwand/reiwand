@@ -49,7 +49,6 @@ fun Entries(main: Main, uid: String, open: (String) -> Unit, close: () -> Unit) 
         Column(Modifier.weight(1f)) { Header(list?.name.orEmpty(), close) }
         Square({ sheet = NAME }, Ph.PencilSimple, stringResource(R.string.rename_playlist), boxed = false)
     }
-    list?.away.orEmpty().forEach { AwayLine(it, Modifier.padding(horizontal = Measure.margin, vertical = Measure.e1)) }
     LazyColumn(Modifier.testTag("list-page"), contentPadding = PaddingValues(bottom = Measure.e4)) {
         if (chosen.isEmpty() && manual && found?.isEmpty() == true) item {
             Blank(stringResource(R.string.list_empty), stringResource(R.string.list_empty_how), Modifier.padding(top = Measure.e8, bottom = Measure.e6).testTag("list-empty")) {

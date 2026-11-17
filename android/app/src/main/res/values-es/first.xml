@@ -7,8 +7,6 @@
     <string name="photos_sub">De tu galería</string>
     <string name="files_sub">Escenas y otros archivos del teléfono</string>
     <string name="animated">Fondo animado</string>
-    <string name="your_server">Tu servidor</string>
-    <string name="connect_server_note">Pega o escanea su dirección y verás aquí sus repositorios.</string>
     <string name="first_set">%1$s ya es tu fondo</string>
     <string name="first_set_home">Lo pusimos en tu pantalla de inicio.</string>
     <string name="first_set_confirm">Elige dónde y el teléfono te lo muestra antes de ponerlo.</string>

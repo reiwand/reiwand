@@ -7,8 +7,6 @@
     <string name="photos_sub">From your gallery</string>
     <string name="files_sub">Scenes and other files on the phone</string>
     <string name="animated">Animated wallpaper</string>
-    <string name="your_server">Your server</string>
-    <string name="connect_server_note">Paste or scan its address and you will see its repositories here.</string>
     <string name="first_set">%1$s is your wallpaper now</string>
     <string name="first_set_home">We put it on your home screen.</string>
     <string name="first_set_confirm">Choose where, and the phone shows it before it is put.</string>

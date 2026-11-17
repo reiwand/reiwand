@@ -20,11 +20,10 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 @Composable
-fun Sources(main: Main, close: (() -> Unit)? = null, connect: (() -> Unit)? = null, coded: ((JSONObject) -> Unit)? = null, library: (String) -> Unit) {
+fun Sources(main: Main, close: (() -> Unit)? = null, start: String = "", library: (String) -> Unit) {
     var changes by remember { mutableIntStateOf(0) }
     var task by remember { mutableStateOf<String?>(null) }
-    var adding by rememberSaveable { mutableStateOf(false) }
-    val status by loaded(JSONObject(), changes, main.revision.intValue) { Sync.status() }
+    var adding by rememberSaveable { mutableStateOf(start.isNotEmpty()) }
     val providers by loaded(JSONObject(), changes, main.revision.intValue) { account("providers") as? JSONObject ?: JSONObject() }
     val run: Run = { waiting, work ->
         main.act(false) {
@@ -43,21 +42,13 @@ fun Sources(main: Main, close: (() -> Unit)? = null, connect: (() -> Unit)? = nu
     }
     if (adding) {
         BackHandler { adding = false }
-        return RepoAdd(main, run, { adding = false }, coded.takeIf { linkedName(status, true) == null }) { adding = false }
+        return RepoAdd(main, run, { adding = false }, start) { adding = false }
     }
     LazyColumn(Modifier.testTag("sources")) {
         item(key = "header") { Header(stringResource(R.string.sources), close) }
         item(key = "intro") { Note(stringResource(R.string.sources_intro)) }
         task?.let { waiting -> item(key = "waiting") { Waiting(main, waiting) } }
-        item(key = "repos") { Column { Repos(main, status, run) { adding = true } } }
-        if (connect != null && linkedName(status, true) == null) item(key = "server") {
-            Column {
-                Group(stringResource(R.string.your_server))
-                Setting(stringResource(R.string.connect_block), Modifier.testTag("connect_server"), stringResource(R.string.connect_server_note), enabled = !cut(), onClick = connect) {
-                    Glyph(Ph.CaretRight, null, tint = tones.mist, size = Measure.iconSmall)
-                }
-            }
-        }
+        item(key = "repos") { Column { Repos(main, run) { adding = true } } }
         item(key = "providers") { Column { Providers(main, providers, run, library) } }
         item(key = "end") { Spacer(Modifier.height(Measure.e8)) }
     }

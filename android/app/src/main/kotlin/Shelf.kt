@@ -39,7 +39,6 @@ fun Shelf(main: Main, sources: () -> Unit, explore: () -> Unit, all: (Boolean) -
     val revision = main.revision.intValue
     val items by loaded<List<Item>?>(null, revision, kind, languages) { fetch("items", "query" to kind, "languages" to languages) }
     val now by loaded<Showing?>(null, revision, languages) { showing(languages) }
-    val linked by loaded<String?>(null, revision) { linkedName(Sync.status(), context.online()) }
     val where = remember(now) { context.screens() }
     val bare = tab == 0 && items?.isEmpty() == true
     val wide = maxWidth
@@ -49,7 +48,7 @@ fun Shelf(main: Main, sources: () -> Unit, explore: () -> Unit, all: (Boolean) -
         verticalArrangement = if (bare) Arrangement.SpaceBetween else Arrangement.Top,
     ) {
         Column(Modifier.testTag("shelf_top")) {
-            Top(linked, { all(true) }, { adding = true })
+            Top({ all(true) }, { adding = true })
             val current = now
             when {
                 current != null -> Now(current, where, { open(current.item.uid) }) { loved ->
@@ -59,7 +58,6 @@ fun Shelf(main: Main, sources: () -> Unit, explore: () -> Unit, all: (Boolean) -
                 else -> Header(stringResource(R.string.library))
             }
             Importing(main)
-            AwayNotes(main)
             if (bare) Empty(main, Hollow.LIBRARY, sources = explore)
         }
         if (bare) Bundled(main, explore)

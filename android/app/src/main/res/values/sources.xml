@@ -73,14 +73,9 @@
     <string name="repo_nothing">Nothing to show. Try other search words, or refresh the repositories.</string>
     <string name="repo_checking">Checking the repository…</string>
     <string name="repo_add_title">Add a repository</string>
-    <string name="repo_about">Paste the whole address the publisher shares (the one the desktop app copies): it already carries the fingerprint, and nothing else is needed. The fingerprint names the key that signs the repository; the phone only accepts the repository if it answers with exactly that key, so nobody in between can swap the packages.</string>
+    <string name="repo_about">Paste the address of a repository or of a server. A public repository is added at once; a private one asks you to sign in; a server shows its repositories to pick one.</string>
     <string name="repo_url_example">https://example.org/wallpapers/</string>
-    <string name="repo_fingerprint">Fingerprint (only if the address does not carry it)</string>
-    <string name="repo_fingerprint_help">64 letters and digits; spaces are fine.</string>
     <string name="repo_sent">Adding it contacts %1$s and reads its list of packages. That site sees this phone\'s internet address.</string>
-    <string name="repo_server_code">This code belongs to a server: connecting to it brings its repositories.</string>
-    <string name="repo_camera_missing">This phone has no camera: type or paste the address of the repository.</string>
-    <string name="repo_camera_refused">Without the camera the code cannot be read: type or paste the address of the repository.</string>
     <plurals name="provider_got">
         <item quantity="one">%1$d new picture was added to your library.</item>
         <item quantity="other">%1$d new pictures were added to your library.</item>

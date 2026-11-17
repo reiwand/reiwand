@@ -60,14 +60,6 @@ class PhoneNoticesTest {
     }
 
     @Test
-    fun aServerAddressThatIsNotOneAnswersOnTheScreen() {
-        shown { main -> Connect(Desk(main), {}, {}) {} }
-        compose.onAllNodes(hasSetTextAction())[0].performTextInput("not an address")
-        compose.onNodeWithTag("connect").performClick()
-        compose.waitUntil(10_000) { compose.onAllNodesWithTag("problem").fetchSemanticsNodes().isNotEmpty() }
-    }
-
-    @Test
     fun aSwitchIsOneControlWithItsName() {
         shown { Toggle(context.getString(R.string.fade), true) {} }
         text(R.string.fade).assertIsOn()

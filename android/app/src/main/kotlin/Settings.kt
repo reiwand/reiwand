@@ -50,16 +50,13 @@ fun Settings(main: Main, account: () -> Unit = {}) {
     val knobs = Knobs(main, values, report, changes, set, change)
     val labels = SETTING_LINES.map { stringResource(it.label) }
     val accountLabel = stringResource(R.string.account)
-    val context = LocalContext.current
-    val linked by loaded<String?>(null, main.revision.intValue) { linkedName(Sync.status(), context.online()) }
-    val linkedLabel = linked?.let { stringResource(R.string.connected_to, it) }
     val searching = query.isNotBlank()
     val found = SETTING_LINES.filterIndexed { i, _ -> finds(query, labels[i]) }
     val more = stringResource(R.string.more_options)
     LazyColumn(Modifier.testTag("settings")) {
         item { Header(stringResource(R.string.settings)) }
         item { Finder(query, stringResource(R.string.search_settings)) { query = it } }
-        if (finds(query, accountLabel)) item { Setting(accountLabel, Modifier.testTag("account"), linkedLabel, onClick = account) }
+        if (finds(query, accountLabel)) item { Setting(accountLabel, Modifier.testTag("account"), onClick = account) }
         Block.entries.forEach { block ->
             val bit = 1 shl block.ordinal
             val open = unfolded and bit != 0
@@ -84,5 +81,5 @@ private fun stored(main: Main, key: String, value: String) {
     if (key == Updates.SETTING || key == Updates.AUTO) Updates.schedule(main)
     if (key == Updates.AUTO && value == "true") Native.account("{\"op\": \"refresh_repos\", \"force\": false}")
     if (key == Net.PRIVATE) Net.private()
-    if (key == Sync.NETWORK || key == Net.PRIVATE) Sync.network(main)
+    if (key == Network.SETTING || key == Net.PRIVATE) Network.changed(main)
 }

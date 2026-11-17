@@ -5,6 +5,7 @@ import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff
@@ -91,60 +92,29 @@ class SourcesTest {
     }
 
     @Test
-    fun aRepositoryNeverAddsWithoutItsFingerprintAndSaysWhy() {
+    fun aRepositoryIsAddedFromOneAddressField() {
         shown { main -> RepoAdd(main, { _, work -> main.act(false) { work() } }) {} }
+        compose.onAllNodes(hasSetTextAction()).assertCountEquals(1)
+        text(R.string.repo_add_url).assertIsNotEnabled()
         field(R.string.repo_url).performTextInput("https://example.org/wallpapers/")
-        text(R.string.repo_add_url).assertIsEnabled().performSemanticsAction(SemanticsActions.OnClick)
-        compose.waitUntil(TIMEOUT_MS) { compose.onAllNodes(hasText(context.getString(R.string.error_android_repo_needs_fingerprint))).fetchSemanticsNodes().isNotEmpty() }
+        text(R.string.repo_add_url).assertIsEnabled()
         text(R.string.repo_sent, "example.org").assertIsDisplayed()
     }
 
-    private fun box(label: Int) = hasContentDescription(context.getString(label)) and hasSetTextAction()
-
-    private fun refused(url: String, print: String, marked: Int?, told: Int? = null) {
+    private fun refused(url: String, told: Int) {
         shown { Sources(it) {} }
         reached(context.getString(R.string.repo_add_title)).performClick()
         field(R.string.repo_url).performTextInput(url)
-        if (print.isNotEmpty()) field(R.string.repo_fingerprint).performTextInput(print)
         compose.onNodeWithTag("repo_add").assertIsEnabled().performSemanticsAction(SemanticsActions.OnClick)
-        val wrong = SemanticsMatcher.keyIsDefined(SemanticsProperties.Error)
-        val shown = patient {
-            if (marked == null) compose.onAllNodesWithTag("repo_problem").fetchSemanticsNodes().isNotEmpty()
-            else compose.onAllNodes(box(marked) and wrong).fetchSemanticsNodes().isNotEmpty()
-        }
-        assertTrue("the refusal is told where it belongs", shown)
-        listOf(R.string.repo_url, R.string.repo_fingerprint).filter { it != marked }.forEach { compose.onAllNodes(box(it) and wrong).assertCountEquals(0) }
-        if (marked != null) compose.onAllNodesWithTag("repo_problem").assertCountEquals(0)
-        told?.let { compose.onNode(hasText(context.getString(it))).assertExists() }
+        val shown = patient { compose.onAllNodes(hasText(context.getString(told))).fetchSemanticsNodes().isNotEmpty() }
+        assertTrue("the refusal is told under the address", shown)
         compose.onNode(hasText(url)).performScrollTo().assertIsDisplayed()
-        if (print.isNotEmpty()) compose.onNode(hasText(print)).performScrollTo().assertIsDisplayed()
         assertEquals(0, Updates.repos())
     }
 
     @Test
-    fun aRefusedRepositoryKeepsItsMessageAndWhatWasTyped() {
-        val print = "ab".repeat(32)
-        refused("http://127.0.0.1:1/", print, null)
-    }
-
-    @Test
-    fun anAddressThatIsNotARepositoryKeepsItsMessageAndWhatWasTyped() {
-        Stalling().use { slow -> refused(slow.url, "cd".repeat(32), null) }
-    }
-
-    @Test
-    fun aFingerprintOfTheWrongLengthKeepsItsMessageAndWhatWasTyped() {
-        refused("https://example.net/wallpapers/", "abc123", R.string.repo_fingerprint, R.string.error_android_repo_fingerprint)
-    }
-
-    @Test
     fun aPlainHttpAddressElsewhereIsToldUnderTheAddress() {
-        refused("http://example.org/wallpapers/", "ab".repeat(32), R.string.repo_url, R.string.error_android_repo_https)
-    }
-
-    @Test
-    fun aWrongAddressIsToldBeforeAMissingFingerprint() {
-        refused("http://example.org/wallpapers/", "", R.string.repo_url, R.string.error_android_repo_https)
+        refused("http://example.org/wallpapers/", R.string.error_android_repo_https)
     }
 
     @Test

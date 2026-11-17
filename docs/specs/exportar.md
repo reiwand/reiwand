@@ -57,3 +57,7 @@ El daemon (`apps/reiwandd/src/carry`) llena el contenido con el estado real: rep
 Importar solo agrega y sigue este orden: repositorios, proveedores y claves, paquetes, fondos propios, biblioteca (listas, favoritos, valoraciones, etiquetas) y ajustes. Un repositorio que pide confirmación queda como pendiente y no hace fallar el resto. Lo que se refiere a un fondo que no está aquí se cuenta como no resuelto. Con `lists = join` una segunda importación no duplica nada; con `both` cada importación crea otra copia con el sufijo (` (importada)`, ` (importada) 2`…).
 
 `reiwand-ctl export ARCHIVO [--own] [--secrets] [--password-file ARCHIVO]` y `reiwand-ctl import ARCHIVO [--list] [--take SECCIÓN]… [--lists join|both] [--suffix TEXTO]`; `--list` solo muestra lo que trae. Ver `dbus.md`, `Carry1`.
+
+## En el teléfono
+
+`crates/reiwand-android` (`carry`) arma el mismo contenido que el daemon y aplica el mismo orden y el mismo informe. El archivo se elige con el selector de archivos del sistema: Kotlin copia el documento a la caché de la app (o desde ella) y Rust trabaja sobre esa ruta. Operaciones de `Native.account`: `carry_preview`, `carry_export` (`own`, `secrets`, `password`) y `carry_import` (`take`, `lists`, `suffix`). Un archivo exportado en el escritorio se importa en el teléfono y al revés; las claves de los proveedores y las sesiones siguen las mismas reglas. El teléfono no tiene subcomando de terminal: la paridad es la de los dos programas sobre el mismo archivo.

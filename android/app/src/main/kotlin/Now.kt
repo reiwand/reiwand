@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -41,11 +42,6 @@ suspend fun showing(languages: List<String>): Showing? {
     return Showing(item, !current.isNull("playlist"))
 }
 
-private val LINKED = setOf("connected", "needs_key", "paused", "ready")
-
-fun linkedName(status: JSONObject, online: Boolean): String? = status.takeIf { online && it.optString("state") in LINKED }
-    ?.let { it.optString("name").ifBlank { Uri.parse(it.optString("url")).host.orEmpty() } }?.takeIf(String::isNotBlank)
-
 fun Context.online(): Boolean = getSystemService(ConnectivityManager::class.java)
     ?.let { it.getNetworkCapabilities(it.activeNetwork) }?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
 
@@ -65,17 +61,12 @@ private val ON = mapOf(HOME to R.string.lib_on_home, LOCK to R.string.lib_on_loc
 private val ROTATING = mapOf(HOME to R.string.lib_rotating_home, LOCK to R.string.lib_rotating_lock, BOTH to R.string.lib_rotating_both)
 
 @Composable
-fun Top(linked: String?, search: () -> Unit, add: () -> Unit, searching: Boolean = false) = Row(
+fun Top(search: () -> Unit, add: () -> Unit, searching: Boolean = false) = Row(
     Modifier.fillMaxWidth().padding(start = Measure.margin, end = Measure.e3, top = 6.dp).heightIn(min = Measure.touch),
     Arrangement.spacedBy(Measure.e2),
     Alignment.CenterVertically,
 ) {
-    Row(Modifier.weight(1f), Arrangement.spacedBy(7.dp), Alignment.CenterVertically) {
-        linked?.let { name ->
-            Glyph(Ph.CloudCheck, null, tint = tones.frost, size = Measure.iconFold)
-            Text(stringResource(R.string.lib_connected_to, name), Modifier.testTag("connected"), tones.frost, style = Type.foot)
-        }
-    }
+    Spacer(Modifier.weight(1f))
     Square(search, Ph.MagnifyingGlass, stringResource(R.string.search), lit = searching)
     Square(add, Ph.Plus, stringResource(R.string.choose))
 }

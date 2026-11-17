@@ -107,7 +107,6 @@ private fun ListRow(main: Main, list: Playlist, open: () -> Unit) = Column(
         }
         Glyph(Ph.CaretRight, null, tint = t.mistLow, size = Measure.iconSmall)
     }
-    list.away.forEach { AwayLine(it, Modifier.padding(start = Measure.margin, end = Measure.margin, bottom = Measure.e2)) }
 }
 
 @Composable
