@@ -41,6 +41,7 @@ pub fn init_repo(
     reiwand_format::init(&repo.dir, &settings, now() / 1000)?;
     reiwand_format::sign_root(&repo.dir, &Signer::new(&root.secret, None)?)?;
     store_key(&repo.key, &online.secret)?;
+    crate::seal::keep_root(&cfg.data, name, &root.secret)?;
     repos::record(cfg, &repo)?;
     Ok(root)
 }

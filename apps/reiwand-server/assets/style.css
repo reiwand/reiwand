@@ -526,13 +526,6 @@ pre.dato { white-space: pre-wrap; padding: var(--e-3) var(--e-4); border-radius:
 .qr svg { display: block; color: var(--noche); }
 .qr-texto { flex: 1 1 16rem; min-width: 0; display: flex; flex-direction: column; gap: var(--e-2); }
 .qr-texto b { font: 600 var(--t-grande) / 1.3 var(--titulo); }
-.clave {
-  padding: var(--e-5);
-  border-radius: var(--radio);
-  background: var(--noche-alta);
-  border: 1px solid var(--noche-linea);
-}
-.clave .dato { font-size: var(--t-grande); letter-spacing: 0.06em; }
 .caso-portada {
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -660,3 +653,8 @@ main label:has(> input[type=checkbox]) { flex-direction: row; align-items: cente
 form:has(input[name="network"][value="own"]:checked) .campos-ruta { display: grid; }
 .lista-pasos { padding-left: 1.4em; display: grid; gap: var(--e-2); }
 .acciones.final { margin-top: var(--e-8); }
+
+.seccion.nueva {
+  outline: 2px solid var(--brote);
+  outline-offset: 4px;
+}

@@ -94,9 +94,3 @@ pub fn record(cfg: &Config, repo: &Repo) -> anyhow::Result<()> {
     open(cfg)?.read(|c| c.execute(sql, params![repo.name, folder, key, id, now()]))?;
     Ok(())
 }
-
-pub fn load_data(data: &Path) -> Vec<Repo> {
-    let path = data.join("db/reiwand.sqlite");
-    let found = Connection::open(path).and_then(|c| read(&c, data));
-    found.unwrap_or_else(|_| vec![Repo::named(data, "main")])
-}

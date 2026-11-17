@@ -45,12 +45,3 @@ pub fn qr(svg: &str, alt: &str, text: Markup) -> Markup {
         }
     }
 }
-
-pub fn key_box(secret: &str, help: &str) -> Markup {
-    html! {
-        div.clave {
-            p.dato { (secret) }
-            p.ayuda { (help) }
-        }
-    }
-}

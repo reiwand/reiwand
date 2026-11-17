@@ -55,7 +55,6 @@ pub struct Settings {
     pub network_chosen: bool,
     pub advertise: bool,
     pub done: bool,
-    pub key_pending: bool,
     pub admin_handle: Option<String>,
     pub repo_name: Option<String>,
 }
@@ -124,7 +123,6 @@ pub fn load(conn: &Connection, cfg: &Config) -> anyhow::Result<Settings> {
         network_chosen: network.is_some(),
         network: network.unwrap_or(started),
         done: get("setup") == Some("done"),
-        key_pending: get("root_key") == Some("pending"),
         repo_name: get("repo_name").map(str::to_owned),
         admin_handle: conn.query_row(HANDLE, [], |r| r.get(0)).optional()?,
     })

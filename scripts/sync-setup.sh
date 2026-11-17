@@ -5,7 +5,6 @@ step --data-urlencode "token=$("$BIN/reiwand-server" setup-token)" "$URL/setup"
 step -d network=own "$URL/setup/network"
 step -d handle=admin -d password=correct-horse-battery "$URL/setup/account"
 step -d name=Example "$URL/setup/repository"
-step -d saved=on "$URL/setup/saved"
 first=$(curl -fsS -b "$jar" "$URL/setup" | grep -o 'register?invite=[0-9a-f]*' | head -n 1 | cut -d= -f2)
 [ -n "$first" ] || fail "the access step did not show the first invitation"
 step -d access=invite "$URL/setup/access"

@@ -136,9 +136,8 @@ fn run(command: Command) -> Result<String> {
                 reiwand_server::init_repo(&cfg, &repo, &name, require_author_signature, online_authors)?;
             let status = reiwand_server::status_repo(&cfg, &repo)?;
             Ok(format!(
-                "Root key fingerprint: {}\n\
-                 Store this root secret key offline now, the server does not keep it:\n\n{}\n{status}",
-                root.fingerprint, root.secret
+                "Root key fingerprint: {}\nThe server keeps the root key sealed in its data folder and in its backups.\n{status}",
+                root.fingerprint
             ))
         }
         Command::Repo(Repo::Import { dir, repo, online_key }) => {

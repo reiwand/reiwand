@@ -69,19 +69,9 @@ async fn the_assistant_walks_every_step_in_both_languages() {
         .await;
     let fields = [("name", "Home wallpapers"), ("online_authors", "on")];
     assert_eq!(post(&server, "/setup/repository", &visit, &fields).await, StatusCode::SEE_OTHER);
-    let key = both(
-        &server,
-        &visit,
-        &["Save the root key", "I saved it"],
-        &["Guarda la clave raíz", "Ya la guardé"],
-    )
-    .await;
-    let secret = key.split("<p class=\"dato\">").nth(1).unwrap().split('<').next().unwrap().to_owned();
-    assert!(secret.len() > 20, "{secret}");
-    assert_eq!(post(&server, "/setup/saved", &visit, &[]).await, StatusCode::UNPROCESSABLE_ENTITY);
-    assert_eq!(post(&server, "/setup/saved", &visit, &[("saved", "on")]).await, StatusCode::SEE_OTHER);
+    assert!(reiwand_server::open_root(&server.cfg.data, "main").unwrap().is_some());
     let (_, access) = show(&server, &visit, false).await;
-    assert!(!access.contains(&secret), "the root key is shown only once");
+    assert!(!access.contains("I saved it") && access.contains("/register?invite="), "{access}");
     let invite =
         both(&server, &visit, &["Who gets in", "/register?invite=", "<svg"], &["Por invitación", "Terminar"])
             .await;
@@ -104,14 +94,12 @@ async fn a_finished_setup_can_never_make_another_administrator_or_repository() {
     let visit = server.visit().await;
     let fields = [("name", "Home"), ("online_authors", "on")];
     assert_eq!(post(&server, "/setup/repository", &visit, &fields).await, StatusCode::SEE_OTHER);
-    assert_eq!(post(&server, "/setup/saved", &visit, &[("saved", "on")]).await, StatusCode::SEE_OTHER);
     assert_eq!(post(&server, "/setup/access", &visit, &[("access", "closed")]).await, StatusCode::SEE_OTHER);
     let fresh = server.app.setup_token().await.unwrap();
     assert_eq!(post(&server, "/setup", &Who::Nobody, &[("token", &fresh)]).await, StatusCode::FORBIDDEN);
     let again = [("handle", "eve"), ("password", "a long enough password")];
     assert_eq!(post(&server, "/setup/account", &visit, &again).await, StatusCode::FORBIDDEN);
     assert_eq!(post(&server, "/setup/repository", &visit, &fields).await, StatusCode::FORBIDDEN);
-    assert_eq!(post(&server, "/setup/again", &visit, &[]).await, StatusCode::FORBIDDEN);
     assert_eq!(post(&server, "/setup/network", &visit, &[("network", "home")]).await, StatusCode::FORBIDDEN);
     let (status, _) = show(&server, &Who::Nobody, false).await;
     assert_eq!(status, StatusCode::SEE_OTHER);
@@ -127,7 +115,6 @@ async fn the_stored_choice_wins_over_the_starting_environment() {
     let visit = server.visit().await;
     let fields = [("name", "Home"), ("online_authors", "on")];
     post(&server, "/setup/repository", &visit, &fields).await;
-    post(&server, "/setup/saved", &visit, &[("saved", "on")]).await;
     assert_eq!(post(&server, "/setup/access", &visit, &[("access", "closed")]).await, StatusCode::SEE_OTHER);
     let body = json!({"handle": "eve", "password": "a long enough password"});
     let (status, _) = server.json(Method::POST, "/api/v1/auth/register", &Who::Nobody, Some(body)).await;
@@ -145,23 +132,4 @@ async fn the_stored_choice_wins_over_the_starting_environment() {
     let bad = json!({"registration": "everyone"});
     assert_eq!(server.json(Method::PATCH, path, &admin, Some(bad)).await.0, StatusCode::UNPROCESSABLE_ENTITY);
     assert_eq!(server.json(Method::GET, path, &Who::Nobody, None).await.0, StatusCode::UNAUTHORIZED);
-}
-
-#[tokio::test]
-async fn a_root_key_lost_to_a_restart_offers_to_make_the_repository_again() {
-    let server = start(&[]).await;
-    server.admin().await;
-    let visit = server.visit().await;
-    let fields = [("name", "Home"), ("online_authors", "on")];
-    assert_eq!(post(&server, "/setup/repository", &visit, &fields).await, StatusCode::SEE_OTHER);
-    let other = server.visit().await;
-    let (_, page) = show(&server, &other, false).await;
-    assert!(page.contains("The root key is no longer shown.") && !page.contains("class=\"clave\""), "{page}");
-    assert_eq!(post(&server, "/setup/saved", &other, &[]).await, StatusCode::UNPROCESSABLE_ENTITY);
-    assert_eq!(post(&server, "/setup/again", &other, &[]).await, StatusCode::SEE_OTHER);
-    let (_, page) = show(&server, &other, false).await;
-    assert!(page.contains("Create the repository"), "{page}");
-    assert_eq!(post(&server, "/setup/repository", &other, &fields).await, StatusCode::SEE_OTHER);
-    let (_, page) = show(&server, &other, false).await;
-    assert!(page.contains("Save the root key") && page.contains("class=\"clave\""));
 }

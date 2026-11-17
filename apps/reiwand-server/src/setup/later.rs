@@ -1,5 +1,5 @@
 use super::steps::{inside, refused};
-use super::{Stage, again, held_key, view};
+use super::{Stage, again, view};
 use crate::creds::digest;
 use crate::db::one;
 use crate::error::{Problem, Res};
@@ -22,7 +22,7 @@ pub struct Repository {
 }
 
 pub async fn repository(State(app): St, headers: HeaderMap, Form(f): Form<Repository>) -> Res<Response> {
-    let visit = inside(&app, &headers, Stage::Repository).await?;
+    inside(&app, &headers, Stage::Repository).await?;
     let name = f.name.trim().to_owned();
     if name.is_empty() || name.chars().count() > 80 {
         return refused(view::repository(&app, Some(&name)), StatusCode::UNPROCESSABLE_ENTITY);
@@ -38,54 +38,10 @@ pub async fn repository(State(app): St, headers: HeaderMap, Form(f): Form<Reposi
     let made = tokio::task::spawn_blocking(move || {
         crate::init_repo(&cfg, &slug, &kept, false, f.online_authors.is_some())
     });
-    let root = made
-        .await
-        .map_err(Problem::internal)?
-        .map_err(|e| Problem::conflict("repository", format!("{e:#}")))?;
+    made.await.map_err(Problem::internal)?.map_err(|e| Problem::conflict("repository", format!("{e:#}")))?;
     let kept = name.clone();
-    app.change(move |c| put(c, &[("root_key", "pending"), ("repo_name", &kept)])).await?;
-    app.held.lock().unwrap_or_else(PoisonError::into_inner).key = Some((visit, name, root.secret));
+    app.change(move |c| put(c, &[("repo_name", &kept)])).await?;
     app.changed().await;
-    Ok(again())
-}
-
-#[derive(Deserialize)]
-pub struct Saved {
-    #[serde(default)]
-    saved: Option<String>,
-}
-
-pub async fn saved(State(app): St, headers: HeaderMap, Form(f): Form<Saved>) -> Res<Response> {
-    let visit = inside(&app, &headers, Stage::Key).await?;
-    if f.saved.is_none() {
-        let held = held_key(&app, Some(&visit));
-        return refused(view::key(&app, held.as_ref(), Some(())), StatusCode::UNPROCESSABLE_ENTITY);
-    }
-    app.change(|c| settings::drop_key(c, "root_key")).await?;
-    app.held.lock().unwrap_or_else(PoisonError::into_inner).key = None;
-    Ok(again())
-}
-
-pub async fn again_repo(app: &App) -> Res<()> {
-    let data = app.cfg.data.clone();
-    tokio::task::spawn_blocking(move || {
-        for repo in crate::repos::load_data(&data) {
-            drop(std::fs::remove_dir_all(data.join(repo.folder())));
-            drop(std::fs::remove_file(data.join(repo.key_name())));
-        }
-    })
-    .await
-    .map_err(Problem::internal)?;
-    app.change(|c| settings::drop_key(c, "root_key")).await?;
-    Ok(())
-}
-
-pub async fn again_key(State(app): St, headers: HeaderMap) -> Res<Response> {
-    let visit = inside(&app, &headers, Stage::Key).await?;
-    if !app.settings().key_pending || held_key(&app, Some(&visit)).is_some() {
-        return Ok(again());
-    }
-    again_repo(&app).await?;
     Ok(again())
 }
 

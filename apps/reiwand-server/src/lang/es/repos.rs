@@ -1,5 +1,15 @@
 pub const TEXTS: super::Texts = &[
     ("Repositories", "Repositorios"),
+    ("The repository was not created", "No se creó el repositorio"),
+    ("Repository created", "Repositorio creado"),
+    (
+        "Copy its address below to add it in the app, and choose who can see it and who can publish.",
+        "Copia su dirección más abajo para añadirlo en la app y elige quién puede verlo y quién puede publicar.",
+    ),
+    (
+        "This repository has no backup root key: it was created before the server kept it.",
+        "Este repositorio no tiene su clave de respaldo: se creó antes de que el servidor la guardara.",
+    ),
     (
         "Create and manage the repositories this server hosts",
         "Crear y administrar los repositorios de este servidor",

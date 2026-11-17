@@ -30,12 +30,16 @@ async fn backup_and_restore_keep_accounts_packages_and_the_signed_index() {
     assert!(
         files.contains_key("reiwand.sqlite")
             && files.contains_key("keys/main.online.key")
+            && files.contains_key("keys/main.root.sealed")
+            && files.contains_key("keys/seal.key")
             && files.keys().any(|k| k.starts_with("thumbs/"))
     );
     let target = server.dir.path().join("restored");
     let cfg = Config { data: target.clone(), ..server.cfg.clone() };
     reiwand_server::restore(&cfg, &snapshot, false).unwrap();
     assert!(reiwand_server::restore(&cfg, &snapshot, false).is_err());
+    let kept = reiwand_server::open_root(&server.cfg.data, "main").unwrap().unwrap();
+    assert_eq!(reiwand_server::open_root(&target, "main").unwrap(), Some(kept));
     let app = App::open(cfg.clone()).unwrap();
     assert!(app.publish().await.unwrap().unwrap() > before);
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();

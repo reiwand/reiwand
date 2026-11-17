@@ -7,7 +7,7 @@ use crate::settings::{Network, Settings};
 use crate::ui::{Choice, Kind, Row, Tone, button, choices, field, fold, notice, rows, status, steps};
 use maud::{Markup, html};
 
-pub use super::forms::{access, account, key, repository};
+pub use super::forms::{access, account, repository};
 
 pub fn frame_line(step: usize) -> Markup {
     html! { p.linea-estado { span.tenue { (tf("Setting up the server · step {} of 4", &[&(step + 1)])) } } }

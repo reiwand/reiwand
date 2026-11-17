@@ -19,7 +19,6 @@ use serde::Deserialize;
 
 #[derive(Default)]
 pub struct Held {
-    key: Option<(Vec<u8>, String, String)>,
     invite: Option<(Vec<u8>, String)>,
 }
 
@@ -29,7 +28,6 @@ pub enum Stage {
     Network,
     Account,
     Repository,
-    Key,
     Access,
     Done,
 }
@@ -39,7 +37,7 @@ impl Stage {
         match self {
             Stage::Code | Stage::Network => 0,
             Stage::Account => 1,
-            Stage::Repository | Stage::Key => 2,
+            Stage::Repository => 2,
             Stage::Access | Stage::Done => 3,
         }
     }
@@ -51,8 +49,6 @@ pub fn routes() -> Router {
         .route("/setup/network", post(steps::network))
         .route("/setup/account", post(steps::account))
         .route("/setup/repository", post(later::repository))
-        .route("/setup/saved", post(later::saved))
-        .route("/setup/again", post(later::again_key))
         .route("/setup/access", post(later::access))
         .route("/api/v1/admin/settings", get(stored::read).patch(stored::change))
 }
@@ -86,10 +82,9 @@ pub async fn stage(app: &App, visit: bool) -> Res<Stage> {
     }
     let admin =
         app.db.run(|c| one::<i64>(c, "SELECT id FROM users WHERE role = 'admin' LIMIT 1", [])).await?;
-    Ok(match (admin, !app.repos.ready().is_empty(), settings.key_pending) {
-        (None, _, _) => Stage::Account,
-        (_, false, _) => Stage::Repository,
-        (_, true, true) => Stage::Key,
+    Ok(match (admin, !app.repos.ready().is_empty()) {
+        (None, _) => Stage::Account,
+        (_, false) => Stage::Repository,
         _ => Stage::Access,
     })
 }
@@ -116,15 +111,9 @@ async fn show(
         (Stage::Network, _) => view::network(&app, &app.settings(), None),
         (Stage::Account, _) => view::account(&app, None, None),
         (Stage::Repository, _) => view::repository(&app, None),
-        (Stage::Key, _) => view::key(&app, held_key(&app, visit.as_deref()).as_ref(), None),
         (Stage::Access, _) => view::access(&app, &later::first_invite(&app, visit.as_deref()).await?),
     };
     Ok(([(header::CACHE_CONTROL, "no-store")], page).into_response())
-}
-
-fn held_key(app: &App, visit: Option<&[u8]>) -> Option<(String, String)> {
-    let held = app.held.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-    held.key.as_ref().filter(|(v, _, _)| Some(v.as_slice()) == visit).map(|(_, n, s)| (n.clone(), s.clone()))
 }
 
 pub fn again() -> Response {

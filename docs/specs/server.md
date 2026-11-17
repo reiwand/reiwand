@@ -20,7 +20,7 @@ docker compose logs reiwand | grep setup        # one-time token for the setup a
 | `healthcheck` | Exit 0 when `GET /healthz` on the local port answers 200 (the image `HEALTHCHECK`); with `REIWAND_TLS=self-signed`, when the port accepts a connection |
 | `setup-token` | Print a one-time token (24 h) that opens the setup assistant at `/setup`; once the setup is finished it opens nothing |
 | `fingerprint` | Print the lowercase hex SHA-256 of the certificate served with `REIWAND_TLS=self-signed`, making it first when there is none |
-| `repo init --name N [--require-author-signature] [--online-authors]` | Create the repository: a root key and an online key. The root secret key is printed once and never stored. `--online-authors` lets accounts register author keys online (below) |
+| `repo init --name N [--require-author-signature] [--online-authors]` | Create the repository: a root key and an online key. The server seals the root secret key in its data folder (see «Root key kept by the server») and prints only its fingerprint. `--online-authors` lets accounts register author keys online (below) |
 | `repo import DIR [--online-key FILE]` | Import `root/<N>.json` files signed offline (and `catalog.json` the first time) plus the online key |
 | `repo status`, `repo publish` | Show the repository and its share URL; sign and publish now |
 | `backup [DIR]` | Snapshot the database with `VACUUM INTO`, copy the blobs, thumbnails and complete private files that the snapshot names (a file deleted meanwhile takes a new snapshot, up to three times; files missing from two snapshots in a row are listed as `missing` in the manifest with a warning), the withdrawn packages, the keys and the repository; default `DIR` is `<data>/backups/<UTC time>`, removed again when the backup fails |
@@ -71,9 +71,7 @@ at the first step not done:
    effect when the setup is finished and at every later start.
 2. **Account**: the administrator. «Change» on a later step edits the same account.
 3. **Repository**: its name, its address name (`main` by default) and «Online authors» (as `repo init --online-authors`). The root
-   secret key is shown once, in that page only (`Cache-Control: no-store`): it is never stored,
-   logged or put in an address. It stays in memory until «I saved it» is marked; if the server
-   restarts before that, the step offers to make the repository again. A repository made before
+   secret key is not shown: the server keeps it sealed (see «Root key kept by the server»). A repository made before
    with `repo init` or `repo import` skips this step.
 4. **Who gets in**: «Closed», «By invitation» or «Open», stored as the registration and
    publishing choices below. The page also makes the first invitation (one use, 7 days) and shows
@@ -142,7 +140,9 @@ thumbs/<sha256>.jpg  640 px previews re-encoded by the validator
 held/<sha256>.wpak   removed or revoked packages (and their previews) for REIWAND_TAKEDOWN_DAYS, not served
 private/<user>/<id>  end-to-end encrypted private files of each account
 repos/<name>/        each repository of the server (docs/specs/repo.md), built with reiwand-format; the first one is `main`
-keys/<name>.online.key  its online signing key (0600); the root key never lives here
+keys/<name>.online.key  its online signing key (0600)
+keys/<name>.root.sealed  its root key sealed with XChaCha20-Poly1305 (0600): 24-byte random nonce followed by the ciphertext
+keys/seal.key        32 random bytes (0600), made on first use: the sealing key of every `*.root.sealed`
 db/reiwand.sqlite.before-vN-from-vM  copy kept once by reiwand-upgrade before it changes the database
 keys/mail.secret     password of the mail server (0600), only when mail is set up
 tls/cert.der, key.der  certificate and key of REIWAND_TLS=self-signed (0600)
@@ -223,17 +223,32 @@ same package id of another repository.
 | Method | Path | Role | Answer |
 |--------|------|------|--------|
 | GET | `/api/v1/admin/repos` | admin | `{items}`: name, repo id, root version, share URL and address of each |
-| POST | `/api/v1/admin/repos` | admin | `{name, title?, require_author_signature?, online_authors?}` creates one and answers `{repository, root_key: {fingerprint, secret, shown_once}}`; the root secret key is shown this once and never stored (`409` if the name is taken) |
+| POST | `/api/v1/admin/repos` | admin | `{title, name?, require_author_signature?, online_authors?}` creates one and answers `{repository, at}`; `title` (up to 80 characters) is required when `name` is missing, and then the address name is derived from it; the answer never carries a secret (`409` if the name is taken). `repository.root_key_kept` tells whether the server holds the root key |
 | GET | `/api/v1/admin/repos/{repo}` | admin | State of one |
 | PATCH | `/api/v1/admin/repos/{repo}` | admin | `{private?, publishing?}`: `private` hides the repository from non-members; `publishing` is `open` (any account may upload for review, the default) or `members` |
 | GET | `/api/v1/admin/repos/{repo}/members` | admin | `{items: [{user, handle, may_read, may_publish}]}` |
 | PUT | `/api/v1/admin/repos/{repo}/members/{user}` | admin | `{may_read?, may_publish?}`; publishing implies reading; both false removes the member |
 | DELETE | `/api/v1/admin/repos/{repo}/members/{user}` | admin | `204` |
 
-`/admin/repos` lists them and creates one; the same is in setup step 3 for the first one and in
+«Repositories» in the administrator's header opens `/admin/repos`: one field, «Name» (free text, up to 80
+characters), and a button. The address name is derived from it: lowercase ASCII, accents folded, any other
+character a hyphen, hyphens collapsed and trimmed, at most 32 characters, `repo` when nothing is left, and `-2`,
+`-3`… when taken. The title is the name as typed. Author signature stays off and online authors off (change
+them with `PATCH` below). The form posts to `/admin/repos` and goes back to the list with the new repository
+highlighted, its address to copy and the controls «Who can see it» and «Who can publish»; a refusal shows as a message on
+that page. The same exists in setup step 3 for the first one and in
 `reiwand-server repo init|import|status --repo NAME` (default `main`; `status` without `--repo`
 lists all, `repo publish` signs all). The background job signs each repository on its own; a
 failure of one does not stop the others and turns the health row red.
+
+### Root key kept by the server
+
+`init_repo` (the form, the API, setup and `repo init`) seals the root secret key of the new repository in
+`keys/<name>.root.sealed` with `keys/seal.key`; it is never shown, logged or returned. It is read back only when a
+root rotation needs it. Both files are under `keys/`, so `backup` and `restore` carry them. A repository made
+before the server kept the key has no such file and `/admin/repos` says so on its row; nothing else changes for
+it. The sealing key lives next to the data it protects: this guards against a copy of a single file, not against
+whoever reads the whole data folder.
 
 ### Private repositories and rights
 

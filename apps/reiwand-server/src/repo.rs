@@ -11,9 +11,11 @@ use std::sync::{Mutex, PoisonError};
 
 mod listed;
 mod manage;
+mod slug;
 
 pub use listed::Shown;
 pub use manage::{import, import_repo, init, init_repo, status, status_repo, statuses, valid_name};
+pub use slug::free_name;
 
 pub struct Repo {
     pub name: String,
@@ -21,6 +23,7 @@ pub struct Repo {
     folder: String,
     key_name: String,
     key: PathBuf,
+    data: PathBuf,
     lock: Mutex<()>,
 }
 
@@ -33,6 +36,7 @@ impl Repo {
             key_name: key_name.into(),
             dir,
             key,
+            data: data.into(),
             lock: Mutex::new(()),
         }
     }
@@ -47,6 +51,10 @@ impl Repo {
 
     pub fn named(data: &Path, name: &str) -> Repo {
         Repo::at(data, name, &format!("repos/{name}"), &format!("keys/{name}.online.key"))
+    }
+
+    pub fn root_key_kept(&self) -> bool {
+        crate::seal::has_root(&self.data, &self.name)
     }
 
     pub fn ready(&self) -> bool {
@@ -150,6 +158,7 @@ impl Repo {
         Some(json!({
             "name": self.name, "repo_id": root.repo_id, "root_version": root.version,
             "root_signed": root.complete, "url": address, "online_key": self.key.is_file(),
+            "root_key_kept": self.root_key_kept(),
             "entry_version": entry_version, "entry_expires": entry_expires,
         }))
     }

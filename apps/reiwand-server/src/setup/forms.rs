@@ -1,8 +1,8 @@
 use super::view::{stepped, summary};
 use crate::App;
-use crate::lang::{t, tf};
+use crate::lang::t;
 use crate::settings::Access;
-use crate::ui::{Choice, Kind, Tone, button, checkbox, choices, field, fold, key_box, notice, qr};
+use crate::ui::{Choice, Kind, button, checkbox, choices, field, fold, qr};
 use maud::{Markup, html};
 
 pub fn account(app: &App, handle: Option<&str>, error: Option<&str>) -> Markup {
@@ -49,32 +49,6 @@ pub fn repository(app: &App, name: Option<&str>) -> Markup {
         }
     };
     stepped(app, t("Set up your server"), 2, body)
-}
-
-pub fn key(app: &App, held: Option<&(String, String)>, missing: Option<()>) -> Markup {
-    let Some((name, secret)) = held else {
-        let body = html! {
-            (notice(Tone::Warn, t("The root key is no longer shown."),
-                html! { p.texto { (t("The server started again before you marked «I saved it», and the key is never kept. Create the repository again to get a new key.")) } },
-                Some(html! { form method="post" action="/setup/again" { (button(Kind::Primary, t("Create it again"))) } })))
-        };
-        return stepped(app, t("Set up your server"), 2, body);
-    };
-    let body = html! {
-        section {
-            h2.titulo-seccion { (t("Save the root key")) }
-            p.intro { (t("It is shown only this time. Keep it outside this server: in a password manager or on paper.")) }
-            form.formulario.ancho.separado method="post" action="/setup/saved" {
-                (key_box(secret, &tf("Root key of «{}». Select it to copy it.", &[name])))
-                (checkbox(html! { input type="checkbox" name="saved" required aria-invalid=[missing.map(|_| "true")]; }, t("I saved it"), None))
-                div.acciones {
-                    (button(Kind::Primary, t("Next")))
-                    span.porque { (t("Mark «I saved it» to go on.")) }
-                }
-            }
-        }
-    };
-    stepped(app, name, 2, body)
 }
 
 pub fn access(app: &App, code: &str) -> Markup {

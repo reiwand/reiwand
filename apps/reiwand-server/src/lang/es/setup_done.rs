@@ -11,20 +11,6 @@ pub const TEXTS: super::Texts = &[
         "Each person adds their author keys from their account, without touching the root key.",
         "Cada persona añade sus claves de autor desde su cuenta, sin tocar la clave raíz.",
     ),
-    ("Save the root key", "Guarda la clave raíz"),
-    (
-        "It is shown only this time. Keep it outside this server: in a password manager or on paper.",
-        "Se muestra solo esta vez. Guárdala fuera de este servidor: en un gestor de contraseñas o en papel.",
-    ),
-    ("Root key of «{}». Select it to copy it.", "Clave raíz de «{}». Selecciónala para copiarla."),
-    ("I saved it", "Ya la guardé"),
-    ("Mark «I saved it» to go on.", "Marca «Ya la guardé» para seguir."),
-    ("The root key is no longer shown.", "La clave raíz ya no se muestra."),
-    (
-        "The server started again before you marked «I saved it», and the key is never kept. Create the repository again to get a new key.",
-        "El servidor volvió a arrancar antes de que marcaras «Ya la guardé», y la clave nunca se guarda. Crea el repositorio otra vez para tener una clave nueva.",
-    ),
-    ("Create it again", "Crearlo otra vez"),
     ("Closed", "Cerrado"),
     (
         "Nobody signs up on their own. What is uploaded is published at once.",

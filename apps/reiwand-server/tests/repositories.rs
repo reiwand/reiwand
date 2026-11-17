@@ -38,9 +38,10 @@ async fn two_repositories_have_their_own_keys_catalogue_and_votes() {
     let make = json!({"name": "second", "title": "Second"});
     let (status, made) = server.json(Method::POST, "/api/v1/admin/repos", &admin, Some(make.clone())).await;
     assert_eq!(status, StatusCode::CREATED, "{made}");
-    let second = made["root_key"]["fingerprint"].as_str().unwrap().to_string();
+    assert!(made.get("root_key").is_none() && !made.to_string().contains("secret key"), "{made}");
+    let sealed = reiwand_server::open_root(&server.cfg.data, "second").unwrap().unwrap();
+    let second = reiwand_format::Signer::new(&sealed, None).unwrap().fingerprint;
     assert_ne!(second, first.fingerprint);
-    assert!(made["root_key"]["secret"].as_str().unwrap().len() > 20);
     assert_eq!(
         server.json(Method::POST, "/api/v1/admin/repos", &admin, Some(make)).await.0,
         StatusCode::CONFLICT

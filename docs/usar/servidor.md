@@ -54,10 +54,10 @@ curl -sS -b galleta -H 'content-type: application/json' -d '{"role": "user"}' \
   "$REIWAND_PUBLIC_URL/api/v1/admin/invites"     # una invitación para otra cuenta: imprime su code y su url
 ```
 
-`repo init` crea las claves del repositorio y muestra una sola vez la clave raíz, que hay que guardar
-fuera del servidor; si responde `error: a repository already exists`, ese servidor ya tiene su
-repositorio y no hay nada que hacer (`reiwand-server repo status` dice su estado y su dirección). El servidor solo conserva la clave en línea, con la
-que vuelve a firmar el índice cada día (cada firma caduca a los 7). Desde *Administración* (o con la
+`repo init` crea las claves del repositorio; la clave raíz la guarda el servidor, cifrada, en su carpeta
+de datos (entra en las copias de seguridad y nunca se muestra). Para más repositorios, *Repositorios* en el
+encabezado de la administración pide solo un nombre y arma la dirección sola. Si `repo init` responde `error: a repository already exists`, ese servidor ya tiene su
+repositorio y no hay nada que hacer (`reiwand-server repo status` dice su estado y su dirección). El servidor usa la clave en línea para volver a firmar el índice cada día (cada firma caduca a los 7). Desde *Administración* (o con la
 API, como arriba) se crean invitaciones y desde *Cuenta*,
 tokens, dispositivos enlazados con un código y subidas de paquetes `.wpak` de las dos versiones del
 manifiesto. El servidor acepta los paquetes para adultos que lo declaran en su manifiesto: llevan
