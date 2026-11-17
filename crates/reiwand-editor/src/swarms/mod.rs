@@ -1,3 +1,4 @@
+mod aim;
 mod budget;
 mod emits;
 mod ends;
@@ -154,6 +155,9 @@ pub(crate) fn edit(dir: &Path, doc: &Value, e: &ParticleEdit) -> Result<Vec<Op>>
         }
         ParticleEdit::Pace { system: s, emitter, max_per_step } => {
             fields::pace(doc, &system(doc, s)?, *emitter, *max_per_step)?
+        }
+        ParticleEdit::Aim { system: s, target, tilt, turn } => {
+            aim::aim(doc, &system(doc, s)?, target, *tilt, *turn)?
         }
         ParticleEdit::Tend(t) => tend::edit(doc, t)?,
         ParticleEdit::Sow(s) => sow::edit(doc, s)?,

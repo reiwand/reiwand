@@ -92,7 +92,7 @@ fn around(a: &Value, f: &Frame, spots: &[Value], t: f64) -> Value {
     };
     let places: Vec<_> = (0..count.min(64)).map(|i| at(i as f64)).collect();
     json!({ "kind": "around", "at": a.get("at").unwrap_or(&json!("p0")), "center": center.map(|c| f.round(c)), "radius": radius,
-        "arc": arc, "start": angle, "count": count, "mode": a.get("mode").unwrap_or(&json!("repeat")), "places": places,
+        "axis": a["axis"], "angles": super::aim::angles(&a["axis"]), "arc": arc, "start": angle, "count": count, "mode": a.get("mode").unwrap_or(&json!("repeat")), "places": places,
         "ends": [at(0.0), at(count.saturating_sub(1) as f64)] })
 }
 

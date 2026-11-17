@@ -113,6 +113,12 @@ pub enum ParticleEdit {
         #[serde(default)]
         max_per_step: Option<u32>,
     },
+    Aim {
+        system: String,
+        target: String,
+        tilt: f64,
+        turn: f64,
+    },
     #[serde(untagged)]
     Light(super::SwarmLight),
     #[serde(untagged)]
