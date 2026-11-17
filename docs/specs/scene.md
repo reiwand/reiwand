@@ -57,7 +57,7 @@ degrees (36 by default).
   from the canvas composites as a whole: a group is flattened first and then mixed in its own space, and its children
   use their own `blend_space` (`canvas` means the canvas, it is not inherited). An adjustment layer uses its space
   only for the final fade when its opacity is below 1. Effects always read `canvas.blend_space`. Scenes written before
-  this field are converted once with `reiwand-upgrade scenes PATH...`. The `layer` action edits it:
+  this field are converted once with `reiwand-upgrade scenes DIR`. The `layer` action edits it:
   `{"blend_space": {"layer": "smoke", "space": "srgb"}}`.
 - `clock.max_fps` caps the frame rate (`1..=240`, or `"display"`, also `0`, to follow the refresh
   rate of each output for motion that gains from it; default 60), `poster_time` is the instant

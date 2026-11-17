@@ -69,3 +69,58 @@ fn every_particle_render_gains_the_square_aspect() {
     assert_eq!(p["plain"]["render"], json!({"fps": 8, "aspect": 1}));
     assert_eq!(p["drawn"]["render"]["aspect"], 0.25);
 }
+
+#[test]
+fn every_layer_and_template_gains_the_canvas_blend_space() {
+    let scene = json!({"layers": [
+        {"id": "a", "type": "solid"},
+        {"id": "g", "type": "group", "blend_space": "srgb", "layers": [{"id": "b", "type": "solid"}]}],
+        "templates": {"t": {"type": "group", "layers": [{"id": "c", "type": "solid"}]}}});
+    let s = upgraded("scenes-space", scene);
+    assert_eq!(s["layers"][0]["blend_space"], "canvas");
+    assert_eq!(s["layers"][1]["blend_space"], "srgb");
+    assert_eq!(s["layers"][1]["layers"][0]["blend_space"], "canvas");
+    assert_eq!(s["templates"]["t"]["blend_space"], "canvas");
+    assert_eq!(s["templates"]["t"]["layers"][0]["blend_space"], "canvas");
+}
+
+#[test]
+fn chroma_key_gains_distance_and_keep() {
+    let scene = json!({"layers": [{"blend_space": "canvas", "effects": [
+        {"effect": "chroma_key", "params": {"keep": 1}}, {"effect": "chroma_key"}, {"effect": "blur"}]}]});
+    let e = &upgraded("scenes-chroma", scene)["layers"][0]["effects"];
+    assert_eq!(e[0]["params"], json!({"keep": 1, "distance": 0}));
+    assert_eq!(e[1]["params"], json!({"distance": 0, "keep": 0}));
+    assert!(e[2].get("params").is_none());
+}
+
+#[test]
+fn the_audio_block_gains_the_gain_release() {
+    let s = upgraded("scenes-audio", json!({"audio": {"attack": 0.05, "gain": "auto"}}));
+    assert_eq!(s["audio"]["gain_release"], 5);
+    let kept = upgraded("scenes-audio-kept", json!({"audio": {"gain_release": 2}, "layers": [{"id": "a"}]}));
+    assert_eq!(kept["audio"]["gain_release"], 2);
+}
+
+#[test]
+fn a_scene_needing_every_step_gets_all_of_them_once() {
+    let scene = json!({
+        "audio": {"attack": 0.05},
+        "layers": [{"id": "a", "type": "particles", "effects": [{"effect": "chroma_key"}]}],
+        "particles": {"s": {"capacity": 4,
+            "forces": [{"vortex": {"center": [0, 0], "strength": 1}}, {"oscillate": {"what": "alpha"}}],
+            "emitters": [{"shape": {"around": {"count": 4}}}],
+            "render": {"stretch": {"time": 0.1}}}}});
+    let s = upgraded("scenes-all", scene);
+    let p = &s["particles"]["s"];
+    assert_eq!(s["audio"]["gain_release"], 5);
+    assert_eq!(s["layers"][0]["blend_space"], "canvas");
+    assert_eq!(s["layers"][0]["effects"][0]["params"], json!({"distance": 0, "keep": 0}));
+    assert_eq!(p["forces"][0]["vortex"]["axis"], json!([0, 0, 1]));
+    assert_eq!(p["forces"][1]["oscillate"]["from"], "top");
+    assert_eq!(p["emitters"][0]["shape"]["around"]["axis"], json!([0, 0, 1]));
+    assert_eq!(p["render"]["stretch"]["mode"], "add");
+    assert_eq!(p["render"]["stretch"]["depth"], "flat");
+    assert_eq!(p["render"]["aspect"], 1);
+    assert_eq!(p["init"]["tilt"]["angle"], json!([[0, 0], [0, 0]]));
+}

@@ -16,5 +16,5 @@
       "render": { "aspect": 1 }
     }
   },
-  "layers": [{ "id": "helice", "type": "particles", "system": "helice", "blend": "add" }]
+  "layers": [{ "blend_space": "canvas", "id": "helice", "type": "particles", "system": "helice", "blend": "add" }]
 }

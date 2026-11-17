@@ -15,8 +15,10 @@ usage:
       changed and the run is repeated later; --skip-download goes on without it. Upgrade the desktop before the server
 
   reiwand-upgrade scenes DIR
-      adds the axis of every vortex force and around emitter to the scene.json files under DIR (version 2 to 3 of
-      the scene format); packed .wpak files are unpacked, upgraded and packed again by their author
+      brings every scene.json under DIR to the current scene format: the blend space of each layer, chroma key
+      distance and keep, the axis of vortex forces and around emitters, stretch mode and depth, the base of
+      oscillate, the tilt and sprite aspect of particle systems and the gain release of the audio block; packed
+      .wpak files are unpacked, upgraded and packed again by their author
 
 It is safe to run again: a folder that is already current is left alone.";
 
