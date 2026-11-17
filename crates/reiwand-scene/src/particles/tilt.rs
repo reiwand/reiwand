@@ -23,9 +23,9 @@ impl Check<'_> {
         let Some(t) = &i.tilt else { return };
         self.uses(t.turned(), "particles2");
         for (name, ends, max) in [("angle", t.angle, 3600.0), ("spin", t.spin, 36000.0)] {
-            for k in 0..2 {
-                self.range(&format!("{p}/tilt/{name}/0/{k}"), ends[0][k], -max, max);
-                self.range(&format!("{p}/tilt/{name}/1/{k}"), ends[1][k], ends[0][k], max);
+            for (k, lo) in ends[0].iter().enumerate() {
+                self.range(&format!("{p}/tilt/{name}/0/{k}"), *lo, -max, max);
+                self.range(&format!("{p}/tilt/{name}/1/{k}"), ends[1][k], *lo, max);
             }
         }
     }
