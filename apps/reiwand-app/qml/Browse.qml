@@ -154,7 +154,7 @@ Item {
             catalog.total = reply.total;
             catalog.hidden = reply.hidden ?? 0;
             catalog.loaded = true;
-            App.query("GetVotes", [reply.packages.map(p => p.repo_id + "/" + p.id)], "Sync1", found => catalog && (catalog.votes = found.items ?? {}, catalog.counted = found.shown === true, catalog.voteRepo = found.repo_id ?? ""), () => catalog && (catalog.counted = false, catalog.voteRepo = ""));
+            App.query("GetVotes", [reply.packages.map(p => p.repo_id + "/" + p.id)], "Publish1", found => catalog && (catalog.votes = found.items ?? {}, catalog.counted = found.shown === true, catalog.voteRepo = found.repo_id ?? ""), () => catalog && (catalog.counted = false, catalog.voteRepo = ""));
             App.query("RequestPreviews", [reply.packages.filter(p => p.preview).map(catalog.spec)], "Repos1", found => catalog && (catalog.previews = Object.assign({}, catalog.previews, found[0])));
         });
     }

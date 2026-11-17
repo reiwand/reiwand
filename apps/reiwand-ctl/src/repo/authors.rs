@@ -5,7 +5,7 @@ use crate::told::{told, tr};
 use anyhow::Result;
 use clap::Subcommand;
 use percent_encoding::{NON_ALPHANUMERIC, utf8_percent_encode};
-use reiwand_sync::Api;
+use reiwand_account::Api;
 use reqwest::Method;
 use serde_json::json;
 

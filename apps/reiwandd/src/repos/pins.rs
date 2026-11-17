@@ -22,13 +22,7 @@ pub(super) fn fetcher_trusting(
 }
 
 pub fn pinned(d: &Daemon, fetch: HttpFetch) -> Result<HttpFetch> {
-    match d.server_pin() {
-        Some((url, pin)) => {
-            let tls = reiwand_sync::pinned_tls(&pin).map_err(|e| failed(e.to_string()))?;
-            d.with_account_tokens(fetch.pinned(&url, tls).map_err(|e| failed(e.to_string()))?)
-        }
-        None => d.with_account_tokens(fetch),
-    }
+    d.with_account_tokens(fetch)
 }
 
 pub fn origin(url: &str) -> Option<String> {
@@ -67,7 +61,7 @@ impl Daemon {
             pins.insert(origin.to_owned(), pin.to_ascii_lowercase());
         }
         for (origin, pin) in pins {
-            let tls = reiwand_sync::pinned_tls(&pin).map_err(|e| failed(e.to_string()))?;
+            let tls = reiwand_account::pinned_tls(&pin).map_err(|e| failed(e.to_string()))?;
             fetch = fetch.pinned(&origin, tls).map_err(|e| failed(e.to_string()))?;
         }
         Ok(fetch)

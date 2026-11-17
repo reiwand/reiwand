@@ -12,7 +12,7 @@ reiwand-client.workspace = true
 reiwand-format = { workspace = true, features = ["sign"] }
 reiwand-providers.workspace = true
 reiwand-qr.workspace = true
-reiwand-sync.workspace = true
+reiwand-account.workspace = true
 reiwand-render = { workspace = true, features = ["avif"] }
 reiwand-depth = { workspace = true, features = ["fetch", "infer"] }
 reiwand-scene.workspace = true

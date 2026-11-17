@@ -11,7 +11,7 @@ ColumnLayout {
     property var items: []
 
     function load() {
-        App.query("ListUploads", [], "Sync1", reply => sessions && (sessions.items = reply.uploads ?? []), () => sessions && (sessions.items = []));
+        App.query("ListUploads", [], "Publish1", reply => sessions && (sessions.items = reply.uploads ?? []), () => sessions && (sessions.items = []));
     }
 
     visible: sessions.items.length > 0
@@ -55,7 +55,7 @@ ColumnLayout {
                 text: App.tr("Cancel")
                 icon.name: "dialog-cancel"
                 visible: modelData.state === "open"
-                onClicked: App.act("CancelUpload", [modelData.id], "Sync1", () => sessions && sessions.load())
+                onClicked: App.act("CancelUpload", [modelData.id], "Publish1", () => sessions && sessions.load())
             }
         }
     }

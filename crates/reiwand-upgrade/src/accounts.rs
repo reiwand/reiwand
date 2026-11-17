@@ -5,8 +5,9 @@ use std::fs;
 use std::path::Path;
 
 pub trait Vault {
-    fn take(&mut self, item: &str) -> Option<String>;
-    fn put(&mut self, item: &str, secret: &str);
+    fn take(&mut self, item: &str) -> anyhow::Result<Option<String>>;
+    fn put(&mut self, item: &str, secret: &str) -> anyhow::Result<()>;
+    fn drop_item(&mut self, item: &str) -> anyhow::Result<()>;
 }
 
 #[derive(Debug, Default, PartialEq)]
@@ -19,10 +20,15 @@ pub struct Moved {
 pub struct NoVault;
 
 impl Vault for NoVault {
-    fn take(&mut self, _: &str) -> Option<String> {
-        None
+    fn take(&mut self, _: &str) -> anyhow::Result<Option<String>> {
+        Ok(None)
     }
-    fn put(&mut self, _: &str, _: &str) {}
+    fn put(&mut self, _: &str, _: &str) -> anyhow::Result<()> {
+        Ok(())
+    }
+    fn drop_item(&mut self, _: &str) -> anyhow::Result<()> {
+        Ok(())
+    }
 }
 
 fn write(path: &Path, bytes: Vec<u8>) -> anyhow::Result<()> {
@@ -35,22 +41,25 @@ pub fn apply(data: &Path, vault: &mut dyn Vault) -> anyhow::Result<()> {
     let Ok(bytes) = fs::read(data.join("sync.json")) else { return Ok(()) };
     let sync: Value = serde_json::from_slice(&bytes)?;
     let pins = fs::read(data.join("repo-pins.json")).ok().and_then(|b| serde_json::from_slice(&b).ok());
-    let done = accounts_step(&sync, pins.unwrap_or_default(), vault);
-    if !done.moved || data.join("accounts.json").exists() {
-        return Ok(());
+    let done = accounts_step(&sync, pins.unwrap_or_default(), vault)?;
+    if done.moved && !data.join("accounts.json").exists() {
+        write(&data.join("accounts.json"), serde_json::to_vec(&done.accounts)?)?;
+        write(&data.join("repo-pins.json"), serde_json::to_vec(&done.pins)?)?;
     }
-    write(&data.join("accounts.json"), serde_json::to_vec(&done.accounts)?)?;
-    write(&data.join("repo-pins.json"), serde_json::to_vec(&done.pins)?)
+    Ok(())
 }
 
 fn text(saved: &Value, field: &str) -> String {
     saved[field].as_str().unwrap_or_default().to_owned()
 }
 
-pub fn accounts_step(sync_json: &Value, pins: BTreeMap<String, String>, vault: &mut dyn Vault) -> Moved {
-    let saved = &sync_json["saved"];
+pub fn accounts_step(
+    saved: &Value,
+    pins: BTreeMap<String, String>,
+    vault: &mut dyn Vault,
+) -> anyhow::Result<Moved> {
     let mut moved = Moved { pins, ..Moved::default() };
-    let Some(site) = origin(&text(saved, "url")) else { return moved };
+    let Some(site) = origin(&text(saved, "url")) else { return Ok(moved) };
     let (user, user_id) = match saved["owner"].as_array() {
         Some(owner) => {
             (owner[0].as_str().unwrap_or_default().to_owned(), owner[1].as_i64().unwrap_or_default())
@@ -62,9 +71,9 @@ pub fn accounts_step(sync_json: &Value, pins: BTreeMap<String, String>, vault: &
         moved.pins.insert(site.clone(), pin.to_ascii_lowercase());
     }
     let id = format!("a{user_id:x}{}", site.len());
-    let token = vault.take("server");
+    let token = vault.take("server")?;
     if let Some(token) = &token {
-        vault.put(&format!("account {id}"), token);
+        vault.put(&format!("account {id}"), token)?;
     }
     let repo_url = text(saved, "repo_url");
     let links = match repo_url.is_empty() {
@@ -76,7 +85,7 @@ pub fn accounts_step(sync_json: &Value, pins: BTreeMap<String, String>, vault: &
     let pending = token.is_none();
     moved.accounts.accounts.push(Rec { id, origin: site, user, user_id, label, pending, links });
     moved.moved = true;
-    moved
+    Ok(moved)
 }
 
 #[cfg(test)]
@@ -88,23 +97,28 @@ mod tests {
     struct Memory(BTreeMap<String, String>);
 
     impl Vault for Memory {
-        fn take(&mut self, item: &str) -> Option<String> {
-            self.0.remove(item)
+        fn take(&mut self, item: &str) -> anyhow::Result<Option<String>> {
+            Ok(self.0.get(item).cloned())
         }
-        fn put(&mut self, item: &str, secret: &str) {
+        fn put(&mut self, item: &str, secret: &str) -> anyhow::Result<()> {
             self.0.insert(item.to_owned(), secret.to_owned());
+            Ok(())
+        }
+        fn drop_item(&mut self, item: &str) -> anyhow::Result<()> {
+            self.0.remove(item);
+            Ok(())
         }
     }
 
     fn sync() -> Value {
-        json!({"saved": {"url": "https://srv.example:8443/api", "pin": "AB12", "owner": ["ana", 7],
-            "repo_url": "https://srv.example:8443/r/shelf", "repo_id": "rid", "label": "home"}, "other": 1})
+        json!({"url": "https://srv.example:8443/api", "pin": "AB12", "owner": ["ana", 7],
+            "repo_url": "https://srv.example:8443/r/shelf", "repo_id": "rid", "label": "home", "offers": []})
     }
 
     #[test]
     fn the_saved_account_becomes_a_linked_account_with_its_secret_moved() {
         let mut vault = Memory(BTreeMap::from([("server".to_owned(), "tok".to_owned())]));
-        let done = accounts_step(&sync(), BTreeMap::new(), &mut vault);
+        let done = accounts_step(&sync(), BTreeMap::new(), &mut vault).unwrap();
         let rec = &done.accounts.accounts[0];
         assert_eq!(
             (rec.origin.as_str(), rec.user.as_str(), rec.pending),
@@ -113,12 +127,11 @@ mod tests {
         assert_eq!(rec.links[0].repo_id.as_deref(), Some("rid"));
         assert_eq!(done.pins["https://srv.example:8443"], "ab12");
         assert_eq!(vault.0.get(&format!("account {}", rec.id)).map(String::as_str), Some("tok"));
-        assert!(!vault.0.contains_key("server"));
     }
 
     #[test]
     fn a_missing_secret_leaves_the_account_pending() {
-        let done = accounts_step(&sync(), BTreeMap::new(), &mut Memory::default());
+        let done = accounts_step(&sync(), BTreeMap::new(), &mut Memory::default()).unwrap();
         assert!(done.accounts.accounts[0].pending);
     }
 
@@ -137,7 +150,7 @@ mod tests {
 
     #[test]
     fn nothing_saved_moves_nothing() {
-        let done = accounts_step(&json!({}), BTreeMap::new(), &mut Memory::default());
+        let done = accounts_step(&json!({}), BTreeMap::new(), &mut Memory::default()).unwrap();
         assert!(!done.moved && done.accounts.accounts.is_empty());
     }
 }

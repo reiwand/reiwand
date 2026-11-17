@@ -27,7 +27,10 @@ pub fn run_with(data: &Path, vault: &mut dyn crate::Vault) -> anyhow::Result<Out
         plain(&item.path().join("state.json"))?;
     }
     crate::apply(data, vault)?;
-    account(&data.join("sync.json"))?;
+    if data.join("sync.json").exists() {
+        vault.drop_item("server")?;
+        fs::remove_file(data.join("sync.json"))?;
+    }
     fs::write(data.join(MARK), format!("{CURRENT}\n"))?;
     Ok(Outcome::Upgraded { from: found, to: CURRENT })
 }
@@ -47,16 +50,6 @@ fn plain(path: &Path) -> anyhow::Result<()> {
         }
     }
     replace(path, &state)
-}
-
-fn account(path: &Path) -> anyhow::Result<()> {
-    let Ok(bytes) = fs::read(path) else { return Ok(()) };
-    let mut state: Value = serde_json::from_slice(&bytes)?;
-    let mut changed = bare(&mut state["repo_url"], true);
-    for offer in state["offers"].as_array_mut().into_iter().flatten() {
-        changed |= bare(&mut offer["url"], false);
-    }
-    if changed { replace(path, &state) } else { Ok(()) }
 }
 
 fn bare(url: &mut Value, server: bool) -> bool {

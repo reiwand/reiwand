@@ -1,5 +1,5 @@
 use super::store::{Link, Rec, clean};
-use crate::account::{block_on, sync_error};
+use super::{block_on, random, sync_error};
 use crate::daemon::Daemon;
 use crate::error::{Result, failed, invalid};
 use crate::repos::pins::origin;
@@ -58,7 +58,7 @@ impl Daemon {
         let same = |r: &Rec| r.origin == site && (r.user_id == user_id || (r.pending && r.user == user));
         let id = match self.account_list().into_iter().find(same) {
             Some(rec) => rec.id,
-            None => format!("a{}", hex(&reiwand_sync::random::<5>())),
+            None => format!("a{}", hex(&random::<5>())),
         };
         self.save_token(&id, secret)?;
         let host = site.split("://").nth(1).unwrap_or(site);

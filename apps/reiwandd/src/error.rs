@@ -120,10 +120,10 @@ impl From<std::io::Error> for Error {
     }
 }
 
-impl From<reiwand_sync::Error> for Error {
-    fn from(e: reiwand_sync::Error) -> Self {
+impl From<reiwand_account::Error> for Error {
+    fn from(e: reiwand_account::Error) -> Self {
         match e {
-            reiwand_sync::Error::Invalid(message) => invalid(message),
+            reiwand_account::Error::Invalid(message) => invalid(message),
             e => failed(e.to_string()),
         }
     }

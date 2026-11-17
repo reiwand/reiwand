@@ -16,7 +16,7 @@ Row {
 
     function cast(vote) {
         const wanted = votes.mine === vote ? "none" : vote;
-        App.act("Vote", [votes.packageId, wanted], "Sync1", found => {
+        App.act("Vote", [votes.packageId, wanted], "Publish1", found => {
             if (!votes)
                 return;
             votes.voted({

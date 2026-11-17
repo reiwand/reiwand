@@ -23,10 +23,6 @@ impl Report {
         self.pend(section, name, &error.parts().1);
     }
 
-    pub fn note(&mut self, text: &str) {
-        self.notes.push(text.to_owned());
-    }
-
     pub fn value(self) -> Value {
         json!({"added": self.added, "pending": self.pending, "unresolved": self.unresolved, "notes": self.notes})
     }

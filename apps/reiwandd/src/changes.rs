@@ -11,7 +11,7 @@ use tokio::time::{Instant, sleep_until};
 use zbus::object_server::SignalEmitter;
 
 pub const TOPICS: [&str; 9] =
-    ["state", "library", "playlists", "profiles", "providers", "repos", "jobs", "inputs", "account"];
+    ["state", "library", "playlists", "profiles", "providers", "repos", "jobs", "inputs", "accounts"];
 const WINDOW: Duration = Duration::from_millis(250);
 const KEPT: usize = 256;
 const MAX_IDS: usize = 256;

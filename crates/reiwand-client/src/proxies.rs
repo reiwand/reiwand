@@ -20,34 +20,11 @@ pub trait Inputs1 {
 }
 
 #[proxy(
-    interface = "io.github.reiwand.Sync1",
+    interface = "io.github.reiwand.Publish1",
     default_service = "io.github.reiwand.Daemon",
     default_path = "/io/github/reiwand/Daemon"
 )]
-pub trait Sync1 {
-    fn add_server(&self, url: &str) -> Result<u64>;
-    fn add_pinned_server(&self, url: &str, fingerprint: &str) -> Result<u64>;
-    fn link(&self, name: &str, plaintext: bool) -> Result<(String, String, u64)>;
-    fn connect(&self, name: &str) -> Result<(String, String, u64)>;
-    fn set_syncing(&self, on: bool, plaintext: bool) -> Result<u64>;
-    fn preview_code(&self, user_code: &str) -> Result<u64>;
-    fn approve_device(&self, user_code: &str, password: &str) -> Result<u64>;
-    fn get_status(&self) -> Result<String>;
-    fn sync_now(&self) -> Result<u64>;
-    fn set_paused(&self, paused: bool) -> Result<()>;
-    fn revoke_device(&self, device: &str, password: &str) -> Result<u64>;
-    fn join(&self, device: &str) -> Result<u64>;
-    fn share_key(&self, device: &str) -> Result<u64>;
-    fn confirm_share(&self, device: &str, code: &str) -> Result<u64>;
-    fn rotate(&self) -> Result<u64>;
-    fn reset(&self) -> Result<u64>;
-    fn confirm_repo(&self, repo: &str, add: bool) -> Result<u64>;
-    fn set_escrow(&self, passphrase: &str) -> Result<u64>;
-    fn restore(&self, passphrase: &str) -> Result<u64>;
-    fn share_files(&self, targets: &[&str], share: bool) -> Result<u64>;
-    fn list_files(&self) -> Result<String>;
-    fn list_away(&self) -> Result<String>;
-    fn fetch_file(&self, file: &str) -> Result<u64>;
+pub trait Publish1 {
     fn upload(&self, path: &str) -> Result<u64>;
     fn upload_as(&self, path: &str, visibility: &str) -> Result<u64>;
     fn list_packages(&self) -> Result<String>;
@@ -60,7 +37,6 @@ pub trait Sync1 {
     fn cancel_upload(&self, id: &str) -> Result<()>;
     fn vote(&self, id: &str, vote: &str) -> Result<String>;
     fn get_votes(&self, ids: &[&str]) -> Result<String>;
-    fn remove_server(&self, wipe: bool) -> Result<()>;
 }
 
 #[proxy(

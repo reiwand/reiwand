@@ -1,5 +1,5 @@
 use super::store::{Link, Rec};
-use crate::account::{block_on, hostname, sync_error};
+use super::{block_on, hostname, random, sync_error};
 use crate::daemon::Daemon;
 use crate::error::Result;
 use reiwand_account::{Api, hex};
@@ -7,7 +7,6 @@ use reiwand_carry::Session;
 use serde_json::json;
 use std::collections::BTreeMap;
 
-#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub struct Imported {
     pub account: String,
@@ -16,7 +15,6 @@ pub struct Imported {
     pub pending: Option<String>,
 }
 
-#[allow(dead_code)]
 impl Daemon {
     pub fn export_sessions(&self) -> Vec<Session> {
         let mut out = Vec::new();
@@ -83,7 +81,7 @@ impl Daemon {
                 (None, None) => {
                     let host = origin.split("://").nth(1).unwrap_or(origin);
                     file.accounts.push(Rec {
-                        id: format!("a{}", hex(&reiwand_sync::random::<5>())),
+                        id: format!("a{}", hex(&random::<5>())),
                         origin: origin.into(),
                         user: account.into(),
                         label: format!("{account}@{host}"),

@@ -11,7 +11,7 @@ ColumnLayout {
     property var items: []
 
     function load() {
-        App.query("ListPackages", [], "Sync1", reply => uploads && (uploads.items = reply.items ?? []), () => uploads && (uploads.items = []));
+        App.query("ListPackages", [], "Publish1", reply => uploads && (uploads.items = reply.items ?? []), () => uploads && (uploads.items = []));
     }
 
     visible: uploads.items.length > 0
@@ -54,7 +54,7 @@ ColumnLayout {
             QQC2.ComboBox {
                 model: [App.tr("Public"), App.tr("Unlisted")]
                 currentIndex: modelData.visibility === "unlisted" ? 1 : 0
-                onActivated: index => App.act("SetVisibility", [modelData.package, modelData.version, index === 1 ? "unlisted" : "public"], "Sync1", () => uploads && uploads.load())
+                onActivated: index => App.act("SetVisibility", [modelData.package, modelData.version, index === 1 ? "unlisted" : "public"], "Publish1", () => uploads && uploads.load())
             }
         }
     }

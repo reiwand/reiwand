@@ -65,7 +65,7 @@ fn lists_keep_both_uses_the_suffix_and_never_collides() {
 #[test]
 fn duplicate_lists_inside_the_file_do_not_collide() {
     let mut c = content();
-    c.lists.push(List { name: "calm".into(), items: vec![item("q")] });
+    c.lists.push(List { name: "calm".into(), items: vec![item("q")], query: None, rules: None });
     let plan = plan(&c, &Local::default(), &pick(ListMode::Both));
     let names: Vec<_> = plan
         .changes
@@ -78,7 +78,7 @@ fn duplicate_lists_inside_the_file_do_not_collide() {
 #[test]
 fn duplicate_lists_inside_the_file_join_when_joining() {
     let mut c = content();
-    c.lists.push(List { name: "calm".into(), items: vec![item("q")] });
+    c.lists.push(List { name: "calm".into(), items: vec![item("q")], query: None, rules: None });
     let plan = plan(&c, &Local::default(), &pick(ListMode::Join));
     let lists: Vec<_> = plan
         .changes
@@ -128,4 +128,24 @@ fn preview_counts_new_skipped_and_conflicts() {
     assert_eq!(row("settings").new, 1);
     assert_eq!(row("settings").skipped, 1);
     assert_eq!(row("favourites").new, 1);
+}
+
+#[test]
+fn a_smart_list_keeps_its_search_and_rules() {
+    let mut c = content();
+    let rules = serde_json::json!({"order": "random"});
+    c.lists.push(List {
+        name: "Sky".into(),
+        items: Vec::new(),
+        query: Some("tag:sky".into()),
+        rules: Some(rules.clone()),
+    });
+    let plan = plan(&c, &Local::default(), &pick(ListMode::Join));
+    let kept = plan.changes.iter().find_map(|c| match c {
+        Change::AddList(l) if l.name == "Sky" => Some((l.query.clone(), l.rules.clone())),
+        _ => None,
+    });
+    assert_eq!(kept, Some((Some("tag:sky".to_string()), Some(rules))));
+    let text = serde_json::to_string(&c).unwrap();
+    assert_eq!(serde_json::from_str::<Content>(&text).unwrap().lists[1].query.as_deref(), Some("tag:sky"));
 }

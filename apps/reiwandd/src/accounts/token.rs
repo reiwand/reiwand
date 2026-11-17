@@ -1,4 +1,4 @@
-use crate::account::block_on;
+use super::block_on;
 use crate::daemon::Daemon;
 use crate::error::Result;
 use crate::keyring::Stored;

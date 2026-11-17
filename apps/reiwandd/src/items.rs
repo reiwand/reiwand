@@ -80,7 +80,7 @@ impl Daemon {
         if limit > MAX_PAGE {
             return Err(invalid(format!("limit must be at most {MAX_PAGE}")));
         }
-        let (serial, away) = (self.changes.serial(), self.away_page(query, offset));
+        let serial = self.changes.serial();
         let seed = (RandomState::new().hash_one(serial) % 2_147_483_646) as u32 + 1;
         let hide = self.state().config.library.hide_mature;
         let (query, total, items) = self.store.read(|lib| {
@@ -91,7 +91,7 @@ impl Daemon {
             Ok::<_, LibraryError>((query, total, items))
         })?;
         let items = items.into_iter().map(|item| self.summary(item)).collect::<Result<_>>()?;
-        reply(SearchPage { model: MODEL, serial, query, total, offset, items, away })
+        reply(SearchPage { model: MODEL, serial, query, total, offset, items })
     }
 
     pub fn get_item(&self, uid: &str) -> Result<String> {
@@ -164,17 +164,14 @@ impl Daemon {
             }
             () => None,
         };
-        let (removed, hashes) = self.store.write(|lib| {
+        let removed = self.store.write(|lib| {
             for item in refs.iter().map(|uid| lib.item(uid)).collect::<Result<Vec<_>, _>>()? {
                 if let Some(reason) = refused(&item) {
                     return Err(invalid(format!("item {} {reason}", item.uid)));
                 }
             }
-            let hashes = lib.hashed()?.into_iter().filter(|(i, _)| refs.contains(&i.uid.as_str()));
-            let hashes: Vec<String> = hashes.map(|(_, hash)| crate::account::removed_blob(&hash)).collect();
-            Ok((lib.remove_items(&refs)?, hashes))
+            Ok(lib.remove_items(&refs)?)
         })?;
-        self.forget_synced(hashes);
         let files: Vec<_> = removed.iter().map(|item| item.path.clone()).collect();
         if let Err(e) = self.clear_removed(&files) {
             tracing::warn!("cannot clear the screens that showed a removed item: {e}");

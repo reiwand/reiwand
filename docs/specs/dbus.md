@@ -9,7 +9,7 @@ system tray and the desktop integration offer a subset.
 | Bus | session |
 | Well-known name | `io.github.reiwand.Daemon` |
 | Object path | `/io/github/reiwand/Daemon` |
-| Interfaces | `io.github.reiwand.Daemon1`, `Library1`, `Playlists1`, `Profiles1`, `Providers1`, `Repos1`, `Inputs1`, `Sync1`, `Carry1`, all on that object |
+| Interfaces | `io.github.reiwand.Daemon1`, `Library1`, `Playlists1`, `Profiles1`, `Providers1`, `Repos1`, `Inputs1`, `Publish1`, `Accounts1`, `Carry1`, all on that object |
 
 The daemon is D-Bus activatable (`packaging/dbus`) and runs as the systemd user unit
 `reiwandd.service`. In the Flatpak (`packaging/flatpak`) it owns the name through `--own-name`, so
@@ -1650,8 +1650,8 @@ Deletes the provider's secret. Kinds without secret never touch the keyring.
 ### `SetSecretStore(s store)`
 
 Chooses where this computer keeps every secret of the program: the passwords and API keys of
-providers, the secret texts of scene properties and the token and sync key of the server
-(`Sync1`). `store` is `keyring` (the Secret Service, the default) or `file` (`InvalidArgs` for
+providers, the secret texts of scene properties and the session token of every account
+(`Accounts1`). `store` is `keyring` (the Secret Service, the default) or `file` (`InvalidArgs` for
 anything else): a private file `secrets.json` (mode 0600, replaced whole through a temporary file)
 in the data folder, for a computer that has no keyring. The choice is the existence of that
 file, so there is one place that decides and nothing else to keep in step. Weakening secrecy is the
@@ -2164,394 +2164,16 @@ Shows a moving rainbow on one device (`-1` for all of them) for 3 s, then the la
 The last strip of an output (`RGB` bytes, rows from the top), also for previews and packages without
 the grant, for the editor; `NotFound` when the output has none.
 
-## `io.github.reiwand.Sync1`
+## `io.github.reiwand.Publish1`
 
-Connects this computer to one self-hosted `reiwand-server` (see `server.md`) and keeps its library
-metadata, playlists, profiles, presets, settings, added repositories and chosen wallpaper files in sync with the other devices of the account. The server address is `https://`, or `http://` to this computer, without user
-information, query or fragment; the daemon contacts no other host for sync, follows no redirect
-and sends the generic `User-Agent`. Every answer is limited in size (1 MiB, 8 MiB for pages of
-changes, 2 MiB for the mailbox, 64 KiB per event); a larger one fails the job without being used.
-The device token, the private X25519 key of this device, the sync key (a 32-byte record key of
-the current key epoch and a 32-byte naming key) with its epoch, the next key during a key
-rotation and the devices that still wait for it and the key that seals the recovery escrow live
-only where secrets are kept (see `SetSecretStore`: the Secret Service or a private file), in one item labelled `reiwand: server` with the
-attributes `xdg:schema = io.github.reiwand.Server` and `server = server`, with the timeouts
-and unlock rules of `Providers1`; they never appear in replies, signals, job targets, job errors,
-logs, `config.toml` or command lines. The rest of the state (server address, device names, sync
-heads, the last synced copy of every other record, values kept for other versions, the choices of
-private files, a running comparison and the public keys of the devices this computer compared
-codes with) is kept in
-`~/.local/share/reiwand/sync.json` (`0600`).
-
-End-to-end encryption is the default: every record is `0x01 ‖ nonce ‖ XChaCha20-Poly1305` of the
-JSON padded to a multiple of 256 bytes (a `0x80` byte, then zeros), with the key and the
-additional data of `server.md` (user id and epoch as 8-byte big-endian integers, epoch also
-8-byte big-endian in the HKDF info). Plain-text sync exists only as the explicit opt-out
-`Link(plaintext = true)` on an account that has no sync yet; the server then labels the account
-with a warning, reported in `warning`. The setting is fixed when the device links: a sync fails
-without sending anything when the server later reports another one. In both modes the naming key
-`K_id` of `server.md` names the items: library items are `hex(HMAC-SHA-256(K_id, repo_id ‖ 0x00 ‖
-package id))` for installed packages and `hex(HMAC-SHA-256(K_id, "blob:" ‖ quick hash))` for other
-files, so devices that hold the same file share its record; playlists, profiles and presets are the
-first 32 hex digits of `HMAC-SHA-256(K_id, kind ‖ 0x00 ‖ uid)` and settings sections of
-`HMAC-SHA-256(K_id, "section" ‖ 0x00 ‖ name)`, so the server cannot tell sections, profiles and
-presets apart. The server names devices `Device N`; the name of this computer
-(`Link(name)`, the host name when empty) travels only inside the encrypted `device` record and is
-never sent in plain-text mode. Devices linked by older versions pin, once, the devices whose
-synced `device` record names the key the server lists.
-
-| Collection | Item | Fields |
-|------------|------|--------|
-| `library` | keyed hash | `title`, `rating`, `favorite`, `t:<tag>`, one field per part of the edit of a picture, so parts changed on two devices both survive: `e:geometry`, `e:ops`, `e:masks`, `e:span`, `e:depth`, `e:parallax`, `e:fit` and `e:outputs/<screen>` for each screen crop, leaving out the `source` and parts at their default (a part over 64 KiB keeps the last copy sent, parts this version does not know are kept as synced, and a received edit keeps the `source` of this computer) and `blob` `{id, hash, size, name}` for a private file on the server; only items with a tag, a rating, a favorite mark, an edit or a private file get a record |
-| `playlists` | keyed hash | `name`, `query`, `r:<rule>` (rules this version does not know are kept as synced), and for manual playlists one `e:<entry>` per entry with its item and a fractional position |
-| `settings` | keyed hash of the section | every option except `playback.volume`, `playback.muted`, `playback.software_parallax`, `library.thumb_cache_mb` and `models.allow_download`; options and sections this version does not know are kept as synced |
-| `settings` | keyed hash | `kind` (`profile` or `preset`) and the profile or preset, with items, playlists and presets named by their synced ids; the options of a profile leave out the settings above that stay on each device, and a received profile keeps their values from this computer |
-| `device` | device id | `name`, `platform`, `key` (base64 of the public X25519 key); never applied, shown in `devices[].label` |
-| `repos` | keyed hash of the repo id | `url` (plain), `repo_id`, `name`, `fingerprints` of the repositories added with an `https://` or loopback `http://` URL; a new one is only offered (`offers`) until `ConfirmRepo` |
-
-Every record holds per field a value and a hybrid logical clock (milliseconds, counter, device);
-a sync pulls the changes since the last head, merges each record field by field with the later
-clock winning (a deletion wins only when it is later than every field), applies the result,
-pushes local changes with the `seq` they are based on and repeats the round for conflicts at
-most three times. Records whose clock is older than the last one seen for the item are refused
-and overwritten with the newer copy. After `Join` or `Restore`, or when the server answers `410
-resync`, the sync downloads every record and uploads again the ones the server no longer holds. Devices delete with a record whose payload says so; a
-`deleted` record without payload carries no clock, nor in an encrypted account any proof of its
-origin, so it deletes nothing and the devices upload their copy again.
-Library records of items that are not on this computer,
-playlist entries and presets of such items are kept and applied once the item appears. A record
-that cannot be decrypted fails the first sync that meets it with the count of such records and is
-then skipped (`quarantined`) until the server holds a newer copy of it.
-
-A page of changes, or a change, of another key epoch than the one the sync started with stops the
-sync with `epoch_mismatch` before anything is stored, and the next sync takes the new key first;
-records of the current or an older epoch that cannot be decrypted are quarantined.
-
-Fields this version does not know, and values it does not understand inside fields it knows (an
-option value, a playlist rule value, a rating above 5), are kept exactly as received: the field
-keeps its local value, and the copy sent back carries the received value until the user changes
-that field here. A received change that cannot be applied here (for example a profile name that
-cannot be stored) is not counted as synced: the record keeps the state this computer shows, the
-change is tried again at every sync, nothing is sent back for it, the first sync that meets it fails
-with the count and the first reason, and `unapplied` counts such changes. A received name of a
-playlist, profile or preset that another object already uses here (or that a preset never takes)
-keeps the local name, and the copy sent back carries the received name until the name changes here.
-A repository that already has a record keeps the record's address, name and fingerprints in the
-copy sent back until they change on this computer, so devices that added it through different
-addresses do not overwrite each other.
-
-When two devices change a playlist in ways that do not merge (one deletes it, or switches it
-between manual and smart, while the other changes its entries), the side with more entries wins
-and the other side is kept as a new playlist named `<name> (conflict)`, the suffix in the language
-of the daemon (`LC_ALL`, `LC_MESSAGES` or `LANG`); a deleted side leaves no copy.
-
-A repository removed on one device is removed on the others too, keeping its installed packages.
-Provider settings and keys are never synced between devices: each computer keeps its own
-providers and their secrets.
-
-Private files are files of the library that come from no repository: `ShareFiles` chooses items and
-folders, and a `files` job (kind `upload`) encrypts each file and uploads it to
-`/api/v1/sync/blobs` (see `server.md`) in pieces of 64 segments, resuming after the last piece the
-server holds; identical files are stored once. Each 64 KiB segment is sealed with
-ChaCha20-Poly1305 under `HMAC-SHA-256(K_id, "reiwand-sync/file-key/v1" ‖ SHA-256 hex of the file)`, with
-a nonce of the segment number (11 bytes big-endian) and a byte that marks the last segment; the
-server name of the file is `hex(HMAC-SHA-256(K_id, "stored:" ‖ SHA-256 hex))`. Other devices list
-them with `ListFiles` and download one on demand with `FetchFile`, which checks every segment and
-the SHA-256 of the whole file and imports it into `~/.local/share/reiwand/files/`. A sync
-starts the `files` job when private files are chosen; it also deletes files that this computer
-uploaded and that no record refers to any more for a day, only while its copy of the records is as
-new as the server's. Transfers run in their own queue, so syncs and key changes never wait for
-them.
-
-Before syncing, the daemon compares the key epoch and key id of `/api/v1/sync/state` with its key.
-When the account moved to later epochs, it takes each new key in turn from a `rotate` message of a
-pinned device: a device whose public key this computer learned in a comparison with matching codes
-(`Join`, `ConfirmShare`), never one the server lists; a device that leaves the device list is
-unpinned for good. Messages of later epochs and of other devices stay in the mailbox; older ones
-and those that do not open are deleted. Without such a message the state becomes `needs_key` and
-nothing is sent until `Join`. After taking a key it passes it on to its other pinned devices, so
-the key follows the comparisons from device to device; a message that cannot be sent is sent again
-at every sync until it arrives. The daemon replaces the key itself (`Rotate`) when the server
-reports `rotate` after a device was revoked, or when a device listed at the last key change has
-left the device list, and it resumes an interrupted rotation with the next key kept in the Secret
-Service. A device that missed a revocation still trusts the revoked device if it compared codes
-with it; join such a device again.
-
-While a linked device holds the sync key, or waits for the next one, and sync is not paused, the
-daemon keeps the event stream of the server open (reconnecting after 30 s, doubling up to 15 min),
-syncs when another device wrote, when the key epoch changes, when a message arrives while it waits
-for a key, 5 s after local library, playlist and profile changes that differ from the synced copies
-(showing a wallpaper is no such change), every 15 minutes and at startup. Automatic syncs never show an unlock prompt; a locked keyring sets `last_error`.
-
-### `AddServer(s url) → (t job)`
-
-Starts an `account` job that reads `/.well-known/reiwand-server` and stores the server. `Exists`
-when a server is already added; `InvalidArgs` for a refused address. The repository the server
-announces is remembered when its address has the origin of the server.
-
-### `AddPinnedServer(s url, s fingerprint) → (t job)`
-
-`AddServer` for a server with its own certificate (`reiwand-server` with `REIWAND_TLS=self-signed`):
-`fingerprint` is the SHA-256 of its certificate in hex (spaces and colons are ignored), as
-`reiwand-server fingerprint` prints it. Every later request to the server, the event stream
-included, accepts only that certificate, whatever its name or issuer; `GetStatus` shows it in
-`pin`. `InvalidArgs` for a fingerprint without 64 hex digits. `AddServer` to such a server fails
-with a message that carries the fingerprint the server showed, so the user can compare it with
-the one on the server before adding it with this method.
-
-### `Link(s name, b plaintext) → (s user_code, s verification_uri, t job)`
-
-Creates the key pair of this device, starts the device code flow with the platform, the public key
-and the client name `reiwand/<version>`, and returns the code to approve at
-`verification_uri` (or with `ApproveDevice` on a linked device); an address the server gives on another
-origin is replaced with `<server>/link`. The `link` job polls until the code is approved, refused
-or expired (10 minutes), stores the token, sets up sync with the key id of a new sync key when the
-account has none (encrypted unless `plaintext`, then the key is stored first), adds the server's
-repository with `Repos1.Add` and syncs. On an account that already syncs, the device
-needs the sync key from another device: state `needs_key`, see `Join`. When the account syncs
-without encryption and `plaintext` is false, the job fails, asks the server to revoke the new
-device and forgets its token; any other failure after the code was approved does the same, so a
-failed link leaves no device on the account. Before asking for a code the method checks that the
-token can be kept: with no Secret Service (and secrets not kept in a private file, see
-`Providers1.SetSecretStore`) it returns `KeyringUnavailable`
-at once. When a `link` job fails, `GetStatus` keeps why in `link_problem` (`keyring`, `refused`,
-`expired`, `encryption` or `other`) and `link_error` until the next `Link`. `Link` is `Connect` followed by `SetSyncing(true,
-plaintext)` in one job, except that a failure of either part revokes the new device. `NotFound` without a
-server, `Exists` when this computer is linked or linking, `InvalidArgs` for a name over 64
-characters or with control characters.
-
-### `Connect(s name) → (s user_code, s verification_uri, t job)`
-
-The first of the two levels of an account: `Link` without sync. It asks for a code and stores the
-token in the same way and with the same checks and errors, adds the server's repository, and
-stops there: it makes no sync key, sets up nothing and calls no `/api/v1/sync/` endpoint. The
-state becomes `connected`, a normal state that clients show as connected and not syncing, without
-any warning: repositories, browsing, installing and `Votes`/`Vote` work, `ApproveDevice`,
-`PreviewCode` and `RevokeDevice` too, and nothing of the library, playlists, profiles, presets,
-settings or private files is sent or received. `SyncNow`, `Join`, `ConfirmShare`, `ShareKey`,
-`Restore`, `Rotate`, `Reset`, `ShareFiles`, `ListFiles`, `FetchFile` and `SetEscrow` fail with
-`syncing is off on this computer; turn it on first`. The job output is `{device, syncing: false,
-encrypted: null, needs_key: false}`.
-
-### `SetSyncing(b on, b plaintext) → (t job)`
-
-The second level. `on` starts a `link` job that reads `/api/v1/sync/state`: on an account that
-does not sync yet it sets sync up with a new key, encrypted unless `plaintext`, as `Link` does;
-on an account that syncs without encryption it fails with the message of `Link` unless
-`plaintext`; on an account that syncs it keeps the key this computer still holds (from before it
-was turned off) or, without one, leaves the state `needs_key` until `Join` or `Restore`. It then
-syncs as usual. The output is `{syncing: true, encrypted, needs_key}`. `on` false turns syncing
-off at once: it stops automatic sync and the event stream, cancels a running sync and transfer of
-private files, clears `last_error` and the comparison, and the state becomes `connected`; the
-token, the server's repository and the sync key stay, so turning syncing on again needs no new
-comparison while the key is current. Its job ends at once with `{syncing: false}`. Both fail with
-`Exists` while a `link`, `Join` or `ShareKey` job runs, and `Failed` until this computer is
-connected or linked. Pausing (`SetPaused`) is a different thing: a paused computer still syncs with
-`SyncNow`.
-
-### `RevokeDevice(s device, s password) → (t job)`
-
-Removes a device of the account (`device` is its id, server name or label, as in `Join`) with an
-`account` job that deletes it on the server and refreshes `devices`; the next sync of another device
-replaces the sync key. It sends the password of the account with the request, like `ApproveDevice`
-(`POST /api/v1/me/devices/{id}/revoke`): a stolen device token alone cannot remove the other devices.
-`Failed` for this computer (use `RemoveServer`), `NotFound` for an unknown device.
-
-### `PreviewCode(s user_code) → (t job)`
-
-Shows what waits behind a code before approving it: an `account` job whose output is the
-server's `{platform, client, requested_at, expires_at}` of the pending request (times in Unix
-milliseconds), never an address. Clients show it with the warning to approve only a code that the
-user's own new device shows, and ask for an explicit confirmation before approving it.
-
-### `ApproveDevice(s user_code, s password) → (t job)`
-
-Approves the code shown by a new device of the same account from this linked device, sending the
-password of the account with the request: the server checks it like a
-sign-in, so a stolen device token alone cannot add a device. The password goes only to the server,
-never to a file or a log. Clients ask for the password after the user confirmed what `PreviewCode`
-showed.
-
-### `GetStatus() → (s json)`
-
-An `AccountReply`; `account` is `null` without a server. `state` is the level of this computer:
-`unlinked` (a server is added, no token), `linking`, `connected` (a token, syncing off: see
-`Connect`), and with syncing on `needs_key`, `ready`, `paused` or `error`; `signed_out` above all.
-A one-line summary is `connected`: «connected · not syncing»; any other state of a linked computer:
-«connected to `name` · synced `last_sync` · encrypted when `encrypted`». `warning` is always `null`
-while `connected`. It reads no network; `devices` and the
-quota are those of the last sync. `pairing` is the running comparison of `Join` or `ShareKey`: the
-other device's id, the code once both nonces are known, and `sharing` on the device that holds
-the key. `quarantined` counts the records skipped because they cannot be decrypted and `unapplied`
-the received changes that wait to be applied. `offers` are repositories synced from other devices
-that wait for `ConfirmRepo`, `recovery` whether the
-server holds an escrow of the current key (`current`), of an older one (`stale`) or none (`off`),
-and `files_bytes` of `files_quota_bytes` the private files on the server. `stale` means that a
-device that may know the recovery passphrase was revoked: clients ask for a new, different
-passphrase, and `SetEscrow` refuses the old one. The state is `signed_out` when the server answers
-`unauthorized` to the token of this computer (the device was revoked or the account deleted): automatic
-sync and the event stream stop, `last_error` says why and clients show a notice on every page; the
-way out is `RemoveServer` and a new link.
-
-### `SyncNow() → (t job)`
-
-Starts an `account_sync` job. `Failed` until this computer is linked and holds a sync key, while
-syncing is off (state `connected`), and
-with a translated message when the account was synced by a newer sync format (`server.md`): this
-version then neither sends nor applies anything until it is updated.
-
-When the key of the account changed (another device rotated it after a device was removed), a sync
-first waits up to 30 s for the device that rotated it to hand the new key over, and fails with
-`the sync key of the account changed: waiting for the new key, or join again` only if it does not
-arrive; a scheduled sync of a device already waiting for the key (`stale`) checks once without waiting, so those syncs
-never block. `REIWAND_HANDOVER_DELAY_MS` delays that hand-over in tests.
-
-A sync sends every change in rounds; a change whose write conflicts three rounds in a row, or a
-cycle that fails while local changes wait, is tried again after 30 s, then 1, 2, 4 and 8 minutes
-and every 15 minutes, without contacting the server while nothing changed locally. The output
-counts in `unsent` the changes that still wait.
-
-Removing a library item here (`Library1.Remove`, or `Repos1.Uninstall` of the last version) sends
-its deletion; a deletion that arrives removes the item here, uninstalling a package, and leaves the
-files in place; an item of a watched folder whose file is still there stays, but is not sent again.
-Items added after a deletion sync again. Deletions are kept 90 days, then become server tombstones.
-
-### `SetPaused(b paused)`
-
-Pauses or resumes automatic sync and closes or opens the event stream; `SyncNow` still works.
-
-### `Join(s device) → (t job)`
-
-On a linked device without the current sync key: `device` is the id, server name or label of a
-device that holds it, which runs `ShareKey` for this device. The `link` job runs a
-commit-then-reveal comparison through the mailbox, with `key-share` messages whose body is the
-JSON `{v: 2, step, pair, data, epoch}` (`data` base64); a message of another version, of another
-comparison, out of order or replayed fails the job, and so does an `abort`. This device sends
-`commit` with a random 16-byte comparison id `pair` (32 hex digits) and `SHA-256("reiwand-sync/commit/v2"
-‖ pair ‖ N_j)` for a random 32-byte nonce `N_j`, waits for the other device's `nonce` `N_h`, and
-only then reveals `N_j`. Both devices show `GetStatus().account.pairing.code`: six digits of
-`T = SHA-256("reiwand-sync/pair/v2" ‖ pair ‖ joining public key ‖ holding public key ‖ N_j ‖ N_h)`
-(the first 8 bytes big-endian modulo 10⁶, as `123 456`), so a server that changes the public keys
-gets one guess per comparison. The comparison is mutual: the job waits both for the `key` message
-and for `ConfirmShare` on this device with the code the other device shows, keeps a received key
-only in memory until then, and sends `abort` when the codes differ. It then opens the key with
-HPKE (auth mode, DHKEM X25519, HKDF-SHA256, ChaCha20-Poly1305, info `reiwand key-share v2`,
-additional data user id ‖ receiving device id ‖ epoch ‖ one byte, 1 when the account is encrypted
-and 0 otherwise ‖ `T`), checks the key id the server reports, stores the key and pins the other
-device, so a server that plays the other device, or tells the two devices different accounts,
-epochs or encryption settings, makes the share fail. Each step waits at most 10 minutes.
-
-### `ShareKey(s device) → (t job)`
-
-On a device that holds the current sync key: a `link` job that waits up to 10 minutes for the
-`commit` of the joining `device`, answers with its own `nonce`, checks the revealed nonce against
-the commitment and outputs `{device, code}`; the code also stays in `pairing` for 10 minutes.
-
-### `ConfirmShare(s device, s code) → (t job)`
-
-Confirms the running comparison with `device`; `code` is the six digits that `device` shows. On
-the device that holds the key it starts an `account` job that sends the sync key sealed, to the
-public key used in the comparison, in a `key` message when `code` equals the code of the
-comparison, and pins `device`. On the joining device it returns the job of the running `Join`,
-which stores the key only when `code` matches. Every comparison allows one attempt on each side:
-when the codes differ the job fails with `InvalidArgs`, which means the server or another device
-stands between them, and the other device gets `abort`.
-
-### `Rotate() → (t job)`
-
-Replaces the sync key of an encrypted account in an `account` job: makes the next record key
-(the naming key stays), stores it as the next key, starts the next epoch with its key id, encrypts
-every record the server holds again (records of the old epoch that cannot be decrypted and
-deletions without payload are not kept), finishes the epoch, which deletes the remaining old records, and sends every pinned device a
-`rotate` message: the new key sealed to its pinned public key like a `key` message with the
-additional data ending in `HKDF-SHA256(old record key, "reiwand-sync/rotate/v1" ‖ epoch)` instead of
-`T`. Pinned devices pass it on to theirs; other devices get the key with `Join`. A rotation after
-a device left forgets the key of the recovery escrow (`recovery` becomes `stale` until `SetEscrow`
-runs again); otherwise this device seals the new key in the escrow again when it holds that key.
-Output: `{epoch, records, shared}`; messages that could not be sent are sent again by later syncs.
-It fails when another device replaced the key first.
-
-### `Reset() → (t job)`
-
-For an account whose key holders are lost: deletes every synced record on the server, sets up
-sync again with a new record key (the naming key and the links between records and local objects
-stay, so devices that join again merge instead of doubling their objects) with end-to-end
-encryption unless this device linked with `plaintext` to a plain-text account, and uploads the
-library, playlists and settings of this computer; output as `SyncNow`. Clients ask for an explicit
-confirmation first. Every other device has to `Join` again.
-
-### `ConfirmRepo(s repo, b add) → (t job)`
-
-Decides on a repository that another device synced and that waits in `offers`; `repo` is its offer
-`id` or at least the first 8 digits of its `repo_id`. With `add`, returns the `repo_add` job of
-`Repos1.Add` with the synced URL; without it the offer
-is declined on this computer, returns `0`, and is not offered again. `NotFound` when no such offer
-waits, `InvalidArgs` when the URL is not a plain repository address (for instance one with `?fingerprint=` synced by a 1.x install).
-
-### `SetEscrow(s passphrase) → (t job)`
-
-Stores the sync key on the server for recovery, in an `account` job: `passphrase` of at least 20
-characters is turned into a key with Argon2id (256 MiB, 3 passes, one lane, a random 16-byte salt)
-that seals the record and naming keys with XChaCha20-Poly1305; the escrow is `0x01 ‖ memory (KiB)
-‖ passes ‖ salt ‖ epoch ‖ nonce ‖ sealed keys` (numbers big-endian, 4 bytes for the costs and 8 for
-the epoch) with the additional data `"reiwand-sync/escrow/v1" ‖ user id ‖ the first 33 bytes`. The
-derived key stays in the Secret Service item of this server, so that after a `Rotate` of this
-device it seals the new key again; a different escrow on the server makes it forget that key, and
-so does a key change after a device left, because the revoked device may know the passphrase: set
-the escrow again then, with a new passphrase, since whoever knew the old one can open every escrow
-sealed with it. While `recovery` is `stale`, a passphrase that opens the escrow still on the server
-is refused (`InvalidArgs`, translated). An empty passphrase deletes the escrow. Only on an encrypted account. Clients warn
-that whoever holds a copy of the server's data can try passphrases without limit.
-
-### `Restore(s passphrase) → (t job)`
-
-On a linked device without the sync key: a `link` job that opens the escrow with `passphrase`,
-refuses an escrow of an epoch older than one this computer already saw, checks that it holds the
-key of the current epoch and key id, and stores it like `Join`; the output names the epoch. A
-device that got the key this way pins no device, so it needs `Join` or `Restore` again after a key
-change.
-
-### `ShareFiles(as targets, b share) → (t job)`
-
-Chooses private files: each target is an item uid or an absolute folder path (every item below it
-is chosen); with `share = false` an item or folder is unchosen, which removes its file from the
-server, and a target can also be the `id` of a file in `ListFiles` that is not on this computer.
-Returns the `files` job. Only on an encrypted account; `NotFound` for an unknown item, `InvalidArgs`
-for a missing folder. A file that cannot be uploaded (the quota is full, or the file of a chosen
-item is missing) does not stop the others: the job uploads the rest and then fails with
-`<n> private files were not uploaded, the others were: <title>: <reason>; …`.
-
-### `ListFiles() → (s json)`
-
-A `FilesReply`: the chosen folders and every private file, those on the server (`stored`, with the
-local item when this computer has the same file and `shared` when it is chosen here) and those
-waiting to upload. It reads no network.
-
-### `ListAway() → (s json)`
-
-An `AwayReply`: the items that other devices synced and that exist only there. An item counts
-when a synced record names it (its own library record, an entry of a playlist, a screen of a
-profile, or a preset made for it), this computer has no item for it, the record carries no
-private file (`ListFiles` lists those) and no repository added here offers a package that its
-name stands for. An item whose own record never synced (one without tags, rating or favorite
-sends none) is named by the records that refer to it and has an empty `title`.
-Sync moves records, not package files: a package or file that one device holds only locally, for
-example a preset made by hand and never published, never reaches the others, and local things are
-not synced on their own; the other devices get it only when the user publishes it to the server
-(`Upload`, `ShareFiles`) or to a repository. Nothing is downloaded or retried for these records.
-Each entry has the `title` of the record, the `playlists` that name it and the `profiles` that
-put it on a screen (`output`). The list is rebuilt at the end of every sync and persists in
-`sync.json`, so an item whose package is installed or published disappears at the next sync. It
-reads no network. Clients show the same note where the item would be: `Search` (unfiltered, first
-page) and `GetPlaylist` carry the entries in `away`, and `GetState` gives each screen of the
-active profile the `away` title. The note names the item (its title, or «Untitled wallpaper»), says that it comes from the
-user's other computers and its file is not on this one, and that sending the files from the computer
-that has it, or adding its repository, makes it available here.
-
-### `FetchFile(s file) → (t job)`
-
-Downloads the private file `file` (its `id` in `ListFiles`) in an `upload` job whose output is
-`{item}`, resuming a partial download.
+Publica en un repositorio de un servidor propio (`reiwand-server`, ver `server.md`) con una cuenta
+guardada en `Accounts1`: subidas, paquetes propios, claves de autor y votos. El destino es, por
+ahora, la primera cuenta con sesión que tenga un enlace a un repositorio de ese servidor; el token
+sale de donde se guardan los secretos (`account <id>`) y nunca aparece en respuestas, señales,
+destinos de tareas, errores ni registros. El demonio solo contacta el servidor de la cuenta, con el
+anclaje de huella de su origen cuando existe, no sigue redirecciones y envía el `User-Agent`
+genérico. Una cuenta sin sesión o rechazada devuelve `SignedOut`; la sincronización automática ya no
+existe: los datos viajan solo por exportar e importar (`Carry1`).
 
 ### `Upload(s path) → (t job)`
 
@@ -2629,13 +2251,6 @@ packages. `shown` is
 repository or `repos.vote_counts` is off. Counts are hints the repository does not sign. `RepoPackage` carries
 `featured` for the packages the repository features (`repo.md`).
 
-### `RemoveServer(b wipe)`
-
-Cancels the account jobs, deletes the keyring item of this server even when linking stopped half
-way (`KeyringUnavailable`: nothing is removed), asks the server in the background to revoke this
-device, and forgets the server. Without `wipe`
-the synced copies stay so that linking the same account again resumes; `wipe` deletes them too.
-The added repository stays.
 
 ## `io.github.reiwand.Carry1`
 
@@ -3099,7 +2714,6 @@ for every `Changed` signal. Topics and their `ids`:
 | `jobs` | A job is created or finishes | job ids as decimal strings |
 | `inputs` | A grant or a decline changes, a question in a desktop notification opens, ends or stops resting, an output starts or stops showing a scene that declares inputs, or audio capture or the pointer feed starts or stops | `[]` |
 | `accounts` | An account is added, removed, signed in again or linked to another repository | `[]` |
-| `account` | The sync server, this device's link or the sync state change | `[]` |
 
 Per topic, the first change emits `Changed` at once and opens a 250 ms window; changes inside the
 window are merged and emitted once when it closes. Merged `ids` are the union, or `[]` when one
@@ -3123,8 +2737,8 @@ of the daemon through `NameOwnerChanged`. Starting a job whose kind and target e
 running job returns that job's id (`import` jobs are never merged, and a `scan` only joins a queued
 scan, never a running one, so a change made while a folder is scanned is seen by the next scan). Library jobs (`scan`,
 `import`, `analyze`) run one at a time, repository jobs (`repo_add`, `repo_refresh`, `install`)
-run one at a time, at most two `provider_sync` jobs download at once, `account`, `account_sync`
-and `upload` jobs run one at a time, and so do `link` jobs and `layers` jobs; a job waiting for its
+run one at a time, at most two `provider_sync` jobs download at once, `account` and
+`upload` jobs run one at a time, and so do `layers` jobs; a job waiting for its
 turn is `queued`. A sync after its downloads and an install after its commit stay `running`
 while they wait for the library.
 
@@ -3138,10 +2752,8 @@ while they wait for the library.
 | `repo_refresh` | `Repos1.Refresh`, schedule | repository id, or `""` | `0/0` | `RefreshOutput` |
 | `install` | `Repos1.Install` | `repo_id/id@version` | bytes | `InstalledPackage` |
 | `layers` | showing a picture whose parallax is on, that has a depth map and no layers for its settings yet | picture path | percent (`0` to `100`) | `{ file, fill, layers }` |
-| `account` | `Sync1.AddServer`, `AddPinnedServer`, `PreviewCode`, `ApproveDevice`, `ConfirmShare`, `Rotate`, `Reset`, `SetEscrow` | server URL, `preview <code>`, `approve <code>`, `share <device id>`, `rotate`, `reset` or `escrow` | `0/0` | server answer, or `{recovery}` |
-| `link` | `Sync1.Link`, `Join`, `ShareKey`, `Restore` | `link`, `join <device id>`, `share <device>` or `restore` | `0/0` | `{device, encrypted, needs_key}`, `{from}`, `{device, code}` or `{epoch}` |
-| `account_sync` | `Sync1.SyncNow`, schedule | `""` | `0/0` | `{applied, records, quarantined, unsent}` |
-| `upload` | `Sync1.Upload`, `ShareFiles`, `FetchFile`, after a sync with private files | random id, `files` or `fetch` | bytes, or segments for `fetch` | `UploadOutput`, `{uploaded}` or `{item}` |
+| `account` | `Accounts1.SignIn` | `sign-in <repository URL>` | `0/0` | `{account, user, server}` |
+| `upload` | `Publish1.Upload` | random id | bytes | `UploadOutput` |
 | `carry_export` | `Carry1.Export` | file path | sections | `{path, sections, own, encrypted}` |
 | `carry_import` | `Carry1.ImportChosen` | file path | steps | `{added, pending, unresolved, notes}` |
 

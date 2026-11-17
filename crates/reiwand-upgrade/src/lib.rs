@@ -4,6 +4,8 @@ pub mod client;
 pub mod server;
 #[cfg(feature = "server")]
 mod server_export;
+#[cfg(feature = "client")]
+pub mod vault;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Outcome {

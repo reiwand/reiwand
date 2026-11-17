@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Reiwand\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-14 00:00+0000\n"
+"POT-Creation-Date: 2026-11-17 00:00+0000\n"
 "PO-Revision-Date: 2026-11-06 00:00+0000\n"
 "Last-Translator: Reiwand contributors\n"
 "Language-Team: Reiwand contributors\n"
@@ -28,127 +28,57 @@ msgstr "Descripción:"
 msgid "Changes:"
 msgstr "Cambios:"
 
-#: apps/reiwand-ctl/src/account.rs
+#: apps/reiwand-ctl/src/accounts.rs
 msgid ""
-"Item names on the server are keyed hashes: a device that once held the names "
-"key and has the same file can still tell that the account stores it, even "
-"after it is revoked."
+"List the accounts known on this computer and the repositories each one is "
+"used for"
 msgstr ""
-"Los nombres de los elementos en el servidor son hashes con clave: un "
-"dispositivo que tuvo la clave de nombres y tiene el mismo archivo aún puede "
-"saber que la cuenta lo guarda, incluso después de revocarlo."
+"Listar las cuentas conocidas en este equipo y los repositorios para los que "
+"se usa cada una"
 
-#: apps/reiwand-ctl/src/account.rs
+#: apps/reiwand-ctl/src/accounts.rs
 msgid ""
-"Approve only a code that your own new device shows on its screen: someone "
-"who sends you a code is trying to get into your account."
+"Sign in to the server of a repository: approve the code in the browser; the "
+"account is used for that repository"
 msgstr ""
-"Aprueba solo un código que tu propio dispositivo nuevo muestre en su "
-"pantalla: quien te envía un código intenta entrar en tu cuenta."
+"Iniciar sesión en el servidor de un repositorio: aprueba el código en el "
+"navegador; la cuenta se usa para ese repositorio"
 
-#: apps/reiwand-ctl/src/account.rs
-msgid ""
-"The device can no longer sync with this account, and the sync key is "
-"replaced."
-msgstr ""
-"El dispositivo ya no puede sincronizar con esta cuenta y la clave de "
-"sincronización se cambia."
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Address of the repository whose server you sign in to"
+msgstr "Dirección del repositorio en cuyo servidor inicias sesión"
 
-#: apps/reiwand-ctl/src/account.rs
-msgid "Remove %1 from the account?"
-msgstr "¿Quitar %1 de la cuenta?"
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Use an account for a repository"
+msgstr "Usar una cuenta para un repositorio"
 
-#: apps/reiwand-ctl/src/account.rs
-msgid "nothing was removed"
-msgstr "no se quitó nada"
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Address of the repository"
+msgstr "Dirección del repositorio"
 
-#: apps/reiwand-ctl/src/account.rs
-msgid "Password of the account: "
-msgstr "Contraseña de la cuenta: "
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Account id from reiwand-ctl account ls"
+msgstr "Id de la cuenta, de reiwand-ctl account ls"
 
-#: apps/reiwand-ctl/src/account.rs
-msgid "no server is added\n"
-msgstr "no hay ningún servidor añadido\n"
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Stop using any account for a repository; the account stays"
+msgstr "Dejar de usar una cuenta en un repositorio; la cuenta se conserva"
 
-#: apps/reiwand-ctl/src/account.rs
-msgid "off: the server can read every record"
-msgstr "desactivado: el servidor puede leer todos los registros"
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Forget an account on this computer, with its saved access"
+msgstr "Olvidar una cuenta en este equipo, con su acceso guardado"
 
-#: apps/reiwand-ctl/src/account.rs
-msgid "end to end"
-msgstr "de extremo a extremo"
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "no accounts"
+msgstr "no hay cuentas"
 
-#: apps/reiwand-ctl/src/account.rs
-msgid "pinned, fingerprint %1"
-msgstr "fijada, huella %1"
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "sign in again"
+msgstr "volver a iniciar sesión"
 
-#: apps/reiwand-ctl/src/account.rs
-msgid "a private file"
-msgstr "un archivo privado"
-
-#: apps/reiwand-ctl/src/account.rs
-msgid "the system keyring"
-msgstr "el llavero del sistema"
-
-#: apps/reiwand-ctl/src/account.rs
-msgid "not applied"
-msgstr "no aplicado"
-
-#: apps/reiwand-ctl/src/account.rs
-msgid "%1 %2 %3 (fingerprint %4, id %5)"
-msgstr "%1 %2 %3 (huella %4, id %5)"
-
-#: apps/reiwand-ctl/src/account.rs apps/reiwand-ctl/src/rgb.rs
-msgid "this computer"
-msgstr "este equipo"
-
-#: apps/reiwand-ctl/src/account.rs
-msgid "not given"
-msgstr "no indicado"
-
-#: apps/reiwand-ctl/src/account.rs
-msgid "Approve this device?"
-msgstr "¿Aprobar este dispositivo?"
-
-#: apps/reiwand-ctl/src/account.rs
-msgid "not approved"
-msgstr "no aprobado"
-
-#: apps/reiwand-ctl/src/account/linking.rs
-msgid "code = %1"
-msgstr "código = %1"
-
-#: apps/reiwand-ctl/src/account/linking.rs
-msgid "Confirm this code on %1, and here the code that %2 shows."
-msgstr "Confirma este código en %1 y escribe aquí el código que muestre %2."
-
-#: apps/reiwand-ctl/src/account/linking.rs
-msgid "Type the code that %1 shows, or nothing to stop: "
-msgstr "Escribe el código que muestra %1, o nada para parar: "
-
-#: apps/reiwand-ctl/src/account/linking.rs
-msgid "the key was not taken"
-msgstr "no se tomó la clave"
-
-#: apps/reiwand-ctl/src/account/linking.rs
-msgid "Confirm with: reiwand-ctl server join %1 --code <the code shown on %2>"
-msgstr ""
-"Confirma con: reiwand-ctl server join %1 --code <el código que muestra %2>"
-
-#: apps/reiwand-ctl/src/account/linking.rs
-msgid "the join stopped"
-msgstr "la vinculación se detuvo"
-
-#: apps/reiwand-ctl/src/account/linking.rs
-msgid ""
-"Send the key with: reiwand-ctl server share %1 --code <the code shown on %2>"
-msgstr ""
-"Envía la clave con: reiwand-ctl server share %1 --code <el código que muestra "
-"%2>"
-
-#: apps/reiwand-ctl/src/account/linking.rs
-msgid "the key was not shared"
-msgstr "no se compartió la clave"
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Open %1 and enter the code %2"
+msgstr "Abre %1 e introduce el código %2"
 
 #: apps/reiwand-ctl/src/acting.rs
 msgid ""
@@ -244,15 +174,12 @@ msgstr "no existe la acción %1; reiwand-ctl scene actions las lista"
 
 #: apps/reiwand-ctl/src/acting.rs
 msgid "there is no query %1; reiwand-ctl scene actions --queries lists them"
-msgstr "no existe la consulta %1; reiwand-ctl scene actions --queries las lista"
+msgstr ""
+"no existe la consulta %1; reiwand-ctl scene actions --queries las lista"
 
 #: apps/reiwand-ctl/src/address.rs
 msgid "%1 is neither a folder nor a URL"
 msgstr "%1 no es una carpeta ni una dirección web"
-
-#: apps/reiwand-ctl/src/inputs/position.rs apps/reiwand-ctl/src/rendering.rs
-msgid "%1 is not a number"
-msgstr "%1 no es un número"
 
 #: apps/reiwand-ctl/src/applying.rs
 msgid "Spread it over every screen, as --fit span"
@@ -347,6 +274,10 @@ msgid "true when a window covers the output, false when not"
 msgstr "true cuando una ventana cubre la salida, false cuando no"
 
 #: apps/reiwand-ctl/src/author.rs
+msgid "%1 is not ROWS,COLUMNS"
+msgstr "%1 no es FILAS,COLUMNAS"
+
+#: apps/reiwand-ctl/src/author.rs
 msgid "Starting point"
 msgstr "Punto de partida"
 
@@ -383,6 +314,31 @@ msgstr ""
 
 #: apps/reiwand-ctl/src/author.rs
 msgid ""
+"Copy a picture, video, sound, font or .cube table into the folder as an asset"
+msgstr ""
+"Copiar una imagen, un vídeo, un sonido, una fuente o una tabla .cube a la "
+"carpeta como recurso"
+
+#: apps/reiwand-ctl/src/author.rs
+msgid "The file to copy"
+msgstr "El archivo que se copia"
+
+#: apps/reiwand-ctl/src/author.rs
+msgid "Asset id; made from the file name when omitted"
+msgstr "Id del recurso; hecho a partir del nombre del archivo si se omite"
+
+#: apps/reiwand-ctl/src/author.rs
+msgid "Read the picture as data, such as a normal map or a mask, not as colors"
+msgstr ""
+"Leer la imagen como datos, como un mapa de normales o una máscara, no como "
+"colores"
+
+#: apps/reiwand-ctl/src/author.rs
+msgid "Split the picture into a sprite sheet of equal cells"
+msgstr "Dividir la imagen en una hoja de sprites de celdas iguales"
+
+#: apps/reiwand-ctl/src/author.rs
+msgid ""
 "Copy a picture into assets/ as the thumbnail of the package, made smaller "
 "when it is over 1024 pixels or 1 MiB, or with --animated as its animated "
 "preview; with --capture draw the scene instead of giving a picture"
@@ -413,7 +369,8 @@ msgstr "  %1: %2, %3, %4 bytes"
 
 #: apps/reiwand-ctl/src/authoring.rs
 msgid ""
-"the app kept unsaved changes; reiwand-ctl scene recover restores or drops them"
+"the app kept unsaved changes; reiwand-ctl scene recover restores or drops "
+"them"
 msgstr ""
 "la aplicación guardó cambios sin confirmar; reiwand-ctl scene recover los "
 "recupera o los descarta"
@@ -441,10 +398,6 @@ msgstr "indica el nombre de la carpeta nueva"
 #: apps/reiwand-ctl/src/authoring.rs
 msgid "nothing is at that pointer"
 msgstr "no hay nada en esa posición del documento"
-
-#: apps/reiwand-ctl/src/cli.rs apps/reiwand-ctl/src/edit.rs
-msgid "Color as #rrggbb"
-msgstr "Color como #rrggbb"
 
 #: apps/reiwand-ctl/src/bench.rs
 msgid ""
@@ -518,6 +471,125 @@ msgstr ""
 msgid "cannot open %1"
 msgstr "no se puede abrir %1"
 
+#: apps/reiwand-ctl/src/blanks.rs
+msgid ""
+"Plasma now shows the background color; plasma-back gives the screens back to "
+"Plasma's own wallpaper"
+msgstr ""
+"Plasma ahora muestra el color de fondo; plasma-back devuelve las pantallas "
+"al fondo propio de Plasma"
+
+#: apps/reiwand-ctl/src/blanks.rs
+msgid "no screen was using the Reiwand wallpaper type"
+msgstr "ninguna pantalla usaba el tipo de fondo de Reiwand"
+
+#: apps/reiwand-ctl/src/blanks.rs
+msgid ""
+"1 screen is back on Plasma's own wallpaper; restore or set a wallpaper to "
+"use Reiwand again"
+msgstr ""
+"1 pantalla volvió al fondo propio de Plasma; restaura o elige un fondo para "
+"usar Reiwand otra vez"
+
+#: apps/reiwand-ctl/src/blanks.rs
+msgid ""
+"%1 screens are back on Plasma's own wallpaper; restore or set a wallpaper to "
+"use Reiwand again"
+msgstr ""
+"%1 pantallas volvieron al fondo propio de Plasma; restaura o elige un fondo "
+"para usar Reiwand otra vez"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid ""
+"Browse the playlist of the screen or the whole library; by default the "
+"playlist when the screen plays one"
+msgstr ""
+"Recorrer la lista de la pantalla o toda la biblioteca; por omisión, la lista "
+"si la pantalla muestra una"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid ""
+"Preview it without applying it: starts browsing, or moves on while browsing; "
+"browse apply keeps it"
+msgstr ""
+"Verlo antes sin aplicarlo: empieza a recorrer o avanza mientras recorres; "
+"browse apply lo deja puesto"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "fade, none, or empty for the usual transition"
+msgstr "fade, none o vacío para la transición de siempre"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "Show the next item of the playlist of an output"
+msgstr "Mostrar el elemento siguiente de la lista de una salida"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "Show the previous item of the playlist of an output"
+msgstr "Mostrar el elemento anterior de la lista de una salida"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "The wallpaper being previewed: apply it, stop, or choose its transition"
+msgstr ""
+"El fondo que estás mirando: aplicarlo, dejar de recorrer o elegir su "
+"transición"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "Apply the wallpaper being previewed and stop browsing"
+msgstr "Aplicar el fondo que estás mirando y dejar de recorrer"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "Choose the transition used when the previewed wallpaper is applied"
+msgstr "Elegir la transición con la que se aplica el fondo que estás mirando"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "Stop browsing and leave the wallpaper as it was"
+msgstr "Dejar de recorrer y dejar el fondo como estaba"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "Show what is being previewed"
+msgstr "Mostrar el fondo que estás mirando"
+
+#: apps/reiwand-ctl/src/browsing.rs apps/reiwand-ctl/src/confirming.rs
+#: apps/reiwand-ctl/src/props.rs
+msgid "every screen"
+msgstr "todas las pantallas"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "applied on %1"
+msgstr "aplicado en %1"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "browsing ended on %1"
+msgstr "se dejó de recorrer en %1"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "nothing is being browsed on %1"
+msgstr "no se está recorriendo nada en %1"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "(none)"
+msgstr "(ninguno)"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "playlist %1"
+msgstr "lista %1"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "library"
+msgstr "biblioteca"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "%1 of %2"
+msgstr "%1 de %2"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "candidate on %1: %2"
+msgstr "a la vista en %1: %2"
+
+#: apps/reiwand-ctl/src/browsing.rs
+msgid "transition: %1"
+msgstr "transición: %1"
+
 #: apps/reiwand-ctl/src/capturing.rs
 msgid "A picture, or with --animated a gif or webp"
 msgstr "Una imagen, o con --animated un gif o webp"
@@ -569,15 +641,176 @@ msgstr ""
 msgid ""
 "For a web page: the screen it is shown on while it is captured; the first "
 "screen without it"
-msgstr "Para una página web: la pantalla en la que se muestra mientras se captura; la primera pantalla sin él"
+msgstr ""
+"Para una página web: la pantalla en la que se muestra mientras se captura; "
+"la primera pantalla sin él"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Read the password of the file from FILE instead of asking on the terminal"
+msgstr ""
+"Leer la contraseña del archivo desde FILE en vez de pedirla en la terminal"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Write the configuration of this computer to one file that import brings to "
+"another"
+msgstr ""
+"Escribe la configuración de este equipo en un archivo que import trae a otro"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Write the configuration of this computer to one file that import brings to "
+"another: added repositories, photo providers, lists, favourites, ratings, "
+"tags, installed wallpapers (as references, downloaded again on import) and "
+"the settings that belong to a person rather than to a screen.\n"
+"\n"
+"With --secrets the file also carries the keys of the photo providers and is "
+"encrypted with a password that is asked for twice on the terminal, or read "
+"from --password-file."
+msgstr ""
+"Escribe la configuración de este equipo en un archivo que import trae a "
+"otro: repositorios añadidos, proveedores de fotos, listas, favoritos, "
+"valoraciones, etiquetas, fondos instalados (como referencias, que se "
+"descargan de nuevo al importar) y los ajustes que son de la persona y no de "
+"una pantalla.\n"
+"\n"
+"Con --secrets el archivo también lleva las claves de los proveedores de "
+"fotos y se cifra con una contraseña que se pide dos veces en la terminal o "
+"se lee de --password-file."
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "File to write; it must not exist"
+msgstr "Archivo que se escribe; no debe existir"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "Also carry the files of your own wallpapers (imported with a copy)"
+msgstr ""
+"Llevar también los archivos de tus fondos propios (importados con copia)"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Also carry the keys of the photo providers; the file is encrypted with a "
+"password"
+msgstr ""
+"Llevar también las claves de los proveedores de fotos; el archivo se cifra "
+"con una contraseña"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "Print the finished job as JSON"
+msgstr "Imprimir la tarea terminada como JSON"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Show what an exported file holds, or add what you choose from it; nothing is "
+"replaced"
+msgstr ""
+"Muestra lo que trae un archivo exportado, o agrega lo que elijas de él; no "
+"se reemplaza nada"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Show what an exported file holds, or add what you choose from it. Importing "
+"only adds: a repository, provider, favourite or tag you already have is "
+"skipped, and a rating is set only on an item without one. Without --take "
+"every section is added."
+msgstr ""
+"Muestra lo que trae un archivo exportado, o agrega lo que elijas de él. "
+"Importar solo agrega: un repositorio, proveedor, favorito o etiqueta que ya "
+"tienes se omite, y una valoración se pone solo en un elemento que no tenga. "
+"Sin --take se agregan todas las secciones."
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "File written by export"
+msgstr "Archivo escrito por export"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "Only show what the file holds and what is new here; change nothing"
+msgstr ""
+"Solo muestra lo que trae el archivo y lo que es nuevo aquí; no cambia nada"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"A list with a name you already have: join adds the missing items to yours, "
+"both keeps the imported one beside it"
+msgstr ""
+"Una lista con un nombre que ya tienes: join suma a la tuya los elementos que "
+"faltan, both conserva la importada a su lado"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Text added to the name of an imported list kept beside yours; by default "
+"' (imported)'"
+msgstr ""
+"Texto que se agrega al nombre de una lista importada que se conserva junto a "
+"la tuya; por defecto ' (importada)'"
+
+#: apps/reiwand-ctl/src/carrying.rs apps/reiwand-ctl/src/cli.rs
+#: apps/reiwand-ctl/src/pack.rs apps/reiwand-ctl/src/repo.rs
+#: apps/reiwand-ctl/src/repo/authors.rs apps/reiwand-ctl/src/server.rs
+#: apps/reiwand-ctl/src/shelving.rs
+msgid "Print the result as JSON"
+msgstr "Imprimir el resultado como JSON"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Section to add (repeat it): repositories, providers, lists, favourites, "
+"ratings, tags, installed, settings, own, secrets"
+msgstr ""
+"Sección que se agrega (repítela): repositories, providers, lists, "
+"favourites, ratings, tags, installed, settings, own, secrets"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"a password is needed and there is no terminal to ask for it: use --password-"
+"file"
+msgstr ""
+"hace falta una contraseña y no hay terminal para pedirla: usa --password-file"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "Password of the file: "
+msgstr "Contraseña del archivo: "
+
+#: apps/reiwand-ctl/src/carrying.rs apps/reiwand-ctl/src/input.rs
+msgid "Repeat the password: "
+msgstr "Repite la contraseña: "
+
+#: apps/reiwand-ctl/src/carrying.rs apps/reiwand-ctl/src/input.rs
+msgid "the passwords differ"
+msgstr "las contraseñas no coinciden"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "the password is empty"
+msgstr "la contraseña está vacía"
+
+#: apps/reiwand-ctl/src/carrying_show.rs
+msgid "File from %1 %2, holds: %3"
+msgstr "Archivo de %1 %2, trae: %3"
+
+#: apps/reiwand-ctl/src/carrying_show.rs
+msgid "%1: %2 in the file, %3 new, %4 skipped, %5 with a name you already have"
+msgstr ""
+"%1: %2 en el archivo, %3 nuevos, %4 omitidos, %5 con un nombre que ya tienes"
+
+#: apps/reiwand-ctl/src/carrying_show.rs
+msgid "added %1: %2"
+msgstr "agregado %1: %2"
+
+#: apps/reiwand-ctl/src/carrying_show.rs
+msgid "%1 entries refer to wallpapers that are not here and were left out"
+msgstr "%1 entradas se refieren a fondos que no están aquí y se dejaron fuera"
+
+#: apps/reiwand-ctl/src/carrying_show.rs
+msgid "pending, %1 %2: %3"
+msgstr "pendiente, %1 %2: %3"
 
 #: apps/reiwand-ctl/src/caution.rs
 msgid ""
-"To allow wallpapers that flash, run: reiwand-ctl config playback.allow_flashing "
-"true"
+"To allow wallpapers that flash, run: reiwand-ctl config playback."
+"allow_flashing true"
 msgstr ""
-"Para permitir los fondos que destellan, ejecuta: reiwand-ctl config "
-"playback.allow_flashing true"
+"Para permitir los fondos que destellan, ejecuta: reiwand-ctl config playback."
+"allow_flashing true"
 
 #: apps/reiwand-ctl/src/caution.rs
 msgid "Installed %1 %2."
@@ -600,13 +833,11 @@ msgid ""
 "Remove the wallpaper and give the screen back to the desktop; restore brings "
 "it back"
 msgstr ""
-"Quita el fondo y devuelve la pantalla al escritorio; restore lo "
-"recupera"
+"Quita el fondo y devuelve la pantalla al escritorio; restore lo recupera"
 
 #: apps/reiwand-ctl/src/cli.rs
 msgid "In Plasma, switch the screens back to Plasma's own wallpaper type"
-msgstr ""
-"En Plasma, devuelve las pantallas al tipo de fondo propio de Plasma"
+msgstr "En Plasma, devuelve las pantallas al tipo de fondo propio de Plasma"
 
 #: apps/reiwand-ctl/src/cli.rs
 msgid "Bring back the wallpaper that clear removed"
@@ -619,6 +850,10 @@ msgstr "Cambiar solo la ubicación del fondo actual"
 #: apps/reiwand-ctl/src/cli.rs
 msgid "Set the color shown around and behind the wallpaper"
 msgstr "Fijar el color que se ve alrededor y detrás del fondo"
+
+#: apps/reiwand-ctl/src/cli.rs apps/reiwand-ctl/src/edit.rs
+msgid "Color as #rrggbb"
+msgstr "Color como #rrggbb"
 
 #: apps/reiwand-ctl/src/cli.rs
 msgid ""
@@ -679,6 +914,17 @@ msgstr ""
 "la tarjeta gráfica o un programa"
 
 #: apps/reiwand-ctl/src/cli.rs
+msgid ""
+"Build again the depth layers of a picture after they failed or were cancelled"
+msgstr ""
+"Volver a crear las capas de profundidad de una imagen que fallaron o se "
+"cancelaron"
+
+#: apps/reiwand-ctl/src/cli.rs
+msgid "Local image file, as a path or a file:// URI"
+msgstr "Imagen local, como ruta o URI file://"
+
+#: apps/reiwand-ctl/src/cli.rs
 msgid "Print the daemon state as JSON"
 msgstr "Imprimir el estado del daemon como JSON"
 
@@ -716,18 +962,6 @@ msgstr "Pausar o reanudar los fondos animados"
 #: apps/reiwand-ctl/src/cli.rs
 msgid "Private mode: cut all network of the program, or give it back"
 msgstr "Modo privado: cortar toda la red del programa, o devolverla"
-
-#: apps/reiwand-ctl/src/network.rs
-msgid "on cuts all network, off gives it back, status tells which"
-msgstr "on corta toda la red, off la devuelve, status dice cuál rige"
-
-#: apps/reiwand-ctl/src/network.rs
-msgid "private mode: on, the network is cut"
-msgstr "modo privado: activado, la red está cortada"
-
-#: apps/reiwand-ctl/src/network.rs
-msgid "private mode: off"
-msgstr "modo privado: desactivado"
 
 #: apps/reiwand-ctl/src/cli.rs
 msgid ""
@@ -804,13 +1038,6 @@ msgstr "Serie desde la que se espera; la actual si se omite"
 msgid "Milliseconds to wait, at most 20000"
 msgstr "Milisegundos de espera, como mucho 20000"
 
-#: apps/reiwand-ctl/src/cli.rs apps/reiwand-ctl/src/folder.rs
-#: apps/reiwand-ctl/src/pack.rs apps/reiwand-ctl/src/repo.rs
-#: apps/reiwand-ctl/src/repo/authors.rs apps/reiwand-ctl/src/server.rs
-#: apps/reiwand-ctl/src/shelving.rs
-msgid "Print the result as JSON"
-msgstr "Imprimir el resultado como JSON"
-
 #: apps/reiwand-ctl/src/cli.rs
 msgid "List running, queued and recently finished jobs"
 msgstr "Listar los trabajos en marcha, en cola y terminados hace poco"
@@ -832,12 +1059,9 @@ msgid "Settings of the scene or video package shown on an output"
 msgstr "Ajustes del paquete de escena o vídeo que se muestra en una salida"
 
 #: apps/reiwand-ctl/src/cli.rs
-msgid ""
-"Create, edit, build and benchmark scenes; needs no daemon except for preview "
-"and apply"
+msgid "Create, edit, build and benchmark scenes; the daemon only for preview"
 msgstr ""
-"Crear, editar, construir y medir escenas; no necesita el daemon salvo para "
-"la vista previa y aplicar"
+"Crear, editar, construir y medir escenas; el daemon solo para la vista previa"
 
 #: apps/reiwand-ctl/src/cli.rs
 msgid "Library folders, items, tags and thumbnails"
@@ -850,14 +1074,6 @@ msgstr "Preajustes de ubicación de los elementos y preajustes globales"
 #: apps/reiwand-ctl/src/cli.rs
 msgid "Playlists and their rotation"
 msgstr "Listas de reproducción y su rotación"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "Show the next item of the playlist of an output"
-msgstr "Mostrar el elemento siguiente de la lista de una salida"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "Show the previous item of the playlist of an output"
-msgstr "Mostrar el elemento anterior de la lista de una salida"
 
 #: apps/reiwand-ctl/src/cli.rs
 msgid "Profiles: saved assignments of every output"
@@ -881,10 +1097,13 @@ msgstr ""
 "Audio, puntero y otras entradas de escenas y páginas: permisos y estado"
 
 #: apps/reiwand-ctl/src/cli.rs
-msgid "The self-hosted server: link, end-to-end encrypted sync and uploads"
+msgid "Publish to a repository: uploads, your packages and your author keys"
+msgstr "Publicar en un repositorio: subidas, tus paquetes y tus claves de autor"
+
+#: apps/reiwand-ctl/src/cli.rs
+msgid "Accounts on repository servers: sign in, choose, forget"
 msgstr ""
-"El servidor propio: enlace, sincronización cifrada de extremo a extremo y "
-"subidas"
+"Cuentas en los servidores de repositorios: iniciar sesión, elegir y olvidar"
 
 #: apps/reiwand-ctl/src/cli.rs
 msgid "Edit images, keeping their files; needs no daemon but for preview"
@@ -903,8 +1122,7 @@ msgid "Whether the media player is read now, and for which screens"
 msgstr "Si ahora se lee el reproductor multimedia, y para qué pantallas"
 
 #: apps/reiwand-ctl/src/cli.rs
-msgid ""
-"Download, check and remove the depth model and runtime; needs no daemon"
+msgid "Download, check and remove the depth model and runtime; needs no daemon"
 msgstr ""
 "Descargar, comprobar y quitar el modelo de profundidad y su motor; no "
 "necesita el daemon"
@@ -912,6 +1130,11 @@ msgstr ""
 #: apps/reiwand-ctl/src/cli.rs
 msgid "Build, sign and check .wpak packages; needs no daemon"
 msgstr "Construir, firmar y comprobar paquetes .wpak; no necesita el daemon"
+
+#: apps/reiwand-ctl/src/cli.rs
+msgid "Print and draw the server connect code; needs no daemon"
+msgstr ""
+"Imprimir y dibujar el código de conexión del servidor; no necesita el daemon"
 
 #: apps/reiwand-ctl/src/cli.rs
 msgid "Operate a package repository; needs no daemon"
@@ -925,10 +1148,13 @@ msgstr ""
 "Moderar un servidor con un token personal (REIWAND_SERVER_TOKEN); no "
 "necesita el daemon"
 
-#: apps/reiwand-ctl/src/browsing.rs apps/reiwand-ctl/src/confirming.rs
-#: apps/reiwand-ctl/src/props.rs
-msgid "every screen"
-msgstr "todas las pantallas"
+#: apps/reiwand-ctl/src/cli.rs
+msgid ""
+"Print the licenses of the libraries, fonts, icons and models the program "
+"carries"
+msgstr ""
+"Imprimir las licencias de las bibliotecas, fuentes, íconos y modelos que "
+"incluye el programa"
 
 #: apps/reiwand-ctl/src/confirming.rs
 msgid "title set to %1"
@@ -1083,6 +1309,10 @@ msgid "effects tried again"
 msgstr "efectos intentados de nuevo"
 
 #: apps/reiwand-ctl/src/confirming.rs
+msgid "building the depth layers of %1 again"
+msgstr "volviendo a crear las capas de profundidad de %1"
+
+#: apps/reiwand-ctl/src/confirming.rs
 msgid "paused"
 msgstr "en pausa"
 
@@ -1121,6 +1351,30 @@ msgstr "transmisión liberada en %1"
 #: apps/reiwand-ctl/src/confirming.rs
 msgid "job %1 cancelled"
 msgstr "tarea %1 cancelada"
+
+#: apps/reiwand-ctl/src/connecting.rs
+msgid "Address of the server, https://host[:port][/path]"
+msgstr "Dirección del servidor, https://host[:puerto][/ruta]"
+
+#: apps/reiwand-ctl/src/connecting.rs
+msgid ""
+"SHA-256 of the server's own certificate, as reiwand-server fingerprint "
+"prints it; leave it out when the certificate validates the normal way"
+msgstr ""
+"SHA-256 del certificado propio del servidor, como lo imprime reiwand-server "
+"fingerprint; omítelo cuando el certificado se valida de la forma normal"
+
+#: apps/reiwand-ctl/src/connecting.rs
+msgid "Invitation code the phone uses to create its account"
+msgstr "Código de invitación con el que el teléfono crea su cuenta"
+
+#: apps/reiwand-ctl/src/connecting.rs
+msgid "Also draw the QR code with block characters"
+msgstr "Dibujar además el código QR con caracteres de bloque"
+
+#: apps/reiwand-ctl/src/connecting.rs
+msgid "Draw for a light terminal background instead of a dark one"
+msgstr "Dibujar para un terminal de fondo claro en lugar de uno oscuro"
 
 #: apps/reiwand-ctl/src/consent.rs
 msgid ""
@@ -1336,6 +1590,32 @@ msgstr ""
 "detrás de los objetos cercanos"
 
 #: apps/reiwand-ctl/src/depth.rs
+msgid ""
+"Make the regions under two or more points one region, so they share a layer "
+"and move together"
+msgstr ""
+"Hace una sola región con las regiones bajo dos o más puntos, para que "
+"compartan capa y se muevan juntas"
+
+#: apps/reiwand-ctl/src/depth.rs
+msgid ""
+"Cut the regions a stroke crosses in two, so each part can move on its own"
+msgstr ""
+"Corta en dos las regiones que cruza un trazo, para que cada parte se mueva "
+"por su cuenta"
+
+#: apps/reiwand-ctl/src/depth.rs
+msgid "Move the region under a point nearer or farther, as a whole"
+msgstr "Acerca o aleja entera la región que hay bajo un punto"
+
+#: apps/reiwand-ctl/src/depth.rs
+msgid ""
+"List the regions of the picture from the nearest, each with a point inside it"
+msgstr ""
+"Lista las regiones de la imagen desde la más cercana, cada una con un punto "
+"dentro"
+
+#: apps/reiwand-ctl/src/depth.rs
 msgid "the image has no depth map"
 msgstr "la imagen no tiene mapa de profundidad"
 
@@ -1373,6 +1653,16 @@ msgstr "guardando el mapa de profundidad"
 #: apps/reiwand-ctl/src/depth.rs
 msgid "done in %1 s"
 msgstr "hecho en %1 s"
+
+#: apps/reiwand-ctl/src/depth.rs
+msgid ""
+"LaMa or ONNX Runtime is not installed, so the simple fill is used. To get "
+"the better fill run reiwand-ctl models download lama-big-fp32 (see reiwand-"
+"ctl models list); nothing is downloaded until you ask"
+msgstr ""
+"LaMa o ONNX Runtime no está instalado, así que se usa el relleno simple. "
+"Para tener el relleno mejor ejecuta reiwand-ctl models download lama-big-"
+"fp32 (mira reiwand-ctl models list); no se descarga nada hasta que lo pidas"
 
 #: apps/reiwand-ctl/src/edit.rs
 msgid ""
@@ -1633,23 +1923,6 @@ msgstr "la ruta no es UTF-8"
 msgid "cannot write %1"
 msgstr "no se puede escribir %1"
 
-#: apps/reiwand-ctl/src/input.rs
-msgid "%1 is not KEY=VALUE"
-msgstr "%1 no es CLAVE=VALOR"
-
-#: apps/reiwand-ctl/src/scriptfaults.rs
-msgid ""
-"the transition for coming in does not play, the plain fade plays instead: %1"
-msgstr ""
-"la transición de entrada no se reproduce y en su lugar se ve el fundido de "
-"siempre: %1"
-
-#: apps/reiwand-ctl/src/scriptfaults.rs
-msgid "the transition for leaving does not play, the plain fade plays instead: %1"
-msgstr ""
-"la transición de salida no se reproduce y en su lugar se ve el fundido de "
-"siempre: %1"
-
 #: apps/reiwand-ctl/src/facts.rs
 msgid "plays without %1"
 msgstr "funciona sin %1"
@@ -1727,29 +2000,6 @@ msgstr ""
 #: apps/reiwand-ctl/src/folder.rs
 msgid "Drop the kept changes instead of restoring them"
 msgstr "Descartar los cambios guardados en vez de restaurarlos"
-
-#: apps/reiwand-ctl/src/folder.rs
-msgid "Check the scene and its files; exits with 1 when something is wrong"
-msgstr "Comprobar la escena y sus archivos; sale con 1 cuando algo está mal"
-
-#: apps/reiwand-ctl/src/folder.rs
-msgid "Print one JSON object per problem"
-msgstr "Imprimir un objeto JSON por problema"
-
-#: apps/reiwand-ctl/src/folder.rs
-msgid "Build the .wpak package, signed with --key, as reiwand-ctl pack build does"
-msgstr ""
-"Construir el paquete .wpak, firmado con --key, como hace reiwand-ctl pack build"
-
-#: apps/reiwand-ctl/src/folder.rs
-msgid "Package file; <id>-<version>.wpak next to the scene folder when omitted"
-msgstr ""
-"Archivo del paquete; <id>-<versión>.wpak junto a la carpeta de la escena si "
-"se omite"
-
-#: apps/reiwand-ctl/src/folder.rs
-msgid "Secret key file of the author"
-msgstr "Archivo de clave secreta del autor"
 
 #: apps/reiwand-ctl/src/folder.rs
 msgid ""
@@ -1853,10 +2103,6 @@ msgstr "%1 (deshecho)"
 #: apps/reiwand-ctl/src/folder.rs
 msgid "there are no unsaved changes to recover"
 msgstr "no hay cambios sin guardar que recuperar"
-
-#: apps/reiwand-ctl/src/folder/parts.rs
-msgid "warning: %1: %2"
-msgstr "aviso: %1: %2"
 
 #: apps/reiwand-ctl/src/folder/parts.rs
 msgid "Adding the package to the library…"
@@ -2093,7 +2339,8 @@ msgstr ""
 msgid ""
 "the change takes effect the next time the daemon starts (reiwand-ctl restart)"
 msgstr ""
-"el cambio se aplica la próxima vez que arranque el daemon (reiwand-ctl restart)"
+"el cambio se aplica la próxima vez que arranque el daemon (reiwand-ctl "
+"restart)"
 
 #: apps/reiwand-ctl/src/gpus.rs
 msgid "the daemon did not start again within 30 seconds"
@@ -2115,6 +2362,28 @@ msgstr "nota: %1"
 msgid "in use: %1 (from %2)"
 msgstr "en uso: %1 (de %2)"
 
+#: apps/reiwand-ctl/src/hearing.rs
+msgid ""
+"on to play the sound of the wallpaper wherever it is shown, off to silence "
+"it, follow to follow the global volume again; the global mute stays the "
+"master"
+msgstr ""
+"on para reproducir el sonido del fondo donde se muestre, off para "
+"silenciarlo y follow para volver a seguir el volumen general; el silencio "
+"general sigue mandando"
+
+#: apps/reiwand-ctl/src/hearing.rs
+msgid "Volume of the wallpaper in percent, below the global volume"
+msgstr "Volumen del fondo en porcentaje, por debajo del volumen general"
+
+#: apps/reiwand-ctl/src/hearing.rs
+msgid "no wallpaper of the library is shown there; name an item with --item"
+msgstr "ningún fondo de la biblioteca se muestra ahí; indica uno con --item"
+
+#: apps/reiwand-ctl/src/hearing.rs
+msgid "%1: sound %2, volume %3, global %4 at %5%"
+msgstr "%1: sonido %2, volumen %3, global %4 al %5%"
+
 #: apps/reiwand-ctl/src/held.rs
 msgid ""
 "\n"
@@ -2133,16 +2402,9 @@ msgstr "%1 no es un archivo local"
 msgid "reiwandd resolved no item"
 msgstr "reiwandd no encontró ningún elemento"
 
-#: apps/reiwand-ctl/src/hearing.rs
-msgid ""
-"on to play the sound of the wallpaper wherever it is shown, off to silence "
-"it, follow to follow the global volume again; the global mute stays the "
-"master"
-msgstr "on para reproducir el sonido del fondo donde se muestre, off para silenciarlo y follow para volver a seguir el volumen general; el silencio general sigue mandando"
-
-#: apps/reiwand-ctl/src/hearing.rs
-msgid "Volume of the wallpaper in percent, below the global volume"
-msgstr "Volumen del fondo en porcentaje, por debajo del volumen general"
+#: apps/reiwand-ctl/src/input.rs
+msgid "%1 is not KEY=VALUE"
+msgstr "%1 no es CLAVE=VALOR"
 
 #: apps/reiwand-ctl/src/input.rs
 msgid ""
@@ -2157,14 +2419,6 @@ msgid "Key password: "
 msgstr "Contraseña de la clave: "
 
 #: apps/reiwand-ctl/src/input.rs
-msgid "Repeat the password: "
-msgstr "Repite la contraseña: "
-
-#: apps/reiwand-ctl/src/input.rs
-msgid "the passwords differ"
-msgstr "las contraseñas no coinciden"
-
-#: apps/reiwand-ctl/src/input.rs
 msgid "the terminal closed"
 msgstr "la terminal se cerró"
 
@@ -2177,25 +2431,12 @@ msgid ""
 "Answer for every input a shown scene asks for in one go: allow some, leave "
 "the others out; the scene runs without what is left out"
 msgstr ""
-"Responde de una vez a todo lo que pide una escena que se ve: permite "
-"unas entradas y deja fuera las demás; la escena corre sin lo que se deja"
-" fuera"
-
-#: apps/reiwand-ctl/src/inputs.rs
-msgid ""
-"Let the scene package shown now use an input whenever it is shown; another "
-"package with the same id does not get it"
-msgstr ""
-"Dejar que el paquete de escena que se muestra ahora use una entrada siempre "
-"que se muestre; otro paquete con el mismo id no la recibe"
+"Responde de una vez a todo lo que pide una escena que se ve: permite unas "
+"entradas y deja fuera las demás; la escena corre sin lo que se deja fuera"
 
 #: apps/reiwand-ctl/src/inputs.rs
 msgid "Package id of the scene"
 msgstr "Id del paquete de la escena"
-
-#: apps/reiwand-ctl/src/inputs.rs
-msgid "Package id of the scene, or the full path of a picture whose parallax follows the pointer"
-msgstr "Id del paquete de la escena, o la ruta completa de una imagen cuyo paralaje sigue al puntero"
 
 #: apps/reiwand-ctl/src/inputs.rs
 msgid "Inputs to allow"
@@ -2208,8 +2449,15 @@ msgstr "Entradas que se dejan fuera"
 #: apps/reiwand-ctl/src/inputs.rs
 msgid "The screen whose package answers, when several show one with this id"
 msgstr ""
-"La pantalla cuyo paquete responde, cuando varias muestran uno con este "
-"id"
+"La pantalla cuyo paquete responde, cuando varias muestran uno con este id"
+
+#: apps/reiwand-ctl/src/inputs.rs
+msgid ""
+"Let the scene package shown now use an input whenever it is shown; another "
+"package with the same id does not get it"
+msgstr ""
+"Dejar que el paquete de escena que se muestra ahora use una entrada siempre "
+"que se muestre; otro paquete con el mismo id no la recibe"
 
 #: apps/reiwand-ctl/src/inputs.rs
 msgid "Input to let the scene read"
@@ -2229,6 +2477,14 @@ msgid ""
 msgstr ""
 "Retirarle una entrada a una escena; se detiene en el acto y los clientes "
 "dejan de pedirla hasta que se conceda"
+
+#: apps/reiwand-ctl/src/inputs.rs
+msgid ""
+"Package id of the scene, or the full path of a picture whose parallax "
+"follows the pointer"
+msgstr ""
+"Id del paquete de la escena, o la ruta completa de una imagen cuyo paralaje "
+"sigue al puntero"
 
 #: apps/reiwand-ctl/src/inputs.rs
 msgid "Input to take back from the scene"
@@ -2320,11 +2576,24 @@ msgid ""
 "as the editor meter reads them; nothing is recorded or kept, and it needs "
 "the audio input of the scene. listening says whether the daemon has the "
 "sound capture open for it, sound whether sound is arriving now"
-msgstr "Muestra los niveles de las 64 bandas del sonido que sigue la escena de una pantalla, como los lee el medidor del editor; no se graba ni se guarda nada y hace falta la entrada de audio de la escena. listening dice si el daemon tiene abierta la captura de sonido para ella y sound si está llegando sonido ahora"
+msgstr ""
+"Muestra los niveles de las 64 bandas del sonido que sigue la escena de una "
+"pantalla, como los lee el medidor del editor; no se graba ni se guarda nada "
+"y hace falta la entrada de audio de la escena. listening dice si el daemon "
+"tiene abierta la captura de sonido para ella y sound si está llegando sonido "
+"ahora"
 
 #: apps/reiwand-ctl/src/inputs.rs
 msgid "The screen, such as a preview output named preview:1"
 msgstr "La pantalla, por ejemplo una salida de vista previa llamada preview:1"
+
+#: apps/reiwand-ctl/src/inputs/asking.rs
+msgid " && reiwand-ctl input clicks on -o %1"
+msgstr " && reiwand-ctl input clicks on -o %1"
+
+#: apps/reiwand-ctl/src/inputs/asking.rs
+msgid "%1 follows %2 once you allow it: %3"
+msgstr "%1 sigue %2 en cuanto lo permitas: %3"
 
 #: apps/reiwand-ctl/src/inputs/giving.rs
 msgid "%1 does not show %2"
@@ -2335,16 +2604,16 @@ msgid "more than one package with the id %1 is shown; choose one with --output"
 msgstr "se muestra más de un paquete con el id %1; elige uno con --output"
 
 #: apps/reiwand-ctl/src/inputs/giving.rs
+msgid "%1 may use %2"
+msgstr "%1 puede usar %2"
+
+#: apps/reiwand-ctl/src/inputs/giving.rs
 msgid ""
 "Asked in a desktop notification: the scene gets the input once you allow it "
 "there."
 msgstr ""
 "Se preguntó en una notificación del escritorio: la escena recibe la entrada "
 "en cuanto la permitas allí."
-
-#: apps/reiwand-ctl/src/inputs/giving.rs
-msgid "%1 may use %2"
-msgstr "%1 puede usar %2"
 
 #: apps/reiwand-ctl/src/inputs/giving.rs
 msgid "%1 is not shown"
@@ -2354,17 +2623,13 @@ msgstr "%1 no se muestra"
 msgid "%1 answered"
 msgstr "%1 respondido"
 
-#: apps/reiwand-ctl/src/inputs/asking.rs
-msgid " && reiwand-ctl input clicks on -o %1"
-msgstr " && reiwand-ctl input clicks on -o %1"
-
-#: apps/reiwand-ctl/src/inputs/asking.rs
-msgid "%1 follows %2 once you allow it: %3"
-msgstr "%1 sigue %2 en cuanto lo permitas: %3"
-
 #: apps/reiwand-ctl/src/inputs/position.rs
 msgid "expected X,Y"
 msgstr "se esperaba X,Y"
+
+#: apps/reiwand-ctl/src/inputs/position.rs apps/reiwand-ctl/src/rendering.rs
+msgid "%1 is not a number"
+msgstr "%1 no es un número"
 
 #: apps/reiwand-ctl/src/inputs/shown.rs
 msgid "audio capture: %1"
@@ -2373,22 +2638,6 @@ msgstr "captura de audio: %1"
 #: apps/reiwand-ctl/src/inputs/shown.rs
 msgid "granted to the picture %1: %2"
 msgstr "permitido a la imagen %1: %2"
-
-#: apps/reiwand-ctl/src/inputs/shown.rs
-msgid "%1: inputs on, the wallpaper is in view"
-msgstr "%1: entradas activas, el fondo está a la vista"
-
-#: apps/reiwand-ctl/src/inputs/shown.rs
-msgid "%1: paused: the wallpaper is paused"
-msgstr "%1: en pausa: el fondo está en pausa"
-
-#: apps/reiwand-ctl/src/inputs/shown.rs
-msgid "%1: paused: a window covers the screen"
-msgstr "%1: en pausa: una ventana cubre la pantalla"
-
-#: apps/reiwand-ctl/src/inputs/shown.rs
-msgid "%1: paused: the screen is not receiving the picture"
-msgstr "%1: en pausa: la pantalla no recibe imagen"
 
 #: apps/reiwand-ctl/src/inputs/shown.rs
 msgid "granted to some version or signer of %1: %2"
@@ -2429,6 +2678,22 @@ msgstr "recibiendo clics ahora: %1"
 #: apps/reiwand-ctl/src/inputs/shown.rs
 msgid "clicks cannot reach the wallpaper here on: %1"
 msgstr "los clics no pueden llegar aquí al fondo en: %1"
+
+#: apps/reiwand-ctl/src/inputs/shown.rs
+msgid "%1: inputs on, the wallpaper is in view"
+msgstr "%1: entradas activas, el fondo está a la vista"
+
+#: apps/reiwand-ctl/src/inputs/shown.rs
+msgid "%1: paused: the wallpaper is paused"
+msgstr "%1: en pausa: el fondo está en pausa"
+
+#: apps/reiwand-ctl/src/inputs/shown.rs
+msgid "%1: paused: a window covers the screen"
+msgstr "%1: en pausa: una ventana cubre la pantalla"
+
+#: apps/reiwand-ctl/src/inputs/shown.rs
+msgid "%1: paused: the screen is not receiving the picture"
+msgstr "%1: en pausa: la pantalla no recibe imagen"
 
 #: apps/reiwand-ctl/src/inputs/shown.rs
 msgid ""
@@ -2570,10 +2835,6 @@ msgstr "Huella de la clave, tal como la imprime list"
 msgid "name the author id that the repository shows"
 msgstr "indica el id de autor que muestra el repositorio"
 
-#: apps/reiwand-ctl/src/spanning.rs
-msgid "%1 is not a number of seconds"
-msgstr "%1 no es un número de segundos"
-
 #: apps/reiwand-ctl/src/keys.rs
 msgid "Number of root keys that must sign a root"
 msgstr "Número de claves raíz que deben firmar una raíz"
@@ -2638,10 +2899,6 @@ msgstr ""
 "%1 es tu clave SECRETA: no la compartas nunca y guarda una copia en un lugar "
 "seguro. %2 es la clave pública: entrégala a quien deba comprobar tus firmas."
 
-#: apps/reiwand-ctl/src/shelving.rs
-msgid "A part as layer:ID, particles:ID, script:PATH or effect:ID"
-msgstr "Una parte como layer:ID, particles:ID, script:RUTA o effect:ID"
-
 #: apps/reiwand-ctl/src/levels.rs
 msgid ""
 "auto, a fixed level q0 to q3, or min-q1 or min-q2 to keep the automatic "
@@ -2678,6 +2935,10 @@ msgstr ", PQ con su propia descripción, MaxCLL %1"
 #: apps/reiwand-ctl/src/levels.rs
 msgid "%1%2 = %3, not connected"
 msgstr "%1%2 = %3, no conectado"
+
+#: apps/reiwand-ctl/src/levels/notes.rs
+msgid "the page reported an error and may not be drawing: %1"
+msgstr "la página informó de un error y puede que no se esté dibujando: %1"
 
 #: apps/reiwand-ctl/src/levels/notes.rs
 msgid "keep it still at its poster"
@@ -2730,9 +2991,9 @@ msgid ""
 "with fewer frames per second and more battery use"
 msgstr ""
 "esta escena es demasiado pesada para este dispositivo y la calidad "
-"automática la deja quieta en su imagen de portada; un nivel fijo como reiwand-"
-"ctl quality q0 la reproduce igual, con menos fotogramas por segundo y más "
-"uso de batería"
+"automática la deja quieta en su imagen de portada; un nivel fijo como "
+"reiwand-ctl quality q0 la reproduce igual, con menos fotogramas por segundo "
+"y más uso de batería"
 
 #: apps/reiwand-ctl/src/levels/notes.rs
 msgid ""
@@ -2740,10 +3001,6 @@ msgid ""
 msgstr ""
 "%1: %2 quiere %3 pero aquí no está permitido, así que esa parte de la escena "
 "queda apagada"
-
-#: apps/reiwand-ctl/src/levels/notes.rs
-msgid "the page reported an error and may not be drawing: %1"
-msgstr "la página informó de un error y puede que no se esté dibujando: %1"
 
 #: apps/reiwand-ctl/src/library.rs
 msgid "Add a folder and scan it; prints the source uid, then the job id"
@@ -2886,10 +3143,9 @@ msgid ""
 "asks for reduced motion, or hide the time zone, the language, the graphics "
 "card or storage from a web page"
 msgstr ""
-"Mostrar las miniaturas para adultos de los paquetes, dejar que las "
-"escenas sigan moviéndose cuando el escritorio pide menos movimiento, u "
-"ocultar a una página web la zona horaria, el idioma, la tarjeta gráfica "
-"o el almacenamiento"
+"Mostrar las miniaturas para adultos de los paquetes, dejar que las escenas "
+"sigan moviéndose cuando el escritorio pide menos movimiento, u ocultar a una "
+"página web la zona horaria, el idioma, la tarjeta gráfica o el almacenamiento"
 
 #: apps/reiwand-ctl/src/library.rs
 msgid "What to allow"
@@ -2966,6 +3222,16 @@ msgstr "Tiempo que tarda en asentarse el movimiento, de 0 a 2000 ms"
 #: apps/reiwand-ctl/src/looking.rs
 msgid "Zoom that hides the edges, 1 to 1.1"
 msgstr "Zoom que oculta los bordes, de 1 a 1,1"
+
+#: apps/reiwand-ctl/src/looking.rs
+msgid "Fill behind near objects; lama when the model is installed, else simple"
+msgstr ""
+"Relleno detrás de los objetos cercanos; lama si el modelo está instalado, si "
+"no simple"
+
+#: apps/reiwand-ctl/src/looking.rs
+msgid "Depth layers, 4 to 6, 5 when new"
+msgstr "Capas de profundidad, de 4 a 6; 5 si es nueva"
 
 #: apps/reiwand-ctl/src/looking.rs
 msgid "Turn the parallax off and keep its settings"
@@ -3111,6 +3377,10 @@ msgid "Package id"
 msgstr "Id del paquete"
 
 #: apps/reiwand-ctl/src/moderate.rs
+msgid "Name of the repository of the server that holds it"
+msgstr "Nombre del repositorio del servidor que lo guarda"
+
+#: apps/reiwand-ctl/src/moderate.rs
 msgid "Reason the author sees, at least 10 characters"
 msgstr "Motivo que ve el autor, de al menos 10 caracteres"
 
@@ -3125,6 +3395,18 @@ msgstr "Listar los paquetes ocultos y por qué"
 #: apps/reiwand-ctl/src/moderate.rs
 msgid "Personal token of a moderator with the mod scope: "
 msgstr "Token personal de un moderador con el alcance mod: "
+
+#: apps/reiwand-ctl/src/network.rs
+msgid "on cuts all network, off gives it back, status tells which"
+msgstr "on corta toda la red, off la devuelve, status dice cuál rige"
+
+#: apps/reiwand-ctl/src/network.rs
+msgid "private mode: on, the network is cut"
+msgstr "modo privado: activado, la red está cortada"
+
+#: apps/reiwand-ctl/src/network.rs
+msgid "private mode: off"
+msgstr "modo privado: desactivado"
 
 #: apps/reiwand-ctl/src/pack.rs
 msgid "Build a .wpak package from a folder that holds manifest.json"
@@ -3222,6 +3504,48 @@ msgstr "la carpeta no está firmada"
 msgid "the signature is not valid"
 msgstr "la firma no es válida"
 
+#: apps/reiwand-ctl/src/passing.rs
+msgid "%1: %2; the last change: %3"
+msgstr "%1: %2; el último cambio: %3"
+
+#: apps/reiwand-ctl/src/passing.rs
+msgid "the transition of each wallpaper"
+msgstr "la transición de cada fondo"
+
+#: apps/reiwand-ctl/src/passing.rs
+msgid "the plain fade"
+msgstr "el fundido simple"
+
+#: apps/reiwand-ctl/src/passing.rs
+msgid "a cut"
+msgstr "un corte"
+
+#: apps/reiwand-ctl/src/passing.rs
+msgid "the wallpaper's own transition played"
+msgstr "se vio la transición propia del fondo"
+
+#: apps/reiwand-ctl/src/passing.rs
+msgid "what you chose played"
+msgstr "se vio lo que elegiste"
+
+#: apps/reiwand-ctl/src/passing.rs
+msgid "the plain fade played, because of less motion"
+msgstr "se vio el fundido simple, por menos movimiento"
+
+#: apps/reiwand-ctl/src/passing.rs
+msgid ""
+"the plain fade played, because the wallpaper's transition could not play"
+msgstr ""
+"se vio el fundido simple, porque la transición del fondo no se pudo ver"
+
+#: apps/reiwand-ctl/src/passing.rs
+msgid "the plain fade played: neither wallpaper brings a transition"
+msgstr "se vio el fundido simple: ninguno de los dos fondos trae transición"
+
+#: apps/reiwand-ctl/src/passing.rs
+msgid "a cut: the screen was not ready for a transition"
+msgstr "un corte: la pantalla no estaba lista para una transición"
+
 #: apps/reiwand-ctl/src/pkg.rs
 msgid ""
 "[REPO/]ID[@VERSION]: a package id, optionally with a repository id prefix "
@@ -3308,6 +3632,10 @@ msgstr ""
 #: apps/reiwand-ctl/src/pkg.rs
 msgid " (update available)"
 msgstr " (hay una actualización)"
+
+#: apps/reiwand-ctl/src/pkg.rs
+msgid "%1 by your content filter"
+msgstr "%1 por tu filtro de contenido"
 
 #: apps/reiwand-ctl/src/pkg.rs
 msgid ""
@@ -3471,16 +3799,16 @@ msgid "Number of entries to print"
 msgstr "Número de entradas que se imprimen"
 
 #: apps/reiwand-ctl/src/playlists/act.rs
-msgid "the playlist has no entry %1"
-msgstr "la lista no tiene la entrada %1"
-
-#: apps/reiwand-ctl/src/playlists/act.rs
 msgid "The folder has %1 pictures and videos"
 msgstr "La carpeta tiene %1 imágenes y vídeos"
 
 #: apps/reiwand-ctl/src/playlists/act.rs
 msgid "Wallpaper rotation"
 msgstr "Rotación de fondos"
+
+#: apps/reiwand-ctl/src/playlists/act.rs
+msgid "the playlist has no entry %1"
+msgstr "la lista no tiene la entrada %1"
 
 #: apps/reiwand-ctl/src/presets.rs
 msgid "List the presets of an item, or the global presets"
@@ -3519,27 +3847,6 @@ msgstr ""
 msgid "no preset named %1"
 msgstr "no hay ningún preajuste llamado %1"
 
-#: apps/reiwand-ctl/src/private.rs
-msgid ""
-"A file that is on no device any more, for example one of a lost computer, is "
-"lost for good once it leaves the server."
-msgstr ""
-"Un archivo que ya no está en ningún dispositivo, por ejemplo uno de un "
-"equipo perdido, se pierde para siempre cuando sale del servidor."
-
-#: apps/reiwand-ctl/src/private.rs
-msgid ""
-"The server will keep the sync key locked with this passphrase, so that a new "
-"device can get it when no device is left. Whoever gets a copy of the "
-"server's data can try to guess the passphrase without limit: use several "
-"unrelated words that you use nowhere else, and keep them somewhere safe."
-msgstr ""
-"El servidor guardará la clave de sincronización cerrada con esta frase, para "
-"que un dispositivo nuevo pueda obtenerla cuando no quede ningún dispositivo. "
-"Quien consiga una copia de los datos del servidor puede intentar adivinar la "
-"frase sin límite: usa varias palabras sin relación que no uses en ningún "
-"otro sitio y guárdalas en un lugar seguro."
-
 #: apps/reiwand-ctl/src/presetting.rs
 msgid "With --from preset: the package the preset is for"
 msgstr "Con --from preset: el paquete para el que es el preajuste"
@@ -3566,90 +3873,13 @@ msgstr "Con --from preset: licencia del preajuste, como CC-BY-4.0"
 msgid "With --from preset: a picture to keep as its thumbnail"
 msgstr "Con --from preset: una imagen que se guarda como su miniatura"
 
-#: apps/reiwand-ctl/src/private.rs
-msgid "List the private files on the server and those waiting to upload"
-msgstr "Listar los archivos privados del servidor y los que esperan subirse"
+#: apps/reiwand-ctl/src/presetting.rs
+msgid "read the values file"
+msgstr "leer el archivo de valores"
 
-#: apps/reiwand-ctl/src/private.rs
-msgid ""
-"Upload items, or every item of folders, end-to-end encrypted; --stop takes "
-"them off the server"
-msgstr ""
-"Subir elementos, o todos los elementos de carpetas, cifrados de extremo a "
-"extremo; --stop los saca del servidor"
-
-#: apps/reiwand-ctl/src/private.rs
-msgid ""
-"Library items (uid or title), files (added to the library if needed), "
-"folders, or with --stop the id of a file on the server"
-msgstr ""
-"Elementos de la biblioteca (uid o título), archivos (se agregan a la "
-"biblioteca si hace falta), carpetas, o con --stop el id de un archivo del "
-"servidor"
-
-#: apps/reiwand-ctl/src/private.rs
-msgid "Stop sharing them and delete them from the server"
-msgstr "Dejar de compartirlos y borrarlos del servidor"
-
-#: apps/reiwand-ctl/src/private.rs
-msgid "With --stop, delete without asking"
-msgstr "Con --stop, borrar sin preguntar"
-
-#: apps/reiwand-ctl/src/private.rs
-msgid "Download a private file from the server into the library"
-msgstr "Descargar un archivo privado del servidor a la biblioteca"
-
-#: apps/reiwand-ctl/src/private.rs
-msgid "Id or name of the private file"
-msgstr "Id o nombre del archivo privado"
-
-#: apps/reiwand-ctl/src/private.rs
-msgid "shared from here"
-msgstr "compartido desde aquí"
-
-#: apps/reiwand-ctl/src/private.rs
-msgid "on the server"
-msgstr "en el servidor"
-
-#: apps/reiwand-ctl/src/private.rs
-msgid "Delete these files from the server?"
-msgstr "¿Borrar estos archivos del servidor?"
-
-#: apps/reiwand-ctl/src/private.rs
-msgid "nothing was deleted"
-msgstr "no se borró nada"
-
-#: apps/reiwand-ctl/src/private.rs
-msgid "declined; other devices keep it"
-msgstr "rechazado; los otros dispositivos lo conservan"
-
-#: apps/reiwand-ctl/src/private.rs
-msgid ""
-"Without the escrow, only a device that holds the sync key can give it to a "
-"new one."
-msgstr ""
-"Sin la custodia, solo un dispositivo que tenga la clave de sincronización "
-"puede dársela a uno nuevo."
-
-#: apps/reiwand-ctl/src/private.rs
-msgid "Delete the escrow from the server?"
-msgstr "¿Borrar la custodia del servidor?"
-
-#: apps/reiwand-ctl/src/private.rs
-msgid "the escrow was kept"
-msgstr "la custodia se conservó"
-
-#: apps/reiwand-ctl/src/private.rs
-msgid "Recovery passphrase: "
-msgstr "Frase de recuperación: "
-
-#: apps/reiwand-ctl/src/private.rs
-msgid "Repeat the passphrase: "
-msgstr "Repite la frase: "
-
-#: apps/reiwand-ctl/src/private.rs
-msgid "the passphrases differ"
-msgstr "las frases no coinciden"
+#: apps/reiwand-ctl/src/presetting.rs
+msgid "the values file is not a JSON object"
+msgstr "el archivo de valores no es un objeto JSON"
 
 #: apps/reiwand-ctl/src/profiles.rs
 msgid "List the profiles"
@@ -3931,6 +4161,32 @@ msgid "Store the password or API key of a provider in the keyring"
 msgstr "Guardar la contraseña o clave de API de un proveedor en el llavero"
 
 #: apps/reiwand-ctl/src/providers.rs
+msgid ""
+"Choose where this computer keeps every secret: the system keyring or a "
+"private file"
+msgstr ""
+"Elige dónde guarda este equipo todos sus secretos: el llavero del sistema o "
+"un archivo privado"
+
+#: apps/reiwand-ctl/src/providers.rs
+msgid ""
+"Choose where this computer keeps every secret (provider passwords and API "
+"keys, the access to the sync server): the system keyring or a private file "
+"in the data folder, for computers with no keyring. Whoever can read your "
+"files can then use them. Secrets move in both directions without removing "
+"anything. Without a value, it shows where they are now."
+msgstr ""
+"Elige dónde guarda este equipo todos sus secretos (contraseñas y claves de "
+"API de los proveedores, el acceso al servidor de sincronización): el llavero "
+"del sistema o un archivo privado en la carpeta de datos, para equipos sin "
+"llavero. Quien pueda leer tus archivos podrá usarlos. Los secretos pasan de "
+"un lado a otro sin quitar nada. Sin valor, muestra dónde están ahora."
+
+#: apps/reiwand-ctl/src/providers.rs
+msgid "Where to keep them; empty shows where they are"
+msgstr "Dónde guardarlos; vacío muestra dónde están"
+
+#: apps/reiwand-ctl/src/providers.rs
 msgid "Delete the stored password or API key of a provider"
 msgstr "Borrar la contraseña o clave de API guardada de un proveedor"
 
@@ -3959,11 +4215,16 @@ msgid "Also delete the downloaded files"
 msgstr "Borrar también los archivos descargados"
 
 #: apps/reiwand-ctl/src/providers.rs
+msgid "Delete the photos a provider brought and keep the provider"
+msgstr "Borrar las fotos que trajo un proveedor y conservar el proveedor"
+
+#: apps/reiwand-ctl/src/providers.rs
 msgid ""
-"the secret of %1 was deleted; store a new one with reiwand-ctl provider secret "
-"%2"
+"the secret of %1 was deleted; store a new one with reiwand-ctl provider "
+"secret %2"
 msgstr ""
-"el secreto de %1 se borró; guarda uno nuevo con reiwand-ctl provider secret %2"
+"el secreto de %1 se borró; guarda uno nuevo con reiwand-ctl provider secret "
+"%2"
 
 #: apps/reiwand-ctl/src/providers.rs
 msgid "secret of %1: "
@@ -4190,6 +4451,34 @@ msgstr "consejo"
 msgid "Usage"
 msgstr "Uso"
 
+#: apps/reiwand-ctl/src/regioning.rs
+msgid "Also save the regions as a PNG, blue far to red near"
+msgstr "Guarda también las regiones como PNG, azul lejos y rojo cerca"
+
+#: apps/reiwand-ctl/src/regioning.rs
+msgid "Print the list as JSON"
+msgstr "Imprime la lista como JSON"
+
+#: apps/reiwand-ctl/src/regioning.rs
+msgid "its stroke crosses no region"
+msgstr "su trazo no cruza ninguna región"
+
+#: apps/reiwand-ctl/src/regioning.rs
+msgid "both its points are already in one region"
+msgstr "sus dos puntos ya están en una misma región"
+
+#: apps/reiwand-ctl/src/regioning.rs
+msgid "its point is in a region that an earlier move or join already took"
+msgstr "su punto está en una región que un movimiento o unión anterior ya tomó"
+
+#: apps/reiwand-ctl/src/regioning.rs
+msgid "%1 %2 is not applied: %3 (at %4,%5); clear the %1s or redo it"
+msgstr "%1 %2 no se aplica: %3 (en %4,%5); borra los %1 o rehazlo"
+
+#: apps/reiwand-ctl/src/regioning.rs
+msgid "%1  depth %2  %3 % of the picture  at %4,%5"
+msgstr "%1  profundidad %2  %3 % de la imagen  en %4,%5"
+
 #: apps/reiwand-ctl/src/remote.rs
 msgid "List the repositories added to this computer"
 msgstr "Listar los repositorios añadidos a este equipo"
@@ -4209,6 +4498,13 @@ msgid ""
 msgstr ""
 "Confiar en el certificado de un servidor de casa que tiene el suyo, con la "
 "huella que mostró el primer intento"
+
+#: apps/reiwand-ctl/src/remote.rs
+msgid ""
+"Add the example wallpapers that come with the program, after removing them"
+msgstr ""
+"Añadir de nuevo los fondos de ejemplo que trae el programa, tras haberlos "
+"quitado"
 
 #: apps/reiwand-ctl/src/remote.rs
 msgid ""
@@ -4233,13 +4529,6 @@ msgstr ""
 #: apps/reiwand-ctl/src/remote.rs
 msgid "Repository id, or at least its first 8 hex digits"
 msgstr "Id del repositorio, o al menos sus 8 primeras cifras hexadecimales"
-
-#: apps/reiwand-ctl/src/remote.rs
-msgid ""
-"Add the example wallpapers that come with the program, after removing them"
-msgstr ""
-"Añadir de nuevo los fondos de ejemplo que trae el programa, tras haberlos "
-"quitado"
 
 #: apps/reiwand-ctl/src/remote.rs
 msgid "Remove a repository"
@@ -4409,8 +4698,8 @@ msgstr ""
 "NOMBRE.pub es pública (compártela); imprime la huella.\n"
 "\n"
 "La clave secreta se protege con una contraseña que se pide en la terminal. "
-"Sin terminal, pon la contraseña en la variable de entorno REIWAND_KEY_PASSWORD, "
-"o usa --no-password para una clave sin contraseña."
+"Sin terminal, pon la contraseña en la variable de entorno "
+"REIWAND_KEY_PASSWORD, o usa --no-password para una clave sin contraseña."
 
 #: apps/reiwand-ctl/src/repo.rs
 msgid "Name of the key files"
@@ -4589,10 +4878,6 @@ msgstr ""
 "Verificar un repositorio publicado como lo haría un cliente, sin instalar "
 "nada"
 
-#: apps/reiwand-ctl/src/moderate.rs
-msgid "Name of the repository of the server that holds it"
-msgstr "Nombre del repositorio del servidor que lo guarda"
-
 #: apps/reiwand-ctl/src/repo.rs
 msgid "URL of the repository, or its folder"
 msgstr "URL del repositorio, o su carpeta"
@@ -4608,7 +4893,8 @@ msgstr "Días hasta que caduca el índice firmado"
 #: apps/reiwand-ctl/src/repo/act.rs
 msgid "sign the root next: reiwand-ctl repo sign-root %1 --key <root key>"
 msgstr ""
-"firma la raíz a continuación: reiwand-ctl repo sign-root %1 --key <clave raíz>"
+"firma la raíz a continuación: reiwand-ctl repo sign-root %1 --key <clave "
+"raíz>"
 
 #: apps/reiwand-ctl/src/repo/act.rs
 msgid "use reiwand-ctl remote add to add a repository to this computer"
@@ -4737,18 +5023,19 @@ msgstr ""
 
 #: apps/reiwand-ctl/src/rgb.rs
 msgid ""
-"The device name as reiwand-ctl rgb devices shows it, with its serial or number "
-"when two share a name"
+"The device name as reiwand-ctl rgb devices shows it, with its serial or "
+"number when two share a name"
 msgstr ""
 "El nombre del dispositivo como lo muestra reiwand-ctl rgb devices, con su "
 "número de serie o su número cuando dos comparten nombre"
 
 #: apps/reiwand-ctl/src/rgb.rs
 msgid ""
-"Place one zone of the device, counted from 0 in reiwand-ctl rgb devices --json"
-msgstr ""
-"Ubicar una zona del dispositivo, contada desde 0 en reiwand-ctl rgb devices --"
+"Place one zone of the device, counted from 0 in reiwand-ctl rgb devices --"
 "json"
+msgstr ""
+"Ubicar una zona del dispositivo, contada desde 0 en reiwand-ctl rgb devices "
+"--json"
 
 #: apps/reiwand-ctl/src/rgb.rs
 msgid "Print the colors a screen sends to RGB lighting, at most 64 by 16"
@@ -4775,6 +5062,10 @@ msgstr "el paquete que se muestra allí no tiene el permiso de rgb"
 #: apps/reiwand-ctl/src/rgb.rs
 msgid "the wallpaper is paused"
 msgstr "el fondo está en pausa"
+
+#: apps/reiwand-ctl/src/rgb.rs
+msgid "this computer"
+msgstr "este equipo"
 
 #: apps/reiwand-ctl/src/rgb.rs
 msgid "another computer on the network"
@@ -4832,276 +5123,23 @@ msgstr ""
 "Editar y mostrar las capas de esta plantilla de script en lugar de las capas "
 "de la escena; las nombran sus propios ids de capa"
 
-#: apps/reiwand-ctl/src/server.rs
-msgid "Add the server this computer syncs with, by its https:// address"
-msgstr ""
-"Añadir el servidor con el que se sincroniza este equipo, por su dirección "
-"https://"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Address of the server"
-msgstr "Dirección del servidor"
-
-#: apps/reiwand-ctl/src/server.rs
+#: apps/reiwand-ctl/src/scriptfaults.rs
 msgid ""
-"SHA-256 of the server's own certificate, as reiwand-server fingerprint prints it"
+"the transition for coming in does not play, the plain fade plays instead: %1"
 msgstr ""
-"SHA-256 del certificado propio del servidor, como lo imprime reiwand-server "
-"fingerprint"
+"la transición de entrada no se reproduce y en su lugar se ve el fundido de "
+"siempre: %1"
 
-#: apps/reiwand-ctl/src/server.rs
+#: apps/reiwand-ctl/src/scriptfaults.rs
 msgid ""
-"Link this computer to an account: prints the code to approve on the server"
+"the transition for leaving does not play, the plain fade plays instead: %1"
 msgstr ""
-"Enlazar este equipo a una cuenta: imprime el código que se aprueba en el "
-"servidor"
+"la transición de salida no se reproduce y en su lugar se ve el fundido de "
+"siempre: %1"
 
 #: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Connect this computer to an account without syncing: prints the code to approve"
-msgstr ""
-"Conectar este equipo a una cuenta sin sincronizar: imprime el código que se "
-"aprueba"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Turn syncing of the library, playlists and settings on or off, staying connected"
-msgstr ""
-"Activar o desactivar la sincronización de la biblioteca, las listas y los "
-"ajustes, sin desconectarse"
-
-#: apps/reiwand-ctl/src/account/level.rs
-msgid ""
-"on: sync the library, playlists and settings with your other devices; off: "
-"stop syncing and stay connected"
-msgstr ""
-"on: sincronizar la biblioteca, las listas y los ajustes con tus otros "
-"dispositivos; off: dejar de sincronizar y seguir conectado"
-
-#: apps/reiwand-ctl/src/account/level.rs
-msgid ""
-"connected, not syncing: repositories, browsing, installing and votes work; "
-"nothing of the library is sent. Turn syncing on with `reiwand-ctl server syncing "
-"on`"
-msgstr ""
-"conectado, sin sincronizar: funcionan los repositorios, explorar, instalar y "
-"votar; no se envía nada de la biblioteca. Activa la sincronización con "
-"`reiwand-ctl server syncing on`"
-
-#: apps/reiwand-ctl/src/account/level.rs
-msgid "Sync without end-to-end encryption?"
-msgstr "¿Sincronizar sin cifrado de extremo a extremo?"
-
-#: apps/reiwand-ctl/src/account/level.rs
-msgid "syncing stays off"
-msgstr "la sincronización sigue desactivada"
-
-#: apps/reiwand-ctl/src/account/level.rs apps/reiwand-ctl/src/server.rs
-msgid ""
-"Name of this computer, seen only by your devices; the host name when empty"
-msgstr ""
-"Nombre de este equipo, que solo ven tus dispositivos; el nombre del host si "
-"está vacío"
-
-#: apps/reiwand-ctl/src/account/level.rs apps/reiwand-ctl/src/server.rs
-msgid ""
-"Sync without end-to-end encryption; the server can then read every record"
-msgstr ""
-"Sincronizar sin cifrado de extremo a extremo; el servidor puede leer "
-"entonces todos los registros"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Show the device that waits for a code, then approve it after you confirm"
-msgstr ""
-"Mostrar el dispositivo que espera un código y aprobarlo después de que "
-"confirmes"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Show the device that waits for a code, then approve it after you confirm. "
-"Approving asks for the password of the account, read from standard input "
-"when it is not a terminal."
-msgstr ""
-"Mostrar el dispositivo que espera un código y aprobarlo después de que "
-"confirmes. Aprobar pide la contraseña de la cuenta, leída de la entrada "
-"estándar cuando no es una terminal."
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Code shown by the device that asks to link"
-msgstr "Código que muestra el dispositivo que pide enlazarse"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Approve without asking; only for a code shown on your own screen"
-msgstr ""
-"Aprobar sin preguntar; solo para un código que se ve en tu propia pantalla"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Remove a device from the account: it can no longer sync"
-msgstr "Quita un equipo de la cuenta: ya no puede sincronizar"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Remove a device from the account: it can no longer sync. Asks for the "
-"password of the account, read from standard input when it is not a terminal."
-msgstr ""
-"Quita un equipo de la cuenta: ya no puede sincronizar. Pide la contraseña de "
-"la cuenta, que se lee de la entrada estándar cuando no es un terminal."
-
-#: apps/reiwand-ctl/src/server.rs
-msgid ""
-"The device to remove, as `server status` lists it: its name, its label or "
-"its id"
-msgstr ""
-"El equipo que se quita, como lo lista `server status`: su nombre, su "
-"etiqueta o su id"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Remove it without asking"
-msgstr "Quitarlo sin preguntar"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Show the server, this device, the sync state and the devices of the account"
-msgstr ""
-"Mostrar el servidor, este dispositivo, el estado de la sincronización y los "
-"dispositivos de la cuenta"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "List the items other devices synced that exist only on those devices"
-msgstr ""
-"Lista los elementos que otros equipos sincronizaron y que existen solo en "
-"esos equipos"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Sync now"
-msgstr "Sincronizar ahora"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Stop syncing automatically"
-msgstr "Dejar de sincronizar automáticamente"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Sync automatically again"
-msgstr "Volver a sincronizar automáticamente"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Get the sync key from a device that holds it; with --wait prints the code to "
-"compare"
-msgstr ""
-"Obtener la clave de sincronización de un dispositivo que la tiene; con --"
-"wait imprime el código que se compara"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Device that holds the key: its name, its label or its id"
-msgstr "Dispositivo que tiene la clave: su nombre, su etiqueta o su id"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "The 6 digits shown by that device, to confirm a running join"
-msgstr ""
-"Las 6 cifras que muestra ese dispositivo, para confirmar una unión en curso"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Answer a joining device, show the code to compare and send the key once it "
-"matches"
-msgstr ""
-"Responder a un dispositivo que se une, mostrar el código que se compara y "
-"enviar la clave cuando coincide"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "The joining device: its name, its label or its id"
-msgstr "El dispositivo que se une: su nombre, su etiqueta o su id"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "The 6 digits shown by the joining device; asked for when missing"
-msgstr ""
-"Las 6 cifras que muestra el dispositivo que se une; se preguntan si faltan"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Replace the sync key, encrypt every record again and hand the key to the "
-"other devices"
-msgstr ""
-"Reemplazar la clave de sincronización, volver a cifrar todos los registros y "
-"pasar la clave a los demás dispositivos"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Delete the synced data on the server and upload this computer's copy under a "
-"new key"
-msgstr ""
-"Borrar los datos sincronizados del servidor y subir la copia de este equipo "
-"con una clave nueva"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Reset without asking"
-msgstr "Reiniciar sin preguntar"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Add a repository that another device synced, after checking it, or decline it"
-msgstr ""
-"Añadir un repositorio que sincronizó otro dispositivo, después de "
-"comprobarlo, o rechazarlo"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid ""
-"The repository: its offer id or the first 8 or more digits of its repo id"
-msgstr ""
-"El repositorio: el id de su oferta o las 8 o más primeras cifras de su id de "
-"repositorio"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Do not add it on this computer and stop asking"
-msgstr "No añadirlo en este equipo y dejar de preguntar"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Store the sync key on the server, locked with a passphrase, for when no "
-"device is left"
-msgstr ""
-"Guardar la clave de sincronización en el servidor, cerrada con una frase de "
-"paso, para cuando no quede ningún dispositivo"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Store the sync key on the server, locked with a passphrase, for when no "
-"device is left. After a device is revoked the escrow is stale: set a new, "
-"different passphrase, since the revoked device may know the old one, which "
-"is refused."
-msgstr ""
-"Guardar la clave de sincronización en el servidor, cerrada con una frase de "
-"paso, para cuando no quede ningún dispositivo. Después de revocar un "
-"dispositivo la custodia queda vieja: fija una frase de paso nueva y "
-"distinta, porque el dispositivo revocado puede conocer la anterior, que se "
-"rechaza."
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Delete the escrow from the server"
-msgstr "Borrar la custodia del servidor"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Delete it without asking"
-msgstr "Borrarla sin preguntar"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Get the sync key from the escrow with its passphrase, when no device can "
-"share it"
-msgstr ""
-"Obtener la clave de sincronización de la custodia con su frase de paso, "
-"cuando ningún dispositivo puede compartirla"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Your own wallpaper files, end-to-end encrypted on the server"
-msgstr ""
-"Tus propios archivos de fondo, cifrados de extremo a extremo en el servidor"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Upload a .wpak package to the repository of the server"
-msgstr "Subir un paquete .wpak al repositorio del servidor"
+msgid "Upload a .wpak package to the repository of your account"
+msgstr "Subir un paquete .wpak al repositorio de tu cuenta"
 
 #: apps/reiwand-ctl/src/server.rs
 msgid "File to upload"
@@ -5151,60 +5189,9 @@ msgstr ""
 msgid "Version to change; every version when left out"
 msgstr "Versión que se cambia; todas las versiones si se omite"
 
-#: apps/reiwand-ctl/src/server.rs
-msgid "Forget the server and delete the token and sync key of this computer"
-msgstr ""
-"Olvidar el servidor y borrar el token y la clave de sincronización de este "
-"equipo"
-
-#: apps/reiwand-ctl/src/server.rs
-msgid "Also delete the local copies of the synced records"
-msgstr "Borrar también las copias locales de los registros sincronizados"
-
-#: apps/reiwand-ctl/src/serving.rs
-msgid "Link without end-to-end encryption?"
-msgstr "¿Vincular sin cifrado de extremo a extremo?"
-
-#: apps/reiwand-ctl/src/serving.rs
-msgid "not linked"
-msgstr "no vinculado"
-
-#: apps/reiwand-ctl/src/serving.rs
-msgid "Reset the synced data of the account?"
-msgstr "¿Restablecer los datos sincronizados de la cuenta?"
-
-#: apps/reiwand-ctl/src/serving.rs
-msgid "nothing was reset"
-msgstr "no se restableció nada"
-
-#: apps/reiwand-ctl/src/author.rs
-msgid "%1 is not ROWS,COLUMNS"
-msgstr "%1 no es FILAS,COLUMNAS"
-
-#: apps/reiwand-ctl/src/author.rs
-msgid ""
-"Copy a picture, video, sound, font or .cube table into the folder as an asset"
-msgstr ""
-"Copiar una imagen, un vídeo, un sonido, una fuente o una tabla .cube a la "
-"carpeta como recurso"
-
-#: apps/reiwand-ctl/src/author.rs
-msgid "The file to copy"
-msgstr "El archivo que se copia"
-
-#: apps/reiwand-ctl/src/author.rs
-msgid "Asset id; made from the file name when omitted"
-msgstr "Id del recurso; hecho a partir del nombre del archivo si se omite"
-
-#: apps/reiwand-ctl/src/author.rs
-msgid "Read the picture as data, such as a normal map or a mask, not as colors"
-msgstr ""
-"Leer la imagen como datos, como un mapa de normales o una máscara, no como "
-"colores"
-
-#: apps/reiwand-ctl/src/author.rs
-msgid "Split the picture into a sprite sheet of equal cells"
-msgstr "Dividir la imagen en una hoja de sprites de celdas iguales"
+#: apps/reiwand-ctl/src/shelving.rs
+msgid "A part as layer:ID, particles:ID, script:PATH or effect:ID"
+msgstr "Una parte como layer:ID, particles:ID, script:RUTA o effect:ID"
 
 #: apps/reiwand-ctl/src/shelving.rs
 msgid "Scene folder the parts come from"
@@ -5343,6 +5330,10 @@ msgid "--layout needs --out"
 msgstr "--layout necesita --out"
 
 #: apps/reiwand-ctl/src/spanning.rs
+msgid "%1 is not a number of seconds"
+msgstr "%1 no es un número de segundos"
+
+#: apps/reiwand-ctl/src/spanning.rs
 msgid "the time is a finite number of seconds up to %1, not %2"
 msgstr "el tiempo es un número finito de segundos hasta %1, no %2"
 
@@ -5353,13 +5344,6 @@ msgstr "%1 no es un número de milímetros"
 #: apps/reiwand-ctl/src/spanning.rs
 msgid "the frame is 0 to %1 mm, not %2"
 msgstr "el marco va de 0 a %1 mm, no %2"
-
-#: apps/reiwand-ctl/src/depth.rs
-msgid ""
-"LaMa or ONNX Runtime is not installed, so the simple fill is used. To get "
-"the better fill run reiwand-ctl models download lama-big-fp32 (see reiwand-ctl "
-"models list); nothing is downloaded until you ask"
-msgstr "LaMa o ONNX Runtime no está instalado, así que se usa el relleno simple. Para tener el relleno mejor ejecuta reiwand-ctl models download lama-big-fp32 (mira reiwand-ctl models list); no se descarga nada hasta que lo pidas"
 
 #: apps/reiwand-ctl/src/stacking.rs
 msgid ""
@@ -5373,16 +5357,6 @@ msgstr ""
 msgid "Number of depth layers, 4 to 6; the layers of the picture by default"
 msgstr ""
 "Número de capas de profundidad, de 4 a 6; por defecto, las capas de la imagen"
-
-#: apps/reiwand-ctl/src/looking.rs
-msgid "Fill behind near objects; lama when the model is installed, else simple"
-msgstr ""
-"Relleno detrás de los objetos cercanos; lama si el modelo está instalado, "
-"si no simple"
-
-#: apps/reiwand-ctl/src/looking.rs
-msgid "Depth layers, 4 to 6, 5 when new"
-msgstr "Capas de profundidad, de 4 a 6; 5 si es nueva"
 
 #: apps/reiwand-ctl/src/stacking.rs
 msgid "Build them again even when the set exists"
@@ -5456,9 +5430,17 @@ msgid "%1 layer sets removed"
 msgstr "%1 conjuntos de capas eliminados"
 
 #: apps/reiwand-ctl/src/stacking.rs
-msgid "the fill off builds no layers: pictures stay still"
+msgid "moves"
+msgstr "se mueve"
+
+#: apps/reiwand-ctl/src/stacking.rs
+msgid "stays still"
+msgstr "queda quieta"
+
+#: apps/reiwand-ctl/src/stacking.rs
+msgid "%1  %2 layers from %3 regions, fill %4, %5x%6, safe shift %7, %8"
 msgstr ""
-"con el relleno desactivado no se crean capas: las imágenes quedan quietas"
+"%1  %2 capas de %3 regiones, relleno %4, %5x%6, desplazamiento seguro %7, %8"
 
 #: apps/reiwand-ctl/src/stacking.rs
 msgid "building the layers: %1 %"
@@ -5515,6 +5497,51 @@ msgstr "aviso: %1 nombra a %2; los scripts no se reescriben"
 #: apps/reiwand-ctl/src/steps.rs
 msgid "to rewrite the exact names: scene act DIR particles '%1'"
 msgstr "para reescribir los nombres exactos: scene act DIR particles '%1'"
+
+#: apps/reiwand-ctl/src/stillness.rs
+msgid "it is still because a window covers the screen"
+msgstr "está quieto porque una ventana tapa la pantalla"
+
+#: apps/reiwand-ctl/src/stillness.rs
+msgid "it is still because the computer is on battery"
+msgstr "está quieto porque el equipo funciona con batería"
+
+#: apps/reiwand-ctl/src/stillness.rs
+msgid "it is still because the screen is locked"
+msgstr "está quieto porque la pantalla está bloqueada"
+
+#: apps/reiwand-ctl/src/stillness.rs
+msgid "it is still because it was paused (reiwand-ctl resume)"
+msgstr "está quieto porque se pausó (reiwand-ctl resume)"
+
+#: apps/reiwand-ctl/src/storing.rs
+msgid ""
+"Secrets (provider passwords and API keys, and the access to the sync server) "
+"are kept in a private file in the data folder, not in the system keyring: "
+"whoever can read your files can use them."
+msgstr ""
+"Los secretos (contraseñas y claves de API de los proveedores, y el acceso al "
+"servidor de sincronización) están en un archivo privado de la carpeta de "
+"datos, no en el llavero del sistema: quien pueda leer tus archivos puede "
+"usarlos."
+
+#: apps/reiwand-ctl/src/storing.rs
+msgid ""
+"No system keyring was found, so secrets cannot be stored. Run `reiwand-ctl "
+"provider store file` to keep them in a private file instead (whoever can "
+"read your files could then use them)."
+msgstr ""
+"No se encontró ningún llavero del sistema, así que no se pueden guardar "
+"secretos. Ejecuta `reiwand-ctl provider store file` para guardarlos en un "
+"archivo privado (quien pueda leer tus archivos podría usarlos)."
+
+#: apps/reiwand-ctl/src/storing.rs
+msgid ""
+"%1 uses plain http: its password or key travels unencrypted. Use https if "
+"the server allows it."
+msgstr ""
+"%1 usa http sin cifrar: su contraseña o clave viaja sin cifrar. Usa https si "
+"el servidor lo permite."
 
 #: apps/reiwand-ctl/src/texturing.rs
 msgid ""
@@ -5727,6 +5754,58 @@ msgstr "No rellenar nunca la zona"
 msgid "Remove all marks before painting this one, or alone to remove them"
 msgstr "Quitar todas las marcas antes de pintar esta, o solas para quitarlas"
 
+#: apps/reiwand-ctl/src/touching.rs
+msgid ""
+"2 to 8 points in fractions of the image, one inside each region to make one; "
+"see edit depth regions"
+msgstr ""
+"De 2 a 8 puntos en fracciones de la imagen, uno dentro de cada región que se "
+"quiere unir; mira edit depth regions"
+
+#: apps/reiwand-ctl/src/touching.rs
+msgid "Remove all joins before adding this one, or alone to remove them"
+msgstr "Quita todas las uniones antes de añadir esta, o solo para quitarlas"
+
+#: apps/reiwand-ctl/src/touching.rs
+msgid "Stroke of 1 to 1024 points that cuts the regions it crosses"
+msgstr "Trazo de 1 a 1024 puntos que corta las regiones que cruza"
+
+#: apps/reiwand-ctl/src/touching.rs
+msgid ""
+"Half the width of the cut as a fraction of the longer side, 0.004 by default"
+msgstr ""
+"Mitad del ancho del corte como fracción del lado más largo, 0.004 por defecto"
+
+#: apps/reiwand-ctl/src/touching.rs
+msgid "Remove all splits before adding this one, or alone to remove them"
+msgstr "Quita todas las divisiones antes de añadir esta, o solo para quitarlas"
+
+#: apps/reiwand-ctl/src/touching.rs
+msgid "A point inside the region, in fractions of the image"
+msgstr "Un punto dentro de la región, en fracciones de la imagen"
+
+#: apps/reiwand-ctl/src/touching.rs
+msgid "How far to move its depth, -1 to 1: above 0 nearer, below 0 farther"
+msgstr ""
+"Cuánto mover su profundidad, de -1 a 1: más de 0 la acerca, menos de 0 la "
+"aleja"
+
+#: apps/reiwand-ctl/src/touching.rs
+msgid "Put every moved region back, or add this move after putting them back"
+msgstr ""
+"Devuelve cada región movida a su sitio, o añade este movimiento después de "
+"devolverlas"
+
+#: apps/reiwand-ctl/src/unkept.rs
+msgid ""
+"warning: %1 followed the removed layer and a value of its place is bound to "
+"something other than keyframes, so it could not be kept where it was: check "
+"where it sits now."
+msgstr ""
+"aviso: %1 seguía a la capa quitada y un valor de su lugar depende de algo "
+"que no son fotogramas clave, así que no se pudo dejar donde estaba: revisa "
+"dónde queda ahora."
+
 #: apps/reiwand-ctl/src/wallclock.rs
 msgid "%1 is not a time: use HH:MM, HH:MM:SS or YYYY-MM-DD HH:MM"
 msgstr "%1 no es una hora: usa HH:MM, HH:MM:SS o AAAA-MM-DD HH:MM"
@@ -5781,6 +5860,14 @@ msgid ""
 msgstr ""
 "Palabras de búsqueda; -palabra excluye una etiqueta, +palabra la exige, type:"
 "png o type:jpg elige el tipo de archivo"
+
+#: apps/reiwand-ctl/src/wallhaven_filters.rs
+msgid ""
+"A wallhaven.cc search address copied from the browser; it fills the search "
+"words and every option it carries"
+msgstr ""
+"Una dirección de búsqueda de wallhaven.cc copiada del navegador; llena las "
+"palabras de búsqueda y todas las opciones que trae"
 
 #: apps/reiwand-ctl/src/wallhaven_filters.rs
 msgid ""
@@ -5889,54 +5976,6 @@ msgstr "--%1: se esperaba %2"
 msgid "job %1 %2/%3"
 msgstr "tarea %1 %2/%3"
 
-#: apps/reiwand-ctl/src/stacking.rs
-msgid "%1  %2 layers from %3 regions, fill %4, %5x%6, safe shift %7, %8"
-msgstr "%1  %2 capas de %3 regiones, relleno %4, %5x%6, desplazamiento seguro %7, %8"
-
-#: apps/reiwand-ctl/src/stacking.rs
-msgid "moves"
-msgstr "se mueve"
-
-#: apps/reiwand-ctl/src/stacking.rs
-msgid "stays still"
-msgstr "queda quieta"
-
-#: apps/reiwand-ctl/src/blanks.rs
-msgid ""
-"Plasma now shows the background color; plasma-back gives the screens "
-"back to Plasma's own wallpaper"
-msgstr ""
-"Plasma ahora muestra el color de fondo; plasma-back devuelve las "
-"pantallas al fondo propio de Plasma"
-
-#: apps/reiwand-ctl/src/blanks.rs
-msgid "no screen was using the Reiwand wallpaper type"
-msgstr "ninguna pantalla usaba el tipo de fondo de Reiwand"
-
-#: apps/reiwand-ctl/src/blanks.rs
-msgid ""
-"1 screen is back on Plasma's own wallpaper; restore or set a wallpaper"
-" to use Reiwand again"
-msgstr ""
-"1 pantalla volvió al fondo propio de Plasma; restaura o elige un fondo"
-" para usar Reiwand otra vez"
-
-#: apps/reiwand-ctl/src/blanks.rs
-msgid ""
-"%1 screens are back on Plasma's own wallpaper; restore or set a "
-"wallpaper to use Reiwand again"
-msgstr ""
-"%1 pantallas volvieron al fondo propio de Plasma; restaura o elige un "
-"fondo para usar Reiwand otra vez"
-
-#: apps/reiwand-ctl/src/presetting.rs
-msgid "read the values file"
-msgstr "leer el archivo de valores"
-
-#: apps/reiwand-ctl/src/presetting.rs
-msgid "the values file is not a JSON object"
-msgstr "el archivo de valores no es un objeto JSON"
-
 #: apps/reiwand-ctl/src/webshot.rs
 msgid "the captured frame cannot be read"
 msgstr "no se puede leer el fotograma capturado"
@@ -5944,106 +5983,11 @@ msgstr "no se puede leer el fotograma capturado"
 #: apps/reiwand-ctl/src/webshot.rs
 msgid "the page drew no frame in %1 s; is it loading or hidden?"
 msgstr ""
-"la página no dibujó ningún fotograma en %1 s; ¿está cargando o está "
-"oculta?"
+"la página no dibujó ningún fotograma en %1 s; ¿está cargando o está oculta?"
 
 #: apps/reiwand-ctl/src/webshot.rs
 msgid "no screen to show the page on; name one with --output"
 msgstr "no hay pantalla donde mostrar la página; indica una con --output"
-
-#: apps/reiwand-ctl/src/touching.rs
-msgid "2 to 8 points in fractions of the image, one inside each region to make one; see edit depth regions"
-msgstr "De 2 a 8 puntos en fracciones de la imagen, uno dentro de cada región que se quiere unir; mira edit depth regions"
-
-#: apps/reiwand-ctl/src/touching.rs
-msgid "Remove all joins before adding this one, or alone to remove them"
-msgstr "Quita todas las uniones antes de añadir esta, o solo para quitarlas"
-
-#: apps/reiwand-ctl/src/touching.rs
-msgid "Stroke of 1 to 1024 points that cuts the regions it crosses"
-msgstr "Trazo de 1 a 1024 puntos que corta las regiones que cruza"
-
-#: apps/reiwand-ctl/src/touching.rs
-msgid "Half the width of the cut as a fraction of the longer side, 0.004 by default"
-msgstr "Mitad del ancho del corte como fracción del lado más largo, 0.004 por defecto"
-
-#: apps/reiwand-ctl/src/touching.rs
-msgid "Remove all splits before adding this one, or alone to remove them"
-msgstr "Quita todas las divisiones antes de añadir esta, o solo para quitarlas"
-
-#: apps/reiwand-ctl/src/touching.rs
-msgid "A point inside the region, in fractions of the image"
-msgstr "Un punto dentro de la región, en fracciones de la imagen"
-
-#: apps/reiwand-ctl/src/touching.rs
-msgid "How far to move its depth, -1 to 1: above 0 nearer, below 0 farther"
-msgstr "Cuánto mover su profundidad, de -1 a 1: más de 0 la acerca, menos de 0 la aleja"
-
-#: apps/reiwand-ctl/src/touching.rs
-msgid "Put every moved region back, or add this move after putting them back"
-msgstr "Devuelve cada región movida a su sitio, o añade este movimiento después de devolverlas"
-
-#: apps/reiwand-ctl/src/depth.rs
-msgid "Make the regions under two or more points one region, so they share a layer and move together"
-msgstr "Hace una sola región con las regiones bajo dos o más puntos, para que compartan capa y se muevan juntas"
-
-#: apps/reiwand-ctl/src/depth.rs
-msgid "Cut the regions a stroke crosses in two, so each part can move on its own"
-msgstr "Corta en dos las regiones que cruza un trazo, para que cada parte se mueva por su cuenta"
-
-#: apps/reiwand-ctl/src/depth.rs
-msgid "Move the region under a point nearer or farther, as a whole"
-msgstr "Acerca o aleja entera la región que hay bajo un punto"
-
-#: apps/reiwand-ctl/src/depth.rs
-msgid "List the regions of the picture from the nearest, each with a point inside it"
-msgstr "Lista las regiones de la imagen desde la más cercana, cada una con un punto dentro"
-
-#: apps/reiwand-ctl/src/regioning.rs
-msgid "Also save the regions as a PNG, blue far to red near"
-msgstr "Guarda también las regiones como PNG, azul lejos y rojo cerca"
-
-#: apps/reiwand-ctl/src/regioning.rs
-msgid "Print the list as JSON"
-msgstr "Imprime la lista como JSON"
-
-#: apps/reiwand-ctl/src/hearing.rs
-msgid "no wallpaper of the library is shown there; name an item with --item"
-msgstr "ningún fondo de la biblioteca se muestra ahí; indica uno con --item"
-
-#: apps/reiwand-ctl/src/hearing.rs
-msgid "%1: sound %2, volume %3, global %4 at %5%"
-msgstr "%1: sonido %2, volumen %3, global %4 al %5%"
-
-#: apps/reiwand-ctl/src/regioning.rs
-msgid "its stroke crosses no region"
-msgstr "su trazo no cruza ninguna región"
-
-#: apps/reiwand-ctl/src/regioning.rs
-msgid "both its points are already in one region"
-msgstr "sus dos puntos ya están en una misma región"
-
-#: apps/reiwand-ctl/src/regioning.rs
-msgid "its point is in a region that an earlier move or join already took"
-msgstr "su punto está en una región que un movimiento o unión anterior ya tomó"
-
-#: apps/reiwand-ctl/src/regioning.rs
-msgid "%1 %2 is not applied: %3 (at %4,%5); clear the %1s or redo it"
-msgstr "%1 %2 no se aplica: %3 (en %4,%5); borra los %1 o rehazlo"
-
-#: apps/reiwand-ctl/src/regioning.rs
-msgid "%1  depth %2  %3 % of the picture  at %4,%5"
-msgstr "%1  profundidad %2  %3 % de la imagen  en %4,%5"
-
-#: apps/reiwand-ctl/src/unkept.rs
-msgid ""
-"warning: %1 followed the removed layer and a value of its place is bound to "
-"something other than keyframes, so it could not be kept where it was: check "
-"where it sits now."
-msgstr ""
-"aviso: %1 seguía a la capa quitada y un valor de su lugar depende de algo que "
-"no son fotogramas clave, así que no se pudo dejar donde estaba: revisa dónde "
-"queda ahora."
 
 #: apps/reiwand-ctl/src/wording.rs
 msgid "Abstract"
@@ -6344,466 +6288,3 @@ msgstr "Invierno"
 #: apps/reiwand-ctl/src/wording.rs
 msgid "Yellow"
 msgstr "Amarillo"
-
-#: apps/reiwand-ctl/src/wallhaven_filters.rs
-msgid ""
-"A wallhaven.cc search address copied from the browser; it fills the search "
-"words and every option it carries"
-msgstr ""
-"Una dirección de búsqueda de wallhaven.cc copiada del navegador; llena las "
-"palabras de búsqueda y todas las opciones que trae"
-
-#: apps/reiwand-ctl/src/adopting.rs
-msgid "the library refused the file"
-msgstr "la biblioteca rechazó el archivo"
-
-#: apps/reiwand-ctl/src/storing.rs
-msgid ""
-"%1 uses plain http: its password or key travels unencrypted. Use https if "
-"the server allows it."
-msgstr ""
-"%1 usa http sin cifrar: su contraseña o clave viaja sin cifrar. Usa https "
-"si el servidor lo permite."
-
-#: apps/reiwand-ctl/src/providers.rs
-msgid ""
-"Choose where this computer keeps every secret (provider passwords and API "
-"keys, the access to the sync server): the system keyring or a private file"
-" in the data folder, for computers with no keyring. Whoever can read your "
-"files can then use them. Secrets move in both directions without removing "
-"anything. Without a value, it shows where they are now."
-msgstr ""
-"Elige dónde guarda este equipo todos sus secretos (contraseñas y claves de"
-" API de los proveedores, el acceso al servidor de sincronización): el "
-"llavero del sistema o un archivo privado en la carpeta de datos, para "
-"equipos sin llavero. Quien pueda leer tus archivos podrá usarlos. Los "
-"secretos pasan de un lado a otro sin quitar nada. Sin valor, muestra dónde"
-" están ahora."
-
-#: apps/reiwand-ctl/src/providers.rs
-msgid ""
-"Choose where this computer keeps every secret: the system keyring or a "
-"private file"
-msgstr ""
-"Elige dónde guarda este equipo todos sus secretos: el llavero del sistema "
-"o un archivo privado"
-
-#: apps/reiwand-ctl/src/account.rs
-msgid ""
-"No keyring is available to keep the access of this computer. Start or "
-"unlock the system keyring and link again, or keep the secrets in a private"
-" file with `reiwand-ctl provider store file` (whoever can read your files "
-"could then use them)."
-msgstr ""
-"No hay un llavero para guardar el acceso de este equipo. Inicia o "
-"desbloquea el llavero del sistema y vuelve a vincular, o guarda los "
-"secretos en un archivo privado con `reiwand-ctl provider store file` (quien "
-"pueda leer tus archivos podría usarlos)."
-
-#: apps/reiwand-ctl/src/storing.rs
-msgid ""
-"No system keyring was found, so secrets cannot be stored. Run `reiwand-ctl "
-"provider store file` to keep them in a private file instead (whoever can "
-"read your files could then use them)."
-msgstr ""
-"No se encontró ningún llavero del sistema, así que no se pueden guardar "
-"secretos. Ejecuta `reiwand-ctl provider store file` para guardarlos en un "
-"archivo privado (quien pueda leer tus archivos podría usarlos)."
-
-#: apps/reiwand-ctl/src/storing.rs
-msgid ""
-"Secrets (provider passwords and API keys, and the access to the sync "
-"server) are kept in a private file in the data folder, not in the system "
-"keyring: whoever can read your files can use them."
-msgstr ""
-"Los secretos (contraseñas y claves de API de los proveedores, y el acceso "
-"al servidor de sincronización) están en un archivo privado de la carpeta "
-"de datos, no en el llavero del sistema: quien pueda leer tus archivos "
-"puede usarlos."
-
-#: apps/reiwand-ctl/src/providers.rs
-msgid "Where to keep them; empty shows where they are"
-msgstr "Dónde guardarlos; vacío muestra dónde están"
-
-#: apps/reiwand-ctl/src/cli.rs
-msgid "Print and draw the server connect code; needs no daemon"
-msgstr "Imprimir y dibujar el código de conexión del servidor; no necesita el daemon"
-
-#: apps/reiwand-ctl/src/connecting.rs
-msgid "Address of the server, https://host[:port][/path]"
-msgstr "Dirección del servidor, https://host[:puerto][/ruta]"
-
-#: apps/reiwand-ctl/src/connecting.rs
-msgid ""
-"SHA-256 of the server's own certificate, as reiwand-server fingerprint prints "
-"it; leave it out when the certificate validates the normal way"
-msgstr ""
-"SHA-256 del certificado propio del servidor, como lo imprime reiwand-server "
-"fingerprint; omítelo cuando el certificado se valida de la forma normal"
-
-#: apps/reiwand-ctl/src/connecting.rs
-msgid "Invitation code the phone uses to create its account"
-msgstr "Código de invitación con el que el teléfono crea su cuenta"
-
-#: apps/reiwand-ctl/src/connecting.rs
-msgid "Also draw the QR code with block characters"
-msgstr "Dibujar además el código QR con caracteres de bloque"
-
-#: apps/reiwand-ctl/src/connecting.rs
-msgid "Draw for a light terminal background instead of a dark one"
-msgstr "Dibujar para un terminal de fondo claro en lugar de uno oscuro"
-
-#: apps/reiwand-ctl/src/stillness.rs
-msgid "it is still because a window covers the screen"
-msgstr "está quieto porque una ventana tapa la pantalla"
-
-#: apps/reiwand-ctl/src/stillness.rs
-msgid "it is still because the computer is on battery"
-msgstr "está quieto porque el equipo funciona con batería"
-
-#: apps/reiwand-ctl/src/stillness.rs
-msgid "it is still because the screen is locked"
-msgstr "está quieto porque la pantalla está bloqueada"
-
-#: apps/reiwand-ctl/src/stillness.rs
-msgid "it is still because it was paused (reiwand-ctl resume)"
-msgstr "está quieto porque se pausó (reiwand-ctl resume)"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "Browse the playlist of the screen or the whole library; by default the playlist when the screen plays one"
-msgstr "Recorrer la lista de la pantalla o toda la biblioteca; por omisión, la lista si la pantalla muestra una"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "Preview it without applying it: starts browsing, or moves on while browsing; browse apply keeps it"
-msgstr "Verlo antes sin aplicarlo: empieza a recorrer o avanza mientras recorres; browse apply lo deja puesto"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "fade, none, or empty for the usual transition"
-msgstr "fade, none o vacío para la transición de siempre"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "The wallpaper being previewed: apply it, stop, or choose its transition"
-msgstr "El fondo que estás mirando: aplicarlo, dejar de recorrer o elegir su transición"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "Apply the wallpaper being previewed and stop browsing"
-msgstr "Aplicar el fondo que estás mirando y dejar de recorrer"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "Choose the transition used when the previewed wallpaper is applied"
-msgstr "Elegir la transición con la que se aplica el fondo que estás mirando"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "Stop browsing and leave the wallpaper as it was"
-msgstr "Dejar de recorrer y dejar el fondo como estaba"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "Show what is being previewed"
-msgstr "Mostrar el fondo que estás mirando"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "applied on %1"
-msgstr "aplicado en %1"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "browsing ended on %1"
-msgstr "se dejó de recorrer en %1"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "nothing is being browsed on %1"
-msgstr "no se está recorriendo nada en %1"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "(none)"
-msgstr "(ninguno)"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "playlist %1"
-msgstr "lista %1"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "library"
-msgstr "biblioteca"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "%1 of %2"
-msgstr "%1 de %2"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "candidate on %1: %2"
-msgstr "a la vista en %1: %2"
-
-#: apps/reiwand-ctl/src/browsing.rs
-msgid "transition: %1"
-msgstr "transición: %1"
-
-#: apps/reiwand-ctl/src/passing.rs
-msgid "%1: %2; the last change: %3"
-msgstr "%1: %2; el último cambio: %3"
-
-#: apps/reiwand-ctl/src/passing.rs
-msgid "the transition of each wallpaper"
-msgstr "la transición de cada fondo"
-
-#: apps/reiwand-ctl/src/passing.rs
-msgid "the plain fade"
-msgstr "el fundido simple"
-
-#: apps/reiwand-ctl/src/passing.rs
-msgid "a cut"
-msgstr "un corte"
-
-#: apps/reiwand-ctl/src/passing.rs
-msgid "the wallpaper's own transition played"
-msgstr "se vio la transición propia del fondo"
-
-#: apps/reiwand-ctl/src/passing.rs
-msgid "what you chose played"
-msgstr "se vio lo que elegiste"
-
-#: apps/reiwand-ctl/src/passing.rs
-msgid "the plain fade played, because of less motion"
-msgstr "se vio el fundido simple, por menos movimiento"
-
-#: apps/reiwand-ctl/src/passing.rs
-msgid "the plain fade played, because the wallpaper's transition could not play"
-msgstr "se vio el fundido simple, porque la transición del fondo no se pudo ver"
-
-#: apps/reiwand-ctl/src/passing.rs
-msgid "the plain fade played: neither wallpaper brings a transition"
-msgstr "se vio el fundido simple: ninguno de los dos fondos trae transición"
-
-#: apps/reiwand-ctl/src/passing.rs
-msgid "a cut: the screen was not ready for a transition"
-msgstr "un corte: la pantalla no estaba lista para una transición"
-
-#: apps/reiwand-ctl/src/providers.rs
-msgid "Delete the photos a provider brought and keep the provider"
-msgstr "Borrar las fotos que trajo un proveedor y conservar el proveedor"
-
-#: apps/reiwand-ctl/src/pkg.rs
-msgid "%1 by your content filter"
-msgstr "%1 por tu filtro de contenido"
-
-#: apps/reiwand-ctl/src/away.rs
-msgid "“%1” comes from your other computers, but its file is not on this computer."
-msgstr "«%1» viene de tus otros equipos, pero su archivo no está en este equipo."
-
-#: apps/reiwand-ctl/src/away.rs
-msgid "On the computer that has it, use “Send files to my other computers”."
-msgstr "En el equipo que lo tiene, usa «Enviar los archivos a mis otros equipos»."
-
-#: apps/reiwand-ctl/src/away.rs
-msgid "“%1”, synced from your other computers, comes from the repository “%2”, which is not added on this computer."
-msgstr "«%1», sincronizado desde tus otros equipos, viene del repositorio «%2», que no está añadido en este equipo."
-
-#: apps/reiwand-ctl/src/away.rs
-msgid "Untitled wallpaper"
-msgstr "Fondo sin título"
-
-#: apps/reiwand-ctl/src/cli.rs
-msgid ""
-"Print the licenses of the libraries, fonts, icons and models the program "
-"carries"
-msgstr ""
-"Imprimir las licencias de las bibliotecas, fuentes, íconos y modelos que "
-"incluye el programa"
-
-#: apps/reiwand-ctl/src/cli.rs
-msgid ""
-"Build again the depth layers of a picture after they failed or were cancelled"
-msgstr ""
-"Volver a crear las capas de profundidad de una imagen que fallaron o se "
-"cancelaron"
-
-#: apps/reiwand-ctl/src/cli.rs
-msgid "Local image file, as a path or a file:// URI"
-msgstr "Imagen local, como ruta o URI file://"
-
-#: apps/reiwand-ctl/src/confirming.rs
-msgid "building the depth layers of %1 again"
-msgstr "volviendo a crear las capas de profundidad de %1"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid ""
-"Read the password of the file from FILE instead of asking on the terminal"
-msgstr ""
-"Leer la contraseña del archivo desde FILE en vez de pedirla en la terminal"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid ""
-"Write the configuration of this computer to one file that import brings to "
-"another"
-msgstr ""
-"Escribe la configuración de este equipo en un archivo que import trae a otro"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid ""
-"Write the configuration of this computer to one file that import brings to "
-"another: added repositories, photo providers, lists, favourites, ratings, "
-"tags, installed wallpapers (as references, downloaded again on import) and "
-"the settings that belong to a person rather than to a screen.\n"
-"\n"
-"With --secrets the file also carries the keys of the photo providers and is "
-"encrypted with a password that is asked for twice on the terminal, or read "
-"from --password-file."
-msgstr ""
-"Escribe la configuración de este equipo en un archivo que import trae a otro: repositorios añadidos, proveedores de fotos, listas, favoritos, valoraciones, etiquetas, fondos instalados (como referencias, que se descargan de nuevo al importar) y los ajustes que son de la persona y no de una pantalla.\n"
-"\n"
-"Con --secrets el archivo también lleva las claves de los proveedores de fotos y se cifra con una contraseña que se pide dos veces en la terminal o se lee de --password-file."
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid "File to write; it must not exist"
-msgstr "Archivo que se escribe; no debe existir"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid "Also carry the files of your own wallpapers (imported with a copy)"
-msgstr ""
-"Llevar también los archivos de tus fondos propios (importados con copia)"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid ""
-"Also carry the keys of the photo providers; the file is encrypted with a "
-"password"
-msgstr ""
-"Llevar también las claves de los proveedores de fotos; el archivo se cifra con una contraseña"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid "Print the finished job as JSON"
-msgstr "Imprimir la tarea terminada como JSON"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid ""
-"Show what an exported file holds, or add what you choose from it; nothing is "
-"replaced"
-msgstr ""
-"Muestra lo que trae un archivo exportado, o agrega lo que elijas de él; no se reemplaza nada"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid ""
-"Show what an exported file holds, or add what you choose from it. Importing "
-"only adds: a repository, provider, favourite or tag you already have is "
-"skipped, and a rating is set only on an item without one. Without --take "
-"every section is added."
-msgstr ""
-"Muestra lo que trae un archivo exportado, o agrega lo que elijas de él. Importar solo agrega: un repositorio, proveedor, favorito o etiqueta que ya tienes se omite, y una valoración se pone solo en un elemento que no tenga. Sin --take se agregan todas las secciones."
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid "File written by export"
-msgstr "Archivo escrito por export"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid "Only show what the file holds and what is new here; change nothing"
-msgstr ""
-"Solo muestra lo que trae el archivo y lo que es nuevo aquí; no cambia nada"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid ""
-"A list with a name you already have: join adds the missing items to yours, "
-"both keeps the imported one beside it"
-msgstr ""
-"Una lista con un nombre que ya tienes: join suma a la tuya los elementos que faltan, both conserva la importada a su lado"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid ""
-"Text added to the name of an imported list kept beside yours; by default "
-"' (imported)'"
-msgstr ""
-"Texto que se agrega al nombre de una lista importada que se conserva junto a la tuya; por defecto ' (importada)'"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid ""
-"Section to add (repeat it): repositories, providers, lists, favourites, "
-"ratings, tags, installed, settings, own, secrets"
-msgstr ""
-"Sección que se agrega (repítela): repositories, providers, lists, favourites, ratings, tags, installed, settings, own, secrets"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid ""
-"a password is needed and there is no terminal to ask for it: use --password-"
-"file"
-msgstr ""
-"hace falta una contraseña y no hay terminal para pedirla: usa --password-file"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid "Password of the file: "
-msgstr "Contraseña del archivo: "
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid "the password is empty"
-msgstr "la contraseña está vacía"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid "File from %1 %2, holds: %3"
-msgstr "Archivo de %1 %2, trae: %3"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid "%1: %2 in the file, %3 new, %4 skipped, %5 with a name you already have"
-msgstr ""
-"%1: %2 en el archivo, %3 nuevos, %4 omitidos, %5 con un nombre que ya tienes"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid "added %1: %2"
-msgstr "agregado %1: %2"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid "%1 entries refer to wallpapers that are not here and were left out"
-msgstr ""
-"%1 entradas se refieren a fondos que no están aquí y se dejaron fuera"
-
-#: apps/reiwand-ctl/src/carrying.rs
-msgid "pending, %1 %2: %3"
-msgstr "pendiente, %1 %2: %3"
-
-#: apps/reiwand-ctl/src/cli.rs
-msgid "Create, edit, build and benchmark scenes; the daemon only for preview"
-msgstr ""
-"Crear, editar, construir y medir escenas; el daemon solo para la vista previa"
-
-#: apps/reiwand-ctl/src/accounts.rs
-msgid "Accounts on repository servers: sign in, choose, forget"
-msgstr "Cuentas en los servidores de repositorios: iniciar sesión, elegir y olvidar"
-
-#: apps/reiwand-ctl/src/accounts.rs
-msgid "List the accounts known on this computer and the repositories each one is used for"
-msgstr "Listar las cuentas conocidas en este equipo y los repositorios para los que se usa cada una"
-
-#: apps/reiwand-ctl/src/accounts.rs
-msgid "Sign in to the server of a repository: approve the code in the browser; the account is used for that repository"
-msgstr "Iniciar sesión en el servidor de un repositorio: aprueba el código en el navegador; la cuenta se usa para ese repositorio"
-
-#: apps/reiwand-ctl/src/accounts.rs
-msgid "Address of the repository whose server you sign in to"
-msgstr "Dirección del repositorio en cuyo servidor inicias sesión"
-
-#: apps/reiwand-ctl/src/accounts.rs
-msgid "Use an account for a repository"
-msgstr "Usar una cuenta para un repositorio"
-
-#: apps/reiwand-ctl/src/accounts.rs
-msgid "Address of the repository"
-msgstr "Dirección del repositorio"
-
-#: apps/reiwand-ctl/src/accounts.rs
-msgid "Account id from reiwand-ctl account ls"
-msgstr "Id de la cuenta, de reiwand-ctl account ls"
-
-#: apps/reiwand-ctl/src/accounts.rs
-msgid "Stop using any account for a repository; the account stays"
-msgstr "Dejar de usar una cuenta en un repositorio; la cuenta se conserva"
-
-#: apps/reiwand-ctl/src/accounts.rs
-msgid "Forget an account on this computer, with its saved access"
-msgstr "Olvidar una cuenta en este equipo, con su acceso guardado"
-
-#: apps/reiwand-ctl/src/accounts.rs
-msgid "no accounts"
-msgstr "no hay cuentas"
-
-#: apps/reiwand-ctl/src/accounts.rs
-msgid "sign in again"
-msgstr "volver a iniciar sesión"
-
-#: apps/reiwand-ctl/src/accounts.rs
-msgid "Open %1 and enter the code %2"
-msgstr "Abre %1 e introduce el código %2"

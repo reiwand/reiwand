@@ -1,7 +1,7 @@
 use reiwand_carry::{Content, Local};
 use std::collections::{BTreeMap, BTreeSet};
 
-pub fn local_of(content: &Content, keys: BTreeSet<String>) -> Local {
+pub fn local_of(content: &Content, keys: BTreeSet<String>, sessions: BTreeSet<String>) -> Local {
     let mut local = Local {
         repo_ids: content.repositories.iter().map(|r| r.repo_id.clone()).collect(),
         providers: content.providers.iter().map(|p| (p.kind.clone(), p.name.clone())).collect(),
@@ -20,6 +20,7 @@ pub fn local_of(content: &Content, keys: BTreeSet<String>) -> Local {
     local.installed = content.installed.iter().map(|i| (i.repo_id.clone(), i.id.clone())).collect();
     local.own = content.own.iter().map(|o| o.id.clone()).collect();
     local.provider_keys = keys;
+    local.sessions = sessions;
     local
 }
 
@@ -40,14 +41,15 @@ mod tests {
                 repo_id: "r".into(),
                 origin: "o".into(),
                 name: String::new(),
+                pin: None,
             }],
-            lists: vec![List { name: "Calm".into(), items: vec![item("a")] }],
+            lists: vec![List { name: "Calm".into(), items: vec![item("a")], query: None, rules: None }],
             favourites: vec![item("a")],
             installed: vec![Installed { repo_id: "r".into(), id: "p".into(), version: "1.0.0".into() }],
             own: vec![OwnFile { id: "h".into(), name: "x.png".into() }],
             ..Content::default()
         };
-        let local = local_of(&content, ["prov".to_owned()].into());
+        let local = local_of(&content, ["prov".to_owned()].into(), BTreeSet::new());
         assert!(
             local.repo_ids.contains("r") && local.own.contains("h") && local.provider_keys.contains("prov")
         );

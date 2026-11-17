@@ -375,8 +375,14 @@ the server, fails the transfer with `io::ErrorKind::Interrupted` at once, local 
 `reiwand-upgrade client --data DIR` (crate `crates/reiwand-upgrade`) runs once on a data folder of 1.x
 and is safe to run again. It strips `?fingerprint=` and `?repo_id=` from every stored repository
 address (`repos/<id>/state.json`), moves the address a 1.x server gave out for its first repository
-(`https://host/repo/`) to `https://host/r/main/` in the stored addresses and mirrors, does the same for the
-server repository and the repository offers of `sync.json`, and writes `format-version`. Nothing is
+(`https://host/repo/`) to `https://host/r/main/` in the stored addresses and mirrors, and moves the old single account of `sync.json` (a flat
+file: server address, pin, owner, repository, label) to the account store: `accounts.json` with one linked account,
+the pin to `repo-pins.json` and the saved access (keyring or `secrets.json` item `server`) to the item
+`account <id>`, which keeps the session. A keyring that cannot be reached or is locked stops the upgrade
+before anything is removed and it runs again on the next start. Then it removes `sync.json` and the item `server` and writes
+`format-version`. The daemon never reads the old files: on data without the mark it refuses to start and names
+`reiwand-upgrade client`. Synchronised copies of lists, favourites and private files on the server are not
+downloaded; use export and import (`exportar.md`) before upgrading. Nothing else is
 downloaded; the repository keeps its `repo_id`, so installed packages stay linked to it. A repository
 that a static host serves under `/repo/` and was added with a `?fingerprint=` address is moved as well,
 and has to be added again by hand. The desktop installers, the user service (`ExecStartPre`, which also covers the RPM) and the Flatpak launcher

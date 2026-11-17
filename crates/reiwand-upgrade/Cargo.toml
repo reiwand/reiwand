@@ -12,17 +12,21 @@ name = "reiwand_upgrade"
 [[bin]]
 name = "reiwand-upgrade"
 path = "src/main.rs"
-required-features = ["server"]
+required-features = ["server", "client"]
 
 [features]
-default = ["server"]
+default = ["server", "client"]
 server = ["dep:rusqlite"]
+client = ["dep:zbus", "dep:tokio", "dep:serde"]
 
 [dependencies]
 anyhow.workspace = true
 reiwand-account.workspace = true
 rusqlite = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
 serde_json.workspace = true
+tokio = { workspace = true, optional = true }
+zbus = { workspace = true, optional = true }
 
 [dev-dependencies]
 tempfile.workspace = true

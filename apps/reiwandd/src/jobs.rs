@@ -26,7 +26,6 @@ pub struct Jobs {
     repos: Semaphore,
     downloads: Semaphore,
     account: Semaphore,
-    linking: Semaphore,
     uploads: Semaphore,
     carrying: Semaphore,
     layering: Semaphore,
@@ -51,7 +50,7 @@ fn active(job: &Job) -> bool {
 fn joins(job: &Job, kind: JobKind, target: &str) -> bool {
     let fresh = match kind {
         JobKind::Import => false,
-        JobKind::Scan | JobKind::AccountSync => job.state == JobState::Queued,
+        JobKind::Scan => job.state == JobState::Queued,
         _ => active(job),
     };
     fresh && job.kind == kind && job.target == target
@@ -61,19 +60,18 @@ impl Jobs {
     pub fn new() -> Self {
         let runtime = tokio::runtime::Handle::current();
         let (library, repos, downloads) = (Semaphore::new(1), Semaphore::new(1), Semaphore::new(2));
-        let (account, linking, uploads) = (Semaphore::new(1), Semaphore::new(1), Semaphore::new(1));
+        let (account, uploads) = (Semaphore::new(1), Semaphore::new(1));
         let (list, layering, carrying) = (Mutex::default(), Semaphore::new(1), Semaphore::new(1));
         let next = AtomicU64::new(1);
-        Self { next, list, library, repos, downloads, account, linking, uploads, carrying, layering, runtime }
+        Self { next, list, library, repos, downloads, account, uploads, carrying, layering, runtime }
     }
 
     fn queue(&self, kind: JobKind) -> &Semaphore {
         match kind {
             JobKind::ProviderSync => &self.downloads,
             JobKind::RepoAdd | JobKind::RepoRefresh | JobKind::Install => &self.repos,
-            JobKind::Account | JobKind::AccountSync => &self.account,
+            JobKind::Account => &self.account,
             JobKind::Upload => &self.uploads,
-            JobKind::Link => &self.linking,
             JobKind::Layers => &self.layering,
             JobKind::CarryExport | JobKind::CarryImport => &self.carrying,
             _ => &self.library,

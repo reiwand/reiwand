@@ -1,81 +1,6 @@
-use super::{Time, Uid};
+use super::Uid;
 
 model! {
-    #[derive(Copy, Eq, Hash)]
-    pub enum AccountState { Unlinked, Linking, Connected, NeedsKey, Ready, Paused, Error, SignedOut, #[serde(other)] Unknown }
-
-    pub struct AccountDevice {
-        pub id: String,
-        pub name: String,
-        pub label: Option<String>,
-        pub platform: String,
-        pub created_at: Time,
-        pub seen_at: Option<Time>,
-        pub current: bool,
-    }
-
-    #[derive(Copy, Eq, Hash)]
-    pub enum Recovery { Off, Current, Stale, #[serde(other)] Unknown }
-
-    pub struct RepoOffer {
-        pub id: String,
-        pub repo_id: String,
-        pub name: String,
-        pub url: String,
-        pub fingerprints: Vec<String>,
-    }
-
-    pub struct Pairing {
-        pub device: String,
-        pub code: Option<String>,
-        pub sharing: bool,
-    }
-
-    pub struct Account {
-        pub url: String,
-        pub name: String,
-        pub repo_id: Option<String>,
-        pub handle: Option<String>,
-        pub device: Option<String>,
-        pub label: String,
-        pub state: AccountState,
-        pub encrypted: Option<bool>,
-        pub warning: Option<String>,
-        pub paused: bool,
-        pub last_sync: Option<Time>,
-        pub last_error: Option<String>,
-        pub records: u32,
-        pub used_bytes: u64,
-        pub quota_bytes: u64,
-        pub devices: Vec<AccountDevice>,
-        pub pairing: Option<Pairing>,
-        pub quarantined: u32,
-        pub unapplied: u32,
-        pub offers: Vec<RepoOffer>,
-        pub recovery: Recovery,
-        pub files_bytes: u64,
-        pub files_quota_bytes: u64,
-        pub job: Option<u64>,
-        pub pin: Option<String>,
-        #[serde(default)]
-        pub link_problem: Option<String>,
-        #[serde(default)]
-        pub link_error: Option<String>,
-        #[serde(default)]
-        pub file_secrets: bool,
-    }
-
-    pub struct AccountReply { pub model: u32, pub serial: u64, pub account: Option<Account> }
-
-    pub struct PrivateFile {
-        pub id: String,
-        pub name: String,
-        pub size: u64,
-        pub item: Option<Uid>,
-        pub shared: bool,
-        pub stored: bool,
-    }
-
     pub struct AwayProfile { pub profile: Uid, pub output: String }
 
     pub struct Away {
@@ -88,10 +13,6 @@ model! {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         pub repo: Option<String>,
     }
-
-    pub struct AwayReply { pub model: u32, pub serial: u64, pub items: Vec<Away> }
-
-    pub struct FilesReply { pub model: u32, pub serial: u64, pub folders: Vec<String>, pub files: Vec<PrivateFile> }
 
     pub struct UploadOutput {
         pub id: String,

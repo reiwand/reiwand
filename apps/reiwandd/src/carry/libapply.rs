@@ -24,7 +24,12 @@ impl Daemon {
                 match change {
                     Change::AddList(list) => {
                         let found = resolved(&uids, &list.items, report);
-                        match lib.create_playlist(&list.name, None, &Rules::default()) {
+                        let rules = list
+                            .rules
+                            .clone()
+                            .and_then(|r| serde_json::from_value::<Rules>(r).ok())
+                            .unwrap_or_default();
+                        match lib.create_playlist(&list.name, list.query.as_deref(), &rules) {
                             Ok(uid) => {
                                 lib.add_to_playlist(&uid, &found)?;
                                 report.add("lists");

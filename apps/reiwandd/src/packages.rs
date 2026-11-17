@@ -157,10 +157,7 @@ impl Daemon {
                 Some(newest) => {
                     self.store.write(|lib| lib.relink_item(&uid, &newest.path, now())).map(|()| vec![old])?
                 }
-                None => {
-                    self.forget_synced(vec![crate::account::removed_package(&gone[0].repo_id, id)]);
-                    self.store.write(|lib| lib.remove_items(&[uid.as_str()]))?
-                }
+                None => self.store.write(|lib| lib.remove_items(&[uid.as_str()]))?,
             };
             self.forget_files(&removed);
             self.forget_data(&removed);

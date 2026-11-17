@@ -89,11 +89,11 @@ pub async fn run(client: &Client, command: Remote) -> Result<()> {
         }
         Remote::Rm { repo, uninstall } => repos.remove(&repo, uninstall).await?,
         Remote::Vote { id, vote } => {
-            println!("{}", crate::providers::patient(client.sync.vote(&id, &vote)).await?)
+            println!("{}", crate::providers::patient(client.publish.vote(&id, &vote)).await?)
         }
         Remote::Votes { ids } => {
             let ids: Vec<&str> = ids.iter().map(String::as_str).collect();
-            println!("{}", crate::providers::patient(client.sync.get_votes(&ids)).await?)
+            println!("{}", crate::providers::patient(client.publish.get_votes(&ids)).await?)
         }
     }
     Ok(())

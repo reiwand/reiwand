@@ -25,7 +25,7 @@ Column {
         target: App.backend
 
         function onChanged(topic) {
-            if (topic === "providers" || topic === "account")
+            if (topic === "providers" || topic === "accounts")
                 notice.load();
         }
     }

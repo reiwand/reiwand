@@ -59,13 +59,18 @@ impl Daemon {
         ctl: &Ctl,
     ) -> Result<Value> {
         let mut opened = open(path, password)?;
-        let local = local_of(&self.carry_state()?.content, self.carry_keys_held());
+        let local =
+            local_of(&self.carry_state()?.content, self.carry_keys_held(), self.carry_sessions_held());
         let changes = plan(&opened.content, &local, &choices.pick()).changes;
         let (mut report, total) = (Report::default(), 6);
         ctl.progress(0, total);
         let (mut ids, mut names) = (Vec::new(), Vec::new());
         for change in &changes {
             if let Change::AddRepository(repo) = change {
+                let pin = repo.pin.as_deref().unwrap_or("");
+                if !pin.is_empty() && reiwand_account::valid_pin(&pin.to_ascii_lowercase()) {
+                    self.pin_origin(&repo.origin, pin).ok();
+                }
                 match self.add_repo(&repo.address, "") {
                     Ok(id) => {
                         ids.push(id);
@@ -100,8 +105,14 @@ impl Daemon {
                         Err(e) => report.fail("secrets", id, &e),
                     }
                 }
-                if !secrets.sessions.is_empty() {
-                    report.note("account sessions are not imported yet");
+                for done in self.import_sessions(&secrets.sessions) {
+                    match done.pending {
+                        None => report.add("accounts"),
+                        Some(why) => {
+                            let name = format!("{} on {}", done.account, done.origin);
+                            report.pend("accounts", &name, &format!("sign in again: {why}"));
+                        }
+                    }
                 }
             }
         }

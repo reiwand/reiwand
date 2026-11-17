@@ -191,6 +191,4 @@ fn fixtures_follow_the_data_model() {
     check::<InstalledReply>("Repos1.ListInstalled");
     check::<SceneProperties>("Daemon1.GetSceneProperties");
     check::<InputsReply>("Inputs1.GetInputs");
-    check::<AccountReply>("Sync1.GetStatus");
-    check::<FilesReply>("Sync1.ListFiles");
 }

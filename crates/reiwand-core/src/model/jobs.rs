@@ -17,7 +17,7 @@ model! {
 
     #[derive(Copy, Eq, Hash)]
     pub enum JobKind {
-        Scan, Import, Analyze, ProviderSync, RepoAdd, RepoRefresh, Install, Account, Link, AccountSync, Upload, Layers, CarryExport, CarryImport,
+        Scan, Import, Analyze, ProviderSync, RepoAdd, RepoRefresh, Install, Account, Upload, Layers, CarryExport, CarryImport,
         #[serde(other)] Unknown,
     }
 

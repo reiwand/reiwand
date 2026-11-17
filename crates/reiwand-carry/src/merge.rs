@@ -51,11 +51,21 @@ fn lists(content: &Content, local: &Local, pick: &Pick, out: &mut Vec<Change>) {
                     count += 1;
                 }
                 taken.insert(name.trim().to_lowercase());
-                out.push(Change::AddList(List { name, items }));
+                out.push(Change::AddList(List {
+                    name,
+                    items,
+                    query: list.query.clone(),
+                    rules: list.rules.clone(),
+                }));
             }
             _ => {
                 taken.insert(list.name.trim().to_lowercase());
-                out.push(Change::AddList(List { name: list.name.clone(), items }));
+                out.push(Change::AddList(List {
+                    name: list.name.clone(),
+                    items,
+                    query: list.query.clone(),
+                    rules: list.rules.clone(),
+                }));
             }
         }
     }

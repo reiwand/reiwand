@@ -44,13 +44,13 @@ pub(crate) async fn run(args: Args) -> anyhow::Result<()> {
     server.at(dbus::OBJECT_PATH, carry1::Carry(weak.clone())).await?;
     server.at(dbus::OBJECT_PATH, rgb1::Rgb(weak.clone())).await?;
     server.at(dbus::OBJECT_PATH, accounts1::Accounts(weak.clone())).await?;
-    server.at(dbus::OBJECT_PATH, sync1::Sync(weak)).await?;
+    server.at(dbus::OBJECT_PATH, publish1::Publish(weak)).await?;
     tokio::spawn(changes::emit(connection.clone(), daemon.clone()));
     inputs1::start(&daemon, connection.clone());
     pool::start(&daemon);
     folders::start(&daemon);
     remote::start(&daemon, connection.clone());
-    account::start(&daemon, connection.clone());
+    accounts::start(&daemon, connection.clone());
     edits::start(&daemon);
     gpus::watch(&daemon);
     tokio::task::spawn_blocking({

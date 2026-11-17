@@ -42,7 +42,7 @@ fn items(found: &str) -> Result<Vec<Value>> {
 }
 
 pub async fn run(client: &Client, command: AuthorKey) -> Result<()> {
-    let sync = &client.sync;
+    let sync = &client.publish;
     match command {
         AuthorKey::List { json } => {
             let found = patient(sync.list_author_keys()).await?;
@@ -74,9 +74,9 @@ pub async fn run(client: &Client, command: AuthorKey) -> Result<()> {
 
 pub async fn uploads(client: &Client, json: bool, cancel: Option<String>) -> Result<()> {
     if let Some(id) = cancel {
-        return patient(client.sync.cancel_upload(&id)).await;
+        return patient(client.publish.cancel_upload(&id)).await;
     }
-    let found: Value = serde_json::from_str(&patient(client.sync.list_uploads()).await?)?;
+    let found: Value = serde_json::from_str(&patient(client.publish.list_uploads()).await?)?;
     if json {
         println!("{found}");
         return Ok(());

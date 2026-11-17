@@ -91,8 +91,7 @@ impl Daemon {
             Ok::<_, Error>((model(lib, info, &showing)?, total, items))
         })?;
         let items = items.into_iter().map(|item| self.summary(item)).collect::<Result<_>>()?;
-        let away = self.away_in(&playlist.uid);
-        reply(PlaylistPage { model: MODEL, serial, playlist, total, offset, items, away })
+        reply(PlaylistPage { model: MODEL, serial, playlist, total, offset, items })
     }
 
     pub fn create_playlist(&self, name: &str, query: &str) -> Result<String> {

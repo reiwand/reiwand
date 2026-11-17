@@ -18,8 +18,8 @@ impl Daemon {
     pub async fn set_secret_store(self: &Arc<Self>, file: bool) -> Result<()> {
         let providers = self.keyring()?;
         let server = self
-            .account
-            .server_ring()
+            .accounts
+            .ring()
             .ok_or_else(|| Error::Named(KEYRING_UNAVAILABLE, "the keyring is not connected yet".into()))?;
         let properties = providers.properties();
         let left = relocate(&[providers, server, &properties], file).await?;
@@ -28,7 +28,7 @@ impl Daemon {
         }
         tracing::info!(file, "the place where secrets are kept changed");
         self.changes.changed("providers", Vec::new());
-        self.changes.changed("account", Vec::new());
+        self.changes.changed("accounts", Vec::new());
         Ok(())
     }
 }

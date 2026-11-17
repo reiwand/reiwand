@@ -1,14 +1,38 @@
-use super::{block_on, sync_error};
+use super::{block_on, random, sync_error};
 use crate::daemon::Daemon;
 use crate::error::{Result, failed, invalid};
 use crate::jobs::Ctl;
+use reiwand_account::{Api, hex};
 use reiwand_core::model::{JobKind, UploadOutput};
 use reqwest::Method;
 use serde_json::{Value, json};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+pub(super) struct Destination {
+    pub api: Api,
+    pub name: String,
+    pub repo_id: Option<String>,
+}
+
 impl Daemon {
+    pub(super) fn destination(&self) -> Result<Destination> {
+        let accounts = self.account_list();
+        let found = accounts.iter().filter(|r| !r.pending).find_map(|r| {
+            let link = r.links.iter().find(|l| reiwand_format::server_repo_name(&l.url).is_some())?;
+            Some((r, link))
+        });
+        let Some((rec, link)) = found else {
+            return Err(failed("sign in to an account linked to a repository first"));
+        };
+        let token =
+            self.account_token(&rec.id).ok_or_else(|| failed("the access of this account is missing"))?;
+        let pin = self.repo_pins().get(&rec.origin).cloned();
+        let api = Api::pinned(&rec.origin, pin.as_deref()).map_err(sync_error)?.with_token(&token);
+        let name = reiwand_format::server_repo_name(&link.url).unwrap_or_default().to_owned();
+        Ok(Destination { api, name, repo_id: link.repo_id.clone() })
+    }
+
     pub fn upload(self: &Arc<Self>, path: &str, visibility: &str) -> Result<u64> {
         if !matches!(visibility, "public" | "unlisted") {
             return Err(invalid("the visibility is public or unlisted"));
@@ -19,15 +43,14 @@ impl Daemon {
         }
         let size =
             std::fs::metadata(&path).map_err(|e| invalid(format!("cannot read the package: {e}")))?.len();
-        self.linked()?;
-        let target = reiwand_sync::hex(&reiwand_sync::random::<8>());
+        self.destination()?;
+        let target = hex(&random::<8>());
         Ok(self
             .start_job(JobKind::Upload, &target, move |d, ctl| d.send_package(&path, size, &visibility, ctl)))
     }
 
     pub fn own_packages(&self) -> Result<String> {
-        let (api, _) = self.account_api(true)?;
-        let found = block_on(api.get("/api/v1/me/packages")).map_err(sync_error)?;
+        let found = block_on(self.destination()?.api.get("/api/v1/me/packages")).map_err(sync_error)?;
         Ok(json!({"items": found["items"]}).to_string())
     }
 
@@ -35,20 +58,19 @@ impl Daemon {
         if !reiwand_format::valid_id(id) || !matches!(visibility, "public" | "unlisted") {
             return Err(invalid("give a package id and public or unlisted"));
         }
-        let name = self.server_repo_name()?;
-        let (api, _) = self.account_api(true)?;
+        let to = self.destination()?;
         let version = Some(version).filter(|v| !v.is_empty());
         let body = json!({"visibility": visibility, "version": version});
-        block_on(api.post(&format!("/api/v1/r/{name}/me/packages/{id}/visibility"), body))
-            .map_err(sync_error)?;
+        let path = format!("/api/v1/r/{}/me/packages/{id}/visibility", to.name);
+        block_on(to.api.post(&path, body)).map_err(sync_error)?;
         Ok(())
     }
 
     fn send_package(&self, path: &Path, size: u64, visibility: &str, ctl: &Ctl) -> Result<Value> {
-        let name = self.server_repo_name()?;
-        let (api, _) = self.account_api(true)?;
+        let to = self.destination()?;
+        let api = to.api;
         let sha256 = reiwand_format::sha256_file(path)?;
-        let asked = json!({"size": size, "sha256": sha256, "visibility": visibility, "repo": name});
+        let asked = json!({"size": size, "sha256": sha256, "visibility": visibility, "repo": to.name});
         let opened = block_on(api.post("/api/v1/uploads", asked)).map_err(sync_error)?;
         let id = opened["id"].as_str().unwrap_or_default().to_owned();
         if visibility != "public" && opened["visibility"] != visibility {

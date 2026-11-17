@@ -20,11 +20,11 @@ msgstr "el servicio (reiwandd) no se está ejecutando"
 #: integrations/plasma-wallpaper/contents/ui/config.qml
 #, kde-format
 msgid ""
-"Reiwand is managed from its app, its icon in the system tray or the "
-"reiwand-ctl command."
+"Reiwand is managed from its app, its icon in the system tray or the reiwand-"
+"ctl command."
 msgstr ""
-"Reiwand se gestiona desde su aplicación, su icono en la bandeja del "
-"sistema o la orden reiwand-ctl."
+"Reiwand se gestiona desde su aplicación, su icono en la bandeja del sistema "
+"o la orden reiwand-ctl."
 
 #: integrations/plasma-wallpaper/contents/ui/config.qml
 #, kde-format

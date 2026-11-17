@@ -1,4 +1,5 @@
-use reiwand_upgrade::{Outcome, client};
+use reiwand_upgrade::{Outcome, Vault, client};
+use std::collections::BTreeMap;
 use std::fs;
 
 #[test]
@@ -26,9 +27,64 @@ fn stored_repositories_lose_the_share_parameters_once() {
     assert_eq!(read("one")["url"], "https://a.example/r/main/");
     assert_eq!(read("one")["bases"][0], "https://a.example/r/main/");
     assert_eq!(read("two")["url"], "https://b.example/r/x/");
-    let sync: serde_json::Value = serde_json::from_slice(&fs::read(data.join("sync.json")).unwrap()).unwrap();
-    assert_eq!(sync["repo_url"], "https://s.example/r/main/");
-    assert_eq!(sync["offers"][0]["url"], "https://c.example/");
+    assert!(!data.join("sync.json").exists());
     assert_eq!(fs::read_to_string(data.join("format-version")).unwrap(), "2\n");
     assert_eq!(client::run(data).unwrap(), Outcome::Nothing);
+}
+
+#[derive(Default)]
+struct Memory {
+    items: BTreeMap<String, String>,
+    unreachable: bool,
+}
+
+impl Vault for Memory {
+    fn take(&mut self, item: &str) -> anyhow::Result<Option<String>> {
+        anyhow::ensure!(!self.unreachable, "the keyring is locked");
+        Ok(self.items.get(item).cloned())
+    }
+    fn put(&mut self, item: &str, secret: &str) -> anyhow::Result<()> {
+        self.items.insert(item.to_owned(), secret.to_owned());
+        Ok(())
+    }
+    fn drop_item(&mut self, item: &str) -> anyhow::Result<()> {
+        self.items.remove(item);
+        Ok(())
+    }
+}
+
+const OLD: &str = r#"{"url":"https://srv.example:8443","name":"laptop","pin":"AB12CD",
+"repo_url":"https://srv.example:8443/r/shelf/","repo_id":"rid","owner":["ana",7],"label":"home",
+"offers":[{"url":"https://c.example/"}],"away":[],"files":{},"replica":{"heads":{}}}"#;
+
+#[test]
+fn the_old_account_keeps_its_session_in_the_new_store() {
+    let dir = tempfile::tempdir().unwrap();
+    let data = dir.path();
+    fs::write(data.join("sync.json"), OLD).unwrap();
+    let mut vault = Memory::default();
+    vault.items.insert("server".into(), "tok".into());
+    client::run_with(data, &mut vault).unwrap();
+    let file: serde_json::Value =
+        serde_json::from_slice(&fs::read(data.join("accounts.json")).unwrap()).unwrap();
+    let rec = &file["accounts"][0];
+    assert_eq!((rec["user"].as_str(), rec["pending"].as_bool()), (Some("ana"), Some(false)));
+    let id = rec["id"].as_str().unwrap();
+    assert_eq!(vault.items.get(&format!("account {id}")).map(String::as_str), Some("tok"));
+    assert!(!vault.items.contains_key("server") && !data.join("sync.json").exists());
+    let pins: BTreeMap<String, String> =
+        serde_json::from_slice(&fs::read(data.join("repo-pins.json")).unwrap()).unwrap();
+    assert_eq!(pins["https://srv.example:8443"], "ab12cd");
+}
+
+#[test]
+fn a_locked_keyring_leaves_everything_for_the_next_run() {
+    let dir = tempfile::tempdir().unwrap();
+    let data = dir.path();
+    fs::write(data.join("sync.json"), OLD).unwrap();
+    let mut vault = Memory { unreachable: true, ..Memory::default() };
+    assert!(client::run_with(data, &mut vault).is_err());
+    assert!(data.join("sync.json").exists() && !data.join("format-version").exists());
+    vault.unreachable = false;
+    assert_eq!(client::run_with(data, &mut vault).unwrap(), Outcome::Upgraded { from: 1, to: 2 });
 }

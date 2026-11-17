@@ -5,9 +5,9 @@ use crate::library1::Library;
 use crate::playlists1::Playlists;
 use crate::profiles1::Profiles;
 use crate::providers1::Providers;
+use crate::publish1::Publish;
 use crate::repos1::Repos;
 use crate::service::Service;
-use crate::sync1::Sync;
 use reiwand_core::dbus;
 use std::sync::Weak;
 use zbus::object_server::Interface;
@@ -53,7 +53,7 @@ fn every_documented_member_exists_and_the_reverse() {
         (dbus::PROVIDERS, Box::new(Providers(Weak::new()))),
         (dbus::REPOS, Box::new(Repos(Weak::new()))),
         (dbus::INPUTS, Box::new(Inputs(Weak::new()))),
-        (dbus::SYNC, Box::new(Sync(Weak::new()))),
+        (dbus::PUBLISH, Box::new(Publish(Weak::new()))),
         (dbus::CARRY, Box::new(Carry(Weak::new()))),
         (dbus::ACCOUNTS, Box::new(Accounts(Weak::new()))),
     ];

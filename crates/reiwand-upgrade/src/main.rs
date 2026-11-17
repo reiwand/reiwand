@@ -35,7 +35,10 @@ fn main() -> anyhow::Result<()> {
     };
     let done = match what {
         Some("server") => reiwand_upgrade::server::run(&data)?,
-        Some("client") => reiwand_upgrade::client::run(&data)?,
+        Some("client") => {
+            let mut vault = reiwand_upgrade::vault::KeyringVault::open(&data)?;
+            reiwand_upgrade::client::run_with(&data, &mut vault)?
+        }
         other => bail!("unknown target {other:?}: use server or client"),
     };
     println!("{}: {done}", data.display());

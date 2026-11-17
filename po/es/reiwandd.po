@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Reiwand\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-14 00:00+0000\n"
+"POT-Creation-Date: 2026-11-17 00:00+0000\n"
 "PO-Revision-Date: 2026-10-22 00:00+0000\n"
 "Last-Translator: Reiwand contributors\n"
 "Language-Team: Reiwand contributors\n"
@@ -13,34 +13,17 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: apps/reiwandd/src/words.rs
-msgid "%1 (conflict)"
-msgstr "%1 (conflicto)"
+msgid ""
+"This server needs a newer version of Reiwand: update it on this computer to "
+"keep using the account."
+msgstr ""
+"Este servidor necesita una versión más nueva de Reiwand: actualízala en este "
+"equipo para seguir usando la cuenta."
 
 #: apps/reiwandd/src/words.rs
 msgid ""
-"This account is synced by a newer version of Reiwand: update it on this "
-"computer to keep syncing."
-msgstr ""
-"Esta cuenta se sincroniza con una versión más nueva de Reiwand: "
-"actualízalo en este equipo para seguir sincronizando."
-
-#: apps/reiwandd/src/words.rs
-msgid ""
-"The server no longer accepts this computer: it was removed from the account "
-"or the account was deleted. Remove the server here and link this computer "
-"again to keep syncing."
-msgstr ""
-"El servidor ya no acepta este equipo: se quitó de la cuenta o se borró la "
-"cuenta. Quita aquí el servidor y vuelve a enlazar este equipo para seguir "
-"sincronizando."
-
-#: apps/reiwandd/src/words.rs
-msgid ""
-"This is the recovery passphrase from before a device was revoked, and that "
-"device may know it: choose a new, different passphrase."
-msgstr ""
-"Esta es la frase de recuperación de antes de revocar un dispositivo, y ese "
-"dispositivo puede conocerla: elige una frase nueva y distinta."
+"The server no longer accepts this account: sign in again to keep using it."
+msgstr "El servidor ya no acepta esta cuenta: vuelve a iniciar sesión para seguir usándola."
 
 #: apps/reiwandd/src/words.rs
 msgid ""
@@ -59,8 +42,8 @@ msgid ""
 "This only works in a Plasma session; elsewhere, removing the wallpaper "
 "already shows the desktop's own."
 msgstr ""
-"Esto solo funciona en una sesión de Plasma; en otros escritorios, al "
-"quitar el fondo ya se ve el del propio escritorio."
+"Esto solo funciona en una sesión de Plasma; en otros escritorios, al quitar "
+"el fondo ya se ve el del propio escritorio."
 
 #: apps/reiwandd/src/words.rs
 msgid ""
@@ -75,8 +58,7 @@ msgid ""
 "The earlier wallpaper's file is no longer there, so it cannot be brought "
 "back."
 msgstr ""
-"El archivo del fondo anterior ya no está, así que no se puede "
-"recuperar."
+"El archivo del fondo anterior ya no está, así que no se puede recuperar."
 
 #: apps/reiwandd/src/words.rs
 msgid ""
@@ -141,89 +123,6 @@ msgstr ""
 msgid "A script of this scene stopped and the scene goes on without it: %1"
 msgstr "Un script de esta escena se detuvo y la escena sigue sin él: %1"
 
-#: apps/reiwandd/src/words/ask.rs
-msgid "Allow"
-msgstr "Permitir"
-
-#: apps/reiwandd/src/words/ask.rs
-msgid "Not now"
-msgstr "Ahora no"
-
-#: apps/reiwandd/src/words/ask.rs
-msgid "Let a wallpaper show what plays?"
-msgstr "¿Dejar que un fondo muestre lo que suena?"
-
-#: apps/reiwandd/src/words/ask.rs
-msgid ""
-"Let “%1” show the title, artist, album, cover and progress of what the media "
-"player plays? Nothing of it is kept, logged or sent."
-msgstr ""
-"¿Dejar que «%1» muestre el título, el artista, el álbum, la carátula y el "
-"avance de lo que suena en el reproductor? Nada de eso se guarda, se registra "
-"ni se envía."
-
-#: apps/reiwandd/src/words/ask.rs
-msgid "Let a wallpaper follow the sound?"
-msgstr "¿Dejar que un fondo siga el sonido?"
-
-#: apps/reiwandd/src/words/ask.rs
-msgid ""
-"Let “%1” follow the sound that plays? The sound is turned into levels on "
-"this computer; nothing is recorded, kept or sent."
-msgstr ""
-"¿Dejar que «%1» siga el sonido que suena? El sonido se convierte en niveles "
-"en este equipo; no se graba, no se guarda y no se envía."
-
-#: apps/reiwandd/src/words/ask.rs
-msgid "Let a wallpaper follow the pointer?"
-msgstr "¿Dejar que un fondo siga el puntero?"
-
-#: apps/reiwandd/src/words/ask.rs
-msgid ""
-"Let “%1” follow the pointer? Only its latest position over the screen "
-"reaches the wallpaper, and it is never kept."
-msgstr ""
-"¿Dejar que «%1» siga el puntero? Al fondo solo llega su última posición "
-"sobre la pantalla, y nunca se guarda."
-
-#: apps/reiwandd/src/words/ask.rs
-msgid ""
-"This wallpaper flashes or shows fast patterns that can trigger seizures in "
-"people with photosensitive epilepsy, and wallpapers that flash are turned "
-"off: allow them in the settings first."
-msgstr ""
-"Este fondo destella o muestra patrones rápidos que pueden provocar "
-"crisis a personas con epilepsia fotosensible, y los fondos que destellan"
-" están desactivados: permítelos antes en los ajustes."
-
-#: apps/reiwandd/src/words/ask.rs
-msgid "what plays"
-msgstr "lo que suena"
-
-#: apps/reiwandd/src/words/ask.rs
-msgid "the sound"
-msgstr "el sonido"
-
-#: apps/reiwandd/src/words/ask.rs
-msgid "clicks"
-msgstr "los clics"
-
-#: apps/reiwandd/src/words/ask.rs
-msgid "the pointer"
-msgstr "el puntero"
-
-#: apps/reiwandd/src/words/ask.rs
-msgid "Let a wallpaper use these?"
-msgstr "¿Dejar que un fondo use esto?"
-
-#: apps/reiwandd/src/words/ask.rs
-msgid ""
-"“%1” asks to use: %2. Until you answer it runs without them, and nothing is "
-"kept or sent."
-msgstr ""
-"«%1» pide usar: %2. Hasta que respondas corre sin ello, y nada se guarda"
-" ni se envía."
-
 #: apps/reiwandd/src/words.rs
 msgid ""
 "Web wallpapers cannot be shown here: the web helper reiwand-web is not "
@@ -236,13 +135,13 @@ msgstr ""
 msgid ""
 "Web wallpapers cannot be shown here: this Flatpak runs on the KDE runtime, "
 "which has no WPE WebKit 2.54 or newer, the engine that draws them. Install "
-"Reiwand from a package of your distribution that has wpewebkit (Arch "
-"Linux, Fedora)."
+"Reiwand from a package of your distribution that has wpewebkit (Arch Linux, "
+"Fedora)."
 msgstr ""
 "Aquí no se pueden mostrar fondos web: este Flatpak usa el runtime de KDE, "
 "que no trae WPE WebKit 2.54 o posterior, el motor que los dibuja. Instala "
-"Reiwand desde un paquete de tu distribución que tenga wpewebkit (Arch "
-"Linux, Fedora)."
+"Reiwand desde un paquete de tu distribución que tenga wpewebkit (Arch Linux, "
+"Fedora)."
 
 #: apps/reiwandd/src/words.rs
 msgid ""
@@ -253,6 +152,12 @@ msgstr ""
 "Aquí no se pueden mostrar fondos web: necesitan WPE WebKit 2.54 o posterior, "
 "que no está instalado. Ubuntu 24.04 no lo trae; Arch Linux y Fedora sí "
 "(wpewebkit)."
+
+#: apps/reiwandd/src/words.rs
+msgid "The wallpaper cannot be shown (%1); the background color shows instead."
+msgstr ""
+"No se puede mostrar el fondo de pantalla (%1); en su lugar se ve el color de "
+"fondo."
 
 #: apps/reiwandd/src/words.rs
 msgid ""
@@ -267,12 +172,12 @@ msgid ""
 msgstr "Aquí no se pueden mostrar fondos web: el auxiliar web no arranca (%1)."
 
 #: apps/reiwandd/src/words.rs
-msgid "A script of the scene reported an error: %1"
-msgstr "Un script de la escena informó de un error: %1"
-
-#: apps/reiwandd/src/words.rs
 msgid "The page reported an error and may not be drawing: %1"
 msgstr "La página informó de un error y puede que no se esté dibujando: %1"
+
+#: apps/reiwandd/src/words.rs
+msgid "A script of the scene reported an error: %1"
+msgstr "Un script de la escena informó de un error: %1"
 
 #: apps/reiwandd/src/words.rs
 msgid ""
@@ -281,13 +186,6 @@ msgid ""
 msgstr ""
 "La página web se detuvo tres veces seguidas y está apagada; en su lugar se "
 "ve el color de fondo."
-
-#: apps/reiwandd/src/words.rs
-msgid ""
-"The wallpaper cannot be shown (%1); the background color shows instead."
-msgstr ""
-"No se puede mostrar el fondo de pantalla (%1); en su lugar se ve el color de "
-"fondo."
 
 #: apps/reiwandd/src/words.rs
 msgid ""
@@ -341,3 +239,86 @@ msgid ""
 msgstr ""
 "El paquete está instalado pero incompleto: no se pudo instalar %1, que "
 "necesita."
+
+#: apps/reiwandd/src/words/ask.rs
+msgid "Allow"
+msgstr "Permitir"
+
+#: apps/reiwandd/src/words/ask.rs
+msgid "Not now"
+msgstr "Ahora no"
+
+#: apps/reiwandd/src/words/ask.rs
+msgid "Let a wallpaper show what plays?"
+msgstr "¿Dejar que un fondo muestre lo que suena?"
+
+#: apps/reiwandd/src/words/ask.rs
+msgid ""
+"Let “%1” show the title, artist, album, cover and progress of what the media "
+"player plays? Nothing of it is kept, logged or sent."
+msgstr ""
+"¿Dejar que «%1» muestre el título, el artista, el álbum, la carátula y el "
+"avance de lo que suena en el reproductor? Nada de eso se guarda, se registra "
+"ni se envía."
+
+#: apps/reiwandd/src/words/ask.rs
+msgid "Let a wallpaper follow the sound?"
+msgstr "¿Dejar que un fondo siga el sonido?"
+
+#: apps/reiwandd/src/words/ask.rs
+msgid ""
+"Let “%1” follow the sound that plays? The sound is turned into levels on "
+"this computer; nothing is recorded, kept or sent."
+msgstr ""
+"¿Dejar que «%1» siga el sonido que suena? El sonido se convierte en niveles "
+"en este equipo; no se graba, no se guarda y no se envía."
+
+#: apps/reiwandd/src/words/ask.rs
+msgid "Let a wallpaper follow the pointer?"
+msgstr "¿Dejar que un fondo siga el puntero?"
+
+#: apps/reiwandd/src/words/ask.rs
+msgid ""
+"Let “%1” follow the pointer? Only its latest position over the screen "
+"reaches the wallpaper, and it is never kept."
+msgstr ""
+"¿Dejar que «%1» siga el puntero? Al fondo solo llega su última posición "
+"sobre la pantalla, y nunca se guarda."
+
+#: apps/reiwandd/src/words/ask.rs
+msgid ""
+"This wallpaper flashes or shows fast patterns that can trigger seizures in "
+"people with photosensitive epilepsy, and wallpapers that flash are turned "
+"off: allow them in the settings first."
+msgstr ""
+"Este fondo destella o muestra patrones rápidos que pueden provocar crisis a "
+"personas con epilepsia fotosensible, y los fondos que destellan están "
+"desactivados: permítelos antes en los ajustes."
+
+#: apps/reiwandd/src/words/ask.rs
+msgid "what plays"
+msgstr "lo que suena"
+
+#: apps/reiwandd/src/words/ask.rs
+msgid "the sound"
+msgstr "el sonido"
+
+#: apps/reiwandd/src/words/ask.rs
+msgid "clicks"
+msgstr "los clics"
+
+#: apps/reiwandd/src/words/ask.rs
+msgid "the pointer"
+msgstr "el puntero"
+
+#: apps/reiwandd/src/words/ask.rs
+msgid "Let a wallpaper use these?"
+msgstr "¿Dejar que un fondo use esto?"
+
+#: apps/reiwandd/src/words/ask.rs
+msgid ""
+"“%1” asks to use: %2. Until you answer it runs without them, and nothing is "
+"kept or sent."
+msgstr ""
+"«%1» pide usar: %2. Hasta que respondas corre sin ello, y nada se guarda ni "
+"se envía."

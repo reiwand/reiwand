@@ -27,6 +27,8 @@ pub struct Repository {
     pub origin: String,
     #[serde(default)]
     pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pin: Option<String>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -41,6 +43,10 @@ pub struct Provider {
 pub struct List {
     pub name: String,
     pub items: Vec<Item>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub query: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rules: Option<serde_json::Value>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]

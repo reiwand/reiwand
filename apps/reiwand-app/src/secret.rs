@@ -59,19 +59,12 @@ impl Backend {
         });
     }
 
-    pub fn passphrase(self: Pin<&mut Self>, tag: &QString, member: &QString, passphrase: &QString) {
-        let (member, passphrase) = (member.to_string(), Zeroizing::new(passphrase.to_string()));
+    pub fn passphrase(self: Pin<&mut Self>, tag: &QString, member: &QString, _passphrase: &QString) {
+        let member = member.to_string();
         self.run(tag, false, async move {
             match (bus::daemon().await?, member.as_str()) {
-                (Daemon::Bus(c), "SetEscrow") => keyring(c.sync.set_escrow(&passphrase)).await,
-                (Daemon::Bus(c), "Restore") => keyring(c.sync.restore(&passphrase)).await,
-                (Daemon::Bus(c), "ApproveDevice") => {
-                    let (code, password) = passphrase.split_once('\n').unwrap_or((&passphrase, ""));
-                    keyring(c.sync.approve_device(code, password)).await
-                }
-                (Daemon::Bus(c), "RevokeDevice") => {
-                    let (device, password) = passphrase.split_once('\n').unwrap_or((&passphrase, ""));
-                    keyring(c.sync.revoke_device(device, password)).await
+                (Daemon::Bus(_), "SetEscrow" | "Restore" | "ApproveDevice" | "RevokeDevice") => {
+                    Err(invalid(format!("{member} is no longer offered by the service")))
                 }
                 (Daemon::Fixtures, "SetEscrow" | "Restore" | "ApproveDevice" | "RevokeDevice") => {
                     Ok(fixture("Sync1", &member))

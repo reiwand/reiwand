@@ -7,14 +7,7 @@ const ELSEWHERE: &str = "votes go only to packages of the repository of the link
 
 impl Daemon {
     fn server_repo(&self) -> Option<String> {
-        let saved = self.saved();
-        saved.repo_id.clone().filter(|_| !saved.url.is_empty())
-    }
-
-    pub(super) fn server_repo_name(&self) -> Result<String> {
-        let saved = self.saved();
-        let name = saved.repo_url.as_deref().and_then(reiwand_format::server_repo_name);
-        name.map(String::from).ok_or_else(|| invalid("the linked server has no repository"))
+        self.destination().ok().and_then(|to| to.repo_id)
     }
 
     pub fn vote(&self, spec: &str, vote: &str) -> Result<String> {
@@ -24,8 +17,8 @@ impl Daemon {
             return Err(invalid("give a package id or REPO/ID and up, down or none"));
         };
         let Some((_, id)) = asked.first() else { return Err(invalid(ELSEWHERE)) };
-        let name = self.server_repo_name()?;
-        let (api, _) = self.account_api(true)?;
+        let to = self.destination()?;
+        let (api, name) = (to.api, to.name);
         let body = json!({ "vote": vote });
         let found =
             block_on(api.post(&format!("/api/v1/r/{name}/packages/{id}/vote"), body)).map_err(sync_error)?;
@@ -38,11 +31,11 @@ impl Daemon {
             return Err(invalid("give at most 1000 package ids, each as ID or REPO/ID"));
         };
         let none = json!({ "items": {}, "shown": false, "repo_id": server }).to_string();
-        if asked.is_empty() || !self.state().config.repos.vote_counts || self.saved().url.is_empty() {
+        if asked.is_empty() || !self.state().config.repos.vote_counts || self.account_list().is_empty() {
             return Ok(none);
         }
-        let Ok((api, _)) = self.account_api(false) else { return Ok(none) };
-        let Ok(name) = self.server_repo_name() else { return Ok(none) };
+        let Ok(to) = self.destination() else { return Ok(none) };
+        let (api, name) = (to.api, to.name);
         let mut found = Map::new();
         for query in reiwand_format::vote_queries(&name, &asked) {
             let page = block_on(api.get(&query)).map_err(sync_error)?;

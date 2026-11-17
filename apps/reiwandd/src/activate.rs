@@ -1,6 +1,6 @@
-use crate::account::DOWNLOADS;
 use crate::daemon::Daemon;
 use crate::error::{Error, Result};
+use crate::profiles::DOWNLOADS;
 use crate::profiles::model;
 use reiwand_core::OutputConfig;
 use reiwand_core::config::parse_hex_color;

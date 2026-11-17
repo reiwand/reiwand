@@ -13,7 +13,7 @@ ColumnLayout {
     property string pending: ""
 
     function load() {
-        App.query("ListAuthorKeys", [], "Sync1", reply => keys && (keys.items = reply.items ?? []), () => keys && (keys.items = []));
+        App.query("ListAuthorKeys", [], "Publish1", reply => keys && (keys.items = reply.items ?? []), () => keys && (keys.items = []));
     }
 
     function failed(error) {
@@ -23,17 +23,17 @@ ColumnLayout {
 
     function add(text) {
         problem = "";
-        App.act("AddAuthorKey", [text], "Sync1", () => keys && keys.load(), keys.failed);
+        App.act("AddAuthorKey", [text], "Publish1", () => keys && keys.load(), keys.failed);
     }
 
     function remove(fingerprint) {
         problem = "";
-        App.act("RemoveAuthorKey", [fingerprint], "Sync1", () => keys && keys.load(), keys.failed);
+        App.act("RemoveAuthorKey", [fingerprint], "Publish1", () => keys && keys.load(), keys.failed);
     }
 
     function rotate(from, text, signature) {
         problem = "";
-        App.act("RotateAuthorKey", [from, text, signature], "Sync1", () => keys && keys.load(), keys.failed);
+        App.act("RotateAuthorKey", [from, text, signature], "Publish1", () => keys && keys.load(), keys.failed);
     }
 
     Component.onCompleted: load()

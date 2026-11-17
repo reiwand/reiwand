@@ -53,6 +53,7 @@ echo "renderer guard checks passed"
 
 # export and import run two daemons of their own, so they go as a separate script
 bash "$(dirname "$0")"/integration-carry.sh "$BIN"
+bash "$(dirname "$0")"/integration-accounts.sh "$BIN"
 
 status=0
 echo "integration test passed"

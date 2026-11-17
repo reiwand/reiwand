@@ -171,11 +171,7 @@ pub enum Command {
     Pkg(Pkg),
     #[command(subcommand, about = "Audio, pointer and other inputs of scenes and pages: grants and state")]
     Input(Inputs),
-    #[command(
-        subcommand,
-        about = "The self-hosted server: link, end-to-end encrypted sync and uploads",
-        after_long_help = crate::account::NAMES
-    )]
+    #[command(subcommand, about = "Publish to a repository: uploads, your packages and your author keys")]
     Server(Server),
     #[command(subcommand, about = "Accounts on repository servers: sign in, choose, forget")]
     Account(crate::accounts::Accounts),

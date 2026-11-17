@@ -12,7 +12,7 @@ pub(super) fn checked(url: &str, trust: &str) -> Result<()> {
     if !(matches!(parsed.scheme(), "https" | "file") || parsed.scheme() == "http" && local(&parsed)) {
         return Err(invalid("use an https:// or file:// URL, or http:// to this computer"));
     }
-    if !trust.is_empty() && !reiwand_sync::valid_pin(&trust.to_ascii_lowercase()) {
+    if !trust.is_empty() && !reiwand_account::valid_pin(&trust.to_ascii_lowercase()) {
         return Err(invalid("a certificate fingerprint has 64 hex digits"));
     }
     Ok(())
@@ -39,7 +39,7 @@ impl Daemon {
 }
 
 fn explain_changed(bases: &[String], e: reiwand_format::Error) -> Error {
-    if !unreachable(&e).is_some_and(|io| reiwand_sync::untrusted(io)) {
+    if !unreachable(&e).is_some_and(|io| reiwand_account::untrusted(io)) {
         return e.into();
     }
     let site = bases.iter().find_map(|base| origin(base)).unwrap_or_default();
@@ -53,13 +53,13 @@ impl Daemon {
         if denied(&e) {
             return self.account_needed(&site);
         }
-        if unreachable(&e).is_some_and(|io| reiwand_sync::untrusted(io)) {
+        if unreachable(&e).is_some_and(|io| reiwand_account::untrusted(io)) {
             let host = site.split("://").nth(1).unwrap_or(&site);
             if !trust.is_empty() || self.repo_pins().contains_key(&site) {
                 let text = format!("the certificate of {host} is not the one you trusted; nothing was added");
                 return Error::Named(CERTIFICATE_CHANGED, text);
             }
-            return match crate::account::block_on(reiwand_sync::peek(&site)) {
+            return match crate::accounts::block_on(reiwand_account::peek(&site)) {
                 Ok(print) => {
                     let text = format!(
                         "the certificate of {host} is not from a known authority; its fingerprint is {print}; \

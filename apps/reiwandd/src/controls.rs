@@ -39,7 +39,6 @@ impl Daemon {
             self.watch_sources();
         }
         if key == reiwand_core::net::KEY {
-            self.account.restart.notify_one();
             self.configure_all();
         }
         if key.starts_with("rgb.") {

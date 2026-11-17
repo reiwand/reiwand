@@ -69,7 +69,7 @@ impl Daemon {
     pub fn state_json(&self) -> String {
         let status = self.compositor.status();
         let serial = self.changes.serial();
-        let (jobs, away) = (self.jobs.active(), self.away_items());
+        let jobs = self.jobs.active();
         let st = self.state();
         let placed = crate::calibration::monitors(&st);
         let output = |(name, info): (&String, &crate::streams::OutputInfo)| {
@@ -137,7 +137,6 @@ impl Daemon {
                 filter: Some(st.config.filter(name)).filter(|f| !f.is_identity()),
                 hdr: crate::lights::state(&st.config, name, &s.hdr),
                 transition: crate::lights::passage(&st.config, name, s.passage),
-                away: crate::account::away_title(&away, st.config.profile.as_deref(), name),
             };
             crate::rotation::overlay(&st, name, &mut state);
             (name.clone(), state)

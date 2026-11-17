@@ -37,17 +37,31 @@ fn providers(map: &BTreeMap<String, toml::Value>) -> Vec<Provider> {
 impl Daemon {
     pub fn carry_state(&self) -> Result<Gathered> {
         let repos = reiwand_format::repos(&self.store.data, now())?;
+        let pins = self.repo_pins();
         let repositories = repos
             .into_iter()
             .filter(|r| r.broken.is_none() && !self.is_examples(&r.repo_id))
-            .map(|r| Repository { origin: origin(&r.url), address: r.url, repo_id: r.repo_id, name: r.name })
+            .map(|r| {
+                let origin = origin(&r.url);
+                let pin = pins.get(&origin).cloned();
+                Repository { origin, address: r.url, repo_id: r.repo_id, name: r.name, pin }
+            })
             .collect();
         let installed = self.state().installed.clone();
         let (entries, lists) = self.store.read(|lib| {
             let mut lists = Vec::new();
-            for info in lib.playlists()?.into_iter().filter(|p| p.query.is_none()) {
-                let items = lib.playlist_items(&info.uid, now())?;
-                lists.push((info.name, items.into_iter().map(|i| i.uid).collect::<Vec<_>>()));
+            for info in lib.playlists()? {
+                let items = match info.query {
+                    Some(_) => Vec::new(),
+                    None => lib.playlist_items(&info.uid, now())?,
+                };
+                let uids = items.into_iter().map(|i| i.uid).collect::<Vec<_>>();
+                lists.push((
+                    info.name,
+                    info.query,
+                    serde_json::to_value(&info.rules).unwrap_or_default(),
+                    uids,
+                ));
             }
             Ok::<_, Error>((lib.hashed()?, lists))
         })?;
@@ -82,9 +96,11 @@ impl Daemon {
         }
         let lists = lists
             .into_iter()
-            .map(|(name, items)| List {
+            .map(|(name, query, rules, items)| List {
                 name,
                 items: items.iter().filter_map(|u| names.get(u).cloned()).collect(),
+                rules: query.as_ref().map(|_| rules),
+                query,
             })
             .collect();
         let mut installed: Vec<Installed> = (installed.iter())
@@ -118,6 +134,10 @@ impl Daemon {
         providers.iter().filter(|(_, v)| wants(v)).map(|(id, _)| id.clone()).collect()
     }
 
+    pub fn carry_sessions_held(&self) -> BTreeSet<String> {
+        self.account_list().iter().flat_map(|r| r.links.iter().filter_map(|l| l.repo_id.clone())).collect()
+    }
+
     pub fn carry_keys_held(&self) -> BTreeSet<String> {
         let Ok(keyring) = self.keyring() else { return BTreeSet::new() };
         let held = |id: &String| self.jobs.block_on(keyring.has(id)).unwrap_or(false);
@@ -132,6 +152,6 @@ impl Daemon {
                 provider_keys.insert(id, secret.to_string());
             }
         }
-        Ok(Secrets { sessions: Vec::new(), provider_keys })
+        Ok(Secrets { sessions: self.export_sessions(), provider_keys })
     }
 }

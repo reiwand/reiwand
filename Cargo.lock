@@ -4329,6 +4329,7 @@ dependencies = [
  "futures-util",
  "image",
  "percent-encoding",
+ "reiwand-account",
  "reiwand-client",
  "reiwand-core",
  "reiwand-depth",
@@ -4339,7 +4340,6 @@ dependencies = [
  "reiwand-qr",
  "reiwand-render",
  "reiwand-scene",
- "reiwand-sync",
  "reiwand-video",
  "reqwest",
  "rpassword",
@@ -4664,8 +4664,11 @@ dependencies = [
  "anyhow",
  "reiwand-account",
  "rusqlite",
+ "serde",
  "serde_json",
  "tempfile",
+ "tokio",
+ "zbus",
 ]
 
 [[package]]
@@ -4727,6 +4730,7 @@ dependencies = [
  "clap",
  "dirs",
  "futures-util",
+ "getrandom 0.4.3",
  "image",
  "jiff",
  "jpeg-decoder",
@@ -4748,7 +4752,6 @@ dependencies = [
  "reiwand-scene",
  "reiwand-schedule",
  "reiwand-script",
- "reiwand-sync",
  "reiwand-type",
  "reiwand-video",
  "reiwand-wayland",

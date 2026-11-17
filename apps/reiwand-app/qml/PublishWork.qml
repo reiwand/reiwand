@@ -45,7 +45,7 @@ Item {
         stage = "upload";
         job = null;
         lastPath = path;
-        work.act("UploadAs", [path, publish.where.hidden ? "unlisted" : "public"], "Sync1", reply => work && (work.job = Array.isArray(reply) ? reply[0] : reply), error => work && work.refused(String(error.message ?? error)));
+        work.act("UploadAs", [path, publish.where.hidden ? "unlisted" : "public"], "Publish1", reply => work && (work.job = Array.isArray(reply) ? reply[0] : reply), error => work && work.refused(String(error.message ?? error)));
     }
 
     function check() {
@@ -96,7 +96,7 @@ Item {
         registered = true;
         stage = "register";
         const text = App.readText("file://" + publish.sign.current["public"]);
-        work.act("AddAuthorKey", [text], "Sync1", () => {
+        work.act("AddAuthorKey", [text], "Publish1", () => {
             if (!work)
                 return;
             applicationWindow().showPassiveNotification(App.tr("Your signature “%1” is now registered in your account at %2.", publish.sign.keyName, host), "long");
