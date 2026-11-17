@@ -5936,3 +5936,11 @@ msgstr ""
 #: crates/reiwand-editor/src/swarms/aim.rs
 msgid "%1 has no axis: aim a vortex force (force:N) or an around emitter (emitter:N)"
 msgstr "%1 no tiene eje: orienta una fuerza de vórtice (force:N) o un emisor alrededor de un punto (emitter:N)"
+
+#: crates/reiwand-core/src/explicit/error.rs
+msgid "%1: \"%2\" is missing. Reiwand does not fill in values: write it, or open it in the editor, which fills it in."
+msgstr "%1: falta «%2». Reiwand no completa valores: escríbelo, o ábrelo en el editor, que lo prellena."
+
+#: crates/reiwand-core/src/explicit/error.rs
+msgid "%1: \"%2\" is not valid: %3"
+msgstr "%1: «%2» no es válido: %3"

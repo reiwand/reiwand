@@ -24,3 +24,25 @@ motor usaba hasta ahora para él. El dato se lee exactamente igual antes y despu
   al sonido y `auto` deja `relative`) y escribe `kind` (`relative`) y `unit` (`db`) en cada enlace al sonido,
   en cada regla `remap` de entrada `audio:` y en cada `turbulent` con `audio`; la tabla los marca clase 2
   porque solo se escriben donde hay sonido. `depth_parallax` recibe `reach` 0 (círculo) del descriptor.
+
+## Mecanismo común del cargador (`reiwand_core::explicit`)
+
+Lo usan los cargadores de todos los formatos; ningún formato escribe su propia lectura con ruta.
+
+- `read(archivo, &Value)` y `read_str(archivo, texto)` leen un tipo y, si falta una clave, devuelven
+  `ReadError { file, path, fault }` con la ruta completa (`layers[3].effects[1].params.reach`), también a
+  través de `#[serde(flatten)]` y de enumeraciones sin etiqueta. `ReadError::said()` pasa por `said` y por el
+  catálogo traducido: «falta "ruta". Reiwand no completa valores: escríbelo, o ábrelo en el editor, que lo
+  prellena.»
+- Una `Option` se escribe siempre: `#[serde(deserialize_with = "explicit::null")]` más
+  `#[schemars(required)]`. Sin el atributo serde acepta la omisión; con él, falta = error. La ausencia es `null`.
+- Enumeración sin etiqueta: se implementa `Deserialize` con `untagged(d, &[(&["clave"], variante), …])`; la
+  clave de pista elige de qué variante se informa el error con su ruta exacta.
+- Esquema: `annotate(&mut esquema, &Prefill(&[("Tipo.campo", "valor JSON")]))` marca todo campo como
+  obligatorio y pone el valor prellenado como `default` (solo anotación; el cargador nunca lo lee) y devuelve
+  las filas desconocidas y los campos sin fila. Una tabla por formato, junto a su crate.
+- Las cuatro guardas, como ayuda de pruebas: `all_required(&esquema)` (lista lo que no es obligatorio),
+  `scan(&[carpetas], &[Rule…])` (`serde(default`, `skip_serializing_if`, `unwrap_or`, `Default`, `Option` sin
+  `explicit::null`; se detiene en `#[cfg(test)]`), `omission(&ejemplo, exento, carga)` (quita cada clave y exige
+  el error con esa ruta) y `round_trip(texto, relee)` (mismos bytes).
+- Tipo de muestra y pruebas: `crates/reiwand-core/tests/explicit.rs`.

@@ -1,0 +1,40 @@
+{
+  "name": "sun",
+  "size": [
+    1.0,
+    2.0
+  ],
+  "parent": null,
+  "layers": [
+    {
+      "id": "a",
+      "opacity": 1.0,
+      "effects": []
+    },
+    {
+      "id": "b",
+      "opacity": 0.5,
+      "effects": [
+        {
+          "kind": "glow",
+          "params": {
+            "reach": 3.0,
+            "mask": null
+          }
+        }
+      ]
+    }
+  ],
+  "tint": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "tone": null,
+  "shape": {
+    "side": 2.0,
+    "round": {
+      "corner": 0.5
+    }
+  }
+}

@@ -4,6 +4,7 @@ pub mod config;
 pub mod damage;
 pub mod dbus;
 pub mod edit;
+pub mod explicit;
 pub mod filter;
 pub mod fit;
 pub mod gpu;

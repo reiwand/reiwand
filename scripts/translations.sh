@@ -66,7 +66,7 @@ xgettext --c++ --from-code=UTF-8 -k -ktr:1 --add-location=file --force-po --pack
   -o "$TMP/reiwandd.pot" apps/reiwandd/src/words.rs apps/reiwandd/src/words/ask.rs
 catalog reiwandd ""
 
-mapfile -t sources < <(find crates/reiwand-scene/src crates/reiwand-format/src crates/reiwand-editor/src crates/reiwand-depth/src crates/reiwand-library/src crates/reiwand-core/src/edit -name '*.rs' | LC_ALL=C sort)
+mapfile -t sources < <(find crates/reiwand-scene/src crates/reiwand-format/src crates/reiwand-editor/src crates/reiwand-depth/src crates/reiwand-library/src crates/reiwand-core/src/edit crates/reiwand-core/src/explicit -name '*.rs' | LC_ALL=C sort)
 for f in "${sources[@]}"; do
   mkdir -p "$TMP/rs/$(dirname "$f")"
   sed -E "s/'([a-z_]+)([^a-z_'])/\2/g" "$f" >"$TMP/rs/$f"
