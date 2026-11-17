@@ -182,7 +182,7 @@ fn released_layer_fields_keep_their_slider_and_switch() {
 #[test]
 fn choices_of_described_effects_show_their_names() {
     let mut doc = starter("empty", "org.example.rays", "Rays", "en").unwrap();
-    doc["scene"]["layers"] = json!([{ "id": "sun", "type": "solid", "color": "#ffffff",
+    doc["scene"]["layers"] = json!([{ "blend_space": "canvas", "id": "sun", "type": "solid", "color": "#ffffff",
         "effects": [{ "effect": "god_rays", "params": { "mode": 2 } }] }]);
     let found = fields(&doc, "/scene/layers/0/effects/0");
     let mode = found.iter().find(|f| f.key == "mode").unwrap();

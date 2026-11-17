@@ -3,7 +3,7 @@ use reiwand_scene::{Runtime, Value, Vec2};
 use serde_json::json;
 
 fn gusty(gusts: f32) -> Runtime {
-    let rope = json!([{ "id": "fox", "type": "mesh", "mesh": "arm", "size": [64, 64],
+    let rope = json!([{ "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "arm", "size": [64, 64],
         "physics": [{ "bone": "root", "mode": "rope", "gravity": 0.5, "stiffness": 0, "damping": 0.2, "wind": 1 }] }]);
     let mut scene = (*layers(rope).scene).clone();
     scene.canvas.wind = Some(Value::Fixed(Vec2([300.0, 0.0])));

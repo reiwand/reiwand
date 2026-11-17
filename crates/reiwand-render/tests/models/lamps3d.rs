@@ -3,9 +3,10 @@ use super::*;
 fn lit_by(light: Value) -> Vec<u8> {
     let Some(r) = renderer() else { return Vec::new() };
     let models = BTreeMap::from([("white", cube(ForgeMaterial::new("paint", [1.0; 4])))]);
-    let mut lamp = json!({ "id": "lamp", "type": "light", "intensity": 3, "radius": 20000 });
+    let mut lamp =
+        json!({ "blend_space": "canvas", "id": "lamp", "type": "light", "intensity": 3, "radius": 20000 });
     light.as_object().unwrap().iter().for_each(|(k, v)| lamp[k] = v.clone());
-    let layers = json!([lamp, { "id": "cube", "type": "model", "model": "white", "scale": [0.7, 0.7, 0.7], "rotation": [0, 45, 0] }]);
+    let layers = json!([lamp, { "blend_space": "canvas", "id": "cube", "type": "model", "model": "white", "scale": [0.7, 0.7, 0.7], "rotation": [0, 45, 0] }]);
     let mut shot = shoot(r, scene(json!({}), layers, models), &[]);
     shot.frame(r, 0.0, Quality::Q3)
 }

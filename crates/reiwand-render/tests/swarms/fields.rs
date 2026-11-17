@@ -50,7 +50,7 @@ pub(super) fn agree(name: &str, [cpu, gpu]: &[Vec<Particle>; 2], tol: f32) {
     }
 }
 
-const LAYER: &str = r#"[{ "id": "p", "type": "particles", "system": "s" }]"#;
+const LAYER: &str = r#"[{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s" }]"#;
 
 fn layers() -> Value {
     serde_json::from_str(LAYER).unwrap()

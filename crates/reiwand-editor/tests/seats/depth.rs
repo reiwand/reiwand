@@ -8,7 +8,7 @@ fn grip(p: &mut reiwand_editor::Project, id: &str, grip: serde_json::Value, to: 
 
 fn tilted(p: &mut reiwand_editor::Project) {
     let leaning = card("a", json!({"position": [380, 420], "tilt": [25, -30], "z": 120, "rotation": 15}));
-    let child = json!({"id": "b", "type": "solid", "color": "#ffffff", "size": [80, 60], "parent": "a",
+    let child = json!({ "blend_space": "canvas", "id": "b", "type": "solid", "color": "#ffffff", "size": [80, 60], "parent": "a",
         "transform": {"position": [40, 10]}});
     act(p, json!({"set": {"pointer": "/scene/layers", "value": [leaning, child]}})).unwrap();
 }

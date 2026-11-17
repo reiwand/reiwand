@@ -31,14 +31,14 @@ fn drawn(doc: &Value) -> Vec<(String, [[f64; 2]; 4])> {
 fn family() -> Value {
     json!([
         card("base", json!({"position": [500, 500], "rotation": 90, "scale": [2, 0.5], "skew": [10, 0]})),
-        {"id": "kid", "type": "solid", "color": "#ff0000", "size": [40, 40], "parent": "base",
+        { "blend_space": "canvas", "id": "kid", "type": "solid", "color": "#ff0000", "size": [40, 40], "parent": "base",
             "transform": {"position": [100, 0], "origin": [0, 1], "rotation": 15}},
-        {"id": "box", "type": "group", "transform": {"position": [100, 50], "rotation": 30}, "layers": [
+        { "blend_space": "canvas", "id": "box", "type": "group", "transform": {"position": [100, 50], "rotation": 30}, "layers": [
             card("inner", json!({"skew": [0, 20], "origin": [0.25, 0.75]})),
-            {"id": "corner", "type": "solid", "color": "#00ff00", "size": [30, 30], "anchor": "bottom_right",
+            { "blend_space": "canvas", "id": "corner", "type": "solid", "color": "#00ff00", "size": [30, 30], "anchor": "bottom_right",
                 "transform": {"position": [-20, -20]}}
         ]},
-        {"id": "far", "type": "solid", "color": "#0000ff", "size": [50, 50], "parallax": [2, 2], "parent": "kid",
+        { "blend_space": "canvas", "id": "far", "type": "solid", "color": "#0000ff", "size": [50, 50], "parallax": [2, 2], "parent": "kid",
             "transform": {"position": [10, 10]}}
     ])
 }
@@ -89,7 +89,7 @@ fn a_tilted_parent_leans_the_outline_of_its_child() {
     let root = tempfile::tempdir().unwrap();
     let layers = json!([
         card("lean", json!({"position": [500, 500], "tilt": [0, 40]})),
-        {"id": "rider", "type": "solid", "color": "#ffffff", "size": [50, 50], "parent": "lean",
+        { "blend_space": "canvas", "id": "rider", "type": "solid", "color": "#ffffff", "size": [50, 50], "parent": "lean",
             "transform": {"position": [80, 0]}}
     ]);
     let p = scene(&root, layers);

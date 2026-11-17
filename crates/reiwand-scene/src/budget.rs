@@ -101,7 +101,7 @@ mod tests {
     use std::sync::Arc;
 
     fn runtime(layers: usize) -> Runtime {
-        let draw = |i: usize| json!({ "id": format!("p{i}"), "type": "particles", "system": "dots" });
+        let draw = |i: usize| json!({ "blend_space": "canvas", "id": format!("p{i}"), "type": "particles", "system": "dots" });
         let dots = json!({ "capacity": 200_000, "emitters": [{ "shape": "edge", "rate": 1000 }] });
         let layers: Vec<_> = (0..layers).map(draw).collect();
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [960, 540] }, "layers": layers, "particles": { "dots": dots } });

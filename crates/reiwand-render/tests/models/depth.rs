@@ -1,7 +1,7 @@
 use super::*;
 
 fn model(id: &str, asset: &str, at: [f32; 3]) -> Value {
-    json!({ "id": id, "type": "model", "model": asset, "position": at })
+    json!({ "blend_space": "canvas", "id": id, "type": "model", "model": asset, "position": at })
 }
 
 #[test]
@@ -24,7 +24,7 @@ fn the_nearer_model_hides_the_farther_one_in_a_3d_group_whatever_their_order() {
         let (near_one, far_one) =
             (model("near", "red", [0.0, 0.0, 1.5]), model("far", "blue", [0.6, 0.0, -2.0]));
         let list = if flip { json!([near_one, far_one]) } else { json!([far_one, near_one]) };
-        let group = json!([{ "id": "world", "type": "group", "space": "3d", "layers": list }]);
+        let group = json!([{ "blend_space": "canvas", "id": "world", "type": "group", "space": "3d", "layers": list }]);
         let px = render(r, scene(json!({}), group, models.clone()), Quality::Q3);
         assert!(near(rgb(&px, 32, 32), [255, 0, 0], 3), "{flip}: {:?}", rgb(&px, 32, 32));
     }
@@ -34,9 +34,9 @@ fn the_nearer_model_hides_the_farther_one_in_a_3d_group_whatever_their_order() {
 fn flat_layers_stay_in_front_unless_they_test_depth() {
     let Some(r) = renderer() else { return };
     let models = BTreeMap::from([("red", cube(unlit("paint", [1.0, 0.0, 0.0, 1.0])))]);
-    let card = |deep: bool| json!({ "id": "card", "type": "solid", "color": "#00ff00", "size": [16, 16], "depth_test": deep });
+    let card = |deep: bool| json!({ "blend_space": "canvas", "id": "card", "type": "solid", "color": "#00ff00", "size": [16, 16], "depth_test": deep });
     for (deep, want) in [(false, [0, 255, 0]), (true, [255, 0, 0])] {
-        let group = json!([{ "id": "world", "type": "group", "space": "3d",
+        let group = json!([{ "blend_space": "canvas", "id": "world", "type": "group", "space": "3d",
             "layers": [card(deep), model("cube", "red", [0.0, 0.0, 1.0])] }]);
         let px = render(r, scene(json!({}), group, models.clone()), Quality::Q3);
         assert!(near(rgb(&px, 32, 32), want, 3), "{deep}: {:?}", rgb(&px, 32, 32));
@@ -68,12 +68,12 @@ fn a_3d_group_inside_another_shares_its_depth() {
         ("red", cube(unlit("paint", [1.0, 0.0, 0.0, 1.0]))),
         ("blue", cube(unlit("paint", [0.0, 0.0, 1.0, 1.0]))),
     ]);
-    let card = json!({ "id": "card", "type": "solid", "color": "#00ff00", "size": [256, 256], "depth_test": true, "transform": { "z": -40 } });
-    let inner = json!({ "id": "inner", "type": "group", "space": "3d",
+    let card = json!({ "blend_space": "canvas", "id": "card", "type": "solid", "color": "#00ff00", "size": [256, 256], "depth_test": true, "transform": { "z": -40 } });
+    let inner = json!({ "blend_space": "canvas", "id": "inner", "type": "group", "space": "3d",
         "layers": [model("near", "blue", [0.0, 0.0, 1.5]), card] });
     let mut far = model("far", "red", [1.5, 0.0, -0.5]);
     far["scale"] = json!([1.5, 1.5, 1.5]);
-    let group = json!([{ "id": "world", "type": "group", "space": "3d",
+    let group = json!([{ "blend_space": "canvas", "id": "world", "type": "group", "space": "3d",
         "layers": [inner, far] }]);
     let px = render(r, scene(json!({}), group, models), Quality::Q3);
     assert!(near(rgb(&px, 42, 32), [0, 0, 255], 3), "{:?}", rgb(&px, 42, 32));
@@ -91,9 +91,9 @@ fn sparks(depth: f32) -> Value {
 fn particles_in_a_3d_group_hide_one_by_one_behind_the_models_in_front_of_them() {
     let Some(r) = renderer() else { return };
     let models = BTreeMap::from([("red", cube(unlit("paint", [1.0, 0.0, 0.0, 1.0])))]);
-    let group = json!([{ "id": "world", "type": "group", "space": "3d", "layers": [
+    let group = json!([{ "blend_space": "canvas", "id": "world", "type": "group", "space": "3d", "layers": [
         model("cube", "red", [0.0; 3]),
-        { "id": "p", "type": "particles", "system": "s", "depth_test": true }] }]);
+        { "blend_space": "canvas", "id": "p", "type": "particles", "system": "s", "depth_test": true }] }]);
     for (depth, quality, want) in [
         (-50.0, Quality::Q3, [0, 255, 0]),
         (50.0, Quality::Q3, [255, 0, 0]),

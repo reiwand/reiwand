@@ -32,7 +32,7 @@ sus pesos en los vértices (como mucho 4 huesos por vértice).
 capa de malla, y es la forma de ver con qué nombres cuentas.
 
 ```json
-    { "id": "figura", "type": "mesh", "mesh": "muneco", "texture": "cielo", "size": [100, 100], "transform": { "scale": [8, 8] },
+    { "blend_space": "canvas", "id": "figura", "type": "mesh", "mesh": "muneco", "texture": "cielo", "size": [100, 100], "transform": { "scale": [8, 8] },
       "clips": [
         { "id": "asentir", "loop": "pingpong",
           "bones": { "neck": { "rotation": [[0, -12], [0.8, 12, "in_out_sine"]] } },
@@ -109,7 +109,7 @@ vértices más cercanos tapan a los lejanos sea cual sea el orden de sus partes.
 Un clip es un tramo de animación con nombre. Puede venir del archivo o llevar claves propias.
 
 ```json
-    { "id": "figura", "type": "mesh", "mesh": "muneco", "texture": "cielo", "size": [100, 100], "transform": { "scale": [8, 8] },
+    { "blend_space": "canvas", "id": "figura", "type": "mesh", "mesh": "muneco", "texture": "cielo", "size": [100, 100], "transform": { "scale": [8, 8] },
       "clips": [
         { "id": "asentir", "loop": "pingpong",
           "bones": { "neck": { "rotation": [[0, -12], [0.8, 12, "in_out_sine"]] } },
@@ -261,7 +261,7 @@ vuelta de un clip que se repite, de modo que un paso camina y un paso que gira c
 Necesita `clips`.
 
 ```json
-      { "id": "persona", "type": "model", "model": "figura", "position": [1.8, -0.2, 0], "size": [800, 800],
+      { "blend_space": "canvas", "id": "persona", "type": "model", "model": "figura", "position": [1.8, -0.2, 0], "size": [800, 800],
         "clips": [{ "id": "andar", "animation": "walk", "loop": "repeat" }],
         "animations": [{ "clip": "andar" }],
         "materials": { "body": { "color": "#9ad1ff" } } }

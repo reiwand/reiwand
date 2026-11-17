@@ -18,11 +18,10 @@ fn cued() -> Runtime {
     let tls = ["play", "pause", "track", "cover"]
         .map(|n| json!({ "id": n, "duration": 1, "autoplay": false, "trigger": format!("media:{n}") }));
     let layers = ["play", "pause", "track", "cover"].map(|n| {
-        json!({ "id": n, "type": "solid", "color": "#ffffff", "size": [1, 1],
+        json!({ "blend_space": "canvas", "id": n, "type": "solid", "color": "#ffffff", "size": [1, 1],
             "transform": { "position": { "timeline": n, "keys": [[0, [0, 0]], [1, [100, 0]]] } } })
     });
-    let sound =
-        json!({ "id": "ding", "type": "sound", "sound": "a", "loop": false, "play_on": "media:track" });
+    let sound = json!({ "blend_space": "canvas", "id": "ding", "type": "sound", "sound": "a", "loop": false, "play_on": "media:track" });
     let mut layers = layers.to_vec();
     layers.push(sound);
     runtime(json!(tls), json!(layers))

@@ -525,7 +525,7 @@ script and effect is a part.
 ```json
 { "schema": "reiwand.scene/1", "canvas": { "size": [1920, 1080] },
   "assets": { "flake": { "path": "assets/flake.png" } },
-  "layers": [{ "id": "snow", "type": "particles", "system": "snow" }],
+  "layers": [{ "blend_space": "canvas", "id": "snow", "type": "particles", "system": "snow" }],
   "particles": { "snow": { "capacity": 2000, "emitters": [{ "shape": "edge", "rate": 120 }] } },
   "ext": { "parts": [{ "kind": "layer", "id": "snow", "title": "Snow", "thumbnail": "parts/0.jpg" }] } }
 ```

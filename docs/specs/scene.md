@@ -35,9 +35,9 @@ degrees (36 by default).
   "clock": { "max_fps": 60, "poster_time": 3.0, "seed": 42 },
   "assets": { "sky": { "path": "assets/sky.png" }, "mono": { "path": "assets/mono.ttf" } },
   "layers": [
-    { "id": "sky", "type": "image", "image": { "prop": "style", "map": { "night": "sky" } },
+    { "blend_space": "canvas", "id": "sky", "type": "image", "image": { "prop": "style", "map": { "night": "sky" } },
       "effects": [{ "effect": "waves", "mask": { "texture": "lake" }, "params": { "amplitude": 4 } }] },
-    { "id": "clock", "type": "text", "font": "mono", "size": 96, "text": { "clock": "HH:mm" },
+    { "blend_space": "canvas", "id": "clock", "type": "text", "font": "mono", "size": 96, "text": { "clock": "HH:mm" },
       "anchor": "bottom_right", "transform": { "position": [-64, -64] },
       "opacity": { "timeline": "intro", "keys": [[0, 0, "out_cubic"], [1.5, 1]] } }
   ],
@@ -51,6 +51,14 @@ degrees (36 by default).
   the top left and angles are clockwise degrees. `fit` places the canvas on each screen (`fill`,
   `fit`, `stretch`, `center`). `background` is `#rrggbb[aa]`.
   `blend_space` is `linear` (default) or `srgb`, which mixes encoded values as most editors do.
+  Every layer carries a required `blend_space` of its own (`canvas`, `linear` or `srgb`; there is no default and an
+  omitted value is an error). `canvas` follows `canvas.blend_space`; the other two decide how that layer composites
+  onto what is below it, for every blend mode and every drawn type (particles included). A layer whose space differs
+  from the canvas composites as a whole: a group is flattened first and then mixed in its own space, and its children
+  use their own `blend_space` (`canvas` means the canvas, it is not inherited). An adjustment layer uses its space
+  only for the final fade when its opacity is below 1. Effects always read `canvas.blend_space`. Scenes written before
+  this field are converted once with `reiwand-upgrade scenes PATH...`. The `layer` action edits it:
+  `{"blend_space": {"layer": "smoke", "space": "srgb"}}`.
 - `clock.max_fps` caps the frame rate (`1..=240`, or `"display"`, also `0`, to follow the refresh
   rate of each output for motion that gains from it; default 60), `poster_time` is the instant
   shown where motion is not wanted or where the device cannot run the scene even at its lowest
@@ -706,7 +714,7 @@ was drawn, as last drawn. The pose is worked out at most once per frame, only fo
 no allocation per frame; at the lowest quality moving skeletons ask for at most 30 frames a second.
 
 ```json
-{ "id": "fox", "type": "mesh", "mesh": "fox", "size": [600, 900],
+{ "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "fox", "size": [600, 900],
   "clips": [{ "id": "idle", "animation": "idle", "events": [{ "t": 1.2, "name": "blink" }] },
             { "id": "wave", "loop": "pingpong", "bones": { "arm": { "rotation": [[0, 0], [0.8, 35, "in_out_sine"]] } },
               "order": { "tail": [[0, 1]] } }],
@@ -1653,7 +1661,7 @@ The values left at their defaults draw exactly what the effects drew before them
 ## Sound
 
 ```json
-{ "id": "gusts", "type": "sound", "sound": "wind", "loop": true, "fade_in": 3, "fade_out": 3,
+{ "blend_space": "canvas", "id": "gusts", "type": "sound", "sound": "wind", "loop": true, "fade_in": 3, "fade_out": 3,
   "play": { "prop": "wind", "map": { "calm": false, "breeze": true } },
   "volume": { "timeline": "storm", "keys": [[0, 0.4], [20, 1, "in_out_sine"], [40, 0.4]] }, "pan": -0.3 }
 ```
@@ -2491,7 +2499,7 @@ them (`scripts2`). `pools` maps at most 16 ids to `{ "type": "mesh", "max" (1 to
 ```json
 "scripts": [{ "path": "scripts/bars.js", "events": ["init", "update", "click"], "uses": ["audio", "layers"],
               "params": { "speed": { "type": "number", "default": 1, "min": 0, "max": 4 } } }],
-"templates": { "bar": { "id": "bar", "type": "solid", "color": "#ffffff", "size": [8, 100] } }
+"templates": { "bar": { "blend_space": "canvas", "id": "bar", "type": "solid", "color": "#ffffff", "size": [8, 100] } }
 ```
 
 ## Rebuilding a scene by hand

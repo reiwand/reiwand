@@ -39,11 +39,11 @@ fn templates_become_layers_in_the_order_scripts_give() {
 #[test]
 fn big_templates_are_refused_and_copies_stop_at_the_layer_limit() {
     let children = |n: usize| -> Vec<serde_json::Value> {
-        (0..n).map(|i| json!({ "id": format!("c{i}"), "type": "solid", "color": "#ffffff" })).collect()
+        (0..n).map(|i| json!({ "blend_space": "canvas", "id": format!("c{i}"), "type": "solid", "color": "#ffffff" })).collect()
     };
     let doc = |n: usize| {
         json!({ "schema": SCHEMA, "canvas": { "size": [10, 10] },
-            "templates": { "big": { "id": "big", "type": "group", "layers": children(n) } } })
+            "templates": { "big": { "blend_space": "canvas", "id": "big", "type": "group", "layers": children(n) } } })
         .to_string()
     };
     let error = Scene::load(&doc(2000), &Default::default()).unwrap_err().to_string();
@@ -83,19 +83,17 @@ fn templates_only_copy_what_scripts_can_draw() {
             "templates": { "t": kind } })
         .to_string()
     };
-    let video = json!({ "id": "t", "type": "video", "video": "v" });
+    let video = json!({ "blend_space": "canvas", "id": "t", "type": "video", "video": "v" });
     assert!(
         Scene::load(&text(video), &Default::default()).unwrap_err().to_string().contains("/templates/t/type")
     );
-    let shape =
-        json!({ "id": "t", "type": "shape", "shape": { "rect": { "size": [2, 2] } }, "fill": "#ffffff" });
+    let shape = json!({ "blend_space": "canvas", "id": "t", "type": "shape", "shape": { "rect": { "size": [2, 2] } }, "fill": "#ffffff" });
     assert!(Scene::load(&text(shape), &Default::default()).is_ok());
 }
 
 #[test]
 fn copies_of_templates_count_in_the_cost_of_the_scene() {
-    let template =
-        json!({ "id": "glow", "type": "solid", "color": "#ffffff", "effects": [{ "effect": "blur" }] });
+    let template = json!({ "blend_space": "canvas", "id": "glow", "type": "solid", "color": "#ffffff", "effects": [{ "effect": "blur" }] });
     let mut rt = runtime(json!({ "templates": { "glow": template } }));
     let alone = rt.cost(Quality::Q3);
     let many = (0..10).map(|i| (format!("g{i}"), "glow".to_string())).collect();
@@ -122,7 +120,7 @@ fn a_script_that_may_turn_bloom_on_counts_it_in_the_cost_of_the_scene_and_its_fe
     let scene = |uses: serde_json::Value| {
         let doc = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] },
             "scripts": [{ "path": "main.js", "uses": uses }],
-            "layers": [{ "id": "fill", "type": "solid", "color": "#808080" }] });
+            "layers": [{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#808080" }] });
         Scene::from_json(&doc.to_string()).unwrap()
     };
     let (lit, plain) = (scene(json!(["bloom"])), scene(json!(["camera"])));
@@ -143,11 +141,11 @@ fn a_script_that_may_turn_bloom_on_counts_it_in_the_cost_of_the_scene_and_its_fe
 
 #[test]
 fn masks_and_layer_feeds_inside_a_template_point_at_the_layers_of_each_copy() {
-    let pic = json!({ "id": "pic", "type": "solid", "color": "#ffffff", "mask": { "layer": "shape" },
+    let pic = json!({ "blend_space": "canvas", "id": "pic", "type": "solid", "color": "#ffffff", "mask": { "layer": "shape" },
         "effects": [{ "effect": "tint", "mask": { "layer": "shape" } },
             { "effect": "displace", "params": { "map": { "layer": "shape" } } }] });
-    let card = json!({ "id": "card", "type": "group",
-        "layers": [{ "id": "shape", "type": "solid", "color": "#000000" }, pic] });
+    let card = json!({ "blend_space": "canvas", "id": "card", "type": "group",
+        "layers": [{ "blend_space": "canvas", "id": "shape", "type": "solid", "color": "#000000" }, pic] });
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] },
         "scripts": [{ "path": "main.js", "uses": ["layers"] }], "layers": [], "templates": { "card": card } });
     let scene = Scene::from_json(&doc.to_string()).unwrap();

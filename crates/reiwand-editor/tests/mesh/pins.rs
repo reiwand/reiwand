@@ -18,7 +18,7 @@ fn layers_follow_bones_and_points_placed_on_the_mesh() {
     let mut p = rigged(&root);
     act(
         &mut p,
-        json!({ "add": { "pointer": "/scene/layers/-", "value": { "id": "hat", "type": "solid" } } }),
+        json!({ "add": { "pointer": "/scene/layers/-", "value": { "blend_space": "canvas", "id": "hat", "type": "solid" } } }),
     )
     .unwrap();
     act(&mut p, attach(json!({ "to": "net", "bone": "arm", "offset": [5, 0], "inherit": ["position"] })))

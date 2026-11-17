@@ -23,5 +23,5 @@ fn issues(more: Json) -> Vec<String> {
 }
 
 fn effect(e: Json) -> Json {
-    json!({ "layers": [{ "id": "sky", "type": "image", "image": "sky", "effects": [e] }] })
+    json!({ "layers": [{ "blend_space": "canvas", "id": "sky", "type": "image", "image": "sky", "effects": [e] }] })
 }

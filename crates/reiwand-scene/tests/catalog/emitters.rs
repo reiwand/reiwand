@@ -58,7 +58,7 @@ fn fluid_takes_any_number_of_point_and_line_emitters_up_to_the_cap() {
     }
     let unknown = Scene::from_json(
         &json!({ "schema": SCHEMA, "canvas": { "size": [8, 8] },
-        "layers": [{ "id": "a", "type": "solid", "color": "#000", "effects": [{ "effect": "fluid",
+        "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#000", "effects": [{ "effect": "fluid",
         "params": { "emitters": [{ "from": [0.5, 0.5], "strength": 1, "spin": 2 }] } }] }] })
         .to_string(),
     );

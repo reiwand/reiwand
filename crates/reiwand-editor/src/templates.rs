@@ -64,7 +64,7 @@ fn make(doc: &Value, ids: &[String], name: Option<&str>) -> Result<Vec<Op>> {
     };
     let value = match copies.len() {
         1 => copies.remove(0),
-        _ => json!({"id": name, "type": "group", "layers": copies}),
+        _ => json!({ "blend_space": "canvas", "id": name, "type": "group", "layers": copies}),
     };
     Ok(match doc.pointer("/scene/templates").is_some_and(Value::is_object) {
         true => vec![Op::Add { path: path(&name), value }],

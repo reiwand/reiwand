@@ -13,29 +13,29 @@ pub(crate) const SCENE: &str = r##"{ "schema": "reiwand.scene/1",
               "sheet": { "path": "s.png", "atlas": [1, 4], "fps": 8 } },
   "timelines": [{ "id": "swing", "duration": 4, "loop": "repeat" }],
   "layers": [
-    { "id": "back", "type": "image", "image": "photo", "size": [320, 180], "parallax": [0.1, 0.1] },
-    { "id": "spin", "type": "image", "image": "photo", "size": [60, 60], "color": "#ff8080", "brightness": 1.2,
+    { "blend_space": "canvas", "id": "back", "type": "image", "image": "photo", "size": [320, 180], "parallax": [0.1, 0.1] },
+    { "blend_space": "canvas", "id": "spin", "type": "image", "image": "photo", "size": [60, 60], "color": "#ff8080", "brightness": 1.2,
       "transform": { "position": [60, 60], "rotation": { "timeline": "swing", "keys": [[0, 0], [4, 360]] } } },
-    { "id": "kid", "type": "solid", "color": "#00ff00", "size": [12, 12], "parent": "spin", "transform": { "position": [40, 0] } },
-    { "id": "sprite", "type": "image", "image": "sheet", "size": [40, 40], "transform": { "position": [270, 40] } },
-    { "id": "glow", "type": "group", "color": "#c0ffc0", "effects": [{ "effect": "blur", "params": { "radius": 6 } }], "layers": [
-      { "id": "dot", "type": "shape", "shape": { "ellipse": { "size": [50, 50] } }, "fill": "#ffcc66",
+    { "blend_space": "canvas", "id": "kid", "type": "solid", "color": "#00ff00", "size": [12, 12], "parent": "spin", "transform": { "position": [40, 0] } },
+    { "blend_space": "canvas", "id": "sprite", "type": "image", "image": "sheet", "size": [40, 40], "transform": { "position": [270, 40] } },
+    { "blend_space": "canvas", "id": "glow", "type": "group", "color": "#c0ffc0", "effects": [{ "effect": "blur", "params": { "radius": 6 } }], "layers": [
+      { "blend_space": "canvas", "id": "dot", "type": "shape", "shape": { "ellipse": { "size": [50, 50] } }, "fill": "#ffcc66",
         "transform": { "position": { "keys": [[0, [100, 130]], [2, [220, 130]]], "loop": "pingpong" } } } ] },
-    { "id": "over", "type": "solid", "color": "#4060ff", "size": [80, 50], "blend": "overlay",
+    { "blend_space": "canvas", "id": "over", "type": "solid", "color": "#4060ff", "size": [80, 50], "blend": "overlay",
       "transform": { "position": { "keys": [[0, [160, 90]], [2, [200, 100]]], "loop": "pingpong" } } },
-    { "id": "masked", "type": "solid", "color": "#ffffff", "size": [40, 40], "mask": { "shape": { "ellipse": { "size": [1, 1] } } },
+    { "blend_space": "canvas", "id": "masked", "type": "solid", "color": "#ffffff", "size": [40, 40], "mask": { "shape": { "ellipse": { "size": [1, 1] } } },
       "transform": { "position": [250, 140], "scale": { "keys": [[0, [1, 1]], [2, [1.5, 1.5]]], "loop": "pingpong" } } },
-    { "id": "words", "type": "text", "text": "Steady", "size": 20, "color": "#ffffff", "transform": { "position": [160, 20] } },
-    { "id": "post", "type": "adjustment", "effects": [{ "effect": "vignette", "params": { "intensity": 0.4 } }] }
+    { "blend_space": "canvas", "id": "words", "type": "text", "text": "Steady", "size": 20, "color": "#ffffff", "transform": { "position": [160, 20] } },
+    { "blend_space": "canvas", "id": "post", "type": "adjustment", "effects": [{ "effect": "vignette", "params": { "intensity": 0.4 } }] }
   ] }"##;
 
 const OWN: &str = r##"{ "schema": "reiwand.scene/1",
   "canvas": { "size": [320, 180], "background": "#102030" },
   "effects": { "smear": { "descriptor": "fx/smear.json", "wgsl": "fx/smear.wgsl" } },
   "layers": [
-    { "id": "src", "type": "solid", "color": "#ff8040", "size": [80, 80], "visible": false,
+    { "blend_space": "canvas", "id": "src", "type": "solid", "color": "#ff8040", "size": [80, 80], "visible": false,
       "transform": { "position": { "keys": [[0, [100, 90]], [2, [220, 90]]], "loop": "pingpong" } } },
-    { "id": "back", "type": "solid", "color": "#203040", "size": [320, 180],
+    { "blend_space": "canvas", "id": "back", "type": "solid", "color": "#203040", "size": [320, 180],
       "effects": [{ "effect": "smear", "params": { "shape": { "layer": "src" }, "boost": 2 } }] }
   ] }"##;
 

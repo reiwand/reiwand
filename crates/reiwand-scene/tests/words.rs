@@ -6,7 +6,7 @@ use std::sync::Arc;
 const VIEW: [f32; 4] = [0.0, 0.0, 100.0, 50.0];
 
 fn scene(text: Json) -> Scene {
-    let layers = json!([{ "id": "hello", "type": "text", "text": text }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "hello", "type": "text", "text": text }]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": layers });
     Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"))
 }
@@ -44,7 +44,7 @@ fn texts_in_several_languages_name_their_feature_and_are_checked() {
     assert!(told.validate(&BTreeMap::new()).is_empty());
     assert!(!scene(json!("Hi")).features().contains("text_languages"));
     let refuse = |text: Json| {
-        let layers = json!([{ "id": "hello", "type": "text", "text": text }]);
+        let layers = json!([{ "blend_space": "canvas", "id": "hello", "type": "text", "text": text }]);
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": layers });
         Scene::load(&text.to_string(), &BTreeMap::new()).err().map(|e| e.to_string()).unwrap_or_default()
     };

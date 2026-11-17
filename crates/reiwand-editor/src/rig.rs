@@ -63,7 +63,7 @@ pub(crate) fn mesh_from_picture(dir: &Path, doc: &Value, c: &Cutting) -> Result<
     let saved = store(dir, &id, &sketch.glb())?;
     let mut ops = set(doc, &format!("/scene/assets/{}", escape(&id)), json!({ "path": saved }));
     let len = doc.pointer("/scene/layers").and_then(Value::as_array).map_or(0, Vec::len);
-    let layer = json!({ "id": id, "type": "mesh", "mesh": id, "texture": c.image, "size": [w, h] });
+    let layer = json!({ "blend_space": "canvas", "id": id, "type": "mesh", "mesh": id, "texture": c.image, "size": [w, h] });
     ops.push(Op::Add { path: format!("/scene/layers/{len}"), value: layer });
     Ok(ops)
 }

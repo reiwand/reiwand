@@ -58,8 +58,7 @@ pub fn project(root: &TempDir) -> Project {
     pic.save(dir.join("pic.png")).unwrap();
     act(&mut project, json!({ "set": { "pointer": "/scene/assets/pic", "value": { "path": "pic.png" } } }))
         .unwrap();
-    let layer =
-        json!({ "id": "logo", "type": "image", "image": "pic", "transform": { "position": [960, 540] } });
+    let layer = json!({ "blend_space": "canvas", "id": "logo", "type": "image", "image": "pic", "transform": { "position": [960, 540] } });
     act(&mut project, json!({ "add": { "pointer": "/scene/layers/-", "value": layer } })).unwrap();
     project
 }

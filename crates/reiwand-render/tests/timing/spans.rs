@@ -11,7 +11,7 @@ const COLUMNS: usize = 16;
 fn many(n: usize, side: f64, wgsl: String) -> Scene {
     let at = |k: usize| [(k % COLUMNS) as f64 * side + side / 2.0, (k / COLUMNS) as f64 * side + side / 2.0];
     let layer = |k| {
-        json!({ "id": format!("l{k}"), "type": "solid", "color": "#ff0000", "size": [side, side],
+        json!({ "blend_space": "canvas", "id": format!("l{k}"), "type": "solid", "color": "#ff0000", "size": [side, side],
             "transform": { "position": at(k) }, "effects": [{ "effect": "busy" }] })
     };
     let layers: Vec<Value> = (0..n).map(layer).collect();

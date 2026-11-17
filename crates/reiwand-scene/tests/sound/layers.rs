@@ -23,24 +23,26 @@ fn sound_layers_validate_their_sources_and_ranges() {
     for (layer, issue) in wrong {
         assert!(issues(layer.clone()).contains(&issue), "{layer}: {:?}", issues(layer.clone()));
     }
-    let many: Vec<Json> =
-        (0..9).map(|i| json!({ "id": format!("s{i}"), "type": "sound", "sound": "wind" })).collect();
+    let many: Vec<Json> = (0..9)
+        .map(|i| json!({ "blend_space": "canvas", "id": format!("s{i}"), "type": "sound", "sound": "wind" }))
+        .collect();
     assert_eq!(scene(json!(many)).validate(&props()), [Issue::Sounds(9)]);
     let mut odd = props();
     odd.insert(VOLUME.into(), serde_json::from_value(json!({ "type": "bool", "default": true })).unwrap());
     assert_eq!(
-        scene(json!([{ "id": "s", "type": "sound", "sound": "wind" }])).validate(&odd),
+        scene(json!([{ "blend_space": "canvas", "id": "s", "type": "sound", "sound": "wind" }]))
+            .validate(&odd),
         [Issue::Volume]
     );
-    let masked = json!([{ "id": "s", "type": "sound", "sound": "wind" },
-                        { "id": "m", "type": "solid", "color": "#ffffff", "mask": { "layer": "s" } }]);
+    let masked = json!([{ "blend_space": "canvas", "id": "s", "type": "sound", "sound": "wind" },
+                        { "blend_space": "canvas", "id": "m", "type": "solid", "color": "#ffffff", "mask": { "layer": "s" } }]);
     assert!(matches!(&scene(masked).validate(&props())[..], [Issue::Unknown { what: "layer", .. }]));
 }
 
 #[test]
 fn scenes_with_sound_get_a_volume_property() {
     let quiet = scene(json!([]));
-    let loud = scene(json!([{ "id": "s", "type": "sound", "sound": "wind" }]));
+    let loud = scene(json!([{ "blend_space": "canvas", "id": "s", "type": "sound", "sound": "wind" }]));
     assert!(!quiet.properties(&props(), "Volume", 100.0).contains_key(VOLUME));
     let added = loud.properties(&props(), "Volume", 100.0);
     assert_eq!((added[VOLUME].kind(), added[VOLUME].default_value()), ("slider", json!(100)));
@@ -55,7 +57,7 @@ fn scenes_with_sound_get_a_volume_property() {
 
 #[test]
 fn timelines_and_properties_start_and_stop_sounds() {
-    let layer = json!([{ "id": "s", "type": "sound", "sound": "wind",
+    let layer = json!([{ "blend_space": "canvas", "id": "s", "type": "sound", "sound": "wind",
         "play": { "timeline": "storm", "keys": [[0, false], [2, true], [6, false]] },
         "volume": { "prop": "depth", "scale": 4 } }]);
     let mut runtime = Runtime::new(Arc::new(scene(layer)), effective(&props(), &[]));
@@ -67,7 +69,9 @@ fn timelines_and_properties_start_and_stop_sounds() {
     assert_eq!(plays, [false, true, false, true]);
     let (voices, wake) = at(14.0);
     assert_eq!((voices[0].volume, voices[0].pan, wake), (1.0, 0.0, Wake::Frame));
-    let toggled = scene(json!([{ "id": "s", "type": "sound", "sound": "wind", "play": { "prop": "soft" } }]));
+    let toggled = scene(
+        json!([{ "blend_space": "canvas", "id": "s", "type": "sound", "sound": "wind", "play": { "prop": "soft" } }]),
+    );
     let mut runtime = Runtime::new(Arc::new(toggled), effective(&props(), &[]));
     assert_eq!(runtime.voices(), (vec![Voice { play: true, volume: 1.0, pan: 0.0, at: 0.0 }], Wake::Idle));
     runtime.set_props(effective(&props(), &[&BTreeMap::from([("soft".into(), json!(false))])]));

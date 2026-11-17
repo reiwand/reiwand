@@ -16,9 +16,9 @@ fn made(name: &str, script: &str, uses: Value, properties: Value) -> String {
     let source = tempfile::tempdir().unwrap();
     let light = json!({ "timeline": "light", "keys": [[0, 0], [0.1, 1]] });
     let layers = json!([
-        { "id": "button", "type": "solid", "color": "#2040c0", "size": [32, 16], "solid": true, "transform": { "position": [16, 16] } },
-        { "id": "lamp", "type": "solid", "color": "#ffffff", "size": [8, 8], "opacity": light, "transform": { "position": [56, 16] } },
-        { "id": "note", "type": "text", "text": "", "size": 8, "color": "#ffffff", "font": "sans-serif" }]);
+        { "blend_space": "canvas", "id": "button", "type": "solid", "color": "#2040c0", "size": [32, 16], "solid": true, "transform": { "position": [16, 16] } },
+        { "blend_space": "canvas", "id": "lamp", "type": "solid", "color": "#ffffff", "size": [8, 8], "opacity": light, "transform": { "position": [56, 16] } },
+        { "blend_space": "canvas", "id": "note", "type": "text", "text": "", "size": 8, "color": "#ffffff", "font": "sans-serif" }]);
     let timelines = json!([{ "id": "light", "duration": 0.1, "autoplay": false, "trigger": "click:button" }]);
     let scripts = json!([{ "path": "tap.js", "events": ["init", "click"], "uses": uses }]);
     let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers,

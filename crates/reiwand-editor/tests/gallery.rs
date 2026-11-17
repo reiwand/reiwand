@@ -40,7 +40,7 @@ fn with_film(root: &TempDir) -> Project {
     let mut p = project(root);
     std::fs::create_dir_all(p.dir.join("assets")).unwrap();
     std::fs::copy(FILM, p.dir.join("assets/clip.webm")).unwrap();
-    let layers = json!([{ "id": "film", "type": "video", "video": "clip", "playback": { "start": 0.0 } }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "film", "type": "video", "video": "clip", "playback": { "start": 0.0 } }]);
     act(&mut p, json!({"set": {"pointer": "/scene/assets/clip", "value": {"path": "assets/clip.webm"}}}))
         .unwrap();
     act(&mut p, json!({"set": {"pointer": "/scene/layers", "value": layers}})).unwrap();

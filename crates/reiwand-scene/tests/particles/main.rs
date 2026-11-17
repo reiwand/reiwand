@@ -36,7 +36,7 @@ fn with(mut base: Json, patch: Json) -> Json {
 }
 
 fn scene(system: Json, visible: bool) -> String {
-    let layer = json!({ "id": "p", "type": "particles", "system": "dots", "visible": visible });
+    let layer = json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "dots", "visible": visible });
     let assets = json!({ "dot": { "path": "dot.png", "atlas": [2, 2] } });
     json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": [layer], "particles": { "dots": system }, "assets": assets })
         .to_string()

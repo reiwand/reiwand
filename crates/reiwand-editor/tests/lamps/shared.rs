@@ -84,8 +84,7 @@ fn a_map_two_layers_share_is_copied_before_it_is_painted() {
         json!({ "layer": "logo", "map": "emissive", "radius": 0.2, "value": 1, "points": [[0.5, 0.5]] });
     act(&mut p, json!({ "paint_map": stroke.clone() })).unwrap();
     let first = layer(&p, "logo")["lighting"]["emissive_map"].as_str().unwrap().to_string();
-    let other =
-        json!({ "id": "other", "type": "image", "image": "pic", "lighting": { "emissive_map": first } });
+    let other = json!({ "blend_space": "canvas", "id": "other", "type": "image", "image": "pic", "lighting": { "emissive_map": first } });
     act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": other } })).unwrap();
     let path = asset(&p, &first)["path"].clone();
     act(&mut p, json!({ "paint_map": stroke })).unwrap();

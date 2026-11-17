@@ -8,16 +8,16 @@ fn shown(frame: &Frame, i: usize) -> String {
 }
 
 fn refused(text: serde_json::Value) -> bool {
-    let layers = json!([{ "id": "t", "type": "text", "text": text }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "t", "type": "text", "text": text }]);
     Scene::load(&scene(layers), &props()).is_err()
 }
 
 #[test]
 fn placeholders_show_while_nothing_plays_in_the_language_of_the_screen() {
     let layers = json!([
-        { "id": "title", "type": "text", "text": { "media": "title", "placeholder": { "en": "Nothing plays", "es": "No suena nada" } } },
-        { "id": "artist", "type": "text", "text": { "media": "artist", "placeholder": "—" } },
-        { "id": "album", "type": "text", "text": { "media": "album" } }
+        { "blend_space": "canvas", "id": "title", "type": "text", "text": { "media": "title", "placeholder": { "en": "Nothing plays", "es": "No suena nada" } } },
+        { "blend_space": "canvas", "id": "artist", "type": "text", "text": { "media": "artist", "placeholder": "—" } },
+        { "blend_space": "canvas", "id": "album", "type": "text", "text": { "media": "album" } }
     ]);
     let mut rt = runtime(&scene(layers));
     let frame = rt.frame(VIEW, Quality::Q3);
@@ -45,7 +45,6 @@ fn placeholders_are_texts_of_media_texts_only() {
     assert!(refused(json!({ "media": "title", "placeholder": { "not a language": "x" } })));
     assert!(refused(json!({ "media": "title", "placeholder": { "pt-BR": "y".repeat(600) } })));
     assert!(refused(json!({ "media": "title", "placeholder": 5 })));
-    let solid =
-        json!([{ "id": "s", "type": "solid", "opacity": { "media": "progress", "placeholder": "x" } }]);
+    let solid = json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "opacity": { "media": "progress", "placeholder": "x" } }]);
     assert!(Scene::load(&scene(solid), &props()).is_err(), "a number has no placeholder");
 }

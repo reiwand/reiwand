@@ -3,12 +3,12 @@ use super::*;
 
 fn moving_package_over_still_blurs(still: usize) {
     let blurred = |j| {
-        json!({ "id": format!("s{j}"), "type": "solid", "color": "#0000ff", "opacity": 0.02,
+        json!({ "blend_space": "canvas", "id": format!("s{j}"), "type": "solid", "color": "#0000ff", "opacity": 0.02,
             "effects": [{ "effect": "blur", "params": { "radius": 0.1 } }] })
     };
     let mut layers: Vec<Value> = (0..still).map(blurred).collect();
     let position = json!({ "keys": [[0, [1910, 1080]], [1, [1930, 1080]]], "loop": "pingpong" });
-    layers.push(json!({ "id": "top", "type": "solid", "color": "#00ff00", "size": [3072, 1728],
+    layers.push(json!({ "blend_space": "canvas", "id": "top", "type": "solid", "color": "#00ff00", "size": [3072, 1728],
         "transform": { "position": position }, "effects": [{ "effect": "pk" }] }));
     let json = json!({ "id": "pk", "cost": {}, "passes": [{ "entry": "fs_m" }] });
     let wgsl = "@fragment fn fs_m(in: VertexOut) -> @location(0) vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0) * tap(in.uv).a; }";

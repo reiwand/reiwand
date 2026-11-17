@@ -4,8 +4,8 @@ declare WORK BIN
 mkdir -p "$WORK/spread"
 cat >"$WORK/spread/scene.json" <<'SCENE'
 {"schema": "reiwand.scene/1", "canvas": {"size": [128, 36], "background": "#000000"},
- "layers": [{"id": "west", "type": "solid", "color": "#ff0000", "size": [64, 36], "transform": {"position": [32, 18]}},
-  {"id": "east", "type": "solid", "color": "#0000ff", "size": [64, 36], "transform": {"position": [96, 18]}}]}
+ "layers": [{ "blend_space": "canvas", "id": "west", "type": "solid", "color": "#ff0000", "size": [64, 36], "transform": {"position": [32, 18]}},
+  { "blend_space": "canvas", "id": "east", "type": "solid", "color": "#0000ff", "size": [64, 36], "transform": {"position": [96, 18]}}]}
 SCENE
 cat >"$WORK/spread/manifest.json" <<'MANIFEST'
 {"schema": "reiwand.wpak/2", "id": "org.example.spread", "version": "1.0.0", "title": "Spread", "license": "CC0-1.0",

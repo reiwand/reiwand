@@ -19,6 +19,7 @@ QtObject {
             "bass": App.tr("Bass"),
             "black": App.tr("To black"),
             "bottom": App.tr("Bottom"),
+            "canvas": App.tr("Like the canvas"),
             "center": App.tr("Centered"),
             "clamp": App.tr("Clamp"),
             "clicks": App.tr("Clicks"),

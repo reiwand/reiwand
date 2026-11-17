@@ -9,7 +9,7 @@ fn waving(repeat: &str) -> Runtime {
     let glb = s.glb();
     let doc = serde_json::json!({ "schema": SCHEMA, "canvas": { "size": [64, 64] },
         "assets": { "mesh": { "path": "mesh.glb" } },
-        "layers": [{ "id": "fox", "type": "mesh", "mesh": "mesh",
+        "layers": [{ "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "mesh",
             "clips": [{ "id": "c", "loop": repeat, "bones": { "arm": { "rotation": [[0, 0], [1, 90]] } } }],
             "animations": [{ "clip": "c" }] }] });
     let mut scene = Scene::from_json(&doc.to_string()).unwrap();

@@ -42,7 +42,7 @@ fn an_event_at_the_start_of_a_loop_fires_once_when_frames_land_on_the_loop() {
 fn events_start_timelines_and_wake_the_scene_only_when_heard() {
     let tls = json!([{ "id": "clock", "duration": 4, "loop": "repeat", "events": [{ "t": 3, "name": "go" }] },
                      { "id": "move", "duration": 1, "trigger": "event:go" }]);
-    let layer = json!([{ "id": "box", "type": "solid", "color": "#ffffff", "size": [10, 10],
+    let layer = json!([{ "blend_space": "canvas", "id": "box", "type": "solid", "color": "#ffffff", "size": [10, 10],
         "transform": { "position": { "timeline": "move", "keys": [[0, [0, 0]], [1, [50, 0]]] } } }]);
     let mut rt = runtime(tls, layer);
     rt.advance(0.5);
@@ -58,7 +58,7 @@ fn events_start_timelines_and_wake_the_scene_only_when_heard() {
 #[test]
 fn scripts_stop_speed_up_and_read_their_timelines() {
     let tls = json!([{ "id": "slide", "duration": 2, "loop": "repeat" }]);
-    let layer = json!([{ "id": "box", "type": "solid", "color": "#ffffff", "size": [10, 10],
+    let layer = json!([{ "blend_space": "canvas", "id": "box", "type": "solid", "color": "#ffffff", "size": [10, 10],
         "transform": { "position": { "timeline": "slide", "keys": [[0, [0, 0]], [2, [100, 0]]] } } }]);
     let mut rt = runtime(tls, layer);
     let send = |rt: &mut Runtime, c| {
@@ -82,12 +82,12 @@ fn still_scenes_with_events_wraps_and_sounds_draw_no_frames() {
                      { "id": "after", "duration": 0.5, "trigger": "event:half" },
                      { "id": "loop", "duration": 2, "loop": "repeat", "wrap": true, "autoplay": false }]);
     let layers = json!([
-        { "id": "box", "type": "solid", "color": "#ffffff", "size": [10, 10],
+        { "blend_space": "canvas", "id": "box", "type": "solid", "color": "#ffffff", "size": [10, 10],
           "opacity": { "timeline": "after", "keys": [[0, 0], [0.5, 1]] } },
-        { "id": "still", "type": "solid", "color": "#ffffff", "size": [10, 10],
+        { "blend_space": "canvas", "id": "still", "type": "solid", "color": "#ffffff", "size": [10, 10],
           "opacity": { "timeline": "loop", "keys": [[0, 0], [1, 1]] } },
-        { "id": "bed", "type": "sound", "sound": "a" },
-        { "id": "bell", "type": "sound", "sounds": ["b", "c"], "mode": "random", "loop": false, "play_on": "event:half" }]);
+        { "blend_space": "canvas", "id": "bed", "type": "sound", "sound": "a" },
+        { "blend_space": "canvas", "id": "bell", "type": "sound", "sounds": ["b", "c"], "mode": "random", "loop": false, "play_on": "event:half" }]);
     let mut rt = runtime(tls, layers);
     rt.set_lengths(BTreeMap::from([("a".into(), 4.0), ("b".into(), 1.0), ("c".into(), 1.0)]));
     let view = [0.0, 0.0, 100.0, 50.0];

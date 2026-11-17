@@ -6,8 +6,8 @@ use std::fs::{self, File};
 
 pub(super) fn scenes_follow_the_phone() {
     let source = tempfile::tempdir().unwrap();
-    let layers = json!([{ "id": "sky", "type": "solid", "color": "#336699" },
-        { "id": "hill", "type": "solid", "color": "#88aa44", "size": [32, 16], "parallax": [0.5, 0.5] }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "sky", "type": "solid", "color": "#336699" },
+        { "blend_space": "canvas", "id": "hill", "type": "solid", "color": "#88aa44", "size": [32, 16], "parallax": [0.5, 0.5] }]);
     let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers });
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
     let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.hills", "version": "1.0.0",

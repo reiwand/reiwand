@@ -67,7 +67,7 @@ fn the_cone_preview_shows_a_projected_layer() {
     let mut p = project(&root);
     light(&mut p, json!({ "add": { "light": "spot", "id": "s" } })).unwrap();
     light(&mut p, json!({ "set": { "layer": "s", "tilt": 89, "z": 200 } })).unwrap();
-    let title = json!({ "id": "title", "type": "text", "text": "Hi", "size": 64 });
+    let title = json!({ "blend_space": "canvas", "id": "title", "type": "text", "text": "Hi", "size": 64 });
     act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": title } })).unwrap();
     light(&mut p, json!({ "projection": { "layer": "s", "from": "title" } })).unwrap();
     let cast = reiwand_editor::lamps::cast(&p.dir, &p.doc, "s", 0.0);
@@ -88,11 +88,11 @@ fn the_cone_preview_shows_the_drawn_picture_of_shapes_and_groups() {
     let mut p = project(&root);
     light(&mut p, json!({ "add": { "light": "spot", "id": "s" } })).unwrap();
     light(&mut p, json!({ "set": { "layer": "s", "tilt": 89, "z": 200 } })).unwrap();
-    let left = json!({ "id": "left", "type": "shape", "shape": { "rect": { "size": [100, 100] } },
+    let left = json!({ "blend_space": "canvas", "id": "left", "type": "shape", "shape": { "rect": { "size": [100, 100] } },
         "fill": "#ff0000", "transform": { "position": [300, 300] } });
-    let right = json!({ "id": "right", "type": "shape", "shape": { "ellipse": { "size": [100, 100] } },
+    let right = json!({ "blend_space": "canvas", "id": "right", "type": "shape", "shape": { "ellipse": { "size": [100, 100] } },
         "fill": "#0000ff", "transform": { "position": [420, 300] } });
-    let group = json!({ "id": "g", "type": "group", "layers": [left, right] });
+    let group = json!({ "blend_space": "canvas", "id": "g", "type": "group", "layers": [left, right] });
     act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": group } })).unwrap();
     light(&mut p, json!({ "projection": { "layer": "s", "from": "g" } })).unwrap();
     let cast = reiwand_editor::lamps::cast(&p.dir, &p.doc, "s", 0.0);

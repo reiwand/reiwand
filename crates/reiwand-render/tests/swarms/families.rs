@@ -22,10 +22,10 @@ fn gallery() -> (Value, Value) {
             "init": { "life": [30, 30], "speed": [0, 0], "size": [2, 2], "palette": { "colors": ["#ffff00"] } } }))
     });
     let layers = json!([
-        { "id": "w", "type": "particles", "system": "world", "blend": "add", "transform": { "position": [100, 40], "scale": [3, 3] } },
-        { "id": "p", "type": "particles", "system": "pointed", "blend": "add" },
-        { "id": "h", "type": "particles", "system": "half", "blend": "add" },
-        { "id": "f", "type": "particles", "system": "fuse", "blend": "add", "instance": { "color": "#ff00ff" } }
+        { "blend_space": "canvas", "id": "w", "type": "particles", "system": "world", "blend": "add", "transform": { "position": [100, 40], "scale": [3, 3] } },
+        { "blend_space": "canvas", "id": "p", "type": "particles", "system": "pointed", "blend": "add" },
+        { "blend_space": "canvas", "id": "h", "type": "particles", "system": "half", "blend": "add" },
+        { "blend_space": "canvas", "id": "f", "type": "particles", "system": "fuse", "blend": "add", "instance": { "color": "#ff00ff" } }
     ]);
     (systems, layers)
 }
@@ -73,7 +73,7 @@ fn families_agree_on_gpu_and_cpu() {
             "init": { "life": [0.2, 0.4], "speed": [20, 50], "angle": [200, 340], "size": [1, 2] }, "forces": [{ "gravity": [0, 120] }] },
         "mist": { "capacity": 600, "emitters": [{ "shape": { "point": [0, 0] }, "rate": 20 }], "init": { "life": [0.2, 0.3], "speed": [0, 5] } }
     });
-    let layers = json!([{ "id": "r", "type": "particles", "system": "rain", "blend": "add", "transform": { "position": [90, 40] } }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "r", "type": "particles", "system": "rain", "blend": "add", "transform": { "position": [90, 40] } }]);
     let Some(mut gpu) = Run::new(r, systems.clone(), layers.clone(), true) else { return };
     let mut cpu = Run::new(r, systems, layers, false).unwrap();
     for _ in 0..40 {
@@ -97,7 +97,7 @@ fn children_without_room_stay_cheap_on_both_paths() {
             "init": { "life": [100, 100], "speed": [0, 0] }, "children": [{ "system": "b", "on": "follow" }] },
         "b": { "capacity": 10, "emitters": vec![point; 8], "init": { "life": [100, 100], "speed": [0, 0] } }
     });
-    let layers = json!([{ "id": "a", "type": "particles", "system": "a" }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "a", "type": "particles", "system": "a" }]);
     for gpu in [true, false] {
         let Some(mut run) = Run::new(r, systems.clone(), layers.clone(), gpu) else { return };
         run.frame(r, 1.0 / 30.0);

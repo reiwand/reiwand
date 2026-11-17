@@ -58,7 +58,7 @@ Inserta un valor en una lista o en un objeto. En una lista, el último nivel de 
 | `value` | cualquier valor JSON (obligatorio) | Lo que se inserta. |
 
 ```sh
-reiwand-ctl scene act mi-escena add '{"pointer":"/scene/layers/-","value":{"id":"fondo","type":"solid","color":"#102030"}}'
+reiwand-ctl scene act mi-escena add '{"pointer":"/scene/layers/-","value":{ "blend_space": "canvas", "id":"fondo","type":"solid","color":"#102030"}}'
 ```
 
 #### `remove`
@@ -284,9 +284,9 @@ Pega capas copiadas con `reiwand-ctl scene ask CARPETA copy`, en esta escena o e
 | `at` | entero | Posición donde pegar (0 es abajo del todo). Sin ella, arriba del todo. |
 
 ```sh
-reiwand-ctl scene act mi-escena paste '{"clip":{"layers":[{"id":"saludo","type":"text","text":"Hola","size":96,"color":"#ffffff"}]}}'
+reiwand-ctl scene act mi-escena paste '{"clip":{"layers":[{ "blend_space": "canvas", "id":"saludo","type":"text","text":"Hola","size":96,"color":"#ffffff"}]}}'
 reiwand-ctl scene act mi-escena add_layer '{"kind":"group","id":"adorno"}'
-reiwand-ctl scene act mi-escena paste '{"clip":{"layers":[{"id":"saludo","type":"text","text":"Hola","size":96,"color":"#ffffff"}]},"into":"adorno","at":0}'
+reiwand-ctl scene act mi-escena paste '{"clip":{"layers":[{ "blend_space": "canvas", "id":"saludo","type":"text","text":"Hola","size":96,"color":"#ffffff"}]},"into":"adorno","at":0}'
 ```
 
 Para obtener un `clip` de verdad, copia una capa de la escena:

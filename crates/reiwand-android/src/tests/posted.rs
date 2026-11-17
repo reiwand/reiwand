@@ -8,7 +8,7 @@ fn the_poster_of_a_scene_with_scripts_is_the_preview_its_author_made_never_a_dra
     let source = tempfile::tempdir().unwrap();
     fs::create_dir_all(source.path().join("assets")).unwrap();
     fs::create_dir_all(source.path().join("scripts")).unwrap();
-    let layers = json!([{ "id": "sky", "type": "solid", "color": "#ff0000" }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "sky", "type": "solid", "color": "#ff0000" }]);
     let script = json!({ "path": "scripts/paint.js", "events": ["update"], "uses": ["layers"] });
     let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers,
         "scripts": [script] });

@@ -63,7 +63,7 @@ fn package_costs_count_their_passes_and_heavy_scenes_warn() {
     let looped = "for (var i = 0u; i < 32u; i++) { for (var j = 0u; j < 32u; j++) { c += tap(in.uv); } }";
     let sly = effect(|d| d["cost"] = json!({ "taps": 0.01 }), looped).unwrap();
     assert!(sly.units() >= 256.0 && sly.class() == Class::Heavy, "{}", sly.units());
-    let solid = |effects: Json| json!({ "id": "l", "type": "solid", "color": "#ffffff", "effects": effects });
+    let solid = |effects: Json| json!({ "blend_space": "canvas", "id": "l", "type": "solid", "color": "#ffffff", "effects": effects });
     let scene = |effects: Json| {
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "layers": [solid(effects)] });
         Scene::from_json(&text.to_string()).unwrap().cost(Quality::Q2)
@@ -74,8 +74,9 @@ fn package_costs_count_their_passes_and_heavy_scenes_warn() {
     let read = scene(json!([{ "effect": "tint" }, { "effect": "under_cost" }]));
     assert!((read - tint - 3.0).abs() < 1e-3, "{tint} {read}");
     let masked = |mask: Json| {
-        let hidden = json!({ "id": "h", "type": "solid", "color": "#ffffff", "visible": false });
-        let a = json!({ "id": "a", "type": "solid", "color": "#ffffff", "mask": mask });
+        let hidden = json!({ "blend_space": "canvas", "id": "h", "type": "solid", "color": "#ffffff", "visible": false });
+        let a =
+            json!({ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#ffffff", "mask": mask });
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "layers": [a, hidden] });
         Scene::from_json(&text.to_string()).unwrap().cost(Quality::Q2)
     };
@@ -84,7 +85,7 @@ fn package_costs_count_their_passes_and_heavy_scenes_warn() {
     assert!((layered - shaped - 1.0).abs() < 1e-3, "{shaped} {layered}");
     let layers: Vec<Json> = (0..12)
         .map(|i| {
-            json!({ "id": format!("l{i}"), "type": "solid", "color": "#ffffff",
+            json!({ "blend_space": "canvas", "id": format!("l{i}"), "type": "solid", "color": "#ffffff",
         "effects": [{ "effect": "blur", "params": { "radius": 32 } }] })
         })
         .collect();

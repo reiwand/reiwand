@@ -88,14 +88,14 @@ pub fn group(doc: &Value, ids: &[String], id: Option<&str>) -> Result<Vec<Op>> {
     let id = id.map(String::from).unwrap_or_else(|| unique(doc, "group"));
     let layers: Vec<Value> = found.iter().map(|(.., v)| v.clone()).collect();
     let removed = found.iter().rev().map(|(l, i, _)| Op::Remove { path: format!("{l}/{i}") });
-    let value = json!({"id": id, "type": "group", "layers": layers});
+    let value = json!({ "blend_space": "canvas", "id": id, "type": "group", "layers": layers});
     Ok(removed.chain([Op::Add { path: format!("{list}/{first}"), value }]).collect())
 }
 
 pub fn ungroup(doc: &Value, id: &str) -> Result<Vec<Op>> {
     let (path, value) = layer(doc, id)?;
     ensure!(value["type"] == "group", said("editor.not_group", "%1 is not a group", &[&id]));
-    let plain = json!({"id": id, "type": "group", "layers": value["layers"]});
+    let plain = json!({ "blend_space": "canvas", "id": id, "type": "group", "layers": value["layers"]});
     let normal = |v: &Value| {
         let layer = serde_json::from_value::<reiwand_scene::Layer>(v.clone()).ok()?;
         serde_json::to_value(layer).ok()?.as_object().cloned()

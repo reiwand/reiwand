@@ -58,7 +58,10 @@ fn scripts_media_and_pointer_hooks_name_their_broken_fields() {
         ),
         (vec![("/timelines/3/trigger", json!("event:jump"))], "names the unknown event \"jump\""),
         (
-            vec![("/templates/fox", json!({ "id": "fox", "type": "solid", "color": "#000000" }))],
+            vec![(
+                "/templates/fox",
+                json!({ "blend_space": "canvas", "id": "fox", "type": "solid", "color": "#000000" }),
+            )],
             "/templates/fox repeats an id",
         ),
         (vec![("/templates/bar/opacity", json!(2))], "/templates/bar/opacity is 2, expected 0..=1"),

@@ -42,7 +42,7 @@ fn staged(layers: serde_json::Value, particles: serde_json::Value, poster: f32) 
 
 fn blinking() -> serde_json::Value {
     let opacity = json!({ "timeline": "blink", "keys": [[0, 0], [0.05, 1], [0.1, 0]] });
-    json!([{ "id": "flash", "type": "solid", "color": "#ffffff", "opacity": opacity }])
+    json!([{ "blend_space": "canvas", "id": "flash", "type": "solid", "color": "#ffffff", "opacity": opacity }])
 }
 
 #[test]
@@ -52,7 +52,11 @@ fn the_state_says_where_particles_run() {
     };
     let dust =
         json!({ "dust": { "capacity": 50, "emitters": [{ "shape": { "point": [16, 9] }, "rate": 30 }] } });
-    let mut scene = staged(json!([{ "id": "dust", "type": "particles", "system": "dust" }]), dust, 0.0);
+    let mut scene = staged(
+        json!([{ "blend_space": "canvas", "id": "dust", "type": "particles", "system": "dust" }]),
+        dust,
+        0.0,
+    );
     let mut plain = state(blinking(), 0.0);
     assert_eq!((scene.particles(), plain.particles()), ("", ""));
     let (power, at) = (Power::new(Tier::T3, false, 60), Instant::now());
@@ -130,7 +134,7 @@ fn turning_the_guard_off_wakes_a_scene_it_paused() {
     };
     let (power, start, size) = (Power::new(Tier::T3, false, 60), Instant::now(), ((32, 18), 60));
     let keys = json!([[0, 0], [0.025, 1], [0.05, 0], [0.075, 1], [0.1, 0]]);
-    let strobe = json!([{ "id": "flash", "type": "solid", "color": "#ffffff", "opacity": { "timeline": "blink", "keys": keys } }]);
+    let strobe = json!([{ "blend_space": "canvas", "id": "flash", "type": "solid", "color": "#ffffff", "opacity": { "timeline": "blink", "keys": keys } }]);
     let mut scene = state(strobe, 0.0);
     scene.guard(true);
     let mut n = 0;

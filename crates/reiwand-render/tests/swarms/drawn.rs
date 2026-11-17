@@ -19,7 +19,7 @@ pub(super) fn seen_among(
     gpu: bool,
 ) -> Option<(Vec<u8>, Vec<String>)> {
     let canvas = json!({ "size": [SIZE.0, SIZE.1], "background": "#000000" });
-    layers.push(json!({ "id": "p", "type": "particles", "system": "s" }));
+    layers.push(json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s" }));
     let effects: serde_json::Map<String, Value> = files
         .iter()
         .filter(|(p, _)| p.ends_with(".json"))
@@ -151,13 +151,14 @@ fn particle_shaders_the_engine_cannot_build_are_left_out_and_particles_still_dra
 fn particles_and_the_layers_drawn_between_them_share_one_pass() {
     let Some(r) = renderer() else { return };
     let passes = |between: bool| {
-        let solid = json!({ "id": "s", "type": "solid", "color": "#ff0000", "size": [40, 40],
+        let solid = json!({ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ff0000", "size": [40, 40],
             "transform": { "position": { "keys": [[0, [40, 40]], [9, [120, 40]]] } } });
-        let mut layers = vec![json!({ "id": "p", "type": "particles", "system": "s" })];
+        let mut layers =
+            vec![json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s" })];
         if between {
             layers.push(solid);
         }
-        layers.push(json!({ "id": "q", "type": "particles", "system": "s" }));
+        layers.push(json!({ "blend_space": "canvas", "id": "q", "type": "particles", "system": "s" }));
         let mut run = Run::new(r, json!({ "s": dot([80.0, 40.0], json!({})) }), json!(layers), true)?;
         run.frame(r, 0.0);
         run.frame(r, 1.0 / 30.0);

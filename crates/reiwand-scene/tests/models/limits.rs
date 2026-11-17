@@ -12,7 +12,7 @@ fn issues(layers: Value) -> Vec<String> {
 }
 
 fn light(extra: Value) -> Value {
-    let mut l = json!({ "id": "sun", "type": "light", "light": "directional" });
+    let mut l = json!({ "blend_space": "canvas", "id": "sun", "type": "light", "light": "directional" });
     extra.as_object().unwrap().iter().for_each(|(k, v)| l[k] = v.clone());
     l
 }
@@ -37,7 +37,7 @@ fn shadow_fields_are_checked_and_need_shadows() {
         assert!(!issues(json!([light(bad.clone())])).is_empty(), "{bad}");
     }
     let three: Vec<Value> = (0..3)
-        .map(|i| json!({ "id": format!("l{i}"), "type": "light", "light": "spot", "shadows": true }))
+        .map(|i| json!({ "blend_space": "canvas", "id": format!("l{i}"), "type": "light", "light": "spot", "shadows": true }))
         .collect();
     assert!(!issues(json!(three)).is_empty(), "at most two shadowed lights");
 }

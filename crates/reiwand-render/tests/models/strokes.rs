@@ -15,7 +15,8 @@ pub fn covered(r: &Renderer, extra: Value, quality: Quality) -> usize {
 }
 
 fn shaded(r: &Renderer, extra: Value, quality: Quality, pick: impl Fn([u8; 3]) -> bool) -> usize {
-    let layer = json!({ "id": "p", "type": "particles", "system": "s", "depth_test": true });
+    let layer =
+        json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s", "depth_test": true });
     let mut shot = shoot(r, scene(extra, group(layer), red()), &[]);
     shot.view.set_particle_trails(r, reiwand_scene::Tier::T3);
     let px = (0..4).map(|_| shot.frame(r, 0.05, quality)).last().unwrap();

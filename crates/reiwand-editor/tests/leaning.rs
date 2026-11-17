@@ -3,7 +3,7 @@ use serde_json::{Value, json};
 use std::path::Path;
 
 fn corners(transform: Value) -> Option<[[f64; 2]; 4]> {
-    let layer = json!({"id": "card", "type": "solid", "color": "#ffffff", "size": [200, 100], "transform": transform});
+    let layer = json!({ "blend_space": "canvas", "id": "card", "type": "solid", "color": "#ffffff", "size": [200, 100], "transform": transform});
     let doc = json!({"scene": {"canvas": {"size": [1000, 1000], "perspective": 1000}, "layers": [layer]}});
     gizmos(Path::new("."), &doc, 0.0)[0].corners
 }

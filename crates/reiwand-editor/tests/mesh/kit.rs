@@ -55,7 +55,8 @@ pub fn parts(root: &TempDir) -> Project {
     std::fs::copy(fixture, p.dir.join("body.glb")).unwrap();
     act(&mut p, json!({ "set": { "pointer": "/scene/assets/body", "value": { "path": "body.glb" } } }))
         .unwrap();
-    let layer = json!({ "id": "body", "type": "mesh", "mesh": "body", "size": [100, 100] });
+    let layer =
+        json!({ "blend_space": "canvas", "id": "body", "type": "mesh", "mesh": "body", "size": [100, 100] });
     act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": layer } })).unwrap();
     p
 }

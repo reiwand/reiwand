@@ -16,7 +16,8 @@ fn issues(layers: Json) -> Vec<String> {
 }
 
 fn lamp(id: &str, extra: Json) -> Json {
-    let mut l = json!({ "id": id, "type": "light", "transform": { "position": [50, 50] } });
+    let mut l =
+        json!({ "blend_space": "canvas", "id": id, "type": "light", "transform": { "position": [50, 50] } });
     l.as_object_mut().unwrap().extend(extra.as_object().cloned().unwrap_or_default());
     l
 }
@@ -24,13 +25,13 @@ fn lamp(id: &str, extra: Json) -> Json {
 #[test]
 fn lighting_maps_must_be_pictures() {
     for map in ["roughness_map", "emissive_map"] {
-        let wall = json!({ "id": "w", "type": "image", "image": "wall", "lighting": { map: "song" } });
+        let wall = json!({ "blend_space": "canvas", "id": "w", "type": "image", "image": "wall", "lighting": { map: "song" } });
         let found = issues(json!([wall]));
         assert!(
             found.iter().any(|i| i.contains(&format!("/layers/0/lighting/{map} does not fit"))),
             "{found:?}"
         );
-        let missing = json!({ "id": "w", "type": "image", "image": "wall", "lighting": { map: "nothing" } });
+        let missing = json!({ "blend_space": "canvas", "id": "w", "type": "image", "image": "wall", "lighting": { map: "nothing" } });
         assert!(!issues(json!([missing])).is_empty());
     }
 }
@@ -38,14 +39,14 @@ fn lighting_maps_must_be_pictures() {
 #[test]
 fn lit_particles_still_name_their_own_feature() {
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "particles": { "snow": { "capacity": 10, "emitters": [{ "shape": "edge" }] } },
-        "layers": [{ "id": "p", "type": "particles", "system": "snow", "lighting": {} }] });
+        "layers": [{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "snow", "lighting": {} }] });
     let scene = Scene::from_json(&doc.to_string()).unwrap();
     assert!(scene.features().contains("particle_lighting"));
 }
 
 #[test]
 fn lamps_follow_their_layer_parents_and_visibility() {
-    let group = json!({ "id": "g", "type": "group", "transform": { "position": [100, 0] }, "layers": [
+    let group = json!({ "blend_space": "canvas", "id": "g", "type": "group", "transform": { "position": [100, 0] }, "layers": [
         lamp("inside", json!({ "light": "spot", "transform": { "position": [10, 20], "rotation": 90 } })),
         lamp("off", json!({ "visible": false }))
     ]});
@@ -87,7 +88,8 @@ fn a_scene_keeps_at_most_twelve_lamps() {
 #[test]
 fn moving_lamps_ask_for_frames_except_at_the_lowest_level() {
     let walk = json!({ "timeline": "go", "keys": [[0, 1], [2, 4]] });
-    let wall = json!({ "id": "w", "type": "image", "image": "wall", "lighting": {} });
+    let wall =
+        json!({ "blend_space": "canvas", "id": "w", "type": "image", "image": "wall", "lighting": {} });
     let moving = lamp("l", json!({ "intensity": walk }));
     let runtime = Runtime::new(Arc::new(scene(json!([wall, moving.clone()]))), Values::new());
     let view = [0.0, 0.0, 200.0, 100.0];
@@ -100,14 +102,14 @@ fn moving_lamps_ask_for_frames_except_at_the_lowest_level() {
 #[test]
 fn a_moving_lamp_that_lights_nothing_lets_the_scene_settle() {
     let walk = json!({ "timeline": "go", "keys": [[0, 1], [2, 4]] });
-    let plain = json!({ "id": "w", "type": "image", "image": "wall" });
+    let plain = json!({ "blend_space": "canvas", "id": "w", "type": "image", "image": "wall" });
     let view = [0.0, 0.0, 200.0, 100.0];
     let wake =
         |layers: Json| Runtime::new(Arc::new(scene(layers)), Values::new()).frame(view, Quality::Q3).wake;
     assert_eq!(wake(json!([plain, lamp("l", json!({ "intensity": walk }))])), Wake::Idle);
     let airy = lamp("l", json!({ "intensity": walk, "volumetric": { "density": 0.5, "samples": 8 } }));
     assert_eq!(wake(json!([plain, airy])), Wake::Frame);
-    let template = json!({ "id": "t", "type": "group", "layers": [{ "id": "w2", "type": "image", "image": "wall", "lighting": {} }] });
+    let template = json!({ "blend_space": "canvas", "id": "t", "type": "group", "layers": [{ "blend_space": "canvas", "id": "w2", "type": "image", "image": "wall", "lighting": {} }] });
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "assets": { "wall": { "path": "wall.png" } },
         "timelines": [{ "id": "go", "duration": 2, "loop": "repeat" }], "templates": { "t": template },
         "layers": [plain, lamp("l", json!({ "intensity": walk }))] });
@@ -125,10 +127,10 @@ fn ambient_and_sky_come_from_the_canvas() {
 
 #[test]
 fn lamps_know_where_they_sit_among_the_drawn_layers() {
-    let wall = |id: &str| json!({ "id": id, "type": "image", "image": "wall" });
-    let group =
-        json!({ "id": "g", "type": "group", "layers": [wall("b"), lamp("inner", json!({})), wall("c")] });
-    let hidden = json!({ "id": "h", "type": "image", "image": "wall", "visible": false });
+    let wall = |id: &str| json!({ "blend_space": "canvas", "id": id, "type": "image", "image": "wall" });
+    let group = json!({ "blend_space": "canvas", "id": "g", "type": "group", "layers": [wall("b"), lamp("inner", json!({})), wall("c")] });
+    let hidden =
+        json!({ "blend_space": "canvas", "id": "h", "type": "image", "image": "wall", "visible": false });
     let layers = json!([wall("a"), lamp("first", json!({})), hidden, group, lamp("last", json!({}))]);
     let runtime = Runtime::new(Arc::new(scene(layers)), Values::new());
     let frame = runtime.frame([0.0, 0.0, 200.0, 100.0], Quality::Q3);
@@ -140,8 +142,8 @@ fn lamps_know_where_they_sit_among_the_drawn_layers() {
 
 #[test]
 fn lamps_follow_the_order_a_script_gives_and_know_their_group() {
-    let wall = |id: &str| json!({ "id": id, "type": "image", "image": "wall" });
-    let group = json!({ "id": "g", "type": "group", "layers": [wall("b"), lamp("inner", json!({}))] });
+    let wall = |id: &str| json!({ "blend_space": "canvas", "id": id, "type": "image", "image": "wall" });
+    let group = json!({ "blend_space": "canvas", "id": "g", "type": "group", "layers": [wall("b"), lamp("inner", json!({}))] });
     let layers = json!([wall("a"), lamp("first", json!({})), group]);
     let mut runtime = Runtime::new(Arc::new(scene(layers)), Values::new());
     let frame = runtime.frame([0.0, 0.0, 200.0, 100.0], Quality::Q3);

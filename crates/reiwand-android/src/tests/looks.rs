@@ -15,7 +15,7 @@ pub(super) fn drawn() {
         "smooth": { "up": 0.05, "down": 0.5 }, "offset": 0.5 });
     let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32], "background": "#000000" },
         "assets": { "floor": { "path": "floor.png" } }, "audio": { "attack": 0.05, "release": 0.3, "gain": "fixed" },
-        "layers": [{ "id": "rain", "type": "particles", "system": "rain", "blend": "normal", "opacity": glow }],
+        "layers": [{ "blend_space": "canvas", "id": "rain", "type": "particles", "system": "rain", "blend": "normal", "opacity": glow }],
         "particles": { "rain": rain } });
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
     let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.rain", "version": "1.0.0", "title": "Rain",

@@ -4,7 +4,7 @@ fn pooled(uses: &str) -> Runtime {
     runtime(json!({
         "pools": { "bars": { "type": "mesh", "max": 2, "max_vertices": 8, "size": [100, 50] } },
         "scripts": [{ "path": "bars.js", "uses": [uses] }],
-        "layers": [{ "id": "bars", "type": "video", "video": "bars" }, { "id": "moon", "type": "solid", "color": "#ffffff" }]
+        "layers": [{ "blend_space": "canvas", "id": "bars", "type": "video", "video": "bars" }, { "blend_space": "canvas", "id": "moon", "type": "solid", "color": "#ffffff" }]
     }))
 }
 

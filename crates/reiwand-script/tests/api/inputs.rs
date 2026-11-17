@@ -75,8 +75,8 @@ fn modules_only_use_the_parts_they_declare() {
     "#;
     let scene = json!({
         "scripts": [{ "path": "main.js", "uses": ["timers"] }],
-        "templates": { "bar": { "id": "bar", "type": "solid", "color": "#ffffff" } },
-        "layers": [{ "id": "a", "type": "solid", "color": "#000000", "effects": [{ "effect": "blur" }] }]
+        "templates": { "bar": { "blend_space": "canvas", "id": "bar", "type": "solid", "color": "#ffffff" } },
+        "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#000000", "effects": [{ "effect": "blur" }] }]
     });
     let out = at(&mut staged(scene, &[("main.js", source)]), 0.0).unwrap();
     let refused = "main.js uses layers without declaring it in scene.json | main.js uses effects without declaring it in scene.json | ok";
@@ -109,11 +109,11 @@ fn shared_values_are_copied_frozen_and_counted_however_they_are_set() {
 #[test]
 fn copies_of_templates_stay_within_the_layer_limit() {
     let children: Vec<_> =
-        (0..100).map(|i| json!({ "id": format!("t{i}"), "type": "solid", "color": "#ffffff" })).collect();
+        (0..100).map(|i| json!({ "blend_space": "canvas", "id": format!("t{i}"), "type": "solid", "color": "#ffffff" })).collect();
     let scene = json!({
         "scripts": [{ "path": "main.js", "uses": ["layers"] }],
-        "templates": { "big": { "id": "big", "type": "group", "layers": children } },
-        "layers": [{ "id": "info", "type": "text", "text": "", "size": 10 }]
+        "templates": { "big": { "blend_space": "canvas", "id": "big", "type": "group", "layers": children } },
+        "layers": [{ "blend_space": "canvas", "id": "info", "type": "text", "text": "", "size": 10 }]
     });
     let source = r#"import { scene } from "reiwand";
         let made = 0, error = "";

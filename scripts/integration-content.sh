@@ -11,7 +11,7 @@ base = dict(common, id="org.example.base", version="1.2.0", title="Base", kind="
             display={"accent": {"prop": "tint"}}, playback={"max_fps": 12},
             requires={"features": ["accent", "playback2"]})
 scene = {"schema": "reiwand.scene/1", "canvas": {"size": [64, 32], "fit": "stretch"},
-         "layers": [{"id": "tint", "type": "solid", "color": {"prop": "tint"}, "size": [64, 32]}]}
+         "layers": [{ "blend_space": "canvas", "id": "tint", "type": "solid", "color": {"prop": "tint"}, "size": [64, 32]}]}
 preset = dict(common, id="org.example.base-green", version="1.0.0", title="Base in green", kind="preset",
               entry="preset.json", requires={"features": ["packages", "preset"],
               "packages": [{"id": "org.example.base", "version": "^1.2"}]})

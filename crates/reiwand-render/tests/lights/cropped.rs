@@ -27,7 +27,7 @@ fn bright(image: &RgbaImage, channel: usize) -> usize {
 }
 
 fn spot(texture: Value) -> Value {
-    json!({ "id": "spot", "type": "light", "light": "spot", "cone": [80, 90], "radius": 400, "z": 40,
+    json!({ "blend_space": "canvas", "id": "spot", "type": "light", "light": "spot", "cone": [80, 90], "radius": 400, "z": 40,
         "intensity": 2, "transform": { "position": [80, 45], "tilt": [89, 0] }, "texture": texture })
 }
 
@@ -50,10 +50,10 @@ fn padded_ktx2_masks_maps_and_projections_line_up_like_their_pngs() {
         return eprintln!("skipping: the card reads no compressed KTX2 class");
     }
     let dark = json!({ "ambient": "#000000" });
-    let masked = json!({ "id": "m", "type": "image", "image": "wall", "size": [160, 90],
+    let masked = json!({ "blend_space": "canvas", "id": "m", "type": "image", "image": "wall", "size": [160, 90],
         "transform": { "position": [80, 45] }, "mask": { "texture": "mask" } });
     same(json!([masked]), dark.clone(), "mask", edge(20), 0);
-    let tinted = json!({ "id": "t", "type": "image", "image": "wall", "size": [160, 90],
+    let tinted = json!({ "blend_space": "canvas", "id": "t", "type": "image", "image": "wall", "size": [160, 90],
         "transform": { "position": [80, 45] },
         "effects": [{ "effect": "tint", "params": { "color": "#ff0000" }, "mask": { "texture": "mask" } }] });
     let tint = |image: &RgbaImage| (0..160).filter(|x| at(image, *x, 45)[0] < 100).count();

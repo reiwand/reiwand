@@ -21,7 +21,7 @@ fn runtime(systems: Json, layers: Json) -> Runtime {
 }
 
 fn layer(system: &str) -> Json {
-    json!([{ "id": "p", "type": "particles", "system": system }])
+    json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": system }])
 }
 
 fn still(more: Json) -> Json {

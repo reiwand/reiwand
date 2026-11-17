@@ -62,7 +62,7 @@ fn forms_order_localize_and_hide_properties() {
 
 #[test]
 fn declared_inputs_limit_what_a_scene_receives() {
-    let layers = json!([{ "id": "glow", "type": "solid", "color": "#ffffff", "size": [10, 10],
+    let layers = json!([{ "blend_space": "canvas", "id": "glow", "type": "solid", "color": "#ffffff", "size": [10, 10],
         "opacity": { "audio": "bass" }, "parallax": [0.5, 0.5] }]);
     let mut rt = runtime(&scene(layers));
     assert!(rt.uses().audio && rt.uses().cursor);
@@ -74,7 +74,7 @@ fn declared_inputs_limit_what_a_scene_receives() {
 
 #[test]
 fn a_spare_frame_hands_its_lists_to_the_next_one() {
-    let shown = json!([{ "id": "a", "type": "solid", "color": "#ff0000", "size": [10, 10],
+    let shown = json!([{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#ff0000", "size": [10, 10],
         "effects": [{ "effect": "blur", "params": { "radius": 2 } }],
         "transform": { "position": { "keys": [[0, [10, 10]], [2, [90, 40]]] } } }]);
     let mut rt = runtime(&scene(shown));

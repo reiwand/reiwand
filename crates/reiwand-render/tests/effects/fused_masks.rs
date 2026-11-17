@@ -32,7 +32,7 @@ fn mixed_masks_stay_on_their_side_when_the_chain_fuses() {
 }
 
 fn same_name(texture: &str) -> Option<Shot> {
-    let half = json!({ "id": "x", "type": "solid", "color": "#ffffff", "size": [32, 32], "visible": false,
+    let half = json!({ "blend_space": "canvas", "id": "x", "type": "solid", "color": "#ffffff", "size": [32, 32], "visible": false,
         "transform": { "position": [48, 16] } });
     let green = json!({ "effect": "tint", "params": { "color": "#00ff00", "blend": "normal" },
         "mask": { "layer": "x" } });

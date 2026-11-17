@@ -40,6 +40,7 @@ QtObject {
         page.run("add", {
             "pointer": "/scene/layers/-",
             "value": {
+                "blend_space": "canvas",
                 "id": "wallcheck",
                 "type": "shape",
                 "shape": {

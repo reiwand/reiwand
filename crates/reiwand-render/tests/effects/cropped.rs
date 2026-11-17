@@ -6,7 +6,7 @@ fn rows() -> RgbaImage {
 
 fn waved(x: i32, amplitude: f32) -> Option<Shot> {
     let waves = json!({ "effect": "waves", "params": { "amplitude": amplitude, "frequency": 1.5, "speed": 0 } });
-    let layer = json!({ "id": "w", "type": "image", "image": "rows", "size": [32, 32],
+    let layer = json!({ "blend_space": "canvas", "id": "w", "type": "image", "image": "rows", "size": [32, 32],
         "transform": { "position": [x, 16] }, "effects": [waves] });
     Fx::chain(json!([])).input(solid([0; 3])).image("rows", rows(), false).layer(layer).shot()
 }

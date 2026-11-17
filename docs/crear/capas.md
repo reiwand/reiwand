@@ -135,7 +135,7 @@ El ejemplo [`animacion-e-interaccion`](ejemplos/animacion-e-interaccion/scene.js
 un botón al hacer clic y suena un golpe:
 
 ```json
-    { "id": "boton", "type": "shape", "shape": { "rect": { "size": [360, 140], "radius": 70 } }, "fill": "#3b82f6",
+    { "blend_space": "canvas", "id": "boton", "type": "shape", "shape": { "rect": { "size": [360, 140], "radius": 70 } }, "fill": "#3b82f6",
       "solid": true, "transform": { "position": [1250, 540],
         "scale": { "timeline": "pulsar", "keys": [[0, [1, 1]], [0.15, [0.9, 0.9], "out_quad"], [0.4, [1, 1], "out_back"]] } } }
 ```
@@ -153,7 +153,7 @@ Dibuja un recurso de imagen. Sin `size`, la imagen se enseña a su tamaño real,
 `size` se estira a ese tamaño.
 
 ```json
-    { "id": "fondo", "type": "image", "image": "cielo", "size": [1920, 1080],
+    { "blend_space": "canvas", "id": "fondo", "type": "image", "image": "cielo", "size": [1920, 1080],
       "effects": [{ "effect": "waves", "params": { "amplitude": 6, "frequency": 3 } }] }
 ```
 
@@ -186,7 +186,7 @@ enseñan el mismo fotograma. En el nivel de calidad más bajo se queda en el pri
 tramo.
 
 ```json
-    { "id": "baile", "type": "image", "image": "bola", "size": [256, 256],
+    { "blend_space": "canvas", "id": "baile", "type": "image", "image": "bola", "size": [256, 256],
       "transform": { "position": [700, 540] },
       "playback": { "rate": 1, "loop": true } }
 ```
@@ -196,7 +196,7 @@ tramo.
 Reproduce un recurso de vídeo (WebM, MP4 o MKV), en bucle salvo que digas lo contrario.
 
 ```json
-    { "id": "pelicula", "type": "video", "video": "cuadros", "size": [1920, 960],
+    { "blend_space": "canvas", "id": "pelicula", "type": "video", "video": "cuadros", "size": [1920, 960],
       "playback": { "rate": 1, "loop": true, "start": 0 } }
 ```
 
@@ -205,7 +205,7 @@ recurso, o un valor con `prop` y `map`). Todas las capas que enseñan el mismo v
 decodificador y un reloj, que dirige la primera de ellas; `own_clock` le da su reloj propio:
 
 ```json
-    { "id": "pequena", "type": "video", "video": "cuadros", "size": [384, 192],
+    { "blend_space": "canvas", "id": "pequena", "type": "video", "video": "cuadros", "size": [384, 192],
       "transform": { "position": [1700, 960] },
       "playback": { "own_clock": true, "rate": 0.5 } }
 ```
@@ -217,7 +217,7 @@ decodificador no va más rápido que `clock.max_fps`. Con una propiedad de archi
 ## Capa de texto (`text`)
 
 ```json
-    { "id": "titulo", "type": "text", "text": "Buenos días", "font": "sans-serif", "size": 160,
+    { "blend_space": "canvas", "id": "titulo", "type": "text", "text": "Buenos días", "font": "sans-serif", "size": 160,
       "color": "#ffffff", "align": "center",
       "outline": { "color": "#3b4a6b", "width": 6 },
       "shadow": { "color": "#00000099", "offset": [6, 8], "blur": 12 },
@@ -263,7 +263,7 @@ Los relojes y las fechas se explican en [escena.md](escena.md). El ejemplo
 un título en español e inglés, hora y fecha:
 
 ```json
-    { "id": "parrafo", "type": "text",
+    { "blend_space": "canvas", "id": "parrafo", "type": "text",
       "text": "Un texto largo se parte en líneas del ancho que tú digas y termina con puntos suspensivos si no cabe.",
       "font": "serif", "size": 44, "color": "#dbe4f5", "align": "left", "valign": "top",
       "line_height": 1.3, "letter_spacing": 1,
@@ -273,14 +273,14 @@ un título en español e inglés, hora y fecha:
 ```
 
 ```json
-    { "id": "hora", "type": "text", "text": { "clock": "HH:mm:ss" }, "font": "monospace", "size": 90,
+    { "blend_space": "canvas", "id": "hora", "type": "text", "text": { "clock": "HH:mm:ss" }, "font": "monospace", "size": 90,
       "color": "#7dd3fc", "anchor": "bottom_right", "transform": { "position": [-80, -60] } }
 ```
 
 ## Capa de forma (`shape`)
 
 ```json
-    { "id": "panel", "type": "shape", "shape": { "rect": { "size": [1200, 500], "radius": 40 } },
+    { "blend_space": "canvas", "id": "panel", "type": "shape", "shape": { "rect": { "size": [1200, 500], "radius": 40 } },
       "gradient": { "from": [0, 0], "to": [0, 1], "stops": [[0, "#2b3a67"], [1, "#101828"]] },
       "stroke": { "color": "#8aa4ff", "width": 4 } }
 ```
@@ -311,12 +311,12 @@ Una `line` mide lo que dice `to` y queda centrada en la posición de la capa.
 (0 a 10000 px).
 
 ```json
-    { "id": "estrella", "type": "shape", "shape": { "star": { "points": 5, "size": 120, "inner": 0.45 } },
+    { "blend_space": "canvas", "id": "estrella", "type": "shape", "shape": { "star": { "points": 5, "size": 120, "inner": 0.45 } },
       "fill": "#f472b6", "transform": { "position": [1280, 540] } }
 ```
 
 ```json
-    { "id": "brillo", "type": "shape", "shape": { "ellipse": { "size": [700, 700] } }, "blend": "add",
+    { "blend_space": "canvas", "id": "brillo", "type": "shape", "shape": { "ellipse": { "size": [700, 700] } }, "blend": "add",
       "gradient": { "radial": true, "from": [0.5, 0.5], "to": [1, 0.5],
         "stops": [[0, "#ffffff60"], [0.5, "#5b7cff30"], [1, "#5b7cff00"]] } }
 ```
@@ -326,7 +326,7 @@ Una `line` mide lo que dice `to` y queda centrada en la posición de la capa.
 Rellena un rectángulo de un color. Sin `size` cubre todo el lienzo.
 
 ```json
-    { "id": "fondo", "type": "solid", "color": "#101828" }
+    { "blend_space": "canvas", "id": "fondo", "type": "solid", "color": "#101828" }
 ```
 
 | Campo | Por defecto | Qué hace |
@@ -342,7 +342,7 @@ resplandores (ver [`grupos-y-mascaras`](ejemplos/grupos-y-mascaras/scene.json)).
 Dibuja el sonido que suena en el equipo. Necesita la entrada `audio`.
 
 ```json
-    { "id": "espectro", "type": "spectrum", "size": [1600, 360], "style": "bars", "bands": 32, "gap": 0.3,
+    { "blend_space": "canvas", "id": "espectro", "type": "spectrum", "size": [1600, 360], "style": "bars", "bands": 32, "gap": 0.3,
       "color": "#7dd3fc", "anchor": "bottom", "transform": { "position": [0, -80] } }
 ```
 
@@ -360,10 +360,10 @@ Dibuja el sonido que suena en el equipo. Necesita la entrada `audio`.
 Junta capas. Sirve para moverlas, girarlas, mezclarlas o aplicarles efectos todas a la vez.
 
 ```json
-    { "id": "ventana", "type": "group", "clip": true,
+    { "blend_space": "canvas", "id": "ventana", "type": "group", "clip": true,
       "layers": [
-        { "id": "marco", "type": "shape", "shape": { "rect": { "size": [700, 420], "radius": 60 } }, "fill": "#ffffff" },
-        { "id": "interior", "type": "image", "image": "cielo", "size": [1400, 790],
+        { "blend_space": "canvas", "id": "marco", "type": "shape", "shape": { "rect": { "size": [700, 420], "radius": 60 } }, "fill": "#ffffff" },
+        { "blend_space": "canvas", "id": "interior", "type": "image", "image": "cielo", "size": [1400, 790],
           "transform": { "position": { "timeline": "paseo", "keys": [[0, [760, 540]], [8, [1160, 540]]] } },
           "effects": [{ "effect": "color_adjust", "params": { "saturation": 1.6, "contrast": 1.2 } }] }
       ] }
@@ -386,7 +386,7 @@ No dibuja nada propio: aplica sus `effects` a todo lo que hay debajo de ella (el
 grupo).
 
 ```json
-    { "id": "retoque", "type": "adjustment", "size": [900, 500],
+    { "blend_space": "canvas", "id": "retoque", "type": "adjustment", "size": [900, 500],
       "transform": { "position": [960, 540] },
       "effects": [{ "effect": "vignette", "params": { "intensity": 0.5 } }] }
 ```

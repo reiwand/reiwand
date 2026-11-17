@@ -58,7 +58,7 @@ impl Painter<'_, '_, '_> {
             false => Src::White,
         };
         let (mode, back) = match redraw {
-            true => self.blend(&mut item, d.blend, bounds, target, false),
+            true => self.blend(&mut item, (d.blend, d.space), bounds, target, false),
             false if d.opacity >= 1.0 => (Mode::Replace, Src::Clear),
             false => (Mode::Normal, Src::Clear),
         };

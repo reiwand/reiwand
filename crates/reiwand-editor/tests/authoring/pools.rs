@@ -26,7 +26,10 @@ fn pools_are_added_changed_listed_drawn_and_removed() {
         refused(&mut p, bad);
     }
     act(&mut p, json!({"add_layer": {"kind": "shapes", "id": "drawn"}})).unwrap();
-    assert_eq!(at(&p, "/scene/layers/1"), json!({"id": "drawn", "type": "video", "video": "bars"}));
+    assert_eq!(
+        at(&p, "/scene/layers/1"),
+        json!({ "blend_space": "canvas", "id": "drawn", "type": "video", "video": "bars"})
+    );
     let rows = query(&root.path().join("glow"), &p.doc, "", &json!({"pools": {}}));
     assert_eq!(rows["pools"][0]["layers"], json!(["drawn"]));
     assert_eq!(rows["pools"][0]["max"], 12);

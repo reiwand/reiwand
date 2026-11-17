@@ -2,7 +2,7 @@ use super::*;
 
 fn pair(debug: Option<Value>) -> Scene {
     let models = BTreeMap::from([("box", cube(unlit("skin", [0.9, 0.1, 0.1, 1.0])))]);
-    let at = |id: &str, x: f32| json!({ "id": id, "type": "model", "model": "box", "position": [x, 0, 0], "scale": [0.4, 0.4, 0.4] });
+    let at = |id: &str, x: f32| json!({ "blend_space": "canvas", "id": id, "type": "model", "model": "box", "position": [x, 0, 0], "scale": [0.4, 0.4, 0.4] });
     let mut s = scene(json!({}), json!([at("a", -1.2), at("b", 1.2)]), models);
     if let Some(d) = debug {
         s.ext.insert("editor".into(), json!({ "debug3d": d }));

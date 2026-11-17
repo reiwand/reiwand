@@ -69,7 +69,7 @@ pub fn preview_document(dir: &Path, doc: &Value, look: &Value) -> Value {
         wide(i) / 2.0 - at * free
     };
     let kind = if video { "video" } else { "image" };
-    let mut layer = json!({ "id": "media", "type": kind, "transform": {
+    let mut layer = json!({ "id": "media", "blend_space": "canvas", "type": kind, "transform": {
         "scale": [scale[0] * zoom, scale[1] * zoom], "position": [shift(0), shift(1)] } });
     layer[kind] = json!("media");
     layer["size"] = json!(size);

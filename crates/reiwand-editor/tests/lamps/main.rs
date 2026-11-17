@@ -55,8 +55,7 @@ pub fn project(root: &TempDir) -> Project {
         let pointer = format!("/scene/assets/{id}");
         act(&mut project, json!({ "set": { "pointer": pointer, "value": { "path": path } } })).unwrap();
     }
-    let logo =
-        json!({ "id": "logo", "type": "image", "image": "pic", "transform": { "position": [960, 540] } });
+    let logo = json!({ "blend_space": "canvas", "id": "logo", "type": "image", "image": "pic", "transform": { "position": [960, 540] } });
     act(&mut project, json!({ "add": { "pointer": "/scene/layers/-", "value": logo } })).unwrap();
     project
 }

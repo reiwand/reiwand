@@ -16,7 +16,7 @@ fn reaching(target: Value) -> Runtime {
         "limits": { "arm": [-150, -5], "hand": [-150, -5] } });
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [64, 64] },
         "assets": { "mesh": { "path": "mesh.glb" } },
-        "layers": [{ "id": "fox", "type": "mesh", "mesh": "mesh", "ik": [ik] }] });
+        "layers": [{ "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "mesh", "ik": [ik] }] });
     let mut scene = Scene::from_json(&doc.to_string()).unwrap();
     scene.adopt(&Default::default(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     Runtime::new(Arc::new(scene), Values::new())

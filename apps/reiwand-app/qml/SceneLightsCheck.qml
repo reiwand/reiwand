@@ -17,6 +17,7 @@ QtObject {
         const at = layers.findIndex(l => l.type === "light");
         expect(at >= 0, "no light layer was added");
         const node = {
+            "blend_space": "canvas",
             "type": "light",
             "id": layers[at].id,
             "pointer": "/scene/layers/" + at

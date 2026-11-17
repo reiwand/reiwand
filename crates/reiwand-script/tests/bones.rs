@@ -22,8 +22,8 @@ fn glb() -> Vec<u8> {
 fn rigged(uses: &[&str], source: &str) -> (Script, Vec<String>) {
     let doc = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [200, 100] }, "assets": { "rig": { "path": "fox.glb" } },
         "scripts": [{ "path": "main.js", "uses": uses, "events": ["down"] }],
-        "layers": [{ "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" },
-            { "id": "fox", "type": "mesh", "mesh": "rig", "size": [64, 64], "hit": ["arm"] }] });
+        "layers": [{ "blend_space": "canvas", "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" },
+            { "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "rig", "size": [64, 64], "hit": ["arm"] }] });
     let mut scene = Scene::from_json(&doc.to_string()).unwrap();
     let bytes = glb();
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(bytes.clone())).unwrap();

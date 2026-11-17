@@ -4,8 +4,8 @@
   "clock": { "max_fps": "display" },
   "scripts": [{ "path": "scripts/pulso.js", "events": ["update"], "uses": ["audio"] }],
   "layers": [
-    { "id": "fondo", "type": "shape", "shape": { "rect": { "size": [1920, 1080] } }, "gradient": { "stops": [[0, "#101828"], [1, "#283a5c"]] } },
-    { "id": "destello", "type": "shape", "shape": { "rect": { "size": [1920, 1080] } }, "fill": "#ffffff", "opacity": 0 },
-    { "id": "pulso", "type": "shape", "shape": { "ring": { "size": [500, 500], "width": 24 } }, "fill": "#ff4fd8" }
+    { "blend_space": "canvas", "id": "fondo", "type": "shape", "shape": { "rect": { "size": [1920, 1080] } }, "gradient": { "stops": [[0, "#101828"], [1, "#283a5c"]] } },
+    { "blend_space": "canvas", "id": "destello", "type": "shape", "shape": { "rect": { "size": [1920, 1080] } }, "fill": "#ffffff", "opacity": 0 },
+    { "blend_space": "canvas", "id": "pulso", "type": "shape", "shape": { "ring": { "size": [500, 500], "width": 24 } }, "fill": "#ff4fd8" }
   ]
 }

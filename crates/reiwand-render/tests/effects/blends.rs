@@ -121,7 +121,7 @@ fn every_blend_mode_mixes_layers_like_its_formula() {
     let mut shots = Vec::new();
     for mode in BLENDS {
         let name = serde_json::to_value(mode).unwrap();
-        let top = json!({ "id": "top", "type": "image", "image": "top", "size": [W, H], "blend": name });
+        let top = json!({ "blend_space": "canvas", "id": "top", "type": "image", "image": "top", "size": [W, H], "blend": name });
         let fx = Fx::chain(json!([])).input(backdrop()).image("top", layer(), false).layer(top).space("srgb");
         let Some(shot) = fx.shot() else { return };
         let (back, front) = (backdrop(), layer());

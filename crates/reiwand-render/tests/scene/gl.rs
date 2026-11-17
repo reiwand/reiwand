@@ -15,7 +15,7 @@ fn gl() -> Option<Renderer> {
 #[test]
 fn scenes_that_blend_in_srgb_render_on_opengl_es() {
     let Some(r) = gl() else { return };
-    let layers = json!([{ "id": "s", "type": "solid", "color": "#ffffff", "opacity": 0.5,
+    let layers = json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ffffff", "opacity": 0.5,
         "effects": [{ "effect": "tint", "params": { "color": "#ff0000" } }] }]);
     let canvas = json!({ "size": [100, 50], "background": "#000000", "blend_space": "srgb" });
     let pixels = Shot::new(&r, canvas, layers, &[]).pixels(&r);

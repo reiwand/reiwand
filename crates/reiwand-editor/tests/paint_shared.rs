@@ -25,8 +25,8 @@ fn painting_a_picture_another_effect_uses_makes_a_copy_for_the_painted_one() {
     .unwrap();
     let effect = json!({ "effect": "blend_gradient" });
     let layers = json!([
-        { "id": "a", "type": "solid", "color": "#ffffff", "effects": [effect] },
-        { "id": "b", "type": "solid", "color": "#ffffff", "effects": [effect] }
+        { "blend_space": "canvas", "id": "a", "type": "solid", "color": "#ffffff", "effects": [effect] },
+        { "blend_space": "canvas", "id": "b", "type": "solid", "color": "#ffffff", "effects": [effect] }
     ]);
     act(&mut p, json!({ "set": { "pointer": "/scene/layers", "value": layers } })).unwrap();
     let (first, second) = ("/scene/layers/0/effects/0/params/map", "/scene/layers/1/effects/0/params/map");

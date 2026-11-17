@@ -11,6 +11,7 @@ fn solid(c: [u8; 3]) -> RgbaImage {
 
 fn shot(r: &Renderer, asset: Value, layer: Value, bytes: Vec<u8>) -> Vec<u8> {
     let mut layer = layer;
+    layer["blend_space"] = json!("canvas");
     layer["id"] = json!("p");
     layer["type"] = json!("image");
     layer["image"] = json!("p");

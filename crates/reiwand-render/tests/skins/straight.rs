@@ -37,7 +37,7 @@ fn apart(a: &[u8], b: &[u8]) -> (u8, f32) {
 fn a_tiled_gpu_reads_pictures_and_hidden_mesh_masks_where_they_lie_instead_of_drawing_them_apart() {
     let Some(_) = renderer() else { return };
     let Ok(r) = Renderer::new() else { return };
-    let picture = json!({ "id": "photo", "type": "image", "image": "pic", "size": [SIDE, SIDE] });
+    let picture = json!({ "blend_space": "canvas", "id": "photo", "type": "image", "image": "pic", "size": [SIDE, SIDE] });
     for shown in [mesh(json!({ "effects": waves() })), picture] {
         let mut shown = shown;
         shown["effects"] = waves();

@@ -30,7 +30,7 @@ fn media_texts_follow_the_track_and_stay_empty_without_one() {
     let names = ["title", "artist", "album", "album_artist", "subtitle", "genres", "kind"];
     let layers: Vec<_> = names
         .iter()
-        .map(|n| json!({ "id": format!("t_{n}"), "type": "text", "text": { "media": n } }))
+        .map(|n| json!({ "blend_space": "canvas", "id": format!("t_{n}"), "type": "text", "text": { "media": n } }))
         .collect();
     let mut rt = runtime(&scene(json!(layers)));
     assert!(rt.uses().media);
@@ -62,9 +62,9 @@ fn solid(frame: &Frame, i: usize) -> Color {
 #[test]
 fn cover_colours_reach_colours_and_ease_with_smooth() {
     let layers = json!([
-        { "id": "p", "type": "solid", "color": { "media": "primary" } },
-        { "id": "t", "type": "solid", "color": { "media": "text" } },
-        { "id": "c", "type": "solid", "color": { "media": "contrast", "smooth": 1 } }
+        { "blend_space": "canvas", "id": "p", "type": "solid", "color": { "media": "primary" } },
+        { "blend_space": "canvas", "id": "t", "type": "solid", "color": { "media": "text" } },
+        { "blend_space": "canvas", "id": "c", "type": "solid", "color": { "media": "contrast", "smooth": 1 } }
     ]);
     let mut rt = runtime(&scene(layers));
     let frame = rt.frame(VIEW, Quality::Q3);
@@ -93,8 +93,8 @@ fn cover_colours_reach_colours_and_ease_with_smooth() {
 #[test]
 fn playing_shows_and_hides_layers_and_drives_numbers() {
     let layers = json!([
-        { "id": "on", "type": "solid", "color": "#ffffff", "visible": { "media": "playing" } },
-        { "id": "lvl", "type": "solid", "color": "#ffffff", "opacity": { "media": "playing", "scale": 0.5 } }
+        { "blend_space": "canvas", "id": "on", "type": "solid", "color": "#ffffff", "visible": { "media": "playing" } },
+        { "blend_space": "canvas", "id": "lvl", "type": "solid", "color": "#ffffff", "opacity": { "media": "playing", "scale": 0.5 } }
     ]);
     let mut rt = runtime(&scene(layers));
     let frame = rt.frame(VIEW, Quality::Q3);
@@ -110,10 +110,10 @@ fn playing_shows_and_hides_layers_and_drives_numbers() {
 #[test]
 fn the_position_runs_on_from_the_last_reading_only_while_playing() {
     let layers = json!([
-        { "id": "bar", "type": "solid", "color": "#ffffff", "opacity": { "media": "progress", "scale": 0.5, "offset": 0.5 } },
-        { "id": "at", "type": "text", "text": { "media": "position" } },
-        { "id": "len", "type": "text", "text": { "media": "duration" } },
-        { "id": "done", "type": "text", "text": { "media": "progress" } }
+        { "blend_space": "canvas", "id": "bar", "type": "solid", "color": "#ffffff", "opacity": { "media": "progress", "scale": 0.5, "offset": 0.5 } },
+        { "blend_space": "canvas", "id": "at", "type": "text", "text": { "media": "position" } },
+        { "blend_space": "canvas", "id": "len", "type": "text", "text": { "media": "duration" } },
+        { "blend_space": "canvas", "id": "done", "type": "text", "text": { "media": "progress" } }
     ]);
     let mut rt = runtime(&scene(layers));
     let frame = rt.frame(VIEW, Quality::Q3);
@@ -151,7 +151,9 @@ fn the_position_runs_on_from_the_last_reading_only_while_playing() {
 
 #[test]
 fn a_text_of_the_position_wakes_once_a_second() {
-    let mut rt = runtime(&scene(json!([{ "id": "at", "type": "text", "text": { "media": "position" } }])));
+    let mut rt = runtime(&scene(
+        json!([{ "blend_space": "canvas", "id": "at", "type": "text", "text": { "media": "position" } }]),
+    ));
     rt.set_media(MediaState { position: 10.25, ..playing() });
     let frame = rt.frame(VIEW, Quality::Q3);
     assert!(matches!(frame.wake, Wake::At(t) if close(t as f32, 0.75)), "{:?}", frame.wake);

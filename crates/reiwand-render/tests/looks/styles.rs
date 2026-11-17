@@ -2,7 +2,7 @@ use super::fonts::boxes;
 use super::*;
 
 pub(super) fn styled(r: &Renderer, more: Value) -> Shot {
-    let mut t = json!({ "id": "t", "type": "text", "text": "A", "font": "b", "size": 20, "color": "#ffffff",
+    let mut t = json!({ "blend_space": "canvas", "id": "t", "type": "text", "text": "A", "font": "b", "size": 20, "color": "#ffffff",
         "transform": { "position": [50, 25] } });
     t.as_object_mut().unwrap().extend(more.as_object().unwrap().clone());
     let scene = json!({ "canvas": canvas("#000000"), "assets": { "b": { "path": "b.ttf" } }, "layers": [t] });

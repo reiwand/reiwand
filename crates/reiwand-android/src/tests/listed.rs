@@ -6,7 +6,7 @@ fn album() -> std::sync::Arc<pack::Pack> {
 }
 
 fn album_of() -> (String, std::sync::Arc<pack::Pack>) {
-    let layers = json!([{ "id": "film", "type": "video", "video": "clip" }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "film", "type": "video", "video": "clip" }]);
     let album = json!({ "album": { "type": "folder", "mode": "all", "accept": ["image", "video"] } });
     packed(layers, album)
 }
@@ -124,8 +124,8 @@ pub(super) fn folder_videos_get_their_length_and_a_clock_scripts_steer() {
 }
 
 pub(super) fn a_video_a_file_property_picks_plays_on_each_own_clock() {
-    let layers = json!([{ "id": "a", "type": "video", "video": { "prop": "pick" } },
-        { "id": "b", "type": "video", "video": { "prop": "pick" }, "playback": { "own_clock": true } }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "a", "type": "video", "video": { "prop": "pick" } },
+        { "blend_space": "canvas", "id": "b", "type": "video", "video": { "prop": "pick" }, "playback": { "own_clock": true } }]);
     let (_, pack) = packed(layers, json!({ "pick": { "type": "file", "accept": ["video"] } }));
     let dir = tempfile::tempdir().unwrap();
     let film = dir.path().join("sea.webm");

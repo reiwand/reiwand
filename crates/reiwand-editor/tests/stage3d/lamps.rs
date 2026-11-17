@@ -59,7 +59,9 @@ fn the_3d_stage_keeps_its_lights_when_another_layer_has_a_bad_color() {
     act(&mut p, json!({ "add_layer": { "kind": "light", "id": "lamp" } })).unwrap();
     assert_eq!(lights(&p)[0]["id"], "lamp");
     let list = p.doc["scene"]["layers"].as_array_mut().unwrap();
-    list.push(json!({"id": "odd", "type": "solid", "color": "#fff", "size": [10, 10]}));
+    list.push(
+        json!({ "blend_space": "canvas", "id": "odd", "type": "solid", "color": "#fff", "size": [10, 10]}),
+    );
     let shown = lights(&p);
     assert_eq!(shown[0]["id"], "lamp");
 }

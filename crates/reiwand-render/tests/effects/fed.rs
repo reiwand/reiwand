@@ -2,7 +2,7 @@ use super::*;
 
 #[test]
 fn effects_take_masks_from_layers_and_shapes() {
-    let half = json!({ "id": "half", "type": "solid", "color": "#ffffff", "size": [32, 32], "visible": false,
+    let half = json!({ "blend_space": "canvas", "id": "half", "type": "solid", "color": "#ffffff", "size": [32, 32], "visible": false,
         "transform": { "position": [48, 16] } });
     let gray =
         |mask: Value| json!([{ "effect": "color_adjust", "params": { "saturation": 0 }, "mask": mask }]);
@@ -41,7 +41,7 @@ fn built_in_effects_read_the_backdrop() {
 }
 
 fn moving(id: &str) -> Value {
-    json!({ "id": id, "type": "solid", "color": "#ffffff", "size": [16, 16], "visible": false,
+    json!({ "blend_space": "canvas", "id": id, "type": "solid", "color": "#ffffff", "size": [16, 16], "visible": false,
         "transform": { "position": { "keys": [[0, [8, 8]], [1, [56, 24]]] } } })
 }
 
@@ -64,7 +64,7 @@ fn played(fx: impl Fn() -> Fx) -> Option<(Shot, Shot, u32)> {
 fn effects_follow_hidden_moving_layers_they_read() {
     let texture = json!([{ "effect": "blend_texture", "params": { "texture": { "layer": "fed" }, "blend": "normal" } }]);
     let mask = json!([{ "effect": "tint", "params": { "color": "#ff0000" }, "mask": { "layer": "fed" } }]);
-    let mid = json!({ "id": "mid", "type": "solid", "color": "#000000", "size": [W, H], "visible": false,
+    let mid = json!({ "blend_space": "canvas", "id": "mid", "type": "solid", "color": "#000000", "size": [W, H], "visible": false,
         "effects": [{ "effect": "blend_texture", "params": { "texture": { "layer": "fed" }, "blend": "normal" } }] });
     let chained = json!([{ "effect": "blend_texture", "params": { "texture": { "layer": "mid" }, "blend": "normal" } }]);
     let cases = [(texture, None), (mask, None), (chained, Some(mid))];
@@ -114,7 +114,7 @@ fn masks_that_read_groups_draw_each_group_once_a_frame() {
                 }
                 l
             };
-            json!({ "id": format!("g{k}"), "type": "group", "visible": false, "layers": [masked(0), masked(1)] })
+            json!({ "blend_space": "canvas", "id": format!("g{k}"), "type": "group", "visible": false, "layers": [masked(0), masked(1)] })
         };
         let read = json!([{ "effect": "blend_texture", "params": { "texture": { "layer": "g0" }, "blend": "normal" } }]);
         let mut run = (0..depth).map(group).fold(Fx::chain(read), Fx::layer).run()?;
@@ -146,7 +146,7 @@ fn groups_with_masked_children_that_feed_each_other_through_effects_draw_once_a_
                 l["effects"] = if next { read(k + 1) } else { json!([]) };
                 l
             };
-            let mut g = json!({ "id": format!("g{k}"), "type": "group", "visible": false, "layers": [child(0), child(1)] });
+            let mut g = json!({ "blend_space": "canvas", "id": format!("g{k}"), "type": "group", "visible": false, "layers": [child(0), child(1)] });
             g["effects"] = if next { read(k + 1) } else { json!([]) };
             g
         };
@@ -168,7 +168,7 @@ fn groups_with_masked_children_that_feed_each_other_through_effects_draw_once_a_
 fn moving_image_masks_draw_like_still_ones() {
     let mask = json!([{ "effect": "tint", "params": { "color": "#ff0000" }, "mask": { "layer": "fed" } }]);
     let shot = |position: Value| {
-        let fed = json!({ "id": "fed", "type": "image", "image": "dot", "size": [24, 16], "visible": false,
+        let fed = json!({ "blend_space": "canvas", "id": "fed", "type": "image", "image": "dot", "size": [24, 16], "visible": false,
             "transform": { "position": position } });
         let fx = Fx::chain(mask.clone()).input(solid(BLUE)).image("dot", ramp(), false).layer(fed);
         let mut run = fx.run()?;
@@ -188,7 +188,7 @@ fn moving_image_masks_draw_like_still_ones() {
 fn small_mask_pictures_keep_their_place_when_drawn_at_their_own_size() {
     let halves = RgbaImage::from_fn(4, 2, |x, _| Rgba(if x < 2 { [255; 4] } else { [0; 4] }));
     let mask = json!([{ "effect": "tint", "params": { "color": "#ff0000" }, "mask": { "layer": "fed" } }]);
-    let fed = json!({ "id": "fed", "type": "image", "image": "halves", "size": [W, H], "visible": false,
+    let fed = json!({ "blend_space": "canvas", "id": "fed", "type": "image", "image": "halves", "size": [W, H], "visible": false,
         "transform": { "position": { "keys": [[0, [32, 16]], [9, [32, 16.5]]] } } });
     let fx = Fx::chain(mask).input(solid(BLUE)).image("halves", halves, true).layer(fed);
     let Some(mut run) = fx.run() else { return };

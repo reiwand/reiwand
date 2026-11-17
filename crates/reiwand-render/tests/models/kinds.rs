@@ -7,8 +7,8 @@ pub fn sparks(depth: f32, render: Value) -> Value {
 }
 
 pub fn group(particles: Value) -> Value {
-    let cube = json!({ "id": "cube", "type": "model", "model": "red", "position": [0, 0, 0] });
-    json!([{ "id": "world", "type": "group", "space": "3d", "layers": [cube, particles] }])
+    let cube = json!({ "blend_space": "canvas", "id": "cube", "type": "model", "model": "red", "position": [0, 0, 0] });
+    json!([{ "blend_space": "canvas", "id": "world", "type": "group", "space": "3d", "layers": [cube, particles] }])
 }
 
 pub fn red() -> BTreeMap<&'static str, Vec<u8>> {
@@ -16,7 +16,8 @@ pub fn red() -> BTreeMap<&'static str, Vec<u8>> {
 }
 
 fn tested(lighting: Option<Value>) -> Value {
-    let mut layer = json!({ "id": "p", "type": "particles", "system": "s", "depth_test": true });
+    let mut layer =
+        json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s", "depth_test": true });
     if let Some(l) = lighting {
         layer["lighting"] = l;
     }
@@ -30,7 +31,7 @@ pub fn red_at(px: &[u8]) -> bool {
 #[test]
 fn lit_particles_in_a_3d_group_hide_one_by_one_behind_the_models_in_front_of_them() {
     let Some(r) = renderer() else { return };
-    let lights = json!({ "id": "sun", "type": "light", "light": "point", "intensity": 2, "radius": 400, "z": 40,
+    let lights = json!({ "blend_space": "canvas", "id": "sun", "type": "light", "light": "point", "intensity": 2, "radius": 400, "z": 40,
         "transform": { "position": [32, 32] } });
     for (render, lighting) in [(json!({ "lit": true }), None), (json!({}), Some(json!({ "strength": 1 })))] {
         let layer = tested(lighting);
@@ -53,7 +54,8 @@ const SAME: &str = "fn particle(p: Sprite) -> Sprite {\n    return p;\n}\n";
 fn owned(depth: f32) -> Scene {
     let mut extra = sparks(depth, json!({ "shader": "same" }));
     extra["effects"] = json!({ "same": { "descriptor": "effects/same.json", "wgsl": "effects/same.wgsl" } });
-    let layer = json!({ "id": "p", "type": "particles", "system": "s", "depth_test": true });
+    let layer =
+        json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s", "depth_test": true });
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [SIDE, SIDE], "background": "#000000" },
         "assets": { "red": { "path": "red.glb" } }, "layers": group(layer), "particles": extra["particles"],
         "effects": extra["effects"] });
@@ -89,10 +91,12 @@ fn bent(r: &Renderer, depth: Option<f32>, tested: bool) -> Vec<u8> {
         RgbaImage::from_fn(16, 16, |x, _| Rgba(if x % 4 < 2 { [0, 255, 0, 255] } else { [0, 0, 255, 255] }));
     let bump = RgbaImage::from_pixel(4, 4, Rgba([255, 128, 255, 255]));
     let images = [("stripes", Pixels::new(stripes)), ("bump", Pixels::new(bump))];
-    let back = json!({ "id": "back", "type": "image", "image": "stripes", "size": [SIDE, SIDE],
+    let back = json!({ "blend_space": "canvas", "id": "back", "type": "image", "image": "stripes", "size": [SIDE, SIDE],
         "transform": { "position": [32, 32] }, "depth_test": true });
-    let mut layers = group(json!({ "id": "p", "type": "particles", "system": "s", "depth_test": tested,
-        "visible": depth.is_some() }));
+    let mut layers = group(
+        json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s", "depth_test": tested,
+        "visible": depth.is_some() }),
+    );
     layers[0]["layers"].as_array_mut().unwrap().insert(0, back);
     let mut extra = sparks(depth.unwrap_or(0.0), json!({ "refract": { "normal": "bump", "amount": 1 } }));
     extra["particles"]["s"]["init"]["size"] = json!([140, 140]);

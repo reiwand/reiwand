@@ -33,7 +33,7 @@ impl Painter<'_, '_, '_> {
                 let over = Target { src: mixed, rect };
                 match d.content {
                     Content::Group { clip } => self.list(i + 1..d.end, over, clip),
-                    _ => self.direct(i, over, (d.opacity, d.blend, d.mask), false),
+                    _ => self.direct(i, over, (d.opacity, d.blend, d.mask, d.space), false),
                 }
                 let layer = self.geometry(i).map_or(rect.affine(), |(size, _)| self.local(i, size));
                 let out = self.effects(i, mixed, rect, invert(layer).then(rect.affine()));

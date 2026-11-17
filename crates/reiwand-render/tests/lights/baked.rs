@@ -4,7 +4,7 @@ use serde_json::json;
 use std::sync::Arc;
 
 fn lamp(x: f32) -> serde_json::Value {
-    json!({ "id": "lamp", "type": "light", "transform": { "position": [x, 45] }, "z": 10, "radius": 30 })
+    json!({ "blend_space": "canvas", "id": "lamp", "type": "light", "transform": { "position": [x, 45] }, "z": 10, "radius": 30 })
 }
 
 fn row(image: &image::RgbaImage, y: u32) -> Vec<u8> {

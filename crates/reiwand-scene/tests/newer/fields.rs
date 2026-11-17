@@ -42,7 +42,7 @@ fn new_fields_round_trip_and_older_scenes_use_none_of_them() {
     let plain: Json = serde_json::from_str(&old.to_json().unwrap()).unwrap();
     assert!(plain["canvas"].get("clear").is_none() && plain.get("effects").is_none());
     let even = json!({ "schema": SCHEMA, "canvas": { "size": [8, 8] },
-        "layers": [{ "id": "a", "type": "solid", "color": "#000000", "parallax": [0.4, 0.4] }] });
+        "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#000000", "parallax": [0.4, 0.4] }] });
     let even = Scene::from_json(&even.to_string()).unwrap();
     assert!(even.features().is_empty() && even.to_json().unwrap().to_string().contains("0.4"));
 }
@@ -50,7 +50,7 @@ fn new_fields_round_trip_and_older_scenes_use_none_of_them() {
 #[test]
 fn clock_texts_keep_their_letters_and_date_texts_name_their_feature() {
     let text = |t: Json| {
-        json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [{ "id": "t", "type": "text", "text": t }] })
+        json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [{ "blend_space": "canvas", "id": "t", "type": "text", "text": t }] })
             .to_string()
     };
     let scene = Scene::load(&text(json!({ "clock": "HH:mm Sydney" })), &BTreeMap::new()).unwrap();
@@ -62,7 +62,7 @@ fn clock_texts_keep_their_letters_and_date_texts_name_their_feature() {
     let dated = Scene::load(&text(json!({ "date": "d MMMM yyyy" })), &BTreeMap::new()).unwrap();
     assert!(dated.features().contains("clock_dates"));
     let wrong = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] },
-        "layers": [{ "id": "s", "type": "solid", "color": "#000000", "opacity": { "date": "d" } }] });
+        "layers": [{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#000000", "opacity": { "date": "d" } }] });
     assert!(Scene::load(&wrong.to_string(), &BTreeMap::new()).is_err());
 }
 

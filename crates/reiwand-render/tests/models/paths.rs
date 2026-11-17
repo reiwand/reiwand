@@ -9,7 +9,7 @@ fn flown(paths: Value, extra: Value) -> Scene {
     let models = BTreeMap::from([("red", cube(unlit("paint", [1.0, 0.0, 0.0, 1.0])))]);
     let mut camera = json!({ "paths": paths });
     extra.as_object().unwrap().iter().for_each(|(k, v)| camera[k] = v.clone());
-    let layers = json!([{ "id": "cube", "type": "model", "model": "red", "scale": [0.5, 0.5, 0.5] }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "cube", "type": "model", "model": "red", "scale": [0.5, 0.5, 0.5] }]);
     scene(json!({ "camera3d": camera }), layers, models)
 }
 

@@ -111,17 +111,37 @@ fn mask_value(in: Out) -> f32 {
     return mix(mix(m, 1.0 - m, item.mask_info.y), 1.0, item.mask_info.w);
 }
 
+fn respace(c: vec3<f32>, kind: u32) -> vec3<f32> {
+    if kind == 1u {
+        return encode(c);
+    }
+    if kind == 2u {
+        return decode(c);
+    }
+    return c;
+}
+
 fn finish(src: vec4<f32>, in: Out) -> vec4<f32> {
     let c = src * mask_value(in);
     if item.mode.x < 3.5 {
         return c;
     }
+    let code = u32(item.mode.x + 0.5);
+    let kind = (code >> 6u) & 3u;
     let bd = textureSampleLevel(back_tex, samp, item.back.xy + in.position.xy * item.back.zw, 0.0);
-    let cb = select(vec3<f32>(0.0), bd.rgb / bd.a, bd.a > 1e-5);
-    let cs = select(vec3<f32>(0.0), c.rgb / c.a, c.a > 1e-5);
-    let blended = max(blend_pick(u32(item.mode.x + 0.5), cb, cs), vec3<f32>(0.0));
-    let rgb = (1.0 - bd.a) * c.rgb + (1.0 - c.a) * bd.rgb + c.a * bd.a * blended;
-    return vec4<f32>(rgb, c.a + bd.a - c.a * bd.a);
+    let cb = respace(select(vec3<f32>(0.0), bd.rgb / bd.a, bd.a > 1e-5), kind);
+    let cs = respace(select(vec3<f32>(0.0), c.rgb / c.a, c.a > 1e-5), kind);
+    let blended = max(blend_pick(code & 63u, cb, cs), vec3<f32>(0.0));
+    if kind == 0u {
+        let rgb = (1.0 - bd.a) * c.rgb + (1.0 - c.a) * bd.rgb + c.a * bd.a * blended;
+        return vec4<f32>(rgb, c.a + bd.a - c.a * bd.a);
+    }
+    let clip = ((code >> 8u) & 1u) == 1u;
+    let alpha = select(c.a + bd.a - c.a * bd.a, bd.a, clip);
+    let base = (1.0 - c.a) * cb * bd.a + c.a * bd.a * blended;
+    let rgb = select(base + (1.0 - bd.a) * cs * c.a, base, clip);
+    let back = respace(select(vec3<f32>(0.0), rgb / alpha, alpha > 1e-5), 3u - kind);
+    return vec4<f32>(back * alpha, alpha);
 }
 
 @fragment

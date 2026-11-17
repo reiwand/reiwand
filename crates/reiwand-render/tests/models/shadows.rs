@@ -11,19 +11,19 @@ fn world(light: Value, spin: bool) -> (Value, BTreeMap<&'static str, Vec<u8>>) {
         .part("block", ForgeShape::Cube, [0.0; 3], 0.6, 0)
         .glb();
     let turn = if spin { json!({ "keys": [[0, [0, 0, 0]], [1, [0, 0, 90]]] }) } else { json!([0, 0, 0]) };
-    let layers = json!([light, { "id": "world", "type": "group", "space": "3d", "layers": [
-        { "id": "ground", "type": "model", "model": "ground" },
-        { "id": "block", "type": "model", "model": "block", "position": [0, 0.8, 1], "rotation": turn }] }]);
+    let layers = json!([light, { "blend_space": "canvas", "id": "world", "type": "group", "space": "3d", "layers": [
+        { "blend_space": "canvas", "id": "ground", "type": "model", "model": "ground" },
+        { "blend_space": "canvas", "id": "block", "type": "model", "model": "block", "position": [0, 0.8, 1], "rotation": turn }] }]);
     (layers, BTreeMap::from([("ground", ground), ("block", block)]))
 }
 
 fn sun(shadows: bool) -> Value {
-    json!({ "id": "sun", "type": "light", "light": "directional", "intensity": 3,
+    json!({ "blend_space": "canvas", "id": "sun", "type": "light", "light": "directional", "intensity": 3,
         "transform": { "tilt": [45, 0] }, "shadows": shadows })
 }
 
 fn lamp(kind: &str) -> Value {
-    let mut l = json!({ "id": "sun", "type": "light", "light": kind, "intensity": 6, "radius": 4000, "z": 30,
+    let mut l = json!({ "blend_space": "canvas", "id": "sun", "type": "light", "light": kind, "intensity": 6, "radius": 4000, "z": 30,
         "transform": { "position": [32, 10] }, "shadows": true });
     if kind == "spot" {
         l["cone"] = json!([60, 120]);
@@ -160,9 +160,9 @@ fn a_point_light_hidden_behind_a_wall_shades_the_whole_ground_across_its_faces()
         let mut light = lamp("point");
         (light["transform"]["position"], light["z"], light["shadows"]) =
             (json!([32, 32]), json!(15), json!(shadows));
-        let layers = json!([light, { "id": "world", "type": "group", "space": "3d", "layers": [
-            { "id": "ground", "type": "model", "model": "ground" },
-            { "id": "wall", "type": "model", "model": "ground", "position": [0, 0, 0.6], "rotation": [0, 180, 0] }] }]);
+        let layers = json!([light, { "blend_space": "canvas", "id": "world", "type": "group", "space": "3d", "layers": [
+            { "blend_space": "canvas", "id": "ground", "type": "model", "model": "ground" },
+            { "blend_space": "canvas", "id": "wall", "type": "model", "model": "ground", "position": [0, 0, 0.6], "rotation": [0, 180, 0] }] }]);
         render(r, scene(json!({}), layers, BTreeMap::from([("ground", ground.clone())])), Quality::Q3)
     };
     let (lit, dark) = (shown(false), shown(true));

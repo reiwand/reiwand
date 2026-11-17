@@ -72,8 +72,8 @@ class SoundTest : SceneBase() {
         const val SETTLE_MS = 1_000L
         const val STREAM_SCENE = """{ "schema": "reiwand.scene/1", "canvas": { "size": [64, 64] },
             "assets": { "wind": { "path": "wind.ogg" } },
-            "layers": [{ "id": "fill", "type": "solid", "color": "#204080" },
-                       { "id": "gusts", "type": "sound", "sound": "wind", "stream": true }] }"""
+            "layers": [{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#204080" },
+                       { "blend_space": "canvas", "id": "gusts", "type": "sound", "sound": "wind", "stream": true }] }"""
         const val STREAM_MANIFEST = """{ "schema": "reiwand.wpak/2", "id": "org.example.stream", "version": "1.0.0",
             "title": "Stream", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "origin": { "kind": "original" },
             "content": { "rating": "general" }, "photosensitive": false, "requires": { "features": ["sound", "sound2"] } }"""

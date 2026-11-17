@@ -2,7 +2,7 @@ use super::{UP, at, once, wall};
 use serde_json::json;
 
 fn lamp(light: serde_json::Value) -> serde_json::Value {
-    let mut l = json!({ "id": "lamp", "type": "light", "transform": { "position": [40, 45] }, "z": 20, "radius": 60 });
+    let mut l = json!({ "blend_space": "canvas", "id": "lamp", "type": "light", "transform": { "position": [40, 45] }, "z": 20, "radius": 60 });
     l.as_object_mut().unwrap().extend(light.as_object().cloned().unwrap());
     l
 }
@@ -43,7 +43,7 @@ fn a_directional_light_reaches_everywhere() {
 
 #[test]
 fn a_layer_without_lighting_ignores_lights() {
-    let plain = json!({ "id": "wall", "type": "image", "image": "wall", "size": [160, 90], "transform": { "position": [80, 45] } });
+    let plain = json!({ "blend_space": "canvas", "id": "wall", "type": "image", "image": "wall", "size": [160, 90], "transform": { "position": [80, 45] } });
     let Some(img) = once(json!([plain, lamp(json!({}))]), json!({}), UP) else { return };
     assert_eq!(at(&img, 40, 45), at(&img, 140, 80));
 }
@@ -53,7 +53,7 @@ fn modest_devices_light_with_at_most_eight_lamps() {
     let Some(r) = super::renderer() else { return };
     let lamps: Vec<_> = (0..10)
         .map(|i| {
-            json!({ "id": format!("l{i}"), "type": "light", "transform": { "position": [8 + 16 * i, 45] },
+            json!({ "blend_space": "canvas", "id": format!("l{i}"), "type": "light", "transform": { "position": [8 + 16 * i, 45] },
             "z": 4, "radius": 6 })
         })
         .collect();
@@ -67,7 +67,7 @@ fn modest_devices_light_with_at_most_eight_lamps() {
 
 #[test]
 fn texts_take_the_light_too() {
-    let text = json!({ "id": "t", "type": "text", "text": "████", "size": 40, "color": "#ffffff",
+    let text = json!({ "blend_space": "canvas", "id": "t", "type": "text", "text": "████", "size": 40, "color": "#ffffff",
         "transform": { "position": [80, 45] }, "lighting": {} });
     let Some(dark) = once(json!([text.clone()]), json!({}), UP) else { return };
     let Some(lit) = once(
@@ -84,8 +84,9 @@ fn texts_take_the_light_too() {
 #[test]
 fn lights_past_the_cap_of_a_device_are_named_as_left_out() {
     let Some(r) = super::renderer() else { return };
-    let lamps: Vec<_> =
-        (0..10).map(|i| json!({ "id": format!("l{i}"), "type": "light", "radius": 6 })).collect();
+    let lamps: Vec<_> = (0..10)
+        .map(|i| json!({ "blend_space": "canvas", "id": format!("l{i}"), "type": "light", "radius": 6 }))
+        .collect();
     let mut layers = vec![wall(json!({}))];
     layers.extend(lamps);
     let mut shot = super::Shot::new(r, super::scene(json!(layers), json!({})), &super::files(UP));

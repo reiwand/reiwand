@@ -48,8 +48,7 @@ pub fn scene(layer: Value, glb: Vec<u8>) -> Scene {
 }
 
 pub fn mesh(extra: Value) -> Value {
-    let mut layer =
-        json!({ "id": "fox", "type": "mesh", "mesh": "mesh", "texture": "pic", "size": [SIDE, SIDE] });
+    let mut layer = json!({ "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "mesh", "texture": "pic", "size": [SIDE, SIDE] });
     extra.as_object().unwrap().iter().for_each(|(k, v)| layer[k] = v.clone());
     layer
 }

@@ -9,7 +9,7 @@ use std::path::Path;
 pub(super) fn chosen_files_and_folders() {
     let source = tempfile::tempdir().unwrap();
     fs::copy(Path::new(FIXTURES).join("green-64x32.png"), source.path().join("sky.png")).unwrap();
-    let layers = json!([{ "id": "sky", "type": "image", "image": "sky" }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "sky", "type": "image", "image": "sky" }]);
     let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] },
         "assets": { "sky": { "path": "sky.png" } }, "layers": layers });
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();

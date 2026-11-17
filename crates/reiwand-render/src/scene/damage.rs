@@ -26,7 +26,11 @@ impl Painter<'_, '_, '_> {
     pub(crate) fn plain(&self, i: usize) -> bool {
         let d = &self.frame.draws[i];
         let plain = matches!(d.content, Content::Group { clip: false }) && d.opacity >= 1.0;
-        let plain = plain && d.blend == Blend::Normal && d.mask.is_none() && d.effects.is_empty();
+        let plain = plain
+            && d.blend == Blend::Normal
+            && d.space.is_none()
+            && d.mask.is_none()
+            && d.effects.is_empty();
         let tilted = d.layer.transform.tilt.is_some() || d.layer.transform.z.is_some();
         plain && d.tint == Color([1.0; 4]) && d.brightness == 1.0 && !d.layer.cache && !tilted
     }

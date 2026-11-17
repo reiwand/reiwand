@@ -13,7 +13,7 @@ fn broken(root: &tempfile::TempDir, bad: &str) -> Project {
 fn trio(bad: &str) -> serde_json::Value {
     json!([
         card("first", json!({"position": [200, 200]})),
-        {"id": "middle", "type": "solid", "color": bad, "size": [200, 100], "transform": {"position": [500, 500]}},
+        { "blend_space": "canvas", "id": "middle", "type": "solid", "color": bad, "size": [200, 100], "transform": {"position": [500, 500]}},
         card("last", json!({"position": [800, 800]}))
     ])
 }

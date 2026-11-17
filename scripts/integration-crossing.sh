@@ -12,7 +12,7 @@ manifest = {"schema": "reiwand.wpak/2", "id": "org.example." + way, "version": "
             "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "previews": {"thumbnail": "preview.png"}}
 passages = {w: {"descriptor": "t/mark.json", "wgsl": "t/mark.wgsl", "duration_ms": int(ms)} for w in way.split("+")}
 scene = {"schema": "reiwand.scene/1", "canvas": {"size": [64, 32], "fit": "stretch"},
-         "transition": passages, "layers": [{"id": "blue", "type": "solid", "color": "#0000ff"}]}
+         "transition": passages, "layers": [{ "blend_space": "canvas", "id": "blue", "type": "solid", "color": "#0000ff"}]}
 mark = {"id": "mark", "stage": "transition", "cost": {"taps": 1, "passes": 1, "scale": 1}}
 wgsl = """fn transition(c: Crossing) -> Crossing {
     var o = c;

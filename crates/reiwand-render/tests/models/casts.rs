@@ -6,11 +6,11 @@ pub fn backdrop(block: Vec<u8>, material: Value, wind: [f32; 2]) -> Scene {
         .material(ForgeMaterial { roughness: 1.0, ..ForgeMaterial::new("ground", [1.0; 4]) })
         .part("ground", ForgeShape::Plane, [0.0; 3], 6.0, 0)
         .glb();
-    let sun = json!({ "id": "sun", "type": "light", "light": "directional", "intensity": 3,
+    let sun = json!({ "blend_space": "canvas", "id": "sun", "type": "light", "light": "directional", "intensity": 3,
         "transform": { "tilt": [45, 0] }, "shadows": true });
-    let layers = json!([sun, { "id": "world", "type": "group", "space": "3d", "layers": [
-        { "id": "ground", "type": "model", "model": "ground" },
-        { "id": "block", "type": "model", "model": "block", "position": [0, 0.8, 1], "materials": { "block": material } }] }]);
+    let layers = json!([sun, { "blend_space": "canvas", "id": "world", "type": "group", "space": "3d", "layers": [
+        { "blend_space": "canvas", "id": "ground", "type": "model", "model": "ground" },
+        { "blend_space": "canvas", "id": "block", "type": "model", "model": "block", "position": [0, 0.8, 1], "materials": { "block": material } }] }]);
     let canvas = json!({ "canvas": { "size": [SIDE, SIDE], "background": "#000000", "wind": wind } });
     let mut s = scene(canvas, layers, BTreeMap::from([("ground", ground), ("block", block)]));
     s.ext.insert(

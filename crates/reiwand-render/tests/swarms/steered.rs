@@ -2,7 +2,7 @@ use super::fields::{agree, alive, both, system};
 use super::*;
 
 fn layers() -> Value {
-    json!([{ "id": "p", "type": "particles", "system": "s" }])
+    json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s" }])
 }
 
 fn moving(more: Value) -> Value {

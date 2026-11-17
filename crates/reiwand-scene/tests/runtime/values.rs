@@ -3,10 +3,10 @@ use super::*;
 #[test]
 fn values_follow_properties_audio_cursor_and_the_clock() {
     let text = scene(json!([
-        { "id": "img", "type": "image", "image": { "prop": "style", "map": { "night": "a", "dawn": "b" } } },
-        { "id": "lvl", "type": "solid", "color": { "prop": "text_color" }, "opacity": { "audio": "bass", "clamp": [0, 1] } },
-        { "id": "tx", "type": "text", "text": { "clock": "HH:mm:ss a" }, "anchor": "bottom_right", "transform": { "position": [-10, -5] } },
-        { "id": "px", "type": "solid", "color": "#000000", "parallax": [0.1, 0.1], "size": [10, 10] }
+        { "blend_space": "canvas", "id": "img", "type": "image", "image": { "prop": "style", "map": { "night": "a", "dawn": "b" } } },
+        { "blend_space": "canvas", "id": "lvl", "type": "solid", "color": { "prop": "text_color" }, "opacity": { "audio": "bass", "clamp": [0, 1] } },
+        { "blend_space": "canvas", "id": "tx", "type": "text", "text": { "clock": "HH:mm:ss a" }, "anchor": "bottom_right", "transform": { "position": [-10, -5] } },
+        { "blend_space": "canvas", "id": "px", "type": "solid", "color": "#000000", "parallax": [0.1, 0.1], "size": [10, 10] }
     ]));
     let mut rt = runtime(&text);
     rt.set_wall(13.0 * 3600.0 + 5.0 * 60.0 + 9.5);
@@ -49,9 +49,9 @@ fn the_pointer_settles_and_hidden_mattes_stay_in_the_draw_list() {
     let gone = (0..60).fold(left, |p, _| step(p, None));
     assert_eq!((gone.smooth, gone.presence, gone.moving()), ([0.5; 2], 0.0, false));
     let text = scene(json!([
-        { "id": "mattes", "type": "group", "visible": false, "layers": [{ "id": "m", "type": "solid", "color": "#ffffff" }] },
-        { "id": "cut", "type": "solid", "color": "#ff0000", "mask": { "layer": "m" } },
-        { "id": "gone", "type": "solid", "color": "#00ff00", "visible": false }
+        { "blend_space": "canvas", "id": "mattes", "type": "group", "visible": false, "layers": [{ "blend_space": "canvas", "id": "m", "type": "solid", "color": "#ffffff" }] },
+        { "blend_space": "canvas", "id": "cut", "type": "solid", "color": "#ff0000", "mask": { "layer": "m" } },
+        { "blend_space": "canvas", "id": "gone", "type": "solid", "color": "#00ff00", "visible": false }
     ]));
     let rt = runtime(&text);
     let frame = rt.frame(VIEW, Quality::Q3);

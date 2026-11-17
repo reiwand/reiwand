@@ -5,7 +5,7 @@ use serde_json::{Value, json};
 fn nested(mask: Value) -> Value {
     json!([
         card("base", json!({"position": [400, 500], "rotation": 30, "scale": [1.5, 0.75], "skew": [12, 0]})),
-        {"id": "kid", "type": "solid", "color": "#ff0000", "size": [120, 80], "parent": "base",
+        { "blend_space": "canvas", "id": "kid", "type": "solid", "color": "#ff0000", "size": [120, 80], "parent": "base",
             "transform": {"position": [60, 20], "origin": [0.2, 0.3], "rotation": -20, "scale": [1.2, 0.9]},
             "mask": mask,
             "effects": [{"effect": "vignette", "mask": mask}]}

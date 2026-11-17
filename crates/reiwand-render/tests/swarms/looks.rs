@@ -10,7 +10,7 @@ fn still(at: [f32; 2], more: Value) -> Value {
 }
 
 fn layer(id: &str, blend: &str) -> Value {
-    json!({ "id": id, "type": "particles", "system": id, "blend": blend })
+    json!({ "blend_space": "canvas", "id": id, "type": "particles", "system": id, "blend": blend })
 }
 
 fn run(r: &Renderer, scene: (Value, Value, Value), images: &[(&str, RgbaImage)], gpu: bool) -> Option<Run> {
@@ -113,7 +113,7 @@ fn rect_frames_gradients_and_layer_renders_match_their_reference() {
     let systems =
         json!({ "red": sprite(20.0, 0.0), "green": sprite(140.0, 1.0), "mixed": mixed, "streak": streak });
     let layers = json!([layer("red", "normal"), layer("green", "normal"), layer("mixed", "add"), layer("streak", "add"),
-        { "id": "dot", "type": "particles", "system": "streak", "blend": "add", "transform": { "position": [80, 52] },
+        { "blend_space": "canvas", "id": "dot", "type": "particles", "system": "streak", "blend": "add", "transform": { "position": [80, 52] },
           "render": { "color_over_life": [[0, "#00ffff"], [1, "#00ffff"]] } }]);
     let assets = json!({ "sheet": { "path": "sheet.png", "rects": [[0, 0, 8, 8], [8, 0, 8, 8]] } });
     for gpu in [false, true] {

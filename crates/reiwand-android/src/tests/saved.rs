@@ -5,7 +5,7 @@ use std::fs::{self, File};
 
 pub(super) fn saved_settings() {
     let source = tempfile::tempdir().unwrap();
-    let layers = json!([{ "id": "sky", "type": "solid", "color": "#336699" }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "sky", "type": "solid", "color": "#336699" }]);
     let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers,
         "timelines": [{ "id": "glow", "duration": 1, "autoplay": false, "trigger": "prop:again" }] });
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();

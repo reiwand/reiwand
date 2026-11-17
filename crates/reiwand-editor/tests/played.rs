@@ -19,7 +19,7 @@ fn a_made_up_track_brings_its_cover_to_the_pictures_that_follow_the_player() {
     let scene = reiwand_scene::Scene::load(
         &json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [8, 8] },
             "assets": { "art": { "path": "assets/cover.png", "media": "current" } },
-            "layers": [{ "id": "art", "type": "image", "image": "art" }] })
+            "layers": [{ "blend_space": "canvas", "id": "art", "type": "image", "image": "art" }] })
         .to_string(),
         &Default::default(),
     )

@@ -80,7 +80,7 @@ fn the_loader_refuses_lighter_variants_that_are_not_lighter_or_not_whole() {
 fn a_scene_whose_effects_bring_a_lighter_variant_names_its_feature() {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "a": { "path": "a.png" } },
         "effects": { "soft": { "descriptor": "fx/soft.json", "wgsl": "fx/soft.wgsl" } },
-        "layers": [{ "id": "l", "type": "image", "image": "a", "effects": [{ "effect": "soft" }] }] });
+        "layers": [{ "blend_space": "canvas", "id": "l", "type": "image", "image": "a", "effects": [{ "effect": "soft" }] }] });
     let with = |lighter: Json| {
         let mut scene = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap();
         let json = soft_json(lighter).to_string();

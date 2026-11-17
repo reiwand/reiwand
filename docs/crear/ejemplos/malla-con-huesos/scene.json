@@ -3,7 +3,7 @@
   "canvas": { "size": [1920, 1080], "background": "#101820" },
   "assets": { "muneco": { "path": "assets/muneco.glb" }, "cielo": { "path": "assets/cielo.png" } },
   "layers": [
-    { "id": "figura", "type": "mesh", "mesh": "muneco", "texture": "cielo", "size": [100, 100], "transform": { "scale": [8, 8] },
+    { "blend_space": "canvas", "id": "figura", "type": "mesh", "mesh": "muneco", "texture": "cielo", "size": [100, 100], "transform": { "scale": [8, 8] },
       "clips": [
         { "id": "asentir", "loop": "pingpong",
           "bones": { "neck": { "rotation": [[0, -12], [0.8, 12, "in_out_sine"]] } },

@@ -10,7 +10,7 @@ fn system(render: Value) -> Value {
 }
 
 fn lamp(x: f32) -> Value {
-    json!({ "id": "lamp", "type": "light", "transform": { "position": [x, 45] }, "z": 20, "radius": 60, "intensity": 2 })
+    json!({ "blend_space": "canvas", "id": "lamp", "type": "light", "transform": { "position": [x, 45] }, "z": 20, "radius": 60, "intensity": 2 })
 }
 
 fn shot(render: Value, layers: Vec<Value>, gpu: bool, quality: Quality) -> Option<image::RgbaImage> {
@@ -24,7 +24,7 @@ fn shown(
     quality: Quality,
 ) -> Option<image::RgbaImage> {
     let r = renderer()?;
-    layers.push(json!({ "id": "p", "type": "particles", "system": "s" }));
+    layers.push(json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s" }));
     let canvas = json!({ "size": [160, 90], "background": "#000000" });
     let assets = json!({ "wall": { "path": "wall.png" }, "bump": { "path": "bump.png", "linear": true },
         "mask": { "path": "mask.png", "linear": true } });
@@ -89,7 +89,7 @@ fn a_normal_map_turns_particles_toward_the_light_on_both_sides() {
 
 #[test]
 fn refracting_particles_bend_what_is_behind_them_above_the_low_levels() {
-    let back = json!({ "id": "back", "type": "image", "image": "mask", "size": [160, 90],
+    let back = json!({ "blend_space": "canvas", "id": "back", "type": "image", "image": "mask", "size": [160, 90],
         "transform": { "position": [80, 45] } });
     let bend = json!({ "refract": { "normal": "bump", "amount": 1 } });
     for gpu in [false, true] {
@@ -112,7 +112,7 @@ fn refracting_particles_bend_what_is_behind_them_above_the_low_levels() {
 #[test]
 fn lit_particles_take_the_picture_a_spot_projects() {
     let spot = |texture: Value| {
-        json!({ "id": "spot", "type": "light", "light": "spot", "cone": [80, 90], "radius": 400, "z": 40,
+        json!({ "blend_space": "canvas", "id": "spot", "type": "light", "light": "spot", "cone": [80, 90], "radius": 400, "z": 40,
             "intensity": 2, "transform": { "position": [80, 45], "tilt": [89, 0] }, "texture": texture })
     };
     for gpu in [false, true] {
@@ -130,7 +130,7 @@ fn lit_particles_take_the_picture_a_spot_projects() {
 
 #[test]
 fn the_shift_view_paints_the_bend_of_refracting_particles_over_a_dimmed_scene() {
-    let back = json!({ "id": "back", "type": "image", "image": "wall", "size": [160, 90],
+    let back = json!({ "blend_space": "canvas", "id": "back", "type": "image", "image": "wall", "size": [160, 90],
         "transform": { "position": [80, 45] } });
     let bend = json!({ "refract": { "normal": "bump", "amount": 1 } });
     for gpu in [false, true] {

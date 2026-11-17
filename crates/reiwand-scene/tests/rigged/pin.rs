@@ -6,9 +6,9 @@ const VIEW: [f32; 4] = [0.0, 0.0, 64.0, 64.0];
 
 fn pinned(attach: serde_json::Value) -> Runtime {
     let mut rt = layers(json!([
-        { "id": "fox", "type": "mesh", "mesh": "arm", "size": [64, 64],
+        { "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "arm", "size": [64, 64],
           "clips": [{ "id": "wave", "animation": "wave", "loop": "once" }], "animations": [{ "clip": "wave" }] },
-        { "id": "badge", "type": "solid", "color": "#ffffff", "size": [4, 4], "attach": attach }
+        { "blend_space": "canvas", "id": "badge", "type": "solid", "color": "#ffffff", "size": [4, 4], "attach": attach }
     ]));
     rt.advance(2.0);
     rt
@@ -38,8 +38,8 @@ fn a_layer_follows_a_point_of_the_file_and_hides_with_its_mesh() {
     let w = world(&rt, "badge");
     assert!(close([w[4], w[5]], [32.0, 32.0], 1e-3), "{w:?}");
     let mut rt = layers(json!([
-        { "id": "fox", "type": "mesh", "mesh": "arm", "visible": false },
-        { "id": "badge", "type": "solid", "color": "#ffffff", "size": [4, 4], "attach": { "layer": "fox", "bone": "hand" } }
+        { "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "arm", "visible": false },
+        { "blend_space": "canvas", "id": "badge", "type": "solid", "color": "#ffffff", "size": [4, 4], "attach": { "layer": "fox", "bone": "hand" } }
     ]));
     rt.advance(0.1);
     assert!(rt.frame(VIEW, Quality::Q3).draws.iter().all(|d| d.layer.id != "badge" || d.hidden));

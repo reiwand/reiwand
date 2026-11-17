@@ -19,7 +19,7 @@ fn fields_that_name_bones_points_and_parts_offer_those_of_their_mesh() {
     act(&mut p, json!({ "physics": { "layer": "net", "bones": ["arm"] } })).unwrap();
     act(
         &mut p,
-        json!({ "add": { "pointer": "/scene/layers/-", "value": { "id": "hat", "type": "solid" } } }),
+        json!({ "add": { "pointer": "/scene/layers/-", "value": { "blend_space": "canvas", "id": "hat", "type": "solid" } } }),
     )
     .unwrap();
     act(&mut p, json!({ "attach": { "layer": "hat", "to": "net", "point": [0.2, 0.5] } })).unwrap();

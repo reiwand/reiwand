@@ -73,7 +73,7 @@ fn families_are_bounded() {
     };
     let mut systems = json!({ "s2": still(json!({ "capacity": 10 })) });
     (0..2).for_each(|n| systems[format!("s{n}")] = wide(n + 1));
-    let layers = json!((0..4).map(|i| json!({ "id": format!("l{i}"), "type": "particles", "system": "s0", "instance": { "count": 1 } })).collect::<Vec<_>>());
+    let layers = json!((0..4).map(|i| json!({ "blend_space": "canvas", "id": format!("l{i}"), "type": "particles", "system": "s0", "instance": { "count": 1 } })).collect::<Vec<_>>());
     let text =
         json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layers, "particles": systems })
             .to_string();

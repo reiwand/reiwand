@@ -25,7 +25,7 @@ ctl scene act "$draft" undo
 ctl scene act "$draft" set '{"pointer": "/scene/camera3d", "value": {"paths": [{"id": "a", "keys": [{"center": [0, 0, 0], "eye": [0, 0, 5], "t": 0}, {"center": [0, 0, 0], "eye": [1, 0, 5], "t": 1}]}]}}'
 ctl scene preview "$draft" -o preview:1 --time 0 || fail "a scene with camera paths was not previewed"
 ctl scene act "$draft" undo
-ctl scene act "$draft" set '{"pointer": "/scene/layers/0", "value": {"id": "title", "text": {"media": "title"}, "type": "text"}}'
+ctl scene act "$draft" set '{"pointer": "/scene/layers/0", "value": { "blend_space": "canvas", "id": "title", "text": {"media": "title"}, "type": "text"}}'
 ctl scene preview "$draft" -o preview:1 --time 0 || fail "a scene showing media titles was not previewed"
 ctl scene act "$draft" undo
 ctl scene act "$draft" set '{"pointer": "/scene/layers/0/transform/tilt", "value": [10, 0]}'
@@ -137,7 +137,7 @@ ctl scene act "$draft" undo
 ctl scene act "$draft" bone '{"layer": "puppet", "name": "arm", "parent": "paw", "to": "limb"}' || fail "the arm was not renamed and rehung"
 ctl pack check "$draft" >/dev/null || fail "renaming and rehanging a bone left the scene invalid"
 ctl scene import "$draft" "$ROOT/tests/fixtures/parts.glb" --id body >/dev/null
-ctl scene act "$draft" add '{"pointer": "/scene/layers/-", "value": {"id": "body", "mesh": "body", "size": [100, 100], "type": "mesh"}}'
+ctl scene act "$draft" add '{"pointer": "/scene/layers/-", "value": { "blend_space": "canvas", "id": "body", "mesh": "body", "size": [100, 100], "type": "mesh"}}'
 ctl scene act "$draft" bone '{"at": [0.8, 0.8], "layer": "body", "name": "tail", "parent": "hip"}' || fail "a mesh of several parts took no bone"
 ctl scene act "$draft" expression '{"layer": "body", "name": "happy", "shapes": {"smile": 0.8}}' || fail "no expression was made"
 ctl scene act "$draft" expression '{"layer": "body", "name": "happy", "to": "glad"}' || fail "the expression was not renamed"

@@ -9,8 +9,8 @@ use std::time::{Duration, Instant};
 fn sounding() -> serde_json::Value {
     json!({ "assets": { "bell": { "path": "bell.ogg" } },
         "scripts": [{ "path": "main.js", "uses": ["sounds", "layers"] }],
-        "layers": [{ "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" },
-            { "id": "bell", "type": "sound", "sound": "bell" }] })
+        "layers": [{ "blend_space": "canvas", "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" },
+            { "blend_space": "canvas", "id": "bell", "type": "sound", "sound": "bell" }] })
 }
 
 fn answer(local: &mut Local, frame: &Frame) -> Result<ScriptOutputs, Error> {
@@ -50,7 +50,7 @@ fn scripts_play_pause_and_stop_sounds_and_set_their_volume() {
     let out = sent(&mut script, 2.0, &[]);
     assert_eq!(out.sounds["bell"].commands, [SoundCommand::Stop, SoundCommand::Play]);
     let refused = staged(
-        json!({ "scripts": [{ "path": "main.js", "uses": ["layers"] }], "layers": [{ "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" }] }),
+        json!({ "scripts": [{ "path": "main.js", "uses": ["layers"] }], "layers": [{ "blend_space": "canvas", "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" }] }),
         &[(
             "main.js",
             r#"import { sound, scene } from "reiwand";
@@ -72,8 +72,8 @@ fn every_pointer_event_reaches_its_layer_handlers() {
         for (const e of ["click", "enter", "leave", "move", "down", "up"]) scene.layer("b").on(e, (t) => seen.push(`${t.type}@${t.local}`));
         export function update() { scene.layer("a").text = seen.join(" "); }"#;
     let doc = json!({ "scripts": [{ "path": "main.js", "events": ["click", "enter", "leave", "move", "down", "up"], "uses": ["layers"] }],
-        "layers": [{ "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" },
-            { "id": "b", "type": "solid", "color": "#ffffff", "size": [4, 4], "solid": true }] });
+        "layers": [{ "blend_space": "canvas", "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" },
+            { "blend_space": "canvas", "id": "b", "type": "solid", "color": "#ffffff", "size": [4, 4], "solid": true }] });
     let mut script = staged(doc, &[("main.js", source)]);
     let kinds = [
         TouchKind::Enter,
@@ -101,7 +101,7 @@ fn every_pointer_event_reaches_its_layer_handlers() {
 #[test]
 fn a_script_thread_answers_frames_and_turns_off_when_it_hangs() {
     let fine = setup(
-        json!({ "layers": [{ "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" }] }),
+        json!({ "layers": [{ "blend_space": "canvas", "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" }] }),
         &[(
             "main.js",
             r#"import { scene } from "reiwand"; export function update(f) { scene.layer("a").text = `t ${f.time}`; }"#,
@@ -128,7 +128,7 @@ fn a_script_thread_answers_frames_and_turns_off_when_it_hangs() {
 #[test]
 fn a_slow_load_within_its_budget_keeps_the_scripts_on() {
     let slow = setup(
-        json!({ "layers": [{ "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" }] }),
+        json!({ "layers": [{ "blend_space": "canvas", "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" }] }),
         &[(
             "main.js",
             r#"import { scene } from "reiwand";

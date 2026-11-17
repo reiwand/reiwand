@@ -10,9 +10,9 @@ fn covers(r: &Renderer, placeholder: Arc<Pixels>) -> Shot {
         "previous": { "path": "cover.png", "media": "previous" }
     });
     let layers = json!([
-        { "id": "now", "type": "image", "image": "cover", "size": [50, 50], "transform": { "position": [25, 25] } },
-        { "id": "then", "type": "image", "image": "previous", "size": [50, 50], "transform": { "position": [75, 25] } },
-        { "id": "fade", "type": "image", "image": "previous", "size": [50, 50], "opacity": 0.5,
+        { "blend_space": "canvas", "id": "now", "type": "image", "image": "cover", "size": [50, 50], "transform": { "position": [25, 25] } },
+        { "blend_space": "canvas", "id": "then", "type": "image", "image": "previous", "size": [50, 50], "transform": { "position": [75, 25] } },
+        { "blend_space": "canvas", "id": "fade", "type": "image", "image": "previous", "size": [50, 50], "opacity": 0.5,
           "transform": { "position": [25, 25] } }
     ]);
     let text = json!({ "canvas": canvas("#000000"), "assets": assets, "layers": layers });

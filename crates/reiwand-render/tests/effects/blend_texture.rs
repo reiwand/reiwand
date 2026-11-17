@@ -19,7 +19,7 @@ fn blend_texture_mixes_pictures_and_layers_with_a_blend_mode() {
         return;
     };
     screen.check(&[((2, 2), [255, 64, 0]), ((10, 2), [0, 128, 255])]);
-    let spot = json!({ "id": "spot", "type": "shape", "shape": { "ellipse": { "size": [20, 20] } }, "fill": "#00ff00",
+    let spot = json!({ "blend_space": "canvas", "id": "spot", "type": "shape", "shape": { "ellipse": { "size": [20, 20] } }, "fill": "#00ff00",
         "visible": false, "transform": { "position": [48, 16] } });
     let fed = json!({ "texture": { "layer": "spot" }, "blend": "normal" });
     let Some(layered) = Fx::new("blend_texture", fed).input(solid([255; 3])).layer(spot).shot() else { return };

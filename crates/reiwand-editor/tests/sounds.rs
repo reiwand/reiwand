@@ -26,9 +26,9 @@ fn scene() -> Value {
     json!({ "scene": {
         "assets": { "wind": { "path": "sounds/wind.wav" }, "rain": { "path": "sounds/rain.wav" } },
         "layers": [
-            { "id": "gusts", "type": "sound", "sound": "wind", "play_on": "event:gust", "fade_in": 2 },
-            { "id": "box", "type": "group", "layers": [{ "id": "drops", "type": "sound", "sounds": ["rain", "wind"], "mode": "random" }] },
-            { "id": "pic", "type": "solid" }
+            { "blend_space": "canvas", "id": "gusts", "type": "sound", "sound": "wind", "play_on": "event:gust", "fade_in": 2 },
+            { "blend_space": "canvas", "id": "box", "type": "group", "layers": [{ "blend_space": "canvas", "id": "drops", "type": "sound", "sounds": ["rain", "wind"], "mode": "random" }] },
+            { "blend_space": "canvas", "id": "pic", "type": "solid" }
         ]
     } })
 }

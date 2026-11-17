@@ -83,7 +83,7 @@ impl<'a> Painter<'a, '_, '_> {
                 Content::Adjustment => self.adjust(i, target),
                 Content::Group { .. } => self.apart(i, target, atop),
                 _ if !d.effects.is_empty() || d.layer.cache || self.baking(i) => self.apart(i, target, atop),
-                _ => self.direct(i, target, (d.opacity, d.blend, d.mask), atop),
+                _ => self.direct(i, target, (d.opacity, d.blend, d.mask, d.space), atop),
             }
             i = d.end;
         }
@@ -179,7 +179,7 @@ impl<'a> Painter<'a, '_, '_> {
         let target = Target { src, rect };
         match self.frame.draws[i].content {
             Content::Group { clip } => self.list(i + 1..self.frame.draws[i].end, target, clip),
-            _ => self.direct(i, target, (1.0, Blend::Normal, None), false),
+            _ => self.direct(i, target, (1.0, Blend::Normal, None, None), false),
         }
         let out = self.effects(i, src, rect, uv);
         if out != src {

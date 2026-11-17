@@ -5,8 +5,7 @@ use serde_json::json;
 fn moving(quality: Quality) -> Option<(Shot, &'static reiwand_render::Renderer)> {
     let r = renderer()?;
     let walk = json!({ "timeline": "go", "keys": [[0, [30, 45]], [4, [130, 45]]] });
-    let lamp =
-        json!({ "id": "lamp", "type": "light", "transform": { "position": walk }, "z": 10, "radius": 12 });
+    let lamp = json!({ "blend_space": "canvas", "id": "lamp", "type": "light", "transform": { "position": walk }, "z": 10, "radius": 12 });
     let mut shot = Shot::new(r, scene(json!([wall(json!({})), lamp]), json!({})), &files(UP));
     shot.pixels(r, quality);
     Some((shot, r))
@@ -26,9 +25,9 @@ fn a_moving_light_redraws_only_the_box_of_its_radius() {
 #[test]
 fn static_lights_keep_the_lit_layers_drawn_once() {
     let Some(r) = renderer() else { return };
-    let lamp = json!({ "id": "lamp", "type": "light", "transform": { "position": [40, 45] }, "z": 10, "radius": 60 });
+    let lamp = json!({ "blend_space": "canvas", "id": "lamp", "type": "light", "transform": { "position": [40, 45] }, "z": 10, "radius": 60 });
     let spin = json!({ "timeline": "go", "keys": [[0, 0], [4, 360]] });
-    let dot = json!({ "id": "dot", "type": "shape", "shape": { "rect": { "size": [30, 30] } }, "fill": "#ff0000",
+    let dot = json!({ "blend_space": "canvas", "id": "dot", "type": "shape", "shape": { "rect": { "size": [30, 30] } }, "fill": "#ff0000",
         "transform": { "position": [80, 45], "rotation": spin } });
     let mut shot = Shot::new(r, scene(json!([wall(json!({})), lamp, dot]), json!({})), &files(UP));
     let first = shot.pixels(r, Quality::Q3);
@@ -53,7 +52,7 @@ fn the_lowest_level_bakes_the_lights_as_they_start() {
 #[test]
 fn static_lights_let_the_scene_settle() {
     let Some(r) = renderer() else { return };
-    let lamp = json!({ "id": "lamp", "type": "light", "transform": { "position": [40, 45] }, "radius": 60 });
+    let lamp = json!({ "blend_space": "canvas", "id": "lamp", "type": "light", "transform": { "position": [40, 45] }, "radius": 60 });
     let mut shot =
         Shot::new(r, scene(json!([wall(json!({})), lamp]), json!({ "ambient": "#202020" })), &files(UP));
     for q in [Quality::Q3, Quality::Q0] {

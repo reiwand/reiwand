@@ -66,7 +66,7 @@ fn tampered_counts_neither_panic_nor_wrap_to_unblocked() {
 fn scene() -> (Scene, impl Fn(&str, usize) -> Result<Vec<u8>, String> + Copy) {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "a": { "path": "a.png" } },
         "effects": { "s": { "descriptor": "fx/s.json", "wgsl": "fx/s.wgsl" } },
-        "layers": [{ "id": "l", "type": "image", "image": "a", "effects": [{ "effect": "s" }] }] });
+        "layers": [{ "blend_space": "canvas", "id": "l", "type": "image", "image": "a", "effects": [{ "effect": "s" }] }] });
     let files = |path: &str, _: usize| match path {
         "fx/s.json" => {
             Ok(json!({ "id": "s", "cost": {}, "passes": [{ "entry": "fs_s" }] }).to_string().into_bytes())

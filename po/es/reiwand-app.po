@@ -9912,6 +9912,10 @@ msgstr "importa antes un archivo de este tipo"
 msgid "Blend mode:"
 msgstr "Modo de fusión:"
 
+#: apps/reiwand-app/qml/SceneLayerLook.qml
+msgid "Blend space:"
+msgstr "Espacio de mezcla:"
+
 #: apps/reiwand-app/qml/SceneLayerMenu.qml
 #: apps/reiwand-app/qml/SceneLayerMore.qml
 #: apps/reiwand-app/qml/SceneMenuCheck.qml
@@ -19988,6 +19992,10 @@ msgstr "Barras"
 #: apps/reiwand-app/qml/facade/SceneValues.qml
 msgid "To black"
 msgstr "A negro"
+
+#: apps/reiwand-app/qml/facade/SceneValues.qml
+msgid "Like the canvas"
+msgstr "Como el lienzo"
 
 #: apps/reiwand-app/qml/facade/SceneValues.qml
 msgid "Centered"

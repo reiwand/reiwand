@@ -5,11 +5,11 @@ use serde_json::{Value, json};
 fn line() -> Value {
     json!([
         card("a", json!({"position": [300, 300], "rotation": 40, "scale": [2, 1]})),
-        {"id": "b", "type": "solid", "color": "#ffffff", "size": [50, 50], "parent": "a", "transform": {"position": [50, 0]}},
-        {"id": "c", "type": "solid", "color": "#ffffff", "size": [50, 50], "parent": "b", "transform": {"position": [0, 40]}},
+        { "blend_space": "canvas", "id": "b", "type": "solid", "color": "#ffffff", "size": [50, 50], "parent": "a", "transform": {"position": [50, 0]}},
+        { "blend_space": "canvas", "id": "c", "type": "solid", "color": "#ffffff", "size": [50, 50], "parent": "b", "transform": {"position": [0, 40]}},
         card("d", json!({"position": [700, 600], "rotation": -15, "skew": [10, 0]})),
-        {"id": "g", "type": "group", "layers": [card("inside", json!({}))]},
-        {"id": "hum", "type": "sound", "sound": "none"}
+        { "blend_space": "canvas", "id": "g", "type": "group", "layers": [card("inside", json!({}))]},
+        { "blend_space": "canvas", "id": "hum", "type": "sound", "sound": "none"}
     ])
 }
 

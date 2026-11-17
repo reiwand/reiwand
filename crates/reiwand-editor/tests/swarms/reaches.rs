@@ -20,7 +20,7 @@ fn every_kind_of_layer_and_a_mask_show_what_a_collider_covers() {
     let wall = reach(&mut p, json!({ "layer": { "id": "net" } }));
     let (inner, open) = solid_and_open(&wall);
     assert!(inner > 0 && open > 0 && wall["approximate"] == false, "{wall}");
-    let label = json!({ "id": "label", "type": "text", "text": "Hi", "size": 64,
+    let label = json!({ "blend_space": "canvas", "id": "label", "type": "text", "text": "Hi", "size": 64,
         "transform": { "position": [960, 540] } });
     act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": label } })).unwrap();
     let wall = reach(&mut p, json!({ "layer": { "id": "label" } }));

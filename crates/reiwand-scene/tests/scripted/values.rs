@@ -39,8 +39,8 @@ fn scripts_read_evaluated_layers_and_their_own_writes() {
 fn per_binding_values_are_found_by_their_site() {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [10, 10] },
         "scripts": [{ "path": "s.js", "params": { "k": { "type": "number", "default": 1 } } }],
-        "templates": { "t": { "id": "t", "type": "solid", "color": "#ffffff", "opacity": { "script": "s.js", "fn": "fade" } } },
-        "layers": [{ "id": "a", "type": "solid", "color": "#ffffff", "transform": { "rotation": { "script": "s.js", "fn": "turn", "params": { "k": 2 } } },
+        "templates": { "t": { "blend_space": "canvas", "id": "t", "type": "solid", "color": "#ffffff", "opacity": { "script": "s.js", "fn": "fade" } } },
+        "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#ffffff", "transform": { "rotation": { "script": "s.js", "fn": "turn", "params": { "k": 2 } } },
             "opacity": { "script": "s.js" } }] });
     let scene = Scene::from_json(&text.to_string()).unwrap();
     let found = sites(&scene);

@@ -22,8 +22,8 @@
     }
   },
   "layers": [
-    { "id": "nieve", "type": "particles", "system": "nieve" },
-    { "id": "chispas", "type": "particles", "system": "chispas", "blend": "add",
+    { "blend_space": "canvas", "id": "nieve", "type": "particles", "system": "nieve" },
+    { "blend_space": "canvas", "id": "chispas", "type": "particles", "system": "chispas", "blend": "add",
       "instance": { "alpha": 0.9, "count": 1 } }
   ]
 }

@@ -93,7 +93,9 @@ fn a_light_keeps_its_handles_when_another_layer_has_a_bad_color() {
     let mut p = project(&root);
     light(&mut p, json!({ "add": { "light": "point", "at": [400, 300] } })).unwrap();
     let list = p.doc["scene"]["layers"].as_array_mut().unwrap();
-    list.push(json!({"id": "odd", "type": "solid", "color": "#fff", "size": [10, 10]}));
+    list.push(
+        json!({ "blend_space": "canvas", "id": "odd", "type": "solid", "color": "#fff", "size": [10, 10]}),
+    );
     let report = lamps::lights(&p.dir, &p.doc, 0.0);
     let rows = report["lights"].as_array().unwrap();
     assert_eq!(rows.len(), 1);

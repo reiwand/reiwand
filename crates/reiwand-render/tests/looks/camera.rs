@@ -9,8 +9,8 @@ fn a_turned_and_zoomed_camera_and_a_tilted_layer_look_as_they_did() {
         "camera": { "center": [50, 25], "zoom": 1.5, "rotation": 12 }
     });
     let layers = json!([
-        { "id": "flat", "type": "image", "image": "ramp", "size": [40, 20], "transform": { "position": [25, 25] } },
-        { "id": "tilted", "type": "image", "image": "ramp", "size": [40, 20],
+        { "blend_space": "canvas", "id": "flat", "type": "image", "image": "ramp", "size": [40, 20], "transform": { "position": [25, 25] } },
+        { "blend_space": "canvas", "id": "tilted", "type": "image", "image": "ramp", "size": [40, 20],
           "transform": { "position": [75, 25], "tilt": [40, 0] } }
     ]);
     let pixels = Shot::new(r, stage, layers, &[("ramp", ramp)]).pixels(r);

@@ -5,7 +5,7 @@ fn stored() -> std::sync::Arc<pack::Pack> {
     let source = tempfile::tempdir().unwrap();
     let scripts = json!([{ "path": "keep.js", "events": ["init"], "uses": ["storage"] }]);
     let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [32, 16] },
-        "layers": [{ "id": "dot", "type": "solid", "color": "#ffffff", "size": [4, 4] }], "scripts": scripts });
+        "layers": [{ "blend_space": "canvas", "id": "dot", "type": "solid", "color": "#ffffff", "size": [4, 4] }], "scripts": scripts });
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
     fs::write(source.path().join("keep.js"), "export function init() {}\n").unwrap();
     let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.keeps", "version": "1.0.0",

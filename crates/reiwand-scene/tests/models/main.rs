@@ -39,7 +39,7 @@ pub fn runtime(scene: Scene) -> Runtime {
 }
 
 pub fn model(id: &str, extra: Value) -> Value {
-    let mut l = json!({ "id": id, "type": "model", "model": "toy" });
+    let mut l = json!({ "blend_space": "canvas", "id": id, "type": "model", "model": "toy" });
     extra.as_object().unwrap().iter().for_each(|(k, v)| l[k] = v.clone());
     l
 }

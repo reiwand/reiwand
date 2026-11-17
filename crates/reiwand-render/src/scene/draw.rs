@@ -2,7 +2,7 @@ use super::item::{Item, gradient, premultiplied, scale_of, shape, toned};
 use super::map::Map;
 use super::paint::{Painter, Target};
 use super::{Op, Src};
-use reiwand_scene::{Affine, Blend, Content, Layout, Mask, SpectrumStyle, Wrapping};
+use reiwand_scene::{Affine, Blend, BlendSpace, Content, Layout, Mask, SpectrumStyle, Wrapping};
 
 mod compose;
 mod gobo;
@@ -110,11 +110,11 @@ impl Painter<'_, '_, '_> {
         &mut self,
         i: usize,
         target: Target,
-        (opacity, blend, mask): (f32, Blend, Option<&Mask>),
+        (opacity, blend, mask, space): (f32, Blend, Option<&Mask>, Option<BlendSpace>),
         atop: bool,
     ) {
         if matches!(self.frame.draws[i].content, Content::Particles { .. }) {
-            return self.particles(i, target, (opacity, blend, mask), atop);
+            return self.particles(i, target, (opacity, blend, mask, space), atop);
         }
         let Some((size, quad)) = self.geometry(i) else { return };
         let Some((entry, mut item, src)) = self.content(i, opacity, size) else { return };
@@ -136,7 +136,7 @@ impl Painter<'_, '_, '_> {
         let d = &frame.draws[i];
         let masked =
             self.mask(&mut item, (mask, d.mask_texture.as_deref(), d.mask_strength), m, size, target);
-        let (mode, back) = self.blend(&mut item, blend, bounds, target, atop);
+        let (mode, back) = self.blend(&mut item, (blend, space), bounds, target, atop);
         if let Some(mut backing) = self.backing(i, m, size, opacity, target) {
             (backing.mask_info, backing.channel, backing.mask_m0, backing.mask_m1, backing.mask_shape) =
                 (item.mask_info, item.channel, item.mask_m0, item.mask_m1, item.mask_shape);

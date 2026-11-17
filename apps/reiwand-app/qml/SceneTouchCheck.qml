@@ -13,6 +13,7 @@ QtObject {
         const panel = Qt.createComponent("SceneTouch.qml").createObject(page, {
                 "page": page,
                 "node": {
+                    "blend_space": "canvas",
                     "id": "pad",
                     "type": "solid",
                     "pointer": pointer

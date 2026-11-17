@@ -155,8 +155,10 @@ fn emit<'a>(
         None => (opacity, tint, brightness),
     };
     let toned = tint != Color([1.0; 4]) || brightness != 1.0;
+    let space = layer.blend_space.apart_from(cx.scene.canvas.blend_space);
     let isolate = !effects.is_empty()
         || !layer.blend.fixed()
+        || space.is_some()
         || layer.mask.is_some()
         || layer.cache
         || (group && (opacity < 1.0 || toned));
@@ -172,6 +174,7 @@ fn emit<'a>(
         origin,
         opacity,
         blend,
+        space,
         mask,
         mask_texture: masked(cx, mask),
         mask_strength,

@@ -108,7 +108,7 @@ fn new_fields_refuse_values_outside_their_limits() {
         assert!(issues.iter().any(|i| i.contains(expected)), "{changes:?} gave {issues:?}, not {expected}");
     }
     let lights: Vec<Json> =
-        (0..13).map(|i| json!({ "id": format!("l{i}"), "type": "light", "light": "directional" })).collect();
+        (0..13).map(|i| json!({ "blend_space": "canvas", "id": format!("l{i}"), "type": "light", "light": "directional" })).collect();
     let issues = broken(&[("/layers", json!(lights))]);
     assert!(
         issues.iter().any(|i| i == "the scene has 13 light layers, at most 12 are allowed"),

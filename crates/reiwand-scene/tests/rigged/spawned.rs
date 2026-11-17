@@ -45,7 +45,7 @@ fn spawned_mesh_templates_get_a_puppet_and_draw() {
 
 #[test]
 fn mesh_children_of_group_templates_draw_too() {
-    let group = json!({ "id": "pack", "type": "group", "layers": [fox(json!({ "id": "body" }))] });
+    let group = json!({ "blend_space": "canvas", "id": "pack", "type": "group", "layers": [fox(json!({ "id": "body" }))] });
     let mut rt = templated(group).unwrap();
     assert!(spawn(&mut rt, &["one"]));
     assert!(rt.puppet("one.body").is_some());
@@ -56,7 +56,7 @@ fn mesh_children_of_group_templates_draw_too() {
 
 #[test]
 fn templates_still_refuse_layers_scripts_cannot_copy() {
-    let sound = json!({ "id": "s", "type": "sound", "sound": "arm" });
+    let sound = json!({ "blend_space": "canvas", "id": "s", "type": "sound", "sound": "arm" });
     let refused = templated(sound).err().map(|e| e.to_string()).unwrap_or_default();
     assert!(refused.contains("/templates/fox/type"), "{refused}");
     assert!(templated(fox(json!({ "id": "body" }))).is_ok());
@@ -65,9 +65,9 @@ fn templates_still_refuse_layers_scripts_cannot_copy() {
 fn pack() -> serde_json::Value {
     let waving = json!({ "id": "body", "clips": [{ "id": "wave", "animation": "wave", "loop": "once" }],
         "animations": [{ "clip": "wave" }], "ik": [{ "chain": ["arm", "hand"], "target": "layer:badge", "weight": 0 }] });
-    let badge = json!({ "id": "badge", "type": "solid", "color": "#ffffff", "size": [4, 4],
+    let badge = json!({ "blend_space": "canvas", "id": "badge", "type": "solid", "color": "#ffffff", "size": [4, 4],
         "attach": { "layer": "body", "bone": "hand" } });
-    json!({ "id": "pack", "type": "group", "layers": [fox(waving), badge] })
+    json!({ "blend_space": "canvas", "id": "pack", "type": "group", "layers": [fox(waving), badge] })
 }
 
 #[test]

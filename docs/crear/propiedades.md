@@ -29,7 +29,7 @@ En el manifiesto:
 En la escena, cualquier valor puede seguirla con `{ "prop": "color_disco" }`:
 
 ```json
-    { "id": "disco", "type": "shape", "shape": { "ellipse": { "size": [300, 300] } },
+    { "blend_space": "canvas", "id": "disco", "type": "shape", "shape": { "ellipse": { "size": [300, 300] } },
       "fill": { "prop": "color_disco" }, "opacity": { "prop": "opacidad", "scale": 0.01 },
       "transform": { "position": [480, 540],
         "scale": { "timeline": "destello", "keys": [[0, [1, 1]], [0.3, [1.5, 1.5], "out_cubic"], [1, [1, 1], "in_out_sine"]] } } }

@@ -79,8 +79,7 @@ fn lamp_scene(home: &Path, source: &str) -> std::path::PathBuf {
     let mut doc: serde_json::Value =
         serde_json::from_slice(&std::fs::read(folder.join("scene.json")).unwrap()).unwrap();
     doc["canvas"]["size"] = serde_json::json!([32, 18]);
-    doc["layers"] =
-        serde_json::json!([{ "id": "lamp", "type": "solid", "color": "#ffffff", "visible": false }]);
+    doc["layers"] = serde_json::json!([{ "blend_space": "canvas", "id": "lamp", "type": "solid", "color": "#ffffff", "visible": false }]);
     let script =
         serde_json::json!({ "path": "scripts/lamp.js", "events": ["update"], "uses": ["layers", "media"] });
     doc["scripts"] = serde_json::json!([script]);

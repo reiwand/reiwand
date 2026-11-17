@@ -4,7 +4,7 @@ use super::*;
 #[test]
 fn a_zooming_blurred_layer_holds_a_bounded_set_of_textures() {
     let scale = json!({ "keys": [[0, [0.1, 0.1]], [1, [1.95, 1.95]]], "loop": "pingpong" });
-    let layer = json!({ "id": "z", "type": "solid", "color": "#ff0000", "size": [1920, 1080],
+    let layer = json!({ "blend_space": "canvas", "id": "z", "type": "solid", "color": "#ff0000", "size": [1920, 1080],
         "transform": { "position": [1920, 1080], "scale": scale },
         "effects": [{ "effect": "blur", "params": { "radius": 4 } }] });
     let json = json!({ "id": "unused", "cost": {}, "passes": [{ "entry": "fs_u" }] });

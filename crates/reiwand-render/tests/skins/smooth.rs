@@ -21,7 +21,7 @@ fn disk() -> RgbaImage {
 
 fn shown(r: &Renderer, quality: Quality, pic: serde_json::Value) -> Vec<u8> {
     let glb = Sketch::cut(&vec![255; (OUT * OUT) as usize], [OUT, OUT], Cut::Grid, 8).glb();
-    let layer = json!({ "id": "fox", "type": "mesh", "mesh": "mesh", "texture": "pic", "size": [OUT, OUT] });
+    let layer = json!({ "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "mesh", "texture": "pic", "size": [OUT, OUT] });
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [OUT, OUT], "background": "#000000" },
         "assets": { "pic": pic, "mesh": { "path": "mesh.glb" } }, "layers": [layer] });
     let mut scene = Scene::from_json(&doc.to_string()).unwrap();

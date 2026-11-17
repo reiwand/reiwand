@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 fn picture_masks_of_a_mesh_are_posed_with_it_by_one_hidden_copy_per_picture() {
     let effect =
         |mask: serde_json::Value| json!({ "effect": "waves", "params": { "amplitude": 4 }, "mask": mask });
-    let fox = json!({ "id": "fox", "type": "mesh", "mesh": "arm", "texture": "skin", "size": [64, 64], "color": "#ff0000",
+    let fox = json!({ "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "arm", "texture": "skin", "size": [64, 64], "color": "#ff0000",
         "clips": [{ "id": "wave", "animation": "wave" }], "animations": [{ "clip": "wave" }],
         "mask": { "texture": "ink" },
         "effects": [effect(json!({ "texture": "ink", "channel": "r" })), effect(json!({ "texture": "veil" })),
@@ -16,7 +16,7 @@ fn picture_masks_of_a_mesh_are_posed_with_it_by_one_hidden_copy_per_picture() {
     let assets = json!({ "arm": { "path": "arm.glb" }, "skin": { "path": "skin.png" }, "ink": { "path": "ink.png" },
         "veil": { "path": "veil.png" } });
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 64] }, "assets": assets,
-        "layers": [{ "id": "sheet_0", "type": "solid", "color": "#000000" }, fox] });
+        "layers": [{ "blend_space": "canvas", "id": "sheet_0", "type": "solid", "color": "#000000" }, fox] });
     let mut scene = Scene::from_json(&text.to_string()).unwrap();
     let glb = arm().bytes();
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
@@ -55,7 +55,7 @@ fn inked(scene: serde_json::Value) -> Runtime {
 }
 
 fn inked_fox(id: &str) -> serde_json::Value {
-    json!({ "id": id, "type": "mesh", "mesh": "arm", "size": [64, 64], "mask": { "texture": "ink" } })
+    json!({ "blend_space": "canvas", "id": id, "type": "mesh", "mesh": "arm", "size": [64, 64], "mask": { "texture": "ink" } })
 }
 
 fn turned(ids: &[&str]) -> ScriptOutputs {
@@ -83,7 +83,8 @@ fn bones_moved_by_scripts_reach_the_hidden_copy_of_a_mask() {
 
 #[test]
 fn masks_of_templates_get_hidden_copies_that_follow_each_spawn() {
-    let group = json!({ "id": "pack", "type": "group", "layers": [inked_fox("body")] });
+    let group =
+        json!({ "blend_space": "canvas", "id": "pack", "type": "group", "layers": [inked_fox("body")] });
     let mut rt = inked(json!({ "templates": { "solo": inked_fox("solo"), "pack": group } }));
     let spawned =
         vec![("a".to_string(), "solo".to_string()), ("b".into(), "pack".into()), ("c".into(), "solo".into())];

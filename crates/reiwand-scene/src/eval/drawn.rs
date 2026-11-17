@@ -107,6 +107,7 @@ pub struct Draw<'a> {
     pub origin: [f32; 2],
     pub opacity: f32,
     pub blend: Blend,
+    pub space: Option<crate::BlendSpace>,
     pub mask: Option<&'a Mask>,
     pub mask_texture: Option<Cow<'a, str>>,
     pub mask_strength: f32,

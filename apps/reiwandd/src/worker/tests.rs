@@ -52,7 +52,7 @@ fn package(dir: &Path, kind: &str, entry: &str, preview: Option<&str>) -> PathBu
     RgbaImage::from_pixel(80, 40, image::Rgba([255, 0, 0, 255])).save(source.join("image.png")).unwrap();
     RgbaImage::from_pixel(20, 20, image::Rgba([0, 0, 255, 255])).save(source.join("preview.png")).unwrap();
     if kind == "scene" {
-        let scene = r##"{"schema": "reiwand.scene/1", "canvas": {"size": [64, 32]}, "layers": [{"id": "fill", "type": "solid", "color": "#ff0000"}]}"##;
+        let scene = r##"{"schema": "reiwand.scene/1", "canvas": {"size": [64, 32]}, "layers": [{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ff0000"}]}"##;
         std::fs::write(source.join("scene.json"), scene).unwrap();
     }
     let manifest = serde_json::json!({"schema": reiwand_format::SCHEMA, "id": "org.example.calm", "version": "1.0.0",

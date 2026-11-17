@@ -25,7 +25,7 @@ fn masks_are_painted_per_channel_into_new_pictures_that_undo_restores() {
     let dir = root.path().join("veil");
     let mut project =
         Project::create(&dir, starter("empty", "org.example.veil", "Veil", "en").unwrap()).unwrap();
-    let layer = json!([{ "id": "fill", "type": "solid", "color": "#ffffff", "effects": [{ "effect": "blend_gradient" }] }]);
+    let layer = json!([{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ffffff", "effects": [{ "effect": "blend_gradient" }] }]);
     act(&mut project, json!({ "set": { "pointer": "/scene/layers", "value": layer } })).unwrap();
     let pointer = "/scene/layers/0/effects/0/params/map";
     let stroke = |channel: Value, value: f32| {
@@ -72,8 +72,7 @@ fn a_new_mask_starts_from_the_paint_of_its_parameter() {
     std::fs::write(root.path().join("veil.wgsl"), wgsl).unwrap();
     let import = Action::ImportEffect { descriptor: root.path().join("veil.json"), wgsl: None };
     project.act(&import).unwrap();
-    let layer =
-        json!([{ "id": "fill", "type": "solid", "color": "#ffffff", "effects": [{ "effect": "veil" }] }]);
+    let layer = json!([{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ffffff", "effects": [{ "effect": "veil" }] }]);
     act(&mut project, json!({ "set": { "pointer": "/scene/layers", "value": layer } })).unwrap();
     let pointer = "/scene/layers/0/effects/0/params/cover";
     let stroke = json!({ "paint_mask": { "pointer": pointer, "channel": 1, "radius": 0.1, "value": 0,
@@ -108,8 +107,7 @@ fn a_first_mask_on_a_ktx2_picture_is_written_as_ktx2() {
         json!({ "set": { "pointer": "/scene/assets/wall", "value": { "path": "assets/wall.ktx2" } } }),
     )
     .unwrap();
-    let layer =
-        json!([{ "id": "w", "type": "image", "image": "wall", "effects": [{ "effect": "blend_gradient" }] }]);
+    let layer = json!([{ "blend_space": "canvas", "id": "w", "type": "image", "image": "wall", "effects": [{ "effect": "blend_gradient" }] }]);
     act(&mut project, json!({ "set": { "pointer": "/scene/layers", "value": layer } })).unwrap();
     let pointer = "/scene/layers/0/effects/0/params/map";
     let stroke = json!({ "paint_mask": { "pointer": pointer, "channel": 1, "radius": 0.1, "value": 1.0,
@@ -145,7 +143,8 @@ fn strokes_on_a_ktx2_map_start_from_the_exact_picture_of_the_last_stroke() {
         json!({ "set": { "pointer": "/scene/assets/wall", "value": { "path": "assets/wall.ktx2" } } }),
     )
     .unwrap();
-    let layer = json!([{ "id": "w", "type": "image", "image": "wall", "lighting": {} }]);
+    let layer =
+        json!([{ "blend_space": "canvas", "id": "w", "type": "image", "image": "wall", "lighting": {} }]);
     act(&mut project, json!({ "set": { "pointer": "/scene/layers", "value": layer } })).unwrap();
     let stroke = |x: f32| json!({ "paint_map": { "layer": "w", "map": "roughness", "radius": 0.05, "value": 0.3, "points": [[x, 0.5]] } });
     act(&mut project, stroke(0.2)).unwrap();
@@ -178,8 +177,7 @@ fn a_flow_map_is_combed_along_the_stroke_from_a_still_picture() {
     let dir = root.path().join("comb");
     let mut project =
         Project::create(&dir, starter("empty", "org.example.comb", "Comb", "en").unwrap()).unwrap();
-    let layer =
-        json!([{ "id": "fill", "type": "solid", "color": "#ffffff", "effects": [{ "effect": "shake" }] }]);
+    let layer = json!([{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ffffff", "effects": [{ "effect": "shake" }] }]);
     act(&mut project, json!({ "set": { "pointer": "/scene/layers", "value": layer } })).unwrap();
     let pointer = "/scene/layers/0/effects/0/params/flow";
     let comb = json!({ "comb_flow": { "pointer": pointer, "radius": 0.1, "hardness": 0.9,

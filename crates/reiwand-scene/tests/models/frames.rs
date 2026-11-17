@@ -32,11 +32,11 @@ fn a_moving_camera_changes_the_key_and_keeps_waking() {
 
 #[test]
 fn a_3d_group_draws_its_models_as_slices_around_layers_that_test_depth() {
-    let group = json!([{ "id": "world", "type": "group", "space": "3d", "layers": [
-        { "id": "front", "type": "solid", "color": "#ffffff", "size": [10, 10] },
+    let group = json!([{ "blend_space": "canvas", "id": "world", "type": "group", "space": "3d", "layers": [
+        { "blend_space": "canvas", "id": "front", "type": "solid", "color": "#ffffff", "size": [10, 10] },
         model("a", json!({})),
-        { "id": "near", "type": "solid", "color": "#ff0000", "size": [10, 10], "depth_test": true, "transform": { "z": 40 } },
-        { "id": "far", "type": "solid", "color": "#00ff00", "size": [10, 10], "depth_test": true },
+        { "blend_space": "canvas", "id": "near", "type": "solid", "color": "#ff0000", "size": [10, 10], "depth_test": true, "transform": { "z": 40 } },
+        { "blend_space": "canvas", "id": "far", "type": "solid", "color": "#00ff00", "size": [10, 10], "depth_test": true },
         model("b", json!({ "position": [0, 0, -3] })) ] }]);
     let rt = runtime(scene(json!({}), group));
     let frame = rt.frame([0.0, 0.0, 200.0, 100.0], Quality::Q3);

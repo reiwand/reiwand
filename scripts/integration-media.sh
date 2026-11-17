@@ -19,11 +19,11 @@ tuned() {
 }
 uid=$(tuned '{"schema": "reiwand.scene/1", "canvas": {"size": [64, 32], "background": "#000000"},
   "assets": {"cover": {"path": "red.png", "media": "current"}, "before": {"path": "red.png", "media": "previous"}},
-  "layers": [{"id": "art", "type": "image", "image": "cover", "size": [64, 32], "transform": {"position": [32, 16]}},
-    {"id": "behind", "type": "image", "image": "before", "size": [64, 32], "transform": {"position": [32, 16]},
+  "layers": [{ "blend_space": "canvas", "id": "art", "type": "image", "image": "cover", "size": [64, 32], "transform": {"position": [32, 16]}},
+    { "blend_space": "canvas", "id": "behind", "type": "image", "image": "before", "size": [64, 32], "transform": {"position": [32, 16]},
       "opacity": {"media": "playing", "scale": -1, "offset": 1}},
-    {"id": "title", "type": "text", "text": {"media": "title"}, "size": 4, "transform": {"position": [2, 2]}},
-    {"id": "bar", "type": "solid", "color": "#00ff00", "size": [4, 2], "opacity": {"media": "progress"},
+    { "blend_space": "canvas", "id": "title", "type": "text", "text": {"media": "title"}, "size": 4, "transform": {"position": [2, 2]}},
+    { "blend_space": "canvas", "id": "bar", "type": "solid", "color": "#00ff00", "size": [4, 2], "opacity": {"media": "progress"},
       "transform": {"position": [62, 31]}}]}' 1.0.0)
 read -r _ _ _ s21 < <(ctl stream TEST-21 160 90)
 consume "$s21"
@@ -113,9 +113,9 @@ ctl scene act "$tuning" set '{"pointer": "/scene/canvas/background", "value": "#
 ctl scene import "$tuning" "$WORK/tune/red.png" --id red >/dev/null
 ctl scene act "$tuning" asset '{"asset": "cover", "cover": "current", "placeholder": "red"}' || fail "no cover asset was made"
 if ctl scene act "$tuning" asset '{"asset": "other", "cover": "current"}' 2>/dev/null; then fail "a cover without a placeholder was made"; fi
-ctl scene act "$tuning" add '{"pointer": "/scene/layers/-", "value": {"id": "art", "image": "cover", "size": [1920, 1080], "transform": {"position": [960, 540]}, "type": "image"}}'
-ctl scene act "$tuning" add '{"pointer": "/scene/layers/-", "value": {"id": "title", "size": 40, "text": {"media": "title"}, "transform": {"position": [40, 40]}, "type": "text"}}'
-ctl scene act "$tuning" add '{"pointer": "/scene/layers/-", "value": {"id": "before", "image": "red", "size": [8, 8], "type": "image", "visible": false}}'
+ctl scene act "$tuning" add '{"pointer": "/scene/layers/-", "value": { "blend_space": "canvas", "id": "art", "image": "cover", "size": [1920, 1080], "transform": {"position": [960, 540]}, "type": "image"}}'
+ctl scene act "$tuning" add '{"pointer": "/scene/layers/-", "value": { "blend_space": "canvas", "id": "title", "size": 40, "text": {"media": "title"}, "transform": {"position": [40, 40]}, "type": "text"}}'
+ctl scene act "$tuning" add '{"pointer": "/scene/layers/-", "value": { "blend_space": "canvas", "id": "before", "image": "red", "size": [8, 8], "type": "image", "visible": false}}'
 ctl scene act "$tuning" set '{"pointer": "/scene/layers/1/text/placeholder", "value": "Nothing plays"}'
 ctl scene act "$tuning" translate '{"language": "es", "pointer": "/scene/layers/1/text/placeholder", "text": "No suena nada"}'
 ctl scene act "$tuning" set '{"pointer": "/scene/layers/1/text/placeholder", "value": "'"$(printf 'x%.0s' $(seq 600))"'"}'
@@ -140,7 +140,7 @@ ctl scene preview "$tuning" -o preview:2 --time 0 || fail "the scene was not pre
 shown "$s22" 255 0 0
 printf '{"cover": "../blue cover.png"}' >"$WORK/outside.json"
 if ctl scene preview "$tuning" -o preview:2 --media "$WORK/outside.json" 2>/dev/null; then fail "a cover outside the folder was read"; fi
-ctl scene act "$tuning" set '{"pointer": "/scene/layers/0", "value": {"color": {"media": "primary"}, "id": "art", "size": [1920, 1080], "transform": {"position": [960, 540]}, "type": "solid"}}'
+ctl scene act "$tuning" set '{"pointer": "/scene/layers/0", "value": { "blend_space": "canvas", "color": {"media": "primary"}, "id": "art", "size": [1920, 1080], "transform": {"position": [960, 540]}, "type": "solid"}}'
 ctl scene preview "$tuning" -o preview:2 --time 0 --media "$WORK/track.json"
 shown "$s22" 0 0 255
 ctl scene preview "$tuning" -o preview:2 --time 0

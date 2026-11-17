@@ -59,7 +59,7 @@ fn the_texts_of_the_listing_say_what_the_program_does() {
 
 #[test]
 fn the_particles_lighting_error_names_the_field_that_is_taken() {
-    let doc = json!({ "scene": { "layers": [{ "id": "p", "type": "particles" }] } });
+    let doc = json!({ "scene": { "layers": [{ "blend_space": "canvas", "id": "p", "type": "particles" }] } });
     let edit = crate::action::LightingEdit { layer: "p".into(), roughness: Some(0.5), ..Default::default() };
     let action = crate::Action::Lighting(edit);
     let why = crate::lamps::act(std::path::Path::new("."), &doc, &action).unwrap().unwrap_err().to_string();

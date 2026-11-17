@@ -115,29 +115,35 @@ pub fn template(
         found.ok_or_else(|| anyhow!(said("editor.import", "import %1 %2 first", &[&article, &what])))
     };
     Ok(match kind {
-        "image" => json!({"id": id, "type": "image", "image": asset("image")?}),
-        "video" => json!({"id": id, "type": "video", "video": asset("video")?}),
-        "sound" => json!({"id": id, "type": "sound", "sound": asset("sound")?}),
-        "mesh" => json!({"id": id, "type": "mesh", "mesh": asset("model")?}),
-        "model" => json!({"id": id, "type": "model", "model": asset("model")?}),
+        "image" => json!({ "blend_space": "canvas", "id": id, "type": "image", "image": asset("image")?}),
+        "video" => json!({ "blend_space": "canvas", "id": id, "type": "video", "video": asset("video")?}),
+        "sound" => json!({ "blend_space": "canvas", "id": id, "type": "sound", "sound": asset("sound")?}),
+        "mesh" => json!({ "blend_space": "canvas", "id": id, "type": "mesh", "mesh": asset("model")?}),
+        "model" => json!({ "blend_space": "canvas", "id": id, "type": "model", "model": asset("model")?}),
         "shapes" => {
             let pools = doc.pointer("/scene/pools").and_then(Value::as_object);
             let first = pools.and_then(|p| p.keys().next().cloned());
             let pool = source.map(String::from).or(first);
             let pool = pool.ok_or_else(|| anyhow!(said("editor.add_pool", "add a pool first", &[])))?;
-            json!({"id": id, "type": "video", "video": pool})
+            json!({ "blend_space": "canvas", "id": id, "type": "video", "video": pool})
         }
-        "group3d" => json!({"id": id, "type": "group", "space": "3d", "layers": []}),
+        "group3d" => {
+            json!({ "blend_space": "canvas", "id": id, "type": "group", "space": "3d", "layers": []})
+        }
         "text" => {
-            json!({"id": id, "type": "text", "text": name.unwrap_or("Text"), "size": 96, "color": "#ffffff"})
+            json!({ "blend_space": "canvas", "id": id, "type": "text", "text": name.unwrap_or("Text"), "size": 96, "color": "#ffffff"})
         }
-        "shape" => json!({"id": id, "type": "shape", "shape": {"rect": {"size": [480, 320], "radius": 24}},
-            "fill": "#4a90d9"}),
-        "solid" => json!({"id": id, "type": "solid", "color": "#203040"}),
-        "spectrum" => json!({"id": id, "type": "spectrum", "size": [960, 240]}),
-        "particles" => json!({"id": id, "type": "particles", "system": source.unwrap_or(id)}),
-        "group" => json!({"id": id, "type": "group", "layers": []}),
-        "adjustment" => json!({"id": id, "type": "adjustment", "effects": []}),
+        "shape" => {
+            json!({ "blend_space": "canvas", "id": id, "type": "shape", "shape": {"rect": {"size": [480, 320], "radius": 24}},
+            "fill": "#4a90d9"})
+        }
+        "solid" => json!({ "blend_space": "canvas", "id": id, "type": "solid", "color": "#203040"}),
+        "spectrum" => json!({ "blend_space": "canvas", "id": id, "type": "spectrum", "size": [960, 240]}),
+        "particles" => {
+            json!({ "blend_space": "canvas", "id": id, "type": "particles", "system": source.unwrap_or(id)})
+        }
+        "group" => json!({ "blend_space": "canvas", "id": id, "type": "group", "layers": []}),
+        "adjustment" => json!({ "blend_space": "canvas", "id": id, "type": "adjustment", "effects": []}),
         "light" => crate::lamps::template(doc, id, source)?,
         _ => bail!(said(
             "editor.not_layer_type",

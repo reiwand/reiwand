@@ -15,7 +15,7 @@ fn option_values_outside_the_built_variants_never_build_on_the_render_thread() {
     let wgsl = "override o: u32 = 1u; override z: u32 = 4u / o;
         @fragment fn fs_v(in: VertexOut) -> @location(0) vec4<f32> { return tap(in.uv) * f32(z) * 0.25; }";
     let used = json!({ "effect": "vv", "params": { "o": { "prop": "p", "map": { "a": 1 } } } });
-    let layers = json!([{ "id": "bg", "type": "solid", "color": "#ff0000", "effects": [used] }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "bg", "type": "solid", "color": "#ff0000", "effects": [used] }]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers,
         "effects": { "vv": { "descriptor": "fx/vv.json", "wgsl": "fx/vv.wgsl" } } });
     let mut scene = Scene::from_json(&text.to_string()).unwrap();

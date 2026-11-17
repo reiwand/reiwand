@@ -5,9 +5,9 @@ mkdir -p "$WORK/cue" && cp "$ROOT/tests/fixtures/green-64x32.png" "$WORK/cue/pre
 printf '%s' '{"schema": "reiwand.scene/1", "canvas": {"size": [64, 32], "background": "#000000"},
   "timelines": [{"id": "song", "duration": 0.2, "autoplay": false, "trigger": "media:track"},
     {"id": "rest", "duration": 0.2, "autoplay": false, "trigger": "media:pause"}],
-  "layers": [{"id": "glow", "type": "solid", "size": [64, 32], "transform": {"position": [32, 16]},
+  "layers": [{ "blend_space": "canvas", "id": "glow", "type": "solid", "size": [64, 32], "transform": {"position": [32, 16]},
       "color": {"timeline": "song", "keys": [[0, "#ff0000"], [0.1, "#0000ff"]]}},
-    {"id": "dim", "type": "solid", "size": [64, 32], "transform": {"position": [32, 16]}, "color": "#00ff00",
+    { "blend_space": "canvas", "id": "dim", "type": "solid", "size": [64, 32], "transform": {"position": [32, 16]}, "color": "#00ff00",
       "opacity": {"timeline": "rest", "keys": [[0, 0], [0.1, 1]]}}]}' >"$WORK/cue/scene.json"
 printf '{"schema": "reiwand.wpak/2", "id": "%s", "version": "1.0.0", "title": "Cue", "license": "CC0-1.0",
   "kind": "scene", "entry": "scene.json", "previews": {"thumbnail": "preview.png"}, "origin": {"kind": "original"},
@@ -45,7 +45,7 @@ printf '%s' 'import { scene, media } from "reiwand";
 export function mediaPlayback({ state }) { scene.layer("box").color = state === "playing" && media.title ? "#0000ff" : "#00ff00"; }' >"$WORK/heard/scripts/heard.js"
 printf '%s' '{"schema": "reiwand.scene/1", "canvas": {"size": [64, 32], "background": "#000000"},
   "scripts": [{"path": "scripts/heard.js", "events": ["mediaPlayback"], "uses": ["media"]}],
-  "layers": [{"id": "box", "type": "solid", "size": [64, 32], "color": "#ff0000", "transform": {"position": [32, 16]}}]}' >"$WORK/heard/scene.json"
+  "layers": [{ "blend_space": "canvas", "id": "box", "type": "solid", "size": [64, 32], "color": "#ff0000", "transform": {"position": [32, 16]}}]}' >"$WORK/heard/scene.json"
 sed "s/$cue/$heard/; s/\"Cue\"/\"Heard\"/" "$WORK/cue/manifest.json" >"$WORK/heard/manifest.json"
 ctl pack build "$WORK/heard" -o "$WORK/import/heard.wpak" >/dev/null
 job=$(bus Library1 Import asb 1 "$WORK/import/heard.wpak" false | out "d[0]")

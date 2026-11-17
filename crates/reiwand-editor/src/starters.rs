@@ -8,12 +8,12 @@ use serde_json::{Value, json};
 pub const STARTERS: [&str; 4] = ["empty", "particles", "parallax", "clock"];
 
 fn sky(top: &str, bottom: &str) -> Value {
-    json!({"id": "sky", "type": "shape", "shape": {"rect": {"size": [1920, 1080]}},
+    json!({ "blend_space": "canvas", "id": "sky", "type": "shape", "shape": {"rect": {"size": [1920, 1080]}},
         "gradient": {"stops": [[0, top], [1, bottom]]}})
 }
 
 fn hill(id: &str, size: [u32; 2], at: [u32; 2], fill: &str, parallax: f64) -> Value {
-    json!({"id": id, "type": "shape", "shape": {"ellipse": {"size": size}}, "fill": fill,
+    json!({ "blend_space": "canvas", "id": id, "type": "shape", "shape": {"ellipse": {"size": size}}, "fill": fill,
         "transform": {"position": at}, "parallax": [parallax, parallax]})
 }
 
@@ -30,12 +30,12 @@ fn layers(starter: &str) -> Result<(Value, Value, Value)> {
                 "render": {"size_over_life": [[0, 0], [0.1, 1], [0.9, 1], [1, 0]]}});
             let props = json!({"density": {"type": "slider", "label": {"en": "Density", "es": "Densidad"},
                 "min": 0, "max": 400, "step": 10, "default": 160}});
-            let layers = json!([sky("#0b1830", "#2c4a70"), {"id": "flakes", "type": "particles",
+            let layers = json!([sky("#0b1830", "#2c4a70"), { "blend_space": "canvas", "id": "flakes", "type": "particles",
                 "system": "flakes", "blend": "add"}]);
             (layers, json!({"flakes": system}), props)
         }
         "parallax" => {
-            let sun = json!({"id": "sun", "type": "shape", "shape": {"ellipse": {"size": [220, 220]}},
+            let sun = json!({ "blend_space": "canvas", "id": "sun", "type": "shape", "shape": {"ellipse": {"size": [220, 220]}},
                 "fill": "#ffe7b0", "transform": {"position": [1380, 330]}, "parallax": [0.005, 0.005]});
             let layers = json!([
                 sky("#f3a96b", "#fbe3c4"),
@@ -47,9 +47,9 @@ fn layers(starter: &str) -> Result<(Value, Value, Value)> {
             (layers, none.clone(), none)
         }
         "clock" => {
-            let time = json!({"id": "time", "type": "text", "text": {"clock": "HH:mm"}, "size": 220,
+            let time = json!({ "blend_space": "canvas", "id": "time", "type": "text", "text": {"clock": "HH:mm"}, "size": 220,
                 "color": {"prop": "color"}, "anchor": "center"});
-            let date = json!({"id": "seconds", "type": "text", "text": {"clock": "ss"}, "size": 64,
+            let date = json!({ "blend_space": "canvas", "id": "seconds", "type": "text", "text": {"clock": "ss"}, "size": 64,
                 "color": {"prop": "color"}, "opacity": 0.6, "anchor": "center", "transform": {"position": [0, 170]}});
             let props = json!({"color": {"type": "color", "label": {"en": "Color", "es": "Color"},
                 "default": "#f2f5ff"}});

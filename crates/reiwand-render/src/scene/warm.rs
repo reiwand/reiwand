@@ -1,5 +1,5 @@
 use super::pipes::{Mode, Pipes, Shader};
-use reiwand_scene::{Blend, Kind, Layer, Scene};
+use reiwand_scene::{Blend, Kind, Layer, LayerSpace, Scene};
 use std::collections::BTreeSet;
 use wgpu::TextureFormat as Format;
 
@@ -20,7 +20,11 @@ fn entry(layer: &Layer) -> Option<&'static str> {
 
 fn walk(layers: &[Layer], atop: bool, pairs: &mut BTreeSet<(&'static str, Mode)>) {
     for (n, layer) in layers.iter().enumerate() {
-        let m = mode(layer.blend, atop && n > 0);
+        let m = if layer.blend_space == LayerSpace::Canvas {
+            mode(layer.blend, atop && n > 0)
+        } else {
+            Mode::Replace
+        };
         let styled = matches!(&layer.kind, Kind::Text(t) if t.styled());
         let text = [matches!(layer.kind, Kind::Text(_)).then_some("fs_shape"), styled.then_some("fs_text")];
         for e in entry(layer).into_iter().chain(text.into_iter().flatten()) {

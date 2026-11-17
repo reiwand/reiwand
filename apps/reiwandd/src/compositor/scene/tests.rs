@@ -139,8 +139,8 @@ fn a_small_moving_layer_damages_only_its_box_on_the_screen() {
         Err(e) => return assert!(std::env::var_os("REIWAND_REQUIRE_GPU").is_none(), "GPU required: {e}"),
     };
     let text = r##"{ "schema": "reiwand.scene/1", "canvas": { "size": [160, 90] },
-      "layers": [{ "id": "back", "type": "solid", "color": "#203040", "size": [160, 90] },
-        { "id": "dot", "type": "solid", "color": "#ffffff", "size": [8, 8],
+      "layers": [{ "blend_space": "canvas", "id": "back", "type": "solid", "color": "#203040", "size": [160, 90] },
+        { "blend_space": "canvas", "id": "dot", "type": "solid", "color": "#ffffff", "size": [8, 8],
           "transform": { "position": { "keys": [[0, [120, 20]], [4, [140, 20]]] } } }] }"##;
     let pack = Arc::new(ScenePack::bare(Scene::from_json(text).unwrap(), Default::default(), Vec::new()));
     let spec = SceneSpec {

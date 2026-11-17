@@ -141,7 +141,7 @@ impl Painter<'_, '_, '_> {
         if let Some(rect) = self.straight(j, m) {
             let out = self.acquire((w, h))?;
             self.ops.push(Op::Clear(out, [0.0; 4]));
-            self.direct(j, Target { src: out, rect }, (1.0, Blend::Normal, None), false);
+            self.direct(j, Target { src: out, rect }, (1.0, Blend::Normal, None, None), false);
             self.isolated.push((key, Some((out, rect))));
             return Some((out, crop));
         }

@@ -12,7 +12,7 @@ fn balls(count: usize, segments: u32) -> (Value, BTreeMap<&'static str, Vec<u8>>
     let place =
         |k: usize| [(k % side) as f32 - side as f32 / 2.0, (k / side) as f32 - side as f32 / 2.0, 0.0];
     let models: Vec<Value> = (0..count)
-        .map(|k| json!({ "id": format!("b{k}"), "type": "model", "model": "ball", "position": place(k) }))
+        .map(|k| json!({ "blend_space": "canvas", "id": format!("b{k}"), "type": "model", "model": "ball", "position": place(k) }))
         .collect();
     (json!(models), BTreeMap::from([("ball", ball)]))
 }
@@ -22,9 +22,9 @@ fn staged(count: usize, segments: u32, shadows: bool) -> Scene {
     let far = 2.0 + count as f32;
     let key = |t: f32, x: f32| json!({ "t": t, "eye": [x, 1, far], "center": [0, 0, 0] });
     let camera = json!({ "paths": [{ "id": "a", "keys": [key(0.0, -3.0), key(10.0, 3.0)] }] });
-    let sun = json!({ "id": "sun", "type": "light", "light": "directional", "intensity": 3,
+    let sun = json!({ "blend_space": "canvas", "id": "sun", "type": "light", "light": "directional", "intensity": 3,
         "transform": { "tilt": [45, 0] }, "shadows": shadows });
-    let layers = json!([sun, { "id": "world", "type": "group", "space": "3d", "layers": models }]);
+    let layers = json!([sun, { "blend_space": "canvas", "id": "world", "type": "group", "space": "3d", "layers": models }]);
     let canvas = json!({ "size": [WIDE.0, WIDE.1], "background": "#000000" });
     scene(json!({ "camera3d": camera, "canvas": canvas }), layers, files)
 }

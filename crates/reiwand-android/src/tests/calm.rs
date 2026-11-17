@@ -3,7 +3,7 @@ use super::*;
 fn blink(id: &str, photosensitive: bool) -> (String, std::path::PathBuf) {
     let source = tempfile::tempdir().unwrap();
     let opacity = json!({ "timeline": "blink", "keys": [[0, 0], [0.05, 1], [0.1, 0]] });
-    let layers = json!([{ "id": "flash", "type": "solid", "color": "#ffffff", "opacity": opacity }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "flash", "type": "solid", "color": "#ffffff", "opacity": opacity }]);
     let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32], "background": "#000000" },
         "clock": { "poster_time": 0.03 }, "layers": layers,
         "timelines": [{ "id": "blink", "duration": 0.1, "loop": "repeat" }] });

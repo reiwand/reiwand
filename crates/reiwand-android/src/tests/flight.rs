@@ -8,7 +8,7 @@ pub(super) fn flown() {
         "spark": { "capacity": 200, "emitters": [{ "shape": { "circle": { "center": [0, 0], "radius": 6 } }, "bursts": [{ "count": 10 }] }],
             "init": { "life": [0.3, 0.3], "speed": [0, 0], "size": [4, 4] } }
     });
-    let layers = json!([{ "id": "p", "type": "particles", "system": "fuse", "blend": "add", "instance": { "color": "#ff0000" } }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "fuse", "blend": "add", "instance": { "color": "#ff0000" } }]);
     let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32], "background": "#000000" },
         "layers": layers, "particles": systems });
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();

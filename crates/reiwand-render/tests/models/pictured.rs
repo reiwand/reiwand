@@ -10,7 +10,7 @@ fn coat() -> String {
 }
 
 fn pictured(params: Value) -> Scene {
-    let layers = json!([{ "id": "m", "type": "model", "model": "ball",
+    let layers = json!([{ "blend_space": "canvas", "id": "m", "type": "model", "model": "ball",
         "materials": { "skin": { "shader": "coat", "params": params } } }]);
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [SIDE, SIDE], "background": "#000000" },
         "assets": { "ball": { "path": "ball.glb" }, "red": { "path": "red.png" }, "blue": { "path": "blue.png" } },

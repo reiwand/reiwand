@@ -57,7 +57,7 @@ fn setting_a_light_checks_its_values_and_fields() {
 fn positions_and_aims_are_given_on_the_canvas() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
-    let group = json!({ "id": "g", "type": "group", "transform": { "position": [100, 50], "rotation": 90 }, "layers": [] });
+    let group = json!({ "blend_space": "canvas", "id": "g", "type": "group", "transform": { "position": [100, 50], "rotation": 90 }, "layers": [] });
     act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": group } })).unwrap();
     light(&mut p, json!({ "add": { "light": "spot", "id": "s", "into": "g", "at": [0, 0] } })).unwrap();
     light(&mut p, json!({ "set": { "layer": "s", "at": [100, 150] } })).unwrap();

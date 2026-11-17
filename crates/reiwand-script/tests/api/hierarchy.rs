@@ -20,12 +20,12 @@ const SOURCE: &str = r#"import { scene } from "reiwand";
     }"#;
 
 fn scene(uses: serde_json::Value) -> serde_json::Value {
-    let solid = |id: &str, at: [f32; 2]| json!({ "id": id, "type": "solid", "color": "#ffffff", "transform": { "position": at } });
+    let solid = |id: &str, at: [f32; 2]| json!({ "blend_space": "canvas", "id": id, "type": "solid", "color": "#ffffff", "transform": { "position": at } });
     json!({
         "scripts": [{ "path": "main.js", "uses": uses }],
         "layers": [solid("sun", [50.0, 20.0]), solid("moon", [70.0, 30.0]),
-                   { "id": "pack", "type": "group", "layers": [solid("kid", [1.0, 1.0])] },
-                   { "id": "info", "type": "text", "text": "", "size": 10 }]
+                   { "blend_space": "canvas", "id": "pack", "type": "group", "layers": [solid("kid", [1.0, 1.0])] },
+                   { "blend_space": "canvas", "id": "info", "type": "text", "text": "", "size": 10 }]
     })
 }
 

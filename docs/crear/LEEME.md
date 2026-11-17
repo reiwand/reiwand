@@ -244,9 +244,9 @@ su `scene.json` entero es:
   "clock": { "max_fps": "display" },
   "assets": { "cielo": { "path": "assets/cielo.png" } },
   "layers": [
-    { "id": "fondo", "type": "image", "image": "cielo", "size": [1920, 1080],
+    { "blend_space": "canvas", "id": "fondo", "type": "image", "image": "cielo", "size": [1920, 1080],
       "effects": [{ "effect": "waves", "params": { "amplitude": 6, "frequency": 3 } }] },
-    { "id": "sol", "type": "shape", "shape": { "ellipse": { "size": [220, 220] } },
+    { "blend_space": "canvas", "id": "sol", "type": "shape", "shape": { "ellipse": { "size": [220, 220] } },
       "fill": { "prop": "color_sol" },
       "transform": { "position": { "timeline": "vuelta",
         "keys": [[0, [260, 820], "in_out_sine"], [12, [1660, 260]]] } } }

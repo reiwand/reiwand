@@ -6,9 +6,9 @@ const VIEW: [f32; 4] = [0.0, 0.0, 64.0, 64.0];
 
 fn zoomed(attach: serde_json::Value, camera: serde_json::Value) -> [f32; 6] {
     let rt = layers(json!([
-        { "id": "fox", "type": "mesh", "mesh": "arm", "size": [64, 64],
+        { "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "arm", "size": [64, 64],
           "clips": [{ "id": "wave", "animation": "wave", "loop": "once" }], "animations": [{ "clip": "wave" }] },
-        { "id": "badge", "type": "solid", "color": "#ffffff", "size": [4, 4], "attach": attach }
+        { "blend_space": "canvas", "id": "badge", "type": "solid", "color": "#ffffff", "size": [4, 4], "attach": attach }
     ]));
     let mut scene = (*rt.scene).clone();
     scene.canvas.camera = Some(serde_json::from_value(camera).unwrap());

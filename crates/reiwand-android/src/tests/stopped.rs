@@ -19,8 +19,8 @@ fn tier() -> String {
 
 fn heavy() -> (String, std::path::PathBuf) {
     let source = tempfile::tempdir().unwrap();
-    let blur = |i: usize| json!({ "id": format!("b{i}"), "type": "adjustment", "effects": [{ "effect": "blur", "params": { "radius": 30 } }] });
-    let fade = json!({ "id": "fade", "type": "solid", "color": "#ffffff",
+    let blur = |i: usize| json!({ "blend_space": "canvas", "id": format!("b{i}"), "type": "adjustment", "effects": [{ "effect": "blur", "params": { "radius": 30 } }] });
+    let fade = json!({ "blend_space": "canvas", "id": "fade", "type": "solid", "color": "#ffffff",
         "opacity": { "timeline": "fade", "keys": [[0, 0], [1, 1]] } });
     let layers: Vec<_> = std::iter::once(fade).chain((0..120).map(blur)).collect();
     let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [960, 540], "background": "#203040" },

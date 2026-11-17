@@ -8,9 +8,10 @@ const FAR: f32 = 200.0;
 fn tilted(group: [f32; 2], fox: Value) -> Runtime {
     let mut fox = fox;
     fox["id"] = json!("fox");
+    fox["blend_space"] = json!("canvas");
     (fox["type"], fox["mesh"], fox["size"]) = (json!("mesh"), json!("arm"), json!([64, 64]));
     fox["depth"] = json!({ "scale": 1 });
-    let rt = layers(json!([{ "id": "g", "type": "group",
+    let rt = layers(json!([{ "blend_space": "canvas", "id": "g", "type": "group",
         "transform": { "position": [32, 32], "tilt": group }, "layers": [fox] }]));
     let mut scene = (*rt.scene).clone();
     scene.canvas.perspective = Some(FAR);
@@ -70,8 +71,10 @@ fn raised_vertices_lean_with_the_tilted_group_around_their_layer() {
 
 #[test]
 fn a_layer_without_tilt_raises_straight_towards_the_viewer() {
-    let rt = layers(json!([{ "id": "fox", "type": "mesh", "mesh": "arm", "size": [64, 64],
-        "depth": { "scale": 1 }, "transform": { "position": [40, 30] } }]));
+    let rt = layers(
+        json!([{ "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "arm", "size": [64, 64],
+        "depth": { "scale": 1 }, "transform": { "position": [40, 30] } }]),
+    );
     let mut scene = (*rt.scene).clone();
     scene.canvas.perspective = Some(FAR);
     let mut rt = Runtime::new(std::sync::Arc::new(scene), Default::default());

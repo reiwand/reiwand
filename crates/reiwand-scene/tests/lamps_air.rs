@@ -15,13 +15,13 @@ fn issues(layers: Json) -> Vec<String> {
 }
 
 fn spot(id: &str, extra: Json) -> Json {
-    let mut l = json!({ "id": id, "type": "light", "light": "spot", "transform": { "position": [50, 50] } });
+    let mut l = json!({ "blend_space": "canvas", "id": id, "type": "light", "light": "spot", "transform": { "position": [50, 50] } });
     l.as_object_mut().unwrap().extend(extra.as_object().cloned().unwrap_or_default());
     l
 }
 
 fn wall(id: &str, lit: bool) -> Json {
-    let mut w = json!({ "id": id, "type": "image", "image": "wall" });
+    let mut w = json!({ "blend_space": "canvas", "id": id, "type": "image", "image": "wall" });
     if lit {
         w["lighting"] = json!({});
     }
@@ -41,7 +41,8 @@ fn volumetrics_keep_density_and_samples_in_range_and_only_on_points_and_spots() 
     for v in bad {
         assert!(!issues(json!([spot("s", json!({ "volumetric": v }))])).is_empty(), "{v}");
     }
-    let tube = json!({ "id": "t", "type": "light", "light": "tube", "volumetric": {} });
+    let tube =
+        json!({ "blend_space": "canvas", "id": "t", "type": "light", "light": "tube", "volumetric": {} });
     assert!(issues(json!([tube])).iter().any(|i| i.contains("/layers/0/volumetric")));
     assert!(
         issues(json!([spot("s", json!({ "volumetric": { "density": 0.5, "samples": 32 } }))])).is_empty()
@@ -58,12 +59,13 @@ fn spots_project_pictures_videos_or_layers_without_loops() {
     }
     let lit = issues(json!([wall("w", true), spot("s", json!({ "texture": { "layer": "w" } }))]));
     assert!(lit.iter().any(|i| i.contains("/layers/1/texture/layer")), "{lit:?}");
-    let group = json!({ "id": "g", "type": "group", "layers": [wall("inner", true)] });
+    let group =
+        json!({ "blend_space": "canvas", "id": "g", "type": "group", "layers": [wall("inner", true)] });
     assert!(!issues(json!([group, spot("s", json!({ "texture": { "layer": "g" } }))])).is_empty());
     let unknown = issues(json!([spot("s", json!({ "texture": { "layer": "nothing" } }))]));
     assert!(unknown.iter().any(|i| i.contains("nothing")), "{unknown:?}");
     assert!(!issues(json!([spot("s", json!({ "texture": "song" }))])).is_empty(), "a sound is no picture");
-    let point = json!({ "id": "p", "type": "light", "texture": "wall" });
+    let point = json!({ "blend_space": "canvas", "id": "p", "type": "light", "texture": "wall" });
     assert!(!issues(json!([point])).is_empty(), "only spots project");
     let used = scene(json!([wall("w", false), spot("s", json!({ "texture": { "layer": "w" } }))])).features();
     assert!(used.contains("light_textures") && used.contains("layer_textures"));
@@ -78,7 +80,7 @@ fn a_scene_projects_with_at_most_four_spots() {
 
 #[test]
 fn particles_take_light_and_refract_with_pictures_in_range() {
-    let layer = |render: Json| json!({ "id": "p", "type": "particles", "system": "rain", "render": render });
+    let layer = |render: Json| json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "rain", "render": render });
     assert!(issues(json!([layer(json!({ "lit": true, "normal": "wall" }))])).is_empty());
     assert!(!issues(json!([layer(json!({ "normal": "song" }))])).is_empty());
     assert!(!issues(json!([layer(json!({ "refract": { "normal": "wall", "amount": 2 } }))])).is_empty());
@@ -99,7 +101,8 @@ fn lamps_carry_their_air_and_picture_and_drop_the_air_at_the_lowest_level() {
     assert_eq!(runtime.frame(view, Quality::Q0).lamps[0].air, None);
     let shown = runtime.frame(view, Quality::Q3);
     assert!(shown.draws.iter().any(|d| d.layer.id == "w"));
-    let hidden = json!({ "id": "w", "type": "image", "image": "wall", "visible": false });
+    let hidden =
+        json!({ "blend_space": "canvas", "id": "w", "type": "image", "image": "wall", "visible": false });
     let s = spot("s", json!({ "texture": { "layer": "w" } }));
     let runtime = Runtime::new(Arc::new(scene(json!([hidden, s]))), Values::new());
     let frame = runtime.frame(view, Quality::Q3);

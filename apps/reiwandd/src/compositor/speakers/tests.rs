@@ -31,7 +31,7 @@ fn scenes_start_muted_play_on_one_output_and_never_while_locked() {
 fn delayed() -> SceneState {
     let text = serde_json::json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [16, 9] },
         "assets": { "wind": { "path": "wind.ogg" } }, "timelines": [{ "id": "t", "duration": 9 }],
-        "layers": [{ "id": "wind", "type": "sound", "sound": "wind",
+        "layers": [{ "blend_space": "canvas", "id": "wind", "type": "sound", "sound": "wind",
                      "play": { "timeline": "t", "keys": [[0, false], [1.5, true]] } }] });
     let scene = Scene::from_json(&text.to_string()).unwrap();
     let sounds = vec![("wind".into(), PathBuf::from("/wind.ogg"))];

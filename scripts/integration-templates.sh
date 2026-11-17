@@ -8,7 +8,7 @@ ctl scene act "$made" duplicate_layer '{"id": "fill", "template": true}' || fail
 ctl scene act "$made" duplicate_layer '{"id": "fill", "template": true}' || fail "no second template was made"
 grep -q '"fill_template_2"' "$made/scene.json" || fail "the second template did not get a free name"
 ctl scene import "$made" "$ROOT/tests/fixtures/magenta-64x32.webm" --id clip >/dev/null || fail "the video was not imported"
-ctl scene act "$made" set '{"pointer": "/scene/layers/0", "value": {"id": "film", "playback": {"own_clock": true, "rate": 2, "start": 0.5}, "type": "video", "video": "clip"}}'
+ctl scene act "$made" set '{"pointer": "/scene/layers/0", "value": { "blend_space": "canvas", "id": "film", "playback": {"own_clock": true, "rate": 2, "start": 0.5}, "type": "video", "video": "clip"}}'
 ctl scene act "$made" add_layer '{"id": "flakes", "kind": "particles"}' >/dev/null
 printf '%s' '{"id": "throb", "name": {"en": "Pulse"}, "cost": {"taps": 1}, "passes": [{"entry": "fs_throb"}],
   "params": [{"id": "gain", "type": "float", "default": 1, "min": 0, "max": 4}, {"id": "speed", "type": "float", "default": 0}]}' >"$WORK/throb.json"

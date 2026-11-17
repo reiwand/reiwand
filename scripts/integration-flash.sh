@@ -2,7 +2,7 @@
 set -euo pipefail
 declare storm serial7
 mkdir -p "$WORK/flash" && cp "$ROOT/tests/fixtures/green-64x32.png" "$WORK/flash/preview.png"
-echo '{"schema": "reiwand.scene/1", "canvas": {"size": [64, 32]}, "layers": [{"id": "fill", "type": "solid", "color": "#ffffff"}]}' >"$WORK/flash/scene.json"
+echo '{"schema": "reiwand.scene/1", "canvas": {"size": [64, 32]}, "layers": [{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ffffff"}]}' >"$WORK/flash/scene.json"
 flash() {
   printf '{"schema": "reiwand.wpak/2", "id": "%s", "version": "1.0.0", "title": "Flash", "license": "CC0-1.0",
     "kind": "scene", "entry": "scene.json", "previews": {"thumbnail": "preview.png"}, "origin": {"kind": "original"},
@@ -32,7 +32,7 @@ mkdir -p "$WORK/blink" && cp "$WORK/flash/preview.png" "$WORK/blink/preview.png"
 cat >"$WORK/blink/scene.json" <<'BLINK'
 {"schema": "reiwand.scene/1", "canvas": {"size": [64, 32], "background": "#000000"},
  "timelines": [{"id": "blink", "duration": 0.1, "loop": "repeat"}],
- "layers": [{"id": "fill", "type": "solid", "color": "#ffffff",
+ "layers": [{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ffffff",
    "opacity": {"timeline": "blink", "keys": [[0, 0], [0.05, 1], [0.1, 0]]}}]}
 BLINK
 sed 's/"org.example.flash2"/"org.example.blink"/; s/"photosensitive": true/"photosensitive": false/' "$WORK/flash/manifest.json" >"$WORK/blink/manifest.json"

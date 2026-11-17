@@ -2,7 +2,7 @@ use super::{at, handle, handles, near, pull, scene, seat};
 use serde_json::json;
 
 fn shape(id: &str, shape: serde_json::Value, extra: serde_json::Value) -> serde_json::Value {
-    let mut layer = json!({"id": id, "type": "shape", "shape": shape, "fill": "#ff0000",
+    let mut layer = json!({ "blend_space": "canvas", "id": id, "type": "shape", "shape": shape, "fill": "#ff0000",
         "transform": {"position": [500, 400], "rotation": 25, "scale": [1.4, 0.8]}});
     for (k, v) in extra.as_object().cloned().unwrap_or_default() {
         layer[k] = v;

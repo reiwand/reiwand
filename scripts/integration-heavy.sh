@@ -6,8 +6,8 @@ import json, sys, zipfile
 manifest = {"schema": "reiwand.wpak/2", "id": "org.example.heavy", "version": "1.0.0", "title": "Heavy",
             "content": {"rating": "general"}, "photosensitive": False, "origin": {"kind": "original"},
             "license": "CC0-1.0", "kind": "scene", "entry": "scene.json"}
-blur = lambda i: {"id": f"b{i}", "type": "adjustment", "effects": [{"effect": "blur", "params": {"radius": 30}}]}
-fade = {"id": "fade", "type": "solid", "color": "#ffffff", "opacity": {"timeline": "fade", "keys": [[0, 0], [1, 1]]}}
+blur = lambda i: { "blend_space": "canvas", "id": f"b{i}", "type": "adjustment", "effects": [{"effect": "blur", "params": {"radius": 30}}]}
+fade = { "blend_space": "canvas", "id": "fade", "type": "solid", "color": "#ffffff", "opacity": {"timeline": "fade", "keys": [[0, 0], [1, 1]]}}
 scene = {"schema": "reiwand.scene/1", "canvas": {"size": [960, 540], "background": "#203040"},
          "clock": {"poster_time": 0.5}, "timelines": [{"id": "fade", "duration": 1.0, "loop": "repeat"}],
          "layers": [fade] + [blur(i) for i in range(250)]}

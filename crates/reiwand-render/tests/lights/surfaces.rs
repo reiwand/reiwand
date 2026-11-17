@@ -2,7 +2,7 @@ use super::{UP, at, once, wall};
 use serde_json::json;
 
 fn left(z: f32) -> serde_json::Value {
-    json!({ "id": "lamp", "type": "light", "transform": { "position": [0, 45] }, "z": z, "radius": 400 })
+    json!({ "blend_space": "canvas", "id": "lamp", "type": "light", "transform": { "position": [0, 45] }, "z": z, "radius": 400 })
 }
 
 #[test]
@@ -17,7 +17,7 @@ fn a_normal_map_turns_the_surface_towards_the_light() {
 
 #[test]
 fn smooth_surfaces_shine_and_rough_ones_do_not() {
-    let light = json!({ "id": "lamp", "type": "light", "transform": { "position": [80, 45] }, "z": 60, "radius": 400 });
+    let light = json!({ "blend_space": "canvas", "id": "lamp", "type": "light", "transform": { "position": [80, 45] }, "z": 60, "radius": 400 });
     let gloss = once(json!([wall(json!({ "roughness": 0.0 })), light.clone()]), json!({}), UP);
     let matte = once(json!([wall(json!({ "roughness": 1.0 })), light]), json!({}), UP);
     let (Some(gloss), Some(matte)) = (gloss, matte) else { return };

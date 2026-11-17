@@ -110,8 +110,7 @@ fn language_files_and_package_effects_belong_to_the_package() {
     act(&mut project, json!({"set": {"pointer": "/manifest/title", "value": "@title"}}));
     let effects = json!({"ripple": {"descriptor": "assets/ripple.json", "wgsl": "assets/ripple.wgsl"}});
     act(&mut project, json!({"set": {"pointer": "/scene/effects", "value": effects}}));
-    let layers =
-        json!([{"id": "sea", "type": "solid", "color": "#103050", "effects": [{"effect": "ripple"}]}]);
+    let layers = json!([{ "blend_space": "canvas", "id": "sea", "type": "solid", "color": "#103050", "effects": [{"effect": "ripple"}]}]);
     act(&mut project, json!({"set": {"pointer": "/scene/layers", "value": layers}}));
     let listed = |p: &Project| p.doc["manifest"]["requires"]["features"].clone();
     assert_eq!(listed(&project), json!(["custom_effects", "effect_options"]));
@@ -181,7 +180,7 @@ fn scenes_too_heavy_for_older_gpus_at_the_middle_level_get_a_warning() {
         Project::create(&dir, starter("parallax", "org.example.haze", "Haze", "en").unwrap()).unwrap();
     let light = problems(&project.dir, &project.doc);
     assert!(!light.iter().any(|p| p.message.contains("older integrated")), "{light:?}");
-    let blur = |i: usize| json!({"id": format!("b{i}"), "type": "adjustment", "effects": [{"effect": "blur", "params": {"radius": 30}}]});
+    let blur = |i: usize| json!({ "blend_space": "canvas", "id": format!("b{i}"), "type": "adjustment", "effects": [{"effect": "blur", "params": {"radius": 30}}]});
     let layers: Vec<Value> = (0..8).map(blur).collect();
     act(&mut project, json!({"set": {"pointer": "/scene/layers", "value": layers}}));
     let heavy = problems(&project.dir, &project.doc);

@@ -12,7 +12,7 @@ fn tint(color: &str, mask: &str) -> Value {
 }
 
 fn wide(id: &str, effects: Value) -> Value {
-    json!({ "id": id, "type": "image", "image": id, "size": [WIDE, H], "effects": effects,
+    json!({ "blend_space": "canvas", "id": id, "type": "image", "image": id, "size": [WIDE, H], "effects": effects,
         "transform": { "position": [W / 2, H / 2] } })
 }
 
@@ -24,7 +24,7 @@ fn shot(tints: Value, also: Value) -> Option<Shot> {
         fx = fx.image(id, stripes(every), true).layer(mask);
     }
     let fx = fx.layer(wide("big", tints));
-    fx.layer(json!({ "id": "other", "type": "image", "image": "big", "size": [1, 1], "effects": also })).shot()
+    fx.layer(json!({ "blend_space": "canvas", "id": "other", "type": "image", "image": "big", "size": [1, 1], "effects": also })).shot()
 }
 
 #[test]

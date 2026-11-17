@@ -70,7 +70,7 @@ pub fn listen(scene: &mut Value, what: &Value) {
     }
     let found = quiet(&mut scene["layers"], id);
     if let (Some(asset), false) = (asset, found) {
-        let layer = json!({ "id": LISTENED, "type": "sound", "sound": asset, "loop": false });
+        let layer = json!({ "blend_space": "canvas", "id": LISTENED, "type": "sound", "sound": asset, "loop": false });
         if let Some(list) = scene["layers"].as_array_mut() {
             list.push(layer);
         }

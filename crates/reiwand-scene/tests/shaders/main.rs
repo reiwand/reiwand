@@ -63,7 +63,7 @@ fn packaged(change: impl FnOnce(&mut Json), wgsl: &str) -> Result<Descriptor, St
 fn scene(uses: Json) -> Scene {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "a": { "path": "a.png" } },
         "effects": { "ripple": { "descriptor": "fx/ripple.json", "wgsl": "fx/ripple.wgsl" } },
-        "layers": [{ "id": "l", "type": "image", "image": "a", "effects": uses }] });
+        "layers": [{ "blend_space": "canvas", "id": "l", "type": "image", "image": "a", "effects": uses }] });
     Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"))
 }
 

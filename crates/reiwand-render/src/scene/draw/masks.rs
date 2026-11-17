@@ -3,7 +3,7 @@ use super::super::map::Map;
 use super::super::paint::{Painter, Target};
 use super::super::pipes::Mode;
 use super::super::{Op, Src};
-use reiwand_scene::{Affine, Blend, Mask};
+use reiwand_scene::{Affine, Blend, BlendSpace, Mask};
 
 pub(crate) fn within(item: &mut Item, crop: [f32; 2]) {
     item.mask_m0[..3].iter_mut().for_each(|v| *v *= crop[0]);
@@ -60,12 +60,12 @@ impl Painter<'_, '_, '_> {
     pub(crate) fn blend(
         &mut self,
         item: &mut Item,
-        blend: Blend,
+        (blend, space): (Blend, Option<BlendSpace>),
         bounds: Rect,
         target: Target,
         atop: bool,
     ) -> (Mode, Src) {
-        if let Some(mode) = super::super::pipes::fixed(blend, atop) {
+        if let Some(mode) = super::super::pipes::fixed(blend, atop).filter(|_| space.is_none()) {
             return (mode, Src::Clear);
         }
         let (x, y) = (bounds.x - target.rect.x, bounds.y - target.rect.y);
@@ -81,7 +81,13 @@ impl Painter<'_, '_, '_> {
         let (w, h) = self.size_of(back);
         let (w, h) = (w as f32, h as f32);
         item.back = [-x / w, -y / h, 1.0 / w, 1.0 / h];
-        item.mode[0] = blend as u32 as f32;
+        let kind = match space {
+            None => 0,
+            Some(BlendSpace::Srgb) => 1,
+            Some(BlendSpace::Linear) => 2,
+        };
+        let clip = u32::from(atop && space.is_some());
+        item.mode[0] = (blend as u32 | kind << 6 | clip << 8) as f32;
         (Mode::Replace, back)
     }
 }

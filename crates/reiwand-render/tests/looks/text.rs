@@ -81,7 +81,7 @@ fn texts_wrap_cut_align_and_sit_on_their_box() {
         shot.pixels(r)
     };
     let words = |more: Value| {
-        let mut t = json!({ "id": "t", "type": "text", "text": "wide words wrap here", "font": "f", "size": 8,
+        let mut t = json!({ "blend_space": "canvas", "id": "t", "type": "text", "text": "wide words wrap here", "font": "f", "size": 8,
             "color": "#ffffff", "transform": { "position": [50, 25] } });
         t.as_object_mut().unwrap().extend(more.as_object().unwrap().clone());
         rows(&shot(t), 0..100, |p| p[0] > 128)
@@ -93,14 +93,14 @@ fn texts_wrap_cut_align_and_sit_on_their_box() {
     let span = |r: &[u32]| r.last().unwrap() - r.first().unwrap();
     assert!(span(&wrapped) > 2 * span(&one) && span(&cut) < span(&wrapped), "{one:?} {wrapped:?} {cut:?}");
     assert!(span(&spaced) > span(&cut) + 4, "{spaced:?} {cut:?}");
-    let boxed = json!({ "id": "t", "type": "text", "text": "Hi", "font": "f", "size": 16, "color": "#ffffff",
+    let boxed = json!({ "blend_space": "canvas", "id": "t", "type": "text", "text": "Hi", "font": "f", "size": 16, "color": "#ffffff",
         "valign": "top", "padding": 2, "transform": { "position": [50, 10] },
         "background": { "color": "#ff0000", "padding": [10, 4], "radius": 3 } });
     let pixels = shot(boxed);
     let red = rows(&pixels, 45..55, |p| p == [255, 0, 0]);
     assert!(red.first().is_some_and(|y| (12..15).contains(y)), "{red:?}");
     check(&pixels, &[((50, 9), [0, 0, 0]), ((5, 20), [0, 0, 0])]);
-    let left = json!({ "id": "t", "type": "text", "text": "Hi\nHello there", "font": "f", "size": 10,
+    let left = json!({ "blend_space": "canvas", "id": "t", "type": "text", "text": "Hi\nHello there", "font": "f", "size": 10,
         "color": "#ffffff", "align": "right", "transform": { "position": [50, 25] } });
     let pixels = shot(left);
     let line =
@@ -113,11 +113,11 @@ fn texts_wrap_cut_align_and_sit_on_their_box() {
 fn texts_lay_out_like_their_reference_image() {
     let Some(r) = renderer() else { return };
     let layers = json!([
-        { "id": "w", "type": "text", "text": "Wide words wrap here", "font": "b", "size": 8, "color": "#ffffff",
+        { "blend_space": "canvas", "id": "w", "type": "text", "text": "Wide words wrap here", "font": "b", "size": 8, "color": "#ffffff",
           "wrap": { "width": 40, "lines": 2, "ellipsis": true }, "line_height": 1.5, "transform": { "position": [25, 25] } },
-        { "id": "r", "type": "text", "text": "Hi\nHello", "font": "b", "size": 7, "color": "#00ff00", "align": "right",
+        { "blend_space": "canvas", "id": "r", "type": "text", "text": "Hi\nHello", "font": "b", "size": 7, "color": "#00ff00", "align": "right",
           "valign": "top", "transform": { "position": [70, 4] } },
-        { "id": "k", "type": "text", "text": "Ok", "font": "b", "size": 10, "color": "#ffffff", "padding": 1,
+        { "blend_space": "canvas", "id": "k", "type": "text", "text": "Ok", "font": "b", "size": 10, "color": "#ffffff", "padding": 1,
           "transform": { "position": [80, 38] }, "background": { "color": "#ff0000", "padding": [4, 2], "radius": 2 } }
     ]);
     let scene =

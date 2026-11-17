@@ -13,7 +13,7 @@ fn scene() -> Scene {
         .material(ForgeMaterial { unlit: true, ..ForgeMaterial::new("skin", [1.0; 4]) })
         .part("ball", ForgeShape::Sphere(8), [0.0; 3], 2.0, 0)
         .glb();
-    let layers = json!([{ "id": "m", "type": "model", "model": "ball", "materials": { "skin": { "shader": "coat" } } }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "m", "type": "model", "model": "ball", "materials": { "skin": { "shader": "coat" } } }]);
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "ball": { "path": "ball.glb" } },
         "effects": { "coat": { "descriptor": "fx/coat.json", "wgsl": "fx/coat.wgsl" } }, "layers": layers });
     let mut scene = Scene::from_json(&doc.to_string()).unwrap();

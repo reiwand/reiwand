@@ -47,13 +47,13 @@ fn same(a: &[u8], b: &[u8], what: &str) {
 fn script_writes_draw_like_the_same_fields_in_the_scene() {
     let Some(r) = renderer() else { return };
     let plain = json!([
-        { "id": "card", "type": "solid", "color": "#ff8040", "size": [40, 20], "transform": { "position": [60, 40] } },
-        { "id": "word", "type": "text", "text": "Hi", "size": 14, "font": "sans-serif", "color": "#ffffff", "transform": { "position": [110, 60] } }
+        { "blend_space": "canvas", "id": "card", "type": "solid", "color": "#ff8040", "size": [40, 20], "transform": { "position": [60, 40] } },
+        { "blend_space": "canvas", "id": "word", "type": "text", "text": "Hi", "size": 14, "font": "sans-serif", "color": "#ffffff", "transform": { "position": [110, 60] } }
     ]);
     let fixed = json!([
-        { "id": "card", "type": "solid", "color": "#ff8040", "size": [30, 10],
+        { "blend_space": "canvas", "id": "card", "type": "solid", "color": "#ff8040", "size": [30, 10],
           "transform": { "position": [60, 40], "skew": [20, 0], "origin": [0, 1] } },
-        { "id": "word", "type": "text", "text": "Ok", "size": 20, "font": "serif", "align": "left", "color": "#ffffff", "transform": { "position": [110, 60] } }
+        { "blend_space": "canvas", "id": "word", "type": "text", "text": "Ok", "size": 20, "font": "serif", "align": "left", "color": "#ffffff", "transform": { "position": [110, 60] } }
     ]);
     let card = LayerOverride {
         skew: Some([20.0, 0.0]),
@@ -81,7 +81,7 @@ fn script_writes_draw_like_the_same_fields_in_the_scene() {
 fn script_effect_controls_draw_like_the_same_parameters() {
     let Some(r) = renderer() else { return };
     let layers = |radius: f32, effects: bool| {
-        let mut back = json!({ "id": "back", "type": "shape", "shape": { "star": { "points": 5, "size": 30 } }, "fill": "#ffcc66",
+        let mut back = json!({ "blend_space": "canvas", "id": "back", "type": "shape", "shape": { "star": { "points": 5, "size": 30 } }, "fill": "#ffcc66",
             "transform": { "position": [80, 45] } });
         if effects {
             back["effects"] = json!([{ "effect": "blur", "name": "soft", "params": { "radius": radius } }, { "effect": "pixelate" }]);
@@ -110,11 +110,11 @@ fn script_effect_controls_draw_like_the_same_parameters() {
 #[test]
 fn layers_made_from_templates_draw_like_written_layers_in_their_order() {
     let Some(r) = renderer() else { return };
-    let bar = json!({ "id": "bar", "type": "group", "layers": [
-        { "id": "fill", "type": "solid", "color": "#40c0ff", "size": [12, 50] },
-        { "id": "cap", "type": "solid", "color": "#ffffff", "size": [12, 4], "transform": { "position": [0, -25] } }
+    let bar = json!({ "blend_space": "canvas", "id": "bar", "type": "group", "layers": [
+        { "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#40c0ff", "size": [12, 50] },
+        { "blend_space": "canvas", "id": "cap", "type": "solid", "color": "#ffffff", "size": [12, 4], "transform": { "position": [0, -25] } }
     ], "effects": [{ "effect": "blur", "params": { "radius": 1 } }] });
-    let floor = json!({ "id": "floor", "type": "solid", "color": "#202020", "size": [160, 30], "transform": { "position": [80, 60] } });
+    let floor = json!({ "blend_space": "canvas", "id": "floor", "type": "solid", "color": "#202020", "size": [160, 30], "transform": { "position": [80, 60] } });
     let placed = |id: &str, x: f32| {
         let mut b = bar.clone();
         b["id"] = json!(id);

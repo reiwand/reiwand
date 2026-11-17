@@ -41,7 +41,7 @@ const LIST: &str = r#"import { scene, folder } from "reiwand";
 fn scene(uses: serde_json::Value) -> serde_json::Value {
     json!({
         "scripts": [{ "path": "main.js", "uses": uses }],
-        "layers": [{ "id": "photo", "type": "solid", "color": "#ffffff" }, { "id": "info", "type": "text", "text": "", "size": 10 }]
+        "layers": [{ "blend_space": "canvas", "id": "photo", "type": "solid", "color": "#ffffff" }, { "blend_space": "canvas", "id": "info", "type": "text", "text": "", "size": 10 }]
     })
 }
 
@@ -145,9 +145,9 @@ const CLIPS: &str = r#"import { scene, folder } from "reiwand";
 
 #[test]
 fn scripts_that_ask_for_videos_list_and_play_them_on_video_layers() {
-    let layers = json!([{ "id": "photo", "type": "solid", "color": "#ffffff" }, { "id": "film", "type": "video", "video": "clip" },
-        { "id": "info", "type": "text", "text": "", "size": 10 }]);
-    let badge = json!({ "id": "badge", "type": "solid", "color": "#ffffff" });
+    let layers = json!([{ "blend_space": "canvas", "id": "photo", "type": "solid", "color": "#ffffff" }, { "blend_space": "canvas", "id": "film", "type": "video", "video": "clip" },
+        { "blend_space": "canvas", "id": "info", "type": "text", "text": "", "size": 10 }]);
+    let badge = json!({ "blend_space": "canvas", "id": "badge", "type": "solid", "color": "#ffffff" });
     let doc = json!({ "scripts": [{ "path": "main.js", "uses": ["folders", "layers"] }], "assets": { "clip": { "path": "clip.webm" } },
         "layers": layers, "templates": { "badge": badge } });
     let mut made = common::setup(doc, &[("main.js", CLIPS)]);

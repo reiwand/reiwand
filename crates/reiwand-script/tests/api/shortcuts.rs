@@ -14,8 +14,8 @@ const SOURCE: &str = r#"import { scene, openShortcut } from "reiwand";
 fn scene(uses: serde_json::Value) -> serde_json::Value {
     json!({
         "scripts": [{ "path": "main.js", "uses": uses, "events": ["update", "click", "down"] }],
-        "layers": [{ "id": "button", "type": "solid", "color": "#ffffff", "solid": true },
-                   { "id": "info", "type": "text", "text": "", "size": 10 }]
+        "layers": [{ "blend_space": "canvas", "id": "button", "type": "solid", "color": "#ffffff", "solid": true },
+                   { "blend_space": "canvas", "id": "info", "type": "text", "text": "", "size": 10 }]
     })
 }
 

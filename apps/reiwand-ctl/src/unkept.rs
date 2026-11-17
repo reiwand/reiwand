@@ -53,7 +53,7 @@ mod tests {
 
     #[test]
     fn only_removed_layers_are_asked_about() {
-        let doc = json!({ "scene": { "layers": [{ "id": "a", "type": "solid" }] } });
+        let doc = json!({ "scene": { "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid" }] } });
         assert!(lost(&doc, &[Action::RemoveLayer { id: "a".into() }]).is_empty());
         assert!(lost(&doc, &[Action::Undo {}]).is_empty());
         assert!(warning(&[]).is_none());

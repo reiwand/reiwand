@@ -4,8 +4,8 @@ full=$1 still=$2 green=$3 blue=$4
 mkdir -p "$WORK/clicks"
 cat >"$WORK/clicks/scene.json" <<'SCENE'
 {"schema": "reiwand.scene/1", "canvas": {"size": [64, 36], "background": "#000000"},
- "layers": [{"id": "button", "type": "solid", "color": "#2040c0", "size": [32, 36], "solid": true, "transform": {"position": [16, 18]}},
-  {"id": "lamp", "type": "solid", "color": "#ffffff", "size": [32, 36], "transform": {"position": [48, 18]},
+ "layers": [{ "blend_space": "canvas", "id": "button", "type": "solid", "color": "#2040c0", "size": [32, 36], "solid": true, "transform": {"position": [16, 18]}},
+  { "blend_space": "canvas", "id": "lamp", "type": "solid", "color": "#ffffff", "size": [32, 36], "transform": {"position": [48, 18]},
    "opacity": {"timeline": "light", "keys": [[0, 0], [0.1, 1]]}}],
  "timelines": [{"id": "light", "duration": 0.1, "autoplay": false, "trigger": "click:button"}]}
 SCENE

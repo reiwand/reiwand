@@ -12,7 +12,7 @@ fn puppet() -> Scene {
     let glb = s.glb();
     let doc = serde_json::json!({ "schema": SCHEMA,
         "assets": { "pic": { "path": "pic.png" }, "mesh": { "path": "mesh.glb" } },
-        "layers": [{ "id": "fox", "type": "mesh", "mesh": "mesh", "texture": "pic",
+        "layers": [{ "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "mesh", "texture": "pic",
             "clips": [{ "id": "swing", "loop": "pingpong", "bones": { "arm": { "rotation": [[0, 0], [1, 60]] } } }],
             "animations": [{ "clip": "swing" }], "ik": [{ "chain": ["root", "arm"], "target": [40, 20], "weight": 0.5 }],
             "physics": [{ "bone": "arm", "mode": "rope", "gravity": 1 }] }], "canvas": { "size": [64, 64], "wind": [30, 0] } });

@@ -11,7 +11,7 @@ pub(super) fn packaged(json: &Value, wgsl: &str, layers: Vec<Value>) -> Option<R
     let mut effects = Map::new();
     effects.insert(id.into(), json!({ "descriptor": format!("fx/{id}.json"), "wgsl": format!("fx/{id}.wgsl") }));
     let list: Vec<Value> =
-        std::iter::once(json!({ "id": "bg", "type": "solid", "color": "#336699" })).chain(layers).collect();
+        std::iter::once(json!({ "blend_space": "canvas", "id": "bg", "type": "solid", "color": "#336699" })).chain(layers).collect();
     let canvas = json!({ "size": [3840, 2160] });
     let text = json!({ "schema": SCHEMA, "canvas": canvas, "layers": list, "effects": effects });
     let mut scene = Scene::from_json(&text.to_string()).unwrap();
@@ -26,7 +26,7 @@ pub(super) fn packaged(json: &Value, wgsl: &str, layers: Vec<Value>) -> Option<R
 
 fn adjustments(layers: usize, uses: usize, effect: &str) -> Vec<Value> {
     let list: Vec<Value> = (0..uses).map(|_| json!({ "effect": effect })).collect();
-    let layer = |i| json!({ "id": format!("adj{i}"), "type": "adjustment", "effects": list });
+    let layer = |i| json!({ "blend_space": "canvas", "id": format!("adj{i}"), "type": "adjustment", "effects": list });
     (0..layers).map(layer).collect()
 }
 

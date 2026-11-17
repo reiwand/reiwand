@@ -10,8 +10,8 @@ fn particles_bounce_off_the_opaque_shape_of_a_layer_on_both_paths() {
     let wall = json!([{ "bounds": { "layer": { "id": "block" } }, "bounce": 1 }]);
     let systems =
         json!({ "s": system(json!({ "line": [[10, 10], [10, 70]] }), init, json!({ "collide": wall })) });
-    let layers = json!([{ "id": "block", "type": "image", "image": "pic", "transform": { "position": [120, 40] } },
-        { "id": "p", "type": "particles", "system": "s" }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "block", "type": "image", "image": "pic", "transform": { "position": [120, 40] } },
+        { "blend_space": "canvas", "id": "p", "type": "particles", "system": "s" }]);
     let assets = json!({ "pic": { "path": "pic.png" } });
     let mut found = [Vec::new(), Vec::new()];
     for (k, gpu) in [false, true].into_iter().enumerate() {
@@ -57,7 +57,7 @@ fn ropes_and_textured_long_trails_draw_along_the_path() {
             s["emitters"][0] = json!({ "shape": { "point": [20, 40] }, "bursts": [{ "count": 1 }] });
             s["init"]["size"] = json!([8, 8]);
         }
-        let layers = json!([{ "id": "p", "type": "particles", "system": "s", "blend": "add" }]);
+        let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s", "blend": "add" }]);
         let Some(mut run) = Run::new(r, json!({ "s": s }), layers, gpu) else { return };
         run.view.set_particle_trails(r, reiwand_scene::Tier::T3);
         let image = (0..60).map(|_| run.frame(r, 1.0 / 30.0)).last().unwrap();

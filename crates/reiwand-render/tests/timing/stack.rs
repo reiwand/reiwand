@@ -44,9 +44,9 @@ fn a_package_stack_spends_no_pass_on_clearing_its_targets_or_copying_the_backdro
     let Some(r) = renderer() else { return };
     book("stack");
     let spin = json!({ "keys": [[0, 0], [4, 360]] });
-    let card = json!({ "id": "card", "type": "solid", "color": "#4060ff", "size": [20, 10],
+    let card = json!({ "blend_space": "canvas", "id": "card", "type": "solid", "color": "#4060ff", "size": [20, 10],
         "transform": { "position": [32, 16], "rotation": spin } });
-    let post = json!({ "id": "post", "type": "adjustment", "effects": [{ "effect": "halo" }] });
+    let post = json!({ "blend_space": "canvas", "id": "post", "type": "adjustment", "effects": [{ "effect": "halo" }] });
     let mut shown = show(r, glow(json!([card.clone(), post]))).unwrap();
     frames(r, &mut shown, 3);
     assert!(shown.view.left_out().is_empty(), "{:?}", shown.view.left_out());
@@ -55,7 +55,7 @@ fn a_package_stack_spends_no_pass_on_clearing_its_targets_or_copying_the_backdro
         6,
         "one pass for the card, four for the effect and one to put it back"
     );
-    let four = json!({ "id": "post", "type": "adjustment", "effects": vec![json!({ "effect": "halo" }); 4] });
+    let four = json!({ "blend_space": "canvas", "id": "post", "type": "adjustment", "effects": vec![json!({ "effect": "halo" }); 4] });
     let mut shown = show(r, glow(json!([card, four]))).unwrap();
     frames(r, &mut shown, 3);
     let stats = shown.view.stats();
@@ -68,9 +68,9 @@ fn a_frame_with_package_effects_keeps_the_hang_limit_for_the_waits_after_it() {
     let Some(r) = renderer() else { return };
     book("hang");
     let spin = json!({ "keys": [[0, 0], [4, 360]] });
-    let card = json!({ "id": "card", "type": "solid", "color": "#4060ff", "size": [20, 10],
+    let card = json!({ "blend_space": "canvas", "id": "card", "type": "solid", "color": "#4060ff", "size": [20, 10],
         "transform": { "position": [32, 16], "rotation": spin } });
-    let post = json!({ "id": "post", "type": "adjustment", "effects": [{ "effect": "halo" }] });
+    let post = json!({ "blend_space": "canvas", "id": "post", "type": "adjustment", "effects": [{ "effect": "halo" }] });
     let mut shown = show(r, glow(json!([card, post]))).unwrap();
     frames(r, &mut shown, 1);
     shown.runtime.advance(1.0 / 60.0);
@@ -87,7 +87,7 @@ fn built_in_effects_are_timed_but_never_left_out() {
     let Some(r) = renderer() else { return };
     book("built-in");
     let spin = json!({ "keys": [[0, 0], [4, 360]] });
-    let card = json!({ "id": "card", "type": "solid", "color": "#4060ff", "size": [20, 10],
+    let card = json!({ "blend_space": "canvas", "id": "card", "type": "solid", "color": "#4060ff", "size": [20, 10],
         "transform": { "position": [32, 16], "rotation": spin },
         "effects": [{ "effect": "blur", "params": { "radius": 8 } }, { "effect": "bloom" }] });
     let mut shown = show(r, glow(json!([card]))).unwrap();

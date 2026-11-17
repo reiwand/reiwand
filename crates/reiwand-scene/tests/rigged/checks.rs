@@ -78,7 +78,7 @@ fn attachments_name_bones_and_points_of_meshes_without_loops() {
         if let Some(b) = back {
             fox["attach"] = b;
         }
-        let layers = json!([fox, { "id": "badge", "type": "mesh", "mesh": "arm", "attach": attach }]);
+        let layers = json!([fox, { "blend_space": "canvas", "id": "badge", "type": "mesh", "mesh": "arm", "attach": attach }]);
         let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 64] },
             "assets": { "arm": { "path": "arm.glb" } }, "layers": layers });
         let mut scene = reiwand_scene::Scene::from_json(&text.to_string()).map_err(|e| e.to_string())?;

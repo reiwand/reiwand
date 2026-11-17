@@ -2,7 +2,7 @@ use super::*;
 
 #[test]
 fn meshes_are_read_from_the_package_and_their_chains_play_everywhere() {
-    let layers = json!([{ "id": "p", "type": "mesh", "mesh": "fox", "ik": [{ "chain": ["arm", "hand"], "target": [10, 10] }] }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "mesh", "mesh": "fox", "ik": [{ "chain": ["arm", "hand"], "target": [10, 10] }] }]);
     let assets = json!({ "assets": { "sky": { "path": "sky.png" }, "fox": { "path": "fox.glb" } } });
     let text = scene(layers, assets.clone());
     let package = load(&manifest(&["ik", "mesh"], json!({})), &text, &[("fox.glb", &fox())]).unwrap();
@@ -10,11 +10,11 @@ fn meshes_are_read_from_the_package_and_their_chains_play_everywhere() {
     for platform in [Platform::Desktop, Platform::Android] {
         assert!(features::playable(&package.manifest, &package.facts, platform).is_ok());
     }
-    let loose = json!([{ "id": "p", "type": "mesh", "mesh": "fox", "ik": [{ "chain": ["hand", "arm"], "target": [1, 1] }] }]);
+    let loose = json!([{ "blend_space": "canvas", "id": "p", "type": "mesh", "mesh": "fox", "ik": [{ "chain": ["hand", "arm"], "target": [1, 1] }] }]);
     let fault =
         load(&manifest(&["ik", "mesh"], json!({})), &scene(loose, assets.clone()), &[("fox.glb", &fox())]);
     assert!(fault.map(drop).unwrap_err().to_string().contains("each hang from the one before"));
-    let wrong = json!([{ "id": "p", "type": "mesh", "mesh": "fox", "ik": [{ "chain": ["arm", "tail"], "target": [1, 1] }] }]);
+    let wrong = json!([{ "blend_space": "canvas", "id": "p", "type": "mesh", "mesh": "fox", "ik": [{ "chain": ["arm", "tail"], "target": [1, 1] }] }]);
     let fault = load(&manifest(&["ik", "mesh"], json!({})), &scene(wrong, assets), &[("fox.glb", &fox())]);
     assert!(fault.map(drop).unwrap_err().to_string().contains("/layers/0/ik/0/chain/1 names \"tail\""));
     let broken = load(&manifest(&["ik", "mesh"], json!({})), &text, &[("fox.glb", b"glTF junk")]);
@@ -31,7 +31,8 @@ fn meshes_are_read_from_the_package_and_their_chains_play_everywhere() {
 fn declared_script_parts_and_media_become_inputs() {
     let more = json!({ "scripts": [{ "path": "game.js", "uses": ["audio", "timers"] }],
         "timelines": [{ "id": "song", "duration": 1, "trigger": "media:track" }] });
-    let text = scene(json!([{ "id": "sky", "type": "image", "image": "sky" }]), more);
+    let text =
+        scene(json!([{ "blend_space": "canvas", "id": "sky", "type": "image", "image": "sky" }]), more);
     let files: [(&str, &[u8]); 1] = [("game.js", b"export function update() {}")];
     let wanted = ["inputs.audio", "inputs.media", "media_info", "scripts", "scripts2", "timeline_events"];
     let fault =
@@ -59,8 +60,10 @@ fn declared_script_parts_and_media_become_inputs() {
 
 #[test]
 fn rgb_output_and_spanned_scenes_need_their_manifest_fields() {
-    let lights =
-        scene(json!([{ "id": "rgb", "type": "adjustment", "size": [32, 8], "rgb": true }]), json!({}));
+    let lights = scene(
+        json!([{ "blend_space": "canvas", "id": "rgb", "type": "adjustment", "size": [32, 8], "rgb": true }]),
+        json!({}),
+    );
     let fault =
         load(&manifest(&["capture", "rgb"], json!({})), &lights, &[]).map(drop).unwrap_err().to_string();
     assert!(
@@ -75,7 +78,8 @@ fn rgb_output_and_spanned_scenes_need_their_manifest_fields() {
     let fault =
         load(&manifest(&["capture", "rgb"], networked), &lights, &[]).map(drop).unwrap_err().to_string();
     assert!(fault.contains("permissions.network"), "{fault}");
-    let plain = scene(json!([{ "id": "sky", "type": "image", "image": "sky" }]), json!({}));
+    let plain =
+        scene(json!([{ "blend_space": "canvas", "id": "sky", "type": "image", "image": "sky" }]), json!({}));
     let spread = json!({ "display": { "span": "all-outputs" } });
     let package = load(&manifest(&["display2", "spanned_scenes"], spread), &plain, &[]).unwrap();
     assert!(features::playable(&package.manifest, &package.facts, Platform::Desktop).is_ok());
@@ -91,7 +95,8 @@ fn rgb_output_and_spanned_scenes_need_their_manifest_fields() {
 fn missing_inputs_point_at_the_script_or_asset_that_needs_them() {
     let more = json!({ "scripts": [{ "path": "game.js", "uses": ["pointer"] }],
         "assets": { "sky": { "path": "sky.png" }, "cover": { "path": "sky.png", "media": "previous" } } });
-    let text = scene(json!([{ "id": "sky", "type": "image", "image": "sky" }]), more);
+    let text =
+        scene(json!([{ "blend_space": "canvas", "id": "sky", "type": "image", "image": "sky" }]), more);
     let files: [(&str, &[u8]); 1] = [("game.js", b"export function update() {}")];
     let wanted = ["inputs.media", "inputs.pointer", "media_info", "scripts"];
     let pointer =

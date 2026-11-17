@@ -3,7 +3,7 @@ use reiwand_editor::Project;
 use serde_json::{Value, json};
 
 fn region() -> Value {
-    json!([{"id": "lens", "type": "adjustment", "size": [300, 200], "redraw": true,
+    json!([{ "blend_space": "canvas", "id": "lens", "type": "adjustment", "size": [300, 200], "redraw": true,
         "effects": [{"effect": "vignette"}],
         "transform": {"position": [500, 400], "origin": [0.5, 0.5], "rotation": 20, "scale": [1.5, 1.5]}}])
 }
@@ -61,6 +61,9 @@ fn the_size_stops_at_twice_the_canvas() {
     assert_eq!(size(&p), json!([2000.0, 2000.0]));
     assert_eq!(view(&p)["over"], json!(false));
     let other = tempfile::tempdir().unwrap();
-    let plain = scene(&other, json!([{"id": "lens", "type": "solid", "color": "#ffffff", "size": [10, 10]}]));
+    let plain = scene(
+        &other,
+        json!([{ "blend_space": "canvas", "id": "lens", "type": "solid", "color": "#ffffff", "size": [10, 10]}]),
+    );
     assert!(view(&plain).is_null());
 }

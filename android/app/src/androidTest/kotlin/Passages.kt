@@ -55,7 +55,7 @@ object Passages {
 """
     private fun scene(color: String, ms: Int?) = """{ "schema": "reiwand.scene/1", "canvas": { "size": [64, 64], "fit": "stretch" },
         ${ms?.let { """"transition": { "in": { "descriptor": "t/mark.json", "wgsl": "t/mark.wgsl", "duration_ms": $it } },""" } ?: ""}
-        "layers": [{ "id": "fill", "type": "solid", "color": "$color" }] }"""
+        "layers": [{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "$color" }] }"""
     private val SCENES = mapOf(
         "Red" to scene("#ff0000", null),
         "Mark" to scene("#0000ff", 1500),

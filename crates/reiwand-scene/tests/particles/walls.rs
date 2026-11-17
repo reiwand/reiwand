@@ -85,8 +85,8 @@ fn colliders_that_kill_start_death_children() {
 #[test]
 fn layer_colliders_cannot_hold_their_own_system() {
     let mut doc: Json = serde_json::from_str(&scene(sparks(), true)).unwrap();
-    doc["layers"] = json!([{ "id": "g", "type": "group", "layers": [{ "id": "p", "type": "particles", "system": "dots" }] },
-        { "id": "sky", "type": "solid", "color": "#ffffff" }]);
+    doc["layers"] = json!([{ "blend_space": "canvas", "id": "g", "type": "group", "layers": [{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "dots" }] },
+        { "blend_space": "canvas", "id": "sky", "type": "solid", "color": "#ffffff" }]);
     doc["particles"]["dots"]["collide"] = json!([{ "bounds": { "layer": { "id": "g" } } }]);
     let found = Scene::from_json(&doc.to_string()).unwrap().validate(&props());
     assert!(found.contains(&Issue::Circle("/particles/dots/collide/0/bounds/layer/id".into())), "{found:?}");

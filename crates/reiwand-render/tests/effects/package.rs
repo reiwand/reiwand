@@ -149,7 +149,7 @@ fn an_option_waiting_for_a_texture_turns_on_when_a_layer_feeds_it() {
     let json = json!({ "id": "lit", "cost": {}, "params": [{ "id": "shape", "type": "texture", "default": "" }],
         "options": [{ "id": "lit", "values": [false, true], "default": false, "when_bound": "shape" }],
         "passes": [{ "entry": "fs_lit", "inputs": ["previous", "asset:shape"] }] });
-    let dot = json!({ "id": "dot", "type": "solid", "color": "#ffffff", "size": [8, 8], "visible": false });
+    let dot = json!({ "blend_space": "canvas", "id": "dot", "type": "solid", "color": "#ffffff", "size": [8, 8], "visible": false });
     let fed = Fx::new("lit", json!({ "shape": { "layer": "dot" } })).own(json.clone(), wgsl).layer(dot);
     let Some(mut run) = fed.run() else { return };
     run.shot().check(&[((32, 16), [255, 0, 0])]);

@@ -15,6 +15,7 @@ pub(super) fn loose(cx: &Context, d: &Draw) -> bool {
         && !tilted
         && d.opacity >= 1.0
         && d.blend == Blend::Normal
+        && d.space.is_none()
         && !cx.mattes.contains(&d.layer.id)
 }
 
@@ -96,6 +97,7 @@ pub(super) fn gather<'a>(
         origin: [0.5, 0.5],
         opacity: 1.0,
         blend: Blend::Normal,
+        space: None,
         mask: None,
         mask_texture: None,
         mask_strength: 1.0,

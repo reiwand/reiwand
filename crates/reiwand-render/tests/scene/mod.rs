@@ -18,6 +18,7 @@ mod packed;
 mod passes;
 mod radiance;
 mod shaped;
+mod spaces;
 mod stage;
 mod strips;
 

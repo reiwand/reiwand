@@ -9,10 +9,10 @@
   "clock": { "max_fps": 30, "poster_time": 2, "seed": 7 },
   "assets": { "cielo": { "path": "assets/cielo.png", "filter": "linear", "wrap": "clamp" } },
   "layers": [
-    { "id": "fondo", "type": "image", "image": "cielo", "size": [2000, 1125], "parallax": [0.01, 0.01] },
-    { "id": "hora", "type": "text", "text": { "clock": "HH:mm" }, "font": "sans-serif", "size": 220,
+    { "blend_space": "canvas", "id": "fondo", "type": "image", "image": "cielo", "size": [2000, 1125], "parallax": [0.01, 0.01] },
+    { "blend_space": "canvas", "id": "hora", "type": "text", "text": { "clock": "HH:mm" }, "font": "sans-serif", "size": 220,
       "color": "#ffffff", "anchor": "center", "parallax": [0.03, 0.03] },
-    { "id": "fecha", "type": "text", "text": { "date": "EEEE d 'de' MMMM" }, "font": "sans-serif", "size": 56,
+    { "blend_space": "canvas", "id": "fecha", "type": "text", "text": { "date": "EEEE d 'de' MMMM" }, "font": "sans-serif", "size": 56,
       "color": "#cfe0ff", "anchor": "bottom", "transform": { "position": [0, -120] } }
   ]
 }

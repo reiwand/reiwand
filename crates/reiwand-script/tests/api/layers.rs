@@ -60,7 +60,7 @@ fn effects_are_switched_and_tuned_within_their_descriptor() {
     "#;
     let scene = json!({
         "scripts": [{ "path": "main.js", "uses": ["effects"] }],
-        "layers": [{ "id": "pic", "type": "solid", "color": "#808080", "effects": [{ "effect": "blur", "name": "soft" }] }]
+        "layers": [{ "blend_space": "canvas", "id": "pic", "type": "solid", "color": "#808080", "effects": [{ "effect": "blur", "name": "soft" }] }]
     });
     let mut script = staged(scene, &[("main.js", source)]);
     let out = at(&mut script, 0.0).unwrap();
@@ -90,8 +90,8 @@ fn templates_spawn_destroy_and_order_layers() {
     "#;
     let scene = json!({
         "scripts": [{ "path": "main.js", "uses": ["layers"] }],
-        "templates": { "bar": { "id": "bar", "type": "solid", "color": "#ffffff", "size": [8, 40] } },
-        "layers": [{ "id": "back", "type": "solid", "color": "#000000" }, { "id": "info", "type": "text", "text": "", "size": 10 }]
+        "templates": { "bar": { "blend_space": "canvas", "id": "bar", "type": "solid", "color": "#ffffff", "size": [8, 40] } },
+        "layers": [{ "blend_space": "canvas", "id": "back", "type": "solid", "color": "#000000" }, { "blend_space": "canvas", "id": "info", "type": "text", "text": "", "size": 10 }]
     });
     let mut script = staged(scene, &[("main.js", source)]);
     let out = at(&mut script, 0.0).unwrap();
@@ -124,7 +124,7 @@ fn scripts_set_fluid_emitters_clamped_and_refuse_lists_that_are_no_emitters() {
     "#;
     let scene = json!({
         "scripts": [{ "path": "main.js", "uses": ["effects"] }],
-        "layers": [{ "id": "pic", "type": "solid", "color": "#808080", "effects": [{ "effect": "fluid" }] }]
+        "layers": [{ "blend_space": "canvas", "id": "pic", "type": "solid", "color": "#808080", "effects": [{ "effect": "fluid" }] }]
     });
     let mut script = staged(scene, &[("main.js", source)]);
     let out = at(&mut script, 0.0).unwrap();

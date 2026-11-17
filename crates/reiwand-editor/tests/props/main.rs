@@ -62,7 +62,6 @@ fn sample() -> Value {
     doc["scene"]["assets"] =
         json!({"calm": {"path": "assets/calm.png"}, "storm": {"path": "assets/storm.png"}});
     doc["scene"]["timelines"] = json!([{"id": "pulse", "duration": 1, "trigger": "prop:go"}]);
-    doc["scene"]["layers"] =
-        json!([{"id": "sky", "type": "image", "image": {"prop": "mood", "map": {"calm": "calm"}}}]);
+    doc["scene"]["layers"] = json!([{ "blend_space": "canvas", "id": "sky", "type": "image", "image": {"prop": "mood", "map": {"calm": "calm"}}}]);
     doc
 }

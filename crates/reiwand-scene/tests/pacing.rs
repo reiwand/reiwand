@@ -14,7 +14,7 @@ fn scene(layers: Value) -> Scene {
 }
 
 fn solid(id: &str, extra: Value) -> Value {
-    let mut layer = json!({ "id": id, "type": "solid", "color": "#ff0000" });
+    let mut layer = json!({ "blend_space": "canvas", "id": id, "type": "solid", "color": "#ff0000" });
     layer.as_object_mut().unwrap().extend(extra.as_object().unwrap().clone());
     layer
 }
@@ -74,7 +74,7 @@ fn motion_blur_follows_the_layer_and_settles_once_it_stops() {
 fn reduced_motion_wakes_sprite_sheets_and_paced_effects_once_a_minute() {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [1000, 1000] },
         "assets": { "sheet": { "path": "sheet.png", "atlas": [1, 4], "fps": 8 } },
-        "layers": [{ "id": "sprite", "type": "image", "image": "sheet", "size": [40, 40] },
+        "layers": [{ "blend_space": "canvas", "id": "sprite", "type": "image", "image": "sheet", "size": [40, 40] },
             solid("w", json!({ "effects": [{ "effect": "waves" }] }))] });
     let mut runtime =
         Runtime::new(Arc::new(Scene::from_json(&text.to_string()).unwrap()), Default::default());

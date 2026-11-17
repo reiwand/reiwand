@@ -30,8 +30,7 @@ fn scene(effect: &str) -> (TempDir, Project) {
     let dir = root.path().join("glow");
     let mut project =
         Project::create(&dir, starter("empty", "org.example.glow", "Glow", "en").unwrap()).unwrap();
-    let layer =
-        json!([{ "id": "fill", "type": "solid", "color": "#ffffff", "effects": [{ "effect": effect }] }]);
+    let layer = json!([{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ffffff", "effects": [{ "effect": effect }] }]);
     act(&mut project, json!({ "set": { "pointer": "/scene/layers", "value": layer } })).unwrap();
     (root, project)
 }

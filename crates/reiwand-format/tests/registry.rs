@@ -92,7 +92,7 @@ fn hdr_videos_get_a_facet_and_a_warning_wherever_their_colors_are_written() {
     let cases = [
         serde_json::json!({ "kind": "video", "entry": "glow.mp4", "files": { "glow.mp4": encode(&mp4) } }),
         serde_json::json!({ "scene": { "assets": { "sky": { "path": "sky.png" }, "clip": { "path": "clip.mkv" } },
-            "layers": [{ "id": "clip", "type": "video", "video": "clip" }] }, "files": { "clip.mkv": encode(&mkv) } }),
+            "layers": [{ "blend_space": "canvas", "id": "clip", "type": "video", "video": "clip" }] }, "files": { "clip.mkv": encode(&mkv) } }),
     ];
     for (i, case) in cases.iter().enumerate() {
         let name = format!("hdr{i}");

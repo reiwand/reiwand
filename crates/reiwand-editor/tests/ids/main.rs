@@ -44,13 +44,13 @@ pub fn scene(root: &TempDir, name: &str) -> Project {
 
 pub fn family(p: &mut Project) {
     let layers = json!([
-        {"id": "base", "type": "solid", "color": "#ffffff", "size": [100, 100], "solid": true,
+        { "blend_space": "canvas", "id": "base", "type": "solid", "color": "#ffffff", "size": [100, 100], "solid": true,
             "transform": {"position": [300, 300], "rotation": 30, "scale": [2, 2]}},
-        {"id": "kid", "type": "solid", "color": "#ff0000", "size": [40, 40], "parent": "base",
+        { "blend_space": "canvas", "id": "kid", "type": "solid", "color": "#ff0000", "size": [40, 40], "parent": "base",
             "transform": {"position": [50, 0]}, "mask": {"layer": "base", "channel": "a"}},
-        {"id": "box", "type": "group", "layers": [
-            {"id": "lead", "type": "solid", "color": "#00ff00", "size": [30, 30]},
-            {"id": "tail", "type": "solid", "color": "#0000ff", "size": [30, 30], "parent": "lead",
+        { "blend_space": "canvas", "id": "box", "type": "group", "layers": [
+            { "blend_space": "canvas", "id": "lead", "type": "solid", "color": "#00ff00", "size": [30, 30]},
+            { "blend_space": "canvas", "id": "tail", "type": "solid", "color": "#0000ff", "size": [30, 30], "parent": "lead",
                 "mask": {"layer": "lead"}, "transform": {"position": [10, 10]}}
         ]}
     ]);

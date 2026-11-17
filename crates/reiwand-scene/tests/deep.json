@@ -21,7 +21,7 @@
     "sparkle": { "descriptor": "effects/sparkle.json", "wgsl": "effects/sparkle.wgsl" }
   },
   "layers": [
-    { "id": "fox", "type": "mesh", "mesh": "fox", "texture": "skin", "color": "#ffeedd", "size": [600, 900],
+    { "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "fox", "texture": "skin", "color": "#ffeedd", "size": [600, 900],
       "parts": { "arm": { "order": 2, "clip_to": "body" }, "body": { "visible": true } },
       "depth": { "scale": 2, "cull": true },
       "clips": [{ "id": "idle", "animation": "idle", "from": 0, "to": 2, "events": [{ "t": 1, "name": "step" }] },
@@ -33,10 +33,10 @@
       "shapes": { "smile": 0.5, "blink": { "keys": [[0, 0], [0.1, 1], [0.2, 0]], "loop": "repeat" } },
       "expressions": { "smile": { "mouth_open": 0.3, "cheeks": 1 } },
       "hit": ["head"], "solid": { "alpha": 0.5 } },
-    { "id": "badge", "type": "image", "image": "cover",
+    { "blend_space": "canvas", "id": "badge", "type": "image", "image": "cover",
       "attach": { "layer": "fox", "bone": "hand", "offset": [10, 0], "inherit": ["position", "rotation"] } },
-    { "id": "stage", "type": "group", "space": "3d", "layers": [
-      { "id": "robot", "type": "model", "model": "robot", "position": [0, 0, 0], "scale": [1.5, 1.5, 1.5],
+    { "blend_space": "canvas", "id": "stage", "type": "group", "space": "3d", "layers": [
+      { "blend_space": "canvas", "id": "robot", "type": "model", "model": "robot", "position": [0, 0, 0], "scale": [1.5, 1.5, 1.5],
         "rotation": { "keys": [[0, [0, 0, 0]], [10, [0, 360, 0]]] },
         "materials": {
           "metal": { "shader": "pbr", "params": { "metallic": 0.9, "roughness": 0.2 }, "cast_shadows": true, "cull": "back" },
@@ -45,16 +45,16 @@
         },
         "root_motion": true, "env": "skin",
         "clips": [{ "id": "walk" }], "animations": [{ "clip": "walk", "rate": 1.5 }] },
-      { "id": "sun", "type": "light", "light": "directional", "shadows": true },
-      { "id": "label", "type": "text", "text": { "media": "title" }, "color": { "media": "text" }, "depth_test": true }
+      { "blend_space": "canvas", "id": "sun", "type": "light", "light": "directional", "shadows": true },
+      { "blend_space": "canvas", "id": "label", "type": "text", "text": { "media": "title" }, "color": { "media": "text" }, "depth_test": true }
     ] },
-    { "id": "show", "type": "particles", "system": "fireworks",
+    { "blend_space": "canvas", "id": "show", "type": "particles", "system": "fireworks",
       "instance": { "alpha": 0.8, "size": 2, "speed": 1.5, "brightness": 2, "color": "#ffccaa", "points": [[100, 100]] },
       "render": { "texture": "spark", "orient": "velocity" } },
-    { "id": "pulse", "type": "solid", "color": "#ffffff",
+    { "blend_space": "canvas", "id": "pulse", "type": "solid", "color": "#ffffff",
       "opacity": { "script": "scripts/game.js", "fn": "pulse", "params": { "speed": 2 } },
       "effects": [{ "effect": "blur", "name": "soft" }] },
-    { "id": "lights", "type": "adjustment", "size": [640, 160], "rgb": true }
+    { "blend_space": "canvas", "id": "lights", "type": "adjustment", "size": [640, 160], "rgb": true }
   ],
   "particles": {
     "fireworks": {
@@ -122,6 +122,6 @@
       "uses": ["audio", "timers", "storage", "layers", "geometry", "effects", "math", "console", "shortcuts"],
       "params": { "speed": { "type": "number", "default": 1, "min": 0, "max": 10 }, "tint": { "type": "color", "default": "#ff0000" } } }
   ],
-  "templates": { "bar": { "id": "bar", "type": "solid", "color": "#ffffff", "size": [10, 100] } },
+  "templates": { "bar": { "blend_space": "canvas", "id": "bar", "type": "solid", "color": "#ffffff", "size": [10, 100] } },
   "pools": { "waves": { "type": "mesh", "max": 8, "max_vertices": 4096, "texture": "skin" } }
 }

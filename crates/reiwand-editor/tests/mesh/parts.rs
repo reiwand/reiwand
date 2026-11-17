@@ -48,7 +48,7 @@ fn bones_are_placed_rehung_and_renamed_on_a_mesh_of_several_parts() {
     ] {
         act(&mut p, json!({ "set": { "pointer": format!("{base}/{key}"), "value": value } })).unwrap();
     }
-    let hat = json!({ "id": "hat", "type": "solid", "attach": { "layer": "body", "bone": "neck" } });
+    let hat = json!({ "blend_space": "canvas", "id": "hat", "type": "solid", "attach": { "layer": "body", "bone": "neck" } });
     act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": hat } })).unwrap();
     act(&mut p, bone("neck", json!({ "to": "spine" }))).unwrap();
     let layer = &p.doc["scene"]["layers"][0];

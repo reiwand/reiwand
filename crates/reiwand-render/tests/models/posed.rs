@@ -10,7 +10,7 @@ fn lit(px: &[u8], x: u32, y: u32) -> bool {
 }
 
 fn model(extra: Value) -> Value {
-    let mut layer = json!({ "id": "rig", "type": "model", "model": "rig" });
+    let mut layer = json!({ "blend_space": "canvas", "id": "rig", "type": "model", "model": "rig" });
     extra.as_object().unwrap().iter().for_each(|(k, v)| layer[k] = v.clone());
     json!([layer])
 }

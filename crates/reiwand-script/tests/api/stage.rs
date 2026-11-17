@@ -21,7 +21,7 @@ const SOURCE: &str = r##"import { scene } from "reiwand";
 fn scene(uses: serde_json::Value) -> serde_json::Value {
     json!({
         "scripts": [{ "path": "main.js", "uses": uses }],
-        "layers": [{ "id": "info", "type": "text", "text": "", "size": 10 }]
+        "layers": [{ "blend_space": "canvas", "id": "info", "type": "text", "text": "", "size": 10 }]
     })
 }
 
@@ -93,7 +93,7 @@ fn scripts_override_the_3d_camera_for_the_next_frame_within_bounds() {
         try { scene.camera3d = { eye: [1, 2] }; } catch (e) { scene.layer("info").text += " " + e.message; }
     }"##;
     let doc = json!({ "camera3d": { "fov": 50 }, "scripts": [{ "path": "main.js", "uses": ["camera"] }],
-        "layers": [{ "id": "info", "type": "text", "text": "", "size": 10 }] });
+        "layers": [{ "blend_space": "canvas", "id": "info", "type": "text", "text": "", "size": 10 }] });
     let mut script = staged(doc, &[("main.js", source)]);
     let out = at(&mut script, 0.0).unwrap();
     let cam = out.stage.unwrap().camera3d.unwrap();

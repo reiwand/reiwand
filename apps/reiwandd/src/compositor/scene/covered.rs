@@ -5,7 +5,7 @@ use serde_json::json;
 use std::sync::Arc;
 
 fn slowed(lights: bool) -> (Quality, &'static str) {
-    let fade = json!({ "id": "fade", "type": "solid", "color": "#ffffff",
+    let fade = json!({ "blend_space": "canvas", "id": "fade", "type": "solid", "color": "#ffffff",
         "opacity": { "timeline": "fade", "keys": [[0, 0], [1, 1]] } });
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 36] }, "layers": [fade],
         "timelines": [{ "id": "fade", "duration": 1.0, "loop": "repeat" }] });

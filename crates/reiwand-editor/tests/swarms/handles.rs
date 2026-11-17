@@ -73,13 +73,13 @@ fn layer_sources_sample_real_pixels_from_a_mesh_a_text_and_a_group_layer() {
         mesh_samples.iter().all(|s| (940.0..961.0).contains(&s[0].as_f64().unwrap())),
         "only the opaque left half of the mesh texture"
     );
-    let label = json!({ "id": "label", "type": "text", "text": "Hi", "size": 64,
+    let label = json!({ "blend_space": "canvas", "id": "label", "type": "text", "text": "Hi", "size": 64,
         "transform": { "position": [960, 540] } });
     act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": label } })).unwrap();
     edit(&mut p, "layer", json!({ "emitter": 0, "id": "label", "threshold": 0.3 })).unwrap();
     let text = &handles(&p)["emitters"][0];
     assert!(!text["samples"].as_array().unwrap().is_empty() && text.get("approximate").is_none(), "{text}");
-    let clock = json!({ "id": "clock", "type": "text", "text": { "clock": "HH:mm" }, "size": 64 });
+    let clock = json!({ "blend_space": "canvas", "id": "clock", "type": "text", "text": { "clock": "HH:mm" }, "size": 64 });
     act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": clock } })).unwrap();
     edit(&mut p, "layer", json!({ "emitter": 0, "id": "clock" })).unwrap();
     assert_eq!(handles(&p)["emitters"][0]["approximate"], json!(true), "a dynamic clock stays approximate");

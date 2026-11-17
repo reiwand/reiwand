@@ -7,8 +7,8 @@ fn removing_a_layer_names_the_followers_that_could_not_be_kept() {
     let dir = tmp.path();
     ok(dir, &["scene", "new", "s", "--from", "empty"]);
     let layers = json!([
-        {"id": "base", "type": "solid", "color": "#ffffff", "size": [100, 100], "solid": true},
-        {"id": "kid", "type": "solid", "color": "#ff0000", "size": [40, 40], "parent": "base",
+        { "blend_space": "canvas", "id": "base", "type": "solid", "color": "#ffffff", "size": [100, 100], "solid": true},
+        { "blend_space": "canvas", "id": "kid", "type": "solid", "color": "#ff0000", "size": [40, 40], "parent": "base",
             "transform": {"position": {"script": "wobble"}}}
     ]);
     let set = json!({"pointer": "/scene/layers", "value": layers}).to_string();

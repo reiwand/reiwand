@@ -9,7 +9,7 @@ fn filmed(layers: serde_json::Value) -> Runtime {
 }
 
 fn video(id: &str, playback: serde_json::Value) -> serde_json::Value {
-    json!({ "id": id, "type": "video", "video": "clip", "size": [20, 20], "playback": playback })
+    json!({ "blend_space": "canvas", "id": id, "type": "video", "video": "clip", "size": [20, 20], "playback": playback })
 }
 
 pub(super) fn shown(rt: &Runtime) -> Vec<String> {
@@ -71,17 +71,17 @@ fn own_clocks_are_refused_where_no_named_video_file_plays() {
     };
     let clock = json!({ "own_clock": true });
     let refused = [
-        json!({ "id": "a", "type": "image", "image": "sky", "playback": clock }),
-        json!({ "id": "a", "type": "video", "video": "bars", "playback": clock }),
-        json!({ "id": "a", "type": "video", "video": { "prop": "film" }, "playback": clock }),
-        json!({ "id": "a", "type": "video", "video": { "prop": "film", "map": { "x": "bars" } }, "playback": clock }),
+        json!({ "blend_space": "canvas", "id": "a", "type": "image", "image": "sky", "playback": clock }),
+        json!({ "blend_space": "canvas", "id": "a", "type": "video", "video": "bars", "playback": clock }),
+        json!({ "blend_space": "canvas", "id": "a", "type": "video", "video": { "prop": "film" }, "playback": clock }),
+        json!({ "blend_space": "canvas", "id": "a", "type": "video", "video": { "prop": "film", "map": { "x": "bars" } }, "playback": clock }),
     ];
     for layer in refused {
         let issues = Scene::from_json(&doc(layer.clone())).unwrap().validate(&Default::default());
         let said: Vec<String> = issues.iter().map(ToString::to_string).collect();
         assert!(said.iter().any(|i| i.contains("/layers/0/playback/own_clock")), "{layer}: {said:?}");
     }
-    let shared = json!({ "id": "a", "type": "video", "video": "bars", "playback": { "own_clock": false } });
+    let shared = json!({ "blend_space": "canvas", "id": "a", "type": "video", "video": "bars", "playback": { "own_clock": false } });
     assert!(!Scene::load(&doc(shared), &Default::default()).unwrap().features().contains("video_clocks"));
 }
 
@@ -91,7 +91,7 @@ fn a_video_picked_by_a_property_keeps_a_clock_of_its_own_for_each_video_it_may_s
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] },
         "assets": { "clip": { "path": "clip.webm" }, "dusk": { "path": "dusk.webm" } },
         "layers": [video("shared", json!({})),
-            { "id": "own", "type": "video", "video": pick, "size": [20, 20], "playback": { "own_clock": true, "rate": 2 } }] });
+            { "blend_space": "canvas", "id": "own", "type": "video", "video": pick, "size": [20, 20], "playback": { "own_clock": true, "rate": 2 } }] });
     let mut rt = runtime(&doc.to_string());
     assert_eq!(rt.scene.lanes(), [("clip@own".into(), "clip".into()), ("dusk@own".into(), "dusk".into())]);
     assert!(rt.scene.validate(&props()).is_empty(), "{:?}", rt.scene.validate(&props()));
@@ -160,8 +160,8 @@ fn a_folder_video_that_does_not_loop_ends_once_its_length_is_known() {
 
 #[test]
 fn a_video_a_file_property_picks_keeps_a_clock_of_its_own() {
-    let layers = json!([{ "id": "a", "type": "video", "video": { "prop": "pick" }, "size": [20, 20] },
-        { "id": "b", "type": "video", "video": { "prop": "pick" }, "size": [20, 20], "playback": { "own_clock": true, "rate": 2 } }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "a", "type": "video", "video": { "prop": "pick" }, "size": [20, 20] },
+        { "blend_space": "canvas", "id": "b", "type": "video", "video": { "prop": "pick" }, "size": [20, 20], "playback": { "own_clock": true, "rate": 2 } }]);
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": layers });
     let props: BTreeMap<String, Property> =
         serde_json::from_value(json!({ "pick": { "type": "file", "accept": ["video"] } })).unwrap();
@@ -179,8 +179,7 @@ fn a_video_a_file_property_picks_keeps_a_clock_of_its_own() {
 
 #[test]
 fn own_clocks_need_a_file_property_that_may_hold_a_video() {
-    let layer =
-        json!({ "id": "b", "type": "video", "video": { "prop": "pick" }, "playback": { "own_clock": true } });
+    let layer = json!({ "blend_space": "canvas", "id": "b", "type": "video", "video": { "prop": "pick" }, "playback": { "own_clock": true } });
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] },
         "assets": { "clip": { "path": "clip.webm" }, "sky": { "path": "sky.png" } }, "layers": [layer] });
     let said = |pick: serde_json::Value| {

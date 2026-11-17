@@ -6,7 +6,7 @@ ctl scene act "$rgbs/pulse" set '{"pointer": "/manifest/id", "value": "org.examp
 ctl scene act "$rgbs/pulse" set '{"pointer": "/scene/timelines", "value": [{"duration": 1, "id": "pulse", "loop": "repeat"}]}'
 layers=$(scene_doc "$rgbs/pulse" /scene/layers | python3 -c 'import json, sys
 layers = json.load(sys.stdin)
-red = {"id": "red", "type": "solid", "color": "#ff0000", "opacity": {"timeline": "pulse", "keys": [[0, 0], [0.5, 1], [1, 0]]}}
+red = { "blend_space": "canvas", "id": "red", "type": "solid", "color": "#ff0000", "opacity": {"timeline": "pulse", "keys": [[0, 0], [0.5, 1], [1, 0]]}}
 print(json.dumps(layers[:1] + [red] + layers[1:]))')
 ctl scene act "$rgbs/pulse" set '{"pointer": "/scene/layers", "value": '"$layers"'}'
 ctl pack build "$rgbs/pulse" -o "$rgbs/pulse.wpak" >/dev/null || fail "the pulsing RGB scene was not built"

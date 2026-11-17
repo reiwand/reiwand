@@ -57,7 +57,7 @@ fn script_shapes_draw_through_the_layer_that_shows_their_pool() {
     let Some(r) = renderer() else { return };
     let pooled = || {
         scene(json!({ "pools": { "bars": { "type": "mesh", "max": 4, "max_vertices": 64 } },
-        "layers": [{ "id": "bars", "type": "video", "video": "bars" }] }))
+        "layers": [{ "blend_space": "canvas", "id": "bars", "type": "video", "video": "bars" }] }))
     };
     let (mut vertices, mut indices) = quad(0.0, 0.0, 80.0, 90.0, [1.0, 0.0, 0.0, 1.0]);
     let (more, mut tail) = quad(100.0, 0.0, 160.0, 45.0, [0.0, 1.0, 0.0, 0.5]);
@@ -84,7 +84,7 @@ fn script_shapes_draw_through_the_layer_that_shows_their_pool() {
 fn script_camera_and_parents_draw_like_the_same_scene_fields() {
     let Some(r) = renderer() else { return };
     let solid = |id: &str, at: [f32; 2], parent: Option<&str>| {
-        let mut l = json!({ "id": id, "type": "solid", "color": "#ffaa00", "size": [20, 10], "transform": { "position": at } });
+        let mut l = json!({ "blend_space": "canvas", "id": id, "type": "solid", "color": "#ffaa00", "size": [20, 10], "transform": { "position": at } });
         parent.iter().for_each(|p| l["parent"] = json!(p));
         l
     };

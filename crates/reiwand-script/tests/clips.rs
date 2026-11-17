@@ -8,8 +8,8 @@ use serde_json::json;
 fn puppet(uses: &[&str]) -> serde_json::Value {
     json!({ "assets": { "rig": { "path": "fox.glb" } },
         "scripts": [{ "path": "main.js", "uses": uses }],
-        "layers": [{ "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" },
-            { "id": "fox", "type": "mesh", "mesh": "rig", "clips": [{ "id": "wave" }] }] })
+        "layers": [{ "blend_space": "canvas", "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" },
+            { "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "rig", "clips": [{ "id": "wave" }] }] })
 }
 
 const SOURCE: &str = r#"import { scene } from "reiwand";

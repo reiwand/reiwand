@@ -49,7 +49,7 @@ fn platforms_only_narrow_where_a_package_plays() {
 #[test]
 fn assets_packages_offer_scene_parts() {
     let scene = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 64] },
-        "layers": [{ "id": "glow", "type": "solid", "color": "#ffcc00" }] })
+        "layers": [{ "blend_space": "canvas", "id": "glow", "type": "solid", "color": "#ffcc00" }] })
     .to_string();
     let shared = manifest(Kind::Assets, "assets.json", json!({ "requires": { "features": ["assets"] } }));
     let mut package = load(&shared, &[("assets.json", scene.as_bytes())]).unwrap();

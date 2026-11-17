@@ -3,10 +3,10 @@ use super::*;
 #[test]
 fn scenes_name_their_newer_features_and_engines_refuse_what_they_cannot_draw() {
     let layers = json!([
-        { "id": "sky", "type": "image", "image": "sky", "blend": "linear_burn", "lighting": { "roughness": 0.5 } },
-        { "id": "lamp", "type": "light", "light": "point", "intensity": 2, "shadows": true },
-        { "id": "title", "type": "text", "text": { "media": "title" } },
-        { "id": "rain", "type": "sound", "sound": "rain", "stream": true }
+        { "blend_space": "canvas", "id": "sky", "type": "image", "image": "sky", "blend": "linear_burn", "lighting": { "roughness": 0.5 } },
+        { "blend_space": "canvas", "id": "lamp", "type": "light", "light": "point", "intensity": 2, "shadows": true },
+        { "blend_space": "canvas", "id": "title", "type": "text", "text": { "media": "title" } },
+        { "blend_space": "canvas", "id": "rain", "type": "sound", "sound": "rain", "stream": true }
     ]);
     let text =
         scene(layers, json!({ "assets": { "sky": { "path": "sky.png" }, "rain": { "path": "rain.wav" } } }));
@@ -30,8 +30,10 @@ fn scenes_name_their_newer_features_and_engines_refuse_what_they_cannot_draw() {
         unlisted.contains("add \"blend_modes2\" (mixes layers with the newer blend modes)"),
         "{unlisted}"
     );
-    let plain =
-        scene(json!([{ "id": "sky", "type": "image", "image": "sky", "parallax": [0.2, 0.2] }]), json!({}));
+    let plain = scene(
+        json!([{ "blend_space": "canvas", "id": "sky", "type": "image", "image": "sky", "parallax": [0.2, 0.2] }]),
+        json!({}),
+    );
     let package = load(&manifest(&["inputs.pointer"]), &[("scene.json", plain.as_bytes())]);
     assert!(package.is_err_and(|e| e.to_string().contains("inputs")));
 }
@@ -40,7 +42,7 @@ fn scenes_name_their_newer_features_and_engines_refuse_what_they_cannot_draw() {
 fn package_effects_are_read_compiled_and_checked() {
     let effects = json!({ "effects": { "ripple": { "descriptor": "effects/ripple.json", "wgsl": "effects/ripple.wgsl" } } });
     let text = scene(
-        json!([{ "id": "sky", "type": "image", "image": "sky", "effects": [{ "effect": "ripple" }] }]),
+        json!([{ "blend_space": "canvas", "id": "sky", "type": "image", "image": "sky", "effects": [{ "effect": "ripple" }] }]),
         effects,
     );
     let descriptor =
@@ -73,7 +75,7 @@ fn long_sounds_need_streaming_and_font_collections_are_allowed() {
     first[36..44].copy_from_slice(b"Xing\0\0\0\x01");
     first[44..48].copy_from_slice(&4000u32.to_be_bytes());
     let song = [first, frame].concat();
-    let layer = |stream: bool| json!([{ "id": "song", "type": "sound", "sound": "song", "stream": stream }]);
+    let layer = |stream: bool| json!([{ "blend_space": "canvas", "id": "song", "type": "sound", "sound": "song", "stream": stream }]);
     let assets = json!({ "assets": { "sky": { "path": "sky.png" }, "song": { "path": "song.mp3" },
         "serif": { "path": "serif.ttc", "face": 1 } } });
     let streamed = scene(layer(true), assets.clone());
@@ -97,7 +99,7 @@ fn long_sounds_need_streaming_and_font_collections_are_allowed() {
 
 #[test]
 fn a_text_layer_in_several_languages_needs_the_default_language_and_names_its_feature() {
-    let layers = json!([{ "id": "hello", "type": "text", "text": { "es": "Hola", "en": "Hello" } }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "hello", "type": "text", "text": { "es": "Hola", "en": "Hello" } }]);
     let text = scene(layers, json!({}));
     let files: [(&str, &[u8]); 1] = [("scene.json", text.as_bytes())];
     let mut listed = manifest(&["text_languages"]);
@@ -118,7 +120,7 @@ fn a_text_layer_in_several_languages_needs_the_default_language_and_names_its_fe
 
 #[test]
 fn the_language_of_a_scene_is_chosen_among_those_its_text_layers_speak() {
-    let layers = json!([{ "id": "hello", "type": "text", "text": { "es": "Hola", "en": "Hello" } }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "hello", "type": "text", "text": { "es": "Hola", "en": "Hello" } }]);
     let text = scene(layers, json!({}));
     let mut listed = manifest(&["text_languages"]);
     listed.default_locale = Some("en".into());

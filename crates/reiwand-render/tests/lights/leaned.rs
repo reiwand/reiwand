@@ -3,11 +3,11 @@ use reiwand_scene::Quality;
 use serde_json::{Value, json};
 
 fn grouped(group: Value) -> Value {
-    let lamp = json!({ "id": "lamp", "type": "light", "transform": { "position": [80, 45] }, "z": 10,
+    let lamp = json!({ "blend_space": "canvas", "id": "lamp", "type": "light", "transform": { "position": [80, 45] }, "z": 10,
         "radius": 30, "intensity": 0.4, "volumetric": { "density": 0.5, "samples": 16 } });
-    let dot = json!({ "id": "dot", "type": "shape", "shape": { "rect": { "size": [4, 4] } },
+    let dot = json!({ "blend_space": "canvas", "id": "dot", "type": "shape", "shape": { "rect": { "size": [4, 4] } },
         "fill": "#ff0000", "transform": { "position": [80, 45] } });
-    let mut g = json!({ "id": "g", "type": "group", "layers": [dot, lamp] });
+    let mut g = json!({ "blend_space": "canvas", "id": "g", "type": "group", "layers": [dot, lamp] });
     group.as_object().into_iter().flatten().for_each(|(k, v)| g[k] = v.clone());
     json!([g])
 }

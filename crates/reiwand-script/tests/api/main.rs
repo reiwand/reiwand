@@ -24,6 +24,6 @@ fn spin_scene() -> serde_json::Value {
     let fade = json!({ "script": "spin.js", "fn": "fade" });
     json!({
         "scripts": [{ "path": "spin.js", "events": ["init"], "params": params }],
-        "layers": [{ "id": "dot", "type": "solid", "color": "#ffffff", "opacity": fade, "transform": { "rotation": spin } }]
+        "layers": [{ "blend_space": "canvas", "id": "dot", "type": "solid", "color": "#ffffff", "opacity": fade, "transform": { "rotation": spin } }]
     })
 }

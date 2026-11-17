@@ -50,11 +50,11 @@ fn same(a: &[u8], b: &[u8], what: &str) {
 fn hitboxes_follow_transforms_groups_and_alpha() {
     let Some(r) = renderer() else { return };
     let layers = json!([
-        { "id": "tilted", "type": "solid", "color": "#ff0000", "size": [40, 20], "solid": true, "transform": { "position": [40, 45], "rotation": 90 } },
-        { "id": "pic", "type": "image", "image": "half", "size": [40, 40], "solid": { "alpha": 0.5 }, "transform": { "position": [120, 45] } },
-        { "id": "deck", "type": "group", "solid": true, "transform": { "position": [80, 20] }, "layers": [
-            { "id": "chip", "type": "solid", "color": "#00ff00", "size": [10, 10], "transform": { "position": [0, 0] } }] },
-        { "id": "plain", "type": "solid", "color": "#0000ff", "size": [10, 10], "transform": { "position": [80, 80] } }]);
+        { "blend_space": "canvas", "id": "tilted", "type": "solid", "color": "#ff0000", "size": [40, 20], "solid": true, "transform": { "position": [40, 45], "rotation": 90 } },
+        { "blend_space": "canvas", "id": "pic", "type": "image", "image": "half", "size": [40, 40], "solid": { "alpha": 0.5 }, "transform": { "position": [120, 45] } },
+        { "blend_space": "canvas", "id": "deck", "type": "group", "solid": true, "transform": { "position": [80, 20] }, "layers": [
+            { "blend_space": "canvas", "id": "chip", "type": "solid", "color": "#00ff00", "size": [10, 10], "transform": { "position": [0, 0] } }] },
+        { "blend_space": "canvas", "id": "plain", "type": "solid", "color": "#0000ff", "size": [10, 10], "transform": { "position": [80, 80] } }]);
     let scene = scene(layers, json!([]));
     let mut view = r.scene_view(&scene, &assets(), &Values::new()).unwrap();
     let runtime = Runtime::new(Arc::new(scene), Values::new());
@@ -75,7 +75,7 @@ fn hitboxes_follow_transforms_groups_and_alpha() {
 #[test]
 fn a_tilted_layer_takes_the_pointer_where_its_projected_outline_is() {
     let Some(r) = renderer() else { return };
-    let layers = json!([{ "id": "card", "type": "solid", "color": "#ff8000", "size": [60, 40], "solid": true,
+    let layers = json!([{ "blend_space": "canvas", "id": "card", "type": "solid", "color": "#ff8000", "size": [60, 40], "solid": true,
         "transform": { "position": [80, 45], "tilt": [60, 0] } }]);
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [160, 90], "background": "#102030", "perspective": 120 },
         "layers": layers });
@@ -95,8 +95,8 @@ fn a_tilted_layer_takes_the_pointer_where_its_projected_outline_is() {
 #[test]
 fn clicks_on_solid_layers_start_animations_and_drags_away_do_not() {
     let Some(r) = renderer() else { return };
-    let lamp = |opacity: Value| json!({ "id": "lamp", "type": "solid", "color": "#ffffff", "size": [20, 20], "opacity": opacity, "transform": { "position": [140, 20] } });
-    let button = json!({ "id": "button", "type": "solid", "color": "#2040c0", "size": [40, 20], "solid": true, "transform": { "position": [80, 45] } });
+    let lamp = |opacity: Value| json!({ "blend_space": "canvas", "id": "lamp", "type": "solid", "color": "#ffffff", "size": [20, 20], "opacity": opacity, "transform": { "position": [140, 20] } });
+    let button = json!({ "blend_space": "canvas", "id": "button", "type": "solid", "color": "#2040c0", "size": [40, 20], "solid": true, "transform": { "position": [80, 45] } });
     let light = json!({ "timeline": "light", "keys": [[0, 0], [0.1, 1]] });
     let timelines = json!([{ "id": "light", "duration": 0.1, "autoplay": false, "trigger": "click:button" }]);
     let still = |opacity: f32| {

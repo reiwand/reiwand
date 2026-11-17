@@ -4,7 +4,7 @@ use serde_json::{Value, json};
 fn nested() -> Value {
     json!([
         card("base", json!({"position": [400, 500], "rotation": 30, "scale": [1.5, 0.75], "skew": [12, 0]})),
-        {"id": "kid", "type": "solid", "color": "#ff0000", "size": [120, 80], "parent": "base",
+        { "blend_space": "canvas", "id": "kid", "type": "solid", "color": "#ff0000", "size": [120, 80], "parent": "base",
             "transform": {"position": [60, 20], "origin": [0.2, 0.3], "rotation": -20, "scale": [1.2, 0.9], "skew": [8, -6]}}
     ])
 }
@@ -163,7 +163,7 @@ fn scaling_and_turning_a_tilted_layer_follow_the_pointer() {
 fn under_a_leaning_parent() -> Value {
     json!([
         card("base", json!({"position": [500, 450], "tilt": [20, -25], "z": 90, "rotation": 10})),
-        {"id": "kid", "type": "solid", "color": "#ff0000", "size": [120, 80], "parent": "base",
+        { "blend_space": "canvas", "id": "kid", "type": "solid", "color": "#ff0000", "size": [120, 80], "parent": "base",
             "transform": {"position": [60, 20], "rotation": -20, "tilt": [15, 10], "z": 40}}
     ])
 }

@@ -50,7 +50,7 @@ pub fn files(bump: [u8; 4]) -> SceneAssets {
 }
 
 pub fn wall(lighting: Value) -> Value {
-    json!({ "id": "wall", "type": "image", "image": "wall", "size": [160, 90], "transform": { "position": [80, 45] },
+    json!({ "blend_space": "canvas", "id": "wall", "type": "image", "image": "wall", "size": [160, 90], "transform": { "position": [80, 45] },
         "lighting": lighting })
 }
 

@@ -49,8 +49,7 @@ fn a_script_made_from_the_media_template_declares_every_media_event() {
 fn own_clock_lanes_take_a_strip_of_frames_of_their_video_once() {
     let mut doc = starter("empty", "org.example.clocks", "Clocks", "en").unwrap();
     doc["scene"]["assets"]["clip"] = json!({ "path": "clip.webm" });
-    doc["scene"]["layers"] =
-        json!([{ "id": "film", "type": "video", "video": "clip", "playback": { "own_clock": true } }]);
+    doc["scene"]["layers"] = json!([{ "blend_space": "canvas", "id": "film", "type": "video", "video": "clip", "playback": { "own_clock": true } }]);
     let dir = tempfile::tempdir().unwrap();
     unsafe { std::env::set_var("XDG_CACHE_HOME", dir.path().join("cache")) };
     let fixture = concat!(env!("CARGO_MANIFEST_DIR"), "/../../tests/fixtures/magenta-64x32.webm");

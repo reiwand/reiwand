@@ -10,7 +10,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 fn halves() -> Arc<ScenePack> {
-    let solid = |id: &str, color: &str, x: f32| json!({ "id": id, "type": "solid", "color": color, "size": [32, 16], "transform": { "position": [x, 8] } });
+    let solid = |id: &str, color: &str, x: f32| json!({ "blend_space": "canvas", "id": id, "type": "solid", "color": color, "size": [32, 16], "transform": { "position": [x, 8] } });
     let timelines = [json!({ "id": "t", "duration": 100, "loop": "repeat" })];
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 16], "background": "#000000", "blend_space": "srgb" },
         "timelines": timelines, "layers": [solid("left", "#ff0000", 16.0), solid("right", "#0000ff", 48.0)] });

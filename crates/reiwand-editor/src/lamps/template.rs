@@ -16,7 +16,7 @@ pub fn template(doc: &Value, id: &str, source: Option<&str>) -> Result<Value> {
     };
     let size = &doc["scene"]["canvas"]["size"];
     let middle = [0, 1].map(|i| size[i].as_f64().unwrap_or([1920.0, 1080.0][i]) / 2.0);
-    let mut l = json!({ "id": id, "type": "light", "light": beam, "transform": { "position": middle } });
+    let mut l = json!({ "blend_space": "canvas", "id": id, "type": "light", "light": beam, "transform": { "position": middle } });
     let extra = match beam {
         Beam::Point => json!({ "radius": 400, "z": 120 }),
         Beam::Spot => json!({ "radius": 900, "z": 150, "intensity": 2, "cone": [25, 45] }),

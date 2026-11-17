@@ -130,7 +130,7 @@ fn a_scene_frame_that_changed_nothing_is_not_composed_again() {
     let (power, now) = (Power::new(Tier::T3, false, 60), Instant::now());
     let text = r##"{ "schema": "reiwand.scene/1", "canvas": { "size": [32, 18] },
       "timelines": [{ "id": "t", "duration": 4, "loop": "repeat" }],
-      "layers": [{ "id": "card", "type": "solid", "color": "#4060ff", "size": [16, 9],
+      "layers": [{ "blend_space": "canvas", "id": "card", "type": "solid", "color": "#4060ff", "size": [16, 9],
         "transform": { "rotation": { "timeline": "t", "keys": [[0, 0], [4, 360]] } } }] }"##;
     let pack = Arc::new(ScenePack::bare(Scene::from_json(text).unwrap(), Default::default(), Vec::new()));
     let spec = SceneSpec { values: Default::default(), pack, ..snowfall() };

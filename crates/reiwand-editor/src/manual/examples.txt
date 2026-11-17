@@ -67,7 +67,7 @@ act set
 reiwand-ctl scene act DIR set '{"pointer":"/scene/canvas/background","value":"#112233"}'
 
 act add
-reiwand-ctl scene act DIR add '{"pointer":"/scene/layers/-","value":{"id":"backdrop","type":"solid","color":"#102030"}}'
+reiwand-ctl scene act DIR add '{"pointer":"/scene/layers/-","value":{ "blend_space": "canvas", "id":"backdrop","type":"solid","color":"#102030"}}'
 
 act remove
 reiwand-ctl scene act DIR add_layer '{"kind":"solid","id":"backdrop"}'
@@ -120,7 +120,7 @@ reiwand-ctl scene act DIR add_layer '{"kind":"image","file":"picture.png","id":"
 reiwand-ctl scene act DIR rename '{"kind":"layer","id":"sky","to":"backdrop"}'
 
 act paste
-reiwand-ctl scene act DIR paste '{"clip":{"layers":[{"id":"greet","type":"text","text":"Hello","size":96,"color":"#ffffff"}]}}'
+reiwand-ctl scene act DIR paste '{"clip":{"layers":[{ "blend_space": "canvas", "id":"greet","type":"text","text":"Hello","size":96,"color":"#ffffff"}]}}'
 
 act rgb
 reiwand-ctl scene act DIR add_layer '{"kind":"adjustment","id":"setting"}'

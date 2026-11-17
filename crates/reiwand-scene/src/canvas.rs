@@ -13,6 +13,25 @@ pub enum BlendSpace {
     Srgb,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum LayerSpace {
+    #[default]
+    Canvas,
+    Linear,
+    Srgb,
+}
+
+impl LayerSpace {
+    pub fn apart_from(self, canvas: BlendSpace) -> Option<BlendSpace> {
+        match (self, canvas) {
+            (LayerSpace::Linear, BlendSpace::Srgb) => Some(BlendSpace::Linear),
+            (LayerSpace::Srgb, BlendSpace::Linear) => Some(BlendSpace::Srgb),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Canvas {

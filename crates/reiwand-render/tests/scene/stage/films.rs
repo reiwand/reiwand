@@ -28,14 +28,14 @@ fn videos_feed_pictures_masks_and_effect_textures() {
         RgbaImage::from_fn(8, 4, |x, _| if x < 4 { Rgba([255; 4]) } else { Rgba([0, 0, 0, 255]) });
     let video = r.upload_rgba(white_left.as_raw(), 8, 4, 32).unwrap();
     let layers = json!([
-        { "id": "pic", "type": "image", "image": "clip", "size": [50, 50], "transform": { "position": [25, 25] } },
-        { "id": "red", "type": "solid", "color": "#ff0000", "size": [50, 50], "transform": { "position": [75, 25] },
+        { "blend_space": "canvas", "id": "pic", "type": "image", "image": "clip", "size": [50, 50], "transform": { "position": [25, 25] } },
+        { "blend_space": "canvas", "id": "red", "type": "solid", "color": "#ff0000", "size": [50, 50], "transform": { "position": [75, 25] },
           "mask": { "texture": "clip" } },
-        { "id": "tex", "type": "adjustment", "effects": [{ "effect": "blend_texture",
+        { "blend_space": "canvas", "id": "tex", "type": "adjustment", "effects": [{ "effect": "blend_texture",
           "params": { "texture": "clip", "blend": "multiply", "amount": 1 } }], "visible": false }
     ]);
     let tinted = json!({ "canvas": canvas("#ff0000"), "assets": { "clip": { "path": "clip.webm" } },
-        "layers": [{ "id": "tex", "type": "adjustment", "effects": [{ "effect": "blend_texture",
+        "layers": [{ "blend_space": "canvas", "id": "tex", "type": "adjustment", "effects": [{ "effect": "blend_texture",
           "params": { "texture": "clip", "blend": "multiply", "amount": 1 } }] }] });
     let textured = shot_with_video(r, &mut Shot::with(r, tinted, &[]), &video);
     check(&textured, &[((10, 25), RED), ((90, 25), [0; 3])]);
@@ -46,12 +46,12 @@ fn videos_feed_pictures_masks_and_effect_textures() {
     let view = shot.view.view(SIZE);
     assert!(shot.runtime.frame(view, Quality::Q3).draws[0].dynamic, "a playing video moves");
     let paused = json!({ "canvas": canvas("#000000"), "assets": { "clip": { "path": "clip.webm" } },
-        "layers": [{ "id": "v", "type": "video", "video": "clip", "playback": { "playing": false } }] });
+        "layers": [{ "blend_space": "canvas", "id": "v", "type": "video", "video": "clip", "playback": { "playing": false } }] });
     let mut still = Shot::with(r, paused, &[]);
     still.runtime.advance(0.1);
     assert!(!still.runtime.frame(view, Quality::Q3).draws[0].dynamic, "a paused video stands still");
     let hidden = json!({ "canvas": canvas("#000000"), "assets": { "clip": { "path": "clip.webm" } },
-        "layers": [{ "id": "v", "type": "video", "video": "clip", "visible": false }] });
+        "layers": [{ "blend_space": "canvas", "id": "v", "type": "video", "video": "clip", "visible": false }] });
     let mut unseen = Shot::with(r, hidden, &[]);
     unseen.runtime.frame(view, Quality::Q3);
     unseen.runtime.advance(1.0);

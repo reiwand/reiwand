@@ -10,7 +10,7 @@ fn project(root: &TempDir) -> Project {
     unsafe { std::env::set_var("XDG_STATE_HOME", &state) };
     let made = starter("empty", "org.example.level", "Level", "en").unwrap();
     let mut p = Project::create(&root.path().join("level"), made).unwrap();
-    let layer = json!([{ "id": "fill", "type": "solid", "color": "#ffffff",
+    let layer = json!([{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ffffff",
         "effects": [{ "effect": "blur" }, { "effect": "god_rays", "optional": true }] }]);
     let set = json!({ "set": { "pointer": "/scene/layers", "value": layer } });
     p.act(&serde_json::from_value::<Action>(set).unwrap()).unwrap();
@@ -76,9 +76,9 @@ fn the_preview_carries_battery_and_reduced_motion_only_when_asked() {
 fn effects_and_emitters_that_follow_the_pointer_are_named() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
-    let layers = json!([{ "id": "fill", "type": "solid", "color": "#ffffff",
+    let layers = json!([{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ffffff",
         "effects": [{ "effect": "blur" }, { "effect": "water_ripple" }] },
-        { "id": "dust", "type": "particles", "system": "dust" }]);
+        { "blend_space": "canvas", "id": "dust", "type": "particles", "system": "dust" }]);
     let particles = json!({ "dust": { "capacity": 100, "emitters": [{ "shape": "edge", "rate": 10, "follow": "cursor" }] } });
     for (pointer, value) in [("/scene/layers", layers), ("/scene/particles", particles)] {
         let set = json!({ "set": { "pointer": pointer, "value": value } });
@@ -98,7 +98,7 @@ fn effects_and_emitters_that_follow_the_pointer_are_named() {
 #[test]
 fn a_render_draws_what_the_preview_draws_with_one_alone_and_a_pinned_seed() {
     let doc = json!({ "scene": { "clock": { "seed": null }, "canvas": { "bloom": { "strength": 1.0 } },
-        "layers": [{ "id": "a", "type": "solid", "color": "#ffffff" }, { "id": "b", "type": "solid", "color": "#ff0000" }],
+        "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#ffffff" }, { "blend_space": "canvas", "id": "b", "type": "solid", "color": "#ff0000" }],
         "ext": { "editor": { "solo": "b" } } } });
     let shown = reiwand_editor::reach::shown(&doc, true);
     assert!(shown["clock"]["seed"].as_u64().is_some_and(|s| s > 0), "the seed stayed random: {shown}");

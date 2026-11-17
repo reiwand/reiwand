@@ -8,7 +8,7 @@ fn ball(material: ForgeMaterial) -> BTreeMap<&'static str, Vec<u8>> {
 }
 
 fn lit_scene(material: ForgeMaterial, extra: Value) -> Scene {
-    let mut layer = json!({ "id": "ball", "type": "model", "model": "ball" });
+    let mut layer = json!({ "blend_space": "canvas", "id": "ball", "type": "model", "model": "ball" });
     extra.as_object().unwrap().iter().for_each(|(k, v)| layer[k] = v.clone());
     scene(json!({}), json!([layer]), ball(material))
 }
@@ -58,7 +58,7 @@ fn a_double_sided_plane_shows_its_back() {
         let mut m = unlit("paint", [0.0, 1.0, 0.0, 1.0]);
         m.double_sided = two;
         let glb = Forge::default().material(m).part("card", ForgeShape::Plane, [0.0; 3], 3.0, 0).glb();
-        let layer = json!([{ "id": "card", "type": "model", "model": "card", "rotation": [0, 180, 0] }]);
+        let layer = json!([{ "blend_space": "canvas", "id": "card", "type": "model", "model": "card", "rotation": [0, 180, 0] }]);
         render(r, scene(json!({}), layer, BTreeMap::from([("card", glb)])), Quality::Q3)
     };
     assert_eq!(rgb(&card(false), 32, 32), [0, 0, 0]);
@@ -83,7 +83,8 @@ fn an_env_picture_tints_a_shiny_ball_and_the_lowest_quality_drops_its_reflection
     let Some(r) = renderer() else { return };
     let mut m = ForgeMaterial::new("paint", [1.0; 4]);
     (m.metallic, m.roughness) = (1.0, 0.1);
-    let layer = json!([{ "id": "ball", "type": "model", "model": "ball", "env": "sky" }]);
+    let layer =
+        json!([{ "blend_space": "canvas", "id": "ball", "type": "model", "model": "ball", "env": "sky" }]);
     let s = scene(json!({ "assets": { "sky": { "path": "sky.png" } } }), layer, ball(m));
     let sky = Pixels::new(RgbaImage::from_pixel(8, 8, Rgba([0, 120, 255, 255])));
     let high = shoot(r, s.clone(), &[("sky", sky.clone())]).frame(r, 0.0, Quality::Q3);
@@ -99,7 +100,7 @@ fn a_map_chosen_by_the_scene_replaces_the_map_of_the_file() {
     let mut m = unlit("paint", [1.0; 4]);
     m.maps[0] = Some(png([255, 0, 0, 255], 8));
     let over = json!({ "materials": { "paint": { "maps": { "base": "blue" } } } });
-    let mut layer = json!({ "id": "ball", "type": "model", "model": "ball" });
+    let mut layer = json!({ "blend_space": "canvas", "id": "ball", "type": "model", "model": "ball" });
     let plain = scene(json!({}), json!([layer.clone()]), ball(m.clone()));
     assert!(near(rgb(&render(r, plain, Quality::Q3), 32, 32), [255, 0, 0], 3));
     layer["materials"] = over["materials"].clone();

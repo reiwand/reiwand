@@ -5,9 +5,9 @@ use serde_json::json;
 
 #[test]
 fn layers_with_their_own_clock_get_a_reel_of_their_own() {
-    let layers = json!([{ "id": "a", "type": "video", "video": "clip" },
-        { "id": "b", "type": "video", "video": "clip", "playback": { "own_clock": true } },
-        { "id": "c", "type": "video", "video": "clip", "playback": { "own_clock": false } }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "a", "type": "video", "video": "clip" },
+        { "blend_space": "canvas", "id": "b", "type": "video", "video": "clip", "playback": { "own_clock": true } },
+        { "blend_space": "canvas", "id": "c", "type": "video", "video": "clip", "playback": { "own_clock": false } }]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "clip": { "path": "clip.webm" } },
         "layers": layers });
     let scene = Scene::from_json(&text.to_string()).unwrap();
@@ -21,8 +21,8 @@ fn layers_with_their_own_clock_get_a_reel_of_their_own() {
 
 #[test]
 fn a_video_a_file_property_picks_gets_a_reel_for_each_own_clock() {
-    let layers = json!([{ "id": "a", "type": "video", "video": { "prop": "pick" } },
-        { "id": "b", "type": "video", "video": { "prop": "pick" }, "playback": { "own_clock": true } }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "a", "type": "video", "video": { "prop": "pick" } },
+        { "blend_space": "canvas", "id": "b", "type": "video", "video": { "prop": "pick" }, "playback": { "own_clock": true } }]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers });
     let scene = Scene::from_json(&text.to_string()).unwrap();
     let reels = picked(&scene, "pick", std::path::Path::new("/tmp/chosen.webm"));
@@ -33,8 +33,8 @@ fn a_video_a_file_property_picks_gets_a_reel_for_each_own_clock() {
 
 #[test]
 fn an_own_clock_on_a_file_property_plays_its_default_video_until_a_file_is_picked() {
-    let layers = json!([{ "id": "a", "type": "video", "video": { "prop": "pick" } },
-        { "id": "b", "type": "video", "video": { "prop": "pick" }, "playback": { "own_clock": true } }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "a", "type": "video", "video": { "prop": "pick" } },
+        { "blend_space": "canvas", "id": "b", "type": "video", "video": { "prop": "pick" }, "playback": { "own_clock": true } }]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "clip": { "path": "clip.webm" } },
         "layers": layers });
     let scene = Scene::from_json(&text.to_string()).unwrap();

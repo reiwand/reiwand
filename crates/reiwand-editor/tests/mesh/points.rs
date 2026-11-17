@@ -22,7 +22,7 @@ fn points(p: &Project) -> Vec<Value> {
 
 fn hatted(root: &tempfile::TempDir) -> Project {
     let mut p = rigged(root);
-    let hat = json!({ "id": "hat", "type": "solid", "color": "#ffffff" });
+    let hat = json!({ "blend_space": "canvas", "id": "hat", "type": "solid", "color": "#ffffff" });
     act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": hat } })).unwrap();
     p
 }

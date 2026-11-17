@@ -42,7 +42,7 @@ fn scene(uses: serde_json::Value) -> serde_json::Value {
     let events =
         ["update", "mediaStatus", "mediaPlayback", "mediaProperties", "mediaThumbnail", "mediaTimeline"];
     json!({ "scripts": [{ "path": "main.js", "events": events, "uses": uses }],
-        "layers": [{ "id": "out", "type": "text", "text": "", "size": 10 }, { "id": "at", "type": "text", "text": "", "size": 10 }] })
+        "layers": [{ "blend_space": "canvas", "id": "out", "type": "text", "text": "", "size": 10 }, { "blend_space": "canvas", "id": "at", "type": "text", "text": "", "size": 10 }] })
 }
 
 #[test]
@@ -92,7 +92,7 @@ fn media_needs_its_declaration_and_carries_no_cover_bytes() {
         export function update() { scene.layer("at").text = JSON.stringify(media.snapshot()); }"#;
     let mut plain = staged(
         json!({ "scripts": [{ "path": "main.js", "uses": ["layers"] }],
-        "layers": [{ "id": "at", "type": "text", "text": "", "size": 10 }] }),
+        "layers": [{ "blend_space": "canvas", "id": "at", "type": "text", "text": "", "size": 10 }] }),
         &[("main.js", reader)],
     );
     let out = plain.update(&Frame { media: Some((&one, 0.0)), ..Frame::at(0.0) }).unwrap();
@@ -114,7 +114,7 @@ fn the_media_template_of_the_editor_feeds_values() {
     let events = ["mediaStatus", "mediaPlayback", "mediaProperties", "mediaThumbnail", "mediaTimeline"];
     let text = json!({ "script": "scripts/media.js", "fn": "nowPlaying" });
     let scene = json!({ "scripts": [{ "path": "scripts/media.js", "events": events, "uses": ["media"] }],
-        "layers": [{ "id": "line", "type": "text", "text": text, "size": 10 }] });
+        "layers": [{ "blend_space": "canvas", "id": "line", "type": "text", "text": text, "size": 10 }] });
     let mut script = staged(scene, &[("scripts/media.js", source)]);
     let one = track("One", true, 2);
     let out = script.update(&Frame { media: Some((&one, 0.0)), ..Frame::at(0.0) }).unwrap();

@@ -3,7 +3,7 @@ use reiwand_scene::Quality;
 use serde_json::{Value, json};
 
 fn spot(texture: Value) -> Value {
-    json!({ "id": "spot", "type": "light", "light": "spot", "cone": [80, 90], "radius": 400, "z": 40,
+    json!({ "blend_space": "canvas", "id": "spot", "type": "light", "light": "spot", "cone": [80, 90], "radius": 400, "z": 40,
         "intensity": 2, "transform": { "position": [80, 45], "tilt": [89, 0] }, "texture": texture })
 }
 
@@ -23,7 +23,7 @@ fn a_spot_projects_a_picture_onto_lit_layers() {
 
 #[test]
 fn a_spot_projects_a_layer_with_its_effects() {
-    let pattern = json!({ "id": "pattern", "type": "shape", "shape": { "rect": { "size": [80, 90] } },
+    let pattern = json!({ "blend_space": "canvas", "id": "pattern", "type": "shape", "shape": { "rect": { "size": [80, 90] } },
         "fill": "#ffffff", "visible": false, "transform": { "position": [120, 45] },
         "effects": [{ "effect": "tint", "params": { "color": "#ff0000" } }] });
     let layers = json!([wall(json!({})), pattern, spot(json!({ "layer": "pattern" }))]);
@@ -36,7 +36,7 @@ fn a_spot_projects_a_layer_with_its_effects() {
 fn a_still_projected_picture_keeps_the_lit_layer_cached() {
     let Some(r) = renderer() else { return };
     let spin = json!({ "timeline": "go", "keys": [[0, 0], [4, 360]] });
-    let dot = json!({ "id": "dot", "type": "shape", "shape": { "rect": { "size": [10, 10] } }, "fill": "#ff0000",
+    let dot = json!({ "blend_space": "canvas", "id": "dot", "type": "shape", "shape": { "rect": { "size": [10, 10] } }, "fill": "#ff0000",
         "transform": { "position": [10, 10], "rotation": spin } });
     let layers = json!([wall(json!({ "strength": 1 })), spot(json!("mask")), dot]);
     let mut shot = Shot::new(r, scene(layers, json!({})), &files(UP));

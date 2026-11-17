@@ -6,7 +6,7 @@ use std::sync::Arc;
 const VIEW: [f32; 4] = [0.0, 0.0, 100.0, 50.0];
 
 fn runtime(opacities: &[Json], audio: Option<Json>) -> Runtime {
-    let layer = |(i, o): (usize, &Json)| json!({ "id": format!("l{i}"), "type": "solid", "color": "#ffffff", "opacity": o });
+    let layer = |(i, o): (usize, &Json)| json!({ "blend_space": "canvas", "id": format!("l{i}"), "type": "solid", "color": "#ffffff", "opacity": o });
     let layers: Vec<Json> = opacities.iter().enumerate().map(layer).collect();
     let mut text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": layers });
     if let Some(a) = audio {

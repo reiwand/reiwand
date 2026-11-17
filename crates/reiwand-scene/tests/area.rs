@@ -14,28 +14,28 @@ fn area(scene: &Scene, id: &str) -> f32 {
 }
 
 fn solid(id: &str, size: [f32; 2], position: [f32; 2]) -> Value {
-    json!({ "id": id, "type": "solid", "color": "#ffffff", "size": size, "transform": { "position": position } })
+    json!({ "blend_space": "canvas", "id": id, "type": "solid", "color": "#ffffff", "size": size, "transform": { "position": position } })
 }
 
 #[test]
 fn adjustment_layers_cost_the_whole_target_whatever_size_they_declare() {
-    let adjust =
-        json!({ "id": "adj", "type": "adjustment", "size": [1, 1], "effects": [{ "effect": "tint" }] });
-    let group =
-        json!({ "id": "g", "type": "group", "layers": [solid("s", [10.0, 10.0], [5.0, 5.0]), adjust] });
+    let adjust = json!({ "blend_space": "canvas", "id": "adj", "type": "adjustment", "size": [1, 1], "effects": [{ "effect": "tint" }] });
+    let group = json!({ "blend_space": "canvas", "id": "g", "type": "group", "layers": [solid("s", [10.0, 10.0], [5.0, 5.0]), adjust] });
     let s = scene(json!([group]));
     assert_eq!((area(&s, "adj"), area(&s, "g")), (1.0, 1.0));
     let tiny = scene(
-        json!([{ "id": "a", "type": "adjustment", "size": [1, 1], "effects": [{ "effect": "blur" }] }]),
+        json!([{ "blend_space": "canvas", "id": "a", "type": "adjustment", "size": [1, 1], "effects": [{ "effect": "blur" }] }]),
     );
-    let full = scene(json!([{ "id": "a", "type": "adjustment", "effects": [{ "effect": "blur" }] }]));
+    let full = scene(
+        json!([{ "blend_space": "canvas", "id": "a", "type": "adjustment", "effects": [{ "effect": "blur" }] }]),
+    );
     assert_eq!(tiny.cost(reiwand_scene::Quality::Q3), full.cost(reiwand_scene::Quality::Q3));
 }
 
 #[test]
 fn groups_cost_their_bounding_extent_and_layers_what_the_canvas_shows() {
     let corners = [solid("a", [10.0, 10.0], [5.0, 5.0]), solid("b", [10.0, 10.0], [995.0, 995.0])];
-    let s = scene(json!([{ "id": "g", "type": "group", "layers": corners }]));
+    let s = scene(json!([{ "blend_space": "canvas", "id": "g", "type": "group", "layers": corners }]));
     assert_eq!(area(&s, "g"), 1.0);
     assert!((area(&s, "a") - 1e-4).abs() < 1e-6);
     let s = scene(json!([
@@ -44,7 +44,7 @@ fn groups_cost_their_bounding_extent_and_layers_what_the_canvas_shows() {
     ]));
     assert_eq!(area(&s, "big"), 1.0);
     assert!((area(&s, "corner") - 0.0025).abs() < 1e-6);
-    let turned = json!({ "id": "t", "type": "solid", "color": "#ffffff", "size": [100, 100],
+    let turned = json!({ "blend_space": "canvas", "id": "t", "type": "solid", "color": "#ffffff", "size": [100, 100],
         "transform": { "position": [500, 500], "rotation": 45 } });
     let diagonal = 2.0f32.sqrt() * 100.0;
     assert!((area(&scene(json!([turned])), "t") - diagonal * diagonal / 1e6).abs() < 1e-4, "t");
@@ -52,10 +52,12 @@ fn groups_cost_their_bounding_extent_and_layers_what_the_canvas_shows() {
 
 #[test]
 fn layers_that_can_move_or_grow_cost_the_whole_canvas() {
-    let bound = json!({ "id": "b", "type": "solid", "color": "#ffffff", "size": [10, 10], "transform": { "scale": { "prop": "s" } } });
-    let reach = json!({ "id": "r", "type": "solid", "color": "#ffffff", "size": [10, 10],
+    let bound = json!({ "blend_space": "canvas", "id": "b", "type": "solid", "color": "#ffffff", "size": [10, 10], "transform": { "scale": { "prop": "s" } } });
+    let reach = json!({ "blend_space": "canvas", "id": "r", "type": "solid", "color": "#ffffff", "size": [10, 10],
         "effects": [{ "effect": "blur", "params": { "radius": 45 } }] });
-    let s = scene(json!([bound, reach, { "id": "p", "type": "particles", "system": "none" }]));
+    let s = scene(
+        json!([bound, reach, { "blend_space": "canvas", "id": "p", "type": "particles", "system": "none" }]),
+    );
     assert_eq!(area(&s, "b"), 1.0);
     assert!((area(&s, "r") - 0.01).abs() < 1e-6);
     assert_eq!(area(&s, "p"), 1.0);
@@ -69,7 +71,7 @@ fn layers_that_can_move_or_grow_cost_the_whole_canvas() {
 fn the_scene_budget_leaves_out_the_uses_past_the_limit_in_order() {
     let uses: Vec<Value> = (0..16).map(|_| json!({ "effect": "tint" })).collect();
     let layers: Vec<Value> = (0..250)
-        .map(|i| json!({ "id": format!("a{i}"), "type": "adjustment", "size": [1, 1], "effects": uses }))
+        .map(|i| json!({ "blend_space": "canvas", "id": format!("a{i}"), "type": "adjustment", "size": [1, 1], "effects": uses }))
         .collect();
     let s = scene(json!(layers));
     let spends = s.spends();

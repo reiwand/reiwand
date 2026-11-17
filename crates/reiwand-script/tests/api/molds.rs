@@ -5,7 +5,7 @@ fn followed(name: &str, source: &str, entry: serde_json::Value, call: &str, time
     let mut entry = entry;
     entry["path"] = json!(path);
     let value = json!({ "script": path, "fn": call });
-    let scene = json!({ "scripts": [entry], "layers": [{ "id": "dot", "type": "solid", "color": "#ffffff", "opacity": value }] });
+    let scene = json!({ "scripts": [entry], "layers": [{ "blend_space": "canvas", "id": "dot", "type": "solid", "color": "#ffffff", "opacity": value }] });
     let mut script = staged(scene, &[(&path, source)]);
     let out = script.update(&Frame { dt: 0.016, ..Frame::at(time) }).unwrap();
     assert!(out.console.is_empty(), "{name}: {:?}", out.console);
@@ -40,8 +40,8 @@ fn the_spawn_template_draws_copies_of_a_template_and_takes_them_away() {
     let params = json!({ "count": { "type": "number", "default": 3 }, "gap": { "type": "number", "default": 50 },
         "template": { "type": "text", "default": "copy" } });
     let scene = json!({ "scripts": [{ "path": "scripts/spawn.js", "events": ["init", "destroy"], "uses": ["layers"], "params": params }],
-        "templates": { "copy": { "id": "copy", "type": "solid", "color": "#ffffff", "size": [8, 40] } },
-        "layers": [{ "id": "back", "type": "solid", "color": "#000000" }] });
+        "templates": { "copy": { "blend_space": "canvas", "id": "copy", "type": "solid", "color": "#ffffff", "size": [8, 40] } },
+        "layers": [{ "blend_space": "canvas", "id": "back", "type": "solid", "color": "#000000" }] });
     let mut script = staged(scene, &[("scripts/spawn.js", source)]);
     let out = at(&mut script, 0.0).unwrap();
     assert!(out.console.is_empty(), "{:?}", out.console);

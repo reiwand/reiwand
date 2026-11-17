@@ -11,7 +11,7 @@ fn skins(layers: &[&str]) -> Vec<RgbaImage> {
     s.bind();
     let glb = s.glb();
     let layer = |id: &&str| {
-        serde_json::json!({ "id": id, "type": "mesh", "mesh": "mesh", "texture": id,
+        serde_json::json!({ "blend_space": "canvas", "id": id, "type": "mesh", "mesh": "mesh", "texture": id,
         "clips": [{ "id": "swing", "loop": "pingpong", "bones": { "arm": { "rotation": [[0, 0], [1, 60]] } } }],
         "animations": [{ "clip": "swing" }] })
     };

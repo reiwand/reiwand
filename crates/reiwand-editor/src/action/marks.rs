@@ -1,4 +1,4 @@
-use reiwand_scene::Blend;
+use reiwand_scene::{Blend, LayerSpace};
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
@@ -64,6 +64,10 @@ pub enum LayerEdit {
     Blend {
         layer: String,
         blend: Blend,
+    },
+    BlendSpace {
+        layer: String,
+        space: LayerSpace,
     },
     Depth {
         layer: String,

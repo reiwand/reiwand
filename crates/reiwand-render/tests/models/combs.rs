@@ -16,7 +16,7 @@ fn combed(map: Option<[u8; 4]>) -> Vec<u8> {
         fur["maps"] = json!({ "comb": "combs" });
         images.push(("combs", Pixels::new(RgbaImage::from_pixel(8, 8, Rgba(rgba)))));
     }
-    let layers = json!([{ "id": "m", "type": "model", "model": "ball", "materials": { "skin": fur } }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "m", "type": "model", "model": "ball", "materials": { "skin": fur } }]);
     let assets = json!({ "assets": { "combs": { "path": "combs.png", "linear": true } } });
     shoot(r, scene(assets, layers, ball()), &images).frame(r, 0.0, Quality::Q3)
 }

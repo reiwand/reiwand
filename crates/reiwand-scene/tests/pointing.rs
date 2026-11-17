@@ -6,8 +6,8 @@ const VIEW: [f32; 4] = [0.0, 0.0, 100.0, 50.0];
 
 fn runtime(extra: serde_json::Value) -> Runtime {
     let mut doc = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [
-        { "id": "back", "type": "solid", "color": "#000000" },
-        { "id": "a", "type": "solid", "color": "#ffffff", "size": [20, 10], "solid": true }] });
+        { "blend_space": "canvas", "id": "back", "type": "solid", "color": "#000000" },
+        { "blend_space": "canvas", "id": "a", "type": "solid", "color": "#ffffff", "size": [20, 10], "solid": true }] });
     for (k, v) in extra.as_object().into_iter().flatten() {
         doc[k] = v.clone();
     }
@@ -127,7 +127,7 @@ fn alpha_thresholds_test_the_coverage_of_the_layer() {
 
 #[test]
 fn scripts_play_pause_stop_and_turn_down_sound_layers() {
-    let sound = json!({ "id": "bell", "type": "sound", "sound": "bell", "play_on": "beat", "loop": false });
+    let sound = json!({ "blend_space": "canvas", "id": "bell", "type": "sound", "sound": "bell", "play_on": "beat", "loop": false });
     let mut rt = runtime(json!({ "assets": { "bell": { "path": "bell.ogg" } }, "layers": [sound] }));
     rt.set_lengths([("bell".to_string(), 10.0)].into());
     let control = |commands: &[SoundCommand], volume: Option<f32>| {

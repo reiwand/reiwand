@@ -39,7 +39,7 @@ fn dressed(root: &tempfile::TempDir) -> Project {
         .unwrap();
     act(&mut p, set("rules", json!([{ "bone": "tail", "parent": "hand", "weight": 1 }]))).unwrap();
     act(&mut p, set("hit", json!(["hand", "arm"]))).unwrap();
-    let hat = json!({ "id": "hat", "type": "solid", "color": "#ffffff", "attach": { "layer": "net", "bone": "hand" } });
+    let hat = json!({ "blend_space": "canvas", "id": "hat", "type": "solid", "color": "#ffffff", "attach": { "layer": "net", "bone": "hand" } });
     act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": hat } })).unwrap();
     assert_eq!(broken(&p), Vec::<String>::new());
     p

@@ -26,7 +26,8 @@ fn wav() -> Vec<u8> {
 fn packaged(id: &str, repeat: bool) -> PathBuf {
     let source = tempfile::tempdir().unwrap();
     fs::write(source.path().join("tone.wav"), wav()).unwrap();
-    let layer = json!({ "id": "bell", "type": "sound", "sound": "tone", "loop": repeat });
+    let layer =
+        json!({ "blend_space": "canvas", "id": "bell", "type": "sound", "sound": "tone", "loop": repeat });
     let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] },
         "assets": { "tone": { "path": "tone.wav" } }, "layers": [layer] });
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();

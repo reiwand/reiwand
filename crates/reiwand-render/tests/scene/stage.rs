@@ -10,7 +10,9 @@ const RED: [u8; 3] = [255, 0, 0];
 const BLUE: [u8; 3] = [0, 0, 255];
 
 fn halved(r: &Renderer, mut canvas: Value, more: Value) -> Shot {
-    let mut layers = vec![json!({ "id": "img", "type": "image", "image": "rb", "size": [100, 50] })];
+    let mut layers = vec![
+        json!({ "blend_space": "canvas", "id": "img", "type": "image", "image": "rb", "size": [100, 50] }),
+    ];
     layers.extend(more.as_array().cloned().unwrap_or_default());
     canvas["background"] = json!("#000000");
     canvas["size"] = json!([100, 50]);
@@ -74,7 +76,7 @@ fn camera_shake_runs_only_with_motion_and_above_the_lowest_level() {
 #[test]
 fn a_canvas_that_does_not_clear_keeps_the_previous_frame() {
     let Some(r) = renderer() else { return };
-    let mover = json!([{ "id": "m", "type": "solid", "color": "#ffffff", "size": [10, 10],
+    let mover = json!([{ "blend_space": "canvas", "id": "m", "type": "solid", "color": "#ffffff", "size": [10, 10],
         "transform": { "position": { "keys": [[0, [20, 25]], [1, [80, 25]]] } } }]);
     let mut kept = Shot::new(
         r,

@@ -7,7 +7,7 @@ fn timed(timelines: Value, layers: Value) -> Value {
 #[test]
 fn wrapped_timelines_and_events_move_what_is_drawn() {
     let Some(r) = renderer() else { return };
-    let fade = json!([{ "id": "f", "type": "solid", "color": "#ffffff", "size": [100, 50],
+    let fade = json!([{ "blend_space": "canvas", "id": "f", "type": "solid", "color": "#ffffff", "size": [100, 50],
         "opacity": { "timeline": "w", "keys": [[0, 1], [2, 0]] } }]);
     let mut wrapped = Shot::with(
         r,
@@ -16,7 +16,7 @@ fn wrapped_timelines_and_events_move_what_is_drawn() {
     );
     wrapped.runtime.advance(3.0);
     check(&wrapped.pixels(r), &[((50, 25), [188, 188, 188])]);
-    let moved = json!([{ "id": "b", "type": "solid", "color": "#ff0000", "size": [20, 50],
+    let moved = json!([{ "blend_space": "canvas", "id": "b", "type": "solid", "color": "#ff0000", "size": [20, 50],
         "transform": { "position": { "timeline": "go", "keys": [[0, [10, 25]], [1, [90, 25]]] } } }]);
     let tls = json!([{ "id": "clock", "duration": 2, "events": [{ "t": 1, "name": "start" }] },
                      { "id": "go", "duration": 1, "trigger": "event:start" }]);
@@ -33,9 +33,9 @@ fn scenes_without_a_preview_are_drawn_at_their_poster_time() {
     let mut text = timed(
         json!([{ "id": "t", "duration": 4 }]),
         json!([
-        { "id": "s", "type": "solid", "size": [100, 50],
+        { "blend_space": "canvas", "id": "s", "type": "solid", "size": [100, 50],
           "color": { "timeline": "t", "keys": [[0, "#000000"], [2, "#00ff00"]] } },
-        { "id": "noon", "type": "solid", "color": "#ffffff", "size": [20, 50], "transform": { "position": [10, 25] },
+        { "blend_space": "canvas", "id": "noon", "type": "solid", "color": "#ffffff", "size": [20, 50], "transform": { "position": [10, 25] },
           "opacity": { "clock": "day" } }]),
     );
     text["schema"] = json!(SCHEMA);

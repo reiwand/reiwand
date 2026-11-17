@@ -130,8 +130,8 @@ fn the_pose_of_a_clip_puts_the_handles_where_the_bones_are() {
 #[test]
 fn the_preview_plays_the_chosen_clip_with_the_chosen_shapes() {
     let mut scene = json!({ "layers": [
-        { "id": "net", "type": "mesh", "animations": [{ "clip": "a" }], "shapes": { "x": 0.2 } },
-        { "id": "g", "type": "group", "layers": [{ "id": "inner", "type": "mesh" }] },
+        { "blend_space": "canvas", "id": "net", "type": "mesh", "animations": [{ "clip": "a" }], "shapes": { "x": 0.2 } },
+        { "blend_space": "canvas", "id": "g", "type": "group", "layers": [{ "blend_space": "canvas", "id": "inner", "type": "mesh" }] },
     ] });
     let look = json!({ "layer": "net", "clip": "b", "shapes": { "y": 0.5 } });
     reiwand_editor::rigs::preview(&mut scene, &look);

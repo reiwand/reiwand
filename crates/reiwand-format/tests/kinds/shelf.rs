@@ -6,7 +6,7 @@ fn shared() -> Manifest {
 
 fn document(parts: Value) -> String {
     json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 64] },
-        "layers": [{ "id": "glow", "type": "solid", "color": "#ffcc00" }],
+        "layers": [{ "blend_space": "canvas", "id": "glow", "type": "solid", "color": "#ffcc00" }],
         "particles": { "snow": { "capacity": 10, "emitters": [{ "shape": { "point": [0, 0] } }] } }, "ext": { "parts": parts } })
     .to_string()
 }
@@ -22,7 +22,7 @@ fn parts_are_listed_with_their_titles_and_thumbnails() {
     assert_eq!(listed.len(), 2);
     assert_eq!(listed[0].thumbnail.as_deref(), Some("parts/glow.png"));
     let plain = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [8, 8] },
-        "layers": [{ "id": "a", "type": "solid", "color": "#000000" }], "particles": { "b": { "capacity": 10, "emitters": [{ "shape": { "point": [0, 0] } }] } } })
+        "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#000000" }], "particles": { "b": { "capacity": 10, "emitters": [{ "shape": { "point": [0, 0] } }] } } })
     .to_string();
     let mut package = load(&shared(), &[("assets.json", plain.as_bytes())]).unwrap();
     let kinds: Vec<_> =

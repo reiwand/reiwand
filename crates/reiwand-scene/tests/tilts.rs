@@ -10,11 +10,11 @@ fn lean(layers: serde_json::Value, id: &str) -> Lean {
 }
 
 fn card(tilt: serde_json::Value) -> serde_json::Value {
-    json!({ "id": "card", "type": "solid", "color": "#ffffff", "size": [40, 20], "transform": { "position": [0, 0], "tilt": tilt } })
+    json!({ "blend_space": "canvas", "id": "card", "type": "solid", "color": "#ffffff", "size": [40, 20], "transform": { "position": [0, 0], "tilt": tilt } })
 }
 
 fn group(tilt: [f32; 2], inner: serde_json::Value) -> serde_json::Value {
-    json!([{ "id": "g", "type": "group", "transform": { "position": [100, 50], "tilt": tilt }, "layers": [inner] }])
+    json!([{ "blend_space": "canvas", "id": "g", "type": "group", "transform": { "position": [100, 50], "tilt": tilt }, "layers": [inner] }])
 }
 
 const SPOTS: [[f32; 2]; 4] = [[80.0, 40.0], [120.0, 60.0], [100.0, 50.0], [90.0, 58.0]];

@@ -13,7 +13,7 @@ Cada capa tiene una lista `effects` de hasta 16 efectos. Se aplican en orden: el
 sobre la capa tal cual, el segundo sobre el resultado del primero, y así.
 
 ```json
-    { "id": "fondo", "type": "image", "image": "cielo", "size": [1920, 1080],
+    { "blend_space": "canvas", "id": "fondo", "type": "image", "image": "cielo", "size": [1920, 1080],
       "effects": [
         { "effect": "color_adjust", "name": "color", "enabled": { "prop": "color_vivo" },
           "params": { "saturation": 1.8, "contrast": 1.15 } },
@@ -63,7 +63,7 @@ Una capa de ajuste (`adjustment`) aplica sus efectos a todo lo que hay debajo de
 de dar un acabado a toda la escena, como el resplandor y el grano del ejemplo:
 
 ```json
-    { "id": "pantalla", "type": "adjustment",
+    { "blend_space": "canvas", "id": "pantalla", "type": "adjustment",
       "effects": [
         { "effect": "bloom", "params": { "threshold": 0.7, "intensity": 0.8, "radius": 24 } },
         { "effect": "vignette", "params": { "intensity": 0.45, "color": "#000010" } },
@@ -96,7 +96,7 @@ una capa que llega más allá de la pantalla conserva el color de sus píxeles m
 Una máscara limita un efecto a una parte de la capa, y puede ser una imagen, otra capa o una forma:
 
 ```json
-    { "id": "fondo", "type": "image", "image": "cielo", "size": [1920, 1080],
+    { "blend_space": "canvas", "id": "fondo", "type": "image", "image": "cielo", "size": [1920, 1080],
       "effects": [
         { "effect": "color_adjust", "name": "color", "enabled": { "prop": "color_vivo" },
           "params": { "saturation": 1.8, "contrast": 1.15 } },
@@ -384,7 +384,7 @@ programa), y las capas los usan como cualquier otro:
 ```
 
 ```json
-    { "id": "fondo", "type": "image", "image": "cielo", "size": [1920, 1080],
+    { "blend_space": "canvas", "id": "fondo", "type": "image", "image": "cielo", "size": [1920, 1080],
       "effects": [{ "effect": "duotono",
         "params": { "sombra": "#12122e", "luz": "#ffcf8a", "cantidad": { "prop": "intensidad" } } },
         { "effect": "niebla", "params": { "color": "#dfe6ff", "cantidad": 0.5 } }] }
@@ -489,7 +489,7 @@ sombreador puede usar:
 | `mask_at(uv)` | La máscara del uso, de 0 a 1. |
 | `px(píxeles)` | Píxeles convertidos al espacio de coordenadas. |
 | `straight(c)` | Quita el premultiplicado por alfa. |
-| `to_linear`, `from_linear` | Pasan entre los valores del efecto y la luz lineal según `canvas.blend_space`. |
+| `to_linear`, `from_linear` | Pasan entre los valores del efecto y la luz lineal según `canvas.blend_space`; los efectos no leen el `blend_space` de la capa. |
 | `frame.time`, `frame.dt` | El tiempo y lo que ha pasado desde el último fotograma. |
 | `frame.cursor`, `frame.inside`, `frame.buttons` | El puntero. |
 | `frame.bass`, `mid`, `treble`, `level`, `beat`, `band(i)` | El sonido. |

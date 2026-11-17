@@ -21,7 +21,7 @@ pub fn scene(effects: &[(&str, String)]) -> Scene {
             )
         })
         .collect();
-    let layer = json!({ "id": "l", "type": "solid", "color": "#ff0000", "size": [64, 32], "effects": uses });
+    let layer = json!({ "blend_space": "canvas", "id": "l", "type": "solid", "color": "#ff0000", "size": [64, 32], "effects": uses });
     let text =
         json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "layers": [layer], "effects": files });
     let mut scene = Scene::from_json(&text.to_string()).unwrap();

@@ -4,18 +4,18 @@ use super::*;
 fn effects_render_their_passes() {
     let Some(r) = renderer() else { return };
     let rb = || halves([255, 0, 0, 255], [0, 0, 255, 255]);
-    let gray = json!([{ "id": "s", "type": "solid", "color": "#ff0000", "effects": [{ "effect": "color_adjust", "params": { "saturation": 0 } }] }]);
+    let gray = json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ff0000", "effects": [{ "effect": "color_adjust", "params": { "saturation": 0 } }] }]);
     check(&Shot::new(r, canvas("#000000"), gray, &[]).pixels(r), &[((50, 25), [127, 127, 127])]);
-    let blur = json!([{ "id": "i", "type": "image", "image": "rb", "size": [100, 50], "effects": [{ "effect": "blur", "params": { "radius": 12 } }] }]);
+    let blur = json!([{ "blend_space": "canvas", "id": "i", "type": "image", "image": "rb", "size": [100, 50], "effects": [{ "effect": "blur", "params": { "radius": 12 } }] }]);
     let pixels = Shot::new(r, canvas("#000000"), blur, &[("rb", rb())]).pixels(r);
     let [red, _, blue] = at(&pixels, 50, 25);
     assert!(red > 60 && blue > 60 && red < 250 && blue < 250, "blurred edge {:?}", at(&pixels, 50, 25));
     check(&pixels, &[((25, 25), [255, 0, 0]), ((75, 25), [0, 0, 255])]);
-    let waves = json!([{ "id": "i", "type": "image", "image": "rb", "size": [100, 50],
+    let waves = json!([{ "blend_space": "canvas", "id": "i", "type": "image", "image": "rb", "size": [100, 50],
         "effects": [{ "effect": "waves", "params": { "amplitude": 10, "frequency": 1, "speed": 0, "direction": 90 } }] }]);
     let pixels = Shot::new(r, canvas("#000000"), waves, &[("rb", rb())]).pixels(r);
     check(&pixels, &[((55, 12), [255, 0, 0]), ((45, 37), [0, 0, 255]), ((25, 25), [255, 0, 0])]);
-    let glow = json!([{ "id": "s", "type": "solid", "color": "#ffffff", "size": [10, 10],
+    let glow = json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ffffff", "size": [10, 10],
         "effects": [{ "effect": "bloom", "params": { "threshold": 0.5, "intensity": 2, "radius": 8 } }] }]);
     let pixels = Shot::new(r, canvas("#000000"), glow, &[]).pixels(r);
     assert!(at(&pixels, 58, 25)[0] > 20 && at(&pixels, 50, 25) == [255; 3], "{:?}", at(&pixels, 58, 25));
@@ -25,15 +25,15 @@ fn effects_render_their_passes() {
 #[test]
 fn groups_isolate_and_spectra_follow_audio() {
     let Some(r) = renderer() else { return };
-    let layers = json!([{ "id": "g", "type": "group", "opacity": 0.5, "layers": [
-        { "id": "a", "type": "solid", "color": "#ff0000", "size": [60, 50], "transform": { "position": [30, 25] } },
-        { "id": "b", "type": "solid", "color": "#0000ff", "size": [60, 50], "transform": { "position": [70, 25] } }
+    let layers = json!([{ "blend_space": "canvas", "id": "g", "type": "group", "opacity": 0.5, "layers": [
+        { "blend_space": "canvas", "id": "a", "type": "solid", "color": "#ff0000", "size": [60, 50], "transform": { "position": [30, 25] } },
+        { "blend_space": "canvas", "id": "b", "type": "solid", "color": "#0000ff", "size": [60, 50], "transform": { "position": [70, 25] } }
     ] }]);
     check(
         &Shot::new(r, canvas("#000000"), layers, &[]).pixels(r),
         &[((10, 25), [188, 0, 0]), ((50, 25), [0, 0, 188]), ((90, 25), [0, 0, 188])],
     );
-    let bars = json!([{ "id": "s", "type": "spectrum", "size": [100, 50], "bands": 16, "gap": 0.0, "color": "#ffffff" }]);
+    let bars = json!([{ "blend_space": "canvas", "id": "s", "type": "spectrum", "size": [100, 50], "bands": 16, "gap": 0.0, "color": "#ffffff" }]);
     let mut shot = Shot::new(r, canvas("#000000"), bars, &[]);
     check(&shot.pixels(r), &[((3, 25), [0, 0, 0])]);
     let mut audio = AudioFrame { silent: false, ..AudioFrame::default() };
@@ -55,10 +55,10 @@ fn groups_isolate_and_spectra_follow_audio() {
 fn static_parts_are_cached_and_steady_frames_create_nothing() {
     let Some(r) = renderer() else { return };
     let layers = json!([
-        { "id": "img", "type": "image", "image": "rb", "size": [100, 50], "effects": [{ "effect": "blur", "params": { "radius": 4 } }] },
-        { "id": "spin", "type": "solid", "color": "#ffffff", "size": [10, 10], "transform": { "rotation": { "keys": [[0, 0], [10, 360]], "loop": "repeat" } } },
-        { "id": "text", "type": "text", "text": "Hi", "size": 30, "color": "#ffffff", "transform": { "position": [20, 25] } },
-        { "id": "pulse", "type": "solid", "color": "#00ff00", "size": [20, 20], "effects": [{ "effect": "blur", "params": { "radius": 2 } }],
+        { "blend_space": "canvas", "id": "img", "type": "image", "image": "rb", "size": [100, 50], "effects": [{ "effect": "blur", "params": { "radius": 4 } }] },
+        { "blend_space": "canvas", "id": "spin", "type": "solid", "color": "#ffffff", "size": [10, 10], "transform": { "rotation": { "keys": [[0, 0], [10, 360]], "loop": "repeat" } } },
+        { "blend_space": "canvas", "id": "text", "type": "text", "text": "Hi", "size": 30, "color": "#ffffff", "transform": { "position": [20, 25] } },
+        { "blend_space": "canvas", "id": "pulse", "type": "solid", "color": "#00ff00", "size": [20, 20], "effects": [{ "effect": "blur", "params": { "radius": 2 } }],
           "transform": { "position": [80, 25], "scale": { "keys": [[0, [1, 1]], [10, [1.4, 1.4]]], "loop": "pingpong" } } }
     ]);
     let mut shot =
@@ -87,7 +87,7 @@ fn static_parts_are_cached_and_steady_frames_create_nothing() {
 #[test]
 fn a_view_swaps_only_a_changed_image() {
     let Some(r) = renderer() else { return };
-    let layers = json!([{ "id": "img", "type": "image", "image": "photo", "size": [100, 50] }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "img", "type": "image", "image": "photo", "size": [100, 50] }]);
     let (red, blue) =
         (halves([255, 0, 0, 255], [255, 0, 0, 255]), halves([0, 0, 255, 255], [0, 0, 255, 255]));
     let mut shot = Shot::new(r, canvas("#000000"), layers, &[("photo", red.clone())]);

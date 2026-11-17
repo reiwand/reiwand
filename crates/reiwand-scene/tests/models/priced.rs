@@ -5,9 +5,9 @@ fn balls(shadows: bool) -> Runtime {
         .material(ForgeMaterial::new("m", [1.0; 4]))
         .part("b", ForgeShape::Sphere(130), [0.0; 3], 1.0, 0)
         .glb();
-    let sun = json!({ "id": "sun", "type": "light", "light": "directional", "shadows": shadows });
+    let sun = json!({ "blend_space": "canvas", "id": "sun", "type": "light", "light": "directional", "shadows": shadows });
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [8, 8] }, "assets": { "a": { "path": "a.glb" } },
-        "layers": [sun, { "id": "x", "type": "model", "model": "a" }] });
+        "layers": [sun, { "blend_space": "canvas", "id": "x", "type": "model", "model": "a" }] });
     let mut scene = Scene::from_json(&text.to_string()).unwrap();
     scene.adopt(&BTreeMap::new(), |_: &str, _: usize| Ok::<_, String>(ball.clone())).unwrap();
     runtime(scene)

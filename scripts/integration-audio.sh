@@ -15,10 +15,10 @@ def package(name, scene, files, inputs=(), features=()):
         out.write(sys.argv[2], "preview.png")
         for path, text in files.items():
             out.writestr(path, text)
-package("sea", {"layers": [{"id": "bars", "type": "spectrum", "size": [64, 32], "bands": 16}]}, {}, ["audio"], ["inputs.audio"])
-package("twin", {"layers": [{"id": "bars", "type": "spectrum", "size": [64, 32], "bands": 32}]}, {}, ["audio"], ["inputs.audio"])
+package("sea", {"layers": [{ "blend_space": "canvas", "id": "bars", "type": "spectrum", "size": [64, 32], "bands": 16}]}, {}, ["audio"], ["inputs.audio"])
+package("twin", {"layers": [{ "blend_space": "canvas", "id": "bars", "type": "spectrum", "size": [64, 32], "bands": 32}]}, {}, ["audio"], ["inputs.audio"])
 tint = "import { scene } from 'reiwand';\nexport function update() { scene.layer('tint').color = [1, 0, 0, 1]; }\n"
-package("spin", {"layers": [{"id": "tint", "type": "solid", "color": "#0000ff"}],
+package("spin", {"layers": [{ "blend_space": "canvas", "id": "tint", "type": "solid", "color": "#0000ff"}],
                  "scripts": [{"path": "scripts/tint.js"}]}, {"scripts/tint.js": tint}, (), ["scripts"])
 PACKAGE
 imported() {

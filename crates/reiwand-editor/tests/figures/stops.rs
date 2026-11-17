@@ -8,7 +8,7 @@ fn stop(p: &mut reiwand_editor::Project, stop: Value) -> anyhow::Result<()> {
 #[test]
 fn stops_are_added_moved_recoloured_and_removed_in_order() {
     let root = tempfile::tempdir().unwrap();
-    let layer = json!({"id": "g", "type": "shape", "shape": {"rect": {"size": [100, 100]}}});
+    let layer = json!({ "blend_space": "canvas", "id": "g", "type": "shape", "shape": {"rect": {"size": [100, 100]}}});
     let mut p = scene(&root, json!([layer]));
     assert!(stop(&mut p, json!({"add": {"at": 0.5}})).is_err());
     stop(&mut p, json!({"make": {"radial": true}})).unwrap();

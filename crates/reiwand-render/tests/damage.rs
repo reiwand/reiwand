@@ -13,12 +13,12 @@ fn layers(post: Value) -> Value {
     let spin = json!({ "timeline": "spin", "keys": [[0, 0], [4, 360]] });
     let slide = json!({ "timeline": "spin", "keys": [[0, [30, 60]], [4, [130, 60]]] });
     json!([
-        { "id": "back", "type": "image", "image": "photo", "size": [160, 90], "effects": [{ "effect": "blur", "params": { "radius": 4 } }] },
-        { "id": "star", "type": "shape", "shape": { "star": { "points": 5, "size": 24 } }, "fill": "#ffcc66",
+        { "blend_space": "canvas", "id": "back", "type": "image", "image": "photo", "size": [160, 90], "effects": [{ "effect": "blur", "params": { "radius": 4 } }] },
+        { "blend_space": "canvas", "id": "star", "type": "shape", "shape": { "star": { "points": 5, "size": 24 } }, "fill": "#ffcc66",
           "transform": { "position": [40, 30], "rotation": spin } },
-        { "id": "card", "type": "solid", "color": "#4060ff80", "size": [40, 30], "blend": "overlay", "transform": { "position": [45, 35] } },
-        { "id": "dot", "type": "shape", "shape": { "ellipse": { "size": [10, 10] } }, "fill": "#ffffff", "transform": { "position": slide } },
-        { "id": "post", "type": "adjustment", "effects": [post] }
+        { "blend_space": "canvas", "id": "card", "type": "solid", "color": "#4060ff80", "size": [40, 30], "blend": "overlay", "transform": { "position": [45, 35] } },
+        { "blend_space": "canvas", "id": "dot", "type": "shape", "shape": { "ellipse": { "size": [10, 10] } }, "fill": "#ffffff", "transform": { "position": slide } },
+        { "blend_space": "canvas", "id": "post", "type": "adjustment", "effects": [post] }
     ])
 }
 
@@ -88,7 +88,7 @@ fn effects_that_read_around_a_change_redraw_what_they_cover() {
 #[test]
 fn the_luminance_grid_follows_the_bright_parts_of_the_frame() {
     let Some(r) = renderer() else { return };
-    let half = json!([{ "id": "white", "type": "solid", "color": "#ffffff", "size": [80, 90], "transform": { "position": [40, 45] } }]);
+    let half = json!([{ "blend_space": "canvas", "id": "white", "type": "solid", "color": "#ffffff", "size": [80, 90], "transform": { "position": [40, 45] } }]);
     let text =
         json!({ "schema": SCHEMA, "canvas": { "size": [160, 90], "background": "#000000" }, "layers": half });
     let scene = Scene::load(&text.to_string(), &Default::default()).unwrap();
@@ -121,11 +121,11 @@ fn the_luminance_grid_follows_the_bright_parts_of_the_frame() {
 fn property_and_script_colour_changes_redraw_the_layers_they_touch() {
     let Some(r) = renderer() else { return };
     let spin = json!({ "timeline": "t", "keys": [[0, 0], [4, 360]] });
-    let dot = json!({ "id": "spin", "type": "shape", "shape": { "ellipse": { "size": [4, 4] } }, "fill": "#000000",
+    let dot = json!({ "blend_space": "canvas", "id": "spin", "type": "shape", "shape": { "ellipse": { "size": [4, 4] } }, "fill": "#000000",
         "transform": { "position": [60, 45], "rotation": spin } });
-    let lit = json!({ "id": "lit", "type": "solid", "color": "#808080", "size": [60, 90], "transform": { "position": [30, 45] },
+    let lit = json!({ "blend_space": "canvas", "id": "lit", "type": "solid", "color": "#808080", "size": [60, 90], "transform": { "position": [30, 45] },
         "brightness": { "prop": "b" } });
-    let hue = json!({ "id": "hue", "type": "group", "layers": [{ "id": "fill", "type": "solid", "color": { "prop": "c" },
+    let hue = json!({ "blend_space": "canvas", "id": "hue", "type": "group", "layers": [{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": { "prop": "c" },
         "size": [60, 90], "transform": { "position": [90, 45] } }] });
     let timelines = [json!({ "id": "t", "duration": 4, "loop": "repeat" })];
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [160, 90], "background": "#000000" },

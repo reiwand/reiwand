@@ -4,8 +4,10 @@ use super::*;
 fn streamed_sounds_are_measured_before_they_are_read() {
     let dir = tempfile::tempdir().unwrap();
     let names = ["a", "b", "c"];
-    let layers: Vec<Value> =
-        names.iter().map(|n| json!({ "id": n, "type": "sound", "sound": n, "stream": true })).collect();
+    let layers: Vec<Value> = names
+        .iter()
+        .map(|n| json!({ "blend_space": "canvas", "id": n, "type": "sound", "sound": n, "stream": true }))
+        .collect();
     let mut assets = json!({ "sky": { "path": "sky.png" } });
     names.iter().for_each(|n| assets[n] = json!({ "path": format!("{n}.ogg") }));
     let text = scene(json!(layers), json!({ "assets": assets }));
@@ -29,7 +31,7 @@ fn streamed_sounds_are_measured_before_they_are_read() {
 fn hostile_package_shaders_are_refused_without_crashing_the_reader() {
     let effects = json!({ "effects": { "ripple": { "descriptor": "effects/ripple.json", "wgsl": "effects/ripple.wgsl" } } });
     let text = scene(
-        json!([{ "id": "sky", "type": "image", "image": "sky", "effects": [{ "effect": "ripple" }] }]),
+        json!([{ "blend_space": "canvas", "id": "sky", "type": "image", "image": "sky", "effects": [{ "effect": "ripple" }] }]),
         effects,
     );
     let descriptor =
@@ -70,7 +72,8 @@ fn only_declared_scripts_name_the_second_script_feature() {
         let more = json!({ "scripts": [declared] });
         write(
             "scene.json",
-            scene(json!([{ "id": "sky", "type": "image", "image": "sky" }]), more).as_bytes(),
+            scene(json!([{ "blend_space": "canvas", "id": "sky", "type": "image", "image": "sky" }]), more)
+                .as_bytes(),
         );
         write("manifest.json", manifest(features).to_json().unwrap().as_bytes());
         reiwand_format::inspect(source.path())

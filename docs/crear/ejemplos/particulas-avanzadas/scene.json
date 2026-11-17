@@ -33,9 +33,9 @@
     }
   },
   "layers": [
-    { "id": "cohetes", "type": "particles", "system": "cohetes", "blend": "add" },
-    { "id": "estrellas", "type": "particles", "system": "estrellas", "blend": "add" },
-    { "id": "luciernagas", "type": "particles", "system": "luciernagas", "blend": "add",
+    { "blend_space": "canvas", "id": "cohetes", "type": "particles", "system": "cohetes", "blend": "add" },
+    { "blend_space": "canvas", "id": "estrellas", "type": "particles", "system": "estrellas", "blend": "add" },
+    { "blend_space": "canvas", "id": "luciernagas", "type": "particles", "system": "luciernagas", "blend": "add",
       "instance": { "alpha": 0.8, "count": 1, "brightness": 1.2 } }
   ]
 }

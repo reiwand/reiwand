@@ -5,7 +5,7 @@ fn wrapped_timelines_blend_their_last_key_into_the_first() {
     let tls = json!([{ "id": "w", "duration": 4, "loop": "repeat", "wrap": true },
                      { "id": "n", "duration": 4, "loop": "repeat" }]);
     let at = |id: &str, t: f64| {
-        let layer = json!([{ "id": "box", "type": "solid", "color": "#ffffff", "size": [10, 10],
+        let layer = json!([{ "blend_space": "canvas", "id": "box", "type": "solid", "color": "#ffffff", "size": [10, 10],
             "transform": { "position": { "timeline": id, "keys": [[1, [0, 0]], [3, [80, 0]]] } } }]);
         let mut rt = runtime(tls.clone(), layer);
         rt.advance(t);
@@ -23,9 +23,9 @@ fn sounds_tell_where_the_scene_says_they_are() {
     let tls =
         json!([{ "id": "t", "duration": 10, "loop": "repeat", "events": [{ "t": 4, "name": "ring" }] }]);
     let layers = json!([
-        { "id": "always", "type": "sound", "sound": "a" },
-        { "id": "keyed", "type": "sound", "sound": "a", "play": { "timeline": "t", "keys": [[0, false], [2, true], [6, false]] } },
-        { "id": "rung", "type": "sound", "sounds": ["a", "b"], "loop": false, "play_on": "event:ring" }]);
+        { "blend_space": "canvas", "id": "always", "type": "sound", "sound": "a" },
+        { "blend_space": "canvas", "id": "keyed", "type": "sound", "sound": "a", "play": { "timeline": "t", "keys": [[0, false], [2, true], [6, false]] } },
+        { "blend_space": "canvas", "id": "rung", "type": "sound", "sounds": ["a", "b"], "loop": false, "play_on": "event:ring" }]);
     let mut rt = runtime(tls, layers);
     rt.set_lengths(BTreeMap::from([("a".into(), 1.0), ("b".into(), 2.0)]));
     rt.advance(3.0);
@@ -111,7 +111,7 @@ fn only_what_the_platform_runs_listens_to_events() {
                      { "id": "m", "duration": 1, "trigger": "event:go" }]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "timelines": tls,
         "assets": { "a": { "path": "a.ogg" } }, "scripts": [{ "path": "s.js" }],
-        "layers": [{ "id": "bell", "type": "sound", "sound": "a", "play_on": "event:tick" }] });
+        "layers": [{ "blend_space": "canvas", "id": "bell", "type": "sound", "sound": "a", "play_on": "event:tick" }] });
     let mut rt = Runtime::new(Arc::new(Scene::from_json(&text.to_string()).unwrap()), Values::new());
     let wake = |rt: &Runtime| rt.frame([0.0, 0.0, 100.0, 50.0], Quality::Q3).wake;
     assert_eq!(wake(&rt), Wake::At(1.0), "scripts and sounds hear every event");

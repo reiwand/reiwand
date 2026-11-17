@@ -14,7 +14,7 @@ cómo se dibujan. La receta va en `particles` de `scene.json`, con un id por sis
 `particles` la dibuja.
 
 ```json
-    { "id": "chispas", "type": "particles", "system": "chispas", "blend": "add",
+    { "blend_space": "canvas", "id": "chispas", "type": "particles", "system": "chispas", "blend": "add",
       "instance": { "alpha": 0.9, "count": 1 } }
 ```
 
@@ -243,7 +243,7 @@ Con `perspective`, cada partícula guarda una profundidad `z` y se dibuja más p
 lejos. `init.depth` y `init.depth_speed` la fijan.
 
 ```json
-    { "id": "estrellas", "type": "particles", "system": "estrellas", "blend": "add" }
+    { "blend_space": "canvas", "id": "estrellas", "type": "particles", "system": "estrellas", "blend": "add" }
 ```
 
 ```json
@@ -309,7 +309,7 @@ que suena en el equipo).
 ## Una capa de sonido
 
 ```json
-    { "id": "ambiente", "type": "sound", "sound": "zumbido", "loop": true, "fade_in": 2, "fade_out": 2,
+    { "blend_space": "canvas", "id": "ambiente", "type": "sound", "sound": "zumbido", "loop": true, "fade_in": 2, "fade_out": 2,
       "play": { "prop": "sonido_activo" },
       "volume": { "timeline": "marea", "keys": [[0, 0.3], [10, 0.8, "in_out_sine"], [20, 0.3, "in_out_sine"]] },
       "pan": -0.2 }
@@ -357,7 +357,7 @@ sonido al hacer clic en un botón: su línea de tiempo dispara un evento y la ca
 usa con `play_on`:
 
 ```json
-    { "id": "sonido", "type": "sound", "sound": "toque", "loop": false, "play_on": "event:golpe", "volume": 0.6 }
+    { "blend_space": "canvas", "id": "sonido", "type": "sound", "sound": "toque", "loop": false, "play_on": "event:golpe", "volume": 0.6 }
 ```
 
 ## Que la escena reaccione al sonido
@@ -378,13 +378,13 @@ Hay tres formas:
    `frame.bass`, `frame.beat` y las demás.
 
 ```json
-    { "id": "latido", "type": "shape", "shape": { "ellipse": { "size": [220, 220] } }, "fill": "#ffffff",
+    { "blend_space": "canvas", "id": "latido", "type": "shape", "shape": { "ellipse": { "size": [220, 220] } }, "fill": "#ffffff",
       "opacity": { "audio": "level", "scale": 1.2, "offset": 0.2, "clamp": [0.2, 1], "smooth": 0.1 },
       "transform": { "scale": { "audio": "bass", "scale": 0.5, "offset": 1, "smooth": { "up": 0.03, "down": 0.3 } } } }
 ```
 
 ```json
-    { "id": "anillo", "type": "spectrum", "size": [500, 500], "style": "circle", "bands": 64, "channel": "left",
+    { "blend_space": "canvas", "id": "anillo", "type": "spectrum", "size": [500, 500], "style": "circle", "bands": 64, "channel": "left",
       "color": "#f472b6", "visible": { "prop": "ver_anillo" } }
 ```
 

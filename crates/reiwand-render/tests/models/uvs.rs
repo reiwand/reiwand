@@ -43,7 +43,7 @@ fn card(side: u32, edit: impl Fn(&mut Value, &mut Vec<u8>)) -> Vec<u8> {
 
 fn shot(glb: Vec<u8>) -> Vec<u8> {
     let r = renderer().unwrap();
-    let layer = json!([{ "id": "card", "type": "model", "model": "card" }]);
+    let layer = json!([{ "blend_space": "canvas", "id": "card", "type": "model", "model": "card" }]);
     render(r, scene(json!({}), layer, BTreeMap::from([("card", glb)])), Quality::Q3)
 }
 

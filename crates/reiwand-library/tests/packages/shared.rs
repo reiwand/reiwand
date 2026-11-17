@@ -18,7 +18,7 @@ fn assets_packages_are_listed_apart_from_wallpapers() {
         "origin": { "kind": "original" }, "content": { "rating": "general" }, "photosensitive": false,
         "requires": { "features": ["assets"] } });
     let scene = json!({ "schema": "reiwand.scene/1", "canvas": { "size": [64, 64] },
-        "layers": [{ "id": "glow", "type": "solid", "color": "#ffcc00" }] });
+        "layers": [{ "blend_space": "canvas", "id": "glow", "type": "solid", "color": "#ffcc00" }] });
     fs::write(source.join("manifest.json"), manifest.to_string()).unwrap();
     fs::write(source.join("assets.json"), scene.to_string()).unwrap();
     reiwand_format::build(&source, root.join("parts.wpak"), &Limits::default()).unwrap();

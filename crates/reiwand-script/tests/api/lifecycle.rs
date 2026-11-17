@@ -40,7 +40,7 @@ fn modules_hear_their_lifecycle_and_only_wake_for_events() {
     let params = json!({ "speed": { "type": "number", "default": 3 } });
     let scene = json!({
         "scripts": [{ "path": "main.js", "events": ["init", "properties", "settings", "resize"], "params": params }],
-        "layers": [{ "id": "out", "type": "text", "text": "", "size": 10 }]
+        "layers": [{ "blend_space": "canvas", "id": "out", "type": "text", "text": "", "size": 10 }]
     });
     let mut script = staged(scene, &[("main.js", source)]);
     let one: Values = [("a".to_string(), json!(1)), ("b".into(), json!(2))].into();

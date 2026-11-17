@@ -69,9 +69,9 @@ fn chains_reach_for_bones_and_layers() {
     let rt = reaching(json!("bone:patch"), json!({}));
     assert!(close(at(&rt, "hand"), [0.0, 0.0], 0.01), "{:?}", at(&rt, "hand"));
     let mut rt = layers(json!([
-        { "id": "fox", "type": "mesh", "mesh": "arm", "size": [64, 64],
+        { "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "arm", "size": [64, 64],
           "ik": [{ "chain": ["root", "arm"], "target": "layer:dot" }] },
-        { "id": "dot", "type": "solid", "color": "#ffffff", "size": [2, 2], "transform": { "position": [32, 8] } }
+        { "blend_space": "canvas", "id": "dot", "type": "solid", "color": "#ffffff", "size": [2, 2], "transform": { "position": [32, 8] } }
     ]));
     rt.advance(1.0 / 60.0);
     assert!(close(at(&rt, "hand"), [0.0, 24.0], 0.01), "{:?}", at(&rt, "hand"));

@@ -11,7 +11,7 @@ fn packed(image: &RgbaImage, codec: Codec, mips: bool) -> Arc<Pixels> {
 }
 
 fn shot(r: &Renderer, asset: Value, size: [u32; 2], pixels: Arc<Pixels>) -> Vec<u8> {
-    let layer = json!({ "id": "p", "type": "image", "image": "p", "size": size });
+    let layer = json!({ "blend_space": "canvas", "id": "p", "type": "image", "image": "p", "size": size });
     let text = json!({ "canvas": canvas("#000000"), "assets": { "p": asset }, "layers": [layer] });
     Shot::with(r, text, &[("p", pixels)]).pixels(r)
 }

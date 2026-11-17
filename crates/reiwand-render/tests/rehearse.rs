@@ -78,7 +78,7 @@ fn gpu() -> Option<&'static Renderer> {
 fn clocked(source: &str) -> (reiwand_scene::Scene, SceneAssets) {
     let doc = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [32, 18], "background": "#000000" },
         "scripts": [{ "path": "scripts/hour.js", "events": ["update"], "uses": ["layers", "console"] }],
-        "layers": [{ "id": "lamp", "type": "solid", "color": "#ffffff", "visible": false }] });
+        "layers": [{ "blend_space": "canvas", "id": "lamp", "type": "solid", "color": "#ffffff", "visible": false }] });
     let scene = reiwand_scene::Scene::load(&doc.to_string(), &Default::default()).unwrap();
     let assets =
         SceneAssets { scripts: vec![("scripts/hour.js".into(), source.into())], ..Default::default() };

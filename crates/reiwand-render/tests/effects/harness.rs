@@ -72,11 +72,11 @@ impl Fx {
     pub fn run(self) -> Option<Run> {
         let r = super::super::renderer()?;
         let (effects, adjustment) = match self.adjust {
-            true => (json!([]), Some(json!({ "id": "fx", "type": "adjustment", "effects": self.effects }))),
+            true => (json!([]), Some(json!({ "blend_space": "canvas", "id": "fx", "type": "adjustment", "effects": self.effects }))),
             false => (self.effects, None),
         };
         let image =
-            json!({ "id": "src", "type": "image", "image": "src", "size": [W, H], "effects": effects });
+            json!({ "blend_space": "canvas", "id": "src", "type": "image", "image": "src", "size": [W, H], "effects": effects });
         let layers: Vec<Value> = std::iter::once(image).chain(self.more).chain(adjustment).collect();
         let mut assets = self.assets;
         assets.insert("src".into(), json!({ "path": "src.png" }));

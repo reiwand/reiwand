@@ -44,7 +44,8 @@ fn every_mesh_the_scene_draws_is_edited_and_models_keep_the_bones_of_their_file(
     std::fs::write(p.dir.join("many.glb"), quads(reiwand_scene::MAX_RIG_PIECES)).unwrap();
     act(&mut p, json!({ "set": { "pointer": "/scene/assets/many", "value": { "path": "many.glb" } } }))
         .unwrap();
-    let layer = json!({ "id": "crowd", "type": "mesh", "mesh": "many", "size": [256, 64] });
+    let layer =
+        json!({ "blend_space": "canvas", "id": "crowd", "type": "mesh", "mesh": "many", "size": [256, 64] });
     act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": layer } })).unwrap();
     assert_eq!(
         info(&p, "crowd")["editable"],
@@ -59,7 +60,7 @@ fn every_mesh_the_scene_draws_is_edited_and_models_keep_the_bones_of_their_file(
     std::fs::copy(fixture, p.dir.join("toy.glb")).unwrap();
     act(&mut p, json!({ "set": { "pointer": "/scene/assets/toy", "value": { "path": "toy.glb" } } }))
         .unwrap();
-    let model = json!({ "id": "toy", "type": "model", "model": "toy" });
+    let model = json!({ "blend_space": "canvas", "id": "toy", "type": "model", "model": "toy" });
     act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": model } })).unwrap();
     let shown = info(&p, "toy");
     assert_eq!((&shown["model"], &shown["editable"]), (&json!(true), &json!(false)), "{shown}");

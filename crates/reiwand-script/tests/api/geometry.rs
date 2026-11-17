@@ -23,7 +23,7 @@ fn scene(uses: serde_json::Value) -> serde_json::Value {
     json!({
         "scripts": [{ "path": "main.js", "uses": uses }],
         "pools": { "bars": { "type": "mesh", "max": 2, "max_vertices": 64 } },
-        "layers": [{ "id": "bars", "type": "video", "video": "bars" }, { "id": "info", "type": "text", "text": "", "size": 10 }]
+        "layers": [{ "blend_space": "canvas", "id": "bars", "type": "video", "video": "bars" }, { "blend_space": "canvas", "id": "info", "type": "text", "text": "", "size": 10 }]
     })
 }
 

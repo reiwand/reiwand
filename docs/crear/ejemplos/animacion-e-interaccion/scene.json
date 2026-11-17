@@ -6,15 +6,15 @@
     "toque": { "path": "assets/zumbido.wav" }
   },
   "layers": [
-    { "id": "baile", "type": "image", "image": "bola", "size": [256, 256],
+    { "blend_space": "canvas", "id": "baile", "type": "image", "image": "bola", "size": [256, 256],
       "transform": { "position": [700, 540] },
       "playback": { "rate": 1, "loop": true } },
-    { "id": "boton", "type": "shape", "shape": { "rect": { "size": [360, 140], "radius": 70 } }, "fill": "#3b82f6",
+    { "blend_space": "canvas", "id": "boton", "type": "shape", "shape": { "rect": { "size": [360, 140], "radius": 70 } }, "fill": "#3b82f6",
       "solid": true, "transform": { "position": [1250, 540],
         "scale": { "timeline": "pulsar", "keys": [[0, [1, 1]], [0.15, [0.9, 0.9], "out_quad"], [0.4, [1, 1], "out_back"]] } } },
-    { "id": "etiqueta", "type": "text", "text": "Toca aquí", "font": "sans-serif", "size": 54, "color": "#ffffff",
+    { "blend_space": "canvas", "id": "etiqueta", "type": "text", "text": "Toca aquí", "font": "sans-serif", "size": 54, "color": "#ffffff",
       "parent": "boton", "inherit": ["transform", "visible"] },
-    { "id": "sonido", "type": "sound", "sound": "toque", "loop": false, "play_on": "event:golpe", "volume": 0.6 }
+    { "blend_space": "canvas", "id": "sonido", "type": "sound", "sound": "toque", "loop": false, "play_on": "event:golpe", "volume": 0.6 }
   ],
   "timelines": [
     { "id": "pulsar", "duration": 0.4, "loop": "once", "autoplay": false, "trigger": "click:boton",

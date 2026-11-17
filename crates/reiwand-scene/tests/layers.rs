@@ -11,7 +11,8 @@ fn runtime(canvas: Json, layers: Json) -> Runtime {
 }
 
 fn box_at(id: &str, more: Json) -> Json {
-    let mut layer = json!({ "id": id, "type": "solid", "color": "#ffffff", "size": [10, 10] });
+    let mut layer =
+        json!({ "blend_space": "canvas", "id": id, "type": "solid", "color": "#ffffff", "size": [10, 10] });
     layer.as_object_mut().unwrap().extend(more.as_object().unwrap().clone());
     layer
 }
@@ -109,9 +110,9 @@ fn parallax_adds_a_bound_offset_to_the_pointer_and_layers_may_bind_their_depth()
 #[test]
 fn tints_brightness_and_mask_strength_reach_the_draws() {
     let layers = json!([
-        { "id": "img", "type": "image", "image": "a", "color": { "keys": [[0, "#ff0000"], [1, "#ff0000"]] },
+        { "blend_space": "canvas", "id": "img", "type": "image", "image": "a", "color": { "keys": [[0, "#ff0000"], [1, "#ff0000"]] },
           "brightness": 3, "mask": { "shape": { "ellipse": { "size": [5, 5] } }, "strength": 0.25 } },
-        { "id": "g", "type": "group", "color": "#00ff00", "layers": [box_at("in", json!({}))] }
+        { "blend_space": "canvas", "id": "g", "type": "group", "color": "#00ff00", "layers": [box_at("in", json!({}))] }
     ]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": layers,
         "assets": { "a": { "path": "a.png" } } });

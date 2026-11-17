@@ -6,7 +6,7 @@ use image::{Rgba, RgbaImage};
 const AWAY: &str = "fn particle(p: Sprite) -> Sprite {\n    var o = p;\n    o.position = p.position + vec2<f32>(20.0, 0.0);\n    return o;\n}\n";
 
 fn lamp(x: f32) -> Value {
-    json!({ "id": "lamp", "type": "light", "transform": { "position": [x, 40] }, "z": 20, "radius": 60,
+    json!({ "blend_space": "canvas", "id": "lamp", "type": "light", "transform": { "position": [x, 40] }, "z": 20, "radius": 60,
         "intensity": 2 })
 }
 
@@ -22,7 +22,7 @@ fn rope(render: Value) -> Value {
 }
 
 fn strung(r: &Renderer, render: Value, mut layers: Vec<Value>, gpu: bool) -> Option<Vec<u8>> {
-    layers.push(json!({ "id": "p", "type": "particles", "system": "s" }));
+    layers.push(json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s" }));
     let assets =
         json!({ "stripes": { "path": "stripes.png" }, "bump": { "path": "bump.png", "linear": true } });
     let stripes = RgbaImage::from_fn(160, 80, |_, y| Rgba(if y % 4 < 2 { [0, 0, 0, 255] } else { [255; 4] }));
@@ -69,7 +69,7 @@ fn ropes_and_trails_take_the_scene_lights() {
 #[test]
 fn ropes_refract_what_is_behind_them() {
     let Some(r) = renderer() else { return };
-    let back = json!({ "id": "back", "type": "image", "image": "stripes", "size": [160, 80],
+    let back = json!({ "blend_space": "canvas", "id": "back", "type": "image", "image": "stripes", "size": [160, 80],
         "transform": { "position": [80, 40] } });
     let bend =
         json!({ "rope": { "width": 12, "subdivide": 2 }, "refract": { "normal": "bump", "amount": 1 } });
@@ -97,7 +97,7 @@ fn particle_shaders_refract_what_is_behind_them() {
         ("effects/same.json", r#"{ "id": "same", "stage": "particle", "cost": {} }"#),
         ("effects/same.wgsl", AWAY),
     ];
-    let back = json!({ "id": "back", "type": "image", "image": "pair", "size": [160, 80],
+    let back = json!({ "blend_space": "canvas", "id": "back", "type": "image", "image": "pair", "size": [160, 80],
         "transform": { "position": [80, 40] } });
     let bend = |amount: f32| {
         dot(

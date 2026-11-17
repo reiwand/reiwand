@@ -7,12 +7,12 @@ fn lamp(shafts: f32) -> Value {
 }
 
 fn sized(shafts: f32, radius: u32) -> Value {
-    json!({ "id": "lamp", "type": "light", "transform": { "position": [80, 45] }, "z": 10, "radius": radius,
+    json!({ "blend_space": "canvas", "id": "lamp", "type": "light", "transform": { "position": [80, 45] }, "z": 10, "radius": radius,
         "intensity": 0.4, "volumetric": { "density": 0.8, "samples": 16, "shafts": shafts } })
 }
 
 fn half() -> Value {
-    json!({ "id": "half", "type": "image", "image": "mask", "size": [160, 90], "opacity": 0.3,
+    json!({ "blend_space": "canvas", "id": "half", "type": "image", "image": "mask", "size": [160, 90], "opacity": 0.3,
         "transform": { "position": [80, 45] } })
 }
 
@@ -27,7 +27,7 @@ fn glow(lit: &image::RgbaImage, below: &image::RgbaImage, x: u32) -> i32 {
 
 #[test]
 fn layers_above_a_light_cover_its_air() {
-    let wall = json!({ "id": "wall", "type": "image", "image": "wall", "size": [160, 90], "transform": { "position": [80, 45] } });
+    let wall = json!({ "blend_space": "canvas", "id": "wall", "type": "image", "image": "wall", "size": [160, 90], "transform": { "position": [80, 45] } });
     let (Some(under), Some(over), Some(plain)) =
         (shot(json!([lamp(0.0), wall.clone()])), shot(json!([wall.clone(), lamp(0.0)])), shot(json!([wall])))
     else {
@@ -62,7 +62,7 @@ fn still_shafts_are_drawn_once_and_a_moving_layer_behind_redraws_the_air() {
     assert_eq!(still.pixels(r, Quality::Q3), first);
     assert_eq!(still.view.stats().draws, 0, "{:?}", still.view.stats());
     let spin = json!({ "timeline": "go", "keys": [[0, 0], [4, 360]] });
-    let dot = json!({ "id": "dot", "type": "shape", "shape": { "rect": { "size": [6, 6] } }, "fill": "#ffffff",
+    let dot = json!({ "blend_space": "canvas", "id": "dot", "type": "shape", "shape": { "rect": { "size": [6, 6] } }, "fill": "#ffffff",
         "transform": { "position": [70, 45], "rotation": spin } });
     let mut moving = Shot::new(r, scene(json!([half(), dot, sized(1.0, 30)]), json!({})), &files(UP));
     moving.pixels(r, Quality::Q3);
@@ -74,7 +74,7 @@ fn still_shafts_are_drawn_once_and_a_moving_layer_behind_redraws_the_air() {
 
 #[test]
 fn an_evenly_dark_background_still_lets_the_shafts_glow() {
-    let dim = json!({ "id": "dim", "type": "shape", "shape": { "rect": { "size": [160, 90] } }, "fill": "#181818",
+    let dim = json!({ "blend_space": "canvas", "id": "dim", "type": "shape", "shape": { "rect": { "size": [160, 90] } }, "fill": "#181818",
         "transform": { "position": [80, 45] } });
     let (Some(plain), Some(cut)) = (shot(json!([dim.clone()])), shot(json!([dim, lamp(1.0)]))) else {
         return;

@@ -7,7 +7,7 @@ fn masks_and_particle_textures_follow_settings() {
     let scene = |two: &str| {
         json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] },
             "assets": { "one": { "path": "one.png" }, two: { "path": "two.png" } },
-            "layers": [{ "id": "veil", "type": "solid", "color": "#000000", "size": [64, 32], "mask": { "texture": mapped } }],
+            "layers": [{ "blend_space": "canvas", "id": "veil", "type": "solid", "color": "#000000", "size": [64, 32], "mask": { "texture": mapped } }],
             "particles": { "dust": { "capacity": 10, "emitters": [{ "shape": { "point": [32, 16] }, "rate": 5 }],
                 "init": { "life": [1, 2] }, "render": { "texture": mapped } } } })
         .to_string()
@@ -58,7 +58,7 @@ fn bindings_follow_values_and_triggers_follow_buttons() {
     let props = sample();
     let scene = |prop: &str, trigger: &str| {
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "assets": { "sky": { "path": "sky.png" } },
-            "layers": [{ "id": "a", "type": "solid", "color": "#000000", "opacity": { "prop": prop } }],
+            "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#000000", "opacity": { "prop": prop } }],
             "timelines": [{ "id": "t", "duration": 1, "trigger": trigger }] });
         Scene::from_json(&text.to_string()).unwrap().validate(&props)
     };

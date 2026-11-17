@@ -10,7 +10,7 @@ fn plane(m: ForgeMaterial) -> Vec<u8> {
 }
 
 fn shaded(model: &str, material: Value) -> Value {
-    json!([{ "id": "m", "type": "model", "model": model, "materials": { "skin": material } }])
+    json!([{ "blend_space": "canvas", "id": "m", "type": "model", "model": model, "materials": { "skin": material } }])
 }
 
 fn covered(px: &[u8]) -> usize {

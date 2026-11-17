@@ -4,8 +4,8 @@ use image::{Rgba, RgbaImage};
 
 fn scene(shape: Value, at: [f32; 2]) -> (Value, Value, Value) {
     let systems = json!({ "s": system(shape, json!({}), json!({})) });
-    let layers = json!([{ "id": "src", "type": "image", "image": "pic", "transform": { "position": at } },
-        { "id": "p", "type": "particles", "system": "s", "blend": "add" }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "src", "type": "image", "image": "pic", "transform": { "position": at } },
+        { "blend_space": "canvas", "id": "p", "type": "particles", "system": "s", "blend": "add" }]);
     (systems, layers, json!({ "pic": { "path": "pic.png" } }))
 }
 

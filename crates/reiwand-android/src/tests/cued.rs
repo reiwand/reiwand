@@ -6,7 +6,7 @@ use std::fs::{self, File};
 
 pub(super) fn cued() {
     let source = tempfile::tempdir().unwrap();
-    let layers = json!([{ "id": "box", "type": "solid", "color": "#ffffff", "size": [16, 16],
+    let layers = json!([{ "blend_space": "canvas", "id": "box", "type": "solid", "color": "#ffffff", "size": [16, 16],
         "opacity": { "timeline": "fade", "keys": [[0, 0], [1, 1]] } }]);
     let events = json!([{ "t": 1, "name": "tock" }, { "t": 3, "name": "go" }]);
     let timelines = json!([{ "id": "clock", "duration": 4, "events": events },

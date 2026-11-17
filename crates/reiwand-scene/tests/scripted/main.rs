@@ -11,10 +11,10 @@ const VIEW: [f32; 4] = [0.0, 0.0, 100.0, 50.0];
 
 fn runtime(extra: serde_json::Value) -> Runtime {
     let mut doc = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] },
-        "templates": { "bar": { "id": "bar", "type": "group", "layers": [{ "id": "fill", "type": "solid", "color": "#ffffff", "size": [4, 10] }] } },
+        "templates": { "bar": { "blend_space": "canvas", "id": "bar", "type": "group", "layers": [{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ffffff", "size": [4, 10] }] } },
         "layers": [
-            { "id": "back", "type": "solid", "color": "#000000", "effects": [{ "effect": "blur", "name": "soft" }, { "effect": "water_ripple" }] },
-            { "id": "label", "type": "text", "text": "a", "size": 12, "font": "serif" }
+            { "blend_space": "canvas", "id": "back", "type": "solid", "color": "#000000", "effects": [{ "effect": "blur", "name": "soft" }, { "effect": "water_ripple" }] },
+            { "blend_space": "canvas", "id": "label", "type": "text", "text": "a", "size": 12, "font": "serif" }
         ] });
     for (k, v) in extra.as_object().into_iter().flatten() {
         doc[k] = v.clone();

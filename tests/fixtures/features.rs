@@ -70,7 +70,7 @@ pub fn effects() -> Value {
             .collect();
         json!({ "effect": d.id, "params": params })
     });
-    let layer = |(i, e): (usize, Value)| json!({ "id": format!("e{i}"), "type": "image", "image": "sky", "effects": [e] });
+    let layer = |(i, e): (usize, Value)| json!({ "blend_space": "canvas", "id": format!("e{i}"), "type": "image", "image": "sky", "effects": [e] });
     let layers: Vec<Value> = used.chain(set).enumerate().map(layer).collect();
     json!({ "manifest": { "inputs": ["audio", "pointer", "clicks"] }, "scene": { "layers": layers } })
 }

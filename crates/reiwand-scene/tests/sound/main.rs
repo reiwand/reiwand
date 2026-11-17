@@ -20,6 +20,7 @@ fn scene(sounds: Json) -> Scene {
 fn issues(layer: Json) -> Vec<Issue> {
     let mut layer = layer;
     layer["id"] = json!("s");
+    layer["blend_space"] = json!("canvas");
     layer["type"] = json!("sound");
     layer.as_object_mut().unwrap().entry("sound").or_insert(json!("wind"));
     scene(json!([layer])).validate(&props())

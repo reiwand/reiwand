@@ -2,8 +2,8 @@ use super::*;
 
 fn bright(canvas: Value) -> Scene {
     let mut doc = json!({ "schema": SCHEMA, "canvas": { "size": [SIDE, SIDE], "background": "#000000" },
-        "layers": [{ "id": "glow", "type": "solid", "color": "#ff4020", "brightness": 4 },
-                   { "id": "mid", "type": "solid", "color": "#808080", "size": [16, 16] }] });
+        "layers": [{ "blend_space": "canvas", "id": "glow", "type": "solid", "color": "#ff4020", "brightness": 4 },
+                   { "blend_space": "canvas", "id": "mid", "type": "solid", "color": "#808080", "size": [16, 16] }] });
     canvas.as_object().unwrap().iter().for_each(|(k, v)| doc["canvas"][k] = v.clone());
     Scene::from_json(&doc.to_string()).unwrap()
 }
@@ -28,7 +28,8 @@ fn tone_maps_bend_bright_colors_and_none_keeps_the_old_picture() {
 fn bright_models_keep_their_light_past_white_with_hdr() {
     let Some(r) = renderer() else { return };
     let models = BTreeMap::from([("lamp", cube(unlit("paint", [1.0, 0.25, 0.1, 1.0])))]);
-    let layer = json!([{ "id": "cube", "type": "model", "model": "lamp", "brightness": 6 }]);
+    let layer =
+        json!([{ "blend_space": "canvas", "id": "cube", "type": "model", "model": "lamp", "brightness": 6 }]);
     let canvas = json!({ "canvas": { "size": [SIDE, SIDE], "background": "#000000", "hdr": true, "tonemap": "aces" } });
     let px = render(r, scene(canvas, layer.clone(), models.clone()), Quality::Q3);
     let flat = render(r, scene(json!({}), layer, models), Quality::Q3);

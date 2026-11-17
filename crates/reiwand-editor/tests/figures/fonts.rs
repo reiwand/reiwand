@@ -8,7 +8,7 @@ fn list(p: &reiwand_editor::Project, layer: &str) -> Value {
 #[test]
 fn the_picker_lists_system_families_package_fonts_and_the_state_of_the_chain() {
     let root = tempfile::tempdir().unwrap();
-    let layer = json!({"id": "t", "type": "text", "text": "x", "font": "sans-serif", "fallback": ["Nothing Installed Here"]});
+    let layer = json!({ "blend_space": "canvas", "id": "t", "type": "text", "text": "x", "font": "sans-serif", "fallback": ["Nothing Installed Here"]});
     let mut p = scene(&root, json!([layer]));
     act(&mut p, json!({"set": {"pointer": "/scene/assets/body", "value": {"path": "assets/body.ttf"}}}))
         .unwrap();
@@ -27,7 +27,7 @@ fn the_picker_lists_system_families_package_fonts_and_the_state_of_the_chain() {
 #[test]
 fn the_font_and_its_fallback_list_are_set_and_cleared() {
     let root = tempfile::tempdir().unwrap();
-    let mut p = scene(&root, json!([{"id": "t", "type": "text", "text": "x"}]));
+    let mut p = scene(&root, json!([{ "blend_space": "canvas", "id": "t", "type": "text", "text": "x"}]));
     act(&mut p, json!({"layer": {"figure": {"fonts": {"layer": "t", "font": "serif", "fallback": ["monospace", "sans-serif"]}}}})).unwrap();
     assert_eq!(at(&p, "/scene/layers/0/font"), json!("serif"));
     assert_eq!(at(&p, "/scene/layers/0/fallback"), json!(["monospace", "sans-serif"]));
@@ -36,7 +36,8 @@ fn the_font_and_its_fallback_list_are_set_and_cleared() {
     act(&mut p, json!({"layer": {"figure": {"fonts": {"layer": "t", "font": "", "fallback": []}}}})).unwrap();
     assert_eq!(at(&p, "/scene/layers/0/font"), Value::Null);
     assert_eq!(at(&p, "/scene/layers/0/fallback"), Value::Null);
-    let shape = json!({"id": "s", "type": "shape", "shape": {"rect": {"size": [10, 10]}}});
+    let shape =
+        json!({ "blend_space": "canvas", "id": "s", "type": "shape", "shape": {"rect": {"size": [10, 10]}}});
     let mut q = scene(&root, json!([shape]));
     assert!(act(&mut q, json!({"layer": {"figure": {"fonts": {"layer": "s", "font": "serif"}}}})).is_err());
 }

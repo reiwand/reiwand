@@ -75,7 +75,7 @@ fn a_picture_becomes_the_cover_with_its_placeholder_and_back() {
     act(
         &mut p,
         json!({ "set": { "pointer": "/scene/layers/0", "value":
-        { "id": "art", "type": "image", "image": "cover", "size": [200, 200] } } }),
+        { "blend_space": "canvas", "id": "art", "type": "image", "image": "cover", "size": [200, 200] } } }),
     )
     .unwrap();
     let problems = reiwand_editor::package::problems(&p.dir, &p.doc);
@@ -114,7 +114,7 @@ fn choosing_the_cover_for_a_field_never_turns_a_plain_picture_into_one_and_undoe
     act(
         &mut p,
         json!({ "set": { "pointer": "/scene/layers/0", "value":
-        { "id": "art", "type": "image", "image": "cover", "size": [64, 64] } } }),
+        { "blend_space": "canvas", "id": "art", "type": "image", "image": "cover", "size": [64, 64] } } }),
     )
     .unwrap();
     let plain = p.doc["scene"]["assets"]["cover"].clone();
@@ -152,14 +152,14 @@ fn the_own_clock_switch_shows_only_where_named_video_files_play() {
     let clock = json!({ "own_clock": false });
     doc["scene"]["pools"] = json!({ "bars": { "type": "mesh", "max": 2, "max_vertices": 8 } });
     doc["scene"]["layers"] = json!([
-        { "id": "film", "type": "video", "video": "clip", "playback": clock },
-        { "id": "still", "type": "image", "image": "sky", "playback": clock },
-        { "id": "bars", "type": "video", "video": "bars", "playback": clock },
-        { "id": "picked", "type": "video", "video": { "prop": "film", "map": { "x": "clip" } }, "playback": clock },
-        { "id": "own", "type": "video", "video": { "prop": "film" }, "playback": clock },
-        { "id": "chosen", "type": "video", "video": { "prop": "pick" }, "playback": clock },
-        { "id": "photo", "type": "video", "video": { "prop": "shot" }, "playback": clock },
-        { "id": "first", "type": "video", "video": { "prop": "lead" }, "playback": clock }
+        { "blend_space": "canvas", "id": "film", "type": "video", "video": "clip", "playback": clock },
+        { "blend_space": "canvas", "id": "still", "type": "image", "image": "sky", "playback": clock },
+        { "blend_space": "canvas", "id": "bars", "type": "video", "video": "bars", "playback": clock },
+        { "blend_space": "canvas", "id": "picked", "type": "video", "video": { "prop": "film", "map": { "x": "clip" } }, "playback": clock },
+        { "blend_space": "canvas", "id": "own", "type": "video", "video": { "prop": "film" }, "playback": clock },
+        { "blend_space": "canvas", "id": "chosen", "type": "video", "video": { "prop": "pick" }, "playback": clock },
+        { "blend_space": "canvas", "id": "photo", "type": "video", "video": { "prop": "shot" }, "playback": clock },
+        { "blend_space": "canvas", "id": "first", "type": "video", "video": { "prop": "lead" }, "playback": clock }
     ]);
     doc["scene"]["assets"]["clip"] = json!({ "path": "clip.webm" });
     doc["manifest"]["properties"] = json!({ "pick": { "type": "file", "accept": ["video"] }, "shot": { "type": "file" },
@@ -177,8 +177,8 @@ fn the_own_clock_switch_shows_only_where_named_video_files_play() {
 fn own_clocks_are_listed_with_their_range_speed_and_where_they_are() {
     let mut doc = starter("empty", "org.example.clocks", "Clocks", "en").unwrap();
     doc["scene"]["assets"]["clip"] = json!({ "path": "clip.webm" });
-    doc["scene"]["layers"] = json!([{ "id": "film", "type": "video", "video": "clip",
-        "playback": { "own_clock": true, "start": 0.5, "end": 2.5, "rate": 2 } }, { "id": "plain", "type": "video", "video": "clip" }]);
+    doc["scene"]["layers"] = json!([{ "blend_space": "canvas", "id": "film", "type": "video", "video": "clip",
+        "playback": { "own_clock": true, "start": 0.5, "end": 2.5, "rate": 2 } }, { "blend_space": "canvas", "id": "plain", "type": "video", "video": "clip" }]);
     let found = reiwand_editor::clocks::clocks(std::path::Path::new("/nonexistent"), &doc, 1.5, 0);
     let list = found["clocks"].as_array().unwrap();
     assert_eq!(list.len(), 1, "{found}");

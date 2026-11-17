@@ -34,8 +34,8 @@ manifest = {"schema": "reiwand.wpak/2", "id": "org.example.glow", "version": "1.
             "presets": [{"id": "warm", "values": {"tint": "#ff0000"}}]}
 scene = {"schema": "reiwand.scene/1", "canvas": {"size": [64, 32], "fit": "stretch"},
          "assets": {"backdrop": {"path": "assets/backdrop.png"}},
-         "layers": [{"id": "backdrop", "type": "image", "image": "backdrop"},
-                    {"id": "tint", "type": "solid", "color": {"prop": "tint"}, "size": [32, 16]}]}
+         "layers": [{ "blend_space": "canvas", "id": "backdrop", "type": "image", "image": "backdrop"},
+                    { "blend_space": "canvas", "id": "tint", "type": "solid", "color": {"prop": "tint"}, "size": [32, 16]}]}
 with zipfile.ZipFile(sys.argv[1], "w") as package:
     package.writestr("manifest.json", json.dumps(manifest))
     package.writestr("scene.json", json.dumps(scene))
@@ -89,7 +89,7 @@ manifest = {"schema": "reiwand.wpak/2", "id": "org.example.clip", "version": "1.
             "content": {"rating": "general"}, "photosensitive": False, "origin": {"kind": "original"}, "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "previews": {"thumbnail": "preview.png"}}
 scene = {"schema": "reiwand.scene/1", "canvas": {"size": [64, 32], "fit": "stretch"},
          "assets": {"clip": {"path": "assets/clip.webm"}},
-         "layers": [{"id": "clip", "type": "video", "video": "clip", "size": [64, 32]}]}
+         "layers": [{ "blend_space": "canvas", "id": "clip", "type": "video", "video": "clip", "size": [64, 32]}]}
 with zipfile.ZipFile(sys.argv[1], "w") as package:
     package.writestr("manifest.json", json.dumps(manifest))
     package.writestr("scene.json", json.dumps(scene))
@@ -116,10 +116,10 @@ knobs = dict(common, id="org.example.knobs", title="Knobs", kind="scene", entry=
 scene = {"schema": "reiwand.scene/1", "canvas": {"size": [64, 32], "fit": "stretch"},
          "assets": {"backdrop": {"path": "assets/backdrop.png"}},
          "timelines": [{"id": "flash", "duration": 2, "autoplay": False, "trigger": "prop:flash"}],
-         "layers": [{"id": "backdrop", "type": "image", "image": {"prop": "photo"}},
-                    {"id": "tint", "type": "solid", "color": {"prop": "tint"}, "size": [32, 16],
+         "layers": [{ "blend_space": "canvas", "id": "backdrop", "type": "image", "image": {"prop": "photo"}},
+                    { "blend_space": "canvas", "id": "tint", "type": "solid", "color": {"prop": "tint"}, "size": [32, 16],
                      "opacity": {"prop": "mood", "map": {"1": 1, "2": 0}}},
-                    {"id": "flash", "type": "solid", "color": "#ffffff", "size": [64, 32],
+                    { "blend_space": "canvas", "id": "flash", "type": "solid", "color": "#ffffff", "size": [64, 32],
                      "visible": {"timeline": "flash", "keys": [[0, False], [0.05, True], [2, False]]}}]}
 reel = dict(common, id="org.example.reel", title="Reel", kind="video", entry="loop.webm",
             requires={"features": ["video_properties", "accent"]}, playback={"speed": 2, "start": 0.6, "volume": 0.5},

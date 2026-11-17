@@ -104,7 +104,7 @@ class ShortcutTest : SceneBase() {
         const val APART_MS = 1_100L
         const val SHORTCUT_SCENE = """{ "schema": "reiwand.scene/1", "canvas": { "size": [64, 64] },
             "scripts": [{ "path": "open.js", "events": ["init", "click"], "uses": ["layers", "clicks", "shortcuts"] }],
-            "layers": [{ "id": "button", "type": "solid", "color": "#2040c0", "size": [32, 64], "solid": true,
+            "layers": [{ "blend_space": "canvas", "id": "button", "type": "solid", "color": "#2040c0", "size": [32, 64], "solid": true,
                         "transform": { "position": [16, 32] } }] }"""
         const val SHORTCUT_SCRIPT = """import { scene, openShortcut } from "reiwand";
 export function init() { scene.layer("button").on("click", () => { openShortcut("open"); }); }

@@ -133,8 +133,8 @@ fn image_variants_of_another_shape_are_reported() {
     );
     let scene = json!({ "schema": "reiwand.scene/1", "canvas": { "size": [64, 32] },
         "assets": { "day": { "path": "day.png" }, "night": { "path": "night.png" } },
-        "layers": [{ "id": "sky", "type": "image", "image": { "prop": "sky", "map": { "day": "day", "night": "night" } } },
-                   { "id": "veil", "type": "solid", "color": "#000000", "size": [64, 32],
+        "layers": [{ "blend_space": "canvas", "id": "sky", "type": "image", "image": { "prop": "sky", "map": { "day": "day", "night": "night" } } },
+                   { "blend_space": "canvas", "id": "veil", "type": "solid", "color": "#000000", "size": [64, 32],
                      "mask": { "texture": { "prop": "sky", "map": { "day": "day", "night": "night" } } } }],
         "particles": { "dust": { "capacity": 10, "emitters": [{ "shape": { "point": [32, 16] }, "rate": 5 }],
                                 "init": { "life": [1, 2] }, "render": { "texture": { "prop": "sky", "map": { "day": "day", "night": "night" } } } } } });

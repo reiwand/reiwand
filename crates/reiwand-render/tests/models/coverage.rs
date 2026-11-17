@@ -1,13 +1,13 @@
 use super::*;
 
 fn placed(id: &str, asset: &str, at: [f32; 3], extra: Value) -> Value {
-    let mut l = json!({ "id": id, "type": "model", "model": asset, "position": at });
+    let mut l = json!({ "blend_space": "canvas", "id": id, "type": "model", "model": asset, "position": at });
     extra.as_object().unwrap().iter().for_each(|(k, v)| l[k] = v.clone());
     l
 }
 
 fn world(layers: Value) -> Value {
-    json!([{ "id": "world", "type": "group", "space": "3d", "layers": layers }])
+    json!([{ "blend_space": "canvas", "id": "world", "type": "group", "space": "3d", "layers": layers }])
 }
 
 fn card(m: ForgeMaterial) -> Vec<u8> {
@@ -52,7 +52,7 @@ fn a_lone_model_at_half_opacity_is_drawn_at_half_once() {
     let Some(r) = renderer() else { return };
     let models = BTreeMap::from([("red", cube(unlit("paint", [1.0, 0.0, 0.0, 1.0])))]);
     let half = json!([placed("m", "red", [0.0; 3], json!({ "opacity": 0.5 }))]);
-    let flat = json!([{ "id": "s", "type": "solid", "color": "#ff0000", "size": [16, 16], "opacity": 0.5 }]);
+    let flat = json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ff0000", "size": [16, 16], "opacity": 0.5 }]);
     let want = rgb(&render(r, scene(json!({}), flat, models.clone()), Quality::Q3), 32, 32);
     assert!(want[0] > 100 && want[0] < 200, "{want:?}");
     let px = render(r, scene(json!({}), half, models.clone()), Quality::Q3);

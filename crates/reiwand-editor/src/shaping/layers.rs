@@ -132,6 +132,10 @@ pub(crate) fn edit(dir: &Path, doc: &Value, e: &L) -> Result<Vec<Op>> {
             let (path, _) = layer(doc, id)?;
             set(doc, &format!("{path}/blend"), json!(blend))
         }
+        L::BlendSpace { layer: id, space } => {
+            let (path, _) = layer(doc, id)?;
+            set(doc, &format!("{path}/blend_space"), json!(space))
+        }
         L::Depth { layer: id, depth, replace } => super::glide::depth(doc, id, *depth, *replace)?,
         L::Instance { layer: id, values, clear } => {
             let (path, found) = layer(doc, id)?;

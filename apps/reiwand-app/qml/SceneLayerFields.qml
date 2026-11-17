@@ -9,7 +9,7 @@ ColumnLayout {
     required property var page
     required property var node
     readonly property var everyday: ["transform", "size", "opacity", "visible", "anchor"]
-    readonly property var sections: [["blend", App.tr("Color and blending"), ["blend", "brightness", "lighting", "solid", "cache"]], ["depth", App.tr("Depth"), ["parallax", "depth_test", "attach", "inherit", "parent"]], ["mask", App.tr("Mask"), ["mask"]]]
+    readonly property var sections: [["blend", App.tr("Color and blending"), ["blend", "blend_space", "brightness", "lighting", "solid", "cache"]], ["depth", App.tr("Depth"), ["parallax", "depth_test", "attach", "inherit", "parent"]], ["mask", App.tr("Mask"), ["mask"]]]
     readonly property var kinds: ({
             "image": App.tr("Image and crop"),
             "text": App.tr("Lettering and color"),
@@ -125,7 +125,7 @@ ColumnLayout {
         SceneFieldList {
             Layout.fillWidth: true
             page: groups.page
-            rows: blendFold.reached ? groups.rows(groups.sections[0][2]).filter(field => field.key !== "blend") : []
+            rows: blendFold.reached ? groups.rows(groups.sections[0][2]).filter(field => field.key !== "blend" && field.key !== "blend_space") : []
         }
     }
 

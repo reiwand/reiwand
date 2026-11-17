@@ -14,7 +14,7 @@ const FILES: [&str; 5] =
 
 const SCENE: &str = r#"{"schema": "reiwand.scene/1", "canvas": {"size": [64, 32]},
     "assets": {"sky": {"path": "assets/textures/sky.png"}},
-    "layers": [{"id": "sky", "type": "image", "image": "sky"}, {"id": "tint", "type": "solid", "color": {"prop": "tint"}}]}"#;
+    "layers": [{ "blend_space": "canvas", "id": "sky", "type": "image", "image": "sky"}, { "blend_space": "canvas", "id": "tint", "type": "solid", "color": {"prop": "tint"}}]}"#;
 
 fn source(dir: &Path) -> Manifest {
     let mut manifest = manifest(Kind::Scene);
@@ -155,9 +155,10 @@ fn sounds_are_checked_when_a_scene_is_built_or_read() {
     let (src, out) = (tmp.path().join("src"), tmp.path().join("rain.wpak"));
     source(&src);
     let sky = r#""path": "assets/textures/sky.png"}"#;
-    let layer = r#"{"id": "rain", "type": "sound", "sound": "rain"}, {"id": "sky""#;
+    let layer = r#"{ "blend_space": "canvas", "id": "rain", "type": "sound", "sound": "rain"}, { "blend_space": "canvas", "id": "sky""#;
     let scene = SCENE.replace(sky, &format!(r#"{sky}, "rain": {{"path": "assets/rain.wav"}}"#));
-    fs::write(src.join("scene.json"), scene.replacen(r#"{"id": "sky""#, layer, 1)).unwrap();
+    fs::write(src.join("scene.json"), scene.replacen(r#"{ "blend_space": "canvas", "id": "sky""#, layer, 1))
+        .unwrap();
     fs::write(src.join("assets/rain.wav"), wav(2)).unwrap();
     build(&src, &out, &Limits::default()).unwrap();
     assert_eq!(open(&out, &Limits::default()).unwrap().scene().unwrap().sounds().count(), 1);

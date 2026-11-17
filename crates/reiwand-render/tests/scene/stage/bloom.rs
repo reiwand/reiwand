@@ -1,7 +1,8 @@
 use super::*;
 
 fn spot(r: &Renderer, canvas: Value) -> Shot {
-    let dot = json!([{ "id": "d", "type": "solid", "color": "#ffffff", "size": [6, 6] }]);
+    let dot =
+        json!([{ "blend_space": "canvas", "id": "d", "type": "solid", "color": "#ffffff", "size": [6, 6] }]);
     let mut world = json!({ "size": [100, 50], "background": "#000000" });
     world.as_object_mut().unwrap().extend(canvas.as_object().unwrap().clone());
     Shot::new(r, world, dot, &[])

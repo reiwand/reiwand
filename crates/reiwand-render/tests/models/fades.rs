@@ -9,8 +9,8 @@ fn two(fade: &str) -> Scene {
     let paths = json!([{ "id": "a", "keys": [key(0.0, 0.0), key(2.0, 0.0)] },
         { "id": "b", "keys": [key(0.0, 1.5), key(2.0, 1.5)] }]);
     let camera = json!({ "paths": paths, "fade": { "to": fade, "duration": 1 } });
-    let layers = json!([{ "id": "floor", "type": "solid", "color": "#00ff00" },
-        { "id": "cube", "type": "model", "model": "red", "scale": [0.5, 0.5, 0.5] }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "floor", "type": "solid", "color": "#00ff00" },
+        { "blend_space": "canvas", "id": "cube", "type": "model", "model": "red", "scale": [0.5, 0.5, 0.5] }]);
     scene(json!({ "camera3d": camera }), layers, models)
 }
 

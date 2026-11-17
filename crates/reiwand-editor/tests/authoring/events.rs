@@ -60,7 +60,7 @@ fn a_trigger_tells_the_timelines_and_sounds_it_starts() {
     p.doc["scene"]["layers"]
         .as_array_mut()
         .unwrap()
-        .push(json!({"id": "boom", "type": "sound", "sound": "none", "play_on": "event:hit"}));
+        .push(json!({ "blend_space": "canvas", "id": "boom", "type": "sound", "sound": "none", "play_on": "event:hit"}));
     p.doc["scene"]["timelines"] = json!([{"id": "shake", "duration": 1, "trigger": "event:hit"},
         {"id": "calm", "duration": 1}]);
     let ask = |t: &str| reiwand_editor::rigs::query(root.path(), &p.doc, "", &json!({ "fires": t }));

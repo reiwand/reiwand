@@ -65,7 +65,7 @@ fn at(pixels: &[u8], x: u32, y: u32) -> [u8; 3] {
 }
 
 fn layer(blend: &str) -> Value {
-    json!([{ "id": "p", "type": "particles", "system": "dots", "blend": blend }])
+    json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "dots", "blend": blend }])
 }
 
 fn fountain() -> Value {
@@ -159,7 +159,7 @@ fn particles_match_their_golden_pixels() {
         let mut half = Run::new(
             r,
             systems.clone(),
-            json!([{ "id": "p", "type": "particles", "system": "dots", "opacity": 0.5 }]),
+            json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "dots", "opacity": 0.5 }]),
             gpu,
         )
         .unwrap();

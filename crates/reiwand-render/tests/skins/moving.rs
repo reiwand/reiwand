@@ -48,7 +48,7 @@ fn layers(amplitude: f64, grouped: bool, mask: Mask) -> Value {
     }
     let mut fox = swing(mesh(json!({})));
     if grouped {
-        all.push(json!({ "id": "all", "type": "group", "effects": [effect], "layers": [fox] }));
+        all.push(json!({ "blend_space": "canvas", "id": "all", "type": "group", "effects": [effect], "layers": [fox] }));
     } else {
         fox["effects"] = json!([effect]);
         all.push(fox);

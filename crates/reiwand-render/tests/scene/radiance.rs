@@ -22,7 +22,8 @@ fn drawn(bytes: Vec<u8>) -> Arc<Pixels> {
 }
 
 fn shot(r: &Renderer, path: &str, pixels: Arc<Pixels>) -> Vec<u8> {
-    let layer = json!({ "id": "p", "type": "image", "image": "p", "size": [100, 50] });
+    let layer =
+        json!({ "blend_space": "canvas", "id": "p", "type": "image", "image": "p", "size": [100, 50] });
     let assets = json!({ "p": { "path": path } });
     let text = json!({ "canvas": canvas("#000000"), "assets": assets, "layers": [layer] });
     Shot::with(r, text, &[("p", pixels)]).pixels(r)

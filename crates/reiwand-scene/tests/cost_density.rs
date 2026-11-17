@@ -4,7 +4,7 @@ fn scene(effects: bool) -> Scene {
     let fx = if effects { serde_json::json!([{ "effect": "waves" }]) } else { serde_json::json!([]) };
     let text = serde_json::json!({ "schema": SCHEMA, "canvas": { "size": [1000, 500], "fit": "fill" },
         "assets": { "a": { "path": "a.png" } },
-        "layers": [{ "id": "a", "type": "image", "image": "a", "size": [1000, 500], "effects": fx }] });
+        "layers": [{ "blend_space": "canvas", "id": "a", "type": "image", "image": "a", "size": [1000, 500], "effects": fx }] });
     Scene::from_json(&text.to_string()).unwrap()
 }
 

@@ -21,7 +21,7 @@ fn probe(json: serde_json::Value, wgsl: &str) -> &'static Descriptor {
 fn scene(effects: serde_json::Value) -> Scene {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] },
         "assets": { "a": { "path": "a.png" }, "grade": { "path": "grade.cube" } },
-        "layers": [{ "id": "l", "type": "image", "image": "a", "effects": effects }] });
+        "layers": [{ "blend_space": "canvas", "id": "l", "type": "image", "image": "a", "effects": effects }] });
     Scene::from_json(&text.to_string()).unwrap()
 }
 

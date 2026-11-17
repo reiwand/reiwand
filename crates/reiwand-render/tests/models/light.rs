@@ -3,8 +3,8 @@ use super::*;
 fn glowing() -> Scene {
     let doc = json!({ "schema": SCHEMA,
         "canvas": { "size": [SIDE, SIDE], "background": "#000000", "hdr": true, "tonemap": "aces" },
-        "layers": [{ "id": "glow", "type": "solid", "color": "#ff4020", "brightness": 4 },
-                   { "id": "mid", "type": "solid", "color": "#808080", "size": [16, 16] }] });
+        "layers": [{ "blend_space": "canvas", "id": "glow", "type": "solid", "color": "#ff4020", "brightness": 4 },
+                   { "blend_space": "canvas", "id": "mid", "type": "solid", "color": "#808080", "size": [16, 16] }] });
     Scene::from_json(&doc.to_string()).unwrap()
 }
 

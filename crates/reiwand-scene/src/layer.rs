@@ -1,8 +1,8 @@
-use crate::Blend;
 use crate::content::{EffectUse, Mask, shown};
 use crate::figure::Attach;
 use crate::light::Lighting;
 use crate::value::Value;
+use crate::{Blend, LayerSpace};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -26,6 +26,7 @@ pub struct Layer {
     pub visible: Value<bool>,
     #[serde(default)]
     pub blend: Blend,
+    pub blend_space: LayerSpace,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mask: Option<Mask>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -68,6 +69,7 @@ impl Layer {
             opacity,
             visible,
             blend,
+            blend_space: LayerSpace::Canvas,
             mask,
             effects,
             parallax,

@@ -9,7 +9,8 @@ fn column(pixels: &[u8], x: u32) -> usize {
 }
 
 fn square(more: Value) -> Value {
-    let mut layer = json!({ "id": "s", "type": "solid", "color": "#ffffff", "size": [40, 40] });
+    let mut layer =
+        json!({ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ffffff", "size": [40, 40] });
     layer.as_object_mut().unwrap().extend(more.as_object().unwrap().clone());
     json!([layer])
 }
@@ -29,8 +30,8 @@ fn tilted_layers_lean_in_depth_with_their_masks() {
     masked["mask"] = json!({ "shape": { "ellipse": { "size": [1, 1] } } });
     let round = Shot::new(r, world.clone(), square(masked), &[]).pixels(r);
     assert!(white(&round, 50, 25) && !white(&round, 40, 7), "the mask leans with the layer");
-    let grouped = json!([{ "id": "g", "type": "group", "transform": { "tilt": [0, 50], "position": [50, 25] },
-        "layers": [{ "id": "s", "type": "solid", "color": "#ffffff", "size": [40, 40], "transform": { "position": [0, 0] } }] }]);
+    let grouped = json!([{ "blend_space": "canvas", "id": "g", "type": "group", "transform": { "tilt": [0, 50], "position": [50, 25] },
+        "layers": [{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ffffff", "size": [40, 40], "transform": { "position": [0, 0] } }] }]);
     let group = Shot::new(r, world.clone(), grouped, &[]).pixels(r);
     assert!((40..60).all(|x| column(&group, x).abs_diff(column(&leaned, x)) <= 2));
     let close =

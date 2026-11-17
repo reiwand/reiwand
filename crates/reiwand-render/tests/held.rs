@@ -32,7 +32,7 @@ fn sparks(life: f32) -> Value {
 #[test]
 fn a_held_scene_with_particles_stays_clean_after_its_view_is_trimmed() {
     let Some(r) = renderer() else { return };
-    let layers = json!([{ "id": "p", "type": "particles", "system": "sparks" }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "sparks" }]);
     for gpu in [false, true] {
         let Some((mut runtime, mut view)) = open(r, sparks(30.0), layers.clone(), gpu) else { return };
         runtime.seek(1.0);
@@ -51,8 +51,9 @@ fn a_held_scene_with_particles_stays_clean_after_its_view_is_trimmed() {
 fn particles_that_no_longer_move_leave_the_damage_to_what_does() {
     let Some(r) = renderer() else { return };
     let slide = json!({ "keys": [[0, [120, 20]], [4, [140, 60]]] });
-    let dot = json!({ "id": "dot", "type": "solid", "color": "#ffffff", "size": [6, 6], "transform": { "position": slide } });
-    let layers = json!([{ "id": "p", "type": "particles", "system": "sparks" }, dot]);
+    let dot = json!({ "blend_space": "canvas", "id": "dot", "type": "solid", "color": "#ffffff", "size": [6, 6], "transform": { "position": slide } });
+    let layers =
+        json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "sparks" }, dot]);
     for gpu in [false, true] {
         let Some((mut runtime, mut view)) = open(r, sparks(0.2), layers.clone(), gpu) else { return };
         let mut damage = Vec::new();

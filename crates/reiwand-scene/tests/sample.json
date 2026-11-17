@@ -12,6 +12,7 @@
   },
   "layers": [
     {
+      "blend_space": "canvas",
       "id": "background",
       "type": "image",
       "image": { "prop": "style", "map": { "night": "sky", "dawn": "sky_dawn" } },
@@ -21,6 +22,7 @@
       ]
     },
     {
+      "blend_space": "canvas",
       "id": "sea",
       "type": "video",
       "video": "sea",
@@ -28,8 +30,9 @@
       "blend": "screen",
       "transform": { "position": [960, 900], "scale": [1, 0.4] }
     },
-    { "id": "sparks", "type": "particles", "system": "sparks", "blend": "add" },
+    { "blend_space": "canvas", "id": "sparks", "type": "particles", "system": "sparks", "blend": "add" },
     {
+      "blend_space": "canvas",
       "id": "clock",
       "type": "text",
       "font": "mono",
@@ -42,13 +45,15 @@
       "opacity": { "timeline": "intro", "keys": [[0, 0, "out_cubic"], [1.5, 1]] }
     },
     {
+      "blend_space": "canvas",
       "id": "badge",
       "type": "group",
       "opacity": 0.8,
       "transform": { "position": [200, 200], "rotation": { "keys": [[0, 0], [10, 360]], "loop": "repeat" } },
       "layers": [
-        { "id": "disc", "type": "shape", "shape": { "ellipse": { "size": [120, 120] } }, "fill": "#ff8800" },
+        { "blend_space": "canvas", "id": "disc", "type": "shape", "shape": { "ellipse": { "size": [120, 120] } }, "fill": "#ff8800" },
         {
+          "blend_space": "canvas",
           "id": "ring",
           "type": "shape",
           "shape": { "ring": { "size": [140, 140], "width": 6 } },
@@ -58,6 +63,7 @@
       ]
     },
     {
+      "blend_space": "canvas",
       "id": "bars",
       "type": "spectrum",
       "size": [800, 120],
@@ -68,6 +74,7 @@
       "opacity": { "audio": "level", "scale": 0.8, "offset": 0.2, "clamp": [0, 1], "smooth": 0.2 }
     },
     {
+      "blend_space": "canvas",
       "id": "post",
       "type": "adjustment",
       "effects": [

@@ -3,7 +3,7 @@ use reiwand_scene::{Quality, Wake};
 use serde_json::{Value, json};
 
 fn lamp(more: Value) -> Value {
-    let mut l = json!({ "id": "lamp", "type": "light", "transform": { "position": [80, 45] }, "z": 10,
+    let mut l = json!({ "blend_space": "canvas", "id": "lamp", "type": "light", "transform": { "position": [80, 45] }, "z": 10,
         "radius": 40, "intensity": 2, "volumetric": { "density": 0.8, "samples": 16 } });
     more.as_object().into_iter().flatten().for_each(|(k, v)| l[k] = v.clone());
     l

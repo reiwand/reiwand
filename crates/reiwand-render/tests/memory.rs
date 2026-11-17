@@ -30,7 +30,9 @@ fn screens_that_show_one_scene_share_its_textures_and_keep_no_pixels() {
         Some(again.clone())
     });
     let assets = SceneAssets { images: [("photo".to_string(), pixels.clone())].into(), ..Default::default() };
-    let scene = scene(json!([{ "id": "p", "type": "image", "image": "photo", "size": [200, 100] }]));
+    let scene = scene(
+        json!([{ "blend_space": "canvas", "id": "p", "type": "image", "image": "photo", "size": [200, 100] }]),
+    );
     let runtime = Runtime::new(Arc::new(scene), Values::new());
     let mut first = r.scene_view(&runtime.scene, &assets, runtime.props()).unwrap();
     let uploads = r.uploads_of(&pixels);
@@ -56,7 +58,7 @@ fn released_textures_serve_later_layers_of_the_same_frame() {
     let Some(r) = renderer() else { return };
     let layer = |n: u32| {
         let spin = json!({ "keys": [[0, 0], [10, 360]], "loop": "repeat" });
-        json!({ "id": format!("l{n}"), "type": "solid", "color": "#ff8000", "size": [40, 40],
+        json!({ "blend_space": "canvas", "id": format!("l{n}"), "type": "solid", "color": "#ff8000", "size": [40, 40],
             "transform": { "position": [20 + 30 * n, 50], "rotation": spin },
             "effects": [{ "effect": "blur", "params": { "radius": 4 } }, { "effect": "waves" }] })
     };

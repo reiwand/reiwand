@@ -3,7 +3,7 @@ use super::super::map::Map;
 use super::super::paint::{Painter, Target};
 use super::super::pipes::{Mode, Shader};
 use super::super::{Op, Src};
-use reiwand_scene::Content;
+use reiwand_scene::{Blend, Content};
 
 impl Painter<'_, '_, '_> {
     pub(crate) fn composite(&mut self, i: usize, src: Src, rect: Rect, target: Target, atop: bool) {
@@ -26,7 +26,7 @@ impl Painter<'_, '_, '_> {
         let m = self.map(i, m);
         let masked =
             self.mask(&mut item, (d.mask, d.mask_texture.as_deref(), d.mask_strength), m, size, target);
-        let (mode, back) = self.blend(&mut item, d.blend, bounds, target, atop);
+        let (mode, back) = self.blend(&mut item, (d.blend, d.space), bounds, target, atop);
         let slot = self.pool.push(&item);
         self.ops.push(Op::Draw {
             target: target.src,
@@ -79,15 +79,20 @@ impl Painter<'_, '_, '_> {
             ..Item::default()
         };
         (item.m0, item.m1) = ndc(target.rect, target.rect.affine());
-        let mode = if d.opacity >= 1.0 { Mode::Replace } else { Mode::Normal };
+        let (mode, back) = match d.space.filter(|_| d.opacity < 1.0) {
+            Some(space) => self.blend(&mut item, (Blend::Normal, Some(space)), target.rect, target, false),
+            None if d.opacity >= 1.0 => (Mode::Replace, Src::Clear),
+            None => (Mode::Normal, Src::Clear),
+        };
         let slot = self.pool.push(&item);
         self.ops.push(Op::Draw {
             target: target.src,
             entry: "fs_texture",
             mode,
             slot,
-            tex: [out, Src::White, Src::Clear],
+            tex: [out, Src::White, back],
         });
         self.release(out);
+        self.release(back);
     }
 }

@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 #[test]
 fn a_slider_number_drives_a_pair_field_on_both_directions() {
-    let layer = json!({ "id": "n", "type": "solid", "color": "#ffffff", "size": [10, 10],
+    let layer = json!({ "blend_space": "canvas", "id": "n", "type": "solid", "color": "#ffffff", "size": [10, 10],
         "transform": { "scale": { "prop": "size" } } });
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [layer] });
     let declared: BTreeMap<String, Property> =

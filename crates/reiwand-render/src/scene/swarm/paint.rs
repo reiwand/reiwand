@@ -2,21 +2,21 @@ use super::mode;
 use crate::scene::Op;
 use crate::scene::item::ndc;
 use crate::scene::paint::{Painter, Target};
-use reiwand_scene::{Affine, Blend, Content, Mask};
+use reiwand_scene::{Affine, Blend, BlendSpace, Content, Mask};
 
 impl Painter<'_, '_, '_> {
     pub(crate) fn particles(
         &mut self,
         i: usize,
         target: Target,
-        (opacity, blend, mask): (f32, Blend, Option<&Mask>),
+        (opacity, blend, mask, space): (f32, Blend, Option<&Mask>, Option<BlendSpace>),
         atop: bool,
     ) {
         let frame = self.frame;
         let d = &frame.draws[i];
         let Content::Particles { flock, size, .. } = d.content else { return };
         self.chart(flock);
-        if mask.is_some() || !blend.fixed() || self.lean(i).is_some() {
+        if mask.is_some() || space.is_some() || !blend.fixed() || self.lean(i).is_some() {
             return self.apart(i, target, atop);
         }
         let seen = match d.content {

@@ -6,7 +6,7 @@ use serde_json::json;
 use std::sync::Arc;
 
 fn heavy() -> SceneSpec {
-    let blur = |i: usize| json!({ "id": format!("b{i}"), "type": "adjustment", "effects": [{ "effect": "blur", "params": { "radius": 30 } }] });
+    let blur = |i: usize| json!({ "blend_space": "canvas", "id": format!("b{i}"), "type": "adjustment", "effects": [{ "effect": "blur", "params": { "radius": 30 } }] });
     let layers: Vec<_> = (0..120).map(blur).collect();
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [960, 540] }, "clock": { "poster_time": 2.0 }, "layers": layers });
     let scene = Scene::from_json(&text.to_string()).unwrap();

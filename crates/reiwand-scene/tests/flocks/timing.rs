@@ -58,7 +58,7 @@ fn prewarm_runs_in_coarse_steps() {
     let swarm = fly.rt.swarm(0).unwrap();
     assert_eq!((swarm.count(), swarm.sim(0, 0).clock[0]), (450, WARM));
     let big = still(json!({ "capacity": 100000, "prewarm": 30 }));
-    let layers = json!([{ "id": "p", "type": "particles", "system": "a" }, { "id": "q", "type": "particles", "system": "b" }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "a" }, { "blend_space": "canvas", "id": "q", "type": "particles", "system": "b" }]);
     let rt = runtime(json!({ "a": big.clone(), "b": big }), layers);
     rt.frame(VIEW, Quality::Q3);
     let steps: Vec<usize> = (0..2).map(|i| rt.swarm(i).unwrap().count()).collect();

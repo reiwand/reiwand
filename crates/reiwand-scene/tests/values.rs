@@ -30,7 +30,7 @@ fn color(frame: &Frame) -> [f32; 4] {
 
 #[test]
 fn colors_blend_in_oklab_along_the_shorter_hue() {
-    let solid = |keys: Json| json!([{ "id": "s", "type": "solid", "color": { "keys": keys } }]);
+    let solid = |keys: Json| json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": { "keys": keys } }]);
     let mut rt = runtime(solid(json!([[0, "#ff0000"], [2, "#00ff00"]])));
     let [r, g, b, a] = color(&at(&mut rt, 1.0));
     assert!(r > 0.9 && g > 0.5 && b < 0.1 && a == 1.0, "{r} {g} {b}");
@@ -38,7 +38,7 @@ fn colors_blend_in_oklab_along_the_shorter_hue() {
     let [r, g, b, _] = color(&at(&mut rt, 1.0));
     assert!(r > 0.95 && g < 0.2 && b < 0.2, "the hue went the long way: {r} {g} {b}");
     let mut rt = runtime(
-        json!([{ "id": "s", "type": "solid", "color": { "keys": [[0, "#000000"]], "base": "#ff000080" } }]),
+        json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": { "keys": [[0, "#000000"]], "base": "#ff000080" } }]),
     );
     assert_eq!(color(&at(&mut rt, 0.0)), [1.0, 0.0, 0.0, 1.0], "a relative color went past an alpha of 1");
     let mut rt = runtime(solid(json!([[0, "#000000"], [2, "#ffffff"]])));
@@ -49,7 +49,7 @@ fn colors_blend_in_oklab_along_the_shorter_hue() {
 
 #[test]
 fn handles_tracks_and_bases_shape_values() {
-    let opacity = |v: Json| json!([{ "id": "s", "type": "solid", "color": "#ffffff", "opacity": v }]);
+    let opacity = |v: Json| json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ffffff", "opacity": v }]);
     let eased = opacity(json!({ "keys": [[0, 0, { "out": [1, 0] }], [2, 1, { "in": [1, 0] }]] }));
     let mut rt = runtime(eased);
     assert!((at(&mut rt, 1.0).draws[0].opacity - 0.5).abs() < 1e-3);
@@ -57,13 +57,12 @@ fn handles_tracks_and_bases_shape_values() {
     assert!(early > 0.0 && early < 0.1, "{early}");
     let mut rt = runtime(opacity(json!({ "keys": [[0, 0], [1, 0.5]], "base": 0.25 })));
     assert!((at(&mut rt, 1.0).draws[0].opacity - 0.75).abs() < 1e-4);
-    let moved = json!([{ "id": "s", "type": "solid", "color": "#ffffff", "size": [10, 10], "transform": {
+    let moved = json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ffffff", "size": [10, 10], "transform": {
         "position": { "x": { "keys": [[0, 0], [2, 40]] }, "base": [5, 7] } } }]);
     let mut rt = runtime(moved);
     let world = at(&mut rt, 1.0).draws[0].world.0;
     assert!((world[4] - 20.0).abs() < 1e-3 && (world[5] - 7.0).abs() < 1e-3, "{world:?}");
-    let tinted =
-        json!([{ "id": "s", "type": "solid", "color": { "r": { "keys": [[0, 0], [2, 1]] }, "b": 0.5 } }]);
+    let tinted = json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": { "r": { "keys": [[0, 0], [2, 1]] }, "b": 0.5 } }]);
     let mut rt = runtime(tinted);
     let [r, g, b, a] = color(&at(&mut rt, 1.0));
     assert!((r - 0.5).abs() < 1e-3 && g == 0.0 && b == 0.5 && a == 1.0);
@@ -72,7 +71,7 @@ fn handles_tracks_and_bases_shape_values() {
 #[test]
 fn time_of_day_and_dates_follow_the_local_clock() {
     let spin = |clock: &str| {
-        json!([{ "id": "s", "type": "solid", "color": "#ffffff", "opacity": 0.5,
+        json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ffffff", "opacity": 0.5,
         "transform": { "rotation": { "clock": clock } } }])
     };
     let mut rt = runtime(spin("hour"));
@@ -81,7 +80,8 @@ fn time_of_day_and_dates_follow_the_local_clock() {
     assert!((frame.draws[0].world.0[1] - 12f32.to_radians().sin()).abs() < 1e-4);
     assert_eq!(frame.wake, Wake::At(3475.0));
     for (clock, value, wake) in [("weekday", 4.0, 43_075.0), ("month", 10.0, 43_075.0), ("day", 0.5, 475.0)] {
-        let mut rt = runtime(json!([{ "id": "s", "type": "solid", "color": "#ffffff",
+        let mut rt =
+            runtime(json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ffffff",
             "opacity": { "clock": clock, "scale": 0.01 } }]));
         rt.set_wall(NOON + 125.0);
         let frame = rt.frame(VIEW, Quality::Q3);
@@ -94,7 +94,8 @@ fn time_of_day_and_dates_follow_the_local_clock() {
     assert_eq!((text.as_str(), wake), ("Thu, Oct 29 '26 12:01 PM", Some(59.0)));
     let new_year = 20_819.0 * 86_400.0;
     assert_eq!(format_time("yyyy-MM-dd w D", new_year, "en", true).0, "2027-01-01 53 1");
-    let mut rt = runtime(json!([{ "id": "t", "type": "text", "text": { "date": "MMMM" } }]));
+    let mut rt =
+        runtime(json!([{ "blend_space": "canvas", "id": "t", "type": "text", "text": { "date": "MMMM" } }]));
     rt.set_language("es");
     rt.set_wall(NOON);
     let frame = rt.frame(VIEW, Quality::Q3);
@@ -105,14 +106,14 @@ fn time_of_day_and_dates_follow_the_local_clock() {
 #[test]
 fn handles_time_positions_and_colors_by_their_share_of_the_way() {
     let curve = json!([[0, [0, 0], { "out": [1, 0] }], [2, [40, 20], { "in": [1, 0] }]]);
-    let moved = json!([{ "id": "s", "type": "solid", "color": "#ffffff", "size": [10, 10],
+    let moved = json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ffffff", "size": [10, 10],
         "transform": { "position": { "keys": curve } } }]);
     let mut rt = runtime(moved);
     let world = at(&mut rt, 1.0).draws[0].world.0;
     assert!((world[4] - 20.0).abs() < 1e-2 && (world[5] - 10.0).abs() < 1e-2, "{world:?}");
     let world = at(&mut rt, 0.4).draws[0].world.0;
     assert!(world[4] < 4.0 && world[5] < 2.0, "a flat handle starts slowly: {world:?}");
-    let solid = |keys: Json| json!([{ "id": "s", "type": "solid", "color": { "keys": keys } }]);
+    let solid = |keys: Json| json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": { "keys": keys } }]);
     let mid = color(&at(&mut runtime(solid(json!([[0, "#000000"], [2, "#ffffff"]]))), 1.0))[0];
     let mut rt = runtime(solid(json!([[0, "#000000", { "out": [1, 0.9] }], [2, "#ffffff"]])));
     let [r, g, b, _] = color(&at(&mut rt, 1.0));
@@ -120,7 +121,7 @@ fn handles_time_positions_and_colors_by_their_share_of_the_way() {
         (r - g).abs() < 1e-3 && (g - b).abs() < 1e-3 && r > mid + 0.1,
         "an early rise is not past {mid}: {r}"
     );
-    let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [{ "id": "t", "type": "text",
+    let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [{ "blend_space": "canvas", "id": "t", "type": "text",
         "text": { "keys": [[0, "a", { "out": [1, 0] }], [2, "b"]] } }] });
     let refused = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_err();
     assert!(format!("{refused:?}").contains("/layers/0/text/keys/0/2"), "{refused:?}");
@@ -128,7 +129,7 @@ fn handles_time_positions_and_colors_by_their_share_of_the_way() {
 
 #[test]
 fn a_seek_far_ahead_lands_on_the_value_of_its_timeline() {
-    let layers = json!([{ "id": "s", "type": "solid", "color": "#ffffff",
+    let layers = json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ffffff",
         "opacity": { "keys": [[0, 0], [3, 1]], "timeline": "loop" } }]);
     let mut rt = timed(layers, json!([{ "id": "loop", "duration": 3, "loop": "repeat" }]));
     let started = std::time::Instant::now();
@@ -141,7 +142,7 @@ fn a_seek_far_ahead_lands_on_the_value_of_its_timeline() {
 #[test]
 fn handles_per_part_shape_each_part_in_its_own_units() {
     let place = |keys: Json| {
-        json!([{ "id": "s", "type": "solid", "color": "#ffffff", "size": [10, 10],
+        json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ffffff", "size": [10, 10],
             "transform": { "position": { "keys": keys } } }])
     };
     let split = json!([[0, [0, 0], { "out": [[1, 0], [0.5, 30]] }], [2, [40, 0]]]);

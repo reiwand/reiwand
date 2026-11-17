@@ -2,8 +2,8 @@ use super::*;
 
 #[test]
 fn an_own_clock_on_a_file_property_plays_the_default_video_until_a_file_is_picked() {
-    let layers = json!([{ "id": "a", "type": "video", "video": { "prop": "pick" }, "size": [20, 20] },
-        { "id": "b", "type": "video", "video": { "prop": "pick" }, "size": [20, 20], "playback": { "own_clock": true } }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "a", "type": "video", "video": { "prop": "pick" }, "size": [20, 20] },
+        { "blend_space": "canvas", "id": "b", "type": "video", "video": { "prop": "pick" }, "size": [20, 20], "playback": { "own_clock": true } }]);
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] },
         "assets": { "clip": { "path": "clip.webm" } }, "layers": layers });
     let pick = json!({ "pick": { "type": "file", "accept": ["video"], "default_asset": "clip" } });

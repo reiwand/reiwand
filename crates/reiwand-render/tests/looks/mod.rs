@@ -27,7 +27,8 @@ fn picture(w: u32, h: u32, f: impl Fn(u32, u32) -> [u8; 4]) -> Arc<Pixels> {
 }
 
 fn sheet(asset: Value, more: Value) -> Value {
-    let mut layer = json!({ "id": "i", "type": "image", "image": "rb", "size": [100, 50] });
+    let mut layer =
+        json!({ "blend_space": "canvas", "id": "i", "type": "image", "image": "rb", "size": [100, 50] });
     layer.as_object_mut().unwrap().extend(more.as_object().unwrap().clone());
     json!({ "canvas": canvas("#000000"), "assets": { "rb": asset }, "layers": [layer] })
 }
@@ -37,15 +38,15 @@ fn tints_brightness_parents_and_weak_masks() {
     let Some(r) = renderer() else { return };
     let white = picture(4, 4, |_, _| [255; 4]);
     let layers = json!([
-        { "id": "img", "type": "image", "image": "w", "size": [20, 50], "color": "#ff0000", "transform": { "position": [10, 25] } },
-        { "id": "dim", "type": "solid", "color": "#ffffff", "brightness": 0.5, "size": [20, 50], "transform": { "position": [30, 25] } },
-        { "id": "g", "type": "group", "color": "#00ff00", "layers": [
-            { "id": "in", "type": "solid", "color": "#ffffff", "size": [20, 50], "transform": { "position": [50, 25] } }] },
-        { "id": "kid", "type": "solid", "color": "#0000ff", "size": [10, 10], "parent": "box", "transform": { "position": [12, 0] } },
-        { "id": "box", "type": "solid", "color": "#ffffff", "size": [10, 10], "transform": { "position": [70, 10] } },
-        { "id": "ghost", "type": "solid", "color": "#ffffff", "size": [10, 10], "parent": "gone", "transform": { "position": [0, 20] } },
-        { "id": "gone", "type": "solid", "color": "#ffffff", "size": [10, 10], "visible": false, "transform": { "position": [70, 20] } },
-        { "id": "half", "type": "solid", "color": "#ff0000", "size": [10, 10], "transform": { "position": [90, 40] },
+        { "blend_space": "canvas", "id": "img", "type": "image", "image": "w", "size": [20, 50], "color": "#ff0000", "transform": { "position": [10, 25] } },
+        { "blend_space": "canvas", "id": "dim", "type": "solid", "color": "#ffffff", "brightness": 0.5, "size": [20, 50], "transform": { "position": [30, 25] } },
+        { "blend_space": "canvas", "id": "g", "type": "group", "color": "#00ff00", "layers": [
+            { "blend_space": "canvas", "id": "in", "type": "solid", "color": "#ffffff", "size": [20, 50], "transform": { "position": [50, 25] } }] },
+        { "blend_space": "canvas", "id": "kid", "type": "solid", "color": "#0000ff", "size": [10, 10], "parent": "box", "transform": { "position": [12, 0] } },
+        { "blend_space": "canvas", "id": "box", "type": "solid", "color": "#ffffff", "size": [10, 10], "transform": { "position": [70, 10] } },
+        { "blend_space": "canvas", "id": "ghost", "type": "solid", "color": "#ffffff", "size": [10, 10], "parent": "gone", "transform": { "position": [0, 20] } },
+        { "blend_space": "canvas", "id": "gone", "type": "solid", "color": "#ffffff", "size": [10, 10], "visible": false, "transform": { "position": [70, 20] } },
+        { "blend_space": "canvas", "id": "half", "type": "solid", "color": "#ff0000", "size": [10, 10], "transform": { "position": [90, 40] },
           "mask": { "shape": { "ellipse": { "size": [1, 1] } }, "strength": 0.5 } }
     ]);
     let pixels = Shot::new(r, canvas("#000000"), layers, &[("w", white)]).pixels(r);
@@ -74,8 +75,8 @@ fn pictures_filter_repeat_mirror_and_shrink() {
     let mirror = shot(json!({ "path": "rb.png", "wrap": "mirror" }), &rb);
     check(&mirror, &[((5, 25), [255, 0, 0]), ((25, 25), [0, 0, 255]), ((35, 25), [255, 0, 0])]);
     let tiles = json!({ "path": "rb.png", "wrap": "repeat", "filter": "nearest" });
-    let both = json!([{ "id": "r", "type": "image", "image": "rb", "size": [50, 50], "transform": { "position": [25, 25] } },
-        { "id": "m", "type": "image", "image": "m", "size": [50, 50], "transform": { "position": [75, 25] } }]);
+    let both = json!([{ "blend_space": "canvas", "id": "r", "type": "image", "image": "rb", "size": [50, 50], "transform": { "position": [25, 25] } },
+        { "blend_space": "canvas", "id": "m", "type": "image", "image": "m", "size": [50, 50], "transform": { "position": [75, 25] } }]);
     let text = json!({ "canvas": canvas("#000000"), "assets": { "rb": tiles, "m": { "path": "m.png", "wrap": "mirror" } },
         "layers": both });
     let lit = picture(20, 10, |x, y| [x as u8 * 12, y as u8 * 25, 255 - x as u8 * 12, 255]);
@@ -87,7 +88,7 @@ fn pictures_filter_repeat_mirror_and_shrink() {
             asset["mipmaps"] = mipmaps;
         }
         let text = json!({ "canvas": canvas("#000000"), "assets": { "c": asset },
-            "layers": [{ "id": "c", "type": "image", "image": "c", "size": [20, 20] }] });
+            "layers": [{ "blend_space": "canvas", "id": "c", "type": "image", "image": "c", "size": [20, 20] }] });
         let pixels = Shot::with(r, text, &[("c", checker.clone())]).pixels(r);
         (42..58)
             .flat_map(|x| (17..33).map(move |y| (x, y)))

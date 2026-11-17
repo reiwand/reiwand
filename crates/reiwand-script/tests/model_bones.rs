@@ -10,8 +10,8 @@ fn modelled(source: &str) -> Script {
     let doc = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [200, 100] },
         "assets": { "toy": { "path": "toy.glb" } },
         "scripts": [{ "path": "main.js", "uses": ["animations", "layers"] }],
-        "layers": [{ "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" },
-            { "id": "m", "type": "model", "model": "toy", "clips": [{ "id": "bend", "animation": "bend" }], "hit": ["tip"] }] });
+        "layers": [{ "blend_space": "canvas", "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" },
+            { "blend_space": "canvas", "id": "m", "type": "model", "model": "toy", "clips": [{ "id": "bend", "animation": "bend" }], "hit": ["tip"] }] });
     let mut scene = Scene::from_json(&doc.to_string()).unwrap();
     let glb = ForgeRig::new(2.0, 0.5).glb();
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();

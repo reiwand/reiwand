@@ -50,5 +50,5 @@ pub fn near(a: [f64; 2], b: [f64; 2], within: f64) -> bool {
 }
 
 pub fn card(id: &str, transform: Value) -> Value {
-    json!({"id": id, "type": "solid", "color": "#ffffff", "size": [200, 100], "transform": transform})
+    json!({ "blend_space": "canvas", "id": id, "type": "solid", "color": "#ffffff", "size": [200, 100], "transform": transform})
 }

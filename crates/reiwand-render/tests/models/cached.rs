@@ -2,7 +2,7 @@ use super::*;
 use reiwand_scene::Wake;
 
 fn still() -> Value {
-    json!([{ "id": "cube", "type": "model", "model": "red", "rotation": [20, 30, 0] }])
+    json!([{ "blend_space": "canvas", "id": "cube", "type": "model", "model": "red", "rotation": [20, 30, 0] }])
 }
 
 #[test]
@@ -24,8 +24,8 @@ fn a_still_model_renders_once_and_the_scene_sleeps() {
 fn a_3d_group_draws_again_only_while_something_in_it_moves() {
     let Some(r) = renderer() else { return };
     let models = BTreeMap::from([("red", cube(unlit("paint", [1.0, 0.0, 0.0, 1.0])))]);
-    let spin = json!([{ "id": "world", "type": "group", "space": "3d", "layers": [
-        { "id": "cube", "type": "model", "model": "red",
+    let spin = json!([{ "blend_space": "canvas", "id": "world", "type": "group", "space": "3d", "layers": [
+        { "blend_space": "canvas", "id": "cube", "type": "model", "model": "red",
           "rotation": { "keys": [[0, [0, 0, 0]], [0.3, [0, 90, 0]]] } }] }]);
     let mut shot = shoot(r, scene(json!({}), spin, models), &[]);
     let mut seen = Vec::new();
@@ -54,13 +54,18 @@ fn models_and_reflections_that_leave_the_scene_free_their_gpu_memory() {
         ("red", cube(unlit("paint", [1.0, 0.0, 0.0, 1.0]))),
         ("blue", cube(unlit("paint", [0.0, 0.0, 1.0, 1.0]))),
     ]);
-    let lit = json!([{ "id": "cube", "type": "model", "model": "red", "env": "sky" }]);
+    let lit =
+        json!([{ "blend_space": "canvas", "id": "cube", "type": "model", "model": "red", "env": "sky" }]);
     let first = scene(json!({ "assets": { "sky": { "path": "sky.png" } } }), lit, models.clone());
     let sky = Pixels::new(RgbaImage::from_pixel(8, 8, Rgba([0, 120, 255, 255])));
     let mut shot = shoot(r, first, &[("sky", sky)]);
     shot.frame(r, 0.0, Quality::Q3);
     assert_eq!(shot.view.held_models(), (1, 1));
-    let second = scene(json!({}), json!([{ "id": "cube", "type": "model", "model": "blue" }]), models);
+    let second = scene(
+        json!({}),
+        json!([{ "blend_space": "canvas", "id": "cube", "type": "model", "model": "blue" }]),
+        models,
+    );
     r.refresh_scene(&mut shot.view, (&second, &reiwand_scene::Values::new()), &SceneAssets::default())
         .unwrap();
     shot.runtime = Runtime::new(Arc::new(second), reiwand_scene::Values::new());

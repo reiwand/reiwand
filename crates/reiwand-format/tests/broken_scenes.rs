@@ -78,9 +78,10 @@ fn a_damaged_scene_read_from_a_folder_is_refused_or_plays() {
 }
 
 fn nested(depth: usize) -> String {
-    let mut layer = r##"{"id":"s","type":"solid","color":"#ffffff","size":[1,1]}"##.to_string();
+    let mut layer =
+        r##"{ "blend_space": "canvas", "id":"s","type":"solid","color":"#ffffff","size":[1,1]}"##.to_string();
     for level in 0..depth {
-        layer = format!(r#"{{"id":"g{level}","type":"group","layers":[{layer}]}}"#);
+        layer = format!(r#"{{ "blend_space": "canvas", "id":"g{level}","type":"group","layers":[{layer}]}}"#);
     }
     format!(r#"{{"schema":"{}","canvas":{{"size":[100,100]}},"layers":[{layer}]}}"#, reiwand_scene::SCHEMA)
 }

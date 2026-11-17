@@ -28,7 +28,7 @@ fn an_anchored_light_moves_to_the_canvas_point_it_is_dragged_to() {
 fn a_light_in_a_skewed_group_lands_where_it_is_dragged() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
-    let group = json!({ "id": "g", "type": "group", "transform": { "position": [500, 400], "skew": [30, 0] }, "layers": [] });
+    let group = json!({ "blend_space": "canvas", "id": "g", "type": "group", "transform": { "position": [500, 400], "skew": [30, 0] }, "layers": [] });
     super::act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": group } })).unwrap();
     light(&mut p, json!({ "add": { "light": "point", "id": "l", "into": "g", "at": [0, 0] } })).unwrap();
     light(&mut p, json!({ "set": { "layer": "l", "at": [700, 600] } })).unwrap();
@@ -87,7 +87,7 @@ fn the_radius_and_tube_end_handles_write_keys_at_the_playhead_when_keyed() {
 fn a_light_in_a_turned_skewed_and_stretched_group_lands_and_aims_where_dragged() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
-    let group = json!({ "id": "g", "type": "group", "layers": [],
+    let group = json!({ "blend_space": "canvas", "id": "g", "type": "group", "layers": [],
         "transform": { "position": [500, 400], "skew": [25, 10], "rotation": 20, "scale": [1.5, 0.8] } });
     super::act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": group } })).unwrap();
     light(&mut p, json!({ "add": { "light": "spot", "id": "s", "into": "g", "at": [0, 0] } })).unwrap();

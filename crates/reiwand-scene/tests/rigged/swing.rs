@@ -125,7 +125,7 @@ fn the_lowest_quality_freezes_bones_and_a_rope_on_battery_settles_too() {
 
 #[test]
 fn wind_keeps_ropes_moving_and_pushes_them_along() {
-    let rope = json!([{ "id": "fox", "type": "mesh", "mesh": "arm", "size": [64, 64],
+    let rope = json!([{ "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "arm", "size": [64, 64],
         "physics": [{ "bone": "root", "mode": "rope", "gravity": 1, "stiffness": 0, "wind": 1 }] }]);
     let mut calm = layers(rope.clone());
     let mut scene = (*layers(rope).scene).clone();

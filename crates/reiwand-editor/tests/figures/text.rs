@@ -4,7 +4,7 @@ use reiwand_type::Fonts;
 use serde_json::{Value, json};
 
 fn label(text: &str, extra: Value) -> Value {
-    let mut layer = json!({"id": "t", "type": "text", "text": text, "size": 60,
+    let mut layer = json!({ "blend_space": "canvas", "id": "t", "type": "text", "text": text, "size": 60,
         "transform": {"position": [500, 400], "rotation": 12}});
     for (k, v) in extra.as_object().cloned().unwrap_or_default() {
         layer[k] = v;

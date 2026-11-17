@@ -21,7 +21,7 @@ fn scene(wgsl: &str) -> Scene {
         "init": { "life": [5, 5], "speed": [0, 0], "size": [12, 12] }, "render": { "shader": "own" } });
     let effects = json!({ "own": { "descriptor": "fx/own.json", "wgsl": "fx/own.wgsl" } });
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "particles": { "s": system }, "effects": effects,
-        "layers": [{ "id": "p", "type": "particles", "system": "s" }] });
+        "layers": [{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s" }] });
     let mut scene = Scene::from_json(&text.to_string()).unwrap();
     let read = |path: &str, _: usize| {
         let json = r#"{ "id": "own", "stage": "particle", "cost": {} }"#;

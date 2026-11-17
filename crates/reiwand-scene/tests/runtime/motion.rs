@@ -42,7 +42,7 @@ fn keys_loop_and_sample() {
 #[test]
 fn static_scenes_sleep_and_animated_ones_ask_for_frames() {
     let still = runtime(&scene(
-        json!([{ "id": "bg", "type": "image", "image": "a" }, { "id": "c", "type": "solid", "color": "#ff0000" }]),
+        json!([{ "blend_space": "canvas", "id": "bg", "type": "image", "image": "a" }, { "blend_space": "canvas", "id": "c", "type": "solid", "color": "#ff0000" }]),
     ));
     let frame = still.frame(VIEW, Quality::Q3);
     assert_eq!(
@@ -50,18 +50,19 @@ fn static_scenes_sleep_and_animated_ones_ask_for_frames() {
         (Wake::Idle, 2, false)
     );
     let spin = scene(
-        json!([{ "id": "s", "type": "solid", "color": "#ff0000", "transform": { "rotation": { "keys": [[0, 0], [1, 90]] } } }]),
+        json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ff0000", "transform": { "rotation": { "keys": [[0, 0], [1, 90]] } } }]),
     );
     let mut spin = runtime(&spin);
     assert!(spin.frame(VIEW, Quality::Q3).draws[0].dynamic);
     assert_eq!(spin.frame(VIEW, Quality::Q3).wake, Wake::Frame);
     spin.seek(1.5);
     assert_eq!(spin.frame(VIEW, Quality::Q3).wake, Wake::Idle);
-    let waves =
-        scene(json!([{ "id": "w", "type": "image", "image": "a", "effects": [{ "effect": "waves" }] }]));
+    let waves = scene(
+        json!([{ "blend_space": "canvas", "id": "w", "type": "image", "image": "a", "effects": [{ "effect": "waves" }] }]),
+    );
     assert_eq!(runtime(&waves).frame(VIEW, Quality::Q0).wake, Wake::Frame);
     let blur = scene(
-        json!([{ "id": "b", "type": "image", "image": "a", "effects": [{ "effect": "blur", "optional": true }] }]),
+        json!([{ "blend_space": "canvas", "id": "b", "type": "image", "image": "a", "effects": [{ "effect": "blur", "optional": true }] }]),
     );
     let blur = runtime(&blur);
     let light = |q| blur.frame(VIEW, q).effects.iter().map(|e| e.descriptor.light).collect::<Vec<_>>();
@@ -74,7 +75,7 @@ fn static_scenes_sleep_and_animated_ones_ask_for_frames() {
 
 #[test]
 fn timelines_follow_the_injected_clock() {
-    let text = scene(json!([{ "id": "s", "type": "solid", "color": "#ffffff",
+    let text = scene(json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ffffff",
         "opacity": { "timeline": "intro", "keys": [[0, 0], [2, 1]] } }]));
     let mut rt = runtime(&text);
     let opacity = |rt: &Runtime| rt.frame(VIEW, Quality::Q3).draws.first().map_or(0.0, |d| d.opacity);

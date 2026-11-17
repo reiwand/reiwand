@@ -5,7 +5,7 @@ use serde_json::json;
 #[test]
 fn the_rest_pose_draws_exactly_the_plain_picture() {
     let Some(r) = renderer() else { return };
-    let plain = json!({ "id": "fox", "type": "image", "image": "pic", "size": [SIDE, SIDE] });
+    let plain = json!({ "blend_space": "canvas", "id": "fox", "type": "image", "image": "pic", "size": [SIDE, SIDE] });
     let flat = render(r, scene(plain, sketch(false)), 0.0, Quality::Q3);
     let bent = render(r, scene(mesh(json!({})), sketch(false)), 0.0, Quality::Q3);
     let worst = flat.iter().zip(&bent).map(|(a, b)| a.abs_diff(*b)).max().unwrap();

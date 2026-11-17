@@ -130,9 +130,9 @@ pub(super) fn scenes() {
     let videos = Path::new(FIXTURES).join("magenta-64x32.webm");
     let source = tempfile::tempdir().unwrap();
     fs::copy(&videos, source.path().join("clip.webm")).unwrap();
-    let layers = json!([{ "id": "clip", "type": "video", "video": "clip" },
-        { "id": "own", "type": "video", "video": "clip", "playback": { "own_clock": true } },
-        { "id": "picked", "type": "video", "video": { "prop": "pick" }, "playback": { "own_clock": true } }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "clip", "type": "video", "video": "clip" },
+        { "blend_space": "canvas", "id": "own", "type": "video", "video": "clip", "playback": { "own_clock": true } },
+        { "blend_space": "canvas", "id": "picked", "type": "video", "video": { "prop": "pick" }, "playback": { "own_clock": true } }]);
     let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "clip": { "path": "clip.webm" } }, "layers": layers });
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
     let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.clip", "version": "1.0.0", "title": "Clip", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" }, "photosensitive": false, "origin": { "kind": "original" },
