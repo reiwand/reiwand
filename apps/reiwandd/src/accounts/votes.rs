@@ -10,7 +10,11 @@ impl Daemon {
         let specs = [spec.to_owned()];
         let repo = spec.split_once('/').map_or("", |(repo, _)| repo);
         let first = || self.destinations().into_iter().next().ok_or_else(|| invalid(ELSEWHERE));
-        let to = if repo.is_empty() { first()? } else { self.destination_for(repo).map_err(|_| invalid(ELSEWHERE))? };
+        let to = if repo.is_empty() {
+            first()?
+        } else {
+            self.destination_for(repo).map_err(|_| invalid(ELSEWHERE))?
+        };
         let found = reiwand_format::voted(&specs, to.repo_id.as_deref());
         let Some(asked) = found.filter(|_| matches!(vote, "up" | "down" | "none")) else {
             return Err(invalid("give a package id or REPO/ID and up, down or none"));
