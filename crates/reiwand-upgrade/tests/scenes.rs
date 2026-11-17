@@ -149,3 +149,15 @@ fn a_scene_needing_every_step_gets_all_of_them_once() {
     assert_eq!(p["render"]["aspect"], 1.0);
     assert_eq!(p["init"]["tilt"]["angle"], json!([[0.0, 0.0], [0.0, 0.0]]));
 }
+
+#[test]
+fn every_refraction_gains_its_size_units() {
+    let scene = json!({"particles": {
+        "rain": {"capacity": 4, "emitters": [], "render": {"refract": {"normal": "drop", "amount": 0.4}}},
+        "far": {"capacity": 4, "emitters": [],
+            "render": {"refract": {"normal": "drop", "units": "pixels", "shift": 30}}}}});
+    let p = &upgraded("scenes-refract-units", scene)["particles"];
+    assert_eq!(p["rain"]["render"]["refract"]["units"], "size");
+    assert_eq!(p["rain"]["render"]["refract"]["amount"], 0.4);
+    assert_eq!(p["far"]["render"]["refract"]["units"], "pixels");
+}

@@ -22,6 +22,7 @@ ColumnLayout {
         enabled: (bend.info?.pictures ?? []).length > 0
         onToggled: bend.put(checked ? {
             "normal": bend.info.normal ?? bend.info.pictures[0],
+            "units": "size",
             "amount": 0.3
         } : {
             "off": true
@@ -40,12 +41,26 @@ ColumnLayout {
                 })
         }
 
+        QQC2.ComboBox {
+            readonly property var units: ["size", "pixels"]
+
+            model: [App.tr("Proportional to the size"), App.tr("In pixels")]
+            currentIndex: bend.bent?.units === "pixels" ? 1 : 0
+            onActivated: index => bend.put({
+                    "units": units[index]
+                })
+        }
+
         SceneSlider {
+            readonly property bool pixels: bend.bent?.units === "pixels"
+
             Layout.fillWidth: true
             from: 0
-            to: 1
-            value: bend.bent?.amount ?? 0.3
-            onMoved: bend.put({
+            to: pixels ? 256 : 1
+            value: pixels ? (bend.bent?.shift ?? 8) : (bend.bent?.amount ?? 0.3)
+            onMoved: bend.put(pixels ? {
+                "shift": Math.round(value)
+            } : {
                 "amount": Math.round(value * 100) / 100
             }, true)
         }

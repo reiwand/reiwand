@@ -572,13 +572,16 @@ Hace que las partículas no se vean a sí mismas, sino que doblen lo que hay det
 | `system` | texto | (obligatorio) Id del sistema. |
 | `layer` | texto | Capa de partículas a la que vale. |
 | `normal` | texto | Id de una imagen del paquete que sirve de mapa de normales. Obligatorio mientras el sistema no tenga uno. |
-| `amount` | número | Cuánto doblan, de 0 a 1. Por defecto 0,3. |
+| `units` | texto | `size` (el corrimiento es `amount` por la mitad del tamaño del sprite) o `pixels` (es `shift` píxeles del lienzo, igual para cualquier tamaño de sprite y a lo largo de toda la estela). Por defecto, las que ya tiene; si no tiene, `size`. Al cambiar de unidades se convierte el valor actual para que el doblez no cambie. |
+| `amount` | número | Con `size`: cuánto doblan, de 0 a 1. Por defecto 0,3. |
+| `shift` | número | Con `pixels`: corrimiento máximo en píxeles del lienzo, de 0 a 256. Por defecto 8. Una gota fina de 7 px con `shift` 40 dobla el fondo hasta 40 px por su opacidad en toda su longitud. |
 | `off` | sí/no | Si es `true`, quita la refracción. Por defecto `false`. |
 
 ```sh
 reiwand-ctl scene act mi-escena add_layer '{"kind":"image","file":"foto.png"}'
 reiwand-ctl scene act mi-escena add_layer '{"kind":"particles","id":"chispas"}'
-reiwand-ctl scene act mi-escena particles '{"refract":{"system":"chispas","normal":"foto","amount":0.4}}'
+reiwand-ctl scene act mi-escena particles '{"refract":{"system":"chispas","normal":"foto","units":"size","amount":0.4}}'
+reiwand-ctl scene act mi-escena particles '{"refract":{"system":"chispas","units":"pixels","shift":40}}'
 reiwand-ctl scene act mi-escena particles '{"refract":{"system":"chispas","off":true}}'
 ```
 

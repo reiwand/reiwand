@@ -121,7 +121,7 @@ fn particles_in_a_3d_group_say_whether_they_hide_one_by_one() {
     assert_eq!(way(&p)["way"], "one_by_one", "{}", way(&p));
     act(&mut p, json!({ "set": { "pointer": format!("{at}/render/lit"), "value": true } })).unwrap();
     assert_eq!(way(&p)["way"], "one_by_one", "lit particles hide one by one");
-    let bend = json!({ "normal": "sky", "amount": 0.5 });
+    let bend = json!({ "normal": "sky", "units": "size", "amount": 0.5 });
     act(&mut p, json!({ "set": { "pointer": format!("{at}/render/refract"), "value": bend } })).unwrap();
     assert_eq!(
         (way(&p)["way"].clone(), way(&p)["caveat"].clone()),

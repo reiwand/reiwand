@@ -1,5 +1,5 @@
 fn bent_across(a: f32, across: f32, bend: vec3<f32>) -> vec4<f32> {
-    let shift = bend.xy * (across * 2.0 - 1.0) * look.bend.x * 0.5 * bend.z;
+    let shift = bend.xy * (across * 2.0 - 1.0) * look.bend.x * select(0.5 * bend.z, 1.0, look.bend.y > 0.5);
     return vec4<f32>(shift * a, 0.0, a);
 }
 

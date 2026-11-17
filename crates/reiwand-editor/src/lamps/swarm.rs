@@ -34,7 +34,7 @@ pub(crate) fn edit(dir: &Path, doc: &Value, e: &SwarmLight) -> Result<Vec<Op>> {
                 ops
             })?
         }
-        SwarmLight::Refract { system: id, layer, normal, amount, off } => {
+        SwarmLight::Refract { system: id, layer, normal, units, amount, shift, off } => {
             let sys = system(doc, id)?;
             if *off {
                 let ops =
@@ -49,10 +49,7 @@ pub(crate) fn edit(dir: &Path, doc: &Value, e: &SwarmLight) -> Result<Vec<Op>> {
             let Some(normal) = normal else {
                 anyhow::bail!(said("editor.refract_normal", "refraction needs a normal map", &[]));
             };
-            let amount = amount.or_else(|| was["amount"].as_f64()).unwrap_or(0.3);
-            let fits = amount.is_finite() && (0.0..=1.0).contains(&amount);
-            ensure!(fits, said("editor.refract_amount", "the amount of refraction goes from 0 to 1", &[]));
-            let next = json!({ "normal": normal, "amount": amount });
+            let next = refraction(doc, id, (&was, normal), (units.as_deref(), *amount, *shift))?;
             render(doc, &sys, layer.as_deref(), |doc, at| {
                 put(doc, &format!("{at}/refract"), Some(next.clone()))
             })?
@@ -60,6 +57,40 @@ pub(crate) fn edit(dir: &Path, doc: &Value, e: &SwarmLight) -> Result<Vec<Op>> {
     };
     made.append(&mut ops);
     checked(dir, doc, made)
+}
+
+fn mean_size(doc: &Value, id: &str) -> f64 {
+    let init = &doc["scene"]["particles"][id]["init"]["size"];
+    init.as_array().map_or(16.0, |l| l.iter().filter_map(Value::as_f64).sum::<f64>() / 2.0)
+}
+
+fn refraction(
+    doc: &Value,
+    id: &str,
+    (was, normal): (&Value, Value),
+    (units, amount, shift): (Option<&str>, Option<f64>, Option<f64>),
+) -> anyhow::Result<Value> {
+    let by = match units.or_else(|| was["units"].as_str()).unwrap_or("size") {
+        "size" => "size",
+        "pixels" => "pixels",
+        _ => anyhow::bail!(said("editor.refract_units", "the units of refraction are size or pixels", &[])),
+    };
+    let half = (0.5 * mean_size(doc, id)).max(1e-6);
+    let before = was["units"].as_str();
+    if by == "size" {
+        let from_pixels = was["shift"].as_f64().map(|s| (s / half).clamp(0.0, 1.0));
+        let amount = amount.or(if before == Some("pixels") { from_pixels } else { was["amount"].as_f64() });
+        let amount = amount.unwrap_or(0.3);
+        let fits = amount.is_finite() && (0.0..=1.0).contains(&amount);
+        ensure!(fits, said("editor.refract_amount", "the amount of refraction goes from 0 to 1", &[]));
+        return Ok(json!({ "normal": normal, "units": "size", "amount": amount }));
+    }
+    let from_size = was["amount"].as_f64().map(|a| (a * half).clamp(0.0, 256.0));
+    let shift = shift.or(if before == Some("size") { from_size } else { was["shift"].as_f64() });
+    let shift = shift.unwrap_or(8.0);
+    let fits = shift.is_finite() && (0.0..=256.0).contains(&shift);
+    ensure!(fits, said("editor.refract_shift", "the shift of refraction goes from 0 to 256 pixels", &[]));
+    Ok(json!({ "normal": normal, "units": "pixels", "shift": shift }))
 }
 
 fn rendered<'a>(doc: &'a Value, id: &str, layer: Option<&str>) -> &'a Value {
@@ -103,7 +134,9 @@ fn levels(lit: bool, refract: bool) -> Value {
 }
 
 pub fn swarm_light(dir: &Path, doc: &Value, id: &str, layer: Option<&str>) -> Value {
-    let Some(s) = doc.pointer(&format!("/scene/particles/{}", escape(id))) else { return Value::Null };
+    if doc.pointer(&format!("/scene/particles/{}", escape(id))).is_none() {
+        return Value::Null;
+    }
     let r = rendered(doc, id, layer);
     let (lit, bend) = (r["lit"] == true, &r["refract"]);
     let pictures: Vec<&String> = doc["scene"]["assets"]
@@ -113,9 +146,11 @@ pub fn swarm_light(dir: &Path, doc: &Value, id: &str, layer: Option<&str>) -> Va
         .filter(|(k, _)| picture(doc, k).is_ok())
         .map(|(k, _)| k)
         .collect();
-    let size =
-        s["init"]["size"].as_array().map_or(16.0, |l| l.iter().filter_map(Value::as_f64).sum::<f64>() / 2.0);
-    let shift = bend["amount"].as_f64().unwrap_or(0.0) * 0.5 * size;
+    let size = mean_size(doc, id);
+    let shift = match bend["units"].as_str() {
+        Some("pixels") => bend["shift"].as_f64().unwrap_or(0.0),
+        _ => bend["amount"].as_f64().unwrap_or(0.0) * 0.5 * size,
+    };
     let field = pixels(dir, doc, bend["normal"].as_str()).map(|m| crate::rigs::url(&m));
     let normal = pixels(dir, doc, r["normal"].as_str());
     json!({ "system": id, "lit": lit, "normal": r["normal"], "refract": bend, "pictures": pictures,

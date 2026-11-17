@@ -98,7 +98,10 @@ fn bent(r: &Renderer, depth: Option<f32>, tested: bool) -> Vec<u8> {
         "visible": depth.is_some() }),
     );
     layers[0]["layers"].as_array_mut().unwrap().insert(0, back);
-    let mut extra = sparks(depth.unwrap_or(0.0), json!({ "refract": { "normal": "bump", "amount": 1 } }));
+    let mut extra = sparks(
+        depth.unwrap_or(0.0),
+        json!({ "refract": { "normal": "bump", "units": "size", "amount": 1 } }),
+    );
     extra["particles"]["s"]["init"]["size"] = json!([140, 140]);
     extra["assets"] =
         json!({ "stripes": { "path": "stripes.png" }, "bump": { "path": "bump.png", "linear": true } });

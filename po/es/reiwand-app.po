@@ -10185,6 +10185,10 @@ msgid "Drag to move this end of the tube"
 msgstr "Arrastra para mover este extremo del tubo"
 
 #: apps/reiwand-app/qml/SceneLightTools.qml
+#: apps/reiwand-app/qml/facade/SceneValues.qml
+msgid "Pixels"
+msgstr "Píxeles"
+
 #: apps/reiwand-app/qml/SceneSwarmEmitter.qml
 #: apps/reiwand-app/qml/facade/SceneNames.qml
 #: apps/reiwand-app/qml/facade/SceneValues.qml
@@ -13005,6 +13009,14 @@ msgstr "%1 por %2 px, cuenta el %3% del cuadrado"
 #: apps/reiwand-app/qml/SceneSwarmBend.qml
 msgid "Bend what is behind the particles"
 msgstr "Doblar lo que hay detrás de las partículas"
+
+#: apps/reiwand-app/qml/SceneSwarmBend.qml
+msgid "Proportional to the size"
+msgstr "Proporcional al tamaño"
+
+#: apps/reiwand-app/qml/SceneSwarmBend.qml
+msgid "In pixels"
+msgstr "En píxeles"
 
 #: apps/reiwand-app/qml/SceneSwarmBend.qml
 msgid "Show the displacement over the preview"
@@ -19027,6 +19039,10 @@ msgstr "Tipo"
 #: apps/reiwand-app/qml/facade/SceneLabels.qml
 msgid "Unit"
 msgstr "Unidad"
+
+#: apps/reiwand-app/qml/facade/SceneLabels.qml
+msgid "Units"
+msgstr "Unidades"
 
 #: apps/reiwand-app/qml/facade/SceneLabels.qml
 msgid "Rising"

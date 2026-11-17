@@ -981,7 +981,7 @@ edit	Parallax.steps	number	optional	1	16	dbus.md:1339
 edit	Parallax.strength	number	optional	1	0.02	dbus.md:583
 edit	Source.bytes	number	optional	1	0	-
 edit	Source.name	string	optional	1	""	choose-pieces.md:32
-edit	Source.pixels	array	optional	1	[0,0]	-
+edit	Source.pixels	array	optional	1	[0,0]	editor.md:85
 edit	Source.sha256	string	optional	1	""	repo.md:110
 edit	Span.center	array	optional	1	[0.5,0.5]	dbus.md:505
 edit	Span.zoom	number	optional	1	1.0	dbus.md:2427

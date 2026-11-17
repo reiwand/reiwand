@@ -62,3 +62,8 @@ pub(super) fn heard(def: &str, map: &Map<String, Value>) -> Vec<(&'static str, V
         .filter_map(|name| Some((name, heard_value(def, name)?)))
         .collect()
 }
+
+pub(super) fn tag(ctx: &str, map: &Map<String, Value>) -> Option<(&'static str, Value)> {
+    (ctx == "refract" && map.contains_key("normal") && !map.contains_key("units"))
+        .then(|| ("units", json!("size")))
+}

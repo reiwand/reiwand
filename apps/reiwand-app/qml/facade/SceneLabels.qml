@@ -39,6 +39,7 @@ QtObject {
             "turbulent": App.tr("Turbulent velocity"),
             "type": App.tr("Type"),
             "unit": App.tr("Unit"),
+            "units": App.tr("Units"),
             "up": App.tr("Rising"),
             "uses": App.tr("Uses"),
             "uv_scale": App.tr("Texture scale"),

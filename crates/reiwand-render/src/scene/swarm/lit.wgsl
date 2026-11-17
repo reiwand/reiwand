@@ -54,6 +54,6 @@ fn fs_lit_particle(in: Corner) -> @location(0) vec4<f32> {
 fn fs_bend_particle(in: Corner) -> @location(0) vec4<f32> {
     let a = painted(in).a;
     let t = textureSampleLevel(bend_map, samp, in.uv * look.crops.zw, 0.0).xy * 2.0 - 1.0;
-    let shift = turned(t, in.turn) * look.bend.x * 0.5 * in.turn.z;
+    let shift = turned(t, in.turn) * look.bend.x * select(0.5 * in.turn.z, 1.0, look.bend.y > 0.5);
     return vec4<f32>(shift * a, 0.0, a);
 }

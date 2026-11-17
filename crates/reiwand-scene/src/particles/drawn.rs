@@ -1,4 +1,4 @@
-use super::{MAX_CURVE, Render, StretchDepth, StretchMode};
+use super::{MAX_CURVE, Refract, Render, StretchDepth, StretchMode};
 use crate::effects::Stage;
 use crate::validate::{Check, Issue};
 
@@ -57,8 +57,13 @@ impl Check<'_> {
         self.uses(r.lit || r.normal.is_some() || r.refract.is_some(), "particle_lighting");
         r.normal.iter().for_each(|n| self.picture(&format!("{p}/normal"), n));
         if let Some(f) = &r.refract {
-            self.picture(&format!("{p}/refract/normal"), &f.normal);
-            self.range(&format!("{p}/refract/amount"), f.amount, 0.0, 1.0);
+            self.picture(&format!("{p}/refract/normal"), f.normal());
+            match f {
+                Refract::Size { amount, .. } => self.range(&format!("{p}/refract/amount"), *amount, 0.0, 1.0),
+                Refract::Pixels { shift, .. } => {
+                    self.range(&format!("{p}/refract/shift"), *shift, 0.0, 256.0)
+                }
+            }
         }
         if let Some(id) = &r.shader {
             self.uses(true, "particle_shaders");

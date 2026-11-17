@@ -83,8 +83,14 @@ fn particles_take_light_and_refract_with_pictures_in_range() {
     let layer = |render: Json| json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "rain", "render": render });
     assert!(issues(json!([layer(json!({ "lit": true, "normal": "wall" }))])).is_empty());
     assert!(!issues(json!([layer(json!({ "normal": "song" }))])).is_empty());
-    assert!(!issues(json!([layer(json!({ "refract": { "normal": "wall", "amount": 2 } }))])).is_empty());
-    assert!(issues(json!([layer(json!({ "refract": { "normal": "wall", "amount": 0.4 } }))])).is_empty());
+    assert!(
+        !issues(json!([layer(json!({ "refract": { "normal": "wall", "units": "size", "amount": 2 } }))]))
+            .is_empty()
+    );
+    assert!(
+        issues(json!([layer(json!({ "refract": { "normal": "wall", "units": "size", "amount": 0.4 } }))]))
+            .is_empty()
+    );
     let s = scene(json!([layer(json!({ "lit": true }))]));
     assert!(s.features().contains("particle_lighting"));
 }
@@ -114,4 +120,26 @@ fn lamps_carry_their_air_and_picture_and_drop_the_air_at_the_lowest_level() {
     assert_eq!(Quality::Q1.air(Tier::T3), Some((4.0, 0.5)));
     assert_eq!(Quality::Q3.air(Tier::T0), Some((4.0, 1.0)));
     assert_eq!((Quality::Q3.bend(), Quality::Q2.bend(), Quality::Q1.bend()), (Some(1.0), Some(0.5), None));
+}
+
+#[test]
+fn particle_refraction_names_its_units_and_range() {
+    let layer = |render: Json| json!({ "id": "p", "type": "particles", "system": "rain", "render": render });
+    let wall = |r: Json| {
+        json!({ "normal": "wall" })
+            .as_object()
+            .cloned()
+            .unwrap()
+            .into_iter()
+            .chain(r.as_object().cloned().unwrap())
+            .collect::<Json>()
+    };
+    let ok = |r: Json| issues(json!([layer(json!({ "refract": wall(r) }))])).is_empty();
+    assert!(ok(json!({ "units": "pixels", "shift": 40 })));
+    assert!(!ok(json!({ "units": "pixels", "shift": 300 })));
+    let parses = |r: Json| serde_json::from_value::<reiwand_scene::Refract>(wall(r)).is_ok();
+    assert!(parses(json!({ "units": "size", "amount": 0.4 })));
+    assert!(!parses(json!({ "units": "pixels", "amount": 0.4 })));
+    assert!(!parses(json!({ "units": "size", "shift": 4 })));
+    assert!(!parses(json!({ "amount": 0.4 })));
 }

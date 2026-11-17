@@ -101,7 +101,7 @@
         "texture": "spark", "frames": "life", "cycles": 3, "brightness": 4, "cutout": [0.2, 0.8, 1],
         "stretch": { "mode": "add", "depth": "flat", "time": 0.1, "min": 2, "max": 40 }, "rope": { "subdivide": 3, "width": 6 },
         "trail": { "length": 32, "width": 0.5, "segments": 16, "textured": true },
-        "orient": "fixed", "angle": 90, "normal": "drops", "lit": true, "refract": { "normal": "drops", "amount": 0.3 },
+        "orient": "fixed", "angle": 90, "normal": "drops", "lit": true, "refract": { "normal": "drops", "units": "size", "amount": 0.3 },
         "shader": "sparkle"
       },
       "children": [{ "system": "embers", "on": "death", "probability": 0.5, "max": 100, "offset": [0, -5], "angle": 15,

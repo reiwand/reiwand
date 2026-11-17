@@ -71,8 +71,7 @@ fn ropes_refract_what_is_behind_them() {
     let Some(r) = renderer() else { return };
     let back = json!({ "blend_space": "canvas", "id": "back", "type": "image", "image": "stripes", "size": [160, 80],
         "transform": { "position": [80, 40] } });
-    let bend =
-        json!({ "rope": { "width": 12, "subdivide": 2 }, "refract": { "normal": "bump", "amount": 1 } });
+    let bend = json!({ "rope": { "width": 12, "subdivide": 2 }, "refract": { "normal": "bump", "units": "size", "amount": 1 } });
     for gpu in [false, true] {
         let Some(bent) = strung(r, bend.clone(), vec![back.clone()], gpu) else { return };
         let Some(plain) = strung(r, json!({ "rope": { "width": 0.01 } }), vec![back.clone()], gpu) else {
@@ -102,7 +101,7 @@ fn particle_shaders_refract_what_is_behind_them() {
     let bend = |amount: f32| {
         dot(
             [80.0, 40.0],
-            json!({ "render": { "shader": "same", "refract": { "normal": "pair", "amount": amount } } }),
+            json!({ "render": { "shader": "same", "refract": { "normal": "pair", "units": "size", "amount": amount } } }),
         )
     };
     for gpu in [false, true] {

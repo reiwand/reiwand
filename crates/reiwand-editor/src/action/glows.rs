@@ -19,7 +19,11 @@ pub enum SwarmLight {
         #[serde(default)]
         normal: Option<String>,
         #[serde(default)]
+        units: Option<String>,
+        #[serde(default)]
         amount: Option<f64>,
+        #[serde(default)]
+        shift: Option<f64>,
         #[serde(default)]
         off: bool,
     },

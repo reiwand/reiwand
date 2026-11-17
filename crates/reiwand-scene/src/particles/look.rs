@@ -63,12 +63,40 @@ pub struct Render {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(deny_unknown_fields)]
-pub struct Refract {
-    #[schemars(extend("x-ref" = "image"))]
-    pub normal: String,
-    #[schemars(extend("x-range" = [0, 1]))]
-    pub amount: f32,
+#[serde(tag = "units", rename_all = "lowercase", deny_unknown_fields)]
+pub enum Refract {
+    Size {
+        #[schemars(extend("x-ref" = "image"))]
+        normal: String,
+        #[schemars(extend("x-range" = [0, 1]))]
+        amount: f32,
+    },
+    Pixels {
+        #[schemars(extend("x-ref" = "image"))]
+        normal: String,
+        #[schemars(extend("x-range" = [0, 256]))]
+        #[schemars(extend("x-unit" = "px"))]
+        shift: f32,
+    },
+}
+
+impl Refract {
+    pub fn normal(&self) -> &str {
+        match self {
+            Self::Size { normal, .. } | Self::Pixels { normal, .. } => normal,
+        }
+    }
+
+    pub fn by_pixels(&self) -> bool {
+        matches!(self, Self::Pixels { .. })
+    }
+
+    pub fn strength(&self) -> f32 {
+        match self {
+            Self::Size { amount, .. } => amount.clamp(0.0, 1.0),
+            Self::Pixels { shift, .. } => shift.clamp(0.0, 256.0),
+        }
+    }
 }
 
 impl Render {

@@ -101,6 +101,7 @@ QtObject {
             "phoenix": App.tr("Phoenix"),
             "pin_light": App.tr("Pin light"),
             "pingpong": App.tr("Back and forth"),
+            "pixels": App.tr("Pixels"),
             "point": App.tr("Point"),
             "previous": App.tr("Previous cover"),
             "primary": App.tr("Main color"),

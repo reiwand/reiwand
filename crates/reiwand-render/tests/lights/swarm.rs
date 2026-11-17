@@ -9,6 +9,12 @@ fn system(render: Value) -> Value {
         "render": render })
 }
 
+fn sized(render: Value, side: u32) -> Value {
+    let mut s = system(render);
+    s["init"]["size"] = json!([side, side]);
+    s
+}
+
 fn lamp(x: f32) -> Value {
     json!({ "blend_space": "canvas", "id": "lamp", "type": "light", "transform": { "position": [x, 45] }, "z": 20, "radius": 60, "intensity": 2 })
 }
@@ -19,6 +25,16 @@ fn shot(render: Value, layers: Vec<Value>, gpu: bool, quality: Quality) -> Optio
 
 fn shown(
     render: Value,
+    layers: Vec<Value>,
+    mode: (bool, bool),
+    quality: Quality,
+) -> Option<image::RgbaImage> {
+    shown_sized(render, 40, layers, mode, quality)
+}
+
+fn shown_sized(
+    render: Value,
+    side: u32,
     mut layers: Vec<Value>,
     (gpu, shift): (bool, bool),
     quality: Quality,
@@ -29,7 +45,7 @@ fn shown(
     let assets = json!({ "wall": { "path": "wall.png" }, "bump": { "path": "bump.png", "linear": true },
         "mask": { "path": "mask.png", "linear": true } });
     let text = json!({ "schema": SCHEMA, "canvas": canvas, "assets": assets, "layers": layers,
-        "particles": { "s": system(render) } });
+        "particles": { "s": sized(render, side) } });
     let scene = Scene::load(&text.to_string(), &Default::default()).unwrap();
     let view = r.scene_view(&scene, &files([255, 128, 128, 255]), &Values::new()).unwrap();
     let mut shot = Shot { runtime: Runtime::new(Arc::new(scene), Values::new()), view };
@@ -91,7 +107,7 @@ fn a_normal_map_turns_particles_toward_the_light_on_both_sides() {
 fn refracting_particles_bend_what_is_behind_them_above_the_low_levels() {
     let back = json!({ "blend_space": "canvas", "id": "back", "type": "image", "image": "mask", "size": [160, 90],
         "transform": { "position": [80, 45] } });
-    let bend = json!({ "refract": { "normal": "bump", "amount": 1 } });
+    let bend = json!({ "refract": { "normal": "bump", "units": "size", "amount": 1 } });
     for gpu in [false, true] {
         let Some(bent) = shot(bend.clone(), vec![back.clone()], gpu, Quality::Q3) else { continue };
         let Some(low) = shot(bend.clone(), vec![back.clone()], gpu, Quality::Q1) else { continue };
@@ -107,6 +123,26 @@ fn refracting_particles_bend_what_is_behind_them_above_the_low_levels() {
         return;
     };
     assert!(close(&cpu, &gpu), "the CPU and GPU paths bend differently");
+}
+
+#[test]
+fn refraction_in_pixels_ignores_the_sprite_size() {
+    let back = json!({ "id": "back", "type": "image", "image": "mask", "size": [160, 90],
+        "transform": { "position": [80, 45] } });
+    let size = json!({ "refract": { "normal": "bump", "units": "size", "amount": 1 } });
+    let pixels = |shift: u32| json!({ "refract": { "normal": "bump", "units": "pixels", "shift": shift } });
+    for gpu in [false, true] {
+        let take = |render: Value, side: u32| {
+            shown_sized(render, side, vec![back.clone()], (gpu, false), Quality::Q3)
+        };
+        let Some(full) = take(size.clone(), 40) else { continue };
+        let Some(same) = take(pixels(20), 40) else { continue };
+        assert!(close(&full, &same), "gpu {gpu}: a 40 px sprite at amount 1 shifts 20 px");
+        let (Some(thin), Some(far)) = (take(size.clone(), 8), take(pixels(20), 8)) else { continue };
+        assert!(!close(&thin, &far), "gpu {gpu}: an 8 px sprite shifts 20 px by pixels, 4 px by size");
+        let Some(wide) = take(pixels(40), 40) else { continue };
+        assert!(!close(&same, &wide), "gpu {gpu}: the shift grows with its value");
+    }
 }
 
 #[test]
@@ -132,7 +168,7 @@ fn lit_particles_take_the_picture_a_spot_projects() {
 fn the_shift_view_paints_the_bend_of_refracting_particles_over_a_dimmed_scene() {
     let back = json!({ "blend_space": "canvas", "id": "back", "type": "image", "image": "wall", "size": [160, 90],
         "transform": { "position": [80, 45] } });
-    let bend = json!({ "refract": { "normal": "bump", "amount": 1 } });
+    let bend = json!({ "refract": { "normal": "bump", "units": "size", "amount": 1 } });
     for gpu in [false, true] {
         let Some(view) = shown(bend.clone(), vec![back.clone()], (gpu, true), Quality::Q3) else { continue };
         let Some(plain) = shot(bend.clone(), vec![back.clone()], gpu, Quality::Q3) else { continue };

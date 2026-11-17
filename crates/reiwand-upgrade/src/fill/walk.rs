@@ -127,6 +127,12 @@ impl<'a> Walk<'a> {
     fn visit(&mut self, s: &'a Value, v: &mut Value, def: &str, ctx: &str) {
         let (s, named) = self.resolve(s);
         let def = named.unwrap_or(def);
+        if let Value::Object(map) = v
+            && let Some((name, value)) = super::legacy::tag(ctx, map)
+        {
+            map.insert(name.into(), value);
+            self.report.note("Refract", name);
+        }
         for key in ["oneOf", "anyOf"] {
             if let Some(list) = s.get(key).and_then(Value::as_array)
                 && let Some(branch) = self.pick(list, v)

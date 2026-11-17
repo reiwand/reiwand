@@ -36,17 +36,17 @@ pub(super) fn light(r: &Renderer, kit: &mut Kit, (render, sprite): (&Render, [f3
     if !render.lit && render.normal.is_none() && bend.is_none() && !lamp.layers {
         return;
     }
-    let exact = |id: Option<&String>| {
+    let exact = |id: Option<&str>| {
         let found = id.and_then(|id| lamp.images.get(id)).map(|i| &i.0);
         found.and_then(|i| r.exact(i)).or_else(|| found.cloned())
     };
-    let (normal, bent) = (exact(render.normal.as_ref()), exact(bend.map(|b| &b.normal)));
+    let (normal, bent) = (exact(render.normal.as_deref()), exact(bend.map(|b| b.normal())));
     let view = |i: Option<crate::GpuImage>| i.map_or_else(|| lamp.white.clone(), |i| i.view);
     kit.lit = Some([view(normal), view(bent)]);
     let normal = render.normal.as_ref().is_some_and(|id| lamp.images.contains_key(id));
     kit.look.light = [flag(render.lit), flag(normal), 0.0, 1.0];
-    kit.bend = bend.map(|b| b.amount.clamp(0.0, 1.0));
-    kit.look.bend = [kit.bend.unwrap_or(0.0), 0.0, 0.0, 0.0];
+    kit.bend = bend.map(|b| b.strength());
+    kit.look.bend = [kit.bend.unwrap_or(0.0), bend.map_or(0.0, |b| flag(b.by_pixels())), 0.0, 0.0];
 }
 
 impl Swarms {
