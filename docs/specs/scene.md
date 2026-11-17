@@ -1829,6 +1829,10 @@ The newer fields behave as follows.
   with `at` is drawn around that point, turned by its `angle`. The `points` of a layer's `instance`
   and the `point(n, [x, y])` of scripts move points `p0` to `p7` for that layer; a `null` entry
   of `points` leaves that point to the system.
+  Without `points`, `p0` is the pixel (0, 0) of the layer, the top-left corner of its frame and not
+  the middle of the canvas that the layer turns around; it moves, turns and scales with the layer in
+  both spaces, exactly like a target or center given as `[0, 0]`. To aim at the middle of the system,
+  give `p0` an `at` of half the canvas.
 - **Shapes.** `inner` cuts a box of that size out of the middle of a `box`, which births fill evenly.
   `scale` stretches a `circle` into an ellipse and `sign` keeps its positive (1) or negative (−1)
   half along x and along y.

@@ -151,3 +151,24 @@ fn a_gap_in_the_points_of_an_instance_keeps_the_point_of_the_system() {
         assert!(!born.is_empty() && born.iter().all(|p| (p.pos[0] - x).abs() < 0.1), "{own}: {born:?}");
     }
 }
+
+#[test]
+fn p0_is_the_corner_of_the_layer_frame_and_moves_with_the_layer() {
+    for (space, want) in [("local", [0.0, 0.0]), ("world", [200.0, 150.0])] {
+        let mut ends = vec![];
+        for target in [json!("p0"), json!([0, 0])] {
+            let forces = json!([{ "attractor": { "target": target, "strength": 4000, "falloff": "constant" } }, { "drag": 6 }]);
+            let system = still(json!({
+                "space": space, "capacity": 4, "forces": forces,
+                "emitters": [{ "shape": { "point": [100, 50] }, "bursts": [{ "count": 4 }] }]
+            }));
+            let layers = json!([{ "id": "p", "type": "particles", "system": "a", "transform": { "position": [300, 200] } }]);
+            let mut fly = Fly::new(runtime(json!({ "a": system }), layers));
+            fly.run(1.0);
+            let at = fly.alive(0)[0].pos;
+            assert!(near(at, want, 10.0), "{space}: {at:?}");
+            ends.push(at);
+        }
+        assert!(near(ends[0], ends[1], 0.001), "{space}: {ends:?}");
+    }
+}
