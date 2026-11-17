@@ -69,7 +69,8 @@ pub(crate) fn effects(dir: &Path, doc: &Value, e: &E) -> Result<Vec<Op>> {
             let d = known(dir, doc, effect)?;
             check(&d, p)?;
             let mut p = p.clone();
-            for def in d.params.iter().filter(|def| def.required && !p.contains_key(&def.id)) {
+            let missing: Vec<_> = d.params.iter().filter(|d| d.required && !p.contains_key(&d.id)).collect();
+            for def in missing {
                 p.insert(def.id.clone(), serde_json::to_value(&def.default)?);
             }
             let (path, found) = layer(doc, id)?;

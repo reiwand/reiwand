@@ -97,6 +97,7 @@ QtObject {
             "segment": App.tr("Segment"),
             "segments": App.tr("Segments"),
             "separation": App.tr("Separation"),
+            "keep": App.tr("Opacity kept"),
             "shade": App.tr("Shade"),
             "shader": App.tr("Shader"),
             "shadow": App.tr("Shadow"),

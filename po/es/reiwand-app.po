@@ -19368,6 +19368,10 @@ msgid "Segments"
 msgstr "Segmentos"
 
 #: apps/reiwand-app/qml/facade/SceneNames.qml
+msgid "Opacity kept"
+msgstr "Opacidad que se conserva"
+
+#: apps/reiwand-app/qml/facade/SceneNames.qml
 msgid "Shade"
 msgstr "Sombra"
 
