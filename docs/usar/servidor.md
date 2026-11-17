@@ -196,6 +196,7 @@ reiwand-ctl account unlink https://fondos.example.org/r/otro # deja de usarla ah
 reiwand-ctl account rm a1                                    # la olvida en este equipo, con su acceso guardado
 reiwand-ctl server upload fondo.wpak                         # sube un paquete con la cuenta del repositorio
 reiwand-ctl server upload fondo.wpak --unlisted              # … oculto: fuera del catálogo, instalable con su enlace
+reiwand-ctl server upload fondo.wpak --repo https://fondos.example.org/r/otro   # … en ese repositorio, con la cuenta vinculada a él
 reiwand-ctl server packages                                  # tus subidas, con su estado y visibilidad
 reiwand-ctl server uploads                                   # las sesiones de subida (en curso o terminadas); --cancel ID cancela una
 reiwand-ctl server author-key list                           # las claves con las que firmas tus paquetes en línea
