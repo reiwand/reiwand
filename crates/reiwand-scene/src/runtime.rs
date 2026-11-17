@@ -15,6 +15,7 @@ mod draw;
 mod feed;
 mod puppets;
 mod reads;
+mod slots;
 
 use draw::holds;
 
@@ -62,6 +63,7 @@ pub struct Runtime {
     places: RefCell<HashMap<usize, crate::kin::Place>>,
     motion: RefCell<HashMap<usize, crate::resolve::Motion>>,
     usual: RefCell<HashMap<crate::input::UsualKey, crate::input::Usual>>,
+    slots: Vec<[f32; crate::BANDS]>,
     wake: Cell<Wake>,
     pace: Cell<u32>,
     sizes: Cell<(usize, usize)>,
@@ -160,6 +162,7 @@ impl Runtime {
             places: RefCell::default(),
             motion: RefCell::default(),
             usual: RefCell::default(),
+            slots: Vec::new(),
             wake,
             pace: Cell::new(u32::MAX),
             sizes: Cell::default(),

@@ -6,6 +6,7 @@ use std::sync::{OnceLock, RwLock};
 mod defs;
 mod handles;
 mod lighter;
+mod listening;
 mod parts;
 mod tools;
 
@@ -49,6 +50,8 @@ pub struct Descriptor {
     pub description: Option<Text>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub uses: Vec<Use>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub audio: Vec<crate::value::Listen>,
     #[serde(default)]
     pub mask_mode: MaskMode,
     #[serde(default)]

@@ -167,8 +167,9 @@ pub use crate::typeset::{Backing, Glyphs, Layout, MAX_FALLBACK, Outline, Shadow,
 pub use crate::uses::{Uses, needs, source, tells_time, variants};
 pub use crate::validate::Issue;
 pub use crate::value::{
-    AudioChannel, AudioKind, AudioUnit, Axis, Band, Binding, EMITTER_TEXELS, EffectEmitter, Level,
-    MAX_EFFECT_EMITTERS, Param, Reference, Value, Vec2, Vec3, emitter_key, emitter_texels,
+    AudioChannel, AudioKind, AudioUnit, Axis, Band, Binding, EMITTER_TEXELS, EffectEmitter, Level, Listen,
+    MAX_EFFECT_EMITTERS, MAX_LISTENS, MAX_SCRIPT_LISTENS, Param, Reference, Value, Vec2, Vec3, emitter_key,
+    emitter_texels,
 };
 pub use crate::voice::{Playlist, Spot, Walk};
 pub use crate::wake::Wake;

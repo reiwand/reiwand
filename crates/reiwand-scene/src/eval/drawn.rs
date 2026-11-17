@@ -84,6 +84,7 @@ pub struct EffectDraw<'a> {
     pub variant: u32,
     pub frozen: bool,
     pub reset: u32,
+    pub heard: [[f32; crate::BANDS]; 2],
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]

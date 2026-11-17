@@ -54,6 +54,7 @@ impl Runtime {
         for (key, usual) in self.usual.get_mut() {
             usual.advance(&audio, dt, *key);
         }
+        self.listen_slots(&audio);
         let beat = audio.beat && !self.audio.beat;
         let changed = self.uses().audio && audio != self.audio && !(audio.silent && self.audio.silent);
         if !audio.silent {

@@ -3,7 +3,7 @@ use crate::validate::{Check, Issue};
 use crate::value::{AudioKind, Band, Binding};
 
 impl Check<'_> {
-    pub(super) fn signal<T>(&mut self, path: &str, b: &Binding<T>) {
+    pub(crate) fn signal<T>(&mut self, path: &str, b: &Binding<T>) {
         let of = b.of.unwrap_or(64);
         if let Some(of) = b.of {
             self.uses(true, "audio_ranges");

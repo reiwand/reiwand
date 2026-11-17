@@ -130,6 +130,7 @@ fn emit<'a>(
             textures,
             emitters,
             velocity,
+            heard: cx.listened(&d.audio),
         };
         frame.effects.push(draw);
     }

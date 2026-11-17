@@ -1003,8 +1003,11 @@ other kinds. The `level` of the whole sound has no band reference: relative and 
 and in `amplitude` it is the amplitude of the whole sound. `beat` ignores the kind and is 1 on a beat.
 `bass`, `mid` and `treble` average the bands below 250 Hz, up to 4 kHz and above, `level` is the
 loudness of the whole sound. (`unit` is not called `scale` because `scale` already multiplies the value.)
-Particle systems (`turbulent.audio`, `audio:` inputs), scripts and shaders keep reading the relative
-level in decibels. Values rise within 20 ms and fall within
+Particle systems (`init.turbulent`, `init.remap`, `remap` forces) carry the five fields of the binding
+next to their `audio` or `audio:<band>` input, all required as for a binding (`kind` and `unit` always, `window`,
+`reference` and `hold_silence` only with `surge`). Shaders and scripts declare what they read as
+`Listen` entries, see "Package effects" and the scripts API; the named levels `bass`, `mid`, `treble`, `level`
+and `band()` stay relative in decibels. Values rise within 20 ms and fall within
 200 ms unless the scene sets `audio`. The order is `bounds`, `exponent`, `invert`, `scale`,
 `offset`, `clamp` and then `smooth`; `bounds` and `exponent` also shape properties, the pointer and
 scripts, and an `exponent` keeps the sign of negative values.
@@ -1283,7 +1286,12 @@ all of them), and layers use the id
 like any effect. Readers parse the descriptor with the fields above, require its `cost`, compile
 the shader with the contract below and refuse it with `/effects/<id>: <reason>` when it does not
 compile, lacks an entry point or an `override` its options name, or declares bindings of its own;
-then they check every use of it like the uses of built-in effects. The inputs an effect needs are
+then they check every use of it like the uses of built-in effects. A descriptor may list at most 2
+`audio` inputs, each `{ "kind", "unit", "window", "reference", "hold_silence" }` with the fields of an audio binding
+(`kind` and `unit` always; `window` from 0.05 to 60, `reference` and `hold_silence` required with `surge` and refused
+otherwise). The shader reads the 64 bands of input `n` with `heard_band(n, i)`, 0 to 63, as the binding of that kind
+would give them (a `surge` is above 1 when the band rises after quiet and decays back); reading it adds the audio
+input like `band()` does, which stays relative in decibels. The inputs an effect needs are
 found in the compiled shader (reading `frame.time`, the pointer or the audio, also through helper
 functions) and added to its `uses`, so that the scene asks for them without the author listing
 them. Package descriptors may also use `stage`: `material` for the shader of a model material, whose
@@ -1832,7 +1840,7 @@ sets it, and every other name must be one of `points`. Targets and centers of fo
 | `init.alpha`, `hsv`, `palette` | an opacity range of its own; `{ "hue": [0, 360], "steps", "sat", "val" }`; or `{ "colors" (1 to 10), "noise": [h, s, v] }` (not both), which replace `color` | `particles2` |
 | `init.gradient` | at most 8 `[t, color]` stops in order, read at a random place (leaned by the exponent of `color`) and replacing `color`; not with `hsv` or `palette` | `particles2` |
 | `init.velocity`, `radial`, `inherit` | `[[vx0, vy0], [vx1, vy1], exponent?]` replacing `speed` and `angle`; a speed away from the center of the shape; `{ "from" (cursor or control point), "speed": [min, max] }` | `particles2` |
-| `init.turbulent`, `offset_noise`, `remap` | turbulent starting velocity `{ "forward", "scale", "noise_speed", "offset", "speed", "phase", "audio" }`; a fractal offset of the birth `{ "distance", "scale", "sign", "octaves" (1 to 6), "noise_scale", "noise_speed" }`; at most 8 `{ "input", "in", "clamp_in", "output", "out", "clamp_out", "op", "wave" }` that map `daytime`, `runtime`, `life`, `age`, `speed`, `random`, `distance:pN`, `audio:<band>` or `cursor:x\|y` onto `size`, `alpha`, `color`, `speed`, `life`, `rotation`, `spin` or `frame` with `set`, `mul`, `add` or `sub` and an optional `sine` or `noise` wave | `particle_fields` |
+| `init.turbulent`, `offset_noise`, `remap` | turbulent starting velocity `{ "forward", "scale", "noise_speed", "offset", "speed", "phase", "audio", "kind", "unit", "window", "reference", "hold_silence" }`; a fractal offset of the birth `{ "distance", "scale", "sign", "octaves" (1 to 6), "noise_scale", "noise_speed" }`; at most 8 `{ "input", "in", "clamp_in", "output", "out", "clamp_out", "op", "wave", "kind", "unit", "window", "reference", "hold_silence" }` that map `daytime`, `runtime`, `life`, `age`, `speed`, `random`, `distance:pN`, `audio:<band>` or `cursor:x\|y` onto `size`, `alpha`, `color`, `speed`, `life`, `rotation`, `spin` or `frame` with `set`, `mul`, `add` or `sub` and an optional `sine` or `noise` wave | `particle_fields` |
 | `perspective`, `init.depth`, `init.depth_speed` | `{ "focal" (1 to 100000 px) }` and depth ranges in pixels, which need `perspective` | `particle_depth` |
 | `init.tilt` | `{ "angle": [[xmin, ymin], [xmax, ymax]], "spin": [[xmin, ymin], [xmax, ymax]] }`, both required, in degrees and degrees per second (angle within ±3600, spin within ±36000). Each particle picks a start angle and a spin in the ranges for the turn about the horizontal (x) and the vertical (y) line of its own sprite, and the angle is `start + spin·age`. The sprite is drawn with its width times `\|cos y\|` and its height times `\|cos x\|` along its own directions, so it composes with `rotation`, `orient` and `angle` (the turn is applied after them, in the frame of the sprite, and a trail or stretch along the sprite shortens with the width); with `perspective` the near edge is drawn larger than the far one; `lit` and the normal map use the normal of the turned sprite, lit on both sides. The back of the sprite shows the same picture, not mirrored. The turn is computed in the shader from the particle, so it costs nothing on the simulation. `tilt` is always written: zero ranges (`[[0,0],[0,0]]` for both) mean no turn, any other value turns the sprite; a fixed angle is a range with equal ends | `particles2` (when something turns) |
 | shape `sphere` | `{ "center": [x, y], "depth": z, "radius": [rx, ry, rz], "inner": f, "sign": [sx, sy, sz] }`, every field required and `at` (a control point) optional: births fill the volume of an ellipsoid evenly (the distance from the middle grows with the cube root of a uniform number and the direction is uniform in 3D), between the fraction `inner` (0 to 1, of the three radii; 0 is a full ball) and the edge, and `sign` (−1, 0 or 1 for each of x, y and z, `[0, 0, 0]` for both sides of each) keeps them on one side by mirroring. x and y give the position, z the depth | `particle_depth` |
@@ -2514,6 +2522,15 @@ way. A frame that runs out of time or memory fails as a whole, and after three s
 the scripts of the scene are off and the screen says so; the scene keeps drawing without them. On
 phones the scripts run in a thread of their own with the same limits, and the diagnostics of the app
 say when a module stopped or the scripts are off.
+
+### Listening to the audio from a script
+
+A scene lists at most 4 `listens` at its root, each `{ "kind", "unit", "window", "reference", "hold_silence" }` with
+the fields of an audio binding (`window`, `reference` and `hold_silence` required with `surge`, refused otherwise).
+`audio.heard(slot, count)` returns the 64 bands (or 16 or 32, averaged) of entry `slot` as a `Float32Array`,
+read as that kind and unit would give them, and throws a `RangeError` for a slot the scene does not list. A
+`surge` slot rises above 1 when the music returns after quiet and decays back. `audio.bass`, `mid`,
+`treble`, `level`, `bands()` and `buffers()` stay relative in decibels. The script needs the `audio` input.
 
 ### Script declarations
 

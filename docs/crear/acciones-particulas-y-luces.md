@@ -221,13 +221,13 @@ Da a cada partícula una velocidad inicial que sigue un ruido que se mueve, como
 | Argumento | Tipo | Qué significa |
 |---|---|---|
 | `system` | texto | (obligatorio) Id del sistema. |
-| `turbulent` | objeto | Campos: `forward` (empuje hacia delante), `scale` (tamaño del remolino), `noise_speed` (rapidez del ruido), `offset`, `speed` (`[mín, máx]`), `phase` y `audio` (banda del sonido que mueve la fase: `bass`, `mid`, `treble` o `level`). |
+| `turbulent` | objeto | Campos: `forward` (empuje hacia delante), `scale` (tamaño del remolino), `noise_speed` (rapidez del ruido), `offset`, `speed` (`[mín, máx]`), `phase` y `audio` (banda del sonido que mueve la fase: `bass`, `mid`, `treble` o `level`); con `audio` van también `kind` (`relative`, `absolute` o `surge`), `unit` (`db` o `amplitude`) y, solo con `surge`, `window`, `reference` y `hold_silence`. |
 | `quiet` | sí/no | Si es `true`, quita la banda de sonido. Por defecto `false`. |
 | `off` | sí/no | Si es `true`, quita la turbulencia entera. Por defecto `false`. |
 
 ```sh
 reiwand-ctl scene act mi-escena add_layer '{"kind":"particles","id":"chispas"}'
-reiwand-ctl scene act mi-escena particles '{"turbulent":{"system":"chispas","turbulent":{"forward":20,"scale":0.01,"audio":"bass"}}}'
+reiwand-ctl scene act mi-escena particles '{"turbulent":{"system":"chispas","turbulent":{"forward":20,"scale":0.01,"audio":"bass","kind":"relative","unit":"db"}}}'
 reiwand-ctl scene act mi-escena particles '{"turbulent":{"system":"chispas","quiet":true}}'
 ```
 

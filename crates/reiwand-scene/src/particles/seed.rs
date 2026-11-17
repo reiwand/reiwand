@@ -1,6 +1,6 @@
 use super::Target;
 use crate::Color;
-use crate::value::Band;
+use crate::value::{AudioKind, AudioUnit, Band, Binding, Reference};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -51,6 +51,17 @@ pub struct Turbulent {
     pub phase: f32,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub audio: Option<Band>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kind: Option<AudioKind>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unit: Option<AudioUnit>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
+    pub window: Option<f32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reference: Option<Reference>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hold_silence: Option<bool>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -116,6 +127,17 @@ pub struct Remap {
     pub op: RemapOp,
     #[serde(default)]
     pub wave: Wave,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kind: Option<AudioKind>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unit: Option<AudioUnit>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
+    pub window: Option<f32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reference: Option<Reference>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hold_silence: Option<bool>,
 }
 
 fn full() -> [f32; 2] {
@@ -132,6 +154,11 @@ impl Default for Turbulent {
             speed: [10.0, 40.0],
             phase: 0.0,
             audio: None,
+            kind: None,
+            unit: None,
+            window: None,
+            reference: None,
+            hold_silence: None,
         }
     }
 }
@@ -146,5 +173,26 @@ impl Default for OffsetNoise {
             noise_scale: 1.0,
             noise_speed: 0.0,
         }
+    }
+}
+
+fn listening(
+    audio: Option<Band>,
+    (kind, unit): (Option<AudioKind>, Option<AudioUnit>),
+    (window, reference, hold_silence): (Option<f32>, Option<Reference>, Option<bool>),
+) -> Binding<()> {
+    Binding { audio, kind, unit, window, reference, hold_silence, ..Binding::default() }
+}
+
+impl Turbulent {
+    pub fn binding(&self) -> Binding<()> {
+        let kinds = (self.kind, self.unit);
+        listening(self.audio, kinds, (self.window, self.reference, self.hold_silence))
+    }
+}
+
+impl Remap {
+    pub fn binding(&self, audio: Option<Band>) -> Binding<()> {
+        listening(audio, (self.kind, self.unit), (self.window, self.reference, self.hold_silence))
     }
 }

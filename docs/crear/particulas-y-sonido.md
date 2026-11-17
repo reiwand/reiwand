@@ -159,9 +159,9 @@ número, `[mín, máx, exponente]` (de 0,1 a 10), el azar se inclina hacia un ex
 | `velocity` | | `[[vx0, vy0], [vx1, vy1]]`, en lugar de `speed` y `angle`. |
 | `radial` | | Velocidad que las aleja del centro de la forma. |
 | `inherit` | | `{ "from": "cursor" o un punto, "speed": [min, max] }`: heredan la velocidad del puntero o de un punto de control. |
-| `turbulent` | | Una velocidad inicial que gira con un ruido suave. |
+| `turbulent` | | Una velocidad inicial que gira con un ruido suave. Con `audio` (una banda) escribe también `kind`, `unit` y, con `surge`, `window`, `reference` y `hold_silence`, como en un enlace de sonido. |
 | `offset_noise` | | Un desplazamiento fractal del lugar de nacimiento. |
-| `remap` | | Hasta 8 reglas que llevan una entrada (`life`, `speed`, `age`, `daytime`, `runtime`, `random`, `distance:pN`, `audio:<banda>`, `cursor:x`, `cursor:y`) a un valor inicial (`output`: `size`, `alpha`, `color`, `speed`, `life`, `rotation`, `spin`, `frame`) con `in`, `out`, `op` (`set`, `mul`, `add`, `sub`) y `wave` (`none`, `sine`, `noise`). |
+| `remap` | | Hasta 8 reglas que llevan una entrada (`life`, `speed`, `age`, `daytime`, `runtime`, `random`, `distance:pN`, `audio:<banda>`, `cursor:x`, `cursor:y`) a un valor inicial (`output`: `size`, `alpha`, `color`, `speed`, `life`, `rotation`, `spin`, `frame`) con `in`, `out`, `op` (`set`, `mul`, `add`, `sub`) y `wave` (`none`, `sine`, `noise`). Con una entrada `audio:<banda>` escribe también `kind`, `unit` y, con `surge`, `window`, `reference` y `hold_silence`. |
 | `depth`, `depth_speed` | | Profundidad inicial y su cambio, en píxeles; necesitan `perspective`. |
 | `tilt` | | Giro en profundidad: `{ "angle": [[xmin, ymin], [xmax, ymax]], "spin": [[xmin, ymin], [xmax, ymax]] }`, ambos obligatorios, en grados y grados por segundo; el editor lo escribe siempre y con ceros no gira. Cada partícula gira sobre la línea horizontal (x) y la vertical (y) de su propio sprite y se dibuja con el ancho por el coseno de y y el alto por el del giro en x: un pétalo se ve de canto y de frente al caer. Con `perspective` el borde cercano se ve mayor; con `lit` la luz usa la normal girada. El dorso muestra la misma imagen. |
 

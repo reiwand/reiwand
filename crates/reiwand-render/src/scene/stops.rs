@@ -49,6 +49,7 @@ pub(crate) struct More {
     pub(crate) sizes: [[f32; 4]; 4],
     pub(crate) bands_l: [[f32; 4]; 16],
     pub(crate) bands_r: [[f32; 4]; 16],
+    pub(crate) heard: [[f32; 4]; 32],
 }
 
 pub(crate) fn frame(runtime: &reiwand_scene::Runtime) -> More {

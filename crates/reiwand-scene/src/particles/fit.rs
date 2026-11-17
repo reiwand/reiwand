@@ -1,4 +1,5 @@
 use super::points::{Room, turn};
+use super::seed::Remap;
 use super::sow::input;
 use super::{EmitShape, MAX_CONTROL, MAX_EMITTERS2, Sim, System, Target};
 use crate::resolve::Context;
@@ -14,33 +15,17 @@ pub(super) struct Fit<'a> {
     pub dt: f32,
 }
 
-fn heard(cx: &Context, b: Band) -> f32 {
-    let a = cx.audio;
-    let mean = |lo: u32, hi: u32| {
-        let it = a.average.iter().skip(lo as usize).take(hi.saturating_sub(lo) as usize + 1);
-        it.sum::<f32>() / (hi.saturating_sub(lo) + 1) as f32
-    };
-    match b {
-        Band::Index(i) => mean(i, i),
-        Band::Range([lo, hi]) => mean(lo, hi),
-        Band::Named(Level::Bass) => a.bass,
-        Band::Named(Level::Mid) => a.mid,
-        Band::Named(Level::Treble) => a.treble,
-        Band::Named(Level::Level) => a.level,
-        Band::Named(Level::Beat) => f32::from(a.beat),
-    }
-}
-
-fn level(cx: &Context, band: &str) -> f32 {
+fn level(cx: &Context, r: &Remap) -> f32 {
+    let band = r.input.trim_start_matches("audio:");
     let named = match band {
         "bass" => Level::Bass,
         "mid" => Level::Mid,
         "treble" => Level::Treble,
         "beat" => Level::Beat,
         "level" => Level::Level,
-        n => return heard(cx, Band::Index(n.parse().unwrap_or(0))),
+        n => return cx.heard(&r.binding(None), Band::Index(n.parse().unwrap_or(0))),
     };
-    heard(cx, Band::Named(named))
+    cx.heard(&r.binding(None), Band::Named(named))
 }
 
 fn spot(s: &System, t: Option<&super::Target>, f: &Fit, cx: &Context) -> [f32; 3] {
@@ -98,17 +83,18 @@ pub(super) fn fit(sim: &mut Sim, s: &System, f: &Fit, cx: &Context, moves: &mut 
     }
     let home = f.to_sim.apply([cx.canvas[0] / 2.0, cx.canvas[1] / 2.0]);
     (sim.depth[2][1], sim.depth[2][2]) = (home[0], home[1]);
-    if let Some(band) = s.init.turbulent.and_then(|t| t.audio) {
-        sim.fields[1][2] *= heard(cx, band);
+    if let Some((t, band)) = s.init.turbulent.and_then(|t| Some((t, t.audio?))) {
+        sim.fields[1][2] *= cx.heard(&t.binding(), band);
     }
     for (k, r) in s.init.remap.iter().take(super::MAX_REMAPS).enumerate() {
-        if let Some((x, y)) = live(cx, f.room, &r.input) {
+        if let Some((x, y)) = live(cx, f.room, r) {
             (sim.remaps[3 * k][3], sim.remaps[3 * k + 2][3]) = (x, y);
         }
     }
 }
 
-pub(super) fn live(cx: &Context, room: &Room, name: &str) -> Option<(f32, f32)> {
+pub(super) fn live(cx: &Context, room: &Room, r: &Remap) -> Option<(f32, f32)> {
+    let name = r.input.as_str();
     let [kind, point] = input(name);
     Some(match kind as u32 {
         0 => (cx.time_of_day("day"), 0.0),
@@ -116,7 +102,7 @@ pub(super) fn live(cx: &Context, room: &Room, name: &str) -> Option<(f32, f32)> 
             let [x, y, _] = room.points[(point as usize).min(MAX_CONTROL - 1)];
             (x, y)
         }
-        7 => (level(cx, name.trim_start_matches("audio:")), 0.0),
+        7 => (level(cx, r), 0.0),
         8 | 9 => {
             let p = cx.pointer;
             (if p.inside { p.smooth[kind as usize - 8] } else { 0.5 }, 0.0)

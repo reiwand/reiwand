@@ -101,6 +101,10 @@ pub(crate) fn apply<'js>(ctx: &Ctx<'js>, state: &Object<'js>, bytes: &[u8]) -> R
             audio.set(name, c.f32()?)?;
         }
         audio.set("beat", c.flag()?)?;
+        let heard = audio.get::<_, Array>("heard")?;
+        for k in 0..c.u8()? {
+            fill(&heard.get::<TypedArray<f32>>(usize::from(k))?, c.take(4 * BANDS)?);
+        }
     }
     let timelines = child(ctx, &frame, "timelines")?;
     for _ in 0..c.u16()? {

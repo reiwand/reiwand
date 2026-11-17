@@ -6,9 +6,11 @@ use std::collections::BTreeMap;
 
 mod emitters;
 mod kinds;
+mod listen;
 
 pub use emitters::{EMITTER_TEXELS, EffectEmitter, MAX_EFFECT_EMITTERS, emitter_key, emitter_texels};
 pub use kinds::{AudioChannel, AudioKind, AudioUnit, Axis, Band, Level, Param, Reference, Vec2, Vec3};
+pub use listen::{Listen, MAX_LISTENS, MAX_SCRIPT_LISTENS};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(untagged)]
@@ -18,7 +20,7 @@ pub enum Value<T> {
     Bound(Box<Binding<T>>),
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields, bound(deserialize = "T: Deserialize<'de>"))]
 #[schemars(rename = "Binding_for_{T}")]
 pub struct Binding<T> {

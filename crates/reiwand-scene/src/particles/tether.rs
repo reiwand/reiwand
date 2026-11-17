@@ -9,7 +9,7 @@ use crate::resolve::Context;
 
 pub(super) fn steady(r: &Remap, room: &Room, cx: &Context) -> ([f32; 4], [f32; 4], [f32; 4]) {
     let row = table(r);
-    let (x, y) = live(cx, room, &r.input).unwrap_or((0.0, 0.0));
+    let (x, y) = live(cx, room, r).unwrap_or((0.0, 0.0));
     let clamps = row[2][1] + 2.0 * row[2][2];
     (
         [15.0, row[0][0], x, y],

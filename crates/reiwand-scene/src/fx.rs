@@ -100,6 +100,7 @@ impl Descriptor {
         let unit = |s: f32| s > 0.0 && s <= 1.0;
         let kind = |name: &str, kind| self.param(name).is_some_and(|i| self.params[i].kind == kind);
         fail(valid(id), "the id must match [a-z0-9_]{1,32}".into());
+        self.listening().into_iter().for_each(|p| fail(false, p));
         fail(self.params.len() <= MAX_PARAMS, format!("more than {MAX_PARAMS} parameters"));
         for (i, p) in self.params.iter().enumerate() {
             fail(valid(&p.id) && self.param(&p.id) == Some(i), format!("{} is not a unique id", p.id));

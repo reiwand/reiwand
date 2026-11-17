@@ -76,6 +76,12 @@ export const audio = Object.freeze({
         }
         return state.buffers[count];
     },
+    heard(slot, count = 64) {
+        if (![16, 32, 64].includes(count)) throw new RangeError("heard takes 16, 32 or 64");
+        const set = state.frame.audio.heard[slot];
+        if (!set) throw new RangeError("heard takes the number of one of the listens of the scene");
+        return reduce(set, count);
+    },
     get bass() {
         return state.frame.audio.bass;
     },

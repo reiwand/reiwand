@@ -8,6 +8,7 @@ struct More {
     sizes: array<vec4<f32>, 4>,
     bands_l: array<vec4<f32>, 16>,
     bands_r: array<vec4<f32>, 16>,
+    heard: array<vec4<f32>, 32>,
 };
 
 @group(1) @binding(8) var aux4: texture_2d<f32>;
@@ -64,6 +65,11 @@ fn band_left(i: u32) -> f32 {
 fn band_right(i: u32) -> f32 {
     let j = min(i, 63u);
     return more.bands_r[j / 4u][j % 4u];
+}
+
+fn heard_band(slot: u32, i: u32) -> f32 {
+    let j = min(i, 63u) + 64u * min(slot, 1u);
+    return more.heard[j / 4u][j % 4u];
 }
 
 fn bands_of(i: u32, count: u32, channel: u32) -> f32 {

@@ -8,6 +8,10 @@ use reiwand_scene::{Affine, Descriptor, EffectDraw, MaskMode, Output, PassBlend}
 
 mod passes;
 
+fn packed(heard: &[[f32; reiwand_scene::BANDS]; 2]) -> [[f32; 4]; 32] {
+    std::array::from_fn(|i| std::array::from_fn(|j| heard[i / 16][(i % 16) * 4 + j]))
+}
+
 const AT: [usize; 9] = [0, 2, 3, 4, 5, 7, 8, 9, 10];
 
 struct Inputs {
@@ -83,6 +87,7 @@ impl Painter<'_, '_, '_> {
         let mut more = More {
             layer_color: [c[0] * b, c[1] * b, c[2] * b, draw.tint.0[3]],
             layer_alpha: draw.opacity,
+            heard: packed(&e.heard),
             ..self.more
         };
         let (base, mut previous, last) = (self.outputs.len(), current, d.passes.len() - 1);

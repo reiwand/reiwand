@@ -140,6 +140,7 @@ fn the_contract_compiles_and_names_its_helpers() {
         "fn band_left(",
         "fn band_right(",
         "fn band_of(",
+        "fn heard_band(",
         "fn band_left_of(",
         "fn band_right_of(",
         "fn layer_color(",

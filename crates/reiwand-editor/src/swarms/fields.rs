@@ -25,7 +25,8 @@ pub(super) fn turbulent(
     }
     let mut next = merged(doc, &at, change);
     if quiet {
-        next.as_object_mut().into_iter().for_each(|o| drop(o.remove("audio")));
+        let heard = ["audio", "kind", "unit", "window", "reference", "hold_silence"];
+        next.as_object_mut().into_iter().for_each(|o| heard.iter().for_each(|k| drop(o.remove(*k))));
     }
     parsed::<Turbulent>(&next, "turbulent")?;
     Ok(set(doc, &at, next))

@@ -23,7 +23,7 @@ ctl scene act "$draft" set '{"pointer": "/scene/particles/spark", "value": {"cap
 ctl scene act "$draft" set '{"pointer": "/scene/particles/dust/children", "value": [{"on": "follow", "system": "spark"}]}'
 ctl scene act "$draft" particles '{"inherit": {"child": 0, "follow": true, "inherit": ["color", "size"], "system": "dust"}}' || fail "the child took nothing from its parent"
 ctl scene act "$draft" particles '{"shader": {"system": "dust"}}' || fail "the shader was not cleared"
-ctl scene act "$draft" particles '{"turbulent": {"system": "dust", "turbulent": {"audio": "bass", "forward": 90, "scale": 0.5, "speed": [20, 40]}}}' || fail "no turbulent start was set"
+ctl scene act "$draft" particles '{"turbulent": {"system": "dust", "turbulent": {"audio": "bass", "kind": "relative", "unit": "db", "forward": 90, "scale": 0.5, "speed": [20, 40]}}}' || fail "no turbulent start was set"
 ctl scene act "$draft" particles '{"turbulent": {"quiet": true, "system": "dust", "turbulent": {}}}' || fail "the turbulent start still follows the sound"
 ctl scene act "$draft" particles '{"offset": {"offset": {"distance": 12, "octaves": 3, "sign": [0, 1]}, "system": "dust"}}' || fail "no fractal offset was set"
 scene_doc "$draft" /manifest/requires/features | grep particle_depth >/dev/null || fail "depth left particle_depth out"

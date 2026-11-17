@@ -99,6 +99,7 @@ impl SceneState {
             props: &self.exposed,
             actions: &actions,
             audio,
+            heard: rt.heard(),
             pointer: rt.pointer(),
             view,
             screen,

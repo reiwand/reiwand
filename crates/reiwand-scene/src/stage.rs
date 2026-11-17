@@ -67,5 +67,9 @@ impl Check<'_> {
             self.range("/audio/release", a.release, 0.01, 10.0);
             self.range("/audio/gain_release", a.gain_release, 0.05, 10.0);
         }
+        self.count("/listens", self.scene.listens.len(), crate::MAX_SCRIPT_LISTENS);
+        for (i, l) in self.scene.listens.iter().enumerate() {
+            self.issues.extend(l.problems(&format!("/listens/{i}")));
+        }
     }
 }

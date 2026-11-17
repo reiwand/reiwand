@@ -1,5 +1,7 @@
 use crate::wire::Wire;
-use reiwand_scene::{AudioFrame, Course, Extent, Fired, LayerRead, MediaState, PointerState, Touch, Values};
+use reiwand_scene::{
+    AudioFrame, BANDS, Course, Extent, Fired, LayerRead, MediaState, PointerState, Touch, Values,
+};
 
 static NO_PROPS: Values = Values::new();
 static IDLE: PointerState = PointerState {
@@ -29,6 +31,7 @@ pub struct Frame<'a> {
     pub props: &'a Values,
     pub actions: &'a [String],
     pub audio: Option<&'a AudioFrame>,
+    pub heard: &'a [[f32; BANDS]],
     pub pointer: &'a PointerState,
     pub view: [f32; 4],
     pub screen: [u32; 2],
@@ -57,6 +60,7 @@ impl Frame<'static> {
             props: &NO_PROPS,
             actions: &[],
             audio: None,
+            heard: &[],
             pointer: &IDLE,
             view: [0.0, 0.0, 1920.0, 1080.0],
             screen: [1920, 1080],
@@ -83,6 +87,7 @@ pub struct Encoder {
     props: Option<Values>,
     zone: Option<String>,
     audio: Option<AudioFrame>,
+    heard: Vec<[f32; BANDS]>,
     folders: Option<String>,
     storage: Option<u64>,
     media: Option<(MediaState, f64)>,
@@ -93,6 +98,7 @@ impl Encoder {
     pub fn reset(&mut self) {
         (self.props, self.zone, self.audio, self.folders, self.storage) = (None, None, None, None, None);
         self.media = None;
+        self.heard.clear();
     }
 
     pub fn encode(&mut self, f: &Frame) -> &[u8] {
@@ -115,11 +121,17 @@ impl Encoder {
         for a in f.actions {
             w.str(a);
         }
-        let audio = f.audio.filter(|a| self.audio.as_ref() != Some(*a));
+        let audio = f.audio.filter(|a| self.audio.as_ref() != Some(*a) || self.heard != f.heard);
         w.flag(audio.is_some());
         if let Some(a) = audio {
             w.f32s(&a.left).f32s(&a.right).f32s(&a.average);
             w.f32(a.bass).f32(a.mid).f32(a.treble).f32(a.level).u8(u8::from(a.beat));
+            w.u8(f.heard.len() as u8);
+            f.heard.iter().for_each(|h| {
+                w.f32s(h);
+            });
+            self.heard.clear();
+            self.heard.extend_from_slice(f.heard);
             self.audio = Some(a.clone());
         }
         w.u16(f.timelines.len());

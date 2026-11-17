@@ -11,7 +11,7 @@ fn turbulent_starts_are_set_undone_and_refused_past_their_limits() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
     let before = p.doc.clone();
-    let gust = json!({ "forward": 90, "scale": 0.5, "speed": [20, 40], "audio": "bass" });
+    let gust = json!({ "forward": 90, "scale": 0.5, "speed": [20, 40], "audio": "bass", "kind": "relative", "unit": "db" });
     edit(&mut p, "turbulent", json!({ "turbulent": gust })).unwrap();
     assert_eq!(system(&p)["init"]["turbulent"], gust);
     undone(&mut p, &before);
@@ -153,7 +153,7 @@ fn systems_whose_id_needs_escaping_are_edited_through_their_layer() {
 fn rays_that_follow_a_band_turn_with_the_sound_level_the_preview_is_told() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
-    let gust = json!({ "forward": 0, "scale": 0.5, "noise_speed": 0, "offset": 4, "speed": [10, 80], "phase": 3, "audio": "bass" });
+    let gust = json!({ "forward": 0, "scale": 0.5, "noise_speed": 0, "offset": 4, "speed": [10, 80], "phase": 3, "audio": "bass", "kind": "relative", "unit": "db" });
     edit(&mut p, "turbulent", json!({ "turbulent": gust.clone() })).unwrap();
     let rays = |sound: f32| {
         let h = reiwand_editor::swarms::heard(&p.dir, &p.doc, "flakes", None, (0.0, sound));

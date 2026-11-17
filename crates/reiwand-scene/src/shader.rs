@@ -7,7 +7,7 @@ mod tree;
 
 const ROOM: usize = 64 << 20;
 
-const READS: [(&str, Use); 20] = [
+const READS: [(&str, Use); 21] = [
     ("time", Use::Time),
     ("dt", Use::Time),
     ("daytime", Use::Time),
@@ -28,6 +28,7 @@ const READS: [(&str, Use); 20] = [
     ("audio", Use::Audio),
     ("bands_l", Use::Audio),
     ("bands_r", Use::Audio),
+    ("heard", Use::Audio),
 ];
 
 pub(crate) fn compile(source: &str) -> Result<(Module, ModuleInfo), String> {

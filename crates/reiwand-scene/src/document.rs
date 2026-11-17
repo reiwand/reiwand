@@ -36,6 +36,8 @@ pub struct Scene {
     pub effects: BTreeMap<String, EffectFiles>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub audio: Option<Hearing>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub listens: Vec<crate::value::Listen>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub camera3d: Option<Camera3d>,
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
@@ -82,10 +84,11 @@ impl Scene {
     pub fn new(size: [u32; 2]) -> Scene {
         let (assets, layers, particles, timelines, scripts, effects, audio, ext, loaded) = Default::default();
         let (camera3d, templates, pools, models, rigs, solids, draft, sheets, rooted) = Default::default();
-        let (transition, passages) = Default::default();
+        let (transition, passages, listens) = Default::default();
         Scene {
             schema: SCHEMA.into(),
             canvas: Canvas::new(size),
+            listens,
             clock: Clock::default(),
             assets,
             layers,

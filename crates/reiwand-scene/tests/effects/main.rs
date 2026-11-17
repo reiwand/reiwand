@@ -6,6 +6,7 @@ use std::sync::Arc;
 mod checks;
 mod costs;
 mod fusion;
+mod heard;
 mod inputs;
 mod lighter;
 mod locality;

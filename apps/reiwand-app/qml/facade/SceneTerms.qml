@@ -87,6 +87,7 @@ QtObject {
             "lighting": App.tr("Lighting"),
             "limits": App.tr("Limits"),
             "line": App.tr("Line"),
+            "listens": App.tr("Audio inputs"),
             "line_height": App.tr("Line height"),
             "linear": App.tr("Linear color"),
             "lines": App.tr("Lines"),

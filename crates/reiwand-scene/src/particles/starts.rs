@@ -73,9 +73,7 @@ impl Check<'_> {
             self.range(&format!("{q}/noise_speed"), t.noise_speed, 0.0, 100.0);
             self.range(&format!("{q}/speed/1"), t.speed[1], t.speed[0].max(0.0), 1e5);
             [t.offset, t.phase].iter().for_each(|v| self.range(&q, *v, -1e4, 1e4));
-            if let Some(Band::Index(n)) = t.audio {
-                self.range(&format!("{q}/audio"), n as f32, 0.0, 63.0);
-            }
+            self.signal(&q, &t.binding());
         }
         if let Some(o) = &i.offset_noise {
             self.uses(true, "particle_fields");
@@ -116,6 +114,8 @@ impl Check<'_> {
             b.parse::<u32>().is_ok_and(|n| n < 64)
                 || serde_json::from_value::<Level>(serde_json::Value::String(b.into())).is_ok()
         };
+        let listened = input.strip_prefix("audio:").map(|_| Band::Named(Level::Level));
+        self.signal(q, &r.binding(listened));
         let known = REMAP_INPUTS.contains(&input)
             || matches!(input, "cursor:x" | "cursor:y")
             || input.strip_prefix("audio:").is_some_and(band)

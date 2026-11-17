@@ -425,6 +425,10 @@ en cada pantalla. El teclado nunca llega a una escena.
 
 **El sonido.** `audio.bass`, `mid`, `treble`, `level` y `beat` en `update`, o las bandas con
 `audio.bands()` y `audio.buffers()`. Es la entrada `audio`; sin ella (o sin sonido) todo vale 0.
+Esos valores son relativos y en decibelios. Para otra lectura (absoluta, o un `surge` que salta cuando la
+música vuelve tras un silencio) declara hasta 4 `listens` en la raíz de la escena, cada una con `kind`,
+`unit` y, con `surge`, `window`, `reference` y `hold_silence`, y léelas con `audio.heard(n)` (64 bandas) o
+`audio.heard(n, 16)`; un `n` que no declaraste lanza `RangeError`.
 
 **Las propiedades.** `props.get(id)` en cualquier momento, o la función `properties(cambiadas)`, que
 solo se llama cuando algo cambió. `props.pressed(id)` avisa de un botón.

@@ -102,6 +102,7 @@ impl Acting {
             props,
             actions: &self.actions,
             audio: sent.listens.then(|| rt.audio()),
+            heard: rt.heard(),
             pointer: rt.pointer(),
             view: sent.view,
             screen: sent.screen,

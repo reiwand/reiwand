@@ -417,6 +417,7 @@ programa), y las capas los usan como cualquier otro:
 | `cost` | **Obligatorio**: `{ "taps", "passes", "scale" }`: lecturas de imagen por píxel, número de pasadas y tamaño de las pasadas como fracción de la capa. |
 | `mask_mode` | `mix` (lo normal: mezcla con la entrada según la máscara) o `strength` (tú escalas con `mask_at(uv)`; conviene a las distorsiones). |
 | `uses` | `time`, `cursor` o `audio`: lo que el efecto necesita. El programa también lo deduce de tu sombreador. |
+| `audio` | Hasta 2 lecturas del sonido, cada una con `kind` (`relative`, `absolute` o `surge`), `unit` (`db` o `amplitude`) y, con `surge`, `window` (de 0.05 a 60 s), `reference` (`band` o `all`) y `hold_silence`; sin `surge` esos tres no se escriben. Tu sombreador lee las 64 bandas de la lectura `n` con `heard_band(n, i)`; un `surge` pasa de 1 cuando la banda sube tras un silencio y luego baja. `band()` sigue siendo relativo y en decibelios. |
 | `reach` | Un parámetro `float`, en píxeles, en que el efecto agranda la capa. |
 | `min_fps` | De 1 a 240: el ritmo con que el efecto aún se ve fluido. |
 | `pace` | Cuándo cambia un efecto que depende del tiempo: `{ "rate": "<parámetro>" }`, `{ "steps": [alto, bajo] }`, `{ "sweep": [...] }` o `"outside"`. |
