@@ -19,8 +19,9 @@ pub async fn run(client: &Client, command: Server) -> Result<()> {
             )
             .await?
         }
-        Server::Packages { json } => {
-            let found: serde_json::Value = serde_json::from_str(&patient(sync.list_packages()).await?)?;
+        Server::Packages { json, at } => {
+            let found: serde_json::Value =
+                serde_json::from_str(&patient(sync.list_packages(at.text())).await?)?;
             if json {
                 println!("{found}");
             }
@@ -29,10 +30,11 @@ pub async fn run(client: &Client, command: Server) -> Result<()> {
                 println!("{} {} {} {}", text("package"), text("version"), text("state"), text("visibility"));
             }
         }
-        Server::Uploads { json, cancel } => crate::keyed::uploads(client, json, cancel).await?,
+        Server::Uploads { json, cancel, at } => crate::keyed::uploads(client, json, cancel, at).await?,
         Server::AuthorKey(command) => crate::keyed::run(client, command).await?,
-        Server::Visibility { id, visibility, version } => {
-            patient(sync.set_visibility(&id, version.as_deref().unwrap_or(""), &visibility)).await?
+        Server::Visibility { id, visibility, version, at } => {
+            patient(sync.set_visibility(at.text(), &id, version.as_deref().unwrap_or(""), &visibility))
+                .await?
         }
     }
     Ok(())

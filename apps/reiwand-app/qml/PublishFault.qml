@@ -9,6 +9,7 @@ PublishError {
     required property var where
     required property string place
     readonly property alias button: main
+    readonly property alias again: again
     readonly property var publish: where.publish
     readonly property var shown: publish.fault ?? ({})
     readonly property string kind: shown.kind ?? ""
@@ -47,6 +48,13 @@ PublishError {
             else
                 fault.publish.work.run();
         }
+    }
+
+    SignInAgain {
+        id: again
+
+        visible: fault.kind === "salida"
+        repo: String((fault.publish.account ?? ({})).url ?? "")
     }
 
     KeyCap {

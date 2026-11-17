@@ -15,6 +15,7 @@ Column {
     readonly property alias signIn: signIn
     readonly property alias remove: remove
     readonly property alias remover: remover
+    readonly property alias repoList: repoList
 
     function again() {
         const first = account.repos.length > 0 ? account.repos[0].url : account.server;
@@ -27,6 +28,7 @@ Column {
     }
 
     spacing: Look.e3
+    Component.onCompleted: row.open = row.open || account.pending
 
     Fila {
         id: row
@@ -64,6 +66,23 @@ Column {
             font.family: Look.letraTexto
             font.pixelSize: Look.tCuerpo
             color: Look.escarcha
+        }
+
+        Repeater {
+            id: repoList
+
+            model: details.account.pending ? [] : details.account.repos
+
+            Loader {
+                required property var modelData
+
+                active: row.open
+                width: details.width - Look.e5
+
+                sourceComponent: AccountRepo {
+                    address: modelData.url
+                }
+            }
         }
 
         Row {

@@ -18,36 +18,42 @@ impl Publish {
     }
 
     #[zbus(out_args("json"))]
-    async fn list_packages(&self) -> Result<String> {
-        self.d()?.run(|d| d.own_packages()).await
+    async fn list_packages(&self, repo: String) -> Result<String> {
+        self.d()?.run(move |d| d.own_packages(&repo)).await
     }
 
     #[zbus(out_args("json"))]
-    async fn list_author_keys(&self) -> Result<String> {
-        self.d()?.run(|d| d.list_author_keys()).await
+    async fn list_author_keys(&self, repo: String) -> Result<String> {
+        self.d()?.run(move |d| d.list_author_keys(&repo)).await
     }
 
     #[zbus(out_args("fingerprint"))]
-    async fn add_author_key(&self, public_key: String) -> Result<String> {
-        self.d()?.run(move |d| d.add_author_key(&public_key)).await
+    async fn add_author_key(&self, repo: String, public_key: String) -> Result<String> {
+        self.d()?.run(move |d| d.add_author_key(&repo, &public_key)).await
     }
 
     #[zbus(out_args("fingerprint"))]
-    async fn rotate_author_key(&self, from: String, public_key: String, signature: String) -> Result<String> {
-        self.d()?.run(move |d| d.rotate_author_key(&from, &public_key, &signature)).await
+    async fn rotate_author_key(
+        &self,
+        repo: String,
+        from: String,
+        public_key: String,
+        signature: String,
+    ) -> Result<String> {
+        self.d()?.run(move |d| d.rotate_author_key(&repo, &from, &public_key, &signature)).await
     }
 
-    async fn remove_author_key(&self, fingerprint: String) -> Result<()> {
-        self.d()?.run(move |d| d.remove_author_key(&fingerprint)).await
+    async fn remove_author_key(&self, repo: String, fingerprint: String) -> Result<()> {
+        self.d()?.run(move |d| d.remove_author_key(&repo, &fingerprint)).await
     }
 
     #[zbus(out_args("json"))]
-    async fn list_uploads(&self) -> Result<String> {
-        self.d()?.run(|d| d.list_uploads()).await
+    async fn list_uploads(&self, repo: String) -> Result<String> {
+        self.d()?.run(move |d| d.list_uploads(&repo)).await
     }
 
-    async fn cancel_upload(&self, id: String) -> Result<()> {
-        self.d()?.run(move |d| d.cancel_upload(&id)).await
+    async fn cancel_upload(&self, repo: String, id: String) -> Result<()> {
+        self.d()?.run(move |d| d.cancel_upload(&repo, &id)).await
     }
 
     #[zbus(out_args("json"))]
@@ -60,7 +66,13 @@ impl Publish {
         self.d()?.run(move |d| d.votes(&ids)).await
     }
 
-    async fn set_visibility(&self, id: String, version: String, visibility: String) -> Result<()> {
-        self.d()?.run(move |d| d.set_visibility(&id, &version, &visibility)).await
+    async fn set_visibility(
+        &self,
+        repo: String,
+        id: String,
+        version: String,
+        visibility: String,
+    ) -> Result<()> {
+        self.d()?.run(move |d| d.set_visibility(&repo, &id, &version, &visibility)).await
     }
 }

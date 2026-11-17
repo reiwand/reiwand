@@ -46,6 +46,40 @@ QtObject {
         second.code = "ABCD-EFGH";
         second.link = "https://casa.example/link";
         expect(second.signIn.text === App.tr("Open in the browser"), "after asking, the code is shown and the browser is offered");
+        const repo = first.repoList.itemAt(0).item;
+        expect(repo !== null && repo.address === "https://repo.example.org/r/example/", "a signed-in account shows its repository");
+        expect(second.repoList.count === 0 && second.row.open, "a signed-out account opens by itself and shows no repository");
+        repo.uploads.versions = [{
+                "package": "org.example.pond",
+                "title": "Pond",
+                "version": "1.0.0",
+                "state": "published",
+                "visibility": "public"
+            }, {
+                "package": "org.example.lake",
+                "version": "0.2.0",
+                "state": "pending_review",
+                "visibility": "unlisted"
+            }];
+        repo.uploads.sessions = [{
+                "id": "9d9d",
+                "state": "open"
+            }, {
+                "id": "8e8e",
+                "state": "failed"
+            }];
+        expect(repo.uploads.list.count === 2 && repo.uploads.list.itemAt(1).current === 1 && repo.uploads.list.itemAt(0).options.length === 2, "each upload shows its visibility and lets it change");
+        expect(repo.uploads.cancels.count === 1 && repo.uploads.cancels.itemAt(0).note === "9d9d", "only the unfinished upload can be cancelled");
+        repo.keys.items = [{
+                "fingerprint": "5a5a"
+            }];
+        expect(repo.keys.list.count === 1 && repo.keys.add.visible, "the author keys are listed and a new one can be registered");
+        expect(!repo.again.visible, "a working account offers no new sign-in");
+        repo.uploads.failed({
+            "name": "io.github.reiwand.Error.SignedOut",
+            "message": "sign in again"
+        });
+        expect(repo.lost && repo.again.visible && repo.again.button.text === App.tr("Sign in again"), "a refused account offers to sign in again right there");
         first.remove.clicked();
         expect(first.remover.opened || first.remover.visible, "removing asks first");
         first.remover.close();

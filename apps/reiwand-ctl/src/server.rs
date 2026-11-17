@@ -1,5 +1,21 @@
 use crate::cli::{JSON, Wait};
-use clap::Subcommand;
+use clap::{Args, Subcommand};
+
+#[derive(Args, Debug)]
+pub struct At {
+    #[arg(
+        long,
+        value_name = "ADDRESS",
+        help = "Repository whose account is used (address or id); required when several repositories have an account"
+    )]
+    pub repo: Option<String>,
+}
+
+impl At {
+    pub fn text(&self) -> &str {
+        self.repo.as_deref().unwrap_or("")
+    }
+}
 
 #[derive(Subcommand, Debug)]
 pub enum Server {
@@ -16,7 +32,7 @@ pub enum Server {
         #[arg(
             long,
             value_name = "ADDRESS",
-            help = "Repository to publish to; the first signed-in account when left out"
+            help = "Repository to publish to; required when several repositories have an account"
         )]
         repo: Option<String>,
         #[command(flatten)]
@@ -26,6 +42,8 @@ pub enum Server {
     Packages {
         #[arg(long, help = "Print the result as JSON")]
         json: bool,
+        #[command(flatten)]
+        at: At,
     },
     #[command(about = "List the upload sessions of this account, or cancel an unfinished one")]
     Uploads {
@@ -33,6 +51,8 @@ pub enum Server {
         json: bool,
         #[arg(long, value_name = "ID", help = "Cancel this unfinished upload")]
         cancel: Option<String>,
+        #[command(flatten)]
+        at: At,
     },
     #[command(subcommand, about = "The keys with which you sign your packages online")]
     AuthorKey(crate::keyed::AuthorKey),
@@ -47,5 +67,7 @@ pub enum Server {
         visibility: String,
         #[arg(long, help = "Version to change; every version when left out")]
         version: Option<String>,
+        #[command(flatten)]
+        at: At,
     },
 }

@@ -16,7 +16,7 @@ Timer {
     function serve(name, args, iface, done, failed) {
         calls = calls.concat([name]);
         if (name === "AddAuthorKey")
-            return Qt.callLater(() => args[0].includes("untrusted comment") ? done() : failed({
+            return Qt.callLater(() => args[1].includes("untrusted comment") ? done() : failed({
                     "message": "not a public key"
                 }));
         if (calls.filter(c => c === "UploadAs").length === 1)

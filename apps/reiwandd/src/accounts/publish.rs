@@ -16,11 +16,20 @@ pub(super) struct Destination {
     pub repo_id: Option<String>,
 }
 
-impl Daemon {
-    pub(super) fn destination(&self) -> Result<Destination> {
-        self.destination_for("")
+pub(super) fn chosen(links: &[(&str, Option<&str>)], repo: &str) -> Result<usize> {
+    if repo.is_empty() && links.len() > 1 {
+        let urls: Vec<&str> = links.iter().map(|l| l.0).collect();
+        return Err(failed(format!(
+            "several repositories have an account; name one of: {}",
+            urls.join(", ")
+        )));
     }
+    let wanted = clean(repo);
+    let at = links.iter().position(|l| repo.is_empty() || clean(l.0) == wanted || l.1 == Some(repo));
+    at.ok_or_else(|| failed("sign in to an account linked to that repository first"))
+}
 
+impl Daemon {
     pub(super) fn destinations(&self) -> Vec<Destination> {
         let pins = self.repo_pins();
         let mut found = Vec::new();
@@ -44,11 +53,11 @@ impl Daemon {
     }
 
     pub(super) fn destination_for(&self, repo: &str) -> Result<Destination> {
-        let wanted = clean(repo);
-        let mut all = self.destinations().into_iter();
-        let found =
-            all.find(|d| repo.is_empty() || clean(&d.url) == wanted || d.repo_id.as_deref() == Some(repo));
-        found.ok_or_else(|| failed("sign in to an account linked to that repository first"))
+        let mut all = self.destinations();
+        let links: Vec<(&str, Option<&str>)> =
+            all.iter().map(|d| (d.url.as_str(), d.repo_id.as_deref())).collect();
+        let at = chosen(&links, repo)?;
+        Ok(all.swap_remove(at))
     }
 
     pub fn upload(self: &Arc<Self>, repo: &str, path: &str, visibility: &str) -> Result<u64> {
@@ -68,16 +77,17 @@ impl Daemon {
         }))
     }
 
-    pub fn own_packages(&self) -> Result<String> {
-        let found = block_on(self.destination()?.api.get("/api/v1/me/packages")).map_err(sync_error)?;
+    pub fn own_packages(&self, repo: &str) -> Result<String> {
+        let found =
+            block_on(self.destination_for(repo)?.api.get("/api/v1/me/packages")).map_err(sync_error)?;
         Ok(json!({"items": found["items"]}).to_string())
     }
 
-    pub fn set_visibility(&self, id: &str, version: &str, visibility: &str) -> Result<()> {
+    pub fn set_visibility(&self, repo: &str, id: &str, version: &str, visibility: &str) -> Result<()> {
         if !reiwand_format::valid_id(id) || !matches!(visibility, "public" | "unlisted") {
             return Err(invalid("give a package id and public or unlisted"));
         }
-        let to = self.destination()?;
+        let to = self.destination_for(repo)?;
         let version = Some(version).filter(|v| !v.is_empty());
         let body = json!({"visibility": visibility, "version": version});
         let path = format!("/api/v1/r/{}/me/packages/{id}/visibility", to.name);

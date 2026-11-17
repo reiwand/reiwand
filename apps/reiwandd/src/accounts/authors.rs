@@ -14,48 +14,54 @@ fn public_of(text: &str) -> Result<String> {
 }
 
 impl Daemon {
-    pub fn list_author_keys(&self) -> Result<String> {
-        let api = self.destination()?.api;
+    pub fn list_author_keys(&self, repo: &str) -> Result<String> {
+        let api = self.destination_for(repo)?.api;
         let found = block_on(api.get("/api/v1/me/author-keys")).map_err(sync_error)?;
         Ok(json!({"items": found["items"]}).to_string())
     }
 
-    pub fn add_author_key(&self, public_key: &str) -> Result<String> {
+    pub fn add_author_key(&self, repo: &str, public_key: &str) -> Result<String> {
         let key = public_of(public_key)?;
-        let api = self.destination()?.api;
+        let api = self.destination_for(repo)?.api;
         let added =
             block_on(api.post("/api/v1/me/author-keys", json!({"public_key": key}))).map_err(sync_error)?;
         Ok(added["fingerprint"].as_str().unwrap_or_default().to_owned())
     }
 
-    pub fn rotate_author_key(&self, from: &str, public_key: &str, signature: &str) -> Result<String> {
+    pub fn rotate_author_key(
+        &self,
+        repo: &str,
+        from: &str,
+        public_key: &str,
+        signature: &str,
+    ) -> Result<String> {
         let (from, key) = (fingerprint_of(from)?, public_of(public_key)?);
         let body = json!({"from": from, "public_key": key, "signature": signature});
-        let api = self.destination()?.api;
+        let api = self.destination_for(repo)?.api;
         let done = block_on(api.post("/api/v1/me/author-keys/rotate", body)).map_err(sync_error)?;
         Ok(done["fingerprint"].as_str().unwrap_or_default().to_owned())
     }
 
-    pub fn remove_author_key(&self, fingerprint: &str) -> Result<()> {
+    pub fn remove_author_key(&self, repo: &str, fingerprint: &str) -> Result<()> {
         let path = format!("/api/v1/me/author-keys/{}", fingerprint_of(fingerprint)?);
-        let api = self.destination()?.api;
+        let api = self.destination_for(repo)?.api;
         block_on(api.slow(Method::DELETE, &path)).map_err(sync_error)?;
         Ok(())
     }
 
-    pub fn list_uploads(&self) -> Result<String> {
-        let api = self.destination()?.api;
+    pub fn list_uploads(&self, repo: &str) -> Result<String> {
+        let api = self.destination_for(repo)?.api;
         let found = block_on(api.get("/api/v1/me/packages")).map_err(sync_error)?;
         Ok(json!({"uploads": found["uploads"]}).to_string())
     }
 
-    pub fn cancel_upload(&self, id: &str) -> Result<()> {
+    pub fn cancel_upload(&self, repo: &str, id: &str) -> Result<()> {
         let fine =
             !id.is_empty() && id.len() <= 64 && id.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-');
         if !fine {
             return Err(invalid("give the id of an upload"));
         }
-        let api = self.destination()?.api;
+        let api = self.destination_for(repo)?.api;
         block_on(api.slow(Method::DELETE, &format!("/api/v1/uploads/{id}"))).map_err(sync_error)?;
         Ok(())
     }

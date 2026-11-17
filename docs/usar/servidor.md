@@ -200,7 +200,7 @@ reiwand-ctl account rm a1                                    # la olvida en este
 reiwand-ctl server upload fondo.wpak                         # sube un paquete con la cuenta del repositorio
 reiwand-ctl server upload fondo.wpak --unlisted              # … oculto: fuera del catálogo, instalable con su enlace
 reiwand-ctl server upload fondo.wpak --repo https://fondos.example.org/r/otro   # … en ese repositorio, con la cuenta vinculada a él
-reiwand-ctl server packages                                  # tus subidas, con su estado y visibilidad
+reiwand-ctl server packages --repo https://fondos.example.org/r/otro   # tus subidas en ese repositorio, con su estado y visibilidad
 reiwand-ctl server uploads                                   # las sesiones de subida (en curso o terminadas); --cancel ID cancela una
 reiwand-ctl server author-key list                           # las claves con las que firmas tus paquetes en línea
 reiwand-ctl server author-key add autor.pub                  # registra una clave; `rotate`, `remove` la cambian o la quitan
@@ -214,6 +214,13 @@ cuenta u otra; en la terminal, `account use` o `account sign-in`. Pegar la direc
 (sin `/r/<nombre>`) no lista repositorios: dice que es un servidor y nombra las direcciones de sus
 repositorios públicos. Al publicar se elige el repositorio de destino; si no hay una cuenta vinculada a
 él, se pide ahí, sea público o privado.
+
+Con más de un repositorio con cuenta, `server packages`, `uploads`, `author-key` y `visibility` piden
+`--repo DIRECCIÓN` (la dirección o el id del repositorio) y, sin él, fallan nombrando las direcciones entre
+las que elegir. En la app, *Cuenta* muestra en cada cuenta, por repositorio, *Mis subidas* (estado y
+visibilidad, que se cambia ahí; las sesiones sin terminar se cancelan) y *Claves de autor* (lista,
+registrar desde un archivo, traspasar y quitar). Una cuenta que debe iniciar sesión de nuevo lo dice en su
+fila y al publicar o votar con ella la app ofrece *Iniciar sesión de nuevo* allí mismo.
 
 **Tu primera cuenta, sin navegador en el equipo** (la cuenta del administrador ya existe y `galleta` es
 su sesión, de la sección anterior):

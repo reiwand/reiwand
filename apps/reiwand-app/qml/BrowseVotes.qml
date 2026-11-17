@@ -8,6 +8,7 @@ Row {
     required property string packageId
     property var counts: null
     property bool shown
+    property bool lost: false
     readonly property string mine: votes.counts ? votes.counts.mine ?? "none" : "none"
 
     spacing: Look.e2
@@ -24,6 +25,12 @@ Row {
                 "down": found.down,
                 "mine": found.mine ?? "none"
             });
+        }, error => {
+            if (!votes)
+                return;
+            votes.lost = String(error.name).endsWith(".SignedOut");
+            if (!votes.lost)
+                App.backend.lastError = error.message;
         });
     }
 
@@ -41,5 +48,10 @@ Row {
         checkable: true
         checked: votes.mine === "down"
         onClicked: votes.cast("down")
+    }
+
+    SignInAgain {
+        visible: votes.lost
+        repo: votes.packageId.split("/")[0]
     }
 }

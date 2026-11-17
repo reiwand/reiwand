@@ -25,3 +25,15 @@ fn a_private_repository_lists_the_accounts_already_known_on_its_server() {
     let some = needed_text("https://h.example", &["ana".into(), "bo".into()]);
     assert!(some.contains("ana, bo") && some.contains("another"));
 }
+
+#[test]
+fn an_account_is_chosen_by_repository_and_never_by_order() {
+    let links = [("https://a.example/r/one/", Some("f1")), ("https://b.example/r/two", None)];
+    assert_eq!(super::publish::chosen(&links, "https://b.example/r/two/").unwrap(), 1);
+    assert_eq!(super::publish::chosen(&links, "f1").unwrap(), 0);
+    let several = super::publish::chosen(&links, "").unwrap_err().to_string();
+    assert!(several.contains("https://a.example/r/one/") && several.contains("https://b.example/r/two"));
+    assert!(super::publish::chosen(&links, "https://c.example/r/x").is_err());
+    assert_eq!(super::publish::chosen(&links[..1], "").unwrap(), 0);
+    assert!(super::publish::chosen(&[], "").is_err());
+}

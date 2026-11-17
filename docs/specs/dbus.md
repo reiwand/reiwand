@@ -2167,7 +2167,7 @@ the grant, for the editor; `NotFound` when the output has none.
 Publica en un repositorio de un servidor propio (`reiwand-server`, ver `server.md`) con una cuenta
 guardada en `Accounts1`: subidas, paquetes propios, claves de autor y votos. El destino de una subida es el
 repositorio que se pasa a `UploadAs` (la cuenta enlazada a él); los votos van por la cuenta del repositorio
-de cada paquete (`repo_id/id`); las demás llamadas usan la primera cuenta con sesión enlazada a un repositorio. El token
+de cada paquete (`repo_id/id`); las demás llamadas reciben el repositorio (`repo`: su dirección o su `repo_id`) cuya cuenta usan. Con `repo` vacío sirven solo si hay un único repositorio con cuenta; con varios fallan con `Failed` y nombran las direcciones entre las que elegir. El token
 sale de donde se guardan los secretos (`account <id>`) y nunca aparece en respuestas, señales,
 destinos de tareas, errores ni registros. El demonio solo contacta el servidor de la cuenta, con el
 anclaje de huella de su origen cuando existe, no sigue redirecciones y envía el `User-Agent`
@@ -2177,7 +2177,7 @@ existe: los datos viajan solo por exportar e importar (`Carry1`).
 ### `UploadAs(s repo, s path, s visibility) → (t job)`
 
 Uploads a `.wpak` package with the token of the account linked to the repository `repo` (its address
-or its `repo_id`; empty: the first account with a session) (`POST /api/v1/uploads`, `PUT`,
+or its `repo_id`; empty: the only repository with an account, `Failed` naming the choices when there are several) (`POST /api/v1/uploads`, `PUT`,
 `finalize`) in an `upload` job whose output is an `UploadOutput`; it fails with no account for that
 repository and when the server refuses the package. It is published after review, or at once when
 the server publishes uploads of the account's role. `visibility` is `public` or `unlisted`
@@ -2185,43 +2185,43 @@ the server publishes uploads of the account's role. `visibility` is `public` or 
 has its id installs it. A server that does not repeat `unlisted` when the upload opens gets it
 cancelled, and the job fails without uploading.
 
-### `ListPackages() → (s json)`
+### `ListPackages(s repo) → (s json)`
 
 `{items: [{package, version, title, state, created_at, published_at, visibility, decision,
-statement}]}`: the versions this account uploaded, from `/api/v1/me/packages`.
+statement}]}`: the versions the account of the repository `repo` uploaded, from `/api/v1/me/packages`.
 
-### `SetVisibility(s id, s version, s visibility)`
+### `SetVisibility(s repo, s id, s version, s visibility)`
 
 Makes every version of the package `id` of this account (`version` empty) or one version `public` or
 `unlisted`; `InvalidArgs` for another value or an id that is not a package id.
 
-### `ListAuthorKeys() → (s json)`
+### `ListAuthorKeys(s repo) → (s json)`
 
 `{items: [{fingerprint, public_key, created_at}]}`: the keys this account registered for its online
 author id, from `/api/v1/me/author-keys` (`server.md`).
 
-### `AddAuthorKey(s public_key) → (s fingerprint)`
+### `AddAuthorKey(s repo, s public_key) → (s fingerprint)`
 
 Registers a minisign public key (the text of a `.pub` file or its key line) for this account's online
 author id and returns its fingerprint; `InvalidArgs` for text that is no public key, and the
 server's refusal when the key is registered already or the repository binds its authors in the root.
 
-### `RotateAuthorKey(s from, s public_key, s signature) → (s fingerprint)`
+### `RotateAuthorKey(s repo, s from, s public_key, s signature) → (s fingerprint)`
 
 Hands the online author over from the registered key `from` (a fingerprint) to `public_key` with the
 `signature` that `reiwand-ctl pack rotate-key` prints, and returns the fingerprint of the new key.
 `InvalidArgs` for a `from` that is no fingerprint or a text that is no public key.
 
-### `RemoveAuthorKey(s fingerprint)`
+### `RemoveAuthorKey(s repo, s fingerprint)`
 
 Removes a registered author key; `InvalidArgs` for a text that is no fingerprint.
 
-### `ListUploads() → (s json)`
+### `ListUploads(s repo) → (s json)`
 
 `{uploads: [{id, state, errors, created_at}]}`: the upload sessions of this account, finished or not,
 from `/api/v1/me/packages`; `ListPackages` lists the versions they became.
 
-### `CancelUpload(s id)`
+### `CancelUpload(s repo, s id)`
 
 Cancels an unfinished upload session (`DELETE /api/v1/uploads/{id}`); `InvalidArgs` for an id that
 cannot be one.

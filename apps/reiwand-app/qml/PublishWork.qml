@@ -45,12 +45,25 @@ Item {
         stage = "upload";
         job = null;
         lastPath = path;
-        work.act("UploadAs", [publish.account.repo ?? "", path, publish.where.hidden ? "unlisted" : "public"], "Publish1", reply => work && (work.job = Array.isArray(reply) ? reply[0] : reply), error => work && work.refused(String(error.message ?? error)));
+        work.act("UploadAs", [publish.account.repo ?? "", path, publish.where.hidden ? "unlisted" : "public"], "Publish1", reply => work && (work.job = Array.isArray(reply) ? reply[0] : reply), error => work && work.rejected(error));
+    }
+
+    function rejected(error) {
+        if (String(error.name ?? "").endsWith(".SignedOut"))
+            return fail({
+                "kind": "salida",
+                "title": App.tr("Sign in again at %1", host),
+                "text": App.tr("The server no longer accepts your account. Sign in again to keep publishing; nothing was lost."),
+                "details": String(error.message ?? "")
+            });
+        refused(String(error.message ?? error));
     }
 
     function check() {
         if (watched === null || stage !== "upload")
             return;
+        if (watched.state === "failed" && String((watched.error ?? {}).name ?? "").endsWith(".SignedOut"))
+            return rejected(watched.error);
         if (watched.state === "failed")
             return refused((watched.error ?? {}).message ?? "");
         if (watched.state !== "done")
@@ -96,7 +109,7 @@ Item {
         registered = true;
         stage = "register";
         const text = App.readText("file://" + publish.sign.current["public"]);
-        work.act("AddAuthorKey", [text], "Publish1", () => {
+        work.act("AddAuthorKey", [publish.account.repo ?? "", text], "Publish1", () => {
             if (!work)
                 return;
             applicationWindow().showPassiveNotification(App.tr("Your signature “%1” is now registered in your account at %2.", publish.sign.keyName, host), "long");

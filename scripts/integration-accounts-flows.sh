@@ -3,6 +3,7 @@ tls=$WORK/tls
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 a() { x main "$@"; }
 repo_url() { echo "${URL[$1]}/r/$2"; }
+h() { a server "$@" --repo "$(repo_url home main)"; }
 account_of() { x "$1" account ls --json | jq_ "[a['id'] for a in r['accounts'] if a['user'] == '$2' and a['server'].startswith('${URL[$3]}')][0]"; }
 
 start_server home home "$tls/ca.pem"
@@ -36,11 +37,11 @@ sign_in main own carl main
 keys=$WORK/keys
 mkdir -p "$keys"
 (cd "$keys" && a repo keygen first --no-password >/dev/null)
-[ "$(a server author-key list --json | jq_ "len(r['items'])")" = 0 ] || fail "an author key existed before registering"
-fingerprint=$(a server author-key add "$keys/first.pub")
+[ "$(h author-key list --json | jq_ "len(r['items'])")" = 0 ] || fail "an author key existed before registering"
+fingerprint=$(h author-key add "$keys/first.pub")
 [ "${#fingerprint}" = 64 ] || fail "adding an author key printed: $fingerprint"
-a server author-key list | grep -q "^$fingerprint " || fail "the registered key is not listed"
-if a server author-key add "$keys/first.key" 2>/dev/null; then fail "a secret key was sent as a public key"; fi
+h author-key list | grep -q "^$fingerprint " || fail "the registered key is not listed"
+if h author-key add "$keys/first.key" 2>/dev/null; then fail "a secret key was sent as a public key"; fi
 noon=$WORK/noon
 mkdir -p "$noon"
 cp "$ROOT/tests/fixtures/green-64x32.png" "$noon/image.png"
@@ -56,18 +57,18 @@ cp "$noon"/*.png "$frost/"
 sed 's/org.example.noon/org.example.frost/; s/"Noon"/"Frost"/' "$noon/manifest.json" >"$frost/manifest.json"
 a pack sign --key "$keys/first.key" "$frost" >/dev/null
 a pack build "$frost" -o "$WORK/frost.wpak" >/dev/null
-if refused=$(a server upload "$WORK/frost.wpak" --wait 2>&1); then fail "a repository that binds its authors took a key registered only in an account"; fi
+if refused=$(h upload "$WORK/frost.wpak" --wait 2>&1); then fail "a repository that binds its authors took a key registered only in an account"; fi
 grep -q "author key" <<<"$refused" || fail "the refusal does not name the signature: $refused"
-a server author-key remove "$fingerprint" >/dev/null
-[ "$(a server author-key list --json | jq_ "len(r['items'])")" = 0 ] || fail "a removed key is still listed"
+h author-key remove "$fingerprint" >/dev/null
+[ "$(h author-key list --json | jq_ "len(r['items'])")" = 0 ] || fail "a removed key is still listed"
 a pack build "$noon" -o "$WORK/noon.wpak" >/dev/null
-a server upload "$WORK/noon.wpak" --unlisted --wait --json | jq_ "r['output']['state']" | grep -qx pending_review || fail "the unlisted upload did not wait for review"
+h upload "$WORK/noon.wpak" --unlisted --wait --json | jq_ "r['output']['state']" | grep -qx pending_review || fail "the unlisted upload did not wait for review"
 case_id=$(api home "$WORK/jar-home-mod" "${URL[home]}/api/v1/mod/queue" | jq_ "r['items'][0]['id']")
 api home "$WORK/jar-home-mod" -d '{"decision": "approve", "statement": "Looks fine to publish."}' "${URL[home]}/api/v1/mod/cases/$case_id/decision" >/dev/null
 api home "$WORK/jar-home-admin" -X POST "${URL[home]}/api/v1/admin/repo/publish" >/dev/null
-a server packages | grep -q 'org.example.noon 1.0.0 published unlisted' || fail "own packages: $(a server packages)"
+h packages | grep -q 'org.example.noon 1.0.0 published unlisted' || fail "own packages: $(h packages)"
 [ "$(curl -fsS --cacert "$tls/ca.pem" "${URL[home]}/api/v1/r/main/catalog?q=noon" | jq_ "len(r['items'])")" = 0 ] || fail "the catalog lists an unlisted package"
-a server visibility org.example.noon public
+h visibility org.example.noon public
 api home "$WORK/jar-home-admin" -X POST "${URL[home]}/api/v1/admin/repo/publish" >/dev/null
 a remote add "$(repo_url home main)" --wait >/dev/null || fail "the public repository was not added"
 a remote refresh --wait >/dev/null

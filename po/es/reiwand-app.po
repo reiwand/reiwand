@@ -26215,3 +26215,48 @@ msgstr "Abrir las fuentes de fotos"
 #: apps/reiwand-app/src/covers.rs
 msgid "Has flashes, turned off"
 msgstr "Tiene destellos, deshabilitado"
+
+msgid "The public keys with which you sign the packages you upload. Create a pair in the build dialog of the editor; only the public key goes here."
+msgstr "Las claves públicas con las que firmas los paquetes que subes. Crea el par en el diálogo de compilación del editor; aquí solo va la clave pública."
+
+msgid "Registered"
+msgstr "Registrada"
+
+msgid "Hand over…"
+msgstr "Traspasar…"
+
+msgid "Register a key from a file…"
+msgstr "Registrar una clave desde un archivo…"
+
+msgid "Hand over to a new key"
+msgstr "Traspasar a una clave nueva"
+
+msgid "Sign the hand-over with the old key in Manage keys… of the step “Sign it” when you publish, and paste the signature here."
+msgstr "Firma el traspaso con la clave antigua en Administrar claves… del paso «Fírmalo» al publicar y pega aquí la firma."
+
+msgid "Repository · %1"
+msgstr "Repositorio · %1"
+
+msgid "My uploads"
+msgstr "Mis subidas"
+
+msgid "Nothing uploaded to this repository yet"
+msgstr "Aún no has subido nada a este repositorio"
+
+msgid "Unlisted"
+msgstr "Oculto"
+
+msgid "Unlisted versions stay out of the catalog and search; whoever has their link can still install them."
+msgstr "Las versiones ocultas quedan fuera del catálogo y de la búsqueda; quien tenga su enlace aún puede instalarlas."
+
+msgid "Upload not finished"
+msgstr "Subida sin terminar"
+
+msgid "Cancel it"
+msgstr "Cancelarla"
+
+msgid "Sign in again at %1"
+msgstr "Inicia sesión de nuevo en %1"
+
+msgid "The server no longer accepts your account. Sign in again to keep publishing; nothing was lost."
+msgstr "El servidor ya no acepta tu cuenta. Inicia sesión de nuevo para seguir publicando; no se perdió nada."
