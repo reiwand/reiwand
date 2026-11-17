@@ -32,7 +32,7 @@ Para qué sirve: ver y poner los fondos que ya tienes.
   no esté dañado ni alterado: uno alterado se rechaza con un aviso. Si no tiene firma conocida se
   importa igual y su ficha dice «Sin firma verificada». Importar una versión más nueva actualiza el
   fondo que ya tienes; con una más antigua la app avisa y ofrece «Usar la más antigua». El filtro
-  **Importados** del estante muestra solo estos fondos; se quitan desde su tapa con *Quitar de la
+  **Local** del estante muestra solo estos fondos; se quitan desde su tapa con *Quitar de la
   biblioteca*.
 - **Marcas en la tapa**: «En uso», o «En …» con el nombre de la pantalla; una nota si el archivo
   falta o está dañado, o si tiene destellos y están apagados.

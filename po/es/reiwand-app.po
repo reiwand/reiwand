@@ -21216,9 +21216,6 @@ msgstr "Importar fondo"
 msgid "Wallpaper packages (*.wpak)"
 msgstr "Paquetes de fondo (*.wpak)"
 
-#: apps/reiwand-app/qml/LibraryAdd.qml
-msgid "Imported"
-msgstr "Importados"
 
 #: apps/reiwand-app/qml/LibraryAdd.qml
 msgid "A newer version of this wallpaper is already in your library."
@@ -21229,9 +21226,13 @@ msgid "Use the older one"
 msgstr "Usar la más antigua"
 
 #: apps/reiwand-app/qml/ItemFacts.qml
-msgid "Imported:"
-msgstr "Importado:"
+msgid "Source:"
+msgstr "Origen:"
 
 #: apps/reiwand-app/qml/ItemFacts.qml
-msgid "Unverified signature"
-msgstr "Sin firma verificada"
+msgid "Local · Unverified signature"
+msgstr "Local · Sin firma verificada"
+
+#: apps/reiwand-app/qml/FirstStart.qml
+msgid "Wallpaper packages you downloaded, as .wpak files."
+msgstr "Paquetes de fondo que descargaste, como archivos .wpak."
