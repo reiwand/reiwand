@@ -75,7 +75,7 @@ fn holding_the_silence_keeps_the_reference_so_a_short_pause_does_not_recharge_th
 }
 
 fn dip(unit: &str) -> (f32, f32) {
-    let layer = json!({ "id": "l0", "type": "solid", "color": "#ffffff",
+    let layer = json!({ "blend_space": "canvas", "id": "l0", "type": "solid", "color": "#ffffff",
         "opacity": { "audio": 4, "kind": "relative", "unit": unit } });
     let audio = json!({ "attack": 0.001, "release": 0.01, "gain_release": 0.4 });
     let text =
@@ -117,7 +117,7 @@ fn absolute_levels_ignore_the_reference() {
 #[test]
 fn kind_unit_and_the_surge_fields_are_required() {
     let load = |b: Json| {
-        let layer = json!({ "id": "l0", "type": "solid", "color": "#ffffff", "opacity": b });
+        let layer = json!({ "blend_space": "canvas", "id": "l0", "type": "solid", "color": "#ffffff", "opacity": b });
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [layer] });
         Scene::load(&text.to_string(), &BTreeMap::new()).is_ok()
     };

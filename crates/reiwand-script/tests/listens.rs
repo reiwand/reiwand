@@ -10,7 +10,7 @@ fn listening(source: &str, listens: usize) -> Script {
     let doc = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [200, 100] },
         "listens": entries,
         "scripts": [{ "path": "main.js", "uses": ["audio", "layers"] }],
-        "layers": [{ "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" }] });
+        "layers": [{ "blend_space": "canvas", "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" }] });
     let scene = Scene::from_json(&doc.to_string()).unwrap();
     let setup = Setup::new(&scene, &sources(&[("main.js", source)]), 1, ("en", &json!({})));
     Script::load(&setup, Limits::default()).unwrap()
