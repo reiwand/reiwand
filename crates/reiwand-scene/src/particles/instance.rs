@@ -18,32 +18,39 @@ pub enum Tunable {
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Instance {
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [0, 1]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub alpha: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [0, 100]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub size: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [0, 4]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub count: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [0, 100]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub speed: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [0, 100]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub life: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [0, 100]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub time_scale: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [0, 16]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub brightness: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub color: Option<Value<Color>>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     #[schemars(extend("x-unit" = "px"))]
     pub points: Vec<Option<Value<Vec2>>>,
 }

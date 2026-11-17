@@ -1,6 +1,6 @@
+use crate::Color;
 use crate::rig::Rig;
 use crate::value::{Param, Value, Vec3};
-use crate::{Color, Layer};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -100,34 +100,43 @@ pub enum Coverage {
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Material {
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "material"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub shader: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub color: Option<Value<Color>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub emissive: Option<Value<Color>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub lit: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub double_sided: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub cast_shadows: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub receive_shadows: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub cull: Option<Cull>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub depth_test: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub depth_write: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub blend: Option<Coverage>,
-    #[serde(skip_serializing_if = "crate::finish_maps::MaterialMaps::is_empty")]
     pub maps: crate::finish_maps::MaterialMaps,
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub params: BTreeMap<String, Value<Param>>,
 }
 
@@ -173,23 +182,5 @@ pub struct Attach {
 impl Default for MeshDepth {
     fn default() -> Self {
         MeshDepth { scale: 1.0, cull: false, sort: true }
-    }
-}
-
-impl Layer {
-    pub fn rig(&self) -> Option<&Rig> {
-        match &self.kind {
-            crate::Kind::Mesh(m) => Some(&m.rig),
-            crate::Kind::Model(m) => Some(&m.rig),
-            _ => None,
-        }
-    }
-
-    pub fn figure(&self) -> Option<&str> {
-        match &self.kind {
-            crate::Kind::Mesh(m) => Some(&m.mesh),
-            crate::Kind::Model(m) => Some(&m.model),
-            _ => None,
-        }
     }
 }

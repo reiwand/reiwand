@@ -10,6 +10,7 @@ pub const MAX_FIRED: usize = 64;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Fired {
     pub timeline: String,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub name: Option<String>,
     pub t: f32,
 }

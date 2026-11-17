@@ -42,51 +42,38 @@ const FILES: &[(&str, &str, &str)] = &include!(concat!(env!("OUT_DIR"), "/effect
 #[serde(deny_unknown_fields)]
 pub struct Descriptor {
     pub id: String,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub name: BTreeMap<String, String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub category: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub description: Option<Text>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub uses: Vec<Use>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub audio: Vec<crate::value::Listen>,
-    #[serde(default)]
     pub mask_mode: MaskMode,
-    #[serde(default)]
     pub params: Vec<ParamDef>,
-    #[serde(default)]
     pub passes: Vec<PassDef>,
-    #[serde(default)]
     pub cost: Cost,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub fuse: Option<Fuse>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub reach: Option<String>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub bounded: Vec<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub min_fps: Option<u32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub velocity: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub state: Option<State>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub solve: Option<Solve>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub pace: Option<Pace>,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub quality: BTreeMap<Quality, Tune>,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub targets: BTreeMap<String, RenderTarget>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub options: Vec<Variant>,
-    #[serde(default, skip_serializing_if = "Stage::is_layer")]
     pub stage: Stage,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub compose: bool,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub lighter: Option<Lighter>,
     #[serde(skip)]
     pub lite: Option<std::sync::Arc<Descriptor>>,
@@ -150,12 +137,4 @@ pub fn register(d: Descriptor) -> Result<&'static Descriptor, String> {
     let d: &'static Descriptor = Box::leak(Box::new(d));
     extra.push(d);
     Ok(d)
-}
-
-fn full() -> f32 {
-    1.0
-}
-
-fn previous() -> Vec<String> {
-    vec!["previous".into()]
 }

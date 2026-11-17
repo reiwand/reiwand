@@ -9,17 +9,13 @@ pub const EMITTER_TEXELS: usize = 3;
 #[serde(deny_unknown_fields)]
 pub struct EffectEmitter {
     pub from: [f32; 2],
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub to: Option<[f32; 2]>,
-    #[serde(default = "up")]
     #[schemars(extend("x-range" = [-360, 360]))]
     pub angle: f32,
     #[schemars(extend("x-range" = [0, 64]))]
     pub strength: f32,
-}
-
-fn up() -> f32 {
-    -90.0
 }
 
 fn word(v: f32, lo: f32, hi: f32) -> [u8; 2] {

@@ -37,7 +37,6 @@ impl std::ops::Deref for Operator {
 struct Written<'a> {
     #[serde(flatten)]
     force: &'a Force,
-    #[serde(skip_serializing_if = "Option::is_none")]
     window: Option<[f32; 4]>,
 }
 

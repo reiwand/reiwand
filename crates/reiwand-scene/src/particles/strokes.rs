@@ -6,16 +6,19 @@ use serde::{Deserialize, Serialize};
 pub struct Trail {
     pub length: u32,
     pub width: f32,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub segments: Option<u32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [0, 7]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub subdivide: Option<u32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub uv_scale: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub uv_scroll: Option<f32>,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub textured: bool,
 }
 
@@ -44,7 +47,7 @@ pub struct Stretch {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Rope {
     #[schemars(extend("x-range" = [0, 7]))]
     pub subdivide: u32,

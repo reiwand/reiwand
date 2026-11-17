@@ -117,28 +117,19 @@ pub const MAX_PREWARM2: f32 = 30.0;
 #[serde(deny_unknown_fields)]
 pub struct System {
     pub capacity: u32,
-    #[serde(default)]
     pub seed: u64,
-    #[serde(default)]
     pub prewarm: f32,
     pub emitters: Vec<Emitter>,
-    #[serde(default)]
     pub init: Init,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub forces: Vec<Operator>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub collide: Vec<Collider>,
-    #[serde(default)]
     pub render: Render,
-    #[serde(default, skip_serializing_if = "is_local")]
     pub space: Placement,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub perspective: Option<Perspective>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub points: Vec<ControlPoint>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub children: Vec<Child>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub lock: Vec<Tunable>,
 }
 
@@ -185,12 +176,4 @@ impl System {
         self.capacity as f32 * side * side * self.render.fill()
             / (canvas[0] as f32 * canvas[1] as f32).max(1.0)
     }
-}
-
-fn is_zero(v: &f32) -> bool {
-    *v == 0.0
-}
-
-fn is_local(v: &Placement) -> bool {
-    *v == Placement::Local
 }

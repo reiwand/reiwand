@@ -15,7 +15,6 @@ macro_rules! patch {
         #[derive(Deserialize)]
         struct Patch {
             $(#[serde(default, deserialize_with = "present")] $field: Option<$kind>,)*
-            #[serde(default)]
             layer_edits: BTreeMap<String, Option<LayerOverride>>,
         }
 

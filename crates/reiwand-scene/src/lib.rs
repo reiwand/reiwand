@@ -35,6 +35,7 @@ mod eye;
 mod fence;
 mod fields;
 mod figure;
+mod figured;
 mod film;
 mod finish_maps;
 mod flash;

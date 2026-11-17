@@ -14,11 +14,8 @@ pub const MAX_POOL_VERTICES: u32 = 65_536;
 #[serde(deny_unknown_fields)]
 pub struct Script {
     pub path: String,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub events: Vec<ScriptEvent>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub uses: Vec<ScriptApi>,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub params: BTreeMap<String, ScriptParam>,
 }
 
@@ -86,9 +83,11 @@ pub struct ScriptParam {
     #[serde(rename = "type")]
     pub kind: ParamType,
     pub default: Param,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub min: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub max: Option<f32>,
 }
 
@@ -107,11 +106,13 @@ pub struct Pool {
     pub max: u32,
     #[schemars(extend("x-range" = [3, 65536]))]
     pub max_vertices: u32,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "image"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub texture: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "px", "x-range" = [1, 4096]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub size: Option<[u32; 2]>,
 }
 

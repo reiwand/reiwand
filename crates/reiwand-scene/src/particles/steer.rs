@@ -35,9 +35,9 @@ pub struct Oscillate {
     #[schemars(extend("x-unit" = "Hz"))]
     pub freq: [f32; 2],
     pub scale: [f32; 2],
-    #[serde(default)]
     pub phase: [f32; 2],
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub mask: Option<[f32; 2]>,
 }
 

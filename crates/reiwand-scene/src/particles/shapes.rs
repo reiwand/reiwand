@@ -1,4 +1,3 @@
-use super::place::half;
 use super::{Around, Between, Handle, Num, Source};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -11,13 +10,15 @@ pub enum EmitShape {
     Circle {
         center: [f32; 2],
         radius: Num,
-        #[serde(default)]
         inner: Num,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         scale: Option<[f32; 2]>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         sign: Option<[i8; 2]>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         at: Option<Handle>,
     },
     Sphere {
@@ -26,7 +27,8 @@ pub enum EmitShape {
         radius: [f32; 3],
         inner: f32,
         sign: [i8; 3],
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         at: Option<Handle>,
     },
     Line([[f32; 2]; 2]),
@@ -34,7 +36,6 @@ pub enum EmitShape {
     Mask {
         #[schemars(extend("x-ref" = "image"))]
         texture: String,
-        #[serde(default = "half")]
         threshold: Num,
     },
     Layer(Source),
@@ -47,8 +48,10 @@ pub enum EmitShape {
 pub struct Area {
     pub from: [f32; 2],
     pub to: [f32; 2],
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub inner: Option<[f32; 2]>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub at: Option<Handle>,
 }

@@ -1,4 +1,3 @@
-use super::full;
 use crate::value::Param;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -31,9 +30,7 @@ impl Stage {
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RenderTarget {
-    #[serde(default = "full")]
     pub scale: f32,
-    #[serde(default)]
     pub format: Texel,
 }
 
@@ -51,7 +48,7 @@ pub struct Variant {
     pub id: String,
     pub values: Vec<Param>,
     pub default: Param,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub when_bound: Option<String>,
 }
 
@@ -59,7 +56,6 @@ pub struct Variant {
 #[serde(deny_unknown_fields)]
 pub struct Entry {
     pub value: f32,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub label: BTreeMap<String, String>,
 }
 

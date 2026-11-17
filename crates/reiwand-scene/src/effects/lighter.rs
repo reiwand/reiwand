@@ -8,7 +8,7 @@ use std::sync::Arc;
 pub struct Lighter {
     pub passes: Vec<PassDef>,
     pub cost: Cost,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub up_to: Option<Quality>,
 }
 

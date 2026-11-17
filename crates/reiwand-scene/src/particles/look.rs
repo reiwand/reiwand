@@ -12,53 +12,63 @@ pub enum Frames {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Render {
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "image"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub texture: Option<Value<String>>,
     #[schemars(extend("x-range" = [0.05, 20]))]
     pub aspect: f32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub frames: Option<Frames>,
     pub fps: f32,
-    #[serde(skip_serializing_if = "std::ops::Not::not")]
     pub mix: bool,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     #[schemars(extend("x-curve" = true))]
     pub size_over_life: Vec<[f32; 2]>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub color_over_life: Vec<(f32, Color)>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub stretch: Option<Stretch>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub trail: Option<Trail>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [0, 16]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub brightness: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub cutout: Option<[f32; 3]>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [1, 64]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub cycles: Option<u32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub order: Option<Stack>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub rope: Option<Rope>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub orient: Option<Orient>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "°"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub angle: Option<f32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "image"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub normal: Option<String>,
-    #[serde(skip_serializing_if = "std::ops::Not::not")]
     pub lit: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub refract: Option<Refract>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "material"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub shader: Option<String>,
 }
 

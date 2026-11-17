@@ -3,25 +3,31 @@ use serde::{Deserialize, Serialize};
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, Hash, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct MaterialMaps {
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "image"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub base: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "image"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub orm: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "image"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub normal: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "image"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub occlusion: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "image"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub emissive: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "image"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub comb: Option<String>,
 }
 

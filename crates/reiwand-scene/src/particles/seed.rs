@@ -13,12 +13,11 @@ pub const REMAP_INPUTS: [&str; 6] = ["daytime", "runtime", "life", "age", "speed
 pub struct Hsv {
     #[schemars(extend("x-unit" = "°"))]
     pub hue: [f32; 2],
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [1, 360]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub steps: Option<u32>,
-    #[serde(default = "full")]
     pub sat: [f32; 2],
-    #[serde(default = "full")]
     pub val: [f32; 2],
 }
 
@@ -26,7 +25,6 @@ pub struct Hsv {
 #[serde(deny_unknown_fields)]
 pub struct Palette {
     pub colors: Vec<Color>,
-    #[serde(default)]
     pub noise: [f32; 3],
 }
 
@@ -34,12 +32,11 @@ pub struct Palette {
 #[serde(deny_unknown_fields)]
 pub struct Carry {
     pub from: Target,
-    #[serde(default = "full")]
     pub speed: [f32; 2],
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Turbulent {
     #[schemars(extend("x-unit" = "°"))]
     pub forward: f32,
@@ -49,23 +46,29 @@ pub struct Turbulent {
     pub offset: f32,
     pub speed: [f32; 2],
     pub phase: f32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub audio: Option<Band>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub kind: Option<AudioKind>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub unit: Option<AudioUnit>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub window: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub reference: Option<Reference>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub hold_silence: Option<bool>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct OffsetNoise {
     #[schemars(extend("x-unit" = "px"))]
     pub distance: f32,
@@ -116,32 +119,29 @@ pub struct Remap {
     pub input: String,
     #[serde(rename = "in")]
     pub from: [f32; 2],
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub clamp_in: bool,
     pub output: RemapOutput,
     #[serde(rename = "out")]
     pub to: [f32; 2],
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub clamp_out: bool,
-    #[serde(default)]
     pub op: RemapOp,
-    #[serde(default)]
     pub wave: Wave,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub kind: Option<AudioKind>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub unit: Option<AudioUnit>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub window: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub reference: Option<Reference>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub hold_silence: Option<bool>,
-}
-
-fn full() -> [f32; 2] {
-    [1.0; 2]
 }
 
 impl Default for Turbulent {

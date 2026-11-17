@@ -1,5 +1,5 @@
 use super::seed::{Carry, Hsv, OffsetNoise, Palette, Remap, Turbulent};
-use super::{EmitShape, Periodic, Spread, Tilt, is_zero};
+use super::{EmitShape, Periodic, Spread, Tilt};
 use crate::Color;
 use crate::value::Value;
 use schemars::JsonSchema;
@@ -12,25 +12,26 @@ pub const MAX_BURSTS: usize = 8;
 #[serde(deny_unknown_fields)]
 pub struct Emitter {
     pub shape: EmitShape,
-    #[serde(default = "zero")]
     pub rate: Value<f32>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub bursts: Vec<Burst>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub follow: Option<Follow>,
-    #[serde(default, skip_serializing_if = "is_zero")]
     pub inherit: f32,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "s"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub duration: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "s"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub delay: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub periodic: Option<Periodic>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub max_per_step: Option<u32>,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub audio_gate: bool,
 }
 
@@ -51,12 +52,15 @@ pub enum Cue {
 #[serde(deny_unknown_fields)]
 pub struct Burst {
     pub count: u32,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub every: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub on: Option<Cue>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "s"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub at: Option<f32>,
 }
 
@@ -71,7 +75,7 @@ impl Burst {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Init {
     pub life: Spread<f32>,
     pub speed: Spread<f32>,
@@ -81,35 +85,43 @@ pub struct Init {
     pub spin: Spread<f32>,
     pub frame: Spread<f32>,
     pub color: Spread<Color>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [0, 1]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub alpha: Option<Spread<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub hsv: Option<Hsv>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub palette: Option<Palette>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub gradient: Vec<(f32, Color)>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "px/s"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub velocity: Option<Spread<[f32; 2]>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "px/s"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub radial: Option<Spread<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub inherit: Option<Carry>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub turbulent: Option<Turbulent>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub offset_noise: Option<OffsetNoise>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "px"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub depth: Option<Spread<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "px/s"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub depth_speed: Option<Spread<f32>>,
     pub tilt: Tilt,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub remap: Vec<Remap>,
 }
 
@@ -145,8 +157,4 @@ impl Default for Init {
             remap,
         }
     }
-}
-
-fn zero() -> Value<f32> {
-    Value::Fixed(0.0)
 }

@@ -1,6 +1,5 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use std::ops::Not;
 
 const DECIMALS: u32 = 2;
 
@@ -9,19 +8,19 @@ const DECIMALS: u32 = 2;
 pub struct Slider {
     pub min: f64,
     pub max: f64,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub step: Option<f64>,
     pub default: f64,
-    #[serde(default)]
     pub integer: bool,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub unit: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [0, 6]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub decimals: Option<u8>,
-    #[serde(default, skip_serializing_if = "Not::not")]
     pub editable: bool,
-    #[serde(default, skip_serializing_if = "Not::not")]
     pub log: bool,
 }
 

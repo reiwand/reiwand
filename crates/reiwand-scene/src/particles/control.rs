@@ -44,15 +44,17 @@ pub enum Placement {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ControlPoint {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "px"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub at: Option<Value<Vec2>>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub follow: Option<Follow>,
-    #[serde(default)]
     pub space: Placement,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "°"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub angle: Option<Value<f32>>,
 }
 

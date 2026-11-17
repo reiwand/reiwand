@@ -28,45 +28,57 @@ pub enum Force {
     Turbulence {
         strength: Value<f32>,
         scale: f32,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         speed: Option<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         time_scale: Option<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         mask: Option<[f32; 2]>,
     },
     Attractor {
         target: Target,
         strength: Value<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
         #[schemars(extend("x-unit" = "px"))]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         radius: Option<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         falloff: Option<Falloff>,
     },
     Vortex {
         center: Target,
         strength: Value<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
         #[schemars(extend("x-unit" = "px"))]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         radius: Option<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         falloff: Option<Falloff>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         inner: Option<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         outer: Option<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         ring: Option<Ring>,
         axis: [f32; 3],
     },
     Orbit {
         center: Target,
         strength: Value<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
         #[schemars(extend("x-unit" = "px"))]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         radius: Option<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         falloff: Option<Falloff>,
     },
     Noise(Value<f32>),

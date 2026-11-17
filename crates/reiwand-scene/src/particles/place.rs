@@ -92,20 +92,11 @@ pub enum Refresh {
 pub struct Source {
     #[schemars(extend("x-ref" = "layer"))]
     pub id: String,
-    #[serde(default = "half")]
     #[schemars(extend("x-range" = [0, 1]))]
     pub threshold: Num,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub color: bool,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub inherit: bool,
-    #[serde(default)]
     #[schemars(extend("x-unit" = "px"))]
     pub jitter: f32,
-    #[serde(default)]
     pub refresh: Refresh,
-}
-
-pub(super) fn half() -> Num {
-    Num::from(0.5)
 }
