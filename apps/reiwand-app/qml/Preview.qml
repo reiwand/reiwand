@@ -20,6 +20,9 @@ Window {
     property real wheel: 0
     property alias panel: dim.panel
     property string animated: ""
+    property string clip: ""
+    property int quiet: App.checking ? 0 : PreviewLook.reposo
+    readonly property bool touching: dim.touching
     readonly property bool live: session.active === true
     readonly property var candidate: session.candidate ?? null
     readonly property var current: session.now ?? null
@@ -47,9 +50,15 @@ Window {
     function look() {
         const uid = candidate ? candidate.uid : "";
         animated = "";
+        clip = "";
         if (uid === "")
             return;
-        App.query("GetItem", [uid], "Library1", reply => preview && preview.candidate && preview.candidate.uid === uid && !(App.state.on_battery ?? false) && reply.about?.photosensitive !== true && (preview.animated = App.url(reply.about?.animated ?? "")), () => {});
+        App.query("GetItem", [uid], "Library1", reply => preview && preview.candidate && preview.candidate.uid === uid && !(App.state.on_battery ?? false) && reply.about?.photosensitive !== true && preview.play(reply), () => {});
+    }
+
+    function play(reply) {
+        clip = reply.item?.kind === "video" && !reply.item?.missing ? App.url(reply.item.path) : "";
+        animated = App.url(reply.about?.animated ?? "");
     }
 
     function take(state) {
@@ -61,6 +70,7 @@ Window {
             output = state.output;
         const was = candidate ? candidate.uid : "";
         session = state;
+        rest();
         panel.reel.sync(state);
         if (candidate && candidate.uid !== was)
             look();
@@ -87,10 +97,11 @@ Window {
     }
 
     function finish(code) {
+        fades.idle.stop();
         left = code;
         closing = true;
         if (!App.checking)
-            leaving.start();
+            fades.leaving.start();
     }
 
     function choose(offset) {
@@ -103,7 +114,14 @@ Window {
         return mode !== "vacio" && mode !== "error";
     }
 
+    function rest() {
+        fades.idle.stop();
+        if (quiet > 0 && live && !closing && !touching)
+            fades.idle.start();
+    }
+
     function scroll(delta) {
+        rest();
         wheel += delta;
         const notches = Math.trunc(Math.abs(wheel) / PreviewLook.ruedaPaso);
         if (notches === 0 || !working())
@@ -114,6 +132,7 @@ Window {
     }
 
     function press(key) {
+        rest();
         if (key === Qt.Key_Escape)
             live ? ask("BrowseCancel", [output]) : finish(0);
         else if (key === Qt.Key_Return || key === Qt.Key_Enter)
@@ -148,39 +167,11 @@ Window {
             requestActivate();
             load();
         }
-        opening.start();
+        fades.opening.start();
     }
 
     Kirigami.Theme.colorSet: Kirigami.Theme.Window
     Kirigami.Theme.inherit: false
-
-    Timer {
-        interval: PreviewLook.espera
-        running: !preview.began
-        onTriggered: preview.fail({})
-    }
-
-    NumberAnimation {
-        id: opening
-
-        target: dim
-        property: "shade"
-        from: 0
-        to: 1
-        duration: preview.calm ? 0 : PreviewLook.aparece
-        easing.type: Easing.OutCubic
-    }
-
-    NumberAnimation {
-        id: leaving
-
-        target: dim
-        property: "shade"
-        to: 0
-        duration: preview.calm ? 0 : PreviewLook.sale
-        easing.type: Easing.OutCubic
-        onFinished: Qt.exit(preview.left)
-    }
 
     Connections {
         function onUpdated(topic, ids) {
@@ -189,6 +180,13 @@ Window {
         }
 
         target: App
+    }
+
+    PreviewFades {
+        id: fades
+
+        dim: dim
+        preview: preview
     }
 
     PreviewScreen {

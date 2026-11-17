@@ -49,7 +49,15 @@ Timer {
             }, () => shown.calm && shown.candidate.title === "Waves"], [() => {
                 shown.left = -1;
                 shown.press(Qt.Key_Escape);
-            }, () => shown.log.slice(-1)[0] === 'BrowseCancel ["DP-1"]' && shown.left === 0], [() => shown.take(empty), () => shown.mode === "vacio" && shown.panel.hints.model[0].text === App.tr("Open the library") && !shown.press(Qt.Key_Left) && shown.press(Qt.Key_Return) && shown.left === 3], [() => shown.fail({
+            }, () => shown.log.slice(-1)[0] === 'BrowseCancel ["DP-1"]' && shown.left === 0], [() => {
+                shown.left = -1;
+                shown.closing = false;
+                shown.quiet = 150;
+                shown.take(calm);
+            }, () => shown.log.slice(-1)[0] === 'BrowseCancel ["DP-1"]' && shown.left === 0], [() => {
+                shown.quiet = 0;
+                shown.take(empty);
+            }, () => shown.mode === "vacio" && shown.panel.hints.model[0].text === App.tr("Open the library") && !shown.press(Qt.Key_Left) && shown.press(Qt.Key_Return) && shown.left === 3], [() => shown.fail({
                     "message": "no answer"
                 }), () => shown.mode === "error" && shown.failure === "no answer" && shown.panel.hints.model.length === 2], [() => shown.press(Qt.Key_Return), () => shown.failure === "" && shown.live && shown.candidate.title === "Aurora" && shown.log.slice(-1)[0] === 'GetBrowse ["DP-1"]'], [() => {
                 shown.left = -1;

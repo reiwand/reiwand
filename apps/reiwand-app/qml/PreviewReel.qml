@@ -9,6 +9,7 @@ Item {
     property bool calm: false
     property string nowUid: ""
     property string animated: ""
+    property string clip: ""
     property alias cards: cards
     signal chosen(int offset)
 
@@ -98,6 +99,7 @@ Item {
                 home: strip.width / 2
                 current: uid === reel.nowUid
                 animated: offset === 0 ? reel.animated : ""
+                clip: offset === 0 ? reel.clip : ""
                 onClicked: offset => reel.chosen(offset)
             }
         }

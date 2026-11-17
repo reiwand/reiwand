@@ -66,6 +66,7 @@ Kirigami.ShadowedRectangle {
         calm: panel.preview.calm
         nowUid: panel.preview.current ? panel.preview.current.uid : ""
         animated: panel.preview.animated
+        clip: panel.preview.clip
         onChosen: offset => panel.preview.choose(offset)
     }
 

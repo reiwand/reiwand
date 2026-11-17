@@ -18,6 +18,7 @@ QtObject {
     readonly property int aparece: 170
     readonly property int sale: 150
     readonly property int espera: 5000
+    readonly property int reposo: 5000
     readonly property real velo: 0.55
     readonly property real cercaOpaca: 0.78
     readonly property real lejosOpaca: 0.36

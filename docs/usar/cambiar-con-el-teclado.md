@@ -12,7 +12,7 @@ Los atajos son globales: no hace falta que nada tenga el foco.
 - **Siguiente** y **anterior** (`LOGO+ALT+N` y `LOGO+ALT+P`): abren la ventana y mueven la selección.
 - **Aplicar** (`LOGO+ALT+Return`): deja el del centro, con la transición que corresponda.
 - **Cancelar** (`LOGO+ALT+Escape`): cierra la ventana; el fondo real sigue igual.
-- Si no haces nada durante 30 segundos se cierra sola y no cambia nada.
+- Si no tocas nada durante 5 segundos (ni teclas, ni atajos, ni rueda, ni mover el puntero sobre la ventana) se cierra sola y no cambia nada; mientras mantienes pulsado un botón sobre una miniatura no se cierra. Si la ventana desaparece de golpe, el demonio descarta la selección en unos 30 segundos.
 
 Con la ventana abierta: las flechas ← y → y la rueda del ratón mueven la selección; Intro, un clic
 en el central o el atajo de aplicar lo aplican y cierran; Esc, un clic fuera o el atajo de cancelar

@@ -1328,10 +1328,13 @@ A `HistoryReply`, newest first. `output` is a connector name; `limit` is `1..=10
 
 **Browsing wallpapers.** A browsing session lets the user look at wallpapers one by one on a screen and keep one, without
 changing anything until they apply it. It belongs to one output (`""` means the only screen when
-there is one; with several screens it browses the library for every screen at once). It holds a
+there is one; with several screens the switcher panel opens on the screen the compositor gives it, the one with the pointer, and then browses the list of that screen). It holds a
 candidate, never changes the wallpaper (the switcher panel and the tray read the
-`BrowseState` data), and ends by itself after 30 s without input. Nothing runs while nobody
-browses: one timer per open session.
+`BrowseState` data), and ends by itself after 30 s without input when no switcher panel holds it: while the panel
+is open the daemon checks every 30 s that the panel still holds its bus name and keeps the session,
+and the panel itself closes (like Esc, changing nothing) after 5 s without a key, wheel turn,
+shortcut or pointer movement over it, never while a button is held on it. Nothing runs while nobody browses:
+one timer per open session.
 
 `source` is `playlist` (the playlist the screen plays: the candidate is exactly the item `Next`
 or `Previous` would show, shuffle and history included, and `position` is its place in the list),

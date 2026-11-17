@@ -7,6 +7,7 @@ Item {
     required property var preview
     property real shade: 1
     property alias panel: panel
+    readonly property bool touching: touch.active
 
     focus: true
     Keys.onPressed: event => event.accepted = preview.press(event.key)
@@ -19,6 +20,17 @@ Item {
     MouseArea {
         anchors.fill: parent
         onClicked: dim.preview.press(Qt.Key_Escape)
+    }
+
+    HoverHandler {
+        onPointChanged: dim.preview.rest()
+    }
+
+    PointHandler {
+        id: touch
+
+        acceptedButtons: Qt.AllButtons
+        onActiveChanged: dim.preview.rest()
     }
 
     WheelHandler {
