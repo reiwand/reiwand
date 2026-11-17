@@ -13,13 +13,8 @@ impl Publish {
 #[zbus::interface(name = "io.github.reiwand.Publish1")]
 impl Publish {
     #[zbus(out_args("job"))]
-    async fn upload(&self, path: String) -> Result<u64> {
-        self.d()?.run(move |d| d.upload(&path, "public")).await
-    }
-
-    #[zbus(out_args("job"))]
-    async fn upload_as(&self, path: String, visibility: String) -> Result<u64> {
-        self.d()?.run(move |d| d.upload(&path, &visibility)).await
+    async fn upload_as(&self, repo: String, path: String, visibility: String) -> Result<u64> {
+        self.d()?.run(move |d| d.upload(&repo, &path, &visibility)).await
     }
 
     #[zbus(out_args("json"))]

@@ -59,6 +59,21 @@ impl Daemon {
         }
     }
 
+    pub fn sign_out_account(&self, account: &str) -> Result<()> {
+        self.edit_accounts(|file| {
+            let Some(rec) = file.accounts.iter_mut().find(|r| r.id == account) else {
+                return Err(not_found(format!("account {account} not found")));
+            };
+            rec.pending = true;
+            Ok(())
+        })?;
+        if let Err(e) = self.drop_token(account) {
+            tracing::warn!("the access of a signed-out account could not be deleted: {}", e.parts().1);
+        }
+        self.changes.changed("repos", Vec::new());
+        Ok(())
+    }
+
     pub fn remove_account(&self, account: &str) -> Result<()> {
         let gone: Rec = self.edit_accounts(|file| {
             let index = file.accounts.iter().position(|r| r.id == account);

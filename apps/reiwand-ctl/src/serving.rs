@@ -9,9 +9,15 @@ use reiwand_client::Client;
 pub async fn run(client: &Client, command: Server) -> Result<()> {
     let sync = &client.publish;
     match command {
-        Server::Upload { file, unlisted, wait } => {
+        Server::Upload { file, unlisted, repo, wait } => {
             let visibility = if unlisted { "unlisted" } else { "public" };
-            job(client, sync.upload_as(&path_arg(&file)?, visibility).map_ok(|id| ((), id)), &wait).await?
+            job(
+                client,
+                sync.upload_as(repo.as_deref().unwrap_or(""), &path_arg(&file)?, visibility)
+                    .map_ok(|id| ((), id)),
+                &wait,
+            )
+            .await?
         }
         Server::Packages { json } => {
             let found: serde_json::Value = serde_json::from_str(&patient(sync.list_packages()).await?)?;

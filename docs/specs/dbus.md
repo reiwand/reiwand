@@ -2165,27 +2165,25 @@ the grant, for the editor; `NotFound` when the output has none.
 ## `io.github.reiwand.Publish1`
 
 Publica en un repositorio de un servidor propio (`reiwand-server`, ver `server.md`) con una cuenta
-guardada en `Accounts1`: subidas, paquetes propios, claves de autor y votos. El destino es, por
-ahora, la primera cuenta con sesión que tenga un enlace a un repositorio de ese servidor; el token
+guardada en `Accounts1`: subidas, paquetes propios, claves de autor y votos. El destino de una subida es el
+repositorio que se pasa a `UploadAs` (la cuenta enlazada a él); los votos van por la cuenta del repositorio
+de cada paquete (`repo_id/id`); las demás llamadas usan la primera cuenta con sesión enlazada a un repositorio. El token
 sale de donde se guardan los secretos (`account <id>`) y nunca aparece en respuestas, señales,
 destinos de tareas, errores ni registros. El demonio solo contacta el servidor de la cuenta, con el
 anclaje de huella de su origen cuando existe, no sigue redirecciones y envía el `User-Agent`
 genérico. Una cuenta sin sesión o rechazada devuelve `SignedOut`; la sincronización automática ya no
 existe: los datos viajan solo por exportar e importar (`Carry1`).
 
-### `Upload(s path) → (t job)`
+### `UploadAs(s repo, s path, s visibility) → (t job)`
 
-Uploads a `.wpak` package with this device's token (`POST /api/v1/uploads`, `PUT`, `finalize`)
-in an `upload` job whose output is an `UploadOutput`; the job fails when the server refuses the
-package. It is published in the server's repository after review, or at once when the server
-publishes uploads of the account's role.
-
-### `UploadAs(s path, s visibility) → (t job)`
-
-Like `Upload`, with `visibility` `public` or `unlisted` (`server.md`, "Uploads"): an unlisted package
-stays out of the catalog and its search, and whoever has its id installs it. A server that does not
-repeat `unlisted` when the upload opens gets it cancelled, and the job fails without uploading.
-`Upload` is `UploadAs` with `public`.
+Uploads a `.wpak` package with the token of the account linked to the repository `repo` (its address
+or its `repo_id`; empty: the first account with a session) (`POST /api/v1/uploads`, `PUT`,
+`finalize`) in an `upload` job whose output is an `UploadOutput`; it fails with no account for that
+repository and when the server refuses the package. It is published after review, or at once when
+the server publishes uploads of the account's role. `visibility` is `public` or `unlisted`
+(`server.md`, "Uploads"): an unlisted package stays out of the catalog and its search, and whoever
+has its id installs it. A server that does not repeat `unlisted` when the upload opens gets it
+cancelled, and the job fails without uploading.
 
 ### `ListPackages() → (s json)`
 
@@ -2230,24 +2228,22 @@ cannot be one.
 
 ### `Vote(s id, s vote) → (s json)`
 
-Sends `up`, `down` or `none` for the package `id` to the linked server with this device's token
-(`POST /api/v1/r/{repo}/packages/{id}/vote`, the repository named in the address of the server's repository) and answers `{id, up, down, mine}`. `id` is a package id of the
-repository of the linked server, or `repo_id/id`. The server keeps only the counts
-and the vote of this account. `InvalidArgs` for another vote, an id that is not a package id, or a
-`repo_id` that is not the one of the linked server's repository (nothing is sent).
+Sends `up`, `down` or `none` for the package `id` with the token of the account linked to its repository
+(`POST /api/v1/r/{repo}/packages/{id}/vote`) and answers `{id, up, down, mine}`. `id` is `repo_id/id`; a bare
+package id goes to the first account with a session. The server keeps only the counts and the vote of this
+account. `InvalidArgs` for another vote, an id that is not a package id, or a `repo_id` with no account
+linked (nothing is sent).
 
 ### `GetVotes(as ids) → (s json)`
 
-`{items: {id: {up, down, mine}}, shown, repo_id}` from the linked server (`mine` is the vote of this account: `up`, `down` or `none`) for at most 1000 package ids, each a package id of the
-server's repository or `repo_id/id`; `items` is keyed by the ids as given, and ids whose `repo_id` is
-not the server's repository are never sent and get no item. Clients pass every row they show; the
-daemon keeps the ids of the server's repository and asks for them at most 100 at a time, so its
-packages get counts however many rows of other repositories come first. `repo_id` is the repository of the linked
-server (`null` when none is linked or it announces none), so a client shows vote buttons only on its
-packages. `shown` is
-`false`, with no items and without reaching the network, while no server is linked, no id is of its
-repository or `repos.vote_counts` is off. Counts are hints the repository does not sign. `RepoPackage` carries
-`featured` for the packages the repository features (`repo.md`).
+`{items: {id: {up, down, mine}}, shown, repos}` for at most 1000 package ids, each a package id or
+`repo_id/id`, asked of every repository that has an account with a session, at most 100 ids at a time
+(`mine` is the vote of the account: `up`, `down` or `none`). `items` is keyed by the ids as given; ids of
+repositories with no account are never sent and get no item. `repos` lists the `repo_id` of the
+repositories that can be voted on, so a client shows vote buttons only on their packages. `shown` is
+`false`, with no items and without reaching the network, while no account is linked or `repos.vote_counts`
+is off. Counts are hints the repository does not sign. `RepoPackage` carries `featured` for the packages
+the repository features (`repo.md`).
 
 
 ## `io.github.reiwand.Carry1`
@@ -2314,6 +2310,11 @@ unknown; `InvalidArgs` when the repository is not on the account's server.
 ### `Unlink(s repo)`
 
 Removes the link of the repository; the account stays.
+
+### `SignOut(s account)`
+
+Deletes the token item of the account and marks it as needing a new sign-in (`pending`); its links
+stay, and signing in again with the same user reuses it. `NotFound` when the account is unknown.
 
 ### `Remove(s account)`
 

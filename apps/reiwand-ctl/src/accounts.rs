@@ -35,6 +35,13 @@ pub enum Accounts {
         #[arg(value_name = "REPO", help = "Address of the repository")]
         repo: String,
     },
+    #[command(
+        about = "Sign out of an account: its saved access is deleted and its links stay; sign in again to use it"
+    )]
+    SignOut {
+        #[arg(value_name = "ACCOUNT", help = "Account id from reiwand-ctl account ls")]
+        account: String,
+    },
     #[command(name = "rm", about = "Forget an account on this computer, with its saved access")]
     Remove {
         #[arg(value_name = "ACCOUNT", help = "Account id from reiwand-ctl account ls")]
@@ -70,6 +77,7 @@ pub async fn run(client: &Client, command: Accounts) -> Result<()> {
         }
         Accounts::Use { repo, account } => accounts.use_account(&repo, &account).await?,
         Accounts::Unlink { repo } => accounts.unlink(&repo).await?,
+        Accounts::SignOut { account } => accounts.sign_out(&account).await?,
         Accounts::Remove { account } => accounts.remove(&account).await?,
     }
     Ok(())

@@ -31,6 +31,10 @@ impl Accounts {
         self.d()?.run(move |d| d.unlink_account(&repo)).await
     }
 
+    async fn sign_out(&self, account: String) -> Result<()> {
+        self.d()?.run(move |d| d.sign_out_account(&account)).await
+    }
+
     async fn remove(&self, account: String) -> Result<()> {
         self.d()?.run(move |d| d.remove_account(&account)).await
     }

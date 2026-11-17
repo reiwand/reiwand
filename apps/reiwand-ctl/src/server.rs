@@ -13,6 +13,12 @@ pub enum Server {
                     the public repository files still list it, so it is not private"
         )]
         unlisted: bool,
+        #[arg(
+            long,
+            value_name = "ADDRESS",
+            help = "Repository to publish to; the first signed-in account when left out"
+        )]
+        repo: Option<String>,
         #[command(flatten)]
         wait: Wait,
     },

@@ -25,8 +25,7 @@ pub trait Inputs1 {
     default_path = "/io/github/reiwand/Daemon"
 )]
 pub trait Publish1 {
-    fn upload(&self, path: &str) -> Result<u64>;
-    fn upload_as(&self, path: &str, visibility: &str) -> Result<u64>;
+    fn upload_as(&self, repo: &str, path: &str, visibility: &str) -> Result<u64>;
     fn list_packages(&self) -> Result<String>;
     fn set_visibility(&self, id: &str, version: &str, visibility: &str) -> Result<()>;
     fn list_author_keys(&self) -> Result<String>;
@@ -103,5 +102,6 @@ pub trait Accounts1 {
     #[zbus(name = "Use")]
     fn use_account(&self, repo: &str, account: &str) -> Result<()>;
     fn unlink(&self, repo: &str) -> Result<()>;
+    fn sign_out(&self, account: &str) -> Result<()>;
     fn remove(&self, account: &str) -> Result<()>;
 }

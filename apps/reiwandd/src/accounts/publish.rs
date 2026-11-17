@@ -2,7 +2,7 @@ use super::{block_on, random, sync_error};
 use crate::daemon::Daemon;
 use crate::error::{Result, failed, invalid};
 use crate::jobs::Ctl;
-use reiwand_account::{Api, hex};
+use reiwand_account::{Api, clean, hex};
 use reiwand_core::model::{JobKind, UploadOutput};
 use reqwest::Method;
 use serde_json::{Value, json};
@@ -12,28 +12,46 @@ use std::sync::Arc;
 pub(super) struct Destination {
     pub api: Api,
     pub name: String,
+    pub url: String,
     pub repo_id: Option<String>,
 }
 
 impl Daemon {
     pub(super) fn destination(&self) -> Result<Destination> {
-        let accounts = self.account_list();
-        let found = accounts.iter().filter(|r| !r.pending).find_map(|r| {
-            let link = r.links.iter().find(|l| reiwand_format::server_repo_name(&l.url).is_some())?;
-            Some((r, link))
-        });
-        let Some((rec, link)) = found else {
-            return Err(failed("sign in to an account linked to a repository first"));
-        };
-        let token =
-            self.account_token(&rec.id).ok_or_else(|| failed("the access of this account is missing"))?;
-        let pin = self.repo_pins().get(&rec.origin).cloned();
-        let api = Api::pinned(&rec.origin, pin.as_deref()).map_err(sync_error)?.with_token(&token);
-        let name = reiwand_format::server_repo_name(&link.url).unwrap_or_default().to_owned();
-        Ok(Destination { api, name, repo_id: link.repo_id.clone() })
+        self.destination_for("")
     }
 
-    pub fn upload(self: &Arc<Self>, path: &str, visibility: &str) -> Result<u64> {
+    pub(super) fn destinations(&self) -> Vec<Destination> {
+        let pins = self.repo_pins();
+        let mut found = Vec::new();
+        for rec in self.account_list().iter().filter(|r| !r.pending) {
+            let Some(token) = self.account_token(&rec.id) else { continue };
+            let Ok(api) = Api::pinned(&rec.origin, pins.get(&rec.origin).map(String::as_str)) else {
+                continue;
+            };
+            let api = api.with_token(&token);
+            for link in &rec.links {
+                let Some(name) = reiwand_format::server_repo_name(&link.url) else { continue };
+                found.push(Destination {
+                    api: api.clone(),
+                    name: name.to_owned(),
+                    url: link.url.clone(),
+                    repo_id: link.repo_id.clone(),
+                });
+            }
+        }
+        found
+    }
+
+    pub(super) fn destination_for(&self, repo: &str) -> Result<Destination> {
+        let wanted = clean(repo);
+        let mut all = self.destinations().into_iter();
+        let found =
+            all.find(|d| repo.is_empty() || clean(&d.url) == wanted || d.repo_id.as_deref() == Some(repo));
+        found.ok_or_else(|| failed("sign in to an account linked to that repository first"))
+    }
+
+    pub fn upload(self: &Arc<Self>, repo: &str, path: &str, visibility: &str) -> Result<u64> {
         if !matches!(visibility, "public" | "unlisted") {
             return Err(invalid("the visibility is public or unlisted"));
         }
@@ -43,10 +61,11 @@ impl Daemon {
         }
         let size =
             std::fs::metadata(&path).map_err(|e| invalid(format!("cannot read the package: {e}")))?.len();
-        self.destination()?;
-        let target = hex(&random::<8>());
-        Ok(self
-            .start_job(JobKind::Upload, &target, move |d, ctl| d.send_package(&path, size, &visibility, ctl)))
+        self.destination_for(repo)?;
+        let (target, repo) = (hex(&random::<8>()), repo.to_owned());
+        Ok(self.start_job(JobKind::Upload, &target, move |d, ctl| {
+            d.send_package(&repo, &path, size, &visibility, ctl)
+        }))
     }
 
     pub fn own_packages(&self) -> Result<String> {
@@ -66,8 +85,8 @@ impl Daemon {
         Ok(())
     }
 
-    fn send_package(&self, path: &Path, size: u64, visibility: &str, ctl: &Ctl) -> Result<Value> {
-        let to = self.destination()?;
+    fn send_package(&self, repo: &str, path: &Path, size: u64, visibility: &str, ctl: &Ctl) -> Result<Value> {
+        let to = self.destination_for(repo)?;
         let api = to.api;
         let sha256 = reiwand_format::sha256_file(path)?;
         let asked = json!({"size": size, "sha256": sha256, "visibility": visibility, "repo": to.name});

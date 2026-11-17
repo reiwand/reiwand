@@ -65,6 +65,12 @@ msgid "Stop using any account for a repository; the account stays"
 msgstr "Dejar de usar una cuenta en un repositorio; la cuenta se conserva"
 
 #: apps/reiwand-ctl/src/accounts.rs
+msgid ""
+"Sign out of an account: its saved access is deleted and its links stay; sign "
+"in again to use it"
+msgstr "Cierra la sesión de una cuenta: se borra su acceso guardado y sus vínculos se conservan; vuelve a iniciar sesión para usarla"
+
+#: apps/reiwand-ctl/src/accounts.rs
 msgid "Forget an account on this computer, with its saved access"
 msgstr "Olvidar una cuenta en este equipo, con su acceso guardado"
 
@@ -5155,6 +5161,10 @@ msgstr ""
 "Dejarlo fuera del catálogo y la búsqueda; quien tenga su enlace aún puede "
 "instalarlo, y los archivos públicos del repositorio aún lo listan, así que "
 "no es privado"
+
+#: apps/reiwand-ctl/src/server.rs
+msgid "Repository to publish to; the first signed-in account when left out"
+msgstr "Repositorio donde publicar; si se omite, la primera cuenta con sesión iniciada"
 
 #: apps/reiwand-ctl/src/server.rs
 msgid ""
