@@ -2566,7 +2566,7 @@ counted counterclockwise changes its sign.
 | a blur of the whole layer | `blur` | `radius` in pixels |
 | a blur away from a center | `blur_radial` | `center`, `strength` (0 to 1) |
 | a blur along a direction | `blur_motion` | `angle`, `length` in pixels |
-| a color made transparent | `chroma_key` | `key`, `tolerance`, `softness` |
+| a color made transparent | `chroma_key` | `key`, `tolerance`, `softness`, `distance`, `keep` |
 | edge detection | `edges` | `threshold`, `width` in pixels, `color` |
 | a fisheye or lens bulge | `lens_distort` | `k1` (above 0 bulges), `center` |
 | a four-point perspective | `perspective` | `top_left`, `top_right`, `bottom_right`, `bottom_left` |
@@ -2591,6 +2591,16 @@ counted counterclockwise changes its sign.
 | animated beams of light | `light_shafts` | `direction`, `angle`, `center`, `color`, `gradient`, `exponent`, `intensity`, `feather`, `smoothness`, `speed` |
 
 A test reads this table and checks that every effect and parameter in it exists.
+
+`chroma_key` measures how far each pixel is from `key` in the OKLab color space. `distance` is
+required: 0 (`chroma only`) compares only the color plane, ignoring lightness, which suits a green
+or blue screen under uneven light but cuts every grey, white and black when the key is neutral; 1
+(`full color`) adds lightness to the distance, so a white, grey or black key removes only that
+tone. `keep` is also required (0 to 1): the opacity that the removed color keeps, 0 making it fully
+transparent. Both must be written in every use of the effect, a scene without them is refused
+(`/layers/N/effects/M/params` lacks the required parameter), and the editor writes them when it adds
+the effect. `spill` pulls the color of the key out of the edges and does nothing for a neutral key.
+The `chroma` material of a model already measures the full color distance and needs neither.
 
 ### Porting a shader to WGSL
 

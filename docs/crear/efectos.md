@@ -247,7 +247,7 @@ Parámetros: `intensity` (número, por defecto 0,35; de 0 a 1); `radius` (númer
 
 **`chroma_key`** (Croma, ligero). Quita un color y lo hace transparente, como una pantalla verde.
 
-Parámetros: `key` (color, por defecto `#00ff00`); `tolerance` (número, por defecto 0,1; de 0 a 1); `softness` (número, por defecto 0,08; de 0 a 1); `spill` (número, por defecto 0,5; de 0 a 1).
+Parámetros: `key` (color, por defecto `#00ff00`); `tolerance` (número, por defecto 0,1; de 0 a 1); `softness` (número, por defecto 0,08; de 0 a 1); `spill` (número, por defecto 0,5; de 0 a 1); `distance` (obligatorio; 0 compara solo el croma y sirve para pantallas verdes o azules con luz despareja, 1 compara el color completo, con su claridad, y es lo que quita un blanco, un gris o un negro sin llevarse los demás tonos); `keep` (obligatorio, número de 0 a 1: la opacidad que conserva el color quitado, 0 lo deja transparente del todo). El editor escribe ambos al añadir el efecto; si faltan en un archivo, la escena se rechaza.
 
 **`color_adjust`** (Ajustes de color, ligero). Ajusta exposición, contraste, saturación y tono.
 

@@ -22,6 +22,9 @@ impl Check<'_> {
                 self.issues.push(Issue::Type(format!("{e}/effect")));
             }
             self.variants(&e, d, effect);
+            for def in d.params.iter().filter(|p| p.required && !effect.params.contains_key(&p.id)) {
+                self.issues.push(Issue::Absent { path: format!("{e}/params"), id: def.id.clone() });
+            }
             for (id, value) in &effect.params {
                 let path = format!("{e}/params/{id}");
                 if d.options.iter().any(|o| &o.id == id) {

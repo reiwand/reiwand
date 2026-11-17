@@ -4764,6 +4764,10 @@ msgid "%1 names \"%2\", a property that holds no value"
 msgstr "%1 nombra «%2», una propiedad que no guarda ningún valor"
 
 #: crates/reiwand-scene/src/issue.rs
+msgid "%1 lacks the required parameter \"%2\""
+msgstr "%1 no tiene el parámetro obligatorio «%2»"
+
+#: crates/reiwand-scene/src/issue.rs
 msgid "%1 needs exactly one source: prop, keys, audio, cursor, clock or script"
 msgstr ""
 "%1 necesita exactamente una fuente: prop, keys, audio, cursor, clock o script"

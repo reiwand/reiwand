@@ -11,6 +11,8 @@ pub struct ParamDef {
     #[serde(rename = "type")]
     pub kind: ParamKind,
     pub default: Param,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub required: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub min: Option<f32>,
     #[serde(default, skip_serializing_if = "Option::is_none")]

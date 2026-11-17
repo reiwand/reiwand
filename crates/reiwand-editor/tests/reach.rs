@@ -121,3 +121,16 @@ fn tried_values_override_the_defaults_of_a_capture() {
     let plain = reiwand_editor::reach::tried(&doc, &reiwand_scene::Values::new());
     assert_eq!(plain.get("speed"), Some(&json!(1.0)));
 }
+
+#[test]
+fn adding_an_effect_writes_every_required_parameter() {
+    let root = TempDir::new().unwrap();
+    let mut p = project(&root);
+    let add = json!({ "effects": { "add": { "layer": "fill", "effect": "chroma_key" } } });
+    p.act(&serde_json::from_value::<Action>(add).unwrap()).unwrap();
+    let params = &p.doc["scene"]["layers"][0]["effects"][2]["params"];
+    assert_eq!(params, &json!({ "distance": 0, "keep": 0 }));
+    let set = json!({ "effects": { "set": { "layer": "fill", "index": 2, "params": { "distance": 1 } } } });
+    p.act(&serde_json::from_value::<Action>(set).unwrap()).unwrap();
+    assert_eq!(p.doc["scene"]["layers"][0]["effects"][2]["params"]["distance"], 1);
+}

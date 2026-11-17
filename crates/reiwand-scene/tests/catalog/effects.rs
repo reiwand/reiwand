@@ -9,7 +9,7 @@ fn values_of_described_parameters_are_named_in_english_and_spanish() {
 }
 
 const BASE: &str = "bloom: threshold intensity radius knee; blur: radius; blur_motion: angle length samples;
-    blur_radial: center strength samples follow; chroma_key: key tolerance softness spill;
+    blur_radial: center strength samples follow; chroma_key: key tolerance softness spill distance keep;
     chromatic_aberration: amount center; clouds: color shade opacity coverage softness size speed warp octaves height;
     color_adjust: exposure contrast saturation hue; color_lut: lut intensity; crt: curvature pitch scan phosphor vignette glow;
     depth_parallax: depth strength focus steps overscan follow orbit; dissolve: progress size edge glow;
@@ -158,4 +158,17 @@ fn a_package_effect_use_reads_a_generic_picture_by_name() {
     assert_eq!(validated("noise"), Vec::<String>::new());
     let unknown = validated("moon");
     assert!(unknown.iter().any(|i| i.contains("/layers/0/effects/0/params/phase")), "{unknown:?}");
+}
+
+#[test]
+fn a_required_parameter_must_be_written() {
+    let layer = |params: Json| {
+        json!({ "layers": [{ "id": "a", "type": "solid", "color": "#000000",
+            "effects": [{ "effect": "chroma_key", "params": params }] }] })
+    };
+    let issues = |params: Json| scene(layer(params)).validate(&BTreeMap::new());
+    let absent = |id: &str| Issue::Absent { path: "/layers/0/effects/0/params".into(), id: id.into() };
+    assert_eq!(issues(json!({})), [absent("distance"), absent("keep")]);
+    assert_eq!(issues(json!({ "distance": 1 })), [absent("keep")]);
+    assert_eq!(issues(json!({ "distance": 1, "keep": 0.5 })), []);
 }

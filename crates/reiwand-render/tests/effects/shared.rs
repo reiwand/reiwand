@@ -131,8 +131,8 @@ fn fused_chains_are_compiled_with_the_view() {
     let toggled = json!({ "keys": [[0, true], [0.5, false], [1, true]], "loop": "repeat" });
     for effects in [
         json!([{ "effect": "shine" }, { "effect": "vignette" }, { "effect": "film_grain" }]),
-        json!([{ "effect": "posterize" }, { "effect": "vignette", "enabled": false }, { "effect": "chroma_key" }, { "effect": "film_grain" }]),
-        json!([{ "effect": "posterize" }, { "effect": "vignette", "enabled": toggled }, { "effect": "chroma_key" }, { "effect": "film_grain" }]),
+        json!([{ "effect": "posterize" }, { "effect": "vignette", "enabled": false }, { "effect": "chroma_key", "params": { "distance": 0, "keep": 0 } }, { "effect": "film_grain" }]),
+        json!([{ "effect": "posterize" }, { "effect": "vignette", "enabled": toggled }, { "effect": "chroma_key", "params": { "distance": 0, "keep": 0 } }, { "effect": "film_grain" }]),
     ] {
         assert_eq!(compiled(effects.clone()), Some(plain.clone()), "{effects}");
     }

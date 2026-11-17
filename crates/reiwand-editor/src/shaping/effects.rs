@@ -66,7 +66,12 @@ fn params(old: &Value, change: &Map<String, Value>) -> Option<Value> {
 pub(crate) fn effects(dir: &Path, doc: &Value, e: &E) -> Result<Vec<Op>> {
     match e {
         E::Add { layer: id, effect, name, at, params: p, optional } => {
-            check(&known(dir, doc, effect)?, p)?;
+            let d = known(dir, doc, effect)?;
+            check(&d, p)?;
+            let mut p = p.clone();
+            for def in d.params.iter().filter(|def| def.required && !p.contains_key(&def.id)) {
+                p.insert(def.id.clone(), serde_json::to_value(&def.default)?);
+            }
             let (path, found) = layer(doc, id)?;
             let sound = said("editor.sound_no_effects", "a sound or light layer takes no effects", &[]);
             ensure!(!["sound", "light"].contains(&found["type"].as_str().unwrap_or_default()), sound);
@@ -75,7 +80,7 @@ pub(crate) fn effects(dir: &Path, doc: &Value, e: &E) -> Result<Vec<Op>> {
             ensure!(at <= len, said("editor.no_effect_at", "the layer %1 has no effect %2", &[id, &at]));
             let mut value = json!({ "effect": effect });
             name.iter().filter(|n| !n.is_empty()).for_each(|n| value["name"] = json!(n));
-            params(&Value::Null, p).into_iter().for_each(|p| value["params"] = p);
+            params(&Value::Null, &p).into_iter().for_each(|p| value["params"] = p);
             if *optional {
                 value["optional"] = json!(true);
             }

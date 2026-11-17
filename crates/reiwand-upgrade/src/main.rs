@@ -8,15 +8,15 @@ const HELP: &str = "reiwand-upgrade: one-time upgrade of stored Reiwand data fro
 usage:
   reiwand-upgrade server --data DIR [--then PROGRAM [ARGS...]]
       server data folder (database, repositories, keys); with --then, runs the program afterwards
-  reiwand-upgrade scenes PATH...
-      scene folders or files from before the per-layer blend space: every layer of every scene.json found under the
-      paths gets blend_space \"canvas\", which is what it did until now. Packages (.wpak) are rebuilt from their
-      folder with reiwand-ctl pack
   reiwand-upgrade client [--data DIR] [--skip-download] [--then PROGRAM [ARGS...]]
       desktop or phone data folder (followed repositories); default: the reiwand folder of the user data directory.
       first downloads, from the old server, the lists, favourites, repository offers and private files that only it
       held, into from-server.reiwand (bring it in with reiwand-ctl import); if the server does not answer, nothing is
       changed and the run is repeated later; --skip-download goes on without it. Upgrade the desktop before the server
+
+  reiwand-upgrade scenes DIR...
+      rewrites every scene.json under the folders so that each chroma_key effect carries distance and keep
+      (the values that reproduce the old look); republish the packages built from them afterwards
 
 It is safe to run again: a folder that is already current is left alone.";
 
@@ -31,10 +31,11 @@ fn user_data() -> anyhow::Result<PathBuf> {
 fn main() -> anyhow::Result<()> {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let what = args.first().map(String::as_str);
-    if what == Some("scenes") {
-        let paths: Vec<PathBuf> = args[1..].iter().map(PathBuf::from).collect();
-        anyhow::ensure!(!paths.is_empty(), "scenes needs at least one folder or file");
-        println!("{}", reiwand_upgrade::scenes::run(&paths)?);
+    if what == Some("scenes") && args.len() > 1 {
+        let roots: Vec<PathBuf> = args[1..].iter().map(PathBuf::from).collect();
+        for path in reiwand_upgrade::scenes::run(&roots)? {
+            println!("{}: upgraded", path.display());
+        }
         return Ok(());
     }
     let given = args.iter().position(|a| a == "--data").and_then(|at| args.get(at + 1));

@@ -1,34 +1,23 @@
-use reiwand_upgrade::scenes;
 use serde_json::{Value, json};
-
-fn scene() -> Value {
-    json!({"schema": "reiwand.scene/1", "layers": [
-        {"id": "a", "type": "solid"},
-        {"id": "g", "type": "group", "layers": [{"id": "b", "type": "solid"}]}
-    ]})
-}
+use std::fs;
 
 #[test]
-fn every_layer_gets_canvas_and_a_second_run_changes_nothing() {
+fn every_chroma_key_gets_the_values_that_reproduce_the_old_look() {
     let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("one").join("scene.json");
-    std::fs::create_dir_all(file.parent().unwrap()).unwrap();
-    std::fs::write(&file, scene().to_string()).unwrap();
-    std::fs::write(dir.path().join("other.json"), "{\"x\":1}").unwrap();
-    let first = scenes::run(&[dir.path().to_path_buf()]).unwrap();
-    assert!(first.contains("1 scenes, 3 layers"), "{first}");
-    let out: Value = serde_json::from_str(&std::fs::read_to_string(&file).unwrap()).unwrap();
-    assert_eq!(out["layers"][0]["blend_space"], "canvas");
-    assert_eq!(out["layers"][1]["layers"][0]["blend_space"], "canvas");
-    let again = scenes::run(&[file]).unwrap();
-    assert!(again.contains("0 layers"), "{again}");
-}
-
-#[test]
-fn an_existing_choice_is_kept() {
-    let mut s = scene();
-    s["layers"][0]["blend_space"] = json!("srgb");
-    let (out, added) = scenes::upgrade(&s.to_string()).unwrap().unwrap();
-    assert_eq!(added, 2);
-    assert!(out.contains("\"srgb\""));
+    let folder = dir.path().join("pack/deep");
+    fs::create_dir_all(&folder).unwrap();
+    let scene = json!({ "layers": [
+        { "id": "a", "effects": [{ "effect": "chroma_key" }, { "effect": "blur" }] },
+        { "id": "b", "effects": [{ "effect": "chroma_key", "params": { "key": "#ffffff", "keep": 0.5 } }] }
+    ] });
+    fs::write(folder.join("scene.json"), scene.to_string()).unwrap();
+    fs::write(dir.path().join("pack/other.json"), "{}").unwrap();
+    let changed = reiwand_upgrade::scenes::run(&[dir.path().join("pack")]).unwrap();
+    assert_eq!(changed, [folder.join("scene.json")]);
+    let read: Value = serde_json::from_slice(&fs::read(folder.join("scene.json")).unwrap()).unwrap();
+    let effects = |i: usize| read["layers"][i]["effects"].clone();
+    assert_eq!(effects(0)[0]["params"], json!({ "distance": 0, "keep": 0 }));
+    assert!(effects(0)[1].get("params").is_none());
+    assert_eq!(effects(1)[0]["params"], json!({ "key": "#ffffff", "distance": 0, "keep": 0.5 }));
+    assert!(reiwand_upgrade::scenes::run(&[dir.path().join("pack")]).unwrap().is_empty());
 }

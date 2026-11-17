@@ -11,6 +11,7 @@ pub enum Issue {
     DuplicateId(String),
     Unknown { path: String, what: &'static str, id: String },
     Valueless { path: String, id: String },
+    Absent { path: String, id: String },
     Source(String),
     Type(String),
     Unsorted(String),
@@ -62,6 +63,9 @@ impl Issue {
             }
             Issue::Valueless { path, id } => {
                 said("scene.valueless", "%1 names \"%2\", a property that holds no value", &[path, id])
+            }
+            Issue::Absent { path, id } => {
+                said("scene.absent", "%1 lacks the required parameter \"%2\"", &[path, id])
             }
             Issue::Source(p) => said(
                 "scene.source",
