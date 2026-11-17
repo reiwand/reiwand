@@ -38,6 +38,8 @@ QtObject {
         expect(!page.empty.visible && page.list.count === 2, "each account gets its row");
         const first = page.list.itemAt(0);
         const second = page.list.itemAt(1);
+        first.row.open = true;
+        second.row.open = true;
         expect(first.row.text === App.tr("%1 at %2", "reader", "repo.example.org") && first.row.note === "repo.example.org/r/example", "a row names the user, the server and its repositories");
         expect(first.signOut.visible && !first.signIn.visible && first.remove.visible, "a signed-in account offers to sign out and to remove");
         expect(second.signIn.visible && !second.signOut.visible && second.row.note === App.tr("Not linked to a repository"), "a signed-out account offers to sign in again");
