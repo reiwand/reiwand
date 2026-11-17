@@ -21424,6 +21424,7 @@ msgstr "Radio en profundidad"
 #: apps/reiwand-app/qml/SceneSwarmVolume.qml
 msgid "Hollow core"
 msgstr "Núcleo hueco"
+
 #: apps/reiwand-app/qml/facade/SceneTerms.qml
 msgid "Audio inputs"
 msgstr "Entradas de sonido"
