@@ -127,7 +127,7 @@ fn refracting_particles_bend_what_is_behind_them_above_the_low_levels() {
 
 #[test]
 fn refraction_in_pixels_ignores_the_sprite_size() {
-    let back = json!({ "id": "back", "type": "image", "image": "mask", "size": [160, 90],
+    let back = json!({ "blend_space": "canvas", "id": "back", "type": "image", "image": "mask", "size": [160, 90],
         "transform": { "position": [80, 45] } });
     let size = json!({ "refract": { "normal": "bump", "units": "size", "amount": 1 } });
     let pixels = |shift: u32| json!({ "refract": { "normal": "bump", "units": "pixels", "shift": shift } });
