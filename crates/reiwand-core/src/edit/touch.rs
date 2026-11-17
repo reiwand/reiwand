@@ -13,6 +13,7 @@ pub const RADIUS: f32 = 0.05;
 pub const FALLOFF: f32 = 0.5;
 pub const STRENGTH: f32 = 0.1;
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Touch {
     pub points: Vec<[f32; 2]>,

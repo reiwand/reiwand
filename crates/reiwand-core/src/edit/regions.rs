@@ -11,12 +11,14 @@ pub const MOST_MOVES: usize = 64;
 pub const MOST_TOGETHER: usize = 8;
 pub const SPLIT_RADIUS: f32 = 0.004;
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Join {
     pub a: [f32; 2],
     pub b: [f32; 2],
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Shift {
     pub at: [f32; 2],

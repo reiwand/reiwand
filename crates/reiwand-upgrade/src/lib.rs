@@ -2,6 +2,7 @@ mod accounts;
 pub mod client;
 #[cfg(feature = "client")]
 mod download;
+pub mod fill;
 pub mod scenes;
 #[cfg(feature = "server")]
 pub mod server;

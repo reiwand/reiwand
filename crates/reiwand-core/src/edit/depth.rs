@@ -10,6 +10,7 @@ pub const MODEL: &str = "depth-anything-v2-small";
 pub const STEPS: [u32; 4] = [1, 8, 16, 32];
 pub const MAX_STRENGTH: f32 = 0.03;
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Depth {
@@ -57,6 +58,7 @@ impl Default for Depth {
     }
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Motion {
@@ -66,6 +68,7 @@ pub enum Motion {
     Accelerometer,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Parallax {
@@ -76,6 +79,7 @@ pub struct Parallax {
     pub steps: u32,
     pub smoothing_ms: u32,
     pub overscan: f32,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub fill: Option<Fill>,
     #[serde(skip_serializing_if = "Option::is_none")]

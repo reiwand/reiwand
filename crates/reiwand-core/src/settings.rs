@@ -2,11 +2,15 @@ use crate::quality::QualityChoice;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
+pub use crate::services::{Media, Models, Repos};
+
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Playback {
     pub volume: f64,
     pub muted: bool,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
     #[serde(with = "fps")]
     pub max_fps: u32,
     pub software_parallax: bool,
@@ -14,6 +18,7 @@ pub struct Playback {
     pub scene_sound: bool,
     pub scene_capture: bool,
     pub duck: bool,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
     pub quality: QualityChoice,
     pub auto_pace: crate::AutoPace,
     pub hdr: crate::HdrChoice,
@@ -92,6 +97,7 @@ impl Playback {
     }
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum TransitionKind {
@@ -101,6 +107,7 @@ pub enum TransitionKind {
     None,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Transition {
@@ -128,10 +135,12 @@ impl Transition {
     }
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Pause {
     pub when_covered: bool,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
     pub on_battery: crate::BatteryPause,
     pub when_locked: bool,
 }
@@ -142,6 +151,7 @@ impl Default for Pause {
     }
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Library {
@@ -160,36 +170,4 @@ impl Default for Library {
 impl Library {
     pub const MIN_MB: u32 = 64;
     pub const MAX_MB: u32 = 8192;
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
-pub struct Repos {
-    pub auto_refresh: bool,
-    pub auto_update: bool,
-    pub vote_counts: bool,
-}
-
-impl Default for Repos {
-    fn default() -> Self {
-        Self { auto_refresh: true, auto_update: false, vote_counts: true }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
-pub struct Models {
-    pub allow_download: bool,
-}
-
-impl Default for Models {
-    fn default() -> Self {
-        Self { allow_download: true }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
-pub struct Media {
-    pub remote_covers: bool,
 }

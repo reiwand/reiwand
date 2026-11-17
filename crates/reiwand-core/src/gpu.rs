@@ -81,9 +81,11 @@ impl<'de> Deserialize<'de> for GpuChoice {
     }
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Render {
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
     pub gpu: GpuChoice,
 }
 

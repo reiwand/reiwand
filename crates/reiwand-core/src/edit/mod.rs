@@ -33,6 +33,7 @@ pub use touch::{
 
 pub const VERSION: u32 = 1;
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Edit {
     pub version: u32,
@@ -56,6 +57,7 @@ pub struct Edit {
     pub fit: Option<Fit>,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Source {
@@ -65,6 +67,7 @@ pub struct Source {
     pub pixels: [u32; 2],
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Geometry {
@@ -74,6 +77,7 @@ pub struct Geometry {
     pub flip: [bool; 2],
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Op {
     pub id: String,
@@ -87,6 +91,7 @@ pub struct Op {
     pub kind: Kind,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum Kind {
@@ -133,6 +138,7 @@ pub enum Kind {
     },
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Blend {
@@ -145,6 +151,7 @@ pub enum Blend {
     Color,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct OutputCrop {
     #[serde(default)]
@@ -152,6 +159,7 @@ pub struct OutputCrop {
     pub crop: [f32; 4],
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Span {

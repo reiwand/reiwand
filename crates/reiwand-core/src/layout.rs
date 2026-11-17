@@ -2,6 +2,7 @@ use crate::{Fit, UvRect};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Layout {
@@ -12,12 +13,14 @@ pub struct Layout {
     pub follow: BTreeMap<String, String>,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Placed {
     pub mm: [f64; 4],
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct Screen {
     pub x: i32,

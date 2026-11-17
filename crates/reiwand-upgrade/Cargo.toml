@@ -28,9 +28,15 @@ reiwand-sync.workspace = true
 rusqlite = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 serde_json.workspace = true
+toml.workspace = true
+toml_edit.workspace = true
 tokio = { workspace = true, optional = true }
 zbus = { workspace = true, optional = true }
 
 [dev-dependencies]
+reiwand-core = { workspace = true, features = ["schema"] }
+reiwand-carry = { workspace = true, features = ["schema"] }
+reiwand-scene.workspace = true
+schemars.workspace = true
 sha2.workspace = true
 tempfile.workspace = true

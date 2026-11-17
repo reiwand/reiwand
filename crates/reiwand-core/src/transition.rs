@@ -3,6 +3,7 @@ use crate::settings::TransitionKind;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum LessMotion {

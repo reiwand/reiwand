@@ -1,0 +1,79 @@
+# my settings
+profile = "night"
+
+[default]
+fit = "fill"
+quality = "q1"
+
+[playback]
+# keep it light
+max_fps = 30
+allow_flashing = false
+auto_pace = "detail"
+duck = false
+hdr = "auto"
+lowest_below_percent = 0
+muted = true
+quality = "auto"
+scene_capture = true
+scene_sound = true
+software_parallax = false
+volume = 0.5
+
+[layout]
+bezel_mm = 0.0
+
+[layout.follow]
+
+[layout.monitors]
+
+[library]
+hide_mature = false
+show_mature = false
+thumb_cache_mb = 512
+watch = true
+
+[media]
+remote_covers = false
+
+[models]
+allow_download = true
+
+[network]
+private = false
+
+[outputs]
+
+[pause]
+on_battery = "always"
+when_covered = true
+when_locked = true
+
+[render]
+gpu = "auto"
+
+[repos]
+auto_refresh = true
+auto_update = false
+vote_counts = true
+
+[rgb]
+enabled = false
+server = "127.0.0.1:6742"
+when_covered = "pause"
+
+[rgb.places]
+
+[shortcuts]
+apply = "LOGO+ALT+Return"
+cancel = "LOGO+ALT+Escape"
+enabled = false
+next = "LOGO+ALT+N"
+previous = "LOGO+ALT+P"
+
+[surfaces]
+
+[transition]
+duration_ms = 600
+kind = "own"
+less_motion = "system"

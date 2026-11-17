@@ -1,0 +1,10 @@
+# my settings
+profile = "night"
+
+[default]
+fit = "fill"
+quality = "q1"
+
+[playback]
+# keep it light
+max_fps = 30

@@ -1,0 +1,51 @@
+angle	Child,ControlPoint,Render	2	reiwand-scene/src/particles/plan.rs:44	0.0	1
+arc	Between	1	reiwand-scene/src/particles/sow.rs:75	derived	2
+at	Area,Around,Burst	1	reiwand-scene/src/particles/pace.rs:99	0.0	1
+channel	Binding_for_Array_size_2_of_float,Binding_for_Color,Binding_for_Param	2	reiwand-scene/src/resolve.rs:88	derived	2
+color	Instance,Layer,Material	1	reiwand-scene/src/eval.rs:151	[1.0; 4]	1
+cone	Layer	1	reiwand-scene/src/eval/lamps.rs:105	derived	2
+cycles	Render	1	reiwand-render/src/scene/swarm/kit.rs:96	1	1
+delay	Emitter	2	reiwand-scene/src/particles/pace.rs:34	0.0	1
+emissive	Material,MaterialMaps	1	reiwand-scene/src/model/surface.rs:69	[0.0; 3]	1
+end	Playback	3	reiwand-scene/src/roll.rs:30	derived	2
+env	Layer,Lighting	1	reiwand-scene/src/eval/staged/key.rs:53	derived	2
+exponent	Binding_for_Array_size_2_of_float,Binding_for_Color,Binding_for_Param	3	reiwand-scene/src/particles/pack.rs:50	1.0	1
+fov	CameraKey	1	reiwand-scene/src/eval/staged/paths/spline.rs:76	derived	2
+frames	Asset,Render,Timeline	2	reiwand-scene/src/sheet.rs:9	derived	2
+inner	Area	1	reiwand-scene/src/particles/pack.rs:93	derived	2
+length	Layer	1	reiwand-scene/src/eval/lamps.rs:126	256.0	1
+mask	EffectUse,Oscillate	3	reiwand-scene/src/particles/drive.rs:53	derived	2
+max	Child,ScriptParam	7	reiwand-scene/src/deep.rs:128	derived	2
+min	ScriptParam	6	reiwand-scene/src/deep.rs:128	derived	2
+mode	Layer	6	reiwand-scene/src/voice.rs:40	derived	2
+of	Binding_for_Array_size_2_of_float,Binding_for_Color,Binding_for_Param	2	reiwand-scene/src/probe.rs:156	derived	2
+offset	Attach,Binding_for_Array_size_2_of_float,Binding_for_Color	5	reiwand-scene/src/kin.rs:64	derived	2
+origin	ROOT,Transform	1	reiwand-scene/src/area/geometry.rs:25	[0.5; 2]	1
+padding	Layer	1	reiwand-scene/src/eval/shown.rs:53	0.0	1
+parallax	Canvas	2	reiwand-scene/src/kin.rs:135	derived	2
+position	Display,Layer,Transform	2	reiwand-scene/src/kin.rs:134	derived	2
+reduce	Binding_for_Array_size_2_of_float,Binding_for_Color,Binding_for_Param	1	reiwand-scene/src/resolve.rs:98	derived	2
+rotation	BonePhysics,Layer	5	reiwand-scene/src/camera.rs:17	derived	2
+scale	Binding_for_Array_size_2_of_float,Binding_for_Color,Binding_for_Param	5	reiwand-scene/src/kin.rs:140	derived	2
+seed	Clock	1	reiwand-scene/src/runtime.rs:98	derived	2
+shadow_bias	Layer	1	reiwand-scene/src/eval/lamps.rs:136	derived	2
+shake	Camera	1	reiwand-scene/src/camera.rs:21	derived	2
+size	Instance,Layer,Pool	5	reiwand-scene/src/pointing.rs:147	derived	2
+space	Layer	2	reiwand-scene/src/eval/lamp3d.rs:12	derived	2
+speed	Instance,Playback	3	reiwand-scene/src/camera.rs:31	derived	2
+start	Playback	2	reiwand-format/src/video.rs:37	0.0	1
+step	Clock,Property	2	reiwand-scene/src/props/slider.rs:41	derived	2
+steps	Hsv	1	reiwand-scene/src/particles/pack.rs:148	0	1
+stretch	Render	1	reiwand-render/src/scene/swarm/kit.rs:80	derived	2
+subdivide	Trail	1	reiwand-render/src/scene/swarm/looks.rs:10	0	1
+taper	Between	1	reiwand-scene/src/particles/sow.rs:75	derived	2
+to	AnimClip,EffectEmitter	3	reiwand-scene/src/bones.rs:39	derived	2
+translation	BonePhysics	1	reiwand-scene/src/rigged/build.rs:13	[0.0; 3]	1
+uv_scale	Trail	1	reiwand-render/src/scene/swarm/looks.rs:11	1.0	1
+uv_scroll	Trail	1	reiwand-render/src/scene/swarm/looks.rs:12	0.0	1
+valign	Layer	1	reiwand-scene/src/kin.rs:35	derived	2
+visible	MeshPart	2	reiwand-scene/src/kin.rs:108	derived	2
+volume	Playback	1	reiwand-format/src/video.rs:55	1.0	1
+window	Operator	1	reiwand-scene/src/particles/drive.rs:70	[0.0, 0.0, 1.0, 1.0]	1
+wrap	Asset,Layer	1	reiwand-render/src/scene/sampling.rs:44	derived	2
+zoom	Display	2	reiwand-scene/src/camera.rs:16	derived	2

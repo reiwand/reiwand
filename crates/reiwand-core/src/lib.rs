@@ -25,6 +25,7 @@ pub mod parallax;
 pub mod quality;
 pub mod rgb;
 pub mod roots;
+pub mod services;
 pub mod settings;
 pub mod shortcuts;
 pub mod spread;

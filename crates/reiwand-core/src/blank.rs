@@ -2,6 +2,7 @@ use crate::config::{Config, OutputConfig};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Kept {

@@ -7,6 +7,7 @@ pub use places::{Flow, MAX_PLACES, PLACE, Place};
 
 pub const SERVER: &str = "127.0.0.1:6742";
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Covered {
@@ -24,6 +25,7 @@ impl Covered {
     }
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Rgb {

@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct OutputConfig {
@@ -19,12 +20,14 @@ pub struct OutputConfig {
     pub clicks: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub filter: Option<Filter>,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub quality: Option<QualityChoice>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hdr: Option<crate::HdrChoice>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub transition: Option<crate::TransitionKind>,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub scenes: BTreeMap<String, BTreeMap<String, toml::Value>>,
 }

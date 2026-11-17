@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::BTreeMap;
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct Manifest {
     pub format: u32,
@@ -13,6 +14,7 @@ pub struct Manifest {
     pub sums: BTreeMap<String, String>,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct Item {
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -20,6 +22,7 @@ pub struct Item {
     pub id: String,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Repository {
     pub address: String,
@@ -31,6 +34,7 @@ pub struct Repository {
     pub pin: Option<String>,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Provider {
     pub kind: String,
@@ -39,6 +43,7 @@ pub struct Provider {
     pub config: Value,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct List {
     pub name: String,
@@ -49,18 +54,21 @@ pub struct List {
     pub rules: Option<serde_json::Value>,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Rating {
     pub item: Item,
     pub rating: u8,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Tagging {
     pub item: Item,
     pub tags: Vec<String>,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct Installed {
     pub repo_id: String,
@@ -68,12 +76,14 @@ pub struct Installed {
     pub version: String,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct OwnFile {
     pub id: String,
     pub name: String,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Session {
     pub repo_id: String,
@@ -82,12 +92,14 @@ pub struct Session {
     pub token: String,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct Secrets {
     pub sessions: Vec<Session>,
     pub provider_keys: BTreeMap<String, String>,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct Content {
     #[serde(default)]

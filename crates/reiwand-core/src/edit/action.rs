@@ -39,6 +39,7 @@ impl Error {
     }
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub enum Action {

@@ -1,0 +1,196 @@
+{
+  "depth": null,
+  "fit": null,
+  "geometry": {
+    "crop": [
+      0.0,
+      0.08,
+      1.0,
+      0.84
+    ],
+    "flip": [
+      false,
+      true
+    ],
+    "rotate": 90,
+    "straighten": -1.2
+  },
+  "masks": {
+    "back": {
+      "invert": false,
+      "range": [
+        0.0,
+        0.35
+      ],
+      "soft": 0.05,
+      "type": "luminance"
+    },
+    "face": {
+      "invert": false,
+      "strokes": [
+        {
+          "erase": false,
+          "hardness": 0.6,
+          "points": [
+            [
+              0.41,
+              0.33
+            ],
+            [
+              0.43,
+              0.35
+            ]
+          ],
+          "radius": 0.04
+        }
+      ],
+      "type": "brush"
+    },
+    "sky": {
+      "from": [
+        0.5,
+        0.0
+      ],
+      "invert": true,
+      "to": [
+        0.5,
+        0.45
+      ],
+      "type": "linear"
+    },
+    "sun": {
+      "center": [
+        0.7,
+        0.2
+      ],
+      "feather": 0.5,
+      "invert": false,
+      "radius": [
+        0.1,
+        0.1
+      ],
+      "type": "radial"
+    }
+  },
+  "ops": [
+    {
+      "enabled": true,
+      "id": "wb",
+      "mask": null,
+      "opacity": null,
+      "temperature": 5600,
+      "tint": 4,
+      "type": "white_balance"
+    },
+    {
+      "enabled": true,
+      "ev": 0.35,
+      "id": "ev",
+      "mask": null,
+      "opacity": 0.5,
+      "type": "exposure"
+    },
+    {
+      "amount": 12,
+      "enabled": true,
+      "id": "ct",
+      "mask": null,
+      "opacity": null,
+      "type": "contrast"
+    },
+    {
+      "enabled": true,
+      "id": "sa",
+      "mask": null,
+      "opacity": null,
+      "saturation": -8,
+      "type": "saturation",
+      "vibrance": 15
+    },
+    {
+      "b": [],
+      "enabled": true,
+      "g": [],
+      "id": "cu",
+      "mask": null,
+      "opacity": null,
+      "r": [],
+      "rgb": [
+        [
+          0,
+          0
+        ],
+        [
+          0.25,
+          0.21
+        ],
+        [
+          0.75,
+          0.8
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "type": "curves"
+    },
+    {
+      "enabled": true,
+      "id": "bl",
+      "mask": "back",
+      "opacity": null,
+      "radius": 18,
+      "type": "blur"
+    },
+    {
+      "blend": "soft_light",
+      "color": "#1a2b6d",
+      "enabled": true,
+      "id": "ov",
+      "mask": "sky",
+      "opacity": null,
+      "type": "overlay"
+    },
+    {
+      "amount": -0.35,
+      "enabled": false,
+      "feather": 0.6,
+      "id": "vi",
+      "mask": null,
+      "midpoint": 0.5,
+      "opacity": null,
+      "roundness": 0.0,
+      "type": "vignette"
+    }
+  ],
+  "outputs": {
+    "Maker Model 1234": {
+      "connector": "DP-1",
+      "crop": [
+        0.0,
+        0.1,
+        0.5,
+        0.5625
+      ]
+    }
+  },
+  "parallax": null,
+  "source": {
+    "bytes": 8421337,
+    "name": "hills.jpg",
+    "pixels": [
+      6000,
+      4000
+    ],
+    "sha256": "9f2c"
+  },
+  "span": {
+    "center": [
+      0.5,
+      0.46
+    ],
+    "zoom": 1.0
+  },
+  "version": 1
+}

@@ -109,9 +109,11 @@ impl Serialize for LayerNamespace {
     }
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Surfaces {
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
     #[serde(skip_serializing_if = "Option::is_none", deserialize_with = "read")]
     pub layer_namespace: Option<LayerNamespace>,
 }

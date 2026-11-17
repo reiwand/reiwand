@@ -6,6 +6,7 @@ pub const PHONE_GAIN: f32 = 3.0;
 pub const MOST_MARGIN: f32 = 0.2;
 pub const LEAST_PIXELS: f32 = 1.0;
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
 pub struct Reach {
     pub shift: f32,
@@ -19,6 +20,7 @@ pub struct Travel {
     pub zoom: f32,
 }
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Still {

@@ -50,8 +50,12 @@ impl Serialize for Operator {
 impl<'de> Deserialize<'de> for Operator {
     fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
         let mut map = Map::deserialize(d)?;
-        let window =
-            map.remove("window").map(serde_json::from_value).transpose().map_err(D::Error::custom)?;
+        let window = map
+            .remove("window")
+            .filter(|v| !v.is_null())
+            .map(serde_json::from_value)
+            .transpose()
+            .map_err(D::Error::custom)?;
         let force = serde_json::from_value(Json::Object(map)).map_err(D::Error::custom)?;
         Ok(Operator { force, window })
     }

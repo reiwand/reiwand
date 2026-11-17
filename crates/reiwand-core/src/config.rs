@@ -11,6 +11,7 @@ use std::path::PathBuf;
 pub use crate::outputs::OutputConfig;
 pub use crate::store::ConfigError;
 
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Config {
@@ -33,6 +34,7 @@ pub struct Config {
     pub render: Render,
     #[serde(skip_serializing_if = "crate::Surfaces::is_default")]
     pub surfaces: crate::Surfaces,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub providers: BTreeMap<String, toml::Value>,
 }

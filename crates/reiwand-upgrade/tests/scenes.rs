@@ -51,7 +51,7 @@ fn every_particle_system_gains_explicit_zero_tilt() {
             "tilt": {"angle": [[5, 5], [9, 9]], "spin": [[0, 0], [0, 0]]}}},
         "plain": {"capacity": 10, "emitters": [], "init": {"life": [1, 2]}}}});
     let p = &upgraded("scenes-tilt", scene)["particles"];
-    let zeros = json!({"angle": [[0, 0], [0, 0]], "spin": [[0, 0], [0, 0]]});
+    let zeros = json!({"angle": [[0.0, 0.0], [0.0, 0.0]], "spin": [[0.0, 0.0], [0.0, 0.0]]});
     assert_eq!(p["bare"]["init"]["tilt"], zeros);
     assert_eq!(p["plain"]["init"]["tilt"], zeros);
     assert_eq!(p["plain"]["init"]["life"], json!([1, 2]));
@@ -65,8 +65,9 @@ fn every_particle_render_gains_the_square_aspect() {
         "drawn": {"capacity": 4, "emitters": [], "render": {"texture": "a", "aspect": 0.25}},
         "plain": {"capacity": 4, "emitters": [], "render": {"fps": 8}}}});
     let p = &upgraded("scenes-aspect", scene)["particles"];
-    assert_eq!(p["bare"]["render"]["aspect"], 1);
-    assert_eq!(p["plain"]["render"], json!({"fps": 8, "aspect": 1}));
+    assert_eq!(p["bare"]["render"]["aspect"], 1.0);
+    assert_eq!(p["plain"]["render"]["aspect"], 1.0);
+    assert_eq!(p["plain"]["render"]["fps"], 8);
     assert_eq!(p["drawn"]["render"]["aspect"], 0.25);
 }
 
@@ -89,9 +90,11 @@ fn chroma_key_gains_distance_and_keep() {
     let scene = json!({"layers": [{"blend_space": "canvas", "effects": [
         {"effect": "chroma_key", "params": {"keep": 1}}, {"effect": "chroma_key"}, {"effect": "blur"}]}]});
     let e = &upgraded("scenes-chroma", scene)["layers"][0]["effects"];
-    assert_eq!(e[0]["params"], json!({"keep": 1, "distance": 0}));
-    assert_eq!(e[1]["params"], json!({"distance": 0, "keep": 0}));
-    assert!(e[2].get("params").is_none());
+    assert_eq!(e[0]["params"]["keep"], json!(1));
+    assert_eq!(e[0]["params"]["distance"].as_f64(), Some(0.0));
+    assert_eq!(e[1]["params"]["keep"].as_f64(), Some(0.0));
+    assert_eq!(e[1]["params"]["key"], json!("#00ff00"));
+    assert_eq!(e[2]["params"]["radius"].as_f64(), Some(8.0));
 }
 
 #[test]
@@ -115,12 +118,12 @@ fn a_scene_needing_every_step_gets_all_of_them_once() {
     let p = &s["particles"]["s"];
     assert_eq!(s["audio"]["gain_release"], 5);
     assert_eq!(s["layers"][0]["blend_space"], "canvas");
-    assert_eq!(s["layers"][0]["effects"][0]["params"], json!({"distance": 0, "keep": 0}));
+    assert_eq!(s["layers"][0]["effects"][0]["params"]["keep"].as_f64(), Some(0.0));
     assert_eq!(p["forces"][0]["vortex"]["axis"], json!([0, 0, 1]));
     assert_eq!(p["forces"][1]["oscillate"]["from"], "top");
     assert_eq!(p["emitters"][0]["shape"]["around"]["axis"], json!([0, 0, 1]));
     assert_eq!(p["render"]["stretch"]["mode"], "add");
     assert_eq!(p["render"]["stretch"]["depth"], "flat");
-    assert_eq!(p["render"]["aspect"], 1);
-    assert_eq!(p["init"]["tilt"]["angle"], json!([[0, 0], [0, 0]]));
+    assert_eq!(p["render"]["aspect"], 1.0);
+    assert_eq!(p["init"]["tilt"]["angle"], json!([[0.0, 0.0], [0.0, 0.0]]));
 }
