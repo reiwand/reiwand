@@ -145,6 +145,7 @@ ctl pack build "$WORK/storm" -o "$WORK/import/storm-1.1.wpak" >/dev/null
 job=$(bus Library1 Import asb 1 "$WORK/import/storm-1.1.wpak" false | out "d[0]")
 wait_for 20 finished "$job" || fail "newer version import: $(bus Daemon1 GetJob t "$job")"
 newer=$(reply "r['job']['output']['imported'][0]['uid']" Daemon1 GetJob t "$job")
+[ "$newer" = "$storm" ] || fail "a newer version made a second item"
 wait_for 30 idle || fail "analysis did not finish: $(bus Daemon1 ListJobs)"
 sleep 0.5
 mark=$(wc -l <"$WORK/library-signals.log")
@@ -154,13 +155,13 @@ wait_for 5 told || fail "Confirm did not announce the other version: $(tail -n "
 [ "$(reply "r['item']['package']['confirmed']" Library1 GetItem s "$newer")" = "['mature']" ] ||
   fail "the other version does not keep the decisions: $(ctl lib show "$newer" --json)"
 ctl release TEST-7 && expect "list(s['outputs'])" "[]"
-bus Library1 Remove asb 3 "$newer" "$storm" "$calm" false >/dev/null
+bus Library1 Remove asb 2 "$storm" "$calm" false >/dev/null
 [ "$(find "$XDG_CACHE_HOME/reiwand/blobs" -type f | wc -l)" = 0 ] || fail "the package entry was kept"
 bus Library1 Remove asb 1 "$sunset" true >/dev/null
 [ ! -e "$copy" ] || fail "the imported copy was not deleted"
 bus Library1 RemoveSource s "$source" >/dev/null
 [ "$(reply "len(r['sources']), " Library1 ListSources)" = "(0,)" ] || fail "sources: $(bus Library1 ListSources)"
-[ "$(reply "r['total']" Library1 Search suu "" 0 0)" = 0 ] || fail "items were kept with their source"
+[ "$(reply "r['total']" Library1 Search suu "" 0 0)" = 0 ] || fail "items were kept with their source: $(ctl lib search "" --json | head -c 600)"
 [ ! -e "$thumb" ] || fail "thumbnails were kept with their source"
 source "$(dirname "$0")"/integration-local.sh
 echo "library checks passed"

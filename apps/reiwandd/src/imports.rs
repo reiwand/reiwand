@@ -3,6 +3,7 @@ use crate::error::{Error, Result, invalid};
 use crate::import::OLDER;
 use crate::jobs::now;
 use reiwand_format::{Limits, installed, open};
+use reiwand_library::qhash;
 use semver::Version;
 use std::fs;
 use std::path::Path;
@@ -28,7 +29,12 @@ impl Daemon {
         let newest = found.iter().filter_map(|f| Version::parse(&f.2).ok()).max();
         match newest {
             Some(n) if n == wanted => {
-                return Ok(found.iter().find(|f| f.2 == version).map_or_else(String::new, |f| f.0.clone()));
+                let same = found.iter().find(|f| f.2 == version).filter(|f| {
+                    matches!((qhash(&f.1), qhash(path)), (Ok(kept), Ok(given)) if kept == given)
+                });
+                if let Some(f) = same {
+                    return Ok(f.0.clone());
+                }
             }
             Some(n) if n > wanted && !older => {
                 return Err(Error::Named(OLDER, format!("{id} {version} is older than the {n} you have")));

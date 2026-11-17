@@ -186,6 +186,7 @@ impl Daemon {
     pub fn forget_files(&self, items: &[Item]) {
         for item in items {
             self.thumbs.remove(item);
+            self.drop_animated(&item.uid);
             self.drop_blobs(&item.path, item.mtime, item.size);
         }
     }

@@ -981,7 +981,10 @@ place did not change is not written at all, so other writers never wait for file
 Imports files one by one in an `import` job. Each path must be absolute (no URI); directories go
 through `AddSource`. With `copy = false` the file is cataloged where it is. With `copy = true`
 it is first copied to `~/.local/share/reiwand/files/` (on a name collision as
-`<stem> (2).<ext>`, `(3)`, …) and takes the original file name without extension as title. A
+`<stem> (2).<ext>`, `(3)`, …; the copy keeps the modification time of the original) and takes
+the original file name without extension as title. A `.wpak` file always goes through the rules
+of `ImportPackages` (verification, version rules, always copied; `copy` is ignored), refusing an
+older version. A
 file that fails is listed in `ImportReport.failed`; the job fails only on a global error.
 
 ### `ImportPackages(as paths, b allow_older) → (t job)`
@@ -991,7 +994,7 @@ files are always copied to `~/.local/share/reiwand/files/`. Each package is open
 hashes are verified; a damaged or modified one is listed in `ImportReport.failed` with the reason.
 There is no signature requirement: a package whose author is not known imports and the app shows
 «Sin firma verificada». A package whose id is installed from a repository is refused. Importing the
-same version again returns the existing item; a newer version updates the item in place (same uid,
+same version again returns the existing item, or, when the file changed, updates it in place; a newer version updates the item in place (same uid,
 its decisions and favorite stay); an older version is listed in `failed` with `older = true` unless
 `allow_older` is true. The search key `local:yes` matches the items imported this way (files cataloged
 by path and packages installed from a repository are excluded), and `source:none` matches every item

@@ -38,7 +38,11 @@ with zipfile.ZipFile(sys.argv[1], "w") as out:
     for name, data in files.items():
         out.writestr(name, data)
 TWIN
-sea_uid=$(imported "$scene/sea.wpak") && spin_uid=$(imported "$scene/spin.wpak") && twin_uid=$(imported "$scene/twin.wpak")
+sea_uid=$(imported "$scene/sea.wpak") && spin_uid=$(imported "$scene/spin.wpak")
+mkdir -p "$scene/twins" && mv "$scene/twin.wpak" "$scene/twins/"
+read -r twin_source twin_job < <(bus Library1 AddSource sb "$scene/twins" true | out "' '.join(map(str, d))")
+wait_for 20 finished "$twin_job" || fail "twin source scan: $(bus Daemon1 GetJob t "$twin_job")"
+twin_uid=$(reply "r['items'][0]['uid']" Library1 Search suu "folder:\"$scene/twins\"" 0 1)
 analysing() {
   local dump
   dump=$(pw-dump 2>/dev/null) || return 1
@@ -150,5 +154,6 @@ ctl input revoke "$sea" audio
 grep -q "$sea" "$XDG_DATA_HOME/reiwand/inputs.json" && fail "a revoked grant was kept"
 [ "$(bands TEST-12 "(r['granted'], r['listening'])")" = "(False, False)" ] ||
   fail "the levels outlived the grant: $(ctl input bands TEST-12)"
-bus Library1 Remove asb 3 "$sea_uid" "$spin_uid" "$twin_uid" false >/dev/null
+bus Library1 Remove asb 2 "$sea_uid" "$spin_uid" false >/dev/null
+bus Library1 RemoveSource s "$twin_source" >/dev/null
 echo "audio and script scene checks passed"

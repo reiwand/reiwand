@@ -15,7 +15,7 @@ pub(crate) const OLDER: &str = "older";
 
 impl Daemon {
     pub fn import(self: &Arc<Self>, paths: Vec<String>, copy: bool) -> Result<u64> {
-        self.import_all(paths, copy, None)
+        self.import_all(paths, copy, Some(false))
     }
 
     pub fn import_all(self: &Arc<Self>, paths: Vec<String>, copy: bool, older: Option<bool>) -> Result<u64> {
@@ -88,8 +88,10 @@ impl Daemon {
             let dest = dir.join(name(n));
             match OpenOptions::new().write(true).create_new(true).mode(0o600).open(&dest) {
                 Ok(mut file) => {
-                    let copied =
-                        File::open(path).and_then(|mut source| std::io::copy(&mut source, &mut file));
+                    let copied = File::open(path).and_then(|mut source| {
+                        std::io::copy(&mut source, &mut file)?;
+                        file.set_modified(source.metadata()?.modified()?)
+                    });
                     return copied
                         .map(|_| dest.clone())
                         .inspect_err(|_| drop(fs::remove_file(&dest)))
