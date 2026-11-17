@@ -125,7 +125,7 @@ Item {
         width: Kirigami.Units.iconSizes.large
         height: width
         visible: picture.status !== Image.Ready && (card.item.missing === true || !!card.item.error)
-        source: "image-missing"
+        source: "image-x-generic"
         color: Kirigami.Theme.textColor
     }
 
