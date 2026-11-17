@@ -1,0 +1,21 @@
+[package]
+name = "reiwand-account"
+description = "HTTP client for Reiwand servers: pinned TLS, accounts and device-code sign-in"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+reiwand-core = { workspace = true, features = ["http"] }
+reqwest = { workspace = true, features = ["stream"] }
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["fs", "net", "time"] }
+tokio-rustls = { workspace = true, features = ["aws-lc-rs"] }
+tokio-util.workspace = true
+zeroize.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "io-util"] }

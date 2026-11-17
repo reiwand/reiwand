@@ -18,6 +18,7 @@ members = [
     "crates/reiwand-audio",
     "crates/reiwand-script",
     "crates/reiwand-sync",
+    "crates/reiwand-account",
     "crates/reiwand-carry",
     "crates/reiwand-editor",
     "crates/reiwand-ktx2",
@@ -60,6 +61,7 @@ reiwand-depth = { path = "crates/reiwand-depth", default-features = false }
 reiwand-audio = { path = "crates/reiwand-audio" }
 reiwand-script = { path = "crates/reiwand-script" }
 reiwand-sync = { path = "crates/reiwand-sync" }
+reiwand-account = { path = "crates/reiwand-account" }
 reiwand-carry = { path = "crates/reiwand-carry" }
 reiwand-editor = { path = "crates/reiwand-editor" }
 reiwand-ktx2 = { path = "crates/reiwand-ktx2" }

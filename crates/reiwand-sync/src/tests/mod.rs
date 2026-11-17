@@ -6,7 +6,6 @@ mod files;
 mod gone;
 mod hostile;
 mod merge;
-mod pinned;
 mod protocol;
 
 use crate::{Doc, Hlc, View};
