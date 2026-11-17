@@ -27,7 +27,7 @@ fn moving_one_point_of_a_layer_leaves_the_others_to_the_system() {
     assert_eq!(instance(&p, &id)["points"], json!([null, [500, 300]]));
     let h = reiwand_editor::swarms::handles(&p.dir, &p.doc, "flakes", Some(&id), 2.0);
     assert_eq!(h["points"][0]["local"], json!([500.0, 50.0]), "p0 still follows its keys");
-    assert!(h["points"][0].get("own").is_none(), "{}", h["points"][0]);
+    assert!(h["points"][0]["own"].is_null(), "{}", h["points"][0]);
     assert_eq!((&h["points"][1]["local"], &h["points"][1]["own"]), (&json!([500.0, 300.0]), &json!(true)));
     own(&mut p, &id, json!({ "0": { "keys": [[0, [1, 2]], [1, [3, 4]]] } })).unwrap();
     own(&mut p, &id, json!({ "1": [600, 300] })).unwrap();

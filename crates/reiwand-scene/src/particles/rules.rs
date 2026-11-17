@@ -36,7 +36,7 @@ impl Check<'_> {
                 b.every
                     .iter()
                     .for_each(|t| self.range(&format!("{q}/bursts/{n}/every"), *t, 1.0 / 60.0, 86_400.0));
-                b.at.iter().for_each(|t| self.range(&format!("{q}/bursts/{n}/at"), *t, 0.0, 86_400.0));
+                self.range(&format!("{q}/bursts/{n}/at"), b.at, 0.0, 86_400.0);
             }
             self.range(&format!("{q}/inherit"), e.inherit, 0.0, 4.0);
             let points = match &e.shape {

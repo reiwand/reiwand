@@ -40,8 +40,8 @@ impl Swarm {
             let link = host.and_then(|(_, h)| h.children.get(part.link));
             let frame = match (host, link) {
                 (Some((h, hs)), Some(c)) => {
-                    let rel = Affine::translate(c.offset.unwrap_or_default())
-                        .then(Affine::rotate(c.angle.unwrap_or(0.0)))
+                    let rel = Affine::translate(c.offset)
+                        .then(Affine::rotate(c.angle))
                         .then(Affine::scale([c.scale; 2]));
                     let origin =
                         hs.points.first().and_then(|p| p.at.as_ref()).map_or([0.0; 2], |v| v.get(cx).0);

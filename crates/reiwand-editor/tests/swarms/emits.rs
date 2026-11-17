@@ -16,7 +16,7 @@ fn an_emitter_bursts_pauses_waits_follows_and_listens() {
     edit(&mut p, "emit", json!({"emitter": 0, "clear": ["bursts"], "values": {"audio_gate": false}}))
         .unwrap();
     let e = &system(&p)["emitters"][0];
-    assert!(e.get("bursts").is_none() && e.get("audio_gate").is_none() && e["delay"] == json!(1));
+    assert!(e["bursts"] == json!([]) && e["audio_gate"] == json!(false) && e["delay"] == json!(1));
     assert!(edit(&mut p, "emit", json!({"emitter": 0, "values": {"wobble": 1}})).is_err());
     assert!(edit(&mut p, "emit", json!({"emitter": 0, "values": {"bursts": [{"count": "many"}]}})).is_err());
     assert!(edit(&mut p, "emit", json!({"emitter": 9, "values": {"delay": 1}})).is_err());
@@ -37,12 +37,12 @@ fn a_force_acts_inside_a_window_of_the_life_and_a_system_locks_values() {
     let kept = &system(&p)["forces"][last];
     assert_eq!((&kept["gravity"], &kept["window"]), (&json!([0, 200]), &json!([0.0, 0.1, 0.8, 1.0])));
     edit(&mut p, "window", json!({"index": last})).unwrap();
-    assert!(system(&p)["forces"][last].get("window").is_none());
+    assert!(system(&p)["forces"][last]["window"].is_null());
     edit(&mut p, "settings", json!({"lock": ["alpha", "size"]})).unwrap();
     assert_eq!(system(&p)["lock"], json!(["alpha", "size"]));
     assert!(edit(&mut p, "settings", json!({"lock": ["wobble"]})).is_err());
     edit(&mut p, "settings", json!({"lock": ["none"]})).unwrap();
-    assert!(system(&p).get("lock").is_none());
+    assert!(system(&p)["lock"].is_null());
     edit(&mut p, "render", json!({"frames": "life", "cycles": 3, "order": "oldest"})).unwrap();
     assert_eq!(
         (&system(&p)["render"]["cycles"], &system(&p)["render"]["order"]),
@@ -50,7 +50,7 @@ fn a_force_acts_inside_a_window_of_the_life_and_a_system_locks_values() {
     );
     assert!(edit(&mut p, "render", json!({"order": "sideways"})).is_err());
     edit(&mut p, "render", json!({"cycles": 0, "order": "none"})).unwrap();
-    assert!(system(&p)["render"].get("order").is_none() && system(&p)["render"].get("cycles").is_none());
+    assert!(system(&p)["render"]["order"].is_null() && system(&p)["render"]["cycles"].is_null());
 }
 
 #[test]
@@ -63,9 +63,9 @@ fn starting_colors_come_from_hues_a_palette_or_a_gradient() {
     let palette = json!({"palette": {"colors": ["#ff0000", "#00ff00"], "noise": [0.1, 0.1, 0.1]}});
     edit(&mut p, "start", json!({ "ranges": palette })).unwrap();
     let init = &system(&p)["init"];
-    assert!(init.get("hsv").is_none() && init["palette"]["colors"][1] == json!("#00ff00"));
+    assert!(init["hsv"].is_null() && init["palette"]["colors"][1] == json!("#00ff00"));
     edit(&mut p, "start", json!({"ranges": {"gradient": [[0, "#000000"], [1, "#ffffff"]]}})).unwrap();
-    assert!(system(&p)["init"].get("palette").is_none());
+    assert!(system(&p)["init"]["palette"].is_null());
     let both = json!({"ranges": {"hsv": {"hue": [0, 10]}, "gradient": [[0, "#000000"]]}});
     assert!(edit(&mut p, "start", both).unwrap_err().to_string().contains("one of them"));
     assert!(edit(&mut p, "start", json!({"ranges": {"hsv": {"hue": "red"}}})).is_err());
@@ -73,7 +73,7 @@ fn starting_colors_come_from_hues_a_palette_or_a_gradient() {
         edit(&mut p, "start", json!({"ranges": {"palette": {"colors": [], "noise": [2, 0, 0]}}})).is_err()
     );
     edit(&mut p, "start", json!({"clear": ["hsv", "palette", "gradient"]})).unwrap();
-    assert!(["hsv", "palette", "gradient"].iter().all(|k| system(&p)["init"].get(*k).is_none()));
+    assert!(["hsv", "palette", "gradient"].iter().all(|k| system(&p)["init"][*k].is_null()));
 }
 
 #[test]
@@ -85,7 +85,7 @@ fn a_system_is_renamed_with_the_layers_and_systems_that_use_it() {
     assert_eq!(system(&p)["children"][0]["system"], "embers");
     edit(&mut p, "rename", json!({"to": "snow"})).unwrap();
     let scene = &p.doc["scene"];
-    assert!(scene["particles"].get("flakes").is_none() && scene["particles"]["snow"]["children"].is_array());
+    assert!(scene["particles"]["flakes"].is_null() && scene["particles"]["snow"]["children"].is_array());
     let layer = scene["layers"].as_array().unwrap().iter().find(|l| l["type"] == "particles").unwrap();
     assert_eq!(layer["system"], "snow");
     assert!(act(&mut p, json!({"particles": {"rename": {"system": "snow", "to": "embers"}}})).is_err());

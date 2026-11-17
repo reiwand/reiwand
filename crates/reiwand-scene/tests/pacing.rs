@@ -129,7 +129,7 @@ fn fluid_emitters_rest_once_settled_while_nothing_blows() {
         runtime.advance(10.0);
         runtime.frame(VIEW, Quality::Q3).wake
     };
-    let spout = |strength: f32| json!([{ "from": [0.5, 0.9], "strength": strength }]);
+    let spout = |strength: f32| json!([{ "from": [0.5, 0.9], "to": null, "angle": 0, "strength": strength }]);
     assert_eq!(wake(json!({ "emitters": spout(4.0) })), Wake::Frame);
     assert_eq!(wake(json!({ "emitters": spout(4.0), "strength": 0 })), Wake::Idle);
     assert_eq!(wake(json!({ "emitters": spout(0.0) })), Wake::Idle);

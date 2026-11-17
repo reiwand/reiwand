@@ -79,10 +79,9 @@ fn hollow(a: [f32; 4], b: [f32; 4], u: [f32; 2], pick: f32) -> [f32; 2] {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum Refresh {
-    #[default]
     Static,
     OnChange,
 }

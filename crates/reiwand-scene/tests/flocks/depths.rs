@@ -49,7 +49,7 @@ fn children_born_from_their_parent_cannot_emit_from_a_layer() {
         let layers = json!([{ "blend_space": "canvas", "id": "bg", "type": "solid", "color": "#ffffff", "size": [20, 20] },
             { "blend_space": "canvas", "id": "p", "type": "particles", "system": "a" }]);
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layers,
-            "particles": { "a": parent, "b": emits } });
+            "particles": prefill::all(json!({ "a": parent, "b": emits })) });
         Scene::from_json(&text.to_string()).unwrap().validate(&BTreeMap::new())
     };
     for on in ["spawn", "death", "follow"] {

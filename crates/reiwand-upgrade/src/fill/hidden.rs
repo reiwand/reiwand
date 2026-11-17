@@ -23,6 +23,9 @@ impl<'a> Walk<'a> {
         if ps.is_boolean() {
             return None;
         }
+        if let Some(fixed) = super::particles::value(def, ctx, name) {
+            return Some(fixed);
+        }
         if let Some(fixed) = legacy::corrected(def, name) {
             return Some(fixed);
         }

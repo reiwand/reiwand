@@ -13,7 +13,7 @@ fn a_force_follows_a_control_point_the_pointer_or_a_typed_fixed_point() {
     for target in [json!([412.5, 77.2]), json!("p0"), json!("cursor"), json!([0, 0])] {
         edit(&mut p, "force", json!({ "index": n, "force": ring(target.clone()) })).unwrap();
         edit(&mut p, "force", json!({ "index": n + 1, "force": pull(target.clone()) })).unwrap();
-        assert_eq!(system(&p)["forces"][n], ring(target.clone()));
+        assert_eq!(system(&p)["forces"][n], reiwand_scene::prefill::part("forces[0]", ring(target.clone())));
         let shown = handles(&p);
         let (keep, pulled) = (&shown["keeps"][0], shown["pulls"].as_array().unwrap().last().unwrap().clone());
         assert_eq!((keep["target"].clone(), pulled["ref"].clone()), (target.clone(), target.clone()));

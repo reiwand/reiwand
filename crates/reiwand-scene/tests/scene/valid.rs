@@ -1,4 +1,5 @@
 use super::*;
+use serde_json::json;
 
 #[test]
 fn sample_roundtrips_and_is_valid() {
@@ -28,8 +29,8 @@ fn unknown_fields_and_values_are_rejected() {
         ("\"loop\": \"repeat\"", "\"loop\": \"forever\""),
         ("\"out_cubic\"", "\"out_cubical\""),
         (
-            "\"scale\": 0.8, \"offset\": 0.2, \"clamp\"",
-            "\"scale\": 0.8, \"offset\": 0.2, \"jitter\": 1, \"clamp\"",
+            "\"scale\": 0.8,\n        \"smooth\"",
+            "\"scale\": 0.8,\n        \"jitter\": 1,\n        \"smooth\"",
         ),
         ("\"fill\": \"#ff8800\"", "\"fill\": \"#ff88\""),
         ("\"capacity\": 4000", "\"capacity\": 4000, \"gravity\": 1"),
@@ -70,8 +71,8 @@ fn validation_names_the_broken_field() {
     );
     assert_eq!(issues(|s| s.particles.clear()), [unknown("/layers/2/system", "particle system", "sparks")]);
     let renamed = SAMPLE.replace(
-        "{ \"prop\": \"depth\", \"scale\": 10 }",
-        "{ \"prop\": \"deep\", \"audio\": \"bass\", \"kind\": \"relative\", \"unit\": \"db\" }",
+        "\"prop\": \"depth\",\n              \"scale\": 10",
+        "\"prop\": \"deep\", \"audio\": \"bass\", \"kind\": \"relative\", \"unit\": \"db\"",
     );
     let found = Scene::from_json(&renamed).unwrap().validate(&props());
     let path = "/layers/0/effects/1/params/radius";
@@ -115,7 +116,8 @@ fn validation_names_the_broken_field() {
         },
     );
     assert_eq!(issues(|s| s.layers = vec![deep]), [Issue::Depth("/layers/0".repeat(9))]);
-    let unsorted = SAMPLE.replace("[[0, 0], [10, 360]]", "[[10, 360], [0, 0]]");
+    let unsorted =
+        edited(|doc| doc["layers"][4]["transform"]["rotation"]["keys"].as_array_mut().unwrap().reverse());
     let found = Scene::from_json(&unsorted).unwrap().validate(&props());
     assert_eq!(found, [Issue::Unsorted("/layers/4/transform/rotation/keys".into())]);
     let clocked = SAMPLE.replace("\"opacity\": 0.6", "\"opacity\": { \"clock\": \"HH\" }");
@@ -123,8 +125,7 @@ fn validation_names_the_broken_field() {
         Scene::from_json(&clocked).unwrap().validate(&props()),
         [Issue::Type("/layers/1/opacity".into())]
     );
-    let huge = SAMPLE
-        .replace("\"scale\": 0.8, \"offset\": 0.2, \"clamp\"", "\"scale\": 1e39, \"offset\": 0.2, \"clamp\"");
+    let huge = edited(|doc| doc["layers"][5]["opacity"]["scale"] = json!(1e39));
     let found = Scene::from_json(&huge).unwrap().validate(&props());
     let infinite = |i: &Issue| matches!(i, Issue::Range { path, value, .. } if path.ends_with("/opacity/scale") && value.is_infinite());
     assert!(found.len() == 1 && infinite(&found[0]), "{found:?}");
@@ -158,4 +159,10 @@ fn validation_names_the_broken_field() {
         Scene::from_json(&clicked).unwrap().validate(&props()),
         [unknown("/timelines/0/trigger", "layer that takes clicks", "sky")]
     );
+}
+
+fn edited(change: impl FnOnce(&mut serde_json::Value)) -> String {
+    let mut doc: serde_json::Value = serde_json::from_str(SAMPLE).unwrap();
+    change(&mut doc);
+    doc.to_string()
 }

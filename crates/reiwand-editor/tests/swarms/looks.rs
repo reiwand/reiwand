@@ -38,7 +38,7 @@ fn particle_shaders_offer_package_effects_of_the_particle_stage() {
     let shown = handles(&p)["shaders"].clone();
     assert_eq!((shown["current"].clone(), shown["warning"].clone()), (json!("grow"), json!(true)));
     edit(&mut p, "shader", json!({})).unwrap();
-    assert!(system(&p)["render"].get("shader").is_none());
+    assert!(system(&p)["render"]["shader"].is_null());
 }
 
 #[test]

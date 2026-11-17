@@ -62,7 +62,7 @@ fn colliders_that_kill_start_death_children() {
     doc["particles"]["dots"]["children"] = json!([{ "system": "puff", "on": "death" }]);
     doc["particles"]["puff"] = json!({ "capacity": 400, "emitters": [{ "shape": { "point": [0, 0] }, "bursts": [{ "count": 2 }] }],
         "init": { "life": [5, 5], "speed": [0, 0] } });
-    let mut rt = runtime(&doc.to_string());
+    let mut rt = runtime(&done(doc.clone()));
     let bake = Bake::new(&rt.scene, 0, Tier::T3, true, |_| None).unwrap();
     let mut clouds: Vec<Cloud> = bake.allocs.iter().map(|a| Cloud::new(*a)).collect();
     let (mut sims, mut stamp) = (vec![Sim::default(); bake.allocs.len()], 0);
@@ -88,10 +88,10 @@ fn layer_colliders_cannot_hold_their_own_system() {
     doc["layers"] = json!([{ "blend_space": "canvas", "id": "g", "type": "group", "layers": [{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "dots" }] },
         { "blend_space": "canvas", "id": "sky", "type": "solid", "color": "#ffffff" }]);
     doc["particles"]["dots"]["collide"] = json!([{ "bounds": { "layer": { "id": "g" } } }]);
-    let found = Scene::from_json(&doc.to_string()).unwrap().validate(&props());
+    let found = Scene::from_json(&done(doc.clone())).unwrap().validate(&props());
     assert!(found.contains(&Issue::Circle("/particles/dots/collide/0/bounds/layer/id".into())), "{found:?}");
     doc["particles"]["dots"]["collide"][0]["bounds"]["layer"]["id"] = json!("sky");
-    let fine = Scene::from_json(&doc.to_string()).unwrap();
+    let fine = Scene::from_json(&done(doc.clone())).unwrap();
     assert_eq!(fine.validate(&props()), []);
     assert!(fine.features().contains("particle_collisions"));
 }

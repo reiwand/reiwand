@@ -41,7 +41,8 @@ fn the_aspect_stays_between_one_twentieth_and_twenty() {
 
 #[test]
 fn the_sides_keep_the_longer_one_at_the_size() {
-    let render = |a: f32| Render { aspect: a, ..Render::default() };
+    let base = super::prefill::system(super::sparks()).render;
+    let render = |a: f32| Render { aspect: a, ..base.clone() };
     assert_eq!(render(0.25).sides(), [0.25, 1.0]);
     assert_eq!(render(4.0).sides(), [1.0, 0.25]);
     assert_eq!(render(1.0).sides(), [1.0, 1.0]);

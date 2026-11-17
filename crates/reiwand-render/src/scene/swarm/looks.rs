@@ -6,12 +6,7 @@ fn flag(b: bool) -> f32 {
 
 pub(super) fn strand(r: &Render) -> [f32; 4] {
     let Some(t) = r.trail.as_ref().filter(|t| t.long()) else { return [0.0; 4] };
-    [
-        t.subdivide.unwrap_or(0).min(7) as f32,
-        t.uv_scale.unwrap_or(1.0),
-        t.uv_scroll.unwrap_or(0.0),
-        flag(t.textured),
-    ]
+    [t.subdivide.min(7) as f32, t.uv_scale, t.uv_scroll, flag(t.textured)]
 }
 
 pub(super) fn cord(r: &Render) -> [f32; 4] {

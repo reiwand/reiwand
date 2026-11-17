@@ -30,7 +30,7 @@ impl Check<'_> {
                 self.range(&format!("{p}/hsv/{name}/0"), lo, 0.0, max);
                 self.range(&format!("{p}/hsv/{name}/1"), hi, lo, max);
             }
-            h.steps.iter().for_each(|n| self.range(&format!("{p}/hsv/steps"), *n as f32, 1.0, 360.0));
+            self.range(&format!("{p}/hsv/steps"), h.steps as f32, 0.0, 360.0);
         }
         if let Some(pal) = &i.palette {
             self.uses(true, "particles2");

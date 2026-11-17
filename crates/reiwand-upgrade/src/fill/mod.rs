@@ -1,6 +1,7 @@
 mod hidden;
 mod legacy;
 mod params;
+mod particles;
 mod table;
 mod walk;
 mod write;

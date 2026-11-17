@@ -13,7 +13,7 @@ fn turbulent_starts_are_set_undone_and_refused_past_their_limits() {
     let before = p.doc.clone();
     let gust = json!({ "forward": 90, "scale": 0.5, "speed": [20, 40], "audio": "bass", "kind": "relative", "unit": "db" });
     edit(&mut p, "turbulent", json!({ "turbulent": gust })).unwrap();
-    assert_eq!(system(&p)["init"]["turbulent"], gust);
+    assert_eq!(system(&p)["init"]["turbulent"], reiwand_scene::prefill::part("init.turbulent", gust));
     undone(&mut p, &before);
     let before = p.doc.clone();
     edit(&mut p, "turbulent", json!({ "turbulent": { "phase": 2 }, "quiet": true })).unwrap();
@@ -30,7 +30,7 @@ fn turbulent_starts_are_set_undone_and_refused_past_their_limits() {
         assert_eq!(p.doc, kept);
     }
     edit(&mut p, "turbulent", json!({ "off": true })).unwrap();
-    assert!(system(&p)["init"].get("turbulent").is_none());
+    assert!(system(&p)["init"]["turbulent"].is_null());
 }
 
 #[test]
@@ -39,7 +39,13 @@ fn fractal_offsets_are_set_undone_and_refused_past_their_limits() {
     let mut p = project(&root);
     let before = p.doc.clone();
     edit(&mut p, "offset", json!({ "offset": { "distance": 12, "octaves": 3, "sign": [0, 1] } })).unwrap();
-    assert_eq!(system(&p)["init"]["offset_noise"], json!({ "distance": 12, "octaves": 3, "sign": [0, 1] }));
+    assert_eq!(
+        system(&p)["init"]["offset_noise"],
+        reiwand_scene::prefill::part(
+            "init.offset_noise",
+            json!({ "distance": 12, "octaves": 3, "sign": [0, 1] })
+        )
+    );
     undone(&mut p, &before);
     let kept = p.doc.clone();
     for bad in [
@@ -52,7 +58,7 @@ fn fractal_offsets_are_set_undone_and_refused_past_their_limits() {
         assert_eq!(p.doc, kept);
     }
     edit(&mut p, "offset", json!({ "off": true })).unwrap();
-    assert!(system(&p)["init"].get("offset_noise").is_none());
+    assert!(system(&p)["init"]["offset_noise"].is_null());
 }
 
 #[test]
@@ -67,7 +73,8 @@ fn the_fan_and_the_offset_arrows_are_what_the_engine_computes() {
     assert_eq!((fan["forward"].clone(), fan["fan"].clone()), (json!(30.0), json!([-15.0, 75.0])));
     let samples = fan["samples"].as_array().unwrap();
     assert_eq!(samples.len(), 12);
-    let t: reiwand_scene::Turbulent = serde_json::from_value(gust).unwrap();
+    let t: reiwand_scene::Turbulent =
+        serde_json::from_value(reiwand_scene::prefill::part("init.turbulent", gust)).unwrap();
     let seed = system(&p)["seed"].as_u64().unwrap_or(0);
     let salt = reiwand_scene::particle_salt(seed, h["seed"].as_u64().unwrap(), 0, 0);
     for (k, s) in samples.iter().enumerate() {
@@ -132,7 +139,7 @@ fn pacing_emitters_evens_the_rope_and_is_refused_for_missing_emitters() {
     assert!(edit(&mut p, "pace", json!({ "max_per_step": 5000 })).is_err());
     assert_eq!(p.doc, kept);
     edit(&mut p, "pace", json!({ "emitter": 1 })).unwrap();
-    assert!(system(&p)["emitters"][1].get("max_per_step").is_none());
+    assert!(system(&p)["emitters"][1]["max_per_step"].is_null());
     assert_eq!(system(&p)["emitters"][0]["max_per_step"], 1);
 }
 
@@ -162,7 +169,8 @@ fn rays_that_follow_a_band_turn_with_the_sound_level_the_preview_is_told() {
     let ((quiet_level, quiet, seed), (loud_level, loud, _)) = (rays(0.0), rays(1.0));
     assert_eq!((quiet_level, loud_level), (json!(0.0), json!(1.0)));
     assert_ne!(quiet, loud, "the band moves the phase of the rays");
-    let mut t: reiwand_scene::Turbulent = serde_json::from_value(gust).unwrap();
+    let mut t: reiwand_scene::Turbulent =
+        serde_json::from_value(reiwand_scene::prefill::part("init.turbulent", gust)).unwrap();
     let salt = reiwand_scene::particle_salt(system(&p)["seed"].as_u64().unwrap_or(0), seed, 0, 0);
     t.phase = 0.0;
     let want = f64::from(reiwand_scene::turbulent_ray(&t, salt, 0, 0.0));

@@ -1,100 +1,582 @@
 {
-  "schema": "reiwand.scene/1",
-  "canvas": { "size": [1920, 1080], "fit": "fill", "background": "#0b1020", "blend_space": "linear" },
-  "clock": { "max_fps": 60, "poster_time": 3.0, "seed": 42 },
   "assets": {
-    "sky": { "path": "assets/sky.png" },
-    "sky_dawn": { "path": "assets/sky-dawn.png" },
-    "lake": { "path": "assets/lake-mask.png", "linear": true },
-    "spark": { "path": "assets/spark.png", "atlas": [4, 4] },
-    "mono": { "path": "assets/mono.ttf" },
-    "sea": { "path": "assets/sea.webm" }
+    "lake": {
+      "linear": true,
+      "path": "assets/lake-mask.png"
+    },
+    "mono": {
+      "path": "assets/mono.ttf"
+    },
+    "sea": {
+      "path": "assets/sea.webm"
+    },
+    "sky": {
+      "path": "assets/sky.png"
+    },
+    "sky_dawn": {
+      "path": "assets/sky-dawn.png"
+    },
+    "spark": {
+      "atlas": [
+        4,
+        4
+      ],
+      "path": "assets/spark.png"
+    }
+  },
+  "canvas": {
+    "background": "#0b1020",
+    "blend_space": "linear",
+    "fit": "fill",
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 3.0,
+    "seed": 42
   },
   "layers": [
     {
       "blend_space": "canvas",
-      "id": "background",
-      "type": "image",
-      "image": { "prop": "style", "map": { "night": "sky", "dawn": "sky_dawn" } },
       "effects": [
-        { "effect": "waves", "mask": { "texture": "lake" }, "params": { "amplitude": 4, "speed": 0.8 } },
-        { "effect": "blur", "enabled": { "prop": "soft" }, "params": { "radius": { "prop": "depth", "scale": 10 } } }
-      ]
+        {
+          "effect": "waves",
+          "mask": {
+            "texture": "lake"
+          },
+          "params": {
+            "amplitude": 4,
+            "speed": 0.8
+          }
+        },
+        {
+          "effect": "blur",
+          "enabled": {
+            "prop": "soft"
+          },
+          "params": {
+            "radius": {
+              "prop": "depth",
+              "scale": 10
+            }
+          }
+        }
+      ],
+      "id": "background",
+      "image": {
+        "map": {
+          "dawn": "sky_dawn",
+          "night": "sky"
+        },
+        "prop": "style"
+      },
+      "type": "image"
     },
     {
+      "blend": "screen",
       "blend_space": "canvas",
       "id": "sea",
-      "type": "video",
-      "video": "sea",
       "opacity": 0.6,
-      "blend": "screen",
-      "transform": { "position": [960, 900], "scale": [1, 0.4] }
+      "transform": {
+        "position": [
+          960,
+          900
+        ],
+        "scale": [
+          1,
+          0.4
+        ]
+      },
+      "type": "video",
+      "video": "sea"
     },
-    { "blend_space": "canvas", "id": "sparks", "type": "particles", "system": "sparks", "blend": "add" },
     {
+      "anchor": null,
+      "attach": null,
+      "blend": "add",
       "blend_space": "canvas",
-      "id": "clock",
-      "type": "text",
-      "font": "mono",
-      "size": 96,
-      "text": { "clock": "HH:mm" },
-      "color": { "prop": "text_color" },
+      "brightness": null,
+      "cache": false,
+      "color": null,
+      "depth_test": false,
+      "effects": [],
+      "id": "sparks",
+      "inherit": null,
+      "instance": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "render": null,
+      "solid": false,
+      "system": "sparks",
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "particles",
+      "visible": true
+    },
+    {
       "anchor": "bottom_right",
-      "transform": { "position": [-64, -64] },
-      "visible": { "prop": "show_clock" },
-      "opacity": { "timeline": "intro", "keys": [[0, 0, "out_cubic"], [1.5, 1]] }
+      "blend_space": "canvas",
+      "color": {
+        "prop": "text_color"
+      },
+      "font": "mono",
+      "id": "clock",
+      "opacity": {
+        "keys": [
+          [
+            0,
+            0,
+            "out_cubic"
+          ],
+          [
+            1.5,
+            1
+          ]
+        ],
+        "timeline": "intro"
+      },
+      "size": 96,
+      "text": {
+        "clock": "HH:mm"
+      },
+      "transform": {
+        "position": [
+          -64,
+          -64
+        ]
+      },
+      "type": "text",
+      "visible": {
+        "prop": "show_clock"
+      }
     },
     {
       "blend_space": "canvas",
       "id": "badge",
-      "type": "group",
-      "opacity": 0.8,
-      "transform": { "position": [200, 200], "rotation": { "keys": [[0, 0], [10, 360]], "loop": "repeat" } },
       "layers": [
-        { "blend_space": "canvas", "id": "disc", "type": "shape", "shape": { "ellipse": { "size": [120, 120] } }, "fill": "#ff8800" },
+        {
+          "blend_space": "canvas",
+          "fill": "#ff8800",
+          "id": "disc",
+          "shape": {
+            "ellipse": {
+              "size": [
+                120,
+                120
+              ]
+            }
+          },
+          "type": "shape"
+        },
         {
           "blend_space": "canvas",
           "id": "ring",
-          "type": "shape",
-          "shape": { "ring": { "size": [140, 140], "width": 6 } },
-          "stroke": { "color": "#ffffff", "width": 2 },
-          "mask": { "layer": "disc", "channel": "a", "invert": true }
+          "mask": {
+            "channel": "a",
+            "invert": true,
+            "layer": "disc"
+          },
+          "shape": {
+            "ring": {
+              "size": [
+                140,
+                140
+              ],
+              "width": 6
+            }
+          },
+          "stroke": {
+            "color": "#ffffff",
+            "width": 2
+          },
+          "type": "shape"
         }
-      ]
+      ],
+      "opacity": 0.8,
+      "transform": {
+        "position": [
+          200,
+          200
+        ],
+        "rotation": {
+          "keys": [
+            [
+              0,
+              0
+            ],
+            [
+              10,
+              360
+            ]
+          ],
+          "loop": "repeat"
+        }
+      },
+      "type": "group"
     },
     {
-      "blend_space": "canvas",
-      "id": "bars",
-      "type": "spectrum",
-      "size": [800, 120],
-      "bands": 32,
-      "color": { "prop": "text_color" },
       "anchor": "bottom",
-      "transform": { "position": [0, -40] },
-      "opacity": { "audio": "level", "kind": "relative", "unit": "db", "scale": 0.8, "offset": 0.2, "clamp": [0, 1], "smooth": 0.2 }
+      "bands": 32,
+      "blend_space": "canvas",
+      "color": {
+        "prop": "text_color"
+      },
+      "id": "bars",
+      "opacity": {
+        "audio": "level",
+        "clamp": [
+          0,
+          1
+        ],
+        "kind": "relative",
+        "offset": 0.2,
+        "scale": 0.8,
+        "smooth": 0.2,
+        "unit": "db"
+      },
+      "size": [
+        800,
+        120
+      ],
+      "transform": {
+        "position": [
+          0,
+          -40
+        ]
+      },
+      "type": "spectrum"
     },
     {
       "blend_space": "canvas",
-      "id": "post",
-      "type": "adjustment",
       "effects": [
-        { "effect": "bloom", "params": { "intensity": { "audio": "bass", "kind": "relative", "unit": "db", "scale": 0.8, "offset": 0.2 } } },
-        { "effect": "color_adjust", "params": { "saturation": 1.2 }, "optional": true }
-      ]
+        {
+          "effect": "bloom",
+          "params": {
+            "intensity": {
+              "audio": "bass",
+              "kind": "relative",
+              "offset": 0.2,
+              "scale": 0.8,
+              "unit": "db"
+            }
+          }
+        },
+        {
+          "effect": "color_adjust",
+          "optional": true,
+          "params": {
+            "saturation": 1.2
+          }
+        }
+      ],
+      "id": "post",
+      "type": "adjustment"
     }
   ],
   "particles": {
     "sparks": {
       "capacity": 4000,
-      "seed": 7,
+      "children": [],
+      "collide": [
+        {
+          "bounce": 0.3,
+          "bounds": "canvas",
+          "friction": 0,
+          "kill": false,
+          "stick": false
+        }
+      ],
+      "emitters": [
+        {
+          "audio_gate": false,
+          "bursts": [
+            {
+              "at": 0,
+              "count": 40,
+              "every": null,
+              "on": "beat"
+            }
+          ],
+          "delay": 0,
+          "duration": null,
+          "follow": null,
+          "inherit": 0,
+          "max_per_step": null,
+          "periodic": null,
+          "rate": {
+            "a": null,
+            "audio": null,
+            "b": null,
+            "base": null,
+            "bounds": null,
+            "channel": null,
+            "clamp": null,
+            "clock": null,
+            "cursor": null,
+            "date": null,
+            "exponent": null,
+            "fn": null,
+            "g": null,
+            "hold_silence": null,
+            "invert": false,
+            "keys": null,
+            "kind": null,
+            "layer": null,
+            "loop": null,
+            "map": null,
+            "media": null,
+            "of": null,
+            "offset": null,
+            "params": null,
+            "placeholder": null,
+            "prop": "density",
+            "r": null,
+            "reduce": null,
+            "reference": null,
+            "scale": null,
+            "script": null,
+            "smooth": null,
+            "timeline": null,
+            "unit": null,
+            "window": null,
+            "x": null,
+            "y": null
+          },
+          "shape": {
+            "box": {
+              "at": null,
+              "from": [
+                0,
+                1080
+              ],
+              "inner": [
+                0,
+                0
+              ],
+              "to": [
+                1920,
+                1100
+              ]
+            }
+          }
+        }
+      ],
+      "forces": [
+        {
+          "gravity": [
+            0,
+            -20
+          ],
+          "window": [
+            0,
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "turbulence": {
+            "mask": [
+              1,
+              1
+            ],
+            "scale": 0.004,
+            "speed": 0,
+            "strength": 30,
+            "time_scale": 1
+          },
+          "window": [
+            0,
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "attractor": {
+            "falloff": "inverse_square",
+            "radius": 0,
+            "strength": 5000,
+            "target": "cursor"
+          },
+          "window": [
+            0,
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "drag": 0.4,
+          "window": [
+            0,
+            0,
+            1,
+            1
+          ]
+        }
+      ],
+      "init": {
+        "alpha": null,
+        "angle": [
+          250,
+          290,
+          1
+        ],
+        "color": [
+          "#ffd27a",
+          "#ff7a3d",
+          1
+        ],
+        "depth": null,
+        "depth_speed": null,
+        "frame": [
+          0.0,
+          0.0,
+          1
+        ],
+        "gradient": [],
+        "hsv": null,
+        "inherit": null,
+        "life": [
+          2,
+          5,
+          1
+        ],
+        "offset_noise": null,
+        "palette": null,
+        "radial": null,
+        "remap": [],
+        "rotation": [
+          0.0,
+          0.0,
+          1
+        ],
+        "size": [
+          4,
+          12,
+          1
+        ],
+        "speed": [
+          40,
+          120,
+          1
+        ],
+        "spin": [
+          0.0,
+          0.0,
+          1
+        ],
+        "tilt": {
+          "angle": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "spin": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ]
+        },
+        "turbulent": null,
+        "velocity": null
+      },
+      "lock": [],
+      "perspective": null,
+      "points": [],
       "prewarm": 2.0,
-      "emitters": [{ "shape": { "box": { "from": [0, 1080], "to": [1920, 1100] } }, "rate": { "prop": "density" }, "bursts": [{ "count": 40, "on": "beat" }] }],
-      "init": { "life": [2, 5], "speed": [40, 120], "angle": [250, 290], "size": [4, 12], "color": ["#ffd27a", "#ff7a3d"] },
-      "forces": [{ "gravity": [0, -20] }, { "turbulence": { "strength": 30, "scale": 0.004 } }, { "attractor": { "target": "cursor", "strength": 5000 } }, { "drag": 0.4 }],
-      "collide": [{ "bounds": "canvas", "bounce": 0.3 }],
-      "render": { "texture": "spark", "frames": "life", "size_over_life": [[0, 0], [0.1, 1], [1, 0]], "trail": { "length": 8, "width": 0.5 } }
+      "render": {
+        "angle": null,
+        "aspect": 1.0,
+        "brightness": null,
+        "color_over_life": [],
+        "cutout": null,
+        "cycles": null,
+        "fps": 12.0,
+        "frames": "life",
+        "lit": false,
+        "mix": false,
+        "normal": null,
+        "order": null,
+        "orient": null,
+        "refract": null,
+        "rope": null,
+        "shader": null,
+        "size_over_life": [
+          [
+            0,
+            0
+          ],
+          [
+            0.1,
+            1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "stretch": null,
+        "texture": "spark",
+        "trail": {
+          "length": 8,
+          "segments": null,
+          "subdivide": 0,
+          "textured": false,
+          "uv_scale": 1,
+          "uv_scroll": 0,
+          "width": 0.5
+        }
+      },
+      "seed": 7,
+      "space": "local"
     }
   },
-  "timelines": [{ "id": "intro", "duration": 1.5, "loop": "once", "autoplay": true }],
-  "scripts": [{ "path": "scripts/scene.js" }]
+  "schema": "reiwand.scene/1",
+  "scripts": [
+    {
+      "path": "scripts/scene.js"
+    }
+  ],
+  "timelines": [
+    {
+      "autoplay": true,
+      "duration": 1.5,
+      "id": "intro",
+      "loop": "once"
+    }
+  ]
 }

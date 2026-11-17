@@ -59,7 +59,7 @@ fn control_points_place_emitters_and_follow_instances() {
         born.iter().all(|p| (37.9..=40.1).contains(&p.pos[0]) && (19.9..=30.1).contains(&p.pos[1])),
         "{born:?}"
     );
-    let moving = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "a", "instance": { "points": [[0, 0], [150, 80]] } }]);
+    let moving = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "a", "instance": prefill::instance(json!({ "points": [[0, 0], [150, 80]] })) }]);
     let mut fly = Fly::new(runtime(json!({ "a": system }), moving));
     fly.frame(0.0);
     assert!(fly.alive(0).iter().all(|p| (147.9..=150.1).contains(&p.pos[0]) && p.pos[1] >= 79.9));
@@ -76,7 +76,7 @@ fn instances_scale_births_time_and_looks() {
     let flowing =
         still(json!({ "capacity": 1000, "emitters": [{ "shape": { "point": [100, 50] }, "rate": 600 }] }));
     let tuned = json!({ "count": 0.5, "time_scale": 2, "life": 2, "alpha": 0.5, "size": 3, "brightness": 2, "color": "#ff0000" });
-    let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "a", "instance": tuned }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "a", "instance": prefill::instance(tuned) }]);
     let mut fly = Fly::new(runtime(json!({ "a": flowing }), layers));
     fly.run(1.0);
     let step = *fly.rt.swarm(0).unwrap().sim(0, 0);
@@ -87,7 +87,7 @@ fn instances_scale_births_time_and_looks() {
     let d = &frame.draws[0];
     assert!(matches!(d.content, Content::Particles { size, .. } if size == 3.0));
     assert_eq!((d.opacity, d.brightness, d.tint), (0.5, 2.0, Color([1.0, 0.0, 0.0, 1.0])));
-    let shared = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "a", "instance": { "alpha": 0.5 } },
+    let shared = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "a", "instance": prefill::instance(json!({ "alpha": 0.5 })) },
         { "blend_space": "canvas", "id": "q", "type": "particles", "system": "a" }]);
     assert_eq!(runtime(json!({ "a": flowing }), shared).flocks().len(), 1, "looks alone share the particles");
 }
@@ -96,7 +96,7 @@ fn instances_scale_births_time_and_looks() {
 fn an_instance_count_above_one_reserves_more_room_and_births() {
     let flowing =
         still(json!({ "capacity": 300, "emitters": [{ "shape": { "point": [100, 50] }, "rate": 300 }] }));
-    let layers = |count: Json| json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "a", "instance": { "count": count } }]);
+    let layers = |count: Json| json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "a", "instance": prefill::instance(json!({ "count": count })) }]);
     let mut fly = Fly::new(runtime(json!({ "a": flowing.clone() }), layers(json!(2.5))));
     assert_eq!(fly.bake.allocs[0], 750);
     fly.run(1.0);
@@ -143,7 +143,7 @@ fn a_gap_in_the_points_of_an_instance_keeps_the_point_of_the_system() {
     let system =
         still(json!({ "points": points, "emitters": [{ "shape": shape, "bursts": [{ "count": 10 }] }] }));
     for (own, x) in [(json!([null, [150, 80]]), 40.0), (json!([[150, 80], null]), 150.0)] {
-        let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "a", "instance": { "points": own } }]);
+        let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "a", "instance": prefill::instance(json!({ "points": own })) }]);
         let mut fly = Fly::new(runtime(json!({ "a": system }), layers));
         fly.frame(0.0);
         let born = fly.alive(0);

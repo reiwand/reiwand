@@ -74,12 +74,11 @@ fn births_inherit_the_motion_of_the_pointer() {
 
 #[test]
 fn turbulent_rays_worked_out_apart_match_the_directions_particles_are_born_with() {
-    let gust =
-        json!({ "forward": 30, "scale": 0.4, "noise_speed": 0, "offset": 3, "speed": [10, 10], "phase": 2 });
+    let gust = json!({ "forward": 30, "scale": 0.4, "noise_speed": 0, "offset": 3, "speed": [10, 10], "phase": 2, "audio": null, "kind": null, "unit": null, "window": null, "reference": null, "hold_silence": null });
     let fly = |clock: Json| {
         let s = still(json!({ "init": { "life": [10, 10], "size": [2, 2], "turbulent": gust } }));
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layer("a"),
-            "particles": { "a": s }, "clock": clock });
+            "particles": prefill::all(json!({ "a": s })), "clock": clock });
         let scene = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"));
         let mut fly = Fly::new(Runtime::new(Arc::new(scene), Values::new()));
         fly.frame(1.0 / 30.0);

@@ -13,8 +13,8 @@ pub struct Kept {
 
 impl Trail {
     pub fn long(&self) -> bool {
-        let more = [self.segments.is_some(), self.subdivide.is_some(), self.uv_scale.is_some()];
-        self.length > 16 || more.contains(&true) || self.uv_scroll.is_some() || self.textured
+        let more = [self.segments.is_some(), self.subdivide != 0, self.uv_scale != 1.0];
+        self.length > 16 || more.contains(&true) || self.uv_scroll != 0.0 || self.textured
     }
 
     pub fn kept(&self) -> Kept {

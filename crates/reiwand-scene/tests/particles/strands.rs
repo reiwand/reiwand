@@ -74,14 +74,14 @@ fn long_trails_keep_spaced_points_within_the_caps() {
         length: 64,
         width: 0.5,
         segments: Some(15),
-        subdivide: Some(2),
-        uv_scale: None,
-        uv_scroll: None,
+        subdivide: 2,
+        uv_scale: 1.0,
+        uv_scroll: 0.0,
         textured: false,
     };
     assert_eq!(long.kept(), Kept { length: 64, kept: 16, stride: 5, long: true });
     assert_eq!(long.kept().capped(Tier::T3, u32::MAX).kept, 16);
-    let plain = Trail { length: 64, segments: None, subdivide: None, ..long.clone() };
+    let plain = Trail { length: 64, segments: None, subdivide: 0, ..long.clone() };
     assert_eq!(plain.kept().capped(Tier::T3, u32::MAX), Kept { length: 64, kept: 64, stride: 1, long: true });
     assert_eq!(plain.kept().capped(Tier::T1, u32::MAX), Kept { length: 64, kept: 16, stride: 5, long: true });
     assert_eq!(plain.kept().capped(Tier::T0, u32::MAX).kept, 0);

@@ -1,5 +1,6 @@
 mod aim;
 mod budget;
+mod check;
 mod emits;
 mod ends;
 mod fields;
@@ -28,6 +29,9 @@ use anyhow::{Result, anyhow, bail, ensure};
 use reiwand_core::message::said;
 use serde_json::{Value, json};
 use std::path::Path;
+
+pub(crate) use check::checked;
+use check::parsed;
 
 pub use crate::curves::{Curve, plot};
 pub use budget::budget;
@@ -69,9 +73,13 @@ pub(crate) fn render(
     ensure!(fits, said("editor.not_particles", "the layer \"%1\" draws no particles of this system", &[&id]));
     let own = format!("{path}/render");
     let copy = doc.pointer(&format!("{sys}/render")).cloned().unwrap_or(json!({}));
-    let mut ops = if found.get("render").is_some() { Vec::new() } else { set(doc, &own, copy) };
+    let ops = if found.get("render").is_some() { Vec::new() } else { set(doc, &own, copy) };
     let mut probe = doc.clone();
+    let mut ops = ops;
     apply(&mut probe, &ops)?;
+    let filled = crate::fill::ops(&probe);
+    apply(&mut probe, &filled)?;
+    ops.extend(filled);
     let squares = squared(&probe, &own);
     apply(&mut probe, &squares)?;
     ops.extend(squares);
@@ -92,31 +100,6 @@ pub(crate) fn put(doc: &Value, path: &str, value: Option<Value>) -> Vec<Op> {
         None if doc.pointer(path).is_some() => vec![Op::Remove { path: path.into() }],
         None => Vec::new(),
     }
-}
-
-fn parsed<T: serde::de::DeserializeOwned>(v: &Value, what: &str) -> Result<()> {
-    serde_json::from_value::<T>(v.clone())
-        .map(drop)
-        .map_err(|e| anyhow!(said("editor.particle_value", "%1 does not fit: %2", &[&what, &e])))
-}
-
-fn issues(dir: &Path, doc: &Value) -> Result<Vec<(String, String)>> {
-    let mut scene: reiwand_scene::Scene = serde_json::from_value(doc["scene"].clone())?;
-    let unread = crate::cache::read_files(&mut scene, dir);
-    let props = crate::meta::read(doc, Some(dir)).map(|m| m.properties).unwrap_or_default();
-    let all = unread.into_iter().chain(scene.validate(&props));
-    Ok(all.map(|i| (i.to_string(), i.message().to_string())).collect())
-}
-
-pub(crate) fn checked(dir: &Path, doc: &Value, ops: Vec<Op>) -> Result<Vec<Op>> {
-    let mut probe = doc.clone();
-    apply(&mut probe, &ops)?;
-    let before = issues(dir, doc).unwrap_or_default();
-    let fresh = issues(dir, &probe)?.into_iter().find(|i| !before.contains(i));
-    if let Some((_, message)) = fresh {
-        bail!(message);
-    }
-    Ok(ops)
 }
 
 pub(crate) fn edit(dir: &Path, doc: &Value, e: &ParticleEdit) -> Result<Vec<Op>> {

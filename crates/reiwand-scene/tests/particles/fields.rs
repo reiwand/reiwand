@@ -63,14 +63,14 @@ fn a_layer_that_holds_the_system_cannot_be_its_source() {
     let mut doc: Json = serde_json::from_str(&scene(sparks(), true)).unwrap();
     doc["layers"] = json!([{ "blend_space": "canvas", "id": "g", "type": "group", "layers": [{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "dots" }] }]);
     doc["particles"]["dots"]["emitters"] = json!([{ "shape": { "layer": { "id": "g" } }, "rate": 10 }]);
-    let found = Scene::from_json(&doc.to_string()).unwrap().validate(&props());
+    let found = Scene::from_json(&done(doc.clone())).unwrap().validate(&props());
     assert!(found.contains(&Issue::Circle("/particles/dots/emitters/0/shape/layer/id".into())), "{found:?}");
     doc["layers"][0]["layers"]
         .as_array_mut()
         .unwrap()
         .push(json!({ "blend_space": "canvas", "id": "sky", "type": "solid", "color": "#ffffff" }));
     doc["particles"]["dots"]["emitters"][0]["shape"]["layer"]["id"] = json!("sky");
-    let fine = Scene::from_json(&doc.to_string()).unwrap();
+    let fine = Scene::from_json(&done(doc.clone())).unwrap();
     assert_eq!(fine.validate(&props()), []);
     assert!(fine.features().contains("particle_layers"));
 }

@@ -46,8 +46,8 @@ fn ends(s: &Spread<f32>) -> [f32; 2] {
     s.ends
 }
 
-fn exp(s: &Spread<f32>) -> f32 {
-    s.exponent.unwrap_or(1.0)
+fn exp<T>(s: &Spread<T>) -> f32 {
+    s.exponent
 }
 
 impl Sim {
@@ -90,12 +90,12 @@ impl Sim {
             let (kind, a, x) = match &em.shape {
                 EmitShape::Point([x, y]) => (0, [*x, *y, 0.0, 0.0], [0.0; 4]),
                 EmitShape::Box(a) => {
-                    let [w, h] = a.inner.unwrap_or_default();
+                    let [w, h] = a.inner;
                     (1, [a.from[0], a.from[1], a.to[0], a.to[1]], [w, h, 0.0, 0.0])
                 }
                 EmitShape::Circle { center: [x, y], radius, inner, scale, sign, .. } => {
-                    let [sx, sy] = scale.unwrap_or([1.0; 2]);
-                    let [gx, gy] = sign.unwrap_or_default().map(f32::from);
+                    let [sx, sy] = *scale;
+                    let [gx, gy] = sign.map(f32::from);
                     (2, [*x, *y, radius.0, inner.0], [sx, sy, gx, gy])
                 }
                 EmitShape::Sphere { center: [x, y], depth, radius: [rx, ry, rz], inner, .. } => {
@@ -137,15 +137,15 @@ impl Sim {
             [v0[0], v0[1], v1[0], v1[1]],
             [exp(&i.life), exp(&i.speed), exp(&i.angle), exp(&i.size)],
             [exp(&i.rotation), exp(&i.spin), exp(&i.frame), one(&i.alpha)],
-            [one(&i.radial), i.velocity.as_ref().and_then(|v| v.exponent).unwrap_or(1.0), 1.0, 0.0],
+            [one(&i.radial), i.velocity.as_ref().map_or(1.0, exp), 1.0, 0.0],
             [0.0, 0.0, f32::from(u8::from(i.velocity.is_some())), 0.0],
         ];
-        self.init[8][2] = i.color.exponent.unwrap_or(1.0);
+        self.init[8][2] = i.color.exponent;
         self.colors[..2].copy_from_slice(&i.color.ends.map(|c| c.0));
         if let Some(h) = &i.hsv {
             self.init[9][3] = 1.0;
             self.tones[0] = [h.hue[0], h.hue[1], h.sat[0], h.sat[1]];
-            self.tones[1] = [h.val[0], h.val[1], h.steps.unwrap_or(0) as f32, 0.0];
+            self.tones[1] = [h.val[0], h.val[1], h.steps as f32, 0.0];
         }
         if !i.gradient.is_empty() {
             self.init[9][3] = 3.0;

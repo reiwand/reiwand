@@ -52,7 +52,7 @@ fn layer_sources_list_only_layers_that_may_feed_the_system_and_show_their_pixels
     edit(&mut p, "layer", json!({ "emitter": 0, "id": "logo", "threshold": 0.5 })).unwrap();
     let shown = &handles(&p)["emitters"][0];
     let samples = shown["samples"].as_array().unwrap();
-    assert!(!samples.is_empty() && shown.get("approximate").is_none(), "{shown}");
+    assert!(!samples.is_empty() && shown["approximate"].is_null(), "{shown}");
     assert!(
         samples.iter().all(|s| (940.0..961.0).contains(&s[0].as_f64().unwrap())),
         "only the opaque left half"
@@ -68,7 +68,7 @@ fn layer_sources_sample_real_pixels_from_a_mesh_a_text_and_a_group_layer() {
     edit(&mut p, "layer", json!({ "emitter": 0, "id": "net", "threshold": 0.5 })).unwrap();
     let mesh = &handles(&p)["emitters"][0];
     let mesh_samples = mesh["samples"].as_array().unwrap();
-    assert!(!mesh_samples.is_empty() && mesh.get("approximate").is_none(), "{mesh}");
+    assert!(!mesh_samples.is_empty() && mesh["approximate"].is_null(), "{mesh}");
     assert!(
         mesh_samples.iter().all(|s| (940.0..961.0).contains(&s[0].as_f64().unwrap())),
         "only the opaque left half of the mesh texture"
@@ -78,7 +78,7 @@ fn layer_sources_sample_real_pixels_from_a_mesh_a_text_and_a_group_layer() {
     act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": label } })).unwrap();
     edit(&mut p, "layer", json!({ "emitter": 0, "id": "label", "threshold": 0.3 })).unwrap();
     let text = &handles(&p)["emitters"][0];
-    assert!(!text["samples"].as_array().unwrap().is_empty() && text.get("approximate").is_none(), "{text}");
+    assert!(!text["samples"].as_array().unwrap().is_empty() && text["approximate"].is_null(), "{text}");
     let clock = json!({ "blend_space": "canvas", "id": "clock", "type": "text", "text": { "clock": "HH:mm" }, "size": 64 });
     act(&mut p, json!({ "add": { "pointer": "/scene/layers/-", "value": clock } })).unwrap();
     edit(&mut p, "layer", json!({ "emitter": 0, "id": "clock" })).unwrap();
@@ -87,7 +87,7 @@ fn layer_sources_sample_real_pixels_from_a_mesh_a_text_and_a_group_layer() {
     edit(&mut p, "layer", json!({ "emitter": 0, "id": "pack", "threshold": 0.5 })).unwrap();
     let grouped = &handles(&p)["emitters"][0];
     let grouped_samples = grouped["samples"].as_array().unwrap();
-    assert!(!grouped_samples.is_empty() && grouped.get("approximate").is_none(), "{grouped}");
+    assert!(!grouped_samples.is_empty() && grouped["approximate"].is_null(), "{grouped}");
     assert!(
         grouped_samples.iter().all(|s| (940.0..961.0).contains(&s[0].as_f64().unwrap())),
         "only the opaque left half, read through the group"
@@ -156,7 +156,8 @@ fn turbulent_rays_follow_the_seed_of_the_scene_and_the_preview_runs_with_it() {
     act(&mut p, json!({ "set": { "pointer": "/scene/clock/seed", "value": 9 } })).unwrap();
     let nine = rays(&p);
     assert_eq!(handles(&p)["seed"], json!(9));
-    let t: reiwand_scene::Turbulent = serde_json::from_value(gust).unwrap();
+    let t: reiwand_scene::Turbulent =
+        serde_json::from_value(reiwand_scene::prefill::part("init.turbulent", gust)).unwrap();
     let salt = reiwand_scene::particle_salt(system(&p)["seed"].as_u64().unwrap_or(0), 9, 0, 0);
     let first = f64::from(reiwand_scene::turbulent_ray(&t, salt, 0, 0.0));
     assert!((nine[0].as_f64().unwrap() - first).abs() < 0.01, "{nine} {first}");
