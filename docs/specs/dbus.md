@@ -1329,7 +1329,7 @@ A `HistoryReply`, newest first. `output` is a connector name; `limit` is `1..=10
 **Browsing wallpapers.** A browsing session lets the user look at wallpapers one by one on a screen and keep one, without
 changing anything until they apply it. It belongs to one output (`""` means the only screen when
 there is one; with several screens it browses the library for every screen at once). It holds a
-candidate, never changes the wallpaper (the strip drawn over it and the tray read the
+candidate, never changes the wallpaper (the switcher panel and the tray read the
 `BrowseState` data), and ends by itself after 30 s without input. Nothing runs while nobody
 browses: one timer per open session.
 
@@ -1342,7 +1342,7 @@ screen plays one, else the library. Every method answers with a `BrowseState` an
 `expired`; only in the reply or signal that ends a session), `source`, `playlist`,
 `playlist_name`, `steps` (how far the candidate is from what the screen shows), `position`,
 `count`, `shown` (uid shown when browsing began), `candidate` (an `ItemSummary`: title, kind,
-thumbnail and package), `now` (the `ItemSummary` the screen shows), `ahead` (up to two
+thumbnail and package), `now` (the `ItemSummary` the screen shows), `behind` and `ahead` (up to two
 `ItemSummary` that follow the candidate, without repeats), `plays` (how the candidate would come
 in: `kind` `fade`, `none` or `own`; `why` `chosen` for the transition picked with
 `BrowseTransition`, `screen` for the screen's own setting, `general` for the general one, `calm`
@@ -1350,16 +1350,16 @@ when the system asks for less motion and `still` when the user does; `duration_m
 otherwise), `path`, `transition`, `idle_ms` (time left before it ends by itself) and `shortcuts`
 (`off`, `asking`, `bound`, `refused`, `unavailable`).
 
-**The strip.** Whenever a session begins, whoever began it (a shortcut, the tray or
-`reiwand-ctl next --preview`), the daemon composes a strip into the frames of the output (or of every real
-output when the session is `""` with several): the live wallpaper dimmed, the candidate framed in the
-middle (animated when its preview is a GIF or WebP, a still otherwise) with its name below, and still
-thumbnails of the neighbours at both sides. No window or surface is created and no keyboard focus is
-taken; it works on every presentation path (layer-shell, Plasma streams, X11 root). Moving slides the
-strip (instant with `transition.less_motion`). The real wallpaper does not change until `BrowseApply`;
-`BrowseCancel` or the idle end remove the strip. While a session is active the wheel over the
-output moves the selection by one per notch, a left click on the middle thumbnail applies and a click on
-another one selects it; this goes through the daemon's own pointer path and only exists during a session.
+**The panel.** Whenever a session begins, whoever began it (a shortcut, the tray or
+`reiwand-ctl next --preview`), the daemon starts `reiwand-app --browse OUTPUT` (the program named by
+`REIWAND_PREVIEW_APP` when set), which claims the bus name `<app id>.Switcher` so that only one panel exists
+per output. It is a window of its own with keyboard focus: a centred panel over a dimmed screen with
+the candidate large in the middle (animated when its preview is a GIF or WebP), sharp still neighbours
+at both sides, its name and position below and a line of keys. It reads and drives the session through
+`GetBrowse`, `Browse`, `BrowseApply` and `BrowseCancel`: arrows, the wheel and clicks on a neighbour
+move, Enter or a click on the middle one applies, Esc or a click outside cancels. The daemon draws
+nothing into the wallpaper frames. Exit code 3 of the panel means "open the library" (shown when the
+screen has a single wallpaper). The real wallpaper does not change until `BrowseApply`.
 
 ### `Browse(s output, s source, i steps) → (s json)`
 
@@ -1400,7 +1400,7 @@ keys: `browse-next`, `browse-previous`, `browse-apply` and `browse-cancel`, prop
 `shortcuts.previous`, `shortcuts.apply` and `shortcuts.cancel`
 (`LOGO+ALT+N`, `LOGO+ALT+P`, `LOGO+ALT+Return` and `LOGO+ALT+Escape`; the desktop may show its own dialog and let the user pick other
 keys). A key press starts or moves a session on the only screen (on every screen with several)
-and the strip appears as said above; the other two keys apply or cancel. Where the desktop
+and the panel opens as said above; the other two keys apply or cancel. Where the desktop
 has no such portal (wlroots compositors, X11) the state is `unavailable` and the user binds
 `reiwand-ctl next --preview`, `prev --preview`, `browse apply` and `browse cancel` to keys in the compositor.
 The daemon opens its own session-bus connection for this, so that the first portal call of that
