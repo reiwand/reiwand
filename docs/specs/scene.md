@@ -209,6 +209,13 @@ scaled by fixed transforms of its own and its groups, grown by the `reach` of it
 whose place can change while it plays (a bound or animated `position`, `rotation`, `skew` or
 `scale`, a `tilt`, an `anchor`, `parallax`, a `parent`, an `attach`, a bound `reach`, or any script
 in the scene) counts as the whole canvas. A
+single-pass effect that the render draws only over a box (`bounded`, or a fixed texture mask in `strength` mode that is
+not inverted, feathered or weaker than 1) counts its units times the share of its texture that the lit texels' box covers
+(the box of the channels the mask reads, or of red, green and blue for `bounded`; the box of both when it has both),
+with a floor of 5 % for the fixed cost of the pass; the boxes are read from the pictures when the package loads, in
+`Scene::read_files`, and a texture that does not clamp counts whole, as does a multi-pass effect. The estimate ignores
+the growth by `reach` of that box. `pack check`, `scene catalog`, the effect panel (`reach` query), the phone and the
+automatic quality level all use that same function (`Scene::effect_units`). A
 layer that masks or feeds others adds one more unit times its share, once however many read it,
 since it is drawn on its own at most once a frame. Particles add their overdraw, `canvas.bloom` adds the units of its effect over the whole canvas, a
 `canvas.camera` makes every layer count as the whole canvas, and every frame costs 1.5 units for composing and copying.

@@ -339,7 +339,7 @@ Una escena sin nada que cambie se duerme y no gasta. Cada parámetro de un efect
 
 ## Cómo ver cuánto cuesta un efecto
 
-Cada efecto cuesta unidades de trabajo por cuadro. El programa baja la calidad si la escena pesa demasiado (con batería, si el equipo es lento) y entonces recorta efectos: los ligeros siguen en todos los niveles; los medios y pesados trabajan a menor tamaño o se omiten, los marcados **Opcional** primero. El costo de un efecto con máscara cuenta la capa entera, aunque la máscara cubra solo un trozo. El de un efecto de paquete cuenta toda la función que llama (una mezcla con muchos modos sube cada uso a unas 2 unidades), y un script que usa la cámara hace que todas las capas cuenten como lienzo entero.
+Cada efecto cuesta unidades de trabajo por cuadro. El programa baja la calidad si la escena pesa demasiado (con batería, si el equipo es lento) y entonces recorta efectos: los ligeros siguen en todos los niveles; los medios y pesados trabajan a menor tamaño o se omiten, los marcados **Opcional** primero. El costo de un efecto de una sola pasada con `bounded`, o con una máscara de imagen fija en modo `strength` (sin invertir, sin difuminar y con fuerza 1), cuenta solo la parte de la imagen que cubren sus píxeles encendidos (con un mínimo del 5 % por el costo fijo de la pasada); el de un efecto de varias pasadas, o de una máscara de otro tipo, cuenta la capa entera. El de un efecto de paquete cuenta toda la función que llama (una mezcla con muchos modos sube cada uso a unas 2 unidades), y un script que usa la cámara hace que todas las capas cuenten como lienzo entero.
 
 **Dónde está:** inspector, con un efecto elegido, sección **Coste**.
 

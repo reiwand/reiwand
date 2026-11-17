@@ -70,6 +70,9 @@ pub struct Scene {
     #[serde(skip)]
     #[schemars(skip)]
     pub rooted: BTreeMap<String, Vec<Layer>>,
+    #[serde(skip)]
+    #[schemars(skip)]
+    pub inked: BTreeMap<String, crate::Inked>,
 }
 
 impl Default for Color {
@@ -82,7 +85,7 @@ impl Scene {
     pub fn new(size: [u32; 2]) -> Scene {
         let (assets, layers, particles, timelines, scripts, effects, audio, ext, loaded) = Default::default();
         let (camera3d, templates, pools, models, rigs, solids, draft, sheets, rooted) = Default::default();
-        let (transition, passages) = Default::default();
+        let (transition, passages, inked) = Default::default();
         Scene {
             schema: SCHEMA.into(),
             canvas: Canvas::new(size),
@@ -107,6 +110,7 @@ impl Scene {
             draft,
             sheets,
             rooted,
+            inked,
         }
     }
 

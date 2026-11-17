@@ -7,7 +7,12 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
 type Stamps = Vec<(String, Option<(i64, i64, u64)>)>;
-type Read = (BTreeMap<String, Arc<Descriptor>>, BTreeMap<String, Arc<ModelFile>>, Option<Issue>);
+type Read = (
+    BTreeMap<String, Arc<Descriptor>>,
+    BTreeMap<String, Arc<ModelFile>>,
+    BTreeMap<String, reiwand_scene::Inked>,
+    Option<Issue>,
+);
 
 type Cache<V> = Mutex<BTreeMap<PathBuf, ((String, Stamps), V)>>;
 
@@ -63,8 +68,9 @@ pub fn read_files(scene: &mut Scene, dir: &Path) -> Option<Issue> {
     let models: Vec<(&str, &str)> =
         figures.filter_map(|id| Some((id, scene.assets.get(id)?.path.as_str()))).collect();
     let effects = scene.effects.values().flat_map(|e| [e.descriptor.clone(), e.wgsl.clone()]);
-    let paths = effects.chain(models.iter().map(|(_, path)| path.to_string()));
-    let shape = serde_json::json!([scene.effects, models]).to_string();
+    let pictures = scene.picture_paths().into_iter().map(str::to_string);
+    let paths = effects.chain(models.iter().map(|(_, path)| path.to_string())).chain(pictures);
+    let shape = serde_json::json!([scene.effects, models, scene.picture_paths()]).to_string();
     let key = (shape, stamps(dir, paths));
     let make = || {
         let mut probe =
@@ -74,11 +80,11 @@ pub fn read_files(scene: &mut Scene, dir: &Path) -> Option<Issue> {
             Err(SceneError::Invalid(issue)) => Some(issue),
             _ => None,
         };
-        (probe.loaded, probe.models, issue)
+        (probe.loaded, probe.models, probe.inked, issue)
     };
     let passing = |issue: &Issue| [STOPPED, UNCHECKED].iter().all(|t| !issue.to_string().contains(t));
-    let kept = |read: &Read| read.2.as_ref().is_none_or(passing);
-    let (loaded, models, issue) = remembered(&FILES, dir, key, make, kept);
-    (scene.loaded, scene.models) = (loaded, models);
+    let kept = |read: &Read| read.3.as_ref().is_none_or(passing);
+    let (loaded, models, inked, issue) = remembered(&FILES, dir, key, make, kept);
+    (scene.loaded, scene.models, scene.inked) = (loaded, models, inked);
     issue
 }

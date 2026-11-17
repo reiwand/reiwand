@@ -1,0 +1,114 @@
+use crate::adopt::Files;
+use crate::{Descriptor, EffectUse, MaskChannel, MaskMode, Scene, Value, Wrapping};
+use std::collections::BTreeSet;
+
+pub type Inked = [[f32; 4]; 4];
+
+const EMPTY: [f32; 4] = [1.0, 1.0, 0.0, 0.0];
+const MAX_PICTURE: usize = 64 << 20;
+
+pub fn ink_bounds(width: u32, height: u32, rgba: &[u8]) -> Inked {
+    let mut found = [[u32::MAX, u32::MAX, 0, 0]; 4];
+    for (i, p) in rgba.as_chunks::<4>().0.iter().enumerate() {
+        let (x, y) = (i as u32 % width, i as u32 / width);
+        for (b, v) in found.iter_mut().zip(p) {
+            if *v > 0 {
+                *b = [b[0].min(x), b[1].min(y), b[2].max(x + 1), b[3].max(y + 1)];
+            }
+        }
+    }
+    let (w, h) = (width as f32, height as f32);
+    found.map(|[x0, y0, x1, y1]| match x1 > x0 {
+        true => [x0 as f32 / w, y0 as f32 / h, x1 as f32 / w, y1 as f32 / h],
+        false => EMPTY,
+    })
+}
+
+fn span(boxes: impl Iterator<Item = [f32; 4]>) -> Option<[f32; 4]> {
+    let full = boxes.filter(|b| b[2] > b[0] && b[3] > b[1]);
+    full.reduce(|a, b| [a[0].min(b[0]), a[1].min(b[1]), a[2].max(b[2]), a[3].max(b[3])])
+}
+
+fn textures<'a>(scene: &'a Scene, e: &'a EffectUse) -> Vec<&'a str> {
+    let Some(d) = scene.effect(&e.effect) else { return Vec::new() };
+    let named = d.bounded.iter().filter_map(|b| d.params.get(d.param(b)?)?.named(e));
+    let masks = fixed_mask(e, d).map(|(id, _)| id);
+    named.chain(masks).collect()
+}
+
+fn fixed_mask<'a>(e: &'a EffectUse, d: &Descriptor) -> Option<(&'a str, Option<MaskChannel>)> {
+    let m = e.mask.as_ref().filter(|m| m.layer.is_none() && m.shape.is_none() && !m.invert)?;
+    let whole = m.strength.as_ref().is_none_or(|s| matches!(s, Value::Fixed(v) if *v >= 1.0));
+    if d.mask_mode != MaskMode::Strength || !whole || m.feather > 0.0 {
+        return None;
+    }
+    match m.texture.as_ref()? {
+        Value::Fixed(id) => Some((id.as_str(), m.channel)),
+        Value::Bound(_) => None,
+    }
+}
+
+impl Scene {
+    pub fn picture_paths(&self) -> Vec<&str> {
+        let uses = || self.layers().flat_map(|l| &l.effects);
+        let masks = uses().filter_map(|e| match e.mask.as_ref()?.texture.as_ref()? {
+            Value::Fixed(id) => Some(id.as_str()),
+            Value::Bound(_) => None,
+        });
+        let named = uses().flat_map(|e| e.params.values()).filter_map(|v| match v {
+            Value::Fixed(crate::Param::Text(id)) => Some(id.as_str()),
+            _ => None,
+        });
+        let ids: BTreeSet<&str> = masks.chain(named).collect();
+        ids.into_iter().filter_map(|id| Some(self.assets.get(id)?.path.as_str())).collect()
+    }
+
+    pub(crate) fn read_inked(&mut self, files: &mut impl Files) {
+        let uses = self.layers().flat_map(|l| &l.effects);
+        let ids: BTreeSet<&str> = uses.flat_map(|e| textures(self, e)).collect();
+        let clamped = |a: &&crate::Asset| a.wrap.unwrap_or_default() == Wrapping::Clamp;
+        let wanted: Vec<(&str, &str)> = ids
+            .into_iter()
+            .filter_map(|id| Some((id, self.assets.get(id).filter(clamped)?.path.as_str())))
+            .collect();
+        let mut found = Vec::new();
+        for (id, path) in wanted {
+            let Ok(bytes) = files.read(path, MAX_PICTURE) else { continue };
+            let Ok(image) = image::load_from_memory(&bytes) else { continue };
+            let image = image.to_rgba8();
+            found.push((id.to_string(), ink_bounds(image.width(), image.height(), image.as_raw())));
+        }
+        self.inked = found.into_iter().collect();
+    }
+
+    pub fn box_share(&self, e: &EffectUse, d: &Descriptor) -> Option<f32> {
+        let single = d.passes.len() == 1 && d.state.is_none() && d.targets.is_empty() && !d.below();
+        if !single {
+            return None;
+        }
+        let masked = fixed_mask(e, d).map(|(id, channel)| {
+            let on: &[usize] = match channel.unwrap_or(MaskChannel::Luminance) {
+                MaskChannel::R => &[0],
+                MaskChannel::G => &[1],
+                MaskChannel::B => &[2],
+                MaskChannel::A => &[3],
+                MaskChannel::Luminance => &[0, 1, 2],
+            };
+            self.inked.get(id).map(|i| span(on.iter().map(|c| i[*c])))
+        });
+        let limits: Vec<_> = d.bounded.iter().filter_map(|b| d.params.get(d.param(b)?)?.named(e)).collect();
+        let bounded = (!limits.is_empty()).then(|| {
+            let all: Option<Vec<&Inked>> = limits.iter().map(|id| self.inked.get(*id)).collect();
+            all.map(|a| span(a.into_iter().flat_map(|i| [i[0], i[1], i[2]])))
+        });
+        let found = match (masked, bounded) {
+            (None, None) => return None,
+            (Some(a), None) | (None, Some(a)) => a?,
+            (Some(a), Some(b)) => {
+                a?.zip(b?).map(|(a, b)| [a[0].max(b[0]), a[1].max(b[1]), a[2].min(b[2]), a[3].min(b[3])])
+            }
+        };
+        let area = found.map_or(0.0, |[x0, y0, x1, y1]| (x1 - x0).max(0.0) * (y1 - y0).max(0.0));
+        Some(area.min(1.0))
+    }
+}

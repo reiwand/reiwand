@@ -38,11 +38,13 @@ pub fn query(dir: &Path, doc: &Value, q: &Value) -> Value {
                 .or_else(|| reiwand_scene::descriptor(id).cloned());
             let Some(d) = found else { continue };
             let optional = use_["optional"] == true;
-            let follows = serde_json::from_value::<reiwand_scene::EffectUse>(use_.clone())
-                .is_ok_and(|e| d.needs(reiwand_scene::Use::Cursor, &e, None));
+            let parsed = serde_json::from_value::<reiwand_scene::EffectUse>(use_.clone()).ok();
+            let follows = parsed.as_ref().is_some_and(|e| d.needs(reiwand_scene::Use::Cursor, e, None));
             let at = |l: Quality| l.effect_scale(d.class(), optional).map(|s| s * d.scale_at(l));
             let scale = at(level);
-            let units = |s: Option<f32>| s.map(|s| d.units() * s * s);
+            let units = |s: Option<f32>| {
+                s.map(|s| parsed.as_ref().map_or(d.units() * s * s, |e| scene.effect_units(e, &d, s)))
+            };
             effects.push(json!({ "layer": layer["id"], "effect": id, "optional": optional,
                 "kept": scale.is_some(), "follows": follows, "scale": scale, "units": units(scale), "full_units": units(at(Quality::Q3)),
                 "levels": LEVELS.map(|l| units(at(l))) }));

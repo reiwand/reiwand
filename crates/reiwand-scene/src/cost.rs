@@ -6,6 +6,7 @@ const BACKDROP: f32 = 2.0;
 const FED: f32 = 1.0;
 const APART: f32 = 1.0;
 const BASE: f32 = 1.5;
+const BOX_FLOOR: f32 = 0.05;
 
 impl Scene {
     pub fn areas(&self) -> HashMap<*const Layer, f32> {
@@ -55,12 +56,17 @@ impl Scene {
         thin * thin * self.flat_units(l, quality, unit)
     }
 
+    pub fn effect_units(&self, e: &crate::EffectUse, d: &crate::Descriptor, scale: f32) -> f32 {
+        let scale = if d.passes.len() > 1 { scale } else { 1.0 };
+        let share = self.box_share(e, d).map_or(1.0, |s| s.max(BOX_FLOOR));
+        d.units() * scale * scale * share
+    }
+
     fn flat_units(&self, l: &Layer, quality: Quality, unit: f32) -> f32 {
         let effects = l.effects.iter().filter_map(|e| {
             let d = self.effect(&e.effect)?.live(quality, e.optional)?;
             let scale = quality.effect_scale(d.class(), e.optional)? * d.scale_at(quality);
-            let scale = if d.passes.len() > 1 { scale } else { 1.0 };
-            Some(d.units() * scale * scale)
+            Some(self.effect_units(e, d, scale))
         });
         let apart = !l.effects.is_empty() || l.mask.is_some() || !l.blend.fixed() || l.cache;
         let below = l.effects.iter().filter_map(|e| self.effect(&e.effect)).map(|d| match d {

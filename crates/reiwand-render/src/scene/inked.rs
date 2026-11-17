@@ -3,24 +3,10 @@ use super::sampling::Sampling;
 use reiwand_scene::{Scene, Value};
 use std::collections::{HashMap, HashSet};
 
-pub(crate) type Inked = [[f32; 4]; 4];
-
-const EMPTY: [f32; 4] = [1.0, 1.0, 0.0, 0.0];
+pub(crate) type Inked = reiwand_scene::Inked;
 
 fn bounds(image: &image::RgbaImage) -> Inked {
-    let (w, h) = image.dimensions();
-    let mut found = [[u32::MAX, u32::MAX, 0, 0]; 4];
-    for (x, y, p) in image.enumerate_pixels() {
-        for (b, v) in found.iter_mut().zip(p.0) {
-            if v > 0 {
-                *b = [b[0].min(x), b[1].min(y), b[2].max(x + 1), b[3].max(y + 1)];
-            }
-        }
-    }
-    found.map(|[x0, y0, x1, y1]| match x1 > x0 {
-        true => [x0 as f32 / w as f32, y0 as f32 / h as f32, x1 as f32 / w as f32, y1 as f32 / h as f32],
-        false => EMPTY,
-    })
+    reiwand_scene::ink_bounds(image.width(), image.height(), image.as_raw())
 }
 
 pub(crate) fn ink(scene: &Scene, assets: &SceneAssets, samplings: &mut HashMap<String, Sampling>) {
