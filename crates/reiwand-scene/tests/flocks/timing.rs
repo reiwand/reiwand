@@ -87,3 +87,22 @@ fn a_seek_simulates_the_scene_time_on_top_of_the_prewarm() {
     let far = first_frame_at(100.0, json!({}));
     assert_eq!(far.0, 450, "capped like the prewarm");
 }
+
+#[test]
+fn a_system_revealed_live_starts_from_its_prewarm_only() {
+    let props: BTreeMap<String, Property> = serde_json::from_str(include_str!("../props.json")).unwrap();
+    let layers = json!([{ "id": "p", "type": "particles", "system": "a", "visible": { "prop": "soft" } }]);
+    let text = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layers,
+        "particles": { "a": flowing(json!({})) } });
+    let scene = Scene::load(&text.to_string(), &props).unwrap();
+    let mut values = effective(&props, &[]);
+    values.insert("soft".into(), json!(false));
+    let mut fly = Fly::new(Runtime::new(Arc::new(scene), values.clone()));
+    fly.rt.advance(5.0);
+    fly.rt.frame(VIEW, Quality::Q3);
+    assert!(fly.rt.swarm(0).is_none_or(|s| s.count() == 0), "hidden systems do not run");
+    values.insert("soft".into(), json!(true));
+    fly.rt.set_props(values);
+    fly.rt.frame(VIEW, Quality::Q3);
+    assert_eq!(fly.rt.swarm(0).unwrap().count(), 1, "no warm-up for the time already elapsed");
+}

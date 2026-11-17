@@ -47,6 +47,7 @@ pub struct Swarm {
     pub(super) emits: u32,
     pub(super) scale: f64,
     pub(super) warm: usize,
+    pub(super) seeked: Option<f64>,
     pub(super) places: Vec<crate::Affine>,
     pub(super) moves: Vec<[[f32; 6]; MAX_EMITTERS2]>,
 }
@@ -91,6 +92,10 @@ impl Swarm {
             scale: 1.0,
             ..Swarm::default()
         };
+    }
+
+    pub(crate) fn seeked_at(&mut self, t: f64) {
+        self.seeked = Some(t);
     }
 
     pub fn count(&self) -> usize {
