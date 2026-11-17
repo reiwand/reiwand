@@ -180,7 +180,7 @@ Una lista de hasta 16, aplicadas en cada paso:
 | `{ "vortex": { "axis", "center", "strength" } }` | Las hace girar alrededor de la recta que pasa por el centro con la dirección `axis` (obligatorio, largo 1; `[0, 0, 1]` gira en la pantalla). Con `canvas.perspective` también empuja en profundidad; sin ella se ignora la parte z. También `inner`, `outer` y `ring`. |
 | `{ "orbit": { "center", "strength" } }` | Las hace orbitar. |
 | `{ "noise": fuerza }` | Un temblor al azar. |
-| `{ "oscillate": { "what", "freq", "scale", "phase", "mask" } }` | Las hace oscilar en posición, opacidad o tamaño. |
+| `{ "oscillate": { "what", "from", "freq", "scale", "phase", "mask" } }` | Las hace oscilar en posición, opacidad o tamaño. `from` es `top` (baja desde el valor pleno) o `floor` (sube desde un piso al azar entre las dos escalas; no vale para la posición). |
 | `{ "cap": velocidad }` | Limita la velocidad. |
 | `{ "torque": k }`, `{ "spin_drag": k }` | Cambian y frenan el giro. |
 | `{ "slow_near": { "target", "inner", "outer", "factor" } }` | Las frenan cerca de un punto. |
@@ -212,7 +212,7 @@ Hasta 8 colisionadores, cada uno `{ "bounds", "bounce", "friction", "kill", "sti
 | `size_over_life` | Lista de `[t, valor]` (hasta 64): multiplica el tamaño. | En el panel de partículas, «A lo largo de la vida de una partícula» da una curva para arrastrar los puntos y, para el color, una barra de degradado.
 | `color_over_life` | Lo mismo, con colores. |
 | `brightness` | 0 a 16, puede seguir un valor. |
-| `stretch` | `{ "time", "min", "max" }`: segundos de movimiento a lo largo de los que se estira la partícula y, en píxeles, el mínimo y el máximo. |
+| `stretch` | `{ "mode", "time", "min", "max" }`, los cuatro obligatorios: `add` suma píxeles al lado (mínimo y máximo en píxeles); `relative` multiplica el lado (mínimo y máximo en veces el lado, así puede quedar más corta que el lado). |
 | `trail` | Una estela: `length` (1 a 16 pasos, o hasta 64 con `segments`), `width` (0 a 1), `segments`, `subdivide` (0 a 7), `uv_scale`, `uv_scroll`, `textured`. |
 | `rope` | Une las partículas en una tira, por orden de nacimiento: `width`, `subdivide`, `smooth`, `uv_scale`, `uv_scroll`. |
 | `order` | Cuál se dibuja encima: `newest`, `oldest`, `largest`, `smallest` o `lowest`. |

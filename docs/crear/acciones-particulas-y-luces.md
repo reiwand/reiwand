@@ -270,7 +270,7 @@ Añade, reemplaza o quita una fuerza que actúa sobre las partículas. Sin `inde
 | Argumento | Tipo | Qué significa |
 |---|---|---|
 | `system` | texto | (obligatorio) Id del sistema. |
-| `force` | cualquier valor JSON | La fuerza: `{"gravity":[x,y]}`, `{"wind":[x,y]}`, `{"drag":k}`, `{"turbulence":{"strength":s,"scale":c}}`, `{"attractor":{"target":"cursor","strength":s}}` (negativa, repele), `{"vortex":{"axis":[0,0,1],"center":[x,y],"strength":s}}`, `{"orbit":{"center":[x,y],"strength":s}}`, `{"noise":s}`, `{"cap":velocidad}`, `{"torque":k}`, `{"spin_drag":k}`, `{"oscillate":{"what":"position","freq":[a,b],"scale":[a,b]}}`, `{"slow_near":{"target":[x,y],"inner":r1,"outer":r2,"factor":f}}`, `{"keep_distance":{"target":"p0","distance":d,"strength":s}}` o `{"keep_between":{"from":"p0","to":"p1","strength":s}}`. Un objetivo es un punto, `"cursor"` o un punto de control. |
+| `force` | cualquier valor JSON | La fuerza: `{"gravity":[x,y]}`, `{"wind":[x,y]}`, `{"drag":k}`, `{"turbulence":{"strength":s,"scale":c}}`, `{"attractor":{"target":"cursor","strength":s}}` (negativa, repele), `{"vortex":{"axis":[0,0,1],"center":[x,y],"strength":s}}`, `{"orbit":{"center":[x,y],"strength":s}}`, `{"noise":s}`, `{"cap":velocidad}`, `{"torque":k}`, `{"spin_drag":k}`, `{"oscillate":{"what":"position","from":"top","freq":[a,b],"scale":[a,b]}}`, `{"slow_near":{"target":[x,y],"inner":r1,"outer":r2,"factor":f}}`, `{"keep_distance":{"target":"p0","distance":d,"strength":s}}` o `{"keep_between":{"from":"p0","to":"p1","strength":s}}`. Un objetivo es un punto, `"cursor"` o un punto de control. |
 | `index` | entero | Fuerza que se reemplaza o se quita. |
 | `remove` | sí/no | Con `index`, la quita. Por defecto `false`. |
 
@@ -428,7 +428,7 @@ Ajusta cómo se dibujan las partículas. Solo cambia lo que nombras.
 |---|---|---|
 | `system` | texto | (obligatorio) Id del sistema. |
 | `layer` | texto | Capa de partículas a la que vale. |
-| `stretch` | cualquier valor JSON | Cuánto se estira cada partícula en la dirección en que se mueve: `{"time": s, "min": px, "max": px}`: segundos de movimiento y, en píxeles, el mínimo y el máximo. `{"time": 0}` lo quita. |
+| `stretch` | cualquier valor JSON | Cuánto se estira cada partícula en la dirección en que se mueve: `{"mode": "add", "time": s, "min": px, "max": px}`: segundos de movimiento y el mínimo y el máximo; con `add` se suman píxeles al lado, con `relative` el largo es el lado por `clamp(time·velocidad, min, max)` (mínimo y máximo en veces el lado, puede ser menor que el lado). Los cuatro campos son obligatorios; `"none"` lo quita. |
 | `frames` | texto | Cómo avanzan los cuadros de una hoja de imágenes: `time` (con el tiempo), `life` (con la vida) o `random`; `none` lo quita. |
 | `fps` | número | Cuadros por segundo con `frames` en `time`. |
 | `mix` | sí/no | Si es `true`, funde cada cuadro con el siguiente. |
@@ -438,8 +438,8 @@ Ajusta cómo se dibujan las partículas. Solo cambia lo que nombras.
 
 ```sh
 reiwand-ctl scene act mi-escena add_layer '{"kind":"particles","id":"chispas"}'
-reiwand-ctl scene act mi-escena particles '{"render":{"system":"chispas","stretch":{"time":0.05},"frames":"life","fps":12,"mix":true,"brightness":2,"cycles":2,"order":"newest"}}'
-reiwand-ctl scene act mi-escena particles '{"render":{"system":"chispas","stretch":{"time":0},"frames":"none","cycles":0,"order":"none"}}'
+reiwand-ctl scene act mi-escena particles '{"render":{"system":"chispas","stretch":{"mode":"add","time":0.05,"min":0,"max":60},"frames":"life","fps":12,"mix":true,"brightness":2,"cycles":2,"order":"newest"}}'
+reiwand-ctl scene act mi-escena particles '{"render":{"system":"chispas","stretch":"none","frames":"none","cycles":0,"order":"none"}}'
 ```
 
 ##### variante `over`
