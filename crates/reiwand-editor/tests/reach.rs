@@ -129,8 +129,9 @@ fn adding_an_effect_writes_every_required_parameter() {
     let add = json!({ "effects": { "add": { "layer": "fill", "effect": "chroma_key" } } });
     p.act(&serde_json::from_value::<Action>(add).unwrap()).unwrap();
     let params = &p.doc["scene"]["layers"][0]["effects"][2]["params"];
-    assert_eq!(params, &json!({ "distance": 0, "keep": 0 }));
+    assert_eq!(params.as_object().unwrap().len(), 2);
+    assert_eq!((params["distance"].as_f64(), params["keep"].as_f64()), (Some(0.0), Some(0.0)));
     let set = json!({ "effects": { "set": { "layer": "fill", "index": 2, "params": { "distance": 1 } } } });
     p.act(&serde_json::from_value::<Action>(set).unwrap()).unwrap();
-    assert_eq!(p.doc["scene"]["layers"][0]["effects"][2]["params"]["distance"], 1);
+    assert_eq!(p.doc["scene"]["layers"][0]["effects"][2]["params"]["distance"].as_f64(), Some(1.0));
 }
