@@ -68,9 +68,7 @@ msgstr "Dejar de usar una cuenta en un repositorio; la cuenta se conserva"
 msgid ""
 "Sign out of an account: its saved access is deleted and its links stay; sign "
 "in again to use it"
-msgstr ""
-"Cierra la sesión de una cuenta: se borra su acceso guardado y sus vínculos "
-"se conservan; vuelve a iniciar sesión para usarla"
+msgstr "Cierra la sesión de una cuenta: se borra su acceso guardado y sus vínculos se conservan; vuelve a iniciar sesión para usarla"
 
 #: apps/reiwand-ctl/src/accounts.rs
 msgid "Forget an account on this computer, with its saved access"
@@ -5147,14 +5145,6 @@ msgstr ""
 "siempre: %1"
 
 #: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Repository whose account is used (address or id); required when several "
-"repositories have an account"
-msgstr ""
-"Repositorio cuya cuenta se usa (dirección o id); obligatorio cuando varios "
-"repositorios tienen cuenta"
-
-#: apps/reiwand-ctl/src/server.rs
 msgid "Upload a .wpak package to the repository of your account"
 msgstr "Subir un paquete .wpak al repositorio de tu cuenta"
 
@@ -5173,12 +5163,6 @@ msgstr ""
 "no es privado"
 
 #: apps/reiwand-ctl/src/server.rs
-msgid ""
-"Repository to publish to; required when several repositories have an account"
-msgstr ""
-"Repositorio donde publicar; obligatorio cuando varios repositorios tienen "
-"cuenta"
-
 #: apps/reiwand-ctl/src/server.rs
 msgid ""
 "List the packages this account uploaded, with their state and visibility"
@@ -6312,3 +6296,9 @@ msgstr "Invierno"
 #: apps/reiwand-ctl/src/wording.rs
 msgid "Yellow"
 msgstr "Amarillo"
+
+msgid "Repository whose account is used (address or id); required when several repositories have an account"
+msgstr "Repositorio cuya cuenta se usa (dirección o id); obligatorio cuando varios repositorios tienen cuenta"
+
+msgid "Repository to publish to; required when several repositories have an account"
+msgstr "Repositorio donde publicar; obligatorio cuando varios repositorios tienen cuenta"
