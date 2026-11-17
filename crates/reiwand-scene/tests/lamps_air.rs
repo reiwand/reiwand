@@ -124,7 +124,7 @@ fn lamps_carry_their_air_and_picture_and_drop_the_air_at_the_lowest_level() {
 
 #[test]
 fn particle_refraction_names_its_units_and_range() {
-    let layer = |render: Json| json!({ "id": "p", "type": "particles", "system": "rain", "render": render });
+    let layer = |render: Json| json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "rain", "render": render });
     let wall = |r: Json| {
         json!({ "normal": "wall" })
             .as_object()
