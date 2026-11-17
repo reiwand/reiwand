@@ -53,7 +53,7 @@ la ventana se abre solo en esa pantalla.
 
 - Los cambios de la biblioteca hechos con la ventana abierta se ven la próxima vez que la abras; de
   la biblioteca se toman como máximo dos mil fondos.
-- Con varias pantallas, la ventana se abre en la pantalla donde está el puntero y recorre toda la biblioteca.
+- Con varias pantallas y ninguna elegida, se abre una sola ventana que recorre toda la biblioteca y el cambio vale para todas; con `--output NOMBRE` se limita a esa pantalla.
 - El escritorio puede no aceptar las teclas propuestas (por ejemplo, si ya las usa otra cosa): elige
   otras en su diálogo o ata las órdenes a mano.
 - Las pantallas se nombran por su conector (`DP-1`, `HDMI-A-1`).
