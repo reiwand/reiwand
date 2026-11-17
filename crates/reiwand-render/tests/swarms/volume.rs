@@ -35,7 +35,8 @@ fn a_ball_around_the_eye_draws_big_near_and_small_far_ones() {
     let init = json!({ "size": [6, 6], "life": [60, 60] });
     let systems =
         json!({ "s": system(shape, init, json!({ "perspective": { "focal": 120 }, "capacity": 128 })) });
-    let layer = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s", "blend": "add" }]);
+    let layer =
+        json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s", "blend": "add" }]);
     for gpu in [false, true] {
         let Some(mut run) = Run::new(r, systems.clone(), layer.clone(), gpu) else { return };
         let pixels = (0..12).map(|_| run.frame(r, 1.0 / 30.0)).last().unwrap();

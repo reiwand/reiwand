@@ -7,7 +7,7 @@ const VIEW: [f32; 4] = [0.0, 0.0, 100.0, 50.0];
 const STEP: f32 = 1.0 / 100.0;
 
 fn runtime(audio: serde_json::Value) -> Runtime {
-    let layer = json!({ "id": "l0", "type": "solid", "color": "#ffffff", "opacity": { "audio": 4 } });
+    let layer = json!({ "blend_space": "canvas", "id": "l0", "type": "solid", "color": "#ffffff", "opacity": { "audio": 4 } });
     let text =
         json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [layer], "audio": audio });
     let scene = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"));
@@ -50,7 +50,7 @@ fn the_default_gain_release_keeps_the_reference_where_it_was() {
 
 #[test]
 fn the_gain_release_is_required_and_limited() {
-    let layer = json!({ "id": "l0", "type": "solid", "color": "#ffffff" });
+    let layer = json!({ "blend_space": "canvas", "id": "l0", "type": "solid", "color": "#ffffff" });
     let load = |audio: serde_json::Value| {
         let text =
             json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [layer], "audio": audio });

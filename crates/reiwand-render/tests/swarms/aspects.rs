@@ -16,7 +16,8 @@ fn extent(pixels: &[u8], around: [u32; 2]) -> [u32; 2] {
 }
 
 fn shot(system: Value, around: [u32; 2], settle: f64) -> [[u32; 2]; 2] {
-    let layers = json!([{ "blend_space": "canvas", "id": "s", "type": "particles", "system": "s", "blend": "add" }]);
+    let layers =
+        json!([{ "blend_space": "canvas", "id": "s", "type": "particles", "system": "s", "blend": "add" }]);
     let Some(r) = renderer() else { return [[0; 2]; 2] };
     let mut found = [[0; 2]; 2];
     for (k, gpu) in [false, true].into_iter().enumerate() {

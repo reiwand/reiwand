@@ -161,7 +161,7 @@ fn p0_is_the_corner_of_the_layer_frame_and_moves_with_the_layer() {
                 "space": space, "capacity": 4, "forces": forces,
                 "emitters": [{ "shape": { "point": [100, 50] }, "bursts": [{ "count": 4 }] }]
             }));
-            let layers = json!([{ "id": "p", "type": "particles", "system": "a", "transform": { "position": [300, 200] } }]);
+            let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "a", "transform": { "position": [300, 200] } }]);
             let mut fly = Fly::new(runtime(json!({ "a": system }), layers));
             fly.run(1.0);
             let at = fly.alive(0)[0].pos;

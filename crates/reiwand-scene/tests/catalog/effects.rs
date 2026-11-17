@@ -163,7 +163,7 @@ fn a_package_effect_use_reads_a_generic_picture_by_name() {
 #[test]
 fn a_required_parameter_must_be_written() {
     let layer = |params: Json| {
-        json!({ "layers": [{ "id": "a", "type": "solid", "color": "#000000",
+        json!({ "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#000000",
             "effects": [{ "effect": "chroma_key", "params": params }] }] })
     };
     let issues = |params: Json| scene(layer(params)).validate(&BTreeMap::new());

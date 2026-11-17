@@ -20,10 +20,9 @@ fn relative_stretch_scales_the_side_and_may_be_shorter_than_it() {
         "added": lone(30.0, json!({ "mode": "add", "depth": "flat", "time": 0.1, "min": 0, "max": 100 })),
         "long": lone(50.0, json!({ "mode": "relative", "depth": "flat", "time": 0.05, "min": 0, "max": 10 })),
         "short": lone(70.0, json!({ "mode": "relative", "depth": "flat", "time": 0.01, "min": 0, "max": 10 })) });
-    let layers = json!(
-        ["none", "added", "long", "short"]
-            .map(|id| json!({ "blend_space": "canvas", "id": id, "type": "particles", "system": id, "blend": "add" }))
-    );
+    let layers = json!(["none", "added", "long", "short"].map(
+        |id| json!({ "blend_space": "canvas", "id": id, "type": "particles", "system": id, "blend": "add" })
+    ));
     for gpu in [false, true] {
         let Some(mut run) = Run::new(r, systems.clone(), layers.clone(), gpu) else { return };
         run.frame(r, 0.0);
@@ -68,9 +67,9 @@ fn dropped(y: f32, z: f32, depth: &str) -> Value {
 #[test]
 fn projected_stretch_follows_the_motion_on_screen() {
     let Some(r) = renderer() else { return };
-    let layers = json!(
-        ["near", "far"].map(|id| json!({ "blend_space": "canvas", "id": id, "type": "particles", "system": id, "blend": "add" }))
-    );
+    let layers = json!(["near", "far"].map(
+        |id| json!({ "blend_space": "canvas", "id": id, "type": "particles", "system": id, "blend": "add" })
+    ));
     for (depth, wanted) in [("flat", [18, 9]), ("projected", [24, 4])] {
         let systems = json!({ "near": dropped(30.0, -50.0, depth), "far": dropped(80.0, 100.0, depth) });
         for gpu in [false, true] {
