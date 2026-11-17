@@ -21188,3 +21188,51 @@ msgstr "Arrastra para orientar el eje alrededor del que giran las partículas: l
 #: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
 msgid "Drag to aim the axis the births turn around: the direction sets the turn, the distance from the center sets the tilt"
 msgstr "Arrastra para orientar el eje alrededor del que nacen las partículas: la dirección fija el giro y la distancia al centro, la inclinación"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Add pixels to the side"
+msgstr "Sumar píxeles al lado"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Multiply the side"
+msgstr "Multiplicar el lado"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Seconds of motion"
+msgstr "Segundos de movimiento"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Shortest, in sides"
+msgstr "Mínimo, en lados"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Longest, in sides"
+msgstr "Máximo, en lados"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Shortest, in pixels"
+msgstr "Mínimo, en píxeles"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Longest, in pixels"
+msgstr "Máximo, en píxeles"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "%1 px long at %2 px/s, side %3 px"
+msgstr "%1 px de largo a %2 px/s, lado de %3 px"
+
+#: apps/reiwand-app/qml/SceneSwarmWaves.qml
+msgid "Fades and pulses"
+msgstr "Fundidos y pulsos"
+
+#: apps/reiwand-app/qml/SceneSwarmWaves.qml
+msgid "Add a pulse"
+msgstr "Añadir un pulso"
+
+#: apps/reiwand-app/qml/SceneSwarmWaves.qml
+msgid "Dive from the top"
+msgstr "Bajar desde lo alto"
+
+#: apps/reiwand-app/qml/SceneSwarmWaves.qml
+msgid "Rise from the floor"
+msgstr "Subir desde el piso"
