@@ -1,4 +1,4 @@
-use super::{add_url, dir, fetch};
+use super::{added, dir, fetch};
 use crate::library::now;
 use crate::{Error, store};
 use serde::{Deserialize, Serialize};
@@ -81,10 +81,11 @@ pub(crate) fn offer(source: &Path, stamp: i64, force: bool) -> Result<Value, Err
     std::fs::create_dir_all(dir()?)?;
     let bundle = reiwand_format::bundled(&repo, &keys, NAME, &wpaks, now())?;
     keep(&Record { repo_id: bundle.repo_id.clone(), declined: false, stamp })?;
-    if super::added().contains(&bundle.repo_id) {
+    if added().contains(&bundle.repo_id) {
         reiwand_format::update_repo(&dir()?, &fetch()?, &bundle.repo_id, now())?;
     } else {
-        add_url(&bundle.url)?;
+        reiwand_format::add_repo(&dir()?, &fetch()?, &bundle.url, now())?;
+        store::changed();
     }
     Ok(json!({"repo_id": bundle.repo_id}))
 }

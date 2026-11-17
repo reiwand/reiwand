@@ -3,10 +3,7 @@
 mod accent;
 mod account;
 mod acting;
-mod address;
-mod apply;
 mod asks;
-mod away;
 mod bench;
 mod blanked;
 mod blend;
@@ -14,18 +11,16 @@ mod blend;
 mod bridge;
 #[cfg(target_os = "android")]
 mod calls;
+mod carry;
 mod choice;
 mod chosen;
 #[cfg(target_os = "android")]
 mod clips;
-mod connect;
 mod converted;
 mod counted;
-mod cycle;
 mod depth;
 #[cfg(target_os = "android")]
 mod engine;
-mod escrow;
 #[cfg(target_os = "android")]
 mod exports;
 mod extras;
@@ -38,24 +33,17 @@ mod hearing;
 #[cfg(target_os = "android")]
 mod heif;
 mod keeping;
-mod keys;
 mod kin;
-mod level;
 mod library;
-mod link;
-mod listen;
-mod local;
 mod media;
 mod net;
 mod opened;
 mod own_sound;
 mod pack;
 mod page;
-mod pairing;
 mod perf;
 mod playing;
 mod power;
-mod private;
 mod props;
 mod providers;
 #[cfg(target_os = "android")]
@@ -65,14 +53,9 @@ mod reel;
 mod relief;
 mod reply;
 mod repos;
-mod revoking;
 mod saved;
-#[cfg(any(target_os = "android", test))]
-mod scan;
-mod server;
 mod settings;
 mod shade;
-mod side;
 mod sound;
 mod stage;
 mod state;
@@ -146,7 +129,7 @@ pub(crate) enum Error {
     #[error("{0:#}")]
     Depth(#[from] anyhow::Error),
     #[error(transparent)]
-    Sync(#[from] reiwand_sync::Error),
+    Account(#[from] reiwand_account::Error),
     #[error("{0}")]
     Said(#[from] reiwand_core::message::Message),
     #[error("not a supported image or video: {0}")]

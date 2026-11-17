@@ -151,4 +151,20 @@
     <string name="error_android_connect_server">The server address in this code is not valid</string>
     <string name="error_android_connect_fingerprint">The certificate fingerprint in this code is not valid</string>
     <string name="error_android_connect_invite">The invitation in this code is not valid</string>
+    <string name="error_android_cert_changed">The certificate of %1$s is not the one you trusted; nothing was added</string>
+    <string name="error_android_cert_unknown">The certificate of %1$s is not from a known authority; its fingerprint is %2$s</string>
+    <string name="error_android_repo_is_server">%1$s is a server, not a repository: pick one of its repositories</string>
+    <string name="error_android_account_needed">This repository is private: sign in with an account of %1$s to open it</string>
+    <string name="error_android_no_account">There is no account %1$s</string>
+    <string name="error_android_account_other_server">That account belongs to another server than the repository</string>
+    <string name="error_android_signin_waiting">No sign-in is waiting; start it again</string>
+    <string name="error_android_signin_refused">The sign-in was refused</string>
+    <string name="error_android_signin_expired">The code expired before it was approved; sign in again</string>
+    <string name="error_android_carry_needs_password">The file is encrypted: type its password</string>
+    <string name="error_android_carry_wrong_password">Wrong password, or the file is damaged</string>
+    <string name="error_android_carry_unreadable">This file cannot be read: %1$s</string>
+    <string name="error_android_carry_file">The file cannot be written: %1$s</string>
+    <string name="error_android_carry_secrets_password">Passwords and keys are only exported with a password</string>
+    <string name="error_android_carry_sessions">Account sessions are not imported: sign in again on this phone</string>
+    <string name="error_android_carry_choice">%1$s is not a choice of the import</string>
 </resources>

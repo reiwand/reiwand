@@ -11,6 +11,7 @@ mod asked;
 mod bundled;
 mod calm;
 mod capped;
+mod carried;
 mod chosen;
 mod converted;
 mod cued;
@@ -28,11 +29,9 @@ mod lit;
 mod looks;
 mod paced;
 mod pages;
-mod pinned;
 mod played;
 mod posted;
 mod previewed;
-mod records;
 mod reeled;
 mod refused;
 mod relief;
@@ -153,7 +152,6 @@ fn the_library_imports_rotates_and_keeps_settings() {
     frames::framing(&green, &bands);
     relief::relief(&green);
     relief::heif_photos_get_maps();
-    records::records();
     lit::hdr_follows_the_setting_and_the_display();
     scenes::scenes();
     kept::home_and_lock_keep_their_own_storage();
@@ -175,6 +173,7 @@ fn the_library_imports_rotates_and_keeps_settings() {
     paced::pages_keep_the_frame_cap_and_the_volume_of_their_author();
     paced::shortcuts_open_what_the_user_chose_after_a_tap();
     updated::nothing_to_update_without_repositories();
+    carried::the_configuration_travels_in_both_directions();
     cut::nothing_leaves_in_private_mode();
     unreadable();
 }

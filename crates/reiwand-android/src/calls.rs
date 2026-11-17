@@ -53,28 +53,6 @@ pub fn poster<'a>(
 }
 
 #[jni_mangle("io.github.reiwand.Native")]
-pub fn read_code<'a>(
-    mut env: EnvUnowned<'a>,
-    _: JObject<'a>,
-    frame: JByteArray<'a>,
-    size: JIntArray<'a>,
-) -> JString<'a> {
-    on(&mut env, |env| {
-        let mut facts = [0; 3];
-        size.get_region(env, 0, &mut facts)?;
-        let [width, height, stride] = facts.map(|n| n.unsigned_abs() as usize);
-        let luma = env.convert_byte_array(&frame)?;
-        let text = crate::scan::read(&luma, width, height, stride).unwrap_or_default();
-        Ok(env.new_string(text)?)
-    })
-}
-
-#[jni_mangle("io.github.reiwand.Native")]
-pub fn connect_code<'a>(mut env: EnvUnowned<'a>, _: JObject<'a>, text: JString<'a>) -> JString<'a> {
-    on(&mut env, |env| Ok(env.new_string(crate::connect::reply(&text.try_to_string(env)?))?))
-}
-
-#[jni_mangle("io.github.reiwand.Native")]
 pub fn library<'a>(mut env: EnvUnowned<'a>, _: JObject<'a>, request: JString<'a>) -> JString<'a> {
     on(&mut env, |env| {
         let answer = library::request(&request.try_to_string(env)?, on_battery());

@@ -1,4 +1,5 @@
-use crate::account::{LISTEN, NETWORK};
+pub(crate) const NETWORK: &str = "sync_network";
+const LISTEN: &str = "sync_listen";
 use crate::said;
 use crate::{Error, power, store};
 use reiwand_core::settings::fps::DISPLAY;

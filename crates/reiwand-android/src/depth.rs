@@ -11,7 +11,7 @@ pub(crate) mod layers;
 pub(crate) mod maps;
 pub(crate) mod model;
 
-pub(crate) use maps::{adopt, forget, raised, shared, stamped};
+pub(crate) use maps::{forget, raised, stamped};
 
 mod answer;
 

@@ -28,7 +28,7 @@ fn failure(id: &str, e: &reiwand_providers::Error, keyed: bool) -> Error {
             "%1 rejected the key or password: enter it again",
             &[&id],
         ),
-        reiwand_providers::Error::Http(e) if reiwand_sync::untrusted(e) => said(
+        reiwand_providers::Error::Http(e) if reiwand_account::untrusted(e) => said(
             "android.provider_untrusted",
             "%1 has a certificate this phone does not trust: if it is your own server, install its certificate authority in the phone's settings",
             &[&id],

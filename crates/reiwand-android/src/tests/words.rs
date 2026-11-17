@@ -49,14 +49,16 @@ fn errors_carry_their_message_id_and_arguments() {
         (&refused["error"], &refused["id"], &refused["args"]),
         (&json!("x"), &json!("android.refused"), &json!(["x"]))
     );
-    let wrong = reiwand_sync::Error::Crypto("the passphrase does not open the recovery escrow");
-    let sync = [wrong, reiwand_sync::Error::Untrusted, reiwand_sync::Error::Network("down".into())];
-    let ids = sync.map(|e| Error::Sync(e).reply()["id"].as_str().unwrap().to_owned());
-    assert_eq!(ids, ["android.wrong_passphrase", "android.sync_untrusted", "android.sync_network"]);
-    let server =
-        reiwand_sync::Error::Server { status: 429, code: "rate_limited".into(), detail: "slow down".into() };
+    let down = [reiwand_account::Error::Untrusted, reiwand_account::Error::Network("down".into())];
+    let ids = down.map(|e| Error::Account(e).reply()["id"].as_str().unwrap().to_owned());
+    assert_eq!(ids, ["android.sync_untrusted", "android.sync_network"]);
+    let server = reiwand_account::Error::Server {
+        status: 429,
+        code: "rate_limited".into(),
+        detail: "slow down".into(),
+    };
     let others = [
-        Error::Sync(server),
+        Error::Account(server),
         Error::Depth(anyhow::anyhow!("no map")),
         Error::Json(serde_json::from_str::<u8>("x").unwrap_err()),
         Error::Unprepared,

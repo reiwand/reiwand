@@ -129,7 +129,7 @@ fn answer(lib: &mut Library, request: Request, on_battery: bool) -> Result<Value
         Request::Cleared => crate::page::cleared()?,
         Request::Thumb { uid } => json!(store::thumb(lib, &lib.item(&uid)?)?),
         Request::Favorite { uids, favorite } => json!(lib.set_favorite_many(&known(lib, &uids), favorite)?),
-        Request::Remove { uids } => lists::remove(lib, &uids, now)?,
+        Request::Remove { uids } => lists::remove(lib, &uids)?,
         Request::Playlists => lists::playlists(lib, now)?,
         Request::Entries { playlist } => listed(named(lib, lib.playlist_items(&playlist, now)?)?)?,
         Request::Create { name } => json!(lib.create_playlist(&name, None, &Rules::default())?),

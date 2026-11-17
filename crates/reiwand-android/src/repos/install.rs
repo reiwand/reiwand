@@ -23,11 +23,3 @@ pub(crate) fn fetched(spec: &str) -> Result<(String, PathBuf), Error> {
 }
 
 pub(crate) use crate::net::fetch;
-
-pub(crate) fn add_url(url: &str) -> Result<Value, Error> {
-    crate::net::reach(url)?;
-    std::fs::create_dir_all(dir()?)?;
-    let info = reiwand_format::add_repo(&dir()?, &fetch()?, url, now())?;
-    store::changed();
-    Ok(json!({"repo_id": info.repo_id, "name": info.name, "packages": info.packages}))
-}

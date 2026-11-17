@@ -25,8 +25,8 @@ fn asked(request: Value) -> Value {
 
 fn every_action(url: &str) -> Vec<Value> {
     let anchored = format!("{url}/");
-    let added = repos::add(&anchored).unwrap_or_else(|e| e.reply());
-    let offered = asked(json!({ "op": "add", "url": url }));
+    let added = repos::add(&anchored, None).unwrap_or_else(|e| e.reply());
+    let offered = asked(json!({ "op": "add_repo", "url": url }));
     let api = net::api(url, None).map_or_else(|e| e.reply(), |_| json!({}));
     let fetched = net::fetch().map(|f| reiwand_format::Fetch::get(&f, url, "index.json", 64).is_err());
     vec![added, offered, api, json!(fetched.unwrap_or(true))]

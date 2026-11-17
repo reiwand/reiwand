@@ -1,10 +1,7 @@
-use crate::said;
 use crate::{Error, store};
-use reiwand_sync::Secrets;
 use std::fs;
 use zeroize::{Zeroize, Zeroizing};
 
-const FILE: &str = "account.vault";
 const TEXTS: &str = "texts.vault";
 
 #[cfg(target_os = "android")]
@@ -72,25 +69,6 @@ fn open(sealed: &[u8]) -> Result<Zeroizing<Vec<u8>>, Error> {
     Ok(Zeroizing::new(sealed.to_vec()))
 }
 
-pub(crate) fn load() -> Result<Secrets, Error> {
-    let sealed = fs::read(store::dir()?.join(FILE)).map_err(|_| {
-        said("android.phone_holds_token", "this phone holds no token for the server; link it again", &[])
-    })?;
-    let broken = || {
-        said(
-            "android.stored_server_secrets",
-            "the stored server secrets are broken; remove the server and link again",
-            &[],
-        )
-    };
-    serde_json::from_slice(&open(&sealed).map_err(|_| broken())?).map_err(|_| broken())
-}
-
-pub(crate) fn store(secrets: &Secrets) -> Result<(), Error> {
-    let plain = Zeroizing::new(serde_json::to_vec(secrets)?);
-    store::write(&store::dir()?.join(FILE), &seal(&plain)?)
-}
-
 pub(crate) fn kept() -> std::collections::BTreeMap<String, String> {
     let sealed = store::dir().ok().and_then(|dir| fs::read(dir.join(TEXTS)).ok());
     let plain = sealed.and_then(|sealed| open(&sealed).ok());
@@ -106,11 +84,4 @@ pub(crate) fn keep(key: &str, text: &str) -> Result<(), Error> {
     let plain = Zeroizing::new(serde_json::to_vec(&texts)?);
     texts.values_mut().for_each(Zeroize::zeroize);
     store::write(&store::dir()?.join(TEXTS), &seal(&plain)?)
-}
-
-pub(crate) fn forget() -> Result<(), Error> {
-    match fs::remove_file(store::dir()?.join(FILE)) {
-        Err(e) if e.kind() != std::io::ErrorKind::NotFound => Err(e.into()),
-        _ => Ok(()),
-    }
 }

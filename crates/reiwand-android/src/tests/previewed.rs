@@ -93,7 +93,7 @@ pub(super) fn repository_previews_come_from_that_repository_once_and_within_a_bo
     add(&repo, &package(tmp.path(), "org.example.sky"), None, now).unwrap();
     publish(&repo, &Signer::new(&online.secret, None).unwrap(), 7, now).unwrap();
     let (port, hits) = serve(repo);
-    let added = repos::add(&format!("http://127.0.0.1:{port}/")).unwrap();
+    let added = repos::add(&format!("http://127.0.0.1:{port}/"), None).unwrap();
     let repo_id = added["repo_id"].as_str().unwrap().to_owned();
     let listed = repos::browse("").unwrap();
     assert_eq!(listed[0]["version"], "1.0.0", "{listed}");

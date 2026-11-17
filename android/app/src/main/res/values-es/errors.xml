@@ -151,4 +151,20 @@
     <string name="error_android_connect_server">La dirección del servidor de este código no es válida</string>
     <string name="error_android_connect_fingerprint">La huella del certificado de este código no es válida</string>
     <string name="error_android_connect_invite">La invitación de este código no es válida</string>
+    <string name="error_android_cert_changed">El certificado de %1$s no es el que aceptaste; no se añadió nada</string>
+    <string name="error_android_cert_unknown">El certificado de %1$s no es de una autoridad conocida; su huella es %2$s</string>
+    <string name="error_android_repo_is_server">%1$s es un servidor, no un repositorio: elige uno de sus repositorios</string>
+    <string name="error_android_account_needed">Este repositorio es privado: inicia sesión con una cuenta de %1$s para abrirlo</string>
+    <string name="error_android_no_account">No existe la cuenta %1$s</string>
+    <string name="error_android_account_other_server">Esa cuenta pertenece a otro servidor distinto del repositorio</string>
+    <string name="error_android_signin_waiting">No hay ningún inicio de sesión en espera; vuelve a empezar</string>
+    <string name="error_android_signin_refused">Se rechazó el inicio de sesión</string>
+    <string name="error_android_signin_expired">El código caducó antes de aprobarse; inicia sesión de nuevo</string>
+    <string name="error_android_carry_needs_password">El archivo está cifrado: escribe su contraseña</string>
+    <string name="error_android_carry_wrong_password">La contraseña no es correcta, o el archivo está dañado</string>
+    <string name="error_android_carry_unreadable">No se puede leer este archivo: %1$s</string>
+    <string name="error_android_carry_file">No se puede escribir el archivo: %1$s</string>
+    <string name="error_android_carry_secrets_password">Las contraseñas y claves solo se exportan con una contraseña</string>
+    <string name="error_android_carry_sessions">Las sesiones de cuenta no se importan: vuelve a iniciar sesión en este teléfono</string>
+    <string name="error_android_carry_choice">%1$s no es una opción de la importación</string>
 </resources>

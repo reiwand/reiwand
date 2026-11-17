@@ -22,7 +22,7 @@ impl Error {
             }
             Error::Library(e) => text("android.library", e.to_string()),
             Error::Io(e) => text("android.io", e.to_string()),
-            Error::Sync(e) => synced(e),
+            Error::Account(e) => synced(e),
             Error::Depth(e) => text("android.depth_failed", format!("{e:#}")),
             Error::Setting(e) => text("android.refused", e.clone()),
             Error::Config(e) => text("android.config", e.to_string()),
@@ -44,15 +44,12 @@ impl Error {
     }
 }
 
-fn synced(e: &reiwand_sync::Error) -> (&'static str, Vec<String>) {
-    use reiwand_sync::Error::{Crypto, Invalid, Network, Server, Untrusted};
+fn synced(e: &reiwand_account::Error) -> (&'static str, Vec<String>) {
+    use reiwand_account::Error::{Crypto, Invalid, Network, Server, Untrusted};
     match e {
         Untrusted => ("android.sync_untrusted", Vec::new()),
         Network(detail) => ("android.sync_network", vec![detail.clone()]),
         Server { detail, .. } => ("android.sync_server", vec![detail.clone()]),
-        Crypto("the passphrase does not open the recovery escrow") => {
-            ("android.wrong_passphrase", Vec::new())
-        }
         Crypto(what) => ("android.sync_crypto", vec![(*what).to_owned()]),
         Invalid(what) => ("android.sync_invalid", vec![what.clone()]),
     }

@@ -1,9 +1,10 @@
-use crate::account::NETWORK;
+use crate::settings::NETWORK;
 use crate::{Error, library, said, settings, store};
 use serde::Deserialize;
 use serde_json::{Value, json};
 
 mod build;
+pub(crate) mod carried;
 mod kinds;
 mod options;
 mod run;
@@ -151,7 +152,7 @@ fn remove(id: &str, purge: bool) -> Result<Value, Error> {
         library::with(|lib| {
             let mine = lib.search(&format!("tag:{}", tag(id)), now, 0, u32::MAX)?;
             let uids: Vec<String> = mine.into_iter().map(|i| i.uid).collect();
-            library::drop_items(lib, &uids, now).map(drop)
+            library::drop_items(lib, &uids).map(drop)
         })?;
     }
     store::changed();

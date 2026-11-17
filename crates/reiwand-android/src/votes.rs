@@ -1,65 +1,82 @@
-use crate::state::{api, linked};
-use crate::{Error, said, server, settings};
-use reiwand_format::voted;
+use crate::account::using::{needed, token_for};
+use crate::library::now;
+use crate::{Error, said, settings};
+use reiwand_account::{Api, origin};
+use reiwand_format::{RepoInfo, server_repo_name, vote_queries, voted};
 use serde_json::{Map, Value, json};
 
 fn runtime() -> Result<tokio::runtime::Runtime, Error> {
     Ok(tokio::runtime::Builder::new_current_thread().enable_all().build()?)
 }
 
-fn answer(path: String, body: Option<Value>) -> Result<Value, Error> {
-    let (api, _) = api()?;
-    Ok(runtime()?.block_on(async {
-        match body {
-            Some(body) => api.post(&path, body).await,
-            None => api.get(&path).await,
-        }
-    })?)
+fn voting() -> Vec<(RepoInfo, String, String)> {
+    let known =
+        crate::repos::dir().ok().and_then(|d| reiwand_format::repos(&d, now()).ok()).unwrap_or_default();
+    let named = known.into_iter().filter_map(|r| {
+        let name = server_repo_name(&r.url)?.to_owned();
+        let site = origin(&r.url)?;
+        Some((r, name, site))
+    });
+    named.collect()
 }
 
-fn repository() -> Result<Option<String>, Error> {
-    linked()?;
-    runtime()?.block_on(server::repository())
+fn api(site: &str, url: &str) -> Result<Api, Error> {
+    let pin = crate::account::pins::all().get(site).cloned();
+    let api = crate::net::api(site, pin.as_deref())?;
+    Ok(match token_for(url) {
+        Some(token) => api.with_token(&token),
+        None => api,
+    })
 }
 
 pub(crate) fn counts(ids: &[String]) -> Result<Value, Error> {
     if voted(ids, None).is_none() {
         return Err(said("android.vote_ids", "give at most 1000 package ids", &[]));
     }
-    let none = |repo: &Option<String>| json!({"items": {}, "shown": false, "repo_id": repo});
-    if ids.is_empty() || linked().is_err() {
-        return Ok(none(&None));
+    let none = json!({"items": {}, "shown": false});
+    if ids.is_empty() || !settings::config().repos.vote_counts || crate::net::private() {
+        return Ok(none);
     }
-    let repo = repository()?;
-    let asked = voted(ids, repo.as_deref()).unwrap_or_default();
-    if asked.is_empty() || !settings::config().repos.vote_counts {
-        return Ok(none(&repo));
+    let mut items = Map::new();
+    let rt = runtime()?;
+    for (repo, name, site) in voting() {
+        let prefix = format!("{}/", repo.repo_id);
+        let asked: Vec<_> = voted(ids, Some(&repo.repo_id)).unwrap_or_default();
+        let asked: Vec<_> = asked.into_iter().filter(|(spec, _)| spec.starts_with(&prefix)).collect();
+        if asked.is_empty() {
+            continue;
+        }
+        let api = api(&site, &repo.url)?;
+        for query in vote_queries(&name, &asked) {
+            let Ok(found) = rt.block_on(api.get(&query)) else { continue };
+            for (spec, id) in &asked {
+                if let Some(count) = found["items"].get(*id) {
+                    items.insert((*spec).to_owned(), count.clone());
+                }
+            }
+        }
     }
-    let mut found = Map::new();
-    for query in reiwand_format::vote_queries(&server::repo_name()?, &asked) {
-        found.extend(answer(query, None)?["items"].as_object().cloned().unwrap_or_default());
-    }
-    let count = |id: &str| found.get(id).cloned().unwrap_or(Value::Null);
-    let items: Map<String, Value> = asked
-        .iter()
-        .filter(|(_, id)| !count(id).is_null())
-        .map(|(spec, id)| ((*spec).into(), count(id)))
-        .collect();
-    Ok(json!({"items": items, "shown": true, "repo_id": repo}))
+    Ok(json!({"items": items, "shown": true}))
 }
 
-pub(crate) fn cast(id: &str, vote: &str) -> Result<Value, Error> {
-    let specs = [id.to_owned()];
+pub(crate) fn cast(spec: &str, vote: &str) -> Result<Value, Error> {
+    let specs = [spec.to_owned()];
     if voted(&specs, None).is_none() || !matches!(vote, "up" | "down" | "none") {
         return Err(said("android.vote_value", "give a package id and up, down or none", &[]));
     }
-    let repo = repository()?;
-    let Some((_, id)) = voted(&specs, repo.as_deref()).unwrap_or_default().first().copied() else {
+    let found = voting().into_iter().find(|(repo, ..)| spec.starts_with(&format!("{}/", repo.repo_id)));
+    let Some((repo, name, site)) = found else {
         return Err(said(
             "android.vote_elsewhere",
-            "votes go only to packages of the repository of the linked server",
+            "this package is not in a repository that takes votes",
             &[],
         ));
     };
-    answer(format!("/api/v1/r/{}/packages/{id}/vote", server::repo_name()?), Some(json!({ "vote": vote })))
+    if token_for(&repo.url).is_none() {
+        return Err(needed(&site));
+    }
+    let id = spec.split_once('/').map_or(spec, |(_, id)| id);
+    let api = api(&site, &repo.url)?;
+    Ok(runtime()?
+        .block_on(api.post(&format!("/api/v1/r/{name}/packages/{id}/vote"), json!({ "vote": vote })))?)
 }

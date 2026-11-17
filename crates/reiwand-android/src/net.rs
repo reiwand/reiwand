@@ -1,8 +1,7 @@
-use crate::state::read;
 use crate::{Error, said, settings};
+use reiwand_account::Api;
 use reiwand_format::Fetch;
 use reiwand_providers::HttpFetch;
-use reiwand_sync::Api;
 use std::io::{self, Write};
 use std::sync::Arc;
 
@@ -28,7 +27,7 @@ pub(crate) fn api(url: &str, pin: Option<&str>) -> Result<Api, Error> {
 
 pub(crate) async fn peek(url: &str) -> Result<String, Error> {
     open()?;
-    Ok(reiwand_sync::peek(url).await?)
+    Ok(reiwand_account::peek(url).await?)
 }
 
 pub(crate) fn local(base: &str) -> bool {
@@ -64,14 +63,21 @@ impl Fetch for Gated {
 }
 
 pub(crate) fn fetch() -> Result<Gated, Error> {
+    fetch_with(None)
+}
+
+pub(crate) fn fetch_with(extra: Option<(&str, &str)>) -> Result<Gated, Error> {
     let failed =
         |e: &dyn std::fmt::Display| said("android.web_client", "web connections cannot start: %1", &[&e]);
-    let web = HttpFetch::new(Arc::default()).map_err(|e| failed(&e))?;
-    let (url, pin) = read(|s| (s.url.clone(), s.pin.clone()));
-    match pin.filter(|p| !url.is_empty() && !p.is_empty()) {
-        Some(pin) => web.pinned(&url, reiwand_sync::pinned_tls(&pin)?).map_err(|e| failed(&e)).map(Gated),
-        None => Ok(Gated(web)),
+    let mut web = HttpFetch::new(Arc::default()).map_err(|e| failed(&e))?;
+    let mut pins = crate::account::pins::all();
+    if let Some((origin, print)) = extra {
+        pins.insert(origin.to_owned(), print.to_ascii_lowercase());
     }
+    for (origin, print) in pins {
+        web = web.pinned(&origin, reiwand_account::pinned_tls(&print)?).map_err(|e| failed(&e))?;
+    }
+    Ok(Gated(crate::account::using::with_tokens(web)?))
 }
 
 #[cfg(test)]
@@ -94,7 +100,7 @@ fn no_connection_opens_beside_the_gate() {
         "client()",
         " peek(",
         "(peek(",
-        "reiwand_sync::peek",
+        "reiwand_account::peek",
     ];
     let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
     let mut stack = vec![root.clone()];

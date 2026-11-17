@@ -15,7 +15,6 @@ pub(crate) enum Request {
     Updates,
     RefreshRepos { force: bool },
     Update { uid: String },
-    Away,
 }
 
 pub(crate) fn request(request: Request) -> Result<Value, Error> {
@@ -23,7 +22,6 @@ pub(crate) fn request(request: Request) -> Result<Value, Error> {
         Request::Updates => list(),
         Request::RefreshRepos { force } => refresh(force),
         Request::Update { uid } => update(&uid, false),
-        Request::Away => Ok(json!(crate::away::current())),
     }
 }
 

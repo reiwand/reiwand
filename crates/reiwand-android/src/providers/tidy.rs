@@ -20,6 +20,6 @@ pub(super) fn evict(id: &str, keep: usize, now: i64) -> Result<(), Error> {
         let excess = mine.len().saturating_sub(keep);
         let gone: Vec<String> =
             mine.iter().map(|i| i.uid.clone()).filter(|u| !protected(lib, u)).take(excess).collect();
-        library::drop_items(lib, &gone, now).map(drop)
+        library::drop_items(lib, &gone).map(drop)
     })
 }

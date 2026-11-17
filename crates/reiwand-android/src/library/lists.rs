@@ -4,13 +4,10 @@ use reiwand_library::{Item, Library, Rules};
 use serde_json::{Value, json};
 use std::collections::HashSet;
 
-pub(crate) fn remove(lib: &mut Library, uids: &[String], now: i64) -> Result<Value, Error> {
+pub(crate) fn remove(lib: &mut Library, uids: &[String]) -> Result<Value, Error> {
     let refs = known(lib, uids);
-    let hashes = lib.hashed()?.into_iter().filter(|(i, _)| refs.contains(&i.uid.as_str()));
-    let removed: Vec<String> = hashes.map(|(_, hash)| reiwand_sync::removed_blob(&hash)).collect();
     let items = lib.remove_items(&refs)?;
     crate::keeping::forget(lib, &items)?;
-    crate::state::forget(removed, now * 1000)?;
     items.iter().try_for_each(store::forget)?;
     items.iter().for_each(crate::converted::forget);
     let gone = |o: &reiwand_core::config::OutputConfig| {
@@ -29,17 +26,12 @@ pub(crate) fn remove(lib: &mut Library, uids: &[String], now: i64) -> Result<Val
 }
 
 pub(super) fn playlists(lib: &Library, now: i64) -> Result<Value, Error> {
-    let (config, away) = (settings::config(), crate::away::within(lib));
+    let config = settings::config();
     let on = |uid: &str, screen: &str| config.resolve(screen).playlist.as_deref() == Some(uid);
     let listed = lib.playlists()?.into_iter().map(|p| {
         let count = lib.playlist_items(&p.uid, now)?.len();
         let (home, lock) = (on(&p.uid, ""), on(&p.uid, crate::choice::LOCK));
-        let away: Vec<Value> = away
-            .iter()
-            .filter(|a| a.playlists.contains(&p.uid))
-            .map(|a| json!({ "key": a.key, "title": a.title, "repo": a.repo.clone().unwrap_or_default() }))
-            .collect();
-        Ok(json!({ "count": count, "current": home || lock, "home": home, "lock": lock, "playlist": p, "away": away }))
+        Ok(json!({ "count": count, "current": home || lock, "home": home, "lock": lock, "playlist": p }))
     });
     Ok(Value::Array(listed.collect::<Result<_, Error>>()?))
 }
