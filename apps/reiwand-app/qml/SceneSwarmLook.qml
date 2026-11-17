@@ -109,4 +109,10 @@ GridLayout {
         tools: look.tools
         focal: look.focal
     }
+
+    SceneSwarmTilt {
+        Layout.columnSpan: 2
+        Layout.fillWidth: true
+        tools: look.tools
+    }
 }

@@ -21244,3 +21244,51 @@ msgstr "Piso"
 #: apps/reiwand-app/qml/facade/SceneValues.qml
 msgid "Relative"
 msgstr "Relativo"
+
+#: apps/reiwand-app/qml/facade/SceneLabels.qml
+msgid "Projected"
+msgstr "Proyectada"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Trail from the speed without perspective"
+msgstr "Estela por la velocidad sin perspectiva"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Trail follows the motion on screen"
+msgstr "La estela sigue el movimiento en pantalla"
+
+#: apps/reiwand-app/qml/SceneSwarmDrops.qml
+msgid "Nearest drop: %1 px"
+msgstr "Gota más cercana: %1 px"
+
+#: apps/reiwand-app/qml/SceneSwarmDrops.qml
+msgid "Farthest drop: %1 px"
+msgstr "Gota más lejana: %1 px"
+
+#: apps/reiwand-app/qml/SceneSwarmTilt.qml
+msgid "Turn about the horizontal line"
+msgstr "Giro sobre la línea horizontal"
+
+#: apps/reiwand-app/qml/SceneSwarmTilt.qml
+msgid "Turn about the vertical line"
+msgstr "Giro sobre la línea vertical"
+
+#: apps/reiwand-app/qml/SceneSwarmTilt.qml
+msgid "Spin about the horizontal line, per second"
+msgstr "Giro continuo sobre la línea horizontal, por segundo"
+
+#: apps/reiwand-app/qml/SceneSwarmTilt.qml
+msgid "Spin about the vertical line, per second"
+msgstr "Giro continuo sobre la línea vertical, por segundo"
+
+#: apps/reiwand-app/qml/SceneSwarmTilt.qml
+msgid "From %1"
+msgstr "Desde %1"
+
+#: apps/reiwand-app/qml/SceneSwarmTilt.qml
+msgid "To %1"
+msgstr "Hasta %1"
+
+#: apps/reiwand-app/qml/SceneSwarmTilt.qml
+msgid "Turn sprites in depth"
+msgstr "Girar los sprites en profundidad"

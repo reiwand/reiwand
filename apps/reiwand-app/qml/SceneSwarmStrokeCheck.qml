@@ -24,6 +24,11 @@ QtObject {
         tools.load();
         if (render().stretch.mode !== "relative" || tools.info.stretch.mode !== "relative")
             throw new Error("stretch: the mode selector did not set the relative mode: " + JSON.stringify(render()));
+        const depth = find("stretchDepth");
+        depth.activated(1);
+        tools.load();
+        if (render().stretch.depth !== "projected" || tools.info.stretch.depth !== "projected")
+            throw new Error("stretch: the depth selector did not set the projected depth: " + JSON.stringify(render()));
         const max = find("stretch_max");
         max.value = 3;
         max.moved();
@@ -33,6 +38,21 @@ QtObject {
         on.toggled();
         if (render()?.stretch !== undefined)
             throw new Error("stretch: switching it off left the stretch");
+        const turn = find("tiltOn");
+        turn.checked = true;
+        turn.toggled();
+        const init = () => JSON.parse(page.editor.value("/scene/particles/flakes/init") || "null");
+        if (JSON.stringify(init()?.tilt?.angle) !== "[[0,0],[0,0]]" || !find("tiltSprite0.5"))
+            throw new Error("tilt: switching it on did not write zero ranges or draw the preview: " + JSON.stringify(init()?.tilt));
+        const high = find("tilt_angle11");
+        high.value = 60;
+        high.moved();
+        if (init().tilt.angle[1][1] !== 60)
+            throw new Error("tilt: the slider did not write the angle: " + JSON.stringify(init().tilt));
+        turn.checked = false;
+        turn.toggled();
+        if (init()?.tilt !== undefined)
+            throw new Error("tilt: switching it off left the tilt");
         find("waveAdd").clicked();
         tools.load();
         if (tools.info.waves.length !== 1 || tools.info.waves[0].from !== "floor")

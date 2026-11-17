@@ -205,7 +205,7 @@ Cambia los valores con que nace cada partícula. Cada rango es `[mínimo, máxim
 | Argumento | Tipo | Qué significa |
 |---|---|---|
 | `system` | texto | (obligatorio) Id del sistema. |
-| `ranges` | objeto | Rangos que cambian: `life` (segundos de vida), `speed` (píxeles por segundo), `angle` (grados, 0 hacia la derecha), `size` (píxeles), `rotation`, `spin` (grados por segundo), `frame` (primer cuadro de una hoja de imágenes), `color` (dos colores que se mezclan al azar), `alpha` (opacidad), `velocity` (`[[vx0,vy0],[vx1,vy1]]`, en lugar de `speed` y `angle`), `radial` (velocidad que se aleja del centro de la forma), `depth` y `depth_speed` (necesitan perspectiva), y uno solo de `hsv` (`{"hue":[0,360],"steps":6,"sat":[a,b],"val":[a,b]}`), `palette` (`{"colors":[...],"noise":[h,s,v]}`) o `gradient` (paradas `[t, color]`), que reemplazan a `color`. |
+| `ranges` | objeto | Rangos que cambian: `life` (segundos de vida), `speed` (píxeles por segundo), `angle` (grados, 0 hacia la derecha), `size` (píxeles), `rotation`, `spin` (grados por segundo), `frame` (primer cuadro de una hoja de imágenes), `color` (dos colores que se mezclan al azar), `alpha` (opacidad), `velocity` (`[[vx0,vy0],[vx1,vy1]]`, en lugar de `speed` y `angle`), `radial` (velocidad que se aleja del centro de la forma), `depth` y `depth_speed` (necesitan perspectiva), `tilt` (`{"angle":[[xmin,ymin],[xmax,ymax]],"spin":[[xmin,ymin],[xmax,ymax]]}`, giro en profundidad; se quita con `clear: ["tilt"]`), y uno solo de `hsv` (`{"hue":[0,360],"steps":6,"sat":[a,b],"val":[a,b]}`), `palette` (`{"colors":[...],"noise":[h,s,v]}`) o `gradient` (paradas `[t, color]`), que reemplazan a `color`. |
 | `clear` | lista de textos | Rangos que se quitan: `alpha`, `velocity`, `radial`, `hsv`, `palette` o `gradient`. |
 
 ```sh
@@ -428,7 +428,7 @@ Ajusta cómo se dibujan las partículas. Solo cambia lo que nombras.
 |---|---|---|
 | `system` | texto | (obligatorio) Id del sistema. |
 | `layer` | texto | Capa de partículas a la que vale. |
-| `stretch` | cualquier valor JSON | Cuánto se estira cada partícula en la dirección en que se mueve: `{"mode": "add", "time": s, "min": px, "max": px}`: segundos de movimiento y el mínimo y el máximo; con `add` se suman píxeles al lado, con `relative` el largo es el lado por `clamp(time·velocidad, min, max)` (mínimo y máximo en veces el lado, puede ser menor que el lado). Los cuatro campos son obligatorios; `"none"` lo quita. |
+| `stretch` | cualquier valor JSON | Cuánto se estira cada partícula en la dirección en que se mueve: `{"mode": "add", "depth": "flat", "time": s, "min": px, "max": px}`: segundos de movimiento y el mínimo y el máximo; con `add` se suman píxeles al lado, con `relative` el largo es el lado por `clamp(time·velocidad, min, max)` (mínimo y máximo en veces el lado, puede ser menor que el lado). `depth` es `flat` (estela por la velocidad sin perspectiva) o `projected` (la estela sigue el movimiento en pantalla). Los cinco campos son obligatorios; `"none"` lo quita. |
 | `frames` | texto | Cómo avanzan los cuadros de una hoja de imágenes: `time` (con el tiempo), `life` (con la vida) o `random`; `none` lo quita. |
 | `fps` | número | Cuadros por segundo con `frames` en `time`. |
 | `mix` | sí/no | Si es `true`, funde cada cuadro con el siguiente. |
@@ -438,7 +438,7 @@ Ajusta cómo se dibujan las partículas. Solo cambia lo que nombras.
 
 ```sh
 reiwand-ctl scene act mi-escena add_layer '{"kind":"particles","id":"chispas"}'
-reiwand-ctl scene act mi-escena particles '{"render":{"system":"chispas","stretch":{"mode":"add","time":0.05,"min":0,"max":60},"frames":"life","fps":12,"mix":true,"brightness":2,"cycles":2,"order":"newest"}}'
+reiwand-ctl scene act mi-escena particles '{"render":{"system":"chispas","stretch":{"mode":"add","depth":"flat","time":0.05,"min":0,"max":60},"frames":"life","fps":12,"mix":true,"brightness":2,"cycles":2,"order":"newest"}}'
 reiwand-ctl scene act mi-escena particles '{"render":{"system":"chispas","stretch":"none","frames":"none","cycles":0,"order":"none"}}'
 ```
 

@@ -14,12 +14,14 @@ GridLayout {
     readonly property var fresh: ({
             "add": {
                 "mode": "add",
+                "depth": "flat",
                 "time": 0.05,
                 "min": 0,
                 "max": 60
             },
             "relative": {
                 "mode": "relative",
+                "depth": "flat",
                 "time": 0.05,
                 "min": 0,
                 "max": 10
@@ -30,6 +32,7 @@ GridLayout {
     function put(change, gesture) {
         const value = Object.assign({
                 "mode": info.mode,
+                "depth": info.depth,
                 "time": info.time,
                 "min": info.min,
                 "max": info.max
@@ -61,8 +64,21 @@ GridLayout {
         currentIndex: stretch.relative ? 1 : 0
         onActivated: index => stretch.tools.edit("render", {
                 "stretch": Object.assign({}, stretch.fresh[stretch.modes[index]], {
+                    "depth": stretch.info.depth,
                     "time": stretch.info.time
                 })
+            })
+    }
+
+    QQC2.ComboBox {
+        objectName: "stretchDepth"
+        Layout.columnSpan: 2
+        Layout.fillWidth: true
+        visible: stretch.info !== null
+        model: [App.tr("Trail from the speed without perspective"), App.tr("Trail follows the motion on screen")]
+        currentIndex: stretch.info?.depth === "projected" ? 1 : 0
+        onActivated: index => stretch.put({
+                "depth": index === 1 ? "projected" : "flat"
             })
     }
 
@@ -159,5 +175,11 @@ GridLayout {
             anchors.margins: Kirigami.Units.smallSpacing
             text: App.tr("%1 px long at %2 px/s, side %3 px", Math.round(preview.span * 10) / 10, Math.round(stretch.info?.speed ?? 0), Math.round(preview.side * 10) / 10)
         }
+    }
+
+    SceneSwarmDrops {
+        Layout.columnSpan: 2
+        Layout.fillWidth: true
+        drops: stretch.info?.drops ?? []
     }
 }

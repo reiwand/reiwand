@@ -46,7 +46,10 @@ const OWN: [&str; 31] = [
 
 fn source() -> String {
     let lit = include_str!("lit.wgsl").replace("@group(2)", "@group(3)");
-    prefixed(&[include_str!("sprite.wgsl"), include_str!("../lamps.wgsl"), &lit].join("\n"))
+    prefixed(
+        &[include_str!("sprite.wgsl"), include_str!("tilt.wgsl"), include_str!("../lamps.wgsl"), &lit]
+            .join("\n"),
+    )
 }
 
 fn prefixed(src: &str) -> String {

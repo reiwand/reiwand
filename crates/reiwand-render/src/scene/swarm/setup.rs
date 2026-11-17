@@ -114,6 +114,7 @@ impl Swarms {
                     reiwand_scene::STAGES_WGSL,
                     PLAIN,
                     include_str!("sprite.wgsl"),
+                    include_str!("tilt.wgsl"),
                     include_str!("ribbon.wgsl"),
                     include_str!("cord.wgsl"),
                     include_str!("../lamps.wgsl"),

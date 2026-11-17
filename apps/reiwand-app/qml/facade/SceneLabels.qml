@@ -9,6 +9,8 @@ QtObject {
             "curve": App.tr("Curve"),
             "duration_ms": App.tr("Duration"),
             "target": App.tr("Target"),
+            "flat": App.tr("Flat"),
+            "projected": App.tr("Projected"),
             "templates": App.tr("Templates"),
             "text": App.tr("Text"),
             "texture": App.tr("Texture"),

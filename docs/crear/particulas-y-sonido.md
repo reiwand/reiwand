@@ -162,6 +162,7 @@ número, `[mín, máx, exponente]` (de 0,1 a 10), el azar se inclina hacia un ex
 | `offset_noise` | | Un desplazamiento fractal del lugar de nacimiento. |
 | `remap` | | Hasta 8 reglas que llevan una entrada (`life`, `speed`, `age`, `daytime`, `runtime`, `random`, `distance:pN`, `audio:<banda>`, `cursor:x`, `cursor:y`) a un valor inicial (`output`: `size`, `alpha`, `color`, `speed`, `life`, `rotation`, `spin`, `frame`) con `in`, `out`, `op` (`set`, `mul`, `add`, `sub`) y `wave` (`none`, `sine`, `noise`). |
 | `depth`, `depth_speed` | | Profundidad inicial y su cambio, en píxeles; necesitan `perspective`. |
+| `tilt` | | Giro en profundidad: `{ "angle": [[xmin, ymin], [xmax, ymax]], "spin": [[xmin, ymin], [xmax, ymax]] }`, ambos obligatorios, en grados y grados por segundo. Cada partícula gira sobre la línea horizontal (x) y la vertical (y) de su propio sprite y se dibuja con el ancho por el coseno de y y el alto por el del giro en x: un pétalo se ve de canto y de frente al caer. Con `perspective` el borde cercano se ve mayor; con `lit` la luz usa la normal girada. El dorso muestra la misma imagen. |
 
 Los extremos de los rangos numéricos (`life`, `speed`, `angle`, `size`...) pueden seguir valores,
 como `"size": [2, { "audio": "bass", "scale": 8 }]`; se leen en cada fotograma. Los colores y las
@@ -212,7 +213,7 @@ Hasta 8 colisionadores, cada uno `{ "bounds", "bounce", "friction", "kill", "sti
 | `size_over_life` | Lista de `[t, valor]` (hasta 64): multiplica el tamaño. | En el panel de partículas, «A lo largo de la vida de una partícula» da una curva para arrastrar los puntos y, para el color, una barra de degradado.
 | `color_over_life` | Lo mismo, con colores. |
 | `brightness` | 0 a 16, puede seguir un valor. |
-| `stretch` | `{ "mode", "time", "min", "max" }`, los cuatro obligatorios: `add` suma píxeles al lado (mínimo y máximo en píxeles); `relative` multiplica el lado (mínimo y máximo en veces el lado, así puede quedar más corta que el lado). |
+| `stretch` | `{ "mode", "depth", "time", "min", "max" }`, los cinco obligatorios (`depth`: `flat` calcula la estela con la velocidad sin perspectiva; `projected` la multiplica por la cercanía de la partícula, así las gotas cercanas llevan estelas largas y las lejanas cortas, como su movimiento en pantalla; con `relative` no cambia nada porque ya sigue el lado proyectado): `add` suma píxeles al lado (mínimo y máximo en píxeles); `relative` multiplica el lado (mínimo y máximo en veces el lado, así puede quedar más corta que el lado). |
 | `trail` | Una estela: `length` (1 a 16 pasos, o hasta 64 con `segments`), `width` (0 a 1), `segments`, `subdivide` (0 a 7), `uv_scale`, `uv_scroll`, `textured`. |
 | `rope` | Une las partículas en una tira, por orden de nacimiento: `width`, `subdivide`, `smooth`, `uv_scale`, `uv_scroll`. |
 | `order` | Cuál se dibuja encima: `newest`, `oldest`, `largest`, `smallest` o `lowest`. |
