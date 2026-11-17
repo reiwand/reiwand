@@ -58,7 +58,7 @@ por su nombre y te lleva a ella. Esc vuelve un paso.
 ## Conseguir más fondos
 
 - Explorar muestra los fondos de los repositorios que tienes. Instalarlos es un clic.
-- «Repositorios…» (o «Añadir por enlace…») añade un repositorio pegando su dirección.
+- «Agregar un repositorio» (en Explorar y en «Repositorios…») añade uno pegando su dirección.
 - Fuentes trae fotos de internet (Bing, NASA, Wikimedia y otras) y las rota solas.
 - «Añadir fondos…» en la Biblioteca suma archivos tuyos; también puedes soltarlos sobre la ventana.
 

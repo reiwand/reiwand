@@ -7,6 +7,7 @@ Kirigami.ScrollablePage {
 
     property var repos: []
     property string error
+    property var accounts: []
     readonly property bool examples: repos.some(r => r.bundled)
     readonly property alias link: link
     readonly property alias list: list
@@ -18,6 +19,17 @@ Kirigami.ScrollablePage {
             page.repos = reply.repos;
             page.error = "";
         }, error => page && (page.error = error.message));
+        App.query("List", [], "Accounts1", reply => page && (page.accounts = reply.accounts), () => page && (page.accounts = []));
+    }
+
+    function accountOf(repo) {
+        const clean = url => String(url).replace(/\/+$/, "");
+        const found = accounts.find(a => a.repos.some(r => r.repo_id === repo.repo_id || clean(r.url) === clean(repo.url)));
+        return found ? found.label || found.user : "";
+    }
+
+    function offer(url) {
+        adder.offer(url);
     }
 
     function name(repo) {
@@ -51,7 +63,7 @@ Kirigami.ScrollablePage {
         target: App.backend
 
         function onChanged(topic) {
-            if (topic === "repos")
+            if (topic === "repos" || topic === "accounts")
                 page.load();
         }
     }
@@ -66,7 +78,7 @@ Kirigami.ScrollablePage {
         Fila {
             id: link
 
-            text: App.tr("Add by link…")
+            text: App.tr("Add a repository")
             kind: "pliega"
             enabled: !App.cut
             explain: App.tr("Paste the address of a repository of yours or someone else's")
@@ -94,6 +106,7 @@ Kirigami.ScrollablePage {
 
                 width: parent.width
                 repo: modelData
+                account: page.accountOf(modelData)
                 name: page.name(modelData)
             }
         }

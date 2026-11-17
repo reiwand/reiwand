@@ -62,7 +62,7 @@ QtObject {
     }
 
     function addExamples(onFailed) {
-        act("AddExamples", [], "Repos1", () => {}, failed => onFailed(failed.name === "io.github.reiwand.Error.NotFound" ? tr("This installation brings no example wallpapers. Add a repository with its link to find more.") : failed.message));
+        act("AddExamples", [], "Repos1", () => {}, failed => onFailed(failed.name === "io.github.reiwand.Error.NotFound" ? tr("This installation brings no example wallpapers. Add a repository with its address to find more.") : failed.message));
     }
 
     function addProvider(id, kind, options, secret, onDone, onError) {

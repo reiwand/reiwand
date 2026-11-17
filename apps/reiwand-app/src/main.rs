@@ -1,3 +1,4 @@
+mod addlink;
 mod app;
 mod args;
 mod backend;

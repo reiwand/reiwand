@@ -390,3 +390,25 @@ URL coincide con el origen y el prefijo de ruta del repositorio al que está vin
 origen. Un `401` con `account_needed` en el índice firmado hace fallar el alta con `AccountNeeded`
 (`dbus.md`), cuyo mensaje lista las cuentas conocidas en ese servidor. Los tokens viven en el
 almacén de secretos, un elemento `account <id>` por cuenta; `accounts.json` no guarda ninguno.
+
+## Agregar un repositorio en la app de escritorio
+
+Un solo botón, «Agregar un repositorio», siempre visible en Explorar y al comienzo de la página
+Repositorios. Abre un cuadro con un campo para la dirección y «Agregar» (Intro en el campo hace lo
+mismo; Esc cierra). La respuesta del demonio decide lo que sigue:
+
+- Público: se agrega, el cuadro se cierra y un aviso lo dice.
+- `AccountNeeded`: el cuadro pide cuenta. Lista «Usar la cuenta X» por cada cuenta conocida de ese
+  servidor (`Accounts1.List`; flechas y Intro eligen; `Accounts1.Use` y se vuelve a agregar) y
+  «Usar otra cuenta» (o «Iniciar sesión» si no hay ninguna), que llama a `Accounts1.SignIn`, muestra
+  el código y la dirección de aprobación y agrega solo cuando el trabajo de inicio de sesión termina.
+- `CertificateUnknown`: «Este servidor usa su propio certificado», con la huella y «Confiar y
+  agregar» (`Repos1.AddTrusting`).
+- `NotARepository`: «Es la dirección de un servidor»; lista las direcciones que trae el error, cada
+  una se elige con clic o Intro y se agrega.
+- `CertificateChanged` y `SignatureChanged`: aviso, no se agrega nada.
+
+La página Repositorios marca con «Requiere atención» los repositorios con `signature_changed` o
+`certificate_changed` y dice la cuenta que usa cada repositorio privado (`Accounts1.List`).
+El esquema `reiwand://add?url=<dirección>` abre Explorar con el cuadro y la dirección puestos; una
+dirección vacía, con caracteres de control o de más de 2048 bytes se ignora.

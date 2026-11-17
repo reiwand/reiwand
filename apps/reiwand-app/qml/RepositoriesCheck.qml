@@ -37,6 +37,23 @@ QtObject {
         expect(bundled.row.text === App.tr("Examples") && !bundled.remove.visible, "the examples must keep their name and cannot be removed");
         expect(home.row.text === "Home" && home.row.note === "casa.example" && home.row.statusTone === "coral", "a failing repository must show its host and its trouble");
         expect(page.examples, "with the examples present there is nothing to add back");
+        page.accounts = [{
+                "id": "a1",
+                "user": "reader",
+                "label": "reader@casa.example",
+                "repos": [{
+                        "url": "https://casa.example/fondos/",
+                        "repo_id": null
+                    }]
+            }];
+        page.repos = [page.repos[0], Object.assign({}, page.repos[1], {
+                "last_error": null,
+                "warnings": ["signature_changed"]
+            })];
+        const warned = page.list.itemAt(1);
+        expect(warned.row.statusTone === "coral" && warned.row.status === App.tr("Needs a look"), "a changed signature must mark the repository");
+        expect(warned.row.note === "casa.example · reader@casa.example", "a private repository must name its account: " + warned.row.note);
+        expect(page.link.text === App.tr("Add a repository"), "the page must offer the same entry as Explore");
         page.repos = [page.repos[1]];
         expect(!page.examples, "without the examples the page must offer them again");
         const shown = Qt.createComponent("RepoAddress.qml").createObject(page, {

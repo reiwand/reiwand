@@ -16133,10 +16133,6 @@ msgstr "Nevada"
 msgid "Chosen"
 msgstr "Elegida"
 
-#: apps/reiwand-app/qml/Quitable.qml
-msgid "Remove the filter %1"
-msgstr "Quitar el filtro %1"
-
 #: apps/reiwand-app/qml/Seleccion.qml
 msgctxt "covers"
 msgid "%1 chosen"
@@ -19335,8 +19331,8 @@ msgid "Choose where to start: the first thing that enters your library becomes y
 msgstr "Elige por dónde empezar: lo primero que entre en tu biblioteca queda de fondo."
 
 #: apps/reiwand-app/qml/facade/App.qml
-msgid "This installation brings no example wallpapers. Add a repository with its link to find more."
-msgstr "Esta instalación no trae fondos de ejemplo. Añade un repositorio con su enlace para encontrar más."
+msgid "This installation brings no example wallpapers. Add a repository with its address to find more."
+msgstr "Esta instalación no trae fondos de ejemplo. Agrega un repositorio con su dirección para encontrar más."
 
 #: apps/reiwand-app/qml/Ahora.qml apps/reiwand-app/qml/AhoraCheck.qml
 msgid "You have not set any wallpaper yet"
@@ -19902,12 +19898,12 @@ msgid "Back to Explore"
 msgstr "Volver a Explorar"
 
 #: apps/reiwand-app/qml/ExploreBar.qml
-msgid "Do you have wallpapers elsewhere? Add a repository with its link."
-msgstr "¿Tienes fondos en otro sitio? Añade un repositorio con su enlace."
+msgid "Do you have wallpapers elsewhere? Add a repository with its address."
+msgstr "¿Tienes fondos en otro sitio? Agrega un repositorio con su dirección."
 
 #: apps/reiwand-app/qml/ExploreBar.qml apps/reiwand-app/qml/RepositoriesPage.qml
-msgid "Add by link…"
-msgstr "Añadir por enlace…"
+msgid "Add a repository"
+msgstr "Agregar un repositorio"
 
 #: apps/reiwand-app/qml/ExploreBar.qml
 msgid "Search the repositories"
@@ -19918,8 +19914,6 @@ msgid "See the shelf"
 msgstr "Ver estante"
 
 #: apps/reiwand-app/qml/RepoAddLink.qml
-msgid "Add by link"
-msgstr "Añadir por enlace"
 
 #: apps/reiwand-app/qml/RepoAddLink.qml
 msgid "Example: https://casa.example/fondos"
@@ -19998,8 +19992,8 @@ msgid "No repositories"
 msgstr "No hay repositorios"
 
 #: apps/reiwand-app/qml/ReposPage.qml
-msgid "The bundled examples were removed. Add them again, or add a repository with its link."
-msgstr "Quitaste los ejemplos incluidos. Vuelve a añadirlos, o añade un repositorio con su enlace."
+msgid "The bundled examples were removed. Add them again, or add a repository with its address."
+msgstr "Quitaste los ejemplos incluidos. Vuelve a añadirlos, o agrega un repositorio con su dirección."
 
 #: apps/reiwand-app/qml/ExploreUpper.qml
 msgid "1 hidden by your content filter"
@@ -20695,3 +20689,75 @@ msgstr "Exportación de la configuración"
 #: apps/reiwand-app/qml/facade/LabelWords.qml
 msgid "Configuration import"
 msgstr "Importación de la configuración"
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "Repository added."
+msgstr "Repositorio agregado."
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "Checking the repository…"
+msgstr "Comprobando el repositorio…"
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "This repository is private"
+msgstr "Este repositorio es privado"
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "This server uses its own certificate"
+msgstr "Este servidor usa su propio certificado"
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "This is the address of a server"
+msgstr "Es la dirección de un servidor"
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "Approve the sign-in in your browser"
+msgstr "Aprueba el inicio de sesión en tu navegador"
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "It was not added"
+msgstr "No se agregó"
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "Use one of your accounts on %1 or sign in with another one."
+msgstr "Usa una de tus cuentas en %1 o inicia sesión con otra."
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "Sign in with an account of %1 to open it."
+msgstr "Inicia sesión con una cuenta de %1 para abrirlo."
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "Its fingerprint is %1. Add it only if you trust this server: the fingerprint is then remembered for this server alone."
+msgstr "Su huella es %1. Agrégalo solo si confías en este servidor: la huella se recuerda solo para ese servidor."
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "Pick one of its repositories."
+msgstr "Elige uno de sus repositorios."
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "Open this address and enter the code. The repository is added once you approve."
+msgstr "Abre esta dirección e introduce el código. El repositorio se agrega cuando lo apruebes."
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "Use the account %1"
+msgstr "Usar la cuenta %1"
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "Use another account"
+msgstr "Usar otra cuenta"
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "Trust and add"
+msgstr "Confiar y agregar"
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "Open in the browser"
+msgstr "Abrir en el navegador"
+
+#: apps/reiwand-app/qml/RepoAddLink.qml
+msgid "Account · %1"
+msgstr "Cuenta · %1"
+
+#: apps/reiwand-app/qml/RepoAddAnswer.qml apps/reiwand-app/qml/RepoAddCheck.qml
+msgid "Sign in"
+msgstr "Iniciar sesión"

@@ -32,12 +32,9 @@ Kirigami.Page {
     }
 
     function exercise() {
-        Qt.createComponent("ExploreCheck.qml").createObject(page, {
-            "page": page
-        }).exercise();
-        Qt.createComponent("ExploreMenuCheck.qml").createObject(page, {
-            "page": page
-        }).exercise();
+        ["ExploreCheck", "RepoAddCheck", "ExploreMenuCheck"].forEach(name => Qt.createComponent(name + ".qml").createObject(page, {
+                "page": page
+            }).exercise());
     }
 
     function flip() {
@@ -105,7 +102,7 @@ Kirigami.Page {
 
             visible: page.catalog.loaded && page.catalog.repos.length === 0
             title: App.tr("No repositories")
-            text: App.tr("The bundled examples were removed. Add them again, or add a repository with its link.")
+            text: App.tr("The bundled examples were removed. Add them again, or add a repository with its address.")
             action: App.tr("Add the examples again")
             actionIcon: "arrow-counter-clockwise"
             onActed: catalog.examples()

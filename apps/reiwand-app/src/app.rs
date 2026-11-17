@@ -29,8 +29,8 @@ pub fn page(name: Option<&str>) -> Option<&'static str> {
 }
 
 pub fn start(uris: Vec<String>, page: Option<&str>) -> Option<ExitCode> {
-    if let Some(page) = page {
-        bus::request(page, None);
+    if let Some(page) = page.map(String::from).or_else(|| crate::addlink::page(&uris)) {
+        bus::request(&page, None);
     }
     if bus::checking() {
         set_link(Ok(Daemon::Fixtures));
@@ -168,8 +168,12 @@ impl Application {
     }
 
     fn open(&self, uris: Vec<String>, platform_data: HashMap<String, OwnedVariant>) {
+        let add = crate::addlink::page(&uris);
         spawn(open(uris));
-        publish(Event::Activate(String::new(), token(&platform_data)));
+        match add {
+            Some(page) => bus::request(&page, token(&platform_data)),
+            None => publish(Event::Activate(String::new(), token(&platform_data))),
+        }
     }
 
     fn activate_action(

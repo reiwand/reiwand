@@ -7,6 +7,8 @@ Column {
 
     required property var repo
     required property string name
+    property string account
+    readonly property bool warned: details.repo.warnings.some(w => ["signature_changed", "certificate_changed"].includes(w))
     readonly property bool broken: !!repo.broken || !!repo.last_error
     readonly property alias row: row
     readonly property alias remove: remove
@@ -20,10 +22,10 @@ Column {
         width: parent.width
         text: details.name
         kind: "despliega"
-        note: details.repo.bundled ? App.tr("Included on this computer") : (/^[a-z]+:\/\/([^/?#]+)/i.exec(details.repo.url) ?? ["", details.repo.url])[1]
+        note: details.repo.bundled ? App.tr("Included on this computer") : (/^[a-z]+:\/\/([^/?#]+)/i.exec(details.repo.url) ?? ["", details.repo.url])[1] + (details.account !== "" ? " · " + details.account : "")
         number: String(details.repo.packages)
-        status: details.broken ? App.tr("Needs a look") : details.repo.stale ? App.tr("Out of date") : App.tr("Up to date")
-        statusTone: details.broken ? "coral" : details.repo.stale ? "ambar" : "brote"
+        status: details.broken || details.warned ? App.tr("Needs a look") : details.repo.stale ? App.tr("Out of date") : App.tr("Up to date")
+        statusTone: details.broken || details.warned ? "coral" : details.repo.stale ? "ambar" : "brote"
     }
 
     Column {
@@ -45,13 +47,18 @@ Column {
                 required property var modelData
 
                 text: Labels.value(modelData)
-                tone: "ambar"
+                tone: ["signature_changed", "certificate_changed"].includes(modelData) ? "coral" : "ambar"
                 icon: "warning"
             }
         }
 
         BrowseTerm {
             text: App.tr("Last check · %1", details.repo.checked ? App.time(details.repo.checked) : App.tr("never"))
+        }
+
+        BrowseTerm {
+            visible: details.account !== ""
+            text: App.tr("Account · %1", details.account)
         }
 
         BrowseTerm {

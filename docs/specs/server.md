@@ -260,8 +260,9 @@ solo aparecen, marcados como «Privado», a quien inició sesión en la web y ti
 (los administradores y moderadores ven todos).
 
 «Abrir en Reiwand» es un enlace `reiwand://add?url=<dirección codificada como componente de URL>`:
-la aplicación de escritorio lo registrará como manejador del esquema `reiwand`; el parámetro `url`
-es la dirección que acepta «Agregar un repositorio». La aplicación nunca lista repositorios a partir
+la aplicación de escritorio es el manejador del esquema `reiwand` (`x-scheme-handler/reiwand` en su
+archivo `.desktop`): abre Explorar con el cuadro «Agregar un repositorio» y la dirección puesta, sin
+agregar nada hasta que la persona pulse «Agregar». El parámetro `url` es la dirección que acepta ese cuadro. La aplicación nunca lista repositorios a partir
 de la dirección de un servidor pegada: esa lista vive aquí.
 
 Cada repositorio tiene su catálogo en `/r/<nombre>/` (búsqueda, filtros y paginación como antes) y

@@ -9,10 +9,11 @@ Row {
     property bool full
     property bool roomy: true
     readonly property real room: parent ? parent.width : 0
-    readonly property real others: [filter, hint, link, toggle].filter(item => item.visible).reduce((sum, item) => sum + item.width + spacing, 0)
+    readonly property real others: [filter, hint, link, off, toggle].filter(item => item.visible).reduce((sum, item) => sum + item.width + spacing, 0)
     readonly property alias filter: filter
     readonly property alias search: search
     readonly property alias link: link
+    readonly property alias off: off
     readonly property alias adder: adder
     readonly property alias toggle: toggle
 
@@ -36,7 +37,7 @@ Row {
 
         anchors.verticalCenter: parent.verticalCenter
         visible: App.cut || (bar.catalog.lone && bar.roomy)
-        text: App.cut ? App.tr("Private mode: the network is cut.") : App.tr("Do you have wallpapers elsewhere? Add a repository with its link.")
+        text: App.cut ? App.tr("Private mode: the network is cut.") : App.tr("Do you have wallpapers elsewhere? Add a repository with its address.")
         font.family: Look.letraTexto
         font.pixelSize: Look.tPie
         color: Look.bruma
@@ -46,10 +47,20 @@ Row {
         id: link
 
         anchors.verticalCenter: parent.verticalCenter
-        visible: bar.catalog.lone || App.cut
-        text: App.cut ? App.tr("Turn off") : App.tr("Add by link…")
-        icon.name: App.cut ? "" : "link-simple"
-        onClicked: App.cut ? App.act("SetOption", ["network.private", "false"], "Daemon1") : adder.open()
+        text: App.tr("Add a repository")
+        icon.name: "link-simple"
+        onClicked: adder.open()
+        Keys.onReturnPressed: clicked()
+        Keys.onEnterPressed: clicked()
+    }
+
+    QQC2.Button {
+        id: off
+
+        anchors.verticalCenter: parent.verticalCenter
+        visible: App.cut
+        text: App.tr("Turn off")
+        onClicked: App.act("SetOption", ["network.private", "false"], "Daemon1")
         Keys.onReturnPressed: clicked()
         Keys.onEnterPressed: clicked()
     }

@@ -1,4 +1,5 @@
-use super::{iface, literals, qml, qml_files};
+use super::ifaces::iface;
+use super::{literals, qml, qml_files};
 use crate::methods::METHODS;
 use crate::service::SERVICE;
 use std::path::Path;

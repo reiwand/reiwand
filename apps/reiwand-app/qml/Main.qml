@@ -69,9 +69,18 @@ Kirigami.ApplicationWindow {
         Qt.callLater(() => shell && shell.arrive());
     }
 
+    function offer(page) {
+        if (!page.startsWith("add:"))
+            return false;
+        reach(4);
+        Qt.callLater(() => pageStack.currentItem?.bar?.adder?.offer(page.slice(4)));
+        return true;
+    }
+
     function activate(page) {
         const index = names.indexOf(page);
-        if (index >= 0 && index !== current && pageStack.currentItem?.editor?.dirty !== true)
+        const unsaved = pageStack.currentItem?.editor?.dirty === true;
+        if (!unsaved && !offer(page) && index >= 0 && index !== current)
             reach(index);
         if (visibility === Window.Minimized)
             showNormal();
@@ -85,7 +94,8 @@ Kirigami.ApplicationWindow {
     pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
     Component.onCompleted: {
         size.restore();
-        reach(Math.max(0, names.indexOf(App.backend.requested())));
+        const requested = App.backend.requested();
+        offer(requested) || reach(Math.max(0, names.indexOf(requested)));
         loadInputs();
     }
     Frame {

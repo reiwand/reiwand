@@ -60,8 +60,13 @@ Para qué sirve: instalar fondos de los repositorios.
   «Desinstalar…».
 - **Detalles** dice autores, versión, permisos que pide y, si tienes servidor, deja votar a favor
   o en contra.
-- **Repositorios…** abre la lista de repositorios; «Añadir por enlace…» añade uno pegando su
-  dirección. Los ejemplos incluidos no necesitan conexión.
+- **Repositorios…** abre la lista de repositorios; «Agregar un repositorio» (siempre visible en
+  Explorar y al comienzo de esa lista) añade uno pegando su dirección. Si es privado, el cuadro pide
+  una cuenta: «Usar la cuenta X» o «Iniciar sesión» (se aprueba en el navegador). Si el servidor usa
+  su propio certificado, muestra su huella y «Confiar y agregar». Si pegas la dirección de un
+  servidor, lista sus repositorios para elegir. Un enlace `reiwand://add?url=…` abre el cuadro con la
+  dirección puesta; nada se agrega hasta que pulses «Agregar». Los ejemplos incluidos no necesitan
+  conexión.
 - **Buscar novedades** y **Actualizar mis fondos** traen lo nuevo.
 - **Más** reúne las herramientas para quien publica: «Subir un paquete…» y «Repositorio estático…».
 - Si un repositorio falla, la tarjeta lo dice («No hay conexión con …», «La firma no coincide») y

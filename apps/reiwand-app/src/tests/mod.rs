@@ -8,6 +8,7 @@ mod following;
 mod gone;
 mod grid;
 mod icons;
+mod ifaces;
 mod keys;
 mod labels;
 mod landing;
@@ -65,11 +66,6 @@ pub fn private_bus() -> (Child, TempDir, String) {
     let mut address = String::new();
     BufReader::new(bus.stdout.take().unwrap()).read_line(&mut address).unwrap();
     (bus, dir, address.trim().to_owned())
-}
-
-pub fn iface(line: &str) -> &'static str {
-    let ifaces = ["Library1", "Playlists1", "Profiles1", "Providers1", "Repos1", "Inputs1", "Sync1", "Rgb1"];
-    ifaces.into_iter().find(|i| line.contains(&format!("\"{i}\""))).unwrap_or("Daemon1")
 }
 
 pub fn literals<'a>(text: &'a str, call: &str) -> Vec<&'a str> {
