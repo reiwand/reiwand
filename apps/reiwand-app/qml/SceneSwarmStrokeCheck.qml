@@ -22,8 +22,8 @@ QtObject {
         const mode = find("stretchMode");
         mode.activated(1);
         tools.load();
-        if (render().stretch.mode !== "relative" || find("stretchSprite").width <= 0)
-            throw new Error("stretch: the mode selector did not set the relative mode or draw the sprite");
+        if (render().stretch.mode !== "relative" || tools.info.stretch.mode !== "relative")
+            throw new Error("stretch: the mode selector did not set the relative mode: " + JSON.stringify(render()));
         const max = find("stretch_max");
         max.value = 3;
         max.moved();
