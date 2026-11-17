@@ -9,7 +9,7 @@ Aviso {
     property bool dismissed: false
 
     function load() {
-        App.query("GetStatus", [], "Sync1", reply => notice && (notice.phase = reply.account ? reply.account.state : ""));
+        notice.phase = "";
     }
 
     text: App.tr("This computer can no longer sync: the server no longer accepts it, because it was removed from the account or the account was deleted.")

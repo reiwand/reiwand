@@ -28,6 +28,10 @@ msgstr "Seguir en movimiento"
 msgid "Sync now"
 msgstr "Sincronizar ahora"
 
+#: apps/reiwand-app/qml/AccountCodes.qml
+msgid "Approve another device"
+msgstr "Aprobar otro equipo"
+
 #: apps/reiwand-app/qml/AccountMore.qml
 msgid "Restore with the recovery passphrase…"
 msgstr "Recuperar con la frase de recuperación…"
@@ -11846,6 +11850,116 @@ msgstr "Borrar datos"
 msgid "%1 MB"
 msgstr "%1 MB"
 
+#: apps/reiwand-app/qml/WordMenu.qml
+msgid "Lists"
+msgstr "Listas"
+
+#: apps/reiwand-app/qml/WordMenu.qml
+msgid "Sections"
+msgstr "Secciones"
+
+#: apps/reiwand-app/qml/WorkFrame.qml
+msgid "Back to %1"
+msgstr "Volver a %1"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "never synced"
+msgstr "nunca sincronizado"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "synced just now"
+msgstr "sincronizado hace un momento"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "synced %1 min ago"
+msgstr "sincronizado hace %1 min"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "synced %1 h ago"
+msgstr "sincronizado hace %1 h"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "synced %1"
+msgstr "sincronizado %1"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "Connected to %1"
+msgstr "Conectado a %1"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "Server added · this computer is not connected yet"
+msgstr "Servidor añadido · este equipo todavía no está conectado"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "Open %1 and enter the code %2"
+msgstr "Abre %1 y escribe el código %2"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "Waiting for the approval of the code"
+msgstr "Esperando la aprobación del código"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "Connected · not syncing"
+msgstr "Conectado · sin sincronizar"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "waiting for the key"
+msgstr "esperando la clave"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "sync paused"
+msgstr "sincronización en pausa"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "the last sync failed"
+msgstr "falló la última sincronización"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "This computer can no longer sync"
+msgstr "Este equipo ya no puede sincronizar"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "not encrypted"
+msgstr "sin cifrar"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid "encrypted"
+msgstr "cifrado"
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid ""
+"Connect this computer to the server first. Connecting alone sends nothing of "
+"your library."
+msgstr ""
+"Conecta primero este equipo al servidor. Conectar por sí solo no envía nada "
+"de tu biblioteca."
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid ""
+"Connected, not syncing: you browse and install from the server, and nothing "
+"of your library leaves this computer. Turn it on to keep your devices the "
+"same."
+msgstr ""
+"Conectado, sin sincronizar: exploras e instalas desde el servidor, y nada de "
+"tu biblioteca sale de este equipo. Actívala para mantener tus equipos "
+"iguales."
+
+#: apps/reiwand-app/qml/facade/AccountWords.qml
+msgid ""
+"Your devices keep the same things, encrypted: the server cannot read them. "
+"Pausing deletes nothing; resume whenever you like."
+msgstr ""
+"Tus equipos guardan lo mismo, cifrado: el servidor no puede leerlo. Pausarla "
+"no borra nada; la retomas cuando quieras."
+
+#: apps/reiwand-app/qml/facade/App.qml
+msgid ""
+"This installation brings no example wallpapers. Add a repository with its "
+"link to find more."
+msgstr ""
+"Esta instalación no trae fondos de ejemplo. Añade un repositorio con su "
+"enlace para encontrar más."
+
 #: apps/reiwand-app/qml/facade/App.qml
 msgid "%1 KB"
 msgstr "%1 KB"
@@ -16069,10 +16183,6 @@ msgstr "Menú"
 msgid "back"
 msgstr "volver"
 
-#: apps/reiwand-app/qml/WorkFrame.qml
-msgid "Back to %1"
-msgstr "Volver a %1"
-
 #: apps/reiwand-app/qml/AccountQr.qml apps/reiwand-app/qml/AhoraTarea.qml
 #: apps/reiwand-app/qml/Aviso.qml apps/reiwand-app/qml/BrowseOwn.qml
 #: apps/reiwand-app/qml/CreateCopy.qml apps/reiwand-app/qml/ItemCopy.qml
@@ -16093,10 +16203,6 @@ msgstr "Explorar"
 msgid "Your wallpaper is still %1"
 msgstr "Tu fondo sigue siendo %1"
 
-#: apps/reiwand-app/qml/WordMenu.qml
-msgid "Lists"
-msgstr "Listas"
-
 #: apps/reiwand-app/qml/ProvidersPage.qml apps/reiwand-app/qml/SourcesNow.qml
 #: apps/reiwand-app/qml/WordMenu.qml
 msgid "Sources"
@@ -16107,10 +16213,6 @@ msgstr "Fuentes"
 #: apps/reiwand-app/qml/WordMenu.qml
 msgid "Create"
 msgstr "Crear"
-
-#: apps/reiwand-app/qml/WordMenu.qml
-msgid "Sections"
-msgstr "Secciones"
 
 #: apps/reiwand-app/qml/TitleFrame.qml
 msgid "Example picture: “%1”, one of the bundled scenes"
@@ -18840,10 +18942,6 @@ msgid "Remove the recovery passphrase?"
 msgstr "¿Quitar la frase de recuperación?"
 
 #: apps/reiwand-app/qml/AccountCodes.qml
-msgid "Approve another device"
-msgstr "Aprobar otro equipo"
-
-#: apps/reiwand-app/qml/AccountCodes.qml
 msgid "Code shown by the new device"
 msgstr "Código que muestra el equipo nuevo"
 
@@ -19042,82 +19140,6 @@ msgstr "La última sincronización se detuvo con este error."
 #: apps/reiwand-app/qml/AccountFiles.qml
 msgid "Remove %1 from the server?"
 msgstr "¿Quitar %1 del servidor?"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "never synced"
-msgstr "nunca sincronizado"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "synced just now"
-msgstr "sincronizado hace un momento"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "synced %1 min ago"
-msgstr "sincronizado hace %1 min"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "synced %1 h ago"
-msgstr "sincronizado hace %1 h"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "synced %1"
-msgstr "sincronizado %1"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "Connected to %1"
-msgstr "Conectado a %1"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "Server added · this computer is not connected yet"
-msgstr "Servidor añadido · este equipo todavía no está conectado"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "Open %1 and enter the code %2"
-msgstr "Abre %1 y escribe el código %2"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "Waiting for the approval of the code"
-msgstr "Esperando la aprobación del código"
-
-#: apps/reiwand-app/qml/AccountCheck.qml apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "Connected · not syncing"
-msgstr "Conectado · sin sincronizar"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "waiting for the key"
-msgstr "esperando la clave"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "sync paused"
-msgstr "sincronización en pausa"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "the last sync failed"
-msgstr "falló la última sincronización"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "This computer can no longer sync"
-msgstr "Este equipo ya no puede sincronizar"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "not encrypted"
-msgstr "sin cifrar"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "encrypted"
-msgstr "cifrado"
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "Connect this computer to the server first. Connecting alone sends nothing of your library."
-msgstr "Conecta primero este equipo al servidor. Conectar por sí solo no envía nada de tu biblioteca."
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "Connected, not syncing: you browse and install from the server, and nothing of your library leaves this computer. Turn it on to keep your devices the same."
-msgstr "Conectado, sin sincronizar: exploras e instalas desde el servidor, y nada de tu biblioteca sale de este equipo. Actívala para mantener tus equipos iguales."
-
-#: apps/reiwand-app/qml/facade/AccountWords.qml
-msgid "Your devices keep the same things, encrypted: the server cannot read them. Pausing deletes nothing; resume whenever you like."
-msgstr "Tus equipos guardan lo mismo, cifrado: el servidor no puede leerlo. Pausarla no borra nada; la retomas cuando quieras."
 
 #: apps/reiwand-app/qml/AccountMain.qml
 msgctxt "sync of the library"

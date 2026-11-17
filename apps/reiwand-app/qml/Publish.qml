@@ -49,7 +49,7 @@ Rectangle {
         if (!shown && result !== null)
             restart();
         reload();
-        App.query("GetStatus", [], "Sync1", reply => publish && (publish.account = reply.account ?? null), () => publish && (publish.account = null));
+        publish.account = null;
         sign.refresh();
         shown = true;
         review.refresh();

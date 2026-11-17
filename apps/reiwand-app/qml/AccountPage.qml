@@ -49,12 +49,8 @@ Kirigami.Page {
         }, backHint]
 
     function load() {
-        App.query("GetStatus", [], "Sync1", reply => {
-            if (!page)
-                return;
-            page.account = reply.account;
-            page.error = "";
-        }, error => page && (page.error = error.message));
+        page.account = null;
+        page.error = "";
     }
 
     function call(member, args) {
@@ -96,12 +92,6 @@ Kirigami.Page {
         const from = level;
         level = "";
         Qt.callLater(() => page && shown.item && shown.item.enter && shown.item.enter(from));
-    }
-
-    function exercise() {
-        Qt.createComponent("AccountCheck.qml").createObject(page, {
-            "page": page
-        }).run();
     }
 
     title: App.tr("Account")
