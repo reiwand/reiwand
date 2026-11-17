@@ -170,14 +170,13 @@ pub(super) fn edit(doc: &Value, e: &S) -> Result<Vec<Op>> {
             if let Some(o) = order.as_deref().filter(|o| *o != "none") {
                 parsed::<reiwand_scene::Stack>(&json!(o), "order")?;
             }
-            stretch.iter().try_for_each(|s| parsed::<reiwand_scene::Stretch>(s, "stretch"))?;
+            super::streaks::checked(stretch.as_ref())?;
             if let Some(f) = frames.as_deref().filter(|f| *f != "none") {
                 parsed::<Frames>(&json!(f), "frames")?;
             }
             render(doc, &system(doc, s)?, layer.as_deref(), |d, at| {
                 look(d, at, |r| {
-                    let on = |s: &&Value| s["time"].as_f64().unwrap_or(0.0) != 0.0;
-                    stretch.iter().for_each(|s| keep(r, "stretch", Some(s.clone()).filter(|s| on(&s))));
+                    stretch.iter().for_each(|s| keep(r, "stretch", Some(s.clone()).filter(|s| s != "none")));
                     frames.iter().for_each(|f| keep(r, "frames", (f != "none").then(|| json!(f))));
                     fps.iter().for_each(|f| keep(r, "fps", Some(json!(f))));
                     mix.iter().for_each(|m| keep(r, "mix", m.then_some(json!(true))));

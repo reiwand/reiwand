@@ -42,14 +42,17 @@ fn reach(r: f32, f: vec4<f32>) -> f32 {
     return x[min(kind, 2u)];
 }
 
-fn wobble(p: Particle, k: u32, a: f32) -> vec3<f32> {
+fn wobble(p: Particle, k: u32, a: f32) -> vec4<f32> {
     let f = sim.forces[k * 4u + 1u];
     let g = sim.forces[k * 4u + 2u];
     let key = KEY + 64u + 3u * k;
     let freq = lerp(f.x, f.y, rand(p.id, key));
-    let amp = lerp(f.z, f.w, rand(p.id, key + 1u)) * window(sim.forces[k * 4u + 3u], clamp(a / p.life, 0.0, 1.0));
+    let fade = window(sim.forces[k * 4u + 3u], clamp(a / p.life, 0.0, 1.0));
+    let amp = lerp(f.z, f.w, rand(p.id, key + 1u)) * fade;
     let turn = TAU * (freq * a + lerp(g.x, g.y, rand(p.id, key + 2u)));
-    return vec3<f32>(amp * sin(turn), amp * sin(turn + TAU / 4.0), amp);
+    let peak = lerp(f.z, f.w, rand(p.id, KEY + 128u + k));
+    let floor = lerp(1.0, f.z + (peak - f.z) * (sin(turn) + 1.0) * 0.5, fade);
+    return vec4<f32>(amp * sin(turn), amp * sin(turn + TAU / 4.0), amp, floor);
 }
 
 fn follow(p: ptr<function, Particle>) {

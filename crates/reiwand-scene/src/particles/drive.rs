@@ -1,5 +1,5 @@
 use super::points::Room;
-use super::{Falloff, Force, MAX_FORCES2, Sim, System, Target, Wobble};
+use super::{Base, Falloff, Force, MAX_FORCES2, Sim, System, Target, Wobble};
 use crate::resolve::Context;
 
 pub(super) const NONE: [f32; 4] = [0.0; 4];
@@ -53,7 +53,7 @@ pub(super) fn forces(sim: &mut Sim, s: &System, room: &Room, cx: &Context) {
                 let [mx, my] = w.mask.unwrap_or([1.0; 2]);
                 let (f, g) =
                     ([w.freq[0], w.freq[1], w.scale[0], w.scale[1]], [w.phase[0], w.phase[1], mx, my]);
-                ([8.0, what, 0.0, 0.0], f, g)
+                ([8.0, what, f32::from(u8::from(w.from == Base::Floor)), 0.0], f, g)
             }
             Force::Cap(v) => ([9.0, v.get(cx), 0.0, 0.0], NONE, NONE),
             Force::Torque(v) => ([10.0, v.get(cx), 0.0, 0.0], NONE, NONE),

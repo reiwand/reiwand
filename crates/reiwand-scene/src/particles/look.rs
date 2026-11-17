@@ -27,8 +27,8 @@ pub struct Render {
     pub size_over_life: Vec<[f32; 2]>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub color_over_life: Vec<(f32, Color)>,
-    #[serde(skip_serializing_if = "Stretch::is_off")]
-    pub stretch: Stretch,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stretch: Option<Stretch>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trail: Option<Trail>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -80,7 +80,7 @@ impl Default for Render {
             mix: false,
             size_over_life,
             color_over_life,
-            stretch: Stretch::default(),
+            stretch: None,
             trail,
             brightness,
             cutout,

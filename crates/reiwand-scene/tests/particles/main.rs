@@ -12,6 +12,7 @@ mod longseek;
 mod scheduled;
 mod steering;
 mod strands;
+mod strokes;
 mod validated;
 mod walls;
 

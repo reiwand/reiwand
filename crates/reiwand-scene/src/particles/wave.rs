@@ -27,13 +27,15 @@ pub(super) fn reach(r: f32, f: [f32; 4]) -> f32 {
     [1.0, r / (r * r).max(1.0), 1.0 / (r * r).max(1.0)][kind.min(2) as usize]
 }
 
-pub(super) fn wobble(p: &Particle, s: &Sim, k: usize, a: f32) -> [f32; 3] {
+pub(super) fn wobble(p: &Particle, s: &Sim, k: usize, a: f32) -> [f32; 4] {
     let (f, g, w) = (s.forces[4 * k + 1], s.forces[4 * k + 2], s.forces[4 * k + 3]);
     let r = |j: u32| rand(s.ids[0], p.id, KEY + 64 + 3 * k as u32 + j);
     let (freq, amp, phase) = (lerp(f[0], f[1], r(0)), lerp(f[2], f[3], r(1)), lerp(g[0], g[1], r(2)));
-    let amp = amp * window(w, (a / p.life).clamp(0.0, 1.0));
+    let fade = window(w, (a / p.life).clamp(0.0, 1.0));
     let turn = TAU * (freq * a + phase);
-    [amp * turn.sin(), amp * (turn + TAU / 4.0).sin(), amp]
+    let peak = lerp(f[2], f[3], rand(s.ids[0], p.id, KEY + 128 + k as u32));
+    let floor = lerp(1.0, f[2] + (peak - f[2]) * (turn.sin() + 1.0) * 0.5, fade);
+    [fade * amp * turn.sin(), fade * amp * (turn + TAU / 4.0).sin(), fade * amp, floor]
 }
 
 fn noise(seed: u32, p: [f32; 2]) -> f32 {

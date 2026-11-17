@@ -16,6 +16,7 @@ mod shapes;
 mod sow;
 mod spots;
 mod steers;
+mod streaks;
 mod tend;
 mod view;
 mod walls;

@@ -68,13 +68,13 @@ fn children_curves_and_the_render_look_are_edited() {
     );
     edit(&mut p, "over", json!({"size": []})).unwrap();
     assert!(system(&p)["render"].get("size_over_life").is_none());
-    let look = json!({"stretch": {"time": 0.1, "max": 40}, "frames": "random", "fps": 8, "mix": true, "brightness": 3});
+    let look = json!({"stretch": {"mode": "add", "time": 0.1, "min": 0, "max": 40}, "frames": "random", "fps": 8, "mix": true, "brightness": 3});
     edit(&mut p, "render", look).unwrap();
     let r = &system(&p)["render"];
     assert_eq!((&r["frames"], &r["brightness"], &r["mix"]), (&json!("random"), &json!(3.0), &json!(true)));
     assert!(edit(&mut p, "render", json!({"brightness": 40})).is_err());
     assert!(edit(&mut p, "render", json!({"frames": "sometimes"})).is_err());
-    edit(&mut p, "render", json!({"stretch": {"time": 0}, "frames": "none", "mix": false})).unwrap();
+    edit(&mut p, "render", json!({"stretch": "none", "frames": "none", "mix": false})).unwrap();
     let r = &system(&p)["render"];
     assert!(r.get("stretch").is_none() && r.get("frames").is_none() && r.get("mix").is_none());
 }

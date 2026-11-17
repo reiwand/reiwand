@@ -66,7 +66,7 @@ fn families_agree_on_gpu_and_cpu() {
         "rain": { "capacity": 600, "seed": 4, "space": "world",
             "emitters": [{ "shape": { "box": { "from": [0, 0], "to": [160, 10], "inner": [100, 4] } }, "rate": 300, "periodic": { "on": [0.3, 0.6], "off": [0.1, 0.2] } }],
             "init": { "life": [0.4, 0.8, 2], "speed": [20, 40], "angle": [80, 100], "size": [2, 3], "palette": { "colors": ["#ffffff", "#88aaff"], "noise": [0.1, 0.1, 0.1] } },
-            "forces": [{ "gravity": [0, 80] }, { "oscillate": { "what": "position", "freq": [1, 2], "scale": [2, 4] } }, { "cap": 90, "window": [0, 0.2, 1, 1] }],
+            "forces": [{ "gravity": [0, 80] }, { "oscillate": { "what": "position", "from": "top", "freq": [1, 2], "scale": [2, 4] } }, { "cap": 90, "window": [0, 0.2, 1, 1] }],
             "collide": [{ "bounds": "canvas", "kill": true }],
             "children": [{ "system": "splash", "on": "death", "probability": 0.5 }, { "system": "mist", "on": "follow" }] },
         "splash": { "capacity": 900, "emitters": [{ "shape": { "point": [0, 0] }, "bursts": [{ "count": 4 }] }],

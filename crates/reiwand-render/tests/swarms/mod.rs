@@ -15,6 +15,7 @@ mod looks;
 mod shone;
 mod sources;
 mod steered;
+mod strokes;
 mod strung;
 mod timed;
 

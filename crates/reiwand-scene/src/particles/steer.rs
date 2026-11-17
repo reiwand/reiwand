@@ -20,10 +20,18 @@ pub enum Wobble {
     Size,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum Base {
+    Top,
+    Floor,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Oscillate {
     pub what: Wobble,
+    pub from: Base,
     #[schemars(extend("x-unit" = "Hz"))]
     pub freq: [f32; 2],
     pub scale: [f32; 2],

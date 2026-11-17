@@ -83,7 +83,7 @@
         { "attractor": { "target": "p1", "strength": 200, "radius": 300, "falloff": "linear" } },
         { "vortex": {"axis": [0, 0, 1],  "center": [960, 540], "strength": 50, "inner": 10, "outer": 400, "ring": { "radius": 200, "width": 40, "pull": 2 } } },
         { "turbulence": { "strength": 20, "scale": 0.01, "speed": 2, "time_scale": 0.5, "mask": [1, 0] } },
-        { "oscillate": { "what": "alpha", "freq": [0.5, 2], "scale": [0.2, 0.6], "phase": [0, 1] } },
+        { "oscillate": { "what": "alpha", "from": "top", "freq": [0.5, 2], "scale": [0.2, 0.6], "phase": [0, 1] } },
         { "cap": 400 }, { "torque": 10 }, { "spin_drag": 0.5 },
         { "slow_near": { "target": "cursor", "inner": 10, "outer": 100, "factor": 0.2 } },
         { "keep_distance": { "target": "p0", "distance": 300, "strength": 1 } },
@@ -99,7 +99,7 @@
       ],
       "render": {
         "texture": "spark", "frames": "life", "cycles": 3, "brightness": 4, "cutout": [0.2, 0.8, 1],
-        "stretch": { "time": 0.1, "min": 2, "max": 40 }, "rope": { "subdivide": 3, "width": 6 },
+        "stretch": { "mode": "add", "time": 0.1, "min": 2, "max": 40 }, "rope": { "subdivide": 3, "width": 6 },
         "trail": { "length": 32, "width": 0.5, "segments": 16, "textured": true },
         "orient": "fixed", "angle": 90, "normal": "drops", "lit": true, "refract": { "normal": "drops", "amount": 0.3 },
         "shader": "sparkle"

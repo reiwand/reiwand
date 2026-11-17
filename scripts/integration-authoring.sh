@@ -21,7 +21,7 @@ ctl scene act "$craft" particles '{"start": {"ranges": {"color": ["#ffffff", "#8
 ctl scene act "$craft" particles '{"start": {"clear": ["velocity"], "system": "dust"}}' || fail "the velocity range was not cleared"
 ctl scene act "$craft" particles '{"force": {"force": {"gravity": [0, 40]}, "system": "dust"}}' || fail "no gravity was added"
 ctl scene act "$craft" particles '{"force": {"force": {"drag": 0.2}, "index": 0, "system": "dust"}}' || fail "the force was not replaced"
-ctl scene act "$craft" particles '{"force": {"force": {"oscillate": {"freq": [1, 2], "scale": [0.5, 1], "what": "size"}}, "system": "dust"}}' || fail "no swing was added"
+ctl scene act "$craft" particles '{"force": {"force": {"oscillate": {"from": "top", "freq": [1, 2], "scale": [0.5, 1], "what": "size"}}, "system": "dust"}}' || fail "no swing was added"
 ctl scene act "$craft" particles '{"force": {"force": {"attractor": {"falloff": "linear", "strength": 30, "target": [40, 30]}}, "system": "dust"}}' || fail "no attractor was added"
 ctl scene act "$craft" particles '{"force": {"force": {"turbulence": {"scale": 0.01, "strength": 10}}, "system": "dust"}}' || fail "no turbulence was added"
 ctl scene act "$craft" particles '{"force": {"index": 1, "remove": true, "system": "dust"}}' || fail "the force was not removed"
@@ -33,7 +33,7 @@ ctl scene act "$craft" particles '{"child": {"child": {"max": 3, "on": "spawn", 
 ctl scene act "$craft" particles '{"child": {"index": 0, "remove": true, "system": "dust"}}' || fail "the child was not removed"
 ctl scene act "$craft" particles '{"over": {"size": [[0, 1], [0.5, 2], [1, 0]], "system": "dust"}}' || fail "the size over life was not set"
 ctl scene act "$craft" particles '{"over": {"color": [[0, "#ffffff"], [1, "#ff000000"]], "system": "dust"}}' || fail "the color over life was not set"
-ctl scene act "$craft" particles '{"render": {"brightness": 2.5, "fps": 8, "frames": "random", "mix": true, "stretch": {"max": 40, "min": 2, "time": 0.1}, "system": "dust"}}' ||
+ctl scene act "$craft" particles '{"render": {"brightness": 2.5, "fps": 8, "frames": "random", "mix": true, "stretch": {"max": 40, "min": 2, "mode": "add", "time": 0.1}, "system": "dust"}}' ||
   fail "the look of the particles was not set"
 ctl scene act "$craft" particles '{"create": {"system": "lone"}}' || fail "no lone system was created"
 ctl scene act "$craft" particles '{"delete": {"system": "lone"}}' || fail "a lone system was not deleted"

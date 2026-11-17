@@ -19,15 +19,20 @@ pub struct Trail {
     pub textured: bool,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum StretchMode {
+    Add,
+    Relative,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Stretch {
-    #[serde(default)]
+    pub mode: StretchMode,
     pub time: f32,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub min: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub max: Option<f32>,
+    pub min: f32,
+    pub max: f32,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -40,12 +45,6 @@ pub struct Rope {
     pub uv_scale: f32,
     pub uv_scroll: f32,
     pub smooth: bool,
-}
-
-impl Stretch {
-    pub(super) fn is_off(&self) -> bool {
-        *self == Stretch::default()
-    }
 }
 
 impl Default for Rope {

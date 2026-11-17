@@ -116,6 +116,8 @@ pub fn heard(dir: &Path, doc: &Value, system: &str, layer: Option<&str>, (t, sou
         "outputs": ["size", "alpha", "color", "speed", "life", "rotation", "spin", "frame"],
         "domains": looks::domains(),
         "cutout": looks::cutout(render),
+        "stretch": super::streaks::stretch(s, render),
+        "waves": super::streaks::waves(s),
         "orient": { "mode": render.get("orient").unwrap_or(&json!("screen")), "angle": render["angle"].as_f64().unwrap_or(0.0) },
         "children": children.collect::<Vec<_>>(),
         "shaders": looks::shaders(doc, dir, render),

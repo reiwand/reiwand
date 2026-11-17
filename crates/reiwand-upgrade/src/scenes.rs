@@ -1,4 +1,4 @@
-use serde_json::{Value, json};
+use serde_json::{Map, Value, json};
 use std::fs;
 use std::path::Path;
 
@@ -32,15 +32,37 @@ fn scene(path: &Path) -> anyhow::Result<bool> {
     Ok(true)
 }
 
+fn fill(map: &mut Map<String, Value>, fields: &[(&str, Value)]) -> bool {
+    let mut done = false;
+    for (name, value) in fields {
+        if !map.contains_key(*name) {
+            map.insert((*name).into(), value.clone());
+            done = true;
+        }
+    }
+    done
+}
+
 fn give(v: &mut Value) -> bool {
     match v {
         Value::Object(map) => {
             let mut done = false;
-            if matches!(map.get("kind").and_then(Value::as_str), Some("vortex" | "around"))
-                && !map.contains_key("axis")
-            {
-                map.insert("axis".into(), json!([0, 0, 1]));
-                done = true;
+            for (key, inner) in map.iter_mut() {
+                let Some(fields) = inner.as_object_mut() else { continue };
+                done |= match key.as_str() {
+                    "vortex" | "around" => fill(fields, &[("axis", json!([0, 0, 1]))]),
+                    "oscillate" => fill(fields, &[("from", json!("top"))]),
+                    "stretch" => fill(
+                        fields,
+                        &[
+                            ("mode", json!("add")),
+                            ("time", json!(0)),
+                            ("min", json!(0)),
+                            ("max", json!(10000)),
+                        ],
+                    ),
+                    _ => false,
+                };
             }
             for inner in map.values_mut() {
                 done |= give(inner);

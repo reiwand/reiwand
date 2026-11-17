@@ -90,19 +90,19 @@ pub use crate::outside::{
 };
 pub use crate::package::shader_line;
 pub use crate::particles::{
-    Area, Around, Bake, Between, Boids, Bow, Burst, CPU_BOIDS, CPU_PARTICLES, Carry, Census, Child, Cloud,
-    Collider, ControlPoint, Cue, EVENT, EmitShape, Emitter, Falloff, Flock, Follow, Force, Frames, Handle,
-    Hsv, Inheritable, Init, Instance, KeepBetween, KeepDistance, Kept, MAX_BOIDS, MAX_BURSTS, MAX_CHILDREN,
-    MAX_COLLIDERS, MAX_COLLIDERS2, MAX_CONTROL, MAX_CURVE, MAX_DEPTH as MAX_GENERATIONS, MAX_EMIT,
-    MAX_EMITTERS, MAX_EMITTERS2, MAX_FIELD, MAX_FORCES, MAX_FORCES2, MAX_HATCH, MAX_LONG, MAX_PALETTE,
-    MAX_PARTS, MAX_POINTS, MAX_PREWARM, MAX_PREWARM2, MAX_REMAPS, MAX_ROPE, MAX_STOPS, MAX_TRAIL, Moment,
-    OffsetNoise, Operator, Orient, Oscillate, PARTICLE_EVENTS, Palette, Part, Particle, Periodic,
-    Perspective, Placement, Play, REMAP_INPUTS, ROPE_POINTS, Refract, Refresh, Remap, RemapOp, RemapOutput,
-    Render, Ring, Rope, STEP, SUBSTEPS, Sim, SlowNear, Source, Spread, Stack, Strand, Stretch, Surface,
-    Swarm, Sweep, System, Taper, Target, Trail, Tunable, Turbulent, WARM, WARM_WORK, Wall, Wave, Wobble, bin,
-    cells, distance_field, fbm, flocks, fractal, gradient, hash, largest, mark, noise1, particle_salt,
-    remap_input, remap_table, remapped, ring_point, seen, stacked, strung, swirl, taper, toward_axis,
-    turbulent_ray, turn,
+    Area, Around, Bake, Base, Between, Boids, Bow, Burst, CPU_BOIDS, CPU_PARTICLES, Carry, Census, Child,
+    Cloud, Collider, ControlPoint, Cue, EVENT, EmitShape, Emitter, Falloff, Flock, Follow, Force, Frames,
+    Handle, Hsv, Inheritable, Init, Instance, KeepBetween, KeepDistance, Kept, MAX_BOIDS, MAX_BURSTS,
+    MAX_CHILDREN, MAX_COLLIDERS, MAX_COLLIDERS2, MAX_CONTROL, MAX_CURVE, MAX_DEPTH as MAX_GENERATIONS,
+    MAX_EMIT, MAX_EMITTERS, MAX_EMITTERS2, MAX_FIELD, MAX_FORCES, MAX_FORCES2, MAX_HATCH, MAX_LONG,
+    MAX_PALETTE, MAX_PARTS, MAX_POINTS, MAX_PREWARM, MAX_PREWARM2, MAX_REMAPS, MAX_ROPE, MAX_STOPS,
+    MAX_TRAIL, Moment, OffsetNoise, Operator, Orient, Oscillate, PARTICLE_EVENTS, Palette, Part, Particle,
+    Periodic, Perspective, Placement, Play, REMAP_INPUTS, ROPE_POINTS, Refract, Refresh, Remap, RemapOp,
+    RemapOutput, Render, Ring, Rope, STEP, SUBSTEPS, Sim, SlowNear, Source, Spread, Stack, Strand, Stretch,
+    StretchMode, Surface, Swarm, Sweep, System, Taper, Target, Trail, Tunable, Turbulent, WARM, WARM_WORK,
+    Wall, Wave, Wobble, bin, cells, distance_field, fbm, flocks, fractal, gradient, hash, largest, mark,
+    noise1, particle_salt, remap_input, remap_table, remapped, ring_point, seen, stacked, strung, swirl,
+    taper, toward_axis, turbulent_ray, turn,
 };
 pub use crate::passage::shader::{MAX_TRANSITION_UNITS, transition_shader};
 pub use crate::passage::{

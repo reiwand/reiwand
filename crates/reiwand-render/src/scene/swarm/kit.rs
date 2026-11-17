@@ -3,7 +3,7 @@ use crate::Renderer;
 use crate::scene::Image;
 use crate::scene::item::linear;
 use bytemuck::{Pod, Zeroable};
-use reiwand_scene::{Frames, Render, Scene, Stack};
+use reiwand_scene::{Frames, Render, Scene, Stack, Stretch, StretchMode};
 
 #[repr(C)]
 #[derive(Clone, Copy, Pod, Zeroable)]
@@ -76,17 +76,12 @@ pub(super) fn kit(
     };
     let tone = |c: [f32; 4]| if srgb { c } else { [linear(c[0]), linear(c[1]), linear(c[2]), c[3]] };
     let flag = |b: bool| f32::from(u8::from(b));
-    let stretch = render.stretch;
+    let stretch = render.stretch.unwrap_or(Stretch { mode: StretchMode::Add, time: 0.0, min: 0.0, max: 0.0 });
     let look = Look {
         tint: [1.0, flag(srgb), 1.0, flag(image.is_some())],
         atlas: [atlas[1] as f32, atlas[0] as f32, frames, render.fps],
-        trail: [stretch.time, 0.0, 0.0, flag(render.mix)],
-        shade: [
-            1.0,
-            render.cycles.unwrap_or(1) as f32,
-            stretch.min.unwrap_or(0.0),
-            stretch.max.unwrap_or(1e9),
-        ],
+        trail: [stretch.time, flag(stretch.mode == StretchMode::Relative), 0.0, flag(render.mix)],
+        shade: [1.0, render.cycles.unwrap_or(1) as f32, stretch.min, stretch.max],
         extra: [flag(!cells.is_empty()), 0.0, 0.0, render.trail.as_ref().map_or(1.0, |t| t.width)],
         cut: render.cutout.map_or([0.0, 1.0, 1.0, 0.0], |[a, b, o]| [a, b, o, 1.0]),
         turn: turn(render),

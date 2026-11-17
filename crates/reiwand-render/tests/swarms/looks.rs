@@ -108,7 +108,7 @@ fn rect_frames_gradients_and_layer_renders_match_their_reference() {
     let streak = still(
         [10.0, 60.0],
         json!({ "init": { "life": [30, 30], "velocity": [[60, 0], [60, 0]], "size": [6, 6] },
-        "render": { "stretch": { "time": 0.2, "min": 4, "max": 30 } } }),
+        "render": { "stretch": { "mode": "add", "time": 0.2, "min": 4, "max": 30 } } }),
     );
     let systems =
         json!({ "red": sprite(20.0, 0.0), "green": sprite(140.0, 1.0), "mixed": mixed, "streak": streak });

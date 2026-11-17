@@ -17,6 +17,7 @@ mod owns;
 mod reaches;
 mod scopes;
 mod sows;
+mod streaks;
 mod targets;
 mod tends;
 

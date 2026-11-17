@@ -68,10 +68,10 @@ fn pull(p: ptr<function, Particle>, k: u32, t: f32, dt: f32, g: ptr<function, Pu
                     (*g).shift += (next.xy - now.xy) * b.zw;
                 }
                 case 1u: {
-                    (*g).look.x *= clamp(1.0 - 0.5 * (next.z + next.x), 0.0, 1.0);
+                    (*g).look.x *= clamp(select(1.0 - 0.5 * (next.z + next.x), next.w, f.z > 0.5), 0.0, 1.0);
                 }
                 default: {
-                    (*g).look.y *= max(1.0 + next.x, 0.0);
+                    (*g).look.y *= max(select(1.0 + next.x, next.w, f.z > 0.5), 0.0);
                 }
             }
         }

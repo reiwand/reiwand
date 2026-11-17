@@ -33,7 +33,7 @@ pub fn kit(name: &str, [w, h]: [f64; 2]) -> Result<Value> {
             "init": {"life": [1.2, 1.8], "speed": [900, 1200], "angle": [78, 84], "size": [2, 3],
                 "color": ["#a8c4e8", "#7fa3d1"]},
             "collide": fall(h),
-            "render": {"stretch": {"time": 4}}}),
+            "render": {"stretch": {"mode": "add", "time": 0.04, "min": 0, "max": 80}}}),
         "dust" => json!({"capacity": 800, "prewarm": 12,
             "emitters": [{"shape": {"box": {"from": [0, 0], "to": [w, h]}}, "rate": 20}],
             "init": {"life": [8, 14], "speed": [3, 12], "angle": [0, 360], "size": [2, 5], "alpha": [0.3, 0.7],

@@ -1,4 +1,4 @@
-use super::{MAX_CURVE, Render};
+use super::{MAX_CURVE, Render, StretchMode};
 use crate::effects::Stage;
 use crate::validate::{Check, Issue};
 
@@ -7,8 +7,7 @@ impl Check<'_> {
         let wide = r.brightness.is_some()
             || r.order.is_some()
             || r.cycles.is_some()
-            || r.stretch.min.is_some()
-            || r.stretch.max.is_some();
+            || r.stretch.is_some_and(|s| s.mode == StretchMode::Relative || s.min > 0.0 || s.max < 1e4);
         self.uses(wide, "particles2");
         r.brightness.iter().for_each(|b| self.number(&format!("{p}/brightness"), b, 0.0, 16.0));
         if let Some(n) = r.cycles {
@@ -17,9 +16,10 @@ impl Check<'_> {
                 self.issues.push(Issue::Type(format!("{p}/cycles")));
             }
         }
-        let [lo, hi] = [r.stretch.min.unwrap_or(0.0), r.stretch.max.unwrap_or(1e4)];
-        self.range(&format!("{p}/stretch/min"), lo, 0.0, 1e4);
-        self.range(&format!("{p}/stretch/max"), hi, lo, 1e4);
+        if let Some(s) = r.stretch {
+            self.range(&format!("{p}/stretch/min"), s.min, 0.0, 1e4);
+            self.range(&format!("{p}/stretch/max"), s.max, s.min, 1e4);
+        }
         if let Some([start, end, opacity]) = r.cutout {
             self.uses(true, "particle_looks");
             self.range(&format!("{p}/cutout/0"), start, 0.0, 1.0);
@@ -75,7 +75,9 @@ impl Check<'_> {
             self.named(&format!("{p}/render/texture"), texture);
         }
         self.range(&format!("{p}/render/fps"), r.fps, 0.0, 240.0);
-        self.range(&format!("{p}/render/stretch"), r.stretch.time, 0.0, 10.0);
+        if let Some(s) = r.stretch {
+            self.range(&format!("{p}/render/stretch"), s.time, 0.0, 10.0);
+        }
         let sizes = r.size_over_life.iter().map(|k| k[0]);
         let colors = r.color_over_life.iter().map(|k| k.0);
         for (name, times) in

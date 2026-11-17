@@ -1,4 +1,4 @@
-use super::{Collider, Force, Operator, Surface, System};
+use super::{Base, Collider, Force, Operator, Surface, System, Wobble};
 use crate::validate::{Check, Issue};
 
 impl Check<'_> {
@@ -90,6 +90,9 @@ impl Check<'_> {
             Force::Oscillate(o) => {
                 self.uses(true, "particles2");
                 let p = format!("{q}/oscillate");
+                if o.what == Wobble::Position && o.from == Base::Floor {
+                    self.issues.push(Issue::Type(format!("{p}/from")));
+                }
                 self.range(&format!("{p}/freq/0"), o.freq[0], 0.0, 60.0);
                 self.range(&format!("{p}/freq/1"), o.freq[1], o.freq[0], 60.0);
                 self.range(&format!("{p}/scale/1"), o.scale[1], o.scale[0], 1e5);

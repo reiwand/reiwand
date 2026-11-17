@@ -50,9 +50,9 @@ fn pulls_reach_only_as_far_as_their_radius() {
 
 #[test]
 fn oscillation_wobbles_without_drifting() {
-    let wobble = json!([{ "oscillate": { "what": "position", "freq": [1, 1], "scale": [5, 5], "mask": [1, 0] } },
-        { "oscillate": { "what": "alpha", "freq": [2, 2], "scale": [1, 1] } },
-        { "oscillate": { "what": "size", "freq": [2, 2], "scale": [0.5, 0.5] } }]);
+    let wobble = json!([{ "oscillate": { "what": "position", "from": "top", "freq": [1, 1], "scale": [5, 5], "mask": [1, 0] } },
+        { "oscillate": { "what": "alpha", "from": "top", "freq": [2, 2], "scale": [1, 1] } },
+        { "oscillate": { "what": "size", "from": "top", "freq": [2, 2], "scale": [0.5, 0.5] } }]);
     let mut fly = driven(wobble, json!({}));
     let (mut xs, mut alphas, mut sizes) = (Vec::new(), Vec::new(), Vec::new());
     for _ in 0..60 {

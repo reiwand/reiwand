@@ -20,7 +20,7 @@
                 "remap": [{ "input": "life", "in": [3, 6], "output": "size", "out": [1, 0.3], "op": "mul" }] },
       "forces": [{ "turbulence": { "strength": 40, "scale": 0.003 } },
                  { "attractor": { "target": "p1", "strength": 4000, "radius": 500, "falloff": "linear" } },
-                 { "oscillate": { "what": "alpha", "freq": [0.5, 1.5], "scale": [0.2, 0.5] } },
+                 { "oscillate": { "what": "alpha", "from": "top", "freq": [0.5, 1.5], "scale": [0.2, 0.5] } },
                  { "drag": 0.3, "window": [0, 0.2, 0.8, 1] }],
       "render": { "size_over_life": [[0, 0], [0.2, 1], [1, 0]], "cutout": [0.1, 0.9, 1], "order": "newest" }
     },

@@ -65,9 +65,12 @@ pub(super) fn simulate(p: &mut Particle, s: &Sim, mirror: &[Event], points: &[[f
             }
             8 => {
                 let (now, next) = (wobble(p, s, k, p.age), wobble(p, s, k, p.age + dt));
+                let floor = f[2] > 0.5;
                 match f[1] as u32 {
                     0 => shift = [0, 1].map(|i| shift[i] + (next[i] - now[i]) * b[2 + i]),
+                    1 if floor => look[0] *= next[3].clamp(0.0, 1.0),
                     1 => look[0] *= (1.0 - 0.5 * (next[2] + next[0])).clamp(0.0, 1.0),
+                    _ if floor => look[1] *= next[3].max(0.0),
                     _ => look[1] *= (1.0 + next[0]).max(0.0),
                 }
                 [0.0; 2]

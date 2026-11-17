@@ -91,10 +91,12 @@ fn vs_particle(
     let size = b.z * curve(t) * look.tint.z * e.w * k;
     let corner = select(vec2<f32>(f32(v & 1u), f32(v >> 1u)), hull_corner(v), look.hull[1].x > 0.0);
     let speed = length(a.zw);
-    let turned = look.shade.z > 0.0 && look.shade.z == look.shade.w;
-    let tail = select(clamp(look.trail.x * speed, look.shade.z, look.shade.w), 0.0, turned || speed <= 0.0);
+    let relative = look.trail.y > 0.5;
+    let turned = !relative && look.shade.z > 0.0 && look.shade.z == look.shade.w;
+    let reach = clamp(look.trail.x * speed, look.shade.z, look.shade.w);
+    var tail = select(reach, 0.0, turned || speed <= 0.0);
     var axis = vec2<f32>(cos(radians(b.w)), sin(radians(b.w)));
-    if (tail > 0.0 || turned || look.turn.x == 1.0) && speed > 0.0 {
+    if (tail > 0.0 || turned || relative || look.turn.x == 1.0) && speed > 0.0 {
         axis = a.zw / speed;
     }
     if look.turn.x == 2.0 {
@@ -107,6 +109,7 @@ fn vs_particle(
     let shade = base * tone * vec4<f32>(vec3<f32>(look.shade.x), look.tint.x * e.z);
     let s = particle(Sprite(center, a.zw, corner, corner, shade, size, degrees(atan2(axis.y, axis.x)), b.x, b.y));
     let turn = vec2<f32>(cos(radians(s.rotation)), sin(radians(s.rotation)));
+    tail = select(tail, s.size * (reach - 1.0), relative);
     let along = mix(-0.5 * s.size - tail, 0.5 * s.size, s.corner.x);
     let p = vec3<f32>(s.position + turn * along + vec2<f32>(-turn.y, turn.x) * (s.corner.y - 0.5) * s.size, 1.0);
     out.position = vec4<f32>(dot(look.m0.xyz, p), dot(look.m1.xyz, p), 0.0, 1.0);
