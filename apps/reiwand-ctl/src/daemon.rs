@@ -104,6 +104,7 @@ pub async fn run(command: Command) -> Result<()> {
         Command::Pkg(command) => pkg::run(client, command).await?,
         Command::Input(command) => inputs::run(client, command).await?,
         Command::Rgb(command) => crate::rgb::run(client, command).await?,
+        Command::Account(command) => crate::accounts::run(client, command).await?,
         Command::Media(command) => crate::media::run(client, command).await?,
         Command::Server(command) => serving::run(client, command).await?,
         Command::Private(args) => crate::network::run(client, args).await?,

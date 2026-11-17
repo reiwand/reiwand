@@ -52,7 +52,8 @@ use reiwand_core::dbus::error::SIGNED_OUT;
 use reiwand_core::model::JobKind;
 use reiwand_sync::Api;
 use reiwand_sync::client::keys as client;
-use saved::{Peer, Saved};
+use saved::Peer;
+use saved::Saved;
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, AtomicU32};
@@ -142,7 +143,7 @@ impl Daemon {
     }
 }
 
-fn hostname() -> String {
+pub(crate) fn hostname() -> String {
     let name = rustix::system::uname().nodename().to_string_lossy().into_owned();
     if name.trim().is_empty() { "Linux computer".into() } else { name }
 }

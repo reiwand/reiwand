@@ -4200,6 +4200,7 @@ version = "1.0.0"
 dependencies = [
  "reiwand-core",
  "reqwest",
+ "serde",
  "serde_json",
  "sha2 0.11.1",
  "thiserror 2.0.21",
@@ -4697,6 +4698,7 @@ name = "reiwand-upgrade"
 version = "1.0.0"
 dependencies = [
  "anyhow",
+ "reiwand-account",
  "rusqlite",
  "serde_json",
  "tempfile",
@@ -4765,6 +4767,7 @@ dependencies = [
  "jiff",
  "jpeg-decoder",
  "libc",
+ "reiwand-account",
  "reiwand-audio",
  "reiwand-carry",
  "reiwand-client",

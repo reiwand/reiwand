@@ -17,7 +17,8 @@ async fn authorization(server: &MockServer) -> Vec<Option<String>> {
 async fn the_token_reaches_only_the_repository_it_belongs_to() {
     let home = MockServer::start().await;
     let mirror = MockServer::start().await;
-    let moved = ResponseTemplate::new(302).insert_header("location", format!("{}/r/shelf/data", mirror.uri()));
+    let moved =
+        ResponseTemplate::new(302).insert_header("location", format!("{}/r/shelf/data", mirror.uri()));
     Mock::given(path("/r/shelf/data"))
         .respond_with(ResponseTemplate::new(200).set_body_bytes(b"ok"))
         .mount(&mirror)
@@ -31,8 +32,11 @@ async fn the_token_reaches_only_the_repository_it_belongs_to() {
         .respond_with(ResponseTemplate::new(200).set_body_bytes(b"ok"))
         .mount(&home)
         .await;
-    let (base, mirror_base, other) =
-        (format!("{}/r/shelf/", home.uri()), format!("{}/r/shelf/", mirror.uri()), format!("{}/r/y/", home.uri()));
+    let (base, mirror_base, other) = (
+        format!("{}/r/shelf/", home.uri()),
+        format!("{}/r/shelf/", mirror.uri()),
+        format!("{}/r/y/", home.uri()),
+    );
     tokio::task::spawn_blocking(move || {
         let fetch = HttpFetch::new(Arc::default()).unwrap().within(&[base.clone(), mirror_base.clone()]);
         let fetch = fetch.account(&base, "secret").unwrap();

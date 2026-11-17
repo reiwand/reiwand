@@ -87,7 +87,14 @@ impl Daemon {
         Ok((text("user_code"), shown.unwrap_or_else(|| format!("{url}/link")), job))
     }
 
-    fn enroll(&self, api: &Api, code: &str, mut interval: u64, expires: u64, ctl: &Ctl) -> Result<Value> {
+    pub(crate) fn enroll(
+        &self,
+        api: &Api,
+        code: &str,
+        mut interval: u64,
+        expires: u64,
+        ctl: &Ctl,
+    ) -> Result<Value> {
         let deadline = Instant::now() + Duration::from_secs(expires);
         while Instant::now() < deadline {
             pause(ctl, Duration::from_secs(interval))?;

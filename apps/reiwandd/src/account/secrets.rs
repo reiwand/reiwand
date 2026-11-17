@@ -15,7 +15,7 @@ fn broken() -> Error {
 }
 
 impl Daemon {
-    pub(super) fn server_keyring(&self) -> Result<&Keyring> {
+    pub(crate) fn server_keyring(&self) -> Result<&Keyring> {
         self.account.keyring.get().ok_or_else(|| failed("the keyring is not ready yet"))
     }
 

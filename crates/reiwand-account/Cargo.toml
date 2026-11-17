@@ -8,6 +8,7 @@ rust-version.workspace = true
 
 [dependencies]
 reiwand-core = { workspace = true, features = ["http"] }
+serde.workspace = true
 reqwest = { workspace = true, features = ["stream"] }
 serde_json.workspace = true
 sha2.workspace = true

@@ -20,10 +20,6 @@ mod tests;
 mod vault;
 mod views;
 
-pub use reiwand_account::{
-    AGENT, Api, Error, MAIL, PAGE, Poll, Result, SMALL, check_url, fingerprint, hex, peek, pinned_tls, poll,
-    same_origin, untrusted, valid_pin,
-};
 pub use away::away;
 pub use blob::{SEALED, SEGMENT, open_segment, seal_segment, sealed_size};
 pub use doc::{Doc, View};
@@ -38,6 +34,10 @@ pub use mailbox::{Letter, Peer, ack, devices, from, inbox, next, nonce, post};
 pub use order::{clash, positions};
 pub use plan::{Clash, Rules, Step, Winner, step};
 pub use record::{Context, open, pad, seal, unpad};
+pub use reiwand_account::{
+    AGENT, Api, Error, MAIL, PAGE, Poll, Result, SMALL, check_url, fingerprint, hex, peek, pinned_tls, poll,
+    same_origin, untrusted, valid_pin,
+};
 pub use session::Session;
 pub use share::{DeviceKey, Mail, aad, code, commit, open_key, seal_key, transcript};
 pub use vault::{Secrets, encode};

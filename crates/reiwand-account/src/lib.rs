@@ -1,10 +1,12 @@
 mod api;
+mod book;
 mod enroll;
 mod pin;
 #[cfg(test)]
 mod tests_pinned;
 
 pub use api::{AGENT, Api, MAIL, PAGE, SMALL, check_url, same_origin};
+pub use book::{File, Link, Rec, clean, origin};
 pub use enroll::{Poll, poll};
 pub use pin::{fingerprint, peek, pinned_tls, untrusted, valid_pin};
 

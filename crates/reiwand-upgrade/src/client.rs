@@ -9,6 +9,10 @@ pub const CURRENT: i64 = 2;
 const MARK: &str = "format-version";
 
 pub fn run(data: &Path) -> anyhow::Result<Outcome> {
+    run_with(data, &mut crate::NoVault)
+}
+
+pub fn run_with(data: &Path, vault: &mut dyn crate::Vault) -> anyhow::Result<Outcome> {
     if !data.is_dir() {
         return Ok(Outcome::Nothing);
     }
@@ -22,6 +26,7 @@ pub fn run(data: &Path) -> anyhow::Result<Outcome> {
     for item in fs::read_dir(data.join("repos")).into_iter().flatten().flatten() {
         plain(&item.path().join("state.json"))?;
     }
+    crate::apply(data, vault)?;
     account(&data.join("sync.json"))?;
     fs::write(data.join(MARK), format!("{CURRENT}\n"))?;
     Ok(Outcome::Upgraded { from: found, to: CURRENT })

@@ -381,3 +381,12 @@ downloaded; the repository keeps its `repo_id`, so installed packages stay linke
 that a static host serves under `/repo/` and was added with a `?fingerprint=` address is moved as well,
 and has to be added again by hand. The desktop installers, the user service (`ExecStartPre`, which also covers the RPM) and the Flatpak launcher
 run it before the daemon starts; the phone runs it when the app is replaced.
+
+### Repositorios con cuenta
+
+`HttpFetch::account(base, token)` agrega a las peticiones un `Authorization: Bearer` solo cuando la
+URL coincide con el origen y el prefijo de ruta del repositorio al que está vinculada la cuenta
+(gana el prefijo más largo). Nunca se envía a un espejo, a otro origen ni a una redirección a otro
+origen. Un `401` con `account_needed` en el índice firmado hace fallar el alta con `AccountNeeded`
+(`dbus.md`), cuyo mensaje lista las cuentas conocidas en ese servidor. Los tokens viven en el
+almacén de secretos, un elemento `account <id>` por cuenta; `accounts.json` no guarda ninguno.

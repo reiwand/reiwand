@@ -1,3 +1,4 @@
+mod accounts;
 pub mod client;
 #[cfg(feature = "server")]
 pub mod server;
@@ -16,3 +17,5 @@ impl std::fmt::Display for Outcome {
         }
     }
 }
+
+pub use accounts::{Moved, NoVault, Vault, accounts_step, apply};

@@ -919,10 +919,10 @@ msgstr "Operar un repositorio de paquetes; no necesita el daemon"
 
 #: apps/reiwand-ctl/src/cli.rs
 msgid ""
-"Moderate a self-hosted server with a personal token (REIWAND_SERVER_TOKEN); "
-"needs no daemon"
+"Moderate a server with a personal token (REIWAND_SERVER_TOKEN); needs no "
+"daemon"
 msgstr ""
-"Moderar un servidor propio con un token personal (REIWAND_SERVER_TOKEN); no "
+"Moderar un servidor con un token personal (REIWAND_SERVER_TOKEN); no "
 "necesita el daemon"
 
 #: apps/reiwand-ctl/src/browsing.rs apps/reiwand-ctl/src/confirming.rs
@@ -6759,3 +6759,51 @@ msgstr "pendiente, %1 %2: %3"
 msgid "Create, edit, build and benchmark scenes; the daemon only for preview"
 msgstr ""
 "Crear, editar, construir y medir escenas; el daemon solo para la vista previa"
+
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Accounts on repository servers: sign in, choose, forget"
+msgstr "Cuentas en los servidores de repositorios: iniciar sesión, elegir y olvidar"
+
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "List the accounts known on this computer and the repositories each one is used for"
+msgstr "Listar las cuentas conocidas en este equipo y los repositorios para los que se usa cada una"
+
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Sign in to the server of a repository: approve the code in the browser; the account is used for that repository"
+msgstr "Iniciar sesión en el servidor de un repositorio: aprueba el código en el navegador; la cuenta se usa para ese repositorio"
+
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Address of the repository whose server you sign in to"
+msgstr "Dirección del repositorio en cuyo servidor inicias sesión"
+
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Use an account for a repository"
+msgstr "Usar una cuenta para un repositorio"
+
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Address of the repository"
+msgstr "Dirección del repositorio"
+
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Account id from reiwand-ctl account ls"
+msgstr "Id de la cuenta, de reiwand-ctl account ls"
+
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Stop using any account for a repository; the account stays"
+msgstr "Dejar de usar una cuenta en un repositorio; la cuenta se conserva"
+
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Forget an account on this computer, with its saved access"
+msgstr "Olvidar una cuenta en este equipo, con su acceso guardado"
+
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "no accounts"
+msgstr "no hay cuentas"
+
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "sign in again"
+msgstr "volver a iniciar sesión"
+
+#: apps/reiwand-ctl/src/accounts.rs
+msgid "Open %1 and enter the code %2"
+msgstr "Abre %1 e introduce el código %2"

@@ -25,7 +25,20 @@ fn unreachable(e: &reiwand_format::Error) -> Option<&std::io::Error> {
     }
 }
 
-pub(super) fn explain_refresh(bases: &[String], e: reiwand_format::Error) -> Error {
+fn denied(e: &reiwand_format::Error) -> bool {
+    unreachable(e).is_some_and(|io| io.kind() == std::io::ErrorKind::PermissionDenied)
+}
+
+impl Daemon {
+    pub(super) fn explain_refresh(&self, bases: &[String], e: reiwand_format::Error) -> Error {
+        if denied(&e) {
+            return self.account_needed(&bases.iter().find_map(|base| origin(base)).unwrap_or_default());
+        }
+        explain_changed(bases, e)
+    }
+}
+
+fn explain_changed(bases: &[String], e: reiwand_format::Error) -> Error {
     if !unreachable(&e).is_some_and(|io| reiwand_sync::untrusted(io)) {
         return e.into();
     }
@@ -37,6 +50,9 @@ pub(super) fn explain_refresh(bases: &[String], e: reiwand_format::Error) -> Err
 impl Daemon {
     pub(super) fn explain_add(&self, url: &str, trust: &str, e: reiwand_format::Error, ctl: &Ctl) -> Error {
         let Some(site) = origin(url) else { return e.into() };
+        if denied(&e) {
+            return self.account_needed(&site);
+        }
         if unreachable(&e).is_some_and(|io| reiwand_sync::untrusted(io)) {
             let host = site.split("://").nth(1).unwrap_or(&site);
             if !trust.is_empty() || self.repo_pins().contains_key(&site) {

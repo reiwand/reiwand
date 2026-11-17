@@ -115,3 +115,17 @@ pub trait Playlists1 {
     #[zbus(signal)]
     fn browse_changed(&self, output: &str, json: &str) -> Result<()>;
 }
+
+#[proxy(
+    interface = "io.github.reiwand.Accounts1",
+    default_service = "io.github.reiwand.Daemon",
+    default_path = "/io/github/reiwand/Daemon"
+)]
+pub trait Accounts1 {
+    fn list(&self) -> Result<String>;
+    fn sign_in(&self, repo_url: &str) -> Result<(String, String, u64)>;
+    #[zbus(name = "Use")]
+    fn use_account(&self, repo: &str, account: &str) -> Result<()>;
+    fn unlink(&self, repo: &str) -> Result<()>;
+    fn remove(&self, account: &str) -> Result<()>;
+}

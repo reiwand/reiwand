@@ -115,6 +115,7 @@ impl Daemon {
                 d.pin_origin(site, &trust)?;
             }
             lock(&d.remote.repo_errors).remove(&info.repo_id);
+            d.resolve_links();
             tracing::info!(repo = &info.repo_id[..8], "repository added");
             d.changes.changed("repos", vec![info.repo_id.clone()]);
             Ok(serde_json::to_value(d.repo_model(info)).unwrap_or_default())
@@ -144,7 +145,7 @@ impl Daemon {
             let updated = ctl.check().and_then(|()| {
                 let fetch = fetcher(self, ctl, bases)?;
                 reiwand_format::update_repo(&self.store.data, &fetch, &id, now())
-                    .map_err(|e| adding::explain_refresh(bases, e))
+                    .map_err(|e| self.explain_refresh(bases, e))
             });
             match settle(updated, || self.gone(&id)) {
                 Settled::Done(outcome) => {

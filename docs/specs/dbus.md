@@ -95,6 +95,7 @@ Every error carries a readable English message. An error raised without a descri
 | `io.github.reiwand.Error.Exists` | Name, folder, provider id or repository already present |
 | `io.github.reiwand.Error.NeedsSecret` | A provider needs a secret that is missing or was rejected |
 | `io.github.reiwand.Error.SignedOut` | The server refused the token of this computer (`unauthorized`): the device was revoked or the account deleted |
+| `io.github.reiwand.Error.AccountNeeded` | The repository requires an account (`401 account_needed`) and none is linked or the linked one is not accepted: the message lists the accounts known on that server; use `Accounts1.Use` or `SignIn` |
 | `io.github.reiwand.Error.KeyringUnavailable` | The keyring item cannot be written or deleted, the keyring stayed locked for 20 s or its unlock prompt was dismissed, the Secret Service did not answer in time, or no Secret Service is available to store a secret |
 | `io.github.reiwand.Error.Stale` | A repository's signed index expired; retry with `allow_stale = true` after asking the user |
 | `io.github.reiwand.Error.Conflict` | A playlist edit by index found other entries than expected: `the playlist changed; reload it` |
@@ -2669,6 +2670,42 @@ Agrega lo elegido. `choices_json` es `{"take": [secciones] | null, "lists": "joi
 fallar la importación. Salida: `{added, pending, unresolved, notes}`. Importar dos veces lo mismo
 no duplica nada en el modo `join`.
 
+## `io.github.reiwand.Accounts1`
+
+Several accounts on the servers of added repositories, each linked to the repositories it is used
+for. The list is in `accounts.json` of the data directory (id, server origin, user, label, whether
+the session must be signed in again, and the linked repository addresses); it never holds a token.
+The token of each account lives only where secrets are kept (see `SetSecretStore`), in one item
+`account <id>`. The token is sent only to the origin of the repository the account is linked to and
+under that repository's path, never to a mirror or to another origin. A repository that answers
+`401 account_needed` fails the add with `AccountNeeded`, whose message lists the accounts known on
+that server.
+
+### `List() → (s json)`
+
+`{"model": 1, "serial": n, "accounts": [{"id", "server", "user", "label", "pending", "repos": [{"url", "repo_id"}]}]}`.
+`repo_id` is `null` until the repository is added.
+
+### `SignIn(s repo_url) → (s user_code, s verification_uri, t job)`
+
+Starts a device-code sign-in to the server of the repository and links the new account to it. The
+person approves `user_code` at `verification_uri` in the browser; the account job finishes when the
+server issues the token. The address follows the rules of repository addresses (pinned certificate
+of a self-signed origin included).
+
+### `Use(s repo, s account)`
+
+Links the account to the repository, replacing the previous link. `NotFound` when the account is
+unknown; `InvalidArgs` when the repository is not on the account's server.
+
+### `Unlink(s repo)`
+
+Removes the link of the repository; the account stays.
+
+### `Remove(s account)`
+
+Deletes the account, its links and its token item.
+
 ## The app: `io.github.reiwand`
 
 The desktop app owns `io.github.reiwand` (`APP_ID`) at `/io/github/reiwand` (`APP_PATH`)
@@ -3061,6 +3098,7 @@ for every `Changed` signal. Topics and their `ids`:
 | `repos` | Repositories or installed packages change | repository ids, or `[]` |
 | `jobs` | A job is created or finishes | job ids as decimal strings |
 | `inputs` | A grant or a decline changes, a question in a desktop notification opens, ends or stops resting, an output starts or stops showing a scene that declares inputs, or audio capture or the pointer feed starts or stops | `[]` |
+| `accounts` | An account is added, removed, signed in again or linked to another repository | `[]` |
 | `account` | The sync server, this device's link or the sync state change | `[]` |
 
 Per topic, the first change emits `Changed` at once and opens a 250 ms window; changes inside the

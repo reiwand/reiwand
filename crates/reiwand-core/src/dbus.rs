@@ -9,6 +9,7 @@ pub const REPOS: &str = "io.github.reiwand.Repos1";
 pub const INPUTS: &str = "io.github.reiwand.Inputs1";
 pub const CARRY: &str = "io.github.reiwand.Carry1";
 pub const SYNC: &str = "io.github.reiwand.Sync1";
+pub const ACCOUNTS: &str = "io.github.reiwand.Accounts1";
 pub const APP_ID: &str = "io.github.reiwand";
 pub const APP_PATH: &str = "/io/github/reiwand";
 pub const DEFAULT_OUTPUT: &str = "default";
@@ -41,6 +42,7 @@ pub mod error {
     pub const CERTIFICATE_UNKNOWN: &str = "io.github.reiwand.Error.CertificateUnknown";
     pub const CERTIFICATE_CHANGED: &str = "io.github.reiwand.Error.CertificateChanged";
     pub const SIGNATURE_CHANGED: &str = "io.github.reiwand.Error.SignatureChanged";
+    pub const ACCOUNT_NEEDED: &str = "io.github.reiwand.Error.AccountNeeded";
     pub const NOT_A_REPOSITORY: &str = "io.github.reiwand.Error.NotARepository";
 
     const SILENT: &str = "failed without giving a reason";

@@ -20,6 +20,7 @@ server = ["dep:rusqlite"]
 
 [dependencies]
 anyhow.workspace = true
+reiwand-account.workspace = true
 rusqlite = { workspace = true, optional = true }
 serde_json.workspace = true
 

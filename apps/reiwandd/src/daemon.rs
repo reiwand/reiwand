@@ -75,6 +75,7 @@ pub struct Daemon {
     pub(crate) rotations: Rotations,
     pub(crate) remote: crate::remote::Remote,
     pub(crate) account: crate::account::Account,
+    pub(crate) accounts: crate::accounts::Book,
     pub(crate) turned: Notify,
     pub(crate) gpus: crate::gpus::Gpus,
 }
@@ -141,6 +142,7 @@ impl Daemon {
             rotations: Rotations::default(),
             remote: Default::default(),
             account: Default::default(),
+            accounts: Default::default(),
             turned: Notify::new(),
             gpus,
         };

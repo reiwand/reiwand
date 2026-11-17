@@ -43,6 +43,7 @@ pub(crate) async fn run(args: Args) -> anyhow::Result<()> {
     server.at(dbus::OBJECT_PATH, repos1::Repos(weak.clone())).await?;
     server.at(dbus::OBJECT_PATH, carry1::Carry(weak.clone())).await?;
     server.at(dbus::OBJECT_PATH, rgb1::Rgb(weak.clone())).await?;
+    server.at(dbus::OBJECT_PATH, accounts1::Accounts(weak.clone())).await?;
     server.at(dbus::OBJECT_PATH, sync1::Sync(weak)).await?;
     tokio::spawn(changes::emit(connection.clone(), daemon.clone()));
     inputs1::start(&daemon, connection.clone());

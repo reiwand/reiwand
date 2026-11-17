@@ -177,6 +177,8 @@ pub enum Command {
         after_long_help = crate::account::NAMES
     )]
     Server(Server),
+    #[command(subcommand, about = "Accounts on repository servers: sign in, choose, forget")]
+    Account(crate::accounts::Accounts),
     #[command(subcommand, about = "Edit images, keeping their files; needs no daemon but for preview")]
     Edit(Edits),
     #[command(subcommand, about = "RGB lighting through an OpenRGB server: status, devices and a test")]
@@ -191,9 +193,7 @@ pub enum Command {
     ConnectCode(crate::connecting::Connect),
     #[command(subcommand, about = "Operate a package repository; needs no daemon")]
     Repo(Repo),
-    #[command(
-        about = "Moderate a self-hosted server with a personal token (REIWAND_SERVER_TOKEN); needs no daemon"
-    )]
+    #[command(about = "Moderate a server with a personal token (REIWAND_SERVER_TOKEN); needs no daemon")]
     Moderate(crate::moderate::Moderate),
     #[command(about = "Print the licenses of the libraries, fonts, icons and models the program carries")]
     Licenses,

@@ -37,7 +37,7 @@ async fn setup() -> (Server, Who, Who, Who) {
     let member = json!({"may_read": true});
     let path = format!("/api/v1/admin/repos/vault/members/{ana_id}");
     assert_eq!(server.json(Method::PUT, &path, &admin, Some(member)).await.0, StatusCode::OK);
-    upload_to(&server, &admin, &package(server.dir.path(), DAWN, "1.0.0"), None).await;
+    upload_to(&server, &admin, &package(server.dir.path(), DAWN, "1.0.0"), Some("main")).await;
     upload_to(&server, &admin, &package(server.dir.path(), DUSK, "1.0.0"), Some("second")).await;
     (server, admin, ana, bob)
 }

@@ -25,9 +25,9 @@ pub fn pinned(d: &Daemon, fetch: HttpFetch) -> Result<HttpFetch> {
     match d.server_pin() {
         Some((url, pin)) => {
             let tls = reiwand_sync::pinned_tls(&pin).map_err(|e| failed(e.to_string()))?;
-            fetch.pinned(&url, tls).map_err(|e| failed(e.to_string()))
+            d.with_account_tokens(fetch.pinned(&url, tls).map_err(|e| failed(e.to_string()))?)
         }
-        None => Ok(fetch),
+        None => d.with_account_tokens(fetch),
     }
 }
 
@@ -41,12 +41,12 @@ impl Daemon {
         self.store.data.join("repo-pins.json")
     }
 
-    pub(super) fn repo_pins(&self) -> BTreeMap<String, String> {
+    pub(crate) fn repo_pins(&self) -> BTreeMap<String, String> {
         let read = fs::read(self.pins_path()).ok();
         read.and_then(|bytes| serde_json::from_slice(&bytes).ok()).unwrap_or_default()
     }
 
-    pub(super) fn pin_origin(&self, origin: &str, pin: &str) -> Result<()> {
+    pub(crate) fn pin_origin(&self, origin: &str, pin: &str) -> Result<()> {
         let mut pins = self.repo_pins();
         pins.insert(origin.to_owned(), pin.to_ascii_lowercase());
         let path = self.pins_path();
