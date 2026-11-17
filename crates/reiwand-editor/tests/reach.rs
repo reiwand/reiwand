@@ -140,6 +140,7 @@ fn adding_an_effect_writes_every_required_parameter() {
 fn the_relief_effect_is_added_with_a_circular_reach_that_can_be_made_square() {
     let root = TempDir::new().unwrap();
     let mut p = project(&root);
+    p.doc["manifest"]["inputs"] = json!(["pointer"]);
     let add = json!({ "effects": { "add": { "layer": "fill", "effect": "depth_parallax" } } });
     p.act(&serde_json::from_value::<Action>(add).unwrap()).unwrap();
     let params = &p.doc["scene"]["layers"][0]["effects"][2]["params"];
