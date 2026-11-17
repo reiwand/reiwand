@@ -164,14 +164,13 @@ fn emit<'a>(
         || layer.cache
         || (group && (opacity < 1.0 || toned));
     let index = frame.draws.len();
-    let (world, lean) = (place.world, place.lean);
     let (blend, mask) = (layer.blend, layer.mask.as_ref());
     let mask_strength = strength(cx, mask);
     let draw = Draw {
         layer,
         end: index + 1,
-        world,
-        lean,
+        world: place.world,
+        lean: place.lean,
         origin,
         opacity,
         blend,
@@ -189,7 +188,7 @@ fn emit<'a>(
         lit: layer.lighting.as_ref().map(|l| lamps::lighting(cx, l)),
     };
     frame.draws.push(draw);
-    walk(cx, layer.children(), (world, lean), quality, frame, canvas);
+    walk(cx, layer.children(), (place.world, place.lean), quality, frame, canvas);
     let moving = paced || moves || cx.wake.get() == Wake::Frame;
     let children = frame.draws[index + 1..].iter().any(|d| d.dynamic);
     if children {
