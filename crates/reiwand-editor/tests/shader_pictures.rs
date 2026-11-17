@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use reiwand_editor::Project;
 use reiwand_editor::actions::Action;
 use reiwand_editor::inspect::fields_from;
@@ -12,14 +14,14 @@ const WGSL: &str = "@fragment fn fs_pic(in: VertexOut) -> @location(0) vec4<f32>
 fn descriptor() -> Value {
     json!({ "id": "pics", "name": { "en": "Pictures" }, "cost": { "taps": 1 }, "passes": [{ "entry": "fs_pic" }],
         "params": [
-            { "id": "at", "type": "position", "default": [0.5, 0.5] },
-            { "id": "cover", "type": "mask", "default": "", "channels": 1 },
-            { "id": "tex", "type": "texture", "default": "" },
-            { "id": "brush", "type": "texture", "default": "", "tool": "gray" }] })
+            { "id": "at", "type": "position", "prefill": [0.5, 0.5] },
+            { "id": "cover", "type": "mask", "prefill": "", "channels": 1 },
+            { "id": "tex", "type": "texture", "prefill": "" },
+            { "id": "brush", "type": "texture", "prefill": "", "tool": "gray" }] })
 }
 
 fn act(project: &mut Project, action: Value) {
-    project.act(&serde_json::from_value::<Action>(action).unwrap()).unwrap();
+    project.act(&serde_json::from_value::<Action>(whole::action(&project, action)).unwrap()).unwrap();
 }
 
 #[test]

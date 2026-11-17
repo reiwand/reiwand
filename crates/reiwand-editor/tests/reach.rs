@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use reiwand_editor::Project;
 use reiwand_editor::actions::Action;
 use reiwand_editor::rigs::query;
@@ -13,7 +15,7 @@ fn project(root: &TempDir) -> Project {
     let layer = json!([{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ffffff",
         "effects": [{ "effect": "blur" }, { "effect": "god_rays", "optional": true }] }]);
     let set = json!({ "set": { "pointer": "/scene/layers", "value": layer } });
-    p.act(&serde_json::from_value::<Action>(set).unwrap()).unwrap();
+    p.act(&serde_json::from_value::<Action>(whole::action(&p, set)).unwrap()).unwrap();
     p
 }
 
@@ -54,7 +56,7 @@ fn the_glare_of_the_bloom_is_kept_only_where_the_daemon_draws_it() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
     let set = json!({ "set": { "pointer": "/scene/canvas/bloom", "value": { "hdr": [1.0, 0.5] } } });
-    p.act(&serde_json::from_value::<Action>(set).unwrap()).unwrap();
+    p.act(&serde_json::from_value::<Action>(whole::action(&p, set)).unwrap()).unwrap();
     let glare = |q: &str, battery| level(&p, q, battery, false)["bloom"].clone();
     assert_eq!(glare("q3", false), json!({ "on": true, "hdr": true, "glare": true }));
     assert_eq!(glare("q2", false), json!({ "on": true, "hdr": true, "glare": true }));
@@ -82,7 +84,7 @@ fn effects_and_emitters_that_follow_the_pointer_are_named() {
     let particles = json!({ "dust": { "capacity": 100, "emitters": [{ "shape": "edge", "rate": 10, "follow": "cursor" }] } });
     for (pointer, value) in [("/scene/layers", layers), ("/scene/particles", particles)] {
         let set = json!({ "set": { "pointer": pointer, "value": value } });
-        p.act(&serde_json::from_value::<Action>(set).unwrap()).unwrap();
+        p.act(&serde_json::from_value::<Action>(whole::action(&p, set)).unwrap()).unwrap();
     }
     let shown = level(&p, "q3", false, false);
     let follows: Vec<_> = shown["effects"]
@@ -127,12 +129,12 @@ fn adding_an_effect_writes_every_required_parameter() {
     let root = TempDir::new().unwrap();
     let mut p = project(&root);
     let add = json!({ "effects": { "add": { "layer": "fill", "effect": "chroma_key" } } });
-    p.act(&serde_json::from_value::<Action>(add).unwrap()).unwrap();
+    p.act(&serde_json::from_value::<Action>(whole::action(&p, add)).unwrap()).unwrap();
     let params = &p.doc["scene"]["layers"][0]["effects"][2]["params"];
-    assert_eq!(params.as_object().unwrap().len(), 2);
+    assert_eq!(params.as_object().unwrap().len(), 6);
     assert_eq!((params["distance"].as_f64(), params["keep"].as_f64()), (Some(0.0), Some(0.0)));
     let set = json!({ "effects": { "set": { "layer": "fill", "index": 2, "params": { "distance": 1 } } } });
-    p.act(&serde_json::from_value::<Action>(set).unwrap()).unwrap();
+    p.act(&serde_json::from_value::<Action>(whole::action(&p, set)).unwrap()).unwrap();
     assert_eq!(p.doc["scene"]["layers"][0]["effects"][2]["params"]["distance"].as_f64(), Some(1.0));
 }
 
@@ -142,11 +144,11 @@ fn the_relief_effect_is_added_with_a_circular_reach_that_can_be_made_square() {
     let mut p = project(&root);
     p.doc["manifest"]["inputs"] = json!(["pointer"]);
     let add = json!({ "effects": { "add": { "layer": "fill", "effect": "depth_parallax" } } });
-    p.act(&serde_json::from_value::<Action>(add).unwrap()).unwrap();
+    p.act(&serde_json::from_value::<Action>(whole::action(&p, add)).unwrap()).unwrap();
     let params = &p.doc["scene"]["layers"][0]["effects"][2]["params"];
-    assert_eq!(params.as_object().unwrap().len(), 1);
+    assert_eq!(params.as_object().unwrap().len(), 10);
     assert_eq!(params["reach"].as_f64(), Some(0.0));
     let set = json!({ "effects": { "set": { "layer": "fill", "index": 2, "params": { "reach": 1 } } } });
-    p.act(&serde_json::from_value::<Action>(set).unwrap()).unwrap();
+    p.act(&serde_json::from_value::<Action>(whole::action(&p, set)).unwrap()).unwrap();
     assert_eq!(p.doc["scene"]["layers"][0]["effects"][2]["params"]["reach"].as_f64(), Some(1.0));
 }

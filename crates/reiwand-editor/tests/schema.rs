@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use reiwand_editor::inspect::fields;
 use reiwand_editor::schema::{MANIFEST, PROPERTY, child, fits};
 use reiwand_editor::starters::starter;

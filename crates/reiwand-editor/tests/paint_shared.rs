@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use reiwand_editor::Project;
 use reiwand_editor::actions::Action;
 use reiwand_editor::starters::starter;
@@ -6,7 +8,7 @@ use std::sync::OnceLock;
 use tempfile::TempDir;
 
 fn act(project: &mut Project, action: Value) -> anyhow::Result<()> {
-    project.act(&serde_json::from_value::<Action>(action).unwrap()).map(drop)
+    project.act(&serde_json::from_value::<Action>(whole::action(&project, action)).unwrap()).map(drop)
 }
 
 #[test]

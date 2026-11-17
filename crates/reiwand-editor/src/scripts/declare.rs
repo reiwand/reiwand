@@ -34,14 +34,8 @@ pub fn declaration(source: &str) -> Value {
     uses.extend(super::played::played(source).then_some(ScriptApi::Animations));
     uses.sort();
     uses.dedup();
-    let mut entry = json!({});
-    if events.iter().any(|e| *e != ScriptEvent::Update) {
-        entry["events"] = json!(events);
-    }
-    if !uses.is_empty() {
-        entry["uses"] = json!(uses);
-    }
-    entry
+    let told = if events.iter().any(|e| *e != ScriptEvent::Update) { events } else { Vec::new() };
+    json!({ "events": told, "uses": uses, "params": {} })
 }
 
 pub fn functions(source: &str) -> Vec<String> {

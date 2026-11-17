@@ -29,8 +29,9 @@ pub fn customs(dir: &Path, doc: &Value) -> Customs {
         let Some(path) = entry.get("descriptor").and_then(Value::as_str) else { continue };
         let Ok(bytes) = fs::read(dir.join(path)) else { continue };
         let Ok(descriptor) = serde_json::from_slice::<Value>(&bytes) else { continue };
-        let params = descriptor.get("params").and_then(Value::as_array).into_iter().flatten();
-        let list = params
+        let listed = |key: &str| descriptor.get(key).and_then(Value::as_array).into_iter().flatten().cloned();
+        let list = listed("params")
+            .chain(listed("options"))
             .filter_map(|p| {
                 Some((
                     p.get("id")?.as_str()?.to_owned(),

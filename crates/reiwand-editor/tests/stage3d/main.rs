@@ -1,3 +1,5 @@
+#[path = "../support/whole.rs"]
+mod whole;
 use image::{Rgba, RgbaImage};
 use reiwand_editor::Project;
 use reiwand_editor::actions::Action;
@@ -29,6 +31,7 @@ fn state() {
 }
 
 pub fn act(project: &mut Project, action: Value) -> anyhow::Result<()> {
+    let action = whole::action(project, action);
     let action = serde_json::from_value::<Action>(action).unwrap();
     assert!(reiwand_editor::ACTIONS.contains(&action.name().as_str()), "{}", action.name());
     project.act(&action).map(drop)

@@ -95,6 +95,7 @@ pub mod review;
 mod revisions;
 mod rgb;
 mod rig;
+mod rigfill;
 mod rigging;
 pub mod rigs;
 pub mod schema;

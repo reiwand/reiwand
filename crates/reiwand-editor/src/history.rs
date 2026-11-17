@@ -57,6 +57,7 @@ impl History {
         at: u64,
         gesture: bool,
     ) -> Result<Vec<Op>> {
+        let ops = crate::rigfill::complete_all(doc, ops);
         let undo = apply(doc, &ops)?;
         let (open, begun) = (self.open, self.begun);
         self.open = open && gesture;
@@ -91,6 +92,7 @@ impl History {
     }
 
     pub fn extend(&mut self, doc: &mut Value, ops: Vec<Op>) -> Result<Vec<Op>> {
+        let ops = crate::rigfill::complete_all(doc, ops);
         let undo = apply(doc, &ops)?;
         if let Some(last) = self.done.last_mut() {
             last.size += size(&undo) + size(&ops);

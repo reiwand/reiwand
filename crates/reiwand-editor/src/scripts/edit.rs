@@ -50,11 +50,9 @@ fn declare(dir: &Path, doc: &Value, path: &str, with_params: bool) -> Result<Vec
             used_params(&source).into_iter().filter(|p| !declared.contains_key(p)).collect();
         let mut all = declared;
         missing.into_iter().take(reiwand_scene::MAX_SCRIPT_PARAMS.saturating_sub(all.len())).for_each(|p| {
-            all.insert(p, json!({"type": "number", "default": 0}));
+            all.insert(p, json!({"type": "number", "default": 0, "min": null, "max": null}));
         });
-        if !all.is_empty() {
-            fresh["params"] = Value::Object(all);
-        }
+        fresh["params"] = Value::Object(all);
     }
     Ok(if fresh == *old { Vec::new() } else { place(doc, fresh) })
 }

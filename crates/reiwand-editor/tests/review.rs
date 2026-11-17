@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use reiwand_editor::review::{report, signature};
 use reiwand_editor::{Project, author_keys};
 use serde_json::{Value, json};
