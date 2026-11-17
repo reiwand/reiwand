@@ -3,7 +3,7 @@ pub mod client;
 #[cfg(feature = "client")]
 mod download;
 pub mod fill;
-mod gain;
+pub mod gain;
 pub mod scenes;
 #[cfg(feature = "server")]
 pub mod server;

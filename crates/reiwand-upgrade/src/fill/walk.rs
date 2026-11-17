@@ -154,6 +154,10 @@ impl<'a> Walk<'a> {
         if def == "EffectUse" && !self.required_only {
             params::complete(map, self.customs, &mut self.report);
         }
+        for (name, value) in super::legacy::heard(def, map) {
+            map.insert(name.into(), value);
+            self.report.note(def, name);
+        }
         let props = s.get("properties").and_then(Value::as_object);
         let required =
             |n: &str| s.get("required").and_then(Value::as_array).is_some_and(|r| r.iter().any(|x| x == n));

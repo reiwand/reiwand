@@ -35,7 +35,11 @@ pub fn rows(format: Format) -> Vec<Row> {
             schema.get("required").and_then(Value::as_array).is_some_and(|r| r.iter().any(|x| x == n))
         };
         for (prop, ps) in schema.get("properties").and_then(Value::as_object).into_iter().flatten() {
-            let Some(value) = walk.fallback(ps, required(prop), def, prop) else { continue };
+            let Some(value) =
+                legacy::heard_value(def, prop).or_else(|| walk.fallback(ps, required(prop), def, prop))
+            else {
+                continue;
+            };
             let row = Row {
                 format: format.name(),
                 def: def.to_string(),

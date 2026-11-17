@@ -102,7 +102,7 @@ fn depth_parallax_gains_the_circle_reach() {
     let scene = json!({"layers": [{"blend_space": "canvas", "effects": [
         {"effect": "depth_parallax", "params": {"strength": 9}}, {"effect": "depth_parallax", "params": {"reach": 1}}]}]});
     let e = &upgraded("scenes-reach", scene)["layers"][0]["effects"];
-    assert_eq!(e[0]["params"]["reach"], json!(0));
+    assert_eq!(e[0]["params"]["reach"].as_f64(), Some(0.0));
     assert_eq!(e[0]["params"]["strength"], json!(9));
     assert_eq!(e[1]["params"]["reach"], json!(1));
 }

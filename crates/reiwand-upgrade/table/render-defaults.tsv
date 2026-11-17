@@ -13,6 +13,7 @@ exponent	Binding_for_Array_size_2_of_float,Binding_for_Color,Binding_for_Param	3
 fov	CameraKey	1	reiwand-scene/src/eval/staged/paths/spline.rs:76	derived	2
 frames	Asset,Render,Timeline	2	reiwand-scene/src/sheet.rs:9	derived	2
 inner	Area	1	reiwand-scene/src/particles/pack.rs:93	derived	2
+kind	Binding_for_Array_size_2_of_float,Binding_for_Color,Binding_for_Param,Binding_for_Vec2,Binding_for_Vec3,Binding_for_boolean,Binding_for_float,Binding_for_string,Remap,Turbulent	1	reiwand-scene/src/input/read.rs:26	"relative"	2
 length	Layer	1	reiwand-scene/src/eval/lamps.rs:126	256.0	1
 mask	EffectUse,Oscillate	3	reiwand-scene/src/particles/drive.rs:53	derived	2
 max	Child,ScriptParam	7	reiwand-scene/src/deep.rs:128	derived	2
@@ -41,6 +42,7 @@ subdivide	Trail	1	reiwand-render/src/scene/swarm/looks.rs:10	0	1
 taper	Between	1	reiwand-scene/src/particles/sow.rs:75	derived	2
 to	AnimClip,EffectEmitter	3	reiwand-scene/src/bones.rs:39	derived	2
 translation	BonePhysics	1	reiwand-scene/src/rigged/build.rs:13	[0.0; 3]	1
+unit	Binding_for_Array_size_2_of_float,Binding_for_Color,Binding_for_Param,Binding_for_Vec2,Binding_for_Vec3,Binding_for_boolean,Binding_for_float,Binding_for_string,Remap,Turbulent	1	reiwand-scene/src/input/read.rs:26	"db"	2
 uv_scale	Trail	1	reiwand-render/src/scene/swarm/looks.rs:11	1.0	1
 uv_scroll	Trail	1	reiwand-render/src/scene/swarm/looks.rs:12	0.0	1
 valign	Layer	1	reiwand-scene/src/kin.rs:35	derived	2

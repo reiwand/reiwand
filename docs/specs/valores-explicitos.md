@@ -19,3 +19,8 @@ motor usaba hasta ahora para él. El dato se lee exactamente igual antes y despu
   otras escenas), `tests/formats.rs` (pares original y completado de config, edición y exportación),
   `tests/table.rs` (la tabla cubre toda propiedad opcional del esquema vivo y toda constante escrita con
   `unwrap_or` en el código de dibujo).
+
+- Sonido: el paso A quita `audio.gain` del bloque `audio` de la escena (`fixed` escribe `absolute` en cada enlace
+  al sonido y `auto` deja `relative`) y escribe `kind` (`relative`) y `unit` (`db`) en cada enlace al sonido,
+  en cada regla `remap` de entrada `audio:` y en cada `turbulent` con `audio`; la tabla los marca clase 2
+  porque solo se escriben donde hay sonido. `depth_parallax` recibe `reach` 0 (círculo) del descriptor.

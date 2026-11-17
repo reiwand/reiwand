@@ -36,6 +36,7 @@ fn scenes_read_the_same_after_step_a() {
     for path in corpus("scene.json") {
         let text = std::fs::read_to_string(&path).unwrap();
         let mut doc: Value = serde_json::from_str(&text).unwrap();
+        reiwand_upgrade::gain::fixed(&mut doc);
         let before = match reiwand_scene::Scene::from_json(&text) {
             Ok(before) => before,
             Err(e) => {
