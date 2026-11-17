@@ -26,7 +26,7 @@ pub fn cost(dir: &Path, doc: &Value, quality: Quality) -> Value {
     let triangles: u64 = models.iter().map(|m| m.triangles).sum();
     let groups = scene
         .layers()
-        .filter(|l| matches!(l.kind, Kind::Group { space: Some(reiwand_scene::Space::Depth), .. }))
+        .filter(|l| matches!(l.kind, Kind::Group { space: reiwand_scene::Space::Depth, .. }))
         .count();
     let canvas = scene.canvas.size.map(|v| v as f32);
     let levels: Vec<Value> = LEVELS

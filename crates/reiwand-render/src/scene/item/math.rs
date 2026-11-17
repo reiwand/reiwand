@@ -48,8 +48,8 @@ pub(crate) fn toned(tint: Color, brightness: f32, srgb: bool, opacity: f32) -> [
     [r * brightness, g * brightness, b * brightness, a]
 }
 
-pub(crate) fn channel(channel: Option<MaskChannel>, texture: bool) -> [f32; 4] {
-    match channel.unwrap_or(if texture { MaskChannel::Luminance } else { MaskChannel::A }) {
+pub(crate) fn channel(channel: MaskChannel) -> [f32; 4] {
+    match channel {
         MaskChannel::R => [1.0, 0.0, 0.0, 0.0],
         MaskChannel::G => [0.0, 1.0, 0.0, 0.0],
         MaskChannel::B => [0.0, 0.0, 1.0, 0.0],

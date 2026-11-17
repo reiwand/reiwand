@@ -2,17 +2,17 @@ use super::item::{Item, Rect, invert};
 use super::paint::{Painter, Target};
 use super::pipes::Mode;
 use super::{Op, Src};
-use reiwand_scene::{Affine, Kind};
+use reiwand_scene::{Affine, CANVAS, Ctx, Kind};
 
 impl Painter<'_, '_, '_> {
-    pub(crate) fn captures(&self, i: usize) -> Option<(Option<[f32; 2]>, bool)> {
+    pub(crate) fn captures(&self, i: usize) -> Option<(Ctx<[f32; 2], CANVAS>, bool)> {
         match self.frame.draws[i].layer.kind {
-            Kind::Adjustment { size, redraw, .. } if size.is_some() || redraw => Some((size, redraw)),
+            Kind::Adjustment { size, redraw, .. } if !size.follows() || redraw => Some((size, redraw)),
             _ => None,
         }
     }
 
-    pub(crate) fn capture(&mut self, i: usize, target: Target, (size, redraw): (Option<[f32; 2]>, bool)) {
+    pub(crate) fn capture(&mut self, i: usize, target: Target, (size, redraw): (Ctx<[f32; 2], CANVAS>, bool)) {
         let frame = self.frame;
         let d = &frame.draws[i];
         if (d.effects.is_empty() && !redraw) || (!d.effects.is_empty() && self.idle(i)) {
@@ -20,7 +20,7 @@ impl Painter<'_, '_, '_> {
         }
         let canvas = frame.canvas;
         let half = canvas.map(|v| v / 2.0);
-        let (grab, put) = match size {
+        let (grab, put) = match size.0 {
             Some(size) => {
                 let at = Affine::translate([d.world.0[4], d.world.0[5]]);
                 let shift = Affine::translate([-d.origin[0] * size[0], -d.origin[1] * size[1]]);
@@ -53,7 +53,7 @@ impl Painter<'_, '_, '_> {
         let masked = match redraw {
             true => {
                 let masking = (d.mask, d.mask_texture.as_deref(), d.mask_strength);
-                self.mask(&mut item, masking, m, size.unwrap_or(canvas), target)
+                self.mask(&mut item, masking, m, size.or(canvas), target)
             }
             false => Src::White,
         };

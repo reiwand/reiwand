@@ -45,7 +45,7 @@ impl Painter<'_, '_, '_> {
                 let slot = if *first.get_or_insert(name) == name { 1 } else { 5 };
                 tex[slot] = src;
                 fx.crop[usize::from(slot == 5)] = crop;
-                fx.slots[base + n] = channel(m.channel, m.texture.is_some());
+                fx.slots[base + n] = channel(m.channel);
                 pick = [
                     f32::from(u8::from(m.invert)),
                     1.0 - e.mask_strength,

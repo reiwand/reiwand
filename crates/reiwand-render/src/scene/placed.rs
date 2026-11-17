@@ -95,7 +95,7 @@ pub(crate) fn uniforms(e: &EffectDraw<'_>, layer_uv: Affine) -> Fx {
     Fx {
         slots,
         texel: [0.0; 4],
-        channel: e.mask.map_or([0.0, 0.0, 0.0, 1.0], |m| channel(m.channel, m.texture.is_some())),
+        channel: e.mask.map_or([0.0, 0.0, 0.0, 1.0], |m| channel(m.channel)),
         mask_m0,
         mask_m1,
         info: [f32::from(u8::from(e.mask.is_some_and(|m| m.invert))), 0.0, 0.0, 0.0],

@@ -23,7 +23,7 @@ impl Painter<'_, '_, '_> {
         let to_local = m.inverse().then(Affine::translate([target.rect.x, target.rect.y]));
         let weak = 1.0 - strength;
         item.mask_info = [1.0, f32::from(u8::from(mask.invert)), mask.feather, weak];
-        item.channel = channel(mask.channel, mask.texture.is_some());
+        item.channel = channel(mask.channel);
         let mut crop = [1.0; 2];
         let (affine, src) = if let Some(id) = texture {
             let found = self.picture(id);

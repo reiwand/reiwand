@@ -107,7 +107,7 @@ impl Painter<'_, '_, '_> {
         if !self.pool.strip.due() {
             return;
         }
-        let grab = match size {
+        let grab = match size.0 {
             Some(size) => {
                 let at = Affine::translate([d.world.0[4], d.world.0[5]]);
                 let shift = Affine::translate([-d.origin[0] * size[0], -d.origin[1] * size[1]]);
@@ -120,7 +120,7 @@ impl Painter<'_, '_, '_> {
         let (x1, y1) = (gx.max(gx + gw).ceil(), gy.max(gy + gh).ceil());
         let rect = Rect { x: x0, y: y0, w: (x1 - x0).max(1.0), h: (y1 - y0).max(1.0) };
         let Some(src) = self.under(rect, target) else { return };
-        let shape = size.unwrap_or(self.frame.canvas);
+        let shape = size.or(self.frame.canvas);
         let (w, h) = fit(shape[0], shape[1]);
         let Some(small) = self.acquire((w, h)) else { return self.release(src) };
         let uv = [(gx - rect.x) / rect.w, (gy - rect.y) / rect.h, gw / rect.w, gh / rect.h];

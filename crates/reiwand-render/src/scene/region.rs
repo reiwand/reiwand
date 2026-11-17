@@ -31,7 +31,7 @@ impl Painter<'_, '_, '_> {
             return None;
         }
         let inked = self.inked(e.mask_texture.as_deref()?)?;
-        Some(span(channel(m.channel, true).into_iter().zip(inked).filter(|(w, _)| *w != 0.0).map(|(_, b)| b)))
+        Some(span(channel(m.channel).into_iter().zip(inked).filter(|(w, _)| *w != 0.0).map(|(_, b)| b)))
     }
 
     fn bounded(&self, e: &EffectDraw<'_>) -> Option<Option<[f32; 4]>> {
