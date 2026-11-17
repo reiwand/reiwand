@@ -5,7 +5,7 @@ use image::DynamicImage;
 use reiwand_format::Kind as PackKind;
 use reiwand_library::{Item, Kind, Meta, qhash};
 use reiwand_render::{decode_image, image_size};
-use std::fs::{self, File};
+use std::fs;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
@@ -18,7 +18,6 @@ pub(crate) use thumbs::{poster, poster_source};
 pub(crate) const MEDIA: &str = "media";
 const THUMBS: &str = "thumbs";
 const EDGE: u32 = 512;
-const OLD: [&str; 4] = ["wallpaper", "pending", "wallpaper.colors", "pending.colors"];
 
 static FILES: OnceLock<PathBuf> = OnceLock::new();
 static GENERATION: AtomicU64 = AtomicU64::new(1);
@@ -33,16 +32,6 @@ pub(crate) fn prepare(files: &str) -> Result<(), Error> {
     [dir.to_path_buf(), dir.join(MEDIA)].iter().for_each(|folder| unfinished(folder));
     reiwand_scene::keep_strikes(&dir.join("stopped-effects"));
     settings::prepare()?;
-    if let Ok((uid, _)) =
-        File::open(dir.join(OLD[0])).map_err(Error::from).and_then(|mut f| store(&mut f, ""))
-    {
-        let path = library::with(|lib| Ok(lib.item(&uid)?.path))?;
-        settings::update(|config| {
-            config.set_image("", path, None);
-            Ok(())
-        })?;
-    }
-    OLD.iter().for_each(|name| drop(fs::remove_file(dir.join(name))));
     Ok(())
 }
 

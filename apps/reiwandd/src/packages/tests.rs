@@ -74,7 +74,7 @@ fn specs_and_errors_are_checked() {
 #[tokio::test(flavor = "multi_thread")]
 async fn repositories_install_over_http_with_progress() {
     let tmp = tempfile::tempdir().unwrap();
-    let fingerprint = repository(tmp.path());
+    repository(tmp.path());
     let server = serve(tmp.path().join("site")).await;
     let (url, data) = (format!("{}/", server.uri()), tmp.path().join("data"));
     let dest = tmp.path().join("preview");

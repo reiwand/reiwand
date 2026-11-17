@@ -38,18 +38,6 @@ pub(crate) struct Look {
 }
 
 pub(crate) fn prepare() -> Result<(), Error> {
-    let mut own = table()?;
-    let (fit, sound) = (own.remove("video_fit"), own.remove("video_sound"));
-    if fit.is_some() || sound.is_some() {
-        update(|config| {
-            if fit.as_ref().and_then(toml::Value::as_str) == Some("stretch") {
-                config.set_fit("", Fit::Stretch);
-            }
-            config.playback.muted = sound.as_ref().and_then(toml::Value::as_str) != Some("on");
-            Ok(())
-        })?;
-        store::write(&store::dir()?.join(OWN), own.to_string().as_bytes())?;
-    }
     caps();
     Ok(())
 }

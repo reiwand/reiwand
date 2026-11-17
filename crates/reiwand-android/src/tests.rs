@@ -39,6 +39,7 @@ mod relief;
 mod saved;
 mod scenes;
 mod screens;
+mod shown;
 mod sounded;
 mod steady;
 mod stopped;
@@ -64,15 +65,13 @@ fn shown(preview: bool) -> String {
 #[test]
 fn the_library_imports_rotates_and_keeps_settings() {
     let dir = tempfile::tempdir().unwrap().keep();
-    fs::copy(Path::new(FIXTURES).join("green-64x32.png"), dir.join("wallpaper")).unwrap();
-    fs::write(dir.join("settings.toml"), "video_fit = \"stretch\"\nvideo_sound = \"on\"\n").unwrap();
     store::prepare(dir.to_str().unwrap()).unwrap();
-    assert!(!dir.join("wallpaper").exists());
+    let green = shown::green_stretched();
     assert_eq!(
         (settings::chosen("fit"), settings::chosen("playback.muted")),
         ("stretch".into(), "false".into())
     );
-    let green = shown(false);
+    assert_eq!(shown(false), green);
     assert_eq!(choice::shown(false).map(|s| s.video), Some(false));
     assert_eq!(
         store::store(&mut open("green-64x32.png"), "again.png").unwrap(),
