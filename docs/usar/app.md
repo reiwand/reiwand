@@ -162,6 +162,14 @@ propios y las claves solo si lo marcas; las claves cifran el archivo con una con
 uno hecho en otro equipo: muestra qué trae, solo suma lo que marcas y deja unir o tener las dos
 listas con el mismo nombre. Es el mismo archivo que usa el teléfono y `reiwand-ctl export` e `import`.
 
+## Cambiar de fondo con vista previa
+
+Desde la bandeja, un atajo o `reiwand-ctl next --preview` se abre una ventanita centrada en tu
+pantalla, con el resto atenuado. El fondo elegido se ve grande en el centro y los vecinos, nítidos, a
+los lados; debajo, su nombre y su posición. ← y →, la rueda o un clic en un vecino mueven la selección;
+Intro o un clic en el central aplican y cierran; Esc o un clic fuera cierran sin cambiar nada. Más en
+[cambiar de fondo con el teclado](cambiar-con-el-teclado.md).
+
 ## La bandeja
 
 En Plasma, el ícono de la bandeja abre un panel con: lo que suena ahora («“…”, 2 de 5»),
