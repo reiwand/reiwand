@@ -136,7 +136,8 @@ GridLayout {
 
         readonly property real side: stretch.info?.side ?? 0
         readonly property real span: stretch.info?.long ?? 0
-        readonly property real unit: Math.min(width * 0.9 / Math.max(span, side, 1), height * 0.8 / Math.max(side, 1))
+        readonly property real across: stretch.info?.across ?? side
+        readonly property real unit: Math.min(width * 0.9 / Math.max(span, side, 1), height * 0.8 / Math.max(across, 1))
 
         Layout.columnSpan: 2
         Layout.fillWidth: true
@@ -151,7 +152,7 @@ GridLayout {
 
         Rectangle {
             width: preview.side * preview.unit
-            height: width
+            height: preview.across * preview.unit
             x: parent.width * 0.95 - width
             anchors.verticalCenter: parent.verticalCenter
             color: "transparent"
@@ -161,7 +162,7 @@ GridLayout {
         Rectangle {
             objectName: "stretchSprite"
             width: preview.span * preview.unit
-            height: preview.side * preview.unit
+            height: preview.across * preview.unit
             x: parent.width * 0.95 - width
             anchors.verticalCenter: parent.verticalCenter
             radius: height / 2

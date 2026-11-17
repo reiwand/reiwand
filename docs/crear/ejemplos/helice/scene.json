@@ -12,7 +12,8 @@
       "forces": [
         { "vortex": { "axis": [0.5, 0, 0.866], "center": [960, 540], "strength": 160 } },
         { "drag": 0.4 }
-      ]
+      ],
+      "render": { "aspect": 1 }
     }
   },
   "layers": [{ "id": "helice", "type": "particles", "system": "helice", "blend": "add" }]

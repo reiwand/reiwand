@@ -55,6 +55,10 @@ fn give(v: &mut Value) -> bool {
                         &[("tilt", json!({"angle": [[0, 0], [0, 0]], "spin": [[0, 0], [0, 0]]}))],
                     );
                 }
+                let render = map.entry("render").or_insert_with(|| json!({}));
+                if let Some(fields) = render.as_object_mut() {
+                    done |= fill(fields, &[("aspect", json!(1))]);
+                }
             }
             for (key, inner) in map.iter_mut() {
                 let Some(fields) = inner.as_object_mut() else { continue };

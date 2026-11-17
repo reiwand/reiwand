@@ -99,9 +99,10 @@ fn vs_particle(
     let reach = clamp(look.trail.x * speed * near, look.shade.z * near, look.shade.w * near);
     var tail = select(reach, 0.0, turned || speed <= 0.0);
     var axis = vec2<f32>(cos(radians(b.w)), sin(radians(b.w)));
-    if (tail > 0.0 || turned || relative || look.turn.x == 1.0) && speed > 0.0 {
-        axis = a.zw / speed;
-    }
+    let driven = (tail > 0.0 || turned || relative || look.turn.x == 1.0) && speed > 0.0;
+    axis = select(axis, a.zw / max(speed, 1e-9), driven);
+    let sides = select(vec2<f32>(1.0), look.tilt[2].yz, look.tilt[2].y > 0.0);
+    let upright = driven && sides.y > sides.x;
     if look.turn.x == 2.0 {
         axis = vec2<f32>(cos(look.turn.y - look.turn.z), sin(look.turn.y - look.turn.z));
     }
@@ -113,21 +114,22 @@ fn vs_particle(
     let s = particle(Sprite(center, a.zw, corner, corner, shade, size, degrees(atan2(axis.y, axis.x)), b.x, b.y));
     let turn = vec2<f32>(cos(radians(s.rotation)), sin(radians(s.rotation)));
     tail = select(tail, s.size * (reach - 1.0), relative);
-    let along = mix(-0.5 * s.size - tail, 0.5 * s.size, s.corner.x);
-    var off = vec2<f32>(along, (s.corner.y - 0.5) * s.size);
+    let wide = vec2<f32>(mix(-0.5 * s.size * sides.x - tail, 0.5 * s.size * sides.x, s.corner.x), (s.corner.y - 0.5) * s.size * sides.y);
+    var q = select(wide, vec2<f32>((s.corner.x - 0.5) * s.size * sides.x, mix(-0.5 * s.size, 0.5 * s.size + tail, s.corner.y)), upright);
     if look.tilt[2].x > 0.5 {
         let a = tilt_of(bitcast<u32>(c.z), b.x);
-        let reach_z = -off.x * a.w + off.y * a.y;
+        let reach_z = -q.x * a.w + q.y * a.y;
         let f = select(1.0, 1.0 / max(1.0 + reach_z / look.deep.x, 0.1), look.deep.w > 0.5);
-        off = vec2<f32>(off.x * a.z, off.y * a.x) * f;
+        q = vec2<f32>(q.x * a.z, q.y * a.x) * f;
         out.tilt = a;
     }
+    let off = select(q, vec2<f32>(-q.y, q.x), upright);
     let p = vec3<f32>(s.position + turn * off.x + vec2<f32>(-turn.y, turn.x) * off.y, 1.0);
     out.position = vec4<f32>(dot(look.m0.xyz, p), dot(look.m1.xyz, p), 0.0, 1.0);
     out.uv = s.uv;
     out.color = s.color;
     out.scale = k;
-    let spun = radians(s.rotation) + look.turn.z;
+    let spun = radians(s.rotation) + look.turn.z + select(0.0, 1.5707964, upright);
     out.turn = vec4<f32>(cos(spun), sin(spun), s.size * look.light.w, 0.0);
     let n = max(look.atlas.x * look.atlas.y, 1.0);
     var f = c.y;

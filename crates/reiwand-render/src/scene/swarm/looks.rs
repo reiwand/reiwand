@@ -36,8 +36,10 @@ pub(super) fn far(scene: &Scene, id: &str, s: Option<&System>) -> Option<(Stack,
     Some((Stack::Farthest, (reach(&s.init.depth) + reach(&s.init.depth_speed) * life).max(1.0)))
 }
 
-pub(super) fn tilt(s: Option<&System>) -> [[f32; 4]; 3] {
-    let Some(t) = s.map(|s| s.init.tilt).filter(|t| t.turned()) else { return [[0.0; 4]; 3] };
+pub(super) fn tilt(s: Option<&System>, r: &Render) -> [[f32; 4]; 3] {
+    let [w, h] = r.sides();
+    let turned = s.map(|s| s.init.tilt).filter(|t| t.turned());
+    let Some(t) = turned else { return [[0.0; 4], [0.0; 4], [0.0, w, h, 0.0]] };
     let row = |[lo, hi]: [[f32; 2]; 2]| [lo[0], lo[1], hi[0], hi[1]].map(f32::to_radians);
-    [row(t.angle), row(t.spin), [1.0, 0.0, 0.0, 0.0]]
+    [row(t.angle), row(t.spin), [1.0, w, h, 0.0]]
 }

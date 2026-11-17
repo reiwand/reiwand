@@ -41,7 +41,7 @@ fn nested_variants_unit_variants_and_needed_fields_are_listed() {
         assert!(text.contains(&format!("\n  {name}")), "{name} is not listed: {text}");
     }
     let top = text.lines().filter(|l| l.starts_with("  ") && !l.starts_with("   ") && l.contains(": object"));
-    assert_eq!(top.count(), 34);
+    assert_eq!(top.count(), 35);
     assert!(describe("layer").unwrap().contains("clear: no arguments"));
     let text = describe("scene3d").unwrap();
     assert!(text.contains("eye: no arguments") && text.contains("center: no arguments"), "{text}");

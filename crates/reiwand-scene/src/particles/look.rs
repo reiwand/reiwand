@@ -17,6 +17,8 @@ pub struct Render {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "image"))]
     pub texture: Option<Value<String>>,
+    #[schemars(extend("x-range" = [0.05, 20]))]
+    pub aspect: f32,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub frames: Option<Frames>,
     pub fps: f32,
@@ -69,12 +71,23 @@ pub struct Refract {
     pub amount: f32,
 }
 
+impl Render {
+    pub fn fill(&self) -> f32 {
+        self.aspect.min(self.aspect.recip())
+    }
+
+    pub fn sides(&self) -> [f32; 2] {
+        [self.aspect.min(1.0), self.aspect.recip().min(1.0)]
+    }
+}
+
 impl Default for Render {
     fn default() -> Self {
         let (texture, frames, trail, size_over_life, color_over_life) = Default::default();
         let (brightness, cutout, cycles, rope, orient, angle, normal, refract, shader) = Default::default();
         Render {
             texture,
+            aspect: 1.0,
             frames,
             fps: 12.0,
             mix: false,

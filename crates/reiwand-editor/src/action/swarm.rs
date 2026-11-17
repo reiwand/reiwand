@@ -44,6 +44,15 @@ pub enum ParticleEdit {
         #[serde(default)]
         range: Option<[f64; 3]>,
     },
+    Aspect {
+        system: String,
+        #[serde(default)]
+        layer: Option<String>,
+        #[serde(default)]
+        aspect: Option<f64>,
+        #[serde(default)]
+        from_texture: bool,
+    },
     Orient {
         system: String,
         #[serde(default)]

@@ -59,3 +59,38 @@ fn fields_that_name_a_control_point_offer_the_points_of_the_system() {
     assert_eq!(at.widget, "ref:control");
     assert_eq!(at.options, [json!("p0"), json!("p1"), json!("p2")]);
 }
+
+#[test]
+fn the_sprite_proportion_is_set_taken_from_the_texture_and_drawn_as_the_rectangle() {
+    let root = tempfile::tempdir().unwrap();
+    let mut p = project(&root);
+    edit(&mut p, "start", json!({ "ranges": { "size": [20, 20] } })).unwrap();
+    assert_eq!(system(&p)["render"]["aspect"], 1.0);
+    edit(&mut p, "aspect", json!({ "aspect": 0.25 })).unwrap();
+    let s = &handles(&p)["sprite"];
+    assert_eq!(
+        (s["width"].as_f64(), s["height"].as_f64(), s["cover"].as_f64()),
+        (Some(5.0), Some(20.0), Some(0.25))
+    );
+    let before = p.doc.clone();
+    edit(&mut p, "aspect", json!({ "aspect": 4 })).unwrap();
+    assert_eq!(handles(&p)["sprite"]["width"], 20.0);
+    undone(&mut p, &before);
+    for bad in [
+        json!({ "aspect": 0.01 }),
+        json!({ "aspect": 30 }),
+        json!({}),
+        json!({ "aspect": 2, "from_texture": true }),
+    ] {
+        assert!(edit(&mut p, "aspect", bad).is_err());
+    }
+    assert!(edit(&mut p, "aspect", json!({ "from_texture": true })).is_err(), "no texture yet");
+    edit(&mut p, "render", json!({})).unwrap();
+    act(&mut p, json!({ "set": { "pointer": "/scene/particles/flakes/render/texture", "value": "pic" } }))
+        .unwrap();
+    edit(&mut p, "aspect", json!({ "from_texture": true })).unwrap();
+    assert_eq!(system(&p)["render"]["aspect"], 2.0);
+    act(&mut p, json!({ "set": { "pointer": "/scene/assets/pic/atlas", "value": [1, 4] } })).unwrap();
+    edit(&mut p, "aspect", json!({ "from_texture": true })).unwrap();
+    assert_eq!(system(&p)["render"]["aspect"], 0.5);
+}

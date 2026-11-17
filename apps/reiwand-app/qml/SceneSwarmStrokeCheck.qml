@@ -38,6 +38,15 @@ QtObject {
         on.toggled();
         if (render()?.stretch !== undefined)
             throw new Error("stretch: switching it off left the stretch");
+        const slim = find("aspectSlider");
+        slim.value = Math.log(0.25);
+        slim.moved();
+        tools.load();
+        if (render()?.aspect !== 0.25 || tools.info.sprite.width !== tools.info.sprite.side * 0.25 || !find("aspectSprite"))
+            throw new Error("aspect: the slider did not write the proportion or the rectangle is not drawn: " + JSON.stringify(render()));
+        find("aspectSquare").clicked();
+        if (render()?.aspect !== 1)
+            throw new Error("aspect: the square button did not write 1: " + JSON.stringify(render()));
         const init = () => JSON.parse(page.editor.value("/scene/particles/flakes/init") || "null");
         if (JSON.stringify(init()?.tilt?.angle) !== "[[0,0],[0,0]]" || !find("tiltSprite0.5"))
             throw new Error("tilt: the system lacks its zero ranges or the preview is not drawn: " + JSON.stringify(init()?.tilt));

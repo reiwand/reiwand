@@ -7,7 +7,7 @@
       "emitters": [{ "shape": { "point": [960, 1040] }, "rate": 0, "bursts": [{ "count": 1, "every": 1.6 }] }],
       "init": { "tilt": { "angle": [[0, 0], [0, 0]], "spin": [[0, 0], [0, 0]] }, "life": [1.1, 1.5], "speed": [700, 850], "angle": [255, 285], "size": [10, 12], "color": ["#ffe9a8", "#ffb347"] },
       "forces": [{ "gravity": [0, 500] }],
-      "render": { "trail": { "length": 12, "width": 0.6 } },
+      "render": { "aspect": 1, "trail": { "length": 12, "width": 0.6 } },
       "children": [{ "system": "estrellas", "on": "death", "inherit": ["color"] }]
     },
     "luciernagas": {
@@ -22,14 +22,14 @@
                  { "attractor": { "target": "p1", "strength": 4000, "radius": 500, "falloff": "linear" } },
                  { "oscillate": { "what": "alpha", "from": "top", "freq": [0.5, 1.5], "scale": [0.2, 0.5] } },
                  { "drag": 0.3, "window": [0, 0.2, 0.8, 1] }],
-      "render": { "size_over_life": [[0, 0], [0.2, 1], [1, 0]], "cutout": [0.1, 0.9, 1], "order": "newest" }
+      "render": { "aspect": 1, "size_over_life": [[0, 0], [0.2, 1], [1, 0]], "cutout": [0.1, 0.9, 1], "order": "newest" }
     },
     "estrellas": {
       "capacity": 3000,
       "emitters": [{ "shape": { "point": [0, 0] }, "rate": 0, "bursts": [{ "count": 60 }] }],
       "init": { "tilt": { "angle": [[0, 0], [0, 0]], "spin": [[0, 0], [0, 0]] }, "life": [0.9, 1.6], "speed": [80, 320], "angle": [0, 360], "size": [5, 9], "color": ["#ffffff", "#9ad1ff"] },
       "forces": [{ "gravity": [0, 160] }, { "drag": 0.8 }],
-      "render": { "size_over_life": [[0, 1], [1, 0]], "color_over_life": [[0, "#ffffff"], [1, "#ffffff00"]] }
+      "render": { "aspect": 1, "size_over_life": [[0, 1], [1, 0]], "color_over_life": [[0, "#ffffff"], [1, "#ffffff00"]] }
     }
   },
   "layers": [

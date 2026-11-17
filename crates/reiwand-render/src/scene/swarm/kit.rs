@@ -102,7 +102,7 @@ pub(super) fn kit(
         cord: super::looks::cord(render),
         sizes: std::array::from_fn(|i| std::array::from_fn(|j| sizes[i * 4 + j])),
         colors: colors.map(tone),
-        tilt: super::looks::tilt(own),
+        tilt: super::looks::tilt(own, render),
         hull: hull
             .filter(|_| image.is_some() && cells.is_empty() && render.cutout.is_none())
             .unwrap_or_default(),

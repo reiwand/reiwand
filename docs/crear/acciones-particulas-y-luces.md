@@ -475,6 +475,14 @@ reiwand-ctl scene act mi-escena particles '{"scope":{"system":"chispas","layer":
 reiwand-ctl scene act mi-escena particles '{"scope":{"system":"chispas","layer":"chispas","own":false}}'
 ```
 
+##### variante `aspect`
+
+Cambia la proporción del sprite: ancho entre alto, de 0.05 a 20 (1 es cuadrado). `size` es el lado más largo. Con `from_texture: true` toma la proporción de la textura. Acepta `layer`. Un valor distinto de 1 necesita `particles2`. El presupuesto cuenta `size²·min(aspect, 1/aspect)`.
+
+```
+reiwand-ctl scene act mi-escena particles '{"aspect":{"system":"chispas","aspect":0.25}}'
+```
+
 ##### variante `cutout`
 
 Reescribe la opacidad de la imagen de las partículas: por debajo de `inicio` pasa a 0, por encima de `fin` pasa a `opacidad`, y entre los dos sube en rampa.

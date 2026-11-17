@@ -39,7 +39,9 @@ pub(super) fn stretch(system: &Value, render: &Value) -> Value {
         Vec::new()
     };
     json!({ "mode": s["mode"], "depth": s["depth"], "time": num("time"), "min": num("min"), "max": num("max"),
-        "speed": speed, "side": side, "long": long, "drops": drops })
+        "speed": speed, "side": side, "long": long,
+        "across": side * super::proportion::cover(render),
+        "drops": drops })
 }
 
 fn wave(what: &str, from: &str, scale: [f64; 2], u: f64, turn: f64) -> f64 {

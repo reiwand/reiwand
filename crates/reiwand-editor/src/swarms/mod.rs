@@ -7,6 +7,7 @@ pub(crate) mod glyphs;
 mod handles;
 mod looks;
 mod named;
+mod proportion;
 mod pulls;
 mod reach;
 mod salt;
@@ -54,7 +55,14 @@ pub(crate) fn render(
     layer: Option<&str>,
     change: impl Fn(&Value, &str) -> Vec<Op>,
 ) -> Result<Vec<Op>> {
-    let Some(id) = layer else { return Ok(change(doc, &format!("{sys}/render"))) };
+    let Some(id) = layer else {
+        let own = format!("{sys}/render");
+        let mut ops = squared(doc, &own);
+        let mut probe = doc.clone();
+        apply(&mut probe, &ops)?;
+        ops.extend(change(&probe, &own));
+        return Ok(ops);
+    };
     let (path, found) = crate::actions::layer(doc, id)?;
     let own = crate::ops::unescape(sys.rsplit('/').next().unwrap_or_default());
     let fits = found["type"] == "particles" && found["system"] == own.as_str();
@@ -64,8 +72,18 @@ pub(crate) fn render(
     let mut ops = if found.get("render").is_some() { Vec::new() } else { set(doc, &own, copy) };
     let mut probe = doc.clone();
     apply(&mut probe, &ops)?;
+    let squares = squared(&probe, &own);
+    apply(&mut probe, &squares)?;
+    ops.extend(squares);
     ops.extend(change(&probe, &own));
     Ok(ops)
+}
+
+fn squared(doc: &Value, at: &str) -> Vec<Op> {
+    match doc.pointer(&format!("{at}/aspect")) {
+        Some(_) => Vec::new(),
+        None => set(doc, &format!("{at}/aspect"), json!(1)),
+    }
 }
 
 pub(crate) fn put(doc: &Value, path: &str, value: Option<Value>) -> Vec<Op> {
@@ -119,6 +137,9 @@ pub(crate) fn edit(dir: &Path, doc: &Value, e: &ParticleEdit) -> Result<Vec<Op>>
             render(doc, &system(doc, s)?, layer.as_deref(), |d, at| {
                 put(d, &format!("{at}/cutout"), range.map(|r| json!(r)))
             })?
+        }
+        ParticleEdit::Aspect { system: s, layer, aspect, from_texture } => {
+            proportion::aspect((dir, doc), &system(doc, s)?, layer.as_deref(), (*aspect, *from_texture))?
         }
         ParticleEdit::Orient { system: s, layer, orient, angle } => {
             render(doc, &system(doc, s)?, layer.as_deref(), |d, at| {

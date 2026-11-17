@@ -182,7 +182,8 @@ impl System {
         let peak = self.render.size_over_life.iter().map(|k| k[1]).fold(0.0, f32::max);
         let peak = if self.render.size_over_life.is_empty() { 1.0 } else { peak };
         let side = (self.init.size[0] + self.init.size[1]) / 2.0 * peak;
-        self.capacity as f32 * side * side / (canvas[0] as f32 * canvas[1] as f32).max(1.0)
+        self.capacity as f32 * side * side * self.render.fill()
+            / (canvas[0] as f32 * canvas[1] as f32).max(1.0)
     }
 }
 

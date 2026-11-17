@@ -12946,6 +12946,26 @@ msgstr "Este punto de control sigue un valor; moverlo sustituye el valor"
 msgid "Drag to move the control point"
 msgstr "Arrastra para mover el punto de control"
 
+#: apps/reiwand-app/qml/SceneSwarmAspect.qml
+msgid "Proportion of the sprite"
+msgstr "Proporción del sprite"
+
+#: apps/reiwand-app/qml/SceneSwarmAspect.qml
+msgid "Width over height"
+msgstr "Ancho entre alto"
+
+#: apps/reiwand-app/qml/SceneSwarmAspect.qml
+msgid "Take from the texture"
+msgstr "Tomar de la textura"
+
+#: apps/reiwand-app/qml/SceneSwarmAspect.qml
+msgid "Square"
+msgstr "Cuadrado"
+
+#: apps/reiwand-app/qml/SceneSwarmAspect.qml
+msgid "%1 by %2 px, counts %3% of the square"
+msgstr "%1 por %2 px, cuenta el %3% del cuadrado"
+
 #: apps/reiwand-app/qml/SceneSwarmBend.qml
 msgid "Bend what is behind the particles"
 msgstr "Doblar lo que hay detrás de las partículas"

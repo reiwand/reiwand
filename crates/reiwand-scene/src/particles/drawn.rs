@@ -14,6 +14,8 @@ impl Check<'_> {
                     || s.max < 1e4
             });
         self.uses(wide, "particles2");
+        self.uses(r.aspect != 1.0, "particles2");
+        self.range(&format!("{p}/aspect"), r.aspect, 0.05, 20.0);
         r.brightness.iter().for_each(|b| self.number(&format!("{p}/brightness"), b, 0.0, 16.0));
         if let Some(n) = r.cycles {
             self.range(&format!("{p}/cycles"), n as f32, 1.0, 64.0);

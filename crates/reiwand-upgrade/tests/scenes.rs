@@ -57,3 +57,15 @@ fn every_particle_system_gains_explicit_zero_tilt() {
     assert_eq!(p["plain"]["init"]["life"], json!([1, 2]));
     assert_eq!(p["kept"]["init"]["tilt"]["angle"], json!([[5, 5], [9, 9]]));
 }
+
+#[test]
+fn every_particle_render_gains_the_square_aspect() {
+    let scene = json!({"particles": {
+        "bare": {"capacity": 4, "emitters": []},
+        "drawn": {"capacity": 4, "emitters": [], "render": {"texture": "a", "aspect": 0.25}},
+        "plain": {"capacity": 4, "emitters": [], "render": {"fps": 8}}}});
+    let p = &upgraded("scenes-aspect", scene)["particles"];
+    assert_eq!(p["bare"]["render"]["aspect"], 1);
+    assert_eq!(p["plain"]["render"], json!({"fps": 8, "aspect": 1}));
+    assert_eq!(p["drawn"]["render"]["aspect"], 0.25);
+}

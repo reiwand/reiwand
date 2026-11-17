@@ -3032,6 +3032,26 @@ msgstr ""
 msgid "there is no particle system \"%1\""
 msgstr "no hay ningún sistema de partículas «%1»"
 
+#: crates/reiwand-editor/src/swarms/proportion.rs
+msgid "the render has no picture to take the proportion from"
+msgstr "el dibujo no tiene una imagen de la que tomar la proporción"
+
+#: crates/reiwand-editor/src/swarms/proportion.rs
+msgid "there is no picture \"%1\" in the scene"
+msgstr "no hay ninguna imagen «%1» en la escena"
+
+#: crates/reiwand-editor/src/swarms/proportion.rs
+msgid "the picture has an empty frame"
+msgstr "la imagen tiene un cuadro vacío"
+
+#: crates/reiwand-editor/src/swarms/proportion.rs
+msgid "give either the proportion or take it from the texture"
+msgstr "indica la proporción o tómala de la textura, pero no las dos cosas"
+
+#: crates/reiwand-editor/src/swarms/proportion.rs
+msgid "the proportion %1 must be between %2 and %3"
+msgstr "la proporción %1 debe estar entre %2 y %3"
+
 #: crates/reiwand-editor/src/swarms/mod.rs crates/reiwand-editor/src/swarms/scopes.rs
 msgid "the layer \"%1\" draws no particles of this system"
 msgstr "la capa «%1» no dibuja partículas de este sistema"

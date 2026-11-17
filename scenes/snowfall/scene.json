@@ -42,7 +42,7 @@
                  { "turbulence": { "strength": 14, "scale": 0.004 } }, { "drag": 0.25 }],
       "collide": [{ "bounds": { "plane": { "point": [1940, 0], "normal": [-1, 0] } }, "kill": true },
                   { "bounds": { "plane": { "point": [0, 1100], "normal": [0, -1] } }, "kill": true }],
-      "render": { "color_over_life": [[0, "#ffffff00"], [0.08, "#ffffffff"], [0.9, "#ffffffff"], [1, "#ffffff00"]] }
+      "render": { "aspect": 1, "color_over_life": [[0, "#ffffff00"], [0.08, "#ffffffff"], [0.9, "#ffffffff"], [1, "#ffffff00"]] }
     }
   }
 }
