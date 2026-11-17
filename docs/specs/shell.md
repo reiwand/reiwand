@@ -200,9 +200,7 @@ clave y trae fotos nuevas en la próxima actualización. «Quitar esta fuente» 
 - Encendida, el programa no manda nada a ninguna red ni busca ningún nombre: todo cliente de red del
   servicio, de `reiwand-ctl` y de la app nace en una sola compuerta (`reiwand_core::net`) que se niega antes
   de resolver un nombre o conectar, con la frase «private mode is on: the network is cut…». Corta
-  fuentes, repositorios y sus descargas, carátulas de internet, la cuenta y la sincronización con el
-  servidor (cierra al momento el flujo de avisos abierto), el enlace con el teléfono (va por el
-  servidor), OpenRGB (aunque esté en este equipo, porque habla por TCP), las descargas de modelos y
+  fuentes, repositorios y sus descargas, carátulas de internet, el inicio de sesión de las cuentas, OpenRGB (aunque esté en este equipo, porque habla por TCP), las descargas de modelos y
   la publicación. Los fondos web se recargan sin la red que tenían permitida y su proceso corre sin
   red. Lo que ya está en el equipo sigue igual: biblioteca, ejemplos incluidos, repositorios de
   archivos locales, escenas, videos y fondos web locales.

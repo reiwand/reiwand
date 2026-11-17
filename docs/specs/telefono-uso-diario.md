@@ -8,8 +8,7 @@ que se ve en ese momento.
 
 ## Biblioteca
 
-La fila de arriba lleva, a la izquierda, «Conectado a NOMBRE» solo cuando la sincronización está
-vinculada y el teléfono tiene red; a la derecha, la búsqueda y «Añadir» como dos cuadros con icono
+La fila de arriba lleva la búsqueda y «Añadir» como dos cuadros con icono
 (`Now.kt`). Debajo va la tarjeta del fondo en uso: dónde está puesto (solo cuando el servicio de
 fondos de la app está elegido en una pantalla), el título, sus datos, «Opciones» y «Favorito»
 (`Now.kt`, primer elemento de la cuadrícula de `Library.kt`). La cuadrícula muestra cada portada con
@@ -132,27 +131,9 @@ Calidad). La primera vez por paquete aparece además un aviso arriba de la pági
 Con la biblioteca vacía la página no muestra encabezado ni filtros: dice «Aún no hay nada» y ofrece
 primero «Explorar repositorios» y después «Añadir fotos», con la tira de fondos de ejemplo y su
 botón «Explorar», que abre el repositorio de ejemplos en Explorar. La hoja «Añadir» agrupa fotos, archivos (también paquetes), carpetas y fondos
-animados. La página «Repositorios» (antes «Fuentes») lleva a «Conectar al servidor» y la vuelta
-atrás regresa a ella; agregar un repositorio a mano es una página propia con la huella en un solo
-campo y el botón fijo sobre el teclado. Junto a la dirección, «Escanear el código QR» abre el mismo
-lector que «Conectar al servidor» (mismo permiso; si se niega la cámara o no hay, el aviso pide
-escribir o pegar la dirección del repositorio): un código con una dirección https:// (o http:// en
-este teléfono) llena el campo, listo para confirmar, y la huella que traiga se comprueba al añadir
-como si se hubiera pegado. El código de la página de administración del servidor no es un error:
-el formulario dice en una línea que es de un servidor y que al conectarse llegan sus repositorios,
-con «Conectar» al lado, que entra en «Conectar al servidor» con ese código ya leído (dirección y
-huella puestas, igual que tras escanear allí). Si el teléfono ya está unido a un servidor, la línea
-aparece sin el botón. Cualquier otro código no llena nada y el lector lo dice con el mismo texto de
-una dirección mal escrita.
+animados. La página «Repositorios» (antes «Fuentes») lleva a «Agregar un repositorio», una página propia con un único campo, la dirección, y el botón fijo sobre el teclado; no hay campo de huella ni lector de códigos, y la app no pide el permiso de la cámara. Un enlace `reiwand://add?url=…` abre la misma página con la dirección escrita y no agrega nada hasta que se pulsa el botón. La dirección vale si empieza por https://; http:// solo vale para una dirección de este mismo teléfono (localhost o 127.0.0.1), y el aviso lo dice con esas palabras.
 
-Al pulsar «Añadir el repositorio» se revisa primero la dirección y después la huella, así que lo
-primero que está mal es lo primero que se dice. La dirección vale si empieza por https://; http://
-solo vale para una dirección de este mismo teléfono (localhost o 127.0.0.1), y el aviso lo dice con
-esas palabras. Un rechazo de la dirección aparece bajo la dirección y marca ese campo; uno de la
-huella (falta, largo o caracteres que no son, o la dirección ya trae una), bajo la huella y la
-marca; cualquier otro (el servidor no responde, la dirección no es un repositorio) aparece debajo
-del último campo sin marcar ninguno. El formulario decide el lugar por el código del rechazo, no
-por su texto.
+La respuesta decide lo que sigue: un repositorio público se agrega y se abre en Explorar; uno privado pide una cuenta («Usar la cuenta X», «Usar otra cuenta» o iniciar sesión con un código que se aprueba en el navegador); un servidor con certificado propio muestra su huella para confiar en ella, una sola vez, para esa dirección; la dirección de un servidor (no de un repositorio) lista los repositorios públicos que ofrece, para elegir uno; y una firma o un certificado que cambian se avisan sin aplicar nada. Un rechazo de la dirección aparece bajo el campo y lo marca; cualquier otro (el servidor no responde, la dirección no es un repositorio) aparece debajo sin marcar nada. El formulario decide el lugar por el código del rechazo, no por su texto.
 
 Lo primero que se añade a una biblioteca vacía pasa a ser el fondo: un solo aviso dice «X ya es tu
 fondo», con el nombre en el idioma de la app, y pregunta dónde (inicio, bloqueo o ambos). Si el
@@ -183,7 +164,7 @@ Encendido corta toda la red del teléfono:
 - No se actualizan repositorios (ni a mano ni el trabajo de fondo), no se agrega un repositorio por dirección y no se instala nada de uno remoto.
 - No se descargan carátulas ni vistas previas, ni modelos de profundidad, y las fuentes de fondos (imagen del día, WebDAV, Immich…) no consultan nada.
 - Los fondos web solo cargan sus propios archivos: la vista bloquea la red y la biblioteca nativa contesta vacío a cualquier origen permitido.
-- No se habla con tu servidor ni con tu computadora: no se vincula, no se sincroniza, no se vota, no se escucha la red local ni se buscan computadoras cercanas.
+- No se habla con tu servidor ni con tu computadora: no se inicia sesión, no se vota, no se escucha la red local ni se buscan computadoras cercanas.
 
 Sigue funcionando todo lo local: la biblioteca, los fondos instalados, las listas, la rotación, los ajustes y los repositorios incluidos en la app.
 

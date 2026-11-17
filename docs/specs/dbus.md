@@ -41,12 +41,12 @@ renderer stopped after an error; restart reiwandd`) and change nothing. Every ot
 working. Debug builds started with `REIWAND_RENDER_STOP=1` stop their renderer on `SIGUSR2`, so tests
 can check this.
 
-The daemon opens network connections only to the providers, repositories and the sync server
-the user added (including the signed mirrors of a repository, the only hosts a repository request
+The daemon opens network connections only to the providers, repositories and the servers
+the user added (the accounts they signed in with) (including the signed mirrors of a repository, the only hosts a repository request
 may be redirected to), with a generic `User-Agent:
 reiwand/<version> (+https://github.com/reiwand/reiwand)` (the program and the address of the
 project, nothing about the person or the computer) and without cookies or `Referer`. At startup it contacts only providers
-due for their automatic sync and a linked sync server whose sync is not paused; the daily
+due for their automatic sync; the daily
 repository refresh starts 10 minutes later.
 
 ## Conventions
@@ -624,7 +624,7 @@ configuration file (see "Configuration file"), never inside the package: in the 
 when that screen has its own values for the package, otherwise in the `[default]` section that the
 screens without their own values share. They apply at once without reloading the scene. A `secret`
 text is stored in the Secret Service instead, once for every output (`KeyringUnavailable` without
-one), and `""` forgets it; it never reaches the configuration, the logs, exported settings or sync.
+one), and `""` forgets it; it never reaches the configuration, the logs or exported settings.
 
 ### `ListApplications() → (s json)`
 
@@ -660,8 +660,7 @@ settings take their defaults. Secrets stay stored.
 
 Saves the current values of the package shown on `output` as a preset named `name` and returns its
 uid; saving a name the package already has replaces that preset and keeps its uid. Saved presets
-belong to the package id, so they survive updates of the package, live in the library and travel
-with sync to the user's other devices.
+belong to the package id, so they survive updates of the package, live in the library.
 
 ### `RenameScenePreset(s preset, s name)`
 
@@ -757,7 +756,7 @@ Changes one setting and saves the configuration. Keys and their current values a
 | `library.thumb_cache_mb` | `64` to `8192`, size of the thumbnail cache | `512` |
 | `library.hide_mature` | leave packages rated `mature` out of `Search` (unless the query has its own `content:` filter; `SearchPage.query` stays the one given) and `Browse`; a change emits `library` and `repos` | `false` |
 | `library.show_mature` | show the previews of packages rated `mature` without blur; otherwise clients (app, tray, phone) blur them until the user confirms once per package with `Library1.Confirm`; a change emits `library` and `repos` | `false` |
-| `repos.auto_refresh` | refresh each repository 10 min after start and then every 24 h; the phone reads it for its daily check, which a synced change starts or stops | `true` |
+| `repos.auto_refresh` | refresh each repository 10 min after start and then every 24 h; the phone reads it for its daily check | `true` |
 | `repos.auto_update` | after each refresh, update without asking the installed packages that have a newer version in their repository, with every check of `Install`; a version that asks for a permission the installed one lacks (an input, `rgb` or a network origin) is not installed: it stays in `ListInstalled` with `asks`. Off by default, because updating without asking changes what runs on the device. There is no notification for updates either way | `false` | En el escritorio la actualización automática espera a que haya corriente (no corre con batería y corre al enchufar). El índice del repositorio lista los permisos de cada versión (`asks`); si una versión nueva pide uno que la instalada no tiene, se retiene sin descargarla. En el teléfono, al actualizar solo queda registrada la versión nueva. «Solo en otro dispositivo»: la nota se recalcula al instalar o importar sin esperar a la sincronización, y un paquete de un repositorio no agregado aquí dice cuál es (`repo`); el teléfono no sincroniza perfiles, por eso no tiene la nota por pantalla.
 | `repos.vote_counts` | fetch and show vote counts from the linked server in the catalog (`GetVotes`); voting itself stays possible | `true` |
 | `layout.bezel_mm` | `0` to `100`, frame width of every screen side for the `span` fit | `0.0` |
@@ -864,8 +863,7 @@ Turns private mode on or off; the same as `SetOption("network.private", …)`. W
 program sends nothing to any network and looks no name up: every network client of the daemon
 is built by one gate (`reiwand_core::net`) that refuses before it resolves a name or connects, with
 the error `private mode is on: the network is cut …`. It cuts the sources, the repositories and
-their downloads, covers from the internet, the account and sync with the server (the open event
-stream is closed at once), the link to the phone, which goes through the server, and OpenRGB
+their downloads, covers from the internet, the accounts and publishing to servers, and OpenRGB
 (also on this computer, as it speaks over TCP). Web wallpapers are reloaded without the network
 they were given, and their helper runs in a namespace with no network. Everything on the computer
 keeps working. It is off by default, is kept in the configuration and is read when the daemon
@@ -2258,7 +2256,7 @@ Exporta la configuración de este equipo a un solo archivo `.reiwand` y la impor
 en `exportar.md`). Importar solo agrega: nunca reemplaza nada de lo que ya hay. Exportar e importar
 corren como tareas (`carry_export`, `carry_import`) y se ven en `Daemon1.ListJobs`. Las rutas son
 absolutas. Las contraseñas y las claves de los proveedores salen solo si la persona las marca, y
-siempre cifradas con la contraseña del archivo. Las sesiones de cuenta del servidor no viajan.
+siempre cifradas con la contraseña del archivo. Las sesiones de cuenta (`Accounts1`) salen solo con las claves, cifradas; al importar, cada equipo pide al servidor su propia copia de la sesión, y la que no se puede copiar queda como cuenta que pide volver a iniciar sesión.
 
 ### `Export(s path, s options_json) → (t job)`
 
@@ -3103,30 +3101,12 @@ struct InputsReply {
     declined: BTreeMap<String, Vec<Input>>, asking: BTreeMap<String, Vec<Input>>,
     quiet: BTreeMap<String, Vec<Input>>, clicks: Vec<String>, clicking: Vec<String>, media: MediaStatus,
 }
-enum AccountState { Unlinked, Linking, Connected, NeedsKey, Ready, Paused, Error, SignedOut }
-struct AccountDevice {
-    id: String, name: String, label: Option<String>, platform: String, created_at: Time,
-    seen_at: Option<Time>, current: bool,
+struct ServerAccountRepo { url: String, repo_id: Option<String> }
+struct ServerAccount {
+    id: String, server: String, user: String, label: String, pending: bool, repos: Vec<ServerAccountRepo>,
 }
-enum Recovery { Off, Current, Stale }
-struct RepoOffer { id: String, repo_id: String, name: String, url: String, fingerprints: Vec<String> }
-struct Pairing { device: String, code: Option<String>, sharing: bool }
-struct Account {
-    url: String, name: String, repo_id: Option<String>, handle: Option<String>,
-    device: Option<String>, label: String, state: AccountState, encrypted: Option<bool>,
-    warning: Option<String>, paused: bool, last_sync: Option<Time>, last_error: Option<String>,
-    records: u32, used_bytes: u64, quota_bytes: u64, devices: Vec<AccountDevice>,
-    pairing: Option<Pairing>, quarantined: u32, unapplied: u32, offers: Vec<RepoOffer>,
-    recovery: Recovery, files_bytes: u64, files_quota_bytes: u64,
-    job: Option<u64>, pin: Option<String>, link_problem: Option<String>, link_error: Option<String>,
-    file_secrets: bool,
-}
-struct AccountReply { model: u32, serial: u64, account: Option<Account> }
-struct PrivateFile { id: String, name: String, size: u64, item: Option<Uid>, shared: bool, stored: bool }
-struct AwayProfile { profile: Uid, output: String }
-struct Away { key: String, title: String, playlists: Vec<Uid>, profiles: Vec<AwayProfile> }
-struct AwayReply { model: u32, serial: u64, items: Vec<Away> }
-struct FilesReply { model: u32, serial: u64, folders: Vec<String>, files: Vec<PrivateFile> }
+struct AccountsReply { model: u32, serial: u64, accounts: Vec<ServerAccount> }
+struct SignIn { user_code: String, verification_uri: String, job: u64 }
 struct UploadOutput { id: String, state: String, package: Option<String>, version: Option<String>, errors: Vec<String> }
 ```
 

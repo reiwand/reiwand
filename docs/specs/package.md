@@ -35,7 +35,7 @@ first version; `web`, `preset` and `assets` need the second.
 
 ## Versions
 
-`schema` is `reiwand.wpak/2`. Every reader (daemon, library, repositories, server, sync and
+`schema` is `reiwand.wpak/2`. Every reader (daemon, library, repositories, server and
 the Android app) refuses a `reiwand.wpak/1` package with `invalid schema: reiwand.wpak/1
 is no longer read; the package needs reiwand.wpak/2`. Within `/2` only optional fields, enum
 values and feature names are added; the meaning of what exists never changes, and a new major

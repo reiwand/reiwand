@@ -62,7 +62,7 @@ vacío, la clave rechaza uno mal escrito, y una variable vacía o mal escrita se
 aviso en el registro y en `ignored` del estado. Vale desde el siguiente arranque del daemon y solo con superficies
 `layer-shell`: `reiwand-ctl state` muestra en `layer_shell` el nombre en uso, de dónde salió, si un
 cambio espera a ese arranque y qué valor se ignoró, y `reiwand-ctl config surfaces.layer_namespace
-NOMBRE` y la app lo avisan. No se sincroniza ni entra en los perfiles, porque depende del
+NOMBRE` y la app lo avisan. No viaja en el archivo exportado ni entra en los perfiles, porque depende del
 escritorio de cada equipo.
 
 El daemon arranca como servicio de usuario de systemd, que no ve las variables ni las opciones de

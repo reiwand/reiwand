@@ -471,14 +471,14 @@ solo imprimen el número del trabajo.
 
 ### Servidor propio
 
-El servidor, su arranque sin Docker, el enlace de cada equipo y lo que se sincroniza están en
-[Servidor propio](../usar/servidor.md). Con un equipo ya enlazado:
+El servidor, su arranque sin Docker, los repositorios y las cuentas están en
+[Servidor propio](../usar/servidor.md). Con una cuenta en el repositorio:
 
 ```
 reiwand-ctl server upload reloj.wpak --wait
 ```
 
-Sube un paquete ya firmado al repositorio del servidor al que estás enlazado. Registra tu clave
+Sube un paquete ya firmado al repositorio elegido, con la cuenta vinculada a él. Registra tu clave
 pública antes con `server author-key add`. Lo que revisa el servidor y lo que rechaza: `paquete.md`.
 
 ## Las acciones del editor: `scene act`, `scene actions` y `scene ask`

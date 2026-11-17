@@ -15,7 +15,7 @@ desde el icono de la bandeja del sistema.
 - Pausa automática cuando una ventana tapa el fondo, con batería o con la pantalla bloqueada.
 - Paquetes `.wpak` propios, con repositorios, firmas y un servidor propio opcional.
 - Editor de escenas integrado, para crear fondos con capas, efectos, partículas, sonido y scripts.
-- Iluminación RGB, reproductor multimedia y una app para Android que sincroniza con tu servidor.
+- Iluminación RGB, reproductor multimedia y una app para Android para llevar tus fondos al teléfono.
 
 ## Instalar
 

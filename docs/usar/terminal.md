@@ -166,7 +166,7 @@ panel de tonos del editor avisa de cómo se ven esas escenas en una pantalla HDR
 (Android 14 o posterior) está en sus ajustes, la app usa `COLOR_MODE_HDR` en su ventana y el
 diagnóstico dice si la pantalla muestra HDR y su pico. `reiwand-ctl quality --hdr on`,
 `reiwand-ctl quality --hdr off -o DP-1` y `reiwand-ctl config playback.hdr.DP-1 auto` lo cambian, y
-`reiwand-ctl quality` y `reiwand-ctl state` muestran el estado de cada pantalla. El ajuste no se sincroniza ni entra en los perfiles, porque depende de cada equipo: al
+`reiwand-ctl quality` y `reiwand-ctl state` muestran el estado de cada pantalla. El ajuste no viaja en el archivo exportado ni entra en los perfiles, porque depende de cada equipo: al
 usar un perfil, cada pantalla conserva su propio valor; las páginas web siguen el general. Con batería o con el perfil de ahorro de energía de power-profiles-daemon
 las escenas bajan de nivel y de fotogramas; si un sensor del sistema dice que la GPU o la CPU están
 cerca de su temperatura crítica, bajan más hasta que se enfrían. Cuando el escritorio pide reducir
@@ -220,7 +220,7 @@ tanto. Con
 `WGPU_BACKEND` puesto, el daemon solo carga los controladores de esa API, también
 al listar las tarjetas. La clase de cada
 tarjeta se mide y se guarda aparte, así que volver a una no la mide otra vez. La dedicada dibuja
-las escenas pesadas con más calidad y gasta más energía. El ajuste no se sincroniza ni entra en los
+las escenas pesadas con más calidad y gasta más energía. El ajuste no viaja en el archivo exportado ni entra en los
 perfiles, y el teléfono, que tiene una sola GPU, no lo muestra y lo ignora.
 
 Los fondos que destellan están deshabilitados por defecto: `playback.allow_flashing` (*Permitir los
@@ -323,7 +323,9 @@ reiwand-ctl playlist start Mar && reiwand-ctl next    # rotar una lista y avanza
 reiwand-ctl profile save Escritorio                # guardar lo que muestra cada pantalla
 reiwand-ctl provider add diario bing               # una fuente en línea
 reiwand-ctl provider wallhaven add arte --ratios 16x9,landscape --colors 660000 --sorting random --no-secret
-reiwand-ctl remote add 'https://example.org/r/fondos/'
+reiwand-ctl remote add 'https://example.org/r/fondos'   # un servidor de casa con su certificado: --trust-certificate HUELLA
+reiwand-ctl account sign-in 'https://example.org/r/privado'   # cuentas por repositorio: sign-in, ls, use, unlink, rm
+reiwand-ctl export config.reiwand && reiwand-ctl import config.reiwand --list   # llevar la configuración a otro equipo en un archivo
 reiwand-ctl pkg install org.example.dawn --wait    # instalar un paquete de un repositorio
 reiwand-ctl jobs | watch | schema                  # trabajos, cambios en vivo, claves válidas
 reiwand-ctl input decide org.example.dawn -a audio,pointer -x network   # una respuesta para todo lo que pide la escena
@@ -618,83 +620,38 @@ obligatorio que falta, consejos) salen en el idioma del escritorio con el catál
 `po/<idioma>/reiwand-ctl.po`; los nombres de las órdenes, de las opciones y de sus valores quedan en
 inglés para que los scripts sigan funcionando igual en cualquier idioma.
 
-La fila *Cuenta* de *Ajustes* abre la página que enlaza el teléfono con tu [servidor propio](servidor.md) con el
-mismo cliente en Rust que el escritorio, para compartir la biblioteca, las listas y los ajustes con
-tus ordenadores. Se escribe la dirección del servidor, *Enlazar este teléfono* muestra un código que
-se aprueba en un ordenador ya enlazado (`reiwand-ctl server approve` o la página *Cuenta* de la app, con
-la contraseña de la cuenta) o en la web del servidor, y después *Obtener la clave* trae la clave de sincronización de otro equipo
-comparando seis cifras en las dos pantallas, como entre ordenadores. Desde el teléfono también se
-aprueba un equipo nuevo, tras ver qué sistema y qué programa piden el código, y se le comparte la
-clave. El token, la clave del teléfono y la de sincronización se guardan cifrados con una clave del
-almacén de claves de Android que no sale del teléfono. Los registros van cifrados de extremo a
-extremo y el servidor solo ve los equipos como `Device 1`, `Device 2`…
-
-En el teléfono se aplican los títulos, etiquetas, valoraciones, favoritos y ediciones (encuadre,
-ajuste, paralaje y el resto de la edición) de los fondos que tiene (el mismo archivo en el teléfono
-y en el ordenador es el mismo fondo), las listas con sus reglas y los ajustes compartidos, como el
-fundido. Se quedan en el teléfono el volumen, el sonido de los vídeos, los fotogramas por segundo y
-el permiso para descargar modelos; los perfiles, los preajustes y los repositorios del
-escritorio se conservan sin tocar. Si cambias la clave en un ordenador, el teléfono la recibe solo,
-y si se revoca un equipo, el primero que sincroniza (también el teléfono) cambia la clave. La
-sincronización en segundo plano usa WorkManager cada hora, solo con Wi-Fi u otra red sin límite de
-datos (salvo *Usar también datos móviles en segundo plano*, que está en los ajustes del teléfono con o sin servidor) y sin batería baja, más una tras abrir la app
-y otra 30 segundos después de cada cambio; *Sincronizar ahora* la lanza al momento con cualquier
-red. Mientras el teléfono no está enlazado, la app no prepara ninguna tarea ni toca la red al
-arrancar. *Pausar la sincronización* y *Quitar el servidor* (que pide al servidor que olvide el
-teléfono) están en la misma pestaña.
-
-Mientras la app está abierta o el fondo se ve (en inicio o en bloqueo, con la pantalla encendida),
-el teléfono escucha el canal de avisos del servidor (el mismo que usa el escritorio) y sincroniza
-en cuanto otro equipo guarda un cambio, en unos segundos y sin esperar a la hora: al abrir el canal
-pregunta además si se perdió algo, así que al encender la pantalla el fondo se pone al día enseguida.
-Un solo canal sirve a la app y al fondo y se abre 2 segundos después de mostrarse, para no abrir y
-cerrar conexiones al pasar de una app a otra. Sigue las mismas reglas que la sincronización de
-cada hora: solo con Wi-Fi u otra red sin límite de datos (salvo *Usar también datos
-móviles en segundo plano*) y nunca con batería baja; se cierra al pasar a datos móviles o al bajar la batería y se
-abre de nuevo al volver la red sin límite o la carga. Si el canal se corta después de abrirse vuelve a
-conectarse a los 5 segundos, solo espera cada vez más (hasta 15 minutos) cuando el servidor no
-responde o cuando la sincronización que pidió un aviso falla (por ejemplo, mientras otra tarea de
-la cuenta está en marcha), y si se cortó porque faltaba la red vuelve en cuanto Android avisa de que
-hay red de nuevo. Mientras una versión más nueva de la app sincroniza la cuenta deja de escuchar
-hasta que actualices esta. Cuando no se ve nada cierra el canal, y con la pantalla apagada no queda nada abierto ni
-ningún despertar nuevo: los cambios llegan con la sincronización de cada hora o al volver a verse
-el fondo. Al desactivar *Escuchar los cambios mientras se ve el fondo* (activado de serie) solo
-escucha con la app abierta. No hay servicio en primer plano ni avisos push de terceros. En la misma pestaña están las funciones de la cuenta que tiene el escritorio: la *Frase de
-recuperación* (guardarla, cambiarla o quitarla, con la misma custodia Argon2id que
-`reiwand-ctl server escrow`, y en un teléfono nuevo sin ningún otro equipo *Recuperar la clave con la
-frase*), *Cambiar la clave de sincronización* (como `reiwand-ctl server rotate`: cifra todo de nuevo,
-la reparte a los demás equipos y vuelve a guardar la frase con la clave nueva salvo que se haya
-revocado un equipo), los *Archivos privados* (los fondos propios que otro equipo subió cifrados, con
-*Descargar* para añadirlos a la biblioteca del teléfono, y en la página de una imagen o un vídeo
-del teléfono *Guardar cifrado en el servidor*, que lo sube por partes cifradas igual que
-`reiwand-ctl server files share`, y al desactivarlo se borra del servidor), las claves de proveedores
-que se sincronizan (el teléfono las guarda selladas por el almacén de claves y las muestra). La página
+En *Ajustes* del teléfono, *Cuenta* lista las cuentas de los servidores con los repositorios donde se usa cada
+una (`reiwand-ctl account ls`): se puede dejar de usar una en un repositorio o quitarla. Una cuenta se
+inicia al agregar un repositorio privado o al publicar, con un código que se aprueba en el navegador; su
+acceso se guarda cifrado con una clave del almacén de claves de Android que no sale del teléfono y solo
+se envía al servidor de su repositorio. No hay sincronización por la red: lo que cada equipo tiene es
+local, y para llevar la configuración de uno a otro (repositorios, proveedores, listas, favoritos,
+valoraciones, etiquetas y ajustes) se exporta a un archivo y se importa en el otro, del teléfono al
+ordenador o al revés (`reiwand-ctl export` e `import` en el ordenador; *Exportar la configuración* e
+*Importar una configuración* en *Cuenta*, con el selector de archivos). Las claves de los proveedores solo salen si
+lo marcas, con el archivo cifrado. La página
 *Fuentes* reúne de dónde vienen los fondos, con o sin servidor propio, y es lo que ofrece el botón
 *Conseguir fondos de internet* de la biblioteca vacía y la opción *Desde internet* de *Añadir*. Arriba están las
 *Imágenes de internet*, los proveedores en el teléfono (imagen del día de Bing, imagen astronómica de la NASA,
 imagen del día de Wikimedia, búsqueda en Wallhaven y carpetas de un servidor WebDAV, Nextcloud o Immich): cada
 uno nace apagado, dice con quién se conecta y qué ve esa parte, y no toca la red hasta que lo enciendes; apagado, ni
 la descarga ahora ni la automática hacen nada; si cambia la dirección a la que apunta, vuelve a apagarse y olvida su
-clave. Descarga solo imágenes, cada seis horas como mucho y con las reglas de red y batería de la sincronización
+clave. Descarga solo imágenes, cada seis horas como mucho y con las reglas de red y batería de los ajustes
 (*Usar también datos móviles en segundo plano*; *Descargar ahora* lo pide la persona y va sin esa espera), guarda
 cada una en la biblioteca con la etiqueta `from-ID`, conserva las últimas *N* (no quita favoritas, de listas ni la
 puesta) y muestra los créditos. Por HTTPS, el teléfono (fuentes, repositorios y servidor propio) confía en las
 raíces públicas que trae el programa y en las autoridades de certificación que instalaste en los ajustes de Android,
 que lee al abrir la app y vuelve a mirar en cada conexión nueva; si un servidor presenta un certificado que no pasa
-esa comprobación, la fuente lo dice debajo de su nombre en vez de quedarse sin descargar. Debajo están los *Repositorios*: los que se añaden en otro equipo llegan como
-propuesta con su clave y se añaden o se rechazan una vez, también se añade uno por su dirección y su huella
-(la huella se pide aparte y se explica con palabras: el teléfono solo lo acepta si responde con esa clave), y
+esa comprobación, la fuente lo dice debajo de su nombre en vez de quedarse sin descargar. Debajo están los *Repositorios*: se añade uno pegando su dirección en un solo campo (si es privado pide una cuenta; si su servidor usa un certificado propio, muestra su huella para que la confirmes), y
 al añadirlo se abre *Explorar*, que busca sus paquetes (los marca si son para adultos y los oculta con *Ocultar el
 contenido para adultos*), enseña la vista previa de cada uno (una por vez que se ve la fila, solo del
 repositorio que añadiste, con un hueco gris mientras llega, sin pedir las de adultos salvo con
 *Mostrar sin difuminar*, y guardadas hasta 16 MiB, que se borran con el repositorio) y los instala en la biblioteca, comprobados con el índice firmado
 del repositorio; un paquete instalado así es el mismo elemento de la biblioteca en el teléfono y
-en el ordenador. Una vez al día, con las mismas reglas de red y batería que la sincronización de
-cada hora (al cambiar *Usar también datos móviles en segundo plano* cambia también la comprobación que
-espera), solo si hay repositorios y mientras *Buscar actualizaciones en los repositorios cada día*
+en el ordenador. Una vez al día, con las reglas de red y batería de los ajustes (*Usar también datos móviles en
+segundo plano*), solo si hay repositorios y mientras *Buscar actualizaciones en los repositorios cada día*
 (`repos.auto_refresh`, activado de serie como en el escritorio, en los ajustes del teléfono) siga
-activado (también cuando se cambia en el ordenador y llega por la sincronización, sea la de cada hora,
-*Sincronizar ahora*, una restauración o un emparejamiento), el teléfono actualiza sus índices como el escritorio: la
+activado, el teléfono actualiza sus índices como el escritorio: la
 pestaña muestra un aviso con cuántos paquetes tienen versión nueva, *Actualizaciones* los lista con
 *Actualizar* (la versión nueva ocupa el lugar de la vieja, con sus listas y ajustes) y *Buscar
 actualizaciones* lo hace al momento. Con *Actualizar los repositorios automáticamente*
@@ -705,11 +662,9 @@ actualizan solos tras esa comprobación, con las mismas reglas de red y batería
 comprobaciones de una instalación; una versión que pide un permiso nuevo no se instala sola:
 queda en la lista con una nota que dice qué pide ahora. Nunca hay notificación de actualizaciones.
 
-Para sincronizar por la red de casa sin un dominio ni un certificado público, un ordenador puede
-servir `reiwand-server` con su propio certificado (`REIWAND_TLS=self-signed`) y anunciarse en la red
-(`REIWAND_ADVERTISE=true`, ver [Servidor propio](servidor.md)). Mientras se escribe la
-dirección del servidor, la pestaña muestra los servidores que encuentra en esa red con el
-descubrimiento de servicios de Android. Un servidor con su propio certificado no se acepta a
-ciegas: la app muestra la huella SHA-256 de su certificado para compararla con la que da
-`reiwand-server fingerprint` en el servidor, y solo si eliges *Confiar en él* la fija; desde entonces
-el teléfono solo habla con ese servidor si presenta ese mismo certificado, y la pestaña lo dice.
+Para usar un repositorio de la red de casa sin un dominio ni un certificado público, un ordenador puede
+servir `reiwand-server` con su propio certificado (`REIWAND_TLS=self-signed`, ver
+[Servidor propio](servidor.md)). Ese servidor no se acepta a ciegas: al agregar su repositorio la app
+muestra la huella SHA-256 de su certificado para compararla con la que da `reiwand-server fingerprint`,
+y solo si eliges *Confiar en él* la fija; desde entonces el teléfono solo habla con ese servidor si
+presenta ese mismo certificado, y la pestaña lo dice.

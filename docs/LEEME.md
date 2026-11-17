@@ -21,7 +21,7 @@
 
 ## Servidor propio
 
-- [`usar/servidor.md`](usar/servidor.md): instalar, enlazar los equipos y sincronizar.
+- [`usar/servidor.md`](usar/servidor.md): instalar, repositorios, cuentas y mover la configuración.
 - [`specs/server.md`](specs/server.md): especificación del servidor.
 - [`specs/repo.md`](specs/repo.md): repositorios firmados.
 
@@ -42,7 +42,7 @@
 ## Especificaciones
 
 - [`specs/scene.md`](specs/scene.md), [`specs/package.md`](specs/package.md), [`specs/web.md`](specs/web.md), [`specs/editor.md`](specs/editor.md), [`specs/dbus.md`](specs/dbus.md): formatos e interfaces.
-- [`specs/biblioteca.md`](specs/biblioteca.md), [`specs/crear.md`](specs/crear.md), [`specs/shell.md`](specs/shell.md), [`specs/look.md`](specs/look.md), [`specs/palette.md`](specs/palette.md), [`specs/piezas-ajuste.md`](specs/piezas-ajuste.md), [`specs/choose-pieces.md`](specs/choose-pieces.md), [`specs/qr.md`](specs/qr.md), [`specs/telefono-uso-diario.md`](specs/telefono-uso-diario.md): la app y sus pantallas.
+- [`specs/biblioteca.md`](specs/biblioteca.md), [`specs/crear.md`](specs/crear.md), [`specs/shell.md`](specs/shell.md), [`specs/look.md`](specs/look.md), [`specs/palette.md`](specs/palette.md), [`specs/piezas-ajuste.md`](specs/piezas-ajuste.md), [`specs/choose-pieces.md`](specs/choose-pieces.md), [`specs/telefono-uso-diario.md`](specs/telefono-uso-diario.md): la app y sus pantallas.
 
 ## Desarrollo
 

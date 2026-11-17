@@ -161,12 +161,14 @@ misma pausa.
 | `crates/reiwand-wayland` | Superficies layer-shell y ventanas de escritorio X11, escala, ritmo y oclusión |
 | `crates/reiwand-audio` | Captura del sonido con PipeWire y su análisis en bandas para las escenas, también a partir del espectro que da Android |
 | `crates/reiwand-script` | Scripts de escena en JavaScript, aislados en un proceso por escena con límites de CPU y memoria, su módulo `reiwand` y `reiwand/math` |
-| `crates/reiwand-sync` | Cifrado, relojes, fusión, protocolo, buzón y formato de los registros de la sincronización, compartidos por el escritorio y Android |
-| `crates/reiwand-android` | Fondo animado de Android en Rust: JNI, GPU compartida, una superficie por fondo, biblioteca, listas, ajustes, escenas, paralaje, mapas de profundidad, repositorios y sincronización con el servidor propio (archivos privados, frase de recuperación, avisos al instante y certificados fijados) |
+| `crates/reiwand-account` | Cliente del servidor propio para las cuentas: inicio de sesión con código, certificados fijados por origen y el archivo de cuentas, compartido por el escritorio y Android |
+| `crates/reiwand-carry` | El archivo `.reiwand` para exportar e importar la configuración: contenedor, cifrado, límites contra entradas hostiles y reglas de unión |
+| `crates/reiwand-upgrade` | El programa de una sola vez que convierte los datos de la 1.x (servidor, escritorio y teléfono) al formato actual |
+| `crates/reiwand-android` | Fondo animado de Android en Rust: JNI, GPU compartida, una superficie por fondo, biblioteca, listas, ajustes, escenas, paralaje, mapas de profundidad, repositorios con cuentas por repositorio, certificados fijados y exportar e importar la configuración |
 | `apps/reiwandd` | Daemon |
 | `apps/reiwand-ctl` | CLI |
 | `apps/reiwand-app` | App de escritorio (Qt Quick y Kirigami sobre Rust con cxx-qt) |
-| `apps/reiwand-server` | Servidor propio: repositorio, catálogo, subidas, moderación y sincronización |
+| `apps/reiwand-server` | Servidor propio: repositorio, catálogo, subidas, moderación y cuentas |
 | `android` | App de Android: proyecto Gradle, servicio de fondo, reproductor de vídeo e interfaz Compose en Kotlin |
 | `integrations/plasma-wallpaper` | Plugin de fondo de Plasma 6 |
 | `integrations/plasma-tray` | Icono de gestión en la bandeja de Plasma 6 |

@@ -127,8 +127,8 @@ error.
 
 Una búsqueda sin resultados dice «Nada coincide con «…»» y ofrece «Quitar los filtros».
 
-Un fondo sincronizado cuyo archivo no está en este equipo muestra un aviso que dice cuál es, de
-dónde viene (una lista, un perfil o un repositorio sincronizados) y qué hacer; si viene de un
+Un fondo importado cuyo archivo no está en este equipo muestra un aviso que dice cuál es, de
+dónde viene (una lista, un perfil o un repositorio importados) y qué hacer; si viene de un
 repositorio, ofrece «Añadir el repositorio». Cerrarlo lo oculta para ese fondo.
 
 ## Primer arranque

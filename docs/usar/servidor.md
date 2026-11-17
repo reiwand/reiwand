@@ -143,7 +143,7 @@ lista todas con su valor por defecto); `VARIABLE_FILE` lee el valor de un archiv
 | `REIWAND_LOG_CLIENTS` | `off` | IP en un registro de abusos: `off`, `prefix` o `full`; se borra a los `REIWAND_LOG_CLIENTS_DAYS` días (7) |
 | `REIWAND_NOTICE_DAYS` | `180` | Días que un aviso legal guarda el nombre, el correo y la firma de quien lo envía |
 | `REIWAND_TAKEDOWN_DAYS` | `90` | Días que se guarda fuera de la vista pública un paquete retirado, como prueba y para una contranotificación |
-| `REIWAND_TLS` | `off` | `self-signed`: sirve HTTPS con un certificado propio, que los clientes aceptan solo por su huella fijada |
+| `REIWAND_TLS` | `off` | `self-signed`: sirve HTTPS con un certificado propio, que los clientes aceptan solo cuando confirmas su huella |
 
 La lista completa de variables y la API HTTP están en
 [`docs/specs/server.md`](../specs/server.md).
@@ -153,96 +153,98 @@ La lista completa de variables y la API HTTP están en
 El servidor 2.0.0 solo atiende `/api/v1/r/<nombre>/…`: ya no existen `/repo/`, las rutas sin nombre de
 repositorio ni el campo `repository` del descubrimiento, y los envíos exigen `repo`. La imagen
 ejecuta `reiwand-upgrade server --data /data` antes de arrancar: guarda una copia de la base
-(`db/reiwand.sqlite.before-v14-from-vN`), pasa el primer repositorio a `repos/main/` y su clave en línea a
-`keys/main.online.key`, y no pierde nada. Quien lo ejecuta sin la imagen lo hace con el servidor parado;
-si el servidor encuentra datos de una versión anterior, se niega a arrancar y nombra ese comando.
-Los equipos que seguían el primer repositorio por `/repo/` pasan a `/r/main/` al actualizarse.
+(`db/reiwand.sqlite.before-v15-from-vN`), pasa el primer repositorio a `repos/main/` y su clave en línea a
+`keys/main.online.key`, y no pierde ningún paquete, versión, voto ni cuenta. Quien lo ejecuta sin la
+imagen lo hace con el servidor parado; si el servidor encuentra datos de una versión anterior, se
+niega a arrancar y nombra ese comando.
 
-## Enlazar los equipos
+El servidor ya no sincroniza bibliotecas: no guarda listas, favoritos, ajustes, archivos ni claves de
+los equipos. Lo que un servidor anterior guardaba de eso no se borra sin más: `reiwand-upgrade server`
+lo escribe en `/data/sync-export/<usuario>.json` (los registros tal como estaban, con la carga en
+hexadecimal; la que estaba cifrada sigue cifrada, porque el servidor nunca tuvo su clave) y pasa los
+archivos privados de cada cuenta a `/data/sync-export/<usuario>/`. Entrégalos a sus dueños y borra la
+carpeta. Los equipos de escritorio y los teléfonos conservan su biblioteca tal cual, y para llevarla a
+otro equipo se usa un archivo exportado (`reiwand-ctl export`). `reiwand-upgrade client` no baja nada
+del servidor: convierte la cuenta del servidor enlazado de la 1.x en una cuenta del repositorio de ese
+servidor, con su sesión y el certificado fijado si lo tenía.
 
-El servicio de cada equipo se enlaza con el servidor desde *Cuenta* en la app o con la CLI:
+## Repositorios y cuentas
+
+Un servidor aloja uno o varios repositorios (`reiwand-server repo init --name N`, o *Repositorios* en
+la administración de la web). Cada uno tiene su dirección sencilla, `https://servidor/r/<nombre>`, que
+se pega tal cual en la app o con `reiwand-ctl remote add`: nada de huellas ni parámetros. La página
+principal del servidor, `/`, es «Explorar repositorios»: lista los repositorios con su dirección para
+copiar y el botón «Abrir en Reiwand». Un repositorio **público** se agrega sin pedir nada; uno
+**privado** pide una cuenta al conectarse, y el administrador da a cada persona derecho de lectura o
+de publicación por repositorio (*Personas*). Un repositorio puede aceptar subidas de cualquier cuenta
+(a revisión) o solo de sus miembros.
+
+Una **cuenta** es de una persona en un servidor y se vincula a los repositorios en los que se usa; se
+pueden tener varias. Se inicia sesión con un código que se aprueba en el navegador, y la sesión se
+guarda en el llavero del sistema (sin llavero, `reiwand-ctl provider store file` la guarda en un
+archivo privado de la carpeta de datos, tras un aviso). El acceso solo se envía al servidor de su
+repositorio. No hay sincronización: la biblioteca y los ajustes de cada equipo son locales.
 
 ```sh
-reiwand-ctl server add https://fondos.example.org
-reiwand-ctl server add https://192.168.1.10:8443 --fingerprint <huella>   # un servidor de casa con su propio certificado
-reiwand-ctl server link --name Escritorio          # muestra un código para /link o para:
-reiwand-ctl server connect --name Portátil         # solo conectar: repositorios, catálogo, instalar y votos, sin sincronizar
-reiwand-ctl server syncing on                       # … más tarde, enciende la sincronización; `off` la apaga y sigue conectado
-reiwand-ctl server approve BCDF-GHJK                # … en un equipo ya enlazado, tras ver quién lo pide y con la contraseña
-reiwand-ctl server join "Device 1" --wait           # equipo nuevo de una cuenta cifrada: muestra sus cifras y pide las del otro
-reiwand-ctl server share "Device 2"                 # en el equipo con la clave: muestra sus cifras y pide las del otro
-reiwand-ctl server status                           # el estado, los equipos de la cuenta y por qué falló el último enlace
-reiwand-ctl server revoke "Device 3"                # quita un equipo de la cuenta (también en Cuenta > Quitar equipo…)
-reiwand-ctl provider store file                     # sin llavero: guarda todos los secretos en un archivo privado, tras el aviso
-reiwand-ctl server rotate                           # clave nueva; los demás equipos la reciben solos
-reiwand-ctl server reset                            # sin ningún equipo con la clave: rehace los datos desde este
-reiwand-ctl server upload fondo.wpak                # sube un paquete con el token del equipo
-reiwand-ctl server upload fondo.wpak --unlisted     # … oculto: fuera del catálogo, instalable con su enlace
-reiwand-ctl server packages                         # tus subidas, con su estado y visibilidad
-reiwand-ctl server uploads                          # las sesiones de subida (en curso o terminadas); --cancel ID cancela una
-reiwand-ctl server author-key list                  # las claves con las que firmas tus paquetes en línea
-reiwand-ctl server author-key add autor.pub         # registra una clave; `rotate`, `remove` la cambian o la quitan
-reiwand-ctl server visibility org.example.fondo public   # cambia la visibilidad de un paquete o de una versión
-reiwand-ctl server repo 1a2b3c4d                    # añade un repositorio que otro equipo sincronizó, tras revisarlo
-reiwand-ctl server files share ./fondos             # sube tus propios fondos, cifrados; en otro equipo:
-reiwand-ctl server files ls                         # … los lista y `server files fetch <id>` descarga uno
-reiwand-ctl server away                             # lo que otros equipos sincronizaron y solo existe en ellos
-reiwand-ctl server escrow                           # guarda la clave en el servidor, cerrada con una frase
-reiwand-ctl server restore                          # equipo nuevo sin ningún otro: recupera la clave con la frase
+reiwand-ctl remote add https://fondos.example.org/r/main     # público: se agrega
+reiwand-ctl remote add https://192.168.1.10:8443/r/main      # servidor de casa con su propio certificado: la primera vez muestra su huella
+reiwand-ctl remote add https://192.168.1.10:8443/r/main --trust-certificate <huella>   # … y la confirmas
+reiwand-ctl account sign-in https://fondos.example.org/r/privado   # muestra un código y una dirección; apruébalo en el navegador
+reiwand-ctl account ls                                       # tus cuentas y los repositorios donde se usa cada una
+reiwand-ctl account use https://fondos.example.org/r/otro a1  # usa esa cuenta en otro repositorio del mismo servidor
+reiwand-ctl account unlink https://fondos.example.org/r/otro # deja de usarla ahí; la cuenta se conserva
+reiwand-ctl account rm a1                                    # la olvida en este equipo, con su acceso guardado
+reiwand-ctl server upload fondo.wpak                         # sube un paquete con la cuenta del repositorio
+reiwand-ctl server upload fondo.wpak --unlisted              # … oculto: fuera del catálogo, instalable con su enlace
+reiwand-ctl server packages                                  # tus subidas, con su estado y visibilidad
+reiwand-ctl server uploads                                   # las sesiones de subida (en curso o terminadas); --cancel ID cancela una
+reiwand-ctl server author-key list                           # las claves con las que firmas tus paquetes en línea
+reiwand-ctl server author-key add autor.pub                  # registra una clave; `rotate`, `remove` la cambian o la quitan
+reiwand-ctl server visibility org.example.fondo public       # cambia la visibilidad de un paquete o de una versión
+reiwand-ctl export config.reiwand                            # la configuración de este equipo en un archivo (ver abajo)
+reiwand-ctl import config.reiwand                            # … y se suma en otro equipo
 ```
 
-**El primer equipo, paso a paso**, también sin navegador (la cuenta del administrador ya existe y
-`galleta` es su sesión, de la sección anterior):
+Si agregas un repositorio de un servidor donde ya tienes una cuenta, la app pregunta si usas esa
+cuenta u otra; en la terminal, `account use` o `account sign-in`. Pegar la dirección de un servidor
+(sin `/r/<nombre>`) no lista repositorios: dice que es un servidor y nombra las direcciones de sus
+repositorios públicos. Al publicar se elige el repositorio de destino; si no hay una cuenta vinculada a
+él, se pide ahí, sea público o privado.
+
+**Tu primera cuenta, sin navegador en el equipo** (la cuenta del administrador ya existe y `galleta` es
+su sesión, de la sección anterior):
 
 ```sh
-reiwand-ctl server add http://127.0.0.1:8080              # la dirección del servidor
-reiwand-ctl provider store file                           # solo sin llavero del sistema, ver abajo
-reiwand-ctl server link --name Escritorio --wait          # imprime code = ABCD-EFGH y url = …/link, y espera
+reiwand-ctl provider store file                           # solo sin llavero del sistema
+reiwand-ctl account sign-in http://127.0.0.1:8080/r/main  # imprime el código ABCD-EFGH y la dirección, y espera
 curl -sS -b galleta -H 'content-type: application/json' \
   -d '{"user_code": "ABCD-EFGH", "approve": true}' \
-  http://127.0.0.1:8080/api/v1/auth/device/approve     # {"approved":true}; con navegador, abre la url y escribe el código
-reiwand-ctl server status                                 # state = ready, la cuenta, este equipo y los de la cuenta
+  http://127.0.0.1:8080/api/v1/auth/device/approve     # {"approved":true}; con navegador, abre la dirección y escribe el código
+reiwand-ctl account ls                                    # la cuenta, con el repositorio donde se usa
 ```
 
-`server add` acepta `https://`, y `http://` solo para este mismo equipo: un servidor que está en otro
-equipo necesita HTTPS (más abajo, con su propio certificado o con un proxy). Enlazar necesita un
-llavero del sistema donde guardar el acceso (GNOME Keyring, KWallet…): sin él, `server link` falla al
-momento y lo dice, sin dejar un equipo fantasma en la cuenta, y `provider store file` lo guarda en un
-archivo privado tras un aviso (se puede volver al llavero con `provider store keyring`). Los equipos siguientes se aprueban desde uno
-ya enlazado con `server approve CÓDIGO`, que pide la contraseña de la cuenta.
+`http://` solo vale para este mismo equipo: un servidor que está en otro equipo necesita HTTPS (más
+abajo, con su propio certificado o con un proxy). Aprueba solo un código que muestre la pantalla de tu
+propio equipo: quien te envía un código intenta entrar en tu cuenta. Aprobar pide una sesión web de la
+cuenta, no el acceso de un equipo, así que quien robe el acceso de un equipo no puede añadir otros.
+Cambiar la contraseña en la web cierra las demás sesiones y borra los tokens.
 
-Un equipo puede quedar **conectado sin sincronizar** (`server connect`): usa los repositorios de la
-cuenta, el catálogo, instala y vota, pero no envía ni recibe nada de la biblioteca, y su estado dice
-«conectado, sin sincronizar», que es normal y no un error. `server syncing on` enciende la
-sincronización después (con la clave de otro equipo, como `server join`); `server syncing off` la
-apaga y el equipo sigue conectado, con su clave guardada. `server link` hace los dos pasos juntos.
-Apagarla no borra nada: el equipo conserva la clave de la cuenta y los registros que ya recibió, y
-en el servidor quedan los datos sincronizados; al volver a encenderla sigue desde ahí sin otro
-emparejamiento. En el teléfono se apaga al instante; en el escritorio (la fila *Sincronizar mi
-biblioteca* de *Cuenta* o `server syncing off`) es un trabajo corto que termina enseguida.
+## Mover la configuración a otro equipo
 
-La sincronización mueve registros (títulos, etiquetas, valoraciones, favoritos y ediciones de la
-biblioteca, listas, perfiles, preajustes y ajustes), no archivos de paquetes ni lo que está puesto:
-qué fondo hay en cada pantalla y cómo se coloca queda en cada equipo, y un paquete que se nombra en
-un registro se obtiene de un repositorio. Lo que existe solo en un equipo
-(por ejemplo un preajuste hecho a mano y nunca publicado) no aparece en los demás, y lo local no se
-sincroniza solo. Cuando un registro sincronizado nombra algo que este equipo no tiene y que ningún
-repositorio conocido ofrece, la biblioteca, la lista que lo nombra y la pantalla en la que se aplicó
-muestran una nota («existe solo en otro equipo; publicarlo en el servidor o en un repositorio lo hace
-disponible aquí»), en la aplicación, en el teléfono y en `reiwand-ctl` (`lib search`, `playlist show`,
-`state` y `server away`). No se descarga nada ni se reintenta en bucle: la nota desaparece en la
-siguiente sincronización, cuando el elemento llega.
-
-Para pasar un archivo a otro equipo, elige los fondos en la biblioteca y pulsa *Enviar los archivos a mis
-otros equipos* (o `reiwand-ctl server files share`): se suben cifrados, y el otro equipo los ofrece en su
-biblioteca y en *Cuenta* con un botón *Descargar* (o `reiwand-ctl server files fetch`) cuando termina su
-siguiente sincronización. Nada se descarga solo.
+`reiwand-ctl export ARCHIVO` (o *Ajustes > Equipo > Mover mi configuración*) escribe un archivo con los
+repositorios agregados, los proveedores de fotos, las listas, los favoritos, las valoraciones, las
+etiquetas, los fondos instalados (como referencias, que se vuelven a bajar) y los ajustes que tienen
+sentido en otro equipo. `--own` suma tus fondos propios; `--secrets` suma las claves de los proveedores
+y las sesiones de tus cuentas, y cifra el archivo con una contraseña. `reiwand-ctl import ARCHIVO` solo
+agrega y nunca reemplaza (`--list` muestra antes lo que trae). Con una cuenta importada, el servidor
+da a cada equipo su propia sesión, que se revoca sola. El detalle está en
+[`docs/specs/exportar.md`](../specs/exportar.md).
 
 Al subir un paquete eliges si es público u oculto (en el diálogo de subida de *Repositorios*, en la
 web del servidor o con `--unlisted`): uno oculto se publica y se firma igual, pero el catálogo y la
 búsqueda no lo muestran, y quien tenga su enlace o su id lo ve y lo instala. Oculto no es privado:
 sigue en los archivos firmados del repositorio, que cualquiera puede descargar y leer, con su título y
-su descripción; lo privado va en la sincronización o en un repositorio propio. *Cuenta* lista tus
+su descripción; lo privado va en un repositorio privado. La página *Cuenta* de la web lista tus
 subidas y te deja cambiar la visibilidad de cada versión, ver y cancelar las sesiones de subida
 que quedaron a medias, y registrar, cambiar (con la firma de `pack rotate-key`) y quitar las claves de
 autor en línea. En un repositorio estático, `reiwand-ctl repo
@@ -268,7 +270,7 @@ Cada paso deja los botones desactivados hasta que terminan todos los que estén 
 
 En el catálogo de *Repositorios* (y en *Explorar* del teléfono) los paquetes que destaca el operador
 del repositorio salen primero, en su propia sección (los firma en el repositorio con `reiwand-ctl repo feature REPO ID --note …` o la pestaña *Repositorio estático* de la app de escritorio, o desde
-`/admin/featured` del servidor), y, con un servidor enlazado, cada paquete del repositorio de ese servidor muestra sus votos a favor y
+`/admin/featured` del servidor), y, con una cuenta en el servidor, cada paquete del repositorio de ese servidor muestra sus votos a favor y
 en contra, con tu voto marcado, y botones para votar (`reiwand-ctl remote vote ID up|down|none`, `remote votes ID…`,
 también como `REPO/ID`); los paquetes de otros repositorios no muestran votos y sus ids nunca se
 envían al servidor. El
@@ -276,64 +278,8 @@ servidor cuenta un voto por cuenta y paquete, guarda solo los recuentos y tu pro
 lista de quién votó ni de quién instaló qué. El ajuste *Mostrar los votos del servidor en el
 catálogo* (`repos.vote_counts`, también en los ajustes del teléfono) deja de pedir y mostrar los
 recuentos. Tus valoraciones locales de la
-biblioteca siguen siendo privadas y se sincronizan cifradas.
+biblioteca siguen siendo privadas y solo salen en un archivo exportado.
 
-Aprueba solo un código que muestre la pantalla de tu propio equipo nuevo: quien te envía un código
-intenta entrar en tu cuenta. Aprobar desde un equipo pide la contraseña de la cuenta, porque los
-tokens de los equipos ya no gestionan dispositivos: quien robe uno no puede añadir equipos ni
-revocar los demás. Las dos pantallas muestran el mismo número de seis cifras solo si
-nadie se ha colado entre los equipos, y en cada uno escribes las cifras del otro: la clave no sale
-ni se guarda hasta que coinciden en los dos; cada intento da una única oportunidad a quien lo
-intente. Al revocar un equipo, otro cambia la clave de sincronización y vuelve a cifrar todo, así
-que el equipo revocado ya no puede leer lo nuevo; la clave nueva pasa solo entre equipos que
-compararon sus cifras, y los demás vuelven a unirse. Cambiar la contraseña en la web cierra las
-demás sesiones y borra los tokens; los equipos siguen enlazados salvo que elijas cerrarlos también.
-
-Se sincronizan los títulos, etiquetas, valoraciones, favoritos y ediciones de las imágenes de la
-biblioteca (cada parte de la edición por separado, así que lo que cambian dos equipos en partes
-distintas se suma, y una parte de más de 64 KiB conserva la última copia enviada), las listas, los
-perfiles, los preajustes y los ajustes (salvo el volumen, la caché, el paralaje por
-software y el permiso para descargar modelos, que se quedan en cada equipo), cifrados de extremo a
-extremo; sin cifrar solo con `--plaintext`, que avisa antes. El token y la clave de sincronización
-viven en el llavero del sistema, y enlazar necesita uno (GNOME Keyring, KWallet…): sin llavero, *Cuenta* lo
-dice con palabras claras y ofrece, con un aviso, guardarlos en un archivo privado de la carpeta de datos
-(`reiwand-ctl provider store file`, el mismo archivo y la misma elección para los secretos de los
-proveedores); quien pueda leer tus archivos podría usarlos, y un aviso visible se queda mientras esté así. Un intento de enlace que
-falla no deja equipos fantasma en la cuenta. *Cuenta* lista los equipos y quita cualquiera (*Quitar
-equipo…*, o `reiwand-ctl server revoke`); un equipo quitado, o de una cuenta borrada, muestra en toda la
-app un aviso de que el servidor ya no lo acepta; el servidor ve los equipos como `Device 1`, `Device 2`… y el
-nombre real viaja cifrado. Al enlazar se añade también el repositorio del servidor.
-
-Los repositorios que añade un equipo llegan a los demás como propuesta: cada equipo los añade solo
-cuando lo confirmas, con su huella. Las claves de los proveedores viajan solo si lo eliges para
-cada proveedor, solo en cuentas cifradas, y en cada equipo se guardan solo en su llavero. Tus
-propios fondos (no los de un repositorio) suben cifrados por partes si eliges el archivo o su
-carpeta; si se corta, la subida sigue donde se quedó, el mismo archivo se guarda una vez y los
-demás equipos lo descargan cuando lo pides. Si dos equipos cambian una lista de formas que no se
-pueden juntar, se conservan las dos: la otra queda como «Lista (conflicto)». Lo que una versión
-más antigua no entiende se le devuelve tal cual, y el servidor recuerda la versión de formato más
-nueva que escribió en la cuenta: un equipo con una versión anterior deja de sincronizar y pide que
-lo actualices, en lugar de subir nombres viejos o registros sin los campos que no conoce.
-
-Borrar un elemento de la biblioteca en un equipo lo borra también en los demás (desinstalando el
-paquete), sin tocar sus archivos; un elemento de una carpeta vigilada cuyo archivo sigue ahí se
-queda, pero no vuelve a los demás. Los borrados se recuerdan 90 días y luego el servidor los purga.
-Si un cambio choca tres veces seguidas o la sincronización falla con cambios sin subir, se
-reintenta a los 30 s, 1, 2, 4 y 8 minutos y después cada 15, sin preguntar al servidor si no ha
-cambiado nada. Si un archivo propio no se puede subir (cuota llena o archivo desaparecido), los
-demás se suben igual y el error nombra cada uno que falló.
-
-Los nombres de los elementos en el servidor son hashes con una clave de nombres que no cambia al
-rotar la clave de sincronización: un equipo que la tuvo, aunque se haya revocado, y tenga el mismo
-archivo puede saber que tu cuenta lo guarda. La app, `reiwand-ctl server --help` y el teléfono lo
-explican.
-
-Si temes perder todos los equipos, `server escrow` guarda la clave en el servidor cerrada con una
-frase (Argon2id, 256 MiB). Quien consiga una copia del servidor puede probar frases sin límite: usa
-varias palabras sin relación que no uses en ningún otro sitio. Tras revocar un equipo la frase deja
-de valer: la app, `reiwand-ctl server status` y el teléfono lo dicen, y hay que guardar otra nueva y
-distinta, porque quien conocía la anterior podría abrir lo que se cierre con ella; la anterior se
-rechaza.
 
 Copias de seguridad: `docker compose exec reiwand reiwand-server backup` deja en
 `/data/backups/<fecha>` una instantánea coherente de la base de datos (`VACUUM INTO`) con los
@@ -347,8 +293,7 @@ docker compose up -d
 ```
 
 La restauración comprueba las sumas y la integridad de la base de datos, firma un índice nuevo
-para que los clientes no vean una versión anterior y hace que cada dispositivo vuelva a descargar
-lo sincronizado.
+para que los clientes no vean una versión anterior.
 
 En una red de casa sin dominio, el servidor puede servir HTTPS él mismo con un certificado propio
 con la dirección que el administrador da a mano:
@@ -357,13 +302,15 @@ con la dirección que el administrador da a mano:
 REIWAND_TLS=self-signed REIWAND_LISTEN=0.0.0.0:8443 \
   REIWAND_PUBLIC_URL=https://192.168.1.10:8443 reiwand-server serve
 reiwand-server fingerprint                    # la huella SHA-256 del certificado, también en el registro
-reiwand-ctl server add https://192.168.1.10:8443 --fingerprint <huella>
+reiwand-ctl remote add https://192.168.1.10:8443/r/main --trust-certificate <huella>
 ```
 
-El certificado se crea en el primer arranque en `/data/tls` y se conserva. Los equipos y el
-teléfono lo aceptan solo por su huella, que se compara una vez y queda fijada: sin ella, `server
-add` falla y dice la huella que mostró el servidor; en la app se escribe en *Añadir servidor*, en
-el teléfono se confirma en un aviso, y `reiwand-ctl server status` y la app la muestran. Con un servidor de la red de casa todo funciona igual que con uno público, sin salir de la red.
+El certificado se crea en el primer arranque en `/data/tls` y se conserva. Al agregar el repositorio,
+la primera vez la app y `remote add` dicen que el servidor usa su propio certificado y muestran su
+huella; compárala con la de `reiwand-server fingerprint` y confírmala («Confiar y agregar», o
+`--trust-certificate`). Queda fijada solo para ese servidor: si más tarde presenta otro, se avisa y no
+se aplica nada. Con un servidor de la red de casa todo funciona igual que con uno público, sin salir de
+la red.
 
 Con dominio propio, cualquier proxy inverso con TLS sirve: el servidor escucha en `REIWAND_BIND`
 (`127.0.0.1:8080` por defecto), el proxy termina el HTTPS y reenvía las peticiones, y `REIWAND_PUBLIC_URL`
@@ -413,13 +360,12 @@ En la página *Ajustes* de la app, el botón *Ajustes de la escena* (o *Ajustes 
 pantalla cambia sus propiedades al momento, aplica sus preajustes, guarda, renombra y borra los
 propios, copia y pega los ajustes o los exporta e importa como un archivo pequeño, decide si la
 pantalla comparte sus valores con las demás, da o retira el permiso de sonido, de puntero y de
-clics y enciende o apaga los clics de esa pantalla. Los preajustes propios son del paquete (siguen tras actualizarlo) y viajan con la sincronización.
+clics y enciende o apaga los clics de esa pantalla. Los preajustes propios son del paquete (siguen tras actualizarlo) y viajan en el archivo exportado.
 
 Los autores describen sus propiedades en el manifiesto (`docs/specs/scene.md`): colores con
 transparencia, deslizadores con paso, decimales, unidades, escala logarítmica y casilla para
 escribir el número, listas con iconos y etiquetas traducidas, textos y textos secretos (que se
-guardan en el llavero del sistema y nunca llegan a `config.toml`, a los registros ni a la
-sincronización), separadores, etiquetas y grupos plegables, botones que lanzan eventos de la escena,
+guardan en el llavero del sistema y nunca llegan a `config.toml`, ni a los registros), separadores, etiquetas y grupos plegables, botones que lanzan eventos de la escena,
 y archivos y carpetas que elige el usuario con el selector de archivos, también vídeos, que
 sustituyen una imagen, un vídeo, una máscara o la textura de unas partículas del paquete sin
 reiniciar la escena. Cada propiedad puede mostrarse o activarse según las demás con condiciones

@@ -58,13 +58,15 @@ Para qué sirve: instalar fondos de los repositorios.
 - Cada tarjeta muestra un fondo. El botón principal es «Instalar», que pasa a «Poner de fondo»;
   «Instalar y poner de fondo» hace las dos cosas. También hay «Actualizar a …», «Detalles» y
   «Desinstalar…».
-- **Detalles** dice autores, versión, permisos que pide y, si tienes servidor, deja votar a favor
-  o en contra.
+- **Detalles** dice autores, versión, permisos que pide y, si tienes una cuenta en el servidor del
+  repositorio, deja votar a favor o en contra.
 - **Repositorios…** abre la lista de repositorios; «Agregar un repositorio» (siempre visible en
   Explorar y al comienzo de esa lista) añade uno pegando su dirección. Si es privado, el cuadro pide
   una cuenta: «Usar la cuenta X» o «Iniciar sesión» (se aprueba en el navegador). Si el servidor usa
   su propio certificado, muestra su huella y «Confiar y agregar». Si pegas la dirección de un
-  servidor, lista sus repositorios para elegir. Un enlace `reiwand://add?url=…` abre el cuadro con la
+  servidor, dice que es un servidor y nombra las direcciones de sus repositorios públicos (la lista
+  completa está en la página «Explorar repositorios» de ese servidor, con «Abrir en Reiwand»). Si la firma de un
+  repositorio cambia, la app avisa y no aplica nada. Un enlace `reiwand://add?url=…` abre el cuadro con la
   dirección puesta; nada se agrega hasta que pulses «Agregar». Los ejemplos incluidos no necesitan
   conexión.
 - **Buscar novedades** y **Actualizar mis fondos** traen lo nuevo.
@@ -139,27 +141,26 @@ a un lugar con ruta; Esc vuelve.
 - «Avanzado»: «Tarjeta gráfica», HDR, «Calidad de la profundidad», Mantenimiento («Recargar los
   ajustes», «Revisar toda la biblioteca»), la versión y «Licencias».
 
-## Cuenta
+## Cuentas
 
-Para qué sirve: conectar un servidor propio y mantener la biblioteca igual en tus equipos. Todo es
-opcional y nada se conecta sin que lo pidas.
+Para qué sirve: entrar a los repositorios privados y publicar. Todo es opcional y nada se conecta sin
+que lo pidas. Las cuentas se vinculan a un repositorio y puedes tener varias; no hay sincronización
+entre tus equipos.
 
-- Sin servidor, la página dice «Aún no hay servidor» y ofrece «Añadir un servidor…».
-- **Servidor**: dirección, certificado y «Conectar este equipo…»; el servidor te da repositorios
-  para explorar, instalar y votar. «Quitar el servidor…» saca este equipo de la cuenta.
-- **Sincronizar mi biblioteca**: fondos, listas, ajustes, etiquetas y favoritos entre tus equipos.
-  Lo que depende del equipo (qué fondo va en cada pantalla) no se sincroniza. «Sincronizar ahora»
-  fuerza una vuelta.
-- **Equipos de la cuenta**: lista de equipos, con «Dejar que sincronice…», «Recibir la clave de
-  este» y «Quitar equipo…».
-- **Más**: aprobar otro equipo, frase de recuperación, cifrado y cambio de clave.
+- Al agregar un repositorio privado, el cuadro pide una cuenta: «Usar la cuenta X», «Usar otra cuenta»
+  o «Iniciar sesión» (un código que se aprueba en el navegador).
+- *Repositorios* dice qué cuenta usa cada repositorio.
+- Al publicar eliges el repositorio de destino; si no tiene una cuenta vinculada, se pide ahí, sea
+  público o privado.
+- Las contraseñas no viajan entre equipos, salvo dentro de un archivo exportado y cifrado.
 
-### Vincular un equipo nuevo
+## Mover la configuración
 
-El equipo nuevo muestra un código de 6 cifras. En uno que ya sincroniza, «Aprobar otro equipo…»:
-compara que las dos pantallas muestren el mismo número y aprueba solo un código que veas en tu
-propio equipo. Quien te envía un código intenta entrar en tu cuenta. «Código para el teléfono»
-muestra un código QR con la dirección del servidor, sin claves ni contraseñas.
+Ajustes › Equipo › «Mover mi configuración» exporta a un archivo los repositorios, proveedores,
+listas, favoritos, valoraciones, etiquetas, fondos instalados y ajustes de este equipo (los fondos
+propios y las claves solo si lo marcas; las claves cifran el archivo con una contraseña), e importa
+uno hecho en otro equipo: muestra qué trae, solo suma lo que marcas y deja unir o tener las dos
+listas con el mismo nombre. Es el mismo archivo que usa el teléfono y `reiwand-ctl export` e `import`.
 
 ## La bandeja
 
@@ -179,6 +180,6 @@ del escritorio. Lo respondido se recuerda y se retira en Ajustes › Equipo › 
 ## Modo privado
 
 En Ajustes › Equipo, primera fila. Corta toda la red: no se actualizan fuentes ni repositorios, no
-se descargan carátulas, los fondos web solo cargan archivos de tu equipo y no se habla con tu
-servidor ni con tu teléfono. Lo que ya tienes sigue funcionando. Explorar, Fuentes y Cuenta
+se descargan carátulas, los fondos web solo cargan archivos de tu equipo y no se habla con tus
+servidores. Lo que ya tienes sigue funcionando. Explorar, Fuentes y Repositorios
 muestran «Modo privado: la red está cortada.» con el botón «Desactivar».

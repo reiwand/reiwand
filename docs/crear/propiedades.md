@@ -138,7 +138,7 @@ propiedad escoge entre variantes de tu escena.
 `default`, `max_len`, `multiline` (una caja de varias líneas) y `secret`. Un texto secreto no tiene
 valor por defecto, se guarda en el llavero del sistema (en el teléfono, sellado por el almacén de
 claves de Android) y nunca en la configuración, los registros, los preajustes, los ajustes
-exportados ni la sincronización. Una escena lo lee como un texto vacío: solo el contenido que puede
+exportados. Una escena lo lee como un texto vacío: solo el contenido que puede
 usar la red lo recibe.
 
 ### Archivo y carpeta
@@ -165,13 +165,13 @@ con `{ "prop": "id" }`:
 Solo se lee la propia carpeta (y sus subcarpetas hasta ese nivel), sin seguir enlaces que salgan de
 ella ni leer archivos ocultos, y nada se lee mientras la escena no se ve. El usuario elige archivos
 y carpetas con el selector de archivos; los preajustes no los fijan y no viajan con los ajustes
-exportados ni la sincronización.
+exportados.
 
 ### Atajo
 
 `shortcut` guarda lo que el usuario eligió abrir desde el fondo: una dirección `https://` (hasta
 2048 caracteres), un archivo, una carpeta o una aplicación por su id de escritorio, nunca una
-orden. Solo lo fija el usuario, nunca el autor, un preajuste ni la sincronización. El contenido
+orden. Solo lo fija el usuario, nunca el autor ni un preajuste. El contenido
 nunca ve el destino, solo `true` si hay uno; un script lo abre con `openShortcut(propiedad)` dentro
 de un clic real de una capa (ver [scripts.md](scripts.md)). El paquete debe tener el permiso de
 clics (ver [paquete.md](paquete.md)).

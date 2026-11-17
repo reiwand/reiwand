@@ -18,8 +18,7 @@ cualquier carpeta, de la tarjeta o de una nube instalada, e *Importar una carpet
 y los vídeos que hay dentro de una carpeta y de sus subcarpetas (5000 como mucho) mostrando cuántos
 lleva de cuántos. Todo se copia al almacenamiento privado de la app, así que no hace falta ningún
 permiso y la app no usa la red salvo para descargar el modelo de profundidad cuando lo pides, para
-tu servidor propio y los repositorios que añades y, solo mientras escribes la dirección de un
-servidor, para buscar en la red local los que se anuncian. Un mismo archivo no se copia dos veces, y los que no se pueden abrir
+los repositorios que añades (con tus cuentas en sus servidores). Un mismo archivo no se copia dos veces, y los que no se pueden abrir
 se cuentan en un solo aviso. Al tocar uno se abre su página, con una vista previa en vivo con la
 forma de la pantalla, sus medidas y duración, y los botones *Usar como fondo*, favorito, *Añadir a
 una lista* y *Quitar*.
@@ -77,7 +76,7 @@ colores del sistema y los gráficos (automático, Vulkan u OpenGL ES). Debajo, e
 la GPU, los fotogramas dibujados y por segundo, el límite que se aplica en ese momento, el estado de
 carga, ahorro de energía y temperatura y, con una escena, la clase del teléfono (y si se midió en su
 GPU), el nivel de calidad y por qué bajó. Los avisos que vienen del motor (los fallos de un
-paquete, de una propiedad, de la profundidad o de la sincronización) llevan un identificador de
+paquete, de una propiedad o de la profundidad) llevan un identificador de
 mensaje y se muestran en el idioma del teléfono con las mismas traducciones que el resto de la app.
 *Licencias* muestra los textos de ONNX Runtime, de los componentes que incluye y de los modelos
 de profundidad y de relleno (LaMa). El diagnóstico dice también si la clase del teléfono se midió con marcas de

@@ -2,15 +2,15 @@
 
 - **Modo privado** (Ajustes › Equipo, o `reiwand-ctl private on`): corta toda la red del programa de
   una vez. Mientras está encendido no se actualizan fuentes ni repositorios, no se descarga nada, no
-  se piden carátulas de internet, no se habla con tu servidor ni con tu teléfono, las luces de
+  se piden carátulas de internet, no se habla con ningún servidor, las luces de
   OpenRGB se apagan (hablan por TCP aunque estén en este equipo) y los fondos web solo cargan archivos
   de este equipo; tampoco se busca ningún nombre en la red. Lo que ya tienes sigue funcionando:
   biblioteca, ejemplos incluidos, escenas, videos y fondos web locales. Está apagado de fábrica y se
   recuerda al reiniciar. No existe ninguna comprobación de versión que cortar: el programa nunca la
   hace.
 - Sin telemetría ni estadísticas de uso. El servicio solo se conecta a internet para los
-  proveedores de fondos, los repositorios y el servidor propio que añadas tú. Al arrancar solo contacta con un
-  proveedor si le toca su sincronización automática; la comprobación diaria de los repositorios
+  proveedores de fondos y los repositorios que añadas tú (cada repositorio es de un servidor, y a ese servidor van su catálogo, tus descargas y, si tienes cuenta, tu sesión). Al arrancar solo contacta con un
+  proveedor si le toca su actualización automática; la comprobación diaria de los repositorios
   (`repos.auto_refresh`, también en los ajustes del teléfono) empieza 10 minutos después. Un repositorio solo puede redirigir a su propia
   dirección y a las réplicas que declara en su raíz firmada.
 - Los proveedores de fondos en línea (Bing, APOD, Wikimedia, Wallhaven, WebDAV/Nextcloud, Immich)
@@ -18,9 +18,9 @@
   User-Agent genérico (`reiwand/<versión>` y la dirección del proyecto, nada tuyo), sin cookies ni cabecera Referer, y las claves de API
   y contraseñas solo se envían al servidor configurado. Se guardan en el llavero del sistema
   (Secret Service) y en ningún otro sitio: ni en la configuración, ni en los registros, ni en la
-  línea de órdenes, ni se sincronizan entre equipos (los proveedores y sus claves son de cada
-  equipo). Un equipo sin llavero puede guardar todos los secretos (proveedores, scripts de escena y
-  acceso al servidor) en un archivo privado (0600) que eliges tú sabiéndolo
+  línea de órdenes, ni viajan a otro equipo salvo en un archivo exportado con `--secrets`, cifrado con una contraseña
+  (los proveedores y sus claves son de cada equipo). Un equipo sin llavero puede guardar todos los secretos (proveedores, scripts de escena y
+  sesiones de tus cuentas) en un archivo privado (0600) que eliges tú sabiéndolo
   (`reiwand-ctl provider store file`, o el aviso de la página de proveedores): un aviso visible se
   queda mientras esté así, y se puede volver al llavero sin quitar nada
   (`reiwand-ctl provider store keyring`). La dirección de tu propio servidor puede usar `http://`
@@ -106,11 +106,9 @@ o un widget llega además a la escena), que el plugin envía y el daemon solo
   otros procesos, con límites de memoria, de CPU por fotograma, de temporizadores, de capas creadas,
   de líneas de consola y de valores compartidos, y nunca ven rutas, nombres de pantallas ni la
   batería.
-- Con un servidor propio, los registros sincronizados salen cifrados con una clave que solo
-  tienen tus equipos (en Android, guardada cifrada con una clave del almacén de claves del
-  teléfono, que no sale de él); los identificadores de los paquetes se derivan de esa clave y el nombre de
-  cada equipo solo viaja cifrado. La clave pasa a un equipo nuevo por el buzón del servidor,
-  sellada para él, después de comparar un código de 6 cifras en las dos pantallas.
+- Un servidor solo conoce lo que le pides: tu cuenta y lo que subes o votas en sus repositorios. No guarda
+  tu biblioteca, listas, favoritos ni ajustes: no hay sincronización. Para llevar tu configuración a otro
+  equipo exportas un archivo (`reiwand-ctl export`) y lo importas allí.
 - Los paquetes se generan sin rutas, usuarios ni nombre del equipo de quien los compila.
 - El servidor propio no guarda IP ni user agents en sus registros salvo que su administrador
-  active el registro de abusos, que se borra solo; los datos sincronizados le llegan cifrados.
+  active el registro de abusos, que se borra solo.

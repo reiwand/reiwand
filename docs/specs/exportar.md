@@ -1,6 +1,6 @@
 # Export and import file (`.reiwand`)
 
-The `reiwand-carry` crate defines the file that moves a device's configuration to another device. It is a pure library (no D-Bus, no network) used by the daemon, the CLI and the phone. Exporting and importing is always a file the user moves as they like; there is no account, server or QR involved.
+The `reiwand-carry` crate defines the file that moves a device's configuration to another device. It is a pure library (no D-Bus, no network) used by the daemon, the CLI and the phone. Exporting and importing is always a file the user moves as they like; there is no server, sync or QR involved.
 
 ## Container
 
@@ -64,4 +64,4 @@ Ajustes > Equipo > «Mover mi configuración» ofrece «Exportar mi configuraci�
 
 ## En el teléfono
 
-`crates/reiwand-android` (`carry`) arma el mismo contenido que el daemon y aplica el mismo orden y el mismo informe. El archivo se elige con el selector de archivos del sistema: Kotlin copia el documento a la caché de la app (o desde ella) y Rust trabaja sobre esa ruta. Operaciones de `Native.account`: `carry_preview`, `carry_export` (`own`, `secrets`, `password`) y `carry_import` (`take`, `lists`, `suffix`). Un archivo exportado en el escritorio se importa en el teléfono y al revés; las claves de los proveedores y las sesiones siguen las mismas reglas. El teléfono no tiene subcomando de terminal: la paridad es la de los dos programas sobre el mismo archivo.
+`crates/reiwand-android` (`carry`) arma el mismo contenido que el daemon y aplica el mismo orden y el mismo informe. El archivo se elige con el selector de archivos del sistema: Kotlin copia el documento a la caché de la app (o desde ella) y Rust trabaja sobre esa ruta. Operaciones de `Native.account`: `carry_preview`, `carry_export` (`own`, `secrets`, `password`) y `carry_import` (`take`, `lists`, `suffix`). Un archivo exportado en el escritorio se importa en el teléfono y al revés; las claves de los proveedores y las sesiones siguen las mismas reglas. Las sesiones de cuenta de un archivo no se aplican en el teléfono: se anotan para que la persona inicie sesión de nuevo. El teléfono no tiene subcomando de terminal: la paridad es la de los dos programas sobre el mismo archivo.

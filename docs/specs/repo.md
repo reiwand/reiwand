@@ -55,7 +55,7 @@ Mirrors copy immutable files first and `entry/latest` last.
 - `repo_id` is the SHA-256 of the exact bytes of `root/1.json`. It never changes.
 - Address: `https://example.org/r/wallpapers`, pasted as it is. The first time, the client reads
   `root/1.json`, checks that it is signed by its own root keys and keeps its hash as the `repo_id`
-  of the repository for good (the anchor); from then on every refresh must chain from that root.
+  of the repository for good (the anchor: trust on first use, as the secure connection to the server vouches for that first root); from then on every refresh must chain from that root.
   The connection must have a certificate valid for a public authority. A home server with its own
   certificate is added only after the user confirms its fingerprint, which is then pinned for that
   server address alone (see `dbus.md`, `Repos1.AddTrusting`); a different certificate later is
@@ -370,7 +370,7 @@ paths copied locally in chunks of 64 KiB, a 10 s connect timeout, and an abort
 thread; a shared cancel flag, checked for every chunk and at least every 100 ms while waiting for
 the server, fails the transfer with `io::ErrorKind::Interrupted` at once, local copies included.
 
-## Upgrading from 1.x
+## Upgrading the data
 
 `reiwand-upgrade client --data DIR` (crate `crates/reiwand-upgrade`) runs once on a data folder of 1.x
 and is safe to run again. It strips `?fingerprint=` and `?repo_id=` from every stored repository
@@ -382,7 +382,8 @@ the pin to `repo-pins.json` and the saved access (keyring or `secrets.json` item
 before anything is removed and it runs again on the next start. Then it removes `sync.json` and the item `server` and writes
 `format-version`. The daemon never reads the old files: on data without the mark it refuses to start and names
 `reiwand-upgrade client`. Synchronised copies of lists, favourites and private files on the server are not
-downloaded; use export and import (`exportar.md`) before upgrading. Nothing else is
+downloaded: the library stays as it is on each device, and what a device wants to carry to another goes in an
+exported file (`exportar.md`). Nothing is
 downloaded; the repository keeps its `repo_id`, so installed packages stay linked to it. A repository
 that a static host serves under `/repo/` and was added with a `?fingerprint=` address is moved as well,
 and has to be added again by hand. The desktop installers, the user service (`ExecStartPre`, which also covers the RPM) and the Flatpak launcher

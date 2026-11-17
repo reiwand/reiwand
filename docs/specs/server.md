@@ -76,7 +76,7 @@ at the first step not done:
    it once as a link; choosing «Closed» deletes it.
 
 «Finish» stores the choices, applies the network choice and deletes every setup token and setup
-visit. From then on `/setup` shows the «Done» screen to administrators (the web address, the repository address with its fingerprint, how to upload) and sends everyone
+visit. From then on `/setup` shows the «Done» screen to administrators (the web address, the plain address of the repository, how to upload) and sends everyone
 else to the catalog; no request to `/setup` can make another administrator or repository, and
 new setup tokens are refused. A server whose database already has an administrator and a
 repository counts as set up when it starts.
@@ -203,8 +203,7 @@ against its own root key: the key of one never verifies another.
 belong to a repository (`(repo, id)`): the same package id can exist in two. Catalogue, package
 page, votes and featured have a route per repository, `/api/v1/r/<name>/catalog`,
 `/api/v1/r/<name>/packages/{id}`, `…/votes`, `…/admin/featured`; there is no route without `r/<name>`
-for them (it answers `404`). An upload must carry `repo` (a name; `422` without it). The HTML home and
-package pages show the first repository only.
+for them (it answers `404`). An upload must carry `repo` (a name; `422` without it).
 
 Moderation stays per server: one team, one set of blocks, one queue. Accounts and tokens are
 shared; the history of a case counts the author's other versions in every repository, and leaves out the
@@ -296,7 +295,7 @@ no code for older databases or layouts. `reiwand-server restore` takes a backup 
 only; to restore an older one, run `reiwand-upgrade server` on the restored folder first. After restoring,
 every repository is marked to sign again. Backups include the `repos/` trees and their keys.
 
-### Upgrading from 1.x
+### Upgrading the data
 
 The migration is the separate program `reiwand-upgrade` (crate `crates/reiwand-upgrade`), which runs once
 and is safe to run again. `reiwand-upgrade server --data DIR` keeps a copy of the database
@@ -304,9 +303,10 @@ and is safe to run again. `reiwand-upgrade server --data DIR` keeps a copy of th
 keys before it commits, moves the old first repository from `repo/` to `repos/main/` and its key from
 `keys/online.key` to `keys/main.online.key`, drops the sync tables of older servers after writing, for each account that had records, `sync-export/<handle>.json` (the records as stored, payload in hex; sealed payloads stay sealed, the server never held their key) and moving its private files to `sync-export/<handle>/`, and leaves everything else where it was. The admin hands those files to their owners and deletes the folder. The server image
 runs it in its entrypoint before `serve`; outside the image run it yourself while the server is stopped.
-Clients of 1.x that follow the first repository by its old address (`/repo/…?fingerprint=…`) are moved
-to `/r/main/` by `reiwand-upgrade client` when they upgrade; a share URL with `?fingerprint=` or
-`?repo_id=` from an old link is refused with a message that says to use the plain address.
+Desktops and phones move their stored data with `reiwand-upgrade client` (see `docs/usar/instalacion.md`),
+which turns the account of the old single-server link into an account of the repository and
+never downloads the records the server held: those only go to `sync-export/` on the server side. A repository address
+with `?fingerprint=` or `?repo_id=` is refused with a message that says to use the plain address.
 
 Only the online key signs on the server, and only entries and their details: an approval adds the
 package with `reiwand_format::add`, a removal or revocation calls `reiwand_format::revoke`, and a
@@ -400,7 +400,7 @@ next_cursor}` with `Link: <…>; rel="next"` when there is more.
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | POST | `/api/v1/auth/register` | — | `{handle, password, invite}` → `201 {id, handle}` |
-| POST | `/api/v1/auth/login` | — | `{handle, password, device: {platform, enc_key?, sig_key?}}` → device token (below) |
+| POST | `/api/v1/auth/login` | — | `{handle, password, device: {platform, client?}}` → device token (below) |
 | POST | `/api/v1/auth/logout` | token or session | Revokes the token or ends the session → `204` |
 | GET | `/api/v1/me` | any | `{id, handle, role, created_at, quota_bytes, used_bytes}` |
 | DELETE | `/api/v1/me` | session | `{password}` → deletes the account and everything it owns → `204` |
@@ -423,6 +423,8 @@ sign in again. The password of an
 account without one can only be set from a session signed in within the last 10
 minutes, and so can such an account be deleted. The web site adds `/login`, `/register`, `/setup`,
 `/link` and `/account`.
+
+The server holds no library data of its users: no lists, favourites, settings, files or mailbox of devices, and no key of theirs. What a person moves between devices is the exported file (`docs/specs/exportar.md`). An account exists to publish, to vote and to read the private repositories it is a member of.
 
 Devices are named on the server `Device 1`, `Device 2`… and never by the client. `platform` is `linux`, `android` or
 `other`.
@@ -568,8 +570,7 @@ A failed automatic signing is stored in the `repos` row (`failed_at` and `failed
 
 On the health page (`/admin`) the row «Firma del índice» appears only once the index was signed
 for the first time (after the publish delay of the first upload). Under «Dirección del repositorio» the
-address one can copy is the repository address for the desktop app, whose `fingerprint`
-is that of the repository key. On a Spanish page, a
+address one can copy is the plain repository address for the desktop app and the phone. On a Spanish page, a
 detail the server gives only in English is kept under the fold «Detalles» of the error notice; on
 an English page it is shown as it is.
 

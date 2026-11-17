@@ -82,8 +82,7 @@ La versión 2.0.0 ya no entiende los formatos de la 1.x dentro de los programas:
 
 Si un programa se niega a arrancar diciendo que los datos son de una versión anterior, ejecuta ese
 comando. Las direcciones de la 1.x con `?fingerprint=` o `?repo_id=` ya no se aceptan: usa la dirección
-simple del repositorio. Una dirección sincronizada de un repositorio que un servidor 1.x daba en `/repo/`
-pasa a `/r/main/`.
+simple del repositorio. Un repositorio que un servidor 1.x daba en `/repo/` pasa a estar en `/r/main/`.
 
 ## Versiones
 
