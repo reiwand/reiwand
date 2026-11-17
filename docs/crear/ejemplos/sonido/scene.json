@@ -1,7 +1,7 @@
 {
   "schema": "reiwand.scene/1",
   "canvas": { "size": [1920, 1080], "background": "#0a0f1a" },
-  "audio": { "attack": 0.02, "release": 0.25, "gain": "auto" },
+  "audio": { "attack": 0.02, "release": 0.25, "gain": "auto", "gain_release": 5 },
   "assets": { "zumbido": { "path": "assets/zumbido.wav" } },
   "layers": [
     { "blend_space": "canvas", "id": "ambiente", "type": "sound", "sound": "zumbido", "loop": true, "fade_in": 2, "fade_out": 2,

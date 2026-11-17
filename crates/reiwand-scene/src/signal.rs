@@ -4,6 +4,9 @@ use serde::{Deserialize, Serialize};
 
 pub const SPLITS: [f32; 2] = [250.0, 4_000.0];
 pub const HEARD: [f32; 2] = [40.0, 16_000.0];
+pub const FLOOR_DB: f32 = -70.0;
+pub const MIN_PEAK: f32 = 1e-4;
+pub const GAIN_RELEASE: f32 = 5.0;
 pub const CLOCKS: [&str; 6] = ["day", "hour", "minute", "second", "weekday", "month"];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
@@ -30,18 +33,39 @@ pub enum Gain {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Hearing {
+    #[serde(default = "attack")]
     #[schemars(extend("x-unit" = "s", "x-range" = [0.001, 2]))]
     pub attack: f32,
+    #[serde(default = "release")]
     #[schemars(extend("x-unit" = "s", "x-range" = [0.01, 10]))]
     pub release: f32,
+    #[serde(default)]
     pub gain: Gain,
+    #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 10], "default" = 5))]
+    pub gain_release: f32,
+}
+
+fn attack() -> f32 {
+    Hearing::default().attack
+}
+
+fn release() -> f32 {
+    Hearing::default().release
+}
+
+pub fn db01(power: f32, floor_db: f32) -> f32 {
+    ((10.0 * power.max(1e-12).log10() - floor_db) / -floor_db).clamp(0.0, 1.0)
+}
+
+pub fn follow_peak(peak: f32, loudest: f32, dt: f32, release: f32) -> f32 {
+    loudest.max(peak * (-dt / release.clamp(0.05, 10.0)).exp()).max(MIN_PEAK)
 }
 
 impl Default for Hearing {
     fn default() -> Self {
-        Hearing { attack: 0.02, release: 0.2, gain: Gain::Auto }
+        Hearing { attack: 0.02, release: 0.2, gain: Gain::Auto, gain_release: GAIN_RELEASE }
     }
 }
 
@@ -77,7 +101,12 @@ pub fn ease(v: f32, target: f32, dt: f32, up: f32, down: f32) -> f32 {
 }
 
 impl Hearing {
-    pub fn hear(&self, last: &AudioFrame, mut next: AudioFrame, dt: f32) -> AudioFrame {
+    pub fn hear(&self, last: &AudioFrame, mut next: AudioFrame, dt: f32, peak: &mut f32) -> AudioFrame {
+        if self.gain == Gain::Auto {
+            let loudest = next.power.iter().flatten().fold(0.0, |a: f32, &b| a.max(b));
+            *peak = follow_peak(*peak, loudest, dt, self.gain_release);
+            next.raw = next.power.map(|c| c.map(|p| db01(p / *peak, FLOOR_DB)));
+        }
         let source = if self.gain == Gain::Fixed { next.loud } else { next.raw };
         let [up, down] = [self.attack, self.release].map(|t| t.clamp(0.001, 10.0));
         let follow = |from: &[f32; BANDS], to: &[f32; BANDS]| {

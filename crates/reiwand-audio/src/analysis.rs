@@ -1,25 +1,20 @@
 use realfft::num_complex::Complex;
 use realfft::{RealFftPlanner, RealToComplex};
-use reiwand_scene::{AudioFrame, BANDS, SPLITS, center, edge, levels};
+use reiwand_scene::{
+    AudioFrame, BANDS, FLOOR_DB, GAIN_RELEASE, MIN_PEAK, SPLITS, center, edge, follow_peak, levels,
+};
 use std::f32::consts::TAU;
 use std::sync::Arc;
 
 pub const WINDOW: usize = 2048;
-const FLOOR_DB: f32 = -70.0;
 const ATTACK: f32 = 0.02;
 const RELEASE: f32 = 0.2;
-const PEAK_DECAY: f32 = 5.0;
-const MIN_PEAK: f32 = 1e-4;
 const QUIET: f32 = 1e-6;
 const SILENT_AFTER: f32 = 2.0;
 const STALE: f32 = 0.1;
 const LOCKOUT: f32 = 0.12;
 
-pub use reiwand_scene::ease as smooth;
-
-pub fn db01(power: f32, floor_db: f32) -> f32 {
-    ((10.0 * power.max(1e-12).log10() - floor_db) / -floor_db).clamp(0.0, 1.0)
-}
+pub use reiwand_scene::{db01, ease as smooth};
 
 pub struct Analyzer {
     fft: Arc<dyn RealToComplex<f32>>,
@@ -117,11 +112,12 @@ impl Analyzer {
             self.power = self.history.iter().flatten().map(|x| x * x).sum::<f32>() / (2 * WINDOW) as f32;
         }
         let loudest = self.raw.iter().flatten().fold(0.0, |a: f32, &b| a.max(b));
-        self.peak = loudest.max(self.peak * (-dt / PEAK_DECAY).exp()).max(MIN_PEAK);
+        self.peak = follow_peak(self.peak, loudest, dt, GAIN_RELEASE);
         let (f, mut flux) = (&mut self.frame, 0.0);
         for b in 0..BANDS {
             let [l, r] = self.raw.map(|c| db01(c[b] / self.peak, FLOOR_DB));
             (f.raw[0][b], f.raw[1][b]) = (l, r);
+            (f.power[0][b], f.power[1][b]) = (self.raw[0][b], self.raw[1][b]);
             (f.loud[0][b], f.loud[1][b]) = (db01(self.raw[0][b], FLOOR_DB), db01(self.raw[1][b], FLOOR_DB));
             if fresh && center(b) < SPLITS[0] {
                 flux += ((l + r) / 2.0 - self.last[b]).max(0.0);

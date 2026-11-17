@@ -36,6 +36,7 @@ QtObject {
             "from": App.tr("From"),
             "g": App.tr("Green"),
             "gain": App.tr("Gain"),
+            "gain_release": App.tr("Gain recovery"),
             "gap": App.tr("Gap"),
             "ghosts": App.tr("Ghosts"),
             "glow": App.tr("Glow"),

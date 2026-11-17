@@ -51,6 +51,7 @@ fn the_schema_describes_every_new_field() {
         "agx",
         "attack",
         "release",
+        "gain_release",
         "descriptor",
         "wgsl",
     ];

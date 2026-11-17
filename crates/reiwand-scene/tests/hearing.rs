@@ -88,13 +88,16 @@ fn uneven_smoothing_rises_fast_and_falls_slowly() {
 fn a_scene_sets_its_own_attack_release_and_gain() {
     let synthetic = |raw: f32, loud: f32| {
         let mut a = AudioFrame { silent: false, loudness: loud, ..AudioFrame::default() };
-        (a.raw, a.loud) = ([[raw; BANDS]; 2], [[loud; BANDS]; 2]);
+        (a.power, a.loud) = ([[raw; BANDS]; 2], [[loud; BANDS]; 2]);
         a
     };
     let bindings =
         [json!({ "audio": "bass" }), json!({ "audio": "level" }), json!({ "audio": 40, "channel": "left" })];
     for (gain, target) in [("auto", 1.0), ("fixed", 0.2)] {
-        let mut rt = runtime(&bindings, Some(json!({ "attack": 0.5, "release": 0.05, "gain": gain })));
+        let mut rt = runtime(
+            &bindings,
+            Some(json!({ "attack": 0.5, "release": 0.05, "gain": gain, "gain_release": 5 })),
+        );
         rt.set_audio(synthetic(1.0, 0.2));
         rt.advance(0.1);
         rt.set_audio(synthetic(1.0, 0.2));

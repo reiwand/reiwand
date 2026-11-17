@@ -65,6 +65,7 @@ impl Check<'_> {
             self.uses(true, "audio_response");
             self.range("/audio/attack", a.attack, 0.001, 2.0);
             self.range("/audio/release", a.release, 0.01, 10.0);
+            self.range("/audio/gain_release", a.gain_release, 0.05, 10.0);
         }
     }
 }

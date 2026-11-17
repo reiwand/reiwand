@@ -97,8 +97,17 @@ its thumbnail and details in the library. Scenes without them read and draw as b
 | `gusts` | 0 to 1 (0.35 when unset): how much of `wind` comes and goes in gusts, from a steady wind at 0 to one that drops to nothing between gusts at 1 | `bone_physics` |
 
 The scene may also set `audio: { "attack" (0.001 to 2 s), "release" (0.01 to 10 s), "gain": "auto" |
-"fixed" }`, how fast audio values rise and fall and whether they follow the system volume
-(`fixed`) or adjust themselves (`auto`, the default) (`audio_response`).
+"fixed", "gain_release" (0.05 to 10 s, required) }`, how fast audio values rise and fall and whether they
+follow the system volume (`fixed`) or adjust themselves (`auto`, the default) (`audio_response`). With `auto`
+every band is measured against the loudest band of the last moments; `gain_release` is the time in which
+that reference falls toward the current level after a loud sound (the system uses 5 s for a scene without an
+`audio` block, and the editor writes 5 when it adds the block): a short one makes bands dip right after each
+hit and recover before the next one. With `fixed` it must still be written and is not used. The reference
+is kept by the scene runtime from the unnormalised band powers of each audio frame (`AudioFrame.power`),
+so scripts' and shaders' `band()` and every binding see the same values; the audio frames also carry the
+default reference for scenes without an `audio` block. `reiwand-upgrade scenes DIR` writes `gain_release: 5`
+into the existing `audio` blocks. The editor shows it as a slider next to `attack` and `release`, and the
+band meter of the sound panel draws the bands against that reference live.
 
 | Asset field | Meaning | Feature |
 |-------------|---------|---------|

@@ -471,7 +471,7 @@ una escena, y los clics están apagados en cada pantalla hasta que el usuario lo
 ## Reacción al sonido de toda la escena
 
 ```json
-  "audio": { "attack": 0.02, "release": 0.25, "gain": "auto" }
+  "audio": { "attack": 0.02, "release": 0.25, "gain": "auto", "gain_release": 5 }
 ```
 
 | Campo | Por defecto | Rango | Qué hace |
@@ -479,6 +479,7 @@ una escena, y los clics están apagados en cada pantalla hasta que el usuario lo
 | `attack` | 0,02 s | 0,001 a 2 | Cuánto tarda en subir un valor de sonido. |
 | `release` | 0,2 s | 0,01 a 10 | Cuánto tarda en bajar. |
 | `gain` | `auto` | `auto`, `fixed` | `auto` se ajusta a lo fuerte que suene; `fixed` mide desde el máximo digital, así que sigue el volumen del sistema. |
+| `gain_release` | obligatorio (el editor propone 5 s) | 0,05 a 10 | Con `gain` `auto`: en cuánto tiempo la referencia (la banda más fuerte reciente) baja hacia el nivel actual tras un golpe. 5 s mantiene la referencia casi fija; 0,3 a 0,5 s hace que las bandas se hundan justo después de cada golpe y se recuperen antes del siguiente (efecto de bombeo). Con `fixed` hay que escribirlo igual y no se usa. |
 
 ## No cubierto aquí
 

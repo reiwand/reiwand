@@ -397,8 +397,8 @@ por encima de -70 dB, relativos a la banda más fuerte de los últimos segundos;
 baja y la fuerte llenan el mismo rango (con `gain` `fixed` se mide desde el máximo digital).
 
 Un bloque `audio` en la raíz de `scene.json` cambia lo rápido que suben y bajan esos valores
-(`attack` y `release`) y si se ajustan a lo fuerte que suena la música o al volumen del sistema
-(`gain`): ver [escena.md](escena.md).
+(`attack` y `release`), si se ajustan a lo fuerte que suena la música o al volumen del sistema
+(`gain`) y, con `auto`, en cuánto tiempo vuelve la referencia tras un golpe (`gain_release`, obligatorio): ver [escena.md](escena.md).
 
 Una escena solo se vuelve a dibujar cuando cambia lo que oye. Sin audio en el equipo, o sin que el
 usuario lo permita, todo lo que sigue al sonido vale 0.

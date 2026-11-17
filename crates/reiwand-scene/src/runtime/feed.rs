@@ -44,7 +44,7 @@ impl Runtime {
     pub fn set_audio(&mut self, audio: AudioFrame) -> bool {
         let dt = (self.t - std::mem::replace(&mut self.heard, self.t)).clamp(0.0, 1.0) as f32;
         let audio = match self.scene.audio {
-            Some(h) => h.hear(&self.audio, audio, dt),
+            Some(h) => h.hear(&self.audio, audio, dt, &mut self.peak),
             None => audio,
         };
         let beat = audio.beat && !self.audio.beat;

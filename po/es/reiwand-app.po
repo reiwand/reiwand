@@ -19713,6 +19713,10 @@ msgid "Gain"
 msgstr "Ganancia"
 
 #: apps/reiwand-app/qml/facade/SceneTerms.qml
+msgid "Gain recovery"
+msgstr "Recuperación de la ganancia"
+
+#: apps/reiwand-app/qml/facade/SceneTerms.qml
 msgid "Gap"
 msgstr "Separación"
 

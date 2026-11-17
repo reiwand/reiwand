@@ -95,3 +95,13 @@ fn an_open_capture_without_sound_draws_no_levels() {
         (json!(true), json!(false), Value::Null)
     );
 }
+
+#[test]
+fn the_gain_release_of_the_scene_sets_the_reference_the_meter_reads_against() {
+    let doc = json!({ "scene": { "audio": { "attack": 0.02, "release": 0.2, "gain": "auto", "gain_release": 0.4 } } });
+    let mut heard = reading(&[], &[]);
+    heard["loud"][0][2] = json!(1.0);
+    heard["loud"][1][2] = json!(1.0);
+    let seen = ask(&doc, json!({ "meter": { "source": { "audio": 2 }, "reading": heard } }));
+    assert!((seen["value"].as_f64().unwrap() - 1.0).abs() < 1e-3, "{seen}");
+}
