@@ -283,7 +283,7 @@
   "listens": [],
   "particles": {},
   "pools": {},
-  "schema": "reiwand.scene/1",
+  "schema": "reiwand.scene/2",
   "scripts": [
     {
       "events": [
