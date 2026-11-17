@@ -66,7 +66,14 @@ async fn expire(daemon: Weak<Daemon>, emitter: SignalEmitter<'static>, output: S
         let Some(found) = daemon.upgrade().map(|d| d.expiry(&output, serial)) else { return };
         match found {
             Expiry::Gone => return,
-            Expiry::Until(until) => tokio::time::sleep_until(until.into()).await,
+            Expiry::Until(until) => {
+                tokio::time::sleep_until(until.into()).await;
+                if super::shortcuts::launch::alive(emitter.connection()).await
+                    && let Some(daemon) = daemon.upgrade()
+                {
+                    daemon.browse_keep(&output, serial);
+                }
+            }
             Expiry::Ended(told) => {
                 let sent = Playlists::browse_changed(&emitter, &told.output, &told.json).await;
                 sent.unwrap_or_else(|e| tracing::debug!("cannot emit a browse signal: {e}"));

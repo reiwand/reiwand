@@ -66,6 +66,8 @@ if [ -x "$BIN/reiwand-app" ] && python3 -c 'import dbus' 2>/dev/null; then
   wait_for 10 window true || fail "the stand-in window did not take its name"
   ctl next -o TEST-31 --preview >/dev/null
   [ "$(opened)" = $((before + 2)) ] || fail "a session opened a second window over the one shown"
+  sleep 12
+  [ "$(ctl browse show -o TEST-31 --json | js "r['active']")" = True ] || fail "a session expired while its window was open"
   timeout 20 "$BIN/reiwand-app" --browse TEST-31 || fail "a second preview window did not leave"
   window true || fail "the second window took the first one's place"
   ctl browse cancel -o TEST-31 >/dev/null

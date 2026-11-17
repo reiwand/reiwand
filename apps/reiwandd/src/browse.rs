@@ -110,6 +110,13 @@ impl Daemon {
         }
     }
 
+    pub fn browse_keep(&self, output: &str, serial: u64) {
+        if let Some(s) = lock(&self.rotations.browse.sessions).get_mut(output).filter(|s| s.serial == serial)
+        {
+            s.until = Instant::now() + *IDLE;
+        }
+    }
+
     pub fn expiry(&self, output: &str, serial: u64) -> Expiry {
         let mut sessions = lock(&self.rotations.browse.sessions);
         let until = match sessions.get(output) {

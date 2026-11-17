@@ -19,14 +19,17 @@ pub fn window_name() -> String {
     format!("{}.Switcher", reiwand_core::dbus::APP_ID)
 }
 
-pub async fn open(conn: &zbus::Connection, output: &str) {
+pub async fn alive(conn: &zbus::Connection) -> bool {
     let proxy = zbus::fdo::DBusProxy::new(conn).await;
     let name = zbus::names::BusName::try_from(window_name());
-    let owned = match (proxy, name) {
+    match (proxy, name) {
         (Ok(proxy), Ok(name)) => proxy.name_has_owner(name).await.unwrap_or(false),
         _ => false,
-    };
-    if !owned {
+    }
+}
+
+pub async fn open(conn: &zbus::Connection, output: &str) {
+    if !alive(conn).await {
         spawn(output);
     }
 }
