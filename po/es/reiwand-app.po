@@ -435,6 +435,12 @@ msgstr "Quitar equipo"
 msgid "Uploads that did not finish"
 msgstr "Subidas que no terminaron"
 
+#: apps/reiwand-app/qml/AccountMain.qml apps/reiwand-app/qml/AccountPage.qml
+#: apps/reiwand-app/qml/AccountSummary.qml
+#: apps/reiwand-app/qml/facade/Labels.qml
+msgid "Server"
+msgstr "Servidor"
+
 #: apps/reiwand-app/qml/AccountSessions.qml
 msgid ""
 "An upload that stopped half way holds one of the two open sessions the "
@@ -13245,11 +13251,6 @@ msgstr "Dirección"
 #: apps/reiwand-app/qml/facade/Labels.qml
 msgid "User name"
 msgstr "Nombre de usuario"
-
-#: apps/reiwand-app/qml/AccountMain.qml apps/reiwand-app/qml/AccountPage.qml
-#: apps/reiwand-app/qml/AccountSummary.qml apps/reiwand-app/qml/facade/Labels.qml
-msgid "Server"
-msgstr "Servidor"
 
 #: apps/reiwand-app/qml/facade/Labels.qml
 msgid "API key"

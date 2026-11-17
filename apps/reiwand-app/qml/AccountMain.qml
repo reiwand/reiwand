@@ -66,13 +66,10 @@ FocusScope {
         Vacio {
             id: empty
 
-            width: Math.min(main.width - Look.e4 * 2, Look.filasAncho)
+            width: Math.min(main.width, Look.filasAncho)
             visible: !main.account && !!main.page && main.page.error === ""
             title: App.tr("No server yet")
             text: App.tr("A Reiwand server gives you its repositories to browse, install and vote, and can keep your library, playlists and settings the same on your devices, encrypted end to end.")
-            action: App.tr("Add a server…")
-            actionIcon: "plus"
-            onActed: main.page.panels.add(empty.button)
         }
 
         AccountAdding {
