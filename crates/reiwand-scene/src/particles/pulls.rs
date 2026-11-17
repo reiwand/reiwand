@@ -1,14 +1,13 @@
-use super::{Base, Collider, Force, Operator, Surface, System, Wobble};
+use super::{Base, Collider, FULL_WINDOW, Falloff, Force, Operator, Surface, System, Wobble};
 use crate::validate::{Check, Issue};
 
 impl Check<'_> {
     pub(super) fn operator(&mut self, q: &str, o: &Operator, s: &System) {
-        if let Some(w) = o.window {
-            self.uses(true, "particles2");
-            w.iter().enumerate().for_each(|(k, v)| self.range(&format!("{q}/window/{k}"), *v, 0.0, 1.0));
-            if w.windows(2).any(|p| p[0] > p[1]) {
-                self.issues.push(Issue::Type(format!("{q}/window")));
-            }
+        let w = o.window;
+        self.uses(w != FULL_WINDOW, "particles2");
+        w.iter().enumerate().for_each(|(k, v)| self.range(&format!("{q}/window/{k}"), *v, 0.0, 1.0));
+        if w.windows(2).any(|p| p[0] > p[1]) {
+            self.issues.push(Issue::Type(format!("{q}/window")));
         }
         self.force2(q, &o.force, s);
     }
@@ -48,9 +47,9 @@ impl Check<'_> {
     }
 
     fn force2(&mut self, q: &str, force: &Force, s: &System) {
-        let reach = |c: &mut Self, radius: &Option<f32>, falloff: bool| {
-            c.uses(radius.is_some() || falloff, "particles2");
-            radius.iter().for_each(|r| c.range(&format!("{q}/radius"), *r, 0.0, 1e5));
+        let reach = |c: &mut Self, radius: f32, falloff: Falloff, plain: Falloff| {
+            c.uses(radius != 0.0 || falloff != plain, "particles2");
+            c.range(&format!("{q}/radius"), radius, 0.0, 1e5);
         };
         match force {
             Force::Gravity(v) => self.value(q, v),
@@ -58,27 +57,28 @@ impl Check<'_> {
             Force::Turbulence { strength, scale, speed, time_scale, mask } => {
                 self.value(&format!("{q}/strength"), strength);
                 self.range(&format!("{q}/scale"), *scale, 1e-6, 1.0);
-                self.uses(speed.is_some() || time_scale.is_some() || mask.is_some(), "particles2");
-                speed.iter().for_each(|v| self.range(&format!("{q}/speed"), *v, 0.0, 100.0));
-                time_scale.iter().for_each(|v| self.range(&format!("{q}/time_scale"), *v, 0.0, 100.0));
-                mask.iter()
-                    .flatten()
-                    .enumerate()
-                    .for_each(|(k, v)| self.range(&format!("{q}/mask/{k}"), *v, 0.0, 1.0));
+                self.uses(*speed != 0.0 || *time_scale != 1.0 || *mask != [1.0; 2], "particles2");
+                self.range(&format!("{q}/speed"), *speed, 0.0, 100.0);
+                self.range(&format!("{q}/time_scale"), *time_scale, 0.0, 100.0);
+                mask.iter().enumerate().for_each(|(k, v)| self.range(&format!("{q}/mask/{k}"), *v, 0.0, 1.0));
             }
-            Force::Attractor { target: t, strength, radius, falloff }
-            | Force::Orbit { center: t, strength, radius, falloff } => {
+            Force::Attractor { target: t, strength, radius, falloff } => {
                 self.value(&format!("{q}/strength"), strength);
                 self.target(q, t, s);
-                reach(self, radius, falloff.is_some());
+                reach(self, *radius, *falloff, Falloff::InverseSquare);
+            }
+            Force::Orbit { center: t, strength, radius, falloff } => {
+                self.value(&format!("{q}/strength"), strength);
+                self.target(q, t, s);
+                reach(self, *radius, *falloff, Falloff::Constant);
             }
             Force::Vortex { center, strength, radius, falloff, inner, outer, ring, axis } => {
                 self.axis(&format!("{q}/axis"), *axis);
                 self.value(&format!("{q}/strength"), strength);
                 self.target(q, center, s);
-                reach(self, radius, falloff.is_some());
-                self.uses(inner.is_some() || outer.is_some() || ring.is_some(), "particles2");
-                let lo = inner.unwrap_or(0.0);
+                reach(self, *radius, *falloff, Falloff::Linear);
+                self.uses(*inner != 0.0 || outer.is_some() || ring.is_some(), "particles2");
+                let lo = *inner;
                 self.range(&format!("{q}/inner"), lo, 0.0, 1e5);
                 outer.iter().for_each(|o| self.range(&format!("{q}/outer"), *o, lo, 1e5));
                 if let Some(r) = ring {
@@ -97,7 +97,7 @@ impl Check<'_> {
                 self.range(&format!("{p}/freq/1"), o.freq[1], o.freq[0], 60.0);
                 self.range(&format!("{p}/scale/1"), o.scale[1], o.scale[0], 1e5);
                 o.phase.iter().for_each(|v| self.range(&format!("{p}/phase"), *v, 0.0, 1.0));
-                o.mask.iter().flatten().for_each(|v| self.range(&format!("{p}/mask"), *v, 0.0, 1.0));
+                o.mask.iter().for_each(|v| self.range(&format!("{p}/mask"), *v, 0.0, 1.0));
             }
             Force::Cap(v) | Force::Torque(v) | Force::SpinDrag(v) => {
                 self.uses(true, "particles2");

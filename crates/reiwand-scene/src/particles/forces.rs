@@ -28,46 +28,38 @@ pub enum Force {
     Turbulence {
         strength: Value<f32>,
         scale: f32,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        speed: Option<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        time_scale: Option<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        mask: Option<[f32; 2]>,
+        speed: f32,
+        time_scale: f32,
+        mask: [f32; 2],
     },
     Attractor {
         target: Target,
         strength: Value<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
         #[schemars(extend("x-unit" = "px"))]
-        radius: Option<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        falloff: Option<Falloff>,
+        radius: f32,
+        falloff: Falloff,
     },
     Vortex {
         center: Target,
         strength: Value<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
         #[schemars(extend("x-unit" = "px"))]
-        radius: Option<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        falloff: Option<Falloff>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        inner: Option<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        radius: f32,
+        falloff: Falloff,
+        inner: f32,
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         outer: Option<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         ring: Option<Ring>,
         axis: [f32; 3],
     },
     Orbit {
         center: Target,
         strength: Value<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
         #[schemars(extend("x-unit" = "px"))]
-        radius: Option<f32>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        falloff: Option<Falloff>,
+        radius: f32,
+        falloff: Falloff,
     },
     Noise(Value<f32>),
     Oscillate(Oscillate),

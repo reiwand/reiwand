@@ -3,6 +3,9 @@ use serde_json::{Value as Json, json};
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
+#[path = "../prefill/mod.rs"]
+mod prefill;
+
 mod births;
 mod depths;
 mod drives;
@@ -14,8 +17,7 @@ mod timing;
 const VIEW: [f32; 4] = [0.0, 0.0, 200.0, 100.0];
 
 fn runtime(systems: Json, layers: Json) -> Runtime {
-    let text =
-        json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layers, "particles": systems });
+    let text = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layers, "particles": prefill::all(systems) });
     let scene = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"));
     Runtime::new(Arc::new(scene), Values::new())
 }

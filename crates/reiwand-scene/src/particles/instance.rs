@@ -17,33 +17,40 @@ pub enum Tunable {
     Points,
 }
 
-#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
 pub struct Instance {
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     #[schemars(extend("x-range" = [0, 1]))]
     pub alpha: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     #[schemars(extend("x-range" = [0, 100]))]
     pub size: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     #[schemars(extend("x-range" = [0, 4]))]
     pub count: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     #[schemars(extend("x-range" = [0, 100]))]
     pub speed: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     #[schemars(extend("x-range" = [0, 100]))]
     pub life: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     #[schemars(extend("x-range" = [0, 100]))]
     pub time_scale: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     #[schemars(extend("x-range" = [0, 16]))]
     pub brightness: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub color: Option<Value<Color>>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     #[schemars(extend("x-unit" = "px"))]
     pub points: Vec<Option<Value<Vec2>>>,
 }

@@ -18,7 +18,7 @@ pub(super) fn flags(l: &Source) -> f32 {
 }
 
 fn span(s: &Option<Spread<f32>>) -> [f32; 4] {
-    s.as_ref().map_or([0.0; 4], |s| [s.ends[0], s.ends[1], s.exponent.unwrap_or(1.0), 1.0])
+    s.as_ref().map_or([0.0; 4], |s| [s.ends[0], s.ends[1], s.exponent, 1.0])
 }
 
 pub fn input(name: &str) -> [f32; 2] {
@@ -71,10 +71,11 @@ impl Sim {
                 self.paths[2 * k] = [x, y, z, 0.0];
             }
             if let super::EmitShape::Between(b) = &em.shape {
-                let (bow, taper) =
-                    (b.arc.unwrap_or(super::Bow { amount: 0.0, side: 1.0 }), b.taper.unwrap_or_default());
-                self.paths[2 * k] = [bow.amount, bow.side, taper.position, taper.size];
-                self.paths[2 * k + 1] = [taper.speed, 0.0, 0.0, 0.0];
+                let [amount, side] = b.arc.map_or([0.0, 1.0], |a| [a.amount, a.side]);
+                let [position, speed, size] =
+                    b.taper.map_or([0.5, 0.0, 0.5], |t| [t.position, t.speed, t.size]);
+                self.paths[2 * k] = [amount, side, position, size];
+                self.paths[2 * k + 1] = [speed, 0.0, 0.0, 0.0];
             }
         }
         if let Some(t) = &i.turbulent {

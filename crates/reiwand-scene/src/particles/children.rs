@@ -27,28 +27,18 @@ pub struct Child {
     #[schemars(extend("x-ref" = "system"))]
     pub system: String,
     pub on: Moment,
-    #[serde(default = "one")]
     #[schemars(extend("x-range" = [0, 1]))]
     pub probability: f32,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub max: Option<u32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "px"))]
-    pub offset: Option<[f32; 2]>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub offset: [f32; 2],
     #[schemars(extend("x-unit" = "°"))]
-    pub angle: Option<f32>,
-    #[serde(default = "one")]
+    pub angle: f32,
     #[schemars(extend("x-range" = [0, 100]))]
     pub scale: f32,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub points_from: bool,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub inherit: Vec<Inheritable>,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub follow_inherit: bool,
-}
-
-fn one() -> f32 {
-    1.0
 }

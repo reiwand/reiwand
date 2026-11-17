@@ -35,10 +35,8 @@ pub struct Oscillate {
     #[schemars(extend("x-unit" = "Hz"))]
     pub freq: [f32; 2],
     pub scale: [f32; 2],
-    #[serde(default)]
     pub phase: [f32; 2],
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub mask: Option<[f32; 2]>,
+    pub mask: [f32; 2],
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]

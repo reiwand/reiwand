@@ -1,5 +1,5 @@
 use super::seed::{Carry, Hsv, OffsetNoise, Palette, Remap, Turbulent};
-use super::{EmitShape, Periodic, Spread, Tilt, is_zero};
+use super::{EmitShape, Periodic, Spread, Tilt};
 use crate::Color;
 use crate::value::Value;
 use schemars::JsonSchema;
@@ -12,25 +12,24 @@ pub const MAX_BURSTS: usize = 8;
 #[serde(deny_unknown_fields)]
 pub struct Emitter {
     pub shape: EmitShape,
-    #[serde(default = "zero")]
     pub rate: Value<f32>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub bursts: Vec<Burst>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub follow: Option<Follow>,
-    #[serde(default, skip_serializing_if = "is_zero")]
     pub inherit: f32,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     #[schemars(extend("x-unit" = "s"))]
     pub duration: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "s"))]
-    pub delay: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub delay: f32,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub periodic: Option<Periodic>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub max_per_step: Option<u32>,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub audio_gate: bool,
 }
 
@@ -51,18 +50,19 @@ pub enum Cue {
 #[serde(deny_unknown_fields)]
 pub struct Burst {
     pub count: u32,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub every: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub on: Option<Cue>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "s"))]
-    pub at: Option<f32>,
+    pub at: f32,
 }
 
 impl Burst {
     pub fn immediate(&self) -> bool {
-        self.on.is_none() && self.every.is_none() && self.at.is_none_or(|a| a <= 0.0)
+        self.on.is_none() && self.every.is_none() && self.at <= 0.0
     }
 
     pub fn timed(&self) -> bool {
@@ -71,7 +71,7 @@ impl Burst {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Init {
     pub life: Spread<f32>,
     pub speed: Spread<f32>,
@@ -81,72 +81,42 @@ pub struct Init {
     pub spin: Spread<f32>,
     pub frame: Spread<f32>,
     pub color: Spread<Color>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     #[schemars(extend("x-range" = [0, 1]))]
     pub alpha: Option<Spread<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub hsv: Option<Hsv>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub palette: Option<Palette>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub gradient: Vec<(f32, Color)>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     #[schemars(extend("x-unit" = "px/s"))]
     pub velocity: Option<Spread<[f32; 2]>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     #[schemars(extend("x-unit" = "px/s"))]
     pub radial: Option<Spread<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub inherit: Option<Carry>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub turbulent: Option<Turbulent>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub offset_noise: Option<OffsetNoise>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     #[schemars(extend("x-unit" = "px"))]
     pub depth: Option<Spread<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     #[schemars(extend("x-unit" = "px/s"))]
     pub depth_speed: Option<Spread<f32>>,
     pub tilt: Tilt,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub remap: Vec<Remap>,
-}
-
-impl Default for Init {
-    fn default() -> Self {
-        let white = Color([1.0; 4]);
-        let [rotation, spin, frame] = [[0.0; 2]; 3].map(Spread::from);
-        let [life, speed, angle, size] =
-            [[1.0, 2.0], [10.0, 40.0], [0.0, 360.0], [2.0, 6.0]].map(Spread::from);
-        let (alpha, hsv, palette, velocity, radial, inherit, turbulent, offset_noise) = Default::default();
-        let (depth, depth_speed, tilt, remap) = Default::default();
-        Init {
-            life,
-            speed,
-            angle,
-            size,
-            rotation,
-            spin,
-            frame,
-            color: Spread::from([white, white]),
-            alpha,
-            hsv,
-            palette,
-            gradient: Vec::new(),
-            velocity,
-            radial,
-            inherit,
-            turbulent,
-            offset_noise,
-            depth,
-            depth_speed,
-            tilt,
-            remap,
-        }
-    }
-}
-
-fn zero() -> Value<f32> {
-    Value::Fixed(0.0)
 }

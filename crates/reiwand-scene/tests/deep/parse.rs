@@ -18,14 +18,14 @@ fn every_advanced_field_parses_validates_and_names_its_feature() {
     let fireworks = &scene.particles["fireworks"];
     assert_eq!(
         (fireworks.space, fireworks.init.life.exponent, fireworks.forces[0].window),
-        (Placement::World, Some(2.0), Some([0.0, 0.1, 0.8, 1.0]))
+        (Placement::World, 2.0, [0.0, 0.1, 0.8, 1.0])
     );
     assert_eq!(
         fireworks.render.stretch,
         Some(Stretch { mode: StretchMode::Add, depth: StretchDepth::Flat, time: 0.1, min: 2.0, max: 40.0 })
     );
     let EmitShape::Box(area) = fireworks.emitters[0].shape else { panic!("no box") };
-    assert_eq!((area.inner, area.at), (Some([50.0, 50.0]), Some(Handle(1))));
+    assert_eq!((area.inner, area.at), ([50.0, 50.0], Some(Handle(1))));
     assert_eq!(scene.scripts[0].events.len(), 6);
     assert_eq!(scene.camera3d.as_ref().unwrap().paths[0].keys.len(), 2);
     assert!(scene.layer("lights").is_some_and(|l| matches!(l.kind, Kind::Adjustment { rgb: true, .. })));

@@ -3,6 +3,9 @@ use serde_json::{Value as Json, json};
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
+#[path = "../prefill/mod.rs"]
+mod prefill;
+
 mod aspects;
 mod axis;
 mod capped;
@@ -43,7 +46,7 @@ fn with(mut base: Json, patch: Json) -> Json {
 fn scene(system: Json, visible: bool) -> String {
     let layer = json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "dots", "visible": visible });
     let assets = json!({ "dot": { "path": "dot.png", "atlas": [2, 2] } });
-    json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": [layer], "particles": { "dots": system }, "assets": assets })
+    json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": [layer], "particles": { "dots": prefill::completed(system) }, "assets": assets })
         .to_string()
 }
 

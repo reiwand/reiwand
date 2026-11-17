@@ -31,7 +31,7 @@ impl Swarm {
         for (p, part) in flock.parts.iter().enumerate().filter(|(p, _)| self.frames[*p].mode[0] == 0) {
             for (e, em) in systems[part.system].emitters.iter().take(MAX_EMITTERS2).enumerate() {
                 let f = &self.feeds[p][e];
-                let start = self.start + f64::from(em.delay.unwrap_or(0.0));
+                let start = self.start + f64::from(em.delay);
                 let end = start + em.duration.filter(|d| *d > 0.0).map_or(f64::INFINITY, f64::from);
                 due = due.min(match () {
                     _ if self.play != Play::Playing => f64::INFINITY,
@@ -77,7 +77,7 @@ impl Swarm {
     pub(super) fn timing(&mut self, p: usize, e: usize, em: &Emitter) {
         let (seed, t, start) = (self.bases[p].ids[0], self.sim, self.start);
         let f = &mut self.feeds[p][e];
-        let begin = start + f64::from(em.delay.unwrap_or(0.0));
+        let begin = start + f64::from(em.delay);
         let length = em.duration.filter(|d| *d > 0.0).map_or(f64::INFINITY, f64::from);
         let pick =
             |w: u32, [lo, hi]: [f32; 2]| f64::from(lo + (hi - lo) * rand(seed, 0xffff_0000 + e as u32, w));
@@ -96,7 +96,7 @@ impl Swarm {
             f.pending = once.fold(f.pending, |n, b| n.saturating_add(b.count));
             for (i, next) in f.next.iter_mut().enumerate() {
                 let timed = em.bursts.get(i).filter(|b| b.timed());
-                *next = timed.map_or(f64::INFINITY, |b| t + f64::from(b.at.unwrap_or(0.0).max(0.0)));
+                *next = timed.map_or(f64::INFINITY, |b| t + f64::from(b.at.max(0.0)));
             }
             if matches!(&em.shape, super::EmitShape::Around(a) if a.restart) {
                 f.sequence = 0;

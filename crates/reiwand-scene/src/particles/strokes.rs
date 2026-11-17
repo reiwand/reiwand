@@ -6,16 +6,13 @@ use serde::{Deserialize, Serialize};
 pub struct Trail {
     pub length: u32,
     pub width: f32,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub segments: Option<u32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [0, 7]))]
-    pub subdivide: Option<u32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub uv_scale: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub uv_scroll: Option<f32>,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub subdivide: u32,
+    pub uv_scale: f32,
+    pub uv_scroll: f32,
     pub textured: bool,
 }
 
@@ -44,7 +41,7 @@ pub struct Stretch {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Rope {
     #[schemars(extend("x-range" = [0, 7]))]
     pub subdivide: u32,
@@ -53,12 +50,6 @@ pub struct Rope {
     pub uv_scale: f32,
     pub uv_scroll: f32,
     pub smooth: bool,
-}
-
-impl Default for Rope {
-    fn default() -> Self {
-        Rope { subdivide: 2, width: 4.0, uv_scale: 1.0, uv_scroll: 0.0, smooth: true }
-    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]

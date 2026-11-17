@@ -30,7 +30,7 @@ impl Room {
         let mut points = [[0.0; 3]; MAX_CONTROL];
         for (k, out) in points.iter_mut().enumerate() {
             let c = s.points.get(k);
-            let angle = c.and_then(|c| c.angle.as_ref()).map_or(0.0, |a| a.get(cx)) + turn(frame);
+            let angle = c.map_or(0.0, |c| c.angle.get(cx)) + turn(frame);
             let at = if c.is_some_and(|c| c.follow.is_some()) {
                 if cursor[2] > 0.5 { [cursor[0], cursor[1]] } else { home }
             } else {

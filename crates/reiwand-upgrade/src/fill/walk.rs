@@ -127,6 +127,7 @@ impl<'a> Walk<'a> {
     fn visit(&mut self, s: &'a Value, v: &mut Value, def: &str, ctx: &str) {
         let (s, named) = self.resolve(s);
         let def = named.unwrap_or(def);
+        super::particles::spread(def, v);
         if let Value::Object(map) = v
             && let Some((name, value)) = super::legacy::tag(ctx, map)
         {
@@ -164,6 +165,7 @@ impl<'a> Walk<'a> {
             map.insert(name.into(), value);
             self.report.note(def, name);
         }
+        super::particles::before(ctx, map);
         let props = s.get("properties").and_then(Value::as_object);
         let required =
             |n: &str| s.get("required").and_then(Value::as_array).is_some_and(|r| r.iter().any(|x| x == n));

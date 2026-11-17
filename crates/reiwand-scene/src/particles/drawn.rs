@@ -46,13 +46,12 @@ impl Check<'_> {
             self.range(&format!("{p}/rope/uv_scroll"), rope.uv_scroll, -100.0, 100.0);
         }
         if let Some(t) = &r.trail {
-            let more =
-                [t.segments.is_some(), t.subdivide.is_some(), t.uv_scale.is_some(), t.uv_scroll.is_some()];
+            let more = [t.segments.is_some(), t.subdivide != 0, t.uv_scale != 1.0, t.uv_scroll != 0.0];
             self.uses(t.length > 16 || more.contains(&true) || t.textured, "particle_ropes");
             t.segments.iter().for_each(|n| self.range(&format!("{p}/trail/segments"), *n as f32, 1.0, 64.0));
-            t.subdivide.iter().for_each(|n| self.range(&format!("{p}/trail/subdivide"), *n as f32, 0.0, 7.0));
-            t.uv_scale.iter().for_each(|v| self.range(&format!("{p}/trail/uv_scale"), *v, 0.0, 100.0));
-            t.uv_scroll.iter().for_each(|v| self.range(&format!("{p}/trail/uv_scroll"), *v, -100.0, 100.0));
+            self.range(&format!("{p}/trail/subdivide"), t.subdivide as f32, 0.0, 7.0);
+            self.range(&format!("{p}/trail/uv_scale"), t.uv_scale, 0.0, 100.0);
+            self.range(&format!("{p}/trail/uv_scroll"), t.uv_scroll, -100.0, 100.0);
         }
         self.uses(r.lit || r.normal.is_some() || r.refract.is_some(), "particle_lighting");
         r.normal.iter().for_each(|n| self.picture(&format!("{p}/normal"), n));

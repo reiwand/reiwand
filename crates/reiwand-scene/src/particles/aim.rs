@@ -31,7 +31,7 @@ impl Swarm {
             if let Some(h) = at {
                 let n = usize::from(h.0);
                 place = if hatched {
-                    let c = s.points.get(n).and_then(|c| c.angle.as_ref());
+                    let c = s.points.get(n).map(|c| &c.angle);
                     let turned = Affine::rotate(c.map_or(0.0, |a| a.get(cx)));
                     frame.then(Affine::translate(room_local(s, h.0, cx))).then(turned)
                 } else {

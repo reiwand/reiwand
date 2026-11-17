@@ -71,18 +71,16 @@ impl Check<'_> {
         }
     }
 
-    pub(super) fn exponent(&mut self, path: &str, e: Option<f32>) {
-        if let Some(e) = e {
-            self.uses(true, "particles2");
-            self.range(&format!("{path}/2"), e, 0.1, 10.0);
-        }
+    pub(super) fn exponent(&mut self, path: &str, e: f32) {
+        self.uses(e != 1.0, "particles2");
+        self.range(&format!("{path}/2"), e, 0.1, 10.0);
     }
 
     pub(super) fn emission(&mut self, q: &str, e: &Emitter, s: &System) {
-        let timed = [e.duration.is_some(), e.delay.is_some(), e.periodic.is_some(), e.max_per_step.is_some()];
+        let timed = [e.duration.is_some(), e.delay != 0.0, e.periodic.is_some(), e.max_per_step.is_some()];
         self.uses(timed.contains(&true) || e.audio_gate, "particles2");
         e.duration.iter().for_each(|d| self.range(&format!("{q}/duration"), *d, 0.0, 86_400.0));
-        e.delay.iter().for_each(|d| self.range(&format!("{q}/delay"), *d, 0.0, 86_400.0));
+        self.range(&format!("{q}/delay"), e.delay, 0.0, 86_400.0);
         e.max_per_step.iter().for_each(|n| self.range(&format!("{q}/max_per_step"), *n as f32, 1.0, 1000.0));
         if let Some(w) = e.periodic {
             for (name, [lo, hi]) in [("on", w.on), ("off", w.off)] {
@@ -95,18 +93,18 @@ impl Check<'_> {
             EmitShape::Box(a) => {
                 [a.from, a.to].into_iter().for_each(|v| self.place(&p, v));
                 let size = [(a.to[0] - a.from[0]).abs(), (a.to[1] - a.from[1]).abs()];
-                for (i, v) in a.inner.iter().flatten().enumerate() {
+                for (i, v) in a.inner.iter().enumerate() {
                     self.range(&format!("{p}/box/inner/{i}"), *v, 0.0, size[i]);
                 }
-                self.uses(a.inner.is_some(), "particles2");
+                self.uses(a.inner != [0.0; 2], "particles2");
                 a.at.iter().for_each(|h| self.handle(&format!("{p}/box/at"), *h, s));
             }
             EmitShape::Circle { scale, sign, at, .. } => {
-                self.uses(scale.is_some() || sign.is_some(), "particles2");
-                for (i, v) in scale.iter().flatten().enumerate() {
+                self.uses(*scale != [1.0; 2] || *sign != [0; 2], "particles2");
+                for (i, v) in scale.iter().enumerate() {
                     self.range(&format!("{p}/circle/scale/{i}"), *v, 0.01, 100.0);
                 }
-                for (i, v) in sign.iter().flatten().enumerate() {
+                for (i, v) in sign.iter().enumerate() {
                     self.range(&format!("{p}/circle/sign/{i}"), f32::from(*v), -1.0, 1.0);
                 }
                 at.iter().for_each(|h| self.handle(&format!("{p}/circle/at"), *h, s));

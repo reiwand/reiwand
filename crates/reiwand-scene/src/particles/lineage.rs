@@ -9,7 +9,7 @@ impl Check<'_> {
         for (k, point) in s.points.iter().enumerate() {
             let q = format!("{p}/points/{k}");
             point.at.iter().for_each(|v| self.value(&format!("{q}/at"), v));
-            point.angle.iter().for_each(|v| self.number(&format!("{q}/angle"), v, -360.0, 360.0));
+            self.number(&format!("{q}/angle"), &point.angle, -360.0, 360.0);
             if point.at.is_some() && point.follow.is_some() {
                 self.issues.push(Issue::Source(q));
             }
@@ -29,8 +29,8 @@ impl Check<'_> {
             self.known(&format!("{q}/system"), "particle system", &c.system, known);
             self.range(&format!("{q}/probability"), c.probability, 0.0, 1.0);
             c.max.iter().for_each(|m| self.range(&format!("{q}/max"), *m as f32, 1.0, MAX_PARTICLES as f32));
-            c.offset.iter().for_each(|o| self.place(&format!("{q}/offset"), *o));
-            c.angle.iter().for_each(|a| self.range(&format!("{q}/angle"), *a, -360.0, 360.0));
+            self.place(&format!("{q}/offset"), c.offset);
+            self.range(&format!("{q}/angle"), c.angle, -360.0, 360.0);
             self.range(&format!("{q}/scale"), c.scale, 0.0, 100.0);
             let child = self.scene.particles.get(&c.system).map_or(&[][..], |s| &s.emitters[..]);
             if c.on != Moment::Static && child.iter().any(|e| matches!(e.shape, EmitShape::Layer(_))) {

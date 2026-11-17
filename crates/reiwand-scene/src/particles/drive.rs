@@ -4,12 +4,12 @@ use crate::resolve::Context;
 
 pub(super) const NONE: [f32; 4] = [0.0; 4];
 
-fn fall(f: Option<Falloff>, default: f32) -> f32 {
-    f.map_or(default, |f| match f {
+fn fall(f: Falloff) -> f32 {
+    match f {
         Falloff::Constant => 0.0,
         Falloff::Linear => 1.0,
         Falloff::InverseSquare => 2.0,
-    })
+    }
 }
 
 pub(super) fn forces(sim: &mut Sim, s: &System, room: &Room, cx: &Context) {
@@ -18,7 +18,7 @@ pub(super) fn forces(sim: &mut Sim, s: &System, room: &Room, cx: &Context) {
             let [x, y, on] = room.aim(t);
             [kind, x, y, v * on]
         };
-        let reach = |r: Option<f32>, f: Option<Falloff>, d: f32| [r.unwrap_or(0.0), fall(f, d), 0.0, -1.0];
+        let reach = |r: f32, f: Falloff| [r, fall(f), 0.0, -1.0];
         let (head, a, b) = match &o.force {
             Force::Gravity(g) => {
                 let [x, y] = g.get(cx).0;
@@ -26,22 +26,22 @@ pub(super) fn forces(sim: &mut Sim, s: &System, room: &Room, cx: &Context) {
             }
             Force::Drag(k) => ([2.0, k.get(cx), 0.0, 0.0], NONE, NONE),
             Force::Turbulence { strength, scale, speed, time_scale, mask } => {
-                let [mx, my] = mask.unwrap_or([1.0; 2]);
-                let drift = [speed.unwrap_or(0.0), 0.2 * time_scale.unwrap_or(1.0), mx, my];
+                let [mx, my] = *mask;
+                let drift = [*speed, 0.2 * time_scale, mx, my];
                 ([3.0, strength.get(cx), *scale, 0.0], drift, NONE)
             }
             Force::Attractor { target, strength, radius, falloff } => {
-                (pull(4.0, target, strength.get(cx)), reach(*radius, *falloff, 2.0), NONE)
+                (pull(4.0, target, strength.get(cx)), reach(*radius, *falloff), NONE)
             }
             Force::Vortex { center, strength, radius, falloff, inner, outer, ring, axis } => {
                 sim.pivots[k] = [axis[0], axis[1], axis[2], 0.0];
-                let mut r = reach(*radius, *falloff, 1.0);
-                (r[2], r[3]) = (inner.unwrap_or(0.0), outer.or(*inner).unwrap_or(-1.0));
+                let mut r = reach(*radius, *falloff);
+                (r[2], r[3]) = (*inner, outer.unwrap_or(-1.0));
                 let ring = ring.map_or(NONE, |g| [g.radius, g.width, g.pull, 1.0]);
                 (pull(5.0, center, strength.get(cx)), r, ring)
             }
             Force::Orbit { center, strength, radius, falloff } => {
-                (pull(6.0, center, strength.get(cx)), reach(*radius, *falloff, 0.0), NONE)
+                (pull(6.0, center, strength.get(cx)), reach(*radius, *falloff), NONE)
             }
             Force::Noise(k) => ([7.0, k.get(cx), 0.0, 0.0], NONE, NONE),
             Force::Oscillate(w) => {
@@ -50,7 +50,7 @@ pub(super) fn forces(sim: &mut Sim, s: &System, room: &Room, cx: &Context) {
                     Wobble::Alpha => 1.0,
                     Wobble::Size => 2.0,
                 };
-                let [mx, my] = w.mask.unwrap_or([1.0; 2]);
+                let [mx, my] = w.mask;
                 let (f, g) =
                     ([w.freq[0], w.freq[1], w.scale[0], w.scale[1]], [w.phase[0], w.phase[1], mx, my]);
                 ([8.0, what, f32::from(u8::from(w.from == Base::Floor)), 0.0], f, g)
@@ -67,7 +67,7 @@ pub(super) fn forces(sim: &mut Sim, s: &System, room: &Room, cx: &Context) {
             Force::Remap(r) => super::tether::steady(r, room, cx),
             Force::Boids(b) => ([16.0, 0.0, 0.0, 0.0], [0.0, b.max_speed, 0.0, 0.0], NONE),
         };
-        let window = o.window.unwrap_or([0.0, 0.0, 1.0, 1.0]);
+        let window = o.window;
         sim.forces[4 * k..4 * k + 4].copy_from_slice(&[head, a, b, window]);
     }
 }
