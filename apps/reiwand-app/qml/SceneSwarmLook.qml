@@ -97,6 +97,12 @@ GridLayout {
         QQC2.ToolTip.text: App.tr("Turn %1°", Math.round(value))
     }
 
+    SceneSwarmStretch {
+        Layout.columnSpan: 2
+        Layout.fillWidth: true
+        tools: look.tools
+    }
+
     SceneSwarmDepth {
         Layout.columnSpan: 2
         Layout.fillWidth: true

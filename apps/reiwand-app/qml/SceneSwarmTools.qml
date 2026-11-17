@@ -127,6 +127,11 @@ ColumnLayout {
         tools: tools
     }
 
+    SceneSwarmWaves {
+        Layout.fillWidth: true
+        tools: tools
+    }
+
     SceneSwarmWindows {
         Layout.fillWidth: true
         tools: tools

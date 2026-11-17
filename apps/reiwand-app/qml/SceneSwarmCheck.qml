@@ -137,6 +137,9 @@ QtObject {
         Qt.createComponent("SceneSwarmPanelsCheck.qml").createObject(page, {
             "page": page
         }).exercise();
+        Qt.createComponent("SceneSwarmStrokeCheck.qml").createObject(page, {
+            "page": page
+        }).exercise();
         Qt.createComponent("SceneWallGripCheck.qml").createObject(page, {
             "page": page
         }).exercise();
