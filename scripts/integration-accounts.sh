@@ -87,7 +87,7 @@ else
   acct_start old
   [ "$(x old account ls --json | jq_ "[(a['user'], a['pending']) for a in r['accounts']]")" = "[('ana', False)]" ] ||
     fail "the migrated account: $(x old account ls)"
-  [ "$(x old account ls --json | jq_ "r['accounts'][0]['links'][0]['url']")" = "https://srv.example:8443/r/shelf/" ] ||
+  [ "$(x old account ls --json | jq_ "r['accounts'][0]['repos'][0]['url']")" = "https://srv.example:8443/r/shelf/" ] ||
     fail "the account lost its repository: $(x old account ls)"
   env "${env[@]}" "$BIN/reiwand-upgrade" client --data "$data" | grep -q "nothing to upgrade" || fail "a second upgrade changed the data"
   x old export "$WORK/with.reiwand" --secrets --password-file <(printf 'pw\n') >/dev/null || fail "the export with accounts failed"
