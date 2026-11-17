@@ -183,7 +183,7 @@ QtObject {
         const parts = /^(in_out|in|out)_(.*)$/.exec(name);
         if (!parts)
             return SceneValues.values[name] ?? label(name);
-        const curve = SceneValues.curves[parts[2]] ?? parts[2];
+        const curve = SceneLinkWords.curves[parts[2]] ?? parts[2];
         return parts[1] === "in" ? App.tr("Ease in (%1)", curve) : parts[1] === "out" ? App.tr("Ease out (%1)", curve) : App.tr("Ease in and out (%1)", curve);
     }
 
@@ -193,8 +193,8 @@ QtObject {
     }
 
     function binding(bound) {
-        const found = Object.keys(SceneValues.sources).find(source => (bound ?? {})[source] !== undefined) ?? "keys";
+        const found = Object.keys(SceneLinkWords.sources).find(source => (bound ?? {})[source] !== undefined) ?? "keys";
         const detail = found === "prop" ? bound.prop : ["audio", "cursor", "media"].includes(found) ? value(bound[found]) : ["clock", "date"].includes(found) ? String(bound[found]) : found === "script" ? [bound.script, bound.fn].filter(part => part).join(" · ") : "";
-        return SceneValues.sources[found] + (detail ? " · " + detail : "");
+        return SceneLinkWords.sources[found] + (detail ? " · " + detail : "");
     }
 }

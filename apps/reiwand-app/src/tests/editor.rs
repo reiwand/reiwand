@@ -111,7 +111,14 @@ fn the_scene_editor_has_words_for_every_field_value_and_effect() {
     let file = |wanted: &str| qml_files().into_iter().find(|(name, _)| name == wanted).unwrap().1;
     let (words, manifest) = (file("SceneWords.qml"), file("ManifestWords.qml"));
     assert!(words.contains("ManifestWords.words"), "SceneWords.qml falls back to ManifestWords.qml");
-    let more = ["SceneTerms.qml", "SceneNames.qml", "SceneLabels.qml", "SceneValues.qml", "SceneEffects.qml"];
+    let more = [
+        "SceneTerms.qml",
+        "SceneNames.qml",
+        "SceneLabels.qml",
+        "SceneValues.qml",
+        "SceneLinkWords.qml",
+        "SceneEffects.qml",
+    ];
     let scene = [words].into_iter().chain(more.map(file)).collect::<String>();
     let (mut keys, mut values, mut theirs) = (BTreeSet::new(), BTreeSet::new(), BTreeSet::new());
     named(&reiwand_scene::schema(), &mut keys, &mut values);
