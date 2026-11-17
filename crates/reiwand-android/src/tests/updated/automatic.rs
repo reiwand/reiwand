@@ -46,7 +46,7 @@ pub(super) fn updates_follow_the_setting() {
     };
     release("1.0.0", &[]);
     let port = serve(repo.clone());
-    let url = format!("http://127.0.0.1:{port}/?fingerprint={}", root.fingerprint);
+    let url = format!("http://127.0.0.1:{port}/");
     let repo_id = repos::add(&url).unwrap()["repo_id"].as_str().unwrap().to_owned();
     repos::install(&repo_id, ID).unwrap();
     assert_eq!(settings::setting("repos.auto_update", None).unwrap(), "false", "off by default");

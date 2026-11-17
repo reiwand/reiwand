@@ -69,7 +69,7 @@ pub(super) fn the_servers_own_certificate_is_trusted_only_for_its_own_origin() {
     add(&repo, &super::previewed::package(tmp.path(), "org.example.home"), None, now).unwrap();
     publish(&repo, &Signer::new(&online.secret, None).unwrap(), 7, now).unwrap();
     let (server, other) = (secure(repo.clone()), secure(repo));
-    let address = |port: u16| format!("https://127.0.0.1:{port}/?fingerprint={}", root.fingerprint);
+    let address = |port: u16| format!("https://127.0.0.1:{port}/");
     let pem = fs::read(PEM).unwrap();
     let leaf = CertificateDer::pem_slice_iter(&pem).next().unwrap().unwrap();
     let print = reiwand_sync::fingerprint(&leaf);

@@ -24,7 +24,7 @@ fn asked(request: Value) -> Value {
 }
 
 fn every_action(url: &str) -> Vec<Value> {
-    let anchored = format!("{url}/?fingerprint={}", "a".repeat(64));
+    let anchored = format!("{url}/");
     let added = repos::add(&anchored).unwrap_or_else(|e| e.reply());
     let offered = asked(json!({ "op": "add", "url": url }));
     let api = net::api(url, None).map_or_else(|e| e.reply(), |_| json!({}));

@@ -76,7 +76,7 @@ async fn repositories_install_over_http_with_progress() {
     let tmp = tempfile::tempdir().unwrap();
     let fingerprint = repository(tmp.path());
     let server = serve(tmp.path().join("site")).await;
-    let (url, data) = (format!("{}/?fingerprint={fingerprint}", server.uri()), tmp.path().join("data"));
+    let (url, data) = (format!("{}/", server.uri()), tmp.path().join("data"));
     let dest = tmp.path().join("preview");
     tokio::task::spawn_blocking(move || {
         let fetch = HttpFetch::new(Arc::default()).unwrap();

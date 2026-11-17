@@ -108,7 +108,7 @@ pub(super) fn dependencies_and_updates_follow_a_repository() {
     operate(&repo, json!({ "op": "add", "files": [base, dep, orphan, calm] }));
     publish();
     let port = serve(repo.clone());
-    let url = format!("http://127.0.0.1:{port}/?fingerprint={}", root.fingerprint);
+    let url = format!("http://127.0.0.1:{port}/");
     let added = repos::add(&url).unwrap();
     let repo_id = added["repo_id"].as_str().unwrap().to_owned();
     assert_eq!(added["packages"], json!(4), "{added}");
