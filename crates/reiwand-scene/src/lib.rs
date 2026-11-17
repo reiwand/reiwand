@@ -82,6 +82,7 @@ mod pin;
 mod played;
 mod pointing;
 mod poses;
+pub mod prefill;
 mod probe;
 mod projected;
 mod props;
