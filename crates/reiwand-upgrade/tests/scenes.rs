@@ -98,6 +98,16 @@ fn chroma_key_gains_distance_and_keep() {
 }
 
 #[test]
+fn depth_parallax_gains_the_circle_reach() {
+    let scene = json!({"layers": [{"blend_space": "canvas", "effects": [
+        {"effect": "depth_parallax", "params": {"strength": 9}}, {"effect": "depth_parallax", "params": {"reach": 1}}]}]});
+    let e = &upgraded("scenes-reach", scene)["layers"][0]["effects"];
+    assert_eq!(e[0]["params"]["reach"], json!(0));
+    assert_eq!(e[0]["params"]["strength"], json!(9));
+    assert_eq!(e[1]["params"]["reach"], json!(1));
+}
+
+#[test]
 fn the_audio_block_gains_the_gain_release() {
     let s = upgraded("scenes-audio", json!({"audio": {"attack": 0.05, "gain": "auto"}}));
     assert_eq!(s["audio"]["gain_release"], 5);

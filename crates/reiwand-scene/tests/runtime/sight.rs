@@ -36,7 +36,7 @@ fn a_hidden_video_read_by_an_effect_of_a_shown_layer_keeps_playing() {
     let video =
         json!({ "blend_space": "canvas", "id": "v", "type": "video", "video": "clip", "visible": false });
     let reader = json!({ "blend_space": "canvas", "id": "deep", "type": "solid", "color": "#ff0000", "size": [50, 50],
-        "effects": [{ "effect": "depth_parallax", "params": { "depth": { "layer": "v" }, "orbit": true } }] });
+        "effects": [{ "effect": "depth_parallax", "params": { "depth": { "layer": "v" }, "orbit": true, "reach": 0 } }] });
     let (at, shown, moving) = rolled(&mut filmed(json!([video, reader])));
     assert!(shown && at > 0.4 && moving, "{at} {shown} {moving}");
 }

@@ -2,7 +2,8 @@ use reiwand_scene::{PointerState, Quality, Runtime, SCHEMA, Scene};
 use serde_json::json;
 use std::sync::Arc;
 
-fn runtime(params: serde_json::Value) -> Runtime {
+fn runtime(mut params: serde_json::Value) -> Runtime {
+    params["reach"] = json!(0);
     let fx = json!([{ "effect": "depth_parallax", "params": params }, { "effect": "waves" }]);
     let layer =
         json!({ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#ff0000", "effects": fx });

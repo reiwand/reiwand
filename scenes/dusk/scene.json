@@ -40,7 +40,7 @@
     { "blend_space": "canvas", "id": "tint", "type": "solid", "color": { "prop": "light" }, "blend": "soft_light", "opacity": { "prop": "warmth" } },
     { "blend_space": "canvas", "id": "relief", "type": "adjustment", "effects": [{ "effect": "depth_parallax",
       "enabled": { "prop": "depth", "map": { "pointer": true, "orbit": true, "off": false } },
-      "params": { "depth": "depth", "strength": 18, "focus": 0.3, "overscan": 1.02,
+      "params": { "depth": "depth", "reach": 0, "strength": 18, "focus": 0.3, "overscan": 1.02,
                   "follow": { "prop": "depth", "map": { "pointer": true, "orbit": false, "off": false } },
                   "orbit": { "prop": "depth", "map": { "pointer": false, "orbit": true, "off": false } } } }] },
     { "blend_space": "canvas", "id": "caption", "type": "text", "text": { "prop": "caption" }, "font": "serif", "size": 56, "align": "left",

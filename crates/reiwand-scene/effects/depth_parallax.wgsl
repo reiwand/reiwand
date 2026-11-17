@@ -1,9 +1,9 @@
 fn depth_parallax_aim() -> vec2<f32> {
     let t = frame.time * TAU;
     let orbit = vec2<f32>(sin(t / 17.0), 0.7 * sin(t / 23.0 + 0.6)) * param(6u).x;
-    let pointer = select((frame.cursor - 0.5) * 2.0, frame.glide, param(8u).x > 0.5);
+    let pointer = select((frame.cursor - 0.5) * 2.0, frame.glide, param(9u).x > 0.5);
     let aim = mix(orbit, pointer, param(5u).x * frame.presence);
-    return aim / max(length(aim), 1.0);
+    return select(aim / max(length(aim), 1.0), clamp(aim, vec2<f32>(-1.0), vec2<f32>(1.0)), param(8u).x > 0.5);
 }
 
 @fragment

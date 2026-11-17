@@ -46,7 +46,7 @@
       "opacity": { "keys": [[0, 0, { "out": [0.5, 1] }], [2, 1, { "in": [0.5, 0] }]], "timeline": "intro", "base": 0.2 },
       "transform": { "position": { "x": { "keys": [[0, 0], [2, 100]] }, "y": { "cursor": "y", "scale": 100 } },
                      "rotation": { "clock": "day", "scale": 360 } },
-      "effects": [{ "effect": "depth_parallax", "params": { "depth": { "layer": "sky" } } }, { "effect": "ripple" }] },
+      "effects": [{ "effect": "depth_parallax", "params": { "depth": { "layer": "sky" }, "reach": 0 } }, { "effect": "ripple" }] },
     { "blend_space": "canvas", "id": "bars", "type": "solid", "color": "#ffffff",
       "opacity": { "audio": [0, 3], "kind": "relative", "unit": "db", "of": 16, "reduce": "max", "bounds": [0.2, 0.8], "exponent": 2,
                    "smooth": { "up": 0.05, "down": 0.4 } } }

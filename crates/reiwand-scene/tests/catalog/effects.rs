@@ -12,7 +12,7 @@ const BASE: &str = "bloom: threshold intensity radius knee; blur: radius; blur_m
     blur_radial: center strength samples follow; chroma_key: key tolerance softness spill distance keep;
     chromatic_aberration: amount center; clouds: color shade opacity coverage softness size speed warp octaves height;
     color_adjust: exposure contrast saturation hue; color_lut: lut intensity; crt: curvature pitch scan phosphor vignette glow;
-    depth_parallax: depth strength focus steps overscan follow orbit; dissolve: progress size edge glow;
+    depth_parallax: depth strength focus steps overscan follow orbit reach; dissolve: progress size edge glow;
     edges: strength threshold width color sketch paper; film_grain: amount size fps; flow: map strength speed direction;
     glitch: bursts beat length rows threshold shift split jitter speed;
     god_rays: source threshold density decay exposure color samples follow; iris: range follow center saccades rate;

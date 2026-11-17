@@ -29,6 +29,11 @@ fn resting(d: &Descriptor, slots: &[[f32; 4]], [pointer, glide]: [&PointerState;
     let eased = if at("smooth") > 0.5 { glide } else { pointer };
     let aim = eased.smooth.map(|c| (c - 0.5) * 2.0 * follow);
     let scale = d.param("scale").map_or(1.0, |i| slots[i][0].abs().max(slots[i][1].abs()));
-    let drift = aim[0].hypot(aim[1]).min(1.0) * at("strength").abs() * scale;
+    let reach = if at("reach") > 0.5 {
+        aim[0].abs().max(aim[1].abs()).min(1.0)
+    } else {
+        aim[0].hypot(aim[1]).min(1.0)
+    };
+    let drift = reach * at("strength").abs() * scale;
     at("overscan") <= 1.0 && at("orbit") == 0.0 && drift < 0.05
 }

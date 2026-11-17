@@ -2,6 +2,7 @@ use super::*;
 
 fn relief(mut params: Value, depth: &RgbaImage) -> Fx {
     params["depth"] = json!("depth");
+    params["reach"] = params.get("reach").cloned().unwrap_or(json!(0));
     Fx::new("depth_parallax", params).image("depth", depth.clone(), true)
 }
 
@@ -64,4 +65,22 @@ fn depth_parallax_scales_each_direction_and_may_follow_the_eased_pointer() {
     let Some((_, raw)) = moved(fx(json!({ "strength": 8, "focus": 0 }))) else { return };
     let Some((_, eased)) = moved(fx(json!({ "strength": 8, "focus": 0, "smooth": true }))) else { return };
     assert!(raw.diff(&still) > 1.0 && eased.diff(&raw) < 0.5, "{}", eased.diff(&raw));
+}
+
+fn reddest(reach: u32, pointer: [f32; 2]) -> Option<usize> {
+    let depth = halves([255; 3], [0; 3]);
+    let mut run = relief(json!({ "strength": 12, "focus": 0, "reach": reach }), &depth)
+        .input(halves(RED, BLUE))
+        .run()?;
+    run.pointer(pointer);
+    let shot = run.shot();
+    Some((0..W).filter(|x| shot.at(*x, 16)[0] > 128).count())
+}
+
+#[test]
+fn depth_parallax_reaches_each_direction_alone_with_a_square_path() {
+    let (Some(edge), Some(corner)) = (reddest(1, [1.0, 0.5]), reddest(1, [1.0, 0.0])) else { return };
+    assert_eq!(edge, corner);
+    let (Some(edge), Some(corner)) = (reddest(0, [1.0, 0.5]), reddest(0, [1.0, 0.0])) else { return };
+    assert!(corner + 2 < edge, "{corner} {edge}");
 }

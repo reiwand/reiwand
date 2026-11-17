@@ -1674,7 +1674,7 @@ rules are also what a phone or a laptop on battery draws.
 | `blur` | `blend` (`normal`) and `amount` (0 to 1) mix the blurred picture back into the sharp one; a lighter variant (1 unit instead of 6) blurs with nine taps at half the size and scales the result up, drawn at Q0 and at Q1 when `optional` instead of leaving the picture sharp |
 | `blur_motion` | `follow`, `shutter` (0 to 0.5 s) |
 | `chromatic_aberration` | `mode` (0 grows with the distance from `center`, 1 the same shift along `angle`, 2 the same shift away from `center`, 3 grows with the square of the distance), `angle` (−360 to 360) |
-| `depth_parallax` | `scale` (−1 to 1 on each axis, 1 by default; a vector handle on the canvas), `smooth` (follows the pointer as `canvas.parallax` eases it) |
+| `depth_parallax` | `scale` (−1 to 1 on each axis, 1 by default; a vector handle on the canvas), `reach` (required: 0 `circle` clips the pointer direction to length 1, so in a corner each axis reaches 0.707 of its edge value; 1 `square` lets x and y each go from −1 to 1 on their own, as `canvas.parallax` moves layers, so a corner shifts the relief as far as the edge does; the editor adds it as 0 and draws the path of the pointer), `smooth` (follows the pointer as `canvas.parallax` eases it) |
 | `film_grain` | `mono` (black and white film), `bias` (−1 to 1, more grain in dark or bright parts), `blend` (`overlay`, the lightness grain as before; any other mode blends a grey noise) |
 | `flow` | `noise` (a built-in flow field when no map is given, as long as `direction`), `phase` |
 | `god_rays` | `mode` (0 radial, 1 along `angle`, 2 a star of `edges` rays from every bright part, at most 8 at Q1), `angle` (−360 to 360), `noise` (0 to 1, a flicker that needs time while not zero), `edges` (2 to 16) |
@@ -2632,7 +2632,7 @@ counted counterclockwise changes its sign.
 | a shake | `shake` | `strength` in pixels, `speed`, `direction` |
 | eyes that move | `iris` | `range` in pixels, `center` |
 | water that flows along a painted map | `flow` | `map` (a `linear` picture), `strength` in pixels, `speed` |
-| parallax from a depth map | `depth_parallax` | `depth` (a `linear` picture, bright is near), `strength` in pixels, `focus` |
+| parallax from a depth map | `depth_parallax` | `depth` (a `linear` picture, bright is near), `strength` in pixels, `focus`, `reach` |
 | a mirrored reflection | `reflection` | `line` (from the top), `opacity` |
 | drifting clouds | `clouds` | `size` and `speed` in pixels, `coverage` |
 | an opacity mask painted on the layer | the layer's `mask` | `texture`, `strength` |

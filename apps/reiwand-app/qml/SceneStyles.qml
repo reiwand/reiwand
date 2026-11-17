@@ -9,12 +9,31 @@ Flow {
     required property var host
     readonly property real chosen: Number(host.value ?? host.field.default ?? 0)
 
+    function drawReach(ctx, w, h, square, phase) {
+        const r = Math.min(w, h) * 0.38, t = phase * 4, side = Math.floor(t) % 4, f = t - Math.floor(t);
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        if (square)
+            ctx.rect(w / 2 - r, h / 2 - r, r * 2, r * 2);
+        else
+            ctx.arc(w / 2, h / 2, r, 0, Math.PI * 2);
+        ctx.stroke();
+        const a = (side + f) * Math.PI / 2 - Math.PI / 4;
+        const c = Math.cos(a), s = Math.sin(a);
+        const k = square ? r / Math.max(Math.abs(c), Math.abs(s)) : r;
+        ctx.beginPath();
+        ctx.arc(w / 2 + c * k, h / 2 + s * k, h * 0.07, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
     function draw(ctx, w, h, style, phase) {
         ctx.clearRect(0, 0, w, h);
         ctx.fillStyle = "#303030";
         ctx.fillRect(0, 0, w, h);
         ctx.fillStyle = "#ffffff";
         ctx.strokeStyle = "#ffffff";
+        if (host.field.sample?.effect === "depth_parallax")
+            return drawReach(ctx, w, h, style === 1, phase);
         const at = phase * 1.4 - 0.2;
         if (style === 0 || style === 1) {
             ctx.fillRect(w * (at - 0.06), 0, w * 0.12, h);

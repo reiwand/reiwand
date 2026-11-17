@@ -87,7 +87,7 @@ fn new_fields_refuse_values_outside_their_limits() {
         (
             vec![(
                 "/layers/0/effects",
-                json!([{ "effect": "depth_parallax", "params": { "depth": { "layer": "glow" } } }]),
+                json!([{ "effect": "depth_parallax", "params": { "depth": { "layer": "glow" }, "reach": 0 } }]),
             )],
             "/layers/0/effects depends on itself",
         ),

@@ -93,6 +93,7 @@ QtObject {
             "sat": App.tr("Saturation range"),
             "saturation": App.tr("Saturation"),
             "scale": App.tr("Scale"),
+            "reach": App.tr("Pointer reach"),
             "scan": App.tr("Scan lines"),
             "scene": App.tr("Scene"),
             "schema": App.tr("Format"),

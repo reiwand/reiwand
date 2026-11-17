@@ -135,3 +135,17 @@ fn adding_an_effect_writes_every_required_parameter() {
     p.act(&serde_json::from_value::<Action>(set).unwrap()).unwrap();
     assert_eq!(p.doc["scene"]["layers"][0]["effects"][2]["params"]["distance"].as_f64(), Some(1.0));
 }
+
+#[test]
+fn the_relief_effect_is_added_with_a_circular_reach_that_can_be_made_square() {
+    let root = TempDir::new().unwrap();
+    let mut p = project(&root);
+    let add = json!({ "effects": { "add": { "layer": "fill", "effect": "depth_parallax" } } });
+    p.act(&serde_json::from_value::<Action>(add).unwrap()).unwrap();
+    let params = &p.doc["scene"]["layers"][0]["effects"][2]["params"];
+    assert_eq!(params.as_object().unwrap().len(), 1);
+    assert_eq!(params["reach"].as_f64(), Some(0.0));
+    let set = json!({ "effects": { "set": { "layer": "fill", "index": 2, "params": { "reach": 1 } } } });
+    p.act(&serde_json::from_value::<Action>(set).unwrap()).unwrap();
+    assert_eq!(p.doc["scene"]["layers"][0]["effects"][2]["params"]["reach"].as_f64(), Some(1.0));
+}
