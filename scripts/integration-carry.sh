@@ -85,8 +85,7 @@ MANIFEST
   x src repo add repo dawn.wpak >/dev/null
   x src repo publish repo --key online.key >/dev/null
 )
-anchor=$(x src repo status "$site/repo" | sed -n 's/^anchor = //p')
-x src remote add "$site/repo?$anchor" --wait >/dev/null
+x src remote add "$site/repo" --wait >/dev/null
 dawn=$(x src pkg install org.example.dawn --wait --json | jq_ "r['output']['item']")
 x src lib import "$WORK/mine.png" --copy --wait >/dev/null
 mine=$(x src lib search "sort:title" --json | jq_ "[i['uid'] for i in r['items'] if i['uid'] != '$dawn'][0]")
