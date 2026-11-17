@@ -18,6 +18,7 @@ Kirigami.ApplicationWindow {
 
     function open(component, properties) {
         const old = pageStack.currentItem;
+        pageStack.columnView.scrollDuration = 0;
         pageStack.clear();
         old?.destroy();
         pageStack.push(component.createObject(pageStack, properties ?? {}));
@@ -62,6 +63,8 @@ Kirigami.ApplicationWindow {
     }
 
     function reach(index) {
+        if (index === current && pageStack.currentItem)
+            return;
         showPage(index);
         Qt.callLater(() => shell && shell.arrive());
     }

@@ -16,7 +16,7 @@ PanelChico {
     QQC2.TextField {
         id: address
 
-        width: Look.masFicha
+        width: parent.width - 2 * parent.padding
         placeholderText: App.tr("Example: https://casa.example/fondos")
         onAccepted: {
             adder.accepted();

@@ -94,6 +94,24 @@ QtObject {
                 fail("two skeletons show at once");
     }
 
+    function rapid() {
+        host.reach(0);
+        const rest = host.pageStack.currentItem.mapToItem(shell, 0, 0).x;
+        for (const page of [1, 7, 3, 7, 4, 0, 7])
+            host.reach(page);
+        host.reach(7);
+        if (host.current !== 7 || host.pageStack.depth !== 1)
+            fail("after rapid switches the page is " + host.current + " with depth " + host.pageStack.depth);
+        const kept = host.pageStack.currentItem;
+        host.reach(7);
+        if (host.pageStack.currentItem !== kept)
+            fail("choosing the shown page rebuilt it");
+        host.reach(0);
+        const back = host.pageStack.currentItem.mapToItem(shell, 0, 0).x;
+        if (host.pageStack.columnView.contentX !== 0 || back !== rest)
+            fail("the page is not at rest: contentX " + host.pageStack.columnView.contentX + ", x " + back + " against " + rest);
+    }
+
     function skeletons() {
         host.showPage(4);
         seated("title", shell.titleFrame);
@@ -129,6 +147,7 @@ QtObject {
         menu();
         steady();
         keyboard();
+        rapid();
         skeletons();
         tones();
         destroy();

@@ -48,6 +48,13 @@ QtObject {
         expect(shown.copied && board.text === "file:///repo/", "the repository address was not copied: " + board.text);
         board.destroy();
         shown.destroy();
+        const link = Qt.createComponent("RepoAddLink.qml").createObject(page);
+        link.open();
+        link.address.text = "https://casa.example/" + "x".repeat(300);
+        const edge = link.address.mapToItem(link.contentItem, link.address.width, 0).x;
+        expect(edge <= link.contentItem.width - Look.e4 + 1, "the address field sticks out of its popup: " + edge + " in " + link.contentItem.width);
+        link.close();
+        link.destroy();
         page.load();
     }
 }
