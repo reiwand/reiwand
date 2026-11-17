@@ -168,6 +168,10 @@ Window {
         target: App
     }
 
+    PreviewTheme {
+        host: preview
+    }
+
     PreviewWarm {
         id: warm
 
