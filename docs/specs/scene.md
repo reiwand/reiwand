@@ -1761,7 +1761,7 @@ scales the whole system around the canvas center.
 | `capacity`, `seed`, `prewarm` | 1 to 200 000 particles; the seed of the system, mixed with `clock.seed`; seconds simulated when the system first shows (at most 10) |
 | `emitters` | at most 4 of `{ "shape", "rate", "bursts", "follow", "inherit" }`. Shapes are `{ "point": [x, y] }`, `{ "box": { "from": [x0, y0], "to": [x1, y1], "inner"?, "at"? } }`, `{ "circle": { "center", "radius", "inner" } }` (a ring when `inner` is above 0), `{ "line": [[x0, y0], [x1, y1]] }`, `"edge"` (the border of the canvas) and `{ "mask": { "texture", "threshold" } }` (where the alpha of an image stretched over the canvas is above `threshold`, 0.5 by default). `rate` is particles per second and may be bound like any value. `bursts` is a list of at most 8 independent bursts, each emitting `count` particles: `on` each `beat` or `click`; otherwise once `at` seconds (0 by default) after the emitter starts and, with `every`, again every that many seconds. The list of one burst the older scenes wrote as `burst` is now written `bursts: [{ ... }]`. `follow: "cursor"` moves the shape with the pointer and `inherit` adds that fraction of the pointer velocity |
 | `init` | `[min, max]` ranges picked for each particle: `life` (seconds), `speed` (pixels per second), `angle` (clockwise degrees, 0 to the right), `size` (pixels), `rotation`, `spin` (degrees per second), `frame` (first atlas frame) and `color` (two colors mixed at random) |
-| `forces` | at most 8 of `{ "gravity": [x, y] }`, `{ "drag": k }`, `{ "turbulence": { "strength", "scale" } }` (curl noise), `{ "attractor": { "target", "strength" } }` (negative strengths repel), `{ "vortex": { "center", "strength" } }`, `{ "orbit": { "center", "strength" } }` and `{ "noise": strength }`. Gravity and strengths may be bound, as in `{ "noise": { "audio": "bass", "scale": 300 } }`. Targets and centers are a point or `"cursor"`, which pulls nothing while the pointer is away |
+| `forces` | at most 8 of `{ "gravity": [x, y] }`, `{ "drag": k }`, `{ "turbulence": { "strength", "scale" } }` (curl noise), `{ "attractor": { "target", "strength" } }` (negative strengths repel), `{ "vortex": { "axis", "center", "strength" } }`, `{ "orbit": { "center", "strength" } }` and `{ "noise": strength }`. Gravity and strengths may be bound, as in `{ "noise": { "audio": "bass", "scale": 300 } }`. Targets and centers are a point or `"cursor"`, which pulls nothing while the pointer is away |
 | `collide` | at most 4 of `{ "bounds", "bounce", "friction", "kill" }` where `bounds` is `"canvas"`, `{ "plane": { "point", "normal" } }` (particles stay on the side the normal points to) or `{ "circle": { "center", "radius" } }` (particles stay outside). `bounce` and `friction` go from 0 to 1 and `kill` removes a particle when it touches |
 | `render` | `texture` (an image asset, split into frames by its `atlas: [rows, columns]`), `frames` (`time` at `fps`, `life` or `random`), `mix` (blends one frame into the next), `size_over_life` and `color_over_life` (`[t, value]` keys from 0 to 1, at most 64, that multiply size and color), `stretch` (`{ "time", "min", "max" }`: seconds of motion a particle is stretched along, and the pixel limits) and `trail` (`length` from 1 to 16 steps, `width` from 0 to 1). Without a texture particles are soft discs. The layer's `blend` (`add` suits glowing particles), `opacity`, `mask` and effects apply |
 
@@ -1802,7 +1802,7 @@ sets it, and every other name must be one of `points`. Targets and centers of fo
 | shape `box` | also `{ "from", "to", "inner": [w, h], "at" }`, a hollow box around a control point | `particles2` |
 | shape `circle` | also `scale: [x, y]` (0.01 to 100), `sign: [x, y]` (−1, 0 or 1: half or quarter circles) and `at` | `particles2` |
 | shape `layer` | `{ "id", "threshold", "color", "inherit", "jitter", "refresh": "static" \| "on_change" }` births where a layer is opaque, taking its color and motion | `particle_layers` |
-| shape `around` | `{ "at", "count" (1 to 4096), "arc", "radius", "speed", "mode": "repeat" \| "mirror", "restart" }` births in turn around a point | `particle_fields` |
+| shape `around` | `{ "axis", "at", "count" (1 to 4096), "arc", "radius", "speed", "mode": "repeat" \| "mirror", "restart" }` births in turn around a point | `particle_fields` |
 | shape `between` | `{ "from", "to", "count", "span", "mode", "arc": { "amount", "side" }, "taper": { "position", "speed", "size" } }` births along a line or arc between two points | `particle_fields` |
 | `init` ranges | each range may add an exponent `[min, max, exponent]` (0.1 to 10) that leans the pick to one end; `color` too | `particles2` |
 | `init.alpha`, `hsv`, `palette` | an opacity range of its own; `{ "hue": [0, 360], "steps", "sat", "val" }`; or `{ "colors" (1 to 10), "noise": [h, s, v] }` (not both), which replace `color` | `particles2` |
@@ -1858,7 +1858,14 @@ The newer fields behave as follows.
   inverse and not at all by default; with a `radius` they do nothing beyond it and weaken as
   `1 − d / radius` (`linear`) or its square (`inverse_square`). A `vortex` with `inner` and `outer`
   turns fully inside `inner` and fades out at `outer`, and its `ring` pulls particles toward a circle
-  of that `radius` with `pull`, fully at `width` pixels away. `turbulence` scrolls its noise `speed`
+  of that `radius` with `pull`, fully at `width` pixels away. `axis` is required in every `vortex` and
+  every `around` shape: three numbers, a direction of length 1 (between 0.999 and 1.001; the editor
+  pre-fills `[0, 0, 1]`, which is the plain turn on the screen). A `vortex` accelerates particles
+  tangentially around the line through `center` along `axis`, and `inner`, `outer`, `falloff` and `ring`
+  measure the distance to that line; an `around` shape places births on the circle of its `radius` that
+  lies in the plane perpendicular to `axis`. Depth (z, towards the viewer) only moves with
+  `canvas.perspective`: without it the z part of the axis is ignored and the particles see the axis
+  projected on the screen. `turbulence` scrolls its noise `speed`
   pixels per second to the right, changes it `time_scale` times as fast and scales its x and y by
   `mask`. La fuerza `turbulence` usa un ruido periódico de 256 celdas y su fase la envuelve el
   anfitrión, por lo que no salta con el reloj encendido durante días; con `smooth` y `gyro`,

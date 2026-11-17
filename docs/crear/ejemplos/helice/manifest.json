@@ -1,0 +1,25 @@
+{
+  "content": {
+    "rating": "general"
+  },
+  "default_locale": "es",
+  "entry": "scene.json",
+  "id": "org.example.helice",
+  "inputs": [],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "origin": {
+    "kind": "original"
+  },
+  "photosensitive": false,
+  "properties": {},
+  "requires": {
+    "features": [
+      "particle_fields",
+      "particles2"
+    ]
+  },
+  "schema": "reiwand.wpak/2",
+  "title": "Hélice de partículas",
+  "version": "0.1.0"
+}

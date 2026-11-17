@@ -134,7 +134,7 @@ Las formas son:
 | `edge` | `"edge"` | En el borde del lienzo. |
 | `mask` | `{ "mask": { "texture", "threshold" } }` | Donde el alfa de una imagen estirada sobre el lienzo supera `threshold` (0,5 por defecto). |
 | `layer` | `{ "layer": { "id", "threshold", "color", "inherit", "jitter", "refresh" } }` | Donde una capa es opaca (hasta 4096 puntos), con el color y el movimiento de la capa. `refresh` es `static` o `on_change`. |
-| `around` | `{ "around": { "at", "count", "arc", "radius", "speed", "mode", "restart" } }` | Uno tras otro alrededor de un punto: `count` sitios (1 a 4096) en `arc` grados, girando `speed` grados por segundo. `mode`: `repeat` o `mirror`. |
+| `around` | `{ "around": { "axis", "at", "count", "arc", "radius", "speed", "mode", "restart" } }` | Uno tras otro alrededor de un punto (en el círculo perpendicular a `axis`, que es obligatorio: tres números de largo 1, `[0, 0, 1]` es el giro plano en pantalla): `count` sitios (1 a 4096) en `arc` grados, girando `speed` grados por segundo. `mode`: `repeat` o `mirror`. |
 | `between` | `{ "between": { "from", "to", "count", "span", "mode", "arc", "taper" } }` | A lo largo de una línea o arco entre dos puntos. |
 
 ### Cómo salen (`init`)
@@ -177,7 +177,7 @@ Una lista de hasta 16, aplicadas en cada paso:
 | `{ "drag": k }` | Las frena. |
 | `{ "turbulence": { "strength", "scale" } }` | Un ruido que las arrastra. También `speed`, `time_scale` y `mask`. |
 | `{ "attractor": { "target", "strength" } }` | Las atrae (con fuerza negativa, las aleja). `target` es un punto, `"cursor"` o un punto de control. Con `radius` no actúa más allá, y `falloff` es `constant`, `linear` o `inverse_square`. |
-| `{ "vortex": { "center", "strength" } }` | Las hace girar alrededor de un centro. También `inner`, `outer` y `ring`. |
+| `{ "vortex": { "axis", "center", "strength" } }` | Las hace girar alrededor de la recta que pasa por el centro con la dirección `axis` (obligatorio, largo 1; `[0, 0, 1]` gira en la pantalla). Con `canvas.perspective` también empuja en profundidad; sin ella se ignora la parte z. También `inner`, `outer` y `ring`. |
 | `{ "orbit": { "center", "strength" } }` | Las hace orbitar. |
 | `{ "noise": fuerza }` | Un temblor al azar. |
 | `{ "oscillate": { "what", "freq", "scale", "phase", "mask" } }` | Las hace oscilar en posición, opacidad o tamaño. |

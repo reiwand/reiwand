@@ -117,7 +117,7 @@ Cambia la forma de un emisor, es decir, de dónde nacen las partículas. Con el 
 |---|---|---|
 | `system` | texto | (obligatorio) Id del sistema. |
 | `emitter` | entero | (obligatorio) Posición del emisor. |
-| `shape` | cualquier valor JSON | (obligatorio) La forma, en píxeles del lienzo: `"edge"` (el borde), `{"point":[x,y]}`, `{"box":{"from":[x0,y0],"to":[x1,y1]}}`, `{"line":[[x0,y0],[x1,y1]]}`, `{"circle":{"center":[x,y],"radius":r,"inner":r2}}` (un anillo si `inner` es mayor que 0), `{"mask":{"texture":"id","threshold":0.5}}` (donde la imagen estirada sobre el lienzo es opaca), `{"around":{"at":"p0","count":8,"radius":100}}` (en turnos alrededor de un punto) o `{"between":{"from":"p0","to":"p1","count":10}}` (a lo largo de una línea entre dos puntos). |
+| `shape` | cualquier valor JSON | (obligatorio) La forma, en píxeles del lienzo: `"edge"` (el borde), `{"point":[x,y]}`, `{"box":{"from":[x0,y0],"to":[x1,y1]}}`, `{"line":[[x0,y0],[x1,y1]]}`, `{"circle":{"center":[x,y],"radius":r,"inner":r2}}` (un anillo si `inner` es mayor que 0), `{"mask":{"texture":"id","threshold":0.5}}` (donde la imagen estirada sobre el lienzo es opaca), `{"around":{"axis":[0,0,1],"at":"p0","count":8,"radius":100}}` (en turnos alrededor de un punto) o `{"between":{"from":"p0","to":"p1","count":10}}` (a lo largo de una línea entre dos puntos). |
 
 ```sh
 reiwand-ctl scene act mi-escena add_layer '{"kind":"particles","id":"chispas"}'
@@ -270,7 +270,7 @@ Añade, reemplaza o quita una fuerza que actúa sobre las partículas. Sin `inde
 | Argumento | Tipo | Qué significa |
 |---|---|---|
 | `system` | texto | (obligatorio) Id del sistema. |
-| `force` | cualquier valor JSON | La fuerza: `{"gravity":[x,y]}`, `{"wind":[x,y]}`, `{"drag":k}`, `{"turbulence":{"strength":s,"scale":c}}`, `{"attractor":{"target":"cursor","strength":s}}` (negativa, repele), `{"vortex":{"center":[x,y],"strength":s}}`, `{"orbit":{"center":[x,y],"strength":s}}`, `{"noise":s}`, `{"cap":velocidad}`, `{"torque":k}`, `{"spin_drag":k}`, `{"oscillate":{"what":"position","freq":[a,b],"scale":[a,b]}}`, `{"slow_near":{"target":[x,y],"inner":r1,"outer":r2,"factor":f}}`, `{"keep_distance":{"target":"p0","distance":d,"strength":s}}` o `{"keep_between":{"from":"p0","to":"p1","strength":s}}`. Un objetivo es un punto, `"cursor"` o un punto de control. |
+| `force` | cualquier valor JSON | La fuerza: `{"gravity":[x,y]}`, `{"wind":[x,y]}`, `{"drag":k}`, `{"turbulence":{"strength":s,"scale":c}}`, `{"attractor":{"target":"cursor","strength":s}}` (negativa, repele), `{"vortex":{"axis":[0,0,1],"center":[x,y],"strength":s}}`, `{"orbit":{"center":[x,y],"strength":s}}`, `{"noise":s}`, `{"cap":velocidad}`, `{"torque":k}`, `{"spin_drag":k}`, `{"oscillate":{"what":"position","freq":[a,b],"scale":[a,b]}}`, `{"slow_near":{"target":[x,y],"inner":r1,"outer":r2,"factor":f}}`, `{"keep_distance":{"target":"p0","distance":d,"strength":s}}` o `{"keep_between":{"from":"p0","to":"p1","strength":s}}`. Un objetivo es un punto, `"cursor"` o un punto de control. |
 | `index` | entero | Fuerza que se reemplaza o se quita. |
 | `remove` | sí/no | Con `index`, la quita. Por defecto `false`. |
 

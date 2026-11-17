@@ -1,0 +1,19 @@
+{
+  "schema": "reiwand.scene/1",
+  "canvas": { "size": [1920, 1080], "background": "#05070f", "perspective": { "focal": 900 } },
+  "particles": {
+    "helice": {
+      "capacity": 900,
+      "points": [{ "at": [960, 540] }],
+      "emitters": [
+        { "shape": { "around": { "axis": [0.5, 0, 0.866], "at": "p0", "count": 18, "radius": 220, "speed": 40 } }, "rate": 60 }
+      ],
+      "init": { "life": [3, 4], "speed": [0, 0], "angle": [0, 360], "size": [6, 9], "color": ["#9ad7ff", "#c3a6ff"] },
+      "forces": [
+        { "vortex": { "axis": [0.5, 0, 0.866], "center": [960, 540], "strength": 160 } },
+        { "drag": 0.4 }
+      ]
+    }
+  },
+  "layers": [{ "id": "helice", "type": "particles", "system": "helice", "blend": "add" }]
+}
