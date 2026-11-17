@@ -53,8 +53,8 @@ printf 'hunter2\n' | ctl provider add dav webdav "url=http://127.0.0.1:$port/dav
   fail "a source could not be added in private mode"
 refused "updating a source" ctl provider sync dav --wait
 refused "updating every source" ctl provider sync --wait
-refused "adding the server" ctl server add "https://127.0.0.1:$port" --wait
-refused "adding the server by name" ctl server add "https://reiwand-private.invalid:$port" --wait
+refused "adding the server" ctl account sign-in "https://127.0.0.1:$port"
+refused "adding the server by name" ctl account sign-in "https://reiwand-private.invalid:$port"
 refused "moderating a server" env REIWAND_SERVER_TOKEN=t "$BIN/reiwand-ctl" moderate --server "http://127.0.0.1:$port" hidden
 refused "downloading the depth model" ctl models download depth-anything-v2-small --yes
 sleep 1
