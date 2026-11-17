@@ -8,7 +8,7 @@
       "emitters": [
         { "shape": { "around": { "axis": [0.5, 0, 0.866], "at": "p0", "count": 18, "radius": 220, "speed": 40 } }, "rate": 60 }
       ],
-      "init": { "life": [3, 4], "speed": [0, 0], "angle": [0, 360], "size": [6, 9], "color": ["#9ad7ff", "#c3a6ff"] },
+      "init": { "tilt": { "angle": [[0, 0], [0, 0]], "spin": [[0, 0], [0, 0]] }, "life": [3, 4], "speed": [0, 0], "angle": [0, 360], "size": [6, 9], "color": ["#9ad7ff", "#c3a6ff"] },
       "forces": [
         { "vortex": { "axis": [0.5, 0, 0.866], "center": [960, 540], "strength": 160 } },
         { "drag": 0.4 }

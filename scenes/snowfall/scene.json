@@ -37,7 +37,7 @@
       "capacity": 2000, "seed": 3, "prewarm": 8,
       "emitters": [{ "shape": { "box": { "from": [-200, -40], "to": [2120, -10] } }, "rate": { "prop": "density" } },
                    { "shape": { "line": [[-30, -40], [-30, 1060]] }, "rate": { "prop": "wind", "map": { "calm": 0, "breeze": 50, "gale": 110 } } }],
-      "init": { "life": [12, 18], "speed": [30, 70], "angle": [80, 100], "size": [3, 8], "color": ["#ffffff", "#dce6f4"] },
+      "init": { "tilt": { "angle": [[0, 0], [0, 0]], "spin": [[0, 0], [0, 0]] }, "life": [12, 18], "speed": [30, 70], "angle": [80, 100], "size": [3, 8], "color": ["#ffffff", "#dce6f4"] },
       "forces": [{ "gravity": { "prop": "wind", "map": { "calm": [0, 14], "breeze": [22, 16], "gale": [60, 20] } } },
                  { "turbulence": { "strength": 14, "scale": 0.004 } }, { "drag": 0.25 }],
       "collide": [{ "bounds": { "plane": { "point": [1940, 0], "normal": [-1, 0] } }, "kill": true },

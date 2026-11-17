@@ -3,7 +3,7 @@ use crate::validate::Check;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Tilt {
     #[schemars(extend("x-unit" = "deg"))]
@@ -20,7 +20,7 @@ impl Tilt {
 
 impl Check<'_> {
     pub(super) fn tilted(&mut self, p: &str, i: &Init) {
-        let Some(t) = &i.tilt else { return };
+        let t = &i.tilt;
         self.uses(t.turned(), "particles2");
         for (name, ends, max) in [("angle", t.angle, 3600.0), ("spin", t.spin, 36000.0)] {
             for (k, lo) in ends[0].iter().enumerate() {

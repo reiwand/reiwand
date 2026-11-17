@@ -42,3 +42,18 @@ fn a_stretch_with_a_mode_gains_the_flat_depth() {
     assert_eq!(s["render"]["stretch"]["depth"], "flat");
     assert_eq!(s["render"]["stretch"]["mode"], "relative");
 }
+
+#[test]
+fn every_particle_system_gains_explicit_zero_tilt() {
+    let scene = json!({"particles": {
+        "bare": {"capacity": 10, "emitters": []},
+        "kept": {"capacity": 10, "emitters": [], "init": {"life": [1, 2],
+            "tilt": {"angle": [[5, 5], [9, 9]], "spin": [[0, 0], [0, 0]]}}},
+        "plain": {"capacity": 10, "emitters": [], "init": {"life": [1, 2]}}}});
+    let p = &upgraded("scenes-tilt", scene)["particles"];
+    let zeros = json!({"angle": [[0, 0], [0, 0]], "spin": [[0, 0], [0, 0]]});
+    assert_eq!(p["bare"]["init"]["tilt"], zeros);
+    assert_eq!(p["plain"]["init"]["tilt"], zeros);
+    assert_eq!(p["plain"]["init"]["life"], json!([1, 2]));
+    assert_eq!(p["kept"]["init"]["tilt"]["angle"], json!([[5, 5], [9, 9]]));
+}

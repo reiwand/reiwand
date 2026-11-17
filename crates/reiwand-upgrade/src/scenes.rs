@@ -47,6 +47,15 @@ fn give(v: &mut Value) -> bool {
     match v {
         Value::Object(map) => {
             let mut done = false;
+            if map.contains_key("emitters") && map.contains_key("capacity") {
+                let init = map.entry("init").or_insert_with(|| json!({}));
+                if let Some(fields) = init.as_object_mut() {
+                    done |= fill(
+                        fields,
+                        &[("tilt", json!({"angle": [[0, 0], [0, 0]], "spin": [[0, 0], [0, 0]]}))],
+                    );
+                }
+            }
             for (key, inner) in map.iter_mut() {
                 let Some(fields) = inner.as_object_mut() else { continue };
                 done |= match key.as_str() {

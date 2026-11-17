@@ -27,7 +27,7 @@ const RANGES: [&str; 17] = [
     "tilt",
 ];
 const TINTS: [&str; 3] = ["hsv", "palette", "gradient"];
-const CLEARED: [&str; 7] = ["alpha", "velocity", "radial", "hsv", "palette", "gradient", "tilt"];
+const CLEARED: [&str; 6] = ["alpha", "velocity", "radial", "hsv", "palette", "gradient"];
 
 fn object(doc: &Value, at: &str) -> Map<String, Value> {
     doc.pointer(at).and_then(Value::as_object).cloned().unwrap_or_default()
@@ -102,6 +102,7 @@ fn start(doc: &Value, sys: &str, ranges: &Map<String, Value>, clear: &[String]) 
     if tints == 1 {
         TINTS.iter().for_each(|t| drop(init.remove(*t)));
     }
+    init.entry("tilt").or_insert_with(|| json!({"angle": [[0, 0], [0, 0]], "spin": [[0, 0], [0, 0]]}));
     for (k, v) in ranges {
         let v = super::ends::kept(&init, k, v)?;
         init.insert(k.clone(), v);

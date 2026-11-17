@@ -67,5 +67,7 @@ fn a_tilt_is_a_start_range_with_both_ends_required() {
         )
         .is_err()
     );
-    edit(&mut p, "start", json!({ "clear": ["tilt"] })).unwrap();
+    assert!(edit(&mut p, "start", json!({ "clear": ["tilt"] })).is_err());
+    let zeros = json!({ "angle": [[0, 0], [0, 0]], "spin": [[0, 0], [0, 0]] });
+    edit(&mut p, "start", json!({ "ranges": { "tilt": zeros } })).unwrap();
 }

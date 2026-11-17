@@ -38,21 +38,14 @@ QtObject {
         on.toggled();
         if (render()?.stretch !== undefined)
             throw new Error("stretch: switching it off left the stretch");
-        const turn = find("tiltOn");
-        turn.checked = true;
-        turn.toggled();
         const init = () => JSON.parse(page.editor.value("/scene/particles/flakes/init") || "null");
         if (JSON.stringify(init()?.tilt?.angle) !== "[[0,0],[0,0]]" || !find("tiltSprite0.5"))
-            throw new Error("tilt: switching it on did not write zero ranges or draw the preview: " + JSON.stringify(init()?.tilt));
+            throw new Error("tilt: the system lacks its zero ranges or the preview is not drawn: " + JSON.stringify(init()?.tilt));
         const high = find("tilt_angle11");
         high.value = 60;
         high.moved();
         if (init().tilt.angle[1][1] !== 60)
             throw new Error("tilt: the slider did not write the angle: " + JSON.stringify(init().tilt));
-        turn.checked = false;
-        turn.toggled();
-        if (init()?.tilt !== undefined)
-            throw new Error("tilt: switching it off left the tilt");
         find("waveAdd").clicked();
         tools.load();
         if (tools.info.waves.length !== 1 || tools.info.waves[0].from !== "floor")

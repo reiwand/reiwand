@@ -12,7 +12,7 @@ GridLayout {
         tools.info;
         return JSON.parse(tools.page.editor.value(SceneSwarmKnobs.pointer(tools.system, "/init")) || "null") ?? {};
     }
-    readonly property var value: init.tilt ?? null
+    readonly property var value: init.tilt ?? {"angle": [[0, 0], [0, 0]], "spin": [[0, 0], [0, 0]]}
     readonly property var rows: [["angle", 0, App.tr("Turn about the horizontal line"), 180], ["angle", 1, App.tr("Turn about the vertical line"), 180], ["spin", 0, App.tr("Spin about the horizontal line, per second"), 720], ["spin", 1, App.tr("Spin about the vertical line, per second"), 720]]
 
     function put(group, which, end, number) {
@@ -35,25 +35,14 @@ GridLayout {
 
     columns: 2
 
-    QQC2.CheckBox {
-        objectName: "tiltOn"
+    QQC2.Label {
         Layout.columnSpan: 2
         text: App.tr("Turn sprites in depth")
-        checked: tilt.value !== null
-        onToggled: tilt.tools.edit("start", checked ? {
-            "ranges": {
-                "tilt": {
-                    "angle": [[0, 0], [0, 0]],
-                    "spin": [[0, 0], [0, 0]]
-                }
-            }
-        } : {
-            "clear": ["tilt"]
-        })
+        font.bold: true
     }
 
     Repeater {
-        model: tilt.value === null ? [] : tilt.rows
+        model: tilt.rows
 
         delegate: ColumnLayout {
             id: row
@@ -95,7 +84,6 @@ GridLayout {
 
         Layout.columnSpan: 2
         Layout.fillWidth: true
-        visible: tilt.value !== null
         implicitHeight: Kirigami.Units.gridUnit * 4
 
         Repeater {
@@ -105,7 +93,7 @@ GridLayout {
                 id: step
 
                 required property real modelData
-                readonly property var ends: tilt.value?.angle ?? [[0, 0], [0, 0]]
+                readonly property var ends: tilt.value.angle
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true

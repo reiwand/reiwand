@@ -108,8 +108,7 @@ pub struct Init {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "px/s"))]
     pub depth_speed: Option<Spread<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub tilt: Option<Tilt>,
+    pub tilt: Tilt,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub remap: Vec<Remap>,
 }

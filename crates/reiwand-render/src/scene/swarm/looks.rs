@@ -37,7 +37,7 @@ pub(super) fn far(scene: &Scene, id: &str, s: Option<&System>) -> Option<(Stack,
 }
 
 pub(super) fn tilt(s: Option<&System>) -> [[f32; 4]; 3] {
-    let Some(t) = s.and_then(|s| s.init.tilt).filter(|t| t.turned()) else { return [[0.0; 4]; 3] };
+    let Some(t) = s.map(|s| s.init.tilt).filter(|t| t.turned()) else { return [[0.0; 4]; 3] };
     let row = |[lo, hi]: [[f32; 2]; 2]| [lo[0], lo[1], hi[0], hi[1]].map(f32::to_radians);
     [row(t.angle), row(t.spin), [1.0, 0.0, 0.0, 0.0]]
 }
