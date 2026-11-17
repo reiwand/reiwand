@@ -16,7 +16,7 @@ fn plain(v: &Value) -> bool {
 }
 
 fn keyed(v: &Value) -> bool {
-    v.get("keys").is_some_and(Value::is_array) && SOURCES.iter().all(|s| v.get(*s).is_none())
+    v.get("keys").is_some_and(Value::is_array) && SOURCES.iter().all(|s| v.get(*s).is_none_or(Value::is_null))
 }
 
 fn shifted(v: &Value, now: &Value, to: &Value, field: &str) -> Option<Value> {

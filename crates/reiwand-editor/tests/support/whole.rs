@@ -53,3 +53,16 @@ pub fn action(project: &Project, action: Value) -> Value {
     }
     action
 }
+
+pub fn empty(value: &Value) -> bool {
+    match value {
+        Value::Null => true,
+        Value::Array(list) => list.is_empty(),
+        Value::Object(map) => map.is_empty(),
+        _ => false,
+    }
+}
+
+pub fn same(project: &Project, pointer: &str, expected: Value) -> Value {
+    at(project, pointer, &expected)
+}

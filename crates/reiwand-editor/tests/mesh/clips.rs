@@ -24,7 +24,9 @@ fn clips_are_added_renamed_timed_and_removed() {
     let mut p = rigged(&root);
     act(&mut p, clip(json!({ "add": true, "length": 2, "loop": "pingpong" }))).unwrap();
     let seeded = json!({ "root": { "rotation": [[0, 0]] } });
-    assert_eq!(layer(&p)["clips"], json!([{ "id": "wave", "to": 2.0, "loop": "pingpong", "bones": seeded }]));
+    let made = json!({ "id": "wave", "to": 2.0, "loop": "pingpong", "bones": seeded });
+    let done = super::whole::at(&p, "/scene/layers/0/clips/0", &made);
+    assert_eq!(layer(&p)["clips"], json!([done]));
     for bad in [
         clip(json!({ "add": true })),
         json!({ "clip": { "layer": "net", "id": "Big wave", "add": true } }),
@@ -41,13 +43,19 @@ fn clips_are_added_renamed_timed_and_removed() {
         (layer(&p)["clips"][0]["id"].clone(), layer(&p)["clips"][0]["to"].clone()),
         (json!("hello"), json!(3.0))
     );
-    assert_eq!(layer(&p)["animations"], json!([{ "clip": "hello" }]));
+    assert_eq!(
+        layer(&p)["animations"],
+        super::whole::at(&p, "/scene/layers/0/animations", &json!([{ "clip": "hello" }]))
+    );
     act(&mut p, json!({ "clip": { "layer": "net", "id": "hello", "remove": true } })).unwrap();
-    assert!(layer(&p).get("clips").is_none() && layer(&p).get("animations").is_none());
+    assert!(super::whole::empty(&layer(&p)["clips"]) && super::whole::empty(&layer(&p)["animations"]));
     act(&mut p, json!({ "undo": {} })).unwrap();
-    assert_eq!(layer(&p)["animations"], json!([{ "clip": "hello" }]));
+    assert_eq!(
+        layer(&p)["animations"],
+        super::whole::at(&p, "/scene/layers/0/animations", &json!([{ "clip": "hello" }]))
+    );
     act(&mut p, json!({ "redo": {} })).unwrap();
-    assert!(layer(&p).get("clips").is_none());
+    assert!(super::whole::empty(&layer(&p)["clips"]));
 }
 
 #[test]
@@ -79,7 +87,7 @@ fn keys_are_set_moved_copied_eased_and_removed() {
     act(&mut p, key(0.0, json!({ "order": "body", "value": 2.4 }))).unwrap();
     assert_eq!(layer(&p)["clips"][0]["order"], json!({ "body": [[0.0, 2.0]] }));
     act(&mut p, key(0.0, json!({ "order": "body", "remove": true }))).unwrap();
-    assert!(layer(&p)["clips"][0].get("order").is_none());
+    assert_eq!(layer(&p)["clips"][0]["order"], json!({}));
     let rows = query(&p, "net", json!({ "keys": "wave" }));
     let first = rows["rows"].as_array().unwrap().iter().find(|r| r["channel"] == "rotation").unwrap();
     assert_eq!(

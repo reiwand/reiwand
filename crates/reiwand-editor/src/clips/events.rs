@@ -19,7 +19,7 @@ pub(crate) fn event(doc: &Value, e: &ClipEventEdit) -> Result<Vec<Op>> {
     let ClipEventEdit { layer, clip: id, name, at, time, to, remove } = e;
     let (path, l) = crate::actions::layer(doc, layer)?;
     let (i, found) = super::found(l, id)?;
-    let mut clip = found.clone();
+    let clip = found.clone();
     named(name)?;
     let span = match (clip["to"].as_f64(), clip["from"].as_f64().unwrap_or(0.0)) {
         (Some(end), from) => (end - from).max(0.0),
@@ -62,14 +62,6 @@ pub(crate) fn event(doc: &Value, e: &ClipEventEdit) -> Result<Vec<Op>> {
         }
     }
     list.sort_by(|a, b| a["t"].as_f64().unwrap_or(0.0).total_cmp(&b["t"].as_f64().unwrap_or(0.0)));
-    match list.is_empty() {
-        true => drop(clip.as_object_mut().map(|m| m.remove("events"))),
-        false => clip["events"] = Value::Array(list),
-    }
     let at = format!("{path}/clips/{i}");
-    Ok(match clip.get("events") {
-        Some(events) => set(doc, &format!("{at}/events"), events.clone()),
-        None if found.get("events").is_some() => vec![Op::Remove { path: format!("{at}/events") }],
-        None => Vec::new(),
-    })
+    Ok(set(doc, &format!("{at}/events"), Value::Array(list)))
 }

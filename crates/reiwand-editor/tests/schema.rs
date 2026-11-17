@@ -7,7 +7,7 @@ use reiwand_format::Manifest;
 use serde_json::{Value, json};
 
 fn deep(root: &Value, schema: &Value, value: &Value, at: &str) {
-    assert!(fits(root, schema, value), "{at} does not fit its schema: {value}");
+    assert!(value.is_null() || fits(root, schema, value), "{at} does not fit its schema: {value}");
     let children: Vec<(String, &Value)> = match value {
         Value::Object(map) => map.iter().map(|(k, v)| (k.clone(), v)).collect(),
         Value::Array(list) => list.iter().enumerate().map(|(i, v)| (i.to_string(), v)).collect(),

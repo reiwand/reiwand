@@ -50,9 +50,7 @@ fn follower(l: &mut Value, change: Change) {
             swap(a.get_mut("bone"), old, new);
             swap(a.get_mut("point"), old, new);
         }
-        Change::Gone(gone, _) if a["bone"] == gone || a["point"] == gone => {
-            drop(l.as_object_mut().and_then(|m| m.remove("attach")))
-        }
+        Change::Gone(gone, _) if a["bone"] == gone || a["point"] == gone => l["attach"] = Value::Null,
         _ => {}
     }
 }

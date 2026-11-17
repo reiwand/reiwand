@@ -32,7 +32,8 @@ fn a_bound_depth_is_kept_unless_the_write_replaces_it() {
     let bound = json!({"set": {"pointer": "/scene/layers/0/parallax", "value": {"keys": [[0, 1], [2, 3]]}}});
     act(&mut p, bound).unwrap();
     assert!(act(&mut p, json!({"layer": {"depth": {"layer": "a", "depth": [1, 2]}}})).is_err());
-    assert_eq!(p.doc["scene"]["layers"][0]["parallax"], json!({"keys": [[0, 1], [2, 3]]}));
+    let kept = super::whole::at(&p, "/scene/layers/0/parallax", &json!({"keys": [[0, 1], [2, 3]]}));
+    assert_eq!(p.doc["scene"]["layers"][0]["parallax"], kept);
     act(&mut p, json!({"layer": {"depth": {"layer": "a", "depth": [1, 2], "replace": true}}})).unwrap();
     assert_eq!(p.doc["scene"]["layers"][0]["parallax"], json!([1.0, 2.0]));
 }

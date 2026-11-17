@@ -124,7 +124,8 @@ fn scripts_that_do_not_compile_or_are_missing_are_problems_everywhere() {
     )
     .unwrap();
     let listed = ["scripts/ok.js", "scripts/bad.js", "scripts/gone.js"];
-    p.doc["scene"]["scripts"] = json!(listed.map(|path| json!({ "path": path, "events": ["update"] })));
+    let scripts = json!(listed.map(|path| json!({ "path": path, "events": ["update"] })));
+    p.doc["scene"]["scripts"] = whole::at(&p, "/scene/scripts", &scripts);
     let shown = |problems: Vec<reiwand_editor::Problem>| {
         problems
             .into_iter()

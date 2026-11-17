@@ -19,7 +19,7 @@ fn a_rule_hands_a_bone_to_another_parent() {
     let hand = json!({ "bone": { "layer": "net", "name": "hand", "parent": "arm", "at": [0.9, 0.5] } });
     act(&mut p, hand).unwrap();
     act(&mut p, rule(json!({ "bone": "hand", "parent": "root" }))).unwrap();
-    assert_eq!(rules(&p), json!([{ "bone": "hand", "parent": "root" }]));
+    assert_eq!(rules(&p), json!([{ "bone": "hand", "parent": "root", "weight": 1.0 }]));
     act(&mut p, rule(json!({ "index": 0, "weight": 0.5 }))).unwrap();
     assert_eq!(rules(&p), json!([{ "bone": "hand", "parent": "root", "weight": 0.5 }]));
     act(&mut p, rule(json!({ "index": 0, "parent": "arm" }))).unwrap();
@@ -39,5 +39,5 @@ fn a_rule_hands_a_bone_to_another_parent() {
         assert!(act(&mut p, rule(bad.clone())).is_err(), "{bad}");
     }
     act(&mut p, rule(json!({ "index": 0, "remove": true }))).unwrap();
-    assert!(p.doc["scene"]["layers"][0].get("rules").is_none());
+    assert!(super::whole::empty(&p.doc["scene"]["layers"][0]["rules"]));
 }

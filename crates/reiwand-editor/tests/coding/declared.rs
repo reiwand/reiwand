@@ -63,7 +63,7 @@ fn the_code_is_checked_against_its_declaration_and_declared_from_what_it_uses() 
     act(&mut p, json!({ "script": { "declare": { "path": "scripts/x.js", "params": true } } })).unwrap();
     let entry = &p.doc["scene"]["scripts"][0];
     assert_eq!(entry["uses"], json!(["audio", "timers"]));
-    assert_eq!(entry["params"]["speed"], json!({ "type": "number", "default": 0 }));
+    assert_eq!(entry["params"]["speed"], json!({ "type": "number", "default": 0, "min": null, "max": null }));
     assert_eq!(audit(&p.dir, &p.doc, "scripts/x.js").unwrap()["synced"], true);
     act(
         &mut p,

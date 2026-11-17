@@ -52,6 +52,8 @@ fn fresh(e: &PoolEdit) -> Map<String, Value> {
     pool.insert("type".into(), json!("mesh"));
     pool.insert("max".into(), json!(e.max.unwrap_or(16)));
     pool.insert("max_vertices".into(), json!(e.max_vertices.unwrap_or(1024)));
+    pool.insert("texture".into(), Value::Null);
+    pool.insert("size".into(), Value::Null);
     pool
 }
 
@@ -98,7 +100,7 @@ pub(crate) fn edit(dir: &Path, doc: &Value, e: &PoolEdit) -> Result<Vec<Op>> {
         pool.insert("size".into(), json!(size));
     }
     for key in e.clear.iter().filter(|k| matches!(k.as_str(), "texture" | "size")) {
-        pool.remove(key);
+        pool.insert(key.clone(), Value::Null);
     }
     let path = format!("{LIST}/{}", escape(id));
     crate::shaping::refused(dir, doc, set(doc, &path, Value::Object(pool)))

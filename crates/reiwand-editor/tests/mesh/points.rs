@@ -58,8 +58,8 @@ fn points_are_placed_moved_rehung_renamed_and_removed() {
     assert!(p.act(&Action::Point(odd)).is_err());
     act(&mut p, point("pin", json!({ "remove": true }))).unwrap();
     assert!(points(&p).is_empty());
-    assert!(p.doc["scene"]["layers"][1].get("attach").is_none());
-    assert!(p.doc["scene"]["layers"][0].get("ik").is_none());
+    assert!(p.doc["scene"]["layers"][1]["attach"].is_null());
+    assert_eq!(p.doc["scene"]["layers"][0]["ik"], json!([]));
     act(&mut p, json!({ "undo": {} })).unwrap();
     assert_eq!(points(&p).len(), 1);
     assert_eq!(p.doc["scene"]["layers"][1]["attach"]["point"], json!("pin"));
@@ -81,7 +81,7 @@ fn a_dropped_layer_moves_its_own_point_and_takes_it_away_when_it_leaves() {
     assert!(points(&p).is_empty());
     act(&mut p, attach(json!({ "point": [0.6, 0.25] }))).unwrap();
     act(&mut p, attach(json!({ "detach": true }))).unwrap();
-    assert!(points(&p).is_empty() && p.doc["scene"]["layers"][1].get("attach").is_none());
+    assert!(points(&p).is_empty() && p.doc["scene"]["layers"][1]["attach"].is_null());
     act(&mut p, json!({ "undo": {} })).unwrap();
     assert_eq!(points(&p).len(), 1);
 }

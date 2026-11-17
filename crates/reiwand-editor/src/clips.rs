@@ -101,7 +101,7 @@ pub(crate) fn clip(dir: &std::path::Path, doc: &Value, c: &ClipEdit) -> Result<V
             })?;
             c["animation"] = json!(name);
             c["to"] = json!(f64::from(m.length));
-            drop(c.as_object_mut().and_then(|o| o.remove("from")));
+            c["from"] = json!(0.0);
         }
         if let Some(f) = from {
             ensure!(

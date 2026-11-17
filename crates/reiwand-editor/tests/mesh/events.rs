@@ -28,7 +28,7 @@ fn clip_events_are_added_moved_renamed_and_removed() {
     act(&mut p, event(json!({ "time": 1.0 }))).unwrap();
     act(&mut p, event(json!({ "at": 1.0, "remove": true }))).unwrap();
     act(&mut p, event(json!({ "name": "tap", "remove": true }))).unwrap();
-    assert!(p.doc["scene"]["layers"][0]["clips"][0].get("events").is_none());
+    assert!(super::whole::empty(&p.doc["scene"]["layers"][0]["clips"][0]["events"]));
     for bad in [
         event(json!({ "time": 2.5 })),
         event(json!({ "time": -1 })),

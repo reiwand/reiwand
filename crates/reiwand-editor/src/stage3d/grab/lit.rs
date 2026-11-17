@@ -85,7 +85,7 @@ pub(crate) fn listed(doc: &Value, seen: &super::Seen, frame: &reiwand_scene::Fra
     let Some(stage) = frame.stages.first() else { return Vec::new() };
     let px = |p: V3| seen.at(p).map(super::super::gizmo::px);
     let held = |v: &Value| match v {
-        Value::Object(_) if v.get("keys").is_some() && v.get("prop").is_none() => "keyed",
+        Value::Object(_) if v["keys"].is_array() && v["prop"].is_null() => "keyed",
         Value::Object(_) => "bound",
         _ => "fixed",
     };

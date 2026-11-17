@@ -77,7 +77,7 @@ fn animation_layers_are_added_tuned_masked_moved_and_removed() {
     assert_eq!(m["layers"].as_array().unwrap().len(), 2);
     animate(&mut p, json!({ "layer": { "layer": "doll", "index": 0, "remove": true } })).unwrap();
     animate(&mut p, json!({ "layer": { "layer": "doll", "index": 0, "remove": true } })).unwrap();
-    assert!(layer(&p, "doll").get("animations").is_none());
+    assert!(super::whole::empty(&layer(&p, "doll")["animations"]));
 }
 
 #[test]
@@ -113,7 +113,7 @@ fn root_motion_presets_and_blend_shapes_of_a_model() {
     assert_eq!(layer(&p, "doll")["shapes"]["bulge"], json!(0.7));
     assert!(animate(&mut p, json!({ "morph": { "layer": "doll", "shape": "bulge", "weight": 3 } })).is_err());
     animate(&mut p, json!({ "morph": { "layer": "doll", "shape": "bulge", "weight": null } })).unwrap();
-    assert!(layer(&p, "doll").get("shapes").is_none());
+    assert!(super::whole::empty(&layer(&p, "doll")["shapes"]));
     edit(&mut p, json!({ "model": { "add": { "asset": "toy", "id": "plain" } } })).unwrap();
     assert!(animate(&mut p, json!({ "root": { "layer": "plain", "on": true } })).is_err(), "needs clips");
 }

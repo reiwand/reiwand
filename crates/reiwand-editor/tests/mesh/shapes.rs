@@ -20,7 +20,7 @@ fn expressions_are_named_sets_of_blend_shape_weights() {
         (json!({ "glad": 1 }), 1)
     );
     act(&mut p, json!({ "expression": { "layer": "body", "name": "glad", "remove": true } })).unwrap();
-    assert!(layer(&p).get("expressions").is_none() && layer(&p).get("shapes").is_none());
+    assert!(super::whole::empty(&layer(&p)["expressions"]) && super::whole::empty(&layer(&p)["shapes"]));
     act(&mut p, json!({ "undo": {} })).unwrap();
     assert_eq!(layer(&p)["shapes"], json!({ "glad": 1 }));
     act(&mut p, json!({ "redo": {} })).unwrap();

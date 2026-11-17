@@ -25,7 +25,7 @@ fn chains_are_added_aimed_limited_and_removed() {
     act(&mut p, ik(json!({ "root": "root", "tip": "hand", "limits": { "arm": [-45, 45] } }))).unwrap();
     assert_eq!(
         chain(&p),
-        json!({ "chain": ["root", "arm", "hand"], "target": [104.0, 20.0], "limits": { "arm": [-45.0, 45.0] } })
+        json!({ "chain": ["root", "arm", "hand"], "target": [104.0, 20.0], "limits": { "arm": [-45.0, 45.0] }, "bend": "clockwise", "weight": 1.0 })
     );
     let shown = query(&p, "net", json!({ "handles": true }))["ik"][0].clone();
     assert_eq!(shown["at"], json!([[0.1, 0.5], [0.5, 0.5], [0.9, 0.5]]));
@@ -39,7 +39,11 @@ fn chains_are_added_aimed_limited_and_removed() {
     assert_eq!((shown["target"].clone(), shown["follows"].clone()), (json!([0.5, 0.5]), json!("bone")));
     assert_eq!(
         chain(&p),
-        json!({ "chain": ["root", "arm", "hand"], "target": "bone:arm", "bend": "counterclockwise", "weight": 0.5 })
+        super::whole::at(
+            &p,
+            "/scene/layers/0/ik/0",
+            &json!({ "chain": ["root", "arm", "hand"], "target": "bone:arm", "bend": "counterclockwise", "weight": 0.5 })
+        )
     );
     act(&mut p, json!({ "undo": {} })).unwrap();
     assert_eq!(chain(&p)["target"], json!([104.0, 20.0]));
@@ -65,7 +69,7 @@ fn chains_are_added_aimed_limited_and_removed() {
         assert!(act(&mut p, ik(bad.clone())).is_err(), "{bad}");
     }
     act(&mut p, ik(json!({ "index": 0, "remove": true }))).unwrap();
-    assert!(p.doc["scene"]["layers"][0].get("ik").is_none());
+    assert!(super::whole::empty(&p.doc["scene"]["layers"][0]["ik"]));
 }
 
 #[test]

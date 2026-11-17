@@ -68,9 +68,15 @@ fn property_edits_while_a_template_is_shown_keep_the_bindings_of_the_scene() {
     assert!(refused.contains("opacity"), "{refused}");
     assert!(p.doc["manifest"]["properties"].get("amount").is_some());
     act(&mut p, json!({ "rename_property": { "id": "amount", "to": "level" } })).unwrap();
-    assert_eq!(p.doc.pointer(&format!("{other}/opacity")), Some(&json!({ "prop": "level" })));
+    assert_eq!(
+        p.doc.pointer(&format!("{other}/opacity")),
+        Some(&super::whole::at(&p, &format!("{other}/opacity"), &json!({ "prop": "level" })))
+    );
     let problems = reiwand_editor::check::review(&p.doc, Some(&p.dir));
     assert!(problems.iter().all(|q| q.warning), "{problems:?}");
     act(&mut p, json!({ "undo": {} })).unwrap();
-    assert_eq!(p.doc.pointer(&format!("{other}/opacity")), Some(&json!({ "prop": "amount" })));
+    assert_eq!(
+        p.doc.pointer(&format!("{other}/opacity")),
+        Some(&super::whole::at(&p, &format!("{other}/opacity"), &json!({ "prop": "amount" })))
+    );
 }

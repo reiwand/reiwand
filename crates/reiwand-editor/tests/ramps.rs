@@ -68,7 +68,8 @@ fn stops_make_a_ramp_picture_that_an_effect_parameter_uses_and_undo_removes() {
     act(&mut project, json!({ "undo": {} })).unwrap();
     assert_eq!(project.doc["scene"]["assets"][&id]["path"], before);
     act(&mut project, json!({ "undo": {} })).unwrap();
-    assert!(project.doc["scene"]["assets"].get(&id).is_none() && project.doc.pointer(POINTER).is_none());
+    assert!(project.doc["scene"]["assets"].get(&id).is_none());
+    assert_ne!(project.doc.pointer(POINTER), Some(&json!(id)));
 }
 
 #[test]

@@ -89,7 +89,8 @@ fn keyed_values_get_a_key_and_bound_ones_are_kept_unless_replaced() {
     let bound = json!({ "prop": "spot", "map": { "a": [0, 0, 0] } });
     act(&mut p, json!({ "set": { "pointer": pointer, "value": bound.clone() } })).unwrap();
     assert!(edit(&mut p, json!({ "grab": g })).is_err());
-    assert_eq!(p.doc.pointer(&pointer), Some(&bound));
+    let kept = super::whole::at(&p, &pointer, &bound);
+    assert_eq!(p.doc.pointer(&pointer), Some(&kept));
     edit(&mut p, json!({ "grab": replace })).unwrap();
     assert!(p.doc.pointer(&pointer).unwrap().is_array());
 }

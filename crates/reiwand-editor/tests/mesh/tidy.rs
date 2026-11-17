@@ -53,16 +53,24 @@ fn removing_a_bone_drops_what_names_it_in_the_same_step() {
     act(&mut p, bone("hand", json!({ "remove": true }))).unwrap();
     assert_eq!(broken(&p), Vec::<String>::new());
     let l = layer(&p);
-    assert_eq!(l["ik"], json!([{ "chain": ["root", "arm"], "target": [88.0, 20.0], "limits": {} }]));
-    assert!(l.get("physics").is_none() && l.get("rules").is_none());
-    assert_eq!((l["hit"].clone(), l["animations"].clone()), (json!(["arm"]), json!([{ "clip": "swing" }])));
-    assert!(l["clips"][0]["bones"].get("hand").is_none());
-    assert_eq!(l["clips"][1]["bones"], json!({ "arm": { "rotation": [[0.0, 0]] } }));
-    assert!(p.doc["scene"]["layers"][1].get("attach").is_none());
+    assert_eq!(
+        l["ik"],
+        json!([{ "chain": ["root", "arm"], "target": [88.0, 20.0], "limits": {}, "bend": "clockwise", "weight": 1.0 }])
+    );
+    assert!(l["physics"] == json!([]) && l["rules"] == json!([]));
+    assert_eq!(
+        (l["hit"].clone(), l["animations"].clone()),
+        (json!(["arm"]), super::whole::at(&p, "/scene/layers/0/animations", &json!([{ "clip": "swing" }])))
+    );
+    assert!(super::whole::empty(&l["clips"][0]["bones"]["hand"]));
+    let seeded = json!([{ "id": "wave", "bones": { "arm": { "rotation": [[0.0, 0]] } } }]);
+    let seeded = super::whole::at(&p, "/scene/layers/0/clips", &seeded);
+    assert_eq!(l["clips"][1]["bones"], seeded[0]["bones"]);
+    assert!(p.doc["scene"]["layers"][1]["attach"].is_null());
     act(&mut p, json!({ "undo": {} })).unwrap();
     assert_eq!(p.doc, before);
     act(&mut p, json!({ "redo": {} })).unwrap();
-    assert!(layer(&p).get("physics").is_none());
+    assert!(super::whole::empty(&layer(&p)["physics"]));
 }
 
 #[test]
@@ -71,12 +79,15 @@ fn rehanging_a_bone_drops_the_chains_and_rules_it_breaks() {
     let mut p = dressed(&root);
     act(&mut p, bone("arm", json!({ "parent": "tail" }))).unwrap();
     assert_eq!(broken(&p), Vec::<String>::new());
-    assert!(layer(&p).get("ik").is_none() && layer(&p).get("rules").is_none());
-    assert_eq!(layer(&p)["physics"], json!([{ "bone": "hand", "mode": "spring" }]));
+    assert!(layer(&p)["ik"] == json!([]) && layer(&p)["rules"] == json!([]));
+    assert_eq!(
+        layer(&p)["physics"],
+        super::whole::at(&p, "/scene/layers/0/physics", &json!([{ "bone": "hand", "mode": "spring" }]))
+    );
     act(&mut p, json!({ "undo": {} })).unwrap();
     act(&mut p, bone("arm", json!({ "parent": "" }))).unwrap();
     assert_eq!(broken(&p), Vec::<String>::new());
-    assert!(layer(&p).get("ik").is_none());
+    assert!(super::whole::empty(&layer(&p)["ik"]));
     assert_eq!(layer(&p)["rules"], json!([{ "bone": "tail", "parent": "hand", "weight": 1 }]));
     act(&mut p, json!({ "undo": {} })).unwrap();
     act(&mut p, bone("tail", json!({ "parent": "hand" }))).unwrap();
@@ -91,7 +102,7 @@ fn removing_a_bone_or_point_leaves_chains_without_limits_as_they_were() {
     act(&mut p, bone("tail", json!({ "parent": "root", "at": [0.2, 0.8] }))).unwrap();
     act(&mut p, json!({ "ik": { "layer": "net", "root": "root", "tip": "arm" } })).unwrap();
     let chain = layer(&p)["ik"].clone();
-    assert!(chain[0].get("limits").is_none());
+    assert_eq!(chain[0]["limits"], json!({}));
     let pin = json!({ "point": { "layer": "net", "name": "pin", "at": [0.5, 0.3] } });
     act(&mut p, pin).unwrap();
     act(&mut p, json!({ "point": { "layer": "net", "name": "pin", "remove": true } })).unwrap();
@@ -106,7 +117,7 @@ fn renaming_and_rehanging_a_bone_at_once_drops_the_chains_it_breaks() {
     let mut p = dressed(&root);
     act(&mut p, bone("arm", json!({ "to": "limb", "parent": "tail" }))).unwrap();
     assert_eq!(broken(&p), Vec::<String>::new());
-    assert!(layer(&p).get("ik").is_none() && layer(&p).get("rules").is_none());
+    assert!(layer(&p)["ik"] == json!([]) && layer(&p)["rules"] == json!([]));
     assert_eq!(layer(&p)["hit"], json!(["hand", "limb"]));
     act(&mut p, json!({ "undo": {} })).unwrap();
     act(&mut p, bone("arm", json!({ "to": "limb", "at": [0.6, 0.5] }))).unwrap();
