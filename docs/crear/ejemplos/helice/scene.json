@@ -1,6 +1,6 @@
 {
   "schema": "reiwand.scene/1",
-  "canvas": { "size": [1920, 1080], "background": "#05070f", "perspective": { "focal": 900 } },
+  "canvas": { "size": [1920, 1080], "background": "#05070f", "perspective": 900 },
   "particles": {
     "helice": {
       "capacity": 900,
