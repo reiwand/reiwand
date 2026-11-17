@@ -23,6 +23,7 @@ QtObject {
             "angles": App.tr("Turn in 3D"),
             "animations": App.tr("Animation layers"),
             "arc": App.tr("Arc"),
+            "axis": App.tr("Axis"),
             "around": App.tr("Around a point"),
             "artifacts": App.tr("Tape streaks"),
             "band": App.tr("Tracking band"),
