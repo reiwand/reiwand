@@ -168,7 +168,6 @@ impl Renderer {
             relief: None,
             flip: [false; 2],
             grade: None,
-            clip: None,
         };
         self.render_layers(target, &[layer], pixels)?;
         let mut rgba = pixels.clone();

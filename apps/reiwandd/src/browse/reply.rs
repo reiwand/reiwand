@@ -22,7 +22,8 @@ impl Daemon {
         let (playlist, playlist_name) = session.and_then(|s| s.playlist.clone()).unzip();
         let left = session.map(|s| s.until.saturating_duration_since(Instant::now()));
         let now = session.and_then(|s| self.item_summary(s.shown.as_deref()?));
-        let ahead = session.map(|s| self.ahead(output, s)).unwrap_or_default();
+        let ahead = session.map(|s| self.around(output, s, 1)).unwrap_or_default();
+        let behind = session.map(|s| self.around(output, s, -1)).unwrap_or_default();
         let plays = session.map(|s| self.plays(output, s, candidate.as_ref())).unwrap_or_default();
         reply(BrowseState {
             model: MODEL,
@@ -40,6 +41,7 @@ impl Daemon {
             candidate,
             now,
             ahead,
+            behind,
             plays,
             path,
             transition: session.map(|s| s.transition.clone()).unwrap_or_default(),
@@ -52,17 +54,8 @@ impl Daemon {
 pub async fn told(daemon: &Weak<Daemon>, emitter: SignalEmitter<'_>, told: Told) -> Result<String> {
     let sent = Playlists::browse_changed(&emitter, &told.output, &told.json).await;
     sent.unwrap_or_else(|e| tracing::debug!("cannot emit a browse signal: {e}"));
-    if let Some(daemon) = daemon.upgrade() {
-        let output = told.output.clone();
-        daemon
-            .run(move |d| {
-                d.stage_sync(&output);
-                Ok::<_, crate::error::Error>(())
-            })
-            .await
-            .ok();
-    }
     if let Some(serial) = told.fresh {
+        super::shortcuts::launch::open(emitter.connection(), &told.output).await;
         tokio::spawn(expire(daemon.clone(), emitter.into_owned(), told.output, serial));
     }
     Ok(told.json)
@@ -75,16 +68,6 @@ async fn expire(daemon: Weak<Daemon>, emitter: SignalEmitter<'static>, output: S
             Expiry::Gone => return,
             Expiry::Until(until) => tokio::time::sleep_until(until.into()).await,
             Expiry::Ended(told) => {
-                if let Some(daemon) = daemon.upgrade() {
-                    let output = told.output.clone();
-                    daemon
-                        .run(move |d| {
-                            d.stage_sync(&output);
-                            Ok::<_, crate::error::Error>(())
-                        })
-                        .await
-                        .ok();
-                }
                 let sent = Playlists::browse_changed(&emitter, &told.output, &told.json).await;
                 sent.unwrap_or_else(|e| tracing::debug!("cannot emit a browse signal: {e}"));
                 return;

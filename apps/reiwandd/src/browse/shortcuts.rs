@@ -1,4 +1,4 @@
-use super::Do;
+use super::act::{Do, run};
 use crate::daemon::Daemon;
 use futures_util::StreamExt;
 use reiwand_core::dbus;
@@ -10,6 +10,7 @@ use tokio::sync::Notify;
 use zbus::Variant as Value;
 use zbus::object_server::SignalEmitter;
 
+pub(crate) mod launch;
 mod portal;
 #[cfg(test)]
 mod portal_tests;
@@ -47,7 +48,6 @@ pub fn action(id: &str) -> Option<Do> {
 
 pub async fn serve(conn: zbus::Connection, daemon: Arc<Daemon>) {
     let emitter = SignalEmitter::new(&conn, dbus::OBJECT_PATH).map(SignalEmitter::into_owned);
-    emitter.iter().for_each(|e| super::attach(&daemon, e));
     loop {
         let wanted = daemon.state().config.shortcuts.clone();
         let browse = &daemon.rotations.browse;
@@ -84,8 +84,8 @@ pub async fn serve(conn: zbus::Connection, daemon: Arc<Daemon>) {
                     let Some(signal) = signal else { break };
                     let Ok(args) = signal.args() else { continue };
                     let Some(act) = action(args.shortcut_id) else { continue };
-                    if args.session_handle.as_str() == session.as_str() {
-                        super::run(&daemon, "", act).await;
+                    if let (Ok(emitter), true) = (&emitter, args.session_handle.as_str() == session.as_str()) {
+                        run(&daemon, emitter, act).await;
                     }
                 }
             }

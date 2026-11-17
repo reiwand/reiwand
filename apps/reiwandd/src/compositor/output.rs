@@ -43,7 +43,6 @@ pub(super) struct Output {
     pub(super) lit: [reiwand_render::Lit; 2],
     pub(super) passing: Option<super::crossing::Passing>,
     pub(super) told: super::status::Passage,
-    pub(super) strip: Option<super::strip::Strip>,
 }
 
 impl Output {
@@ -76,7 +75,6 @@ impl Output {
             lit: Default::default(),
             passing: None,
             told: Default::default(),
-            strip: None,
         }
     }
 
@@ -140,10 +138,7 @@ impl Output {
     }
 
     pub(super) fn damage(&self) -> Option<Region> {
-        let plain = self.strip.is_none()
-            && self.fade.is_none()
-            && self.shown.relief.is_none()
-            && self.shown.uv.is_none();
+        let plain = self.fade.is_none() && self.shown.relief.is_none() && self.shown.uv.is_none();
         self.shown.scene.as_ref().filter(|_| plain && !self.stale)?.damage
     }
 
@@ -175,7 +170,7 @@ impl Output {
         let moving =
             |s: &Shown| !s.videos().is_empty() || s.scene.as_ref().is_some_and(|sc| sc.due.is_some());
         let moving = |s: &Shown| moving(s) || s.content.page().is_some();
-        self.fade.is_some() || self.moving || self.strip.is_some() || self.layers().any(moving)
+        self.fade.is_some() || self.moving || self.layers().any(moving)
     }
 
     pub(super) fn fading(&self) -> bool {

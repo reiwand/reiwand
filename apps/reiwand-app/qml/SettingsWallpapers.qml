@@ -54,11 +54,11 @@ FocusScope {
             "place": "more"
         },
         {
-            "text": App.tr("Apply the wallpaper of the strip"),
+            "text": App.tr("Apply the wallpaper of the switcher"),
             "place": "more"
         },
         {
-            "text": App.tr("Close the strip without changing"),
+            "text": App.tr("Close the switcher without changing"),
             "place": "more"
         },
         {

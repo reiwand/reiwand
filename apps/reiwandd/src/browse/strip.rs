@@ -3,7 +3,7 @@ use crate::daemon::Daemon;
 use reiwand_core::TransitionKind;
 use reiwand_core::model::{BrowsePlays, BrowseSource, ItemSummary};
 
-const AHEAD: i32 = 2;
+const NEAR: i32 = 2;
 
 fn scene(item: Option<&ItemSummary>) -> bool {
     item.and_then(|i| i.package.as_ref()).is_some_and(|p| p.kind == "scene")
@@ -15,12 +15,13 @@ impl Daemon {
         self.summary(item).ok()
     }
 
-    pub(super) fn ahead(&self, output: &str, session: &Session) -> Vec<ItemSummary> {
+    pub(super) fn around(&self, output: &str, session: &Session, direction: i32) -> Vec<ItemSummary> {
+        let offsets = (1..=NEAR).map(|n| n * direction);
         let uids: Vec<String> = match session.source {
             BrowseSource::Playlist => {
-                (1..=AHEAD).filter_map(|n| self.peek(output, session.steps + n).ok()?.item).collect()
+                offsets.filter_map(|n| self.peek(output, session.steps + n).ok()?.item).collect()
             }
-            _ => (1..=AHEAD)
+            _ => offsets
                 .filter_map(|n| {
                     let at = super::list::moved(session.index, session.items.len(), n)?;
                     session.items.get(at).cloned()
@@ -28,14 +29,14 @@ impl Daemon {
                 .collect(),
         };
         let mut seen = vec![session.candidate.clone().unwrap_or_default()];
-        let mut ahead = Vec::new();
+        let mut found = Vec::new();
         for uid in uids {
             if !seen.contains(&uid) {
-                ahead.extend(self.item_summary(&uid));
+                found.extend(self.item_summary(&uid));
                 seen.push(uid);
             }
         }
-        ahead
+        found
     }
 
     pub(super) fn plays(

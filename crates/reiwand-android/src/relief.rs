@@ -109,5 +109,5 @@ pub(crate) fn layer<'a>(
     let relief = raised.zip(uv).filter(|(_, uv)| !uv.repeat);
     let relief = relief.map(|((raised, charging), uv)| raised.relief(aspect, &uv, charging));
     let (fit, background) = (look.fit, look.background);
-    Layer { image, fit, background, opacity, uv, relief, flip: look.flip, grade: look.grade, clip: None }
+    Layer { image, fit, background, opacity, uv, relief, flip: look.flip, grade: look.grade }
 }

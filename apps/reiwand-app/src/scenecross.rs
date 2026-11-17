@@ -41,7 +41,6 @@ fn layer(image: &reiwand_render::GpuImage) -> Layer<'_> {
         relief: None,
         flip: [false; 2],
         grade: None,
-        clip: None,
     }
 }
 

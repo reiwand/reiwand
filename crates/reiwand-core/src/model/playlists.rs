@@ -106,6 +106,8 @@ model! {
         #[serde(default)]
         pub ahead: Vec<ItemSummary>,
         #[serde(default)]
+        pub behind: Vec<ItemSummary>,
+        #[serde(default)]
         pub plays: BrowsePlays,
         pub path: Option<PathBuf>,
         pub transition: String,

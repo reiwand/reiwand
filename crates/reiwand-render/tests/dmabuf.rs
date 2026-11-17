@@ -11,7 +11,6 @@ fn color(background: [u8; 3]) -> Layer<'static> {
         fit: Fit::Fill,
         background,
         opacity: 1.0,
-        clip: None,
         uv: None,
         relief: None,
         flip: [false; 2],

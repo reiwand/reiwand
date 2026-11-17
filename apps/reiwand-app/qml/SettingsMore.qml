@@ -49,7 +49,7 @@ FocusScope {
             text: App.tr("Change wallpaper with the keyboard")
             kind: "captura"
             keys: SettingsFolder.keys(part.options["shortcuts.next"] ?? "LOGO+ALT+N")
-            explain: App.tr("Shows a strip over the wallpaper and moves to the next one. To change the combination, press Enter and then the new keys.")
+            explain: App.tr("Opens the wallpaper switcher on the next one. To change the combination, press Enter and then the new keys.")
             onCaptured: keys => App.act("SetOption", ["shortcuts.next", SettingsFolder.joined(keys)])
         }
 
@@ -57,23 +57,23 @@ FocusScope {
             text: App.tr("Previous wallpaper with the keyboard")
             kind: "captura"
             keys: SettingsFolder.keys(part.options["shortcuts.previous"] ?? "LOGO+ALT+P")
-            explain: App.tr("Shows a strip over the wallpaper and moves to the one before. To change the combination, press Enter and then the new keys.")
+            explain: App.tr("Opens the wallpaper switcher on the one before. To change the combination, press Enter and then the new keys.")
             onCaptured: keys => App.act("SetOption", ["shortcuts.previous", SettingsFolder.joined(keys)])
         }
 
         Fila {
-            text: App.tr("Apply the wallpaper of the strip")
+            text: App.tr("Apply the wallpaper of the switcher")
             kind: "captura"
             keys: SettingsFolder.keys(part.options["shortcuts.apply"] ?? "LOGO+ALT+Return")
-            explain: App.tr("Keeps the wallpaper in the middle of the strip. The wheel moves the strip and a click on the middle one applies it. To change the combination, press Enter and then the new keys.")
+            explain: App.tr("Keeps the wallpaper in the middle of the switcher. Enter and a click on the middle one do the same. To change the combination, press Enter and then the new keys.")
             onCaptured: keys => App.act("SetOption", ["shortcuts.apply", SettingsFolder.joined(keys)])
         }
 
         Fila {
-            text: App.tr("Close the strip without changing")
+            text: App.tr("Close the switcher without changing")
             kind: "captura"
             keys: SettingsFolder.keys(part.options["shortcuts.cancel"] ?? "LOGO+ALT+Escape")
-            explain: App.tr("Closes the strip and leaves the wallpaper as it was. To change the combination, press Enter and then the new keys.")
+            explain: App.tr("Closes the switcher and leaves the wallpaper as it was. Esc does the same. To change the combination, press Enter and then the new keys.")
             onCaptured: keys => App.act("SetOption", ["shortcuts.cancel", SettingsFolder.joined(keys)])
         }
 

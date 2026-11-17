@@ -21126,28 +21126,46 @@ msgid "The server no longer accepts your account. Sign in again to keep publishi
 msgstr "El servidor ya no acepta tu cuenta. Inicia sesión de nuevo para seguir publicando; no se perdió nada."
 
 #: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Shows a strip over the wallpaper and moves to the next one. To change the combination, press Enter and then the new keys."
-msgstr "Muestra una tira sobre el fondo y pasa al siguiente. Para cambiar la combinación, pulsa Intro y luego las teclas nuevas."
+msgid ""
+"Opens the wallpaper switcher on the next one. To change the combination, "
+"press Enter and then the new keys."
+msgstr ""
+"Abre el cambiador de fondos en el siguiente. Para cambiar la combinación, "
+"pulsa Intro y luego las teclas nuevas."
 
 #: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Shows a strip over the wallpaper and moves to the one before. To change the combination, press Enter and then the new keys."
-msgstr "Muestra una tira sobre el fondo y pasa al anterior. Para cambiar la combinación, pulsa Intro y luego las teclas nuevas."
+msgid ""
+"Opens the wallpaper switcher on the one before. To change the combination, "
+"press Enter and then the new keys."
+msgstr ""
+"Abre el cambiador de fondos en el anterior. Para cambiar la combinación, "
+"pulsa Intro y luego las teclas nuevas."
 
 #: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Apply the wallpaper of the strip"
-msgstr "Aplicar el fondo de la tira"
+msgid "Apply the wallpaper of the switcher"
+msgstr "Aplicar el fondo del cambiador"
 
 #: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Keeps the wallpaper in the middle of the strip. The wheel moves the strip and a click on the middle one applies it. To change the combination, press Enter and then the new keys."
-msgstr "Deja el fondo que está en el centro de la tira. La rueda mueve la tira y un clic en el del centro lo aplica. Para cambiar la combinación, pulsa Intro y luego las teclas nuevas."
+msgid ""
+"Keeps the wallpaper in the middle of the switcher. Enter and a click on the "
+"middle one do the same. To change the combination, press Enter and then the "
+"new keys."
+msgstr ""
+"Se queda con el fondo del centro del cambiador. Intro y un clic en el del "
+"centro hacen lo mismo. Para cambiar la combinación, pulsa Intro y luego las "
+"teclas nuevas."
 
 #: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Close the strip without changing"
-msgstr "Cerrar la tira sin cambiar nada"
+msgid "Close the switcher without changing"
+msgstr "Cerrar el cambiador sin cambiar nada"
 
 #: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Closes the strip and leaves the wallpaper as it was. To change the combination, press Enter and then the new keys."
-msgstr "Cierra la tira y deja el fondo como estaba. Para cambiar la combinación, pulsa Intro y luego las teclas nuevas."
+msgid ""
+"Closes the switcher and leaves the wallpaper as it was. Esc does the same. "
+"To change the combination, press Enter and then the new keys."
+msgstr ""
+"Cierra el cambiador y deja el fondo como estaba. Esc hace lo mismo. Para "
+"cambiar la combinación, pulsa Intro y luego las teclas nuevas."
 
 #: apps/reiwand-app/qml/SettingsMore.qml
 msgid "The desktop did not give the keys: bind reiwand-ctl next --preview, prev --preview, browse apply and browse cancel to your own keys"
@@ -21164,3 +21182,24 @@ msgstr "Tecla para aplicar el fondo de la tira"
 #: apps/reiwand-app/qml/facade/Labels.qml
 msgid "Key to close the strip without changing"
 msgstr "Tecla para cerrar la tira sin cambiar nada"
+
+
+#: apps/reiwand-app/qml/Preview.qml
+msgid "Change wallpaper · %1"
+msgstr "Cambiar de fondo · %1"
+
+#: apps/reiwand-app/qml/Preview.qml
+msgid "List «%1»"
+msgstr "Lista «%1»"
+
+#: apps/reiwand-app/qml/PreviewHints.qml
+msgid "Move, or use the wheel"
+msgstr "Mover o usar la rueda"
+
+#: apps/reiwand-app/qml/PreviewPanel.qml
+msgid "This screen has only one wallpaper"
+msgstr "Esta pantalla tiene un solo fondo"
+
+#: apps/reiwand-app/qml/PreviewPanel.qml
+msgid "Add more wallpapers to the library to switch between them."
+msgstr "Añade más fondos a la biblioteca para poder cambiar entre ellos."

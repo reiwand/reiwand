@@ -135,7 +135,6 @@ pub fn save_frame(
         relief: None,
         flip: [false; 2],
         grade: None,
-        clip: None,
     };
     r.render_layers(&mut target, &[layer], &mut pixels)?;
     pixels.as_chunks_mut::<4>().0.iter_mut().for_each(|p| p.swap(0, 2));
