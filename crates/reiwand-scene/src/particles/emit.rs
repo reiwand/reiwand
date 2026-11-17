@@ -15,22 +15,22 @@ pub struct Emitter {
     pub rate: Value<f32>,
     pub bursts: Vec<Burst>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub follow: Option<Follow>,
     pub inherit: f32,
     #[schemars(extend("x-unit" = "s"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub duration: Option<f32>,
     #[schemars(extend("x-unit" = "s"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub delay: Option<f32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub periodic: Option<Periodic>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub max_per_step: Option<u32>,
     pub audio_gate: bool,
 }
@@ -53,14 +53,14 @@ pub enum Cue {
 pub struct Burst {
     pub count: u32,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub every: Option<f32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub on: Option<Cue>,
     #[schemars(extend("x-unit" = "s"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub at: Option<f32>,
 }
 
@@ -87,39 +87,39 @@ pub struct Init {
     pub color: Spread<Color>,
     #[schemars(extend("x-range" = [0, 1]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub alpha: Option<Spread<f32>>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub hsv: Option<Hsv>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub palette: Option<Palette>,
     pub gradient: Vec<(f32, Color)>,
     #[schemars(extend("x-unit" = "px/s"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub velocity: Option<Spread<[f32; 2]>>,
     #[schemars(extend("x-unit" = "px/s"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub radial: Option<Spread<f32>>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub inherit: Option<Carry>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub turbulent: Option<Turbulent>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub offset_noise: Option<OffsetNoise>,
     #[schemars(extend("x-unit" = "px"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub depth: Option<Spread<f32>>,
     #[schemars(extend("x-unit" = "px/s"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub depth_speed: Option<Spread<f32>>,
     pub tilt: Tilt,
     pub remap: Vec<Remap>,

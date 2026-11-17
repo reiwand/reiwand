@@ -92,6 +92,7 @@ pub fn starter(name: &str, id: &str, title: &str, locale: &str) -> Result<Value>
     if let Some(mut doc) = made {
         let ops = sync(&doc, &Default::default(), None);
         apply(&mut doc, &ops)?;
+        crate::completing::scene_doc(&mut doc);
         return Ok(doc);
     }
     let (layers, particles, mut properties) = layers(name)?;
@@ -112,6 +113,7 @@ pub fn starter(name: &str, id: &str, title: &str, locale: &str) -> Result<Value>
     let mut doc = json!({"manifest": manifest, "scene": scene});
     let ops = sync(&doc, &Default::default(), None);
     apply(&mut doc, &ops)?;
+    crate::completing::scene_doc(&mut doc);
     Ok(doc)
 }
 

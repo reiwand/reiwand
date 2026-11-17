@@ -25,7 +25,7 @@ pub enum Control {
         default: String,
         #[schemars(extend("x-range" = [1, 1024]))]
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         max_len: Option<u32>,
         multiline: bool,
         secret: bool,
@@ -35,7 +35,7 @@ pub enum Control {
         accept: Vec<String>,
         #[schemars(extend("x-ref" = "media"))]
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         default_asset: Option<String>,
     },
     Folder {
@@ -84,7 +84,7 @@ pub enum Choice {
         label: Text,
         #[schemars(extend("x-ref" = "icon"))]
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         icon: Option<String>,
     },
     Plain(Json),

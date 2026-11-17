@@ -20,6 +20,7 @@ mod cells;
 pub mod check;
 mod clips;
 pub mod clocks;
+pub mod completing;
 mod contents;
 pub mod copying;
 pub mod covers;

@@ -140,6 +140,9 @@ pub fn at(doc: &Value, pointer: &str) -> Option<Value> {
 }
 
 pub fn sample(root: &Value, schema: &Value) -> Value {
+    if let Some(d) = schema.get("default") {
+        return d.clone();
+    }
     let (schema, _) = deref(root, schema);
     if let Some(d) = schema.get("default").or_else(|| schema.get("const")) {
         return d.clone();

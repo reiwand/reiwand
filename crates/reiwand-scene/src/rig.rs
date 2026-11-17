@@ -37,13 +37,13 @@ pub struct Rig {
 pub struct AnimClip {
     pub id: String,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub animation: Option<String>,
     #[schemars(extend("x-unit" = "s"))]
     pub from: f32,
     #[schemars(extend("x-unit" = "s"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub to: Option<f32>,
     #[serde(rename = "loop")]
     pub repeat: Loop,
@@ -130,11 +130,11 @@ pub struct BonePhysics {
     pub wind: f32,
     #[schemars(extend("x-unit" = "°"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub rotation: Option<[f32; 2]>,
     #[schemars(extend("x-unit" = "px"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub translation: Option<[f32; 2]>,
 }
 

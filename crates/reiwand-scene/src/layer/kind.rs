@@ -35,7 +35,7 @@ pub enum Kind {
         size: crate::Ctx<[f32; 2], { crate::SOURCE }>,
         color: Value<Color>,
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         playback: Option<Playback>,
     },
     Video {
@@ -49,13 +49,13 @@ pub enum Kind {
     Shape {
         shape: Shape,
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         fill: Option<Value<Color>>,
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         gradient: Option<Gradient>,
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         stroke: Option<Stroke>,
     },
     Particles {
@@ -63,10 +63,10 @@ pub enum Kind {
         system: String,
         color: Value<Color>,
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         instance: Option<Box<Instance>>,
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         render: Option<Box<Render>>,
     },
     Spectrum(Spectrum),

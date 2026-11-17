@@ -22,34 +22,34 @@ pub enum Tunable {
 pub struct Instance {
     #[schemars(extend("x-range" = [0, 1]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub alpha: Option<Value<f32>>,
     #[schemars(extend("x-range" = [0, 100]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub size: Option<Value<f32>>,
     #[schemars(extend("x-range" = [0, 4]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub count: Option<Value<f32>>,
     #[schemars(extend("x-range" = [0, 100]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub speed: Option<Value<f32>>,
     #[schemars(extend("x-range" = [0, 100]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub life: Option<Value<f32>>,
     #[schemars(extend("x-range" = [0, 100]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub time_scale: Option<Value<f32>>,
     #[schemars(extend("x-range" = [0, 16]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub brightness: Option<Value<f32>>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub color: Option<Value<Color>>,
     #[schemars(extend("x-unit" = "px"))]
     pub points: Vec<Option<Value<Vec2>>>,

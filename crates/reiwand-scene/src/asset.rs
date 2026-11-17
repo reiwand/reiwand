@@ -10,36 +10,36 @@ pub struct Asset {
     pub path: String,
     pub linear: bool,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub atlas: Option<[u32; 2]>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub filter: Option<Filter>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub wrap: Option<Wrapping>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub mipmaps: Option<bool>,
     #[schemars(extend("x-range" = [0, 255]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub face: Option<u32>,
     #[schemars(extend("x-unit" = "px"))]
     pub rects: Vec<[u32; 4]>,
     #[schemars(extend("x-range" = [1, 256]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub frames: Option<u32>,
     #[schemars(extend("x-range" = [0.1, 120]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub fps: Option<f32>,
     #[schemars(extend("x-unit" = "s"))]
     pub durations: Vec<f32>,
     pub animated: bool,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub media: Option<crate::Cover>,
     pub shapes: std::collections::BTreeMap<String, String>,
 }

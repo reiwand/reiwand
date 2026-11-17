@@ -21,10 +21,10 @@ pub const MAX_TRANSITION_MS: u32 = 10_000;
 pub struct Transition {
     #[serde(rename = "in")]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub coming: Option<Passage>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub out: Option<Passage>,
 }
 

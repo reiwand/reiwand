@@ -5,7 +5,14 @@ use serde_json::{Value as Json, json};
 use std::borrow::Cow;
 
 pub fn schema() -> Json {
-    Json::from(schemars::schema_for!(Scene))
+    let mut raw = Json::from(schemars::schema_for!(Scene));
+    crate::prefill::prefill(&mut raw);
+    raw
+}
+
+pub fn uncovered() -> Vec<String> {
+    let mut raw = Json::from(schemars::schema_for!(Scene));
+    crate::prefill::prefill(&mut raw).uncovered
 }
 
 pub fn property_schema() -> Json {

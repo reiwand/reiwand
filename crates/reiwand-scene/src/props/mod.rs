@@ -37,14 +37,14 @@ pub enum Text {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct Property {
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub label: Option<Text>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub help: Option<Text>,
     #[schemars(extend("x-ref" = "group"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub group: Option<String>,
     #[schemars(extend("x-condition" = true))]
     pub visible_if: Condition,
@@ -54,7 +54,7 @@ pub struct Property {
     pub order: f64,
     #[schemars(extend("x-ref" = "icon"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub icon: Option<String>,
     pub quality: BTreeMap<crate::Quality, Json>,
     #[serde(flatten)]
@@ -73,7 +73,7 @@ pub enum Condition {
 pub struct Preset {
     pub id: String,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub label: Option<Text>,
     pub values: Values,
 }

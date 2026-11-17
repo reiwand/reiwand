@@ -27,10 +27,10 @@ pub struct Timeline {
     pub duration: f32,
     #[schemars(extend("x-range" = [1, 240]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub fps: Option<f32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub frames: Option<u32>,
     pub wrap: bool,
     #[serde(rename = "loop")]
@@ -40,7 +40,7 @@ pub struct Timeline {
     pub autoplay: bool,
     #[schemars(extend("x-ref" = "trigger"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub trigger: Option<String>,
     pub events: Vec<Event>,
 }
@@ -58,10 +58,10 @@ pub struct Event {
 pub struct Handles {
     #[serde(rename = "in")]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub before: Option<Side>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub out: Option<Side>,
 }
 

@@ -37,7 +37,7 @@ pub struct Oscillate {
     pub scale: [f32; 2],
     pub phase: [f32; 2],
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub mask: Option<[f32; 2]>,
 }
 

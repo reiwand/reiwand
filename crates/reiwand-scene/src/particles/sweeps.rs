@@ -14,7 +14,7 @@ pub enum Sweep {
 #[serde(deny_unknown_fields)]
 pub struct Around {
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub at: Option<Target>,
     #[schemars(extend("x-range" = [1, 4096]))]
     pub count: u32,
@@ -56,10 +56,10 @@ pub struct Between {
     pub span: Num,
     pub mode: Sweep,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub arc: Option<Bow>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub taper: Option<Taper>,
 }
 

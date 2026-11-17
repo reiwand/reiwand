@@ -84,10 +84,10 @@ pub struct ScriptParam {
     pub kind: ParamType,
     pub default: Param,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub min: Option<f32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub max: Option<f32>,
 }
 
@@ -108,11 +108,11 @@ pub struct Pool {
     pub max_vertices: u32,
     #[schemars(extend("x-ref" = "image"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub texture: Option<String>,
     #[schemars(extend("x-unit" = "px", "x-range" = [1, 4096]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub size: Option<[u32; 2]>,
 }
 

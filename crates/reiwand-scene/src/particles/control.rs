@@ -46,15 +46,15 @@ pub enum Placement {
 pub struct ControlPoint {
     #[schemars(extend("x-unit" = "px"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub at: Option<Value<Vec2>>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub follow: Option<Follow>,
     pub space: Placement,
     #[schemars(extend("x-unit" = "°"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub angle: Option<Value<f32>>,
 }
 

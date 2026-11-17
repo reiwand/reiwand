@@ -23,7 +23,7 @@ pub struct TextLayer {
     pub text: crate::words::Words,
     #[schemars(extend("x-ref" = "font"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub font: Option<String>,
     #[schemars(extend("x-ref" = "font"))]
     pub fallback: Vec<String>,
@@ -33,30 +33,30 @@ pub struct TextLayer {
     pub align: Align,
     pub valign: Valign,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub wrap: Option<Wrap>,
     #[schemars(extend("x-range" = [0.5, 4]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub line_height: Option<f32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub background: Option<Backing>,
     #[schemars(extend("x-unit" = "px", "x-range" = [0, 1024]))]
     pub padding: f32,
     #[schemars(extend("x-unit" = "px", "x-range" = [-100, 1000]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub letter_spacing: Option<Value<f32>>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub outline: Option<Outline>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub shadow: Option<Shadow>,
     #[schemars(extend("x-unit" = "px", "x-range" = [0, 64]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub blur: Option<Value<f32>>,
     pub render: Glyphs,
 }
@@ -86,7 +86,7 @@ pub struct Wrap {
     pub width: f32,
     #[schemars(extend("x-range" = [1, 1000]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub lines: Option<u32>,
     pub ellipsis: bool,
 }

@@ -29,13 +29,13 @@ pub enum Force {
         strength: Value<f32>,
         scale: f32,
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         speed: Option<f32>,
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         time_scale: Option<f32>,
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         mask: Option<[f32; 2]>,
     },
     Attractor {
@@ -43,10 +43,10 @@ pub enum Force {
         strength: Value<f32>,
         #[schemars(extend("x-unit" = "px"))]
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         radius: Option<f32>,
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         falloff: Option<Falloff>,
     },
     Vortex {
@@ -54,19 +54,19 @@ pub enum Force {
         strength: Value<f32>,
         #[schemars(extend("x-unit" = "px"))]
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         radius: Option<f32>,
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         falloff: Option<Falloff>,
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         inner: Option<f32>,
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         outer: Option<f32>,
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         ring: Option<Ring>,
         axis: [f32; 3],
     },
@@ -75,10 +75,10 @@ pub enum Force {
         strength: Value<f32>,
         #[schemars(extend("x-unit" = "px"))]
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         radius: Option<f32>,
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required)]
+        #[schemars(required, extend("x-null" = true))]
         falloff: Option<Falloff>,
     },
     Noise(Value<f32>),

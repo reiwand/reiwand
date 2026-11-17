@@ -29,17 +29,17 @@ pub struct Scene {
     pub scripts: Vec<Script>,
     pub effects: BTreeMap<String, EffectFiles>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub audio: Option<Hearing>,
     pub listens: Vec<crate::value::Listen>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub camera3d: Option<Camera3d>,
     pub templates: BTreeMap<String, Layer>,
     pub pools: BTreeMap<String, Pool>,
     pub ext: BTreeMap<String, Json>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub transition: Option<crate::Transition>,
     #[serde(skip)]
     #[schemars(skip)]

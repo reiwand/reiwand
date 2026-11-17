@@ -126,7 +126,7 @@ pub struct System {
     pub render: Render,
     pub space: Placement,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub perspective: Option<Perspective>,
     pub points: Vec<ControlPoint>,
     pub children: Vec<Child>,

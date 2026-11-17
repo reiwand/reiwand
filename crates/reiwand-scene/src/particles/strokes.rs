@@ -7,17 +7,17 @@ pub struct Trail {
     pub length: u32,
     pub width: f32,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub segments: Option<u32>,
     #[schemars(extend("x-range" = [0, 7]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub subdivide: Option<u32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub uv_scale: Option<f32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub uv_scroll: Option<f32>,
     pub textured: bool,
 }

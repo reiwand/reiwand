@@ -137,7 +137,7 @@ pub use crate::rigged::{
 };
 pub use crate::runtime::Runtime;
 pub use crate::scan::imported;
-pub use crate::schema::{easings, property_schema, schema};
+pub use crate::schema::{easings, property_schema, schema, uncovered};
 pub use crate::scripted::{
     EffectControl, Extent, LayerRead, MAX_CONSOLE, MAX_LINE, MAX_SCRIPT_BYTES, MAX_SCRIPT_TEXT, MAX_SPAWNED,
     MAX_WATCHED, USER_FILES, plain_line,

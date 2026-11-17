@@ -20,7 +20,7 @@ pub struct Camera3d {
     pub paths: Vec<CameraPath>,
     pub order: PathOrder,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub fade: Option<Fade>,
 }
 
@@ -38,7 +38,7 @@ pub struct CameraPath {
     pub id: String,
     pub keys: Vec<CameraKey>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub ease: Option<Ease>,
     #[serde(rename = "loop")]
     pub closed: bool,
@@ -52,11 +52,11 @@ pub struct CameraKey {
     pub eye: Vec3,
     pub center: Vec3,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub up: Option<Vec3>,
     #[schemars(extend("x-unit" = "°", "x-range" = [1, 179]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub fov: Option<f32>,
 }
 

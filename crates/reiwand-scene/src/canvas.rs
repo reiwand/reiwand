@@ -41,36 +41,36 @@ pub struct Canvas {
     pub background: Color,
     pub blend_space: BlendSpace,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub parallax: Option<Glide>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub camera: Option<Camera>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub bloom: Option<Bloom>,
     pub hdr: bool,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub tonemap: Option<Tonemap>,
     pub clear: bool,
     #[schemars(extend("x-unit" = "px", "x-range" = [100, 100000]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub perspective: Option<f32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub ambient: Option<Color>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub sky: Option<Color>,
     #[schemars(extend("x-unit" = "px/s"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub wind: Option<Value<Vec2>>,
     #[schemars(extend("x-range" = [0, 1]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub gusts: Option<f32>,
 }
 
@@ -83,11 +83,11 @@ pub struct Clock {
     #[schemars(extend("x-unit" = "s"))]
     pub poster_time: f32,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub seed: Option<u64>,
     #[schemars(extend("x-unit" = "s", "x-range" = [1, 3600]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub step: Option<f32>,
 }
 

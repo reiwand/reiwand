@@ -14,13 +14,13 @@ pub struct Listen {
     pub unit: AudioUnit,
     #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub window: Option<f32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub reference: Option<Reference>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub hold_silence: Option<bool>,
 }
 

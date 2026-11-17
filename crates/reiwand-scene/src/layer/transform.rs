@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 pub struct Transform {
     #[schemars(extend("x-unit" = "px"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub position: Option<Value<Vec2>>,
     pub scale: Value<Vec2>,
     #[schemars(extend("x-unit" = "°", "x-range" = [-360, 360]))]
@@ -16,11 +16,11 @@ pub struct Transform {
     pub origin: crate::Ctx<[f32; 2], { crate::ANCHOR }>,
     #[schemars(extend("x-unit" = "°", "x-range" = [-89, 89]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub tilt: Option<Value<Vec2>>,
     #[schemars(extend("x-unit" = "px"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub z: Option<Value<f32>>,
 }
 

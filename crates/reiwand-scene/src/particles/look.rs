@@ -16,12 +16,12 @@ pub enum Frames {
 pub struct Render {
     #[schemars(extend("x-ref" = "image"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub texture: Option<Value<String>>,
     #[schemars(extend("x-range" = [0.05, 20]))]
     pub aspect: f32,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub frames: Option<Frames>,
     pub fps: f32,
     pub mix: bool,
@@ -29,46 +29,46 @@ pub struct Render {
     pub size_over_life: Vec<[f32; 2]>,
     pub color_over_life: Vec<(f32, Color)>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub stretch: Option<Stretch>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub trail: Option<Trail>,
     #[schemars(extend("x-range" = [0, 16]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub brightness: Option<Value<f32>>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub cutout: Option<[f32; 3]>,
     #[schemars(extend("x-range" = [1, 64]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub cycles: Option<u32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub order: Option<Stack>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub rope: Option<Rope>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub orient: Option<Orient>,
     #[schemars(extend("x-unit" = "°"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub angle: Option<f32>,
     #[schemars(extend("x-ref" = "image"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub normal: Option<String>,
     pub lit: bool,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub refract: Option<Refract>,
     #[schemars(extend("x-ref" = "material"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub shader: Option<String>,
 }
 

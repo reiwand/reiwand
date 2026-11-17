@@ -30,15 +30,15 @@ pub struct Child {
     #[schemars(extend("x-range" = [0, 1]))]
     pub probability: f32,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub max: Option<u32>,
     #[schemars(extend("x-unit" = "px"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub offset: Option<[f32; 2]>,
     #[schemars(extend("x-unit" = "°"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub angle: Option<f32>,
     #[schemars(extend("x-range" = [0, 100]))]
     pub scale: f32,

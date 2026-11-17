@@ -32,24 +32,24 @@ pub struct Light {
     #[schemars(extend("x-unit" = "px", "x-range" = [1, 100000]))]
     pub length: f32,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub volumetric: Option<Volumetric>,
     #[schemars(extend("x-ref" = "image"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub texture: Option<Value<String>>,
     pub shadows: bool,
     #[schemars(extend("x-unit" = "px", "x-range" = [256, 4096]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub shadow_resolution: Option<u32>,
     #[schemars(extend("x-range" = [0, 1]))]
     pub shadow_bias: f32,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub position3d: Option<Value<crate::Vec3>>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub aim3d: Option<Value<crate::Vec3>>,
 }
 
@@ -69,7 +69,7 @@ pub struct Volumetric {
 pub struct Lighting {
     #[schemars(extend("x-ref" = "image"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub normal: Option<String>,
     #[schemars(extend("x-range" = [0, 1]))]
     pub roughness: Value<f32>,
@@ -81,15 +81,15 @@ pub struct Lighting {
     pub strength: Value<f32>,
     #[schemars(extend("x-ref" = "image"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub env: Option<String>,
     #[schemars(extend("x-ref" = "image"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub roughness_map: Option<String>,
     #[schemars(extend("x-ref" = "image"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub emissive_map: Option<String>,
 }
 

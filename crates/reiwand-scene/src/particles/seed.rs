@@ -15,7 +15,7 @@ pub struct Hsv {
     pub hue: [f32; 2],
     #[schemars(extend("x-range" = [1, 360]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub steps: Option<u32>,
     pub sat: [f32; 2],
     pub val: [f32; 2],
@@ -47,23 +47,23 @@ pub struct Turbulent {
     pub speed: [f32; 2],
     pub phase: f32,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub audio: Option<Band>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub kind: Option<AudioKind>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub unit: Option<AudioUnit>,
     #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub window: Option<f32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub reference: Option<Reference>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub hold_silence: Option<bool>,
 }
 
@@ -127,20 +127,20 @@ pub struct Remap {
     pub op: RemapOp,
     pub wave: Wave,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub kind: Option<AudioKind>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub unit: Option<AudioUnit>,
     #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub window: Option<f32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub reference: Option<Reference>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub hold_silence: Option<bool>,
 }
 

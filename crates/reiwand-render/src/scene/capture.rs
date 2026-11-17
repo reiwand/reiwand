@@ -12,7 +12,12 @@ impl Painter<'_, '_, '_> {
         }
     }
 
-    pub(crate) fn capture(&mut self, i: usize, target: Target, (size, redraw): (Ctx<[f32; 2], CANVAS>, bool)) {
+    pub(crate) fn capture(
+        &mut self,
+        i: usize,
+        target: Target,
+        (size, redraw): (Ctx<[f32; 2], CANVAS>, bool),
+    ) {
         let frame = self.frame;
         let d = &frame.draws[i];
         if (d.effects.is_empty() && !redraw) || (!d.effects.is_empty() && self.idle(i)) {

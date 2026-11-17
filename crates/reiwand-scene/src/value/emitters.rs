@@ -10,7 +10,7 @@ pub const EMITTER_TEXELS: usize = 3;
 pub struct EffectEmitter {
     pub from: [f32; 2],
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub to: Option<[f32; 2]>,
     #[schemars(extend("x-range" = [-360, 360]))]
     pub angle: f32,

@@ -9,14 +9,14 @@ use std::collections::BTreeMap;
 pub struct Mask {
     #[schemars(extend("x-ref" = "image"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub texture: Option<Value<String>>,
     #[schemars(extend("x-ref" = "layer"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub layer: Option<String>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub shape: Option<Shape>,
     pub channel: MaskChannel,
     pub invert: bool,
@@ -41,11 +41,11 @@ pub struct EffectUse {
     #[schemars(extend("x-ref" = "effect"))]
     pub effect: String,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub name: Option<String>,
     pub enabled: Value<bool>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub mask: Option<Mask>,
     pub params: BTreeMap<String, Value<Param>>,
     pub optional: bool,

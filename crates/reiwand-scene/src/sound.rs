@@ -19,12 +19,12 @@ pub struct Sound {
     pub mode: Order,
     #[schemars(extend("x-unit" = "s", "x-range" = [0, 600]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub pause: Option<[f32; 2]>,
     pub stream: bool,
     #[schemars(extend("x-ref" = "trigger"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub play_on: Option<String>,
     #[serde(rename = "loop")]
     pub repeat: bool,

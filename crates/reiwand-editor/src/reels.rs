@@ -100,6 +100,7 @@ pub fn preview_document(dir: &Path, doc: &Value, look: &Value) -> Value {
     let scene = json!({ "schema": reiwand_scene::SCHEMA, "canvas": canvas, "layers": [layer],
         "assets": { "media": { "path": entry } } });
     let mut document = json!({ "manifest": manifest, "scene": scene });
+    crate::completing::scene_doc(&mut document);
     crate::rigs::staged(look).into_iter().for_each(|s| document["preview"] = s);
     document
 }

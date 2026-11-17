@@ -9,16 +9,16 @@ pub struct Slider {
     pub min: f64,
     pub max: f64,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub step: Option<f64>,
     pub default: f64,
     pub integer: bool,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub unit: Option<String>,
     #[schemars(extend("x-range" = [0, 6]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub decimals: Option<u8>,
     pub editable: bool,
     pub log: bool,

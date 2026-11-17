@@ -35,7 +35,7 @@ pub struct Camera {
     #[schemars(extend("x-unit" = "°", "x-range" = [-360, 360]))]
     pub rotation: Value<f32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub shake: Option<Shake>,
 }
 
@@ -62,7 +62,7 @@ pub struct Bloom {
     pub radius: Value<f32>,
     pub tint: Value<Color>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub hdr: Option<Glare>,
 }
 
@@ -97,7 +97,7 @@ pub struct Playback {
     #[schemars(extend("x-unit" = "s"))]
     pub end: crate::Ctx<f32, { crate::END }>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required)]
+    #[schemars(required, extend("x-null" = true))]
     pub frame: Option<Value<f32>>,
     pub own_clock: bool,
 }
