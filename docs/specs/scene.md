@@ -1761,7 +1761,9 @@ The simulation advances in fixed steps of 1/60 s, at most 15 per frame; a longer
 equal steps up to a second, so particles keep real time down to one frame per second and never
 catch up more than a second, and the same seed and the same frames give the same particles. While
 no particle lives and none is emitted, the system skips ahead to its next timed burst. A paused
-scene frees its particles and starts them again, prewarmed, when it resumes. It runs in compute shaders
+scene frees its particles and starts them again, prewarmed, when it resumes. A still render, a poster or a seek to the second T (`--time`) starts each system at `prewarm` plus T seconds of
+simulation, in the same steps of 1/15 s and under the same 30 s and shared-budget caps as `prewarm`, so beyond 30 s
+the system is as it is at 30 s. It runs in compute shaders
 on the GPU, and on the CPU with software rendering or where compute shaders are missing. Particles
 only move while their layer is shown and the scene runs, and a scene keeps rendering only while
 particles live, are emitted or wait for their next timed burst. A scene holds at most 2 000

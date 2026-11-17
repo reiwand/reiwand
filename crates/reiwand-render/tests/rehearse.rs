@@ -126,3 +126,27 @@ fn no_code_of_a_scene_script_runs_in_the_rendering_process() {
         }
     }
 }
+
+fn flowing_scene() -> (reiwand_scene::Scene, SceneAssets) {
+    let doc = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [160, 80], "background": "#000000" },
+        "layers": [{ "id": "p", "type": "particles", "system": "a", "blend": "add" }],
+        "particles": { "a": { "capacity": 400, "seed": 3, 
+            "emitters": [{ "shape": { "point": [80, 40] }, "rate": 30, "duration": 2 }],
+            "init": { "life": [0.5, 0.5], "speed": [0, 0], "size": [24, 24], "color": ["#ffffff", "#ffffff"] } } } });
+    (reiwand_scene::Scene::load(&doc.to_string(), &Default::default()).unwrap(), SceneAssets::default())
+}
+
+#[test]
+fn a_render_at_a_time_shows_the_particles_emitted_until_then() {
+    let Some(r) = gpu() else { return };
+    let (scene, assets) = flowing_scene();
+    let at = |time: f64| {
+        let wanted = Rehearsal { edge: 160, time, ..Rehearsal::default() };
+        r.rehearse(&scene, &assets, &Default::default(), &wanted).unwrap().frames.remove(0)
+    };
+    let (first, one, three) = (at(0.0), at(1.0), at(3.0));
+    assert!(first.pixels().all(|p| p.0[0] == 0), "nothing has been emitted at 0 s");
+    assert!(one.pixels().any(|p| p.0[0] > 0), "particles at 1 s");
+    assert_eq!(one, at(1.0), "deterministic");
+    assert!(three.pixels().all(|p| p.0[0] == 0), "the emitter ended and its particles died by 3 s");
+}

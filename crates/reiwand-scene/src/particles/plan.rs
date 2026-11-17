@@ -93,8 +93,8 @@ impl Swarm {
         let due = self.due(systems, flock);
         let (n, dt) = match self.clock {
             None => {
-                let warm = root.prewarm.clamp(0.0, MAX_PREWARM2);
-                match warm > 0.0 {
+                let warm = (root.prewarm.clamp(0.0, MAX_PREWARM2) + now.max(0.0) as f32).min(MAX_PREWARM2);
+                match warm > 0.0 && (root.prewarm > 0.0 || warm >= WARM) {
                     true => (((warm / WARM).round() as usize).clamp(1, self.warm), WARM),
                     false => (1, STEP),
                 }
