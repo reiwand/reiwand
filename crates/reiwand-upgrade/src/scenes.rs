@@ -31,7 +31,12 @@ pub fn customs(dir: &Path, doc: &Value) -> Customs {
         let Ok(descriptor) = serde_json::from_slice::<Value>(&bytes) else { continue };
         let params = descriptor.get("params").and_then(Value::as_array).into_iter().flatten();
         let list = params
-            .filter_map(|p| Some((p.get("id")?.as_str()?.to_owned(), p.get("default")?.clone())))
+            .filter_map(|p| {
+                Some((
+                    p.get("id")?.as_str()?.to_owned(),
+                    p.get("default").or_else(|| p.get("prefill"))?.clone(),
+                ))
+            })
             .collect();
         found.insert(name.clone(), list);
     }
@@ -48,8 +53,9 @@ fn scene(path: &Path) -> anyhow::Result<bool> {
     let Ok(mut doc) = serde_json::from_slice::<Value>(&fs::read(path)?) else { return Ok(false) };
     let customs = customs(path.parent().unwrap_or(Path::new(".")), &doc);
     let dropped = crate::gain::fixed(&mut doc);
+    let renamed = crate::descriptors::rewrite(path.parent().unwrap_or(Path::new(".")), &doc)? > 0;
     if complete_with(Format::Scene, &mut doc, &customs).written == 0 && !dropped {
-        return Ok(false);
+        return Ok(renamed);
     }
     let staged = path.with_extension("json.upgrading");
     fs::write(&staged, text(&doc)?)?;

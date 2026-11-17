@@ -29,7 +29,7 @@ pub fn scene(extra: Value, layers: Value) -> Scene {
     let mut doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] },
         "assets": { "toy": { "path": "toy.glb" } }, "layers": layers });
     extra.as_object().unwrap().iter().for_each(|(k, v)| doc[k] = v.clone());
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     scene.adopt(&BTreeMap::new(), |_: &str, _: usize| Ok::<_, String>(cube())).unwrap();
     scene
 }

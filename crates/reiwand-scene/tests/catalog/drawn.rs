@@ -55,8 +55,9 @@ fn newer_effects_refuse_values_outside_their_types_and_ranges() {
     let pushed = scene(effect(json!({ "effect": "fluid" })));
     let quiet = scene(effect(json!({ "effect": "fluid", "params": { "push": 0 } })));
     assert!(needs(&busy).cursor && needs(&pushed).cursor && !needs(&quiet).cursor);
-    let timed =
-        |e: Json| descriptor("fluid").unwrap().needs(Use::Time, &serde_json::from_value(e).unwrap(), None);
+    let timed = |e: Json| {
+        descriptor("fluid").unwrap().needs(Use::Time, &serde_json::from_value(whole_use(e)).unwrap(), None)
+    };
     let spout =
         json!({ "effect": "fluid", "params": { "emitters": [{ "from": [0.5, 0.9], "strength": 4 }] } });
     assert!(timed(spout) && !timed(json!({ "effect": "fluid" })), "only emitters ask for time");
@@ -70,4 +71,14 @@ fn newer_effects_refuse_values_outside_their_types_and_ranges() {
     let mut slots = [[0.0; 4]; MAX_PARAMS];
     slots[0][0] = 0.9;
     assert!((trail.settle(&slots) - 0.987).abs() < 0.01, "{}", trail.settle(&slots));
+}
+
+fn whole_use(mut v: serde_json::Value) -> serde_json::Value {
+    let o = v.as_object_mut().unwrap();
+    o.entry("name").or_insert(serde_json::Value::Null);
+    o.entry("enabled").or_insert(serde_json::json!(true));
+    o.entry("mask").or_insert(serde_json::Value::Null);
+    o.entry("optional").or_insert(serde_json::json!(false));
+    o.entry("params").or_insert(serde_json::json!({}));
+    v
 }

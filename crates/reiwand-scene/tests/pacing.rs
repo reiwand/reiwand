@@ -10,7 +10,7 @@ fn scene(layers: Value) -> Scene {
         json!({ "id": "move", "duration": 1, "loop": "once" }),
     ];
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [1000, 1000] }, "timelines": timelines, "layers": layers });
-    Scene::from_json(&text.to_string()).unwrap()
+    Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap()
 }
 
 fn solid(id: &str, extra: Value) -> Value {
@@ -76,8 +76,10 @@ fn reduced_motion_wakes_sprite_sheets_and_paced_effects_once_a_minute() {
         "assets": { "sheet": { "path": "sheet.png", "atlas": [1, 4], "fps": 8 } },
         "layers": [{ "blend_space": "canvas", "id": "sprite", "type": "image", "image": "sheet", "size": [40, 40] },
             solid("w", json!({ "effects": [{ "effect": "waves" }] }))] });
-    let mut runtime =
-        Runtime::new(Arc::new(Scene::from_json(&text.to_string()).unwrap()), Default::default());
+    let mut runtime = Runtime::new(
+        Arc::new(Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap()),
+        Default::default(),
+    );
     runtime.set_wall(90.0);
     let wake = runtime.frame(VIEW, Quality::Q3).wake;
     assert!(wake != Wake::Idle, "{wake:?}");

@@ -91,7 +91,7 @@ fn the_scheduler_knows_when_particles_live() {
 #[test]
 fn budgets_follow_the_device_tier_and_masks_place_particles() {
     let big = with(sparks(), json!({ "capacity": 8000, "init": { "size": [40, 60] } }));
-    let s = Scene::from_json(&scene(big, true)).unwrap();
+    let s = Scene::from_json(&reiwand_upgrade::fill::whole(&scene(big, true))).unwrap();
     let bake = |tier, cpu| Bake::new(&s, 0, tier, cpu, |_| None).unwrap();
     assert_eq!(
         [bake(Tier::T0, true).allocs[0], bake(Tier::T2, true).allocs[0], bake(Tier::T2, false).allocs[0]],
@@ -142,7 +142,9 @@ fn an_emitter_runs_several_independent_bursts() {
     let near = |a: f32, b: f32| (a - b).abs() < 0.05;
     assert!(near(seconds[1].0, 0.25) && near(seconds[2].0, 0.5) && near(seconds[3].0, 1.25), "{seconds:?}");
     let doc = json!({ "capacity": 10, "emitters": [{ "shape": "edge", "bursts": vec![json!({ "count": 1 }); 9] }] });
-    let found = Scene::from_json(&scene(doc, true)).unwrap().validate(&Default::default());
+    let found = Scene::from_json(&reiwand_upgrade::fill::whole(&scene(doc, true)))
+        .unwrap()
+        .validate(&Default::default());
     assert!(
         found.iter().any(|i| matches!(i, Issue::Range { path, .. } if path.ends_with("/bursts"))),
         "{found:?}"

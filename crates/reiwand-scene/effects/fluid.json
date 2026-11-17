@@ -8,7 +8,7 @@
     {
       "id": "render",
       "type": "enum",
-      "default": 0,
+      "prefill": 0,
       "values": [
         { "value": 0, "label": { "en": "Gradient", "es": "Degradado" } },
         { "value": 1, "label": { "en": "Emitter color", "es": "Color del emisor" } },
@@ -16,16 +16,16 @@
         { "value": 3, "label": { "en": "Distortion", "es": "Distorsión" } }
       ]
     },
-    { "id": "gradient", "type": "texture", "tools": ["ramp"], "default": "" },
-    { "id": "color", "type": "color", "default": "#ffffff" },
-    { "id": "velocity_decay", "type": "float", "default": 0.98, "min": 0, "max": 1 },
-    { "id": "dye_decay", "type": "float", "default": 0.97, "min": 0, "max": 1 },
-    { "id": "push", "type": "float", "default": 1, "min": 0, "max": 8, "uses": "cursor" },
-    { "id": "emitters", "type": "emitters", "default": [], "uses": "time", "waits_for": "strength" },
-    { "id": "strength", "type": "float", "default": 1, "min": 0, "max": 8 },
-    { "id": "blend", "type": "blend", "default": "normal" },
-    { "id": "perspective", "type": "float", "default": 0, "min": 0, "max": 1 },
-    { "id": "opaque", "type": "bool", "default": false }
+    { "id": "gradient", "type": "texture", "tools": ["ramp"], "prefill": "" },
+    { "id": "color", "type": "color", "prefill": "#ffffff" },
+    { "id": "velocity_decay", "type": "float", "prefill": 0.98, "min": 0, "max": 1 },
+    { "id": "dye_decay", "type": "float", "prefill": 0.97, "min": 0, "max": 1 },
+    { "id": "push", "type": "float", "prefill": 1, "min": 0, "max": 8, "uses": "cursor" },
+    { "id": "emitters", "type": "emitters", "prefill": [], "uses": "time", "waits_for": "strength" },
+    { "id": "strength", "type": "float", "prefill": 1, "min": 0, "max": 8 },
+    { "id": "blend", "type": "blend", "prefill": "normal" },
+    { "id": "perspective", "type": "float", "prefill": 0, "min": 0, "max": 1 },
+    { "id": "opaque", "type": "bool", "prefill": false }
   ],
   "state": { "scale": 0.25, "settle": 6 },
   "passes": [

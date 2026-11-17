@@ -88,10 +88,10 @@ fn layer_colliders_cannot_hold_their_own_system() {
     doc["layers"] = json!([{ "blend_space": "canvas", "id": "g", "type": "group", "layers": [{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "dots" }] },
         { "blend_space": "canvas", "id": "sky", "type": "solid", "color": "#ffffff" }]);
     doc["particles"]["dots"]["collide"] = json!([{ "bounds": { "layer": { "id": "g" } } }]);
-    let found = Scene::from_json(&doc.to_string()).unwrap().validate(&props());
+    let found = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap().validate(&props());
     assert!(found.contains(&Issue::Circle("/particles/dots/collide/0/bounds/layer/id".into())), "{found:?}");
     doc["particles"]["dots"]["collide"][0]["bounds"]["layer"]["id"] = json!("sky");
-    let fine = Scene::from_json(&doc.to_string()).unwrap();
+    let fine = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     assert_eq!(fine.validate(&props()), []);
     assert!(fine.features().contains("particle_collisions"));
 }

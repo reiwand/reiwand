@@ -16,11 +16,11 @@ fn scripts_declare_their_inputs_by_what_they_import() {
         imported("import { audio as a, input } from \"reiwand\""),
         [ScriptApi::Audio, ScriptApi::Pointer]
     );
-    let scene = Scene::from_json(
-        &json!({ "schema": SCHEMA, "canvas": { "size": [10, 10] },
+    let scene = Scene::from_json(&reiwand_upgrade::fill::whole(
+        &&json!({ "schema": SCHEMA, "canvas": { "size": [10, 10] },
         "scripts": [{ "path": "a.js" }, { "path": "b.js", "uses": ["timers"] }] })
         .to_string(),
-    )
+    ))
     .unwrap();
     let files = [
         ("a.js".to_string(), "/* audio cursor */ export const x = 1;".to_string()),

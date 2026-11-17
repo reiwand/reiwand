@@ -49,7 +49,10 @@ fn scene(system: Json, visible: bool) -> String {
 
 fn runtime(text: &str) -> Runtime {
     let props = props();
-    Runtime::new(Arc::new(Scene::load(text, &props).unwrap()), effective(&props, &[]))
+    Runtime::new(
+        Arc::new(Scene::load(&reiwand_upgrade::fill::whole(&text), &props).unwrap()),
+        effective(&props, &[]),
+    )
 }
 
 fn run(text: &str, frames: usize, quality: Quality) -> Cloud {
@@ -68,5 +71,5 @@ fn run(text: &str, frames: usize, quality: Quality) -> Cloud {
 }
 
 fn issues(system: Json) -> Vec<Issue> {
-    Scene::from_json(&scene(system, true)).unwrap().validate(&props())
+    Scene::from_json(&reiwand_upgrade::fill::whole(&scene(system, true))).unwrap().validate(&props())
 }

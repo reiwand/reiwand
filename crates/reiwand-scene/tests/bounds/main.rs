@@ -16,7 +16,7 @@ fn faults(changes: &[(&str, Json)]) -> Vec<String> {
             None => doc.pointer_mut(parent).unwrap_or_else(|| panic!("{path}"))[key] = value.clone(),
         }
     }
-    match Scene::from_json(&doc.to_string()) {
+    match Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())) {
         Ok(scene) => scene.validate(&BTreeMap::new()).iter().map(ToString::to_string).collect(),
         Err(e) => vec![e.to_string()],
     }

@@ -3,7 +3,7 @@ use super::*;
 fn scene(system: Json, assets: Json) -> Scene {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layer("a"),
         "particles": { "a": system }, "assets": assets });
-    Scene::from_json(&text.to_string()).unwrap_or_else(|e| panic!("{e}"))
+    Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap_or_else(|e| panic!("{e}"))
 }
 
 fn issues(more: Json) -> (Vec<Issue>, std::collections::BTreeSet<String>) {

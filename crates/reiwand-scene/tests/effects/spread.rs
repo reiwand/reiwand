@@ -14,7 +14,7 @@ fn rows(params: &[f32]) -> Vec<[f32; 4]> {
 
 fn shaped(id: &str, body: &str) -> &'static Descriptor {
     let json = json!({ "id": id, "mask_mode": "strength",
-        "params": [{ "id": "strength", "type": "float", "default": 0.1 }, { "id": "flow", "type": "texture", "default": "" }],
+        "params": [{ "id": "strength", "type": "float", "prefill": 0.1 }, { "id": "flow", "type": "texture", "prefill": "" }],
         "passes": [{ "entry": "fs_p", "inputs": ["previous", "asset:flow"] }] });
     probe(json, &format!("@fragment\nfn fs_p(in: VertexOut) -> @location(0) vec4<f32> {{\n{body}\n}}\n"))
 }

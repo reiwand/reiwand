@@ -112,7 +112,10 @@ fn only_what_the_platform_runs_listens_to_events() {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "timelines": tls,
         "assets": { "a": { "path": "a.ogg" } }, "scripts": [{ "path": "s.js" }],
         "layers": [{ "blend_space": "canvas", "id": "bell", "type": "sound", "sound": "a", "play_on": "event:tick" }] });
-    let mut rt = Runtime::new(Arc::new(Scene::from_json(&text.to_string()).unwrap()), Values::new());
+    let mut rt = Runtime::new(
+        Arc::new(Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap()),
+        Values::new(),
+    );
     let wake = |rt: &Runtime| rt.frame([0.0, 0.0, 100.0, 50.0], Quality::Q3).wake;
     assert_eq!(wake(&rt), Wake::At(1.0), "scripts and sounds hear every event");
     rt.set_listeners(true, false);

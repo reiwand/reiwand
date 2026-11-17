@@ -1,17 +1,307 @@
 {
-  "schema": "reiwand.scene/1",
-  "canvas": { "size": [1920, 1080], "fit": "fill", "background": "#000000" },
-  "clock": { "max_fps": "display" },
-  "scripts": [
-    { "path": "scripts/giro.js", "events": ["update"],
-      "params": { "velocidad": { "type": "number", "default": 30, "min": -720, "max": 720 } } }
-  ],
+  "assets": {},
+  "audio": null,
+  "camera3d": null,
+  "canvas": {
+    "ambient": null,
+    "background": "#000000",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
+    "size": [
+      1920,
+      1080
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": "display",
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": null
+  },
+  "effects": {},
+  "ext": {},
   "layers": [
-    { "blend_space": "canvas", "id": "fondo", "type": "shape", "shape": { "rect": { "size": [1920, 1080] } },
-      "gradient": { "stops": [[0, "#101828"], [1, "#283a5c"]] } },
-    { "blend_space": "canvas", "id": "aspa_lenta", "type": "shape", "shape": { "rect": { "size": [700, 40] } }, "fill": "#5ee7ff", "anchor": "center",
-      "transform": { "rotation": { "script": "scripts/giro.js", "fn": "gira" } } },
-    { "blend_space": "canvas", "id": "aspa_rapida", "type": "shape", "shape": { "rect": { "size": [420, 28] } }, "fill": "#ff4fd8", "anchor": "center",
-      "transform": { "rotation": { "script": "scripts/giro.js", "fn": "gira", "params": { "velocidad": -150 } } } }
-  ]
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": null,
+      "gradient": {
+        "from": [
+          0.0,
+          0.0
+        ],
+        "radial": false,
+        "stops": [
+          [
+            0,
+            "#101828"
+          ],
+          [
+            1,
+            "#283a5c"
+          ]
+        ],
+        "to": [
+          0.0,
+          1.0
+        ]
+      },
+      "id": "fondo",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "rect": {
+          "radius": 0.0,
+          "size": [
+            1920,
+            1080
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": "center",
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#5ee7ff",
+      "gradient": null,
+      "id": "aspa_lenta",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "rect": {
+          "radius": 0.0,
+          "size": [
+            700,
+            40
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": {
+          "a": null,
+          "audio": null,
+          "b": null,
+          "base": null,
+          "bounds": null,
+          "channel": null,
+          "clamp": null,
+          "clock": null,
+          "cursor": null,
+          "date": null,
+          "exponent": null,
+          "fn": "gira",
+          "g": null,
+          "hold_silence": null,
+          "invert": false,
+          "keys": null,
+          "kind": null,
+          "layer": null,
+          "loop": null,
+          "map": null,
+          "media": null,
+          "of": null,
+          "offset": null,
+          "params": null,
+          "placeholder": null,
+          "prop": null,
+          "r": null,
+          "reduce": null,
+          "reference": null,
+          "scale": null,
+          "script": "scripts/giro.js",
+          "smooth": null,
+          "timeline": null,
+          "unit": null,
+          "window": null,
+          "x": null,
+          "y": null
+        },
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": "center",
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#ff4fd8",
+      "gradient": null,
+      "id": "aspa_rapida",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "rect": {
+          "radius": 0.0,
+          "size": [
+            420,
+            28
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": {
+          "a": null,
+          "audio": null,
+          "b": null,
+          "base": null,
+          "bounds": null,
+          "channel": null,
+          "clamp": null,
+          "clock": null,
+          "cursor": null,
+          "date": null,
+          "exponent": null,
+          "fn": "gira",
+          "g": null,
+          "hold_silence": null,
+          "invert": false,
+          "keys": null,
+          "kind": null,
+          "layer": null,
+          "loop": null,
+          "map": null,
+          "media": null,
+          "of": null,
+          "offset": null,
+          "params": {
+            "velocidad": -150
+          },
+          "placeholder": null,
+          "prop": null,
+          "r": null,
+          "reduce": null,
+          "reference": null,
+          "scale": null,
+          "script": "scripts/giro.js",
+          "smooth": null,
+          "timeline": null,
+          "unit": null,
+          "window": null,
+          "x": null,
+          "y": null
+        },
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/1",
+  "scripts": [
+    {
+      "events": [
+        "update"
+      ],
+      "params": {
+        "velocidad": {
+          "default": 30,
+          "max": 720,
+          "min": -720,
+          "type": "number"
+        }
+      },
+      "path": "scripts/giro.js",
+      "uses": []
+    }
+  ],
+  "templates": {},
+  "timelines": [],
+  "transition": null
 }

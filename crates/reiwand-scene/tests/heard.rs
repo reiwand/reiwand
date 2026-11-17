@@ -8,7 +8,7 @@ fn runtime(autoplay: bool) -> Runtime {
         "assets": { "a": { "path": "a.ogg" } },
         "layers": [{ "blend_space": "canvas", "id": "s", "type": "sound", "sound": "a",
                      "play": { "timeline": "t", "keys": [[0, false], [1, true]] } }] });
-    let scene = Scene::from_json(&text.to_string()).unwrap();
+    let scene = Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap();
     Runtime::new(Arc::new(scene), Values::new())
 }
 

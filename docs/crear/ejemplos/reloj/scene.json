@@ -1,12 +1,231 @@
 {
-  "schema": "reiwand.scene/1",
-  "canvas": { "size": [1920, 1080], "fit": "fill", "background": "#000000" },
-  "clock": { "max_fps": "display" },
-  "scripts": [{ "path": "scripts/reloj.js" }],
+  "assets": {},
+  "audio": null,
+  "camera3d": null,
+  "canvas": {
+    "ambient": null,
+    "background": "#000000",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
+    "size": [
+      1920,
+      1080
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": "display",
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": null
+  },
+  "effects": {},
+  "ext": {},
   "layers": [
-    { "blend_space": "canvas", "id": "fondo", "type": "shape", "shape": { "rect": { "size": [1920, 1080] } }, "gradient": { "stops": [[0, "#101828"], [1, "#283a5c"]] } },
-    { "blend_space": "canvas", "id": "hora", "type": "text", "text": "--:--", "size": 220, "anchor": "center", "color": "#f2f5ff" },
-    { "blend_space": "canvas", "id": "fecha", "type": "text", "text": "", "size": 56, "anchor": "center", "color": "#c9d4f0",
-      "transform": { "position": [0, 170] } }
-  ]
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": null,
+      "gradient": {
+        "from": [
+          0.0,
+          0.0
+        ],
+        "radial": false,
+        "stops": [
+          [
+            0,
+            "#101828"
+          ],
+          [
+            1,
+            "#283a5c"
+          ]
+        ],
+        "to": [
+          0.0,
+          1.0
+        ]
+      },
+      "id": "fondo",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "rect": {
+          "radius": 0.0,
+          "size": [
+            1920,
+            1080
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "align": "center",
+      "anchor": "center",
+      "attach": null,
+      "background": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "blur": null,
+      "brightness": null,
+      "cache": false,
+      "color": "#f2f5ff",
+      "depth_test": false,
+      "effects": [],
+      "fallback": [],
+      "font": null,
+      "id": "hora",
+      "inherit": null,
+      "letter_spacing": null,
+      "lighting": null,
+      "line_height": null,
+      "mask": null,
+      "opacity": 1.0,
+      "outline": null,
+      "padding": null,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "render": null,
+      "shadow": null,
+      "size": 220,
+      "solid": false,
+      "text": "--:--",
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "text",
+      "valign": null,
+      "visible": true,
+      "wrap": null
+    },
+    {
+      "align": "center",
+      "anchor": "center",
+      "attach": null,
+      "background": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "blur": null,
+      "brightness": null,
+      "cache": false,
+      "color": "#c9d4f0",
+      "depth_test": false,
+      "effects": [],
+      "fallback": [],
+      "font": null,
+      "id": "fecha",
+      "inherit": null,
+      "letter_spacing": null,
+      "lighting": null,
+      "line_height": null,
+      "mask": null,
+      "opacity": 1.0,
+      "outline": null,
+      "padding": null,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "render": null,
+      "shadow": null,
+      "size": 56,
+      "solid": false,
+      "text": "",
+      "transform": {
+        "origin": null,
+        "position": [
+          0,
+          170
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "text",
+      "valign": null,
+      "visible": true,
+      "wrap": null
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/1",
+  "scripts": [
+    {
+      "events": [],
+      "params": {},
+      "path": "scripts/reloj.js",
+      "uses": []
+    }
+  ],
+  "templates": {},
+  "timelines": [],
+  "transition": null
 }

@@ -5,9 +5,9 @@
   "description": { "en": "Scrolls the picture, repeating at the edges.", "es": "Desplaza la imagen y la repite en los bordes." },
   "mask_mode": "strength",
   "params": [
-    { "id": "speed", "type": "vec2", "default": [0.01, 0], "min": -4, "max": 4, "uses": "time" },
-    { "id": "repeat_x", "type": "bool", "default": true },
-    { "id": "repeat_y", "type": "bool", "default": true }
+    { "id": "speed", "type": "vec2", "prefill": [0.01, 0], "min": -4, "max": 4, "uses": "time" },
+    { "id": "repeat_x", "type": "bool", "prefill": true },
+    { "id": "repeat_y", "type": "bool", "prefill": true }
   ],
   "fuse": "uv"
 }

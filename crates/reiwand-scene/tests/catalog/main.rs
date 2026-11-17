@@ -15,7 +15,8 @@ const NEWER: &str =
 fn scene(more: Json) -> Scene {
     let mut doc = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "sky": { "path": "sky.png" } } });
     doc.as_object_mut().unwrap().extend(more.as_object().unwrap().clone());
-    Scene::from_json(&doc.to_string()).unwrap_or_else(|e| panic!("{more}: {e}"))
+    Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string()))
+        .unwrap_or_else(|e| panic!("{more}: {e}"))
 }
 
 fn issues(more: Json) -> Vec<String> {

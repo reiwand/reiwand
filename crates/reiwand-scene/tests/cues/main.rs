@@ -11,7 +11,7 @@ fn runtime(timelines: Json, layers: Json) -> Runtime {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "timelines": timelines,
         "assets": { "a": { "path": "a.ogg" }, "b": { "path": "b.ogg" }, "c": { "path": "c.ogg" } },
         "layers": layers });
-    let scene = Scene::from_json(&text.to_string()).unwrap();
+    let scene = Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap();
     assert_eq!(scene.validate(&BTreeMap::new()), []);
     Runtime::new(Arc::new(scene), Values::new())
 }

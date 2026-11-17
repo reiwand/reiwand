@@ -1,15 +1,278 @@
 {
-  "schema": "reiwand.scene/1",
-  "canvas": { "size": [1920, 1080], "fit": "fill", "background": "#000000" },
-  "clock": { "max_fps": "display" },
-  "assets": { "cielo": { "path": "assets/cielo.png" } },
+  "assets": {
+    "cielo": {
+      "animated": false,
+      "atlas": null,
+      "durations": [],
+      "face": null,
+      "filter": null,
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/cielo.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
+    }
+  },
+  "audio": null,
+  "camera3d": null,
+  "canvas": {
+    "ambient": null,
+    "background": "#000000",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
+    "size": [
+      1920,
+      1080
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": "display",
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": null
+  },
+  "effects": {},
+  "ext": {},
   "layers": [
-    { "blend_space": "canvas", "id": "fondo", "type": "image", "image": "cielo", "size": [1920, 1080],
-      "effects": [{ "effect": "waves", "params": { "amplitude": 6, "frequency": 3 } }] },
-    { "blend_space": "canvas", "id": "sol", "type": "shape", "shape": { "ellipse": { "size": [220, 220] } },
-      "fill": { "prop": "color_sol" },
-      "transform": { "position": { "timeline": "vuelta",
-        "keys": [[0, [260, 820], "in_out_sine"], [12, [1660, 260]]] } } }
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "color": null,
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "waves",
+          "enabled": true,
+          "mask": null,
+          "name": null,
+          "optional": false,
+          "params": {
+            "amplitude": 6,
+            "angle2": 90.0,
+            "count": 1.0,
+            "direction": 0.0,
+            "frequency": 3,
+            "perspective": 0.0,
+            "phase": "",
+            "speed": 1.0
+          }
+        }
+      ],
+      "id": "fondo",
+      "image": "cielo",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "playback": null,
+      "size": [
+        1920,
+        1080
+      ],
+      "solid": false,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": {
+        "a": null,
+        "audio": null,
+        "b": null,
+        "base": null,
+        "bounds": null,
+        "channel": null,
+        "clamp": null,
+        "clock": null,
+        "cursor": null,
+        "date": null,
+        "exponent": null,
+        "fn": null,
+        "g": null,
+        "hold_silence": null,
+        "invert": false,
+        "keys": null,
+        "kind": null,
+        "layer": null,
+        "loop": null,
+        "map": null,
+        "media": null,
+        "of": null,
+        "offset": null,
+        "params": null,
+        "placeholder": null,
+        "prop": "color_sol",
+        "r": null,
+        "reduce": null,
+        "reference": null,
+        "scale": null,
+        "script": null,
+        "smooth": null,
+        "timeline": null,
+        "unit": null,
+        "window": null,
+        "x": null,
+        "y": null
+      },
+      "gradient": null,
+      "id": "sol",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "ellipse": {
+          "size": [
+            220,
+            220
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": {
+          "a": null,
+          "audio": null,
+          "b": null,
+          "base": null,
+          "bounds": null,
+          "channel": null,
+          "clamp": null,
+          "clock": null,
+          "cursor": null,
+          "date": null,
+          "exponent": null,
+          "fn": null,
+          "g": null,
+          "hold_silence": null,
+          "invert": false,
+          "keys": [
+            [
+              0,
+              [
+                260,
+                820
+              ],
+              "in_out_sine"
+            ],
+            [
+              12,
+              [
+                1660,
+                260
+              ]
+            ]
+          ],
+          "kind": null,
+          "layer": null,
+          "loop": null,
+          "map": null,
+          "media": null,
+          "of": null,
+          "offset": null,
+          "params": null,
+          "placeholder": null,
+          "prop": null,
+          "r": null,
+          "reduce": null,
+          "reference": null,
+          "scale": null,
+          "script": null,
+          "smooth": null,
+          "timeline": "vuelta",
+          "unit": null,
+          "window": null,
+          "x": null,
+          "y": null
+        },
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    }
   ],
-  "timelines": [{ "id": "vuelta", "duration": 12, "loop": "pingpong" }]
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/1",
+  "scripts": [],
+  "templates": {},
+  "timelines": [
+    {
+      "autoplay": true,
+      "delay": 0.0,
+      "duration": 12,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "vuelta",
+      "loop": "pingpong",
+      "speed": 1.0,
+      "trigger": null,
+      "wrap": false
+    }
+  ],
+  "transition": null
 }

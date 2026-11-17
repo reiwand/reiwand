@@ -48,5 +48,5 @@ const EXPECTED: [&str; 36] = [
 ];
 
 fn full() -> Scene {
-    Scene::load(FULL, &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"))
+    Scene::load(&reiwand_upgrade::fill::whole(&FULL), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"))
 }

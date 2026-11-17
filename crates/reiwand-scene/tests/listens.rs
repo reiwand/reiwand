@@ -64,7 +64,7 @@ fn the_runtime_fills_one_slot_per_listen_and_surges_after_silence() {
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] },
         "listens": [{ "kind": "relative", "unit": "amplitude" },
                     { "kind": "surge", "unit": "amplitude", "window": 1, "reference": "band", "hold_silence": false }] });
-    let scene = Scene::from_json(&doc.to_string()).unwrap();
+    let scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     let mut rt = Runtime::new(std::sync::Arc::new(scene), Values::new());
     for _ in 0..180 {
         rt.set_audio(tone(false));

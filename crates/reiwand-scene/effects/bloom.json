@@ -4,11 +4,11 @@
   "category": "light",
   "description": { "en": "Glows bright areas of the picture outward.", "es": "Hace que las zonas brillantes de la imagen irradien luz hacia fuera." },
   "params": [
-    { "id": "threshold", "type": "float", "default": 0.8, "min": 0, "max": 4 },
-    { "id": "intensity", "type": "float", "default": 1, "min": 0, "max": 8 },
-    { "id": "radius", "type": "float", "default": 16, "min": 0, "max": 128 },
-    { "id": "knee", "type": "float", "default": 0.5, "min": 0, "max": 1 },
-    { "id": "tint", "type": "color", "default": "#ffffff" }
+    { "id": "threshold", "type": "float", "prefill": 0.8, "min": 0, "max": 4 },
+    { "id": "intensity", "type": "float", "prefill": 1, "min": 0, "max": 8 },
+    { "id": "radius", "type": "float", "prefill": 16, "min": 0, "max": 128 },
+    { "id": "knee", "type": "float", "prefill": 0.5, "min": 0, "max": 1 },
+    { "id": "tint", "type": "color", "prefill": "#ffffff" }
   ],
   "passes": [
     { "entry": "fs_bloom_bright", "scale": 0.5 },

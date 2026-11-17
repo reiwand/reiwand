@@ -50,7 +50,7 @@ fn children_born_from_their_parent_cannot_emit_from_a_layer() {
             { "blend_space": "canvas", "id": "p", "type": "particles", "system": "a" }]);
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layers,
             "particles": { "a": parent, "b": emits } });
-        Scene::from_json(&text.to_string()).unwrap().validate(&BTreeMap::new())
+        Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap().validate(&BTreeMap::new())
     };
     for on in ["spawn", "death", "follow"] {
         let found = issues(on);

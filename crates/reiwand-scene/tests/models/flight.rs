@@ -78,7 +78,10 @@ fn random_order_plays_every_path_once_per_round_and_fades_between_them() {
 fn path_keys_are_checked() {
     let bad = |paths: Value| {
         let doc = json!({ "schema": SCHEMA, "canvas": { "size": [8, 8] }, "layers": [], "camera3d": { "paths": paths } });
-        !Scene::from_json(&doc.to_string()).unwrap().validate(&BTreeMap::new()).is_empty()
+        !Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string()))
+            .unwrap()
+            .validate(&BTreeMap::new())
+            .is_empty()
     };
     let k = |t: f32| json!({ "t": t, "eye": [0, 0, 5], "center": [0, 0, 0] });
     assert!(!bad(json!([{ "id": "a", "keys": [k(0.0), k(1.0)] }])));

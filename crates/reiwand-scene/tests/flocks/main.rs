@@ -16,7 +16,8 @@ const VIEW: [f32; 4] = [0.0, 0.0, 200.0, 100.0];
 fn runtime(systems: Json, layers: Json) -> Runtime {
     let text =
         json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layers, "particles": systems });
-    let scene = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"));
+    let scene = Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new())
+        .unwrap_or_else(|e| panic!("{e}"));
     Runtime::new(Arc::new(scene), Values::new())
 }
 

@@ -4,6 +4,7 @@ use std::collections::BTreeMap;
 use std::sync::Arc;
 
 mod clocks;
+mod clocks_more;
 mod forms;
 mod lanes;
 mod media;
@@ -18,7 +19,7 @@ fn props() -> BTreeMap<String, Property> {
 
 fn runtime(text: &str) -> Runtime {
     let props = props();
-    let scene = Scene::load(text, &props).unwrap();
+    let scene = Scene::load(&reiwand_upgrade::fill::whole(&text), &props).unwrap();
     Runtime::new(Arc::new(scene), effective(&props, &[]))
 }
 

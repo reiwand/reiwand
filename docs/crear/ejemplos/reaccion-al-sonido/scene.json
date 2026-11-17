@@ -1,11 +1,224 @@
 {
-  "schema": "reiwand.scene/1",
-  "canvas": { "size": [1920, 1080], "fit": "fill", "background": "#000000" },
-  "clock": { "max_fps": "display" },
-  "scripts": [{ "path": "scripts/pulso.js", "events": ["update"], "uses": ["audio"] }],
+  "assets": {},
+  "audio": null,
+  "camera3d": null,
+  "canvas": {
+    "ambient": null,
+    "background": "#000000",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
+    "size": [
+      1920,
+      1080
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": "display",
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": null
+  },
+  "effects": {},
+  "ext": {},
   "layers": [
-    { "blend_space": "canvas", "id": "fondo", "type": "shape", "shape": { "rect": { "size": [1920, 1080] } }, "gradient": { "stops": [[0, "#101828"], [1, "#283a5c"]] } },
-    { "blend_space": "canvas", "id": "destello", "type": "shape", "shape": { "rect": { "size": [1920, 1080] } }, "fill": "#ffffff", "opacity": 0 },
-    { "blend_space": "canvas", "id": "pulso", "type": "shape", "shape": { "ring": { "size": [500, 500], "width": 24 } }, "fill": "#ff4fd8" }
-  ]
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": null,
+      "gradient": {
+        "from": [
+          0.0,
+          0.0
+        ],
+        "radial": false,
+        "stops": [
+          [
+            0,
+            "#101828"
+          ],
+          [
+            1,
+            "#283a5c"
+          ]
+        ],
+        "to": [
+          0.0,
+          1.0
+        ]
+      },
+      "id": "fondo",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "rect": {
+          "radius": 0.0,
+          "size": [
+            1920,
+            1080
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#ffffff",
+      "gradient": null,
+      "id": "destello",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "rect": {
+          "radius": 0.0,
+          "size": [
+            1920,
+            1080
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#ff4fd8",
+      "gradient": null,
+      "id": "pulso",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "ring": {
+          "size": [
+            500,
+            500
+          ],
+          "width": 24
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/1",
+  "scripts": [
+    {
+      "events": [
+        "update"
+      ],
+      "params": {},
+      "path": "scripts/pulso.js",
+      "uses": [
+        "audio"
+      ]
+    }
+  ],
+  "templates": {},
+  "timelines": [],
+  "transition": null
 }

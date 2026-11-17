@@ -5,25 +5,24 @@
   "description": { "en": "Shifts layers by a depth map as the pointer moves, for a 3D-ish parallax.", "es": "Desplaza las capas según un mapa de profundidad cuando se mueve el puntero, para un efecto de relieve." },
   "mask_mode": "strength",
   "params": [
-    { "id": "depth", "type": "texture", "tools": ["gray", "depth"], "default": "" },
-    { "id": "strength", "type": "float", "default": 24, "min": 0, "max": 256 },
-    { "id": "focus", "type": "float", "default": 0.5, "min": 0, "max": 1 },
-    { "id": "steps", "type": "float", "default": 16, "min": 8, "max": 24 },
-    { "id": "overscan", "type": "float", "default": 1, "min": 1, "max": 1.25 },
-    { "id": "follow", "type": "bool", "default": true, "uses": "cursor" },
-    { "id": "orbit", "type": "bool", "default": false, "uses": "time" },
-    { "id": "scale", "type": "vec2", "default": [1, 1], "min": -1, "max": 1 },
+    { "id": "depth", "type": "texture", "tools": ["gray", "depth"], "prefill": "" },
+    { "id": "strength", "type": "float", "prefill": 24, "min": 0, "max": 256 },
+    { "id": "focus", "type": "float", "prefill": 0.5, "min": 0, "max": 1 },
+    { "id": "steps", "type": "float", "prefill": 16, "min": 8, "max": 24 },
+    { "id": "overscan", "type": "float", "prefill": 1, "min": 1, "max": 1.25 },
+    { "id": "follow", "type": "bool", "prefill": true, "uses": "cursor" },
+    { "id": "orbit", "type": "bool", "prefill": false, "uses": "time" },
+    { "id": "scale", "type": "vec2", "prefill": [1, 1], "min": -1, "max": 1 },
     {
       "id": "reach",
       "type": "enum",
-      "default": 0,
-      "required": true,
+      "prefill": 0,
       "values": [
         { "value": 0, "label": { "en": "Circle", "es": "Círculo" } },
         { "value": 1, "label": { "en": "Square", "es": "Cuadrado" } }
       ]
     },
-    { "id": "smooth", "type": "bool", "default": false }
+    { "id": "smooth", "type": "bool", "prefill": false }
   ],
   "passes": [{ "entry": "fs_depth_parallax", "inputs": ["previous", "asset:depth"] }],
   "cost": { "taps": 3 },

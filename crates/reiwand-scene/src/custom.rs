@@ -185,7 +185,7 @@ impl Descriptor {
                 format!("the option {id} needs 1 to 16 whole numbers or flags"),
             );
             fail(
-                o.values.contains(&o.default),
+                o.values.contains(&o.prefill),
                 format!("the default of the option {id} is not one of its values"),
             );
             let bound = o

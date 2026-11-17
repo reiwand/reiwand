@@ -14,12 +14,13 @@ fn transition(c: Crossing) -> Crossing {
 
 fn iris() -> Json {
     json!({ "id": "porthole", "stage": "transition", "cost": { "taps": 1, "passes": 1, "scale": 1 },
-        "params": [{ "id": "soft", "type": "float", "default": 0.1, "min": 0, "max": 1 }] })
+        "params": [{ "id": "soft", "type": "float", "prefill": 0.1, "min": 0, "max": 1 }] })
 }
 
 fn crossing(transition: Json, descriptor: Json, wgsl: &str) -> Scene {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "transition": transition });
-    let mut scene = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"));
+    let mut scene = Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new())
+        .unwrap_or_else(|e| panic!("{e}"));
     let files = |path: &str, _: usize| match path {
         "t/iris.json" => Ok(descriptor.to_string().into_bytes()),
         "t/iris.wgsl" => Ok(wgsl.as_bytes().to_vec()),
@@ -57,14 +58,14 @@ fn a_scene_brings_its_transition_in_and_out() {
     let entries: Vec<_> = module.entry_points.iter().map(|e| e.name.as_str()).collect();
     assert_eq!(entries, ["vs_main", "reiwand_fs"]);
     assert!(scene.passages.problems().is_empty());
-    let back = Scene::from_json(&scene.to_json().unwrap()).unwrap();
+    let back = Scene::from_json(&reiwand_upgrade::fill::whole(&scene.to_json().unwrap())).unwrap();
     assert_eq!(back.transition, scene.transition);
 }
 
 #[test]
 fn scenes_without_a_transition_read_as_before() {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] } });
-    let mut scene = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap();
+    let mut scene = Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new()).unwrap();
     scene.adopt(&BTreeMap::new(), |_: &str, _: usize| Err::<Vec<u8>, _>("none")).unwrap();
     assert!(scene.transition.is_none() && scene.passages == Passages::default());
     assert!(!scene.features().contains("transition") && !scene.to_json().unwrap().contains("transition"));
@@ -77,7 +78,7 @@ fn a_bad_transition_falls_back_without_refusing_the_scene() {
     let mut layered = iris();
     layered["stage"] = json!("layer");
     let mut pictured = iris();
-    pictured["params"] = json!([{ "id": "soft", "type": "texture", "default": "white" }]);
+    pictured["params"] = json!([{ "id": "soft", "type": "texture", "prefill": "white" }]);
     let tapped = IRIS.replace("after(c.uv), before", "tap(c.uv), before");
     for (descriptor, wgsl, problem) in [
         (heavy, IRIS, "more than the 8 a transition may cost"),
@@ -115,7 +116,8 @@ fn the_shape_of_a_transition_is_checked_with_the_scene() {
         ),
         (json!({ "sideways": {} }), "unknown field"),
     ] {
-        let fault = Scene::load(&text(t), &BTreeMap::new()).unwrap_err().to_string();
+        let fault =
+            Scene::load(&reiwand_upgrade::fill::whole(&text(t)), &BTreeMap::new()).unwrap_err().to_string();
         assert!(fault.contains(problem), "{fault}");
     }
 }

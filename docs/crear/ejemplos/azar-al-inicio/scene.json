@@ -1,12 +1,271 @@
 {
-  "schema": "reiwand.scene/1",
-  "canvas": { "size": [1920, 1080], "fit": "fill", "background": "#000000" },
-  "clock": { "max_fps": "display", "seed": null },
-  "scripts": [{ "path": "scripts/azar.js", "events": ["init"] }],
+  "assets": {},
+  "audio": null,
+  "camera3d": null,
+  "canvas": {
+    "ambient": null,
+    "background": "#000000",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
+    "size": [
+      1920,
+      1080
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": "display",
+    "poster_time": 0.0,
+    "seed": null,
+    "step": null
+  },
+  "effects": {},
+  "ext": {},
   "layers": [
-    { "blend_space": "canvas", "id": "fondo", "type": "shape", "shape": { "rect": { "size": [1920, 1080] } }, "gradient": { "stops": [[0, "#101828"], [1, "#283a5c"]] } },
-    { "blend_space": "canvas", "id": "circulo", "type": "shape", "shape": { "ellipse": { "size": [400, 400] } }, "fill": "#ff7a59" },
-    { "blend_space": "canvas", "id": "cuadrado", "type": "shape", "shape": { "rect": { "size": [360, 360] } }, "fill": "#7bd88f" },
-    { "blend_space": "canvas", "id": "anillo", "type": "shape", "shape": { "ring": { "size": [420, 420], "width": 40 } }, "fill": "#8fb8ff" }
-  ]
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": null,
+      "gradient": {
+        "from": [
+          0.0,
+          0.0
+        ],
+        "radial": false,
+        "stops": [
+          [
+            0,
+            "#101828"
+          ],
+          [
+            1,
+            "#283a5c"
+          ]
+        ],
+        "to": [
+          0.0,
+          1.0
+        ]
+      },
+      "id": "fondo",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "rect": {
+          "radius": 0.0,
+          "size": [
+            1920,
+            1080
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#ff7a59",
+      "gradient": null,
+      "id": "circulo",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "ellipse": {
+          "size": [
+            400,
+            400
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#7bd88f",
+      "gradient": null,
+      "id": "cuadrado",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "rect": {
+          "radius": 0.0,
+          "size": [
+            360,
+            360
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#8fb8ff",
+      "gradient": null,
+      "id": "anillo",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "ring": {
+          "size": [
+            420,
+            420
+          ],
+          "width": 40
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/1",
+  "scripts": [
+    {
+      "events": [
+        "init"
+      ],
+      "params": {},
+      "path": "scripts/azar.js",
+      "uses": []
+    }
+  ],
+  "templates": {},
+  "timelines": [],
+  "transition": null
 }

@@ -11,7 +11,7 @@ fn props() -> BTreeMap<String, Property> {
 }
 
 fn sample() -> Scene {
-    Scene::from_json(SAMPLE).unwrap()
+    Scene::from_json(&reiwand_upgrade::fill::whole(&SAMPLE)).unwrap()
 }
 
 fn issues(edit: impl FnOnce(&mut Scene)) -> Vec<Issue> {

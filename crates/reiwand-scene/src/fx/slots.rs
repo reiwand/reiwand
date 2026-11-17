@@ -29,7 +29,7 @@ impl ParamDef {
     }
 
     pub fn named<'a>(&'a self, e: &'a crate::EffectUse) -> Option<&'a str> {
-        match (e.params.get(&self.id), &self.default) {
+        match (e.params.get(&self.id), &self.prefill) {
             (Some(crate::Value::Fixed(Param::Text(id))), _) | (None, Param::Text(id)) => Some(id),
             _ => None,
         }
@@ -57,7 +57,7 @@ impl ParamDef {
                 [if blows { list.len().min(crate::MAX_EFFECT_EMITTERS) as f32 } else { 0.0 }, 0.0, 0.0, 0.0]
             }
             (ParamKind::Texture | ParamKind::Lut | ParamKind::Mask, _) => [0.0; 4],
-            _ => self.slot(&self.default),
+            _ => self.slot(&self.prefill),
         }
     }
 }

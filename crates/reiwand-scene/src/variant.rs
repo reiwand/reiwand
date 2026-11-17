@@ -16,7 +16,7 @@ impl Variant {
     }
 
     fn base(&self) -> usize {
-        self.at(&self.default).unwrap_or(0)
+        self.at(&self.prefill).unwrap_or(0)
     }
 
     fn built(&self, e: &EffectUse, pick: usize) -> usize {
@@ -60,13 +60,13 @@ impl Descriptor {
     }
 
     fn painted(&self, id: &str) -> bool {
-        self.param(id).is_some_and(|i| matches!(&self.params[i].default, Param::Text(t) if !t.is_empty()))
+        self.param(id).is_some_and(|i| matches!(&self.params[i].prefill, Param::Text(t) if !t.is_empty()))
     }
 
     pub fn constants(&self, variant: u32) -> Vec<(String, f64)> {
         let pick =
             |k: usize, o: &Variant| o.values.get((variant >> (4 * k) & 15) as usize).and_then(Param::whole);
-        let found = |(k, o): (usize, &Variant)| Some((o.id.clone(), pick(k, o).or(o.default.whole())?));
+        let found = |(k, o): (usize, &Variant)| Some((o.id.clone(), pick(k, o).or(o.prefill.whole())?));
         self.options.iter().enumerate().filter_map(found).collect()
     }
 

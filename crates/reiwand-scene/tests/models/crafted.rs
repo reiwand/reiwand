@@ -33,7 +33,7 @@ fn a_scene_refuses_models_that_together_pass_the_triangle_budget() {
     let assets = json!({ "a": { "path": "a.glb" }, "b": { "path": "b.glb" } });
     let layers = json!([{ "blend_space": "canvas", "id": "x", "type": "model", "model": "a" }, { "blend_space": "canvas", "id": "y", "type": "model", "model": "b" }]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [8, 8] }, "assets": assets, "layers": layers });
-    let mut scene = Scene::from_json(&text.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap();
     let read = scene.adopt(&BTreeMap::new(), |_: &str, _: usize| Ok::<_, String>(heavy.clone()));
     assert!(format!("{read:?}").contains("triangles the models of a scene may hold"), "{read:?}");
 }
@@ -47,7 +47,7 @@ fn a_tier_shows_the_poster_of_models_past_its_triangles_counting_fur_shells() {
     let made = |materials: Value| {
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [8, 8] }, "assets": { "a": { "path": "a.glb" } },
             "layers": [{ "blend_space": "canvas", "id": "x", "type": "model", "model": "a", "materials": materials }] });
-        let mut scene = Scene::from_json(&text.to_string()).unwrap();
+        let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap();
         scene.adopt(&BTreeMap::new(), |_: &str, _: usize| Ok::<_, String>(ball.clone())).unwrap();
         runtime(scene)
     };

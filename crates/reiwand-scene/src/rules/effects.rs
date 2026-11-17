@@ -22,8 +22,9 @@ impl Check<'_> {
                 self.issues.push(Issue::Type(format!("{e}/effect")));
             }
             self.variants(&e, d, effect);
-            for def in d.params.iter().filter(|p| p.required && !effect.params.contains_key(&p.id)) {
-                self.issues.push(Issue::Absent { path: format!("{e}/params"), id: def.id.clone() });
+            let wanted = d.params.iter().map(|p| &p.id).chain(d.options.iter().map(|o| &o.id));
+            for id in wanted.filter(|id| !effect.params.contains_key(*id)) {
+                self.issues.push(Issue::Absent { path: format!("{e}/params"), id: id.clone() });
             }
             for (id, value) in &effect.params {
                 let path = format!("{e}/params/{id}");
@@ -41,7 +42,12 @@ impl Check<'_> {
                     Value::Fixed(Param::Number(n)) => {
                         self.range(&path, *n, def.min.unwrap_or(f32::MIN), def.max.unwrap_or(f32::MAX))
                     }
-                    Value::Fixed(Param::Text(id)) if def.kind.asset() => self.texture(&path, id, lut),
+                    Value::Fixed(Param::Text(id))
+                        if def.kind.asset()
+                            && !(id.is_empty() && def.prefill == Param::Text(String::new())) =>
+                    {
+                        self.texture(&path, id, lut)
+                    }
                     Value::Bound(b) if def.kind == ParamKind::Emitters => self.emitted(&path, def, b),
                     Value::Bound(b) if b.layer.is_some() => self.fed(&path, def, b),
                     Value::Bound(b) if def.kind.asset() => {

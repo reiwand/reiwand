@@ -17,14 +17,8 @@ pub enum Hull {
 pub struct BoneCollider {
     #[schemars(extend("x-ref" = "bone"))]
     pub bone: String,
-    #[serde(default)]
     pub shape: Hull,
     #[schemars(extend("x-range" = [0, 100]))]
     pub radius: f32,
-    #[serde(default, skip_serializing_if = "is_zero")]
     pub offset: [f32; 3],
-}
-
-fn is_zero(v: &[f32; 3]) -> bool {
-    *v == [0.0; 3]
 }

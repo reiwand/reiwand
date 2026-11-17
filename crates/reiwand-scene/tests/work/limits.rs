@@ -66,7 +66,7 @@ fn package_costs_count_their_passes_and_heavy_scenes_warn() {
     let solid = |effects: Json| json!({ "blend_space": "canvas", "id": "l", "type": "solid", "color": "#ffffff", "effects": effects });
     let scene = |effects: Json| {
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "layers": [solid(effects)] });
-        Scene::from_json(&text.to_string()).unwrap().cost(Quality::Q2)
+        Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap().cost(Quality::Q2)
     };
     let tint = scene(json!([{ "effect": "tint" }]));
     let json = json!({ "id": "under_cost", "passes": [{ "entry": "fs_under_cost", "inputs": ["previous", "backdrop"] }] });
@@ -78,7 +78,7 @@ fn package_costs_count_their_passes_and_heavy_scenes_warn() {
         let a =
             json!({ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#ffffff", "mask": mask });
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "layers": [a, hidden] });
-        Scene::from_json(&text.to_string()).unwrap().cost(Quality::Q2)
+        Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap().cost(Quality::Q2)
     };
     let (shaped, layered) =
         (masked(json!({ "shape": { "ellipse": { "size": [8, 8] } } })), masked(json!({ "layer": "h" })));
@@ -90,7 +90,7 @@ fn package_costs_count_their_passes_and_heavy_scenes_warn() {
         })
         .collect();
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers });
-    let heavy = Scene::from_json(&text.to_string()).unwrap();
+    let heavy = Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap();
     assert!(heavy.heavy_cost().is_some_and(|(cost, budget)| cost > budget));
     let weighed = heavy.heaviest(Quality::Q2, 3);
     assert_eq!(weighed.len(), 3);

@@ -1,20 +1,252 @@
 {
-  "schema": "reiwand.scene/1",
-  "canvas": { "size": [1920, 1080], "background": "#05070f", "perspective": 900 },
+  "assets": {},
+  "audio": null,
+  "camera3d": null,
+  "canvas": {
+    "ambient": null,
+    "background": "#05070f",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": 900,
+    "size": [
+      1920,
+      1080
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": null
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "add",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "color": null,
+      "depth_test": false,
+      "effects": [],
+      "id": "helice",
+      "inherit": null,
+      "instance": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "render": null,
+      "solid": false,
+      "system": "helice",
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "particles",
+      "visible": true
+    }
+  ],
+  "listens": [],
   "particles": {
     "helice": {
       "capacity": 900,
-      "points": [{ "at": [960, 540] }],
+      "children": [],
+      "collide": [],
       "emitters": [
-        { "shape": { "around": { "axis": [0.5, 0, 0.866], "at": "p0", "count": 18, "radius": 220, "speed": 40 } }, "rate": 60 }
+        {
+          "audio_gate": false,
+          "bursts": [],
+          "delay": null,
+          "duration": null,
+          "follow": null,
+          "inherit": 0,
+          "max_per_step": null,
+          "periodic": null,
+          "rate": 60,
+          "shape": {
+            "around": {
+              "arc": 360.0,
+              "at": "p0",
+              "axis": [
+                0.5,
+                0,
+                0.866
+              ],
+              "count": 18,
+              "mode": "repeat",
+              "radius": 220,
+              "restart": false,
+              "speed": 40
+            }
+          }
+        }
       ],
-      "init": { "tilt": { "angle": [[0, 0], [0, 0]], "spin": [[0, 0], [0, 0]] }, "life": [3, 4], "speed": [0, 0], "angle": [0, 360], "size": [6, 9], "color": ["#9ad7ff", "#c3a6ff"] },
       "forces": [
-        { "vortex": { "axis": [0.5, 0, 0.866], "center": [960, 540], "strength": 160 } },
-        { "drag": 0.4 }
+        {
+          "vortex": {
+            "axis": [
+              0.5,
+              0,
+              0.866
+            ],
+            "center": [
+              960,
+              540
+            ],
+            "falloff": null,
+            "inner": null,
+            "outer": null,
+            "radius": null,
+            "ring": null,
+            "strength": 160
+          },
+          "window": null
+        },
+        {
+          "drag": 0.4,
+          "window": null
+        }
       ],
-      "render": { "aspect": 1 }
+      "init": {
+        "alpha": null,
+        "angle": [
+          0,
+          360
+        ],
+        "color": [
+          "#9ad7ff",
+          "#c3a6ff"
+        ],
+        "depth": null,
+        "depth_speed": null,
+        "frame": [
+          0.0,
+          0.0
+        ],
+        "gradient": [],
+        "hsv": null,
+        "inherit": null,
+        "life": [
+          3,
+          4
+        ],
+        "offset_noise": null,
+        "palette": null,
+        "radial": null,
+        "remap": [],
+        "rotation": [
+          0.0,
+          0.0
+        ],
+        "size": [
+          6,
+          9
+        ],
+        "speed": [
+          0,
+          0
+        ],
+        "spin": [
+          0.0,
+          0.0
+        ],
+        "tilt": {
+          "angle": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ],
+          "spin": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        "turbulent": null,
+        "velocity": null
+      },
+      "lock": [],
+      "perspective": null,
+      "points": [
+        {
+          "angle": null,
+          "at": [
+            960,
+            540
+          ],
+          "follow": null,
+          "space": "local"
+        }
+      ],
+      "prewarm": 0.0,
+      "render": {
+        "angle": null,
+        "aspect": 1,
+        "brightness": null,
+        "color_over_life": [],
+        "cutout": null,
+        "cycles": null,
+        "fps": 12.0,
+        "frames": null,
+        "lit": false,
+        "mix": false,
+        "normal": null,
+        "order": null,
+        "orient": null,
+        "refract": null,
+        "rope": null,
+        "shader": null,
+        "size_over_life": [],
+        "stretch": null,
+        "texture": null,
+        "trail": null
+      },
+      "seed": 0,
+      "space": "local"
     }
   },
-  "layers": [{ "blend_space": "canvas", "id": "helice", "type": "particles", "system": "helice", "blend": "add" }]
+  "pools": {},
+  "schema": "reiwand.scene/1",
+  "scripts": [],
+  "templates": {},
+  "timelines": [],
+  "transition": null
 }

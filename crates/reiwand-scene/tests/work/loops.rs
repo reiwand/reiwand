@@ -75,7 +75,7 @@ fn counted_loops_pass_and_unbounded_work_is_refused() {
     );
     assert!(wide.unwrap_err().contains("a counter that a literal limits"));
     let negative = |d: &mut Json| {
-        d["options"].as_array_mut().unwrap().push(json!({ "id": "neg", "values": [-1, -2], "default": -1 }))
+        d["options"].as_array_mut().unwrap().push(json!({ "id": "neg", "values": [-1, -2], "prefill": -1 }))
     };
     for body in [
         "for (var i: u32 = u32(neg); i > 0u; i--) { c *= 0.9; }",

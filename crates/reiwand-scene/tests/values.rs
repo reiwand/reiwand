@@ -13,7 +13,10 @@ fn runtime(layers: Json) -> Runtime {
 fn timed(layers: Json, timelines: Json) -> Runtime {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": layers,
         "timelines": timelines, "clock": { "step": 600 } });
-    Runtime::new(Arc::new(Scene::load(&text.to_string(), &BTreeMap::new()).unwrap()), Values::new())
+    Runtime::new(
+        Arc::new(Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new()).unwrap()),
+        Values::new(),
+    )
 }
 
 fn at(rt: &mut Runtime, t: f64) -> Frame<'_> {
@@ -123,7 +126,8 @@ fn handles_time_positions_and_colors_by_their_share_of_the_way() {
     );
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [{ "blend_space": "canvas", "id": "t", "type": "text",
         "text": { "keys": [[0, "a", { "out": [1, 0] }], [2, "b"]] } }] });
-    let refused = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_err();
+    let refused =
+        Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new()).unwrap_err();
     assert!(format!("{refused:?}").contains("/layers/0/text/keys/0/2"), "{refused:?}");
 }
 
@@ -158,7 +162,10 @@ fn handles_per_part_shape_each_part_in_its_own_units() {
     let wide = json!([[0, [0, 0], { "out": [[1, 0], [1, 0], [1, 0], [1, 0], [1, 0]] }], [2, [1, 1]]]);
     assert!(
         Scene::load(
-            &json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": place(wide) }).to_string(),
+            &reiwand_upgrade::fill::whole(
+                &json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": place(wide) })
+                    .to_string()
+            ),
             &BTreeMap::new()
         )
         .is_err()

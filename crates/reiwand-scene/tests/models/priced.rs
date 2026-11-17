@@ -8,7 +8,7 @@ fn balls(shadows: bool) -> Runtime {
     let sun = json!({ "blend_space": "canvas", "id": "sun", "type": "light", "light": "directional", "shadows": shadows });
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [8, 8] }, "assets": { "a": { "path": "a.glb" } },
         "layers": [sun, { "blend_space": "canvas", "id": "x", "type": "model", "model": "a" }] });
-    let mut scene = Scene::from_json(&text.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap();
     scene.adopt(&BTreeMap::new(), |_: &str, _: usize| Ok::<_, String>(ball.clone())).unwrap();
     runtime(scene)
 }

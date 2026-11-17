@@ -42,7 +42,7 @@ fn per_binding_values_are_found_by_their_site() {
         "templates": { "t": { "blend_space": "canvas", "id": "t", "type": "solid", "color": "#ffffff", "opacity": { "script": "s.js", "fn": "fade" } } },
         "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#ffffff", "transform": { "rotation": { "script": "s.js", "fn": "turn", "params": { "k": 2 } } },
             "opacity": { "script": "s.js" } }] });
-    let scene = Scene::from_json(&text.to_string()).unwrap();
+    let scene = Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap();
     let found = sites(&scene);
     let keys: Vec<(&str, &str, Option<&str>)> =
         found.iter().map(|s| (s.path.as_str(), s.call.as_str(), s.layer.as_deref())).collect();
@@ -61,7 +61,9 @@ fn per_binding_values_are_found_by_their_site() {
     ] {
         let mut text = text.clone();
         text["layers"][0]["opacity"] = bad;
-        let error = Scene::load(&text.to_string(), &Default::default()).unwrap_err().to_string();
+        let error = Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &Default::default())
+            .unwrap_err()
+            .to_string();
         assert!(error.contains(path), "{error}");
     }
 }

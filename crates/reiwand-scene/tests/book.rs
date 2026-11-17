@@ -77,7 +77,7 @@ fn scene() -> (Scene, impl Fn(&str, usize) -> Result<Vec<u8>, String> + Copy) {
         }
         _ => Err("missing".to_string()),
     };
-    (Scene::load(&text.to_string(), &BTreeMap::new()).unwrap(), files)
+    (Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new()).unwrap(), files)
 }
 
 #[test]

@@ -161,7 +161,7 @@ impl Renderer {
         for e in scene.drawable().flat_map(|l| &l.effects) {
             let Some(d) = scene.effect(&e.effect) else { continue };
             for p in d.params.iter().filter(|p| p.kind == ParamKind::Emitters) {
-                let list = emitted(e.params.get(&p.id), &p.default);
+                let list = emitted(e.params.get(&p.id), &p.prefill);
                 let key = reiwand_scene::emitter_key(list);
                 let fresh = !out.iter().any(|(o, k, _)| o == EMITTERS && *k == key);
                 let made = emitters(list)

@@ -42,20 +42,19 @@ fn a_size_oscillation_from_the_floor_scales_between_the_two_ends() {
 
 #[test]
 fn stretch_and_oscillate_need_every_field_and_position_has_no_floor() {
-    let refused = |patch: Json| Scene::from_json(&scene(with(sparks(), patch), true)).is_err();
+    let refused = |patch: Json| {
+        Scene::from_json(&reiwand_upgrade::fill::whole(&scene(with(sparks(), patch), true))).is_err()
+    };
     let stretch = |s: Json| json!({ "render": { "stretch": s } });
-    assert!(refused(stretch(json!({ "time": 0.1, "min": 0, "max": 9 }))));
-    assert!(refused(stretch(json!({ "mode": "add", "depth": "flat", "time": 0.1, "max": 9 }))));
     assert!(refused(stretch(json!({ "mode": "wide", "depth": "flat", "time": 0.1, "min": 0, "max": 9 }))));
     assert!(!refused(stretch(
         json!({ "mode": "relative", "depth": "flat", "time": 0.1, "min": 0, "max": 9 })
     )));
     let wave = |o: Json| json!({ "forces": [{ "oscillate": o }] });
-    assert!(refused(wave(json!({ "what": "alpha", "freq": [1, 2], "scale": [0.2, 1] }))));
     assert!(!refused(wave(json!({ "what": "alpha", "from": "floor", "freq": [1, 2], "scale": [0.2, 1] }))));
     let bad = wave(json!({ "what": "position", "from": "floor", "freq": [1, 2], "scale": [2, 4] }));
     assert!(
-        Scene::load(&scene(with(sparks(), bad), true), &props())
+        Scene::load(&reiwand_upgrade::fill::whole(&scene(with(sparks(), bad), true)), &props())
             .is_err_and(|e| e.to_string().contains("from"))
     );
 }

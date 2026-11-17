@@ -4,7 +4,7 @@ pub fn rigged(extra: Value, layers: Value) -> Scene {
     let mut doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] },
         "assets": { "toy": { "path": "toy.glb" } }, "layers": layers });
     extra.as_object().unwrap().iter().for_each(|(k, v)| doc[k] = v.clone());
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     let glb = ForgeRig::new(2.0, 0.5).glb();
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     scene
@@ -80,11 +80,11 @@ fn bone_physics_of_a_model_swings_settles_and_freezes_at_the_lowest_quality() {
 
 #[test]
 fn root_motion_needs_clips_and_names_model_animation() {
-    let s = Scene::from_json(
-        &json!({ "schema": SCHEMA, "canvas": { "size": [8, 8] }, "assets": { "toy": { "path": "toy.glb" } },
+    let s = Scene::from_json(&reiwand_upgrade::fill::whole(
+        &&json!({ "schema": SCHEMA, "canvas": { "size": [8, 8] }, "assets": { "toy": { "path": "toy.glb" } },
             "layers": [model("m", json!({ "root_motion": true }))] })
         .to_string(),
-    )
+    ))
     .unwrap();
     let issues = s.validate(&BTreeMap::new());
     assert!(issues.iter().any(|i| i.to_string().contains("root_motion")), "{issues:?}");

@@ -14,7 +14,8 @@ fn broken(changes: &[(&str, Json)]) -> Vec<String> {
             other => drop(other.as_object_mut().unwrap().insert(key.into(), value.clone())),
         }
     }
-    let scene = Scene::from_json(&doc.to_string()).unwrap_or_else(|e| panic!("{changes:?}: {e}"));
+    let scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string()))
+        .unwrap_or_else(|e| panic!("{changes:?}: {e}"));
     scene.validate(&BTreeMap::new()).iter().map(ToString::to_string).collect()
 }
 
@@ -131,8 +132,11 @@ fn malformed_new_fields_are_refused_while_parsing() {
     ] {
         let saved = doc.pointer(pointer).cloned().unwrap();
         *doc.pointer_mut(pointer).unwrap() = value;
-        assert!(Scene::from_json(&doc.to_string()).is_err(), "{pointer} was accepted");
+        assert!(
+            Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).is_err(),
+            "{pointer} was accepted"
+        );
         *doc.pointer_mut(pointer).unwrap() = saved;
     }
-    assert!(Scene::from_json(&doc.to_string()).is_ok());
+    assert!(Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).is_ok());
 }

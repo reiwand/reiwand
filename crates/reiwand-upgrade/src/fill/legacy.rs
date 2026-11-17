@@ -19,6 +19,7 @@ pub(super) fn corrected(def: &str, name: &str) -> Option<Value> {
     Some(match (def, name) {
         ("Layer", "parallax") => json!([0, 0]),
         ("Glide", "offset") => json!([0, 0]),
+        ("BoneCollider", "offset") => json!([0, 0, 0]),
         ("System", "space") => json!("local"),
         ("Manifest", "description") => json!(""),
         ("Canvas", "clear") => json!(true),

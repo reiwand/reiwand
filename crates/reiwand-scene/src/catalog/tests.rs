@@ -41,11 +41,11 @@ fn a_direction_vector_is_not_a_draggable_point() {
 fn handles_follow_the_kinds_and_units_of_the_descriptor() {
     use crate::effects::{Descriptor, Grab};
     let json = serde_json::json!({"id": "beam", "params": [
-        {"id": "start", "type": "position", "default": [0.1, 0.5]},
-        {"id": "end", "type": "position", "default": [0.9, 0.5]},
-        {"id": "aim", "type": "vec2", "default": [1, 0], "min": -1, "max": 1},
-        {"id": "tilt", "type": "float", "unit": "degrees", "default": 0, "min": 0, "max": 90},
-        {"id": "gain", "type": "float", "default": 1, "min": 0, "max": 4}]});
+        {"id": "start", "type": "position", "prefill": [0.1, 0.5]},
+        {"id": "end", "type": "position", "prefill": [0.9, 0.5]},
+        {"id": "aim", "type": "vec2", "prefill": [1, 0], "min": -1, "max": 1},
+        {"id": "tilt", "type": "float", "unit": "degrees", "prefill": 0, "min": 0, "max": 90},
+        {"id": "gain", "type": "float", "prefill": 1, "min": 0, "max": 4}]});
     let d = Descriptor::parse(&json.to_string(), "").unwrap();
     let found: Vec<_> = d.handles().iter().map(|h| (h.param, h.kind, h.partner)).collect();
     assert_eq!(

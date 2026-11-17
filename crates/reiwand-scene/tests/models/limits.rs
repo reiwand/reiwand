@@ -3,7 +3,7 @@ use super::*;
 fn issues(layers: Value) -> Vec<String> {
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [8, 8] }, "assets": { "toy": { "path": "toy.glb" } },
         "layers": layers });
-    Scene::from_json(&doc.to_string())
+    Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string()))
         .unwrap()
         .validate(&BTreeMap::new())
         .iter()

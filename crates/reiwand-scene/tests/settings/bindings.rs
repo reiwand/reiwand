@@ -12,8 +12,9 @@ fn masks_and_particle_textures_follow_settings() {
                 "init": { "life": [1, 2] }, "render": { "texture": mapped } } } })
         .to_string()
     };
-    assert!(Scene::load(&scene("other"), &props).is_err());
-    let loaded = std::sync::Arc::new(Scene::load(&scene("two"), &props).unwrap());
+    assert!(Scene::load(&reiwand_upgrade::fill::whole(&scene("other")), &props).is_err());
+    let loaded =
+        std::sync::Arc::new(Scene::load(&reiwand_upgrade::fill::whole(&scene("two")), &props).unwrap());
     let storm = values(json!({ "look": "b" }));
     let sprite = loaded.particles["dust"].render.texture.as_ref().unwrap();
     assert_eq!(sprite.settled(Some(&effective(&props, &[&storm]))), Some("two".to_string()));
@@ -60,7 +61,7 @@ fn bindings_follow_values_and_triggers_follow_buttons() {
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "assets": { "sky": { "path": "sky.png" } },
             "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#000000", "opacity": { "prop": prop } }],
             "timelines": [{ "id": "t", "duration": 1, "trigger": trigger }] });
-        Scene::from_json(&text.to_string()).unwrap().validate(&props)
+        Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap().validate(&props)
     };
     assert_eq!(scene("speed", "prop:again"), []);
     assert_eq!(scene("speed", "prop:mood"), []);

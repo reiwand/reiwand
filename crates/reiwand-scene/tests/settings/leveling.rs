@@ -49,7 +49,7 @@ fn properties_without_quality_values_leave_the_scene_untouched() {
 #[test]
 fn a_new_quality_level_changes_the_values_the_scene_reads_only_when_it_tunes_them() {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 64] }, "layers": [] }).to_string();
-    let scene = Arc::new(Scene::from_json(&text).unwrap());
+    let scene = Arc::new(Scene::from_json(&reiwand_upgrade::fill::whole(&text)).unwrap());
     let chosen = values(json!({ "rate": 80, "mode": "full", "glow": true, "tint": "#ffffff" }));
     let mut runtime = Runtime::new(scene.clone(), chosen.clone());
     assert!(!runtime.set_leveling(leveling()), "Q3 keeps the chosen values");

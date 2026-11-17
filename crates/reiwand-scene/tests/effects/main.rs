@@ -23,7 +23,7 @@ fn scene(effects: serde_json::Value) -> Scene {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] },
         "assets": { "a": { "path": "a.png" }, "grade": { "path": "grade.cube" } },
         "layers": [{ "blend_space": "canvas", "id": "l", "type": "image", "image": "a", "effects": effects }] });
-    Scene::from_json(&text.to_string()).unwrap()
+    Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap()
 }
 
 fn runtime(effects: serde_json::Value) -> Runtime {

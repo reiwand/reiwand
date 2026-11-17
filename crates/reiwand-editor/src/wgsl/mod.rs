@@ -63,8 +63,8 @@ fn valid(id: &str, json: &Value) -> Result<String> {
     ensure!(d.params.len() <= MAX_PARAMS, fail(&format!("has more than {MAX_PARAMS} parameters")));
     let lighter = d.lighter.as_ref().map_or(0, |l| l.passes.len());
     ensure!(d.passes.len().max(lighter) <= MAX_PASSES, fail(&format!("has more than {MAX_PASSES} passes")));
-    if let Some(p) = d.params.iter().find(|p| !p.accepts(&p.default)) {
-        return Err(fail(&format!("gives {} a default that does not fit its type", p.id)));
+    if let Some(p) = d.params.iter().find(|p| !p.accepts(&p.prefill)) {
+        return Err(fail(&format!("gives {} a prefill that does not fit its type", p.id)));
     }
     if let Some(p) = d.params.iter().find(|p| p.min.zip(p.max).is_some_and(|(lo, hi)| lo > hi)) {
         return Err(fail(&format!("has min above max for {}", p.id)));

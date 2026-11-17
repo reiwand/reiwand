@@ -19,9 +19,12 @@ pub const MAX_TRANSITION_MS: u32 = 10_000;
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Transition {
-    #[serde(rename = "in", default, skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "in")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub coming: Option<Passage>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub out: Option<Passage>,
 }
 
@@ -30,16 +33,9 @@ pub struct Transition {
 pub struct Passage {
     pub descriptor: String,
     pub wgsl: String,
-    #[serde(default = "standard")]
     pub duration_ms: u32,
-    #[serde(default)]
     pub curve: Ease,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub params: BTreeMap<String, Param>,
-}
-
-fn standard() -> u32 {
-    1_000
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

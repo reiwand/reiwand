@@ -8,7 +8,10 @@ fn runtime(layers: usize) -> Runtime {
     let blur = |i: usize| json!({ "blend_space": "canvas", "id": format!("b{i}"), "type": "adjustment", "effects": [{ "effect": "blur", "params": { "radius": 30 } }] });
     let layers: Vec<_> = (0..layers).map(blur).collect();
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [960, 540] }, "layers": layers });
-    Runtime::new(Arc::new(Scene::from_json(&text.to_string()).unwrap()), Default::default())
+    Runtime::new(
+        Arc::new(Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap()),
+        Default::default(),
+    )
 }
 
 fn strains(tier: Tier) -> [Budget; 5] {

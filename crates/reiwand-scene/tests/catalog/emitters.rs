@@ -56,12 +56,12 @@ fn fluid_takes_any_number_of_point_and_line_emitters_up_to_the_cap() {
         let found = issues(effect(json!({ "effect": "fluid", "params": params.clone() })));
         assert!(found.iter().any(|f| f.contains("/params/emitters")), "{params}: {found:?}");
     }
-    let unknown = Scene::from_json(
+    let unknown = Scene::from_json(&reiwand_upgrade::fill::whole(&
         &json!({ "schema": SCHEMA, "canvas": { "size": [8, 8] },
         "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#000", "effects": [{ "effect": "fluid",
         "params": { "emitters": [{ "from": [0.5, 0.5], "strength": 1, "spin": 2 }] } }] }] })
         .to_string(),
-    );
+    ));
     assert!(
         unknown.is_err()
             || unknown.unwrap().validate(&BTreeMap::new()).iter().any(|i| i.to_string().contains("emitters"))

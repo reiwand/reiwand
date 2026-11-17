@@ -56,7 +56,12 @@ fn models_and_cameras_name_their_features() {
     assert!(f.contains("model3d") && f.contains("camera3d") && !f.contains("model_animation"), "{f:?}");
     let posed = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "assets": { "toy": { "path": "toy.glb" } },
         "layers": [model("m", json!({ "clips": [{ "id": "walk" }] }))] });
-    assert!(Scene::from_json(&posed.to_string()).unwrap().features().contains("model_animation"));
+    assert!(
+        Scene::from_json(&reiwand_upgrade::fill::whole(&posed.to_string()))
+            .unwrap()
+            .features()
+            .contains("model_animation")
+    );
     let flown = json!({ "camera3d": { "paths": [{ "id": "a", "keys": [{ "t": 0, "eye": [0, 0, 5], "center": [0, 0, 0] }, { "t": 1, "eye": [1, 0, 5], "center": [0, 0, 0] }] }] } });
     assert!(scene(flown, json!([])).features().contains("camera_paths"));
     let toned = scene(json!({ "canvas": { "size": [200, 100], "hdr": true, "tonemap": "agx" } }), json!([]));

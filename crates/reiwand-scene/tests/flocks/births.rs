@@ -80,7 +80,8 @@ fn turbulent_rays_worked_out_apart_match_the_directions_particles_are_born_with(
         let s = still(json!({ "init": { "life": [10, 10], "size": [2, 2], "turbulent": gust } }));
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layer("a"),
             "particles": { "a": s }, "clock": clock });
-        let scene = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"));
+        let scene = Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new())
+            .unwrap_or_else(|e| panic!("{e}"));
         let mut fly = Fly::new(Runtime::new(Arc::new(scene), Values::new()));
         fly.frame(1.0 / 30.0);
         fly.alive(0)

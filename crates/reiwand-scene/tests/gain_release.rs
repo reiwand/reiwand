@@ -10,7 +10,8 @@ fn runtime(audio: serde_json::Value) -> Runtime {
     let layer = json!({ "blend_space": "canvas", "id": "l0", "type": "solid", "color": "#ffffff", "opacity": { "audio": 4, "kind": "relative", "unit": "db" } });
     let text =
         json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [layer], "audio": audio });
-    let scene = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"));
+    let scene = Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new())
+        .unwrap_or_else(|e| panic!("{e}"));
     Runtime::new(Arc::new(scene), Values::new())
 }
 
@@ -54,9 +55,9 @@ fn the_gain_release_is_required_and_limited() {
     let load = |audio: serde_json::Value| {
         let text =
             json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [layer], "audio": audio });
-        Scene::load(&text.to_string(), &BTreeMap::new()).map(|s| s.validate(&BTreeMap::new()).is_empty())
+        Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new())
+            .map(|s| s.validate(&BTreeMap::new()).is_empty())
     };
-    assert!(load(json!({ "attack": 0.02, "release": 0.2 })).is_err());
     assert_eq!(load(json!({ "gain_release": 0.4 })).ok(), Some(true));
     assert!(load(json!({ "gain_release": 0.01 })).is_err());
     assert!(load(json!({ "gain_release": 11 })).is_err());

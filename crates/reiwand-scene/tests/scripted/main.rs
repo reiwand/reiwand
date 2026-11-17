@@ -19,7 +19,10 @@ fn runtime(extra: serde_json::Value) -> Runtime {
     for (k, v) in extra.as_object().into_iter().flatten() {
         doc[k] = v.clone();
     }
-    Runtime::new(Arc::new(Scene::from_json(&doc.to_string()).unwrap()), Values::new())
+    Runtime::new(
+        Arc::new(Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap()),
+        Values::new(),
+    )
 }
 
 fn ids(rt: &Runtime) -> Vec<String> {

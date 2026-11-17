@@ -39,15 +39,14 @@ pub enum MaskChannel {
 pub struct EffectUse {
     #[schemars(extend("x-ref" = "effect"))]
     pub effect: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub name: Option<String>,
-    #[serde(default = "shown")]
     pub enabled: Value<bool>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub mask: Option<Mask>,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub params: BTreeMap<String, Value<Param>>,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub optional: bool,
 }
 

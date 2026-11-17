@@ -34,18 +34,18 @@ fn package_effects_compile_against_the_contract_and_report_what_they_read() {
         ),
         (json!({ "targets": { "history": { "scale": 3 } } }), WGSL, "a scale outside (0, 2]"),
         (
-            json!({ "options": [{ "id": "taps", "values": [0.5], "default": 0.5 }] }),
+            json!({ "options": [{ "id": "taps", "values": [0.5], "prefill": 0.5 }] }),
             WGSL,
             "whole numbers or flags",
         ),
         (
-            json!({ "options": [{ "id": "taps", "values": [4], "default": 8 }] }),
+            json!({ "options": [{ "id": "taps", "values": [4], "prefill": 8 }] }),
             WGSL,
             "not one of its values",
         ),
-        (json!({ "options": [{ "id": "detail", "values": [4], "default": 4 }] }), WGSL, "not a unique id"),
+        (json!({ "options": [{ "id": "detail", "values": [4], "prefill": 4 }] }), WGSL, "not a unique id"),
         (
-            json!({ "options": [{ "id": "taps", "values": [4], "default": 4, "when_bound": "detail" }] }),
+            json!({ "options": [{ "id": "taps", "values": [4], "prefill": 4, "when_bound": "detail" }] }),
             WGSL,
             "no texture",
         ),
@@ -70,7 +70,7 @@ fn descriptors_check_their_new_fields() {
     let pass = |p: Json| json!({ "id": "probe", "passes": [p], "cost": {} });
     let params = |p: Json| json!({ "id": "probe", "params": [p], "passes": [{ "entry": "fs_a" }] });
     let many: Vec<Json> =
-        (0..25).map(|i| json!({ "id": format!("p{i}"), "type": "float", "default": 0 })).collect();
+        (0..25).map(|i| json!({ "id": format!("p{i}"), "type": "float", "prefill": 0 })).collect();
     let cases = [
         (pass(json!({ "entry": "fs_a", "copy": "previous" })), "needs either an entry, a copy or a swap"),
         (pass(json!({ "entry": "fs_a", "target": "nowhere" })), "writes an unknown target"),
@@ -78,27 +78,27 @@ fn descriptors_check_their_new_fields() {
         (pass(json!({ "entry": "fs_a", "vertex": "vs_a", "grid": [65, 8] })), "a grid of 1 to 64"),
         (pass(json!({ "entry": "fs_a", "inputs": vec!["input"; 10] })), "more than 9 inputs"),
         (pass(json!({ "entry": "fs_a", "inputs": ["target:nowhere"] })), "unknown input target:nowhere"),
-        (params(json!({ "id": "k", "type": "enum", "default": 0 })), "needs 1 to 64 values"),
-        (params(json!({ "id": "k", "type": "float", "default": 0, "channels": 3 })), "is no mask"),
+        (params(json!({ "id": "k", "type": "enum", "prefill": 0 })), "needs 1 to 64 values"),
+        (params(json!({ "id": "k", "type": "float", "prefill": 0, "channels": 3 })), "is no mask"),
         (
-            params(json!({ "id": "k", "type": "mask", "default": "", "channels": 2 })),
+            params(json!({ "id": "k", "type": "mask", "prefill": "", "channels": 2 })),
             "channels other than 1, 3 or 4",
         ),
-        (params(json!({ "id": "k", "type": "blend", "default": "sparkle" })), "default of k does not fit"),
+        (params(json!({ "id": "k", "type": "blend", "prefill": "sparkle" })), "prefill of k does not fit"),
         (
-            params(json!({ "id": "k", "type": "float", "default": 0, "yields_to": "k" })),
+            params(json!({ "id": "k", "type": "float", "prefill": 0, "yields_to": "k" })),
             "k yields to no other",
         ),
         (
-            params(json!({ "id": "k", "type": "float", "default": 0, "yields_to": "q" })),
+            params(json!({ "id": "k", "type": "float", "prefill": 0, "yields_to": "q" })),
             "k yields to no other",
         ),
         (
-            params(json!({ "id": "k", "type": "float", "default": 0, "waits_for": "k" })),
+            params(json!({ "id": "k", "type": "float", "prefill": 0, "waits_for": "k" })),
             "k waits for no other",
         ),
         (
-            params(json!({ "id": "k", "type": "float", "default": 0, "waits_for": "q" })),
+            params(json!({ "id": "k", "type": "float", "prefill": 0, "waits_for": "q" })),
             "k waits for no other",
         ),
         (
@@ -106,7 +106,7 @@ fn descriptors_check_their_new_fields() {
             "pace steps are outside 1..=240",
         ),
         (
-            params(json!({ "id": "k", "type": "float", "default": 0, "label": { "en": "x".repeat(300) } })),
+            params(json!({ "id": "k", "type": "float", "prefill": 0, "label": { "en": "x".repeat(300) } })),
             "256",
         ),
         (

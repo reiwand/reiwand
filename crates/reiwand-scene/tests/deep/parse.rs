@@ -35,7 +35,7 @@ fn every_advanced_field_parses_validates_and_names_its_feature() {
 fn advanced_fields_round_trip_and_older_forms_still_read() {
     let scene = deep();
     let text = scene.to_json().unwrap();
-    assert_eq!(Scene::from_json(&text).unwrap(), scene);
+    assert_eq!(Scene::from_json(&reiwand_upgrade::fill::whole(&text)).unwrap(), scene);
     let written: Json = serde_json::from_str(&text).unwrap();
     assert_eq!(written["particles"]["fireworks"]["init"]["life"], json!([1.0, 3.0, 2.0]));
     assert_eq!(written["particles"]["fireworks"]["forces"][0]["window"], json!([0.0, 0.1, 0.8, 1.0]));
@@ -45,7 +45,7 @@ fn advanced_fields_round_trip_and_older_forms_still_read() {
     let system: System = serde_json::from_value(old.clone()).unwrap();
     assert_eq!(serde_json::to_value(&system).unwrap()["emitters"][0]["shape"], old["emitters"][0]["shape"]);
     assert_eq!((system.init.life.ends, system.render.stretch.map(|s| s.time)), ([1.0, 2.0], Some(0.5)));
-    let older = Scene::from_json(include_str!("../sample.json")).unwrap();
+    let older = Scene::from_json(&reiwand_upgrade::fill::whole(&include_str!("../sample.json"))).unwrap();
     assert!(older.features().is_empty() && !needs(&older).media);
 }
 
@@ -74,7 +74,7 @@ fn models_are_read_from_their_files_and_checked_by_name() {
             Some(slot) => *slot = value,
             None => doc.pointer_mut(parent).unwrap()[key] = value,
         }
-        let mut broken = Scene::from_json(&doc.to_string()).unwrap();
+        let mut broken = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
         let found = adopt(&mut broken, &figure()).unwrap_err().to_string();
         assert!(found.contains(fault), "{found}");
     }
@@ -104,7 +104,7 @@ fn shader_stages_are_checked_against_their_use() {
     let mut scene = deep();
     let mut doc: Json = serde_json::from_str(DEEP).unwrap();
     doc["layers"][4]["effects"] = json!([{ "effect": "glass" }]);
-    let mut misplaced = Scene::from_json(&doc.to_string()).unwrap();
+    let mut misplaced = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     let found = adopt(&mut misplaced, &figure()).unwrap_err().to_string();
     assert!(found.contains("/layers/4/effects/0/effect does not fit"), "{found}");
     adopt(&mut scene, &figure()).unwrap();

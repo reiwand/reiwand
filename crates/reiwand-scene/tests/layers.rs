@@ -7,7 +7,10 @@ const VIEW: [f32; 4] = [0.0, 0.0, 100.0, 50.0];
 
 fn runtime(canvas: Json, layers: Json) -> Runtime {
     let text = json!({ "schema": SCHEMA, "canvas": canvas, "layers": layers });
-    Runtime::new(Arc::new(Scene::load(&text.to_string(), &BTreeMap::new()).unwrap()), Values::new())
+    Runtime::new(
+        Arc::new(Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new()).unwrap()),
+        Values::new(),
+    )
 }
 
 fn box_at(id: &str, more: Json) -> Json {
@@ -116,7 +119,10 @@ fn tints_brightness_and_mask_strength_reach_the_draws() {
     ]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": layers,
         "assets": { "a": { "path": "a.png" } } });
-    let rt = Runtime::new(Arc::new(Scene::load(&text.to_string(), &BTreeMap::new()).unwrap()), Values::new());
+    let rt = Runtime::new(
+        Arc::new(Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new()).unwrap()),
+        Values::new(),
+    );
     let frame = rt.frame(VIEW, Quality::Q3);
     let d = &frame.draws[0];
     assert_eq!((d.tint.0, d.brightness, d.mask_strength), ([1.0, 0.0, 0.0, 1.0], 3.0, 0.25));

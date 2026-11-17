@@ -14,7 +14,7 @@ fn scene(sounds: Json) -> Scene {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": sounds,
         "assets": { "wind": { "path": "wind.ogg" }, "pic": { "path": "pic.png" } },
         "timelines": [{ "id": "storm", "duration": 10, "loop": "repeat" }] });
-    Scene::from_json(&text.to_string()).unwrap()
+    Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap()
 }
 
 fn issues(layer: Json) -> Vec<Issue> {

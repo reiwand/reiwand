@@ -2,8 +2,8 @@ use super::*;
 
 #[test]
 fn sample_roundtrips_and_is_valid() {
-    let scene = Scene::load(SAMPLE, &props()).unwrap();
-    assert_eq!(Scene::from_json(&scene.to_json().unwrap()).unwrap(), scene);
+    let scene = Scene::load(&reiwand_upgrade::fill::whole(&SAMPLE), &props()).unwrap();
+    assert_eq!(Scene::from_json(&reiwand_upgrade::fill::whole(&scene.to_json().unwrap())).unwrap(), scene);
     let ids: Vec<&str> = scene.layers().map(|l| l.id.as_str()).collect();
     assert_eq!(ids, ["background", "sea", "sparks", "clock", "badge", "disc", "ring", "bars", "post"]);
     assert_eq!(scene.canvas.background, Color::parse("#0b1020").unwrap());
@@ -37,7 +37,10 @@ fn unknown_fields_and_values_are_rejected() {
     ];
     for (from, to) in edits {
         assert!(SAMPLE.contains(from), "{from}");
-        assert!(Scene::from_json(&SAMPLE.replacen(from, to, 1)).is_err(), "{to}");
+        assert!(
+            Scene::from_json(&reiwand_upgrade::fill::whole(&SAMPLE.replacen(from, to, 1))).is_err(),
+            "{to}"
+        );
     }
 }
 
@@ -73,7 +76,7 @@ fn validation_names_the_broken_field() {
         "{ \"prop\": \"depth\", \"scale\": 10 }",
         "{ \"prop\": \"deep\", \"audio\": \"bass\", \"kind\": \"relative\", \"unit\": \"db\" }",
     );
-    let found = Scene::from_json(&renamed).unwrap().validate(&props());
+    let found = Scene::from_json(&reiwand_upgrade::fill::whole(&renamed)).unwrap().validate(&props());
     let path = "/layers/0/effects/1/params/radius";
     assert_eq!(found, [Issue::Source(path.into()), unknown(path, "property", "deep")]);
     let found = issues(|s| {
@@ -116,20 +119,20 @@ fn validation_names_the_broken_field() {
     );
     assert_eq!(issues(|s| s.layers = vec![deep]), [Issue::Depth("/layers/0".repeat(9))]);
     let unsorted = SAMPLE.replace("[[0, 0], [10, 360]]", "[[10, 360], [0, 0]]");
-    let found = Scene::from_json(&unsorted).unwrap().validate(&props());
+    let found = Scene::from_json(&reiwand_upgrade::fill::whole(&unsorted)).unwrap().validate(&props());
     assert_eq!(found, [Issue::Unsorted("/layers/4/transform/rotation/keys".into())]);
     let clocked = SAMPLE.replace("\"opacity\": 0.6", "\"opacity\": { \"clock\": \"HH\" }");
     assert_eq!(
-        Scene::from_json(&clocked).unwrap().validate(&props()),
+        Scene::from_json(&reiwand_upgrade::fill::whole(&clocked)).unwrap().validate(&props()),
         [Issue::Type("/layers/1/opacity".into())]
     );
     let huge = SAMPLE
         .replace("\"scale\": 0.8, \"offset\": 0.2, \"clamp\"", "\"scale\": 1e39, \"offset\": 0.2, \"clamp\"");
-    let found = Scene::from_json(&huge).unwrap().validate(&props());
+    let found = Scene::from_json(&reiwand_upgrade::fill::whole(&huge)).unwrap().validate(&props());
     let infinite = |i: &Issue| matches!(i, Issue::Range { path, value, .. } if path.ends_with("/opacity/scale") && value.is_infinite());
     assert!(found.len() == 1 && infinite(&found[0]), "{found:?}");
     let curve = SAMPLE.replace("\"out_cubic\"", "[0.2, 0, 1.5, 1]");
-    let found = Scene::from_json(&curve).unwrap().validate(&props());
+    let found = Scene::from_json(&reiwand_upgrade::fill::whole(&curve)).unwrap().validate(&props());
     assert_eq!(found, [range("/layers/3/opacity/keys/0/2/2", 1.5, 0.0, 1.0)]);
     let chain: Vec<Layer> = (0..2000)
         .map(|i| Layer {
@@ -145,17 +148,17 @@ fn validation_names_the_broken_field() {
     assert!(started.elapsed().as_secs() < 2);
     let triggered = SAMPLE.replace("\"autoplay\": true", "\"trigger\": \"prop:nothing\"");
     assert_eq!(
-        Scene::from_json(&triggered).unwrap().validate(&props()),
+        Scene::from_json(&reiwand_upgrade::fill::whole(&triggered)).unwrap().validate(&props()),
         [unknown("/timelines/0/trigger", "property", "nothing")]
     );
     let tapped = SAMPLE.replace("\"autoplay\": true", "\"trigger\": \"tap:sky\"");
     assert_eq!(
-        Scene::from_json(&tapped).unwrap().validate(&props()),
+        Scene::from_json(&reiwand_upgrade::fill::whole(&tapped)).unwrap().validate(&props()),
         [unknown("/timelines/0/trigger", "trigger", "tap:sky")]
     );
     let clicked = SAMPLE.replace("\"autoplay\": true", "\"trigger\": \"click:sky\"");
     assert_eq!(
-        Scene::from_json(&clicked).unwrap().validate(&props()),
+        Scene::from_json(&reiwand_upgrade::fill::whole(&clicked)).unwrap().validate(&props()),
         [unknown("/timelines/0/trigger", "layer that takes clicks", "sky")]
     );
 }

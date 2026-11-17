@@ -17,7 +17,7 @@ fn picture_masks_of_a_mesh_are_posed_with_it_by_one_hidden_copy_per_picture() {
         "veil": { "path": "veil.png" } });
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 64] }, "assets": assets,
         "layers": [{ "blend_space": "canvas", "id": "sheet_0", "type": "solid", "color": "#000000" }, fox] });
-    let mut scene = Scene::from_json(&text.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap();
     let glb = arm().bytes();
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     let ids: Vec<&str> = scene.layers.iter().map(|l| l.id.as_str()).collect();
@@ -48,7 +48,7 @@ fn inked(scene: serde_json::Value) -> Runtime {
     let assets = json!({ "arm": { "path": "arm.glb" }, "ink": { "path": "ink.png" } });
     let mut doc = json!({ "schema": SCHEMA, "canvas": { "size": [64, 64] }, "assets": assets, "layers": [] });
     scene.as_object().unwrap().iter().for_each(|(k, v)| doc[k] = v.clone());
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     let glb = arm().bytes();
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     Runtime::new(std::sync::Arc::new(scene), Values::new())

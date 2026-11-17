@@ -1,5 +1,6 @@
 mod accounts;
 pub mod client;
+mod descriptors;
 #[cfg(feature = "client")]
 mod download;
 pub mod fill;

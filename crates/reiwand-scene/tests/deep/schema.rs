@@ -68,7 +68,7 @@ fn the_schema_describes_every_advanced_field() {
 fn each_model_file_is_read_once_and_its_counts_cannot_overflow() {
     let mut doc: Json = serde_json::from_str(DEEP).unwrap();
     doc["assets"]["robot"]["path"] = json!("models/fox.glb");
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     let (model, mut reads) = (figure(), 0);
     let mut inner = files(&model);
     let counted = |path: &str, max: usize| {

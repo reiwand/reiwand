@@ -50,7 +50,7 @@ pub enum Texel {
 pub struct Variant {
     pub id: String,
     pub values: Vec<Param>,
-    pub default: Param,
+    pub prefill: Param,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub when_bound: Option<String>,
 }

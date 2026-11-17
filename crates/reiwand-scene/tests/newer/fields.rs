@@ -30,20 +30,20 @@ fn every_new_field_parses_validates_and_names_its_feature() {
 fn new_fields_round_trip_and_older_scenes_use_none_of_them() {
     let scene = full();
     let text = scene.to_json().unwrap();
-    let again = Scene::from_json(&text).unwrap();
+    let again = Scene::from_json(&reiwand_upgrade::fill::whole(&text)).unwrap();
     assert_eq!(again, scene);
     assert_eq!(again.features(), scene.features());
     let written: Json = serde_json::from_str(&text).unwrap();
     assert_eq!(written["layers"][0]["parallax"], json!([0.1, 0.02]));
     assert_eq!(written["layers"][9]["opacity"]["keys"][0][2], json!({ "out": [0.5, 1.0] }));
     assert!(written["canvas"].get("clear").is_some() && written["layers"][7].get("redraw").is_some());
-    let old = Scene::from_json(SAMPLE).unwrap();
+    let old = Scene::from_json(&reiwand_upgrade::fill::whole(&SAMPLE)).unwrap();
     assert_eq!(old.features(), Default::default());
     let plain: Json = serde_json::from_str(&old.to_json().unwrap()).unwrap();
     assert!(plain["canvas"].get("clear").is_none() && plain.get("effects").is_none());
     let even = json!({ "schema": SCHEMA, "canvas": { "size": [8, 8] },
         "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#000000", "parallax": [0.4, 0.4] }] });
-    let even = Scene::from_json(&even.to_string()).unwrap();
+    let even = Scene::from_json(&reiwand_upgrade::fill::whole(&even.to_string())).unwrap();
     assert!(even.features().is_empty() && even.to_json().unwrap().to_string().contains("0.4"));
 }
 
@@ -53,17 +53,23 @@ fn clock_texts_keep_their_letters_and_date_texts_name_their_feature() {
         json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [{ "blend_space": "canvas", "id": "t", "type": "text", "text": t }] })
             .to_string()
     };
-    let scene = Scene::load(&text(json!({ "clock": "HH:mm Sydney" })), &BTreeMap::new()).unwrap();
+    let scene = Scene::load(
+        &reiwand_upgrade::fill::whole(&text(json!({ "clock": "HH:mm Sydney" }))),
+        &BTreeMap::new(),
+    )
+    .unwrap();
     assert!(scene.features().is_empty());
     let mut rt = Runtime::new(std::sync::Arc::new(scene), Values::new());
     rt.set_wall(13.0 * 3600.0 + 5.0 * 60.0);
     let frame = rt.frame([0.0, 0.0, 100.0, 50.0], Quality::Q3);
     assert!(matches!(&frame.draws[0].content, Content::Text { text, .. } if text == "13:05 Sydney"));
-    let dated = Scene::load(&text(json!({ "date": "d MMMM yyyy" })), &BTreeMap::new()).unwrap();
+    let dated =
+        Scene::load(&reiwand_upgrade::fill::whole(&text(json!({ "date": "d MMMM yyyy" }))), &BTreeMap::new())
+            .unwrap();
     assert!(dated.features().contains("clock_dates"));
     let wrong = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] },
         "layers": [{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#000000", "opacity": { "date": "d" } }] });
-    assert!(Scene::load(&wrong.to_string(), &BTreeMap::new()).is_err());
+    assert!(Scene::load(&reiwand_upgrade::fill::whole(&wrong.to_string()), &BTreeMap::new()).is_err());
 }
 
 #[test]

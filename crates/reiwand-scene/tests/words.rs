@@ -8,7 +8,8 @@ const VIEW: [f32; 4] = [0.0, 0.0, 100.0, 50.0];
 fn scene(text: Json) -> Scene {
     let layers = json!([{ "blend_space": "canvas", "id": "hello", "type": "text", "text": text }]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": layers });
-    Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"))
+    Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new())
+        .unwrap_or_else(|e| panic!("{e}"))
 }
 
 fn shown(scene: &Scene, languages: &[&str]) -> String {
@@ -46,7 +47,10 @@ fn texts_in_several_languages_name_their_feature_and_are_checked() {
     let refuse = |text: Json| {
         let layers = json!([{ "blend_space": "canvas", "id": "hello", "type": "text", "text": text }]);
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": layers });
-        Scene::load(&text.to_string(), &BTreeMap::new()).err().map(|e| e.to_string()).unwrap_or_default()
+        Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new())
+            .err()
+            .map(|e| e.to_string())
+            .unwrap_or_default()
     };
     assert!(refuse(json!({ "en": "Hi", "english": "Hello" })).contains("/text/english"));
     assert!(refuse(json!({ "en": "Hi", "es": " " })).contains("/text/es"));

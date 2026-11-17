@@ -22,7 +22,7 @@ pub struct Hold<'a> {
 }
 
 fn value(p: &ParamDef) -> [f32; 2] {
-    match &p.default {
+    match &p.prefill {
         Param::Vec2(v) => *v,
         Param::Number(n) => [*n, *n],
         _ => [0.5, 0.5],

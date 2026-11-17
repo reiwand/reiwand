@@ -74,7 +74,10 @@ fn mask_of(e: &EffectUse) -> Option<Source<'_>> {
 }
 
 fn fusable(e: &EffectUse) -> Option<(&'static Descriptor, Source<'_>)> {
-    let pictured = |d: &Descriptor| d.params.iter().any(|p| p.kind.asset() && e.params.contains_key(&p.id));
+    let blank = |v: &Value<crate::Param>| matches!(v, Value::Fixed(crate::Param::Text(t)) if t.is_empty());
+    let pictured = |d: &Descriptor| {
+        d.params.iter().any(|p| p.kind.asset() && e.params.get(&p.id).is_some_and(|v| !blank(v)))
+    };
     let mask = mask_of(e).filter(|_| e.enabled == Value::Fixed(true))?;
     let mixed = |d: &Descriptor| mask.is_some() && d.mask_mode == MaskMode::Mix && d.fuse == Some(Fuse::Uv);
     let d = descriptor(&e.effect)

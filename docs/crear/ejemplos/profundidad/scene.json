@@ -1,20 +1,269 @@
 {
-  "schema": "reiwand.scene/1",
-  "canvas": {
-    "size": [1920, 1080], "background": "#000000", "perspective": 1400,
-    "parallax": { "amount": 1, "delay": 0.2, "pointer": 1 }
-  },
   "assets": {
-    "cielo": { "path": "assets/cielo.png" },
-    "profundidad": { "path": "assets/profundidad.png", "linear": true }
+    "cielo": {
+      "animated": false,
+      "atlas": null,
+      "durations": [],
+      "face": null,
+      "filter": null,
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/cielo.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
+    },
+    "profundidad": {
+      "animated": false,
+      "atlas": null,
+      "durations": [],
+      "face": null,
+      "filter": null,
+      "fps": null,
+      "frames": null,
+      "linear": true,
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/profundidad.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
+    }
   },
+  "audio": null,
+  "camera3d": null,
+  "canvas": {
+    "ambient": null,
+    "background": "#000000",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": {
+      "amount": 1,
+      "delay": 0.2,
+      "gyro": false,
+      "offset": [
+        0,
+        0
+      ],
+      "pointer": 1
+    },
+    "perspective": 1400,
+    "size": [
+      1920,
+      1080
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": null
+  },
+  "effects": {},
+  "ext": {},
   "layers": [
-    { "blend_space": "canvas", "id": "fondo", "type": "image", "image": "cielo", "size": [1920, 1080],
-      "effects": [{ "effect": "depth_parallax",
-        "params": { "depth": "profundidad", "reach": 0, "strength": 40, "focus": 0.5, "steps": 16, "follow": true, "orbit": true } }] },
-    { "blend_space": "canvas", "id": "cartel", "type": "shape", "shape": { "rect": { "size": [640, 360], "radius": 30 } }, "fill": "#ffffffcc",
-      "transform": { "position": [960, 540], "tilt": [0, 25], "z": 120 }, "parallax": [0.03, 0.03] },
-    { "blend_space": "canvas", "id": "titulo", "type": "text", "text": "Profundidad", "font": "sans-serif", "size": 110, "color": "#1b2440",
-      "transform": { "position": [960, 540], "tilt": [0, 25], "z": 130 }, "parallax": [0.04, 0.04] }
-  ]
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "color": null,
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "depth_parallax",
+          "enabled": true,
+          "mask": null,
+          "name": null,
+          "optional": false,
+          "params": {
+            "depth": "profundidad",
+            "focus": 0.5,
+            "follow": true,
+            "orbit": true,
+            "overscan": 1.0,
+            "reach": 0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "smooth": false,
+            "steps": 16,
+            "strength": 40
+          }
+        }
+      ],
+      "id": "fondo",
+      "image": "cielo",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "playback": null,
+      "size": [
+        1920,
+        1080
+      ],
+      "solid": false,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#ffffffcc",
+      "gradient": null,
+      "id": "cartel",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0.03,
+        0.03
+      ],
+      "parent": null,
+      "shape": {
+        "rect": {
+          "radius": 30,
+          "size": [
+            640,
+            360
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": [
+          960,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": [
+          0,
+          25
+        ],
+        "z": 120
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "align": "center",
+      "anchor": null,
+      "attach": null,
+      "background": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "blur": null,
+      "brightness": null,
+      "cache": false,
+      "color": "#1b2440",
+      "depth_test": false,
+      "effects": [],
+      "fallback": [],
+      "font": "sans-serif",
+      "id": "titulo",
+      "inherit": null,
+      "letter_spacing": null,
+      "lighting": null,
+      "line_height": null,
+      "mask": null,
+      "opacity": 1.0,
+      "outline": null,
+      "padding": null,
+      "parallax": [
+        0.04,
+        0.04
+      ],
+      "parent": null,
+      "render": null,
+      "shadow": null,
+      "size": 110,
+      "solid": false,
+      "text": "Profundidad",
+      "transform": {
+        "origin": null,
+        "position": [
+          960,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": [
+          0,
+          25
+        ],
+        "z": 130
+      },
+      "type": "text",
+      "valign": null,
+      "visible": true,
+      "wrap": null
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/1",
+  "scripts": [],
+  "templates": {},
+  "timelines": [],
+  "transition": null
 }

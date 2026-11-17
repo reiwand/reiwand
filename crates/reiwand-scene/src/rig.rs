@@ -18,26 +18,16 @@ pub const MAX_BODIES: usize = 64;
 pub const MAX_EXPRESSIONS: usize = 64;
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
-#[serde(default)]
 pub struct Rig {
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub clips: Vec<AnimClip>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub animations: Vec<AnimLayer>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub ik: Vec<IkChain>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub physics: Vec<BonePhysics>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub colliders: Vec<BoneCollider>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub rules: Vec<BoneRule>,
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     #[schemars(extend("x-ref" = "shape"))]
     pub shapes: BTreeMap<String, Value<f32>>,
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub expressions: BTreeMap<String, BTreeMap<String, f32>>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     #[schemars(extend("x-ref" = "bone"))]
     pub hit: Vec<String>,
 }
@@ -46,24 +36,21 @@ pub struct Rig {
 #[serde(deny_unknown_fields)]
 pub struct AnimClip {
     pub id: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub animation: Option<String>,
-    #[serde(default)]
     #[schemars(extend("x-unit" = "s"))]
     pub from: f32,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "s"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub to: Option<f32>,
-    #[serde(default = "repeat", rename = "loop")]
+    #[serde(rename = "loop")]
     pub repeat: Loop,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub events: Vec<Event>,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     #[schemars(extend("x-ref" = "bone"))]
     pub bones: BTreeMap<String, BoneKeys>,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub shapes: BTreeMap<String, Vec<crate::Key<f32>>>,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub order: BTreeMap<String, Vec<crate::Key<f32>>>,
 }
 
@@ -72,23 +59,16 @@ pub struct AnimClip {
 pub struct AnimLayer {
     #[schemars(extend("x-ref" = "clip"))]
     pub clip: String,
-    #[serde(default = "one")]
     #[schemars(extend("x-range" = [0, 1]))]
     pub weight: Value<f32>,
-    #[serde(default = "one")]
     #[schemars(extend("x-range" = [0, 16]))]
     pub rate: Value<f32>,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub additive: bool,
-    #[serde(default)]
     #[schemars(extend("x-unit" = "s", "x-range" = [0, 10]))]
     pub blend_in: f32,
-    #[serde(default)]
     #[schemars(extend("x-unit" = "s", "x-range" = [0, 10]))]
     pub blend_out: f32,
-    #[serde(default = "crate::content::shown")]
     pub enabled: Value<bool>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[schemars(extend("x-ref" = "bone"))]
     pub bones: Vec<String>,
 }
@@ -116,13 +96,10 @@ pub struct IkChain {
     pub chain: Vec<String>,
     #[schemars(extend("x-ref" = "reach"))]
     pub target: Reach,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     #[schemars(extend("x-unit" = "°", "x-ref" = "bone"))]
     pub limits: BTreeMap<String, [f32; 2]>,
-    #[serde(default = "one")]
     #[schemars(extend("x-range" = [0, 1]))]
     pub weight: Value<f32>,
-    #[serde(default)]
     pub bend: Bend,
 }
 
@@ -140,28 +117,24 @@ pub enum Body {
 pub struct BonePhysics {
     #[schemars(extend("x-ref" = "bone"))]
     pub bone: String,
-    #[serde(default)]
     pub mode: Body,
-    #[serde(default = "half")]
     #[schemars(extend("x-range" = [0, 1]))]
     pub stiffness: f32,
-    #[serde(default = "half")]
     #[schemars(extend("x-range" = [0, 1]))]
     pub damping: f32,
-    #[serde(default = "half")]
     #[schemars(extend("x-range" = [0, 1]))]
     pub inertia: f32,
-    #[serde(default)]
     #[schemars(extend("x-range" = [-10, 10]))]
     pub gravity: f32,
-    #[serde(default)]
     #[schemars(extend("x-range" = [0, 1]))]
     pub wind: f32,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "°"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub rotation: Option<[f32; 2]>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "px"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub translation: Option<[f32; 2]>,
 }
 
@@ -174,18 +147,6 @@ pub struct BoneRule {
     pub parent: String,
     #[schemars(extend("x-range" = [0, 1]))]
     pub weight: Value<f32>,
-}
-
-fn one() -> Value<f32> {
-    Value::Fixed(1.0)
-}
-
-fn half() -> f32 {
-    0.5
-}
-
-fn repeat() -> Loop {
-    Loop::Repeat
 }
 
 impl Rig {

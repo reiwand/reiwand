@@ -95,5 +95,5 @@ fn adopt(scene: &mut Scene, model: &Json) -> Result<(), SceneError> {
 }
 
 fn deep() -> Scene {
-    Scene::load(DEEP, &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"))
+    Scene::load(&reiwand_upgrade::fill::whole(&DEEP), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"))
 }

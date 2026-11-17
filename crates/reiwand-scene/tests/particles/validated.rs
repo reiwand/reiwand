@@ -13,7 +13,11 @@ fn systems_are_validated_against_their_limits() {
         json!({ "collide": [{ "bounds": "box" }] }),
         json!({ "init": { "glow": [1, 2] } }),
     ] {
-        assert!(Scene::from_json(&scene(with(sparks(), bad.clone()), true)).is_err(), "{bad}");
+        assert!(
+            Scene::from_json(&reiwand_upgrade::fill::whole(&scene(with(sparks(), bad.clone()), true)))
+                .is_err(),
+            "{bad}"
+        );
     }
     assert_eq!(
         issues(with(sparks(), json!({ "capacity": 0 }))),
@@ -26,8 +30,11 @@ fn systems_are_validated_against_their_limits() {
     let life = with(sparks(), json!({ "init": { "life": [3, 1] } }));
     assert_eq!(issues(life), [range(&format!("{p}/init/life/1"), 1.0, 3.0, 600.0)]);
     let five = Json::Array(vec![json!({ "shape": "edge", "rate": 1 }); 5]);
-    let wide =
-        Scene::from_json(&scene(with(sparks(), json!({ "emitters": five, "prewarm": 20 })), true)).unwrap();
+    let wide = Scene::from_json(&reiwand_upgrade::fill::whole(&scene(
+        with(sparks(), json!({ "emitters": five, "prewarm": 20 })),
+        true,
+    )))
+    .unwrap();
     assert!(wide.validate(&props()).is_empty() && wide.features().contains("particles2"));
     let nine = Json::Array(vec![json!({ "shape": "edge", "rate": 1 }); 9]);
     let too_many = Issue::TooMany { path: format!("{p}/emitters"), count: 9, max: 8 };
@@ -42,7 +49,7 @@ fn systems_are_validated_against_their_limits() {
     assert_eq!(issues(with(sparks(), json!({ "emitters": rate }))), [unknown]);
     let curve = with(sparks(), json!({ "render": { "size_over_life": [[0.5, 1], [0.1, 0]] } }));
     assert_eq!(issues(curve), [Issue::Unsorted(format!("{p}/render/size_over_life"))]);
-    let mut big = Scene::from_json(&scene(sparks(), true)).unwrap();
+    let mut big = Scene::from_json(&reiwand_upgrade::fill::whole(&scene(sparks(), true))).unwrap();
     let huge: System = serde_json::from_value(with(sparks(), json!({ "capacity": 150_000 }))).unwrap();
     big.particles.extend((0..32).map(|i| (format!("s{i}"), huge.clone())));
     let found = big.validate(&props());

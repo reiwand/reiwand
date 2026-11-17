@@ -5,11 +5,11 @@
   "description": { "en": "Blends a texture over the picture with a chosen blend mode.", "es": "Mezcla una textura sobre la imagen con el modo de fusión que elijas." },
   "mask_mode": "strength",
   "params": [
-    { "id": "texture", "type": "texture", "default": "" },
-    { "id": "blend", "type": "blend", "default": "multiply" },
-    { "id": "amount", "type": "float", "default": 1, "min": 0, "max": 1 },
-    { "id": "offset", "type": "vec2", "default": [0, 0], "min": -2, "max": 2 },
-    { "id": "scale", "type": "vec2", "default": [1, 1], "min": 0.01, "max": 16 }
+    { "id": "texture", "type": "texture", "prefill": "" },
+    { "id": "blend", "type": "blend", "prefill": "multiply" },
+    { "id": "amount", "type": "float", "prefill": 1, "min": 0, "max": 1 },
+    { "id": "offset", "type": "vec2", "prefill": [0, 0], "min": -2, "max": 2 },
+    { "id": "scale", "type": "vec2", "prefill": [1, 1], "min": 0.01, "max": 16 }
   ],
   "passes": [{ "entry": "fs_blend_texture", "inputs": ["previous", "asset:texture"] }]
 }

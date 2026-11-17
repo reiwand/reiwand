@@ -9,7 +9,7 @@ fn shown(frame: &Frame, i: usize) -> String {
 
 fn refused(text: serde_json::Value) -> bool {
     let layers = json!([{ "blend_space": "canvas", "id": "t", "type": "text", "text": text }]);
-    Scene::load(&scene(layers), &props()).is_err()
+    Scene::load(&reiwand_upgrade::fill::whole(&scene(layers)), &props()).is_err()
 }
 
 #[test]
@@ -46,5 +46,8 @@ fn placeholders_are_texts_of_media_texts_only() {
     assert!(refused(json!({ "media": "title", "placeholder": { "pt-BR": "y".repeat(600) } })));
     assert!(refused(json!({ "media": "title", "placeholder": 5 })));
     let solid = json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "opacity": { "media": "progress", "placeholder": "x" } }]);
-    assert!(Scene::load(&scene(solid), &props()).is_err(), "a number has no placeholder");
+    assert!(
+        Scene::load(&reiwand_upgrade::fill::whole(&scene(solid)), &props()).is_err(),
+        "a number has no placeholder"
+    );
 }

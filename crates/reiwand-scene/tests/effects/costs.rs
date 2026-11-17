@@ -5,11 +5,16 @@ use std::borrow::Cow;
 fn asset_parameters_name_assets_of_their_kind() {
     probe(
         json!({ "id": "probe_assets", "passes": [{ "entry": "fs_a", "inputs": ["previous", "asset:depth"] }],
-            "params": [{ "id": "depth", "type": "texture", "default": "" }, { "id": "grade", "type": "lut", "default": "" }] }),
+            "params": [{ "id": "depth", "type": "texture", "prefill": "" }, { "id": "grade", "type": "lut", "prefill": "" }] }),
         "",
     );
+    let merged = |params: serde_json::Value| {
+        let mut all = json!({ "depth": "", "grade": "" });
+        all.as_object_mut().unwrap().extend(params.as_object().unwrap().clone());
+        all
+    };
     let issues = |params: serde_json::Value| {
-        scene(json!([{ "effect": "probe_assets", "params": params }])).validate(&BTreeMap::new())
+        scene(json!([{ "effect": "probe_assets", "params": merged(params) }])).validate(&BTreeMap::new())
     };
     assert_eq!(issues(json!({ "depth": "a", "grade": "grade" })), []);
     let path = |p: &str| format!("/layers/0/effects/0/params/{p}");
