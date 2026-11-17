@@ -24,14 +24,6 @@ pub enum Smooth {
     Apart { up: f32, down: f32 },
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum Gain {
-    #[default]
-    Auto,
-    Fixed,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Hearing {
@@ -41,8 +33,6 @@ pub struct Hearing {
     #[serde(default = "release")]
     #[schemars(extend("x-unit" = "s", "x-range" = [0.01, 10]))]
     pub release: f32,
-    #[serde(default)]
-    pub gain: Gain,
     #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 10], "default" = 5))]
     pub gain_release: f32,
 }
@@ -65,7 +55,7 @@ pub fn follow_peak(peak: f32, loudest: f32, dt: f32, release: f32) -> f32 {
 
 impl Default for Hearing {
     fn default() -> Self {
-        Hearing { attack: 0.02, release: 0.2, gain: Gain::Auto, gain_release: GAIN_RELEASE }
+        Hearing { attack: 0.02, release: 0.2, gain_release: GAIN_RELEASE }
     }
 }
 
@@ -102,12 +92,10 @@ pub fn ease(v: f32, target: f32, dt: f32, up: f32, down: f32) -> f32 {
 
 impl Hearing {
     pub fn hear(&self, last: &AudioFrame, mut next: AudioFrame, dt: f32, peak: &mut f32) -> AudioFrame {
-        if self.gain == Gain::Auto {
-            let loudest = next.power.iter().flatten().fold(0.0, |a: f32, &b| a.max(b));
-            *peak = follow_peak(*peak, loudest, dt, self.gain_release);
-            next.raw = next.power.map(|c| c.map(|p| db01(p / *peak, FLOOR_DB)));
-        }
-        let source = if self.gain == Gain::Fixed { next.loud } else { next.raw };
+        let loudest = next.power.iter().flatten().fold(0.0, |a: f32, &b| a.max(b));
+        *peak = follow_peak(*peak, loudest, dt, self.gain_release);
+        next.raw = next.power.map(|c| c.map(|p| db01(p / *peak, FLOOR_DB)));
+        let source = next.raw;
         let [up, down] = [self.attack, self.release].map(|t| t.clamp(0.001, 10.0));
         let follow = |from: &[f32; BANDS], to: &[f32; BANDS]| {
             std::array::from_fn(|b| ease(from[b], to[b], dt, up, down))
@@ -116,6 +104,22 @@ impl Hearing {
         next.average = std::array::from_fn(|b| (next.left[b] + next.right[b]) / 2.0);
         [next.bass, next.mid, next.treble] = levels(&next.average);
         next.level = ease(last.level, next.loudness, dt, up, down);
+        self.kinds(last, &mut next, dt);
         next
+    }
+
+    pub fn kinds(&self, last: &AudioFrame, next: &mut AudioFrame, dt: f32) {
+        let [up, down] = [self.attack, self.release].map(|t| t.clamp(0.001, 10.0));
+        let (side, level) = (next.sides(), next.total());
+        for (i, extra) in next.extra.iter_mut().enumerate() {
+            let follow = |c: usize| {
+                std::array::from_fn(|b| ease(last.extra[i].sides[c][b], side[i][c][b], dt, up, down))
+            };
+            extra.sides[0] = follow(0);
+            extra.sides[1] = follow(1);
+            extra.sides[2] = std::array::from_fn(|b| (extra.sides[0][b] + extra.sides[1][b]) / 2.0);
+            extra.named[..3].copy_from_slice(&levels(&extra.sides[2]));
+            extra.named[3] = ease(last.extra[i].named[3], level[i], dt, up, down);
+        }
     }
 }

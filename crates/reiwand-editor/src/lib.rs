@@ -62,6 +62,7 @@ pub mod media;
 pub mod meta;
 pub mod meter;
 mod meter_gain;
+mod meter_kind;
 pub mod molds;
 pub mod motion;
 pub mod offer;

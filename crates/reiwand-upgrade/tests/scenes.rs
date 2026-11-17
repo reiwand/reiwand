@@ -106,6 +106,18 @@ fn the_audio_block_gains_the_gain_release() {
 }
 
 #[test]
+fn the_scene_wide_gain_becomes_the_kind_of_each_binding() {
+    let layers = json!([{"id": "a", "type": "solid", "opacity": {"audio": "bass"}, "init": {"turbulent": {"audio": 3}}}]);
+    let fixed = upgraded("scenes-gain-fixed", json!({"audio": {"gain": "fixed"}, "layers": layers}));
+    assert!(fixed["audio"].get("gain").is_none());
+    assert_eq!(fixed["layers"][0]["opacity"]["kind"], "absolute");
+    assert_eq!(fixed["layers"][0]["opacity"]["unit"], "db");
+    let auto = upgraded("scenes-gain-auto", json!({"audio": {"gain": "auto"}, "layers": layers}));
+    assert_eq!(auto["layers"][0]["opacity"]["kind"], "relative");
+    assert!(auto["audio"].get("gain").is_none());
+}
+
+#[test]
 fn a_scene_needing_every_step_gets_all_of_them_once() {
     let scene = json!({
         "audio": {"attack": 0.05},

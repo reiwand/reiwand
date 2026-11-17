@@ -66,7 +66,8 @@ pub use crate::input::{
     AudioFrame, BANDS, BloomSet, BoneSet, Camera3dSet, CameraSet, GlideSet, LayerOverride, MAX_DRIVEN_BONES,
     MAX_DRIVEN_RIGS, MAX_DRIVEN_SHAPES, MAX_IMPULSES, MAX_MESH_BYTES, MESH_FLOATS, MadeTrack, MediaState,
     Mesh, ParticleCommand, ParticleControl, PointerState, RigControl, ScriptOutputs, ShakeSet, SoundCommand,
-    SoundControl, StageSet, TimelineCommand, Tuning, VideoCommand, VideoControl,
+    SoundControl, StageSet, TimelineCommand, Tuning, Usual, UsualKey, VideoCommand, VideoControl, read,
+    surge, usual_key,
 };
 pub use crate::layer::{Anchor, Inherit, Kind, Layer, Parallax, Solid, Transform};
 pub use crate::lean::Lean;
@@ -147,8 +148,8 @@ pub use crate::scripting::{
 pub use crate::seat::Seated;
 pub use crate::shape::{MAX_ARGUMENTS, MAX_BRACKETS, MAX_OPERANDS};
 pub use crate::signal::{
-    CLOCKS, FLOOR_DB, GAIN_RELEASE, Gain, HEARD, Hearing, MIN_PEAK, Reduce, SPLITS, Smooth, center, db01,
-    ease, edge, follow_peak, levels,
+    CLOCKS, FLOOR_DB, GAIN_RELEASE, HEARD, Hearing, MIN_PEAK, Reduce, SPLITS, Smooth, center, db01, ease,
+    edge, follow_peak, levels,
 };
 pub use crate::sites::{Site, script_inputs, script_key, sites};
 pub use crate::sound::{MAX_SOUNDS, Order, Sound, VOLUME, Voice, volume_property};
@@ -166,8 +167,8 @@ pub use crate::typeset::{Backing, Glyphs, Layout, MAX_FALLBACK, Outline, Shadow,
 pub use crate::uses::{Uses, needs, source, tells_time, variants};
 pub use crate::validate::Issue;
 pub use crate::value::{
-    AudioChannel, Axis, Band, Binding, EMITTER_TEXELS, EffectEmitter, Level, MAX_EFFECT_EMITTERS, Param,
-    Value, Vec2, Vec3, emitter_key, emitter_texels,
+    AudioChannel, AudioKind, AudioUnit, Axis, Band, Binding, EMITTER_TEXELS, EffectEmitter, Level,
+    MAX_EFFECT_EMITTERS, Param, Reference, Value, Vec2, Vec3, emitter_key, emitter_texels,
 };
 pub use crate::voice::{Playlist, Spot, Walk};
 pub use crate::wake::Wake;

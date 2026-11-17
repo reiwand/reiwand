@@ -1,12 +1,15 @@
 use serde::{Deserialize, Serialize};
 
+mod kinds;
 mod media;
 mod mesh;
 mod outputs;
+mod read;
 mod rigs;
 mod stage;
 mod track;
 
+pub use kinds::{Extra, Usual, UsualKey, surge, usual_key};
 pub use media::MediaState;
 pub use mesh::{MAX_MESH_BYTES, MESH_FLOATS, Mesh};
 pub(crate) use outputs::UNSET;
@@ -14,6 +17,7 @@ pub use outputs::{
     LayerOverride, ParticleCommand, ParticleControl, ScriptOutputs, SoundCommand, SoundControl,
     TimelineCommand, Tuning, VideoCommand, VideoControl,
 };
+pub use read::read;
 pub use rigs::{BoneSet, MAX_DRIVEN_BONES, MAX_DRIVEN_RIGS, MAX_DRIVEN_SHAPES, MAX_IMPULSES, RigControl};
 pub use stage::{BloomSet, Camera3dSet, CameraSet, GlideSet, ShakeSet, StageSet};
 pub use track::MadeTrack;
@@ -38,6 +42,7 @@ pub struct AudioFrame {
     pub power: [[f32; BANDS]; 2],
     pub loud: [[f32; BANDS]; 2],
     pub loudness: f32,
+    pub extra: [Extra; 3],
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
@@ -69,6 +74,7 @@ impl Default for AudioFrame {
             power: [zero; 2],
             loud: [zero; 2],
             loudness: 0.0,
+            extra: [Extra::default(); 3],
         }
     }
 }

@@ -79,7 +79,7 @@ fn layers_drawing_one_system_share_its_budget() {
 
 #[test]
 fn ranges_of_births_and_emitter_shapes_may_be_bound() {
-    let loud = json!({ "audio": "bass", "scale": 8.0 });
+    let loud = json!({ "audio": "bass", "kind": "relative", "unit": "db", "scale": 8.0 });
     let circle = json!({ "circle": { "center": [100, 50], "radius": loud, "inner": 2 } });
     let bound = with(sparks(), json!({ "emitters": [{ "shape": circle, "rate": 10 }] }));
     let mut init = bound["init"].clone();
@@ -97,6 +97,9 @@ fn ranges_of_births_and_emitter_shapes_may_be_bound() {
     assert_eq!(written["particles"]["dots"]["emitters"][0]["shape"]["circle"]["radius"], loud);
     let plain = Scene::from_json(&scene(sparks(), true)).unwrap();
     assert!(!plain.features().contains("particle_values") && !needs(&plain).audio);
-    let colored = with(sparks(), json!({ "init": { "color": [{ "audio": "bass" }, "#ffffff"] } }));
+    let colored = with(
+        sparks(),
+        json!({ "init": { "color": [{ "audio": "bass", "kind": "relative", "unit": "db" }, "#ffffff"] } }),
+    );
     assert!(matches!(&issues(colored)[..], [Issue::Type(p)] if p.ends_with("/init/color")));
 }

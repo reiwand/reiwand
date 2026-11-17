@@ -166,7 +166,7 @@ número, `[mín, máx, exponente]` (de 0,1 a 10), el azar se inclina hacia un ex
 | `tilt` | | Giro en profundidad: `{ "angle": [[xmin, ymin], [xmax, ymax]], "spin": [[xmin, ymin], [xmax, ymax]] }`, ambos obligatorios, en grados y grados por segundo; el editor lo escribe siempre y con ceros no gira. Cada partícula gira sobre la línea horizontal (x) y la vertical (y) de su propio sprite y se dibuja con el ancho por el coseno de y y el alto por el del giro en x: un pétalo se ve de canto y de frente al caer. Con `perspective` el borde cercano se ve mayor; con `lit` la luz usa la normal girada. El dorso muestra la misma imagen. |
 
 Los extremos de los rangos numéricos (`life`, `speed`, `angle`, `size`...) pueden seguir valores,
-como `"size": [2, { "audio": "bass", "scale": 8 }]`; se leen en cada fotograma. Los colores y las
+como `"size": [2, { "audio": "bass", "kind": "relative", "unit": "db", "scale": 8 }]`; se leen en cada fotograma. Los colores y las
 velocidades se leen al cargar.
 
 ### Fuerzas
@@ -193,7 +193,7 @@ Una lista de hasta 16, aplicadas en cada paso:
 
 Cualquier fuerza acepta `window: [entra_ini, entra_fin, sale_ini, sale_fin]`, fracciones de la
 vida en las que entra y sale. La gravedad y las fuerzas pueden seguir valores, como
-`{ "noise": { "audio": "bass", "scale": 300 } }`.
+`{ "noise": { "audio": "bass", "kind": "relative", "unit": "db", "scale": 300 } }`.
 
 ### Choques
 
@@ -370,7 +370,7 @@ entrada `audio` en el manifiesto (ver [escena.md](escena.md)); el usuario la con
 Hay tres formas:
 
 1. **Valores**: cualquier número, color o interruptor puede seguir el sonido con
-   `{ "audio": "bass" }`, una banda, o un rango de bandas, como se explica en
+   `{ "audio": "bass", "kind": "relative", "unit": "db" }`, una banda, o un rango de bandas, como se explica en
    [escena.md](escena.md). Con `scale`, `offset`, `clamp` y `smooth` se ajusta cuánto y qué tan
    rápido.
 2. **Capas de espectro**: una capa `spectrum` dibuja las barras, el círculo o la onda del sonido
@@ -381,8 +381,8 @@ Hay tres formas:
 
 ```json
     { "blend_space": "canvas", "id": "latido", "type": "shape", "shape": { "ellipse": { "size": [220, 220] } }, "fill": "#ffffff",
-      "opacity": { "audio": "level", "scale": 1.2, "offset": 0.2, "clamp": [0.2, 1], "smooth": 0.1 },
-      "transform": { "scale": { "audio": "bass", "scale": 0.5, "offset": 1, "smooth": { "up": 0.03, "down": 0.3 } } } }
+      "opacity": { "audio": "level", "kind": "relative", "unit": "db", "scale": 1.2, "offset": 0.2, "clamp": [0.2, 1], "smooth": 0.1 },
+      "transform": { "scale": { "audio": "bass", "kind": "relative", "unit": "db", "scale": 0.5, "offset": 1, "smooth": { "up": 0.03, "down": 0.3 } } } }
 ```
 
 ```json
@@ -394,11 +394,25 @@ Los valores de sonido van de 0 a 1. `bass`, `mid` y `treble` promedian las banda
 250 Hz, hasta 4 kHz y por encima; `level` es la fuerza de todo el sonido; `beat` vale 1 en un
 golpe. El análisis tiene 64 bandas por canal (de 40 Hz a 16 kHz), y cada una va en decibelios
 por encima de -70 dB, relativos a la banda más fuerte de los últimos segundos; así la música
-baja y la fuerte llenan el mismo rango (con `gain` `fixed` se mide desde el máximo digital).
+baja y la fuerte llenan el mismo rango. Eso es lo que lee una entrada de partículas, un guion o un
+sombreador. Un enlace de escena (`audio` en un valor) elige además cómo se mide, sin valor por defecto:
+
+- `kind`: `relative` (contra la banda más fuerte reciente), `absolute` (desde el máximo digital: cuánto
+  suena de verdad, sin importar lo anterior) o `surge` (cuánto más fuerte que lo habitual suena ahora; 1 es
+  lo habitual y no tiene techo, así que quien lo consuma debe acotarlo con `bounds` o `clamp`).
+- `unit`: `db` (decibelios, 0 a 1) o `amplitude` (lineal, 0 a 1: las caídas tras un golpe se ven).
+- Solo con `surge`: `window` (0,05 a 60 s, el tiempo con el que se promedia lo habitual), `reference`
+  (`band`: cada banda contra su propio promedio; `all`: contra el promedio de todas juntas, así una banda
+  baja cuando entra otra más fuerte y una banda que vuelve no se dispara) y `hold_silence` (`true`: el
+  promedio se congela durante el silencio, para que una pausa no recargue el siguiente golpe).
+
+El selector de bandas del editor muestra estos campos con el medidor en vivo, ya rellenos con
+`relative`, `db`, ventana de 1 s, `band` y `false`. `reiwand-upgrade scenes` convierte las escenas
+anteriores: el antiguo `gain` pasa a `kind` (`fixed` a `absolute`, `auto` a `relative`) y cada enlace
+recibe `unit: "db"`.
 
 Un bloque `audio` en la raíz de `scene.json` cambia lo rápido que suben y bajan esos valores
-(`attack` y `release`), si se ajustan a lo fuerte que suena la música o al volumen del sistema
-(`gain`) y, con `auto`, en cuánto tiempo vuelve la referencia tras un golpe (`gain_release`, obligatorio): ver [escena.md](escena.md).
+(`attack` y `release`) y en cuánto tiempo vuelve la referencia relativa tras un golpe (`gain_release`, obligatorio): ver [escena.md](escena.md).
 
 Una escena solo se vuelve a dibujar cuando cambia lo que oye. Sin audio en el equipo, o sin que el
 usuario lo permita, todo lo que sigue al sonido vale 0.

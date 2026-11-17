@@ -11,10 +11,10 @@ pub(super) fn drawn() {
         "forces": [{ "gravity": [0, 200] }],
         "collide": [{ "bounds": { "mask": { "texture": "floor" } }, "bounce": 0.2 }],
         "render": { "order": "newest", "trail": { "length": 6, "width": 0.5 } } });
-    let glow = json!({ "audio": [0, 3], "of": 16, "reduce": "max", "bounds": [0.1, 0.9], "exponent": 2,
+    let glow = json!({ "audio": [0, 3], "kind": "relative", "unit": "db", "of": 16, "reduce": "max", "bounds": [0.1, 0.9], "exponent": 2,
         "smooth": { "up": 0.05, "down": 0.5 }, "offset": 0.5 });
     let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32], "background": "#000000" },
-        "assets": { "floor": { "path": "floor.png" } }, "audio": { "attack": 0.05, "release": 0.3, "gain": "fixed", "gain_release": 5 },
+        "assets": { "floor": { "path": "floor.png" } }, "audio": { "attack": 0.05, "release": 0.3, "gain_release": 5 },
         "layers": [{ "blend_space": "canvas", "id": "rain", "type": "particles", "system": "rain", "blend": "normal", "opacity": glow }],
         "particles": { "rain": rain } });
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();

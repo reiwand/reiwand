@@ -30,6 +30,7 @@ pub enum Issue {
     Volume,
     Generations(String),
     Missing(String, String),
+    Required(String),
     Figures(usize),
     Shadows(usize),
     Flat(String),
@@ -114,6 +115,7 @@ impl Issue {
             Issue::Generations(p) => {
                 said("scene.generations", "%1 nests particle systems more than two levels deep", &[p])
             }
+            Issue::Required(p) => said("scene.required", "%1 is required and has no default", &[p]),
             Issue::Missing(p, name) => {
                 said("scene.missing", "%1 names \"%2\", which its model does not have", &[p, name])
             }

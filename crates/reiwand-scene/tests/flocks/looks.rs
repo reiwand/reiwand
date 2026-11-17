@@ -93,9 +93,9 @@ fn orders_put_the_chosen_particles_last() {
 
 #[test]
 fn bound_birth_ranges_and_shapes_follow_their_sources() {
-    let loud = json!({ "audio": "bass", "scale": 10 });
+    let loud = json!({ "audio": "bass", "kind": "relative", "unit": "db", "scale": 10 });
     let system = still(json!({ "capacity": 2000, "emitters": [{ "shape": { "circle": { "center": [100, 50],
-        "radius": { "audio": "bass", "scale": 20 } } }, "rate": 600 }],
+        "radius": { "audio": "bass", "kind": "relative", "unit": "db", "scale": 20 } } }, "rate": 600 }],
         "init": { "life": [10, 10], "speed": [0, 0], "size": [loud, loud] } }));
     let mut fly = Fly::of(json!({ "a": system }));
     let bass = |b| AudioFrame { bass: b, silent: false, ..AudioFrame::default() };
@@ -134,7 +134,7 @@ fn new_looks_are_validated_and_named() {
         json!({ "collide": [{ "bounds": { "mask": { "texture": "nowhere" } } }] }),
         json!({ "collide": [{ "bounds": { "mask": { "texture": "song" } } }] }),
         json!({ "collide": [{ "bounds": { "mask": { "texture": "floor", "threshold": 2 } } }] }),
-        json!({ "emitters": [{ "shape": { "mask": { "texture": "floor", "threshold": { "audio": "bass" } } }, "rate": 1 }] }),
+        json!({ "emitters": [{ "shape": { "mask": { "texture": "floor", "threshold": { "audio": "bass", "kind": "relative", "unit": "db" } } }, "rate": 1 }] }),
         json!({ "render": { "trail": { "length": 99, "width": 0.5 } } }),
     ];
     for b in bad {

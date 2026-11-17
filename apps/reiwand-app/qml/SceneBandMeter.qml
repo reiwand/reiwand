@@ -37,7 +37,7 @@ Item {
                 id: slot
 
                 required property int index
-                readonly property real level: Math.min(1, Math.max(0, meter.bands[index] ?? 0))
+                readonly property real level: Math.min(1, Math.max(0, (meter.bands[index] ?? 0) / (meter.source.kind === "surge" ? 3 : 1)))
                 readonly property bool marked: meter.reply.marked ? index >= meter.reply.marked[0] && index <= meter.reply.marked[1] : false
 
                 width: meter.width / meter.of

@@ -1,7 +1,7 @@
 use super::{MAX_STEP, Runtime};
 use crate::Values;
 use crate::input::{AudioFrame, MediaState, PointerState, ScriptOutputs, TimelineCommand};
-use crate::uses;
+use crate::{Hearing, uses};
 use std::collections::BTreeSet;
 
 impl Runtime {
@@ -45,8 +45,15 @@ impl Runtime {
         let dt = (self.t - std::mem::replace(&mut self.heard, self.t)).clamp(0.0, 1.0) as f32;
         let audio = match self.scene.audio {
             Some(h) => h.hear(&self.audio, audio, dt, &mut self.peak),
-            None => audio,
+            None => {
+                let mut audio = audio;
+                Hearing::default().kinds(&self.audio, &mut audio, dt);
+                audio
+            }
         };
+        for (key, usual) in self.usual.get_mut() {
+            usual.advance(&audio, dt, *key);
+        }
         let beat = audio.beat && !self.audio.beat;
         let changed = self.uses().audio && audio != self.audio && !(audio.silent && self.audio.silent);
         if !audio.silent {

@@ -69,8 +69,10 @@ fn validation_names_the_broken_field() {
         [unknown("/layers/0/image/map/dawn", "asset", "sky_dawn")]
     );
     assert_eq!(issues(|s| s.particles.clear()), [unknown("/layers/2/system", "particle system", "sparks")]);
-    let renamed = SAMPLE
-        .replace("{ \"prop\": \"depth\", \"scale\": 10 }", "{ \"prop\": \"deep\", \"audio\": \"bass\" }");
+    let renamed = SAMPLE.replace(
+        "{ \"prop\": \"depth\", \"scale\": 10 }",
+        "{ \"prop\": \"deep\", \"audio\": \"bass\", \"kind\": \"relative\", \"unit\": \"db\" }",
+    );
     let found = Scene::from_json(&renamed).unwrap().validate(&props());
     let path = "/layers/0/effects/1/params/radius";
     assert_eq!(found, [Issue::Source(path.into()), unknown(path, "property", "deep")]);

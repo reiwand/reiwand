@@ -1,11 +1,13 @@
-use crate::meter_gain;
+use crate::{meter_gain, meter_kind};
 use reiwand_core::message::said;
-use reiwand_scene::{AudioChannel, BANDS, Band, Binding, Gain, Level, Reduce, SPLITS, center, levels};
+use reiwand_scene::{
+    AudioKind, AudioUnit, BANDS, Band, Binding, Level, Reduce, SPLITS, center, read, usual_key,
+};
 use serde_json::{Value, json};
 
 const DISPLAYS: [usize; 3] = [16, 32, 64];
 
-fn channel(reading: &Value, key: &str, side: usize) -> [f32; BANDS] {
+pub(crate) fn channel(reading: &Value, key: &str, side: usize) -> [f32; BANDS] {
     let list = reading[key][side].as_array();
     std::array::from_fn(|i| list.and_then(|l| l.get(i)).and_then(Value::as_f64).unwrap_or(0.0) as f32)
 }
@@ -59,46 +61,28 @@ pub fn query(doc: &Value, q: &Value) -> Value {
         "marked": span(&source).map(|(a, z)| [a * of / BANDS, (z * of).div_ceil(BANDS) - 1]),
     });
     let audio = &doc["scene"]["audio"];
-    let fixed = audio["gain"] == json!(Gain::Fixed);
-    let release = audio["gain_release"].as_f64().filter(|_| audio.is_object() && !fixed);
+    let release = audio["gain_release"].as_f64().filter(|_| audio.is_object());
     if !listening {
         meter_gain::reset();
         return out;
     }
-    let key = if fixed || release.is_some() { "loud" } else { "raw" };
-    let (mut left, mut right) = (channel(reading, key, 0), channel(reading, key, 1));
-    if let Some(release) = release {
-        [left, right] = meter_gain::follow(&[left, right], release as f32);
-    }
-    let average: [f32; BANDS] = std::array::from_fn(|i| (left[i] + right[i]) / 2.0);
-    let side = match source.channel.unwrap_or_default() {
-        AudioChannel::Average => &average,
-        AudioChannel::Left => &left,
-        AudioChannel::Right => &right,
+    let frame = meter_kind::frame(reading, release.map(|r| r as f32));
+    let (kind, unit) = (source.kind.unwrap_or(AudioKind::Relative), source.unit.unwrap_or(AudioUnit::Db));
+    let usual = (kind == AudioKind::Surge).then(|| meter_gain::usual(&frame, usual_key(&source)));
+    let side = meter_kind::side(&frame, usual.as_ref(), &source, kind, unit);
+    let named = |level| match (&usual, level) {
+        (Some(_), Level::Beat) => f32::from(frame.beat),
+        (Some(u), level) => meter_kind::surged(&frame, u, level, unit),
+        (None, level) => frame.named(kind, unit, level),
     };
-    let [bass, mid, treble] = levels(&average);
-    let loudness = reading["loudness"].as_f64().unwrap_or(0.0) as f32;
-    let beat = f32::from(reading["beat"] == true);
-    let value = span(&source).map_or_else(
-        || if matches!(source.audio, Some(Band::Named(Level::Beat))) { beat } else { loudness },
-        |(a, z)| {
-            let named = match source.audio {
-                Some(Band::Named(Level::Bass)) => Some(bass),
-                Some(Band::Named(Level::Mid)) => Some(mid),
-                Some(Band::Named(Level::Treble)) => Some(treble),
-                _ => None,
-            };
-            let picked = &side[a..z];
-            named.unwrap_or_else(|| match source.reduce.unwrap_or_default() {
-                Reduce::Max => picked.iter().copied().fold(0.0, f32::max),
-                Reduce::Mean => picked.iter().sum::<f32>() / picked.len() as f32,
-            })
-        },
-    );
-    out["bands"] = json!(fold(side, of, source.reduce.unwrap_or_default()));
+    let value = source.audio.map_or(0.0, |band| read(&frame, usual.as_ref(), &source, band));
+    out["bands"] = json!(fold(&side, of, source.reduce.unwrap_or_default()));
     out["raw"] = json!(value);
     out["value"] = json!(source.modify(value));
-    out["levels"] = json!({ "bass": bass, "mid": mid, "treble": treble, "level": loudness, "beat": beat });
+    out["levels"] = json!({
+        "bass": named(Level::Bass), "mid": named(Level::Mid), "treble": named(Level::Treble),
+        "level": named(Level::Level), "beat": named(Level::Beat),
+    });
     out["silent"] = json!(reading["silent"] == true);
     out
 }

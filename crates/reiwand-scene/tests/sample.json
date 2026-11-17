@@ -71,14 +71,14 @@
       "color": { "prop": "text_color" },
       "anchor": "bottom",
       "transform": { "position": [0, -40] },
-      "opacity": { "audio": "level", "scale": 0.8, "offset": 0.2, "clamp": [0, 1], "smooth": 0.2 }
+      "opacity": { "audio": "level", "kind": "relative", "unit": "db", "scale": 0.8, "offset": 0.2, "clamp": [0, 1], "smooth": 0.2 }
     },
     {
       "blend_space": "canvas",
       "id": "post",
       "type": "adjustment",
       "effects": [
-        { "effect": "bloom", "params": { "intensity": { "audio": "bass", "scale": 0.8, "offset": 0.2 } } },
+        { "effect": "bloom", "params": { "intensity": { "audio": "bass", "kind": "relative", "unit": "db", "scale": 0.8, "offset": 0.2 } } },
         { "effect": "color_adjust", "params": { "saturation": 1.2 }, "optional": true }
       ]
     }

@@ -74,13 +74,13 @@ const val MIXES_MANIFEST = """{ "schema": "reiwand.wpak/2", "id": "org.example.m
     "effect.blend_texture", "effect.fluid", "effect.glitter", "effect.god_rays.mode", "effect.light_shafts",
     "effect.tint", "effect.trail", "effect_masks", "layer_textures"] } }"""
 const val RAIN_SCENE = """{ "schema": "reiwand.scene/1", "canvas": { "size": [64, 32] },
-    "audio": { "attack": 0.05, "release": 0.3, "gain": "fixed", "gain_release": 5 },
+    "audio": { "attack": 0.05, "release": 0.3, "gain_release": 5 },
     "particles": { "rain": { "capacity": 60, "seed": 3, "emitters": [{ "shape": { "box": { "from": [4, 0], "to": [60, 4] } }, "rate": 60 }],
         "init": { "life": [2, 2], "speed": [0, 0], "size": [3, 3], "gradient": [[0, "#ff0000"], [1, "#0000ff"]] },
         "forces": [{ "gravity": [0, 200] }], "collide": [{ "bounds": "canvas", "bounce": 0.2 }],
         "render": { "order": "newest", "trail": { "length": 6, "width": 0.5 } } } },
     "layers": [{ "blend_space": "canvas", "id": "rain", "type": "particles", "system": "rain",
-        "opacity": { "audio": [0, 3], "of": 16, "bounds": [0.1, 0.9], "exponent": 2, "smooth": { "up": 0.05, "down": 0.5 }, "offset": 0.5 } }] }"""
+        "opacity": { "audio": [0, 3], "kind": "relative", "unit": "db", "of": 16, "bounds": [0.1, 0.9], "exponent": 2, "smooth": { "up": 0.05, "down": 0.5 }, "offset": 0.5 } }] }"""
 const val RAIN_MANIFEST = """{ "schema": "reiwand.wpak/2", "id": "org.example.rain", "version": "1.0.0",
     "title": "Rain", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "origin": { "kind": "original" },
     "content": { "rating": "general" }, "photosensitive": false, "inputs": ["audio"],

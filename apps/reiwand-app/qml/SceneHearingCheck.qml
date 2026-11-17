@@ -11,6 +11,8 @@ QtObject {
                 "page": page,
                 "source": {
                     "audio": [0, 3],
+                    "kind": "relative",
+                    "unit": "db",
                     "of": 16,
                     "reduce": "max"
                 },
@@ -41,6 +43,8 @@ QtObject {
             "pointer": pointer,
             "value": {
                 "audio": "bass",
+                "kind": "relative",
+                "unit": "db",
                 "smooth": 0.3
             }
         });

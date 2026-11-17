@@ -476,7 +476,7 @@ reiwand-ctl scene act DIR add_layer '{"kind":"sound","file":"sound.ogg"}'
 reiwand-ctl scene ask DIR wave '{"asset":"sound","buckets":8}'
 
 ask meter
-reiwand-ctl scene ask DIR meter '{"source":{"audio":[0,3],"of":16},"reading":{"listening":true,"raw":[[0.5,0.2,0.1,0.9],[0.5,0.2,0.1,0.9]],"loudness":0.5},"of":16}'
+reiwand-ctl scene ask DIR meter '{"source":{"audio":[0,3], "kind": "relative", "unit": "db","of":16},"reading":{"listening":true,"raw":[[0.5,0.2,0.1,0.9],[0.5,0.2,0.1,0.9]],"loudness":0.5},"of":16}'
 
 ask response
 reiwand-ctl scene ask DIR response '{"smooth":{"up":0.05,"down":0.4}}'

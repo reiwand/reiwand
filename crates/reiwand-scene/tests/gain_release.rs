@@ -7,7 +7,7 @@ const VIEW: [f32; 4] = [0.0, 0.0, 100.0, 50.0];
 const STEP: f32 = 1.0 / 100.0;
 
 fn runtime(audio: serde_json::Value) -> Runtime {
-    let layer = json!({ "blend_space": "canvas", "id": "l0", "type": "solid", "color": "#ffffff", "opacity": { "audio": 4 } });
+    let layer = json!({ "blend_space": "canvas", "id": "l0", "type": "solid", "color": "#ffffff", "opacity": { "audio": 4, "kind": "relative", "unit": "db" } });
     let text =
         json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [layer], "audio": audio });
     let scene = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"));
@@ -15,7 +15,7 @@ fn runtime(audio: serde_json::Value) -> Runtime {
 }
 
 fn train(release: f32) -> Vec<f32> {
-    let audio = json!({ "attack": 0.001, "release": 0.01, "gain": "auto", "gain_release": release });
+    let audio = json!({ "attack": 0.001, "release": 0.01, "gain_release": release });
     let mut rt = runtime(audio);
     let mut seen = Vec::new();
     for tick in 0..300 {
@@ -56,7 +56,7 @@ fn the_gain_release_is_required_and_limited() {
             json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [layer], "audio": audio });
         Scene::load(&text.to_string(), &BTreeMap::new()).map(|s| s.validate(&BTreeMap::new()).is_empty())
     };
-    assert!(load(json!({ "attack": 0.02, "release": 0.2, "gain": "auto" })).is_err());
+    assert!(load(json!({ "attack": 0.02, "release": 0.2 })).is_err());
     assert_eq!(load(json!({ "gain_release": 0.4 })).ok(), Some(true));
     assert!(load(json!({ "gain_release": 0.01 })).is_err());
     assert!(load(json!({ "gain_release": 11 })).is_err());

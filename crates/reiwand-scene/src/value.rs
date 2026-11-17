@@ -8,7 +8,7 @@ mod emitters;
 mod kinds;
 
 pub use emitters::{EMITTER_TEXELS, EffectEmitter, MAX_EFFECT_EMITTERS, emitter_key, emitter_texels};
-pub use kinds::{AudioChannel, Axis, Band, Level, Param, Vec2, Vec3};
+pub use kinds::{AudioChannel, AudioKind, AudioUnit, Axis, Band, Level, Param, Reference, Vec2, Vec3};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(untagged)]
@@ -38,6 +38,17 @@ pub struct Binding<T> {
     pub audio: Option<Band>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub channel: Option<AudioChannel>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kind: Option<AudioKind>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unit: Option<AudioUnit>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
+    pub window: Option<f32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reference: Option<Reference>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hold_silence: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cursor: Option<Axis>,
     #[serde(default, skip_serializing_if = "Option::is_none")]

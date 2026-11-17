@@ -10,6 +10,8 @@ pub(super) fn value(def: &str, name: &str) -> Option<Value> {
         ("Stretch", "min") => json!(0),
         ("Stretch", "max") => json!(10000),
         ("Hearing", "gain_release") => json!(5),
+        ("Binding", "kind") => json!("relative"),
+        ("Binding", "unit") => json!("db"),
         ("vortex" | "around", "axis") => json!([0, 0, 1]),
         _ => return None,
     })

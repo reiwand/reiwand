@@ -63,7 +63,7 @@ fn forms_order_localize_and_hide_properties() {
 #[test]
 fn declared_inputs_limit_what_a_scene_receives() {
     let layers = json!([{ "blend_space": "canvas", "id": "glow", "type": "solid", "color": "#ffffff", "size": [10, 10],
-        "opacity": { "audio": "bass" }, "parallax": [0.5, 0.5] }]);
+        "opacity": { "audio": "bass", "kind": "relative", "unit": "db" }, "parallax": [0.5, 0.5] }]);
     let mut rt = runtime(&scene(layers));
     assert!(rt.uses().audio && rt.uses().cursor);
     rt.declare(Uses { audio: false, cursor: true, clicks: false, scripts: true, media: false });

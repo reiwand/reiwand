@@ -104,7 +104,7 @@ fn quality_overrides_only_lower_the_cost() {
 fn dropped_effects_need_no_inputs() {
     let rt = runtime(
         json!([{ "effect": "water_ripple" }, { "effect": "god_rays", "optional": true, "params": { "follow": true } },
-        { "effect": "vignette", "params": { "intensity": { "audio": "bass" } } }]),
+        { "effect": "vignette", "params": { "intensity": { "audio": "bass", "kind": "relative", "unit": "db" } } }]),
     );
     let needs = |q| (rt.uses_at(q).audio, rt.uses_at(q).cursor);
     assert_eq!(

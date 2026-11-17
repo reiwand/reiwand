@@ -96,13 +96,12 @@ its thumbnail and details in the library. Scenes without them read and draw as b
 | `wind` | `[x, y]` pixels per second, may be bound: the wind that moves bones with `physics` and models with the `foliage` material | `bone_physics` |
 | `gusts` | 0 to 1 (0.35 when unset): how much of `wind` comes and goes in gusts, from a steady wind at 0 to one that drops to nothing between gusts at 1 | `bone_physics` |
 
-The scene may also set `audio: { "attack" (0.001 to 2 s), "release" (0.01 to 10 s), "gain": "auto" |
-"fixed", "gain_release" (0.05 to 10 s, required) }`, how fast audio values rise and fall and whether they
-follow the system volume (`fixed`) or adjust themselves (`auto`, the default) (`audio_response`). With `auto`
+The scene may also set `audio: { "attack" (0.001 to 2 s), "release" (0.01 to 10 s), "gain_release" (0.05 to 10 s, required) }`, how fast audio values rise and fall
+and how the relative reference recovers (`audio_response`). With the `relative` kind of audio binding
 every band is measured against the loudest band of the last moments; `gain_release` is the time in which
 that reference falls toward the current level after a loud sound (the system uses 5 s for a scene without an
 `audio` block, and the editor writes 5 when it adds the block): a short one makes bands dip right after each
-hit and recover before the next one. With `fixed` it must still be written and is not used. The reference
+hit and recover before the next one. The reference
 is kept by the scene runtime from the unnormalised band powers of each audio frame (`AudioFrame.power`),
 so scripts' and shaders' `band()` and every binding see the same values; the audio frames also carry the
 default reference for scenes without an `audio` block. `reiwand-upgrade scenes DIR` writes `gain_release: 5`
@@ -978,18 +977,34 @@ one source:
 |--------|---------|
 | User property | `{ "prop": "style", "map": { "night": "sky" } }` |
 | Keyframes | `{ "keys": [[0, 0], [2, 1, "in_out_sine"]], "timeline": "intro", "loop": "repeat" }` |
-| Audio | `{ "audio": "bass" }`, `{ "audio": 3, "channel": "left" }` |
+| Audio | `{ "audio": "bass", "kind": "relative", "unit": "db" }`, `{ "audio": 3, "kind": "relative", "unit": "db", "channel": "left" }`, `{ "audio": "bass", "kind": "surge", "unit": "amplitude", "window": 1, "reference": "band", "hold_silence": false }` |
 | Pointer | `{ "cursor": "x" }` (`x`, `y`, `inside`, `speed`) |
 | Clock | `{ "clock": "HH:mm:ss a" }` (text only: `HH`, `H`, `hh`, `h`, `mm`, `m`, `ss`, `s`, `a`) |
 | Script | `{ "script": "scripts/spin.js" }`; with `"fn": "pulse"` and `"params": { "speed": 2 }` a module serves many values (`scripts2`, see "Scripts") |
 | Media player | `{ "media": "title" }` (`media_info`, see below) |
 
 Non-literal values accept `scale`, `offset`, `clamp: [min, max]`, `invert` and `smooth` (seconds).
-Audio values go from 0 to 1: each of the 64 bands per channel (40 Hz to 16 kHz, spaced evenly in
-pitch) is its level in decibels above −70 dB, relative to the loudest band of the last seconds, so
-that quiet and loud music both fill the range (`gain: "fixed"` measures it from full scale instead);
+Every audio binding states, with no default, a `kind` and a `unit` (and the fields of `surge`):
+`kind: "relative"` is the level of each of the 64 bands per channel (40 Hz to 16 kHz, spaced evenly in
+pitch) against the loudest band of the last seconds, so that quiet and loud music both fill the range;
+`"absolute"` is the level from full scale (what a quiet passage really is, whatever the music did
+before); `"surge"` is how much louder than usual the band is now, `1` meaning as usual, with no
+ceiling (it is the only kind that leaves 0 to 1: whatever consumes it should bound it with
+`bounds` or `clamp`). `unit: "db"` shows relative and absolute in decibels above −70 dB (0 to 1), so that a
+45 % dip in amplitude is only about 0.07; `"amplitude"` shows them linearly (0 to 1), so dips after hits are
+visible. For `surge` `amplitude` is the ratio of amplitudes (`sqrt` of the power ratio) and `db` is
+`1 + dB / 20` (each 20 dB above usual adds 1; never below 0). `surge` also requires `window` (0.05 to 60 s):
+the usual is the running average of the power over that time (short: hits stand out; long: the music coming
+back after a silence), `reference` (`"band"`: each band against its own average; `"all"`: against the
+average of the summed power of all bands, shared by every band, so a band drops when a louder one enters and
+a quiet band returning does not spike) and `hold_silence` (`true`: the average does not change while the
+analysis reports silence, so a pause does not recharge the next burst); these three are refused on the
+other kinds. The `level` of the whole sound has no band reference: relative and absolute coincide in `db`
+and in `amplitude` it is the amplitude of the whole sound. `beat` ignores the kind and is 1 on a beat.
 `bass`, `mid` and `treble` average the bands below 250 Hz, up to 4 kHz and above, `level` is the
-loudness of the whole sound and `beat` is 1 on a beat. Values rise within 20 ms and fall within
+loudness of the whole sound. (`unit` is not called `scale` because `scale` already multiplies the value.)
+Particle systems (`turbulent.audio`, `audio:` inputs), scripts and shaders keep reading the relative
+level in decibels. Values rise within 20 ms and fall within
 200 ms unless the scene sets `audio`. The order is `bounds`, `exponent`, `invert`, `scale`,
 `offset`, `clamp` and then `smooth`; `bounds` and `exponent` also shape properties, the pointer and
 scripts, and an `exponent` keeps the sign of negative values.
@@ -1021,7 +1036,7 @@ Newer values add these forms, each with its feature:
 | Relative | `{ "keys": [[0, 0], [1, 30]], "base": 120 }` adds the animation to `base` (numbers, positions and colors, part by part; a lone number in an effect or script parameter is added to both parts of a pair and to the red, green and blue of a color, and the alpha of a sum stays within 0 to 1) | `relative_values` |
 | Time as a number | `{ "clock": "day" }` from 0 at midnight to almost 1 before the next; also `hour` (0 to 23), `minute` and `second` (0 to 59), `weekday` (1 for Monday to 7 for Sunday) and `month` (1 to 12), all in local time; a value that follows `day` changes at most once a minute, or every `clock.step` seconds (1 to 3600), and the others when they change | `clock_values` |
 | Dates | `{ "date": "EEEE d 'de' MMMM yyyy" }` (text only) with `yyyy`, `yy`, `MMMM`, `MMM`, `MM`, `M`, `dd`, `d`, `EEEE`, `EEE`, `D` (day of the year) and `w` (ISO week) besides the tokens of a clock, names in the language of the package (English or Spanish, English for the others); text between single quotes stays as written and `''` writes a quote; a text without hours, minutes or seconds changes at midnight. A `clock` text keeps only the tokens of the time, and every other letter stays as written | `clock_dates` |
-| Frequency ranges | `{ "audio": [0, 3], "of": 16, "reduce": "max" }` follows bands 0 to 3 of 16 (`of` is 16, 32 or 64, default 64, also for a single band) and takes their `mean` (default) or `max` | `audio_ranges` |
+| Frequency ranges | `{ "audio": [0, 3], "kind": "relative", "unit": "db", "of": 16, "reduce": "max" }` follows bands 0 to 3 of 16 (`of` is 16, 32 or 64, default 64, also for a single band) and takes their `mean` (default) or `max` | `audio_ranges` |
 | Shaping | `bounds: [a, b]` maps a value to (x − a) / (b − a) clamped to 0 to 1, `exponent` (0.1 to 10) raises it, both before `scale` and `offset`; `smooth: { "up", "down" }` rises and falls at different speeds | `shaping` |
 | Layer as texture | `{ "layer": "<id>" }` for a `texture` or `mask` parameter of an effect: the layer is drawn on its own (even with `visible: false`) and fed to the effect aligned with the screen, so that each point of the effect reads the point of that layer above it, at the size the effect's layer has on the screen; it is drawn again only when that layer changes, and each one costs as much as a layer drawn on its own; layers may not feed themselves through other layers, masks or groups | `layer_textures` |
 
@@ -1770,7 +1785,7 @@ scales the whole system around the canvas center.
 | `capacity`, `seed`, `prewarm` | 1 to 200 000 particles; the seed of the system, mixed with `clock.seed`; seconds simulated when the system first shows (at most 10) |
 | `emitters` | at most 4 of `{ "shape", "rate", "bursts", "follow", "inherit" }`. Shapes are `{ "point": [x, y] }`, `{ "box": { "from": [x0, y0], "to": [x1, y1], "inner"?, "at"? } }`, `{ "circle": { "center", "radius", "inner" } }` (a ring when `inner` is above 0), `{ "line": [[x0, y0], [x1, y1]] }`, `"edge"` (the border of the canvas) and `{ "mask": { "texture", "threshold" } }` (where the alpha of an image stretched over the canvas is above `threshold`, 0.5 by default). `rate` is particles per second and may be bound like any value. `bursts` is a list of at most 8 independent bursts, each emitting `count` particles: `on` each `beat` or `click`; otherwise once `at` seconds (0 by default) after the emitter starts and, with `every`, again every that many seconds. The list of one burst the older scenes wrote as `burst` is now written `bursts: [{ ... }]`. `follow: "cursor"` moves the shape with the pointer and `inherit` adds that fraction of the pointer velocity |
 | `init` | `[min, max]` ranges picked for each particle: `life` (seconds), `speed` (pixels per second), `angle` (clockwise degrees, 0 to the right), `size` (pixels), `rotation`, `spin` (degrees per second), `frame` (first atlas frame) and `color` (two colors mixed at random) |
-| `forces` | at most 8 of `{ "gravity": [x, y] }`, `{ "drag": k }`, `{ "turbulence": { "strength", "scale" } }` (curl noise), `{ "attractor": { "target", "strength" } }` (negative strengths repel), `{ "vortex": { "axis", "center", "strength" } }`, `{ "orbit": { "center", "strength" } }` and `{ "noise": strength }`. Gravity and strengths may be bound, as in `{ "noise": { "audio": "bass", "scale": 300 } }`. Targets and centers are a point or `"cursor"`, which pulls nothing while the pointer is away |
+| `forces` | at most 8 of `{ "gravity": [x, y] }`, `{ "drag": k }`, `{ "turbulence": { "strength", "scale" } }` (curl noise), `{ "attractor": { "target", "strength" } }` (negative strengths repel), `{ "vortex": { "axis", "center", "strength" } }`, `{ "orbit": { "center", "strength" } }` and `{ "noise": strength }`. Gravity and strengths may be bound, as in `{ "noise": { "audio": "bass", "kind": "relative", "unit": "db", "scale": 300 } }`. Targets and centers are a point or `"cursor"`, which pulls nothing while the pointer is away |
 | `collide` | at most 4 of `{ "bounds", "bounce", "friction", "kill" }` where `bounds` is `"canvas"`, `{ "plane": { "point", "normal" } }` (particles stay on the side the normal points to) or `{ "circle": { "center", "radius" } }` (particles stay outside). `bounce` and `friction` go from 0 to 1 and `kill` removes a particle when it touches |
 | `render` | `texture` (an image asset, split into frames by its `atlas: [rows, columns]`), `aspect` (required, 0.05 to 20: width divided by height of the sprite, 1 for a square one; `size` is the longer side, so the quad is `size` by `size/aspect` for a tall sprite and `size·aspect` by `size` for a wide one, it turns with the particle, `stretch` lengthens its long side, and the lit and refract normals follow it; a tall sprite that is carried by its motion (`orient` velocity, a stretch or a turned sprite) turns so that the top of the texture leads; a non-1 value needs `particles2`; the budget counts `size²·min(aspect, 1/aspect)`; `reiwand-upgrade scenes` writes `1` into every render that lacks it), `frames` (`time` at `fps`, `life` or `random`), `mix` (blends one frame into the next), `size_over_life` and `color_over_life` (`[t, value]` keys from 0 to 1, at most 64, that multiply size and color), `stretch` (`{ "time", "min", "max" }`: seconds of motion a particle is stretched along, and the pixel limits) and `trail` (`length` from 1 to 16 steps, `width` from 0 to 1). Without a texture particles are soft discs. The layer's `blend` (`add` suits glowing particles), `opacity`, `mask` and effects apply |
 
@@ -2067,7 +2082,7 @@ the system (`particles2`). Each end of the `init` ranges of numbers (`life`, `sp
 `size`, `rotation`, `spin`, `frame`, `alpha`, `radial`, `depth`, `depth_speed`) and the numbers of
 emitter shapes (`radius` and `inner` of `circle`, `threshold` of `layer`, `arc`, `radius` and
 `speed` of `around`, `span` of `between`) may be bound like any value, for instance
-`"size": [2, { "audio": "bass", "scale": 8 }]` (`particle_values`), and are read every frame and
+`"size": [2, { "audio": "bass", "kind": "relative", "unit": "db", "scale": 8 }]` (`particle_values`), and are read every frame and
 kept within the limits of the field; colors, velocities and the `threshold` of `mask`, read when the
 scene loads, stay literal. Births may also follow the sound or the pointer through the `rate` of the emitter, the
 `instance` multipliers of the layer or control points.

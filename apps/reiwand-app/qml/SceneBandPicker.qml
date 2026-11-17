@@ -15,17 +15,29 @@ Kirigami.Dialog {
     property string level: ""
     property string reduce: "mean"
     property string channel: "average"
+    property string kind: "relative"
+    property string unit: "db"
+    property real window: 1
+    property string reference: "band"
+    property bool hold: false
+    readonly property var heard: ({
+            "kind": kind,
+            "unit": unit,
+            "window": window,
+            "reference": reference,
+            "hold_silence": hold
+        })
     readonly property var table: ask({
         "of": picker.of
     })
-    readonly property var request: level !== "" ? {
+    readonly property var request: level !== "" ? Object.assign({
         "pick": level
-    } : (from < 0 ? null : {
+    }, heard) : (from < 0 ? null : Object.assign({
         "pick": from === to ? from : [from, to],
         "of": of,
         "reduce": reduce,
         "channel": channel
-    })
+    }, heard))
     readonly property var reply: request ? ask(Object.assign({
             "base": base
         }, request)) : null
@@ -68,6 +80,11 @@ Kirigami.Dialog {
     onOpened: {
         level = "";
         from = to = -1;
+        kind = base.kind ?? "relative";
+        unit = base.unit ?? "db";
+        window = base.window ?? 1;
+        reference = base.reference ?? "band";
+        hold = base.hold_silence ?? false;
     }
 
     ColumnLayout {
@@ -149,6 +166,11 @@ Kirigami.Dialog {
                 currentIndex: ["average", "left", "right"].indexOf(picker.channel)
                 onActivated: index => picker.channel = ["average", "left", "right"][index]
             }
+        }
+
+        SceneBandHeard {
+            Layout.fillWidth: true
+            picker: picker
         }
     }
 }

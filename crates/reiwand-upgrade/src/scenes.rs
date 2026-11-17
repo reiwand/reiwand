@@ -47,7 +47,8 @@ pub fn text(doc: &Value) -> anyhow::Result<String> {
 fn scene(path: &Path) -> anyhow::Result<bool> {
     let Ok(mut doc) = serde_json::from_slice::<Value>(&fs::read(path)?) else { return Ok(false) };
     let customs = customs(path.parent().unwrap_or(Path::new(".")), &doc);
-    if complete_with(Format::Scene, &mut doc, &customs).written == 0 {
+    let dropped = crate::gain::fixed(&mut doc);
+    if complete_with(Format::Scene, &mut doc, &customs).written == 0 && !dropped {
         return Ok(false);
     }
     let staged = path.with_extension("json.upgrading");

@@ -99,7 +99,7 @@ fn emitter_lists_may_be_keyframed_or_follow_a_property_through_a_map() {
 fn emitter_lists_follow_no_number_and_refuse_keys_outside_their_ranges() {
     let a = json!([{ "from": [0.2, 0.9], "strength": 2 }]);
     let cases = [
-        json!({ "audio": "bass" }),
+        json!({ "audio": "bass", "kind": "relative", "unit": "db" }),
         json!({ "cursor": "x" }),
         json!({ "keys": [[0, a], [1, [{ "from": [9, 0.5], "strength": 1 }]]] }),
         json!({ "keys": [[0, a], [1, 3]] }),

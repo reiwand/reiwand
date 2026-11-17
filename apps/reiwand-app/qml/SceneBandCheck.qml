@@ -12,7 +12,7 @@ QtObject {
             throw new Error("bands: the strip has " + picker.table.bands.length + " bands");
         picker.mark(2, false);
         picker.mark(5, true);
-        if (JSON.stringify(picker.reply.source) !== "{\"audio\":[2,5],\"of\":16}")
+        if (JSON.stringify(picker.reply.source) !== "{\"audio\":[2,5],\"kind\":\"relative\",\"of\":16,\"unit\":\"db\"}")
             throw new Error("bands: a range gave " + JSON.stringify(picker.reply));
         picker.reduce = "max";
         picker.channel = "left";
@@ -24,10 +24,12 @@ QtObject {
         if (picker.reply.source.audio !== 7 || picker.reply.source.of !== 32)
             throw new Error("bands: a single band of 32 gave " + JSON.stringify(picker.reply));
         picker.level = "treble";
-        if (JSON.stringify(picker.reply.source) !== "{\"audio\":\"treble\"}")
+        if (JSON.stringify(picker.reply.source) !== "{\"audio\":\"treble\",\"kind\":\"relative\",\"unit\":\"db\"}")
             throw new Error("bands: a named band gave " + JSON.stringify(picker.reply));
         picker.base = {
             "audio": "bass",
+            "kind": "relative",
+            "unit": "db",
             "scale": 3
         };
         if (picker.ask({

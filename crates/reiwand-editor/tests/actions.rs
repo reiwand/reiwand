@@ -187,7 +187,7 @@ fn the_inspector_follows_the_schema() {
     assert!(layer.iter().any(|f| f.key == "opacity" && !f.required));
     act(
         &mut doc,
-        json!({"set": {"pointer": "/scene/layers/1/opacity", "value": {"audio": "bass", "smooth": 0.2}}}),
+        json!({"set": {"pointer": "/scene/layers/1/opacity", "value": {"audio": "bass", "kind": "relative", "unit": "db", "smooth": 0.2}}}),
     );
     let binding = fields(&doc, "/scene/layers/1/opacity");
     let field = |key: &str| binding.iter().find(|f| f.key == key).unwrap_or_else(|| panic!("{key}"));

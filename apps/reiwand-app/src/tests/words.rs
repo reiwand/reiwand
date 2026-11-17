@@ -89,7 +89,8 @@ fn explore(doc: &Value, pointer: &str, seen: &mut BTreeSet<String>, shown: &mut 
             ("group" | "list", true) => vec![field.value.clone()],
             _ => Vec::new(),
         };
-        let bound = (field.bindable && !seen.contains("bound")).then(|| json!({"audio": "bass"}));
+        let bound = (field.bindable && !seen.contains("bound"))
+            .then(|| json!({"audio": "bass", "kind": "relative", "unit": "db"}));
         for value in samples.into_iter().chain(bound).filter(|v| !v.is_null()) {
             let mut copy = doc.clone();
             if apply(&mut copy, &set(doc, &field.pointer, value.clone())).is_ok() {

@@ -5,9 +5,29 @@ use serde_json::{Map, Value, json};
 
 const NAMES: [&str; 5] = ["bass", "mid", "treble", "level", "beat"];
 const DIRECTIONS: [&str; 4] = ["x", "y", "inside", "speed"];
-const SOURCES: [&str; 15] = [
-    "audio", "of", "reduce", "channel", "cursor", "prop", "map", "keys", "timeline", "loop", "media",
-    "script", "fn", "params", "clock",
+const KINDS: [&str; 3] = ["relative", "absolute", "surge"];
+const UNITS: [&str; 2] = ["db", "amplitude"];
+const SOURCES: [&str; 20] = [
+    "audio",
+    "kind",
+    "unit",
+    "window",
+    "reference",
+    "hold_silence",
+    "of",
+    "reduce",
+    "channel",
+    "cursor",
+    "prop",
+    "map",
+    "keys",
+    "timeline",
+    "loop",
+    "media",
+    "script",
+    "fn",
+    "params",
+    "clock",
 ];
 
 fn resolution(q: &Value) -> Result<usize> {
@@ -102,7 +122,41 @@ fn pick(q: &Value, of: usize, mut map: Map<String, Value>) -> Result<(Value, Str
         side @ ("left" | "right") => drop(map.insert("channel".into(), json!(side))),
         _ => bail!(said("editor.band_channel", "the channel is average, left or right", &[])),
     }
+    heard(q, &mut map)?;
     Ok((Value::Object(map), label))
+}
+
+fn heard(q: &Value, map: &mut Map<String, Value>) -> Result<()> {
+    let given = |key: &str, otherwise: Value| {
+        [&q[key], &q["base"][key]].into_iter().find(|v| !v.is_null()).cloned().unwrap_or(otherwise)
+    };
+    let (kind, unit) = (given("kind", json!("relative")), given("unit", json!("db")));
+    ensure!(
+        kind.as_str().is_some_and(|k| KINDS.contains(&k)),
+        said("editor.band_kind", "the kind is relative, absolute or surge", &[])
+    );
+    ensure!(
+        unit.as_str().is_some_and(|u| UNITS.contains(&u)),
+        said("editor.band_unit", "the unit is db or amplitude", &[])
+    );
+    if kind == "surge" {
+        let window = given("window", json!(1));
+        ensure!(
+            window.as_f64().is_some_and(|w| (0.05..=60.0).contains(&w)),
+            said("editor.band_window", "the window goes from 0.05 to 60 seconds", &[])
+        );
+        let reference = given("reference", json!("band"));
+        ensure!(
+            ["band", "all"].iter().any(|r| reference == *r),
+            said("editor.band_reference", "the reference is band or all", &[])
+        );
+        map.insert("window".into(), window);
+        map.insert("reference".into(), reference);
+        map.insert("hold_silence".into(), json!(given("hold_silence", json!(false)) == true));
+    }
+    map.insert("kind".into(), kind);
+    map.insert("unit".into(), unit);
+    Ok(())
 }
 
 pub fn source(q: &Value) -> Result<Value> {

@@ -3,6 +3,10 @@ import QtQuick
 
 QtObject {
     readonly property var words: ({
+            "absolute": App.tr("Absolute"),
+            "db": App.tr("Decibels"),
+            "hold_silence": App.tr("Keep the usual during silence"),
+            "kind": App.tr("Measured as"),
             "padding": App.tr("Padding"),
             "palette": App.tr("Palette"),
             "pan": App.tr("Balance"),
@@ -63,9 +67,11 @@ QtObject {
             "rects": App.tr("Sprite rectangles"),
             "redraw": App.tr("Redraw"),
             "reduce": App.tr("Combine bands"),
+            "reference": App.tr("Usual of"),
             "reflection": App.tr("Reflection"),
             "refract": App.tr("Refraction"),
             "refresh": App.tr("Refresh"),
+            "relative": App.tr("Relative to the music"),
             "release": App.tr("Release"),
             "remap": App.tr("Remap"),
             "render": App.tr("Look"),
@@ -151,6 +157,7 @@ QtObject {
             "stroke": App.tr("Outline"),
             "style": App.tr("Style"),
             "subdivide": App.tr("Subdivisions"),
+            "surge": App.tr("Surge over the usual"),
             "swing": App.tr("Swing"),
             "system": App.tr("Particle system")
         })

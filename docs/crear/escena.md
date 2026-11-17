@@ -323,7 +323,7 @@ objeto con exactamente **una** fuente. Estas son las fuentes:
 |--------|---------|----------|
 | Propiedad de usuario | `{ "prop": "tema", "map": { "dia": "#ffe08a", "noche": "#8fb4ff" } }` | Lo que el usuario elige. Ver [propiedades.md](propiedades.md). |
 | Fotogramas clave | `{ "timeline": "salto", "keys": [[0, 0.4, "out_bounce"], [3, 0.4]] }` | Una animación en el tiempo. |
-| Sonido | `{ "audio": "bass" }`, `{ "audio": 3, "channel": "left" }` | Lo que suena en el equipo. |
+| Sonido | `{ "audio": "bass", "kind": "relative", "unit": "db" }`, `{ "audio": 3, "kind": "relative", "unit": "db", "channel": "left" }` | Lo que suena en el equipo. |
 | Puntero | `{ "cursor": "x" }` | Dónde está el ratón o el dedo. |
 | Reloj | `{ "clock": "HH:mm" }`, `{ "clock": "hour" }` | La hora y la fecha locales. |
 | Medios | `{ "media": "title" }` | Lo que suena en el reproductor. |
@@ -362,11 +362,11 @@ Variantes:
 
 ### Sonido
 
-`{ "audio": "bass" }` va de 0 a 1. Hay 64 bandas por canal, de 40 Hz a 16 kHz. Cada una va en
+`{ "audio": "bass", "kind": "relative", "unit": "db" }` va de 0 a 1. Hay 64 bandas por canal, de 40 Hz a 16 kHz. Cada una va en
 decibelios por encima de -70 dB, relativos a la banda más fuerte de los últimos segundos, así que
 la música baja y la fuerte llenan el mismo rango.
 
-- Un número es una banda (`{ "audio": 3 }`); un par es un rango (`{ "audio": [0, 3], "of": 16,
+- Un número es una banda (`{ "audio": 3, "kind": "relative", "unit": "db" }`); un par es un rango (`{ "audio": [0, 3], "kind": "relative", "unit": "db", "of": 16,
   "reduce": "max" }`, con `of` 16, 32 o 64 y `reduce` `mean` o `max`).
 - Los nombres: `bass` (bajo 250 Hz), `mid` (hasta 4 kHz), `treble` (por encima), `level` (todo el
   sonido) y `beat` (1 en cada golpe).
@@ -471,15 +471,14 @@ una escena, y los clics están apagados en cada pantalla hasta que el usuario lo
 ## Reacción al sonido de toda la escena
 
 ```json
-  "audio": { "attack": 0.02, "release": 0.25, "gain": "auto", "gain_release": 5 }
+  "audio": { "attack": 0.02, "release": 0.25, "gain_release": 5 }
 ```
 
 | Campo | Por defecto | Rango | Qué hace |
 |-------|-------------|-------|----------|
 | `attack` | 0,02 s | 0,001 a 2 | Cuánto tarda en subir un valor de sonido. |
 | `release` | 0,2 s | 0,01 a 10 | Cuánto tarda en bajar. |
-| `gain` | `auto` | `auto`, `fixed` | `auto` se ajusta a lo fuerte que suene; `fixed` mide desde el máximo digital, así que sigue el volumen del sistema. |
-| `gain_release` | obligatorio (el editor propone 5 s) | 0,05 a 10 | Con `gain` `auto`: en cuánto tiempo la referencia (la banda más fuerte reciente) baja hacia el nivel actual tras un golpe. 5 s mantiene la referencia casi fija; 0,3 a 0,5 s hace que las bandas se hundan justo después de cada golpe y se recuperen antes del siguiente (efecto de bombeo). Con `fixed` hay que escribirlo igual y no se usa. |
+| `gain_release` | obligatorio (el editor propone 5 s) | 0,05 a 10 | Con el tipo `relative`: en cuánto tiempo la referencia (la banda más fuerte reciente) baja hacia el nivel actual tras un golpe. 5 s mantiene la referencia casi fija; 0,3 a 0,5 s hace que las bandas se hundan justo después de cada golpe y se recuperen antes del siguiente (efecto de bombeo). |
 
 ## No cubierto aquí
 

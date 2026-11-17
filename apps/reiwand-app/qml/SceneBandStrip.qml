@@ -28,9 +28,9 @@ Item {
     SceneBandMeter {
         anchors.fill: parent
         page: picker.page
-        source: picker.reply?.source ?? ({
-                "audio": "level"
-            })
+        source: picker.reply?.source ?? Object.assign({
+            "audio": "level"
+        }, picker.heard)
         of: picker.of
         live: picker.visible
     }

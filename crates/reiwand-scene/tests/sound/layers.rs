@@ -6,7 +6,10 @@ fn sound_layers_validate_their_sources_and_ranges() {
                        "pan": -0.5, "loop": false, "fade_in": 2, "fade_out": 4 });
     assert_eq!(issues(good), []);
     let wrong = [
-        (json!({ "volume": { "audio": "bass" } }), Issue::SoundSource("/layers/0/volume".into())),
+        (
+            json!({ "volume": { "audio": "bass", "kind": "relative", "unit": "db" } }),
+            Issue::SoundSource("/layers/0/volume".into()),
+        ),
         (json!({ "pan": { "cursor": "x" } }), Issue::SoundSource("/layers/0/pan".into())),
         (json!({ "play": { "script": "s.js" } }), Issue::SoundSource("/layers/0/play".into())),
         (json!({ "opacity": 0.5 }), Issue::Sound("/layers/0".into())),

@@ -1,6 +1,8 @@
-use crate::signal::{CLOCKS, Smooth};
+mod signal;
+
+use crate::signal::CLOCKS;
 use crate::validate::{Check, Issue};
-use crate::value::{Band, Binding, Param, Value, Vec2, Vec3};
+use crate::value::{Binding, Param, Value, Vec2, Vec3};
 use crate::{Color, Ease};
 
 pub(crate) trait Probe: Sized {
@@ -149,51 +151,6 @@ impl Check<'_> {
                     self.range(&format!("{at}/1"), dv, -1e6, 1e6);
                 }
             }
-        }
-    }
-
-    fn signal<T>(&mut self, path: &str, b: &Binding<T>) {
-        let of = b.of.unwrap_or(64);
-        if let Some(of) = b.of {
-            self.uses(true, "audio_ranges");
-            if ![16, 32, 64].contains(&of) {
-                self.issues.push(Issue::Range {
-                    path: format!("{path}/of"),
-                    value: of as f32,
-                    min: 16.0,
-                    max: 64.0,
-                });
-            }
-        }
-        let top = of.saturating_sub(1) as f32;
-        match b.audio {
-            Some(Band::Index(i)) => self.range(&format!("{path}/audio"), i as f32, 0.0, top),
-            Some(Band::Range([lo, hi])) => {
-                self.uses(true, "audio_ranges");
-                self.range(&format!("{path}/audio/0"), lo as f32, 0.0, top);
-                self.range(&format!("{path}/audio/1"), hi as f32, lo as f32, top);
-            }
-            _ => {}
-        }
-        let ranged = matches!(b.audio, Some(Band::Range(_)));
-        if (b.of.is_some() && b.audio.is_none()) || (b.reduce.is_some() && !ranged) {
-            self.issues.push(Issue::Type(path.into()));
-        }
-        self.uses(b.reduce.is_some(), "audio_ranges");
-        if let Some([lo, hi]) = b.bounds {
-            self.uses(true, "shaping");
-            self.range(&format!("{path}/bounds/0"), lo, -1e6, 1e6);
-            self.range(&format!("{path}/bounds/1"), hi, lo.next_up(), 1e6);
-        }
-        if let Some(e) = b.exponent {
-            self.uses(true, "shaping");
-            self.range(&format!("{path}/exponent"), e, 0.1, 10.0);
-        }
-        if let Some(smooth) = b.smooth {
-            self.uses(matches!(smooth, Smooth::Apart { .. }), "shaping");
-            let [up, down] = smooth.times();
-            self.range(&format!("{path}/smooth"), up, 0.0, 60.0);
-            self.range(&format!("{path}/smooth"), down, 0.0, 60.0);
         }
     }
 }

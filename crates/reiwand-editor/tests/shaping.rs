@@ -36,11 +36,11 @@ fn the_made_up_pointer_stays_on_the_screen_and_moves() {
 
 #[test]
 fn the_smooth_of_a_binding_has_a_field_of_its_own() {
-    let doc = json!({ "scene": { "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "opacity": { "audio": "bass", "smooth": 0.3 } }] } });
+    let doc = json!({ "scene": { "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "opacity": { "audio": "bass", "kind": "relative", "unit": "db", "smooth": 0.3 } }] } });
     let fields = reiwand_editor::inspect::fields(&doc, "/scene/layers/0/opacity");
     let smooth = fields.iter().find(|f| f.key == "smooth").expect("a binding has smooth");
     assert_eq!((smooth.widget.as_str(), smooth.value.clone()), ("smooth", json!(0.3)));
-    let apart = json!({ "scene": { "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "opacity": { "audio": "bass", "smooth": { "up": 0.1, "down": 1 } } }] } });
+    let apart = json!({ "scene": { "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "opacity": { "audio": "bass", "kind": "relative", "unit": "db", "smooth": { "up": 0.1, "down": 1 } } }] } });
     let fields = reiwand_editor::inspect::fields(&apart, "/scene/layers/0/opacity");
     assert_eq!(fields.iter().find(|f| f.key == "smooth").map(|f| f.widget.as_str()), Some("smooth"));
 }

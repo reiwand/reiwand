@@ -41,11 +41,11 @@ fn close(a: f32, b: f32) -> bool {
 #[test]
 fn ranges_of_bands_reduce_by_mean_or_max_on_a_channel() {
     let bindings = [
-        json!({ "audio": [0, 3], "of": 16, "reduce": "max" }),
-        json!({ "audio": [0, 3], "of": 16 }),
-        json!({ "audio": 2, "of": 16 }),
-        json!({ "audio": [60, 63], "channel": "right" }),
-        json!({ "audio": [1, 1], "of": 32, "channel": "left", "reduce": "max" }),
+        json!({ "audio": [0, 3], "kind": "relative", "unit": "db", "of": 16, "reduce": "max" }),
+        json!({ "audio": [0, 3], "kind": "relative", "unit": "db", "of": 16 }),
+        json!({ "audio": 2, "kind": "relative", "unit": "db", "of": 16 }),
+        json!({ "audio": [60, 63], "kind": "relative", "unit": "db", "channel": "right" }),
+        json!({ "audio": [1, 1], "kind": "relative", "unit": "db", "of": 32, "channel": "left", "reduce": "max" }),
     ];
     let mut rt = runtime(&bindings, None);
     rt.set_audio(ramp());
@@ -57,9 +57,9 @@ fn ranges_of_bands_reduce_by_mean_or_max_on_a_channel() {
 #[test]
 fn bounds_and_an_exponent_shape_sound_and_the_pointer() {
     let bindings = [
-        json!({ "audio": "bass", "bounds": [0.8, 1] }),
-        json!({ "audio": "bass", "bounds": [0.8, 1], "exponent": 2 }),
-        json!({ "audio": "bass", "bounds": [0.95, 1] }),
+        json!({ "audio": "bass", "kind": "relative", "unit": "db", "bounds": [0.8, 1] }),
+        json!({ "audio": "bass", "kind": "relative", "unit": "db", "bounds": [0.8, 1], "exponent": 2 }),
+        json!({ "audio": "bass", "kind": "relative", "unit": "db", "bounds": [0.95, 1] }),
         json!({ "cursor": "x", "bounds": [0.5, 1], "exponent": 2, "scale": 0.5, "offset": 0.5 }),
     ];
     let mut rt = runtime(&bindings, None);
@@ -71,7 +71,10 @@ fn bounds_and_an_exponent_shape_sound_and_the_pointer() {
 
 #[test]
 fn uneven_smoothing_rises_fast_and_falls_slowly() {
-    let mut rt = runtime(&[json!({ "audio": "bass", "smooth": { "up": 0.01, "down": 1 } })], None);
+    let mut rt = runtime(
+        &[json!({ "audio": "bass", "kind": "relative", "unit": "db", "smooth": { "up": 0.01, "down": 1 } })],
+        None,
+    );
     let loud = |bass| AudioFrame { bass, silent: false, ..AudioFrame::default() };
     rt.set_audio(loud(0.0));
     read(&rt);
@@ -91,13 +94,22 @@ fn a_scene_sets_its_own_attack_release_and_gain() {
         (a.power, a.loud) = ([[raw; BANDS]; 2], [[loud; BANDS]; 2]);
         a
     };
-    let bindings =
-        [json!({ "audio": "bass" }), json!({ "audio": "level" }), json!({ "audio": 40, "channel": "left" })];
-    for (gain, target) in [("auto", 1.0), ("fixed", 0.2)] {
-        let mut rt = runtime(
-            &bindings,
-            Some(json!({ "attack": 0.5, "release": 0.05, "gain": gain, "gain_release": 5 })),
-        );
+    let bindings = |kind: &str| {
+        let on = |band: Json| {
+            let mut b = json!({ "kind": kind, "unit": "db" });
+            b["audio"] = band;
+            b
+        };
+        [on(json!("bass")), on(json!("level")), on(json!(40))].map(|mut b| {
+            if b["audio"] == 40 {
+                b["channel"] = json!("left");
+            }
+            b
+        })
+    };
+    for (gain, target) in [("relative", 1.0), ("absolute", 0.2)] {
+        let mut rt =
+            runtime(&bindings(gain), Some(json!({ "attack": 0.5, "release": 0.05, "gain_release": 5 })));
         rt.set_audio(synthetic(1.0, 0.2));
         rt.advance(0.1);
         rt.set_audio(synthetic(1.0, 0.2));
@@ -109,6 +121,6 @@ fn a_scene_sets_its_own_attack_release_and_gain() {
         rt.set_audio(synthetic(0.0, 0.0));
         assert!(read(&rt)[0] < rise * 0.2, "{gain}: the release is quick");
     }
-    let plain = runtime(&bindings, None);
+    let plain = runtime(&bindings("relative"), None);
     assert!(!plain.scene.features().contains("audio_response"));
 }

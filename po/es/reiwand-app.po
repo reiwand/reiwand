@@ -7574,6 +7574,42 @@ msgid "Their average"
 msgstr "Su promedio"
 
 #: apps/reiwand-app/qml/SceneBandPicker.qml
+msgid "Measured as"
+msgstr "Se mide como"
+
+#: apps/reiwand-app/qml/SceneBandPicker.qml
+msgid "Relative to the music"
+msgstr "Relativo a la música"
+
+#: apps/reiwand-app/qml/SceneBandPicker.qml
+msgid "Surge over the usual"
+msgstr "Salto sobre lo habitual"
+
+#: apps/reiwand-app/qml/SceneBandPicker.qml
+msgid "Decibels"
+msgstr "Decibelios"
+
+#: apps/reiwand-app/qml/SceneBandPicker.qml
+msgid "Usual over (tenths of a second)"
+msgstr "Lo habitual en (décimas de segundo)"
+
+#: apps/reiwand-app/qml/SceneBandPicker.qml
+msgid "Usual of"
+msgstr "Lo habitual de"
+
+#: apps/reiwand-app/qml/SceneBandPicker.qml
+msgid "Its own band"
+msgstr "Su propia banda"
+
+#: apps/reiwand-app/qml/SceneBandPicker.qml
+msgid "All bands together"
+msgstr "Todas las bandas juntas"
+
+#: apps/reiwand-app/qml/SceneBandPicker.qml
+msgid "Keep the usual during silence"
+msgstr "Mantener lo habitual durante el silencio"
+
+#: apps/reiwand-app/qml/SceneBandPicker.qml
 msgid "The loudest"
 msgstr "La más fuerte"
 

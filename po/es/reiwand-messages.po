@@ -692,6 +692,22 @@ msgid "the channel is average, left or right"
 msgstr "el canal es ambos, izquierdo o derecho"
 
 #: crates/reiwand-editor/src/bands.rs
+msgid "the kind is relative, absolute or surge"
+msgstr "el tipo es relative, absolute o surge"
+
+#: crates/reiwand-editor/src/bands.rs
+msgid "the unit is db or amplitude"
+msgstr "la escala es db o amplitude"
+
+#: crates/reiwand-editor/src/bands.rs
+msgid "the window goes from 0.05 to 60 seconds"
+msgstr "la ventana va de 0,05 a 60 segundos"
+
+#: crates/reiwand-editor/src/bands.rs
+msgid "the reference is band or all"
+msgstr "la referencia es band o all"
+
+#: crates/reiwand-editor/src/bands.rs
 msgid "%1 is not x, y, inside or speed"
 msgstr "%1 no es x, y, inside ni speed"
 
@@ -4866,6 +4882,10 @@ msgstr "%1 anida sistemas de partículas a más de dos niveles"
 #: crates/reiwand-scene/src/issue.rs
 msgid "%1 names \"%2\", which its model does not have"
 msgstr "%1 nombra «%2», que su modelo no tiene"
+
+#: crates/reiwand-scene/src/issue.rs
+msgid "%1 is required and has no default"
+msgstr "%1 es obligatorio y no tiene valor por defecto"
 
 #: crates/reiwand-scene/src/issue.rs
 msgid "the scene has %1 mesh and model layers, at most 16 are allowed"

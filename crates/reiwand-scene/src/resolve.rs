@@ -1,12 +1,13 @@
 use crate::input::{AudioFrame, MediaState, PointerState, ScriptOutputs};
 use crate::kin::Place;
 use crate::timeline::{Loop, Playhead, local};
-use crate::value::{AudioChannel, Axis, Band, Binding, Level};
-use crate::{BANDS, Reduce, Scene, Timeline, Values, Wake};
+use crate::value::{Axis, Binding};
+use crate::{Scene, Timeline, Values, Wake};
 use std::cell::{Cell, RefCell};
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 pub(crate) mod binding;
+mod heard;
 pub(crate) mod media;
 
 pub(crate) struct Context<'a> {
@@ -33,6 +34,7 @@ pub(crate) struct Context<'a> {
     pub(crate) homes: &'a HashMap<String, String>,
     pub(crate) places: &'a RefCell<HashMap<usize, Place>>,
     pub(crate) motion: &'a RefCell<HashMap<usize, Motion>>,
+    pub(crate) usual: &'a RefCell<HashMap<crate::input::UsualKey, crate::input::Usual>>,
     pub(crate) now: f64,
     pub(crate) view: [f32; 4],
     pub(crate) canvas: [f32; 2],
@@ -85,30 +87,7 @@ impl Context<'_> {
 
     pub(crate) fn signal(&self, b: &Binding<impl Sized>) -> Option<f32> {
         let a = self.audio;
-        let bands = match b.channel.unwrap_or_default() {
-            AudioChannel::Average => &a.average,
-            AudioChannel::Left => &a.left,
-            AudioChannel::Right => &a.right,
-        };
-        let of = b.of.unwrap_or(BANDS as u32).clamp(1, BANDS as u32) as usize;
-        let group = |lo: u32, hi: u32| {
-            let a = (lo as usize * BANDS / of).min(BANDS - 1);
-            let z = ((hi.max(lo) as usize + 1) * BANDS / of).clamp(a + 1, BANDS);
-            let it = bands[a..z].iter().copied();
-            match b.reduce.unwrap_or_default() {
-                Reduce::Max => it.fold(0.0, f32::max),
-                Reduce::Mean => it.sum::<f32>() / (z - a) as f32,
-            }
-        };
-        let audio = b.audio.map(|band| match band {
-            Band::Index(i) => group(i, i),
-            Band::Range([lo, hi]) => group(lo, hi),
-            Band::Named(Level::Bass) => a.bass,
-            Band::Named(Level::Mid) => a.mid,
-            Band::Named(Level::Treble) => a.treble,
-            Band::Named(Level::Level) => a.level,
-            Band::Named(Level::Beat) => f32::from(a.beat),
-        });
+        let audio = b.audio.map(|band| self.heard(b, band));
         if audio.is_some() && !a.silent {
             self.note(Wake::Frame);
         }

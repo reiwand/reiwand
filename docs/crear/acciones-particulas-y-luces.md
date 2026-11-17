@@ -1016,8 +1016,8 @@ Dice a qué reacciona un enlace al sonido y qué valor da con un nivel de sonido
 La respuesta tiene `granted`, `listening`, `of` y `marked` (`[primera, última]` banda marcada en esa rejilla, o `null` si el enlace es el volumen o el pulso). Con `listening` en `true` añade `bands` (los niveles plegados a `of` bandas), `levels` (`bass`, `mid`, `treble`, `level` y `beat`), `silent`, `raw` (el valor antes de darle forma) y `value` (el valor ya con la forma: `bounds`, `exponent`, `invert`, `scale`, `offset` y `clamp`). Si el enlace está mal escrito o `of` no es 16, 32 ni 64, trae `error`.
 
 ```sh
-reiwand-ctl scene ask mi-escena meter '{"source":{"audio":[0,3],"of":16},"reading":{"listening":true,"raw":[[0.5,0.2,0.1,0.9],[0.5,0.2,0.1,0.9]],"loudness":0.5},"of":16}'
-reiwand-ctl scene ask mi-escena meter '{"source":{"audio":"bass","scale":2,"clamp":[0,1]},"reading":{"listening":false}}'
+reiwand-ctl scene ask mi-escena meter '{"source":{"audio":[0,3], "kind": "relative", "unit": "db","of":16},"reading":{"listening":true,"raw":[[0.5,0.2,0.1,0.9],[0.5,0.2,0.1,0.9]],"loudness":0.5},"of":16}'
+reiwand-ctl scene ask mi-escena meter '{"source":{"audio":"bass", "kind": "relative", "unit": "db","scale":2,"clamp":[0,1]},"reading":{"listening":false}}'
 ```
 
 #### `response`

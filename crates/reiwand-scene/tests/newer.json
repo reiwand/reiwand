@@ -9,7 +9,7 @@
     "hdr": true, "tonemap": "aces", "clear": false, "perspective": 1200, "ambient": "#202030", "sky": "#304060"
   },
   "clock": { "max_fps": 30, "step": 5 },
-  "audio": { "attack": 0.05, "release": 0.5, "gain": "fixed", "gain_release": 5 },
+  "audio": { "attack": 0.05, "release": 0.5, "gain_release": 5 },
   "assets": {
     "sky": { "path": "sky.png", "filter": "nearest", "wrap": "repeat", "mipmaps": true },
     "run": { "path": "run.png", "atlas": [2, 4], "frames": 6, "fps": 12 },
@@ -48,7 +48,7 @@
                      "rotation": { "clock": "day", "scale": 360 } },
       "effects": [{ "effect": "depth_parallax", "params": { "depth": { "layer": "sky" } } }, { "effect": "ripple" }] },
     { "blend_space": "canvas", "id": "bars", "type": "solid", "color": "#ffffff",
-      "opacity": { "audio": [0, 3], "of": 16, "reduce": "max", "bounds": [0.2, 0.8], "exponent": 2,
+      "opacity": { "audio": [0, 3], "kind": "relative", "unit": "db", "of": 16, "reduce": "max", "bounds": [0.2, 0.8], "exponent": 2,
                    "smooth": { "up": 0.05, "down": 0.4 } } }
   ],
   "timelines": [

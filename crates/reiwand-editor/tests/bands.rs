@@ -26,23 +26,35 @@ fn the_layout_tells_the_pitch_of_every_band_at_each_resolution() {
 
 #[test]
 fn a_band_or_a_range_becomes_a_source_that_keeps_the_shaping() {
-    let base = json!({ "audio": "bass", "scale": 2, "offset": 1, "clamp": [0, 1] });
+    let base = json!({ "audio": "bass", "kind": "relative", "unit": "db", "scale": 2, "offset": 1, "clamp": [0, 1] });
     let named = pick(json!({ "pick": "treble", "base": base }));
-    assert_eq!(named["source"], json!({ "audio": "treble", "scale": 2, "offset": 1, "clamp": [0, 1] }));
+    assert_eq!(
+        named["source"],
+        json!({ "audio": "treble", "kind": "relative", "unit": "db", "scale": 2, "offset": 1, "clamp": [0, 1] })
+    );
     let one = pick(json!({ "pick": 3, "of": 16, "channel": "left" }));
-    assert_eq!(one["source"], json!({ "audio": 3, "of": 16, "channel": "left" }));
+    assert_eq!(
+        one["source"],
+        json!({ "audio": 3, "kind": "relative", "unit": "db", "of": 16, "channel": "left" })
+    );
     assert!(one["hertz"][0].as_f64().unwrap() < one["hertz"][1].as_f64().unwrap());
     let range = pick(json!({ "pick": [0, 3], "of": 16, "reduce": "max" }));
-    assert_eq!(range["source"], json!({ "audio": [0, 3], "of": 16, "reduce": "max" }));
+    assert_eq!(
+        range["source"],
+        json!({ "audio": [0, 3], "kind": "relative", "unit": "db", "of": 16, "reduce": "max" })
+    );
     assert_eq!(range["label"], "0-3");
-    let plain =
-        pick(json!({ "pick": [2, 5], "reduce": "mean", "base": { "audio": "bass", "reduce": "max" } }));
-    assert_eq!(plain["source"], json!({ "audio": [2, 5] }));
+    let plain = pick(
+        json!({ "pick": [2, 5], "reduce": "mean", "base": { "audio": "bass", "kind": "relative", "unit": "db", "reduce": "max" } }),
+    );
+    assert_eq!(plain["source"], json!({ "audio": [2, 5], "kind": "relative", "unit": "db" }));
 }
 
 #[test]
 fn a_pointer_direction_replaces_the_source_and_bad_picks_are_refused() {
-    let moved = pick(json!({ "direction": "speed", "base": { "audio": 3, "of": 16, "invert": true } }));
+    let moved = pick(
+        json!({ "direction": "speed", "base": { "audio": 3, "kind": "relative", "unit": "db", "of": 16, "invert": true } }),
+    );
     assert_eq!(moved["source"], json!({ "cursor": "speed", "invert": true }));
     for bad in [
         json!({ "direction": "z" }),
@@ -55,4 +67,19 @@ fn a_pointer_direction_replaces_the_source_and_bad_picks_are_refused() {
     ] {
         assert!(pick(bad.clone())["error"].is_string(), "{bad}");
     }
+}
+
+#[test]
+fn a_pick_carries_the_kind_and_the_surge_fields_and_refuses_bad_ones() {
+    let surge = pick(
+        json!({ "pick": 3, "kind": "surge", "unit": "amplitude", "window": 4, "reference": "all", "hold_silence": true }),
+    );
+    assert_eq!(
+        surge["source"],
+        json!({ "audio": 3, "kind": "surge", "unit": "amplitude", "window": 4, "reference": "all", "hold_silence": true })
+    );
+    let back = pick(json!({ "pick": "bass", "kind": "absolute", "base": surge["source"] }));
+    assert_eq!(back["source"], json!({ "audio": "bass", "kind": "absolute", "unit": "amplitude" }));
+    assert!(pick(json!({ "pick": 1, "kind": "loud" }))["error"].is_string());
+    assert!(pick(json!({ "pick": 1, "kind": "surge", "window": 100 }))["error"].is_string());
 }

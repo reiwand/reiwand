@@ -15,7 +15,7 @@ use std::path::Path;
 mod checked;
 
 const SCENE: &str = r##"{"schema": "reiwand.scene/1", "canvas": {"size": [3840, 1600]},
-    "layers": [{ "blend_space": "canvas", "id": "glow", "type": "solid", "color": "#336699", "opacity": {"audio": "bass"}}]}"##;
+    "layers": [{"blend_space": "canvas", "id": "glow", "type": "solid", "color": "#336699", "opacity": {"audio": "bass", "kind": "relative", "unit": "db"}}]}"##;
 
 fn source(dir: &Path, manifest: &Manifest) {
     fs::create_dir_all(dir).unwrap();

@@ -60,6 +60,7 @@ impl Runtime {
                 &self.places
             },
             motion: &self.motion,
+            usual: &self.usual,
             now: self.t,
             view: [0.0; 4],
             canvas: self.scene.canvas.size.map(|v| v as f32),

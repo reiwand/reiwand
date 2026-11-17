@@ -1,11 +1,23 @@
-use reiwand_scene::{BANDS, FLOOR_DB, MIN_PEAK, db01, follow_peak};
+use reiwand_scene::{AudioFrame, BANDS, FLOOR_DB, MIN_PEAK, Usual, UsualKey, db01, follow_peak};
 use std::sync::Mutex;
 use std::time::Instant;
 
 static REFERENCE: Mutex<(f32, Option<Instant>)> = Mutex::new((MIN_PEAK, None));
 
+static USUAL: Mutex<Option<(UsualKey, Usual, Instant)>> = Mutex::new(None);
+
 pub(crate) fn reset() {
     *REFERENCE.lock().unwrap_or_else(|e| e.into_inner()) = (MIN_PEAK, None);
+    *USUAL.lock().unwrap_or_else(|e| e.into_inner()) = None;
+}
+
+pub(crate) fn usual(frame: &AudioFrame, key: UsualKey) -> Usual {
+    let mut guard = USUAL.lock().unwrap_or_else(|e| e.into_inner());
+    let now = Instant::now();
+    let (_, mut usual, at) = guard.take().filter(|(k, ..)| *k == key).unwrap_or((key, Usual::at(frame), now));
+    usual.advance(frame, (now - at).as_secs_f32().min(1.0), key);
+    *guard = Some((key, usual, now));
+    usual
 }
 
 pub(crate) fn follow(loud: &[[f32; BANDS]; 2], release: f32) -> [[f32; BANDS]; 2] {

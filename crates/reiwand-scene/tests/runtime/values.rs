@@ -4,7 +4,7 @@ use super::*;
 fn values_follow_properties_audio_cursor_and_the_clock() {
     let text = scene(json!([
         { "blend_space": "canvas", "id": "img", "type": "image", "image": { "prop": "style", "map": { "night": "a", "dawn": "b" } } },
-        { "blend_space": "canvas", "id": "lvl", "type": "solid", "color": { "prop": "text_color" }, "opacity": { "audio": "bass", "clamp": [0, 1] } },
+        { "blend_space": "canvas", "id": "lvl", "type": "solid", "color": { "prop": "text_color" }, "opacity": { "audio": "bass", "kind": "relative", "unit": "db", "clamp": [0, 1] } },
         { "blend_space": "canvas", "id": "tx", "type": "text", "text": { "clock": "HH:mm:ss a" }, "anchor": "bottom_right", "transform": { "position": [-10, -5] } },
         { "blend_space": "canvas", "id": "px", "type": "solid", "color": "#000000", "parallax": [0.1, 0.1], "size": [10, 10] }
     ]));
