@@ -17,36 +17,36 @@ pub enum Tunable {
     Points,
 }
 
-#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Instance {
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     #[schemars(extend("x-range" = [0, 1]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
     pub alpha: Option<Value<f32>>,
-    #[schemars(extend("x-range" = [0, 100]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
+    #[schemars(extend("x-range" = [0, 100]))]
     pub size: Option<Value<f32>>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     #[schemars(extend("x-range" = [0, 4]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
     pub count: Option<Value<f32>>,
-    #[schemars(extend("x-range" = [0, 100]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
+    #[schemars(extend("x-range" = [0, 100]))]
     pub speed: Option<Value<f32>>,
-    #[schemars(extend("x-range" = [0, 100]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
+    #[schemars(extend("x-range" = [0, 100]))]
     pub life: Option<Value<f32>>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     #[schemars(extend("x-range" = [0, 100]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
     pub time_scale: Option<Value<f32>>,
-    #[schemars(extend("x-range" = [0, 16]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
+    #[schemars(extend("x-range" = [0, 16]))]
     pub brightness: Option<Value<f32>>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]

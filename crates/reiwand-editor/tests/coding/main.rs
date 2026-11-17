@@ -2,6 +2,8 @@ mod declared;
 mod reverts;
 mod tables;
 mod trees;
+#[path = "../support/whole.rs"]
+mod whole;
 
 use reiwand_editor::Project;
 use reiwand_editor::actions::Action;
@@ -11,6 +13,7 @@ use std::sync::OnceLock;
 use tempfile::TempDir;
 
 pub fn act(p: &mut Project, action: Value) -> anyhow::Result<()> {
+    let action = whole::action(p, action);
     p.act(&serde_json::from_value::<Action>(action).unwrap()).map(drop)
 }
 

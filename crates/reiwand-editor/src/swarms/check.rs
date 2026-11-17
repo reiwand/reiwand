@@ -21,7 +21,7 @@ pub(crate) fn checked(dir: &Path, doc: &Value, ops: Vec<Op>) -> Result<Vec<Op>> 
     let mut probe = doc.clone();
     let mut ops = ops;
     apply(&mut probe, &ops)?;
-    let filled = crate::fill::ops(&probe);
+    let filled = crate::completing::ops(&probe);
     apply(&mut probe, &filled)?;
     ops.extend(filled);
     let before = issues(dir, doc).unwrap_or_default();

@@ -36,9 +36,7 @@ pub struct Oscillate {
     pub freq: [f32; 2],
     pub scale: [f32; 2],
     pub phase: [f32; 2],
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
-    pub mask: Option<[f32; 2]>,
+    pub mask: [f32; 2],
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]

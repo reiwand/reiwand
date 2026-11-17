@@ -5,8 +5,8 @@
   "description": { "en": "Grades color using a LUT image.", "es": "Da un tratamiento de color con una imagen de tabla de colores." },
   "mask_mode": "strength",
   "params": [
-    { "id": "lut", "type": "lut", "tools": ["table"], "default": "" },
-    { "id": "intensity", "type": "float", "default": 1, "min": 0, "max": 1 }
+    { "id": "lut", "type": "lut", "tools": ["table"], "prefill": "" },
+    { "id": "intensity", "type": "float", "prefill": 1, "min": 0, "max": 1 }
   ],
   "passes": [{ "entry": "fs_color_lut" }]
 }

@@ -1,14 +1,17 @@
 use super::Force;
+use reiwand_core::explicit::{read, untagged};
 use schemars::{JsonSchema, Schema, SchemaGenerator};
 use serde::de::Error as _;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value as Json};
 use std::borrow::Cow;
 
+pub const FULL_WINDOW: [f32; 4] = [0.0, 0.0, 1.0, 1.0];
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Operator {
     pub force: Force,
-    pub window: Option<[f32; 4]>,
+    pub window: [f32; 4],
 }
 
 #[derive(JsonSchema)]
@@ -16,13 +19,13 @@ pub struct Operator {
 struct Shown {
     #[serde(flatten)]
     force: Force,
-    #[schemars(extend("x-range" = [0, 1]))]
-    window: Option<[f32; 4]>,
+    #[schemars(extend("x-range" = [0, 1]), required)]
+    window: [f32; 4],
 }
 
 impl From<Force> for Operator {
     fn from(force: Force) -> Self {
-        Operator { force, window: None }
+        Operator { force, window: FULL_WINDOW }
     }
 }
 
@@ -37,7 +40,7 @@ impl std::ops::Deref for Operator {
 struct Written<'a> {
     #[serde(flatten)]
     force: &'a Force,
-    window: Option<[f32; 4]>,
+    window: [f32; 4],
 }
 
 impl Serialize for Operator {
@@ -49,13 +52,10 @@ impl Serialize for Operator {
 impl<'de> Deserialize<'de> for Operator {
     fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
         let mut map = Map::deserialize(d)?;
-        let window = map
-            .remove("window")
-            .filter(|v| !v.is_null())
-            .map(serde_json::from_value)
-            .transpose()
-            .map_err(D::Error::custom)?;
-        let force = serde_json::from_value(Json::Object(map)).map_err(D::Error::custom)?;
+        let window = map.remove("window").ok_or_else(|| D::Error::missing_field("window"))?;
+        let window = serde_json::from_value(window).map_err(D::Error::custom)?;
+        let force = untagged(Json::Object(map), &[(&[], &|v| read("", v))])
+            .map_err(|e| D::Error::custom(e.to_string()))?;
         Ok(Operator { force, window })
     }
 }

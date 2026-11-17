@@ -93,3 +93,9 @@ pub fn complete_required(format: Format, doc: &mut Value) -> Report {
     walk.start(doc);
     walk.report
 }
+
+pub fn whole(text: &str) -> String {
+    let Ok(mut doc) = serde_json::from_str::<Value>(text) else { return text.to_owned() };
+    complete(Format::Scene, &mut doc);
+    serde_json::to_string(&doc).unwrap_or_else(|_| text.to_owned())
+}

@@ -68,7 +68,7 @@ fn extreme_systems_neither_overflow_nor_panic() {
 #[test]
 fn layers_drawing_one_system_share_its_budget() {
     let big = with(sparks(), json!({ "capacity": 1500, "init": { "size": [40, 60] } }));
-    let mut s = Scene::from_json(&scene(big, true)).unwrap();
+    let mut s = Scene::from_json(&reiwand_upgrade::fill::whole(&scene(big, true))).unwrap();
     let one = Bake::new(&s, 0, Tier::T0, true, |_| None).unwrap();
     let layer = s.layers[0].clone();
     s.layers.extend((1..8).map(|i| Layer { id: format!("p{i}"), ..layer.clone() }));
@@ -86,7 +86,7 @@ fn ranges_of_births_and_emitter_shapes_may_be_bound() {
     init["size"] = json!([2, loud]);
     init["life"] = json!([0.5, { "keys": [[0, 1], [2, 2]] }, 2]);
     let text = scene(with(bound, json!({ "init": init })), true);
-    let parsed = Scene::from_json(&text).unwrap();
+    let parsed = Scene::from_json(&reiwand_upgrade::fill::whole(&text)).unwrap();
     let found = parsed.validate(&props());
     assert!(found.is_empty(), "{found:?}");
     assert!(parsed.features().contains("particle_values") && needs(&parsed).audio);
@@ -95,7 +95,7 @@ fn ranges_of_births_and_emitter_shapes_may_be_bound() {
     let written: Json = serde_json::to_value(&parsed).unwrap();
     assert_eq!(written["particles"]["dots"]["init"]["size"], json!([2.0, loud, 1.0]));
     assert_eq!(written["particles"]["dots"]["emitters"][0]["shape"]["circle"]["radius"], loud);
-    let plain = Scene::from_json(&scene(sparks(), true)).unwrap();
+    let plain = Scene::from_json(&reiwand_upgrade::fill::whole(&scene(sparks(), true))).unwrap();
     assert!(!plain.features().contains("particle_values") && !needs(&plain).audio);
     let colored = with(
         sparks(),

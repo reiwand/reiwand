@@ -126,7 +126,10 @@ fn dropped_effects_need_no_inputs() {
 fn effects_turned_off_by_a_property_need_no_inputs() {
     let text = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../../scenes/dusk/scene.json"));
     let depth = |mode: &str| Values::from([("depth".to_owned(), json!(mode))]);
-    let mut rt = Runtime::new(Arc::new(Scene::from_json(&text.unwrap()).unwrap()), depth("off"));
+    let mut rt = Runtime::new(
+        Arc::new(Scene::from_json(&reiwand_upgrade::fill::whole(&text.unwrap())).unwrap()),
+        depth("off"),
+    );
     let mut cursor = |mode: &str| (rt.set_props(depth(mode)), rt.uses().cursor).1;
     assert_eq!(
         ["off", "pointer", "orbit", "off", "pointer"].map(&mut cursor),

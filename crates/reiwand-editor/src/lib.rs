@@ -34,7 +34,6 @@ mod depthmap;
 mod diverged;
 mod figures;
 mod files;
-mod fill;
 pub mod films;
 pub mod findings;
 mod fits;

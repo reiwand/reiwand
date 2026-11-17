@@ -61,7 +61,7 @@ fn still(weights: [f32; 2]) -> Scene {
     let glb = ForgeRig { twist: true, weights, ..ForgeRig::new(2.0, 0.5) }.glb();
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] },
         "assets": { "toy": { "path": "toy.glb" } }, "layers": [model("m", json!({}))] });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     scene
 }
@@ -88,7 +88,7 @@ fn sculpted_shapes_beside_a_model_join_its_blend_shapes() {
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] },
         "assets": { "toy": { "path": "toy.glb", "shapes": { "smile": "toy-smile-1.wpsh" } } },
         "layers": [model("m", json!({ "shapes": { "smile": 1 } }))] });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     assert!(scene.paths().contains("toy-smile-1.wpsh"));
     let read = move |path: &str, _: usize| {
         Ok::<_, String>(if path.ends_with(".glb") { glb.clone() } else { shape.clone() })

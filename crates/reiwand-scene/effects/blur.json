@@ -4,9 +4,9 @@
   "category": "blur",
   "description": { "en": "Blurs the picture by a fixed radius.", "es": "Desenfoca la imagen con un radio fijo." },
   "params": [
-    { "id": "radius", "type": "float", "default": 8, "min": 0, "max": 128 },
-    { "id": "blend", "type": "blend", "default": "normal" },
-    { "id": "amount", "type": "float", "default": 1, "min": 0, "max": 1 }
+    { "id": "radius", "type": "float", "prefill": 8, "min": 0, "max": 128 },
+    { "id": "blend", "type": "blend", "prefill": "normal" },
+    { "id": "amount", "type": "float", "prefill": 1, "min": 0, "max": 1 }
   ],
   "passes": [{ "entry": "fs_blur_h" }, { "entry": "fs_blur_v", "inputs": ["previous", "input"] }],
   "cost": { "taps": 3, "passes": 2, "scale": 1 },

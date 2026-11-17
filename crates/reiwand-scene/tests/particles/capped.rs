@@ -59,7 +59,7 @@ fn steering_flocks_walls_and_strands_refuse_bad_values() {
     assert!(matches!(&issues(with(sparks(), gone))[..], [Issue::Unknown { what: "layer", .. }]));
     let remap =
         json!({ "forces": [{ "remap": { "input": "age", "in": [0, 1], "output": "glow", "out": [0, 1] } }] });
-    assert!(Scene::from_json(&scene(with(sparks(), remap), true)).is_err());
+    assert!(Scene::from_json(&reiwand_upgrade::fill::whole(&scene(with(sparks(), remap), true))).is_err());
 }
 
 #[test]
@@ -82,9 +82,16 @@ fn each_new_particle_field_names_its_feature() {
         (json!({ "render": { "rope": {} } }), "particle_ropes"),
     ];
     for (more, feature) in uses {
-        let found = Scene::from_json(&scene(with(sparks(), more.clone()), true)).unwrap();
+        let found =
+            Scene::from_json(&reiwand_upgrade::fill::whole(&scene(with(sparks(), more.clone()), true)))
+                .unwrap();
         assert_eq!(found.validate(&props()), [], "{more}");
         assert!(found.features().contains(feature), "{more}");
     }
-    assert!(!Scene::from_json(&scene(sparks(), true)).unwrap().features().contains("particle_ropes"));
+    assert!(
+        !Scene::from_json(&reiwand_upgrade::fill::whole(&scene(sparks(), true)))
+            .unwrap()
+            .features()
+            .contains("particle_ropes")
+    );
 }

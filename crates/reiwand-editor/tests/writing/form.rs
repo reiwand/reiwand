@@ -12,7 +12,7 @@ fn the_form_edits_parameters_passes_and_fields_and_renames_their_uses() {
     let angle = json!({ "effect": "bend", "id": "spin", "set": { "type": "float", "min": -90, "max": 90, "unit": "degrees" } });
     shader(&mut p, json!({ "param": angle })).unwrap();
     let spin = &descriptor(&p, "bend")["params"][3];
-    assert_eq!((spin["unit"].clone(), spin["default"].clone()), (json!("degrees"), json!(0)), "{spin}");
+    assert_eq!((spin["unit"].clone(), spin["prefill"].clone()), (json!("degrees"), json!(0)), "{spin}");
     let handles = ask(&p, json!({ "shader_check": { "effect": "bend" } }));
     assert!(
         handles["handles"].as_array().unwrap().iter().any(|h| h["param"] == "spin" && h["handle"] == "angle")

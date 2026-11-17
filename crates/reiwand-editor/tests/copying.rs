@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use reiwand_editor::copying::{extract, facts, lineage, new_id};
 use serde_json::{Value, json};
 use std::fs;

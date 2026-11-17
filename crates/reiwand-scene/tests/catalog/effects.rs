@@ -65,7 +65,7 @@ fn described_effects_are_complete_and_drawn_only_with_a_shader() {
         for p in &more {
             let shown: Vec<&ParamDef> = full.params.iter().filter(|o| o.id == p.id).collect();
             assert!(
-                p.accepts(&p.default) && matches!(shown[..], [o] if o.kind == p.kind),
+                p.accepts(&p.prefill) && matches!(shown[..], [o] if o.kind == p.kind),
                 "{}.{}",
                 b.id,
                 p.id
@@ -134,14 +134,14 @@ fn described_effects_and_parameters_are_validated_like_built_in_ones() {
 #[test]
 fn a_package_effect_use_reads_a_generic_picture_by_name() {
     let descriptor = json!({ "id": "phased", "cost": {}, "params": [
-        { "id": "phase", "type": "texture", "default": "" },
-        { "id": "flat", "type": "texture", "default": "normal_flat" }],
+        { "id": "phase", "type": "texture", "prefill": "" },
+        { "id": "flat", "type": "texture", "prefill": "normal_flat" }],
         "passes": [{ "entry": "fs_phased", "inputs": ["previous", "asset:phase", "asset:flat"] }] });
     let wgsl = "@fragment fn fs_phased(in: VertexOut) -> @location(0) vec4<f32> {
     return sample(aux0, in.uv) * sample(aux1, in.uv);
 }";
     let validated = |phase: &str| {
-        let used = effect(json!({ "effect": "phased", "params": { "phase": phase } }));
+        let used = effect(json!({ "effect": "phased", "params": { "phase": phase, "flat": "normal_flat" } }));
         let mut doc =
             scene(json!({ "effects": { "phased": { "descriptor": "fx/p.json", "wgsl": "fx/p.wgsl" } },
             "layers": used["layers"] }));
@@ -161,14 +161,25 @@ fn a_package_effect_use_reads_a_generic_picture_by_name() {
 }
 
 #[test]
-fn a_required_parameter_must_be_written() {
+fn every_parameter_must_be_written() {
     let layer = |params: Json| {
         json!({ "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#000000",
             "effects": [{ "effect": "chroma_key", "params": params }] }] })
     };
-    let issues = |params: Json| scene(layer(params)).validate(&BTreeMap::new());
+    let issues = |params: Json| {
+        let mut doc = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "assets": {} });
+        doc.as_object_mut().unwrap().extend(layer(json!({})).as_object().unwrap().clone());
+        let mut doc: Json = serde_json::from_str(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
+        doc["layers"][0]["effects"][0]["params"] = params;
+        Scene::from_json(&doc.to_string()).unwrap().validate(&BTreeMap::new())
+    };
     let absent = |id: &str| Issue::Absent { path: "/layers/0/effects/0/params".into(), id: id.into() };
-    assert_eq!(issues(json!({})), [absent("distance"), absent("keep")]);
-    assert_eq!(issues(json!({ "distance": 1 })), [absent("keep")]);
-    assert_eq!(issues(json!({ "distance": 1, "keep": 0.5 })), []);
+    let ids = ["key", "tolerance", "softness", "spill", "distance", "keep"];
+    let all = ids.iter().map(|id| absent(id)).collect::<Vec<_>>();
+    assert_eq!(issues(json!({})), all);
+    let full = json!({ "key": "#00ff00", "tolerance": 0.3, "softness": 0.1, "spill": 0.5, "distance": 1, "keep": 0.5 });
+    assert_eq!(issues(full.clone()), []);
+    let mut part = full;
+    part.as_object_mut().unwrap().remove("keep");
+    assert_eq!(issues(part), [absent("keep")]);
 }

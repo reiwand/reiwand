@@ -87,7 +87,7 @@ pub fn detected(doc: &Value, dir: Option<&Path>) -> BTreeSet<Input> {
 }
 
 pub fn sync(doc: &Value, before: &BTreeSet<Input>, dir: Option<&Path>) -> Vec<Op> {
-    let filled = crate::fill::ops(doc);
+    let filled = crate::completing::ops(doc);
     if !filled.is_empty() {
         return filled;
     }

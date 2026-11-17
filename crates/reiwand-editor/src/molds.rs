@@ -24,13 +24,13 @@ pub fn script_params(name: &str) -> Option<Value> {
         "spawn" => json!({
             "count": { "type": "number", "default": 8, "min": 1, "max": 64 },
             "gap": { "type": "number", "default": 120, "min": 1, "max": 2000 },
-            "template": { "type": "text", "default": "copy" }
+            "template": { "type": "text", "default": "copy", "min": null, "max": null }
         }),
         "wave" => json!({
             "speed": { "type": "number", "default": 1, "min": 0, "max": 20 },
             "size": { "type": "number", "default": 20, "min": 0, "max": 1000 }
         }),
-        "setting" => json!({ "prop": { "type": "text", "default": "" } }),
+        "setting" => json!({ "prop": { "type": "text", "default": "", "min": null, "max": null } }),
         _ => return None,
     })
 }

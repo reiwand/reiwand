@@ -4550,6 +4550,7 @@ dependencies = [
  "naga",
  "reiwand-core",
  "reiwand-palette",
+ "reiwand-upgrade",
  "schemars",
  "serde",
  "serde_json",

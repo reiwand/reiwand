@@ -126,7 +126,7 @@ fn pictures<'a>(
             Some(Value::Fixed(p)) => named(p),
             _ => None,
         };
-        let default = d.params.iter().find(|p| p.id == id).and_then(|p| named(&p.default));
+        let default = d.params.iter().find(|p| p.id == id).and_then(|p| named(&p.prefill));
         *slot = given.or(default);
     }
     out

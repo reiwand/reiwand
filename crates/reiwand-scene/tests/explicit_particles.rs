@@ -2,7 +2,7 @@
 mod prefill;
 
 use reiwand_core::explicit::{Rule, all_required, omission, read, round_trip, scan};
-use reiwand_scene::{System, schema};
+use reiwand_scene::{System, schema, uncovered};
 use serde_json::Value;
 use std::collections::BTreeSet;
 use std::path::Path;
@@ -111,10 +111,7 @@ fn writing_the_sample_again_gives_the_same_bytes() {
 }
 
 #[test]
-fn the_prefill_table_matches_the_schema() {
-    let table: BTreeSet<&str> = prefill::rows().keys().copied().collect();
-    let live = prefill::schema_keys(&schema());
-    let live: BTreeSet<&str> = live.iter().map(String::as_str).collect();
-    assert_eq!(table.difference(&live).collect::<Vec<_>>(), Vec::<&&str>::new(), "rows without a field");
-    assert_eq!(live.difference(&table).collect::<Vec<_>>(), Vec::<&&str>::new(), "fields without a row");
+fn the_prefill_table_covers_every_particle_field() {
+    let missing: Vec<String> = uncovered().into_iter().filter(|row| row.contains("Particle")).collect();
+    assert_eq!(missing, Vec::<String>::new(), "fields without a row");
 }

@@ -1,97 +1,377 @@
 {
   "assets": {
     "lake": {
+      "animated": false,
+      "atlas": null,
+      "durations": [],
+      "face": null,
+      "filter": null,
+      "fps": null,
+      "frames": null,
       "linear": true,
-      "path": "assets/lake-mask.png"
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/lake-mask.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
     },
     "mono": {
-      "path": "assets/mono.ttf"
+      "animated": false,
+      "atlas": null,
+      "durations": [],
+      "face": null,
+      "filter": null,
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/mono.ttf",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
     },
     "sea": {
-      "path": "assets/sea.webm"
+      "animated": false,
+      "atlas": null,
+      "durations": [],
+      "face": null,
+      "filter": null,
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/sea.webm",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
     },
     "sky": {
-      "path": "assets/sky.png"
+      "animated": false,
+      "atlas": null,
+      "durations": [],
+      "face": null,
+      "filter": null,
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/sky.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
     },
     "sky_dawn": {
-      "path": "assets/sky-dawn.png"
+      "animated": false,
+      "atlas": null,
+      "durations": [],
+      "face": null,
+      "filter": null,
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/sky-dawn.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
     },
     "spark": {
+      "animated": false,
       "atlas": [
         4,
         4
       ],
-      "path": "assets/spark.png"
+      "durations": [],
+      "face": null,
+      "filter": null,
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/spark.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
     }
   },
+  "audio": null,
+  "camera3d": null,
   "canvas": {
+    "ambient": null,
     "background": "#0b1020",
     "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
     "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
     "size": [
       1920,
       1080
-    ]
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
   },
   "clock": {
     "max_fps": 60,
     "poster_time": 3.0,
-    "seed": 42
+    "seed": 42,
+    "step": null
   },
+  "effects": {},
+  "ext": {},
   "layers": [
     {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
       "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "color": null,
+      "depth_test": false,
       "effects": [
         {
           "effect": "waves",
+          "enabled": true,
           "mask": {
+            "channel": null,
+            "feather": 0.0,
+            "invert": false,
+            "layer": null,
+            "shape": null,
+            "strength": null,
             "texture": "lake"
           },
+          "name": null,
+          "optional": false,
           "params": {
             "amplitude": 4,
+            "angle2": 90.0,
+            "count": 1.0,
+            "direction": 0.0,
+            "frequency": 4.0,
+            "perspective": 0.0,
+            "phase": "",
             "speed": 0.8
           }
         },
         {
           "effect": "blur",
           "enabled": {
-            "prop": "soft"
+            "a": null,
+            "audio": null,
+            "b": null,
+            "base": null,
+            "bounds": null,
+            "channel": null,
+            "clamp": null,
+            "clock": null,
+            "cursor": null,
+            "date": null,
+            "exponent": null,
+            "fn": null,
+            "g": null,
+            "hold_silence": null,
+            "invert": false,
+            "keys": null,
+            "kind": null,
+            "layer": null,
+            "loop": null,
+            "map": null,
+            "media": null,
+            "of": null,
+            "offset": null,
+            "params": null,
+            "placeholder": null,
+            "prop": "soft",
+            "r": null,
+            "reduce": null,
+            "reference": null,
+            "scale": null,
+            "script": null,
+            "smooth": null,
+            "timeline": null,
+            "unit": null,
+            "window": null,
+            "x": null,
+            "y": null
           },
+          "mask": null,
+          "name": null,
+          "optional": false,
           "params": {
+            "amount": 1.0,
+            "blend": "normal",
             "radius": {
+              "a": null,
+              "audio": null,
+              "b": null,
+              "base": null,
+              "bounds": null,
+              "channel": null,
+              "clamp": null,
+              "clock": null,
+              "cursor": null,
+              "date": null,
+              "exponent": null,
+              "fn": null,
+              "g": null,
+              "hold_silence": null,
+              "invert": false,
+              "keys": null,
+              "kind": null,
+              "layer": null,
+              "loop": null,
+              "map": null,
+              "media": null,
+              "of": null,
+              "offset": null,
+              "params": null,
+              "placeholder": null,
               "prop": "depth",
-              "scale": 10
+              "r": null,
+              "reduce": null,
+              "reference": null,
+              "scale": 10,
+              "script": null,
+              "smooth": null,
+              "timeline": null,
+              "unit": null,
+              "window": null,
+              "x": null,
+              "y": null
             }
           }
         }
       ],
       "id": "background",
       "image": {
+        "a": null,
+        "audio": null,
+        "b": null,
+        "base": null,
+        "bounds": null,
+        "channel": null,
+        "clamp": null,
+        "clock": null,
+        "cursor": null,
+        "date": null,
+        "exponent": null,
+        "fn": null,
+        "g": null,
+        "hold_silence": null,
+        "invert": false,
+        "keys": null,
+        "kind": null,
+        "layer": null,
+        "loop": null,
         "map": {
           "dawn": "sky_dawn",
           "night": "sky"
         },
-        "prop": "style"
+        "media": null,
+        "of": null,
+        "offset": null,
+        "params": null,
+        "placeholder": null,
+        "prop": "style",
+        "r": null,
+        "reduce": null,
+        "reference": null,
+        "scale": null,
+        "script": null,
+        "smooth": null,
+        "timeline": null,
+        "unit": null,
+        "window": null,
+        "x": null,
+        "y": null
       },
-      "type": "image"
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "playback": null,
+      "size": null,
+      "solid": false,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "image",
+      "visible": true
     },
     {
+      "anchor": null,
+      "attach": null,
       "blend": "screen",
       "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "color": null,
+      "depth_test": false,
+      "effects": [],
       "id": "sea",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
       "opacity": 0.6,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "playback": null,
+      "size": null,
+      "solid": false,
       "transform": {
+        "origin": null,
         "position": [
           960,
           900
         ],
+        "rotation": 0.0,
         "scale": [
           1,
           0.4
-        ]
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
       },
       "type": "video",
-      "video": "sea"
+      "video": "sea",
+      "visible": true
     },
     {
       "anchor": null,
@@ -136,14 +416,80 @@
       "visible": true
     },
     {
+      "align": "center",
       "anchor": "bottom_right",
+      "attach": null,
+      "background": null,
+      "blend": "normal",
       "blend_space": "canvas",
+      "blur": null,
+      "brightness": null,
+      "cache": false,
       "color": {
-        "prop": "text_color"
+        "a": null,
+        "audio": null,
+        "b": null,
+        "base": null,
+        "bounds": null,
+        "channel": null,
+        "clamp": null,
+        "clock": null,
+        "cursor": null,
+        "date": null,
+        "exponent": null,
+        "fn": null,
+        "g": null,
+        "hold_silence": null,
+        "invert": false,
+        "keys": null,
+        "kind": null,
+        "layer": null,
+        "loop": null,
+        "map": null,
+        "media": null,
+        "of": null,
+        "offset": null,
+        "params": null,
+        "placeholder": null,
+        "prop": "text_color",
+        "r": null,
+        "reduce": null,
+        "reference": null,
+        "scale": null,
+        "script": null,
+        "smooth": null,
+        "timeline": null,
+        "unit": null,
+        "window": null,
+        "x": null,
+        "y": null
       },
+      "depth_test": false,
+      "effects": [],
+      "fallback": [],
       "font": "mono",
       "id": "clock",
+      "inherit": null,
+      "letter_spacing": null,
+      "lighting": null,
+      "line_height": null,
+      "mask": null,
       "opacity": {
+        "a": null,
+        "audio": null,
+        "b": null,
+        "base": null,
+        "bounds": null,
+        "channel": null,
+        "clamp": null,
+        "clock": null,
+        "cursor": null,
+        "date": null,
+        "exponent": null,
+        "fn": null,
+        "g": null,
+        "hold_silence": null,
+        "invert": false,
         "keys": [
           [
             0,
@@ -155,31 +501,174 @@
             1
           ]
         ],
-        "timeline": "intro"
+        "kind": null,
+        "layer": null,
+        "loop": null,
+        "map": null,
+        "media": null,
+        "of": null,
+        "offset": null,
+        "params": null,
+        "placeholder": null,
+        "prop": null,
+        "r": null,
+        "reduce": null,
+        "reference": null,
+        "scale": null,
+        "script": null,
+        "smooth": null,
+        "timeline": "intro",
+        "unit": null,
+        "window": null,
+        "x": null,
+        "y": null
       },
+      "outline": null,
+      "padding": null,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "render": null,
+      "shadow": null,
       "size": 96,
+      "solid": false,
       "text": {
-        "clock": "HH:mm"
+        "a": null,
+        "audio": null,
+        "b": null,
+        "base": null,
+        "bounds": null,
+        "channel": null,
+        "clamp": null,
+        "clock": "HH:mm",
+        "cursor": null,
+        "date": null,
+        "exponent": null,
+        "fn": null,
+        "g": null,
+        "hold_silence": null,
+        "invert": false,
+        "keys": null,
+        "kind": null,
+        "layer": null,
+        "loop": null,
+        "map": null,
+        "media": null,
+        "of": null,
+        "offset": null,
+        "params": null,
+        "placeholder": null,
+        "prop": null,
+        "r": null,
+        "reduce": null,
+        "reference": null,
+        "scale": null,
+        "script": null,
+        "smooth": null,
+        "timeline": null,
+        "unit": null,
+        "window": null,
+        "x": null,
+        "y": null
       },
       "transform": {
+        "origin": null,
         "position": [
           -64,
           -64
-        ]
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
       },
       "type": "text",
+      "valign": null,
       "visible": {
-        "prop": "show_clock"
-      }
+        "a": null,
+        "audio": null,
+        "b": null,
+        "base": null,
+        "bounds": null,
+        "channel": null,
+        "clamp": null,
+        "clock": null,
+        "cursor": null,
+        "date": null,
+        "exponent": null,
+        "fn": null,
+        "g": null,
+        "hold_silence": null,
+        "invert": false,
+        "keys": null,
+        "kind": null,
+        "layer": null,
+        "loop": null,
+        "map": null,
+        "media": null,
+        "of": null,
+        "offset": null,
+        "params": null,
+        "placeholder": null,
+        "prop": "show_clock",
+        "r": null,
+        "reduce": null,
+        "reference": null,
+        "scale": null,
+        "script": null,
+        "smooth": null,
+        "timeline": null,
+        "unit": null,
+        "window": null,
+        "x": null,
+        "y": null
+      },
+      "wrap": null
     },
     {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
       "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "clip": false,
+      "color": null,
+      "depth_test": false,
+      "effects": [],
       "id": "badge",
+      "inherit": null,
       "layers": [
         {
+          "anchor": null,
+          "attach": null,
+          "blend": "normal",
           "blend_space": "canvas",
+          "brightness": null,
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
           "fill": "#ff8800",
+          "gradient": null,
           "id": "disc",
+          "inherit": null,
+          "lighting": null,
+          "mask": null,
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "parent": null,
           "shape": {
             "ellipse": {
               "size": [
@@ -188,16 +677,55 @@
               ]
             }
           },
-          "type": "shape"
+          "solid": false,
+          "stroke": null,
+          "transform": {
+            "origin": null,
+            "position": null,
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ],
+            "tilt": null,
+            "z": null
+          },
+          "type": "shape",
+          "visible": true
         },
         {
+          "anchor": null,
+          "attach": null,
+          "blend": "normal",
           "blend_space": "canvas",
+          "brightness": null,
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": null,
+          "gradient": null,
           "id": "ring",
+          "inherit": null,
+          "lighting": null,
           "mask": {
             "channel": "a",
+            "feather": 0.0,
             "invert": true,
-            "layer": "disc"
+            "layer": "disc",
+            "shape": null,
+            "strength": null,
+            "texture": null
           },
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "parent": null,
           "shape": {
             "ring": {
               "size": [
@@ -207,20 +735,62 @@
               "width": 6
             }
           },
+          "solid": false,
           "stroke": {
             "color": "#ffffff",
             "width": 2
           },
-          "type": "shape"
+          "transform": {
+            "origin": null,
+            "position": null,
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ],
+            "tilt": null,
+            "z": null
+          },
+          "type": "shape",
+          "visible": true
         }
       ],
+      "lighting": null,
+      "mask": null,
       "opacity": 0.8,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "solid": false,
+      "space": null,
       "transform": {
+        "origin": null,
         "position": [
           200,
           200
         ],
         "rotation": {
+          "a": null,
+          "audio": null,
+          "b": null,
+          "base": null,
+          "bounds": null,
+          "channel": null,
+          "clamp": null,
+          "clock": null,
+          "cursor": null,
+          "date": null,
+          "exponent": null,
+          "fn": null,
+          "g": null,
+          "hold_silence": null,
+          "invert": false,
           "keys": [
             [
               0,
@@ -231,70 +801,280 @@
               360
             ]
           ],
-          "loop": "repeat"
-        }
+          "kind": null,
+          "layer": null,
+          "loop": "repeat",
+          "map": null,
+          "media": null,
+          "of": null,
+          "offset": null,
+          "params": null,
+          "placeholder": null,
+          "prop": null,
+          "r": null,
+          "reduce": null,
+          "reference": null,
+          "scale": null,
+          "script": null,
+          "smooth": null,
+          "timeline": null,
+          "unit": null,
+          "window": null,
+          "x": null,
+          "y": null
+        },
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
       },
-      "type": "group"
+      "type": "group",
+      "visible": true
     },
     {
       "anchor": "bottom",
+      "attach": null,
       "bands": 32,
+      "blend": "normal",
       "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "channel": "average",
       "color": {
-        "prop": "text_color"
+        "a": null,
+        "audio": null,
+        "b": null,
+        "base": null,
+        "bounds": null,
+        "channel": null,
+        "clamp": null,
+        "clock": null,
+        "cursor": null,
+        "date": null,
+        "exponent": null,
+        "fn": null,
+        "g": null,
+        "hold_silence": null,
+        "invert": false,
+        "keys": null,
+        "kind": null,
+        "layer": null,
+        "loop": null,
+        "map": null,
+        "media": null,
+        "of": null,
+        "offset": null,
+        "params": null,
+        "placeholder": null,
+        "prop": "text_color",
+        "r": null,
+        "reduce": null,
+        "reference": null,
+        "scale": null,
+        "script": null,
+        "smooth": null,
+        "timeline": null,
+        "unit": null,
+        "window": null,
+        "x": null,
+        "y": null
       },
+      "depth_test": false,
+      "effects": [],
+      "gap": 0.2,
       "id": "bars",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
       "opacity": {
+        "a": null,
         "audio": "level",
+        "b": null,
+        "base": null,
+        "bounds": null,
+        "channel": null,
         "clamp": [
           0,
           1
         ],
+        "clock": null,
+        "cursor": null,
+        "date": null,
+        "exponent": null,
+        "fn": null,
+        "g": null,
+        "hold_silence": null,
+        "invert": false,
+        "keys": null,
         "kind": "relative",
+        "layer": null,
+        "loop": null,
+        "map": null,
+        "media": null,
+        "of": null,
         "offset": 0.2,
+        "params": null,
+        "placeholder": null,
+        "prop": null,
+        "r": null,
+        "reduce": null,
+        "reference": null,
         "scale": 0.8,
+        "script": null,
         "smooth": 0.2,
-        "unit": "db"
+        "timeline": null,
+        "unit": "db",
+        "window": null,
+        "x": null,
+        "y": null
       },
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
       "size": [
         800,
         120
       ],
+      "solid": false,
+      "style": "bars",
       "transform": {
+        "origin": null,
         "position": [
           0,
           -40
-        ]
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
       },
-      "type": "spectrum"
+      "type": "spectrum",
+      "visible": true
     },
     {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
       "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
       "effects": [
         {
           "effect": "bloom",
+          "enabled": true,
+          "mask": null,
+          "name": null,
+          "optional": false,
           "params": {
             "intensity": {
+              "a": null,
               "audio": "bass",
+              "b": null,
+              "base": null,
+              "bounds": null,
+              "channel": null,
+              "clamp": null,
+              "clock": null,
+              "cursor": null,
+              "date": null,
+              "exponent": null,
+              "fn": null,
+              "g": null,
+              "hold_silence": null,
+              "invert": false,
+              "keys": null,
               "kind": "relative",
+              "layer": null,
+              "loop": null,
+              "map": null,
+              "media": null,
+              "of": null,
               "offset": 0.2,
+              "params": null,
+              "placeholder": null,
+              "prop": null,
+              "r": null,
+              "reduce": null,
+              "reference": null,
               "scale": 0.8,
-              "unit": "db"
-            }
+              "script": null,
+              "smooth": null,
+              "timeline": null,
+              "unit": "db",
+              "window": null,
+              "x": null,
+              "y": null
+            },
+            "knee": 0.5,
+            "radius": 16.0,
+            "threshold": 0.8,
+            "tint": "#ffffff"
           }
         },
         {
           "effect": "color_adjust",
+          "enabled": true,
+          "mask": null,
+          "name": null,
           "optional": true,
           "params": {
+            "contrast": 1.0,
+            "exposure": 0.0,
+            "hue": 0.0,
             "saturation": 1.2
           }
         }
       ],
       "id": "post",
-      "type": "adjustment"
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "redraw": false,
+      "rgb": false,
+      "size": null,
+      "solid": false,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "adjustment",
+      "visible": true
     }
   ],
+  "listens": [],
   "particles": {
     "sparks": {
       "capacity": 4000,
@@ -565,18 +1345,31 @@
       "space": "local"
     }
   },
-  "schema": "reiwand.scene/1",
+  "pools": {},
+  "schema": "reiwand.scene/2",
   "scripts": [
     {
-      "path": "scripts/scene.js"
+      "events": [],
+      "params": {},
+      "path": "scripts/scene.js",
+      "uses": []
     }
   ],
+  "templates": {},
   "timelines": [
     {
       "autoplay": true,
+      "delay": 0.0,
       "duration": 1.5,
+      "events": [],
+      "fps": null,
+      "frames": null,
       "id": "intro",
-      "loop": "once"
+      "loop": "once",
+      "speed": 1.0,
+      "trigger": null,
+      "wrap": false
     }
-  ]
+  ],
+  "transition": null
 }

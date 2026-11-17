@@ -24,7 +24,9 @@ pub fn extend(dir: Option<&Path>, doc: &Value, pointer: &str, out: &mut Vec<Fiel
     }
     crate::films::narrow(doc, out);
     let value = doc.pointer(pointer).unwrap_or(&Value::Null);
-    if let (Some(id), None) = (value.get("prop").and_then(Value::as_str), value.get("keys")) {
+    if let (Some(id), true) =
+        (value.get("prop").and_then(Value::as_str), !value.get("keys").is_some_and(Value::is_array))
+    {
         variants(doc, pointer, id, out);
     }
 }

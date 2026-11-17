@@ -11,12 +11,8 @@ pub enum EmitShape {
         center: [f32; 2],
         radius: Num,
         inner: Num,
-        #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required, extend("x-null" = true))]
-        scale: Option<[f32; 2]>,
-        #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required, extend("x-null" = true))]
-        sign: Option<[i8; 2]>,
+        scale: [f32; 2],
+        sign: [i8; 2],
         #[serde(deserialize_with = "reiwand_core::explicit::null")]
         #[schemars(required, extend("x-null" = true))]
         at: Option<Handle>,
@@ -48,9 +44,7 @@ pub enum EmitShape {
 pub struct Area {
     pub from: [f32; 2],
     pub to: [f32; 2],
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
-    pub inner: Option<[f32; 2]>,
+    pub inner: [f32; 2],
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
     pub at: Option<Handle>,

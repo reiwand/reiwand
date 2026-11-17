@@ -1,31 +1,678 @@
 {
-  "schema": "reiwand.scene/1",
-  "canvas": { "size": [1920, 1080], "background": "#0b1020" },
-  "assets": { "cielo": { "path": "assets/cielo.png" } },
+  "assets": {
+    "cielo": {
+      "animated": false,
+      "atlas": null,
+      "durations": [],
+      "face": null,
+      "filter": null,
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/cielo.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
+    }
+  },
+  "audio": null,
+  "camera3d": null,
+  "canvas": {
+    "ambient": null,
+    "background": "#0b1020",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
+    "size": [
+      1920,
+      1080
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": null
+  },
+  "effects": {},
+  "ext": {},
   "layers": [
-    { "blend_space": "canvas", "id": "fondo", "type": "image", "image": "cielo", "size": [1920, 1080] },
-    { "blend_space": "canvas", "id": "ventana", "type": "group", "clip": true,
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "color": null,
+      "depth_test": false,
+      "effects": [],
+      "id": "fondo",
+      "image": "cielo",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "playback": null,
+      "size": [
+        1920,
+        1080
+      ],
+      "solid": false,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "clip": true,
+      "color": null,
+      "depth_test": false,
+      "effects": [],
+      "id": "ventana",
+      "inherit": null,
       "layers": [
-        { "blend_space": "canvas", "id": "marco", "type": "shape", "shape": { "rect": { "size": [700, 420], "radius": 60 } }, "fill": "#ffffff" },
-        { "blend_space": "canvas", "id": "interior", "type": "image", "image": "cielo", "size": [1400, 790],
-          "transform": { "position": { "timeline": "paseo", "keys": [[0, [760, 540]], [8, [1160, 540]]] } },
-          "effects": [{ "effect": "color_adjust", "params": { "saturation": 1.6, "contrast": 1.2 } }] }
-      ] },
-    { "blend_space": "canvas", "id": "foco", "type": "shape", "shape": { "ellipse": { "size": [500, 500] } }, "fill": "#ffffff", "visible": false },
-    { "blend_space": "canvas", "id": "halo", "type": "solid", "color": "#ffd27a", "blend": "add", "opacity": 0.35,
-      "mask": { "layer": "foco", "channel": "a", "feather": 0.4 } },
-    { "blend_space": "canvas", "id": "planeta", "type": "shape", "shape": { "ellipse": { "size": [120, 120] } }, "fill": "#ff7a59",
-      "anchor": "top_left", "transform": { "position": [200, 160] } },
-    { "blend_space": "canvas", "id": "luna", "type": "shape", "shape": { "ellipse": { "size": [40, 40] } }, "fill": "#ffffff",
-      "parent": "planeta", "inherit": ["transform", "visible"],
-      "transform": { "position": { "timeline": "orbita",
-        "keys": [[0, [90, 0]], [3, [0, 90]], [6, [-90, 0]], [9, [0, -90]], [12, [90, 0]]] } } },
-    { "blend_space": "canvas", "id": "retoque", "type": "adjustment", "size": [900, 500],
-      "transform": { "position": [960, 540] },
-      "effects": [{ "effect": "vignette", "params": { "intensity": 0.5 } }] }
+        {
+          "anchor": null,
+          "attach": null,
+          "blend": "normal",
+          "blend_space": "canvas",
+          "brightness": null,
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#ffffff",
+          "gradient": null,
+          "id": "marco",
+          "inherit": null,
+          "lighting": null,
+          "mask": null,
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "parent": null,
+          "shape": {
+            "rect": {
+              "radius": 60,
+              "size": [
+                700,
+                420
+              ]
+            }
+          },
+          "solid": false,
+          "stroke": null,
+          "transform": {
+            "origin": null,
+            "position": null,
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ],
+            "tilt": null,
+            "z": null
+          },
+          "type": "shape",
+          "visible": true
+        },
+        {
+          "anchor": null,
+          "attach": null,
+          "blend": "normal",
+          "blend_space": "canvas",
+          "brightness": null,
+          "cache": false,
+          "color": null,
+          "depth_test": false,
+          "effects": [
+            {
+              "effect": "color_adjust",
+              "enabled": true,
+              "mask": null,
+              "name": null,
+              "optional": false,
+              "params": {
+                "contrast": 1.2,
+                "exposure": 0.0,
+                "hue": 0.0,
+                "saturation": 1.6
+              }
+            }
+          ],
+          "id": "interior",
+          "image": "cielo",
+          "inherit": null,
+          "lighting": null,
+          "mask": null,
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "parent": null,
+          "playback": null,
+          "size": [
+            1400,
+            790
+          ],
+          "solid": false,
+          "transform": {
+            "origin": null,
+            "position": {
+              "a": null,
+              "audio": null,
+              "b": null,
+              "base": null,
+              "bounds": null,
+              "channel": null,
+              "clamp": null,
+              "clock": null,
+              "cursor": null,
+              "date": null,
+              "exponent": null,
+              "fn": null,
+              "g": null,
+              "hold_silence": null,
+              "invert": false,
+              "keys": [
+                [
+                  0,
+                  [
+                    760,
+                    540
+                  ]
+                ],
+                [
+                  8,
+                  [
+                    1160,
+                    540
+                  ]
+                ]
+              ],
+              "kind": null,
+              "layer": null,
+              "loop": null,
+              "map": null,
+              "media": null,
+              "of": null,
+              "offset": null,
+              "params": null,
+              "placeholder": null,
+              "prop": null,
+              "r": null,
+              "reduce": null,
+              "reference": null,
+              "scale": null,
+              "script": null,
+              "smooth": null,
+              "timeline": "paseo",
+              "unit": null,
+              "window": null,
+              "x": null,
+              "y": null
+            },
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ],
+            "tilt": null,
+            "z": null
+          },
+          "type": "image",
+          "visible": true
+        }
+      ],
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "solid": false,
+      "space": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "group",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#ffffff",
+      "gradient": null,
+      "id": "foco",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "ellipse": {
+          "size": [
+            500,
+            500
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": false
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "add",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "color": "#ffd27a",
+      "depth_test": false,
+      "effects": [],
+      "id": "halo",
+      "inherit": null,
+      "lighting": null,
+      "mask": {
+        "channel": "a",
+        "feather": 0.4,
+        "invert": false,
+        "layer": "foco",
+        "shape": null,
+        "strength": null,
+        "texture": null
+      },
+      "opacity": 0.35,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "size": null,
+      "solid": false,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "solid",
+      "visible": true
+    },
+    {
+      "anchor": "top_left",
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#ff7a59",
+      "gradient": null,
+      "id": "planeta",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "ellipse": {
+          "size": [
+            120,
+            120
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": [
+          200,
+          160
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#ffffff",
+      "gradient": null,
+      "id": "luna",
+      "inherit": [
+        "transform",
+        "visible"
+      ],
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": "planeta",
+      "shape": {
+        "ellipse": {
+          "size": [
+            40,
+            40
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": {
+          "a": null,
+          "audio": null,
+          "b": null,
+          "base": null,
+          "bounds": null,
+          "channel": null,
+          "clamp": null,
+          "clock": null,
+          "cursor": null,
+          "date": null,
+          "exponent": null,
+          "fn": null,
+          "g": null,
+          "hold_silence": null,
+          "invert": false,
+          "keys": [
+            [
+              0,
+              [
+                90,
+                0
+              ]
+            ],
+            [
+              3,
+              [
+                0,
+                90
+              ]
+            ],
+            [
+              6,
+              [
+                -90,
+                0
+              ]
+            ],
+            [
+              9,
+              [
+                0,
+                -90
+              ]
+            ],
+            [
+              12,
+              [
+                90,
+                0
+              ]
+            ]
+          ],
+          "kind": null,
+          "layer": null,
+          "loop": null,
+          "map": null,
+          "media": null,
+          "of": null,
+          "offset": null,
+          "params": null,
+          "placeholder": null,
+          "prop": null,
+          "r": null,
+          "reduce": null,
+          "reference": null,
+          "scale": null,
+          "script": null,
+          "smooth": null,
+          "timeline": "orbita",
+          "unit": null,
+          "window": null,
+          "x": null,
+          "y": null
+        },
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "vignette",
+          "enabled": true,
+          "mask": null,
+          "name": null,
+          "optional": false,
+          "params": {
+            "center": [
+              0.5,
+              0.5
+            ],
+            "color": "#000000",
+            "intensity": 0.5,
+            "radius": 1.0,
+            "roundness": 1.0,
+            "softness": 0.65
+          }
+        }
+      ],
+      "id": "retoque",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "redraw": false,
+      "rgb": false,
+      "size": [
+        900,
+        500
+      ],
+      "solid": false,
+      "transform": {
+        "origin": null,
+        "position": [
+          960,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "adjustment",
+      "visible": true
+    }
   ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/1",
+  "scripts": [],
+  "templates": {},
   "timelines": [
-    { "id": "paseo", "duration": 8, "loop": "pingpong" },
-    { "id": "orbita", "duration": 12, "loop": "repeat" }
-  ]
+    {
+      "autoplay": true,
+      "delay": 0.0,
+      "duration": 8,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "paseo",
+      "loop": "pingpong",
+      "speed": 1.0,
+      "trigger": null,
+      "wrap": false
+    },
+    {
+      "autoplay": true,
+      "delay": 0.0,
+      "duration": 12,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "orbita",
+      "loop": "repeat",
+      "speed": 1.0,
+      "trigger": null,
+      "wrap": false
+    }
+  ],
+  "transition": null
 }

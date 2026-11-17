@@ -5,7 +5,7 @@ fn scaled(aspect: f32) -> f32 {
         sparks(),
         json!({ "capacity": 8000, "init": { "size": [40, 60] }, "render": { "aspect": aspect } }),
     );
-    let s = Scene::from_json(&scene(big, true)).unwrap();
+    let s = Scene::from_json(&reiwand_upgrade::fill::whole(&scene(big, true))).unwrap();
     Bake::new(&s, 0, Tier::T0, true, |_| None).unwrap().sizes[0]
 }
 
@@ -18,8 +18,11 @@ fn the_budget_counts_the_rectangle_and_not_the_square() {
         assert!((slim / square - 2.0).abs() < 1e-3, "{aspect}: {slim} {square}");
     }
     let sys = |aspect| {
-        let s = Scene::from_json(&scene(with(sparks(), json!({ "render": { "aspect": aspect } })), true))
-            .unwrap();
+        let s = Scene::from_json(&reiwand_upgrade::fill::whole(&scene(
+            with(sparks(), json!({ "render": { "aspect": aspect } })),
+            true,
+        )))
+        .unwrap();
         s.particles.values().next().unwrap().overdraw([200, 100])
     };
     assert!((sys(0.25) * 4.0 - sys(1.0)).abs() < 1e-4 && (sys(5.0) * 5.0 - sys(1.0)).abs() < 1e-4);

@@ -29,9 +29,15 @@ pub fn customs(dir: &Path, doc: &Value) -> Customs {
         let Some(path) = entry.get("descriptor").and_then(Value::as_str) else { continue };
         let Ok(bytes) = fs::read(dir.join(path)) else { continue };
         let Ok(descriptor) = serde_json::from_slice::<Value>(&bytes) else { continue };
-        let params = descriptor.get("params").and_then(Value::as_array).into_iter().flatten();
-        let list = params
-            .filter_map(|p| Some((p.get("id")?.as_str()?.to_owned(), p.get("default")?.clone())))
+        let listed = |key: &str| descriptor.get(key).and_then(Value::as_array).into_iter().flatten().cloned();
+        let list = listed("params")
+            .chain(listed("options"))
+            .filter_map(|p| {
+                Some((
+                    p.get("id")?.as_str()?.to_owned(),
+                    p.get("default").or_else(|| p.get("prefill"))?.clone(),
+                ))
+            })
             .collect();
         found.insert(name.clone(), list);
     }
@@ -44,12 +50,20 @@ pub fn text(doc: &Value) -> anyhow::Result<String> {
     Ok(text)
 }
 
-fn scene(path: &Path) -> anyhow::Result<bool> {
+fn version(doc: &mut Value) -> bool {
+    let Some(schema) = doc.get_mut("schema").filter(|s| *s == "reiwand.scene/1") else { return false };
+    *schema = Value::from("reiwand.scene/2");
+    true
+}
+
+pub fn scene(path: &Path) -> anyhow::Result<bool> {
     let Ok(mut doc) = serde_json::from_slice::<Value>(&fs::read(path)?) else { return Ok(false) };
     let customs = customs(path.parent().unwrap_or(Path::new(".")), &doc);
     let dropped = crate::gain::fixed(&mut doc);
-    if complete_with(Format::Scene, &mut doc, &customs).written == 0 && !dropped {
-        return Ok(false);
+    let renamed = crate::descriptors::rewrite(path.parent().unwrap_or(Path::new(".")), &doc)? > 0;
+    let versioned = version(&mut doc);
+    if complete_with(Format::Scene, &mut doc, &customs).written == 0 && !dropped && !versioned {
+        return Ok(renamed);
     }
     let staged = path.with_extension("json.upgrading");
     fs::write(&staged, text(&doc)?)?;

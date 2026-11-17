@@ -29,7 +29,7 @@ pub const FIELDS: [&str; 19] = [
 ];
 const PARAM_KEYS: [&str; 14] = [
     "type",
-    "default",
+    "prefill",
     "min",
     "max",
     "unit",
@@ -94,7 +94,7 @@ pub(crate) fn param(json: &mut Value, c: &ParamChange) -> Result<()> {
         None => {
             crate::clips::valid(c.id)?;
             let kind = c.set.get("type").and_then(Value::as_str).unwrap_or("float");
-            params.push(json!({ "id": c.id, "type": kind, "default": default_of(kind) }));
+            params.push(json!({ "id": c.id, "type": kind, "prefill": default_of(kind) }));
             params.len() - 1
         }
     };
@@ -104,8 +104,8 @@ pub(crate) fn param(json: &mut Value, c: &ParamChange) -> Result<()> {
         keyed(k, &PARAM_KEYS)?;
         p[k] = v.clone();
     }
-    if p["type"] != kind_before && !c.set.contains_key("default") {
-        p["default"] = default_of(p["type"].as_str().unwrap_or("float"));
+    if p["type"] != kind_before && !c.set.contains_key("prefill") {
+        p["prefill"] = default_of(p["type"].as_str().unwrap_or("float"));
     }
     for k in c.clear {
         keyed(k, &PARAM_KEYS[2..])?;

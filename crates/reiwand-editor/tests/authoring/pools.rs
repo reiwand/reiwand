@@ -8,11 +8,14 @@ fn pools_are_added_changed_listed_drawn_and_removed() {
     let mut p = project(&root);
     assert!(refused(&mut p, json!({"add_layer": {"kind": "shapes"}})).contains("add a pool first"));
     act(&mut p, json!({"pool": {"id": "bars", "add": true, "max": 8, "max_vertices": 64}})).unwrap();
-    assert_eq!(at(&p, "/scene/pools/bars"), json!({"type": "mesh", "max": 8, "max_vertices": 64}));
+    assert_eq!(
+        at(&p, "/scene/pools/bars"),
+        json!({"type": "mesh", "max": 8, "max_vertices": 64, "texture": null, "size": null})
+    );
     act(&mut p, json!({"pool": {"id": "bars", "size": [128, 64], "max": 12}})).unwrap();
     assert_eq!(at(&p, "/scene/pools/bars/size"), json!([128, 64]));
     act(&mut p, json!({"pool": {"id": "bars", "clear": ["size"]}})).unwrap();
-    assert_eq!(at(&p, "/scene/pools/bars").get("size"), None);
+    assert_eq!(at(&p, "/scene/pools/bars/size"), serde_json::Value::Null);
     for bad in [
         json!({"pool": {"id": "bars", "add": true}}),
         json!({"pool": {"id": "Big One", "add": true}}),

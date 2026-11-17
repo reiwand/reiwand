@@ -76,7 +76,7 @@ impl Scene {
             let d = self.effect(&e.effect)?;
             let Some(id) = &d.reach else { return Some(0.0) };
             let given =
-                e.params.get(id).map_or(d.param(id).map(|i| d.params[i].default.clone()), |v| match v {
+                e.params.get(id).map_or(d.param(id).map(|i| d.params[i].prefill.clone()), |v| match v {
                     Value::Fixed(p) => Some(p.clone()),
                     Value::Bound(_) => None,
                 });

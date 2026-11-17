@@ -160,7 +160,7 @@ pub(super) fn inputs<'a>(
         _ => None,
     });
     let lists = d.params.iter().filter(|p| p.kind == crate::ParamKind::Emitters);
-    let lists = lists.map(|p| match found(&p.id).as_deref().unwrap_or(&p.default) {
+    let lists = lists.map(|p| match found(&p.id).as_deref().unwrap_or(&p.prefill) {
         crate::Param::Emitters(list) => (p.id.as_str(), list.clone()),
         _ => (p.id.as_str(), Vec::new()),
     });

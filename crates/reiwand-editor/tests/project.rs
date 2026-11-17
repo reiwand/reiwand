@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use image::{Rgba, RgbaImage};
 use reiwand_editor::Project;
 use reiwand_editor::actions::Action;
@@ -19,7 +21,7 @@ fn state() {
 }
 
 fn act(project: &mut Project, action: Value) {
-    project.act(&serde_json::from_value::<Action>(action).unwrap()).unwrap();
+    project.act(&serde_json::from_value::<Action>(whole::action(project, action)).unwrap()).unwrap();
 }
 
 #[test]
@@ -103,7 +105,7 @@ fn language_files_and_package_effects_belong_to_the_package() {
     fs::create_dir(dir.join("locale")).unwrap();
     fs::write(dir.join("locale/en.json"), json!({"title": "Tide"}).to_string()).unwrap();
     let descriptor = json!({"id": "ripple", "passes": [{"entry": "fs_ripple"}], "cost": {},
-        "options": [{"id": "taps", "values": [1, 2], "default": 1}]});
+        "options": [{"id": "taps", "values": [1, 2], "prefill": 1}]});
     fs::write(dir.join("assets/ripple.json"), descriptor.to_string()).unwrap();
     let wgsl = "override taps: i32 = 1;\n@fragment\nfn fs_ripple(in: VertexOut) -> @location(0) vec4<f32> {\n    return tap(in.uv) * f32(taps);\n}\n";
     fs::write(dir.join("assets/ripple.wgsl"), wgsl).unwrap();
@@ -117,7 +119,7 @@ fn language_files_and_package_effects_belong_to_the_package() {
     let unread = problems(&project.dir, &project.doc);
     assert!(unread.iter().any(|p| p.warning && p.message.starts_with("locale/en.json ")), "{unread:?}");
     let typed = json!({"add": {"pointer": "/manifest/requires/features/-", "value": "rgb"}});
-    assert!(project.act(&serde_json::from_value::<Action>(typed).unwrap()).is_err());
+    assert!(project.act(&serde_json::from_value::<Action>(whole::action(&project, typed)).unwrap()).is_err());
     act(&mut project, json!({"add": {"pointer": "/manifest/requires/features/-", "value": "locale_files"}}));
     assert_eq!(listed(&project), json!(["custom_effects", "effect_options", "locale_files"]));
     act(&mut project, json!({"set": {"pointer": "/scene/layers/0/opacity", "value": 0.5}}));

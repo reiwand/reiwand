@@ -77,7 +77,7 @@ pub(crate) fn render(
     let mut probe = doc.clone();
     let mut ops = ops;
     apply(&mut probe, &ops)?;
-    let filled = crate::fill::ops(&probe);
+    let filled = crate::completing::ops(&probe);
     apply(&mut probe, &filled)?;
     ops.extend(filled);
     let squares = squared(&probe, &own);

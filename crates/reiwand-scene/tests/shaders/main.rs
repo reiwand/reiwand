@@ -35,16 +35,16 @@ fn fs_ripple(in: VertexOut) -> @location(0) vec4<f32> {
 fn descriptor() -> Json {
     json!({ "id": "ripple", "name": { "en": "Ripple", "es": "Onda" },
         "params": [
-            { "id": "detail", "type": "int", "default": 1, "min": 0, "max": 4, "label": { "en": "Detail", "es": "Detalle" } },
-            { "id": "style", "type": "enum", "default": 0, "values": [{ "value": 0, "label": { "en": "Soft" } }, { "value": 1 }] },
-            { "id": "mode", "type": "blend", "default": "screen", "help": { "en": "How the waves mix" } },
-            { "id": "center", "type": "position", "default": [0.5, 0.5] },
-            { "id": "source", "type": "texture", "default": "" },
-            { "id": "paint", "type": "mask", "default": "", "channels": 3, "paint": "#000000" }
+            { "id": "detail", "type": "int", "prefill": 1, "min": 0, "max": 4, "label": { "en": "Detail", "es": "Detalle" } },
+            { "id": "style", "type": "enum", "prefill": 0, "values": [{ "value": 0, "label": { "en": "Soft" } }, { "value": 1 }] },
+            { "id": "mode", "type": "blend", "prefill": "screen", "help": { "en": "How the waves mix" } },
+            { "id": "center", "type": "position", "prefill": [0.5, 0.5] },
+            { "id": "source", "type": "texture", "prefill": "" },
+            { "id": "paint", "type": "mask", "prefill": "", "channels": 3, "paint": "#000000" }
         ],
         "targets": { "history": { "scale": 0.5, "format": "rgba16f" } },
-        "options": [{ "id": "taps", "values": [4, 8], "default": 4 },
-                    { "id": "tinted", "values": [false, true], "default": false, "when_bound": "paint" }],
+        "options": [{ "id": "taps", "values": [4, 8], "prefill": 4 },
+                    { "id": "tinted", "values": [false, true], "prefill": false, "when_bound": "paint" }],
         "passes": [
             { "entry": "fs_ripple_step", "scale": 0.5, "target": "history", "blend": "add",
               "inputs": ["previous", "target:history", "backdrop", "asset:source", "asset:paint"] },
@@ -60,11 +60,29 @@ fn packaged(change: impl FnOnce(&mut Json), wgsl: &str) -> Result<Descriptor, St
     Descriptor::packaged("ripple", &d.to_string(), wgsl)
 }
 
+fn full(mut uses: Json) -> Json {
+    let d = descriptor();
+    let wanted: Vec<(String, Json)> = ["params", "options"]
+        .iter()
+        .flat_map(|k| d[k].as_array().unwrap().iter())
+        .map(|p| (p["id"].as_str().unwrap().to_owned(), p["prefill"].clone()))
+        .collect();
+    for u in uses.as_array_mut().unwrap() {
+        let params = u.as_object_mut().unwrap().entry("params").or_insert_with(|| json!({}));
+        for (id, value) in &wanted {
+            params.as_object_mut().unwrap().entry(id.clone()).or_insert_with(|| value.clone());
+        }
+    }
+    uses
+}
+
 fn scene(uses: Json) -> Scene {
+    let uses = full(uses);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "a": { "path": "a.png" } },
         "effects": { "ripple": { "descriptor": "fx/ripple.json", "wgsl": "fx/ripple.wgsl" } },
         "layers": [{ "blend_space": "canvas", "id": "l", "type": "image", "image": "a", "effects": uses }] });
-    Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"))
+    Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new())
+        .unwrap_or_else(|e| panic!("{e}"))
 }
 
 fn adopt(scene: &mut Scene, descriptor: &Json) -> Result<(), SceneError> {
@@ -74,4 +92,14 @@ fn adopt(scene: &mut Scene, descriptor: &Json) -> Result<(), SceneError> {
         _ => Err("missing"),
     };
     scene.adopt(&BTreeMap::new(), files)
+}
+
+fn used(mut v: Json) -> EffectUse {
+    let o = v.as_object_mut().unwrap();
+    o.entry("name").or_insert(Json::Null);
+    o.entry("enabled").or_insert(json!(true));
+    o.entry("mask").or_insert(Json::Null);
+    o.entry("optional").or_insert(json!(false));
+    o.entry("params").or_insert(json!({}));
+    serde_json::from_value(v).unwrap()
 }

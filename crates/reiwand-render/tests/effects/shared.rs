@@ -159,9 +159,9 @@ fn the_last_view_of_an_effect_frees_its_shaders() {
 #[test]
 fn every_built_in_effect_renders_with_its_defaults() {
     for d in reiwand_scene::builtin() {
-        let required = d.params.iter().filter(|p| p.required);
+        let required = d.params.iter();
         let set: serde_json::Map<String, serde_json::Value> =
-            required.map(|p| (p.id.clone(), serde_json::to_value(&p.default).unwrap())).collect();
+            required.map(|p| (p.id.clone(), serde_json::to_value(&p.prefill).unwrap())).collect();
         let Some(mut run) = Fx::new(&d.id, set.into()).run() else { return };
         let out = run.shot();
         assert_eq!(run.stats().compiled, 0, "{} compiled a shader while drawing", d.id);

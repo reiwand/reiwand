@@ -69,9 +69,12 @@ pub(crate) fn effects(dir: &Path, doc: &Value, e: &E) -> Result<Vec<Op>> {
             let d = known(dir, doc, effect)?;
             check(&d, p)?;
             let mut p = p.clone();
-            let missing: Vec<_> = d.params.iter().filter(|d| d.required && !p.contains_key(&d.id)).collect();
-            for def in missing {
-                p.insert(def.id.clone(), serde_json::to_value(&def.default)?);
+            let given: Vec<String> = p.keys().cloned().collect();
+            for def in d.params.iter().filter(|d| !given.contains(&d.id)) {
+                p.insert(def.id.clone(), serde_json::to_value(&def.prefill)?);
+            }
+            for def in d.options.iter().filter(|d| !given.contains(&d.id)) {
+                p.insert(def.id.clone(), serde_json::to_value(&def.prefill)?);
             }
             let (path, found) = layer(doc, id)?;
             let sound = said("editor.sound_no_effects", "a sound or light layer takes no effects", &[]);
@@ -79,12 +82,9 @@ pub(crate) fn effects(dir: &Path, doc: &Value, e: &E) -> Result<Vec<Op>> {
             let len = found["effects"].as_array().map_or(0, Vec::len);
             let at = at.unwrap_or(len);
             ensure!(at <= len, said("editor.no_effect_at", "the layer %1 has no effect %2", &[id, &at]));
-            let mut value = json!({ "effect": effect });
-            name.iter().filter(|n| !n.is_empty()).for_each(|n| value["name"] = json!(n));
-            params(&Value::Null, &p).into_iter().for_each(|p| value["params"] = p);
-            if *optional {
-                value["optional"] = json!(true);
-            }
+            let named = name.as_ref().filter(|n| !n.is_empty());
+            let value = json!({ "effect": effect, "name": named, "enabled": true, "mask": null,
+                "optional": *optional, "params": params(&Value::Null, &p).unwrap_or_else(|| json!({})) });
             refused(dir, doc, vec![Op::Add { path: format!("{path}/effects/{at}"), value }])
         }
         E::Set { layer: id, index, params: p, enabled, name, optional } => {
@@ -96,10 +96,14 @@ pub(crate) fn effects(dir: &Path, doc: &Value, e: &E) -> Result<Vec<Op>> {
             }
             enabled.iter().for_each(|on| ops.extend(set(doc, &format!("{at}/enabled"), json!(on))));
             if let Some(n) = name {
-                ops.extend(put(doc, &format!("{at}/name"), (!n.is_empty()).then(|| json!(n))));
+                ops.extend(set(
+                    doc,
+                    &format!("{at}/name"),
+                    if n.is_empty() { Value::Null } else { json!(n) },
+                ));
             }
             if let Some(o) = optional {
-                ops.extend(put(doc, &format!("{at}/optional"), o.then_some(json!(true))));
+                ops.extend(set(doc, &format!("{at}/optional"), json!(o)));
             }
             refused(dir, doc, ops)
         }

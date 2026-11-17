@@ -10,15 +10,9 @@ pub struct Trail {
     #[schemars(required, extend("x-null" = true))]
     pub segments: Option<u32>,
     #[schemars(extend("x-range" = [0, 7]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
-    pub subdivide: Option<u32>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
-    pub uv_scale: Option<f32>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
-    pub uv_scroll: Option<f32>,
+    pub subdivide: u32,
+    pub uv_scale: f32,
+    pub uv_scroll: f32,
     pub textured: bool,
 }
 
@@ -56,12 +50,6 @@ pub struct Rope {
     pub uv_scale: f32,
     pub uv_scroll: f32,
     pub smooth: bool,
-}
-
-impl Default for Rope {
-    fn default() -> Self {
-        Rope { subdivide: 2, width: 4.0, uv_scale: 1.0, uv_scroll: 0.0, smooth: true }
-    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]

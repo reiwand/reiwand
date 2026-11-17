@@ -8,7 +8,10 @@ fn runtime(mut params: serde_json::Value) -> Runtime {
     let layer =
         json!({ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#ff0000", "effects": fx });
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 100] }, "layers": [layer] });
-    Runtime::new(Arc::new(Scene::from_json(&text.to_string()).unwrap()), Default::default())
+    Runtime::new(
+        Arc::new(Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap()),
+        Default::default(),
+    )
 }
 
 fn effects(rt: &Runtime) -> Vec<String> {
@@ -45,7 +48,10 @@ fn a_glow_without_intensity_is_left_out_of_frames() {
     let layer = |i: f32| json!({ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#ff0000", "effects": fx(i) });
     let rt = |i: f32| {
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 100] }, "layers": [layer(i)] });
-        Runtime::new(Arc::new(Scene::from_json(&text.to_string()).unwrap()), Default::default())
+        Runtime::new(
+            Arc::new(Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap()),
+            Default::default(),
+        )
     };
     assert!(effects(&rt(0.0)).is_empty());
     assert_eq!(effects(&rt(0.5)), ["bloom"]);

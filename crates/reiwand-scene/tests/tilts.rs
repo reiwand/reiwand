@@ -4,7 +4,10 @@ use std::sync::Arc;
 
 fn lean(layers: serde_json::Value, id: &str) -> Lean {
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layers });
-    let rt = Runtime::new(Arc::new(Scene::from_json(&doc.to_string()).unwrap()), Default::default());
+    let rt = Runtime::new(
+        Arc::new(Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap()),
+        Default::default(),
+    );
     let frame = rt.frame([0.0, 0.0, 200.0, 100.0], Quality::Q3);
     frame.draws.iter().find(|d| d.layer.id == id).and_then(|d| d.lean).unwrap_or(Lean::IDENTITY)
 }

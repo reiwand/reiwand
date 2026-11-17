@@ -33,13 +33,9 @@ pub struct Child {
     #[schemars(required, extend("x-null" = true))]
     pub max: Option<u32>,
     #[schemars(extend("x-unit" = "px"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
-    pub offset: Option<[f32; 2]>,
+    pub offset: [f32; 2],
     #[schemars(extend("x-unit" = "°"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
-    pub angle: Option<f32>,
+    pub angle: f32,
     #[schemars(extend("x-range" = [0, 100]))]
     pub scale: f32,
     pub points_from: bool,

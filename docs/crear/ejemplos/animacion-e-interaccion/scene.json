@@ -1,23 +1,373 @@
 {
-  "schema": "reiwand.scene/1",
-  "canvas": { "size": [1920, 1080], "background": "#10141f" },
   "assets": {
-    "bola": { "path": "assets/bola.png", "atlas": [1, 4], "frames": 4, "fps": 6, "filter": "nearest" },
-    "toque": { "path": "assets/zumbido.wav" }
+    "bola": {
+      "animated": false,
+      "atlas": [
+        1,
+        4
+      ],
+      "durations": [],
+      "face": null,
+      "filter": "nearest",
+      "fps": 6,
+      "frames": 4,
+      "linear": false,
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/bola.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
+    },
+    "toque": {
+      "animated": false,
+      "atlas": null,
+      "durations": [],
+      "face": null,
+      "filter": null,
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/zumbido.wav",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
+    }
   },
+  "audio": null,
+  "camera3d": null,
+  "canvas": {
+    "ambient": null,
+    "background": "#10141f",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
+    "size": [
+      1920,
+      1080
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": null
+  },
+  "effects": {},
+  "ext": {},
   "layers": [
-    { "blend_space": "canvas", "id": "baile", "type": "image", "image": "bola", "size": [256, 256],
-      "transform": { "position": [700, 540] },
-      "playback": { "rate": 1, "loop": true } },
-    { "blend_space": "canvas", "id": "boton", "type": "shape", "shape": { "rect": { "size": [360, 140], "radius": 70 } }, "fill": "#3b82f6",
-      "solid": true, "transform": { "position": [1250, 540],
-        "scale": { "timeline": "pulsar", "keys": [[0, [1, 1]], [0.15, [0.9, 0.9], "out_quad"], [0.4, [1, 1], "out_back"]] } } },
-    { "blend_space": "canvas", "id": "etiqueta", "type": "text", "text": "Toca aquí", "font": "sans-serif", "size": 54, "color": "#ffffff",
-      "parent": "boton", "inherit": ["transform", "visible"] },
-    { "blend_space": "canvas", "id": "sonido", "type": "sound", "sound": "toque", "loop": false, "play_on": "event:golpe", "volume": 0.6 }
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "color": null,
+      "depth_test": false,
+      "effects": [],
+      "id": "baile",
+      "image": "bola",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "playback": {
+        "end": null,
+        "frame": null,
+        "loop": true,
+        "own_clock": false,
+        "playing": true,
+        "rate": 1,
+        "start": 0.0
+      },
+      "size": [
+        256,
+        256
+      ],
+      "solid": false,
+      "transform": {
+        "origin": null,
+        "position": [
+          700,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#3b82f6",
+      "gradient": null,
+      "id": "boton",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "rect": {
+          "radius": 70,
+          "size": [
+            360,
+            140
+          ]
+        }
+      },
+      "solid": true,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": [
+          1250,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": {
+          "a": null,
+          "audio": null,
+          "b": null,
+          "base": null,
+          "bounds": null,
+          "channel": null,
+          "clamp": null,
+          "clock": null,
+          "cursor": null,
+          "date": null,
+          "exponent": null,
+          "fn": null,
+          "g": null,
+          "hold_silence": null,
+          "invert": false,
+          "keys": [
+            [
+              0,
+              [
+                1,
+                1
+              ]
+            ],
+            [
+              0.15,
+              [
+                0.9,
+                0.9
+              ],
+              "out_quad"
+            ],
+            [
+              0.4,
+              [
+                1,
+                1
+              ],
+              "out_back"
+            ]
+          ],
+          "kind": null,
+          "layer": null,
+          "loop": null,
+          "map": null,
+          "media": null,
+          "of": null,
+          "offset": null,
+          "params": null,
+          "placeholder": null,
+          "prop": null,
+          "r": null,
+          "reduce": null,
+          "reference": null,
+          "scale": null,
+          "script": null,
+          "smooth": null,
+          "timeline": "pulsar",
+          "unit": null,
+          "window": null,
+          "x": null,
+          "y": null
+        },
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "align": "center",
+      "anchor": null,
+      "attach": null,
+      "background": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "blur": null,
+      "brightness": null,
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "fallback": [],
+      "font": "sans-serif",
+      "id": "etiqueta",
+      "inherit": [
+        "transform",
+        "visible"
+      ],
+      "letter_spacing": null,
+      "lighting": null,
+      "line_height": null,
+      "mask": null,
+      "opacity": 1.0,
+      "outline": null,
+      "padding": null,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": "boton",
+      "render": null,
+      "shadow": null,
+      "size": 54,
+      "solid": false,
+      "text": "Toca aquí",
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "text",
+      "valign": null,
+      "visible": true,
+      "wrap": null
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fade_in": 0.0,
+      "fade_out": 0.0,
+      "id": "sonido",
+      "inherit": null,
+      "lighting": null,
+      "loop": false,
+      "mask": null,
+      "mode": null,
+      "opacity": 1.0,
+      "pan": 0.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "pause": null,
+      "play": true,
+      "play_on": "event:golpe",
+      "solid": false,
+      "sound": "toque",
+      "sounds": [],
+      "stream": false,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "sound",
+      "visible": true,
+      "volume": 0.6
+    }
   ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/1",
+  "scripts": [],
+  "templates": {},
   "timelines": [
-    { "id": "pulsar", "duration": 0.4, "loop": "once", "autoplay": false, "trigger": "click:boton",
-      "events": [{ "t": 0.15, "name": "golpe" }] }
-  ]
+    {
+      "autoplay": false,
+      "delay": 0.0,
+      "duration": 0.4,
+      "events": [
+        {
+          "name": "golpe",
+          "t": 0.15
+        }
+      ],
+      "fps": null,
+      "frames": null,
+      "id": "pulsar",
+      "loop": "once",
+      "speed": 1.0,
+      "trigger": "click:boton",
+      "wrap": false
+    }
+  ],
+  "transition": null
 }

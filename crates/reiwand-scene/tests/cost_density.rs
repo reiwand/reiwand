@@ -5,7 +5,7 @@ fn scene(effects: bool) -> Scene {
     let text = serde_json::json!({ "schema": SCHEMA, "canvas": { "size": [1000, 500], "fit": "fill" },
         "assets": { "a": { "path": "a.png" } },
         "layers": [{ "blend_space": "canvas", "id": "a", "type": "image", "image": "a", "size": [1000, 500], "effects": fx }] });
-    Scene::from_json(&text.to_string()).unwrap()
+    Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap()
 }
 
 #[test]

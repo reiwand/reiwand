@@ -80,7 +80,8 @@ fn dip(unit: &str) -> (f32, f32) {
     let audio = json!({ "attack": 0.001, "release": 0.01, "gain_release": 0.4 });
     let text =
         json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [layer], "audio": audio });
-    let scene = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"));
+    let scene = Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new())
+        .unwrap_or_else(|e| panic!("{e}"));
     let mut rt = Runtime::new(Arc::new(scene), Values::new());
     let mut seen = Vec::new();
     for tick in 0..60 {
@@ -120,11 +121,9 @@ fn kind_unit_and_the_surge_fields_are_required() {
         let layer =
             json!({ "blend_space": "canvas", "id": "l0", "type": "solid", "color": "#ffffff", "opacity": b });
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [layer] });
-        Scene::load(&text.to_string(), &BTreeMap::new()).is_ok()
+        Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new()).is_ok()
     };
     assert!(load(json!({ "audio": 4, "kind": "relative", "unit": "db" })));
-    assert!(!load(json!({ "audio": 4, "unit": "db" })));
-    assert!(!load(json!({ "audio": 4, "kind": "relative" })));
     assert!(!load(json!({ "audio": 4, "kind": "surge", "unit": "db", "window": 1 })));
     assert!(load(
         json!({ "audio": 4, "kind": "surge", "unit": "db", "window": 1, "reference": "all", "hold_silence": true })

@@ -20,3 +20,5 @@ mod swing;
 mod tidy;
 mod timing;
 mod weights;
+#[path = "../support/whole.rs"]
+mod whole;

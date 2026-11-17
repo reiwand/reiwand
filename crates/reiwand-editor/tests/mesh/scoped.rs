@@ -19,7 +19,7 @@ fn layers_inside_a_template_get_bones_chains_and_attachments_of_their_own() {
     assert_eq!(net["ik"][0]["chain"], json!(["root", "arm", "hand"]), "{template}");
     assert_eq!(badge["attach"], json!({ "layer": "net", "bone": "arm" }));
     let scene = &p.doc["scene"]["layers"][0]["layers"];
-    assert!(scene.as_array().unwrap().iter().all(|l| l.get("ik").is_none() && l.get("attach").is_none()));
+    assert!(scene.as_array().unwrap().iter().all(|l| super::whole::empty(&l["ik"]) && l["attach"].is_null()));
     let seen = p.seen();
     let shown = reiwand_editor::rigs::query(&p.dir, &seen, "net", &json!({ "handles": true }));
     assert_eq!(shown["ik"].as_array().map(Vec::len), Some(1), "{shown}");

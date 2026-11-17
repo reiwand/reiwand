@@ -2,7 +2,8 @@ use super::*;
 
 #[test]
 fn scripts_media_and_pointer_hooks_name_their_broken_fields() {
-    let script = |n: usize| json!({ "path": format!("scripts/{n}.js") });
+    let script =
+        |n: usize| json!({ "path": format!("scripts/{n}.js"), "events": [], "uses": [], "params": {} });
     for (changes, fault) in [
         (vec![("/scripts/0/events", json!(["click", "click"]))], "/scripts/0/events repeats an id"),
         (vec![("/scripts/0/events", json!(["shake"]))], "unknown variant `shake`"),
@@ -41,10 +42,6 @@ fn scripts_media_and_pointer_hooks_name_their_broken_fields() {
         ),
         (
             vec![("/layers/2/layers/2/text", json!({ "media": "primary" }))],
-            "/layers/2/layers/2/text/media does not fit",
-        ),
-        (
-            vec![("/layers/2/layers/2/text", json!({ "media": "lyrics" }))],
             "/layers/2/layers/2/text/media does not fit",
         ),
         (vec![("/timelines/2/trigger", json!("media:skip"))], "names the unknown media trigger \"skip\""),

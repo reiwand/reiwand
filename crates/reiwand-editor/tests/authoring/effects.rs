@@ -17,7 +17,10 @@ fn an_effect_starts_the_stack_of_a_layer_that_has_none() {
     act(&mut p, effects(json!({"add": {"layer": "card", "effect": "film_grain", "at": 0}}))).unwrap();
     let stack = at(&p, &format!("{path}/effects"));
     assert_eq!(stack[0]["effect"], "film_grain");
-    assert_eq!(stack[1], json!({"effect": "vignette", "name": "edge", "params": {"intensity": 0.4}}));
+    assert_eq!(stack[1]["effect"], "vignette");
+    assert_eq!(stack[1]["name"], "edge");
+    assert_eq!(stack[1]["params"]["intensity"], json!(0.4));
+    assert_eq!(stack[1]["params"].as_object().unwrap().len(), 6, "every parameter is written");
     act(&mut p, json!({"undo": {}})).unwrap();
     act(&mut p, json!({"undo": {}})).unwrap();
     assert_eq!(at(&p, &format!("{path}/effects")), serde_json::Value::Null);
@@ -55,9 +58,13 @@ fn an_effect_changes_moves_and_leaves_with_its_parameters() {
         (&first["params"]["intensity"], &first["enabled"], &first["optional"]),
         (&json!(0.7), &json!(false), &json!(true))
     );
-    act(&mut p, effects(json!({"set": {"layer": "card", "index": 0, "params": {"intensity": null}}})))
-        .unwrap();
-    assert!(at(&p, &format!("{path}/effects/0")).get("params").is_none());
+    let before = at(&p, &format!("{path}/effects/0"));
+    let reply = refused(
+        &mut p,
+        effects(json!({"set": {"layer": "card", "index": 0, "params": {"intensity": null}}})),
+    );
+    assert!(reply.contains("intensity"), "{reply}");
+    assert_eq!(at(&p, &format!("{path}/effects/0")), before);
     act(&mut p, effects(json!({"move": {"layer": "card", "index": 0, "to": 1}}))).unwrap();
     assert_eq!(at(&p, &format!("{path}/effects/1/effect")), "vignette");
     assert!(refused(&mut p, effects(json!({"move": {"layer": "card", "index": 0, "to": 2}}))).contains('2'));

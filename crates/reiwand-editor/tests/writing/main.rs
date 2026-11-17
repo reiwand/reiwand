@@ -2,6 +2,8 @@ mod checking;
 mod form;
 mod lighter;
 mod starting;
+#[path = "../support/whole.rs"]
+mod whole;
 
 use reiwand_editor::Project;
 use reiwand_editor::actions::Action;
@@ -11,6 +13,7 @@ use std::sync::OnceLock;
 use tempfile::TempDir;
 
 pub fn act(p: &mut Project, action: Value) -> anyhow::Result<()> {
+    let action = whole::action(p, action);
     let action = serde_json::from_value::<Action>(action).unwrap();
     assert!(reiwand_editor::ACTIONS.contains(&action.name().as_str()), "{}", action.name());
     p.act(&action).map(drop)

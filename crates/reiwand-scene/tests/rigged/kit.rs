@@ -126,7 +126,7 @@ pub fn arm() -> Gl {
 pub fn scene(layer: Value, glb: Vec<u8>) -> Result<Scene, SceneError> {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 64] },
         "assets": { "arm": { "path": "arm.glb" } }, "layers": [layer] });
-    let mut scene = Scene::from_json(&text.to_string())?;
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string()))?;
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone()))?;
     Ok(scene)
 }
@@ -164,7 +164,7 @@ pub fn close(a: [f32; 2], b: [f32; 2], within: f32) -> bool {
 pub fn layers(list: Value) -> Runtime {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 64] },
         "assets": { "arm": { "path": "arm.glb" } }, "layers": list });
-    let mut scene = Scene::from_json(&text.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap();
     let glb = arm().bytes();
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     Runtime::new(Arc::new(scene), Values::new())

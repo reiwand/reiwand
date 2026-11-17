@@ -5,20 +5,20 @@
   "description": { "en": "Offsets pixels using a map of normals or offsets.", "es": "Desplaza los píxeles con un mapa de normales o de desplazamientos." },
   "mask_mode": "strength",
   "params": [
-    { "id": "map", "type": "texture", "tools": ["gray", "flow"], "default": "" },
+    { "id": "map", "type": "texture", "tools": ["gray", "flow"], "prefill": "" },
     {
       "id": "mode",
       "type": "enum",
-      "default": 0,
+      "prefill": 0,
       "values": [
         { "value": 0, "label": { "en": "Normals", "es": "Normales" } },
         { "value": 1, "label": { "en": "Offsets", "es": "Desplazamientos" } }
       ]
     },
-    { "id": "scale", "type": "float", "default": 1, "min": 0.1, "max": 16 },
-    { "id": "strength", "type": "float", "default": 8, "min": 0, "max": 256 },
-    { "id": "scroll", "type": "vec2", "default": [0, 0], "min": -4, "max": 4, "uses": "time" },
-    { "id": "ratio", "type": "float", "default": 1, "min": 0.1, "max": 10 }
+    { "id": "scale", "type": "float", "prefill": 1, "min": 0.1, "max": 16 },
+    { "id": "strength", "type": "float", "prefill": 8, "min": 0, "max": 256 },
+    { "id": "scroll", "type": "vec2", "prefill": [0, 0], "min": -4, "max": 4, "uses": "time" },
+    { "id": "ratio", "type": "float", "prefill": 1, "min": 0.1, "max": 10 }
   ],
   "passes": [{ "entry": "fs_displace", "inputs": ["previous", "asset:map"] }],
   "reach": "strength"

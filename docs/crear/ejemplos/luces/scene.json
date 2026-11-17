@@ -1,19 +1,320 @@
 {
-  "schema": "reiwand.scene/1",
-  "canvas": { "size": [1920, 1080], "background": "#000000", "ambient": "#10131f", "sky": "#202a44" },
   "assets": {
-    "piedra": { "path": "assets/piedra.png" },
-    "relieve": { "path": "assets/relieve.png", "linear": true }
+    "piedra": {
+      "animated": false,
+      "atlas": null,
+      "durations": [],
+      "face": null,
+      "filter": null,
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/piedra.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
+    },
+    "relieve": {
+      "animated": false,
+      "atlas": null,
+      "durations": [],
+      "face": null,
+      "filter": null,
+      "fps": null,
+      "frames": null,
+      "linear": true,
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/relieve.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
+    }
   },
+  "audio": null,
+  "camera3d": null,
+  "canvas": {
+    "ambient": "#10131f",
+    "background": "#000000",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
+    "size": [
+      1920,
+      1080
+    ],
+    "sky": "#202a44",
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": null
+  },
+  "effects": {},
+  "ext": {},
   "layers": [
-    { "blend_space": "canvas", "id": "pared", "type": "image", "image": "piedra", "size": [1920, 1080],
-      "lighting": { "normal": "relieve", "roughness": 0.4, "strength": 1 } },
-    { "blend_space": "canvas", "id": "farol", "type": "light", "light": "point", "color": "#ffd9a0", "intensity": 1.6, "radius": 700, "z": 160,
-      "transform": { "position": { "timeline": "paseo",
-        "keys": [[0, [400, 400]], [8, [1500, 700], "in_out_sine"], [16, [400, 400], "in_out_sine"]] } } },
-    { "blend_space": "canvas", "id": "foco", "type": "light", "light": "spot", "color": "#8fb4ff", "intensity": 1.2, "radius": 900,
-      "cone": [20, 45], "z": 300, "transform": { "position": [1500, 150], "rotation": 20 },
-      "volumetric": { "density": 0.25, "samples": 16, "shafts": 0.3 } }
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "color": null,
+      "depth_test": false,
+      "effects": [],
+      "id": "pared",
+      "image": "piedra",
+      "inherit": null,
+      "lighting": {
+        "emissive": 0.0,
+        "emissive_map": null,
+        "env": null,
+        "normal": "relieve",
+        "reflection": 0.0,
+        "roughness": 0.4,
+        "roughness_map": null,
+        "strength": 1
+      },
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "playback": null,
+      "size": [
+        1920,
+        1080
+      ],
+      "solid": false,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "aim3d": null,
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "color": "#ffd9a0",
+      "cone": null,
+      "depth_test": false,
+      "effects": [],
+      "id": "farol",
+      "inherit": null,
+      "intensity": 1.6,
+      "length": null,
+      "light": "point",
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "position3d": null,
+      "radius": 700,
+      "shadow_bias": null,
+      "shadow_resolution": null,
+      "shadows": false,
+      "solid": false,
+      "texture": null,
+      "transform": {
+        "origin": null,
+        "position": {
+          "a": null,
+          "audio": null,
+          "b": null,
+          "base": null,
+          "bounds": null,
+          "channel": null,
+          "clamp": null,
+          "clock": null,
+          "cursor": null,
+          "date": null,
+          "exponent": null,
+          "fn": null,
+          "g": null,
+          "hold_silence": null,
+          "invert": false,
+          "keys": [
+            [
+              0,
+              [
+                400,
+                400
+              ]
+            ],
+            [
+              8,
+              [
+                1500,
+                700
+              ],
+              "in_out_sine"
+            ],
+            [
+              16,
+              [
+                400,
+                400
+              ],
+              "in_out_sine"
+            ]
+          ],
+          "kind": null,
+          "layer": null,
+          "loop": null,
+          "map": null,
+          "media": null,
+          "of": null,
+          "offset": null,
+          "params": null,
+          "placeholder": null,
+          "prop": null,
+          "r": null,
+          "reduce": null,
+          "reference": null,
+          "scale": null,
+          "script": null,
+          "smooth": null,
+          "timeline": "paseo",
+          "unit": null,
+          "window": null,
+          "x": null,
+          "y": null
+        },
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "light",
+      "visible": true,
+      "volumetric": null,
+      "z": 160
+    },
+    {
+      "aim3d": null,
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "color": "#8fb4ff",
+      "cone": [
+        20,
+        45
+      ],
+      "depth_test": false,
+      "effects": [],
+      "id": "foco",
+      "inherit": null,
+      "intensity": 1.2,
+      "length": null,
+      "light": "spot",
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "position3d": null,
+      "radius": 900,
+      "shadow_bias": null,
+      "shadow_resolution": null,
+      "shadows": false,
+      "solid": false,
+      "texture": null,
+      "transform": {
+        "origin": null,
+        "position": [
+          1500,
+          150
+        ],
+        "rotation": 20,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "light",
+      "visible": true,
+      "volumetric": {
+        "density": 0.25,
+        "samples": 16,
+        "shafts": 0.3
+      },
+      "z": 300
+    }
   ],
-  "timelines": [{ "id": "paseo", "duration": 16, "loop": "repeat" }]
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/1",
+  "scripts": [],
+  "templates": {},
+  "timelines": [
+    {
+      "autoplay": true,
+      "delay": 0.0,
+      "duration": 16,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "paseo",
+      "loop": "repeat",
+      "speed": 1.0,
+      "trigger": null,
+      "wrap": false
+    }
+  ],
+  "transition": null
 }

@@ -1,93 +1,93 @@
 {
   "params": {
     "bloom": [
-      { "id": "tint", "type": "color", "default": "#ffffff" }
+      { "id": "tint", "type": "color", "prefill": "#ffffff" }
     ],
     "blur": [
-      { "id": "blend", "type": "blend", "default": "normal" },
-      { "id": "amount", "type": "float", "default": 1, "min": 0, "max": 1 }
+      { "id": "blend", "type": "blend", "prefill": "normal" },
+      { "id": "amount", "type": "float", "prefill": 1, "min": 0, "max": 1 }
     ],
     "blur_motion": [
-      { "id": "follow", "type": "bool", "default": false },
-      { "id": "shutter", "type": "float", "default": 0.05, "min": 0, "max": 0.5 }
+      { "id": "follow", "type": "bool", "prefill": false },
+      { "id": "shutter", "type": "float", "prefill": 0.05, "min": 0, "max": 0.5 }
     ],
     "chromatic_aberration": [
-      { "id": "mode", "type": "enum", "default": 0, "values": [
+      { "id": "mode", "type": "enum", "prefill": 0, "values": [
         { "value": 0, "label": { "en": "Expansion", "es": "Expansión" } }, { "value": 1, "label": { "en": "Directional", "es": "Direccional" } },
         { "value": 2, "label": { "en": "Radial", "es": "Radial" } }, { "value": 3, "label": { "en": "Barrel", "es": "Barril" } }] },
-      { "id": "angle", "type": "float", "default": 0, "min": -360, "max": 360 }
+      { "id": "angle", "type": "float", "prefill": 0, "min": -360, "max": 360 }
     ],
     "depth_parallax": [
-      { "id": "scale", "type": "vec2", "default": [1, 1], "min": -1, "max": 1 },
-      { "id": "smooth", "type": "bool", "default": false }
+      { "id": "scale", "type": "vec2", "prefill": [1, 1], "min": -1, "max": 1 },
+      { "id": "smooth", "type": "bool", "prefill": false }
     ],
     "film_grain": [
-      { "id": "mono", "type": "bool", "default": false },
-      { "id": "bias", "type": "float", "default": 0, "min": -1, "max": 1 },
-      { "id": "blend", "type": "blend", "default": "overlay" }
+      { "id": "mono", "type": "bool", "prefill": false },
+      { "id": "bias", "type": "float", "prefill": 0, "min": -1, "max": 1 },
+      { "id": "blend", "type": "blend", "prefill": "overlay" }
     ],
     "flow": [
-      { "id": "noise", "type": "bool", "default": false },
-      { "id": "phase", "type": "texture", "default": "" }
+      { "id": "noise", "type": "bool", "prefill": false },
+      { "id": "phase", "type": "texture", "prefill": "" }
     ],
     "god_rays": [
-      { "id": "mode", "type": "enum", "default": 0, "values": [
+      { "id": "mode", "type": "enum", "prefill": 0, "values": [
         { "value": 0, "label": { "en": "Radial", "es": "Radial" } }, { "value": 1, "label": { "en": "Directional", "es": "Direccional" } },
         { "value": 2, "label": { "en": "Star", "es": "Estrella" } }] },
-      { "id": "angle", "type": "float", "default": 90, "min": -360, "max": 360 },
-      { "id": "noise", "type": "float", "default": 0, "min": 0, "max": 1, "uses": "time" },
-      { "id": "edges", "type": "int", "default": 6, "min": 2, "max": 16 }
+      { "id": "angle", "type": "float", "prefill": 90, "min": -360, "max": 360 },
+      { "id": "noise", "type": "float", "prefill": 0, "min": 0, "max": 1, "uses": "time" },
+      { "id": "edges", "type": "int", "prefill": 6, "min": 2, "max": 16 }
     ],
-    "iris": [{ "id": "background", "type": "bool", "default": false }],
-    "lens_distort": [{ "id": "background", "type": "bool", "default": false }],
-    "reflection": [{ "id": "angle", "type": "float", "default": 0, "min": -360, "max": 360 }],
+    "iris": [{ "id": "background", "type": "bool", "prefill": false }],
+    "lens_distort": [{ "id": "background", "type": "bool", "prefill": false }],
+    "reflection": [{ "id": "angle", "type": "float", "prefill": 0, "min": -360, "max": 360 }],
     "scroll": [
-      { "id": "repeat_x", "type": "bool", "default": true },
-      { "id": "repeat_y", "type": "bool", "default": true }
+      { "id": "repeat_x", "type": "bool", "prefill": true },
+      { "id": "repeat_y", "type": "bool", "prefill": true }
     ],
     "shake": [
-      { "id": "noise", "type": "float", "default": 0, "min": 0, "max": 1 },
-      { "id": "friction", "type": "float", "default": 0, "min": 0, "max": 1 },
-      { "id": "bounds", "type": "vec2", "default": [1, 1], "min": 0, "max": 1 },
-      { "id": "phase", "type": "texture", "default": "", "tool": "gray" },
-      { "id": "flow", "type": "texture", "default": "", "tool": "flow", "paint": "#808000" },
-      { "id": "motion", "type": "enum", "default": 0, "values": [
+      { "id": "noise", "type": "float", "prefill": 0, "min": 0, "max": 1 },
+      { "id": "friction", "type": "float", "prefill": 0, "min": 0, "max": 1 },
+      { "id": "bounds", "type": "vec2", "prefill": [1, 1], "min": 0, "max": 1 },
+      { "id": "phase", "type": "texture", "prefill": "", "tool": "gray" },
+      { "id": "flow", "type": "texture", "prefill": "", "tool": "flow", "paint": "#808000" },
+      { "id": "motion", "type": "enum", "prefill": 0, "values": [
         { "value": 0, "label": { "en": "Noise", "es": "Ruido" } }, { "value": 1, "label": { "en": "Periodic push", "es": "Empuje periódico" } }] },
-      { "id": "side", "type": "enum", "default": 0, "values": [
+      { "id": "side", "type": "enum", "prefill": 0, "values": [
         { "value": 0, "label": { "en": "Both ways", "es": "A los dos lados" } }, { "value": 1, "label": { "en": "Forward", "es": "Hacia adelante" } },
         { "value": 2, "label": { "en": "Backward", "es": "Hacia atrás" } }] }
     ],
     "shine": [
-      { "id": "blend", "type": "blend", "default": "add" },
-      { "id": "gradient", "type": "texture", "default": "" },
-      { "id": "style", "type": "enum", "default": 0, "values": [
+      { "id": "blend", "type": "blend", "prefill": "add" },
+      { "id": "gradient", "type": "texture", "prefill": "" },
+      { "id": "style", "type": "enum", "prefill": 0, "values": [
         { "value": 0, "label": { "en": "Line", "es": "Línea" } }, { "value": 1, "label": { "en": "Double line", "es": "Línea doble" } },
         { "value": 2, "label": { "en": "Ring", "es": "Anillo" } }, { "value": 3, "label": { "en": "Glint", "es": "Destello" } }] }
     ],
     "sway": [
-      { "id": "double", "type": "bool", "default": false },
-      { "id": "phase", "type": "texture", "default": "" },
-      { "id": "foliage", "type": "bool", "default": false },
-      { "id": "ratio", "type": "float", "default": 1, "min": 0.1, "max": 10 }
+      { "id": "double", "type": "bool", "prefill": false },
+      { "id": "phase", "type": "texture", "prefill": "" },
+      { "id": "foliage", "type": "bool", "prefill": false },
+      { "id": "ratio", "type": "float", "prefill": 1, "min": 0.1, "max": 10 }
     ],
     "twirl": [
-      { "id": "aspect", "type": "float", "default": 1, "min": 0.1, "max": 10 },
-      { "id": "inner", "type": "float", "default": 0, "min": 0, "max": 1 },
-      { "id": "noise", "type": "float", "default": 0, "min": 0, "max": 1 },
-      { "id": "repeat", "type": "bool", "default": false }
+      { "id": "aspect", "type": "float", "prefill": 1, "min": 0.1, "max": 10 },
+      { "id": "inner", "type": "float", "prefill": 0, "min": 0, "max": 1 },
+      { "id": "noise", "type": "float", "prefill": 0, "min": 0, "max": 1 },
+      { "id": "repeat", "type": "bool", "prefill": false }
     ],
     "water_ripple": [
-      { "id": "perspective", "type": "float", "default": 0, "min": 0, "max": 1 },
-      { "id": "reflection", "type": "texture", "default": "" },
-      { "id": "tint", "type": "color", "default": "#ffffff" },
-      { "id": "walls", "type": "texture", "default": "" },
-      { "id": "speed", "type": "float", "default": 1, "min": 0, "max": 4 }
+      { "id": "perspective", "type": "float", "prefill": 0, "min": 0, "max": 1 },
+      { "id": "reflection", "type": "texture", "prefill": "" },
+      { "id": "tint", "type": "color", "prefill": "#ffffff" },
+      { "id": "walls", "type": "texture", "prefill": "" },
+      { "id": "speed", "type": "float", "prefill": 1, "min": 0, "max": 4 }
     ],
     "waves": [
-      { "id": "count", "type": "int", "default": 1, "min": 1, "max": 2 },
-      { "id": "angle2", "type": "float", "default": 90, "min": -360, "max": 360 },
-      { "id": "perspective", "type": "float", "default": 0, "min": 0, "max": 1 },
-      { "id": "phase", "type": "texture", "default": "" }
+      { "id": "count", "type": "int", "prefill": 1, "min": 1, "max": 2 },
+      { "id": "angle2", "type": "float", "prefill": 90, "min": -360, "max": 360 },
+      { "id": "perspective", "type": "float", "prefill": 0, "min": 0, "max": 1 },
+      { "id": "phase", "type": "texture", "prefill": "" }
     ]
   },
   "effects": []

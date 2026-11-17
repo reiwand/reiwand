@@ -5,9 +5,9 @@
   "description": { "en": "Sharpens local contrast without affecting overall exposure.", "es": "Aumenta el contraste local sin cambiar la exposición general." },
   "mask_mode": "strength",
   "params": [
-    { "id": "radius", "type": "float", "default": 8, "min": 1, "max": 64 },
-    { "id": "amount", "type": "float", "default": 0.5, "min": 0, "max": 4 },
-    { "id": "luma_only", "type": "bool", "default": true }
+    { "id": "radius", "type": "float", "prefill": 8, "min": 1, "max": 64 },
+    { "id": "amount", "type": "float", "prefill": 0.5, "min": 0, "max": 4 },
+    { "id": "luma_only", "type": "bool", "prefill": true }
   ],
   "passes": [
     { "entry": "fs_local_contrast_h", "scale": 0.5 },

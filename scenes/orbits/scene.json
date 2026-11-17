@@ -1,27 +1,903 @@
 {
-  "schema": "reiwand.scene/1",
-  "canvas": { "size": [1920, 1080], "fit": "fill", "background": "#050716" },
-  "clock": { "max_fps": "display" },
-  "scripts": [{ "path": "scripts/orbits.js" }],
+  "assets": {},
+  "audio": null,
+  "camera3d": null,
+  "canvas": {
+    "ambient": null,
+    "background": "#050716",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
+    "size": [
+      1920,
+      1080
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": "display",
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": null
+  },
+  "effects": {},
+  "ext": {},
   "layers": [
-    { "blend_space": "canvas", "id": "space", "type": "shape", "shape": { "rect": { "size": [1920, 1080] } },
-      "gradient": { "radial": true, "from": [0.5, 0.5], "to": [1, 1], "stops": [[0, "#18204a"], [1, "#04050f"]] } },
-    { "blend_space": "canvas", "id": "backdrop", "type": "image", "image": { "prop": "backdrop" }, "size": [1920, 1080], "opacity": 0.5 },
-    { "blend_space": "canvas", "id": "paths", "type": "group", "opacity": 0.35, "layers": [
-      { "blend_space": "canvas", "id": "r1", "type": "shape", "shape": { "ring": { "size": [420, 176], "width": 2 } }, "fill": "#9fb4ff" },
-      { "blend_space": "canvas", "id": "r2", "type": "shape", "shape": { "ring": { "size": [660, 277], "width": 2 } }, "fill": "#9fb4ff" },
-      { "blend_space": "canvas", "id": "r3", "type": "shape", "shape": { "ring": { "size": [940, 395], "width": 2 } }, "fill": "#9fb4ff" }
-    ] },
-    { "blend_space": "canvas", "id": "corona", "type": "shape", "shape": { "ellipse": { "size": [520, 520] } }, "blend": "add",
-      "gradient": { "radial": true, "from": [0.5, 0.5], "to": [1, 0.5], "stops": [[0, "#ffcf6a90"], [0.3, "#ffcf6a31"], [0.65, "#ffcf6a06"], [1, "#ffcf6a00"]] } },
-    { "blend_space": "canvas", "id": "sun", "type": "shape", "shape": { "ellipse": { "size": [150, 150] } },
-      "gradient": { "radial": true, "from": [0.4, 0.4], "to": [1, 0.5], "stops": [[0, "#fff6d0"], [1, "#ffb43c"]] } },
-    { "blend_space": "canvas", "id": "inner", "type": "shape", "shape": { "ellipse": { "size": [34, 34] } }, "fill": "#d9a37c", "transform": { "position": [1153, 574], "scale": [0.91, 0.91] } },
-    { "blend_space": "canvas", "id": "middle", "type": "shape", "shape": { "ellipse": { "size": [52, 52] } }, "fill": "#e7c98f", "transform": { "position": [677, 611], "scale": [0.93, 0.93] } },
-    { "blend_space": "canvas", "id": "outer", "type": "shape", "shape": { "ellipse": { "size": [60, 60] } },
-      "gradient": { "from": [0, 0], "to": [1, 1], "stops": [[0, "#7fd0ff"], [1, "#2c6bb8"]] }, "transform": { "position": [816, 352], "scale": [0.71, 0.71] } },
-    { "blend_space": "canvas", "id": "moon", "type": "shape", "shape": { "ellipse": { "size": [16, 16] } }, "fill": "#e9ecf2", "transform": { "position": [886, 352] } },
-    { "blend_space": "canvas", "id": "time", "type": "text", "text": { "clock": "HH:mm" }, "font": "monospace", "size": 64, "color": "#c9d4ff",
-      "anchor": "top_right", "transform": { "position": [-64, 48] }, "visible": { "prop": "clock" } }
-  ]
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": null,
+      "gradient": {
+        "from": [
+          0.5,
+          0.5
+        ],
+        "radial": true,
+        "stops": [
+          [
+            0,
+            "#18204a"
+          ],
+          [
+            1,
+            "#04050f"
+          ]
+        ],
+        "to": [
+          1,
+          1
+        ]
+      },
+      "id": "space",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "rect": {
+          "radius": 0.0,
+          "size": [
+            1920,
+            1080
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "color": null,
+      "depth_test": false,
+      "effects": [],
+      "id": "backdrop",
+      "image": {
+        "a": null,
+        "audio": null,
+        "b": null,
+        "base": null,
+        "bounds": null,
+        "channel": null,
+        "clamp": null,
+        "clock": null,
+        "cursor": null,
+        "date": null,
+        "exponent": null,
+        "fn": null,
+        "g": null,
+        "hold_silence": null,
+        "invert": false,
+        "keys": null,
+        "kind": null,
+        "layer": null,
+        "loop": null,
+        "map": null,
+        "media": null,
+        "of": null,
+        "offset": null,
+        "params": null,
+        "placeholder": null,
+        "prop": "backdrop",
+        "r": null,
+        "reduce": null,
+        "reference": null,
+        "scale": null,
+        "script": null,
+        "smooth": null,
+        "timeline": null,
+        "unit": null,
+        "window": null,
+        "x": null,
+        "y": null
+      },
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 0.5,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "playback": null,
+      "size": [
+        1920,
+        1080
+      ],
+      "solid": false,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "clip": false,
+      "color": null,
+      "depth_test": false,
+      "effects": [],
+      "id": "paths",
+      "inherit": null,
+      "layers": [
+        {
+          "anchor": null,
+          "attach": null,
+          "blend": "normal",
+          "blend_space": "canvas",
+          "brightness": null,
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#9fb4ff",
+          "gradient": null,
+          "id": "r1",
+          "inherit": null,
+          "lighting": null,
+          "mask": null,
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "parent": null,
+          "shape": {
+            "ring": {
+              "size": [
+                420,
+                176
+              ],
+              "width": 2
+            }
+          },
+          "solid": false,
+          "stroke": null,
+          "transform": {
+            "origin": null,
+            "position": null,
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ],
+            "tilt": null,
+            "z": null
+          },
+          "type": "shape",
+          "visible": true
+        },
+        {
+          "anchor": null,
+          "attach": null,
+          "blend": "normal",
+          "blend_space": "canvas",
+          "brightness": null,
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#9fb4ff",
+          "gradient": null,
+          "id": "r2",
+          "inherit": null,
+          "lighting": null,
+          "mask": null,
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "parent": null,
+          "shape": {
+            "ring": {
+              "size": [
+                660,
+                277
+              ],
+              "width": 2
+            }
+          },
+          "solid": false,
+          "stroke": null,
+          "transform": {
+            "origin": null,
+            "position": null,
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ],
+            "tilt": null,
+            "z": null
+          },
+          "type": "shape",
+          "visible": true
+        },
+        {
+          "anchor": null,
+          "attach": null,
+          "blend": "normal",
+          "blend_space": "canvas",
+          "brightness": null,
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#9fb4ff",
+          "gradient": null,
+          "id": "r3",
+          "inherit": null,
+          "lighting": null,
+          "mask": null,
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "parent": null,
+          "shape": {
+            "ring": {
+              "size": [
+                940,
+                395
+              ],
+              "width": 2
+            }
+          },
+          "solid": false,
+          "stroke": null,
+          "transform": {
+            "origin": null,
+            "position": null,
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ],
+            "tilt": null,
+            "z": null
+          },
+          "type": "shape",
+          "visible": true
+        }
+      ],
+      "lighting": null,
+      "mask": null,
+      "opacity": 0.35,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "solid": false,
+      "space": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "group",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "add",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": null,
+      "gradient": {
+        "from": [
+          0.5,
+          0.5
+        ],
+        "radial": true,
+        "stops": [
+          [
+            0,
+            "#ffcf6a90"
+          ],
+          [
+            0.3,
+            "#ffcf6a31"
+          ],
+          [
+            0.65,
+            "#ffcf6a06"
+          ],
+          [
+            1,
+            "#ffcf6a00"
+          ]
+        ],
+        "to": [
+          1,
+          0.5
+        ]
+      },
+      "id": "corona",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "ellipse": {
+          "size": [
+            520,
+            520
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": null,
+      "gradient": {
+        "from": [
+          0.4,
+          0.4
+        ],
+        "radial": true,
+        "stops": [
+          [
+            0,
+            "#fff6d0"
+          ],
+          [
+            1,
+            "#ffb43c"
+          ]
+        ],
+        "to": [
+          1,
+          0.5
+        ]
+      },
+      "id": "sun",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "ellipse": {
+          "size": [
+            150,
+            150
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#d9a37c",
+      "gradient": null,
+      "id": "inner",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "ellipse": {
+          "size": [
+            34,
+            34
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": [
+          1153,
+          574
+        ],
+        "rotation": 0.0,
+        "scale": [
+          0.91,
+          0.91
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#e7c98f",
+      "gradient": null,
+      "id": "middle",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "ellipse": {
+          "size": [
+            52,
+            52
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": [
+          677,
+          611
+        ],
+        "rotation": 0.0,
+        "scale": [
+          0.93,
+          0.93
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": null,
+      "gradient": {
+        "from": [
+          0,
+          0
+        ],
+        "radial": false,
+        "stops": [
+          [
+            0,
+            "#7fd0ff"
+          ],
+          [
+            1,
+            "#2c6bb8"
+          ]
+        ],
+        "to": [
+          1,
+          1
+        ]
+      },
+      "id": "outer",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "ellipse": {
+          "size": [
+            60,
+            60
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": [
+          816,
+          352
+        ],
+        "rotation": 0.0,
+        "scale": [
+          0.71,
+          0.71
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#e9ecf2",
+      "gradient": null,
+      "id": "moon",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "ellipse": {
+          "size": [
+            16,
+            16
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": null,
+        "position": [
+          886,
+          352
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "align": "center",
+      "anchor": "top_right",
+      "attach": null,
+      "background": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "blur": null,
+      "brightness": null,
+      "cache": false,
+      "color": "#c9d4ff",
+      "depth_test": false,
+      "effects": [],
+      "fallback": [],
+      "font": "monospace",
+      "id": "time",
+      "inherit": null,
+      "letter_spacing": null,
+      "lighting": null,
+      "line_height": null,
+      "mask": null,
+      "opacity": 1.0,
+      "outline": null,
+      "padding": null,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "render": null,
+      "shadow": null,
+      "size": 64,
+      "solid": false,
+      "text": {
+        "a": null,
+        "audio": null,
+        "b": null,
+        "base": null,
+        "bounds": null,
+        "channel": null,
+        "clamp": null,
+        "clock": "HH:mm",
+        "cursor": null,
+        "date": null,
+        "exponent": null,
+        "fn": null,
+        "g": null,
+        "hold_silence": null,
+        "invert": false,
+        "keys": null,
+        "kind": null,
+        "layer": null,
+        "loop": null,
+        "map": null,
+        "media": null,
+        "of": null,
+        "offset": null,
+        "params": null,
+        "placeholder": null,
+        "prop": null,
+        "r": null,
+        "reduce": null,
+        "reference": null,
+        "scale": null,
+        "script": null,
+        "smooth": null,
+        "timeline": null,
+        "unit": null,
+        "window": null,
+        "x": null,
+        "y": null
+      },
+      "transform": {
+        "origin": null,
+        "position": [
+          -64,
+          48
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "text",
+      "valign": null,
+      "visible": {
+        "a": null,
+        "audio": null,
+        "b": null,
+        "base": null,
+        "bounds": null,
+        "channel": null,
+        "clamp": null,
+        "clock": null,
+        "cursor": null,
+        "date": null,
+        "exponent": null,
+        "fn": null,
+        "g": null,
+        "hold_silence": null,
+        "invert": false,
+        "keys": null,
+        "kind": null,
+        "layer": null,
+        "loop": null,
+        "map": null,
+        "media": null,
+        "of": null,
+        "offset": null,
+        "params": null,
+        "placeholder": null,
+        "prop": "clock",
+        "r": null,
+        "reduce": null,
+        "reference": null,
+        "scale": null,
+        "script": null,
+        "smooth": null,
+        "timeline": null,
+        "unit": null,
+        "window": null,
+        "x": null,
+        "y": null
+      },
+      "wrap": null
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/1",
+  "scripts": [
+    {
+      "events": [],
+      "params": {},
+      "path": "scripts/orbits.js",
+      "uses": []
+    }
+  ],
+  "templates": {},
+  "timelines": [],
+  "transition": null
 }

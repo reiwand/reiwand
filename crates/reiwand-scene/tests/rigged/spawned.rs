@@ -11,7 +11,7 @@ fn templated(template: serde_json::Value) -> Result<Runtime, SceneError> {
 fn kept(templates: serde_json::Value) -> Result<Runtime, SceneError> {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 64] }, "assets": { "arm": { "path": "arm.glb" } },
         "layers": [], "templates": templates });
-    let mut scene = Scene::from_json(&text.to_string())?;
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string()))?;
     let glb = arm().bytes();
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone()))?;
     Ok(Runtime::new(Arc::new(scene), Values::new()))

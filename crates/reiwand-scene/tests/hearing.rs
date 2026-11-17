@@ -12,7 +12,8 @@ fn runtime(opacities: &[Json], audio: Option<Json>) -> Runtime {
     if let Some(a) = audio {
         text["audio"] = a;
     }
-    let scene = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"));
+    let scene = Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new())
+        .unwrap_or_else(|e| panic!("{e}"));
     assert!(scene.validate(&BTreeMap::new()).is_empty(), "{:?}", scene.validate(&BTreeMap::new()));
     Runtime::new(Arc::new(scene), Values::new())
 }

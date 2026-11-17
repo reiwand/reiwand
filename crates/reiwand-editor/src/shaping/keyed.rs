@@ -28,7 +28,8 @@ pub(crate) fn write(
         return Ok(());
     }
     let parts = value.as_array().filter(|p| p.len() == 2).cloned();
-    let split = stored.keys().all(|k| PARTS.contains(&k.as_str()));
+    let split =
+        stored.iter().all(|(k, v)| v.is_null() || v.as_bool() == Some(false) || PARTS.contains(&k.as_str()));
     let Some(parts) = parts.filter(|_| split) else {
         return super::plain(work, pointer, false);
     };

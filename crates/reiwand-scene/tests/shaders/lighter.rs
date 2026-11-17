@@ -27,7 +27,7 @@ fn fs_soft_wide(in: VertexOut) -> @location(0) vec4<f32> {
 "#;
 
 fn soft_json(lighter: Json) -> Json {
-    json!({ "id": "soft", "params": [{ "id": "radius", "type": "float", "default": 2, "min": 0, "max": 8 }],
+    json!({ "id": "soft", "params": [{ "id": "radius", "type": "float", "prefill": 2, "min": 0, "max": 8 }],
         "passes": [{ "entry": "fs_soft_a" }, { "entry": "fs_soft_b" }],
         "cost": { "taps": 2, "passes": 2, "scale": 1 }, "lighter": lighter })
 }
@@ -80,9 +80,10 @@ fn the_loader_refuses_lighter_variants_that_are_not_lighter_or_not_whole() {
 fn a_scene_whose_effects_bring_a_lighter_variant_names_its_feature() {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "a": { "path": "a.png" } },
         "effects": { "soft": { "descriptor": "fx/soft.json", "wgsl": "fx/soft.wgsl" } },
-        "layers": [{ "blend_space": "canvas", "id": "l", "type": "image", "image": "a", "effects": [{ "effect": "soft" }] }] });
+        "layers": [{ "blend_space": "canvas", "id": "l", "type": "image", "image": "a", "effects": [{ "effect": "soft", "params": { "radius": 2 } }] }] });
     let with = |lighter: Json| {
-        let mut scene = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap();
+        let mut scene =
+            Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new()).unwrap();
         let json = soft_json(lighter).to_string();
         let files = |path: &str, _: usize| match path {
             "fx/soft.json" => Ok(json.clone().into_bytes()),

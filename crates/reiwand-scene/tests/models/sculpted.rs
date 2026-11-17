@@ -5,7 +5,7 @@ fn adopted(shapes: Value, shape: Vec<u8>) -> Result<Scene, SceneError> {
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] },
         "assets": { "toy": { "path": "toy.glb", "shapes": shapes } },
         "layers": [model("m", json!({}))] });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     let read = move |path: &str, _: usize| {
         Ok::<_, String>(if path.ends_with(".glb") { glb.clone() } else { shape.clone() })
     };

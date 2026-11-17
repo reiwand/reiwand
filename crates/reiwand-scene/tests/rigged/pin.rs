@@ -84,7 +84,7 @@ fn a_touch_names_the_hit_bone_under_it() {
     );
     let mut doc = serde_json::to_value(&*rt.scene).unwrap();
     doc["scripts"] = json!([{ "path": "a.js" }]);
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     scene.adopt(&Default::default(), |_: &str, _: usize| Ok::<_, String>(super::kit::arm().bytes())).unwrap();
     let mut rt = Runtime::new(std::sync::Arc::new(scene), Values::new());
     let full = Hitbox {

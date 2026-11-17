@@ -11,8 +11,8 @@ const JSON_TEXT: &str = r##"{
   "stage": "transition",
   "cost": { "taps": 1, "passes": 1, "scale": 1 },
   "params": [
-    { "id": "center", "type": "vec2", "default": [0.5, 0.5], "label": { "en": "Center", "es": "Centro" } },
-    { "id": "edge", "type": "float", "default": 0.2, "min": 0.01, "max": 1, "label": { "en": "Edge", "es": "Borde" } }
+    { "id": "center", "type": "vec2", "prefill": [0.5, 0.5], "label": { "en": "Center", "es": "Centro" } },
+    { "id": "edge", "type": "float", "prefill": 0.2, "min": 0.01, "max": 1, "label": { "en": "Edge", "es": "Borde" } }
   ]
 }
 "##;

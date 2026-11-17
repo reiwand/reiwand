@@ -8,7 +8,7 @@ fn played(clip: Value, timelines: Value) -> Runtime {
     let layer = fox(json!({ "clips": [clip], "animations": [{ "clip": "c" }] }));
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 64] }, "timelines": timelines,
         "assets": { "arm": { "path": "arm.glb" } }, "layers": [layer] });
-    let mut scene = Scene::from_json(&text.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap();
     let mut gl = arm();
     let times = gl.doc["animations"][0]["samplers"][0]["input"].as_u64().unwrap() as usize;
     gl.doc["accessors"][times]["max"] = json!([1.0]);

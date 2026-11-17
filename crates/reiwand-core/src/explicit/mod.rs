@@ -3,6 +3,7 @@ mod omit;
 mod read;
 mod scan;
 mod schema;
+pub mod walk;
 
 pub use error::{Fault, ReadError};
 pub use omit::{omission, round_trip};

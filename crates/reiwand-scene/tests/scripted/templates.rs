@@ -46,9 +46,10 @@ fn big_templates_are_refused_and_copies_stop_at_the_layer_limit() {
             "templates": { "big": { "blend_space": "canvas", "id": "big", "type": "group", "layers": children(n) } } })
         .to_string()
     };
-    let error = Scene::load(&doc(2000), &Default::default()).unwrap_err().to_string();
+    let error =
+        Scene::load(&reiwand_upgrade::fill::whole(&doc(2000)), &Default::default()).unwrap_err().to_string();
     assert!(error.contains("/templates/big/layers"), "{error}");
-    let scene = Scene::load(&doc(199), &Default::default()).unwrap();
+    let scene = Scene::load(&reiwand_upgrade::fill::whole(&doc(199)), &Default::default()).unwrap();
     let mut rt = Runtime::new(Arc::new(scene), Values::new());
     let many = (0..256).map(|i| (format!("b{i}"), "big".to_string())).collect();
     rt.set_script(ScriptOutputs { spawned: many, ..ScriptOutputs::default() });
@@ -85,10 +86,13 @@ fn templates_only_copy_what_scripts_can_draw() {
     };
     let video = json!({ "blend_space": "canvas", "id": "t", "type": "video", "video": "v" });
     assert!(
-        Scene::load(&text(video), &Default::default()).unwrap_err().to_string().contains("/templates/t/type")
+        Scene::load(&reiwand_upgrade::fill::whole(&text(video)), &Default::default())
+            .unwrap_err()
+            .to_string()
+            .contains("/templates/t/type")
     );
     let shape = json!({ "blend_space": "canvas", "id": "t", "type": "shape", "shape": { "rect": { "size": [2, 2] } }, "fill": "#ffffff" });
-    assert!(Scene::load(&text(shape), &Default::default()).is_ok());
+    assert!(Scene::load(&reiwand_upgrade::fill::whole(&text(shape)), &Default::default()).is_ok());
 }
 
 #[test]
@@ -121,7 +125,7 @@ fn a_script_that_may_turn_bloom_on_counts_it_in_the_cost_of_the_scene_and_its_fe
         let doc = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] },
             "scripts": [{ "path": "main.js", "uses": uses }],
             "layers": [{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#808080" }] });
-        Scene::from_json(&doc.to_string()).unwrap()
+        Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap()
     };
     let (lit, plain) = (scene(json!(["bloom"])), scene(json!(["camera"])));
     assert!(
@@ -148,7 +152,7 @@ fn masks_and_layer_feeds_inside_a_template_point_at_the_layers_of_each_copy() {
         "layers": [{ "blend_space": "canvas", "id": "shape", "type": "solid", "color": "#000000" }, pic] });
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] },
         "scripts": [{ "path": "main.js", "uses": ["layers"] }], "layers": [], "templates": { "card": card } });
-    let scene = Scene::from_json(&doc.to_string()).unwrap();
+    let scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     assert!(scene.validate(&Default::default()).is_empty(), "{:?}", scene.validate(&Default::default()));
     let mut rt = Runtime::new(Arc::new(scene), Default::default());
     let spawned = vec![("c1".to_string(), "card".to_string())];

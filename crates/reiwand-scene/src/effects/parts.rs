@@ -47,7 +47,7 @@ pub enum Texel {
 pub struct Variant {
     pub id: String,
     pub values: Vec<Param>,
-    pub default: Param,
+    pub prefill: Param,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub when_bound: Option<String>,
 }

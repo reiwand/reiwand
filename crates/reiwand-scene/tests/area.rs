@@ -5,7 +5,7 @@ const VIEW: [f32; 4] = [0.0, 0.0, 1000.0, 1000.0];
 
 fn scene(layers: Value) -> Scene {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [1000, 1000] }, "layers": layers });
-    Scene::from_json(&text.to_string()).unwrap()
+    Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap()
 }
 
 fn area(scene: &Scene, id: &str) -> f32 {
@@ -63,7 +63,9 @@ fn layers_that_can_move_or_grow_cost_the_whole_canvas() {
     assert_eq!(area(&s, "p"), 1.0);
     let mut scripted = scene(json!([solid("a", [10.0, 10.0], [5.0, 5.0])]));
     assert!(area(&scripted, "a") < 1e-3);
-    scripted.scripts = serde_json::from_value(json!([{ "path": "move.js" }])).unwrap();
+    scripted.scripts =
+        serde_json::from_value(json!([{ "path": "move.js", "events": [], "uses": [], "params": {} }]))
+            .unwrap();
     assert_eq!(area(&scripted, "a"), 1.0);
 }
 

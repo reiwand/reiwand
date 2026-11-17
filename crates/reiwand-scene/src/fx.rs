@@ -42,7 +42,7 @@ impl Descriptor {
         let pictures =
             |def: &&ParamDef| matches!(def.kind, ParamKind::Texture | ParamKind::Lut | ParamKind::Mask);
         for (slot, def) in slots.iter_mut().zip(&self.params).filter(|(_, def)| !pictures(def)) {
-            *slot = def.slot(value(&def.id).as_deref().unwrap_or(&def.default));
+            *slot = def.slot(value(&def.id).as_deref().unwrap_or(&def.prefill));
         }
         if self.solve == Some(Solve::Homography) && self.params.len() + 3 <= SLOTS {
             let rows = homography(std::array::from_fn(|i| [slots[i][0], slots[i][1]]));
@@ -78,7 +78,7 @@ impl Descriptor {
 
     pub fn needs(&self, input: Use, e: &crate::EffectUse, props: Option<&crate::Values>) -> bool {
         let on = |p: &ParamDef| {
-            let value = e.params.get(&p.id).map_or(Some(p.default.clone()), |v| v.settled(props));
+            let value = e.params.get(&p.id).map_or(Some(p.prefill.clone()), |v| v.settled(props));
             value.is_none_or(|v| live(p.slot(&v)))
         };
         let held =
@@ -104,7 +104,7 @@ impl Descriptor {
         fail(self.params.len() <= MAX_PARAMS, format!("more than {MAX_PARAMS} parameters"));
         for (i, p) in self.params.iter().enumerate() {
             fail(valid(&p.id) && self.param(&p.id) == Some(i), format!("{} is not a unique id", p.id));
-            fail(p.accepts(&p.default), format!("the default of {} does not fit its type", p.id));
+            fail(p.accepts(&p.prefill), format!("the prefill of {} does not fit its type", p.id));
             fail(p.min.zip(p.max).is_none_or(|(lo, hi)| lo <= hi), format!("{} has min above max", p.id));
             let pictured =
                 matches!(p.kind, ParamKind::Texture | ParamKind::Mask) && !p.tools.contains(&Tool::Table);

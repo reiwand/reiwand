@@ -1,14 +1,35 @@
 {
+  "assets": {},
+  "audio": null,
+  "camera3d": null,
   "canvas": {
+    "ambient": null,
     "background": "#070b16",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
     "size": [
       1920,
       1080
-    ]
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
   },
   "clock": {
-    "seed": 7
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 7,
+    "step": null
   },
+  "effects": {},
+  "ext": {},
   "layers": [
     {
       "anchor": null,
@@ -105,6 +126,7 @@
       "visible": true
     }
   ],
+  "listens": [],
   "particles": {
     "chispas": {
       "capacity": 4000,
@@ -521,5 +543,10 @@
       "space": "local"
     }
   },
-  "schema": "reiwand.scene/1"
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": [],
+  "transition": null
 }

@@ -1,5 +1,7 @@
 #[path = "../../../tests/fixtures/features.rs"]
 mod table;
+#[path = "support/whole.rs"]
+mod whole;
 
 use reiwand_editor::inspect::fields;
 use reiwand_editor::schema::{MANIFEST, SCENE, child, fits};

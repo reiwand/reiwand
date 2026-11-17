@@ -15,7 +15,7 @@ fn sample_roundtrips_and_is_valid() {
     let clock = scene.layer("clock").unwrap();
     assert_eq!(
         (clock.anchor, clock.blend, clock.transform.origin),
-        (Some(Anchor::BottomRight), Blend::Normal, None)
+        (Some(Anchor::BottomRight), Blend::Normal, Ctx::word())
     );
 }
 
@@ -61,8 +61,12 @@ fn validation_names_the_broken_field() {
         [range("/layers/0/opacity", 2.0, 0.0, 1.0)]
     );
     assert_eq!(
-        issues(|s| s.layers[1].kind =
-            Kind::Video { video: Value::Fixed("gone".into()), size: None, color: None, playback: None }),
+        issues(|s| s.layers[1].kind = Kind::Video {
+            video: Value::Fixed("gone".into()),
+            size: Ctx::word(),
+            color: white(),
+            playback: Playback::default()
+        }),
         [unknown("/layers/1/video", "asset", "gone")]
     );
     assert_eq!(
@@ -92,26 +96,26 @@ fn validation_names_the_broken_field() {
     assert_eq!(found, [unknown("/layers/0/effects/1/effect", "effect", "sparkle")]);
     let looped = issues(|s| {
         let Kind::Group { layers, .. } = &mut s.layers[4].kind else { unreachable!() };
-        layers[0].mask = Some(Mask { layer: Some("ring".into()), ..Mask::default() });
+        layers[0].mask = Some(Mask { layer: Some("ring".into()), ..mask() });
     });
     assert_eq!(looped, [Issue::Cycle("/layers/disc".into()), Issue::Cycle("/layers/ring".into())]);
     for mask in [
-        Mask { layer: Some("disc".into()), ..Mask::default() },
-        Mask { shape: Some(Shape::Ellipse { size: [4.0, 4.0] }), ..Mask::default() },
+        Mask { layer: Some("disc".into()), ..mask() },
+        Mask { shape: Some(Shape::Ellipse { size: [4.0, 4.0] }), ..mask() },
     ] {
         assert!(issues(|s| s.layers[0].effects[0].mask = Some(mask)).is_empty());
     }
     let own = issues(|s| {
         let layer = Some(s.layers[0].id.clone());
-        s.layers[0].effects[0].mask = Some(Mask { layer, ..Mask::default() });
+        s.layers[0].effects[0].mask = Some(Mask { layer, ..mask() });
     });
     assert_eq!(own, [Issue::Circle("/layers/0/effects".into())]);
     let deep = (0..9).fold(
-        Layer::new("leaf", Kind::Adjustment { size: None, redraw: false, rgb: false }),
+        Layer::new("leaf", Kind::Adjustment { size: Ctx::word(), redraw: false, rgb: false }),
         |inner, i| {
             Layer::new(
                 format!("g{i}"),
-                Kind::Group { layers: vec![inner], clip: false, color: None, space: None },
+                Kind::Group { layers: vec![inner], clip: false, color: white(), space: Space::default() },
             )
         },
     );
@@ -134,8 +138,8 @@ fn validation_names_the_broken_field() {
     assert_eq!(found, [range("/layers/3/opacity/keys/0/2/2", 1.5, 0.0, 1.0)]);
     let chain: Vec<Layer> = (0..2000)
         .map(|i| Layer {
-            mask: Some(Mask { layer: Some(format!("l{}", i + 1)), ..Mask::default() }),
-            ..Layer::new(format!("l{i}"), Kind::Adjustment { size: None, redraw: false, rgb: false })
+            mask: Some(Mask { layer: Some(format!("l{}", i + 1)), ..mask() }),
+            ..Layer::new(format!("l{i}"), Kind::Adjustment { size: Ctx::word(), redraw: false, rgb: false })
         })
         .collect();
     let started = std::time::Instant::now();
@@ -165,4 +169,20 @@ fn edited(change: impl FnOnce(&mut serde_json::Value)) -> String {
     let mut doc: serde_json::Value = serde_json::from_str(SAMPLE).unwrap();
     change(&mut doc);
     doc.to_string()
+}
+
+fn mask() -> Mask {
+    Mask {
+        texture: None,
+        layer: None,
+        shape: None,
+        channel: MaskChannel::Luminance,
+        invert: false,
+        feather: 0.0,
+        strength: Value::Fixed(1.0),
+    }
+}
+
+fn white() -> Value<Color> {
+    Value::Fixed(Color::parse("#ffffff").unwrap())
 }

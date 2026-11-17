@@ -60,22 +60,28 @@ pub fn build(name: &str, case: &Value, dir: &Path) -> reiwand_format::Result<Pat
     reiwand_format::build(&source, &out, &reiwand_format::Limits::default()).map(|_| out)
 }
 
+fn whole(d: &reiwand_scene::Descriptor) -> Value {
+    let params: Map<String, Value> = d
+        .params
+        .iter()
+        .map(|p| (p.id.clone(), if p.kind.asset() { json!("sky") } else { json!(p.prefill) }))
+        .collect();
+    json!({ "effect": d.id, "params": params })
+}
+
 pub fn effects() -> Value {
-    let used = newer_effects().map(|id| json!({ "effect": id }));
+    let first = |id: &str| reiwand_format::features::BUILTIN.split_whitespace().any(|b| b == id);
+    let newer = reiwand_scene::builtin().iter().filter(move |d| !first(&d.id));
+    let used = reiwand_scene::undrawn().iter().chain(newer).map(whole);
     let built =
         reiwand_scene::builtin().iter().filter(|d| reiwand_scene::newer_params(&d.id).next().is_some());
-    let set = built.map(|d| {
-        let params: Map<String, Value> = reiwand_scene::newer_params(&d.id)
-            .chain(d.params.iter().filter(|p| p.required))
-            .map(|p| (p.id.clone(), if p.kind.asset() { json!("sky") } else { json!(p.default) }))
-            .collect();
-        json!({ "effect": d.id, "params": params })
-    });
+    let set = built.map(whole);
     let layer = |(i, e): (usize, Value)| json!({ "blend_space": "canvas", "id": format!("e{i}"), "type": "image", "image": "sky", "effects": [e] });
     let layers: Vec<Value> = used.chain(set).enumerate().map(layer).collect();
     json!({ "manifest": { "inputs": ["audio", "pointer", "clicks"] }, "scene": { "layers": layers } })
 }
 
+#[allow(dead_code)]
 pub fn newer_effects() -> impl Iterator<Item = &'static str> {
     let first = |id: &str| reiwand_format::features::BUILTIN.split_whitespace().any(|b| b == id);
     let newer = reiwand_scene::builtin().iter().filter(move |d| !first(&d.id));

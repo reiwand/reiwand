@@ -4,13 +4,23 @@ use serde_json::json;
 const WGSL: &str = "override o: u32 = 1u; override z: u32 = 4u / o;
     @fragment fn fs_v(in: VertexOut) -> @location(0) vec4<f32> { return tap(in.uv) * f32(z) * 0.25; }";
 
+fn whole_use(mut v: serde_json::Value) -> serde_json::Value {
+    let o = v.as_object_mut().unwrap();
+    o.entry("name").or_insert(serde_json::Value::Null);
+    o.entry("enabled").or_insert(serde_json::json!(true));
+    o.entry("mask").or_insert(serde_json::Value::Null);
+    o.entry("optional").or_insert(serde_json::json!(false));
+    o.entry("params").or_insert(serde_json::json!({}));
+    v
+}
+
 fn used(params: serde_json::Value) -> EffectUse {
-    serde_json::from_value(json!({ "effect": "vv", "params": params })).unwrap()
+    serde_json::from_value(whole_use(json!({ "effect": "vv", "params": params }))).unwrap()
 }
 
 #[test]
 fn values_outside_the_prebuilt_variants_draw_a_prebuilt_one() {
-    let json = json!({ "id": "vv", "cost": {}, "options": [{ "id": "o", "values": [1, 0], "default": 1 }],
+    let json = json!({ "id": "vv", "cost": {}, "options": [{ "id": "o", "values": [1, 0], "prefill": 1 }],
         "passes": [{ "entry": "fs_v" }] });
     let d = Descriptor::packaged("vv", &json.to_string(), WGSL).unwrap();
     let zero = |_: &str| Some(Param::Number(0.0));

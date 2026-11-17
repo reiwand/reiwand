@@ -1,8 +1,6 @@
 use serde_json::{Value, json};
 use std::collections::BTreeSet;
 
-const LISTS: [&str; 6] = ["clips", "animations", "ik", "physics", "rules", "hit"];
-
 pub(crate) struct Tree<'a> {
     pub names: &'a [String],
     pub parents: &'a [Option<usize>],
@@ -50,14 +48,13 @@ fn clips(l: &mut Value, gone: &str, keep: Option<&str>) {
         }
         let tracked =
             ["bones", "shapes", "order"].iter().any(|k| c[*k].as_object().is_some_and(|m| !m.is_empty()));
-        if let Some(b) = keep.filter(|_| !tracked && c.get("animation").is_none()) {
+        if let Some(b) = keep.filter(|_| !tracked && c["animation"].is_null()) {
             c["bones"] = json!({ b: { "rotation": [[c["from"].as_f64().unwrap_or(0.0), 0]] } });
         }
     }
 }
 
 pub(crate) fn layer(l: &mut Value, before: &Tree, after: &Tree, gone: Option<&str>, keep: Option<&str>) {
-    let old = l.clone();
     let is = |v: &Value| gone.is_some_and(|g| v == g);
     if let Some(g) = gone {
         clips(l, g, keep);
@@ -87,9 +84,5 @@ pub(crate) fn layer(l: &mut Value, before: &Tree, after: &Tree, gone: Option<&st
     rules.retain(|r| !is(&r["bone"]) && !is(&r["parent"]));
     while let Some(i) = (0..rules.len()).find(|i| after.looped(rules, *i) && !before.looped(rules, *i)) {
         rules.remove(i);
-    }
-    let emptied = |k: &str, v: &Value| v.as_array().is_some_and(Vec::is_empty) && old[k] != json!([]);
-    if let Some(m) = l.as_object_mut() {
-        m.retain(|k, v| !LISTS.contains(&k.as_str()) || !emptied(k, v));
     }
 }

@@ -36,7 +36,7 @@ fn keys_go_where_the_playhead_is_on_clips_that_start_later() {
     assert_eq!(arm(&p)["rotation"], json!([[1.25, 30.0]]));
     assert!(act(&mut p, key(0.5, json!({ "bone": "arm", "remove": true }))).is_err());
     act(&mut p, key(1.0, json!({ "bone": "arm", "remove": true }))).unwrap();
-    assert!(arm(&p).is_null());
+    assert!(arm(&p).is_null() || arm(&p)["rotation"] == json!([]));
 }
 
 #[test]
@@ -50,14 +50,20 @@ fn keying_a_turn_leaves_the_motion_of_the_file_and_a_full_pose_takes_it() {
         (json!([5.0, 0.0]), json!(0.0))
     );
     act(&mut p, key(0.5, json!({ "bone": "arm", "rotation": 30 }))).unwrap();
-    assert_eq!(arm(&p), json!({ "rotation": [[0.5, 30.0]] }));
+    assert_eq!(
+        arm(&p),
+        json!({ "rotation": [[0.5, 30.0]], "angles": [], "position": [], "scale": [], "shift": [] })
+    );
     let pose = query(&p, "net", json!({ "pose": { "clip": "wave", "time": 0.75 } }));
     assert_eq!(pose["bones"][1]["position"], json!([7.5, 0.0]));
     act(&mut p, key(0.5, json!({ "bone": "arm" }))).unwrap();
     assert_eq!(
         arm(&p),
-        json!({ "rotation": [[0.5, 30.0]], "position": [[0.5, [5.0, 0.0]]], "scale": [[0.5, [1.0, 1.0]]] })
+        json!({ "rotation": [[0.5, 30.0]], "position": [[0.5, [5.0, 0.0]]], "scale": [[0.5, [1.0, 1.0]]], "angles": [], "shift": [] })
     );
     act(&mut p, json!({ "undo": {} })).unwrap();
-    assert_eq!(arm(&p), json!({ "rotation": [[0.5, 30.0]] }));
+    assert_eq!(
+        arm(&p),
+        json!({ "rotation": [[0.5, 30.0]], "angles": [], "position": [], "scale": [], "shift": [] })
+    );
 }

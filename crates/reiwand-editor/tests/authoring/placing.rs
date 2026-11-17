@@ -18,7 +18,10 @@ fn a_mesh_layer_comes_from_a_glb_file_in_one_step_and_plays_a_new_clip() {
     assert!(p.dir.join("assets/parts.glb").is_file());
     assert_eq!(p.history.labels().0.len(), 2, "importing and adding is one step");
     act(&mut p, json!({"clip": {"layer": "body", "id": "wave", "add": true, "play": true}})).unwrap();
-    assert_eq!(at(&p, &format!("{path}/animations")), json!([{"clip": "wave"}]));
+    assert_eq!(
+        at(&p, &format!("{path}/animations")),
+        json!([{"clip": "wave", "weight": 1.0, "rate": 1.0, "additive": false, "blend_in": 0.0, "blend_out": 0.0, "bones": [], "enabled": true}])
+    );
     refused(&mut p, json!({"clip": {"layer": "body", "id": "wave", "play": true}}));
     let picture = root.path().join("dot.png");
     image::RgbaImage::new(4, 4).save(&picture).unwrap();

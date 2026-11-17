@@ -105,7 +105,10 @@ mod tests {
         let dots: serde_json::Value = serde_json::from_str(include_str!("budget_dots.json")).unwrap();
         let layers: Vec<_> = (0..layers).map(draw).collect();
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [960, 540] }, "layers": layers, "particles": { "dots": dots } });
-        Runtime::new(Arc::new(Scene::from_json(&text.to_string()).unwrap()), Default::default())
+        Runtime::new(
+            Arc::new(Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap()),
+            Default::default(),
+        )
     }
 
     #[test]

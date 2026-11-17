@@ -2,10 +2,9 @@ use super::{Num, Target};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum Sweep {
-    #[default]
     Repeat,
     Mirror,
 }
@@ -61,10 +60,4 @@ pub struct Between {
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
     pub taper: Option<Taper>,
-}
-
-impl Default for Taper {
-    fn default() -> Self {
-        Taper { position: 0.5, speed: 0.0, size: 0.5 }
-    }
 }

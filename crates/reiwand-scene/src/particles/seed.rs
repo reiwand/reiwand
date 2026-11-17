@@ -14,9 +14,7 @@ pub struct Hsv {
     #[schemars(extend("x-unit" = "°"))]
     pub hue: [f32; 2],
     #[schemars(extend("x-range" = [1, 360]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
-    pub steps: Option<u32>,
+    pub steps: u32,
     pub sat: [f32; 2],
     pub val: [f32; 2],
 }
@@ -55,9 +53,9 @@ pub struct Turbulent {
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
     pub unit: Option<AudioUnit>,
-    #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
+    #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
     pub window: Option<f32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
@@ -93,20 +91,18 @@ pub enum RemapOutput {
     Frame,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum RemapOp {
-    #[default]
     Set,
     Mul,
     Add,
     Sub,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum Wave {
-    #[default]
     None,
     Sine,
     Noise,
@@ -132,9 +128,9 @@ pub struct Remap {
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
     pub unit: Option<AudioUnit>,
-    #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
+    #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
     pub window: Option<f32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
@@ -142,38 +138,6 @@ pub struct Remap {
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
     pub hold_silence: Option<bool>,
-}
-
-impl Default for Turbulent {
-    fn default() -> Self {
-        Turbulent {
-            forward: 0.0,
-            scale: 1.0,
-            noise_speed: 1.0,
-            offset: 0.0,
-            speed: [10.0, 40.0],
-            phase: 0.0,
-            audio: None,
-            kind: None,
-            unit: None,
-            window: None,
-            reference: None,
-            hold_silence: None,
-        }
-    }
-}
-
-impl Default for OffsetNoise {
-    fn default() -> Self {
-        OffsetNoise {
-            distance: 10.0,
-            scale: 1.0,
-            sign: [0; 2],
-            octaves: 1,
-            noise_scale: 1.0,
-            noise_speed: 0.0,
-        }
-    }
 }
 
 fn listening(

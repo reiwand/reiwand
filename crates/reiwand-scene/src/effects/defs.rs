@@ -10,8 +10,7 @@ pub struct ParamDef {
     pub id: String,
     #[serde(rename = "type")]
     pub kind: ParamKind,
-    pub default: Param,
-    pub required: bool,
+    pub prefill: Param,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub min: Option<f32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]

@@ -1,11 +1,35 @@
 {
+  "assets": {},
+  "audio": null,
+  "camera3d": null,
   "canvas": {
+    "ambient": null,
     "background": "#05070f",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
     "size": [
       1920,
       1080
-    ]
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
   },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": null
+  },
+  "effects": {},
+  "ext": {},
   "layers": [
     {
       "anchor": null,
@@ -144,6 +168,7 @@
       "visible": true
     }
   ],
+  "listens": [],
   "particles": {
     "cohetes": {
       "capacity": 200,
@@ -788,5 +813,10 @@
       "space": "world"
     }
   },
-  "schema": "reiwand.scene/1"
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": [],
+  "transition": null
 }

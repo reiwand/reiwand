@@ -1,20 +1,239 @@
 {
-  "schema": "reiwand.scene/1",
-  "canvas": { "size": [1920, 1080], "background": "#101820" },
-  "assets": { "muneco": { "path": "assets/muneco.glb" }, "cielo": { "path": "assets/cielo.png" } },
+  "assets": {
+    "cielo": {
+      "animated": false,
+      "atlas": null,
+      "durations": [],
+      "face": null,
+      "filter": null,
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/cielo.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
+    },
+    "muneco": {
+      "animated": false,
+      "atlas": null,
+      "durations": [],
+      "face": null,
+      "filter": null,
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "media": null,
+      "mipmaps": null,
+      "path": "assets/muneco.glb",
+      "rects": [],
+      "shapes": {},
+      "wrap": null
+    }
+  },
+  "audio": null,
+  "camera3d": null,
+  "canvas": {
+    "ambient": null,
+    "background": "#101820",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
+    "size": [
+      1920,
+      1080
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": null
+  },
+  "effects": {},
+  "ext": {},
   "layers": [
-    { "blend_space": "canvas", "id": "figura", "type": "mesh", "mesh": "muneco", "texture": "cielo", "size": [100, 100], "transform": { "scale": [8, 8] },
-      "clips": [
-        { "id": "asentir", "loop": "pingpong",
-          "bones": { "neck": { "rotation": [[0, -12], [0.8, 12, "in_out_sine"]] } },
-          "shapes": { "smile": [[0, 0], [0.8, 1]] },
-          "events": [{ "t": 0.4, "name": "mitad" }] }
+    {
+      "anchor": null,
+      "animations": [
+        {
+          "additive": false,
+          "blend_in": 0.3,
+          "blend_out": 0.0,
+          "bones": [],
+          "clip": "asentir",
+          "enabled": true,
+          "rate": 1,
+          "weight": 1
+        }
       ],
-      "animations": [{ "clip": "asentir", "weight": 1, "rate": 1, "blend_in": 0.3 }],
-      "physics": [{ "bone": "neck", "mode": "spring", "stiffness": 0.6, "damping": 0.4, "inertia": 0.5 }],
-      "ik": [{ "chain": ["hip", "neck"], "target": [60, 20], "limits": { "neck": [-30, 30] }, "weight": 0.3, "bend": "clockwise" }],
-      "rules": [{ "bone": "neck", "parent": "hip", "weight": 1 }],
-      "parts": { "chest": { "order": 1 }, "legs": { "order": 0 } },
-      "shapes": { "smile": 0.2 } }
-  ]
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "clips": [
+        {
+          "animation": null,
+          "bones": {
+            "neck": {
+              "angles": [],
+              "position": [],
+              "rotation": [
+                [
+                  0,
+                  -12
+                ],
+                [
+                  0.8,
+                  12,
+                  "in_out_sine"
+                ]
+              ],
+              "scale": [],
+              "shift": []
+            }
+          },
+          "events": [
+            {
+              "name": "mitad",
+              "t": 0.4
+            }
+          ],
+          "from": 0.0,
+          "id": "asentir",
+          "loop": "pingpong",
+          "order": {},
+          "shapes": {
+            "smile": [
+              [
+                0,
+                0
+              ],
+              [
+                0.8,
+                1
+              ]
+            ]
+          },
+          "to": null
+        }
+      ],
+      "colliders": [],
+      "color": null,
+      "depth": null,
+      "depth_test": false,
+      "effects": [],
+      "expressions": {},
+      "hit": [],
+      "id": "figura",
+      "ik": [
+        {
+          "bend": "clockwise",
+          "chain": [
+            "hip",
+            "neck"
+          ],
+          "limits": {
+            "neck": [
+              -30,
+              30
+            ]
+          },
+          "target": [
+            60,
+            20
+          ],
+          "weight": 0.3
+        }
+      ],
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "mesh": "muneco",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "parts": {
+        "chest": {
+          "clip_to": null,
+          "order": 1,
+          "visible": null
+        },
+        "legs": {
+          "clip_to": null,
+          "order": 0,
+          "visible": null
+        }
+      },
+      "physics": [
+        {
+          "bone": "neck",
+          "damping": 0.4,
+          "gravity": 0.0,
+          "inertia": 0.5,
+          "mode": "spring",
+          "rotation": null,
+          "stiffness": 0.6,
+          "translation": null,
+          "wind": 0.0
+        }
+      ],
+      "rules": [
+        {
+          "bone": "neck",
+          "parent": "hip",
+          "weight": 1
+        }
+      ],
+      "shapes": {
+        "smile": 0.2
+      },
+      "size": [
+        100,
+        100
+      ],
+      "solid": false,
+      "texture": "cielo",
+      "transform": {
+        "origin": null,
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          8,
+          8
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "mesh",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/1",
+  "scripts": [],
+  "templates": {},
+  "timelines": [],
+  "transition": null
 }

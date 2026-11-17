@@ -344,7 +344,7 @@ scene	Bloom.radius	Value_for_float	optional	1	16.0	dbus.md:2407
 scene	Bloom.strength	Value_for_float	optional	1	1.0	dbus.md:583
 scene	Bloom.threshold	Value_for_float	optional	1	0.8	editor.md:85
 scene	Bloom.tint	Value_for_Color	optional	1	"#ffffff"	dbus.md:2403
-scene	BoneCollider.offset	array	optional	3	[]	editor.md:79
+scene	BoneCollider.offset	array	optional	1	[0,0,0]	editor.md:79
 scene	BoneCollider.shape	Hull	optional	1	"capsule"	editor.md:73
 scene	BoneKeys.angles	array	optional	3	[]	editor.md:73
 scene	BoneKeys.position	array	optional	3	[]	dbus.md:1206

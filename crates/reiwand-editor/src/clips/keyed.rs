@@ -151,9 +151,12 @@ fn store(c: &mut Value, path: &[String], keys: Vec<Value>) {
         true => drop(at.as_object_mut().and_then(|m| m.remove(last))),
         false => at[last.as_str()] = json!(keys),
     }
-    for depth in (0..up.len()).rev() {
+    for depth in (1..up.len()).rev() {
         let parent = up[..depth].iter().fold(&mut *c, |v, p| &mut v[p.as_str()]);
-        if parent[up[depth].as_str()].as_object().is_some_and(|m| m.is_empty()) {
+        let bare = |v: &Value| {
+            v.as_array().is_some_and(Vec::is_empty) || v.as_object().is_some_and(|m| m.is_empty())
+        };
+        if parent[up[depth].as_str()].as_object().is_some_and(|m| m.values().all(bare)) {
             drop(parent.as_object_mut().and_then(|m| m.remove(&up[depth])));
         }
     }

@@ -17,7 +17,7 @@ fn picture_masks_of_a_mesh_are_posed_with_it_by_one_hidden_copy_per_picture() {
         "veil": { "path": "veil.png" } });
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 64] }, "assets": assets,
         "layers": [{ "blend_space": "canvas", "id": "sheet_0", "type": "solid", "color": "#000000" }, fox] });
-    let mut scene = Scene::from_json(&text.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap();
     let glb = arm().bytes();
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     let ids: Vec<&str> = scene.layers.iter().map(|l| l.id.as_str()).collect();
@@ -25,15 +25,15 @@ fn picture_masks_of_a_mesh_are_posed_with_it_by_one_hidden_copy_per_picture() {
     let fox = scene.layer("fox").unwrap();
     let masks: Vec<_> = fox.effects.iter().map(|e| e.mask.as_ref().unwrap()).collect();
     assert_eq!(fox.mask.as_ref().unwrap().layer.as_deref(), Some("sheet_1"));
-    assert_eq!((masks[0].layer.as_deref(), masks[0].channel), (Some("sheet_1"), Some(MaskChannel::R)));
-    assert_eq!(
-        (masks[1].layer.as_deref(), masks[1].channel),
-        (Some("sheet_2"), Some(MaskChannel::Luminance))
-    );
+    assert_eq!((masks[0].layer.as_deref(), masks[0].channel), (Some("sheet_1"), MaskChannel::R));
+    assert_eq!((masks[1].layer.as_deref(), masks[1].channel), (Some("sheet_2"), MaskChannel::Luminance));
     assert!(masks[2].layer.is_none() && masks[2].shape.is_some(), "shapes stay in the box");
     let copy = scene.layer("sheet_1").unwrap();
     let Kind::Mesh(m) = &copy.kind else { panic!("not a mesh") };
-    assert_eq!((m.texture.clone(), m.color.clone()), (Some(Value::Fixed("ink".into())), None));
+    assert_eq!(
+        (m.texture.clone(), m.color.clone()),
+        (Some(Value::Fixed("ink".into())), Value::Fixed(Color::parse("#ffffff").unwrap()))
+    );
     assert!(copy.effects.is_empty() && copy.mask.is_none() && copy.visible == Value::Fixed(false));
     assert!(
         scene.sheets.get("sheet_2").map(String::as_str) == Some("fox")
@@ -48,7 +48,7 @@ fn inked(scene: serde_json::Value) -> Runtime {
     let assets = json!({ "arm": { "path": "arm.glb" }, "ink": { "path": "ink.png" } });
     let mut doc = json!({ "schema": SCHEMA, "canvas": { "size": [64, 64] }, "assets": assets, "layers": [] });
     scene.as_object().unwrap().iter().for_each(|(k, v)| doc[k] = v.clone());
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     let glb = arm().bytes();
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     Runtime::new(std::sync::Arc::new(scene), Values::new())

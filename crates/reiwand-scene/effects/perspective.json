@@ -5,10 +5,10 @@
   "description": { "en": "Warps the four corners of the picture into a new quad.", "es": "Deforma las cuatro esquinas de la imagen hacia un cuadrilátero nuevo." },
   "mask_mode": "strength",
   "params": [
-    { "id": "top_left", "type": "vec2", "default": [0.04, 0], "min": -2, "max": 3 },
-    { "id": "top_right", "type": "vec2", "default": [0.96, 0], "min": -2, "max": 3 },
-    { "id": "bottom_right", "type": "vec2", "default": [1, 1], "min": -2, "max": 3 },
-    { "id": "bottom_left", "type": "vec2", "default": [0, 1], "min": -2, "max": 3 }
+    { "id": "top_left", "type": "vec2", "prefill": [0.04, 0], "min": -2, "max": 3 },
+    { "id": "top_right", "type": "vec2", "prefill": [0.96, 0], "min": -2, "max": 3 },
+    { "id": "bottom_right", "type": "vec2", "prefill": [1, 1], "min": -2, "max": 3 },
+    { "id": "bottom_left", "type": "vec2", "prefill": [0, 1], "min": -2, "max": 3 }
   ],
   "passes": [{ "entry": "fs_perspective" }],
   "solve": "homography"

@@ -11,7 +11,7 @@ fn a_slider_number_drives_a_pair_field_on_both_directions() {
     let declared: BTreeMap<String, Property> =
         serde_json::from_value(json!({ "size": { "type": "slider", "min": 0.5, "max": 3, "default": 1 } }))
             .unwrap();
-    let scene = Arc::new(Scene::load(&text.to_string(), &declared).unwrap());
+    let scene = Arc::new(Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &declared).unwrap());
     let mut props = Values::new();
     props.insert("size".into(), json!(2.0));
     let rt = Runtime::new(scene, props);

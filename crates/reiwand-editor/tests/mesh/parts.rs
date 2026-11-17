@@ -65,7 +65,7 @@ fn bones_are_placed_rehung_and_renamed_on_a_mesh_of_several_parts() {
         (layer["hit"].clone(), p.doc["scene"]["layers"][1]["attach"]["bone"].clone()),
         (json!(["spine"]), json!("spine"))
     );
-    assert!(p.doc["scene"]["layers"][1]["attach"].get("point").is_none());
+    assert!(p.doc["scene"]["layers"][1]["attach"]["point"].is_null());
     let path = p.doc["scene"]["assets"]["body"]["path"].as_str().unwrap().to_owned();
     let rig = reiwand_scene::Rigged::decode(&std::fs::read(p.dir.join(path)).unwrap()).unwrap();
     assert_eq!(

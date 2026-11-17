@@ -10,7 +10,7 @@ fn effects() -> Value {
     let mut out = serde_json::Map::new();
     for d in reiwand_scene::builtin() {
         let params: Vec<Value> =
-            d.params.iter().map(|p| json!([p.id, serde_json::to_value(&p.default).unwrap()])).collect();
+            d.params.iter().map(|p| json!([p.id, serde_json::to_value(&p.prefill).unwrap()])).collect();
         out.insert(d.id.clone(), Value::Array(params));
     }
     Value::Object(out)

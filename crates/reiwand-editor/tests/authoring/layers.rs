@@ -87,7 +87,8 @@ fn the_canvas_glows_and_moves_in_depth_from_its_defaults() {
         json!({"set": {"pointer": "/scene/canvas/parallax/amount", "value": {"keys": [[0, 1], [2, 3]]}}});
     act(&mut p, bound).unwrap();
     act(&mut p, json!({"canvas": {"parallax": {"pointer": 0.5}}})).unwrap();
-    assert_eq!(at(&p, "/scene/canvas/parallax/amount"), json!({"keys": [[0, 1], [2, 3]]}));
+    let bound = super::whole::at(&p, "/scene/canvas/parallax/amount", &json!({"keys": [[0, 1], [2, 3]]}));
+    assert_eq!(at(&p, "/scene/canvas/parallax/amount"), bound);
     act(&mut p, json!({"canvas": {"parallax": {"off": true}}})).unwrap();
     assert_eq!(at(&p, "/scene/canvas/parallax"), serde_json::Value::Null);
 }

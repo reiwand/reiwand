@@ -15,7 +15,7 @@ impl Descriptor {
         set: Option<Cow<'a, Param>>,
     ) -> Option<Cow<'a, Param>> {
         let Some(cap) = self.tuned(quality, id) else { return set };
-        let value = set.or_else(|| self.param(id).map(|i| Cow::Borrowed(&self.params[i].default)));
+        let value = set.or_else(|| self.param(id).map(|i| Cow::Borrowed(&self.params[i].prefill)));
         Some(match (cap, value.as_deref()) {
             (Param::Number(c), Some(Param::Number(v))) => Cow::Owned(Param::Number(v.min(*c))),
             _ => Cow::Borrowed(cap),

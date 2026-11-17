@@ -44,7 +44,8 @@ fn spec(old: Option<&Value>, p: &Param) -> Result<Value> {
         _ => None,
     };
     for (key, given) in [("min", p.range.0), ("max", p.range.1)] {
-        out.extend(keep(key, given).filter(|_| number).map(|v| (key.to_owned(), v)));
+        let kept = keep(key, given).filter(|_| number).unwrap_or(Value::Null);
+        out.insert(key.to_owned(), kept);
     }
     let out = Value::Object(out);
     let parsed = serde_json::from_value::<ScriptParam>(out.clone())

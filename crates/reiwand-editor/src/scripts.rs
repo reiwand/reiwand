@@ -94,8 +94,9 @@ pub fn import(dir: &Path, doc: &Value, file: &Path, template: Option<&str>) -> R
     fs::write(dir.join(&path), &source)
         .map_err(|e| said("editor.cannot_write", "cannot write %1: %2", &[&path, &e]))?;
     let mut entry = entry(doc, &path, &source);
-    if let Some(params) =
-        template.and_then(crate::molds::script_params).filter(|_| entry.get("params").is_none())
+    if let Some(params) = template
+        .and_then(crate::molds::script_params)
+        .filter(|_| entry["params"].as_object().is_none_or(|p| p.is_empty()))
     {
         entry["params"] = params;
     }

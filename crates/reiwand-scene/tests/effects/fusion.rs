@@ -1,7 +1,20 @@
 use super::*;
 
+fn whole_use(mut v: serde_json::Value) -> serde_json::Value {
+    let o = v.as_object_mut().unwrap();
+    o.entry("name").or_insert(serde_json::Value::Null);
+    o.entry("enabled").or_insert(serde_json::json!(true));
+    o.entry("mask").or_insert(serde_json::Value::Null);
+    o.entry("optional").or_insert(serde_json::json!(false));
+    o.entry("params").or_insert(serde_json::json!({}));
+    v
+}
+
 fn uses(list: serde_json::Value) -> Vec<EffectUse> {
-    serde_json::from_value(list).unwrap()
+    serde_json::from_value(serde_json::Value::Array(
+        list.as_array().unwrap().iter().cloned().map(whole_use).collect(),
+    ))
+    .unwrap()
 }
 
 fn waves(mask: serde_json::Value) -> serde_json::Value {

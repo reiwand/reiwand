@@ -18,14 +18,12 @@ pub struct Emitter {
     #[schemars(required, extend("x-null" = true))]
     pub follow: Option<Follow>,
     pub inherit: f32,
-    #[schemars(extend("x-unit" = "s"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
+    #[schemars(extend("x-unit" = "s"))]
     pub duration: Option<f32>,
     #[schemars(extend("x-unit" = "s"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
-    pub delay: Option<f32>,
+    pub delay: f32,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
     pub periodic: Option<Periodic>,
@@ -59,14 +57,12 @@ pub struct Burst {
     #[schemars(required, extend("x-null" = true))]
     pub on: Option<Cue>,
     #[schemars(extend("x-unit" = "s"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
-    pub at: Option<f32>,
+    pub at: f32,
 }
 
 impl Burst {
     pub fn immediate(&self) -> bool {
-        self.on.is_none() && self.every.is_none() && self.at.is_none_or(|a| a <= 0.0)
+        self.on.is_none() && self.every.is_none() && self.at <= 0.0
     }
 
     pub fn timed(&self) -> bool {
@@ -85,9 +81,9 @@ pub struct Init {
     pub spin: Spread<f32>,
     pub frame: Spread<f32>,
     pub color: Spread<Color>,
-    #[schemars(extend("x-range" = [0, 1]))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
+    #[schemars(extend("x-range" = [0, 1]))]
     pub alpha: Option<Spread<f32>>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
@@ -96,13 +92,13 @@ pub struct Init {
     #[schemars(required, extend("x-null" = true))]
     pub palette: Option<Palette>,
     pub gradient: Vec<(f32, Color)>,
-    #[schemars(extend("x-unit" = "px/s"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
+    #[schemars(extend("x-unit" = "px/s"))]
     pub velocity: Option<Spread<[f32; 2]>>,
-    #[schemars(extend("x-unit" = "px/s"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
+    #[schemars(extend("x-unit" = "px/s"))]
     pub radial: Option<Spread<f32>>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
@@ -113,48 +109,14 @@ pub struct Init {
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
     pub offset_noise: Option<OffsetNoise>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     #[schemars(extend("x-unit" = "px"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
     pub depth: Option<Spread<f32>>,
-    #[schemars(extend("x-unit" = "px/s"))]
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
+    #[schemars(extend("x-unit" = "px/s"))]
     pub depth_speed: Option<Spread<f32>>,
     pub tilt: Tilt,
     pub remap: Vec<Remap>,
-}
-
-impl Default for Init {
-    fn default() -> Self {
-        let white = Color([1.0; 4]);
-        let [rotation, spin, frame] = [[0.0; 2]; 3].map(Spread::from);
-        let [life, speed, angle, size] =
-            [[1.0, 2.0], [10.0, 40.0], [0.0, 360.0], [2.0, 6.0]].map(Spread::from);
-        let (alpha, hsv, palette, velocity, radial, inherit, turbulent, offset_noise) = Default::default();
-        let (depth, depth_speed, tilt, remap) = Default::default();
-        Init {
-            life,
-            speed,
-            angle,
-            size,
-            rotation,
-            spin,
-            frame,
-            color: Spread::from([white, white]),
-            alpha,
-            hsv,
-            palette,
-            gradient: Vec::new(),
-            velocity,
-            radial,
-            inherit,
-            turbulent,
-            offset_noise,
-            depth,
-            depth_speed,
-            tilt,
-            remap,
-        }
-    }
 }

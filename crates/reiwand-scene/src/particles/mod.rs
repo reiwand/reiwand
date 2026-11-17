@@ -77,7 +77,7 @@ pub use forces::{Falloff, Force, Target};
 pub use instance::{Instance, Tunable};
 pub use kept::Kept;
 pub use look::{Frames, Refract, Render};
-pub use ops::Operator;
+pub use ops::{FULL_WINDOW, Operator};
 pub use pack::{EVENT, MAX_HATCH, PARTICLE_EVENTS, Sim};
 pub use paths::{taper, turn};
 pub use place::{Refresh, Source};

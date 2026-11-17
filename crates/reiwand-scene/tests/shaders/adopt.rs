@@ -20,8 +20,8 @@ fn scenes_adopt_their_package_effects_and_check_their_uses() {
         assert!(fault.contains(problem), "{fault}");
     }
     let mut wide = descriptor();
-    wide["options"] = json!([{ "id": "taps", "values": [1, 2, 3, 4, 5], "default": 1 },
-        { "id": "tinted", "values": [false, true], "default": false }]);
+    wide["options"] = json!([{ "id": "taps", "values": [1, 2, 3, 4, 5], "prefill": 1 },
+        { "id": "tinted", "values": [false, true], "prefill": false }]);
     let props: BTreeMap<String, Property> = serde_json::from_value(json!({
         "q": { "type": "slider", "min": 1, "max": 8, "default": 1 }, "t": { "type": "bool", "default": false } })).unwrap();
     let mut bound = scene(
@@ -37,23 +37,20 @@ fn scenes_adopt_their_package_effects_and_check_their_uses() {
     );
     let mut waiting = descriptor();
     waiting["options"][0]["values"] = json!([1, 2, 3, 4, 5]);
-    waiting["options"][0]["default"] = json!(1);
+    waiting["options"][0]["prefill"] = json!(1);
     let mut both = scene(json!([{ "effect": "ripple",
-        "params": { "taps": { "prop": "q" }, "paint": { "prop": "t", "map": { "false": "a", "true": "a" } } } }]));
+        "params": { "taps": { "prop": "q" }, "tinted": { "prop": "t" }, "paint": { "prop": "t", "map": { "false": "a", "true": "a" } } } }]));
     let files = |path: &str, _: usize| {
         Ok::<_, &str>(if path.ends_with("json") { waiting.to_string() } else { WGSL.into() }.into_bytes())
     };
     let fault = both.adopt(&props, files).unwrap_err().to_string();
     assert!(fault.ends_with("needs 10 variants of its shader, at most 8 are allowed"), "{fault}");
     let d = packaged(|_| (), WGSL).unwrap();
-    let fed: EffectUse =
-        serde_json::from_value(json!({ "effect": "ripple", "params": { "paint": { "layer": "sky" } } }))
-            .unwrap();
+    let fed: EffectUse = used(json!({ "effect": "ripple", "params": { "paint": { "layer": "sky" } } }));
     assert_eq!((d.variant(&fed, |_| None), d.variants(&fed).unwrap()), (1 << 4, vec![1 << 4]));
-    let painted: EffectUse =
-        serde_json::from_value(json!({ "effect": "ripple", "params": { "paint": "a" } })).unwrap();
+    let painted: EffectUse = used(json!({ "effect": "ripple", "params": { "paint": "a" } }));
     assert_eq!(d.variants(&painted).unwrap(), vec![1 << 4]);
-    let plain: EffectUse = serde_json::from_value(json!({ "effect": "ripple" })).unwrap();
+    let plain: EffectUse = used(json!({ "effect": "ripple" }));
     assert_eq!((d.variant(&plain, |_| None), d.variants(&plain).unwrap()), (0, vec![0]));
     let mut gone = scene(json!([{ "effect": "ripple" }]));
     let files = |_: &str, _: usize| Err::<Vec<u8>, _>("no such file");
@@ -81,7 +78,7 @@ fn package_effects_compile_once_and_share_a_shader_budget() {
         })
         .collect();
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "effects": effects, "layers": [] });
-    let mut many = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap();
+    let mut many = Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new()).unwrap();
     let files = |path: &str, max: usize| {
         let id = path.trim_start_matches("fx/").split('.').next().unwrap_or_default();
         let mut d = descriptor();

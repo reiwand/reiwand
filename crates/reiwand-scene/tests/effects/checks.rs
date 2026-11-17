@@ -28,14 +28,15 @@ fn lut_files_parse_within_limits() {
     let es = reiwand_core::message::tr_in(&["es_ES.UTF-8".into()]);
     assert_eq!(LutError::Line(2).to_string(), "line 2 of the LUT is not valid");
     assert_eq!(LutError::Count(7, 8).message().told(&es), "la LUT tiene 7 entradas y se esperaban 8");
-    let invalid = Scene::from_json(r#"{ "schema": "nope" }"#).unwrap_err().message();
+    let invalid =
+        Scene::from_json(&reiwand_upgrade::fill::whole(r#"{ "schema": "nope" }"#)).unwrap_err().message();
     assert!(invalid.told(&es).starts_with("escena no válida: "), "{}", invalid.told(&es));
 }
 
 #[test]
 fn descriptors_are_checked_and_tuned_per_quality() {
     let tuned = probe(
-        json!({ "id": "probe_tune", "params": [{ "id": "taps", "type": "float", "default": 16 }],
+        json!({ "id": "probe_tune", "params": [{ "id": "taps", "type": "float", "prefill": 16 }],
             "passes": [{ "entry": "fs_a" }], "cost": { "taps": 8 },
             "quality": { "q1": { "params": { "taps": 8 } }, "q0": { "params": { "taps": 4 }, "scale": 0.5 } } }),
         "",
@@ -62,7 +63,7 @@ fn descriptors_are_checked_and_tuned_per_quality() {
         (json!({ "passes": [{ "entry": "fs_a", "inputs": ["asset:map"] }] }), "unknown input asset:map"),
         (json!({ "fuse": "uv" }), "fn uv_probe_bad("),
         (json!({ "passes": [{ "entry": "fs_a" }], "reach": "size" }), "reach"),
-        (json!({ "passes": [], "params": [{ "id": "k", "type": "texture", "default": 1 }] }), "default of k"),
+        (json!({ "passes": [], "params": [{ "id": "k", "type": "texture", "prefill": 1 }] }), "prefill of k"),
         (json!({ "passes": [{ "entry": "fs_a" }], "quality": { "q0": { "params": { "k": 1 } } } }), "sets k"),
     ];
     for (mut json, problem) in broken {

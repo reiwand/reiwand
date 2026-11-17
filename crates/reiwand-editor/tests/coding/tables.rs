@@ -58,8 +58,11 @@ fn the_settings_of_a_module_are_a_typed_table_whose_names_follow_into_the_values
     assert!(refused(&mut p, set("flag", json!({}))).contains("type"));
     act(&mut p, set("speed", json!({ "default": 3 }))).unwrap();
     assert_eq!(p.doc["scene"]["scripts"][0]["params"]["speed"]["max"], 5);
-    act(&mut p, set("speed", json!({ "type": "bool", "default": true }))).unwrap();
-    assert_eq!(p.doc["scene"]["scripts"][0]["params"]["speed"], json!({ "type": "bool", "default": true }));
+    act(&mut p, set("speed", json!({ "type": "bool", "default": true, "min": null, "max": null }))).unwrap();
+    assert_eq!(
+        p.doc["scene"]["scripts"][0]["params"]["speed"],
+        json!({ "type": "bool", "default": true, "min": null, "max": null })
+    );
     act(&mut p, set("speed", json!({ "type": "number", "default": 1 }))).unwrap();
     act(&mut p, json!({ "add_layer": { "kind": "solid", "id": "box" } })).unwrap();
     let bound = json!({ "script": "scripts/w.js", "fn": "wave", "params": { "speed": 4 } });

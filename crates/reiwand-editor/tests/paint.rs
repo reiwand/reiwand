@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use reiwand_editor::Project;
 use reiwand_editor::actions::Action;
 use reiwand_editor::starters::starter;
@@ -15,7 +17,7 @@ fn state() {
 }
 
 fn act(project: &mut Project, action: Value) -> anyhow::Result<()> {
-    project.act(&serde_json::from_value::<Action>(action).unwrap()).map(drop)
+    project.act(&serde_json::from_value::<Action>(whole::action(project, action)).unwrap()).map(drop)
 }
 
 #[test]
@@ -64,7 +66,7 @@ fn a_new_mask_starts_from_the_paint_of_its_parameter() {
         Project::create(&dir, starter("empty", "org.example.veil", "Veil", "en").unwrap()).unwrap();
     let descriptor = json!({ "id": "veil", "name": { "en": "Veil" }, "cost": { "taps": 2 },
         "passes": [{ "entry": "fs_veil", "inputs": ["previous", "asset:cover"] }],
-        "params": [{ "id": "cover", "type": "mask", "default": "", "channels": 3, "paint": "#ffffff" }] });
+        "params": [{ "id": "cover", "type": "mask", "prefill": "", "channels": 3, "paint": "#ffffff" }] });
     let wgsl = "@fragment fn fs_veil(in: VertexOut) -> @location(0) vec4<f32> {
     return tap(in.uv) * sample(aux0, in.uv).g;
 }";

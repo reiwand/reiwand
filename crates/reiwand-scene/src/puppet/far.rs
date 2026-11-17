@@ -12,7 +12,7 @@ fn waving(repeat: &str) -> Runtime {
         "layers": [{ "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "mesh",
             "clips": [{ "id": "c", "loop": repeat, "bones": { "arm": { "rotation": [[0, 0], [1, 90]] } } }],
             "animations": [{ "clip": "c" }] }] });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     scene.adopt(&Default::default(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     Runtime::new(Arc::new(scene), Values::new())
 }

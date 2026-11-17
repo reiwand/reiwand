@@ -10,7 +10,7 @@ fn scene(layers: Json) -> Scene {
     let timelines = [json!({ "id": "go", "duration": 2, "loop": "repeat" })];
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "assets": assets, "timelines": timelines,
         "layers": layers });
-    Scene::from_json(&doc.to_string()).unwrap()
+    Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap()
 }
 
 fn issues(layers: Json) -> Vec<String> {
@@ -42,7 +42,7 @@ fn lighting_maps_must_be_pictures() {
 fn lit_particles_still_name_their_own_feature() {
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "particles": prefill::all(json!({ "snow": { "capacity": 10, "emitters": [{ "shape": "edge" }] } })),
         "layers": [{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "snow", "lighting": {} }] });
-    let scene = Scene::from_json(&doc.to_string()).unwrap();
+    let scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     assert!(scene.features().contains("particle_lighting"));
 }
 
@@ -115,14 +115,20 @@ fn a_moving_lamp_that_lights_nothing_lets_the_scene_settle() {
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "assets": { "wall": { "path": "wall.png" } },
         "timelines": [{ "id": "go", "duration": 2, "loop": "repeat" }], "templates": { "t": template },
         "layers": [plain, lamp("l", json!({ "intensity": walk }))] });
-    let spawned = Runtime::new(Arc::new(Scene::from_json(&doc.to_string()).unwrap()), Values::new());
+    let spawned = Runtime::new(
+        Arc::new(Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap()),
+        Values::new(),
+    );
     assert_eq!(spawned.frame(view, Quality::Q3).wake, Wake::Frame);
 }
 
 #[test]
 fn ambient_and_sky_come_from_the_canvas() {
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [20, 10], "ambient": "#102030" }, "layers": [] });
-    let runtime = Runtime::new(Arc::new(Scene::from_json(&doc.to_string()).unwrap()), Values::new());
+    let runtime = Runtime::new(
+        Arc::new(Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap()),
+        Values::new(),
+    );
     let frame = runtime.frame([0.0, 0.0, 20.0, 10.0], Quality::Q3);
     assert!(frame.ambient.is_some() && frame.sky.is_none());
 }
