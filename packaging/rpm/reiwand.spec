@@ -47,7 +47,6 @@ sed 's|@BINDIR@|%{_bindir}|g' packaging/systemd/reiwandd.service > %{buildroot}%
 sed 's|@BINDIR@|%{_bindir}|g' packaging/dbus/io.github.reiwand.Daemon.service > %{buildroot}%{_datadir}/dbus-1/services/io.github.reiwand.Daemon.service
 sed 's|@BINDIR@|%{_bindir}|g' packaging/dbus/io.github.reiwand.service > %{buildroot}%{_datadir}/dbus-1/services/io.github.reiwand.service
 sed 's|@BINDIR@|%{_bindir}|g' packaging/desktop/io.github.reiwand.desktop > %{buildroot}%{_datadir}/applications/io.github.reiwand.desktop
-%{_datadir}/mime/packages/io.github.reiwand.xml
 install -Dm644 packaging/mime/io.github.reiwand.xml %{buildroot}%{_datadir}/mime/packages/io.github.reiwand.xml
 install -Dm644 packaging/icons/io.github.reiwand.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/io.github.reiwand.svg
 for name in io.github.reiwand-symbolic io.github.reiwand-paused-symbolic; do
@@ -75,6 +74,7 @@ install -Dm644 -t %{buildroot}%{_datadir}/reiwand/examples examples/*.wpak
 %{_datadir}/dbus-1/services/io.github.reiwand.Daemon.service
 %{_datadir}/dbus-1/services/io.github.reiwand.service
 %{_datadir}/applications/io.github.reiwand.desktop
+%{_datadir}/mime/packages/io.github.reiwand.xml
 %{_datadir}/icons/hicolor/scalable/apps/io.github.reiwand.svg
 %{_datadir}/icons/hicolor/symbolic/apps/io.github.reiwand-*symbolic.svg
 %{_datadir}/icons/hicolor/*/apps/io.github.reiwand.png
