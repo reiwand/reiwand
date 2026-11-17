@@ -74,7 +74,10 @@ La versión 2.0.0 ya no entiende los formatos de la 1.x dentro de los programas:
 `reiwand-upgrade`, los convierte una sola vez y se puede repetir sin riesgo.
 
 - Escritorio: `install.sh`, el servicio de usuario (también con el paquete RPM) y el Flatpak lo
-  ejecutan solos antes de que arranque el demonio. A mano: `reiwand-upgrade client`.
+  ejecutan solos antes de que arranque el demonio. A mano: `reiwand-upgrade client`. Si el equipo
+  sincronizaba con un servidor, baja una sola vez lo que solo guardaba ese servidor a
+  `from-server.reiwand` (en la carpeta de datos), que se suma con `reiwand-ctl import`: actualiza los
+  equipos antes que el servidor.
 - Teléfono: la app lo ejecuta sola al actualizarse. Quita las huellas de las direcciones guardadas de
   repositorios y no descarga nada.
 - Servidor: la imagen lo ejecuta al arrancar; sin la imagen, `reiwand-upgrade server --data DIR` con el

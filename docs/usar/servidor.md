@@ -164,8 +164,11 @@ lo escribe en `/data/sync-export/<usuario>.json` (los registros tal como estaban
 hexadecimal; la que estaba cifrada sigue cifrada, porque el servidor nunca tuvo su clave) y pasa los
 archivos privados de cada cuenta a `/data/sync-export/<usuario>/`. Entrégalos a sus dueños y borra la
 carpeta. Los equipos de escritorio y los teléfonos conservan su biblioteca tal cual, y para llevarla a
-otro equipo se usa un archivo exportado (`reiwand-ctl export`). `reiwand-upgrade client` no baja nada
-del servidor: convierte la cuenta del servidor enlazado de la 1.x en una cuenta del repositorio de ese
+otro equipo se usa un archivo exportado (`reiwand-ctl export`). `reiwand-upgrade client` baja una sola
+vez lo que solo guardaba el servidor anterior para esa cuenta (listas, favoritos y archivos privados
+sincronizados) a `from-server.reiwand` en la carpeta de datos, que se suma con `reiwand-ctl import`; por
+eso se actualiza cada equipo **antes** que el servidor. Si el servidor no responde, no cambia nada y lo
+reintenta en el próximo arranque (`--skip-download` sigue sin bajarlo). Además convierte la cuenta del servidor enlazado de la 1.x en una cuenta del repositorio de ese
 servidor, con su sesión y el certificado fijado si lo tenía.
 
 ## Repositorios y cuentas

@@ -381,10 +381,12 @@ the pin to `repo-pins.json` and the saved access (keyring or `secrets.json` item
 `account <id>`, which keeps the session. A keyring that cannot be reached or is locked stops the upgrade
 before anything is removed and it runs again on the next start. Then it removes `sync.json` and the item `server` and writes
 `format-version`. The daemon never reads the old files: on data without the mark it refuses to start and names
-`reiwand-upgrade client`. Synchronised copies of lists, favourites and private files on the server are not
-downloaded: the library stays as it is on each device, and what a device wants to carry to another goes in an
-exported file (`exportar.md`). Nothing is
-downloaded; the repository keeps its `repo_id`, so installed packages stay linked to it. A repository
+`reiwand-upgrade client`. Before removing the sync state it downloads, once, what only the old server held
+for that account (synchronised lists, favourites and private files) into `from-server.reiwand` in the data
+folder, an exported file (`exportar.md`) the user brings in with `reiwand-ctl import`; nothing is merged into
+the library on its own. If the server does not answer, nothing is changed, the mark `sync-download-pending`
+is written and the run is repeated on the next start; `--skip-download` goes on without it. The desktop is
+upgraded before its server (a 2.x server no longer serves that data). The repository keeps its `repo_id`, so installed packages stay linked to it. A repository
 that a static host serves under `/repo/` and was added with a `?fingerprint=` address is moved as well,
 and has to be added again by hand. The desktop installers, the user service (`ExecStartPre`, which also covers the RPM) and the Flatpak launcher
 run it before the daemon starts; the phone runs it when the app is replaced.
