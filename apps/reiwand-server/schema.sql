@@ -40,8 +40,6 @@ CREATE TABLE devices (
   user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
   number INTEGER NOT NULL,
   platform TEXT NOT NULL CHECK (platform IN ('linux', 'android', 'other')),
-  enc_key BLOB,
-  sig_key BLOB,
   created_at INTEGER NOT NULL,
   seen_at INTEGER,
   UNIQUE (user_id, number)
@@ -65,8 +63,6 @@ CREATE TABLE device_codes (
   code_hash BLOB PRIMARY KEY,
   user_code TEXT NOT NULL UNIQUE,
   platform TEXT NOT NULL,
-  enc_key BLOB,
-  sig_key BLOB,
   user_id INTEGER REFERENCES users ON DELETE CASCADE,
   state TEXT NOT NULL DEFAULT 'pending' CHECK (state IN ('pending', 'approved', 'denied')),
   interval_s INTEGER NOT NULL DEFAULT 5,
@@ -216,55 +212,6 @@ CREATE TABLE audit (
 ) STRICT;
 
 CREATE INDEX audit_at ON audit(at);
-
-CREATE TABLE sync_heads (
-  user_id INTEGER PRIMARY KEY REFERENCES users ON DELETE CASCADE,
-  seq INTEGER NOT NULL DEFAULT 0,
-  min_seq INTEGER NOT NULL DEFAULT 0,
-  epoch INTEGER NOT NULL DEFAULT 0,
-  encrypted INTEGER NOT NULL,
-  escrow BLOB,
-  used_bytes INTEGER NOT NULL DEFAULT 0
-, key_id TEXT, rotate INTEGER NOT NULL DEFAULT 0, format INTEGER NOT NULL DEFAULT 0) STRICT;
-
-CREATE TABLE sync_records (
-  id INTEGER PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
-  collection TEXT NOT NULL,
-  item TEXT NOT NULL,
-  seq INTEGER NOT NULL,
-  epoch INTEGER NOT NULL,
-  device_id TEXT NOT NULL,
-  deleted INTEGER NOT NULL,
-  hash BLOB NOT NULL,
-  payload BLOB,
-  updated_at INTEGER NOT NULL,
-  UNIQUE (user_id, collection, item)
-) STRICT;
-
-CREATE UNIQUE INDEX sync_records_seq ON sync_records(user_id, seq);
-
-CREATE TABLE mailbox (
-  id INTEGER PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
-  to_device TEXT NOT NULL REFERENCES devices ON DELETE CASCADE,
-  from_device TEXT NOT NULL,
-  kind TEXT NOT NULL CHECK (kind IN ('key-share', 'apply', 'send', 'ping')),
-  body BLOB NOT NULL,
-  created_at INTEGER NOT NULL,
-  expires_at INTEGER NOT NULL
-) STRICT;
-
-CREATE INDEX mailbox_inbox ON mailbox(to_device, id);
-
-CREATE TABLE sync_blobs (
-  user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
-  id TEXT NOT NULL,
-  size INTEGER NOT NULL,
-  received INTEGER NOT NULL DEFAULT 0,
-  created_at INTEGER NOT NULL,
-  PRIMARY KEY (user_id, id)
-) STRICT, WITHOUT ROWID;
 
 CREATE VIRTUAL TABLE search USING fts5(package, title, description, tags, tokenize = 'trigram remove_diacritics 1');
 

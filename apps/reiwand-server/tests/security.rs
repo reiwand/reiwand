@@ -15,8 +15,6 @@ async fn passwords_change_only_from_the_web_and_keep_devices_unless_asked() {
     let admin = server.admin().await;
     let ana = server.user(&admin, "ana", "user").await;
     let ((desk, _), (phone, _)) = (server.device("ana").await, server.device("ana").await);
-    let (_, state) = server.json(Method::POST, "/api/v1/sync/setup", &desk, Some(json!({}))).await;
-    assert_eq!(state["rotate"], false);
     let (_, token) = server
         .json(Method::POST, "/api/v1/me/tokens", &ana, Some(json!({"name": "script", "scopes": "upload"})))
         .await;
@@ -31,26 +29,19 @@ async fn passwords_change_only_from_the_web_and_keep_devices_unless_asked() {
         server.json(Method::POST, "/api/v1/auth/device/start", &Who::Nobody, Some(start)).await;
     let approve = json!({"user_code": started["user_code"]});
     let (status, refused) =
-        server.json(Method::POST, "/api/v1/auth/device/approve", &desk, Some(approve)).await;
+        server.json(Method::POST, "/api/v1/auth/device/approve", &desk, Some(approve.clone())).await;
     assert_eq!(
-        (status, refused["detail"].as_str().unwrap().contains("password")),
+        (status, refused["detail"].as_str().unwrap().contains("account page")),
         (StatusCode::FORBIDDEN, true)
     );
-    let wrong = json!({"user_code": started["user_code"], "password": "not the password"});
-    let (status, _) = server.json(Method::POST, "/api/v1/auth/device/approve", &desk, Some(wrong)).await;
-    assert_eq!(status, StatusCode::UNAUTHORIZED);
-    let (status, _) = server
-        .json(
-            Method::POST,
-            "/api/v1/auth/device/preview",
-            &desk,
-            Some(json!({"user_code": started["user_code"]})),
-        )
-        .await;
+    let preview = json!({"user_code": started["user_code"]});
+    let (status, _) =
+        server.json(Method::POST, "/api/v1/auth/device/preview", &desk, Some(preview.clone())).await;
+    assert_eq!(status, StatusCode::FORBIDDEN);
+    let (status, _) = server.json(Method::POST, "/api/v1/auth/device/preview", &ana, Some(preview)).await;
     assert_eq!(status, StatusCode::OK);
-    let approve = json!({"user_code": started["user_code"], "password": "a long enough password"});
     assert_eq!(
-        server.json(Method::POST, "/api/v1/auth/device/approve", &desk, Some(approve)).await.0,
+        server.json(Method::POST, "/api/v1/auth/device/approve", &ana, Some(approve)).await.0,
         StatusCode::OK
     );
     let fields = [("current", "a long enough password"), ("new", "a brand new password")];
@@ -66,7 +57,6 @@ async fn passwords_change_only_from_the_web_and_keep_devices_unless_asked() {
     for kept in [&web, &desk, &phone] {
         assert_eq!(server.json(Method::GET, "/api/v1/me", kept, None).await.0, StatusCode::OK);
     }
-    assert_eq!(server.json(Method::GET, "/api/v1/sync/state", &desk, None).await.1["rotate"], false);
     let fields =
         [("current", "a brand new password"), ("new", "the third new password"), ("devices", "true")];
     let answer = server.form("/api/v1/me/password", &web, &fields).await;
@@ -77,8 +67,6 @@ async fn passwords_change_only_from_the_web_and_keep_devices_unless_asked() {
     }
     let (_, devices) = server.json(Method::GET, "/api/v1/me/devices", &renewed, None).await;
     assert_eq!(devices["items"].as_array().unwrap().len(), 0);
-    let db = rusqlite::Connection::open(server.dir.path().join("data/db/reiwand.sqlite")).unwrap();
-    assert_eq!(db.query_row("SELECT rotate FROM sync_heads", [], |r| r.get::<_, i64>(0)).unwrap(), 1);
 }
 
 #[tokio::test]
@@ -125,13 +113,13 @@ async fn pending_codes_show_what_the_device_sent_and_nothing_else() {
     let ana = server.user(&admin, "ana", "user").await;
     let (desk, _) = server.device("ana").await;
     let (_, devices) = server.json(Method::GET, "/api/v1/me/tokens", &desk, None).await;
-    assert_eq!(devices["items"][0]["scopes"], "upload sync");
+    assert_eq!(devices["items"][0]["scopes"], "upload account");
     let start = json!({"platform": "android", "client": "reiwand/9.9"});
     let (_, started) =
         server.json(Method::POST, "/api/v1/auth/device/start", &Who::Nobody, Some(start)).await;
     let code = json!({"user_code": started["user_code"]});
     let (status, shown) =
-        server.json(Method::POST, "/api/v1/auth/device/preview", &desk, Some(code.clone())).await;
+        server.json(Method::POST, "/api/v1/auth/device/preview", &ana, Some(code.clone())).await;
     assert_eq!(
         (status, shown["platform"].as_str(), shown["client"].as_str()),
         (StatusCode::OK, Some("android"), Some("reiwand/9.9"))
@@ -145,11 +133,11 @@ async fn pending_codes_show_what_the_device_sent_and_nothing_else() {
     assert!(page.contains("reiwand/9.9") && page.contains("your own new device"));
     let unknown = json!({"user_code": "BBBB-BBBB"});
     assert_eq!(
-        server.json(Method::POST, "/api/v1/auth/device/preview", &desk, Some(unknown)).await.0,
+        server.json(Method::POST, "/api/v1/auth/device/preview", &ana, Some(unknown)).await.0,
         StatusCode::NOT_FOUND
     );
     let (_, token) = server
-        .json(Method::POST, "/api/v1/me/tokens", &ana, Some(json!({"name": "script", "scopes": "sync"})))
+        .json(Method::POST, "/api/v1/me/tokens", &ana, Some(json!({"name": "script", "scopes": "account"})))
         .await;
     let script = Who::Bearer(token["token"].as_str().unwrap().into());
     assert_eq!(
@@ -159,7 +147,7 @@ async fn pending_codes_show_what_the_device_sent_and_nothing_else() {
     let approve = json!({"user_code": started["user_code"], "approve": true});
     let (status, _) = server.json(Method::POST, "/api/v1/auth/device/approve", &script, Some(approve)).await;
     assert_eq!(status, StatusCode::FORBIDDEN);
-    let wide = json!({"name": "devices", "scopes": "sync devices"});
+    let wide = json!({"name": "devices", "scopes": "account devices"});
     let (status, _) = server.json(Method::POST, "/api/v1/me/tokens", &ana, Some(wide)).await;
     assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
     let long = json!({"platform": "linux", "client": "x".repeat(65)});

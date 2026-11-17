@@ -8,18 +8,9 @@ pub const TEXTS: super::Texts = &[
     ("{} day", "{} día"),
     ("{} days", "{} días"),
     ("Renew now", "Renovar ahora"),
-    ("What happens to the phones", "Qué pasa con los teléfonos"),
-    (
-        "when it is renewed its fingerprint changes, and so does the code for phones",
-        "al renovarlo cambia su huella y cambia el código para teléfonos",
-    ),
     (
         "it is your own certificate: replace its files and restart the server",
         "es tu propio certificado: cambia sus archivos y reinicia el servidor",
-    ),
-    (
-        "Phones and apps recognise this server by the fingerprint of its certificate. After it is renewed they stop connecting until they read the new code: it appears below, in \"For the phones\".",
-        "Los teléfonos y las apps reconocen este servidor por la huella de su certificado. Después de renovarlo dejan de conectarse hasta que lean el código nuevo: aparece aquí abajo, en «Para los teléfonos».",
     ),
     ("Index signature", "Firma del índice"),
     ("Up to date", "Al día"),
@@ -86,19 +77,8 @@ pub const TEXTS: super::Texts = &[
         "Arregla lo que dicen los detalles y vuelve a intentarlo. Mientras tanto las apps siguen viendo lo publicado {}.",
     ),
     ("Everything is ready for the first wallpaper.", "Todo listo para el primer fondo."),
-    (
-        "Upload it from the desktop app (Account → Add server) or from your Account page. For someone else to install what you publish, give them an invitation from People and the code for phones on this page.",
-        "Súbelo desde la app de escritorio (Cuenta → Añadir servidor) o desde tu página de Cuenta. Para que otra persona instale lo que publiques, dale una invitación desde Personas y el código para teléfonos de esta página.",
-    ),
     ("Upload a wallpaper", "Subir un fondo"),
     ("Go to People", "Ir a Personas"),
-    ("For the phones", "Para los teléfonos"),
-    ("The phone reads this code.", "El teléfono lee este código."),
-    (
-        "It brings the address and the fingerprint of the certificate.",
-        "Trae la dirección y la huella del certificado.",
-    ),
-    ("It brings the address of the server.", "Trae la dirección del servidor."),
     ("Copy the address", "Copiar la dirección"),
     ("logs and featured", "registros y destacados"),
     (

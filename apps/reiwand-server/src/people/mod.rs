@@ -94,8 +94,7 @@ async fn create(State(app): St, auth: Option<Auth>, Form(f): Form<Fresh>) -> Res
     let (uses, days) = (f.uses.trim().parse().unwrap_or(1), f.days.trim().parse().unwrap_or(7));
     let (code, id, expires) = new_invite(&app, auth.user, &f.role, uses, days).await?;
     let link = app.cfg.url(&format!("/register?invite={code}"));
-    let svg = crate::qr::own_connect_svg(&app, Some(&code)).unwrap_or_default();
-    let created = Created { id, link, svg, role: f.role, uses, expires };
+    let created = Created { id, link, role: f.role, uses, expires };
     let people = load(&app, &auth, Some(created), Draft::default(), None).await?;
     draw(&app, &auth, StatusCode::CREATED, people).await
 }

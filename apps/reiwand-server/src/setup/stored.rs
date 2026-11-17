@@ -18,7 +18,6 @@ fn shown(app: &App, s: &Settings) -> Value {
         "registration": s.access().value(),
         "auto_publish": crate::settings::publish_value(s.auto_publish),
         "network": if s.network == crate::settings::Network::Home { "home" } else { "own" },
-        "advertise": s.advertise,
         "setup_done": s.done,
         "public_url": app.cfg.public_url,
     })

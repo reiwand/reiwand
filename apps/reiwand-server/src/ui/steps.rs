@@ -1,5 +1,5 @@
 use crate::icons::icon;
-use maud::{Markup, PreEscaped, html};
+use maud::{Markup, html};
 
 pub fn steps(label: &str, names: &[&str], current: usize) -> Markup {
     html! {
@@ -33,15 +33,6 @@ pub fn choices(legend: &str, name: &str, options: &[Choice], chosen: &str) -> Ma
                     span { b { (c.title) } small { (c.text) } }
                 }
             }
-        }
-    }
-}
-
-pub fn qr(svg: &str, alt: &str, text: Markup) -> Markup {
-    html! {
-        div.qr {
-            div role="img" aria-label=(alt) { (PreEscaped(svg)) }
-            div.qr-texto { (text) }
         }
     }
 }

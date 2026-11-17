@@ -12,7 +12,7 @@ if docker compose exec -T reiwand sh -c true 2>/dev/null; then
 fi
 
 test "$(curl -fsS "$URL/healthz")" = ok
-curl -fsS "$URL/.well-known/reiwand-server" | grep '"end_to_end_default":true' > /dev/null
+curl -fsS "$URL/.well-known/reiwand-server" | grep '"name"' > /dev/null
 [ -z "${REIWAND_VERSION:-}" ] || curl -fsS "$URL/.well-known/reiwand-server" | grep -F "\"version\":\"$REIWAND_VERSION\"" > /dev/null
 docker compose logs reiwand | grep 'one-time setup token' > /dev/null
 

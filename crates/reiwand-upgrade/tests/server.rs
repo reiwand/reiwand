@@ -14,6 +14,11 @@ INSERT INTO versions (id, package_id, version, sha256, size, kind, title, descri
 INSERT INTO cases (id, version_id, reason, created_at) VALUES (3, 9, 'upload', 11), (4, 7, 'report', 30);
 INSERT INTO votes (package_id, user_id, value, at) VALUES ('org.example.dawn', 1, 1, 52), ('org.example.dawn', 2, -1, 53);
 INSERT INTO featured (package_id, note, at) VALUES ('org.example.dawn', 'start here', 50);
+INSERT INTO devices (id, user_id, number, platform, enc_key, created_at) VALUES ('d1', 1, 1, 'linux', x'0102', 0);
+INSERT INTO tokens (id, user_id, name, hash, scopes, created_at) VALUES (1, 1, 'phone', x'AA', 'upload sync', 0);
+INSERT INTO sync_heads (user_id, seq, encrypted) VALUES (1, 1, 0);
+INSERT INTO sync_records (user_id, collection, item, seq, epoch, device_id, deleted, hash, payload, updated_at)
+  VALUES (1, 'library', 'one', 1, 0, 'd1', 0, x'00', x'7b7d', 5);
 UPDATE repo_state SET dirty = 0, signed_at = 612;
 PRAGMA user_version = 11;
 ";
@@ -23,9 +28,12 @@ fn old_data(data: &Path) {
     let conn = Connection::open(data.join("db/reiwand.sqlite")).unwrap();
     conn.execute_batch(OLD).unwrap();
     conn.execute_batch(ROWS).unwrap();
-    for (dir, name, text) in
-        [("repo", "root/1.json", "first"), ("repo", "catalog.json", "{}"), ("keys", "online.key", "secret")]
-    {
+    for (dir, name, text) in [
+        ("repo", "root/1.json", "first"),
+        ("repo", "catalog.json", "{}"),
+        ("keys", "online.key", "secret"),
+        ("private/1", "a.bin", "mine"),
+    ] {
         let path = data.join(dir).join(name);
         fs::create_dir_all(path.parent().unwrap()).unwrap();
         fs::write(path, text).unwrap();
@@ -38,7 +46,7 @@ fn count(conn: &Connection, sql: &str) -> i64 {
 
 fn assert_kept(data: &Path) {
     let conn = Connection::open(data.join("db/reiwand.sqlite")).unwrap();
-    assert_eq!(count(&conn, "PRAGMA user_version"), 14);
+    assert_eq!(count(&conn, "PRAGMA user_version"), 15);
     assert_eq!(count(&conn, "SELECT count(*) FROM packages WHERE repo = 'main'"), 2);
     assert_eq!(count(&conn, "SELECT count(*) FROM versions WHERE repo = 'main'"), 2);
     assert_eq!(count(&conn, "SELECT id FROM versions WHERE package_id = 'org.example.dawn'"), 7);
@@ -59,6 +67,16 @@ fn assert_kept(data: &Path) {
     assert_eq!(count(&conn, "SELECT count(*) FROM sqlite_master WHERE name = 'repo_state'"), 0);
     assert_eq!(fs::read_to_string(data.join("repos/main").join("root/1.json")).unwrap(), "first");
     assert_eq!(fs::read_to_string(data.join("keys/main.online.key")).unwrap(), "secret");
+    assert_eq!(
+        count(&conn, "SELECT count(*) FROM sqlite_master WHERE name LIKE 'sync_%' OR name = 'mailbox'"),
+        0
+    );
+    assert_eq!(count(&conn, "SELECT count(*) FROM pragma_table_info('devices') WHERE name LIKE '%_key'"), 0);
+    assert_eq!(count(&conn, "SELECT count(*) FROM tokens WHERE scopes = 'upload account'"), 1);
+    let export = fs::read_to_string(data.join("sync-export/ana.json")).unwrap();
+    assert!(export.contains("\"item\": \"one\"") && export.contains("7b7d"));
+    assert_eq!(fs::read_to_string(data.join("sync-export/ana/a.bin")).unwrap(), "mine");
+    assert!(!data.join("sync-export/bob.json").exists());
     assert!(!data.join("repo").exists() && !data.join("keys/online.key").exists());
 }
 
@@ -67,9 +85,9 @@ fn a_version_11_server_is_upgraded_once_keeping_everything() {
     let dir = tempfile::tempdir().unwrap();
     let data = dir.path();
     old_data(data);
-    assert_eq!(server::run(data).unwrap(), Outcome::Upgraded { from: 11, to: 14 });
+    assert_eq!(server::run(data).unwrap(), Outcome::Upgraded { from: 11, to: 15 });
     assert_kept(data);
-    let copy = Connection::open(data.join("db/reiwand.sqlite.before-v14-from-v11")).unwrap();
+    let copy = Connection::open(data.join("db/reiwand.sqlite.before-v15-from-v11")).unwrap();
     assert_eq!(count(&copy, "PRAGMA user_version"), 11);
     assert_eq!(count(&copy, "SELECT count(*) FROM votes"), 2);
     assert_eq!(server::run(data).unwrap(), Outcome::Nothing);
@@ -89,7 +107,7 @@ fn a_version_12_server_is_upgraded_too() {
     )
     .unwrap();
     drop(conn);
-    assert_eq!(server::run(data).unwrap(), Outcome::Upgraded { from: 12, to: 14 });
+    assert_eq!(server::run(data).unwrap(), Outcome::Upgraded { from: 12, to: 15 });
     assert_kept(data);
 }
 

@@ -37,8 +37,6 @@ pub struct Config {
     pub package_max: u64,
     pub user_quota: u64,
     pub uploads_per_day: u64,
-    pub sync_quota: u64,
-    pub files_quota: u64,
     pub entry_days: u32,
     pub resign_hours: u64,
     pub publish_delay: u64,
@@ -52,6 +50,5 @@ pub struct Config {
     pub takedown_days: u64,
     pub rate_limits: bool,
     pub self_signed: bool,
-    pub advertise: bool,
     pub validator: PathBuf,
 }

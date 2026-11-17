@@ -72,17 +72,13 @@ async fn registering_and_linking_read_in_both_languages() {
 }
 
 #[tokio::test]
-async fn a_new_account_starts_with_the_phone_code_and_no_other_person_shows() {
+async fn a_new_account_starts_empty_and_no_other_person_shows() {
     let server = start(&[("REIWAND_PUBLIC_URL", "https://wall.example")]).await;
     let admin = server.admin().await;
     let mar = server.user(&admin, "mar", "user").await;
     let (_, page) = get(&server, "/account", &mar, ES).await;
     for word in [
         "Tu cuenta está lista.",
-        "En tu teléfono",
-        "<svg",
-        "https://wall.example/repo",
-        "Copiar la dirección",
         "Todavía no subiste ninguno.",
         "Ninguno todavía.",
         "Avanzado",
@@ -90,10 +86,9 @@ async fn a_new_account_starts_with_the_phone_code_and_no_other_person_shows() {
     ] {
         assert!(page.contains(word), "{word}");
     }
-    assert!(page.find("En tu teléfono") < page.find("Tus fondos"));
     assert!(!page.contains("href=\"/admin\"") && !page.contains("href=\"/mod\""));
     let (_, english) = get(&server, "/account", &mar, "en").await;
-    assert!(english.contains("On your phone") && english.contains("Your account is ready."));
+    assert!(english.contains("Your account is ready."));
     assert!(reiwand_server::missed_texts().is_empty());
 }
 
@@ -108,7 +103,6 @@ async fn removing_a_device_asks_inside_its_row_and_only_for_your_own() {
     let (_, plain) = get(&server, "/account", &ana, ES).await;
     assert!(plain.contains(&format!("href=\"/account?remove={mine}#dispositivos\"")));
     assert!(!plain.contains("class=\"confirmar\"") && plain.contains("Tus fondos"));
-    assert!(plain.find("Dispositivos") < plain.find("En tu teléfono"));
     let (_, asking) = get(&server, &format!("/account?remove={mine}"), &ana, ES).await;
     assert!(asking.contains("class=\"confirmar\"") && asking.contains("¿Quitar «Dispositivo 1»?"));
     assert!(asking.contains("class=\"fila foco\"") && asking.contains("Cancelar"));
@@ -136,7 +130,7 @@ async fn a_new_token_is_shown_once_with_its_name_in_the_result_screen() {
     let done = server
         .call(Method::POST, "/api/v1/me/tokens?back=/account", &ana)
         .header("accept-language", ES)
-        .form(&[("name", "copia-noche"), ("scopes", "catalog:read sync"), ("days", "30")])
+        .form(&[("name", "copia-noche"), ("scopes", "catalog:read upload"), ("days", "30")])
         .send()
         .await
         .unwrap();
@@ -146,7 +140,7 @@ async fn a_new_token_is_shown_once_with_its_name_in_the_result_screen() {
         "Token creado.",
         "no se vuelve a mostrar",
         "copia-noche",
-        "catalog:read sync",
+        "catalog:read upload",
         "en 30 días",
         "Continuar",
     ] {

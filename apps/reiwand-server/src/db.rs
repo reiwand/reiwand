@@ -14,7 +14,7 @@ pub const HOUR: i64 = 60 * MINUTE;
 pub const DAY: i64 = 24 * HOUR;
 
 const SCHEMA: &str = include_str!("../schema.sql");
-pub const SCHEMA_VERSION: i64 = 14;
+pub const SCHEMA_VERSION: i64 = 15;
 
 pub fn now() -> i64 {
     SystemTime::now().duration_since(UNIX_EPOCH).map_or(0, |d| d.as_millis() as i64)
@@ -83,8 +83,8 @@ fn version(conn: &Connection) -> rusqlite::Result<i64> {
 
 fn foreign(found: i64) -> anyhow::Error {
     let message = format!(
-        "the database has schema {found} but this program reads {SCHEMA_VERSION}; if it was made by version \
-         1.x run `reiwand-upgrade server --data <data folder>` once (the server image does it at start); \
+        "the database has schema {found} but this program reads {SCHEMA_VERSION}; if it was made by an older version \
+         run `reiwand-upgrade server --data <data folder>` once (the server image does it at start); \
          the database was left untouched"
     );
     tracing::error!("{message}");
@@ -103,27 +103,6 @@ pub fn changed(rows: usize, what: &str) -> Res<()> {
 
 pub fn one<T: FromSql>(conn: &Connection, sql: &str, values: impl Params) -> Res<Option<T>> {
     Ok(conn.query_row(sql, values, |r| r.get(0)).optional()?)
-}
-
-pub fn cut(
-    conn: &Connection,
-    sql: &str,
-    values: impl Params,
-    from: i64,
-    limit: i64,
-    budget: i64,
-) -> Res<(i64, bool)> {
-    let mut statement = conn.prepare(sql)?;
-    let found = statement.query_map(values, |r| Ok((r.get::<_, i64>(0)?, r.get::<_, i64>(1)?)))?;
-    let found = found.collect::<Result<Vec<_>, _>>()?;
-    let (mut last, mut total, mut taken) = (from, 0, 0);
-    for (key, size) in &found {
-        if taken == limit || (taken > 0 && total + size > budget) {
-            break;
-        }
-        (last, total, taken) = (*key, total + size, taken + 1);
-    }
-    Ok((last, (taken as usize) < found.len()))
 }
 
 pub fn rows(conn: &Connection, sql: &str, values: impl Params) -> Res<Vec<Value>> {

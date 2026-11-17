@@ -26,7 +26,6 @@ pub const API: Rule = Rule { name: "api", burst: 50.0, seconds: 2.5 };
 pub const LOGIN: Rule = Rule { name: "login", burst: 5.0, seconds: 60.0 };
 pub const FAILS: Rule = Rule { name: "fails", burst: 10.0, seconds: 900.0 };
 pub const REPORT: Rule = Rule { name: "report", burst: 5.0, seconds: 3600.0 };
-pub const SYNC: Rule = Rule { name: "sync", burst: 60.0, seconds: 60.0 };
 
 type Buckets = HashMap<(&'static str, String), (f64, Instant, Instant)>;
 

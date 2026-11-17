@@ -39,19 +39,16 @@ pub fn privacy(c: &Config) -> Markup {
         h2 { (t("What is stored")) }
         ul {
             li { (t("Your handle, a password hash (Argon2id) and your role.")) }
-            li { (t("Your devices under generic names (Device 1, Device 2…) with their public keys, \
-                 and hashes of your tokens, never the tokens.")) }
+            li { (t("Your devices under generic names (Device 1, Device 2…) and hashes of your tokens, \
+                 never the tokens.")) }
             li { (t("Packages you upload and moderation records about them.")) }
-            li { (t("Synced library, playlists and settings. With end-to-end encryption, the default, \
-                 the server only holds ciphertext it cannot read.")) }
         }
         h2 { (t("What is not")) }
         p { (tf("No tracking, analytics or third-party resources, and one strictly necessary session cookie. \
             IP addresses and user agents are not logged unless the operator turns on abuse logging, \
             which keeps them at most {} days.", &[&c.log_days])) }
         h2 { (t("How long")) }
-        p { (tf("Sessions 30 days, device codes 10 minutes, device messages 7 days, deleted sync items \
-            180 days, the name, email and signature of a legal notice {} days, a \
+        p { (tf("Sessions 30 days, device codes 10 minutes, the name, email and signature of a legal notice {} days, a \
             package withdrawn by the moderators {} days, as evidence and for a \
             counter-notice. Everything else until you delete it or your account.",
             &[&c.notice_days, &c.takedown_days])) }

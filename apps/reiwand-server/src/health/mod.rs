@@ -61,8 +61,6 @@ async fn render(app: &Arc<App>, auth: &Auth, view: View) -> Res<Response> {
         app.db.run(|c| one::<i64>(c, "SELECT COUNT(*) FROM featured", [])).await?.unwrap_or_default();
     let failed = view.failed.or_else(|| facts.sign_failed.as_ref().map(|f| f.1.clone()));
     let extras = Extras {
-        phone_svg: crate::qr::own_connect_svg(app, None).unwrap_or_default(),
-        fingerprint: settings.network == Network::Home,
         repo_url: info.and_then(|i| i["url"].as_str().map(str::to_owned)),
         featured,
         failed,

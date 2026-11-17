@@ -26,53 +26,16 @@ pub const TEXTS: super::Texts = &[
         "Cualquiera puede registrarse. Lo que suben las cuentas nuevas espera tu revisión.",
     ),
     ("Your first invitation", "Tu primera invitación"),
-    ("QR code with the invitation link", "Código QR con el enlace de la invitación"),
-    ("Give it to whoever you want to get in.", "Dásela a quien quieras que entre."),
-    (
-        "It is shown only this time; you can make more in People.",
-        "Se muestra solo esta vez; puedes crear más en Personas.",
-    ),
     ("Finish", "Terminar"),
     ("Set up", "Configurado"),
     ("No wallpapers yet", "Sin fondos todavía"),
     ("Done: your server already hands out wallpapers.", "Listo: tu servidor ya reparte fondos."),
-    (
-        "What you publish appears in the app and on the phone of whoever connects with these details.",
-        "Lo que publiques aparece en la app y en el teléfono de quien se conecte con estos datos.",
-    ),
-    ("For the app and the phone", "Para la app y el teléfono"),
-    (
-        "The phone reads this code: it brings the address and the fingerprint.",
-        "El teléfono lee este código: trae la dirección y la huella.",
-    ),
-    ("The phone reads this code: it brings the address.", "El teléfono lee este código: trae la dirección."),
-    (
-        "QR code with the address and the fingerprint of the server",
-        "Código QR con la dirección y la huella del servidor",
-    ),
-    ("QR code with the address of the server", "Código QR con la dirección del servidor"),
-    (
-        "In the desktop app, paste the repository address below.",
-        "En la app de escritorio, pega la dirección del repositorio de abajo.",
-    ),
     ("The web", "La web"),
     ("Repository address", "Dirección del repositorio"),
     ("Copied", "Copiado"),
     ("Copy", "Copiar"),
     ("Advanced", "Avanzado"),
     ("To upload wallpapers", "Para subir fondos"),
-    (
-        "In the desktop app, open Account → Add server.",
-        "En la app de escritorio, abre Cuenta → Añadir servidor.",
-    ),
-    (
-        "Paste the repository address above and sign in as {}.",
-        "Pega la dirección del repositorio de arriba y entra como {}.",
-    ),
-    (
-        "In the editor of your wallpaper, press {} and choose this server.",
-        "En el editor de tu fondo, toca {} y elige este servidor.",
-    ),
     ("Publish…", "Publicar…"),
     (
         "Without the app, you can also upload a .wpak file from your Account page in this browser.",

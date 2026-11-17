@@ -193,5 +193,5 @@ fn the_schema_is_the_one_earlier_builds_wrote() {
         .query_map([], |r| Ok(format!("-- {}\n{};\n", r.get::<_, String>(0)?, r.get::<_, String>(1)?)));
     let text = rows.unwrap().collect::<Result<Vec<_>, _>>().unwrap().join("\n");
     let hash: String = sha2::Sha256::digest(text.as_bytes()).iter().map(|b| format!("{b:02x}")).collect();
-    assert_eq!(hash, "c40b324d83d2ea0de41a1927da1a0c89330b49651969622892103c7913caedf5");
+    assert_eq!(hash, "195f2501817a6670878338c5b34c8a28bad0f4486d07690c93fd1b1681bbbdea");
 }

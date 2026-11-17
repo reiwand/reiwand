@@ -2,7 +2,7 @@ use super::view::{stepped, summary};
 use crate::App;
 use crate::lang::t;
 use crate::settings::Access;
-use crate::ui::{Choice, Kind, button, checkbox, choices, field, fold, qr};
+use crate::ui::{Choice, Kind, button, checkbox, choices, field, fold};
 use maud::{Markup, html};
 
 pub fn account(app: &App, handle: Option<&str>, error: Option<&str>) -> Markup {
@@ -75,7 +75,6 @@ pub fn access(app: &App, code: &str) -> Markup {
         other => other.value(),
     };
     let link = app.cfg.url(&format!("/register?invite={code}"));
-    let svg = crate::qr::own_connect_svg(app, Some(code)).unwrap_or_default();
     let name = settings.repo_name.clone().unwrap_or_default();
     let body = html! {
         (summary(app, 3))
@@ -85,11 +84,8 @@ pub fn access(app: &App, code: &str) -> Markup {
                 (choices(t("Who gets in"), "access", &options, chosen))
                 div {
                     h3.subtitulo { (t("Your first invitation")) }
-                    (qr(&svg, t("QR code with the invitation link"), html! {
-                        b { (t("Give it to whoever you want to get in.")) }
-                        span.texto { (t("It is shown only this time; you can make more in People.")) }
-                        span.dato { (link) }
-                    }))
+                    p.texto { (t("Give it to whoever you want to get in. It is shown only this time; you can make more in People.")) }
+                    span.dato { (link) }
                 }
                 div { (button(Kind::Primary, t("Finish"))) }
             }

@@ -3,14 +3,13 @@ use crate::auth::{Auth, Role, SCOPES};
 use crate::creds::{self, digest};
 use crate::db::{DAY, changed, now, rows};
 use crate::error::{Input, Problem, Res, require};
-use crate::mailbox::Note;
 use crate::{Reply, Router, St};
 use axum::Json;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::{delete, get, post};
-use rusqlite::{Connection, OptionalExtension, params};
+use rusqlite::{Connection, params};
 use serde::Deserialize;
 use serde_json::{Value, json};
 
@@ -27,7 +26,7 @@ pub fn routes() -> Router {
 
 const TOKENS: &str = "SELECT id, name, scopes, device_id, created_at, used_at, expires_at FROM tokens \
                       WHERE user_id = ?1";
-const DEVICES: &str = "SELECT id, 'Device ' || number AS name, platform, enc_key, sig_key, created_at, \
+const DEVICES: &str = "SELECT id, 'Device ' || number AS name, platform, created_at, \
                        seen_at FROM devices WHERE user_id = ?1 ORDER BY number";
 pub const DEVICE_ROW: &str = "DELETE FROM devices WHERE id = ?1 AND user_id = ?2";
 const KEYS: &str = "SELECT fingerprint, public_key, created_at FROM author_keys WHERE user_id = ?1";
@@ -66,15 +65,8 @@ async fn packages(State(app): St, auth: Auth) -> Reply {
 async fn export(State(app): St, auth: Auth) -> Reply {
     auth.browser()?;
     let user = auth.user;
-    let head = "SELECT seq, min_seq, epoch, encrypted, escrow, used_bytes FROM sync_heads WHERE user_id = ?1";
-    let records = "SELECT collection, item, seq, epoch, device_id AS device, deleted, payload, updated_at \
-                   FROM sync_records WHERE user_id = ?1 ORDER BY seq";
-    let files =
-        "SELECT id, size, received, created_at FROM sync_blobs WHERE user_id = ?1 ORDER BY created_at";
     let out = app.db.run(move |c| {
-        let (sync, records) = (rows(c, head, [user])?, rows(c, records, [user])?);
-        let files = rows(c, files, [user])?;
-        let mut out = json!({"profile": profile(c, user)?, "sync": sync, "records": records, "files": files});
+        let mut out = json!({"profile": profile(c, user)?});
         for what in ["tokens", "devices", "keys", "versions", "uploads"] {
             out[what] = listing(c, user, what)?.into();
         }
@@ -164,21 +156,8 @@ pub async fn erase(
     id: String,
     sql: &'static str,
 ) -> Res<StatusCode> {
-    let (gone, key) = (vec![id.clone()], (what == "author-keys").then(|| id.clone()));
-    let epoch = app.db.run(move |c| {
-        changed(c.execute(sql, params![id, user])?, "item")?;
-        Ok(if what == "devices" { revoked(c, user)? } else { None })
-    });
-    let epoch = epoch.await?;
+    let key = (what == "author-keys").then(|| id.clone());
+    app.db.run(move |c| changed(c.execute(sql, params![id, user])?, "item")).await?;
     crate::authors::publish(app, user, None, key).await?;
-    if let Some(epoch) = epoch {
-        app.hub.kick(&gone);
-        app.hub.send(user, Note { event: "epoch", device: None, value: epoch });
-    }
     Ok(StatusCode::NO_CONTENT)
-}
-
-pub fn revoked(c: &Connection, user: i64) -> Res<Option<i64>> {
-    let sql = "UPDATE sync_heads SET rotate = 1 WHERE user_id = ?1 RETURNING epoch";
-    Ok(c.query_row(sql, [user], |r| r.get(0)).optional()?)
 }

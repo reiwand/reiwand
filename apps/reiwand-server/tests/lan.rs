@@ -17,17 +17,14 @@ async fn a_home_server_is_reached_over_https_by_its_pinned_fingerprint() {
     assert_eq!(lan::host(&url), "127.0.0.1");
     let (cert, key) = lan::certificate(dir.path(), "127.0.0.1").unwrap();
     assert_eq!(lan::certificate(dir.path(), "127.0.0.1").unwrap().0, cert, "the certificate is kept");
-    let print = lan::fingerprint(&cert);
+    assert_eq!(lan::fingerprint(&cert).len(), 64);
     assert!(lan::acceptor(cert, key).is_ok());
     tokio::spawn(App::open(cfg).unwrap().serve_door(tcp));
-    let unknown = reiwand_sync::Api::new(&url).unwrap().get("/.well-known/reiwand-server").await;
-    assert!(matches!(unknown, Err(reiwand_sync::Error::Untrusted)), "{unknown:?}");
-    assert_eq!(reiwand_sync::peek(&url).await.unwrap(), print);
-    let found = reiwand_sync::Api::pinned(&url, Some(&print))
-        .unwrap()
-        .get("/.well-known/reiwand-server")
-        .await
-        .unwrap();
+    let url = format!("{url}/.well-known/reiwand-server");
+    let strict = reqwest::Client::new().get(&url).send().await;
+    assert!(strict.is_err(), "a certificate nobody vouches for must be refused");
+    let lenient = reqwest::Client::builder().danger_accept_invalid_certs(true).build().unwrap();
+    let found: serde_json::Value = lenient.get(&url).send().await.unwrap().json().await.unwrap();
     assert!(found["api"].as_array().unwrap().contains(&serde_json::json!("v1")), "{found}");
     let mode = std::os::unix::fs::PermissionsExt::mode(
         &std::fs::metadata(dir.path().join("tls/key.der")).unwrap().permissions(),

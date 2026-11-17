@@ -86,16 +86,13 @@ async fn roles_below_the_route_are_refused_on_the_api_and_the_web() {
 }
 
 #[tokio::test]
-async fn one_account_cannot_reach_the_devices_and_messages_of_another() {
+async fn one_account_cannot_reach_the_devices_of_another() {
     let server = start(&[]).await;
     let admin = server.admin().await;
     let _ = server.user(&admin, "ana", "user").await;
     let bob = server.user(&admin, "bob", "user").await;
-    let (ana_phone, ana_device) = server.device("ana").await;
+    let (_, ana_device) = server.device("ana").await;
     let (bob_phone, _) = server.device("bob").await;
-    let body = json!({"to_device": ana_device, "kind": "ping", "body": ""});
-    let (status, _) = server.json(Method::POST, "/api/v1/mailbox", &bob_phone, Some(body)).await;
-    assert_eq!(status, StatusCode::NOT_FOUND);
     let gone = format!("/api/v1/me/devices/{ana_device}");
     assert_eq!(server.json(Method::DELETE, &gone, &bob_phone, None).await.0, StatusCode::FORBIDDEN);
     assert_eq!(server.json(Method::DELETE, &gone, &bob, None).await.0, StatusCode::NOT_FOUND);
@@ -104,8 +101,6 @@ async fn one_account_cannot_reach_the_devices_and_messages_of_another() {
     assert_eq!(server.json(Method::POST, &revoke, &bob_phone, password).await.0, StatusCode::NOT_FOUND);
     let kept = format!("SELECT CAST(COUNT(*) AS TEXT) FROM devices WHERE id = '{ana_device}'");
     assert_eq!(read(&server, &kept), "1");
-    let (status, _) = server.json(Method::GET, "/api/v1/mailbox", &ana_phone, None).await;
-    assert_eq!(status, StatusCode::OK);
     let (_, mine) = server.json(Method::GET, "/api/v1/me/devices", &bob_phone, None).await;
     assert!(!mine.to_string().contains(&ana_device));
 }

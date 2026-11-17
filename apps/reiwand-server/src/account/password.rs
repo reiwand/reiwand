@@ -4,8 +4,6 @@ use crate::auth::Auth;
 use crate::creds::{self, check_password};
 use crate::db::changed;
 use crate::error::{Input, Res};
-use crate::mailbox::Note;
-use crate::me::revoked;
 use crate::net::Client;
 use axum::extract::State;
 use axum::http::{StatusCode, header};
@@ -27,12 +25,10 @@ pub(super) async fn forget(
 ) -> Res<impl IntoResponse> {
     auth.browser()?;
     confirm(&app, &auth, &client, f.password).await?;
-    let files = crate::files::dir(&app, auth.user);
     app.db
         .run(move |c| changed(c.execute("DELETE FROM users WHERE id = ?1", [auth.user])?, "account"))
         .await?;
     app.changed().await;
-    let _ = tokio::fs::remove_dir_all(files).await;
     Ok((StatusCode::NO_CONTENT, [(header::SET_COOKIE, creds::cookie(&app.cfg, "", 0))]))
 }
 
@@ -54,7 +50,7 @@ pub(super) async fn password(
     confirm(&app, &auth, &client, change.current).await?;
     check_password(&auth.handle, &change.new)?;
     let (hash, user, devices) = (creds::hash(&app, change.new).await?, auth.user, change.devices);
-    let (session, gone, epoch) = app
+    let session = app
         .db
         .run(move |c| {
             let tx = c.transaction()?;
@@ -62,20 +58,11 @@ pub(super) async fn password(
             tx.execute("DELETE FROM sessions WHERE user_id = ?1", [user])?;
             tx.execute("DELETE FROM tokens WHERE user_id = ?1 AND device_id IS NULL", [user])?;
             tx.execute("DELETE FROM device_codes WHERE user_id = ?1", [user])?;
-            let sql = "DELETE FROM devices WHERE user_id = ?1 AND ?2 RETURNING id";
-            let gone = tx
-                .prepare(sql)?
-                .query_map(params![user, devices], |r| r.get(0))?
-                .collect::<Result<Vec<String>, _>>()?;
-            let epoch = if gone.is_empty() { None } else { revoked(&tx, user)? };
+            tx.execute("DELETE FROM devices WHERE user_id = ?1 AND ?2", params![user, devices])?;
             let session = creds::session(&tx, user)?;
             tx.commit()?;
-            Ok((session, gone, epoch))
+            Ok(session)
         })
         .await?;
-    app.hub.kick(&gone);
-    if let Some(epoch) = epoch {
-        app.hub.send(user, Note { event: "epoch", device: None, value: epoch });
-    }
     Ok((StatusCode::NO_CONTENT, [(header::SET_COOKIE, creds::cookie(&app.cfg, &session, 30 * 86400))]))
 }

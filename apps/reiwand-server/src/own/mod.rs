@@ -1,6 +1,5 @@
 mod advanced;
 mod devices;
-mod phone;
 mod security;
 mod works;
 
@@ -11,7 +10,6 @@ use crate::error::{Problem, Res};
 use crate::frame::Frame;
 use crate::lang::{t, tf, word};
 use crate::me::listing;
-use crate::sync::head;
 use crate::ui::{Tone, empty, size, status_line};
 use axum::extract::{Query, State};
 use axum::response::{IntoResponse, Redirect, Response};
@@ -30,9 +28,9 @@ pub async fn account(State(app): St, auth: Option<Auth>, Query(ask): Query<Ask>)
     let user = auth.user;
     let data = app.db.run(move |c| {
         let lists = ["versions", "uploads", "devices", "tokens", "keys"].map(|w| listing(c, user, w));
-        Ok((profile(c, user)?, lists.into_iter().collect::<Res<Vec<_>>>()?, head(c, user).ok()))
+        Ok((profile(c, user)?, lists.into_iter().collect::<Res<Vec<_>>>()?))
     });
-    let (me, lists, sync) = data.await?;
+    let (me, lists) = data.await?;
     let [versions, uploads, devices, tokens, keys] =
         <[Vec<Value>; 5]>::try_from(lists).map_err(|_| Problem::internal("account lists"))?;
     let fresh = versions.is_empty() && uploads.is_empty() && devices.is_empty();
@@ -44,7 +42,6 @@ pub async fn account(State(app): St, auth: Option<Auth>, Query(ask): Query<Ask>)
         &tf("You signed in as {} ({})", &[&auth.handle, &word(auth.role.name())]),
         Some(&tf("you use {} of {} for wallpapers", &[&size(used), &size(quota)])),
     );
-    let phone = phone::phone(&app, fresh);
     let names = app.repos.ready().iter().map(|r| r.name.clone()).collect();
     let targets: Vec<String> = crate::access::visible(&app, Some(&auth), names)
         .await
@@ -54,13 +51,10 @@ pub async fn account(State(app): St, auth: Option<Auth>, Query(ask): Query<Ask>)
         .collect();
     let body = html! {
         @if fresh {
-            (empty(t("Your account is ready."), html! { (t("To have the home wallpapers on your phone, read the \
-                code below with the app. If you make wallpapers, upload them from here.")) }))
-            (phone)
+            (empty(t("Your account is ready."), html! { (t("If you make wallpapers, upload them from here or from the editor.")) }))
         }
         (works::works(&versions, &uploads, &targets, !fresh && !asking))
-        (devices::devices(&app, &devices, if asking { &ask.remove } else { "" }, sync.as_ref()))
-        @if !fresh { (phone) }
+        (devices::devices(&devices, if asking { &ask.remove } else { "" }))
         (security::security())
         (advanced::advanced(&app, auth.user, &tokens, &keys))
     };

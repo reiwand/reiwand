@@ -11,10 +11,9 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 const FORMAT: &str = "reiwand-server-backup/1";
-const TREES: [&str; 6] = ["blobs", "thumbs", "private", "held", "keys", "repos"];
+const TREES: [&str; 5] = ["blobs", "thumbs", "held", "keys", "repos"];
 const FILES: &str = "SELECT 'blobs/' || sha256 || '.wpak' FROM versions WHERE state = 'pending' \
-                     UNION SELECT 'thumbs/' || sha256 || '.jpg' FROM versions WHERE state IN ('pending', 'published') \
-                     UNION SELECT 'private/' || user_id || '/' || id FROM sync_blobs WHERE received = size";
+                     UNION SELECT 'thumbs/' || sha256 || '.jpg' FROM versions WHERE state IN ('pending', 'published')";
 
 #[derive(Serialize, Deserialize)]
 struct Manifest {
@@ -149,8 +148,6 @@ pub fn restore(cfg: &Config, src: &Path, force: bool) -> Result<()> {
     let mut conn = Connection::open(&db)?;
     crate::db::create(&mut conn)?;
     conn.execute("UPDATE repos SET dirty = 1", [])?;
-    conn.execute("UPDATE sync_heads SET seq = MAX(seq, ?1), min_seq = MAX(seq, ?1)", [now()])?;
-    conn.execute("UPDATE sync_blobs SET received = 0 WHERE received < size", [])?;
     Ok(())
 }
 

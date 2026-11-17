@@ -35,16 +35,8 @@ pub const TEXTS: super::Texts = &[
         "Tu usuario, un hash de tu contraseña (Argon2id) y tu rol.",
     ),
     (
-        "Your devices under generic names (Device 1, Device 2…) with their public keys, and hashes of your tokens, never the tokens.",
-        "Tus dispositivos con nombres genéricos (Dispositivo 1, Dispositivo 2…) y sus claves públicas, y hashes de tus tokens, nunca los tokens.",
-    ),
-    (
         "Packages you upload and moderation records about them.",
         "Los fondos que subes y los registros de moderación sobre ellos.",
-    ),
-    (
-        "Synced library, playlists and settings. With end-to-end encryption, the default, the server only holds ciphertext it cannot read.",
-        "Biblioteca, listas y ajustes sincronizados. Con el cifrado de extremo a extremo, que es lo normal, el servidor solo guarda texto cifrado que no puede leer.",
     ),
     ("What is not", "Qué no se guarda"),
     (
@@ -52,10 +44,6 @@ pub const TEXTS: super::Texts = &[
         "Sin rastreo, sin analíticas y sin recursos de terceros, y una sola cookie de sesión, la estrictamente necesaria. Las direcciones IP y los agentes de usuario no se registran salvo que quien opera el servidor active el registro de abusos, que los guarda como máximo {} días.",
     ),
     ("How long", "Por cuánto tiempo"),
-    (
-        "Sessions 30 days, device codes 10 minutes, device messages 7 days, deleted sync items 180 days, the name, email and signature of a legal notice {} days, a package withdrawn by the moderators {} days, as evidence and for a counter-notice. Everything else until you delete it or your account.",
-        "Las sesiones 30 días, los códigos de dispositivo 10 minutos, los mensajes entre dispositivos 7 días, lo borrado de la sincronización 180 días, el nombre, el correo y la firma de un aviso legal {} días, y un fondo retirado por los moderadores {} días, como prueba y para un contra-aviso. Todo lo demás hasta que lo borres tú o borres tu cuenta.",
-    ),
     ("Your rights", "Tus derechos"),
     ("account page", "página de tu cuenta"),
     (

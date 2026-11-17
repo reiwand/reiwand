@@ -5,8 +5,7 @@ use axum::serve::Listener;
 use std::io;
 use std::net::SocketAddr;
 use std::pin::Pin;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex, PoisonError, RwLock};
+use std::sync::{Arc, PoisonError, RwLock};
 use std::task::{Context, Poll};
 use std::time::Duration;
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt, ReadBuf};
@@ -18,8 +17,6 @@ use tokio_rustls::server::TlsStream;
 #[derive(Default)]
 pub struct Door {
     tls: RwLock<Option<TlsAcceptor>>,
-    announced: Mutex<Option<mdns_sd::ServiceDaemon>>,
-    live: AtomicBool,
 }
 
 pub fn acceptor(cfg: &Config, network: &Network) -> Result<Option<TlsAcceptor>> {
@@ -54,19 +51,12 @@ impl Door {
     pub fn apply(&self, cfg: &Config, settings: &Settings) -> Result<()> {
         let found = acceptor(cfg, &settings.network)?;
         *self.tls.write().unwrap_or_else(PoisonError::into_inner) = found;
-        let mut announced = self.announced.lock().unwrap_or_else(PoisonError::into_inner);
-        match (settings.advertise && self.live.load(Ordering::Relaxed), announced.is_some()) {
-            (true, false) => *announced = Some(lan::advertise(cfg.listen.port())?),
-            (false, true) => drop(announced.take()),
-            _ => {}
-        }
         Ok(())
     }
 }
 
 impl App {
     pub async fn serve_door(self: Arc<App>, tcp: TcpListener) -> Result<()> {
-        self.door.live.store(true, Ordering::Relaxed);
         self.door.apply(&self.cfg, &self.settings())?;
         let (sent, got) = mpsc::channel(64);
         let local = tcp.local_addr()?;

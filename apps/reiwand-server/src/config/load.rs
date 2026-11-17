@@ -80,8 +80,6 @@ impl Config {
             package_max: num("PACKAGE_MAX_MIB", 256)? << 20,
             user_quota: num("USER_QUOTA_MIB", 2048)? << 20,
             uploads_per_day: num("UPLOADS_PER_DAY", 20)?,
-            sync_quota: num("SYNC_QUOTA_MIB", 64)? << 20,
-            files_quota: num("FILES_QUOTA_MIB", 1024)? << 20,
             entry_days: entry_days as u32,
             resign_hours: num("RESIGN_HOURS", 24)?.clamp(1, entry_days * 12),
             publish_delay: num("PUBLISH_DELAY_SECS", 30)?,
@@ -100,7 +98,6 @@ impl Config {
             takedown_days: num("TAKEDOWN_DAYS", 90)?.clamp(1, 3650),
             rate_limits: flag("RATE_LIMITS", true)?,
             self_signed: pick("TLS", get("TLS").as_deref(), &[("off", false), ("self-signed", true)], false)?,
-            advertise: flag("ADVERTISE", false)?,
             validator: std::env::current_exe().unwrap_or_else(|_| PathBuf::from("reiwand-server")),
             public_url,
         })

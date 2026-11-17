@@ -4,12 +4,10 @@ use super::mail_row::{self, Asked};
 use super::rows::{self, Line};
 use crate::icons::icon;
 use crate::lang::{count, since, t, tf, tm};
-use crate::ui::{Kind, Row, Tone, copyable, empty, link_button, notice, qr, rows as list, status};
+use crate::ui::{Kind, Row, Tone, copyable, empty, link_button, notice, rows as list, status};
 use maud::{Markup, html};
 
 pub struct Extras {
-    pub phone_svg: String,
-    pub fingerprint: bool,
     pub repo_url: Option<String>,
     pub featured: i64,
     pub failed: Option<String>,
@@ -65,19 +63,11 @@ fn failure(facts: &Facts, raw: &str) -> Markup {
     notice(Tone::Bad, t("The index could not be signed."), body, Some(again))
 }
 
-fn phones(extras: &Extras) -> Markup {
-    let (read, alt) = if extras.fingerprint {
-        (
-            t("It brings the address and the fingerprint of the certificate."),
-            t("QR code with the address and the fingerprint of the server"),
-        )
-    } else {
-        (t("It brings the address of the server."), t("QR code with the address of the server"))
-    };
+fn address(extras: &Extras) -> Markup {
     html! {
-        section.seccion #telefonos aria-labelledby="tel" {
-            h2 #tel { (t("For the phones")) }
-            (qr(&extras.phone_svg, alt, html! { b { (t("The phone reads this code.")) } span.texto { (read) } }))
+        section.seccion #direccion aria-labelledby="dir" {
+            h2 #dir { (t("Repository address")) }
+            p.texto { (t("Paste it in Explore → Add a repository, in the app.")) }
             @if let Some(url) = &extras.repo_url {
                 (copyable(url, t("Copy the address"), t("Copied")))
             }
@@ -133,7 +123,7 @@ pub fn render(facts: &Facts, mail: &Found, extras: &Extras) -> (Markup, Markup) 
         }
         @if facts.packages == 0 && extras.failed.is_none() {
             (empty(t("Everything is ready for the first wallpaper."), html! {
-                (t("Upload it from the desktop app (Account → Add server) or from your Account page. For someone else to install what you publish, give them an invitation from People and the code for phones on this page."))
+                (t("Upload it from the desktop app or from your Account page. For someone else to install what you publish, give them an invitation from People and the repository address on this page."))
             }))
             div.acciones { (link_button(Kind::Primary, "/account", t("Upload a wallpaper"))) (link_button(Kind::Plain, "/admin/personas", t("Go to People"))) }
         }
@@ -142,7 +132,7 @@ pub fn render(facts: &Facts, mail: &Found, extras: &Extras) -> (Markup, Markup) 
             (list(items, false))
             @if let Some(to) = &writes { p.intro { (tf("If a row turns red or has little time left, we write to {}.", &[to])) } }
         }
-        @if extras.repo_url.is_some() { (phones(extras)) }
+        @if extras.repo_url.is_some() { (address(extras)) }
         (advanced(extras))
     };
     (line, body)

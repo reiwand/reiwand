@@ -1,13 +1,18 @@
-use crate::Outcome;
+use crate::{Outcome, server_export};
 use anyhow::{Context, bail, ensure};
 use rusqlite::Connection;
 use std::fs;
 use std::path::Path;
 
 pub const FIRST: i64 = 11;
-pub const CURRENT: i64 = 14;
+pub const CURRENT: i64 = 15;
 
-const STEPS: [&str; 2] = [include_str!("../migrations/11-12.sql"), include_str!("../migrations/12-13.sql")];
+const STEPS: [&str; 4] = [
+    include_str!("../migrations/11-12.sql"),
+    include_str!("../migrations/12-13.sql"),
+    include_str!("../migrations/13-14.sql"),
+    include_str!("../migrations/14-15.sql"),
+];
 
 pub fn run(data: &Path) -> anyhow::Result<Outcome> {
     let path = data.join("db/reiwand.sqlite");
@@ -32,22 +37,22 @@ pub fn run(data: &Path) -> anyhow::Result<Outcome> {
         Connection::open(&path)?.execute("VACUUM INTO ?1", [copy.to_string_lossy().as_ref()])?;
     }
     move_files(data)?;
+    let old = Connection::open(&path)?;
+    server_export::write(&old, data)?;
+    let people = server_export::people(&old)?;
+    drop(old);
     let mut conn = Connection::open(&path)?;
     conn.pragma_update(None, "journal_mode", "WAL")?;
     conn.pragma_update(None, "foreign_keys", "OFF")?;
     let tx = conn.transaction()?;
-    for step in found..CURRENT - 1 {
+    for step in found..CURRENT {
         tx.execute_batch(STEPS[(step - FIRST) as usize])?;
     }
-    tx.execute(
-        "UPDATE repos SET folder = 'repos/main', online_key = 'keys/main.online.key' \
-         WHERE name = 'main' AND folder = 'repo'",
-        [],
-    )?;
     let broken: i64 = tx.query_row("SELECT count(*) FROM pragma_foreign_key_check", [], |r| r.get(0))?;
     ensure!(broken == 0, "the upgrade left {broken} rows without their parent");
     tx.pragma_update(None, "user_version", CURRENT)?;
     tx.commit()?;
+    server_export::move_files(data, &people)?;
     Ok(Outcome::Upgraded { from: found, to: CURRENT })
 }
 

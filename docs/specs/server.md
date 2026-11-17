@@ -1,7 +1,7 @@
 # Self-hosted server
 
 `reiwand-server` is one binary that serves a signed package repository, a web catalog, accounts,
-uploads with moderation, and device sync for one community or household. It keeps every byte
+uploads with moderation, and device sign-in for one community or household. It keeps every byte
 of state in one data directory, makes no outgoing connection the operator did not
 configure, and sends no telemetry.
 
@@ -40,8 +40,7 @@ the published port. Any other client, a device of the home network included, is 
 address and cannot pick another one with that header; a proxy elsewhere (another container of the
 compose network, another machine) is named in `REIWAND_TRUSTED_PROXIES`. `deploy/nginx/reiwand.conf` is an Nginx example: it allows
 bodies up to the default `REIWAND_PACKAGE_MAX_MIB`, uses HTTP/1.1 upstream, streams uploads, and serves
-`/api/v1/sync/events` (server-sent events) unbuffered with a long read timeout. The server uses no
-WebSockets.
+streams uploads. The server uses no WebSockets and no long-lived event streams.
 
 Each release also pushes the image to `ghcr.io/<owner>/reiwand-server` (`linux/amd64`, tags
 `<version>` and `latest`) with BuildKit SPDX SBOMs of the image and of the build stage and a
@@ -60,8 +59,7 @@ one-time setup token …` at every start. `/setup` asks for that token and then 
 each one is stored as soon as it is sent, so closing the browser or restarting the server resumes
 at the first step not done:
 
-1. **Network**: «Only at home» (the server makes its own certificate, as `REIWAND_TLS=self-signed`,
-   and announces itself with mDNS, as `REIWAND_ADVERTISE=true`) or «I have my certificate» with the
+1. **Network**: «Only at home» (the server makes its own certificate, as `REIWAND_TLS=self-signed`) or «I have my certificate» with the
    paths of a PEM certificate chain and its PEM private key inside the server. Both paths empty
    means a reverse proxy in front holds the certificate. Before storing the paths the server reads
    both files and checks that the certificate is in force, that it names the host of
@@ -75,11 +73,10 @@ at the first step not done:
    with `repo init` or `repo import` skips this step.
 4. **Who gets in**: «Closed», «By invitation» or «Open», stored as the registration and
    publishing choices below. The page also makes the first invitation (one use, 7 days) and shows
-   it once as a link and a QR code; choosing «Closed» deletes it.
+   it once as a link; choosing «Closed» deletes it.
 
 «Finish» stores the choices, applies the network choice and deletes every setup token and setup
-visit. From then on `/setup` shows the «Done» screen to administrators (QR code for the phone,
-the web address, the repository address with its fingerprint, how to upload) and sends everyone
+visit. From then on `/setup` shows the «Done» screen to administrators (the web address, the repository address with its fingerprint, how to upload) and sends everyone
 else to the catalog; no request to `/setup` can make another administrator or repository, and
 new setup tokens are refused. A server whose database already has an administrator and a
 repository counts as set up when it starts.
@@ -90,7 +87,7 @@ digest; the token form shares the login rate limit.
 ### Stored settings
 
 The registration choice, the publishing choice and the network choice live in the database.
-The variables `REIWAND_REGISTRATION`, `REIWAND_AUTO_PUBLISH`, `REIWAND_TLS` and `REIWAND_ADVERTISE` only give
+The variables `REIWAND_REGISTRATION`, `REIWAND_AUTO_PUBLISH` and `REIWAND_TLS` only give
 the starting value: once a choice is stored it wins over them. «Closed» and «By invitation»
 publish every upload at once (`all`); «Open» publishes only from trusted accounts (`trusted`).
 
@@ -112,8 +109,6 @@ reads the value of `NAME` from a file, for secrets.
 | `REIWAND_LICENSES` | `CC0-1.0,CC-BY-4.0,CC-BY-SA-4.0` | SPDX ids accepted in uploads |
 | `REIWAND_PACKAGE_MAX_MIB`, `REIWAND_USER_QUOTA_MIB` | `256`, `2048` | Package size and storage per account |
 | `REIWAND_UPLOADS_PER_DAY` | `20` | Upload sessions per account and day |
-| `REIWAND_SYNC_QUOTA_MIB` | `64` | Sync records per account |
-| `REIWAND_FILES_QUOTA_MIB` | `1024` | Private files per account |
 | `REIWAND_ENTRY_DAYS` | `7` | Lifetime of each signed index (1 to 14, capped by the root) |
 | `REIWAND_RESIGN_HOURS` | `24` | Re-sign the index at least this often (at most half the index lifetime) |
 | `REIWAND_PUBLISH_DELAY_SECS` | `30` | Wait after a moderation decision before signing, to batch changes |
@@ -124,7 +119,6 @@ reads the value of `NAME` from a file, for secrets.
 | `REIWAND_TAKEDOWN_DAYS` | `90` | Days a removed or revoked package stays in `held/` as evidence and for a counter-notice (1 to 3650) |
 | `REIWAND_RATE_LIMITS` | `true` | In-memory rate limits |
 | `REIWAND_TLS` | `off` | `self-signed` serves HTTPS itself with a certificate of its own, made on the first start in `tls/` (ECDSA P-256, valid for the host of `REIWAND_PUBLIC_URL` and `localhost`); clients reach it only by its pinned fingerprint. The same port still answers plain HTTP from loopback (the health check) and redirects plain requests from elsewhere to `REIWAND_PUBLIC_URL`. Until the setup stores a network choice |
-| `REIWAND_ADVERTISE` | `false` | Announce the server on the local network with mDNS as `_reiwand._tcp`, instance `reiwand-<6 random hex digits>` drawn at every start, TXT `v=0`; nothing else about the server, the account or the devices is announced |
 | `REIWAND_LOG` | `info` | Log filter |
 
 Logs go to standard output and never contain addresses, user agents, tokens, bodies or emails.
@@ -134,11 +128,10 @@ With `REIWAND_LOG_CLIENTS` the server writes `logs/clients-<date>.jsonl` (`at`, 
 ### Data directory
 
 ```
-db/reiwand.sqlite      accounts, packages, moderation, sync records (WAL)
+db/reiwand.sqlite      accounts, packages, moderation (WAL)
 blobs/<sha256>.wpak  uploads waiting for review
 thumbs/<sha256>.jpg  640 px previews re-encoded by the validator
 held/<sha256>.wpak   removed or revoked packages (and their previews) for REIWAND_TAKEDOWN_DAYS, not served
-private/<user>/<id>  end-to-end encrypted private files of each account
 repos/<name>/        each repository of the server (docs/specs/repo.md), built with reiwand-format; the first one is `main`
 keys/<name>.online.key  its online signing key (0600)
 keys/<name>.root.sealed  its root key sealed with XChaCha20-Poly1305 (0600): 24-byte random nonce followed by the ciphertext
@@ -154,14 +147,13 @@ tmp/ logs/ backups/
 - JSON in UTF-8. Times are Unix milliseconds unless they belong to repository files.
 - Errors are `application/problem+json`: `{type: "about:blank", title, status, code, detail}`.
   `code` is stable (`invalid`, `malformed`, `unauthorized`, `forbidden`, `not_found`,
-  `rate_limited`, `handle_taken`, `version`, `epoch_mismatch`, `resync`, …).
+  `rate_limited`, `handle_taken`, `version`, …).
 - `429` responses carry `Retry-After`.
 - Authentication is `Authorization: Bearer reiwand_<kind>_<64 hex>_<8 hex CRC-32>` (kinds `d`
   device, `p` personal) or the session cookie of the web site. The server stores SHA-256 of
   tokens and sessions only; revocation is immediate.
-- Scopes: `catalog:read`, `upload`, `sync`, `mod`, `admin`. Device tokens get `upload sync`: only
-  account sessions manage devices (a device may still sign itself out, and approve or remove another
-  one with the account password: `POST /api/v1/me/devices/{id}/revoke {password}`). Personal tokens
+- Scopes: `catalog:read`, `upload`, `account`, `mod`, `admin`. Device tokens get `upload account`: only
+  account sessions manage devices (a device may still sign itself out). Personal tokens
   are created on the web site; `mod` and `admin` need the role and expire within 90 days. Web
   sessions have every scope of the role. A token acts with the lower of its role and its scopes
   everywhere, the web pages included: without `admin` it is at most `moderator`, without `mod`
@@ -169,9 +161,7 @@ tmp/ logs/ backups/
 - Roles: `user`, `trusted`, `moderator`, `admin`.
 - Requests with a cookie and an unsafe method must be same-origin (`Sec-Fetch-Site` and
   `Origin` are checked); bearer requests are exempt.
-- Request bodies are limited to 1 MiB, 6 MiB for sync changes and 8 MiB for a piece of a private
-  file; uploads stream without limit up to the declared size. Answers stay small: a page of sync changes holds at most 4 MiB of
-  payloads (always one change), the mailbox at most 1 MiB of bodies. Requests time out after 30 s except uploads, private file pieces, moderation decisions and event streams.
+- Request bodies are limited to 1 MiB; uploads stream without limit up to the declared size. Requests time out after 30 s except uploads and moderation decisions.
 - Every form endpoint also accepts `application/x-www-form-urlencoded`; with `?back=/path` the
   answer is an HTML page. `POST …?_method=DELETE|PATCH` stands for those methods in forms.
 - Public reads (`/r/<name>/`, `/media/`, `/api/v1/r/<name>/catalog`, `/api/v1/r/<name>/packages/…`) send
@@ -180,7 +170,7 @@ tmp/ logs/ backups/
 Rate limits per client address (IPv6 per /64): 20 requests/s with bursts of 50 overall; 5 per
 minute for login, registration, setup, device code start and every password check
 of a signed-in account; 10 failed logins or password checks per account in 15 minutes; 5 reports or
-notices per hour. Sync writes: 60 per minute per device.
+notices per hour.
 
 ## Discovery and health
 
@@ -188,7 +178,7 @@ notices per hour. Sync writes: 60 per minute per device.
 |--------|------|--------|
 | GET | `/healthz` | `ok` |
 | GET | `/readyz` | `200` or `503` with `{database, repository, index_fresh}` |
-| GET | `/.well-known/reiwand-server` | `{name, version, api: ["v1"], registration, sync: {end_to_end_default, plaintext_requires_confirmation, record_max_bytes, quota_bytes}, uploads: {max_bytes, per_day, licenses}, repositories: [{name, url, repo_id, entry_expires, private, publishing}], legal: {notice, terms, privacy, contact}}` |
+| GET | `/.well-known/reiwand-server` | `{name, version, api: ["v1"], registration, uploads: {max_bytes, per_day, licenses}, repositories: [{name, url, repo_id, entry_expires, private, publishing}], legal: {notice, terms, privacy, contact}}` |
 
 ## Repository
 
@@ -300,7 +290,7 @@ Administrators and moderators read every repository; only administrators publish
 
 ### Database versions and backups
 
-The database carries a version number (`user_version`, 14 in 2.0). The server knows only that version:
+The database carries a version number (`user_version`, 15). The server knows only that version:
 it refuses to open any other and names the migration (`reiwand-upgrade server --data DIR`). It contains
 no code for older databases or layouts. `reiwand-server restore` takes a backup of the current version
 only; to restore an older one, run `reiwand-upgrade server` on the restored folder first. After restoring,
@@ -310,9 +300,9 @@ every repository is marked to sign again. Backups include the `repos/` trees and
 
 The migration is the separate program `reiwand-upgrade` (crate `crates/reiwand-upgrade`), which runs once
 and is safe to run again. `reiwand-upgrade server --data DIR` keeps a copy of the database
-(`db/reiwand.sqlite.before-v14-from-vM`), applies the schema steps in one transaction that checks the
+(`db/reiwand.sqlite.before-v15-from-vM`), applies the schema steps in one transaction that checks the
 keys before it commits, moves the old first repository from `repo/` to `repos/main/` and its key from
-`keys/online.key` to `keys/main.online.key`, and leaves everything else where it was. The server image
+`keys/online.key` to `keys/main.online.key`, drops the sync tables of older servers after writing, for each account that had records, `sync-export/<handle>.json` (the records as stored, payload in hex; sealed payloads stay sealed, the server never held their key) and moving its private files to `sync-export/<handle>/`, and leaves everything else where it was. The admin hands those files to their owners and deletes the folder. The server image
 runs it in its entrypoint before `serve`; outside the image run it yourself while the server is stopped.
 Clients of 1.x that follow the first repository by its old address (`/repo/…?fingerprint=…`) are moved
 to `/r/main/` by `reiwand-upgrade client` when they upgrade; a share URL with `?fingerprint=` or
@@ -339,8 +329,7 @@ packages already published needs a rotation signed by an earlier key of the acco
 `reiwand-ctl pack rotate-key OLD.key NEW.pub --author u<id>` prints the signature, and
 `POST /api/v1/me/author-keys/rotate` (or the form of `/account`) stores it with the new key. The
 desktop does the same without the web page: `reiwand-ctl server author-key list|add|rotate|remove`, or
-*Author keys* in *Account* (`ListAuthorKeys`, `AddAuthorKey`, `RotateAuthorKey` and `RemoveAuthorKey`
-of `Sync1`, `dbus.md`), and `reiwand-ctl server uploads [--cancel ID]` or *Uploads that did not finish*
+*Author keys* in *Account* (see `dbus.md`), and `reiwand-ctl server uploads [--cancel ID]` or *Uploads that did not finish*
 in *Account* list and cancel the upload sessions that `/api/v1/me/packages` returns in `uploads`. Clients
 trust, for each package, the key that signed the first version they installed and accept a later
 version only from that key or a key that a chain of rotations reaches; authors that the root lists
@@ -416,11 +405,11 @@ next_cursor}` with `Link: <…>; rel="next"` when there is more.
 | GET | `/api/v1/me` | any | `{id, handle, role, created_at, quota_bytes, used_bytes}` |
 | DELETE | `/api/v1/me` | session | `{password}` → deletes the account and everything it owns → `204` |
 | POST | `/api/v1/me/password` | session | `{current, new, devices?}`; see below |
-| GET | `/api/v1/me/export` | session | Profile, devices, tokens, keys, versions, uploads, sync head and records |
-| GET, POST | `/api/v1/me/tokens` | any, session | List; create `{name, scopes: "upload sync", days?}` → `201 {id, token, scopes, expires_at}` (shown once) |
+| GET | `/api/v1/me/export` | session | Profile, devices, tokens, keys, versions and uploads |
+| GET, POST | `/api/v1/me/tokens` | any, session | List; create `{name, scopes: "upload account", days?}` → `201 {id, token, scopes, expires_at}` (shown once) |
 | DELETE | `/api/v1/me/tokens/{id}` | session | Revoke a personal token |
-| GET | `/api/v1/me/devices` | any | `{items: [{id, name, platform, enc_key, sig_key, created_at, seen_at}]}` |
-| DELETE | `/api/v1/me/devices/{id}` | session, or the device itself | Revoke a device, its tokens, its mailbox and its event stream; asks for a key rotation |
+| GET | `/api/v1/me/devices` | any | `{items: [{id, name, platform, created_at, seen_at}]}` |
+| DELETE | `/api/v1/me/devices/{id}` | session, or the device itself | Revoke a device and its tokens |
 | GET, POST | `/api/v1/me/author-keys` | any, `upload` | List; add `{public_key}` (minisign public key file or line) → `201 {fingerprint}` |
 | POST | `/api/v1/me/author-keys/rotate` | `upload` | `{from, public_key, signature}`: hand an online author over from a registered key to a new one → `201 {fingerprint}` |
 | DELETE | `/api/v1/me/author-keys/{fingerprint}` | `upload` | Remove |
@@ -429,15 +418,14 @@ next_cursor}` with `Link: <…>; rel="next"` when there is more.
 Handles are 3 to 32 of `a-z 0-9 _ -`; passwords 10 to 256 characters without the handle,
 hashed with Argon2id (19 MiB, 2 passes). A new password revokes every session (the answer sets a
 new session cookie with `204`), every personal token and every approved device code of the
-account; with `devices: true` it also revokes every device and asks for a key rotation, so devices
-link again and get the sync key from a device that holds it or from the escrow. The password of an
+account; with `devices: true` it also revokes every device, so devices
+sign in again. The password of an
 account without one can only be set from a session signed in within the last 10
 minutes, and so can such an account be deleted. The web site adds `/login`, `/register`, `/setup`,
 `/link` and `/account`.
 
-Devices are named on the server `Device 1`, `Device 2`… and never by the client: the real name
-travels inside the encrypted `device` sync record. `platform` is `linux`, `android` or
-`other`; `enc_key` (X25519) and `sig_key` (Ed25519) are base64 of 32 bytes.
+Devices are named on the server `Device 1`, `Device 2`… and never by the client. `platform` is `linux`, `android` or
+`other`.
 
 Device token answer: `{token, device_id, device_name, scopes}`.
 
@@ -445,18 +433,15 @@ Device token answer: `{token, device_id, device_name, scopes}`.
 
 For devices without a keyboard or accounts without a password (RFC 8628 style):
 
-1. `POST /api/v1/auth/device/start {platform, enc_key?, sig_key?, client?}` (`client`: at most 64
+1. `POST /api/v1/auth/device/start {platform, client?}` (`client`: at most 64
    characters naming the client software) →
    `{device_code, user_code: "BCDF-GHJK", verification_uri, verification_uri_complete, interval: 5, expires_in: 600}`.
-2. The device shows `user_code` (and a QR code of `verification_uri_complete`).
-3. The user approves at `/link`, or another device calls
-   `POST /api/v1/auth/device/approve {user_code, approve: true|false, password}`: a session approves
-   without `password`; a device token needs the password of the
-   account (checked like a sign-in, `401 bad_credentials` when wrong), so a stolen device token
-   cannot add devices, and an account without a password approves at `/link`. Before that,
-   `POST /api/v1/auth/device/preview {user_code}` (a session, or any device token) answers what the
-   pending request sent, `{platform, client, requested_at, expires_at}`, and never an address;
-   `/link` shows the same with the warning to approve only a code shown on the user's own screen.
+2. The device shows `user_code` and `verification_uri_complete`.
+3. The user approves at `/link` with a web session. A device token cannot approve or preview a
+   request (`403`), so a stolen device token cannot add devices. `POST /api/v1/auth/device/preview {user_code}`
+   (a web session) answers what the pending request sent, `{platform, client, requested_at, expires_at}`,
+   and never an address; `/link` shows the same with the warning to approve only a code shown on the
+   user's own screen.
 4. The device polls `POST /api/v1/auth/device/token {device_code}` no faster than `interval`.
    Answers `400` with `code` `authorization_pending`, `slow_down` (add 5 s), `expired_token`,
    `access_denied` or `invalid_grant`, or `200` with the device token.
@@ -479,7 +464,7 @@ while its page, the package API and installing it by id keep working. Clients th
 field never see it, since first-version shards leave unlisted releases out. Unlisted is not private:
 the detailed shards list every release with its title, description and id, and anyone can read the
 repository, so the account page, the upload dialog of the app and the page of the package say so and
-point to sync or an own repository for private wallpapers. Clients ask for
+point to an own private repository. Clients ask for
 `unlisted` only when the answer of `POST /api/v1/uploads` repeats it, and cancel the upload otherwise,
 so that a server without unlisted uploads never publishes a package openly. `/api/v1/me/packages`
 gives each version its `visibility`, and the account page has the picker on the upload form and a
@@ -516,7 +501,7 @@ review unless `REIWAND_AUTO_PUBLISH` publishes them.
 | DELETE | `/api/v1/admin/invites/{id}` | admin | Revoke |
 | GET | `/api/v1/admin/users` | admin | Accounts |
 | PATCH | `/api/v1/admin/users/{id}` | admin | `{role?, status?: active\|suspended, quota_mib?}` |
-| GET, PATCH | `/api/v1/admin/settings` | admin | Stored settings `{registration, auto_publish, network, advertise, setup_done, public_url}`; change `{registration?, auto_publish?}` |
+| GET, PATCH | `/api/v1/admin/settings` | admin | Stored settings `{registration, auto_publish, network, setup_done, public_url}`; change `{registration?, auto_publish?}` |
 | GET | `/api/v1/admin/repo` | admin | Repository state |
 | POST | `/api/v1/admin/repo/publish` | admin | Sign now → `{entry_version, expires, packages}` |
 | GET, POST | `/api/v1/r/{repo}/admin/featured` | admin | List; feature `{id, note?}` (a published package, at most 64, a note of at most 200 characters on one line) |
@@ -582,10 +567,9 @@ A failed automatic signing is stored in the `repos` row (`failed_at` and `failed
 índice» turns red with when and why until a signing works again.
 
 On the health page (`/admin`) the row «Firma del índice» appears only once the index was signed
-for the first time (after the publish delay of the first upload). Under «Para los teléfonos» the
-QR carries the address and, on a home network, the fingerprint of the certificate, while the
-address one can copy below it is the repository address for the desktop app, whose `fingerprint`
-is that of the repository key: two fingerprints, each right for its use. On a Spanish page, a
+for the first time (after the publish delay of the first upload). Under «Dirección del repositorio» the
+address one can copy is the repository address for the desktop app, whose `fingerprint`
+is that of the repository key. On a Spanish page, a
 detail the server gives only in English is kept under the fold «Detalles» of the error notice; on
 an English page it is shown as it is.
 
@@ -596,148 +580,6 @@ an English page it is shown as it is.
 content; answers with a receipt number), `/legal/notice/{receipt}` (state of the decision) and
 `/legal/counter-notice`. The pages use no JavaScript and no third-party resources. A notice keeps
 the sender's name, email and signature for `REIWAND_NOTICE_DAYS`, then only its content.
-
-## Sync
-
-Sync stores the latest state of each item per account. The server never interprets payloads.
-
-A client is at one of two levels. **Connected** (`Sync1.Connect`, `reiwand-ctl server connect`, the
-phone op `{"op":"connect","label"}`) holds a device token and uses the repositories of the account,
-the catalog, installs and votes, and never calls `/api/v1/sync/*`: it sends and receives nothing of
-the library, asks for no sync key, and its state is `connected` with no warning. **Syncing**
-(`Sync1.SetSyncing(true, plaintext)`, `reiwand-ctl server syncing on`, the phone op
-`{"op":"syncing","on":true,"plaintext"}`) sets sync up or joins it, as linking did. Turning it off
-cancels sync, pairing and file jobs and keeps the device, its token and its sync key, so turning it
-on again needs no new pairing. It deletes nothing: the device keeps the key of the account and the
-records it already received, and the server keeps the synced data. On the phone it takes effect at
-once; on the desktop it is a short job (`Sync1.SetSyncing(false, …)` returns its id). `Sync1.Link` and the phone op `link` do both steps at once. Sync,
-pairing, key rotation, escrow, files and reset answer `syncing is off` while connected.
-
-On a local network without a public name, `REIWAND_TLS=self-signed` and `REIWAND_ADVERTISE=true` let
-a computer of the house run the server for its devices: the phone finds `_reiwand._tcp` with the
-system's network service discovery, and every client refuses the certificate until the user
-gives its fingerprint (`reiwand-server fingerprint`, also logged at start), compared once and pinned
-from then on for every request to that server, including the event stream. A pin replaces the
-check of the authorities and of the name, never the TLS handshake signatures.
-
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| GET | `/api/v1/sync/state` | device | `{seq, min_seq, epoch, encrypted, key_id, rotate, used_bytes, quota_bytes, warning, escrow, files_bytes, files_quota_bytes, format}` (`escrow` tells whether one is stored, `format` is the newest sync format that wrote to the account); `404 sync_not_set_up` before setup |
-| POST | `/api/v1/sync/setup` | device | `{encrypted: true, key_id?}` (default) or `{encrypted: false, confirm_plaintext: true, key_id?}` → `201` state |
-| GET | `/api/v1/sync/changes?since=&limit=` | device | `{seq, min_seq, epoch, more, changes: [{collection, item, seq, epoch, device, deleted, payload}]}`; `410 resync` when `0 < since < min_seq` or `since > seq` |
-| POST | `/api/v1/sync/changes` | device | `{epoch, format, changes: [{collection, item, base, deleted, payload}]}` (at most 500) → `{seq, results}`; `409 client_too_old` when `format` (0 when missing) is below the account's, `422` when it is above the newest the server knows |
-| POST | `/api/v1/sync/epoch` | device | Key epochs, below → state |
-| POST | `/api/v1/sync/reset` | `sync` | `{confirm: "reset"}` deletes every record, private file and escrow → `204` |
-| GET, PUT | `/api/v1/sync/escrow` | device | `{escrow: base64 \| null}`, at most 4 KiB, only with encryption |
-| GET | `/api/v1/sync/blobs?after=` | device | Private files by id after `after`, 1000 per page: `{items: [{id, size, received, created_at}], more, used_bytes, quota_bytes}` |
-| POST | `/api/v1/sync/blobs/{id}` | device | `{size}` opens or finds the file → `{id, size, received}`; `409 size` for another size, `413 quota` |
-| PUT | `/api/v1/sync/blobs/{id}?offset=` | device | Body: the next bytes at `offset`, which must equal `received` (`409 offset`), with a `Content-Length` of 1 byte to 8 MiB (`411 length`), streamed to disk within 2 minutes; one piece per file and four per account at a time (`429`) → `{id, size, received}` |
-| GET | `/api/v1/sync/blobs/{id}?offset=&length=` | device | Bytes of a complete file, at most 8 MiB per request (`409 incomplete` before) |
-| DELETE | `/api/v1/sync/blobs/{id}` | device | Delete → `204` |
-| GET | `/api/v1/sync/events` | device | Server-sent events, one stream per device |
-
-Collections: `repos`, `library`, `playlists`, `settings` and `device`.
-
-Private files are opaque files of at most the account's files quota, named by 64 lowercase hex
-digits, only in encrypted accounts. A file is uploaded in pieces and resumes at `received`;
-incomplete files are deleted after 7 days. When the server holds fewer bytes of a file than
-`received` (after a restore), it lowers `received` to what it holds. Clients encrypt them in 64 KiB segments with keys the
-server never sees, and name them with a keyed hash so that one account stores identical files once
-(see `Sync1` in `dbus.md`). Payloads are base64, at most 256 KiB each; a tombstone is `deleted: true` without
-payload and is purged after 180 days, which raises `min_seq`.
-
-Sync format: clients send the version of the record format they write (`format`, 1 in this
-version). The account keeps the highest one that wrote to it and refuses writes of a lower one with
-`409 client_too_old`, and refuses a `format` above the newest it knows with `422`, so no device
-can lock the others out with a format that does not exist; a device with an old version never uploads old item names or records
-without the fields it does not know; it keeps reading until it is updated, and clients show a
-translated message. Records keep the fields and top-level keys that a version does not know when it
-merges them.
-
-Writes use optimistic concurrency per item. `base` is the `seq` of the item the client last saw
-(0 for a new item). A matching base is stored with `seq = head + 1` and answers
-`{item, status: "ok", seq}`; otherwise the answer is `{item, status: "conflict", current:
-{seq, epoch, device, deleted, payload}}`, except that a retry of the same device's own last write
-(same payload hash) answers `ok`. A different `epoch` refuses the batch with `409
-epoch_mismatch`; going over the quota answers `413 quota` and stores nothing. A tombstone for an
-item that already is one answers `ok` with its `seq` and writes nothing.
-
-Key epochs: `key_id` (32 lowercase hex digits) names the key of the current epoch without
-revealing it. `{epoch: current + 1, key_id}` starts a rotation and clears `rotate`; from then on
-writes need the new epoch. `{epoch: current, done: true}` finishes it: records of older epochs are
-deleted. `{epoch: current, key_id}` repeats the start (same `key_id`) or records the key id of an
-account that has none. Anything else answers `409 epoch_mismatch`. Revoking a device sets
-`rotate`, which asks the remaining devices to rotate.
-
-Events: `event: seq` with `{"seq": n}` after any write, `event: mail` with `{"id": n}` for the
-receiving device, `event: epoch` with `{"epoch": n}` after a rotation step or a revoked device
-(`-1` after a reset). The stream of a revoked device ends.
-Keep-alive comments arrive every 25 s.
-
-### End-to-end encryption
-
-Encryption is the default and plain-text sync exists only as an explicit opt-out that the
-server labels with a warning. Clients keep a random 32-byte sync key `SK` that never reaches
-the server:
-
-- `K_rec = HKDF-SHA256(SK, info = "reiwand-sync/records/v1" ‖ epoch)` encrypts records, and the
-  first 16 bytes of `HKDF-SHA256(SK, info = "reiwand-sync/key-id/v1")` in hex are its `key_id`.
-- `K_id`, 32 random bytes that travel with `SK` and stay across rotations, names items (accounts
-  set up before it existed keep `HKDF-SHA256(SK, info = "reiwand-sync/ids/v1")`). `library` items are
-  `hex(HMAC-SHA-256(K_id, repo_id ‖ 0x00 ‖ package id))` (or `blob:` and a hash for private
-  files); the server accepts only 64 lowercase hex digits there, in both modes. Other items
-  are random ids or keyed hashes of at most 64 characters of `A-Z a-z 0-9 _ -`.
-- A record is `0x01 ‖ nonce (24) ‖ XChaCha20-Poly1305(K_rec, nonce, pad256(json), aad)` with
-  `aad = "reiwand-sync/1" ‖ user id ‖ epoch ‖ collection ‖ 0x00 ‖ item`. The plaintext is padded
-  to a multiple of 256 bytes, so in an encrypted account the server refuses payloads unless
-  `len = 41 + 256·k` with `k ≥ 1` and the first byte is 1.
-- The JSON inside carries a hybrid logical clock; clients reject clocks older than the last
-  one seen for an item.
-
-What the server still sees: accounts, generic device names and platforms, public keys,
-collection names, item ids, padded sizes, times and sequence numbers, and the sizes of private
-files.
-
-Recovery escrow (optional): `PUT /api/v1/sync/escrow` stores `SK` and `K_id` sealed with
-XChaCha20-Poly1305 under a key that Argon2id (256 MiB, 3 passes) derives from a passphrase of at
-least 20 characters; the escrow names its costs, salt and epoch, and the server cannot open it but
-can try passphrases offline (format in `Sync1.SetEscrow` of `dbus.md`). A device without any other
-device left links, fetches the escrow and opens it with the passphrase. A revoked device may know
-the passphrase, so after a revocation the escrow is left at its old epoch (stale): clients say so
-and refuse the old passphrase when it is set again, by trying it on the stored escrow.
-
-Deletions: removing a library item on a device (an imported or private file, or the last version of
-a package) writes a record whose deletion clock is newer than its fields; the other devices remove
-the item too (an item of a watched folder whose file is still there stays), and never upload it
-again unless it was added after the deletion. A deletion record older than 90 days becomes a
-server tombstone (`deleted: true`), which the server purges after 180 days.
-A device that stays away longer than that downloads everything again (`410 resync`) and cannot tell a purged
-deletion from records the server lost, so it uploads what it still has: an item deleted elsewhere in the meantime
-comes back and can be deleted again.
-
-What item names reveal: library items are named with the keyed hash `K_id`, which survives key
-rotations. A device that once held `K_id`, a revoked one included, and holds the same file or knows
-the package can compute its name and see that the account stores it. Clients explain this where
-private files are shared.
-
-Key rotation: a device makes `SK'`, starts the next epoch with its `key_id`, re-encrypts and
-uploads every record with the new epoch, finishes the epoch, and sends `SK'` through the mailbox
-to the devices whose public keys it pinned in a code comparison, which pass it on to theirs; the
-public keys the server lists are never trusted for this, and every other device joins again.
-
-### Mailbox
-
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| POST | `/api/v1/mailbox` | device | `{to_device, kind: key-share\|apply\|send\|ping, body: base64}` → `201 {id}` |
-| GET | `/api/v1/mailbox?after=` | device | Messages for this device: `{items: [{id, from_device, kind, body, created_at}], more}` |
-| DELETE | `/api/v1/mailbox/{id}` | device | Acknowledge → `204` |
-
-Bodies hold at most 64 KiB; a device keeps at most 100 pending messages for 7 days. A new
-device receives `SK` and `K_id` as a `key-share` sealed with HPKE (RFC 9180, auth mode, DHKEM
-X25519, HKDF-SHA256, ChaCha20-Poly1305) to its `enc_key`, after a commit-then-reveal exchange of
-nonces through the mailbox and a code derived from both public keys and both nonces that the
-user compares on both screens (see `Sync1.Join` in `dbus.md`).
 
 ## Operating a public server
 

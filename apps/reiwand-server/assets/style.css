@@ -514,18 +514,6 @@ pre.dato { white-space: pre-wrap; padding: var(--e-3) var(--e-4); border-radius:
   border-radius: 1px;
   background: var(--acento);
 }
-.qr { display: flex; flex-wrap: wrap; gap: var(--e-5); align-items: center; }
-.qr img, .qr svg {
-  width: 11rem;
-  height: 11rem;
-  padding: 0.65rem;
-  border-radius: var(--radio);
-  background: var(--escarcha);
-  box-shadow: var(--sombra);
-}
-.qr svg { display: block; color: var(--noche); }
-.qr-texto { flex: 1 1 16rem; min-width: 0; display: flex; flex-direction: column; gap: var(--e-2); }
-.qr-texto b { font: 600 var(--t-grande) / 1.3 var(--titulo); }
 .caso-portada {
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -569,7 +557,6 @@ pre.dato { white-space: pre-wrap; padding: var(--e-3) var(--e-4); border-radius:
   .fila-accion { width: 100%; }
   .fila-accion .boton { flex: 1 1 auto; }
   .miniatura { width: 5.5rem; }
-  .qr img, .qr svg { width: 10rem; height: 10rem; }
   * + .seccion, * + .mas.grande, .columna * + * > .seccion:first-child { margin-top: var(--e-7); }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -643,7 +630,6 @@ main input[type=checkbox]:checked { background: var(--escarcha); border-color: v
 main input[type=checkbox]:checked::after { content: ""; width: 0.4rem; height: 0.75rem; margin-top: -0.15rem; border: solid var(--noche); border-width: 0 3px 3px 0; transform: rotate(45deg); }
 main label:has(> input[type=checkbox]) { flex-direction: row; align-items: center; gap: var(--e-3); font-weight: 400; }
 
-.qr svg { color: var(--noche); }
 .acciones > .boton { max-width: 100%; white-space: normal; }
 .formulario.separado { margin-top: var(--e-5); }
 .formulario.ancho { max-width: none; }

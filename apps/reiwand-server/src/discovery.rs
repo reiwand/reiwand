@@ -71,17 +71,13 @@ pub async fn discovery(State(app): St, auth: Option<Auth>, Query(ask): Query<Ask
         })
         .collect();
     let registration = format!("{:?}", app.settings().registration).to_lowercase();
-    let sync = json!({
-        "end_to_end_default": true, "plaintext_requires_confirmation": true,
-        "record_max_bytes": 262144, "quota_bytes": c.sync_quota, "files_quota_bytes": c.files_quota,
-    });
     let legal = json!({
         "notice": c.url("/legal/notice"), "terms": c.url("/legal/terms"),
         "privacy": c.url("/legal/privacy"), "contact": c.contact,
     });
     Ok(Json(json!({
         "name": c.name, "version": crate::VERSION, "api": ["v1"], "registration": registration,
-        "sync": sync, "repositories": repositories, "repositories_page": c.url("/"), "legal": legal,
+        "repositories": repositories, "repositories_page": c.url("/"), "legal": legal,
         "uploads": {"max_bytes": c.package_max, "per_day": c.uploads_per_day, "licenses": c.licenses},
     })))
 }

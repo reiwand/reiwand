@@ -1368,7 +1368,7 @@ Used by:
       Copyright (c) 2018-2024 The rust-random Project Developers
       Copyright (c) 2014 The Rust Project Developers
   getrandom 0.3.4
-      Copyright (c) 2018-2025 The rust-random Project Developers
+      Copyright (c) 2018-2024 The rust-random Project Developers
       Copyright (c) 2014 The Rust Project Developers
   getrandom 0.4.3
       Copyright (c) 2018-2026 The rust-random Project Developers
@@ -1461,8 +1461,6 @@ Used by:
   lazy_static 1.5.1
   libc 0.2.191
       Copyright (c) The Rust Project Developers
-  libfuzzer-sys 0.4.13
-      Copyright (c) 2010 The Rust Project Developers
   libsqlite3-sys 0.38.2
       Copyright (c) 2014 The rusqlite developers
   linux-raw-sys 0.12.1
@@ -1721,7 +1719,6 @@ Used by:
   want 0.3.2
       Copyright (c) 2018-2019 Sean McArthur
   wasi 0.11.1+wasi-snapshot-preview1
-  wasip2 1.0.4+wasi-0.2.12
   wasm-bindgen 0.2.129
       Copyright (c) 2014 Alex Crichton
   wasm-bindgen-futures 0.4.79
@@ -1739,7 +1736,6 @@ Used by:
       Copyright (c) 2014 Alex Crichton
   winnow 1.0.4
   wiremock 0.6.5
-  wit-bindgen 0.57.1
   zerocopy 0.8.63
       Copyright 2023 The Fuchsia Authors
   zerocopy-derive 0.8.63
@@ -1782,11 +1778,6 @@ Used by:
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
   aligned 0.4.3
-      copyright notice that is included in or attached to the work
-      copyright license to reproduce, prepare Derivative Works of,
-      (c) You must retain, in the Source form of any Derivative Works
-      Copyright [yyyy] [name of copyright owner]
-  arbitrary 1.5.0
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
@@ -2314,11 +2305,6 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
-  libfuzzer-sys 0.4.13
-      copyright notice that is included in or attached to the work
-      copyright license to reproduce, prepare Derivative Works of,
-      (c) You must retain, in the Source form of any Derivative Works
-      Copyright [yyyy] [name of copyright owner]
   linux-raw-sys 0.12.1
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -2527,7 +2513,6 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
-  r-efi 5.3.0
   r-efi 6.0.0
   raw-window-metal 1.1.0
       copyright notice that is included in or attached to the work
@@ -2782,11 +2767,6 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
-  wasip2 1.0.4+wasi-0.2.12
-      copyright notice that is included in or attached to the work
-      copyright license to reproduce, prepare Derivative Works of,
-      (c) You must retain, in the Source form of any Derivative Works
-      Copyright [yyyy] [name of copyright owner]
   wasm-bindgen 0.2.129
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -2938,11 +2918,6 @@ Used by:
       (c) You must retain, in the Source form of any Derivative Works
       Copyright (c) Microsoft Corporation.
   wiremock 0.6.5
-      copyright notice that is included in or attached to the work
-      copyright license to reproduce, prepare Derivative Works of,
-      (c) You must retain, in the Source form of any Derivative Works
-      Copyright [yyyy] [name of copyright owner]
-  wit-bindgen 0.57.1
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
@@ -3332,8 +3307,6 @@ For more information, please refer to <http://unlicense.org/>
 Used by:
   aligned-vec 0.6.4
       Copyright (c) 2022 sarah
-  arbitrary 1.5.0
-      Copyright (c) 2019 Manish Goregaokar
   arg_enum_proc_macro 0.3.4
       Copyright (c) 2018 Luca Barbato
   atomic_refcell 0.1.14
@@ -3428,7 +3401,6 @@ Used by:
       Copyright (c) 2021 sarah
   pulp-wasm-simd-flag 0.1.1
       Copyright sarah quiñones <sarah@veganb.tw>
-  r-efi 5.3.0
   r-efi 6.0.0
   radium 0.7.0
       Copyright (c) 2019 kneecaw (Nika Layzell)
@@ -6257,16 +6229,6 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
-  wasip2 1.0.4+wasi-0.2.12
-      copyright notice that is included in or attached to the work
-      copyright license to reproduce, prepare Derivative Works of,
-      (c) You must retain, in the Source form of any Derivative Works
-      Copyright [yyyy] [name of copyright owner]
-  wit-bindgen 0.57.1
-      copyright notice that is included in or attached to the work
-      copyright license to reproduce, prepare Derivative Works of,
-      (c) You must retain, in the Source form of any Derivative Works
-      Copyright [yyyy] [name of copyright owner]
 
 Apache License
                            Version 2.0, January 2004
@@ -8659,8 +8621,13 @@ freely, subject to the following restrictions:
 
 ========================================================================
 Without a licence text: the crate is in no local registry, so neither its text nor its declared licence could be read (see each crate's own source):
+  arbitrary 1.5.0
   basisu_wasm_libcxx 0.1.0
   interpolate_name 0.2.4
+  libfuzzer-sys 0.4.13
+  r-efi 5.3.0
+  wasip2 1.0.4+wasi-0.2.12
+  wit-bindgen 0.57.1
 
 ========================================================================
 Android libraries (Apache License 2.0, text above):

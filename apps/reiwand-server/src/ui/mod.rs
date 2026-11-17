@@ -12,7 +12,7 @@ pub use forms::{
 };
 pub use rows::{Row, pairs, quiet_line, rows, status, status_line};
 pub use size::size;
-pub use steps::{Choice, choices, qr, steps};
+pub use steps::{Choice, choices, steps};
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Tone {

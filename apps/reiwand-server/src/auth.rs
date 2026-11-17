@@ -17,8 +17,8 @@ pub enum Role {
 }
 
 pub const ROLES: [&str; 4] = ["user", "trusted", "moderator", "admin"];
-pub const SCOPES: [&str; 5] = ["catalog:read", "upload", "sync", "mod", "admin"];
-pub const DEVICE_SCOPES: &str = "upload sync";
+pub const SCOPES: [&str; 5] = ["catalog:read", "upload", "account", "mod", "admin"];
+pub const DEVICE_SCOPES: &str = "upload account";
 
 impl Role {
     pub fn parse(text: &str) -> Role {
@@ -49,7 +49,7 @@ impl Auth {
     }
 
     pub fn device(&self) -> Res<&str> {
-        self.scope("sync")?;
+        self.scope("account")?;
         self.device.as_deref().ok_or_else(|| Problem::forbidden("this call needs a device token"))
     }
 

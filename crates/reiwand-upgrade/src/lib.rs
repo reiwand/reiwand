@@ -2,6 +2,8 @@ mod accounts;
 pub mod client;
 #[cfg(feature = "server")]
 pub mod server;
+#[cfg(feature = "server")]
+mod server_export;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Outcome {

@@ -98,9 +98,7 @@ pub fn network(app: &App, settings: &Settings, fault: Option<(&Network, NetFault
         Choice {
             value: "home",
             title: t("Only at home"),
-            text: t(
-                "For the devices of your network. The server makes its own certificate and announces itself on the local network; each phone recognises it by reading a QR code at the end.",
-            ),
+            text: t("For the devices of your network. The server makes its own certificate."),
         },
         Choice {
             value: "own",

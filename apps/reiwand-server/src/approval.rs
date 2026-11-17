@@ -15,8 +15,6 @@ pub struct Approve {
     user_code: String,
     #[serde(default = "yes")]
     approve: bool,
-    #[serde(default)]
-    password: Option<String>,
 }
 
 fn yes() -> bool {
@@ -41,25 +39,13 @@ pub struct Preview {
 }
 
 pub async fn preview(State(app): St, auth: Auth, Input(p): Input<Preview>) -> Reply {
-    if auth.device.is_some() { auth.scope("sync") } else { auth.browser() }?;
+    auth.browser()?;
     let code = user_code(&p.user_code)?;
     Ok(Json(app.db.run(move |c| pending_device(c, &code)).await?))
 }
 
-pub async fn approve(State(app): St, auth: Auth, client: Client, Input(a): Input<Approve>) -> Reply {
-    match (&auth.device, a.password.clone()) {
-        (None, _) => auth.browser()?,
-        (Some(_), Some(password)) => {
-            let (who, user) = (auth.handle.clone(), auth.user);
-            let checked = crate::account::authenticate(&app, &client, &who, password).await?;
-            require(checked == user, "the password belongs to another account")?;
-        }
-        (Some(_), None) => {
-            return Err(Problem::forbidden(
-                "approving a device needs the account password, or the account page of the web site",
-            ));
-        }
-    }
+pub async fn approve(State(app): St, auth: Auth, Input(a): Input<Approve>) -> Reply {
+    auth.browser()?;
     let code = user_code(&a.user_code)?;
     let state = if a.approve { "approved" } else { "denied" };
     let sql = "UPDATE device_codes SET state = ?2, user_id = ?3 WHERE user_code = ?1 AND state = 'pending' \

@@ -3,10 +3,9 @@ use crate::auth::{Auth, Role};
 use crate::db::one;
 use crate::error::Res;
 use crate::frame::Frame;
-use crate::lang::{t, tf, tm};
+use crate::lang::{t, tf};
 use crate::layout::setup_screen;
-use crate::settings::Network;
-use crate::ui::{Kind, Row, Tone, copyable, link_button, qr, rows, status};
+use crate::ui::{Kind, Row, Tone, copyable, link_button, rows, status};
 use axum::http::header;
 use axum::response::{IntoResponse, Redirect, Response};
 use maud::html;
@@ -17,8 +16,6 @@ pub async fn screen(app: &App, auth: Option<Auth>) -> Res<Response> {
     };
     let count = app.db.run(|c| one::<i64>(c, "SELECT COUNT(*) FROM packages", [])).await?.unwrap_or_default();
     let settings = app.settings();
-    let home = settings.network == Network::Home;
-    let svg = crate::qr::own_connect_svg(app, None).unwrap_or_default();
     let repo = app
         .repos
         .first()
@@ -32,28 +29,15 @@ pub async fn screen(app: &App, auth: Option<Auth>) -> Res<Response> {
             @if count == 0 { span.tenue { (t("No wallpapers yet")) } }
         }
     };
-    let (read, alt) = match home {
-        true => (
-            t("The phone reads this code: it brings the address and the fingerprint."),
-            t("QR code with the address and the fingerprint of the server"),
-        ),
-        false => (
-            t("The phone reads this code: it brings the address."),
-            t("QR code with the address of the server"),
-        ),
-    };
     let web = Row::new(html! { (t("The web")) }).value(html! { span.dato { (app.cfg.public_url) } });
     let body = html! {
         div.vacio {
             b { (t("Done: your server already hands out wallpapers.")) }
-            p { (t("What you publish appears in the app and on the phone of whoever connects with these details.")) }
+            p { (t("What you publish appears in the app of whoever adds this repository.")) }
         }
         section.seccion aria-labelledby="tel" {
-            h2 #tel { (t("For the app and the phone")) }
-            (qr(&svg, alt, html! {
-                b { (read) }
-                span.texto { (t("In the desktop app, paste the repository address below.")) }
-            }))
+            h2 #tel { (t("For the app")) }
+            p.texto { (t("In the app, paste the repository address below in Explore → Add a repository.")) }
             (rows(vec![web], true))
             h3.subtitulo { (t("Repository address")) }
             (copyable(&repo, t("Copy"), t("Copied")))
@@ -61,9 +45,8 @@ pub async fn screen(app: &App, auth: Option<Auth>) -> Res<Response> {
         section.seccion aria-labelledby="sub" {
             h2 #sub { (t("To upload wallpapers")) }
             ol.texto.lista-pasos {
-                li { (t("In the desktop app, open Account → Add server.")) }
-                li { (tf("Paste the repository address above and sign in as {}.", &[&auth.handle])) }
-                li { (tm("In the editor of your wallpaper, press {} and choose this server.", &[html! { "«" (t("Publish…")) "»" }])) }
+                li { (t("In the desktop app, add the repository above from Explore.")) }
+                li { (tf("In the editor of your wallpaper, press {} and choose the repository; sign in as {} when it asks.", &[&t("Publish…"), &auth.handle])) }
             }
             p.texto { (t("Without the app, you can also upload a .wpak file from your Account page in this browser.")) }
         }

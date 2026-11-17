@@ -69,10 +69,7 @@ pub fn created(c: &Created) -> Markup {
         section.seccion aria-labelledby="nueva" {
             h2 #nueva { (t("Your new invitation")) }
             p.intro { (who) }
-            (qr(&c.svg, t("QR code with the invitation link"), html! {
-                b { (t("Have them read it with their phone camera, or send them the link.")) }
-                span.texto { (t("It opens the page to create their account, with the invitation already filled in.")) }
-            }))
+            p.texto { (t("Send them the link: it opens the page to create their account, with the invitation already filled in.")) }
             (copyable(&c.link, t("Copy the link"), t("Copied")))
         }
     }

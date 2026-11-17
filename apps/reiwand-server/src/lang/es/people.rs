@@ -34,14 +34,6 @@ pub const TEXTS: super::Texts = &[
         "For {} people, with the role \"{}\"; it works until {}. It is shown only this time: if you lose it, revoke it and create another.",
         "Para {} personas, con rol «{}»; sirve hasta el {}. Se muestra solo esta vez: si la pierdes, revócala y crea otra.",
     ),
-    (
-        "Have them read it with their phone camera, or send them the link.",
-        "Que lo lea con la cámara de su teléfono, o mándale el enlace.",
-    ),
-    (
-        "It opens the page to create their account, with the invitation already filled in.",
-        "Abre la página para crear su cuenta, con la invitación ya puesta.",
-    ),
     ("Copy the link", "Copiar el enlace"),
     ("None alive.", "Ninguna viva."),
     ("you", "tú"),

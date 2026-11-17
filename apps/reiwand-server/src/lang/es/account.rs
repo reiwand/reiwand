@@ -48,7 +48,6 @@ pub const TEXTS: super::Texts = &[
     ("State", "Estado"),
     ("Upload {}", "Subida {}"),
     ("Devices", "Dispositivos"),
-    ("Link a new device with its code", "Vincular un dispositivo nuevo con su código"),
     ("Access tokens", "Tokens de acceso"),
     ("Name", "Nombre"),
     ("Scopes", "Permisos"),
@@ -77,10 +76,6 @@ pub const TEXTS: super::Texts = &[
     ("Current password", "Contraseña actual"),
     ("New password", "Contraseña nueva"),
     ("Also sign out every device", "También cerrar la sesión de todos los dispositivos"),
-    (
-        "Signed-out devices have to be linked again and to get the sync key from a device that still holds it; without one, or a recovery passphrase, the encrypted sync data has to be reset.",
-        "Los dispositivos desconectados tienen que vincularse otra vez y recibir la clave de sincronización de un dispositivo que todavía la tenga; sin uno, o sin una frase de recuperación, hay que reiniciar los datos cifrados de la sincronización.",
-    ),
     ("Change password", "Cambiar la contraseña"),
     ("Delete my account", "Borrar mi cuenta"),
 ];

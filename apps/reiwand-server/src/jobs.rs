@@ -82,24 +82,13 @@ pub async fn purge(app: &Arc<App>) -> Res<()> {
             "DELETE FROM sessions WHERE seen_at < ?1 OR created_at < ?2",
             params![t - 7 * DAY, t - 30 * DAY],
         )?;
-        for table in ["device_codes", "setup_tokens", "setup_visits", "mailbox", "invites", "strikes"] {
+        for table in ["device_codes", "setup_tokens", "setup_visits", "invites", "strikes"] {
             c.execute(&format!("DELETE FROM {table} WHERE expires_at < ?1"), [t])?;
         }
-        let old = t - 180 * DAY;
-        let floor = "UPDATE sync_heads SET min_seq = MAX(min_seq, (SELECT COALESCE(MAX(seq), 0) \
-                     FROM sync_records r WHERE r.user_id = sync_heads.user_id AND r.deleted = 1 \
-                     AND r.updated_at < ?1))";
-        c.execute(floor, [old])?;
-        c.execute("DELETE FROM sync_records WHERE deleted = 1 AND updated_at < ?1", [old])?;
         c.execute("DELETE FROM uploads WHERE state != 'done' AND expires_at < ?1", [t])?;
-        let sql = "DELETE FROM sync_blobs WHERE received < size AND created_at < ?1 RETURNING user_id, id";
-        let mut stale = c.prepare(sql)?;
-        let stale = stale.query_map([t - 7 * DAY], |r| Ok((r.get::<_, i64>(0)?, r.get::<_, String>(1)?)))?;
-        Ok(stale.collect::<Result<Vec<_>, _>>()?)
+        Ok(())
     });
-    for (user, id) in cleaned.await? {
-        let _ = fs::remove_file(crate::files::dir(app, user).join(id));
-    }
+    cleaned.await?;
     let older = |days: u64| {
         move |item: &fs::DirEntry| {
             item.metadata()

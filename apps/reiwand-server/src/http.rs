@@ -1,8 +1,8 @@
 use crate::error::Problem;
 use crate::net::{API, client_ip, key};
 use crate::{
-    App, St, account, admin, catalog, device, featuring, files, hiding, legal, mailbox, me, moderation,
-    pages, records, served, sync, upload, visibility, votes, web,
+    App, St, account, admin, catalog, device, featuring, hiding, legal, me, moderation, pages, served,
+    upload, visibility, votes, web,
 };
 use axum::Router;
 use axum::extract::{ConnectInfo, DefaultBodyLimit, MatchedPath, Request, State};
@@ -30,10 +30,6 @@ pub fn router(app: Arc<App>) -> Router {
         crate::session_copy::routes,
         crate::health::routes,
         crate::people::routes,
-        sync::routes,
-        records::routes,
-        mailbox::routes,
-        files::routes,
         visibility::routes,
         votes::routes,
         featuring::routes,

@@ -9,33 +9,6 @@ pub const TEXTS: super::Texts = &[
         "For the app or phone you want to add to your account",
         "Para la app o el teléfono que quieres sumar a tu cuenta",
     ),
-    ("On your phone", "En tu teléfono"),
-    (
-        "QR code with this server's address and fingerprint",
-        "Código QR con la dirección y la huella de este servidor",
-    ),
-    ("QR code with this server's address", "Código QR con la dirección de este servidor"),
-    (
-        "In the phone app, choose \"Scan the code\" and point it here.",
-        "En la app del teléfono, elige «Escanear el código» y apunta aquí.",
-    ),
-    (
-        "The code carries this server's address and fingerprint: your phone recognises it without typing anything. Then sign in with your handle and password.",
-        "El código trae la dirección y la huella de este servidor: tu teléfono lo reconoce sin escribir nada. Después entra con tu usuario y tu contraseña.",
-    ),
-    (
-        "The code carries this server's address: your phone recognises it without typing anything. Then sign in with your handle and password.",
-        "El código trae la dirección de este servidor: tu teléfono la reconoce sin escribir nada. Después entra con tu usuario y tu contraseña.",
-    ),
-    (
-        "A code needs a secure address (https), and this server has none. Type the address below in the app.",
-        "Un código necesita una dirección segura (https) y este servidor no la tiene. Escribe la dirección de abajo en la app.",
-    ),
-    ("Fingerprint", "Huella"),
-    (
-        "For the desktop app: Account → Add server, and paste the address.",
-        "Para la app de escritorio: Cuenta → Añadir servidor, y pega la dirección.",
-    ),
     ("Waiting for review", "Espera revisión"),
     ("Choose the file…", "Elegir el archivo…"),
     ("No file chosen", "Ningún archivo elegido"),
@@ -44,24 +17,6 @@ pub const TEXTS: super::Texts = &[
     ("You have not uploaded any yet.", "Todavía no subiste ninguno."),
     ("Device {}", "Dispositivo {}"),
     ("{} · linked {}", "{} · vinculado {}"),
-    (
-        "Remove \"{}\"? It stops syncing with your account and, to use it again, you will have to link it again.",
-        "¿Quitar «{}»? Deja de sincronizar con tu cuenta y, para volver a usarlo, tendrás que vincularlo otra vez.",
-    ),
-    (
-        "None yet. A phone that reads the code above shows up here.",
-        "Ninguno todavía. Un teléfono que lee el código de arriba aparece aquí.",
-    ),
-    ("Synced data", "Datos sincronizados"),
-    ("Private files", "Archivos privados"),
-    (
-        "{} of {}: lists, favourites and settings of your devices",
-        "{} de {}: listas, favoritos y ajustes de tus dispositivos",
-    ),
-    (
-        "{} of {}: encrypted files that your devices keep here; only they can read them",
-        "{} de {}: archivos cifrados que tus dispositivos guardan aquí; solo ellos pueden leerlos",
-    ),
     ("Change the password", "Cambiar la contraseña"),
     ("Download all my data", "Descargar todos mis datos"),
     (
@@ -77,10 +32,6 @@ pub const TEXTS: super::Texts = &[
     ("You signed in as {} ({})", "Entraste como {} ({})"),
     ("you use {} of {} for wallpapers", "usas {} de {} para fondos"),
     ("Your account is ready.", "Tu cuenta está lista."),
-    (
-        "To have the home wallpapers on your phone, read the code below with the app. If you make wallpapers, upload them from here.",
-        "Para tener los fondos de casa en tu teléfono, lee el código de abajo con la app. Si haces fondos, súbelos desde aquí.",
-    ),
     ("Token created.", "Token creado."),
     ("Copy it now: it is not shown again.", "Cópialo ahora: no se vuelve a mostrar."),
     ("Token", "Token"),

@@ -1,9 +1,8 @@
 use crate::db::now;
+use crate::icons::icon;
 use crate::lang::{since, t, tf};
-use crate::sync::Head;
-use crate::ui::{Kind, Row, button, confirm, link_button, pairs, rows, size};
+use crate::ui::{Kind, Row, button, confirm, link_button, rows};
 use crate::web::text;
-use crate::{App, icons::icon};
 use maud::{Markup, html};
 use serde_json::Value;
 
@@ -27,7 +26,7 @@ fn row(d: &Value, asking: bool) -> Row {
     let row = Row::new(html! { (name(d)) }).value(value);
     if asking {
         let ask = tf(
-            "Remove \"{}\"? It stops syncing with your account and, to use it again, you will have to link it again.",
+            "Remove \"{}\"? It loses its access to your account and, to use it again, you will have to sign in again.",
             &[&name(d)],
         );
         let action = format!("/api/v1/me/devices/{id}?_method=DELETE&back=/account");
@@ -43,23 +42,15 @@ fn row(d: &Value, asking: bool) -> Row {
     }
 }
 
-pub fn devices(app: &App, list: &[Value], asking: &str, sync: Option<&Head>) -> Markup {
+pub fn devices(list: &[Value], asking: &str) -> Markup {
     let items: Vec<Row> = list.iter().map(|d| row(d, text(d, "id") == asking)).collect();
     html! {
         section.seccion aria-labelledby="dispositivos" {
             h2 #dispositivos { (t("Devices")) }
             @if items.is_empty() {
-                p.texto { (t("None yet. A phone that reads the code above shows up here.")) }
+                p.texto { (t("None yet. A device that signs in with its code shows up here.")) }
             } @else { (rows(items, false)) }
-            @if let Some(h) = sync {
-                (pairs(&[
-                    (t("Synced data"), html! { (tf("{} of {}: lists, favourites and settings of your devices",
-                        &[&size(h.used as u64), &size(app.cfg.sync_quota)])) }),
-                    (t("Private files"), html! { (tf("{} of {}: encrypted files that your devices keep here; only they can read them",
-                        &[&size(h.files as u64), &size(app.cfg.files_quota)])) }),
-                ]))
-            }
-            div.acciones { a.boton href="/link" { (icon("link")) (t("Link a new device with its code")) } }
+            div.acciones { a.boton href="/link" { (icon("link")) (t("Sign in a device with its code")) } }
         }
     }
 }

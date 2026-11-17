@@ -13,9 +13,7 @@ fn password() -> Markup {
             (checkbox(html! { input type="checkbox" name="devices" value="true"; }, t("Also sign out every device"), None))
             p.texto { (t("A new password signs out every other session and deletes your access tokens. Your \
                 devices stay linked unless you also sign them out.")) }
-            p.texto { (t("Signed-out devices have to be linked again and to get the sync key from a device \
-                that still holds it; without one, or a recovery passphrase, the encrypted sync data \
-                has to be reset.")) }
+            p.texto { (t("Signed-out devices have to sign in again.")) }
             (form_actions(button(Kind::Plain, t("Change password"))))
         }
     }

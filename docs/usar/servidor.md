@@ -1,8 +1,7 @@
 # Servidor propio
 
 `reiwand-server` publica un repositorio firmado de paquetes, un catálogo web sin JavaScript, cuentas
-con subidas y moderación, y la sincronización de la biblioteca, las listas y los ajustes entre
-dispositivos, cifrada de extremo a extremo por defecto. Es un solo binario en un contenedor sin
+con subidas y moderación, y el inicio de sesión de dispositivos con un código. Es un solo binario en un contenedor sin
 shell, que corre como root por defecto (con una línea `user:` en `compose.yaml` puede correr como otro usuario); todo vive en la carpeta
 `./data`, montada como `/data`, y la copia de seguridad es copiar esa carpeta. No envía telemetría ni se conecta a terceros.
 
@@ -145,7 +144,6 @@ lista todas con su valor por defecto); `VARIABLE_FILE` lee el valor de un archiv
 | `REIWAND_NOTICE_DAYS` | `180` | Días que un aviso legal guarda el nombre, el correo y la firma de quien lo envía |
 | `REIWAND_TAKEDOWN_DAYS` | `90` | Días que se guarda fuera de la vista pública un paquete retirado, como prueba y para una contranotificación |
 | `REIWAND_TLS` | `off` | `self-signed`: sirve HTTPS con un certificado propio, que los clientes aceptan solo por su huella fijada |
-| `REIWAND_ADVERTISE` | `false` | Anunciar el servidor en la red local por mDNS (`_reiwand._tcp`) con un nombre al azar en cada arranque |
 
 La lista completa de variables y la API HTTP están en
 [`docs/specs/server.md`](../specs/server.md).
@@ -353,10 +351,10 @@ para que los clientes no vean una versión anterior y hace que cada dispositivo 
 lo sincronizado.
 
 En una red de casa sin dominio, el servidor puede servir HTTPS él mismo con un certificado propio
-y anunciarse en la red local para que el teléfono lo encuentre:
+con la dirección que el administrador da a mano:
 
 ```sh
-REIWAND_TLS=self-signed REIWAND_ADVERTISE=true REIWAND_LISTEN=0.0.0.0:8443 \
+REIWAND_TLS=self-signed REIWAND_LISTEN=0.0.0.0:8443 \
   REIWAND_PUBLIC_URL=https://192.168.1.10:8443 reiwand-server serve
 reiwand-server fingerprint                    # la huella SHA-256 del certificado, también en el registro
 reiwand-ctl server add https://192.168.1.10:8443 --fingerprint <huella>
@@ -365,11 +363,7 @@ reiwand-ctl server add https://192.168.1.10:8443 --fingerprint <huella>
 El certificado se crea en el primer arranque en `/data/tls` y se conserva. Los equipos y el
 teléfono lo aceptan solo por su huella, que se compara una vez y queda fijada: sin ella, `server
 add` falla y dice la huella que mostró el servidor; en la app se escribe en *Añadir servidor*, en
-el teléfono se confirma en un aviso, y `reiwand-ctl server status` y la app la muestran. El anuncio
-(`_reiwand._tcp` por mDNS) solo dice que hay un servidor de Reiwand, con un nombre al azar que
-cambia en cada arranque, y nada de la cuenta ni de los equipos. Es la misma sincronización y el
-mismo cifrado de extremo a extremo que con un servidor público, solo que sin salir de la red de
-casa.
+el teléfono se confirma en un aviso, y `reiwand-ctl server status` y la app la muestran. Con un servidor de la red de casa todo funciona igual que con uno público, sin salir de la red.
 
 Con dominio propio, cualquier proxy inverso con TLS sirve: el servidor escucha en `REIWAND_BIND`
 (`127.0.0.1:8080` por defecto), el proxy termina el HTTPS y reenvía las peticiones, y `REIWAND_PUBLIC_URL`
@@ -387,9 +381,7 @@ sudo nginx -t && sudo systemctl reload nginx
 El ejemplo atiende `fondos.example.org` en el 443 (y redirige el 80), con las rutas de los
 certificados como marcadores, `client_max_body_size 256m` (el tamaño máximo de paquete por defecto,
 `REIWAND_PACKAGE_MAX_MIB`: súbelo a la par si cambias esa variable), HTTP/1.1 con
-`Connection ""` hacia el servidor y sin guardar las subidas en disco. Los avisos en vivo de la
-sincronización (`/api/v1/sync/events`, eventos del servidor, no WebSockets) van en un bloque aparte
-sin búfer y con un tiempo de espera largo.
+`Connection ""` hacia el servidor y sin guardar las subidas en disco. El servidor no usa WebSockets ni conexiones largas.
 
 Los paquetes de escena (`docs/specs/scene.md`) se importan y se aplican como cualquier otro
 elemento de la biblioteca. El daemon los dibuja en la GPU solo cuando algo visible cambia, con

@@ -19,7 +19,6 @@ scripts/sway-test.sh target/debug        # superficies layer-shell en un Sway si
 scripts/x11-test.sh target/debug         # ventanas de escritorio en un Xvfb
 cargo build -p reiwand-server && cargo build -p reiwand-android --example phone
 cp target/debug/examples/phone target/debug/
-scripts/sync-test.sh target/debug        # daemons, el cliente del teléfono y reiwand-server: enlace, clave y sincronización
 scripts/package.sh                       # genera dist/reiwand-*.tar.gz
 scripts/translations.sh update [idioma]  # actualiza po/ con los textos del QML, del validador, del editor y de la ayuda de reiwand-ctl
 target/debug/reiwand-app --check            # carga todo el QML de la app y falla ante cualquier aviso

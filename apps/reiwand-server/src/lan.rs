@@ -8,8 +8,6 @@ use tokio_rustls::rustls::ServerConfig;
 use tokio_rustls::rustls::crypto::aws_lc_rs;
 use tokio_rustls::rustls::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
 
-pub const SERVICE: &str = "_reiwand._tcp.local.";
-
 pub fn host(public_url: &str) -> String {
     let rest = public_url.split_once("://").map_or(public_url, |(_, rest)| rest);
     let host = rest.split('/').next().unwrap_or_default();
@@ -57,14 +55,4 @@ pub fn chain_acceptor(
     let config = ServerConfig::builder_with_provider(provider).with_safe_default_protocol_versions()?;
     let config = config.with_no_client_auth().with_single_cert(chain, key)?;
     Ok(tokio_rustls::TlsAcceptor::from(Arc::new(config)))
-}
-
-pub fn advertise(port: u16) -> Result<mdns_sd::ServiceDaemon> {
-    let daemon = mdns_sd::ServiceDaemon::new().context("cannot start mDNS")?;
-    let name = format!("reiwand-{}", fingerprint(&getrandom::u64()?.to_le_bytes())[..6].to_owned());
-    let host = format!("{name}.local.");
-    let info =
-        mdns_sd::ServiceInfo::new(SERVICE, &name, &host, "", port, &[("v", "0")][..])?.enable_addr_auto();
-    daemon.register(info).context("cannot announce the server on the local network")?;
-    Ok(daemon)
 }

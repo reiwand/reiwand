@@ -460,40 +460,6 @@ jobs:
           cargo build --locked -p reiwandd -p reiwand-ctl
           scripts/x11-test.sh target/debug
 
-  sync:
-    name: Server sync end-to-end
-    needs: version
-    if: needs.version.outputs.rust == 'true'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 45
-    steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
-        with:
-          persist-credentials: false
-
-      - name: Install system packages
-        run: |
-          scripts/ci-apt.sh \
-            pkg-config libclang-dev libpipewire-0.3-dev \
-            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
-            gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
-            mesa-vulkan-drivers libvulkan1 \
-            pipewire pipewire-bin wireplumber dbus-x11 gnome-keyring
-
-      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
-
-      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
-        with:
-          shared-key: dev
-          save-if: false
-
-      - name: Daemons, the phone client and reiwand-server with end-to-end encrypted sync
-        run: |
-          cargo build --locked -p reiwandd -p reiwand-ctl -p reiwand-server
-          cargo build --locked -p reiwand-android --example phone
-          cp target/debug/examples/phone target/debug/phone
-          scripts/sync-test.sh target/debug
-
   build:
     name: Release binaries (${{ matrix.name }})
     needs: version
@@ -1174,7 +1140,7 @@ jobs:
   release:
     name: Release
     if: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-    needs: [version, workflows, lint, clippy, test, render-gl, depth, e2e, sway, x11, sync, build, package, android-native, android, android-lint, android-emulator, rpm, plasma, app-check, web, server]
+    needs: [version, workflows, lint, clippy, test, render-gl, depth, e2e, sway, x11, build, package, android-native, android, android-lint, android-emulator, rpm, plasma, app-check, web, server]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -1268,7 +1234,7 @@ jobs:
 
   cache-cleanup:
     name: Cache cleanup
-    needs: [version, workflows, lint, clippy, test, render-gl, depth, e2e, web, sway, x11, sync, build, package, android-native, android, android-lint, android-emulator, rpm, flatpak, flatpak-daemon, app-check, plasma, server, release, image, flatpak-release]
+    needs: [version, workflows, lint, clippy, test, render-gl, depth, e2e, web, sway, x11, build, package, android-native, android, android-lint, android-emulator, rpm, flatpak, flatpak-daemon, app-check, plasma, server, release, image, flatpak-release]
     if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10

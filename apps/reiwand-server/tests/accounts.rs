@@ -60,7 +60,11 @@ async fn first_admin_registration_and_tokens() {
             .0,
         StatusCode::FORBIDDEN
     );
-    assert_eq!(server.json(Method::GET, "/api/v1/sync/state", &bearer, None).await.0, StatusCode::FORBIDDEN);
+    let revoke = server
+        .json(Method::POST, "/api/v1/me/devices/none/revoke", &bearer, Some(json!({"password": "x"})))
+        .await;
+    assert_eq!(revoke.0, StatusCode::FORBIDDEN);
+    assert_eq!(server.json(Method::GET, "/api/v1/sync/state", &bearer, None).await.0, StatusCode::NOT_FOUND);
     let real = token["token"].as_str().unwrap();
     let forged = Who::Bearer(format!("{}{}", &real[..79], if real.ends_with('0') { 1 } else { 0 }));
     assert_eq!(server.json(Method::GET, "/api/v1/me", &forged, None).await.0, StatusCode::UNAUTHORIZED);
@@ -92,14 +96,8 @@ async fn devices_get_generic_names_and_enroll_with_codes() {
     assert_eq!((status, body["code"].as_str()), (StatusCode::BAD_REQUEST, Some("authorization_pending")));
     let (_, body) = server.json(Method::POST, "/api/v1/auth/device/token", &Who::Nobody, Some(poll)).await;
     assert_eq!(body["code"], "slow_down");
-    let key = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=";
     let (_, started) = server
-        .json(
-            Method::POST,
-            "/api/v1/auth/device/start",
-            &Who::Nobody,
-            Some(json!({"platform": "android", "enc_key": key})),
-        )
+        .json(Method::POST, "/api/v1/auth/device/start", &Who::Nobody, Some(json!({"platform": "android"})))
         .await;
     assert!(
         started["verification_uri_complete"]
@@ -129,7 +127,8 @@ async fn devices_get_generic_names_and_enroll_with_codes() {
     assert_eq!((status, enrolled["device_name"].as_str()), (StatusCode::OK, Some("Device 2")));
     let phone = Who::Bearer(enrolled["token"].as_str().unwrap().into());
     let (_, list) = server.json(Method::GET, "/api/v1/me/devices", &phone, None).await;
-    assert_eq!(list["items"][1]["enc_key"], key);
+    assert_eq!(list["items"][1]["platform"], "android");
+    assert!(list["items"][1].get("enc_key").is_none());
     let gone = format!("/api/v1/me/devices/{}", enrolled["device_id"].as_str().unwrap());
     assert_eq!(
         server.call(Method::DELETE, &gone, &first).send().await.unwrap().status(),
@@ -137,7 +136,10 @@ async fn devices_get_generic_names_and_enroll_with_codes() {
     );
     let (_, mine) = server.json(Method::GET, "/api/v1/me/tokens", &ana, None).await;
     let devices = mine["items"].as_array().unwrap().iter().filter(|t| !t["device_id"].is_null());
-    assert!(devices.clone().count() == 2 && devices.clone().all(|t| t["scopes"] == "upload sync"), "{mine}");
+    assert!(
+        devices.clone().count() == 2 && devices.clone().all(|t| t["scopes"] == "upload account"),
+        "{mine}"
+    );
     assert_eq!(
         server.call(Method::DELETE, &gone, &ana).send().await.unwrap().status(),
         StatusCode::NO_CONTENT

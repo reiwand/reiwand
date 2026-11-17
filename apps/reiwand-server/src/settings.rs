@@ -53,7 +53,6 @@ pub struct Settings {
     pub auto_publish: Publish,
     pub network: Network,
     pub network_chosen: bool,
-    pub advertise: bool,
     pub done: bool,
     pub admin_handle: Option<String>,
     pub repo_name: Option<String>,
@@ -116,10 +115,6 @@ pub fn load(conn: &Connection, cfg: &Config) -> anyhow::Result<Settings> {
     Ok(Settings {
         registration: get("registration").and_then(registration).unwrap_or(cfg.registration),
         auto_publish: get("auto_publish").and_then(parse_publish).unwrap_or(cfg.auto_publish),
-        advertise: match &network {
-            Some(n) => *n == Network::Home,
-            None => cfg.advertise,
-        },
         network_chosen: network.is_some(),
         network: network.unwrap_or(started),
         done: get("setup") == Some("done"),

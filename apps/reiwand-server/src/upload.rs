@@ -22,6 +22,9 @@ use tokio::io::AsyncWriteExt;
 
 mod finish;
 mod package;
+mod pieces;
+
+pub use pieces::Pieces;
 
 use finish::{cancel, finalize, finish, put, show};
 use package::web;

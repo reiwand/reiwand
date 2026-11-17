@@ -17,10 +17,7 @@ async fn discovery_health_and_legal_pages() {
     let (status, ready) = server.json(Method::GET, "/readyz", &Who::Nobody, None).await;
     assert_eq!((status, ready["database"].as_bool()), (StatusCode::OK, Some(true)));
     let (_, info) = server.json(Method::GET, "/.well-known/reiwand-server", &Who::Nobody, None).await;
-    assert_eq!(
-        (info["sync"]["end_to_end_default"].as_bool(), info["registration"].as_str()),
-        (Some(true), Some("invite"))
-    );
+    assert_eq!((info["sync"].is_null(), info["registration"].as_str()), (true, Some("invite")));
     let legal = server.call(Method::GET, "/legal", &Who::Nobody).send().await.unwrap().text().await.unwrap();
     assert!(legal.contains("Example Wallpapers") && legal.contains("abuse@example.org"));
     for doc in ["terms", "privacy", "content", "licenses", "notice", "counter-notice"] {

@@ -1,6 +1,5 @@
 mod common;
 
-use base64::Engine;
 use common::{Who, package, start, upload};
 use reiwand_server::{App, Config};
 use reqwest::{Method, StatusCode};
@@ -15,13 +14,6 @@ async fn backup_and_restore_keep_accounts_packages_and_the_signed_index() {
     let ana = server.user(&admin, "ana", "user").await;
     let status = upload(&server, &ana, &package(server.dir.path(), "org.example.dawn", "1.0.0")).await;
     assert_eq!(status["state"], "published", "{status}");
-    let (desk, _) = server.device("ana").await;
-    server.json(Method::POST, "/api/v1/sync/setup", &desk, Some(json!({}))).await;
-    let sealed = base64::prelude::BASE64_STANDARD.encode([1u8; 297]);
-    let record = json!({"collection": "settings", "item": "playback", "base": 0, "payload": sealed});
-    let changes = json!({"epoch": 0, "changes": [record]});
-    let (_, synced) = server.json(Method::POST, "/api/v1/sync/changes", &desk, Some(changes)).await;
-    assert_eq!(synced["results"][0]["status"], "ok", "{synced}");
     let (_, published) = server.json(Method::POST, "/api/v1/admin/repo/publish", &admin, None).await;
     let before = published["entry_version"].as_u64().unwrap();
     let snapshot = reiwand_server::backup(&server.cfg, None).unwrap();
@@ -61,11 +53,6 @@ async fn backup_and_restore_keep_accounts_packages_and_the_signed_index() {
         http.post(format!("{url}/api/v1/auth/login")).json(&login).send().await.unwrap().status(),
         StatusCode::OK
     );
-    let Who::Bearer(token) = desk else { unreachable!() };
-    let pull = |since: u64| http.get(format!("{url}/api/v1/sync/changes?since={since}")).bearer_auth(&token);
-    assert_eq!(pull(1).send().await.unwrap().status(), StatusCode::GONE);
-    let fresh: Value = pull(0).send().await.unwrap().json().await.unwrap();
-    assert!(fresh["changes"].as_array().unwrap().len() == 1 && fresh["seq"].as_i64().unwrap() > 1, "{fresh}");
     let latest = http.get(format!("{url}/r/main/entry/latest")).send().await.unwrap();
     assert_eq!(latest.headers()["cache-control"], "no-cache");
     let seen = latest.text().await.unwrap().trim().parse::<u64>().unwrap();

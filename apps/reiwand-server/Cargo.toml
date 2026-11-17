@@ -9,7 +9,6 @@ rust-version.workspace = true
 [dependencies]
 reiwand-format = { workspace = true, features = ["sign"] }
 reiwand-palette.workspace = true
-reiwand-qr.workspace = true
 reiwand-scene.workspace = true
 anyhow.workspace = true
 argon2.workspace = true
@@ -24,7 +23,6 @@ hyper-util.workspace = true
 image.workspace = true
 lettre.workspace = true
 maud.workspace = true
-mdns-sd.workspace = true
 percent-encoding.workspace = true
 rcgen.workspace = true
 x509-parser.workspace = true
@@ -43,4 +41,3 @@ tracing-subscriber.workspace = true
 
 [dev-dependencies]
 reqwest = { workspace = true, features = ["form", "multipart"] }
-reiwand-sync.workspace = true

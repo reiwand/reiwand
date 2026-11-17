@@ -26,7 +26,6 @@ pub struct Account {
 pub struct Created {
     pub id: i64,
     pub link: String,
-    pub svg: String,
     pub role: String,
     pub uses: i64,
     pub expires: i64,

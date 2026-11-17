@@ -31,10 +31,6 @@ pub const TEXTS: super::Texts = &[
     ("Next", "Siguiente"),
     ("How do the others reach this server?", "¿Cómo llegan los demás a este servidor?"),
     ("Only at home", "Solo en casa"),
-    (
-        "For the devices of your network. The server makes its own certificate and announces itself on the local network; each phone recognises it by reading a QR code at the end.",
-        "Para los equipos de tu red. El servidor crea su propio certificado y se anuncia en la red local; cada teléfono lo reconoce leyendo un código QR al final.",
-    ),
     ("I have my certificate", "Tengo mi certificado"),
     (
         "If you already have a name of your own and a certificate for it.",

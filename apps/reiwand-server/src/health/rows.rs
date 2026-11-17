@@ -27,9 +27,6 @@ fn capital(text: String) -> String {
 }
 
 pub fn certificate(cert: &Cert) -> Line {
-    let phones = t(
-        "Phones and apps recognise this server by the fingerprint of its certificate. After it is renewed they stop connecting until they read the new code: it appears below, in \"For the phones\".",
-    );
     let (tone, text, detail) = match cert.days {
         d if d < 0 => (Tone::Bad, tf("Certificate expired {} ago", &[&days(-d)]), None),
         d if d <= 30 => (Tone::Warn, tf("Expires in {}", &[&days(d)]), None),
@@ -45,11 +42,10 @@ pub fn certificate(cert: &Cert) -> Line {
             Some(t("it is your own certificate: replace its files and restart the server").into()),
         ));
     } else {
-        let note = t("when it is renewed its fingerprint changes, and so does the code for phones");
+        let note = t("when it is renewed its fingerprint changes");
         row = row
             .value(state(tone, &text, Some(note.into())))
-            .action(post("/admin/certificate", button(Kind::Plain, t("Renew now"))))
-            .more(crate::ui::fold(t("What happens to the phones"), html! { p.texto { (phones) } }, false));
+            .action(post("/admin/certificate", button(Kind::Plain, t("Renew now"))));
     }
     Line { row, tone: Some(tone) }
 }

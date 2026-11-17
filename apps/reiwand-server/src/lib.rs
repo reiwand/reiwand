@@ -23,7 +23,6 @@ mod entry;
 mod error;
 mod explore;
 mod featuring;
-mod files;
 mod frame;
 mod health;
 mod hiding;
@@ -36,7 +35,6 @@ mod lang;
 mod layout;
 mod legal;
 mod mail;
-mod mailbox;
 mod me;
 mod members;
 mod mod_case;
@@ -50,8 +48,6 @@ mod own;
 mod pages;
 mod people;
 mod policies;
-pub mod qr;
-mod records;
 mod repo;
 mod repos;
 mod result;
@@ -63,7 +59,6 @@ mod serving;
 mod session_copy;
 pub mod settings;
 mod setup;
-mod sync;
 #[cfg(test)]
 mod tests;
 mod ui;
@@ -77,7 +72,6 @@ mod web;
 pub use backup::{backup, restore};
 pub use config::Config;
 pub use lang::missed_texts;
-pub use records::SYNC_FORMAT;
 pub use repo::{import, import_repo, init, init_repo, status, status_repo, statuses};
 pub use seal::open_root;
 pub use validate::check;
@@ -103,7 +97,6 @@ pub struct App {
     db: db::Db,
     repos: repos::Repos,
     limits: net::Limiter,
-    hub: mailbox::Hub,
     clients: net::ClientLog,
     validations: Semaphore,
     hashing: Semaphore,
@@ -111,7 +104,7 @@ pub struct App {
     band: band::Band,
     mail: mail::Post,
     deciding: Mutex<()>,
-    pieces: files::Pieces,
+    pieces: upload::Pieces,
     settings: std::sync::RwLock<settings::Settings>,
     door: door::Door,
     held: std::sync::Mutex<setup::Held>,
@@ -132,7 +125,6 @@ impl App {
             held: Default::default(),
             repos: repos::Repos::new(db.clone(), cfg.data.clone()),
             limits: net::Limiter::new(cfg.rate_limits),
-            hub: mailbox::Hub::default(),
             clients: net::ClientLog::new(&cfg),
             validations: Semaphore::new(2),
             hashing: Semaphore::new(4),
@@ -140,7 +132,7 @@ impl App {
             band,
             mail: mail::Post::default(),
             deciding: Mutex::new(()),
-            pieces: files::Pieces::default(),
+            pieces: upload::Pieces::default(),
             cfg,
         }))
     }
