@@ -57,6 +57,7 @@ impl State {
                 self.locked = locked;
                 self.hush();
             }
+            Command::Strip(output, spec) => self.strip(&output, spec),
             Command::Press(output, id) => {
                 if let Some(page) = self.outputs.get(&output).and_then(|o| o.shown.content.page()) {
                     let slot = self.pages.get(&page.key(self.power.choice));

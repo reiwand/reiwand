@@ -54,6 +54,14 @@ FocusScope {
             "place": "more"
         },
         {
+            "text": App.tr("Apply the wallpaper of the strip"),
+            "place": "more"
+        },
+        {
+            "text": App.tr("Close the strip without changing"),
+            "place": "more"
+        },
+        {
             "text": App.tr("Keyboard shortcuts"),
             "place": "more"
         },

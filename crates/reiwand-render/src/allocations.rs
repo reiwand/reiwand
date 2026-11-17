@@ -87,6 +87,7 @@ fn steady_frames_allocate_nothing_beyond_the_gpu_calls_they_make() {
         relief: None,
         flip: [false; 2],
         grade: None,
+        clip: None,
     };
     let layers = [layer(&red, 1.0), layer(&blue, 0.5)];
     let mut target = r.create_target(32, 16).unwrap();

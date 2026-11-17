@@ -334,7 +334,7 @@ reiwand-ctl input clicks on -o DP-1                # dejar que los clics de esa 
 
 ## Recorrer fondos con el teclado
 
-La ventana que aparece al recorrer los fondos está en [Cambiar de fondo con el teclado](cambiar-con-el-teclado.md).
+La tira que aparece sobre el fondo al recorrerlos está en [Cambiar de fondo con el teclado](cambiar-con-el-teclado.md).
 
 `reiwand-ctl next --preview` y `reiwand-ctl prev --preview` muestran cuál sería el fondo siguiente o el
 anterior sin cambiar nada: empiezan a recorrer la lista que muestra esa pantalla (o la biblioteca,
@@ -358,8 +358,8 @@ bindsym $mod+Alt+Escape exec reiwand-ctl browse cancel
 
 y en X11 lo mismo con el gestor de atajos de tu entorno (o `xbindkeys`).
 
-El atajo, la bandeja y `reiwand-ctl next --preview` abren una ventana sobre el escritorio con el fondo
-que pondrías y cómo entraría (← y → recorren, Intro aplica, Esc cancela); la guía
+El atajo, la bandeja y `reiwand-ctl next --preview` dibujan sobre el fondo una tira con el actual, los
+anteriores y los siguientes (los atajos y la rueda recorren, el clic en el central aplica); la guía
 `docs/usar/cambiar-con-el-teclado.md` la explica con sus límites.
 
 El proveedor Wallhaven usa la API oficial v1 y admite todas las opciones de su búsqueda: palabras

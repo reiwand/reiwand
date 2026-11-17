@@ -1,3 +1,4 @@
+mod control;
 mod counted;
 mod crossing;
 mod feed;
@@ -27,6 +28,7 @@ mod state;
 mod status;
 mod steer;
 pub(crate) mod stops;
+mod strip;
 mod surface;
 
 use crate::fatal;
@@ -44,6 +46,7 @@ use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard, mpsc};
 use std::thread::JoinHandle;
+pub use strip::{Pic, StripSpec};
 
 enum Command {
     Configure(String, (u32, u32), Spec),
@@ -61,6 +64,7 @@ enum Command {
     Saver(bool),
     Locked(bool),
     Press(String, String),
+    Strip(String, Option<Arc<StripSpec>>),
     Fire(String, String),
     Retry,
     Again(String),
@@ -136,30 +140,6 @@ impl Compositor {
 
     pub fn calmed(&self) -> bool {
         self.calm.load(Ordering::Relaxed)
-    }
-
-    pub fn set_power(&self, on_battery: bool) {
-        self.send(Command::Power(on_battery))
-    }
-
-    pub fn set_lowest(&self, lowest: bool) {
-        self.send(Command::Lowest(lowest))
-    }
-
-    pub fn set_saver(&self, saver: bool) {
-        self.send(Command::Saver(saver))
-    }
-
-    pub fn set_locked(&self, locked: bool) {
-        self.send(Command::Locked(locked))
-    }
-
-    pub fn retry_effects(&self) {
-        self.send(Command::Retry)
-    }
-
-    pub fn restart_particles(&self, output: &str) {
-        self.send(Command::Again(output.into()))
     }
 
     pub fn status(&self) -> BTreeMap<String, OutputStatus> {

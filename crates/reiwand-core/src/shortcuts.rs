@@ -6,11 +6,19 @@ pub struct Shortcuts {
     pub enabled: bool,
     pub next: String,
     pub previous: String,
+    pub apply: String,
+    pub cancel: String,
 }
 
 impl Default for Shortcuts {
     fn default() -> Self {
-        Self { enabled: false, next: "LOGO+ALT+N".into(), previous: "LOGO+ALT+P".into() }
+        Self {
+            enabled: false,
+            next: "LOGO+ALT+N".into(),
+            previous: "LOGO+ALT+P".into(),
+            apply: "LOGO+ALT+Return".into(),
+            cancel: "LOGO+ALT+Escape".into(),
+        }
     }
 }
 

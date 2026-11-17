@@ -224,7 +224,7 @@ nombre que ve la persona: el panel propio de un portátil (conectores eDP, LVDS,
 cualquier otra es «Monitor», numerada en orden estable por el nombre del conector cuando hay varias
 («Monitor 1», «Monitor 2»). La usan el aviso del primer arranque y su menú «Aplicar a…», la marca de
 la tapa puesta, el botón principal de la tarjeta, la tira de pantallas, Ajustes › Pantallas (que
-deja el conector como texto secundario), la ventana de vista previa del atajo, la bandeja y la
+deja el conector como texto secundario), la bandeja y la
 pregunta del editor «en qué pantalla». La terminal sigue usando los nombres de conector.
 
 ## Bloque ahora

@@ -54,6 +54,7 @@ pub(crate) struct Control {
     pub(crate) parallax: BTreeSet<String>,
     pub(crate) views: BTreeMap<String, View>,
     pub(crate) followed: BTreeSet<String>,
+    pub(crate) browsing: BTreeSet<String>,
     pub(crate) capturing: bool,
     pub(crate) blocked: bool,
     windows: BTreeMap<String, Window>,
@@ -161,6 +162,17 @@ pub(crate) fn window(output: &str, window: Option<Window>) {
     drop(control);
     if let Some(window) = follow {
         window.track_pointer(true);
+    }
+}
+
+pub(crate) fn browsing(output: &str, on: bool) {
+    let Some(hub) = hub() else { return };
+    let changed = {
+        let mut control = lock(&hub.control);
+        if on { control.browsing.insert(output.to_owned()) } else { control.browsing.remove(output) }
+    };
+    if changed {
+        hub.update(None);
     }
 }
 

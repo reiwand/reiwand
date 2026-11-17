@@ -146,6 +146,7 @@ impl Engine {
                 relief: None,
                 flip: [false; 2],
                 grade: self.look.grade,
+                clip: None,
             };
             let at = self.measured.then(std::time::Instant::now);
             let presented =

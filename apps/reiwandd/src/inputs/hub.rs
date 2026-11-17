@@ -83,8 +83,12 @@ impl Hub {
             (control.views, control.blocked) = (views, blocked);
         }
         let (audio, pointed) = (!control.wants(Input::Audio).is_empty(), control.wants(Input::Pointer));
-        let followed: BTreeSet<String> =
-            pointed.iter().cloned().chain(control.wants(Input::Clicks)).collect();
+        let followed: BTreeSet<String> = pointed
+            .iter()
+            .cloned()
+            .chain(control.wants(Input::Clicks))
+            .chain(control.browsing.iter().cloned())
+            .collect();
         let flips: Vec<_> = (control.windows.iter())
             .filter(|(output, _)| control.followed.contains(*output) != followed.contains(*output))
             .map(|(output, window)| (window.clone(), followed.contains(output)))

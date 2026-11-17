@@ -66,7 +66,14 @@ impl PointerHandler for State {
             let (x, y) = (event.position.0 / f64::from(width), event.position.1 / f64::from(height));
             let at = Some([x as f32, y as f32]);
             let pos = match event.kind {
-                PointerEventKind::Axis { .. } => continue,
+                PointerEventKind::Axis { vertical, .. } => {
+                    let discrete =
+                        if vertical.value120 != 0 { vertical.value120 } else { vertical.discrete * 120 };
+                    if discrete != 0 || vertical.absolute != 0.0 {
+                        (self.sink)(Event::Wheel(screen.name.clone(), discrete, vertical.absolute));
+                    }
+                    continue;
+                }
                 PointerEventKind::Leave { .. } => {
                     self.buttons = 0;
                     None

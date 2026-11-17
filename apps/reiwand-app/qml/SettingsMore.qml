@@ -49,7 +49,7 @@ FocusScope {
             text: App.tr("Change wallpaper with the keyboard")
             kind: "captura"
             keys: SettingsFolder.keys(part.options["shortcuts.next"] ?? "LOGO+ALT+N")
-            explain: App.tr("Goes to the next wallpaper of the list. To change the combination, press Enter and then the new keys.")
+            explain: App.tr("Shows a strip over the wallpaper and moves to the next one. To change the combination, press Enter and then the new keys.")
             onCaptured: keys => App.act("SetOption", ["shortcuts.next", SettingsFolder.joined(keys)])
         }
 
@@ -57,13 +57,29 @@ FocusScope {
             text: App.tr("Previous wallpaper with the keyboard")
             kind: "captura"
             keys: SettingsFolder.keys(part.options["shortcuts.previous"] ?? "LOGO+ALT+P")
-            explain: App.tr("Goes back to the wallpaper before. To change the combination, press Enter and then the new keys.")
+            explain: App.tr("Shows a strip over the wallpaper and moves to the one before. To change the combination, press Enter and then the new keys.")
             onCaptured: keys => App.act("SetOption", ["shortcuts.previous", SettingsFolder.joined(keys)])
         }
 
         Fila {
+            text: App.tr("Apply the wallpaper of the strip")
+            kind: "captura"
+            keys: SettingsFolder.keys(part.options["shortcuts.apply"] ?? "LOGO+ALT+Return")
+            explain: App.tr("Keeps the wallpaper in the middle of the strip. The wheel moves the strip and a click on the middle one applies it. To change the combination, press Enter and then the new keys.")
+            onCaptured: keys => App.act("SetOption", ["shortcuts.apply", SettingsFolder.joined(keys)])
+        }
+
+        Fila {
+            text: App.tr("Close the strip without changing")
+            kind: "captura"
+            keys: SettingsFolder.keys(part.options["shortcuts.cancel"] ?? "LOGO+ALT+Escape")
+            explain: App.tr("Closes the strip and leaves the wallpaper as it was. To change the combination, press Enter and then the new keys.")
+            onCaptured: keys => App.act("SetOption", ["shortcuts.cancel", SettingsFolder.joined(keys)])
+        }
+
+        Fila {
             text: App.tr("Keyboard shortcuts")
-            note: part.unmet ? App.tr("The desktop did not give the keys: bind reiwand-ctl next --preview and reiwand-ctl prev --preview to your own keys") : App.tr("The desktop is asked for these two combinations")
+            note: part.unmet ? App.tr("The desktop did not give the keys: bind reiwand-ctl next --preview, prev --preview, browse apply and browse cancel to your own keys") : App.tr("The desktop is asked for these four combinations")
             noteTone: part.unmet ? "coral" : ""
             kind: "llave"
             checked: part.options["shortcuts.enabled"] === true

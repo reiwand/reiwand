@@ -69,6 +69,8 @@ fn options() -> Vec<Field> {
         flag("shortcuts.enabled"),
         option("shortcuts.next", FieldKind::Text),
         option("shortcuts.previous", FieldKind::Text),
+        option("shortcuts.apply", FieldKind::Text),
+        option("shortcuts.cancel", FieldKind::Text),
         flag("pause.when_covered"),
         flag("pause.when_locked"),
         option(reiwand_core::BatteryPause::KEY, FieldKind::Text),

@@ -2293,10 +2293,6 @@ msgstr "Nombre de la superficie"
 msgid "Automatic"
 msgstr "Automático"
 
-#: apps/reiwand-app/qml/Preview.qml
-msgid "Apply"
-msgstr "Aplicar"
-
 #: apps/reiwand-app/qml/SettingsTesting.qml
 msgid ""
 "The name the wallpaper surfaces give the compositor. Change it if the "
@@ -17199,7 +17195,6 @@ msgstr "Ningún proyecto se llama así"
 
 
 
-
 #: apps/reiwand-app/qml/CreateRecent.qml
 msgid "Your first wallpaper starts here"
 msgstr "Tu primer fondo empieza aquí"
@@ -18303,30 +18298,14 @@ msgstr "Los fondos de esta lista se turnan en esta pantalla, como dicen las regl
 msgid "Change wallpaper with the keyboard"
 msgstr "Cambiar de fondo con el teclado"
 
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Goes to the next wallpaper of the list. To change the combination, press Enter and then the new keys."
-msgstr "Pasa al siguiente fondo de la lista. Para cambiar la combinación, pulsa Intro y luego las teclas nuevas."
-
 #: apps/reiwand-app/qml/SettingsMore.qml apps/reiwand-app/qml/SettingsWallpapers.qml
 msgid "Previous wallpaper with the keyboard"
 msgstr "Volver al fondo anterior con el teclado"
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Goes back to the wallpaper before. To change the combination, press Enter and then the new keys."
-msgstr "Vuelve al fondo de antes. Para cambiar la combinación, pulsa Intro y luego las teclas nuevas."
 
 #: apps/reiwand-app/qml/SettingsMore.qml apps/reiwand-app/qml/SettingsTabsCheck.qml
 #: apps/reiwand-app/qml/SettingsWallpapers.qml
 msgid "Keyboard shortcuts"
 msgstr "Atajos de teclado"
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid "The desktop is asked for these two combinations"
-msgstr "Se le piden al escritorio estas dos combinaciones"
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid "The desktop did not give the keys: bind reiwand-ctl next --preview and reiwand-ctl prev --preview to your own keys"
-msgstr "El escritorio no dio los atajos: ata reiwand-ctl next --preview y reiwand-ctl prev --preview a tus propias teclas"
 
 #: apps/reiwand-app/qml/SettingsMore.qml
 msgid "Where the desktop cannot give them, bind the commands of the terminal tool to your own keys."
@@ -19161,122 +19140,6 @@ msgstr "En marcha"
 #: apps/reiwand-app/qml/AccountMain.qml
 msgid "one device"
 msgstr "un equipo"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "%1 · My files"
-msgstr "%1 · Mis archivos"
-
-#: apps/reiwand-app/qml/PreviewStrip.qml
-msgid "%1 · now"
-msgstr "%1 · ahora"
-
-#: apps/reiwand-app/qml/Preview.qml
-msgid "Change screen"
-msgstr "Cambiar de pantalla"
-
-#: apps/reiwand-app/qml/Preview.qml
-msgid "Change wallpaper"
-msgstr "Cambiar de fondo"
-
-#: apps/reiwand-app/qml/PreviewTop.qml
-msgid "Changes: %1"
-msgstr "Cambia: %1"
-
-#: apps/reiwand-app/qml/PreviewTop.qml
-msgid "Changes: every screen"
-msgstr "Cambia: todas las pantallas"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "chosen for this change"
-msgstr "elegido para este cambio"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "fade · %1 s, %2"
-msgstr "fundido · %1 s, %2"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "its author's transition, or a fade if it has none"
-msgstr "la transición de su autor, o un fundido si no trae una"
-
-#: apps/reiwand-app/qml/PreviewStrip.qml
-msgid "List «%1» · %2 of %3"
-msgstr "Lista «%1» · %2 de %3"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "no transition, %1"
-msgstr "sin transición, %1"
-
-#: apps/reiwand-app/qml/PreviewTop.qml
-msgid "Now on your desktop: %1"
-msgstr "Ahora en tu escritorio: %1"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "Once applied: %1"
-msgstr "Al aplicar: %1"
-
-#: apps/reiwand-app/qml/Preview.qml apps/reiwand-app/qml/PreviewText.qml
-msgid "Open the library"
-msgstr "Abrir la biblioteca"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "simple fade · you asked for less motion"
-msgstr "fundido simple · pediste menos movimiento"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "simple fade · your system asks for less motion"
-msgstr "fundido simple · tu sistema pide menos movimiento"
-
-#: apps/reiwand-app/qml/PreviewCheck.qml apps/reiwand-app/qml/PreviewText.qml
-msgid "Still picture of the scene: it moves once applied"
-msgstr "Imagen quieta de la escena: se mueve al aplicarla"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "Still picture of the video: it moves once applied"
-msgstr "Imagen quieta del vídeo: se mueve al aplicarlo"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "The list «%1» has only «%2», which is already set. Add more wallpapers to it and the shortcut %3 goes through them one by one, with their preview."
-msgstr "La lista «%1» tiene solo «%2», que ya está puesto. Añádele más fondos y el atajo %3 los recorre uno a uno, con su vista previa."
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "The preview could not open"
-msgstr "No se pudo abrir la vista previa"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "the setting of this screen"
-msgstr "el ajuste de esta pantalla"
-
-#: apps/reiwand-app/qml/Preview.qml
-msgid "The wallpaper service does not answer."
-msgstr "El servicio de fondos no responde."
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "The wallpaper service does not answer. What you have set stays as it is."
-msgstr "El servicio de fondos no responde. Lo que tienes puesto sigue igual."
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "There is no other wallpaper to change to"
-msgstr "No hay otro fondo al que cambiar"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "This is how it comes in: %1"
-msgstr "Así entra: %1"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "your general setting"
-msgstr "tu ajuste general"
-
-#: apps/reiwand-app/qml/PreviewStrip.qml
-msgid "Your library · %1 of %2"
-msgstr "Tu biblioteca · %1 de %2"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "Your library has no wallpapers yet. Add some and the shortcut %1 goes through them one by one, with their preview."
-msgstr "Tu biblioteca todavía no tiene fondos. Añade algunos y el atajo %1 los recorre uno a uno, con su vista previa."
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "Your library has only «%1», which is already set. Add more wallpapers and the shortcut %2 goes through them one by one, with their preview."
-msgstr "Tu biblioteca tiene solo «%1», que ya está puesto. Añade más fondos y el atajo %2 los recorre uno a uno, con su vista previa."
 
 #: apps/reiwand-app/qml/PackageMiddle.qml apps/reiwand-app/qml/PackageTopCheck.qml
 msgid "See as"
@@ -20785,3 +20648,43 @@ msgstr ""
 msgctxt "layers"
 msgid "Try again"
 msgstr "Volver a intentar"
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid "Shows a strip over the wallpaper and moves to the next one. To change the combination, press Enter and then the new keys."
+msgstr "Muestra una tira sobre el fondo y pasa al siguiente. Para cambiar la combinación, pulsa Intro y luego las teclas nuevas."
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid "Shows a strip over the wallpaper and moves to the one before. To change the combination, press Enter and then the new keys."
+msgstr "Muestra una tira sobre el fondo y pasa al anterior. Para cambiar la combinación, pulsa Intro y luego las teclas nuevas."
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid "Apply the wallpaper of the strip"
+msgstr "Aplicar el fondo de la tira"
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid "Keeps the wallpaper in the middle of the strip. The wheel moves the strip and a click on the middle one applies it. To change the combination, press Enter and then the new keys."
+msgstr "Deja el fondo que está en el centro de la tira. La rueda mueve la tira y un clic en el del centro lo aplica. Para cambiar la combinación, pulsa Intro y luego las teclas nuevas."
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid "Close the strip without changing"
+msgstr "Cerrar la tira sin cambiar nada"
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid "Closes the strip and leaves the wallpaper as it was. To change the combination, press Enter and then the new keys."
+msgstr "Cierra la tira y deja el fondo como estaba. Para cambiar la combinación, pulsa Intro y luego las teclas nuevas."
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid "The desktop did not give the keys: bind reiwand-ctl next --preview, prev --preview, browse apply and browse cancel to your own keys"
+msgstr "El escritorio no dio los atajos: ata reiwand-ctl next --preview, prev --preview, browse apply y browse cancel a tus propias teclas"
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid "The desktop is asked for these four combinations"
+msgstr "Se le piden al escritorio estas cuatro combinaciones"
+
+#: apps/reiwand-app/qml/facade/Labels.qml
+msgid "Key to apply the wallpaper of the strip"
+msgstr "Tecla para aplicar el fondo de la tira"
+
+#: apps/reiwand-app/qml/facade/Labels.qml
+msgid "Key to close the strip without changing"
+msgstr "Tecla para cerrar la tira sin cambiar nada"

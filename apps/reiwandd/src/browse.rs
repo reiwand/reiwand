@@ -10,12 +10,14 @@ mod list;
 mod reply;
 mod session;
 pub(crate) mod shortcuts;
+mod stage;
 mod strip;
 #[cfg(test)]
 mod tests;
 mod transition;
 
 pub use reply::told;
+pub(crate) use stage::{Do, attach, pointer, run, wheel};
 
 pub static IDLE: LazyLock<Duration> = LazyLock::new(|| {
     let ms = std::env::var("REIWAND_BROWSE_IDLE_MS").ok().and_then(|v| v.parse().ok());
@@ -50,6 +52,7 @@ pub struct Browsing {
     sessions: Mutex<HashMap<String, Session>>,
     held: Mutex<HashMap<String, (Duration, Instant)>>,
     shortcuts: Mutex<Option<ShortcutsState>>,
+    stages: Mutex<HashMap<String, stage::Stage>>,
     made: AtomicU64,
 }
 

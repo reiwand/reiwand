@@ -13,7 +13,17 @@ mod readback;
 use crate::gpu::renderer;
 
 fn layer(image: Option<&GpuImage>, fit: Fit, background: [u8; 3], opacity: f32) -> Layer<'_> {
-    Layer { image, fit, background, opacity, uv: None, relief: None, flip: [false; 2], grade: None }
+    Layer {
+        image,
+        fit,
+        background,
+        opacity,
+        uv: None,
+        relief: None,
+        flip: [false; 2],
+        grade: None,
+        clip: None,
+    }
 }
 
 fn draw(r: &Renderer, image: Option<&RgbaImage>, fit: Fit, background: [u8; 3], size: (u32, u32)) -> Vec<u8> {

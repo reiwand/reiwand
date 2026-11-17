@@ -72,6 +72,7 @@ impl Shot {
             fit: Fit::Stretch,
             background: [0; 3],
             opacity: 1.0,
+            clip: None,
             uv: None,
             relief: None,
             flip: [false; 2],

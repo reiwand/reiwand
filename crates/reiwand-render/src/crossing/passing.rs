@@ -26,6 +26,7 @@ fn plain(background: [u8; 3]) -> Layer<'static> {
         relief: None,
         flip: [false; 2],
         grade: None,
+        clip: None,
     }
 }
 

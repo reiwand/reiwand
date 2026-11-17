@@ -1,3 +1,4 @@
+use super::Do;
 use crate::daemon::Daemon;
 use futures_util::StreamExt;
 use reiwand_core::dbus;
@@ -9,7 +10,6 @@ use tokio::sync::Notify;
 use zbus::Variant as Value;
 use zbus::object_server::SignalEmitter;
 
-pub(crate) mod launch;
 mod portal;
 #[cfg(test)]
 mod portal_tests;
@@ -19,6 +19,8 @@ type Options<'a> = HashMap<&'a str, Value<'a>>;
 static REBIND: Notify = Notify::const_new();
 pub const NEXT: &str = "browse-next";
 pub const PREVIOUS: &str = "browse-previous";
+pub const APPLY: &str = "browse-apply";
+pub const CANCEL: &str = "browse-cancel";
 
 pub fn rebind() {
     REBIND.notify_one();
@@ -28,19 +30,24 @@ pub fn proposed(wanted: &Shortcuts) -> Vec<(&'static str, &'static str, Option<&
     vec![
         (NEXT, "Preview the next wallpaper", Shortcuts::trigger(&wanted.next)),
         (PREVIOUS, "Preview the previous wallpaper", Shortcuts::trigger(&wanted.previous)),
+        (APPLY, "Apply the wallpaper being previewed", Shortcuts::trigger(&wanted.apply)),
+        (CANCEL, "Leave the preview without changing the wallpaper", Shortcuts::trigger(&wanted.cancel)),
     ]
 }
 
-pub fn steps(id: &str) -> Option<i32> {
+pub fn action(id: &str) -> Option<Do> {
     match id {
-        NEXT => Some(1),
-        PREVIOUS => Some(-1),
+        NEXT => Some(Do::Move(1)),
+        PREVIOUS => Some(Do::Move(-1)),
+        APPLY => Some(Do::Apply),
+        CANCEL => Some(Do::Cancel),
         _ => None,
     }
 }
 
 pub async fn serve(conn: zbus::Connection, daemon: Arc<Daemon>) {
     let emitter = SignalEmitter::new(&conn, dbus::OBJECT_PATH).map(SignalEmitter::into_owned);
+    emitter.iter().for_each(|e| super::attach(&daemon, e));
     loop {
         let wanted = daemon.state().config.shortcuts.clone();
         let browse = &daemon.rotations.browse;
@@ -76,9 +83,9 @@ pub async fn serve(conn: zbus::Connection, daemon: Arc<Daemon>) {
                 signal = activated.next() => {
                     let Some(signal) = signal else { break };
                     let Ok(args) = signal.args() else { continue };
-                    let (Some(steps), Ok(emitter)) = (steps(args.shortcut_id), &emitter) else { continue };
+                    let Some(act) = action(args.shortcut_id) else { continue };
                     if args.session_handle.as_str() == session.as_str() {
-                        launch::pressed(&daemon, emitter, steps).await;
+                        super::run(&daemon, "", act).await;
                     }
                 }
             }

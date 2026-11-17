@@ -42,7 +42,12 @@ pub fn start(session: Session, daemon: Arc<Daemon>) -> anyhow::Result<()> {
             Event::Frame(output) => frame(&output),
             Event::Exposed(output) => repaint(&output),
             Event::Backdrop(output) => backdrop(&output),
-            Event::Pointer(output, pos, buttons) => crate::inputs::surface_pointer(&output, pos, buttons),
+            Event::Pointer(output, pos, buttons) => {
+                if !crate::browse::pointer(&output, pos, buttons) {
+                    crate::inputs::surface_pointer(&output, pos, buttons)
+                }
+            }
+            Event::Wheel(output, discrete, pixels) => drop(crate::browse::wheel(&output, discrete, pixels)),
             Event::Input(output) => region(&output),
             event => drop(tx.send(event)),
         },
@@ -135,6 +140,7 @@ impl Daemon {
             | Event::Exposed(_)
             | Event::Backdrop(_)
             | Event::Pointer(..)
+            | Event::Wheel(..)
             | Event::Input(_) => Ok(()),
         }
     }

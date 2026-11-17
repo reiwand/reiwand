@@ -32,7 +32,11 @@ pub(super) fn draw(
     if lights {
         return Ok(output.lit_only(now));
     }
-    let unchanged = output.unchanged(moved, exporter.starved(name));
+    let stripped = output.strip.as_mut().is_some_and(|s| {
+        s.advance(now, refresh);
+        std::mem::take(&mut s.changed)
+    });
+    let unchanged = output.unchanged(moved, exporter.starved(name)) && !stripped;
     let duration = output.shown.transition.map_or(transition, |d| d.as_secs_f32());
     let progress = output.progress(now, output.passing.as_ref().map_or(duration, |p| p.duration()));
     let opacity = if output.fade.is_some() { smoothstep(progress) } else { 1.0 };
@@ -59,6 +63,12 @@ pub(super) fn draw(
     };
     if let Some(one) = &one {
         layers = one;
+    }
+    let mut stacked = Vec::new();
+    if let Some(strip) = &output.strip {
+        stacked.extend_from_slice(layers);
+        strip.layers(output.size, now, &mut stacked);
+        layers = &stacked;
     }
     let written = match &mut output.sink {
         _ if unchanged => Ok(Ok(())),

@@ -68,6 +68,7 @@ fn spanned_screens_stay_continuous_under_overscan() {
             fit: Fit::Stretch,
             background: [0; 3],
             opacity: 1.0,
+            clip: None,
             uv,
             relief: Some(relief),
             flip: [false; 2],

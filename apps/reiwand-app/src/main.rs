@@ -31,7 +31,6 @@ mod looks;
 mod methods;
 mod packer;
 mod picture;
-mod preview;
 mod recentstore;
 mod relief;
 mod reliefjobs;
@@ -110,14 +109,11 @@ fn start() -> ExitCode {
     match args.first().map(String::as_str) {
         Some("--version" | "-V") => println!("reiwand-app {}", reiwand_core::VERSION),
         Some("--help" | "-h") => {
-            println!(
-                "usage: reiwand-app [--check | --version | --page PAGE | --browse OUTPUT] [FILE | URI]..."
-            );
+            println!("usage: reiwand-app [--check | --version | --page PAGE] [FILE | URI]...");
             println!("pages: {}", app::PAGES.join(", "));
         }
         Some("--check") if !bus::checking() => return checkrun::run(),
         Some("--depth") => return depthproc::child(&args[1..]),
-        Some("--browse") => return preview::start(),
         Some("--page") => match app::page(args.get(1).map(String::as_str)) {
             Some(page) => return open(&args[2..], Some(page)),
             None => {
@@ -166,7 +162,7 @@ fn engine(url: &str) -> u8 {
     if bus::checking() && shards::claim("compiled") {
         looks::qobject::compile_qml();
     }
-    if bus::checking() || url == preview::PREVIEW {
+    if bus::checking() {
         engine.as_mut().on_object_creation_failed(|_, _| std::process::exit(1)).release();
     }
     engine.load(&QUrl::from(url));

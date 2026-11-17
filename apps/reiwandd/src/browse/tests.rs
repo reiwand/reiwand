@@ -1,5 +1,6 @@
+use super::Do;
 use super::list::moved;
-use super::shortcuts::{proposed, steps};
+use super::shortcuts::{action, proposed};
 use super::{Browsing, source};
 use reiwand_core::model::{BrowseSource, ShortcutsState};
 use reiwand_core::shortcuts::Shortcuts;
@@ -44,11 +45,32 @@ fn shortcut_state_starts_off() {
 
 #[test]
 fn shortcuts_propose_valid_triggers_only() {
-    let wanted = Shortcuts { enabled: true, next: "LOGO+ALT+N".into(), previous: "bad key;".into() };
+    let wanted = Shortcuts {
+        enabled: true,
+        next: "LOGO+ALT+N".into(),
+        previous: "bad key;".into(),
+        ..Shortcuts::default()
+    };
     let shown = proposed(&wanted);
     assert_eq!(shown[0].2, Some("LOGO+ALT+N"));
     assert_eq!(shown[1].2, None);
-    assert_eq!(steps(shown[0].0), Some(1));
-    assert_eq!(steps(shown[1].0), Some(-1));
-    assert_eq!(steps("other"), None);
+    assert_eq!(shown[2].2, Some("LOGO+ALT+Return"));
+    assert_eq!(shown[3].2, Some("LOGO+ALT+Escape"));
+    assert_eq!(action(shown[0].0), Some(Do::Move(1)));
+    assert_eq!(action(shown[1].0), Some(Do::Move(-1)));
+    assert_eq!(action(shown[2].0), Some(Do::Apply));
+    assert_eq!(action(shown[3].0), Some(Do::Cancel));
+    assert_eq!(action("other"), None);
+}
+
+#[test]
+fn the_strip_shows_neighbours_without_repeating_the_middle() {
+    use super::stage::around;
+    assert_eq!(around(0, Some(0), 3), vec![]);
+    assert_eq!(around(1, Some(0), 3), vec![]);
+    assert_eq!(around(3, Some(0), 3), vec![(1, 1), (-1, 2)]);
+    assert_eq!(around(4, Some(1), 3), vec![(1, 2), (-1, 0), (2, 3)]);
+    let wide = around(20, Some(10), 3);
+    assert_eq!(wide.len(), 6);
+    assert!(wide.contains(&(-3, 7)) && wide.contains(&(3, 13)));
 }

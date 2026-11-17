@@ -120,7 +120,7 @@ async fn the_daemon_registers_before_binding() {
     bind(&own, &wanted).await.unwrap();
     let seen = seen.lock().unwrap();
     assert_eq!(seen.registered.values().collect::<Vec<_>>(), [APP_ID]);
-    assert_eq!(seen.bound, ["browse-next", "browse-previous"]);
+    assert_eq!(seen.bound, ["browse-next", "browse-previous", "browse-apply", "browse-cancel"]);
 }
 
 #[tokio::test]

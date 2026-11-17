@@ -745,6 +745,8 @@ Changes one setting and saves the configuration. Keys and their current values a
 | `shortcuts.enabled` | `true`, `false`: ask the desktop for the keys that browse wallpapers | `false` |
 | `shortcuts.next` | keys joined by `+`, such as `LOGO+ALT+N`; a proposal the desktop may change | `LOGO+ALT+N` |
 | `shortcuts.previous` | the same, to browse back | `LOGO+ALT+P` |
+| `shortcuts.apply` | the same, to apply the candidate of the open session | `LOGO+ALT+Return` |
+| `shortcuts.cancel` | the same, to close the session without changing | `LOGO+ALT+Escape` |
 | `transition.kind.<output>` | the same values for one output, or `general` (or an empty value) to follow `transition.kind`; kept as `transition` in `[outputs."<output>"]`, not listed in `options` but in `transitions`, read back with `reiwand-ctl config transition.kind.<output>` and kept when a profile is used | general |
 | `transition.less_motion` | `system` (follow the desktop's reduced motion), `always`, `never`: while it reduces, every transition becomes the plain fade and `none` stays a cut; it does not touch parallax | `system` |
 | `pause.when_covered` | pause while a maximized or fullscreen window covers the output | `true` |
@@ -1324,7 +1326,7 @@ A `HistoryReply`, newest first. `output` is a connector name; `limit` is `1..=10
 **Browsing wallpapers.** A browsing session lets the user look at wallpapers one by one on a screen and keep one, without
 changing anything until they apply it. It belongs to one output (`""` means the only screen when
 there is one; with several screens it browses the library for every screen at once). It holds a
-candidate, never shows it on the desktop (a window or the tray draws the preview from the
+candidate, never changes the wallpaper (the strip drawn over it and the tray read the
 `BrowseState` data), and ends by itself after 30 s without input. Nothing runs while nobody
 browses: one timer per open session.
 
@@ -1345,12 +1347,16 @@ when the system asks for less motion and `still` when the user does; `duration_m
 otherwise), `path`, `transition`, `idle_ms` (time left before it ends by itself) and `shortcuts`
 (`off`, `asking`, `bound`, `refused`, `unavailable`).
 
-**The preview window.** Whenever a session begins, whoever began it (a shortcut, the tray or
-`reiwand-ctl next --preview`), the daemon starts `reiwand-app --browse OUTPUT` unless some process owns
-the bus name `io.github.reiwand.Preview`. The window claims that name and leaves at once when
-it is taken, so there is never a second one; it follows `BrowseChanged` for its output and closes
-when the session ends. A key press whose `Browse` fails (nothing to browse) also opens it, so it
-can say why.
+**The strip.** Whenever a session begins, whoever began it (a shortcut, the tray or
+`reiwand-ctl next --preview`), the daemon composes a strip into the frames of the output (or of every real
+output when the session is `""` with several): the live wallpaper dimmed, the candidate framed in the
+middle (animated when its preview is a GIF or WebP, a still otherwise) with its name below, and still
+thumbnails of the neighbours at both sides. No window or surface is created and no keyboard focus is
+taken; it works on every presentation path (layer-shell, Plasma streams, X11 root). Moving slides the
+strip (instant with `transition.less_motion`). The real wallpaper does not change until `BrowseApply`;
+`BrowseCancel` or the idle end remove the strip. While a session is active the wheel over the
+output moves the selection by one per notch, a left click on the middle thumbnail applies and a click on
+another one selects it; this goes through the daemon's own pointer path and only exists during a session.
 
 ### `Browse(s output, s source, i steps) → (s json)`
 
@@ -1386,19 +1392,20 @@ The `BrowseState` of `output`, with `active: false` when nobody browses there.
 
 Sent on every change of a session, with the `BrowseState`, also when it ends by itself.
 
-**Global shortcuts.** With `shortcuts.enabled` the daemon asks the desktop portal for global shortcuts to bind two
-keys: `browse-next` and `browse-previous`, proposing `shortcuts.next` and `shortcuts.previous`
-(`LOGO+ALT+N` and `LOGO+ALT+P`; the desktop may show its own dialog and let the user pick other
+**Global shortcuts.** With `shortcuts.enabled` the daemon asks the desktop portal for global shortcuts to bind four
+keys: `browse-next`, `browse-previous`, `browse-apply` and `browse-cancel`, proposing `shortcuts.next`,
+`shortcuts.previous`, `shortcuts.apply` and `shortcuts.cancel`
+(`LOGO+ALT+N`, `LOGO+ALT+P`, `LOGO+ALT+Return` and `LOGO+ALT+Escape`; the desktop may show its own dialog and let the user pick other
 keys). A key press starts or moves a session on the only screen (on every screen with several)
-and the preview window opens as said above. Where the desktop
+and the strip appears as said above; the other two keys apply or cancel. Where the desktop
 has no such portal (wlroots compositors, X11) the state is `unavailable` and the user binds
-`reiwand-ctl next --preview` and `reiwand-ctl prev --preview` to keys in the compositor.
+`reiwand-ctl next --preview`, `prev --preview`, `browse apply` and `browse cancel` to keys in the compositor.
 The daemon opens its own session-bus connection for this, so that the first portal call of that
 connection is `org.freedesktop.host.portal.Registry.Register` with the app id `io.github.reiwand` (the id of the
 installed desktop entry); a failed registration is logged at WARN. Outside Flatpak the portal refuses a
 connection that already talked to it, which is why the shared connection is not used. Settings reads the state
 with `GetBrowse` and, when it is `refused` or `unavailable`, says next to "Keyboard shortcuts" that the keys
-must be bound by hand to the two commands above.
+must be bound by hand to the commands above.
 
 ## `io.github.reiwand.Profiles1`
 

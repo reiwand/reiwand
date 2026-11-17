@@ -172,7 +172,8 @@ fn the_daemon_draw_and_the_export_produce_the_same_pixels() {
     let exported = r.read_image(&developed).unwrap();
     let mut target = r.create_target(40, 24).unwrap();
     let (image, fit, background, flip) = (Some(&developed), Fit::Stretch, [0; 3], [false; 2]);
-    let layer = Layer { image, fit, background, opacity: 1.0, uv: None, relief: None, flip, grade: None };
+    let layer =
+        Layer { image, fit, background, opacity: 1.0, uv: None, relief: None, flip, grade: None, clip: None };
     let mut drawn = Vec::new();
     r.render_layers(&mut target, &[layer], &mut drawn).unwrap();
     for (i, pixel) in exported.pixels().enumerate() {

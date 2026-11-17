@@ -85,6 +85,7 @@ impl State {
             .chain(self.heard())
             .chain(self.page_due())
             .chain(self.starvation())
+            .chain(self.outputs.values().filter_map(|o| o.strip.as_ref()?.due))
             .chain(self.backdrops())
             .chain(self.outputs.values().filter_map(|o| o.passing.as_ref()?.until()))
             .chain(moving.and_then(|fps| self.motion.due(fps)))
@@ -103,6 +104,7 @@ impl State {
                 output.dirty = true;
             }
             output.dirty |= shared.1.starved(name);
+            output.dirty |= output.strip.as_ref().and_then(|s| s.due).is_some_and(|at| at <= now);
             output.unwatched(streaming);
             if deadline(output, output.open(streaming) || lights, self.power, now).is_none_or(|at| at > now) {
                 continue;
