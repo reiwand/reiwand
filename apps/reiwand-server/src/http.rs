@@ -129,7 +129,7 @@ async fn guard(State(app): St, req: Request, next: Next) -> Response {
                 .into_response()
         }),
     };
-    let api = ["/api/", "/r/", "/.well-known/"].iter().any(|p| path.starts_with(p));
+    let api = ["/api/", "/r/", "/.well-known/"].iter().any(|p| path.starts_with(p)) && !web::is_page(&path);
     if form || !api {
         response = crate::result::screen(&app, response, form, back.as_deref()).await;
     }

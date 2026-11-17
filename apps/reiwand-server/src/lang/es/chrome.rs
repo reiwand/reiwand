@@ -8,7 +8,7 @@ pub const TEXTS: super::Texts = &[
     ("Content policy", "Política de contenido"),
     ("Open-source licenses", "Licencias de código abierto"),
     ("Report content", "Denunciar contenido"),
-    ("Catalog", "Catálogo"),
+    ("Explore repositories", "Explorar repositorios"),
     ("Account ({})", "Cuenta ({})"),
     ("Moderation", "Moderación"),
     ("Administration", "Administración"),

@@ -10,7 +10,7 @@ pub const TEXTS: super::Texts = &[
     ("Nothing found", "No se encontró nada"),
     ("Try other words or clear the filters.", "Prueba con otras palabras o quita los filtros."),
     ("More wallpapers", "Más fondos"),
-    ("Wallpapers", "Fondos"),
+    ("Wallpapers in {}", "Fondos de {}"),
     ("a deleted account", "una cuenta borrada"),
     ("Preview of {}", "Vista previa de {}"),
     ("Out of the catalog", "Fuera del catálogo"),

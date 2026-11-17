@@ -7,7 +7,7 @@ use serde_json::Value;
 
 pub fn withdrawn(items: &[Value]) -> Markup {
     let row = |h: &Value| {
-        let name = html! { a href={ "/packages/" (text(h, "id")) } { (h["title"].as_str().unwrap_or(text(h, "id"))) } };
+        let name = html! { a href={ "/r/" (text(h, "repo")) "/packages/" (text(h, "id")) } { (h["title"].as_str().unwrap_or(text(h, "id"))) } };
         let line = tf(
             "by {} · withdrawn {} · {}",
             &[&text(h, "owner"), &ago(h["hidden_at"].as_i64().unwrap_or(0)), &text(h, "reason")],

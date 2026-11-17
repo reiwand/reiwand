@@ -72,7 +72,8 @@ async fn votes_are_counted_without_voters_and_featured_packages_are_marked() {
         (picked["items"][0]["id"].as_str(), picked["items"][0]["featured"].as_bool()),
         (Some(DAWN), Some(true))
     );
-    let page = server.call(Method::GET, &format!("/packages/{DAWN}"), &Who::Nobody).send().await.unwrap();
+    let page =
+        server.call(Method::GET, &format!("/r/main/packages/{DAWN}"), &Who::Nobody).send().await.unwrap();
     assert!(page.text().await.unwrap().contains("Featured by this server"));
     let get = async |path: String| server.call(Method::GET, &path, &Who::Nobody).send().await.unwrap();
     let latest = get("/r/main/entry/latest".into()).await.text().await.unwrap();

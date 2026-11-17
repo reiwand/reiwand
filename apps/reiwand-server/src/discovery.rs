@@ -81,7 +81,7 @@ pub async fn discovery(State(app): St, auth: Option<Auth>, Query(ask): Query<Ask
     });
     Ok(Json(json!({
         "name": c.name, "version": crate::VERSION, "api": ["v1"], "registration": registration,
-        "sync": sync, "repositories": repositories, "legal": legal,
+        "sync": sync, "repositories": repositories, "repositories_page": c.url("/"), "legal": legal,
         "uploads": {"max_bytes": c.package_max, "per_day": c.uploads_per_day, "licenses": c.licenses},
     })))
 }

@@ -250,6 +250,25 @@ before the server kept the key has no such file and `/admin/repos` says so on it
 it. The sealing key lives next to the data it protects: this guards against a copy of a single file, not against
 whoever reads the whole data folder.
 
+### Explorar repositorios (página pública)
+
+`/` lista los repositorios del servidor sin JavaScript y con el aspecto de las demás páginas
+públicas: nombre, número de fondos listados, fecha de la última publicación, la dirección sencilla
+`https://servidor/r/<nombre>` (con «Copiar la dirección» cuando hay JavaScript; el texto se puede
+seleccionar sin él), el botón «Abrir en Reiwand» y un enlace al catálogo. Los repositorios privados
+solo aparecen, marcados como «Privado», a quien inició sesión en la web y tiene derecho de lectura
+(los administradores y moderadores ven todos).
+
+«Abrir en Reiwand» es un enlace `reiwand://add?url=<dirección codificada como componente de URL>`:
+la aplicación de escritorio lo registrará como manejador del esquema `reiwand`; el parámetro `url`
+es la dirección que acepta «Agregar un repositorio». La aplicación nunca lista repositorios a partir
+de la dirección de un servidor pegada: esa lista vive aquí.
+
+Cada repositorio tiene su catálogo en `/r/<nombre>/` (búsqueda, filtros y paginación como antes) y
+sus páginas de paquete en `/r/<nombre>/packages/{id}`, con votos y denuncias del propio repositorio.
+El catálogo del primer repositorio es `/r/<nombre>/` como el de los demás; no hay otra ruta. Un repositorio privado
+responde 401 a quien no es miembro. El descubrimiento añade `repositories_page` (la dirección del servidor, `<url>/`).
+
 ### Private repositories and rights
 
 A repository is public or private (`repos.private`). Members are rows of `repo_members (repo,

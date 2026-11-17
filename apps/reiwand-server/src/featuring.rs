@@ -95,7 +95,7 @@ async fn screen(State(app): St, auth: Option<Auth>) -> Res<Response> {
     let body = html! {
         p.texto { (t("Featured packages are signed into the repository; clients show them apart in their catalog.")) }
         table { tbody { @for i in &items { tr {
-            td { (text(i, "repo")) } td { a href={ "/packages/" (text(i, "id")) } { code { (text(i, "id")) } } } td { (text(i, "note")) }
+            td { (text(i, "repo")) } td { a href={ "/r/" (text(i, "repo")) "/packages/" (text(i, "id")) } { code { (text(i, "id")) } } } td { (text(i, "note")) }
             td { form method="post" action={ "/api/v1/r/" (text(i, "repo")) "/admin/featured/" (text(i, "id")) "?_method=DELETE&back=/admin/featured" } {
                 button { (t("Stop featuring")) }
             } }

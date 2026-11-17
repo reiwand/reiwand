@@ -53,7 +53,8 @@ async fn upload_review_publish_and_install_with_a_verifying_client() {
     assert_eq!(status, StatusCode::OK, "{published}");
     let (_, catalog) = server.json(Method::GET, "/api/v1/r/main/catalog?q=dawn", &Who::Nobody, None).await;
     assert_eq!(catalog["items"][0]["id"], DAWN);
-    let home = server.call(Method::GET, "/?q=Dawn", &Who::Nobody).send().await.unwrap().text().await.unwrap();
+    let home =
+        server.call(Method::GET, "/r/main/?q=Dawn", &Who::Nobody).send().await.unwrap().text().await.unwrap();
     assert!(home.contains("Dawn 1.0.0"));
     let info = reiwand_server::status(&server.cfg).unwrap();
     let url = info["url"].as_str().unwrap().to_string();
@@ -185,7 +186,7 @@ async fn signatures_blocklist_and_web_uploads() {
         server.json(Method::GET, "/api/v1/r/main/packages/org.example.dusk", &Who::Nobody, None).await;
     assert_eq!(item["owner"], "ana");
     let page = server
-        .call(Method::GET, "/packages/org.example.dusk", &Who::Nobody)
+        .call(Method::GET, "/r/main/packages/org.example.dusk", &Who::Nobody)
         .send()
         .await
         .unwrap()

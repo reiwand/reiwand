@@ -19,9 +19,15 @@ use serde_json::Value;
 
 pub fn routes() -> Router {
     Router::new()
-        .route("/", get(home))
-        .route("/packages/{id}", get(package))
+        .route("/", get(crate::explore::list))
+        .route("/r/{repo}/", get(repo_catalog))
+        .route("/r/{repo}/packages/{id}", get(repo_package))
         .route("/media/{file}", get(media))
+}
+
+pub fn is_page(path: &str) -> bool {
+    let rest = path.strip_prefix("/r/").unwrap_or_default();
+    matches!(rest.split('/').collect::<Vec<_>>()[..], [_, ""] | [_, "packages", _])
 }
 
 pub fn text<'a>(value: &'a Value, key: &str) -> &'a str {
@@ -35,14 +41,40 @@ fn joined(value: &Value) -> String {
 const FACETS: [&str; 8] =
     ["audio", "pointer", "sound", "customizable", "localized", "photosensitive", "mature", "4k"];
 
-async fn home(State(app): St, auth: Option<Auth>, Query(s): Query<Search>) -> Res<Markup> {
+async fn repo_catalog(
+    State(app): St,
+    auth: Option<Auth>,
+    Path(name): Path<String>,
+    Query(s): Query<Search>,
+) -> Res<Markup> {
+    let name = crate::scope::resolve(&app, &name)?.name.clone();
+    catalog(app, auth, name, s).await
+}
+
+async fn repo_package(
+    State(app): St,
+    auth: Option<Auth>,
+    Path((name, id)): Path<(String, String)>,
+) -> Res<Markup> {
+    let name = crate::scope::resolve(&app, &name)?.name.clone();
+    package(app, auth, name, id).await
+}
+
+async fn catalog(
+    app: std::sync::Arc<crate::App>,
+    auth: Option<Auth>,
+    repo: String,
+    s: Search,
+) -> Res<Markup> {
+    crate::access::read(&app, &repo, auth.as_ref()).await?;
     let (q, kind, rating, facet) = (s.q.clone(), s.kind.clone(), s.content.clone(), s.facet.clone());
     let picked = !s.featured.is_empty();
-    let repo = crate::scope::first(&app);
-    let (items, next) = app.db.run(move |c| search(c, &repo, &s)).await?;
+    let base = format!("/r/{repo}");
+    let named = repo.clone();
+    let (items, next) = app.db.run(move |c| search(c, &named, &s)).await?;
     let encode = |text: &str| utf8_percent_encode(text, NON_ALPHANUMERIC).to_string();
     let body = html! {
-        form role="search" method="get" action="/" {
+        form role="search" method="get" action={ (base) "/" } {
             label { (t("Search")) input type="search" name="q" value=(q); }
             label { (t("Type")) select name="kind" {
                 option value="" { (t("Any")) }
@@ -62,7 +94,7 @@ async fn home(State(app): St, auth: Option<Auth>, Query(s): Query<Search>) -> Re
         @if items.is_empty() { (empty(t("Nothing found"), html! { (t("Try other words or clear the filters.")) })) }
         ul.grid { @for i in &items { li {
             (preview(text(i, "thumbnail"), "", 320, i["content"] == "mature"))
-            a href={ "/packages/" (text(i, "id")) } { (text(i, "title")) }
+            a href={ (base) "/packages/" (text(i, "id")) } { (text(i, "title")) }
             br;
             small {
                 @if i["featured"] == true { (t("Featured")) " · " }
@@ -71,17 +103,23 @@ async fn home(State(app): St, auth: Option<Auth>, Query(s): Query<Search>) -> Re
             }
         } } }
         @if let Some(next) = next {
-            p { a rel="next" href={ "/?cursor=" (next) "&q=" (encode(&q)) "&kind=" (encode(&kind))
+            p { a rel="next" href={ (base) "/?cursor=" (next) "&q=" (encode(&q)) "&kind=" (encode(&kind))
                 "&content=" (encode(&rating)) "&facet=" (encode(&facet)) } {
                 (t("More wallpapers"))
             } }
         }
     };
-    Ok(page(&app, auth.as_ref(), "/", t("Wallpapers"), body))
+    Ok(page(&app, auth.as_ref(), "/", &tf("Wallpapers in {}", &[&repo]), body))
 }
 
-async fn package(State(app): St, auth: Option<Auth>, Path(id): Path<String>) -> Res<Markup> {
-    let (key, repo) = (id.clone(), crate::scope::first(&app));
+async fn package(
+    app: std::sync::Arc<crate::App>,
+    auth: Option<Auth>,
+    repo: String,
+    id: String,
+) -> Res<Markup> {
+    crate::access::read(&app, &repo, auth.as_ref()).await?;
+    let (key, base) = (id.clone(), format!("/r/{repo}"));
     let (latest, versions) = app.db.run(move |c| details(c, &repo, &key)).await?;
     let (title, owner) = (text(&latest, "title"), latest["owner"].as_str().unwrap_or(t("a deleted account")));
     let render = if latest["content"].is_null() { markup::verbatim } else { markup::html };
@@ -101,7 +139,7 @@ async fn package(State(app): St, auth: Option<Auth>, Path(id): Path<String>) -> 
                 photosensitive epilepsy.")) } }, None))
         }
         (PreEscaped(description))
-        (crate::votes::ballot(&id, &latest, auth.is_some()))
+        (crate::votes::ballot(&base, &id, &latest, auth.is_some()))
         dl {
             dt { (t("Package")) } dd { code { (id) } }
             dt { (t("Type")) } dd { (word(text(&latest, "kind"))) }
@@ -120,7 +158,7 @@ async fn package(State(app): St, auth: Option<Auth>, Path(id): Path<String>) -> 
         h2 { (t("Versions")) }
         ul { @for v in &versions { li { a href=(text(v, "download")) { (text(v, "version")) } } } }
         h2 { (t("Report this wallpaper")) }
-        form.formulario method="post" action={ "/api/v1/r/" (text(&latest, "repo")) "/packages/" (id) "/reports?back=/packages/" (id) } {
+        form.formulario method="post" action={ "/api/v1" (base) "/packages/" (id) "/reports?back=" (base) "/packages/" (id) } {
             label { (t("Reason")) select name="category" {
                 @for c in ["copyright", "illegal", "malware", "mature", "spam", "other"] {
                     option value=(c) { (word(c)) }

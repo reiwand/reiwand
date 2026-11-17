@@ -9,7 +9,7 @@ pub fn nav(auth: Option<&Auth>, current: &str, sign_in: bool) -> Markup {
         html! { a href=(href) aria-current=[(href == current).then_some("page")] class=(if href == current { "actual" } else { "" }) { (label) } }
     };
     html! {
-        (link("/", t("Catalog")))
+        (link("/", t("Explore repositories")))
         @if let Some(a) = auth {
             (link("/account", &tf("Account ({})", &[&a.handle])))
             @if a.role >= Role::Moderator { (link("/mod", t("Review"))) }

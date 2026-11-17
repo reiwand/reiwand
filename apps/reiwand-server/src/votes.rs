@@ -113,7 +113,7 @@ async fn counts(State(app): St, auth: Option<Auth>, sc: Scope, Query(q): Query<I
     Ok(Json(json!({"items": items.await?})))
 }
 
-pub fn ballot(id: &str, latest: &Value, signed: bool) -> maud::Markup {
+pub fn ballot(base: &str, id: &str, latest: &Value, signed: bool) -> maud::Markup {
     let (up, down) = (&latest["votes"]["up"], &latest["votes"]["down"]);
     maud::html! {
         p {
@@ -121,7 +121,7 @@ pub fn ballot(id: &str, latest: &Value, signed: bool) -> maud::Markup {
             "▲ " (up) " · ▼ " (down) " " (t("votes, counted without any list of who voted."))
         }
         @if signed { @for (vote, label) in [("up", t("Vote up")), ("down", t("Vote down")), ("none", t("Withdraw my vote"))] {
-            form.inline method="post" action={ "/api/v1/r/" (crate::web::text(latest, "repo")) "/packages/" (id) "/vote?back=/packages/" (id) } {
+            form.inline method="post" action={ "/api/v1" (base) "/packages/" (id) "/vote?back=" (base) "/packages/" (id) } {
                 input type="hidden" name="vote" value=(vote);
                 (crate::ui::button(crate::ui::Kind::Plain, label))
             }

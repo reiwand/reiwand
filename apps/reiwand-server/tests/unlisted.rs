@@ -33,7 +33,8 @@ async fn unlisted_uploads_stay_out_of_the_catalog_but_keep_their_link() {
     let (status, item) =
         server.json(Method::GET, &format!("/api/v1/r/main/packages/{NOON}"), &Who::Nobody, None).await;
     assert_eq!((status, item["listed"].as_bool()), (StatusCode::OK, Some(false)), "{item}");
-    let shown = server.call(Method::GET, &format!("/packages/{NOON}"), &Who::Nobody).send().await.unwrap();
+    let shown =
+        server.call(Method::GET, &format!("/r/main/packages/{NOON}"), &Who::Nobody).send().await.unwrap();
     assert!(shown.text().await.unwrap().contains("Unlisted"));
     let (_, mine) = server.json(Method::GET, "/api/v1/me/packages", &ana, None).await;
     assert_eq!(mine["items"][0]["visibility"], "unlisted", "{mine}");

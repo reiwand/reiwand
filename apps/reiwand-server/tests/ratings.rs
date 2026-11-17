@@ -46,10 +46,11 @@ async fn mature_uploads_carry_their_label_and_the_catalog_filters_by_rating_and_
     assert_eq!(ids("?facet=photosensitive").await, ["org.example.dusk", "org.example.night"]);
     assert_eq!(ids("?content=mature").await, ["org.example.night"]);
     assert_eq!(ids("?facet=mature&q=night").await, ["org.example.night"]);
-    let home = server.call(Method::GET, "/?content=mature", &Who::Nobody).send().await.unwrap();
+    let home = server.call(Method::GET, "/r/main/?content=mature", &Who::Nobody).send().await.unwrap();
     let home = home.text().await.unwrap();
     assert!(home.contains("class=\"veil\"") && home.contains("Mature content: select to show"), "{home}");
-    let page = server.call(Method::GET, "/packages/org.example.dusk", &Who::Nobody).send().await.unwrap();
+    let page =
+        server.call(Method::GET, "/r/main/packages/org.example.dusk", &Who::Nobody).send().await.unwrap();
     assert!(!page.text().await.unwrap().contains("class=\"veil\""));
     let hide = json!({"id": "org.example.dawn", "reason": "Shown by mistake in the catalog."});
     let (status, _) =
@@ -71,7 +72,8 @@ async fn mature_uploads_carry_their_label_and_the_catalog_filters_by_rating_and_
         server.json(Method::GET, "/api/v1/r/main/packages/org.example.dusk", &Who::Nobody, None).await;
     assert_eq!((&dusk["content"], &dusk["photosensitive"]), (&json!("general"), &json!(true)), "{dusk}");
     assert_eq!(dusk["facets"], json!(["android", "desktop", "landscape", "photosensitive"]));
-    let page = server.call(Method::GET, "/packages/org.example.dusk", &Who::Nobody).send().await.unwrap();
+    let page =
+        server.call(Method::GET, "/r/main/packages/org.example.dusk", &Who::Nobody).send().await.unwrap();
     assert!(page.text().await.unwrap().contains("flashing lights"));
     let (status, _) = server.json(Method::POST, "/api/v1/admin/repo/publish", &admin, None).await;
     assert_eq!(status, StatusCode::OK);

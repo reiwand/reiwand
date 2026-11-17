@@ -103,7 +103,7 @@ async fn copy_script_is_plain_and_the_frame_is_complete() {
     }
     let (_, _, setup) = get(&server, "/setup", &Who::Nobody).await;
     assert!(!setup.contains("href=\"/login\""));
-    let (status, _, missing) = get(&server, "/packages/none-here", &Who::Nobody).await;
+    let (status, _, missing) = get(&server, "/r/main/packages/none-here", &Who::Nobody).await;
     assert_eq!(status, StatusCode::NOT_FOUND);
     assert!(missing.contains("nota mal") && missing.contains("Continue") && missing.contains("linea-estado"));
 }

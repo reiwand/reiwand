@@ -21,6 +21,7 @@ mod discovery;
 mod door;
 mod entry;
 mod error;
+mod explore;
 mod featuring;
 mod files;
 mod frame;
