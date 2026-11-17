@@ -144,6 +144,10 @@ A stream exists while at least one claim holds it. Claims are kept per output an
 Coverage is also tracked per claimant. An output counts as covered only when every claimant
 reports it covered. `SetOutputCovered` from a client without a claim applies to the held claim.
 
+A stream whose name starts with `preview:` is private: it never shows the content of the desktop
+(`default`), only what its own `Library1.Apply` (or a draft) gives it, and an output that has not
+shown content yet shows the first content applied to it without a transition.
+
 Output names are trimmed and an empty name means `default` in `RequestStream`, `HoldStream`,
 `ReleaseStream` and `SetOutputCovered`.
 

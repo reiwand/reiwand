@@ -16,10 +16,9 @@ pub(crate) use page::Drawn;
 const LIFE: Duration = Duration::from_secs(60);
 const MAX_DOCUMENT: usize = 9 << 20;
 const DECODED: u64 = 512 << 20;
-const PREVIEW: &str = "preview:";
 
 pub fn virtual_output(name: &str) -> bool {
-    name.starts_with(PREVIEW)
+    name.starts_with(reiwand_core::config::PRIVATE_PREFIX)
 }
 
 pub(crate) fn previews(

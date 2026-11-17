@@ -90,3 +90,13 @@ fn library_and_repository_options() {
     let c: Config = toml::from_str("[library]\nthumb_cache_mb = 1").unwrap();
     assert_eq!(c.clone().normalize(), ["library.thumb_cache_mb"]);
 }
+
+#[test]
+fn a_private_preview_output_never_inherits_the_desktop_content() {
+    let text = "[default]\nplaylist = \"P1\"\nfit = \"tile\"\n[outputs.\"preview:a\"]\nimage = \"/b.png\"\n";
+    let c: Config = toml::from_str(text).unwrap();
+    let fresh = c.resolve("preview:card-1");
+    assert_eq!((fresh.image, fresh.playlist, fresh.fit), (None, None, Fit::Tile));
+    assert_eq!(c.resolve("preview:a").image.as_deref(), Some(Path::new("/b.png")));
+    assert_eq!(c.resolve("DP-1").playlist.as_deref(), Some("P1"));
+}

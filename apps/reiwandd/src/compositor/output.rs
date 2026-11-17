@@ -29,6 +29,7 @@ pub(super) struct Output {
     pub(super) stale: bool,
     pub(super) sink: Sink,
     pub(super) last_render: Option<Instant>,
+    pub(super) blank: bool,
     pub(super) offset: [f32; 2],
     pub(super) moving: bool,
     pub(super) refresh: u32,
@@ -50,9 +51,11 @@ impl Output {
         let (fade, last_render) = (None, None);
         let (active, dirty, missing_frame, stale, moving) = (true, true, false, true, false);
         let (offset, covered, failed) = ([0.0; 2], false, 0);
+        let blank = false;
         Self {
             size,
             shown,
+            blank,
             fade,
             active,
             dirty,
@@ -102,13 +105,15 @@ impl Output {
     }
 
     pub(super) fn animates(&self, transition: bool, streaming: bool, resized: bool) -> bool {
-        transition && self.watched(streaming) && !resized && self.active && self.last_render.is_some()
+        let live = self.active && !self.blank && self.last_render.is_some();
+        transition && live && self.watched(streaming) && !resized
     }
 
     pub(super) fn show(&mut self, shown: Shown, size: (u32, u32), transition: bool, streaming: bool) {
         let resized = std::mem::replace(&mut self.size, size) != size;
         let animate = self.animates(transition, streaming, resized);
         let old = std::mem::replace(&mut self.shown, shown);
+        self.blank = false;
         self.fade = (animate && !old.content.same_source(&self.shown.content)).then_some((old, None));
         self.passing = None;
         let kept = std::mem::take(&mut self.lit[0]);

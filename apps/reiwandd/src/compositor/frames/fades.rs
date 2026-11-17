@@ -19,7 +19,10 @@ fn a_stream_nobody_watches_changes_picture_without_a_fade() {
     let mut output = Output::new((16, 9), shown, Sink::Stream(None), 60);
     assert!(!output.animates(true, true, false), "a fade before the first frame");
     output.last_render = Some(Instant::now());
-    assert!(output.animates(true, true, false));
+    assert!(output.animates(true, true, false), "a colour wallpaper must fade into the next content");
+    output.blank = true;
+    assert!(!output.animates(true, true, false), "the first content faded in from nothing");
+    output.blank = false;
     assert!(
         !output.animates(true, false, false),
         "a consumer that arrives later got the first frame mid-fade"
