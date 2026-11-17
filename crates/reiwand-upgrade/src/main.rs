@@ -8,8 +8,11 @@ const HELP: &str = "reiwand-upgrade: one-time upgrade of stored Reiwand data fro
 usage:
   reiwand-upgrade server --data DIR [--then PROGRAM [ARGS...]]
       server data folder (database, repositories, keys); with --then, runs the program afterwards
-  reiwand-upgrade client [--data DIR] [--then PROGRAM [ARGS...]]
-      desktop or phone data folder (followed repositories); default: the reiwand folder of the user data directory
+  reiwand-upgrade client [--data DIR] [--skip-download] [--then PROGRAM [ARGS...]]
+      desktop or phone data folder (followed repositories); default: the reiwand folder of the user data directory.
+      first downloads, from the old server, the lists, favourites, repository offers and private files that only it
+      held, into from-server.reiwand (bring it in with reiwand-ctl import); if the server does not answer, nothing is
+      changed and the run is repeated later; --skip-download goes on without it. Upgrade the desktop before the server
 
 It is safe to run again: a folder that is already current is left alone.";
 
@@ -37,7 +40,11 @@ fn main() -> anyhow::Result<()> {
         Some("server") => reiwand_upgrade::server::run(&data)?,
         Some("client") => {
             let mut vault = reiwand_upgrade::vault::KeyringVault::open(&data)?;
-            reiwand_upgrade::client::run_with(&data, &mut vault)?
+            reiwand_upgrade::client::run_options(
+                &data,
+                &mut vault,
+                args.iter().any(|a| a == "--skip-download"),
+            )?
         }
         other => bail!("unknown target {other:?}: use server or client"),
     };

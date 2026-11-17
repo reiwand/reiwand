@@ -1,4 +1,4 @@
-use reiwand_upgrade::{Outcome, Vault, client};
+use reiwand_upgrade::{Outcome, client};
 use std::collections::BTreeMap;
 use std::fs;
 
@@ -32,26 +32,8 @@ fn stored_repositories_lose_the_share_parameters_once() {
     assert_eq!(client::run(data).unwrap(), Outcome::Nothing);
 }
 
-#[derive(Default)]
-struct Memory {
-    items: BTreeMap<String, String>,
-    unreachable: bool,
-}
-
-impl Vault for Memory {
-    fn take(&mut self, item: &str) -> anyhow::Result<Option<String>> {
-        anyhow::ensure!(!self.unreachable, "the keyring is locked");
-        Ok(self.items.get(item).cloned())
-    }
-    fn put(&mut self, item: &str, secret: &str) -> anyhow::Result<()> {
-        self.items.insert(item.to_owned(), secret.to_owned());
-        Ok(())
-    }
-    fn drop_item(&mut self, item: &str) -> anyhow::Result<()> {
-        self.items.remove(item);
-        Ok(())
-    }
-}
+mod vault;
+use vault::Memory;
 
 const OLD: &str = r#"{"url":"https://srv.example:8443","name":"laptop","pin":"AB12CD",
 "repo_url":"https://srv.example:8443/r/shelf/","repo_id":"rid","owner":["ana",7],"label":"home",
@@ -63,7 +45,7 @@ fn the_old_account_keeps_its_session_in_the_new_store() {
     let data = dir.path();
     fs::write(data.join("sync.json"), OLD).unwrap();
     let mut vault = Memory::default();
-    vault.items.insert("server".into(), "tok".into());
+    vault.items.insert("server".into(), r#"{"token":"tok"}"#.into());
     client::run_with(data, &mut vault).unwrap();
     let file: serde_json::Value =
         serde_json::from_slice(&fs::read(data.join("accounts.json")).unwrap()).unwrap();

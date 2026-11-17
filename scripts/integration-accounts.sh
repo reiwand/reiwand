@@ -66,7 +66,7 @@ cat >"$data/sync.json" <<'OLD'
  "repo_url": "https://srv.example:8443/r/shelf/", "repo_id": "rid", "owner": ["ana", 7], "label": "home",
  "offers": [{"url": "https://c.example/"}], "away": [], "files": {}, "replica": {"heads": {}}}
 OLD
-printf '{"server/server": "old-token"}' >"$data/secrets.json"
+printf '{"server/server": "{\\"token\\":\\"old-token\\"}"}' >"$data/secrets.json"
 chmod 600 "$data/secrets.json"
 
 mapfile -t env < <(acct_env old)

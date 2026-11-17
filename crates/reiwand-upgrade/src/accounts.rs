@@ -71,7 +71,11 @@ pub fn accounts_step(
         moved.pins.insert(site.clone(), pin.to_ascii_lowercase());
     }
     let id = format!("a{user_id:x}{}", site.len());
-    let token = vault.take("server")?;
+    let token = vault
+        .take("server")?
+        .and_then(|held| serde_json::from_str::<Value>(&held).ok())
+        .and_then(|held| held["token"].as_str().map(str::to_owned))
+        .filter(|token| !token.is_empty());
     if let Some(token) = &token {
         vault.put(&format!("account {id}"), token)?;
     }
@@ -117,7 +121,8 @@ mod tests {
 
     #[test]
     fn the_saved_account_becomes_a_linked_account_with_its_secret_moved() {
-        let mut vault = Memory(BTreeMap::from([("server".to_owned(), "tok".to_owned())]));
+        let mut vault =
+            Memory(BTreeMap::from([("server".to_owned(), r#"{"token":"tok","key":""}"#.to_owned())]));
         let done = accounts_step(&sync(), BTreeMap::new(), &mut vault).unwrap();
         let rec = &done.accounts.accounts[0];
         assert_eq!(

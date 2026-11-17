@@ -1,5 +1,7 @@
 mod accounts;
 pub mod client;
+#[cfg(feature = "client")]
+mod download;
 #[cfg(feature = "server")]
 pub mod server;
 #[cfg(feature = "server")]
