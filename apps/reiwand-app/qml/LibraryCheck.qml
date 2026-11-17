@@ -80,7 +80,6 @@ QtObject {
         first.exercise();
         damaged();
         menus.exercise();
-        notes();
         daily.exercise();
         page.tools.shown();
     }
@@ -167,27 +166,5 @@ QtObject {
         const found = [card.hurt, card.main, card.said(card.entry)];
         card.destroy();
         must(found.join("|") === ["true", App.tr("Show in folder"), App.tr("Could not open this scene: the file is damaged")].join("|"), "a damaged file does not offer to show its folder or names another kind: " + found.join("|"));
-    }
-
-    function notes() {
-        const notes = page.notes;
-        const kept = notes.away.items;
-        const all = page.all;
-        page.all = false;
-        notes.away.items = [{
-                "key": "0123456789abcdef",
-                "title": "",
-                "playlists": []
-            }, {
-                "key": "fedcba9876543210",
-                "title": "Hills",
-                "repo": "r",
-                "playlists": []
-            }];
-        notes.forceLayout();
-        const found = [notes.room > 0, notes.height > 0, notes.y + notes.height <= page.bar.y];
-        notes.away.items = kept;
-        page.all = all;
-        must(found.join() === "true,true,true", "a note of the library lies over the tabs: " + found.join());
     }
 }

@@ -1098,7 +1098,8 @@ msgstr ""
 
 #: apps/reiwand-ctl/src/cli.rs
 msgid "Publish to a repository: uploads, your packages and your author keys"
-msgstr "Publicar en un repositorio: subidas, tus paquetes y tus claves de autor"
+msgstr ""
+"Publicar en un repositorio: subidas, tus paquetes y tus claves de autor"
 
 #: apps/reiwand-ctl/src/cli.rs
 msgid "Accounts on repository servers: sign in, choose, forget"

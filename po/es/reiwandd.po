@@ -23,7 +23,9 @@ msgstr ""
 #: apps/reiwandd/src/words.rs
 msgid ""
 "The server no longer accepts this account: sign in again to keep using it."
-msgstr "El servidor ya no acepta esta cuenta: vuelve a iniciar sesión para seguir usándola."
+msgstr ""
+"El servidor ya no acepta esta cuenta: vuelve a iniciar sesión para seguir "
+"usándola."
 
 #: apps/reiwandd/src/words.rs
 msgid ""

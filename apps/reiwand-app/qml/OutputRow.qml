@@ -133,13 +133,6 @@ RowLayout {
         }
 
         SmallNote {
-            visible: row.info.away !== undefined && row.info.away !== null
-            text: row.daemon.tr("“%1” comes from your other computers, but its file is not on this computer.", Names.of({
-                    "title": row.info.away
-                })) + " " + row.daemon.tr("On the computer that has it, use “Send files to my other computers”.")
-        }
-
-        SmallNote {
             visible: row.mature
             text: row.daemon.tr("Mature content: click the picture to always show this package")
         }

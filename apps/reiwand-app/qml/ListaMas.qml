@@ -68,11 +68,6 @@ QQC2.ScrollView {
             active: more.visible
         }
 
-        AwayNote {
-            width: parent.width
-            playlist: more.uid
-        }
-
         Fila {
             text: App.tr("Remove the list")
             note: App.tr("You can undo it right after")

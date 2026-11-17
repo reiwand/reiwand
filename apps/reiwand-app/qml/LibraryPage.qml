@@ -23,9 +23,8 @@ Kirigami.Page {
     readonly property string skeleton: opened !== "" ? "options" : ""
     readonly property bool full: all && opened === ""
     readonly property bool tellsService: opened === "" && state.failed
-    readonly property real bandLow: opened !== "" ? 0 : state.alone ? state.low : all ? 0 : notes.room + bar.height + Look.e4 + covers.implicitHeight
+    readonly property real bandLow: opened !== "" ? 0 : state.alone ? state.low : all ? 0 : bar.height + Look.e4 + covers.implicitHeight
     readonly property real bandHigh: bandLow
-    readonly property alias notes: notes
     readonly property real bandFrom: state.alone ? lower.y : lower.y + bar.y
     property rect band
     property rect upper
@@ -126,17 +125,11 @@ Kirigami.Page {
         width: placed ? page.band.width : page.width
         height: placed ? page.band.height : page.height
 
-        LibraryNotes {
-            id: notes
-
-            page: page
-        }
-
         LibraryBar {
             id: bar
 
             visible: !state.alone
-            y: page.all ? 0 : Math.max(notes.room, covers.y - height - Look.e4)
+            y: page.all ? 0 : covers.y - height - Look.e4
             tools: tools
             total: library.total
             all: page.all
@@ -150,7 +143,7 @@ Kirigami.Page {
 
             visible: library.total > 0
             page: page
-            y: page.all ? bar.height + Look.e5 : Math.max(notes.room + bar.height + Look.e4, lower.height - height)
+            y: page.all ? bar.height + Look.e5 : Math.max(bar.height + Look.e4, lower.height - height)
             width: parent.width
         }
 

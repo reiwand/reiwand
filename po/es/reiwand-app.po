@@ -275,7 +275,6 @@ msgid "Stop sharing"
 msgstr "Dejar de compartir"
 
 #: apps/reiwand-app/qml/AccountFiles.qml apps/reiwand-app/qml/DepthDialog.qml
-#: apps/reiwand-app/qml/SyncedFiles.qml
 msgid "Download"
 msgstr "Descargar"
 
@@ -11798,14 +11797,6 @@ msgid ""
 msgstr ""
 "El motor los traduce para cada usuario. Elige uno con Usar un texto por "
 "clave en un título o una etiqueta."
-
-#: apps/reiwand-app/qml/SyncedFiles.qml
-msgid ""
-"%1 (%2) was sent to your server from another computer and is not in this "
-"library yet."
-msgstr ""
-"%1 (%2) se envió a tu servidor desde otro equipo y aún no está en esta "
-"biblioteca."
 
 #: apps/reiwand-app/qml/TextsKeys.qml
 msgid "Use a text by key"
