@@ -60,7 +60,7 @@ Importar solo agrega y sigue este orden: repositorios, proveedores y claves, paq
 
 ## En la app de escritorio
 
-Ajustes > Equipo > «Mover mi configuración» ofrece «Exportar mi configuración…» e «Importar una configuración…». Exportar permite marcar los fondos propios (muestra el tamaño que suman) y las contraseñas y claves (pide la contraseña dos veces y cifra todo el archivo), y ejecuta `Carry1.Export` como tarea. Importar abre el archivo, pide la contraseña si está cifrado, muestra la vista previa por sección (nuevos, ya presentes, conflictos de nombre; todo marcado salvo los ajustes), deja elegir «Unir» o «Tener las dos» en las listas con el mismo nombre y ejecuta `ImportChosen` como tarea. El resultado lista lo añadido y los pendientes con botones hacia la página que corresponde.
+Ajustes > Equipo > «Mover mi configuración» ofrece «Exportar mi configuración…» e «Importar una configuración…». Exportar permite marcar los fondos propios (muestra el tamaño que suman) y las contraseñas y claves (pide la contraseña dos veces y cifra todo el archivo), y ejecuta `Carry1.Export` como tarea. Importar abre el archivo, pide la contraseña si está cifrado, muestra la vista previa por sección (nuevos, ya presentes, conflictos de nombre; todo marcado salvo los ajustes), deja elegir «Unir» o «Tener las dos» en las listas con el mismo nombre y ejecuta `ImportChosen` como tarea. El resultado lista lo añadido y lo que falta resolver, con botones hacia la página que corresponde.
 
 ## En el teléfono
 
