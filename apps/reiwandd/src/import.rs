@@ -1,5 +1,5 @@
 use crate::daemon::Daemon;
-use crate::error::{Result, invalid};
+use crate::error::{Error, Result, invalid};
 use crate::jobs::{Ctl, now};
 use crate::scan::local;
 use crate::store::private_dir;
@@ -11,24 +11,38 @@ use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+pub(crate) const OLDER: &str = "older";
+
 impl Daemon {
     pub fn import(self: &Arc<Self>, paths: Vec<String>, copy: bool) -> Result<u64> {
+        self.import_all(paths, copy, None)
+    }
+
+    pub fn import_all(self: &Arc<Self>, paths: Vec<String>, copy: bool, older: Option<bool>) -> Result<u64> {
         if paths.is_empty() || paths.len() > 1000 {
             return Err(invalid("give 1 to 1000 files"));
         }
         paths.iter().try_for_each(|path| local(path).map(drop))?;
-        Ok(self.start_job(JobKind::Import, "", move |d, ctl| d.import_files(&paths, copy, ctl)))
+        Ok(self.start_job(JobKind::Import, "", move |d, ctl| d.import_files(&paths, (copy, older), ctl)))
     }
 
-    fn import_files(self: &Arc<Self>, paths: &[String], copy: bool, ctl: &Ctl) -> Result<Value> {
+    fn import_files(
+        self: &Arc<Self>,
+        paths: &[String],
+        how: (bool, Option<bool>),
+        ctl: &Ctl,
+    ) -> Result<Value> {
         let mut report = ImportReport { imported: Vec::new(), failed: Vec::new() };
         for (done, path) in (1..).zip(paths) {
             if ctl.check().is_err() {
                 break;
             }
-            match self.import_one(Path::new(path), copy) {
+            match self.import_one(Path::new(path), how) {
                 Ok(uid) => report.imported.push(Imported { path: path.into(), uid }),
-                Err(e) => report.failed.push(PathError { path: path.into(), error: e.to_string() }),
+                Err(e) => {
+                    let older = matches!(e, Error::Named(OLDER, _));
+                    report.failed.push(PathError { path: path.into(), error: e.to_string(), older })
+                }
             }
             ctl.progress(done, paths.len() as u64);
         }
@@ -39,9 +53,12 @@ impl Daemon {
         Ok(serde_json::to_value(report).unwrap_or_default())
     }
 
-    pub(crate) fn import_one(&self, path: &Path, copy: bool) -> Result<String> {
+    pub(crate) fn import_one(&self, path: &Path, (copy, older): (bool, Option<bool>)) -> Result<String> {
         if !fs::metadata(path)?.is_file() || Kind::detect(path).is_none() {
             return Err(invalid("not an image, video or package file"));
+        }
+        if let (Some(older), Some(Kind::Package)) = (older, Kind::detect(path)) {
+            return self.import_package(path, older);
         }
         if !copy {
             return self.store.write(|lib| lib.import_file(path, now()));
@@ -58,7 +75,7 @@ impl Daemon {
         self.store.write(titled).inspect_err(|_| drop(fs::remove_file(&copied)))
     }
 
-    fn copy_in(&self, path: &Path) -> Result<PathBuf> {
+    pub(crate) fn copy_in(&self, path: &Path) -> Result<PathBuf> {
         let dir = self.store.files();
         private_dir(&dir)?;
         let name = |n: u32| match (n, path.file_stem(), path.extension()) {

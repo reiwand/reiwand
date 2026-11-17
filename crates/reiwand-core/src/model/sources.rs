@@ -24,7 +24,7 @@ model! {
 
     pub struct Imported { pub path: PathBuf, pub uid: Uid }
 
-    pub struct PathError { pub path: PathBuf, pub error: String }
+    pub struct PathError { pub path: PathBuf, pub error: String, pub older: bool }
 
     pub struct ImportReport { pub imported: Vec<Imported>, pub failed: Vec<PathError> }
 

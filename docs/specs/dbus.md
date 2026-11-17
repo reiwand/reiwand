@@ -984,6 +984,19 @@ it is first copied to `~/.local/share/reiwand/files/` (on a name collision as
 `<stem> (2).<ext>`, `(3)`, …) and takes the original file name without extension as title. A
 file that fails is listed in `ImportReport.failed`; the job fails only on a global error.
 
+### `ImportPackages(as paths, b allow_older) → (t job)`
+
+Imports `.wpak` files into the library as the implicit local source, in an `import` job; the
+files are always copied to `~/.local/share/reiwand/files/`. Each package is opened and its content
+hashes are verified; a damaged or modified one is listed in `ImportReport.failed` with the reason.
+There is no signature requirement: a package whose author is not known imports and the app shows
+«Sin firma verificada». A package whose id is installed from a repository is refused. Importing the
+same version again returns the existing item; a newer version updates the item in place (same uid,
+its decisions and favorite stay); an older version is listed in `failed` with `older = true` unless
+`allow_older` is true. The search key `local:yes` matches the items imported this way (files cataloged
+by path and packages installed from a repository are excluded), and `source:none` matches every item
+without a source. `ImportReport.failed[]` entries carry `path`, `error` and `older`.
+
 ### `Resolve(as refs) → (as uids)`
 
 Turns references into uids, in order. A reference is an exact uid (any case), a unique uid

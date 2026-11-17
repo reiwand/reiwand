@@ -21203,3 +21203,35 @@ msgstr "Esta pantalla tiene un solo fondo"
 #: apps/reiwand-app/qml/PreviewPanel.qml
 msgid "Add more wallpapers to the library to switch between them."
 msgstr "Añade más fondos a la biblioteca para poder cambiar entre ellos."
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "Import wallpaper…"
+msgstr "Importar fondo…"
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "Import wallpaper"
+msgstr "Importar fondo"
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "Wallpaper packages (*.wpak)"
+msgstr "Paquetes de fondo (*.wpak)"
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "Imported"
+msgstr "Importados"
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "A newer version of this wallpaper is already in your library."
+msgstr "Ya tienes una versión más nueva de este fondo en tu biblioteca."
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "Use the older one"
+msgstr "Usar la más antigua"
+
+#: apps/reiwand-app/qml/ItemFacts.qml
+msgid "Imported:"
+msgstr "Importado:"
+
+#: apps/reiwand-app/qml/ItemFacts.qml
+msgid "Unverified signature"
+msgstr "Sin firma verificada"

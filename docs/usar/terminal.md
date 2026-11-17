@@ -327,6 +327,7 @@ reiwand-ctl remote add 'https://example.org/r/fondos'   # un servidor de casa co
 reiwand-ctl account sign-in 'https://example.org/r/privado'   # cuentas por repositorio: sign-in, ls, use, unlink, rm
 reiwand-ctl export config.reiwand && reiwand-ctl import config.reiwand --list   # llevar la configuración a otro equipo en un archivo
 reiwand-ctl pkg install org.example.dawn --wait    # instalar un paquete de un repositorio
+reiwand-ctl pkg import fondo.wpak otro.wpak --wait  # importar paquetes locales; --allow-older acepta una versión más antigua
 reiwand-ctl jobs | watch | schema                  # trabajos, cambios en vivo, claves válidas
 reiwand-ctl input decide org.example.dawn -a audio,pointer -x network   # una respuesta para todo lo que pide la escena
 reiwand-ctl input grant org.example.dawn audio     # dejar que la escena que se ve siga el sonido (-o elige pantalla)

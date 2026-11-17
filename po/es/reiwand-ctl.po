@@ -6302,3 +6302,17 @@ msgstr "Repositorio cuya cuenta se usa (dirección o id); obligatorio cuando var
 
 msgid "Repository to publish to; required when several repositories have an account"
 msgstr "Repositorio donde publicar; obligatorio cuando varios repositorios tienen cuenta"
+
+#: apps/reiwand-ctl/src/pkg.rs
+msgid "%1 packages were not imported"
+msgstr "No se importaron %1 paquetes"
+
+#: apps/reiwand-ctl/src/pkg.rs
+msgid "Import package files into the library, or update the ones already imported"
+msgstr "Importa archivos de paquete a la biblioteca, o actualiza los ya importados"
+
+msgid "Package files (.wpak) to import"
+msgstr "Archivos de paquete (.wpak) que importar"
+
+msgid "Allow a version older than the imported one"
+msgstr "Permite una versión más antigua que la importada"

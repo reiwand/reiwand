@@ -138,6 +138,7 @@ fn parse(key: &str, value: &str, now: i64) -> Option<(String, Vec<Value>)> {
                 vec![Value::Integer(prefix.chars().count() as i64), Value::Text(prefix)],
             )
         }
+        "source" if lower == "none" => ("i.source_id IS NULL".into(), vec![]),
         "source" => ("i.source_id = (SELECT id FROM sources WHERE uid = ?)".into(), text(value)),
         "provider" => (PROVIDED.into(), int(flag(&lower)?)),
         "kind" if ["scene", "web", "assets"].contains(&lower.as_str()) => {

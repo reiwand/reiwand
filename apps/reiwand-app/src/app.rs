@@ -132,10 +132,17 @@ async fn forward(conn: Connection) -> zbus::Result<()> {
 
 async fn open(uris: Vec<String>) {
     let paths: Vec<String> = uris.iter().filter_map(|uri| path(uri)).collect();
-    if !paths.is_empty()
-        && let Err(e) = bus::call("Library1", "Import", vec![json!(paths), json!(false)]).await
-    {
-        publish(Event::Error(e.message));
+    let (packages, rest): (Vec<String>, Vec<String>) =
+        paths.into_iter().partition(|path| path.to_lowercase().ends_with(".wpak"));
+    let calls = [("ImportPackages", packages), ("Import", rest)];
+    for (method, paths) in calls {
+        if paths.is_empty() {
+            continue;
+        }
+        let args = vec![json!(paths), json!(false)];
+        if let Err(e) = bus::call("Library1", method, args).await {
+            publish(Event::Error(e.message));
+        }
     }
 }
 

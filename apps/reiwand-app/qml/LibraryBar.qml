@@ -15,8 +15,8 @@ Flow {
     property var tags: []
     property var counts: queries.map(() => 0)
     readonly property bool favorite: word === 6
-    readonly property var queries: ["", "kind:scene", "kind:image provider:no", "kind:video", "kind:web", "provider:yes", "fav:yes"]
-    readonly property var names: [App.tr("All"), App.tr("Scenes"), App.tr("Pictures"), App.tr("Videos"), App.tr("Web"), App.tr("From sources"), App.tr("Favorites")]
+    readonly property var queries: ["", "kind:scene", "kind:image provider:no", "kind:video", "kind:web", "provider:yes", "fav:yes", "local:yes"]
+    readonly property var names: [App.tr("All"), App.tr("Scenes"), App.tr("Pictures"), App.tr("Videos"), App.tr("Web"), App.tr("From sources"), App.tr("Favorites"), App.tr("Imported")]
     readonly property var shown: names.map((name, index) => index).filter(index => index === 0 || index === 6 || index === word || counts[index] > 0)
     readonly property bool worded: kind === "" && tag === ""
     readonly property string term: kind !== "" ? "kind:" + kind : queries[word]
@@ -161,6 +161,11 @@ Flow {
 
         interval: 250
         onTriggered: bar.changed()
+    }
+
+    LibraryImport {
+        tools: bar.tools
+        tight: bar.tight
     }
 
     QQC2.Button {

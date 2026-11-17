@@ -84,7 +84,7 @@ impl Daemon {
         let seed = (RandomState::new().hash_one(serial) % 2_147_483_646) as u32 + 1;
         let hide = self.state().config.library.hide_mature;
         let (query, total, items) = self.store.read(|lib| {
-            let query = lib.normalize_query(query, seed)?;
+            let query = lib.normalize_query(&self.local_query(query), seed)?;
             let shown = reiwand_library::shown(&query, hide);
             let total = lib.count(&shown, now())?;
             let items = if limit == 0 { Vec::new() } else { lib.search(&shown, now(), offset, limit)? };

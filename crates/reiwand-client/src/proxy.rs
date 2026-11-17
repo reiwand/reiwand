@@ -93,6 +93,7 @@ pub trait Library1 {
     fn list_sources(&self) -> Result<String>;
     fn rescan(&self, source: &str) -> Result<u64>;
     fn import(&self, paths: &[&str], copy: bool) -> Result<u64>;
+    fn import_packages(&self, paths: &[&str], allow_older: bool) -> Result<u64>;
     fn resolve(&self, refs: &[&str]) -> Result<Vec<String>>;
     fn remove(&self, uids: &[&str], delete_files: bool) -> Result<()>;
     fn search(&self, query: &str, offset: u32, limit: u32) -> Result<String>;

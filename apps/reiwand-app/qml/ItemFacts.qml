@@ -41,6 +41,13 @@ Kirigami.FormLayout {
     }
 
     QQC2.Label {
+        Kirigami.FormData.label: App.tr("Imported:")
+        visible: !!host.item.package && !host.details.installed && !host.item.source
+        text: App.tr("Unverified signature")
+        textFormat: Text.PlainText
+    }
+
+    QQC2.Label {
         Kirigami.FormData.label: App.tr("Revoked:")
         visible: !!host.details.revoked
         text: Labels.value(host.details.revoked)

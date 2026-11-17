@@ -56,6 +56,8 @@ echo "Installing the app"
 mkdir -p "$DATA_HOME/applications"
 sed "s|@BINDIR@|$BINDIR|g" "$HERE/packaging/dbus/$APP_ID.service" >"$DBUS_DIR/$APP_ID.service"
 sed "s|@BINDIR@|$BINDIR|g" "$HERE/packaging/desktop/$APP_ID.desktop" >"$DATA_HOME/applications/$APP_ID.desktop"
+install -Dm644 "$HERE/packaging/mime/$APP_ID.xml" "$DATA_HOME/mime/packages/$APP_ID.xml"
+update-mime-database "$DATA_HOME/mime" >/dev/null 2>&1 || true
 install -Dm644 "$HERE/packaging/icons/$APP_ID.svg" "$DATA_HOME/icons/hicolor/scalable/apps/$APP_ID.svg"
 for name in "$APP_ID-symbolic" "$APP_ID-paused-symbolic"; do
   install -Dm644 "$HERE/packaging/icons/$name.svg" "$DATA_HOME/icons/hicolor/symbolic/apps/$name.svg"

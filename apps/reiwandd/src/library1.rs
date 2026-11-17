@@ -49,6 +49,11 @@ impl Library {
         self.d()?.run(move |d| d.import(paths, copy)).await
     }
 
+    #[zbus(out_args("job"))]
+    async fn import_packages(&self, paths: Vec<String>, allow_older: bool) -> Result<u64> {
+        self.d()?.run(move |d| d.import_all(paths, true, Some(allow_older))).await
+    }
+
     #[zbus(out_args("uids"))]
     async fn resolve(&self, refs: Vec<String>) -> Result<Vec<String>> {
         self.d()?.run(move |d| d.resolve(&refs)).await

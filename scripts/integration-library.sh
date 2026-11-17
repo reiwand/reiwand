@@ -162,4 +162,5 @@ bus Library1 RemoveSource s "$source" >/dev/null
 [ "$(reply "len(r['sources']), " Library1 ListSources)" = "(0,)" ] || fail "sources: $(bus Library1 ListSources)"
 [ "$(reply "r['total']" Library1 Search suu "" 0 0)" = 0 ] || fail "items were kept with their source"
 [ ! -e "$thumb" ] || fail "thumbnails were kept with their source"
+source "$(dirname "$0")"/integration-local.sh
 echo "library checks passed"
