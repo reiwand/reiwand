@@ -22,7 +22,7 @@ fn relative_stretch_scales_the_side_and_may_be_shorter_than_it() {
         "short": lone(70.0, json!({ "mode": "relative", "depth": "flat", "time": 0.01, "min": 0, "max": 10 })) });
     let layers = json!(
         ["none", "added", "long", "short"]
-            .map(|id| json!({ "id": id, "type": "particles", "system": id, "blend": "add" }))
+            .map(|id| json!({ "blend_space": "canvas", "id": id, "type": "particles", "system": id, "blend": "add" }))
     );
     for gpu in [false, true] {
         let Some(mut run) = Run::new(r, systems.clone(), layers.clone(), gpu) else { return };
@@ -46,7 +46,7 @@ fn oscillating_from_the_floor_agrees_on_both_paths() {
         let wave = json!({ "oscillate": { "what": what, "from": from, "freq": [0.5, 2], "scale": [0.2, 1], "phase": [0, 1] } });
         waves.push(json!({ "s": system(json!({ "box": { "from": [0, 0], "to": [160, 80] } }), json!({}), json!({ "forces": [wave] })) }));
     }
-    let layers = json!([{ "id": "p", "type": "particles", "system": "s" }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s" }]);
     for systems in waves {
         let Some(found) = both(r, &systems, &layers, 10) else { return };
         assert_eq!(found[0].len(), found[1].len());
@@ -69,7 +69,7 @@ fn dropped(y: f32, z: f32, depth: &str) -> Value {
 fn projected_stretch_follows_the_motion_on_screen() {
     let Some(r) = renderer() else { return };
     let layers = json!(
-        ["near", "far"].map(|id| json!({ "id": id, "type": "particles", "system": id, "blend": "add" }))
+        ["near", "far"].map(|id| json!({ "blend_space": "canvas", "id": id, "type": "particles", "system": id, "blend": "add" }))
     );
     for (depth, wanted) in [("flat", [18, 9]), ("projected", [24, 4])] {
         let systems = json!({ "near": dropped(30.0, -50.0, depth), "far": dropped(80.0, 100.0, depth) });

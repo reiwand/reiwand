@@ -16,7 +16,7 @@ fn extent(pixels: &[u8], around: [u32; 2]) -> [u32; 2] {
 }
 
 fn shot(system: Value, around: [u32; 2], settle: f64) -> [[u32; 2]; 2] {
-    let layers = json!([{ "id": "s", "type": "particles", "system": "s", "blend": "add" }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "s", "type": "particles", "system": "s", "blend": "add" }]);
     let Some(r) = renderer() else { return [[0; 2]; 2] };
     let mut found = [[0; 2]; 2];
     for (k, gpu) in [false, true].into_iter().enumerate() {
@@ -83,7 +83,7 @@ fn the_top_of_a_tall_texture_leads_when_it_follows_its_motion_and_stays_up_other
         s["init"]["size"] = json!([24, 24]);
         s
     };
-    let layers = json!([{ "id": "s", "type": "particles", "system": "s", "blend": "normal" }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "s", "type": "particles", "system": "s", "blend": "normal" }]);
     let assets = json!({ "tex": { "path": "tex.png" } });
     let red = |p: &[u8], x: u32, y: u32| at(p, x, y)[2] < 80 && at(p, x, y)[0] > 150;
     let white = |p: &[u8], x: u32, y: u32| at(p, x, y)[2] > 150;

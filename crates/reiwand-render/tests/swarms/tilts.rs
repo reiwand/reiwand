@@ -28,7 +28,7 @@ fn a_turned_sprite_is_narrower_by_the_cosine_of_each_angle() {
         "plain": flake([40.0, 70.0], tilt([0.0, 0.0], [0.0, 0.0]), json!({})) });
     let layers = json!(
         ["wide", "tall", "plain"]
-            .map(|id| json!({ "id": id, "type": "particles", "system": id, "blend": "add" }))
+            .map(|id| json!({ "blend_space": "canvas", "id": id, "type": "particles", "system": id, "blend": "add" }))
     );
     for gpu in [false, true] {
         let Some(mut run) = Run::new(r, systems.clone(), layers.clone(), gpu) else { return };
@@ -47,7 +47,7 @@ fn a_turned_sprite_is_narrower_by_the_cosine_of_each_angle() {
 fn the_spin_turns_the_sprite_edge_on_and_back() {
     let Some(r) = renderer() else { return };
     let systems = json!({ "s": flake([40.0, 40.0], tilt([0.0, 0.0], [0.0, 180.0]), json!({})) });
-    let layers = json!([{ "id": "s", "type": "particles", "system": "s", "blend": "add" }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "s", "type": "particles", "system": "s", "blend": "add" }]);
     for gpu in [false, true] {
         let Some(mut run) = Run::new(r, systems.clone(), layers.clone(), gpu) else { return };
         run.frame(r, 0.0);
@@ -65,7 +65,7 @@ fn the_turn_follows_the_direction_of_a_velocity_oriented_sprite() {
     let mut moving = flake([40.0, 10.0], tilt([0.0, 60.0], [0.0, 0.0]), json!({ "orient": "velocity" }));
     moving["init"]["velocity"] = json!([[0, 30], [0, 30]]);
     let systems = json!({ "s": moving });
-    let layers = json!([{ "id": "s", "type": "particles", "system": "s", "blend": "add" }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "s", "type": "particles", "system": "s", "blend": "add" }]);
     for gpu in [false, true] {
         let Some(mut run) = Run::new(r, systems.clone(), layers.clone(), gpu) else { return };
         run.frame(r, 0.0);
@@ -81,7 +81,7 @@ fn a_perspective_turn_makes_the_near_edge_larger() {
     let mut deep = flake([40.0, 40.0], tilt([0.0, 60.0], [0.0, 0.0]), json!({}));
     deep["perspective"] = json!({ "focal": 30 });
     deep["init"]["depth"] = json!([0, 0]);
-    let layers = json!([{ "id": "s", "type": "particles", "system": "s", "blend": "add" }]);
+    let layers = json!([{ "blend_space": "canvas", "id": "s", "type": "particles", "system": "s", "blend": "add" }]);
     for gpu in [false, true] {
         let Some(mut run) = Run::new(r, json!({ "s": deep.clone() }), layers.clone(), gpu) else { return };
         run.frame(r, 0.0);
