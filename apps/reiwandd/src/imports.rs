@@ -29,9 +29,10 @@ impl Daemon {
         let newest = found.iter().filter_map(|f| Version::parse(&f.2).ok()).max();
         match newest {
             Some(n) if n == wanted => {
-                let same = found.iter().find(|f| f.2 == version).filter(|f| {
-                    matches!((qhash(&f.1), qhash(path)), (Ok(kept), Ok(given)) if kept == given)
-                });
+                let same = found
+                    .iter()
+                    .find(|f| f.2 == version)
+                    .filter(|f| matches!((qhash(&f.1), qhash(path)), (Ok(kept), Ok(given)) if kept == given));
                 if let Some(f) = same {
                     return Ok(f.0.clone());
                 }
@@ -49,6 +50,7 @@ impl Daemon {
         let before = self.store.read(|lib| lib.item(&uid))?;
         let relinked = self.store.write(|lib| lib.relink_item(&uid, &copied, now()));
         relinked.inspect_err(|_| drop(fs::remove_file(&copied)))?;
+        self.repoint(&old, &copied)?;
         self.forget_files(&[before]);
         if old.starts_with(self.store.files()) {
             fs::remove_file(&old).ok();
