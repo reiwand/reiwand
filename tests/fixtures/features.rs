@@ -66,6 +66,7 @@ pub fn effects() -> Value {
         reiwand_scene::builtin().iter().filter(|d| reiwand_scene::newer_params(&d.id).next().is_some());
     let set = built.map(|d| {
         let params: Map<String, Value> = reiwand_scene::newer_params(&d.id)
+            .chain(d.params.iter().filter(|p| p.required))
             .map(|p| (p.id.clone(), if p.kind.asset() { json!("sky") } else { json!(p.default) }))
             .collect();
         json!({ "effect": d.id, "params": params })
