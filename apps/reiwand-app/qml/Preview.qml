@@ -115,7 +115,7 @@ Window {
 
     function press(key) {
         if (key === Qt.Key_Escape)
-            live ? App.query("BrowseCancel", [output], "Playlists1", reply => preview && preview.take(reply), () => preview && preview.finish(0)) : finish(0);
+            live ? ask("BrowseCancel", [output]) : finish(0);
         else if (key === Qt.Key_Return || key === Qt.Key_Enter)
             mode === "vacio" ? finish(3) : mode === "error" ? load() : choose(0);
         else if (working() && (key === Qt.Key_Left || key === Qt.Key_Right))
