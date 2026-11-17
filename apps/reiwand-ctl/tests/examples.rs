@@ -55,7 +55,6 @@ fn render(r: &Renderer, runtime: &mut Runtime, assets: &SceneAssets) -> (RgbImag
             relief: None,
             flip: [false; 2],
             grade: None,
-            clip: None,
         };
         r.render_layers(&mut target, &[layer], &mut pixels).unwrap();
         (wake, created) = (frame.wake, created + if i >= 70 { view.stats().created } else { 0 });

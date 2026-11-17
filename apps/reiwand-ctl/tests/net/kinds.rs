@@ -23,7 +23,6 @@ fn layer<'a>(image: &'a GpuImage, relief: Option<Relief<'a>>) -> Layer<'a> {
         relief,
         flip: [false; 2],
         grade: None,
-        clip: None,
     }
 }
 
