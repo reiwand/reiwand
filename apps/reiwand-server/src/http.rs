@@ -114,7 +114,6 @@ async fn guard(State(app): St, req: Request, next: Next) -> Response {
         || path.ends_with("/decision")
         || path.starts_with("/mod/cases/")
         || path == "/upload";
-    let long = long || path == "/api/v1/sync/events" || path.starts_with("/api/v1/sync/blobs/");
     let probe = path == "/healthz" || path == "/readyz";
     let mut response = match app.limits.take(&API, &key(ip, 32, 64)) {
         Err(problem) if !probe => problem.into_response(),

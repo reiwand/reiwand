@@ -166,12 +166,4 @@ impl Api {
             false => Err(Self::answer(response, SMALL).await.err().unwrap_or(invalid("no file data"))),
         }
     }
-
-    pub async fn events(&self) -> Result<Response> {
-        let response = self.request(Method::GET, "/api/v1/sync/events").send().await.map_err(net)?;
-        match response.status().is_success() {
-            true => Ok(response),
-            false => Err(Self::answer(response, SMALL).await.err().unwrap_or(invalid("no event stream"))),
-        }
-    }
 }
