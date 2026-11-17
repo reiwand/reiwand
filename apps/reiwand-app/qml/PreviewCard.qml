@@ -15,7 +15,7 @@ Item {
     property bool calm: false
     property bool current: false
     property string animated: ""
-    property string clip: ""
+    property string playUid: ""
     property string found: ""
     property bool shown: false
     readonly property bool middle: offset === 0
@@ -25,7 +25,7 @@ Item {
     readonly property real centre: reach === 0 ? 0 : sign * Math.round(unit * (PreviewLook.focoAncho / 2 + PreviewLook.hueco + (reach === 1 ? PreviewLook.cercaAncho / 2 : PreviewLook.cercaAncho + PreviewLook.hueco + PreviewLook.lejosAncho / 2 + (reach === 3 ? PreviewLook.lejosAncho / 2 : 0))))
     readonly property int edge: PreviewLook.edge(Math.min(span, PreviewLook.focoAncho * unit) * Screen.devicePixelRatio)
     readonly property bool hovered: grip.containsMouse
-    readonly property bool staying: animated === "" && clip === "" || calm
+    readonly property bool staying: animated === "" && playUid === "" || calm
     property real home: 0
     signal clicked(int offset)
 
@@ -121,14 +121,11 @@ Item {
         cache: false
     }
 
-    Loader {
-        id: movie
-
+    TapaViva {
         anchors.fill: parent
-        active: card.middle && !card.calm && card.clip !== ""
-        visible: item && item.running
-        source: "PreviewVideo.qml"
-        onLoaded: item.source = card.clip
+        uid: card.playUid
+        wanted: card.middle && !card.calm && card.playUid !== "" && card.shown && card.Window.active
+        corner: PreviewLook.tarjetaRadio
     }
 
     Kirigami.Icon {

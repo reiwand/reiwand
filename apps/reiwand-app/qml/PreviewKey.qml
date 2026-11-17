@@ -19,7 +19,7 @@ Rectangle {
         id: word
 
         anchors.centerIn: parent
-        text: cap.key
+        text: cap.key === "Intro" ? App.trc("key", "Enter") : cap.key
         color: Kirigami.Theme.textColor
         font.family: Look.letraTexto
         font.pixelSize: PreviewLook.tTecla

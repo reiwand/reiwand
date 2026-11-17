@@ -8,6 +8,7 @@ use std::time::{Duration, Instant};
 
 mod act;
 mod list;
+pub(crate) mod pointer;
 mod reply;
 mod session;
 pub(crate) mod shortcuts;

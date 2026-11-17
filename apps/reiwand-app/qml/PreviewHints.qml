@@ -7,7 +7,7 @@ Row {
 
     property string mode
     readonly property var model: mode === "vacio" ? [hint(["Intro"], App.tr("Open the library")), hint(["Esc"], App.tr("Close"))] : mode === "error" ? [hint(["Intro"], App.tr("Try again")), hint(["Esc"], App.tr("Close"))] : [hint(["←", "→"], App.tr("Move, or use the wheel")), hint(["Intro"], App.tr("Apply")), hint(["Esc"], App.tr("Close"))]
-    readonly property string said: model.map(hint => hint.keys.join(" ") + " " + hint.text).join(", ")
+    readonly property string said: model.map(hint => hint.keys.map(k => k === "Intro" ? App.trc("key", "Enter") : k).join(" ") + " " + hint.text).join(", ")
 
     function hint(keys, text) {
         return {

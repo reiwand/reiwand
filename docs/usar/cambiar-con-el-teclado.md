@@ -21,8 +21,19 @@ fondo, la ventana lo dice y ofrece abrir la biblioteca; si algo falla, nombra el
 reintentar.
 
 Sigue el esquema claro u oscuro del sistema. Si pediste menos movimiento (o lo pide tu sistema) la
-selección salta sin deslizar y el central no se anima. Los vídeos y las escenas se ven como una
-imagen quieta; se mueven al aplicarlos.
+selección salta sin deslizar y el central no se anima.
+
+Al cerrarla, el proceso de la ventana queda oculto durante 5 minutos, sin trabajar (no consume
+procesador; guarda unos 180 MB de memoria) y, pasado ese tiempo sin usarla, se cierra. Así la
+siguiente vez aparece al instante (unos 50 ms); la primera vez tras iniciar sesión, o tras 5 minutos
+sin usarla, tarda unos 300 ms porque tiene que arrancar.
+
+Solo el fondo del centro se mueve: las escenas y los vídeos se ven en marcha dentro del recuadro,
+dibujados por el demonio en un destino aparte, sin sonido y sin tocar el fondo real; las demás
+miniaturas son imágenes quietas. Al pasar a otro fondo o al cerrar la ventana el destino se libera, así
+que no queda nada trabajando. Sigue quieto si el equipo va con batería o si el fondo es fotosensible. La animación usa
+los módulos QML de KPipeWire, los mismos que las tarjetas animadas de la biblioteca; sin ellos el
+central queda como imagen quieta.
 
 ## Activar los atajos
 
@@ -53,7 +64,7 @@ la ventana se abre solo en esa pantalla.
 
 - Los cambios de la biblioteca hechos con la ventana abierta se ven la próxima vez que la abras; de
   la biblioteca se toman como máximo dos mil fondos.
-- Con varias pantallas y ninguna elegida, se abre una sola ventana que recorre toda la biblioteca y el cambio vale para todas; con `--output NOMBRE` se limita a esa pantalla.
+- Con varias pantallas y ninguna elegida, la ventana se abre en la pantalla donde está el puntero (Plasma) y recorre la lista de esa pantalla; con `--output NOMBRE` se abre en la que indiques. Fuera de Plasma se usa la primera pantalla.
 - El escritorio puede no aceptar las teclas propuestas (por ejemplo, si ya las usa otra cosa): elige
   otras en su diálogo o ata las órdenes a mano.
 - Las pantallas se nombran por su conector (`DP-1`, `HDMI-A-1`).

@@ -1328,7 +1328,7 @@ A `HistoryReply`, newest first. `output` is a connector name; `limit` is `1..=10
 
 **Browsing wallpapers.** A browsing session lets the user look at wallpapers one by one on a screen and keep one, without
 changing anything until they apply it. It belongs to one output (`""` means the only screen when
-there is one; with several screens the switcher panel opens on the screen the compositor gives it, the one with the pointer, and then browses the list of that screen). It holds a
+there is one; with several screens and an empty `output`, the daemon asks KWin (`org.kde.KWin /KWin activeOutputName`, 150 ms timeout) for the screen with the pointer and the switcher panel opens full screen on that screen and browses its list; without KWin the first open session or the first screen is used). It holds a
 candidate, never changes the wallpaper (the switcher panel and the tray read the
 `BrowseState` data), and ends by itself after 30 s without input when no switcher panel holds it: while the panel
 is open the daemon checks every 30 s that the panel still holds its bus name and keeps the session,
@@ -1357,11 +1357,16 @@ otherwise), `path`, `transition`, `idle_ms` (time left before it ends by itself)
 `reiwand-ctl next --preview`), the daemon starts `reiwand-app --browse OUTPUT` (the program named by
 `REIWAND_PREVIEW_APP` when set), which claims the bus name `<app id>.Switcher` so that only one panel exists
 per output. It is a window of its own with keyboard focus: a centred panel over a dimmed screen with
-the candidate large in the middle (animated when its preview is a GIF or WebP), sharp still neighbours
+the candidate large in the middle (a scene or video plays there, rendered by the daemon into a muted
+`preview:card-*` stream requested through `RequestStream` and `Apply`, as the library cards do, and released when the
+candidate changes or the panel closes; other kinds use an animated GIF or WebP preview when the package has one),
+sharp still neighbours
 at both sides, its name and position below and a line of keys. It reads and drives the session through
 `GetBrowse`, `Browse`, `BrowseApply` and `BrowseCancel`: arrows, the wheel and clicks on a neighbour
 move, Enter or a click on the middle one applies, Esc or a click outside cancels. The daemon draws
-nothing into the wallpaper frames. Exit code 3 of the panel means "open the library" (shown when the
+nothing into the wallpaper frames. After `BrowseApply` or `BrowseCancel` the window hides and the process stays resident for 5 minutes without
+working, hearing the `browse` signal; the next session shows the same process at once (the daemon sees the
+bus name taken and does not start another). After 5 minutes hidden it exits. Exit code 3 of the panel means "open the library" (shown when the
 screen has a single wallpaper). The real wallpaper does not change until `BrowseApply`.
 
 ### `Browse(s output, s source, i steps) → (s json)`

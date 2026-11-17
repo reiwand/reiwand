@@ -21,7 +21,7 @@ QtObject {
         id: waiting
 
         interval: PreviewLook.espera
-        running: !fades.preview.began
+        running: !fades.preview.began && !fades.preview.warm.resting
         onTriggered: fades.preview.fail({})
     }
 
@@ -44,6 +44,6 @@ QtObject {
         to: 0
         duration: fades.preview.calm ? 0 : PreviewLook.sale
         easing.type: Easing.OutCubic
-        onFinished: Qt.exit(fades.preview.left)
+        onFinished: fades.preview.left === 0 ? fades.preview.warm.rest() : Qt.exit(fades.preview.left)
     }
 }

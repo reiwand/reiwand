@@ -19,8 +19,10 @@ Window {
     property int left: -1
     property real wheel: 0
     property alias panel: dim.panel
-    property string animated: ""
-    property string clip: ""
+    property alias animated: motion.animated
+    property alias playUid: motion.playUid
+    property alias warm: warm
+    property alias opening: fades.opening
     property int quiet: App.checking ? 0 : PreviewLook.reposo
     readonly property bool touching: dim.touching
     readonly property bool live: session.active === true
@@ -47,20 +49,6 @@ Window {
         ask("GetBrowse", [output]);
     }
 
-    function look() {
-        const uid = candidate ? candidate.uid : "";
-        animated = "";
-        clip = "";
-        if (uid === "")
-            return;
-        App.query("GetItem", [uid], "Library1", reply => preview && preview.candidate && preview.candidate.uid === uid && !(App.state.on_battery ?? false) && reply.about?.photosensitive !== true && preview.play(reply), () => {});
-    }
-
-    function play(reply) {
-        clip = reply.item?.kind === "video" && !reply.item?.missing ? App.url(reply.item.path) : "";
-        animated = App.url(reply.about?.animated ?? "");
-    }
-
     function take(state) {
         began = true;
         failure = "";
@@ -68,12 +56,13 @@ Window {
             return finish(0);
         if (state.active)
             output = state.output;
+        warm.show();
         const was = candidate ? candidate.uid : "";
         session = state;
         rest();
         panel.reel.sync(state);
         if (candidate && candidate.uid !== was)
-            look();
+            motion.look();
         if (state.active && output === "" && !retargeted && screens.length > 1 && screen.name !== "")
             retarget();
     }
@@ -88,11 +77,14 @@ Window {
 
     function fail(error) {
         began = true;
+        warm.show();
         failure = error.message || App.tr("The wallpaper service does not answer.");
     }
 
     function heard(where, state) {
-        if (where === output || state.active && !live)
+        if (warm.resting)
+            state.active && warm.wake(state);
+        else if (where === output || state.active && !live)
             take(state);
     }
 
@@ -155,19 +147,13 @@ Window {
             press(Qt.Key_Escape);
     }
     Component.onCompleted: {
-        const found = Qt.application.screens.find(s => s.name === output);
-        if (found)
-            screen = found;
         if (args.includes("--shots")) {
             Qt.createComponent("PreviewShots.qml").createObject(preview, {
                 "preview": preview
             });
         } else {
-            showFullScreen();
-            requestActivate();
             load();
         }
-        fades.opening.start();
     }
 
     Kirigami.Theme.colorSet: Kirigami.Theme.Window
@@ -180,6 +166,18 @@ Window {
         }
 
         target: App
+    }
+
+    PreviewWarm {
+        id: warm
+
+        preview: preview
+    }
+
+    PreviewMotion {
+        id: motion
+
+        preview: preview
     }
 
     PreviewFades {

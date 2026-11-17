@@ -18,7 +18,6 @@ Requires:       gstreamer1-plugins-base >= 1.24
 Requires:       gstreamer1-plugins-good >= 1.24
 Requires:       pipewire-gstreamer
 Requires:       kf6-kirigami
-Requires:       qt6-qtmultimedia
 Recommends:     wpewebkit >= 2.54
 Recommends:     %{name}-examples
 

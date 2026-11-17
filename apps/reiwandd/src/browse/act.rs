@@ -11,18 +11,22 @@ pub(crate) enum Do {
 }
 
 impl Daemon {
-    pub(crate) fn browse_key(&self) -> String {
+    pub(crate) fn browse_key(&self, pointer: &str) -> String {
         let sessions = lock(&self.rotations.browse.sessions);
         let mut open: Vec<&String> = sessions.keys().collect();
         open.sort();
-        open.first().map_or_else(|| self.browse_output(""), |key| (*key).clone())
+        open.first().map_or_else(
+            || if pointer.is_empty() { self.browse_output("") } else { pointer.to_owned() },
+            |key| (*key).clone(),
+        )
     }
 }
 
 pub(crate) async fn run(daemon: &Arc<Daemon>, emitter: &SignalEmitter<'static>, act: Do) {
+    let pointer = super::pointer::resolve(&Arc::downgrade(daemon), emitter.connection(), String::new()).await;
     let done = daemon
         .run(move |d| {
-            let key = d.browse_key();
+            let key = d.browse_key(&pointer);
             match act {
                 Do::Move(steps) => d.browse_move(&key, "", steps),
                 Do::Apply => d.browse_apply(&key, ""),

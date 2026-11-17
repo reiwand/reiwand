@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls as QQC2
+import org.kde.kirigami as Kirigami
 import io.github.reiwand.app
 
 Item {
@@ -9,6 +10,7 @@ Item {
     property bool wanted
     property string output
     property var stream: null
+    property real corner: 0
     readonly property bool asked: wanted && !(QQC2.Overlay.overlay?.visibleChildren.some(c => String(c).startsWith("QQuickPopupItem")) ?? false)
 
     function start() {
@@ -46,6 +48,12 @@ Item {
         if (output !== "")
             App.act("ReleaseStream", [output], "Daemon1");
         output = "";
+    }
+
+    layer.enabled: stream !== null && corner > 0 && GraphicsInfo.api !== GraphicsInfo.Software && GraphicsInfo.api !== GraphicsInfo.Unknown
+    layer.effect: Kirigami.ShadowedTexture {
+        color: "transparent"
+        radius: viva.corner
     }
 
     onAskedChanged: asked ? rest.restart() : stop()

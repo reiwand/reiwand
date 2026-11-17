@@ -9,7 +9,7 @@ Item {
     property bool calm: false
     property string nowUid: ""
     property string animated: ""
-    property string clip: ""
+    property string playUid: ""
     property alias cards: cards
     signal chosen(int offset)
 
@@ -99,7 +99,7 @@ Item {
                 home: strip.width / 2
                 current: uid === reel.nowUid
                 animated: offset === 0 ? reel.animated : ""
-                clip: offset === 0 ? reel.clip : ""
+                playUid: offset === 0 ? reel.playUid : ""
                 onClicked: offset => reel.chosen(offset)
             }
         }

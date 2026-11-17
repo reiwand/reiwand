@@ -69,7 +69,11 @@ Timer {
                     "active": false,
                     "ended": "expired"
                 });
-            }, () => shown.left === 0]]
+            }, () => shown.left === 0], [() => shown.warm.rest(), () => shown.warm.resting && !shown.visible && !shown.began && !shown.live && shown.playUid === ""], [() => shown.heard("DP-1", {
+                    "output": "DP-1",
+                    "active": false,
+                    "ended": "expired"
+                }), () => shown.warm.resting && !shown.visible], [() => shown.heard("DP-1", calm), () => !shown.warm.resting && shown.visible && shown.live && shown.candidate.title === "Waves"]]
 
     function start() {
         host.waiting++;
