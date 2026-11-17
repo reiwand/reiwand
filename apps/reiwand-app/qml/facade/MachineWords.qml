@@ -11,6 +11,7 @@ QtObject {
 
     function place(where) {
         return ({
+                "carry": App.tr("Move your configuration"),
                 "grants": App.tr("Scene permissions"),
                 "sound": App.tr("Sound of the scenes"),
                 "media": App.tr("What you are listening to"),

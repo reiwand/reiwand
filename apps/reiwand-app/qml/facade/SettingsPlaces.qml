@@ -11,6 +11,7 @@ QtObject {
             "pause": 1,
             "screen": 1,
             "layouts": 1,
+            "carry": 2,
             "grants": 2,
             "sound": 2,
             "media": 2,

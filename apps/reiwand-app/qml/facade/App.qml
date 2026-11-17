@@ -69,6 +69,10 @@ QtObject {
         backend.addProvider(remember(onDone, onError), id, kind, JSON.stringify(options), secret);
     }
 
+    function carry(member, path, password, json, onDone, onError) {
+        backend.carry(remember(onDone, onError), member, path, password, json);
+    }
+
     function setSecret(id, secret, onDone, onError) {
         backend.setSecret(remember(onDone, onError), id, secret);
     }

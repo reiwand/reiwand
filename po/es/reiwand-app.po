@@ -20761,3 +20761,223 @@ msgstr "Cuenta · %1"
 #: apps/reiwand-app/qml/RepoAddAnswer.qml apps/reiwand-app/qml/RepoAddCheck.qml
 msgid "Sign in"
 msgstr "Iniciar sesión"
+
+#: apps/reiwand-app/qml/CarryCheck.qml apps/reiwand-app/qml/CarryWords.qml
+msgid "%1 already here"
+msgstr "%1 ya están aquí"
+
+#: apps/reiwand-app/qml/CarryChoose.qml
+msgid "Some lists have the same name as one of yours:"
+msgstr "Algunas listas se llaman igual que una de las tuyas:"
+
+#: apps/reiwand-app/qml/CarryChoose.qml
+msgid "Join them: add to your list what it lacks"
+msgstr "Unirlas: sumar a tu lista lo que le falta"
+
+#: apps/reiwand-app/qml/CarryChoose.qml
+msgid "Keep both: the imported one is told apart by its name"
+msgstr "Tener las dos: la importada se distingue por su nombre"
+
+#: apps/reiwand-app/qml/CarryExport.qml
+msgid "That file already exists: choose another name."
+msgstr "Ese archivo ya existe: elige otro nombre."
+
+#: apps/reiwand-app/qml/CarryExport.qml
+msgid "One file with your repositories, photo sources, lists, favorites, wallpapers installed from repositories and the settings that make sense on another computer."
+msgstr "Un solo archivo con tus repositorios, fuentes de fotos, listas, favoritos, fondos instalados desde repositorios y los ajustes que tienen sentido en otro equipo."
+
+#: apps/reiwand-app/qml/CarryExport.qml
+msgid "You have none of your own: nothing would be added."
+msgstr "No tienes fondos propios: no se agregaría nada."
+
+#: apps/reiwand-app/qml/CarryExport.qml
+msgid "Include passwords and keys"
+msgstr "Incluir contraseñas y claves"
+
+#: apps/reiwand-app/qml/CarryExport.qml
+msgid "The whole file is locked with a password you choose now. You will need it to import the file; it cannot be recovered."
+msgstr "Todo el archivo se protege con una contraseña que eliges ahora. La necesitarás para importarlo y no se puede recuperar."
+
+#: apps/reiwand-app/qml/CarryExport.qml
+msgid "The two passwords are not the same."
+msgstr "Las dos contraseñas no coinciden."
+
+#: apps/reiwand-app/qml/CarryImport.qml
+msgid "Choose what to bring. What you already have is never replaced."
+msgstr "Elige qué traer. Lo que ya tienes nunca se reemplaza."
+
+#: apps/reiwand-app/qml/CarryImport.qml
+msgid "Importing… you can follow it in the list of tasks."
+msgstr "Importando… puedes seguirlo en la lista de tareas."
+
+#: apps/reiwand-app/qml/CarryResult.qml
+msgid "Nothing was added: you already had all of it."
+msgstr "No se agregó nada: ya tenías todo."
+
+#: apps/reiwand-app/qml/CarryResult.qml
+msgid "Still to do:"
+msgstr "Falta por hacer:"
+
+#: apps/reiwand-app/qml/CarryResult.qml
+msgid "Account sessions do not travel in the file."
+msgstr "Las sesiones de cuenta no viajan en el archivo."
+
+#: apps/reiwand-app/qml/SettingsCarry.qml
+msgid "One file to take your repositories, lists and favorites to another computer"
+msgstr "Un archivo para llevar tus repositorios, listas y favoritos a otro equipo"
+
+#: apps/reiwand-app/qml/SettingsCarry.qml
+msgid "You choose whether it carries your own wallpapers and your passwords and keys. A file with passwords is locked with a password you choose."
+msgstr "Tú eliges si lleva tus fondos propios y tus contraseñas y claves. Un archivo con contraseñas se protege con una contraseña que tú eliges."
+
+#: apps/reiwand-app/qml/SettingsCarry.qml
+msgid "Adds what the file brings; nothing you have is replaced"
+msgstr "Agrega lo que trae el archivo; nada de lo que tienes se reemplaza"
+
+#: apps/reiwand-app/qml/SettingsCarry.qml
+msgid "You see what the file holds and tick what to bring. Lists with the same name can be joined or kept both."
+msgstr "Ves qué contiene el archivo y marcas qué traer. Las listas con el mismo nombre se pueden unir o tener las dos."
+
+#: apps/reiwand-app/qml/SettingsMachine.qml
+msgid "Export and import"
+msgstr "Exportar e importar"
+
+#: apps/reiwand-app/qml/SettingsMachine.qml
+msgid "Take your repositories, lists, favorites and settings to another computer in one file, or bring them here from one."
+msgstr "Lleva tus repositorios, listas, favoritos y ajustes a otro equipo en un solo archivo, o tráelos aquí desde uno."
+
+#: apps/reiwand-app/qml/CarryCheck.qml apps/reiwand-app/qml/CarryWords.qml
+msgid "%1 new"
+msgstr "%1 nuevos"
+
+#: apps/reiwand-app/qml/CarryCheck.qml apps/reiwand-app/qml/CarryWords.qml
+msgid "%1 with the same name"
+msgstr "%1 con el mismo nombre"
+
+#: apps/reiwand-app/qml/CarryCheck.qml apps/reiwand-app/qml/CarryWords.qml
+msgid "Confirm the certificate"
+msgstr "Confirmar el certificado"
+
+#: apps/reiwand-app/qml/CarryCheck.qml apps/reiwand-app/qml/SettingsMachine.qml apps/reiwand-app/qml/facade/MachineWords.qml
+msgid "Move your configuration"
+msgstr "Llevar tu configuración"
+
+#: apps/reiwand-app/qml/CarryCheck.qml apps/reiwand-app/qml/SettingsCarry.qml apps/reiwand-app/qml/facade/SettingsMachineRows.qml
+msgid "Export my configuration…"
+msgstr "Exportar mi configuración…"
+
+#: apps/reiwand-app/qml/CarryCheck.qml apps/reiwand-app/qml/SettingsCarry.qml apps/reiwand-app/qml/facade/SettingsMachineRows.qml
+msgid "Import a configuration…"
+msgstr "Importar una configuración…"
+
+#: apps/reiwand-app/qml/CarryCheck.qml apps/reiwand-app/qml/CarryImport.qml
+msgid "Import a configuration"
+msgstr "Importar una configuración"
+
+#: apps/reiwand-app/qml/CarryExport.qml
+msgid "The configuration was not saved: %1"
+msgstr "La configuración no se guardó: %1"
+
+#: apps/reiwand-app/qml/CarryExport.qml
+msgid "Export my configuration"
+msgstr "Exportar mi configuración"
+
+#: apps/reiwand-app/qml/CarryExport.qml
+msgid "Choose where to save…"
+msgstr "Elegir dónde guardar…"
+
+#: apps/reiwand-app/qml/CarryExport.qml
+msgid "Include my own wallpapers"
+msgstr "Incluir mis fondos propios"
+
+#: apps/reiwand-app/qml/CarryExport.qml
+msgid "They add %1 to the file."
+msgstr "Suman %1 al archivo."
+
+#: apps/reiwand-app/qml/CarryExport.qml
+msgid "Password for the file"
+msgstr "Contraseña del archivo"
+
+#: apps/reiwand-app/qml/CarryExport.qml
+msgid "Write it again"
+msgstr "Escríbela otra vez"
+
+#: apps/reiwand-app/qml/CarryExport.qml
+msgid "Save my configuration"
+msgstr "Guardar mi configuración"
+
+#: apps/reiwand-app/qml/CarryExport.qml apps/reiwand-app/qml/CarryImport.qml
+msgid "Reiwand configuration"
+msgstr "Configuración de Reiwand"
+
+#: apps/reiwand-app/qml/CarryExport.qml
+msgid "Your configuration was saved in %1"
+msgstr "Tu configuración se guardó en %1"
+
+#: apps/reiwand-app/qml/CarryImport.qml
+msgid "The configuration was not imported: %1"
+msgstr "La configuración no se importó: %1"
+
+#: apps/reiwand-app/qml/CarryImport.qml
+msgid "(imported)"
+msgstr "(importada)"
+
+#: apps/reiwand-app/qml/CarryImport.qml
+msgid "This file is locked with a password."
+msgstr "Este archivo está protegido con una contraseña."
+
+#: apps/reiwand-app/qml/CarryImport.qml
+msgid "Password of the file"
+msgstr "Contraseña del archivo"
+
+#: apps/reiwand-app/qml/CarryImport.qml
+msgid "That password does not open the file, or the file is damaged."
+msgstr "Esa contraseña no abre el archivo, o el archivo está dañado."
+
+#: apps/reiwand-app/qml/CarryImport.qml
+msgid "All files"
+msgstr "Todos los archivos"
+
+#: apps/reiwand-app/qml/CarryResult.qml
+msgid "Added to your configuration:"
+msgstr "Se agregó a tu configuración:"
+
+#: apps/reiwand-app/qml/CarryResult.qml
+msgid "%1 items refer to wallpapers that are not on this computer."
+msgstr "%1 elementos se refieren a fondos que no están en este equipo."
+
+#: apps/reiwand-app/qml/CarryResult.qml apps/reiwand-app/qml/facade/CarryWords.qml
+msgid "Sign in again"
+msgstr "Iniciar sesión otra vez"
+
+#: apps/reiwand-app/qml/facade/CarryWords.qml
+msgid "Photo sources"
+msgstr "Fuentes de fotos"
+
+#: apps/reiwand-app/qml/facade/CarryWords.qml
+msgid "Ratings"
+msgstr "Valoraciones"
+
+#: apps/reiwand-app/qml/facade/CarryWords.qml
+msgid "Wallpapers from repositories"
+msgstr "Fondos de repositorios"
+
+#: apps/reiwand-app/qml/facade/CarryWords.qml
+msgid "My own wallpapers"
+msgstr "Mis fondos propios"
+
+#: apps/reiwand-app/qml/facade/CarryWords.qml
+msgid "Passwords and keys"
+msgstr "Contraseñas y claves"
+
+#: apps/reiwand-app/qml/facade/CarryWords.qml
+msgid "Nothing to bring"
+msgstr "Nada que traer"
+
+#: apps/reiwand-app/qml/facade/CarryWords.qml
+msgid "Open the repositories"
+msgstr "Abrir los repositorios"
+
+#: apps/reiwand-app/qml/facade/CarryWords.qml
+msgid "Open the photo sources"
+msgstr "Abrir las fuentes de fotos"

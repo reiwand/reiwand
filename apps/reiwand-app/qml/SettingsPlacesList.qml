@@ -39,6 +39,11 @@ QtObject {
             page: list.page
         }
     }
+    readonly property Component carry: Component {
+        SettingsCarry {
+            page: list.page
+        }
+    }
     readonly property Component sound: Component {
         SettingsSound {
             page: list.page

@@ -58,6 +58,10 @@ Importar solo agrega y sigue este orden: repositorios, proveedores y claves, paq
 
 `reiwand-ctl export ARCHIVO [--own] [--secrets] [--password-file ARCHIVO]` y `reiwand-ctl import ARCHIVO [--list] [--take SECCIÓN]… [--lists join|both] [--suffix TEXTO]`; `--list` solo muestra lo que trae. Ver `dbus.md`, `Carry1`.
 
+## En la app de escritorio
+
+Ajustes > Equipo > «Mover mi configuración» ofrece «Exportar mi configuración…» e «Importar una configuración…». Exportar permite marcar los fondos propios (muestra el tamaño que suman) y las contraseñas y claves (pide la contraseña dos veces y cifra todo el archivo), y ejecuta `Carry1.Export` como tarea. Importar abre el archivo, pide la contraseña si está cifrado, muestra la vista previa por sección (nuevos, ya presentes, conflictos de nombre; todo marcado salvo los ajustes), deja elegir «Unir» o «Tener las dos» en las listas con el mismo nombre y ejecuta `ImportChosen` como tarea. El resultado lista lo añadido y los pendientes con botones hacia la página que corresponde.
+
 ## En el teléfono
 
 `crates/reiwand-android` (`carry`) arma el mismo contenido que el daemon y aplica el mismo orden y el mismo informe. El archivo se elige con el selector de archivos del sistema: Kotlin copia el documento a la caché de la app (o desde ella) y Rust trabaja sobre esa ruta. Operaciones de `Native.account`: `carry_preview`, `carry_export` (`own`, `secrets`, `password`) y `carry_import` (`take`, `lists`, `suffix`). Un archivo exportado en el escritorio se importa en el teléfono y al revés; las claves de los proveedores y las sesiones siguen las mismas reglas. El teléfono no tiene subcomando de terminal: la paridad es la de los dos programas sobre el mismo archivo.

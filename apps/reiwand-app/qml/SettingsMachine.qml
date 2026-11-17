@@ -33,6 +33,10 @@ FocusScope {
             "off": lights.off
         },
         {
+            "text": move.text,
+            "value": move.value
+        },
+        {
             "text": advanced.text,
             "value": advanced.value
         }
@@ -101,6 +105,16 @@ FocusScope {
             value: MachineWords.lights(tab.lightsOn, tab.lightsStatus)
             explain: off ? App.tr("Start OpenRGB and its server, or search for “OpenRGB” to change its address or turn the lights off.") : ""
             onOpened: tab.page.open("lights", lights)
+        }
+
+        Fila {
+            id: move
+
+            text: App.tr("Move your configuration")
+            kind: "pliega"
+            value: App.tr("Export and import")
+            explain: App.tr("Take your repositories, lists, favorites and settings to another computer in one file, or bring them here from one.")
+            onOpened: tab.page.open("carry", move)
         }
 
         Fila {

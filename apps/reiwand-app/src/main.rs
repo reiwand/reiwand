@@ -4,6 +4,7 @@ mod args;
 mod backend;
 mod builtin;
 mod bus;
+mod carrying;
 mod checkrun;
 mod choices;
 mod chooser;
@@ -70,6 +71,7 @@ mod strips;
 #[cfg(test)]
 mod tests;
 mod texts;
+mod textual;
 mod tones;
 mod tr;
 

@@ -29,7 +29,7 @@ QtObject {
 
     function equipo() {
         const tab = open("");
-        same(JSON.stringify(SettingsReach.rows(tab).map(fila => fila.text)), JSON.stringify([App.tr("Private mode"), App.tr("Scene permissions"), App.tr("Sound of the scenes"), App.tr("What you are listening to"), App.tr("RGB lights"), App.tr("Advanced")]), "the rows of the device tab");
+        same(JSON.stringify(SettingsReach.rows(tab).map(fila => fila.text)), JSON.stringify([App.tr("Private mode"), App.tr("Scene permissions"), App.tr("Sound of the scenes"), App.tr("What you are listening to"), App.tr("RGB lights"), App.tr("Move your configuration"), App.tr("Advanced")]), "the rows of the device tab");
         same(MachineWords.lights(true, {
             "connected": false,
             "devices": []

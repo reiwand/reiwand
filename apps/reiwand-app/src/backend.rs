@@ -42,6 +42,17 @@ pub mod qobject {
             secret: &QString,
         );
         #[qinvokable]
+        fn carry(
+            self: Pin<&mut Backend>,
+            tag: &QString,
+            member: &QString,
+            path: &QString,
+            password: &QString,
+            json: &QString,
+        );
+        #[qinvokable]
+        fn own_size(self: &Backend) -> f64;
+        #[qinvokable]
         fn set_secret(self: Pin<&mut Backend>, tag: &QString, id: &QString, secret: &QString);
         #[qinvokable]
         fn passphrase(self: Pin<&mut Backend>, tag: &QString, member: &QString, passphrase: &QString);
@@ -105,7 +116,7 @@ pub mod qobject {
 
 use crate::args::{carries_secret, invalid};
 use crate::bus;
-use crate::{app, choices, tr};
+use crate::{app, tr};
 use cxx_qt::Threading;
 use cxx_qt_lib::QString;
 use qobject::Backend;
@@ -174,25 +185,5 @@ impl Backend {
 
     pub fn read_text(&self, url: &QString) -> QString {
         QString::from(&app::path(&url.to_string()).and_then(crate::texts::head).unwrap_or_default())
-    }
-
-    pub fn licenses(&self) -> QString {
-        QString::from(crate::texts::LICENSES)
-    }
-
-    pub fn markup(&self, text: &QString) -> QString {
-        QString::from(&reiwand_core::markup::html(&text.to_string()))
-    }
-
-    pub fn plain(&self, text: &QString) -> QString {
-        QString::from(&reiwand_core::markup::plain(&text.to_string()))
-    }
-
-    pub fn toggle(&self, list: &QString, item: &QString, order: &QString) -> QString {
-        QString::from(&choices::toggled(&list.to_string(), &item.to_string(), &order.to_string()))
-    }
-
-    pub fn flip(&self, bits: &QString, index: i32) -> QString {
-        QString::from(&choices::flipped(&bits.to_string(), usize::try_from(index).unwrap_or_default()))
     }
 }

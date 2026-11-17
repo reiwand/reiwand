@@ -83,6 +83,9 @@ Kirigami.Page {
 
     function exercise() {
         Qt.createComponent("SettingsCheck.qml").createObject(page).exercise();
+        Qt.createComponent("CarryCheck.qml").createObject(page, {
+            "page": page
+        }).exercise();
         Qt.createComponent("SettingsTabsCheck.qml").createObject(page, {
             "page": page
         }).exercise();

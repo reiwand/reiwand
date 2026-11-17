@@ -6,6 +6,8 @@ import io.github.reiwand.app
 QtObject {
     function places() {
         return [
+            ["carry", App.tr("Export my configuration…")],
+            ["carry", App.tr("Import a configuration…")],
             ["grants", App.tr("What scenes may use")],
             ["sound", App.tr("Let scenes play their sounds")],
             ["sound", App.tr("Let scenes react to the sound that plays")],
