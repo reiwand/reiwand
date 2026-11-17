@@ -516,12 +516,13 @@ jobs:
             files: |
               target/release/reiwand-app
           - name: tools
-            bins: reiwand-ctl reiwand-web
+            bins: reiwand-ctl reiwand-web reiwand-upgrade
             cache: daemon
             save: false
             files: |
               target/release/reiwand-ctl
               target/release/reiwand-web
+              target/release/reiwand-upgrade
     env:
       REIWAND_VERSION: ${{ needs.version.outputs.informational }}
     steps:

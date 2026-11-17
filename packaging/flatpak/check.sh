@@ -29,7 +29,7 @@ rm -r "$dir"
 test -f "$files/share/reiwand/kwin-pointer/contents/code/main.js"
 grep -qF "\"Version\": \"${version%%+*}\"" "$files/share/reiwand/kwin-pointer/metadata.json"
 for name in .Daemon:reiwandd :reiwand-app; do
-  grep -x "Exec=.* --command=/app/bin/${name#*:} $app" "$exports/dbus-1/services/io.github.reiwand${name%%:*}.service"
+  grep -x "Exec=.* --command=/app/bin/reiwand-launch $app /app/bin/${name#*:}" "$exports/dbus-1/services/io.github.reiwand${name%%:*}.service"
 done
 desktop=$exports/applications/$app.desktop
 grep -x "Exec=.* --command=/app/bin/reiwand-app --file-forwarding $app @@u %U @@" "$desktop"
