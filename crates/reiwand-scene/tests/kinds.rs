@@ -117,7 +117,8 @@ fn absolute_levels_ignore_the_reference() {
 #[test]
 fn kind_unit_and_the_surge_fields_are_required() {
     let load = |b: Json| {
-        let layer = json!({ "blend_space": "canvas", "id": "l0", "type": "solid", "color": "#ffffff", "opacity": b });
+        let layer =
+            json!({ "blend_space": "canvas", "id": "l0", "type": "solid", "color": "#ffffff", "opacity": b });
         let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [layer] });
         Scene::load(&text.to_string(), &BTreeMap::new()).is_ok()
     };
