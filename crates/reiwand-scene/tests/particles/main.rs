@@ -14,6 +14,7 @@ mod steering;
 mod strands;
 mod strokes;
 mod validated;
+mod volume;
 mod walls;
 
 const VIEW: [f32; 4] = [0.0, 0.0, 200.0, 100.0];

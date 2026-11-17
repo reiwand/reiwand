@@ -124,6 +124,17 @@ fn between(b: &Value, f: &Frame, spots: &[Value], t: f64) -> Value {
         "taper": taped.then(|| json!({ "at": point(pos * span), "position": pos, "size": size })), "places": places })
 }
 
+fn sphere(v: &Value, f: &Frame, spots: &[Value]) -> Value {
+    let place = anchored(&v["at"], f, spots);
+    let center = pair(&v["center"]);
+    let radius: Vec<f64> = (0..3).map(|k| v["radius"][k].as_f64().unwrap_or(0.0)).collect();
+    let inner = v["inner"].as_f64().unwrap_or(0.0);
+    let at = |dx: f64, dy: f64| f.round(place.apply([center[0] + dx, center[1] + dy]));
+    json!({ "kind": "sphere", "center": at(0.0, 0.0), "local": center, "east": at(radius[0], 0.0), "south": at(0.0, radius[1]),
+        "inner_east": at(radius[0] * inner, 0.0), "radius": radius, "depth": v["depth"], "inner": inner, "sign": v["sign"],
+        "scale": f.scale(), "anchor": v["at"], "inverse": place.inverse() })
+}
+
 pub(super) fn shapes(
     dir: &Path,
     doc: &Value,
@@ -153,6 +164,7 @@ pub(super) fn shapes(
                 json!({ "kind": kind, "center": f.round(place.apply(center)), "local": center, "radius": radius * f.scale(), "edge": edge,
                     "inner": num(&v["inner"], t, 0.0) * f.scale(), "anchor": v["at"], "inverse": place.inverse() })
             }
+            "sphere" => sphere(v, f, spots),
             "around" => around(v, f, spots, t),
             "between" => between(v, f, spots, t),
             "layer" => super::samples::samples(dir, doc, v, t),

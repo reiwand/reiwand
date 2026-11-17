@@ -117,7 +117,7 @@ Cambia la forma de un emisor, es decir, de dónde nacen las partículas. Con el 
 |---|---|---|
 | `system` | texto | (obligatorio) Id del sistema. |
 | `emitter` | entero | (obligatorio) Posición del emisor. |
-| `shape` | cualquier valor JSON | (obligatorio) La forma, en píxeles del lienzo: `"edge"` (el borde), `{"point":[x,y]}`, `{"box":{"from":[x0,y0],"to":[x1,y1]}}`, `{"line":[[x0,y0],[x1,y1]]}`, `{"circle":{"center":[x,y],"radius":r,"inner":r2}}` (un anillo si `inner` es mayor que 0), `{"mask":{"texture":"id","threshold":0.5}}` (donde la imagen estirada sobre el lienzo es opaca), `{"around":{"axis":[0,0,1],"at":"p0","count":8,"radius":100}}` (en turnos alrededor de un punto) o `{"between":{"from":"p0","to":"p1","count":10}}` (a lo largo de una línea entre dos puntos). |
+| `shape` | cualquier valor JSON | (obligatorio) La forma, en píxeles del lienzo: `"edge"` (el borde), `{"point":[x,y]}`, `{"box":{"from":[x0,y0],"to":[x1,y1]}}`, `{"line":[[x0,y0],[x1,y1]]}`, `{"circle":{"center":[x,y],"radius":r,"inner":r2}}` (un anillo si `inner` es mayor que 0), `{"sphere":{"center":[x,y],"depth":z,"radius":[rx,ry,rz],"inner":0,"sign":[0,0,0]}}` (dentro de un elipsoide; todos los campos obligatorios), `{"mask":{"texture":"id","threshold":0.5}}` (donde la imagen estirada sobre el lienzo es opaca), `{"around":{"axis":[0,0,1],"at":"p0","count":8,"radius":100}}` (en turnos alrededor de un punto) o `{"between":{"from":"p0","to":"p1","count":10}}` (a lo largo de una línea entre dos puntos). |
 
 ```sh
 reiwand-ctl scene act mi-escena add_layer '{"kind":"particles","id":"chispas"}'

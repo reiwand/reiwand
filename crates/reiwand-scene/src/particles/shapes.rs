@@ -20,6 +20,15 @@ pub enum EmitShape {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         at: Option<Handle>,
     },
+    Sphere {
+        center: [f32; 2],
+        depth: f32,
+        radius: [f32; 3],
+        inner: f32,
+        sign: [i8; 3],
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        at: Option<Handle>,
+    },
     Line([[f32; 2]; 2]),
     Edge,
     Mask {

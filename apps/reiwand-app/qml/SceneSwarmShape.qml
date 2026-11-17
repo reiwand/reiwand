@@ -58,6 +58,15 @@ Item {
                 ctx.arc(e.center[0] * r, e.center[1] * r, e.radius * r, 0, 2 * Math.PI);
                 ctx.stroke();
             }
+            if (e.kind === "sphere") {
+                [1, e.inner].forEach((k, i) => {
+                    ctx.setLineDash(i ? [4, 4] : []);
+                    ctx.beginPath();
+                    ctx.ellipse((e.center[0] - e.radius[0] * k * e.scale) * r, (e.center[1] - e.radius[1] * k * e.scale) * r, 2 * e.radius[0] * k * e.scale * r, 2 * e.radius[1] * k * e.scale * r);
+                    ctx.stroke();
+                });
+                ctx.setLineDash([]);
+            }
             if (e.kind === "around" && e.center) {
                 const a = e.start * Math.PI / 180;
                 ctx.beginPath();

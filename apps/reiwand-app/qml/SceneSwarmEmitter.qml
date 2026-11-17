@@ -9,7 +9,7 @@ ColumnLayout {
 
     required property var tools
     required property var emitter
-    readonly property var kinds: ["point", "box", "circle", "line", "edge", "around", "between", "layer"]
+    readonly property var kinds: ["point", "box", "circle", "sphere", "line", "edge", "around", "between", "layer"]
     readonly property var targets: (tools?.info?.points ?? []).map(p => p.name).concat(["cursor"])
 
     function fresh(kind) {
@@ -28,6 +28,15 @@ ColumnLayout {
                 "circle": {
                     "center": c,
                     "radius": 100
+                }
+            },
+            "sphere": {
+                "sphere": {
+                    "center": c,
+                    "depth": 0,
+                    "radius": [200, 200, 200],
+                    "inner": 0,
+                    "sign": [0, 0, 0]
                 }
             },
             "line": {
@@ -88,7 +97,7 @@ ColumnLayout {
 
         QQC2.ComboBox {
             Layout.fillWidth: true
-            model: [App.tr("Point"), App.tr("Box"), App.tr("Circle"), App.tr("Line"), App.tr("Edge"), App.tr("Around a point"), App.tr("Between two points"), App.tr("From a layer")]
+            model: [App.tr("Point"), App.tr("Box"), App.tr("Circle"), App.tr("Ball"), App.tr("Line"), App.tr("Edge"), App.tr("Around a point"), App.tr("Between two points"), App.tr("From a layer")]
             currentIndex: row.kinds.indexOf(row.emitter.kind)
             onActivated: index => tools.edit("shape", {
                     "emitter": row.emitter.index,
@@ -127,6 +136,13 @@ ColumnLayout {
             value: row.emitter.count ?? 1
             onValueModified: row.patch(s => s.count = value)
         }
+    }
+
+    SceneSwarmVolume {
+        Layout.fillWidth: true
+        visible: row.emitter.kind === "sphere"
+        tools: row.tools
+        emitter: row.emitter
     }
 
     SceneSwarmSource {

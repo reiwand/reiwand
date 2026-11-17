@@ -66,6 +66,10 @@ impl Sim {
             if let super::EmitShape::Around(a) = &em.shape {
                 self.paths[2 * k] = [a.axis[0], a.axis[1], a.axis[2], 0.0];
             }
+            if let super::EmitShape::Sphere { sign, .. } = &em.shape {
+                let [x, y, z] = sign.map(f32::from);
+                self.paths[2 * k] = [x, y, z, 0.0];
+            }
             if let super::EmitShape::Between(b) = &em.shape {
                 let (bow, taper) =
                     (b.arc.unwrap_or(super::Bow { amount: 0.0, side: 1.0 }), b.taper.unwrap_or_default());

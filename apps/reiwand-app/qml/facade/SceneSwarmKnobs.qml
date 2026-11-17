@@ -80,6 +80,29 @@ QtObject {
                     "act": to => shape.patch(s => s.radius = Math.round(dist(put(to), e.local) * 10) / 10)
                 }
             ];
+        case "sphere":
+            return [
+                {
+                    "at": e.center,
+                    "tip": anchored ? App.tr("Drag to move the ball away from its control point") : "",
+                    "act": to => shape.patch(s => s.center = put(to))
+                },
+                {
+                    "at": e.east,
+                    "tip": App.tr("Drag to change the horizontal radius"),
+                    "act": to => shape.patch(s => s.radius[0] = Math.round(Math.abs(put(to)[0] - e.local[0]) * 10) / 10)
+                },
+                {
+                    "at": e.south,
+                    "tip": App.tr("Drag to change the vertical radius"),
+                    "act": to => shape.patch(s => s.radius[1] = Math.round(Math.abs(put(to)[1] - e.local[1]) * 10) / 10)
+                },
+                {
+                    "at": e.inner_east,
+                    "tip": App.tr("Drag to hollow the ball: the second ring keeps births outside it"),
+                    "act": to => shape.patch(s => s.inner = Math.round(Math.min(1, Math.abs(put(to)[0] - e.local[0]) / Math.max(1e-6, s.radius[0])) * 100) / 100)
+                }
+            ];
         case "around":
             if (!e.center)
                 return [];

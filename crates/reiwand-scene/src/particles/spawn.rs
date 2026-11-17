@@ -76,7 +76,7 @@ pub(super) fn spawn(
         }
     }
     let (mut host, mut deep) = ([0; 2], depth(s, id));
-    if s.shapes[e] == 6 && s.depth[2][3] > 0.5 {
+    if matches!(s.shapes[e], 6 | 9) && s.depth[2][3] > 0.5 {
         deep[0] += extra[1];
     }
     if let Some(ev) = ev {

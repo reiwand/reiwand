@@ -21292,3 +21292,71 @@ msgstr "Hasta %1"
 #: apps/reiwand-app/qml/SceneSwarmTilt.qml
 msgid "Turn sprites in depth"
 msgstr "Girar los sprites en profundidad"
+
+#: apps/reiwand-app/qml/SceneSwarmEmitter.qml
+msgid "Ball"
+msgstr "Esfera"
+
+#: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
+msgid "Drag to move the ball away from its control point"
+msgstr "Arrastra para alejar la esfera de su punto de control"
+
+#: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
+msgid "Drag to change the horizontal radius"
+msgstr "Arrastra para cambiar el radio horizontal"
+
+#: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
+msgid "Drag to change the vertical radius"
+msgstr "Arrastra para cambiar el radio vertical"
+
+#: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
+msgid "Drag to hollow the ball: the second ring keeps births outside it"
+msgstr "Arrastra para ahuecar la esfera: el segundo anillo deja los nacimientos fuera de él"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Horizontal: both sides"
+msgstr "Horizontal: ambos lados"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Horizontal: right side"
+msgstr "Horizontal: lado derecho"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Horizontal: left side"
+msgstr "Horizontal: lado izquierdo"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Vertical: both sides"
+msgstr "Vertical: ambos lados"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Vertical: lower side"
+msgstr "Vertical: lado inferior"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Vertical: upper side"
+msgstr "Vertical: lado superior"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Depth: both sides"
+msgstr "Profundidad: ambos lados"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Depth: far side"
+msgstr "Profundidad: lado lejano"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Depth: near side"
+msgstr "Profundidad: lado cercano"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Side view of the ball"
+msgstr "Vista lateral de la esfera"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Depth radius"
+msgstr "Radio en profundidad"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Hollow core"
+msgstr "Núcleo hueco"

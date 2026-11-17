@@ -19,6 +19,7 @@ mod strokes;
 mod strung;
 mod tilts;
 mod timed;
+mod volume;
 
 const SIZE: (u32, u32) = (160, 80);
 

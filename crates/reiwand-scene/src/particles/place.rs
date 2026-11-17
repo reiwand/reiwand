@@ -10,8 +10,22 @@ pub(super) fn place(s: &Sim, e: usize, id: u32, points: &[[f32; 2]], order: u32)
     if let Some(spot) = sweep(s, e, id, order, points) {
         return spot;
     }
+    if s.shapes[e] == 9 {
+        return ball(s, e, id);
+    }
     let (at, center) = spread(s, e, id, points);
     (at, center, [1.0, 0.0])
+}
+
+fn ball(s: &Sim, e: usize, id: u32) -> Spot {
+    let (a, b, g, seed) = (s.emitters[4 * e], s.emitters[4 * e + 1], s.paths[2 * e], s.ids[0]);
+    let r = lerp(b[1].powi(3), 1.0, rand(seed, id, 0)).cbrt();
+    let t = TAU * rand(seed, id, 1);
+    let z = 2.0 * rand(seed, id, KEY + 72) - 1.0;
+    let w = (1.0 - z * z).max(0.0).sqrt();
+    let mut off = [r * w * t.cos() * a[2], r * w * t.sin() * a[3], r * z * b[0]];
+    (0..3).filter(|k| g[*k] != 0.0).for_each(|k| off[k] = g[k] * off[k].abs());
+    ([a[0] + off[0], a[1] + off[1]], [a[0], a[1]], [1.0, b[2] + off[2]])
 }
 
 fn spread(s: &Sim, e: usize, id: u32, points: &[[f32; 2]]) -> ([f32; 2], [f32; 2]) {

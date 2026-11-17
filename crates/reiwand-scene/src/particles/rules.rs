@@ -52,6 +52,16 @@ impl Check<'_> {
                     );
                     vec![*center]
                 }
+                EmitShape::Sphere { center, depth, radius, inner, sign, .. } => {
+                    let r = format!("{q}/shape/sphere");
+                    self.range(&format!("{r}/depth"), *depth, -1e5, 1e5);
+                    self.range(&format!("{r}/inner"), *inner, 0.0, 1.0);
+                    for k in 0..3 {
+                        self.range(&format!("{r}/radius/{k}"), radius[k], 0.0, 1e5);
+                        self.range(&format!("{r}/sign/{k}"), f32::from(sign[k]), -1.0, 1.0);
+                    }
+                    vec![*center]
+                }
                 EmitShape::Mask { texture, threshold } => {
                     let known = self.scene.assets.contains_key(texture);
                     self.known(&format!("{q}/shape/mask/texture"), "asset", texture, known);

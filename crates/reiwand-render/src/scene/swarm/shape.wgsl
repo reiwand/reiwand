@@ -24,8 +24,24 @@ fn hollow(a: vec4<f32>, b: vec4<f32>, u: vec2<f32>, pick: f32) -> vec2<f32> {
     return vec2<f32>(lerp(hi.x - band.x, hi.x, u.x), lerp(y.x, y.y, u.y));
 }
 
+fn ball(e: u32, id: u32) -> array<vec2<f32>, 3> {
+    let a = sim.emitters[e * 4u];
+    let b = sim.emitters[e * 4u + 1u];
+    let sign = sim.paths[e * 2u].xyz;
+    let r = pow(lerp(b.y * b.y * b.y, 1.0, rand(id, 0u)), 1.0 / 3.0);
+    let t = TAU * rand(id, 1u);
+    let z = 2.0 * rand(id, KEY + 72u) - 1.0;
+    let s = sqrt(max(1.0 - z * z, 0.0));
+    var off = r * vec3<f32>(s * cos(t) * a.z, s * sin(t) * a.w, z * b.x);
+    off = select(off, sign * abs(off), sign != vec3<f32>(0.0));
+    return array(a.xy + off.xy, a.xy, vec2<f32>(1.0, b.z + off.z));
+}
+
 fn place(e: u32, id: u32, order: u32) -> array<vec2<f32>, 3> {
     let kind = sim.shapes[e / 4u][e % 4u];
+    if kind == 9u {
+        return ball(e, id);
+    }
     if kind >= 6u {
         return sweep(e, id, order, kind);
     }

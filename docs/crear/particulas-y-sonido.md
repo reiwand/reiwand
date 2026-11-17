@@ -130,6 +130,7 @@ Las formas son:
 | `point` | `{ "point": [x, y] }` | En un punto. |
 | `box` | `{ "box": { "from": [x0, y0], "to": [x1, y1] } }` | En un rectángulo. Con `inner: [ancho, alto]` y `at` es un rectángulo hueco alrededor de un punto de control. |
 | `circle` | `{ "circle": { "center", "radius", "inner" } }` | En un disco, o en un anillo si `inner` es mayor que 0. También `scale: [x, y]` (0,01 a 100), `sign: [x, y]` (-1, 0 o 1: medios círculos o cuartos) y `at`. |
+| `sphere` | `{ "sphere": { "center": [x, y], "depth": z, "radius": [rx, ry, rz], "inner": 0, "sign": [0, 0, 0] } }` | Dentro de una esfera o elipsoide, repartidas por igual en su volumen (no en la superficie). `inner` (0 a 1, fracción de los radios) deja el núcleo vacío, y `sign` (-1, 0 o 1 por cada uno de x, y, z) las deja en un solo lado. Todos los campos son obligatorios; `at` es opcional. x e y dan la posición y z la profundidad: con `perspective` se suma a `init.depth` y a `depth` de la forma (las que nacen cerca del ojo se ven grandes y quedan cerca del centro de la imagen); sin `perspective` se descarta z y queda el reparto de una bola vista de frente, más densa hacia el centro que un disco. |
 | `line` | `{ "line": [[x0, y0], [x1, y1]] }` | Sobre una línea. |
 | `edge` | `"edge"` | En el borde del lienzo. |
 | `mask` | `{ "mask": { "texture", "threshold" } }` | Donde el alfa de una imagen estirada sobre el lienzo supera `threshold` (0,5 por defecto). |

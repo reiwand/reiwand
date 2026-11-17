@@ -928,6 +928,7 @@ rate, bursts, timeline, pointer, sound gate and inherit controls.
 Selecting a particle system, or a particles layer, draws its tools over the preview in pixels of
 the canvas, through the transform of the layer: every emitter shape with handles (the point; the
 corners of a box and the center and radius of a circle, around the control point they are anchored to;
+a `sphere` as an ellipse with handles on its center and its two radii in the plane and a second, dashed ring for `inner` (the emitter panel adds a side view, x against depth, whose handles drag the center depth and the depth radius, a hollow-core slider and three buttons that cycle each direction through both sides, one side or the other; `handles` returns `center`, `east`, `south`, `inner_east`, `radius`, `depth`, `inner` and `sign`; the shape is written through the `particles` action `shape` with every field);
 the ends of a line; for `around`, the center, a handle for the radius and one for the end of the
 arc, with a dot at each place a birth takes; for `between`, its two ends, a handle that bows the
 line and one that slides the widest point of the taper, with dots sized as the taper sizes them;

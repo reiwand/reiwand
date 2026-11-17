@@ -20,6 +20,7 @@ mod sows;
 mod streaks;
 mod targets;
 mod tends;
+mod volume;
 
 fn state() {
     static STATE: OnceLock<TempDir> = OnceLock::new();

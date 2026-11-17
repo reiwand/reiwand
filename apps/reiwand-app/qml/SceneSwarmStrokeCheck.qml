@@ -54,6 +54,31 @@ QtObject {
         tools.load();
         if (tools.info.waves[0].from !== "top")
             throw new Error("waves: the base selector did not set top");
+        const first = () => JSON.parse(page.editor.value("/scene/particles/flakes/emitters/0/shape") || "null");
+        tools.edit("shape", {
+                "emitter": 0,
+                "shape": {
+                    "sphere": {
+                        "center": [960, 540],
+                        "depth": 0,
+                        "radius": [200, 100, 300],
+                        "inner": 0,
+                        "sign": [0, 0, 0]
+                    }
+                }
+            });
+        tools.load();
+        if (!find("ballSide") || !find("ballInner"))
+            throw new Error("sphere: the side view and the hollow slider are not shown");
+        find("ballSign2").clicked();
+        tools.load();
+        if (JSON.stringify(first()?.sphere?.sign) !== "[0,0,1]")
+            throw new Error("sphere: the toggle did not keep the births on the far side: " + JSON.stringify(first()));
+        const inner = find("ballInner");
+        inner.value = 0.5;
+        inner.moved();
+        if (first().sphere.inner !== 0.5)
+            throw new Error("sphere: the hollow slider did not write the inner fraction: " + JSON.stringify(first()));
         tools.destroy();
     }
 }

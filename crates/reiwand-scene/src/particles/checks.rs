@@ -111,6 +111,10 @@ impl Check<'_> {
                 }
                 at.iter().for_each(|h| self.handle(&format!("{p}/circle/at"), *h, s));
             }
+            EmitShape::Sphere { at, .. } => {
+                self.uses(true, "particle_depth");
+                at.iter().for_each(|h| self.handle(&format!("{p}/sphere/at"), *h, s));
+            }
             EmitShape::Layer(l) => {
                 self.uses(true, "particle_layers");
                 let drawn = self.scene.layer(&l.id).is_some_and(crate::Layer::drawn);

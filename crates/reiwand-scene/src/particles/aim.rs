@@ -24,7 +24,7 @@ impl Swarm {
             self.feeds[k][e].rate = rate;
             let at = match &em.shape {
                 EmitShape::Box(a) => a.at,
-                EmitShape::Circle { at, .. } => *at,
+                EmitShape::Circle { at, .. } | EmitShape::Sphere { at, .. } => *at,
                 _ => None,
             };
             let mut place = frame;

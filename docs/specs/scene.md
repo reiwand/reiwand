@@ -1811,6 +1811,7 @@ sets it, and every other name must be one of `points`. Targets and centers of fo
 | `init.turbulent`, `offset_noise`, `remap` | turbulent starting velocity `{ "forward", "scale", "noise_speed", "offset", "speed", "phase", "audio" }`; a fractal offset of the birth `{ "distance", "scale", "sign", "octaves" (1 to 6), "noise_scale", "noise_speed" }`; at most 8 `{ "input", "in", "clamp_in", "output", "out", "clamp_out", "op", "wave" }` that map `daytime`, `runtime`, `life`, `age`, `speed`, `random`, `distance:pN`, `audio:<band>` or `cursor:x\|y` onto `size`, `alpha`, `color`, `speed`, `life`, `rotation`, `spin` or `frame` with `set`, `mul`, `add` or `sub` and an optional `sine` or `noise` wave | `particle_fields` |
 | `perspective`, `init.depth`, `init.depth_speed` | `{ "focal" (1 to 100000 px) }` and depth ranges in pixels, which need `perspective` | `particle_depth` |
 | `init.tilt` | `{ "angle": [[xmin, ymin], [xmax, ymax]], "spin": [[xmin, ymin], [xmax, ymax]] }`, both required, in degrees and degrees per second (angle within ±3600, spin within ±36000). Each particle picks a start angle and a spin in the ranges for the turn about the horizontal (x) and the vertical (y) line of its own sprite, and the angle is `start + spin·age`. The sprite is drawn with its width times `\|cos y\|` and its height times `\|cos x\|` along its own directions, so it composes with `rotation`, `orient` and `angle` (the turn is applied after them, in the frame of the sprite, and a trail or stretch along the sprite shortens with the width); with `perspective` the near edge is drawn larger than the far one; `lit` and the normal map use the normal of the turned sprite, lit on both sides. The back of the sprite shows the same picture, not mirrored. The turn is computed in the shader from the particle, so it costs nothing on the simulation. `tilt` is always written: zero ranges (`[[0,0],[0,0]]` for both) mean no turn, any other value turns the sprite; a fixed angle is a range with equal ends | `particles2` (when something turns) |
+| shape `sphere` | `{ "center": [x, y], "depth": z, "radius": [rx, ry, rz], "inner": f, "sign": [sx, sy, sz] }`, every field required and `at` (a control point) optional: births fill the volume of an ellipsoid evenly (the distance from the middle grows with the cube root of a uniform number and the direction is uniform in 3D), between the fraction `inner` (0 to 1, of the three radii; 0 is a full ball) and the edge, and `sign` (−1, 0 or 1 for each of x, y and z, `[0, 0, 0]` for both sides of each) keeps them on one side by mirroring. x and y give the position, z the depth | `particle_depth` |
 | force `window` | `[in_start, in_end, out_start, out_end]` fractions of the life, in order, in which any force fades in and out | `particles2` |
 | forces | `{ "oscillate": { "what": "position" \| "alpha" \| "size", "from": "top" \| "floor", "freq", "scale", "phase", "mask" } }`, `{ "cap": speed }`, `{ "torque": k }`, `{ "spin_drag": k }`, `{ "slow_near": { "target", "inner", "outer", "factor" } }`; `attractor`, `vortex` and `orbit` take `radius` and `falloff` (`constant`, `linear`, `inverse_square`), `vortex` also `inner`, `outer` and `ring: { "radius", "width", "pull" }`, `turbulence` also `speed`, `time_scale` and `mask` | `particles2` |
 | forces | `{ "keep_distance": { "target", "distance", "strength" } }` (−1000 to 1000), `{ "keep_between": { "from", "to", "strength" } }`, `{ "remap": { … } }` applied every step (input `age` too) | `particle_steering` |
@@ -1844,7 +1845,16 @@ The newer fields behave as follows.
   give `p0` an `at` of half the canvas.
 - **Shapes.** `inner` cuts a box of that size out of the middle of a `box`, which births fill evenly.
   `scale` stretches a `circle` into an ellipse and `sign` keeps its positive (1) or negative (−1)
-  half along x and along y.
+  half along x and along y. A `sphere` draws the three coordinates of a point of the ball and uses
+  its z as depth only with `perspective`: the depth of a birth is `init.depth` plus `depth` of the
+  shape plus the z of the point (the same rule as `around`, so a system that wants only the ball
+  has no `init.depth`, or one of `[0, 0]`), and a system without `perspective` drops z, which leaves
+  births spread as the picture of a ball seen from the front, thicker towards the middle than a
+  disc (the share of births inside 0.6 of the radius is 0.49, against 0.36 for a disc). The
+  x and y of the point go through `space` and the control point `at` like those of a `circle`,
+  so they are turned and scaled with the placement; z is not. The radius for the speed given by `radial` is measured from the
+  middle in the plane. `tilt` of `init` and the turn of `around` do not depend on it. Both paths
+  draw the same point from the same random numbers.
 - **Starting values.** A range `[min, max, exponent]` picks `min + (max − min) · u^exponent`.
   `alpha` replaces the alpha of the color. `hsv` picks the hue in degrees (with `steps`, one of that
   many hues from one end of the range to the other), the saturation and the value from 0 to 1

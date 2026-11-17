@@ -352,7 +352,7 @@ the scene sound, runs `sound2`, `script_sounds`, `scripts2`, `script_layers` and
 | `shadows` | sets `shadows` on a light, or `cast_shadows` or `receive_shadows` on a material | runs | runs |
 | `particles2` | moves particles in world space, with control points, per-layer `instance` or `render`, scripts that use `particles`, emitter timing, newer emitter shapes, initializers and forces, operator windows, render `brightness`, `cycles`, `order` or a stretch range, `init.gradient`, a `mask` collider, or beyond the older limits (8 systems, 4 emitters, 8 forces, 4 colliders, 10 s of prewarm) | runs | runs |
 | `particle_children` | sets `children` on a system | runs | runs |
-| `particle_depth` | sets `perspective`, `init.depth` or `init.depth_speed` | runs | runs |
+| `particle_depth` | sets `perspective`, `init.depth`, `init.depth_speed` or an emitter shape `sphere` | runs | runs |
 | `particle_lighting` | sets `render.lit`, `render.normal` or `render.refract`, or `lighting` on a particles layer | runs | runs |
 | `particle_layers` | emits from a `layer` | runs | runs |
 | `particle_fields` | uses `turbulent`, `offset_noise`, `init.remap`, `around` or `between` | runs | runs |

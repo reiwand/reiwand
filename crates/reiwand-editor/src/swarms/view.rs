@@ -21,7 +21,7 @@ pub(super) fn middle(e: &Value) -> Option<[f64; 2]> {
         "point" => pair(&e["at"]),
         "line" => mean(&[e["from"].clone(), e["to"].clone()]),
         "box" => mean(e["corners"].as_array()?),
-        "circle" | "around" => pair(&e["center"]),
+        "circle" | "sphere" | "around" => pair(&e["center"]),
         "between" => pair(&e["bulge"]),
         "layer" => mean(e["outline"].as_array()?),
         _ => None,

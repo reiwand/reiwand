@@ -98,6 +98,9 @@ impl Sim {
                     let [gx, gy] = sign.unwrap_or_default().map(f32::from);
                     (2, [*x, *y, radius.0, inner.0], [sx, sy, gx, gy])
                 }
+                EmitShape::Sphere { center: [x, y], depth, radius: [rx, ry, rz], inner, .. } => {
+                    (9, [*x, *y, *rx, *ry], [*rz, *inner, *depth, 0.0])
+                }
                 EmitShape::Line([p, q]) => (3, [p[0], p[1], q[0], q[1]], [0.0; 4]),
                 EmitShape::Edge => (4, [0.0; 4], [0.0; 4]),
                 EmitShape::Mask { .. } => (5, [0.0; 4], [0.0; 4]),
