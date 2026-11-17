@@ -101,7 +101,7 @@ fn foreign(dir: &Path) {
         config: json!({ "url": "https://far.example/", "bogus": 5 }),
     };
     let content = Content {
-        lists: vec![List { name: "Far".into(), items: vec![item] }],
+        lists: vec![List { name: "Far".into(), items: vec![item], query: None, rules: None }],
         providers: vec![lonely],
         ..Content::default()
     };

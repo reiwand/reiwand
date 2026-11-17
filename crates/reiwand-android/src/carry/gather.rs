@@ -25,6 +25,7 @@ fn repositories() -> Result<Vec<Repository>, Error> {
             address: r.url,
             repo_id: r.repo_id,
             name: r.name,
+            pin: None,
         })
         .collect())
 }
@@ -93,6 +94,8 @@ pub(super) fn gather() -> Result<Gathered, Error> {
         .map(|(name, items)| List {
             name,
             items: items.iter().filter_map(|u| names.get(u).cloned()).collect(),
+            query: None,
+            rules: None,
         })
         .collect();
     let mut held: Vec<Installed> = (installed.iter())
