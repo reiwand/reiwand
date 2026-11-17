@@ -45,7 +45,7 @@ expect "$shown" "$cyan"
 opened() { [ -e "$WORK/preview-opened" ] && wc -l <"$WORK/preview-opened" || echo 0; }
 window() {
   dbus-send --session --print-reply --dest=org.freedesktop.DBus /org/freedesktop/DBus \
-    org.freedesktop.DBus.NameHasOwner string:io.github.reiwand.Preview | grep -q "boolean $1"
+    org.freedesktop.DBus.NameHasOwner string:io.github.reiwand.Switcher | grep -q "boolean $1"
 }
 before=$(opened)
 ctl next -o TEST-31 --preview >/dev/null
@@ -61,7 +61,7 @@ wait_for 20 expired || fail "an idle session did not expire"
 expect "$shown" "$gold"
 [ "$(opened)" = $((before + 2)) ] || fail "an expired session left no trace of its window"
 if [ -x "$BIN/reiwand-app" ] && python3 -c 'import dbus' 2>/dev/null; then
-  python3 -c 'import dbus, time; dbus.SessionBus().request_name("io.github.reiwand.Preview"); time.sleep(60)' &
+  python3 -c 'import dbus, time; dbus.SessionBus().request_name("io.github.reiwand.Switcher"); time.sleep(60)' &
   holder=$!
   wait_for 10 window true || fail "the stand-in window did not take its name"
   ctl next -o TEST-31 --preview >/dev/null

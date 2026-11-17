@@ -30,7 +30,7 @@ Window {
     readonly property real unit: PreviewLook.unit(width)
     readonly property real aspect: width > 0 && height > 0 ? width / height : 16 / 9
     readonly property string mode: failure !== "" ? "error" : began && (!live || alone) ? "vacio" : "normal"
-    readonly property string heading: screens.length > 1 && output !== "" ? App.tr("Change wallpaper · %1", output) : App.tr("Change wallpaper")
+    readonly property string heading: screens.length > 1 && output !== "" ? App.tr("Change wallpaper · %1", App.state.outputs[output]?.screen?.identity || output) : App.tr("Change wallpaper")
     readonly property string origin: session.source === "playlist" ? App.tr("List «%1»", session.playlist_name ?? "") : App.tr("Your library")
     readonly property string position: live ? App.tr("%1 of %2", (session.position ?? 0) + 1, session.count ?? 0) : ""
 

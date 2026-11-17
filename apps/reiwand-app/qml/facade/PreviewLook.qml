@@ -5,7 +5,7 @@ import QtQuick
 QtObject {
     readonly property int focoAncho: 520
     readonly property int cercaAncho: 264
-    readonly property int lejosAncho: 184
+    readonly property int lejosAncho: 150
     readonly property int hueco: 18
     readonly property int panelLado: 36
     readonly property int panelArriba: 24
@@ -20,7 +20,7 @@ QtObject {
     readonly property int espera: 5000
     readonly property real velo: 0.55
     readonly property real cercaOpaca: 0.78
-    readonly property real lejosOpaca: 0.5
+    readonly property real lejosOpaca: 0.36
     readonly property real ruedaPaso: 120
     readonly property real tTitulo: 15
     readonly property real tNombre: 24
