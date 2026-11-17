@@ -51,5 +51,8 @@ if ctl set "$ROOT/tests/fixtures/green-64x32.png" 2>/dev/null; then fail "a wall
 kill -0 "$daemon" || fail "the daemon exited with its renderer"
 echo "renderer guard checks passed"
 
+# export and import run two daemons of their own, so they go as a separate script
+bash "$(dirname "$0")"/integration-carry.sh "$BIN"
+
 status=0
 echo "integration test passed"

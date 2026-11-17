@@ -101,4 +101,8 @@ fn device_local_settings_are_not_portable() {
     assert!(!kept.contains_key("playback.volume"));
     assert!(is_device_local("outputs.HDMI-1.wallpaper"));
     assert!(is_device_local("playback.software_parallax"));
+    assert!(is_device_local("playback.hdr"));
+    assert!(is_device_local("playback.hdr.DP-1"));
+    assert!(is_device_local("layout.bezel_mm"));
+    assert!(is_device_local("rgb.host"));
 }

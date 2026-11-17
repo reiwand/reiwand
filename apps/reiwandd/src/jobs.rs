@@ -28,6 +28,7 @@ pub struct Jobs {
     account: Semaphore,
     linking: Semaphore,
     uploads: Semaphore,
+    carrying: Semaphore,
     layering: Semaphore,
     runtime: tokio::runtime::Handle,
 }
@@ -61,9 +62,9 @@ impl Jobs {
         let runtime = tokio::runtime::Handle::current();
         let (library, repos, downloads) = (Semaphore::new(1), Semaphore::new(1), Semaphore::new(2));
         let (account, linking, uploads) = (Semaphore::new(1), Semaphore::new(1), Semaphore::new(1));
-        let (list, layering) = (Mutex::default(), Semaphore::new(1));
+        let (list, layering, carrying) = (Mutex::default(), Semaphore::new(1), Semaphore::new(1));
         let next = AtomicU64::new(1);
-        Self { next, list, library, repos, downloads, account, linking, uploads, layering, runtime }
+        Self { next, list, library, repos, downloads, account, linking, uploads, carrying, layering, runtime }
     }
 
     fn queue(&self, kind: JobKind) -> &Semaphore {
@@ -74,12 +75,17 @@ impl Jobs {
             JobKind::Upload => &self.uploads,
             JobKind::Link => &self.linking,
             JobKind::Layers => &self.layering,
+            JobKind::CarryExport | JobKind::CarryImport => &self.carrying,
             _ => &self.library,
         }
     }
 
     pub fn wait_turn(&self, kind: JobKind) -> Option<SemaphorePermit<'_>> {
         self.runtime.block_on(self.queue(kind).acquire()).ok()
+    }
+
+    pub fn block_on<T>(&self, work: impl Future<Output = T>) -> T {
+        self.runtime.block_on(work)
     }
 
     fn with<T>(&self, id: u64, change: impl FnOnce(&mut Entry) -> T) -> Option<T> {

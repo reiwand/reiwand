@@ -39,7 +39,7 @@ impl Daemon {
         Ok(serde_json::to_value(report).unwrap_or_default())
     }
 
-    fn import_one(&self, path: &Path, copy: bool) -> Result<String> {
+    pub(crate) fn import_one(&self, path: &Path, copy: bool) -> Result<String> {
         if !fs::metadata(path)?.is_file() || Kind::detect(path).is_none() {
             return Err(invalid("not an image, video or package file"));
         }

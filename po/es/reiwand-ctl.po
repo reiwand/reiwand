@@ -6623,3 +6623,139 @@ msgstr "Imagen local, como ruta o URI file://"
 #: apps/reiwand-ctl/src/confirming.rs
 msgid "building the depth layers of %1 again"
 msgstr "volviendo a crear las capas de profundidad de %1"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Read the password of the file from FILE instead of asking on the terminal"
+msgstr ""
+"Leer la contraseña del archivo desde FILE en vez de pedirla en la terminal"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Write the configuration of this computer to one file that import brings to "
+"another"
+msgstr ""
+"Escribe la configuración de este equipo en un archivo que import trae a otro"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Write the configuration of this computer to one file that import brings to "
+"another: added repositories, photo providers, lists, favourites, ratings, "
+"tags, installed wallpapers (as references, downloaded again on import) and "
+"the settings that belong to a person rather than to a screen.\n"
+"\n"
+"With --secrets the file also carries the keys of the photo providers and is "
+"encrypted with a password that is asked for twice on the terminal, or read "
+"from --password-file."
+msgstr ""
+"Escribe la configuración de este equipo en un archivo que import trae a otro: repositorios añadidos, proveedores de fotos, listas, favoritos, valoraciones, etiquetas, fondos instalados (como referencias, que se descargan de nuevo al importar) y los ajustes que son de la persona y no de una pantalla.\n"
+"\n"
+"Con --secrets el archivo también lleva las claves de los proveedores de fotos y se cifra con una contraseña que se pide dos veces en la terminal o se lee de --password-file."
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "File to write; it must not exist"
+msgstr "Archivo que se escribe; no debe existir"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "Also carry the files of your own wallpapers (imported with a copy)"
+msgstr ""
+"Llevar también los archivos de tus fondos propios (importados con copia)"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Also carry the keys of the photo providers; the file is encrypted with a "
+"password"
+msgstr ""
+"Llevar también las claves de los proveedores de fotos; el archivo se cifra con una contraseña"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "Print the finished job as JSON"
+msgstr "Imprimir la tarea terminada como JSON"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Show what an exported file holds, or add what you choose from it; nothing is "
+"replaced"
+msgstr ""
+"Muestra lo que trae un archivo exportado, o agrega lo que elijas de él; no se reemplaza nada"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Show what an exported file holds, or add what you choose from it. Importing "
+"only adds: a repository, provider, favourite or tag you already have is "
+"skipped, and a rating is set only on an item without one. Without --take "
+"every section is added."
+msgstr ""
+"Muestra lo que trae un archivo exportado, o agrega lo que elijas de él. Importar solo agrega: un repositorio, proveedor, favorito o etiqueta que ya tienes se omite, y una valoración se pone solo en un elemento que no tenga. Sin --take se agregan todas las secciones."
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "File written by export"
+msgstr "Archivo escrito por export"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "Only show what the file holds and what is new here; change nothing"
+msgstr ""
+"Solo muestra lo que trae el archivo y lo que es nuevo aquí; no cambia nada"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"A list with a name you already have: join adds the missing items to yours, "
+"both keeps the imported one beside it"
+msgstr ""
+"Una lista con un nombre que ya tienes: join suma a la tuya los elementos que faltan, both conserva la importada a su lado"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Text added to the name of an imported list kept beside yours; by default "
+"' (imported)'"
+msgstr ""
+"Texto que se agrega al nombre de una lista importada que se conserva junto a la tuya; por defecto ' (importada)'"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"Section to add (repeat it): repositories, providers, lists, favourites, "
+"ratings, tags, installed, settings, own, secrets"
+msgstr ""
+"Sección que se agrega (repítela): repositories, providers, lists, favourites, ratings, tags, installed, settings, own, secrets"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid ""
+"a password is needed and there is no terminal to ask for it: use --password-"
+"file"
+msgstr ""
+"hace falta una contraseña y no hay terminal para pedirla: usa --password-file"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "Password of the file: "
+msgstr "Contraseña del archivo: "
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "the password is empty"
+msgstr "la contraseña está vacía"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "File from %1 %2, holds: %3"
+msgstr "Archivo de %1 %2, trae: %3"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "%1: %2 in the file, %3 new, %4 skipped, %5 with a name you already have"
+msgstr ""
+"%1: %2 en el archivo, %3 nuevos, %4 omitidos, %5 con un nombre que ya tienes"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "added %1: %2"
+msgstr "agregado %1: %2"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "%1 entries refer to wallpapers that are not here and were left out"
+msgstr ""
+"%1 entradas se refieren a fondos que no están aquí y se dejaron fuera"
+
+#: apps/reiwand-ctl/src/carrying.rs
+msgid "pending, %1 %2: %3"
+msgstr "pendiente, %1 %2: %3"
+
+#: apps/reiwand-ctl/src/cli.rs
+msgid "Create, edit, build and benchmark scenes; the daemon only for preview"
+msgstr ""
+"Crear, editar, construir y medir escenas; el daemon solo para la vista previa"

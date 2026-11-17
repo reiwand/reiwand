@@ -153,6 +153,17 @@ pub trait Providers1 {
 }
 
 #[proxy(
+    interface = "io.github.reiwand.Carry1",
+    default_service = "io.github.reiwand.Daemon",
+    default_path = "/io/github/reiwand/Daemon"
+)]
+pub trait Carry1 {
+    fn export(&self, path: &str, options_json: &str) -> Result<u64>;
+    fn preview_import(&self, path: &str, password: &str) -> Result<String>;
+    fn import_chosen(&self, path: &str, password: &str, choices_json: &str) -> Result<u64>;
+}
+
+#[proxy(
     interface = "io.github.reiwand.Repos1",
     default_service = "io.github.reiwand.Daemon",
     default_path = "/io/github/reiwand/Daemon"

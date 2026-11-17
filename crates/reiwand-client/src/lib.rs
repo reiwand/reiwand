@@ -27,6 +27,7 @@ pub struct Client {
     pub providers: Providers1Proxy<'static>,
     pub repos: Repos1Proxy<'static>,
     pub inputs: Inputs1Proxy<'static>,
+    pub carry: Carry1Proxy<'static>,
     pub sync: Sync1Proxy<'static>,
     pub rgb: Rgb1Proxy<'static>,
 }
@@ -70,6 +71,7 @@ impl Client {
             providers: Providers1Proxy::new(&bus).await?,
             repos: Repos1Proxy::new(&bus).await?,
             inputs: Inputs1Proxy::new(&bus).await?,
+            carry: Carry1Proxy::new(&bus).await?,
             sync: Sync1Proxy::new(&bus).await?,
             rgb: Rgb1Proxy::new(&bus).await?,
             daemon,

@@ -25,7 +25,7 @@ Unencrypted files carry no signature: integrity comes from the sums in the manif
 
 ## Settings of this device
 
-These keys are never exported and are dropped on import even if a file holds them: playback volume and mute, `playback.software_parallax`, `playback.max_fps`, the thumbnail cache size, the model download permission, `render.gpu`, `playback.quality`, the layer namespace, remote covers, the private network switch, battery pause (`pause.on_battery`) and everything that names a screen of this machine (`outputs.`, `screens.`, `device.` prefixes and the per-screen `playback.quality.<output>` and `transition.kind.<output>`). The list is `DEVICE_KEYS` and `is_device_local` in the crate; `portable` filters a settings map.
+These keys are never exported and are dropped on import even if a file holds them: playback volume and mute, `playback.software_parallax`, `playback.max_fps`, the thumbnail cache size, the model download permission, `render.gpu`, `playback.quality`, the layer namespace, remote covers, the private network switch, battery pause (`pause.on_battery`), the HDR choice (`playback.hdr`), the bezel size (`layout.bezel_mm`) and everything that names a screen of this machine (`outputs.`, `screens.`, `device.`, `layout.`, `rgb.` prefixes and the per-screen `playback.quality.<output>`, `playback.hdr.<output>` and `transition.kind.<output>`). The list is `DEVICE_KEYS` and `is_device_local` in the crate; `portable` filters a settings map.
 
 ## Encryption
 
@@ -49,3 +49,11 @@ Reading refuses: more than 100,000 entries, an entry above 8 GiB, a total above 
 ## Limits
 
 An encrypted file is built and opened in memory, so very large own wallpapers in an encrypted export need that much memory. Plain files stream from and to disk.
+
+## En el daemon (`Carry1`)
+
+El daemon (`apps/reiwandd/src/carry`) llena el contenido con el estado real: repositorios añadidos (dirección, `repo_id` y origen; el repositorio de ejemplos no viaja), proveedores, listas, favoritos, valoraciones, etiquetas, paquetes instalados como referencias (`repo_id`, `id`), los ajustes portables y, si se marca, los fondos propios con su archivo. Las listas inteligentes no se exportan. Las claves de los proveedores salen solo con `secrets` y siempre cifradas. Las sesiones de cuenta del servidor no se importan y la importación lo avisa.
+
+Importar solo agrega y sigue este orden: repositorios, proveedores y claves, paquetes, fondos propios, biblioteca (listas, favoritos, valoraciones, etiquetas) y ajustes. Un repositorio que pide confirmación queda como pendiente y no hace fallar el resto. Lo que se refiere a un fondo que no está aquí se cuenta como no resuelto. Con `lists = join` una segunda importación no duplica nada; con `both` cada importación crea otra copia con el sufijo (` (importada)`, ` (importada) 2`…).
+
+`reiwand-ctl export ARCHIVO [--own] [--secrets] [--password-file ARCHIVO]` y `reiwand-ctl import ARCHIVO [--list] [--take SECCIÓN]… [--lists join|both] [--suffix TEXTO]`; `--list` solo muestra lo que trae. Ver `dbus.md`, `Carry1`.

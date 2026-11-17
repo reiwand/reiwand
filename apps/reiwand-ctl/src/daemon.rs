@@ -100,6 +100,7 @@ pub async fn run(command: Command) -> Result<()> {
         Command::Profile(command) => profiles::run(client, command).await?,
         Command::Provider(command) => providers::run(client, command).await?,
         Command::Remote(command) => remote::run(client, command).await?,
+        Command::Carrying(command) => crate::carrying::run(client, command).await?,
         Command::Pkg(command) => pkg::run(client, command).await?,
         Command::Input(command) => inputs::run(client, command).await?,
         Command::Rgb(command) => crate::rgb::run(client, command).await?,

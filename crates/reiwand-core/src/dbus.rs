@@ -7,6 +7,7 @@ pub const PROFILES: &str = "io.github.reiwand.Profiles1";
 pub const PROVIDERS: &str = "io.github.reiwand.Providers1";
 pub const REPOS: &str = "io.github.reiwand.Repos1";
 pub const INPUTS: &str = "io.github.reiwand.Inputs1";
+pub const CARRY: &str = "io.github.reiwand.Carry1";
 pub const SYNC: &str = "io.github.reiwand.Sync1";
 pub const APP_ID: &str = "io.github.reiwand";
 pub const APP_PATH: &str = "/io/github/reiwand";

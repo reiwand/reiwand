@@ -1,3 +1,4 @@
+use crate::carry1::Carry;
 use crate::inputs1::Inputs;
 use crate::library1::Library;
 use crate::playlists1::Playlists;
@@ -43,7 +44,7 @@ fn introspect(interface: &dyn Interface) -> String {
 #[test]
 fn every_documented_member_exists_and_the_reverse() {
     let spec = include_str!("../../../docs/specs/dbus.md");
-    let interfaces: [(&str, Box<dyn Interface>); 8] = [
+    let interfaces: [(&str, Box<dyn Interface>); 9] = [
         (dbus::INTERFACE, Box::new(Service(Weak::new()))),
         (dbus::LIBRARY, Box::new(Library(Weak::new()))),
         (dbus::PLAYLISTS, Box::new(Playlists(Weak::new()))),
@@ -52,6 +53,7 @@ fn every_documented_member_exists_and_the_reverse() {
         (dbus::REPOS, Box::new(Repos(Weak::new()))),
         (dbus::INPUTS, Box::new(Inputs(Weak::new()))),
         (dbus::SYNC, Box::new(Sync(Weak::new()))),
+        (dbus::CARRY, Box::new(Carry(Weak::new()))),
     ];
     let mut sections = spec.split("\n## ").skip(1);
     for (name, interface) in interfaces {

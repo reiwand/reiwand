@@ -1,7 +1,9 @@
 use serde_json::Value;
 use std::collections::BTreeMap;
 
-pub const DEVICE_KEYS: [&str; 12] = [
+pub const DEVICE_KEYS: [&str; 14] = [
+    "playback.hdr",
+    "layout.bezel_mm",
     "playback.volume",
     "playback.muted",
     "playback.software_parallax",
@@ -16,9 +18,16 @@ pub const DEVICE_KEYS: [&str; 12] = [
     "pause.on_battery",
 ];
 
-// per-screen choices are named after the screen (`playback.quality.DP-1`), which belongs to this machine
-const DEVICE_PREFIXES: [&str; 5] =
-    ["outputs.", "screens.", "device.", "playback.quality.", "transition.kind."];
+const DEVICE_PREFIXES: [&str; 8] = [
+    "outputs.",
+    "screens.",
+    "device.",
+    "playback.quality.",
+    "playback.hdr.",
+    "transition.kind.",
+    "layout.",
+    "rgb.",
+];
 
 pub fn is_device_local(key: &str) -> bool {
     DEVICE_KEYS.contains(&key) || DEVICE_PREFIXES.iter().any(|p| key.starts_with(p))

@@ -62,6 +62,8 @@ QtObject {
             "account_sync": App.tr("Server sync"),
             "upload": App.tr("Transfer with the server"),
             "layers": App.tr("Depth layers"),
+            "carry_export": App.tr("Configuration export"),
+            "carry_import": App.tr("Configuration import"),
             "unlinked": App.tr("Not linked"),
             "linking": App.tr("Waiting for approval"),
             "connected": App.tr("Connected, not syncing"),

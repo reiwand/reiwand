@@ -149,9 +149,7 @@ pub enum Command {
     },
     #[command(subcommand, about = "Settings of the scene or video package shown on an output")]
     Prop(Prop),
-    #[command(
-        about = "Create, edit, build and benchmark scenes; needs no daemon except for preview and apply"
-    )]
+    #[command(about = "Create, edit, build and benchmark scenes; the daemon only for preview")]
     Scene(SceneArgs),
     #[command(subcommand, about = "Library folders, items, tags and thumbnails")]
     Lib(Lib),
@@ -165,6 +163,8 @@ pub enum Command {
     Profile(Profile),
     #[command(subcommand, about = "Online sources of wallpapers")]
     Provider(Provider),
+    #[command(flatten)]
+    Carrying(crate::carrying::Carrying),
     #[command(subcommand, about = "Package repositories added to this computer")]
     Remote(Remote),
     #[command(subcommand, about = "Packages of the added repositories")]

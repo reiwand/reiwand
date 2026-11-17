@@ -1,6 +1,6 @@
 use clap::CommandFactory;
 use reiwand_core::edit::{ACTIONS, Action};
-use reiwand_ctl::{CALLS, Cli};
+use reiwand_ctl::{CALLS, CARRY_CALLS, Cli};
 use std::collections::HashSet;
 
 const NOT_IN_CLI: &[&str] = &["Library1.RequestThumbnails", "Inputs1.Touch"];
@@ -53,7 +53,7 @@ fn supplies(command: &clap::Command, token: &str) -> bool {
 #[test]
 fn every_call_is_supplied_by_its_command() {
     let mut seen = HashSet::new();
-    for (interface, method, path, tokens) in CALLS {
+    for (interface, method, path, tokens) in CALLS.iter().chain(CARRY_CALLS) {
         assert!(seen.insert((interface, method)), "{interface}.{method} is listed twice");
         let command = subcommand(path);
         for token in *tokens {
@@ -69,11 +69,14 @@ fn every_documented_method_has_a_command() {
     let members = documented(&text);
     assert!(!members.is_empty(), "docs/specs/dbus.md has no interface member headings");
     for (member, args) in members.iter().filter(|(member, _)| !NOT_IN_CLI.contains(&member.as_str())) {
-        let call = CALLS.iter().find(|(interface, method, ..)| format!("{interface}.{method}") == *member);
+        let call = CALLS
+            .iter()
+            .chain(CARRY_CALLS)
+            .find(|(interface, method, ..)| format!("{interface}.{method}") == *member);
         let (.., tokens) = call.unwrap_or_else(|| panic!("{member} has no reiwand-ctl command"));
         assert_eq!(tokens.len(), args.len(), "{member} documents the arguments {args:?}");
     }
-    for (interface, method, ..) in CALLS {
+    for (interface, method, ..) in CALLS.iter().chain(CARRY_CALLS) {
         let member = format!("{interface}.{method}");
         assert!(members.iter().any(|(m, _)| *m == member), "{member} is not documented");
     }

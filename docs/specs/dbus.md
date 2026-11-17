@@ -9,7 +9,7 @@ system tray and the desktop integration offer a subset.
 | Bus | session |
 | Well-known name | `io.github.reiwand.Daemon` |
 | Object path | `/io/github/reiwand/Daemon` |
-| Interfaces | `io.github.reiwand.Daemon1`, `Library1`, `Playlists1`, `Profiles1`, `Providers1`, `Repos1`, `Inputs1`, `Sync1`, all on that object |
+| Interfaces | `io.github.reiwand.Daemon1`, `Library1`, `Playlists1`, `Profiles1`, `Providers1`, `Repos1`, `Inputs1`, `Sync1`, `Carry1`, all on that object |
 
 The daemon is D-Bus activatable (`packaging/dbus`) and runs as the systemd user unit
 `reiwandd.service`. In the Flatpak (`packaging/flatpak`) it owns the name through `--own-name`, so
@@ -2636,6 +2636,39 @@ device, and forgets the server. Without `wipe`
 the synced copies stay so that linking the same account again resumes; `wipe` deletes them too.
 The added repository stays.
 
+## `io.github.reiwand.Carry1`
+
+Exporta la configuración de este equipo a un solo archivo `.reiwand` y la importa en otro (formato
+en `exportar.md`). Importar solo agrega: nunca reemplaza nada de lo que ya hay. Exportar e importar
+corren como tareas (`carry_export`, `carry_import`) y se ven en `Daemon1.ListJobs`. Las rutas son
+absolutas. Las contraseñas y las claves de los proveedores salen solo si la persona las marca, y
+siempre cifradas con la contraseña del archivo. Las sesiones de cuenta del servidor no viajan.
+
+### `Export(s path, s options_json) → (t job)`
+
+Escribe `path`, que no debe existir (`Exists`). `options_json` es
+`{"own": bool, "secrets": bool, "password": string}`: `own` incluye los archivos de los fondos
+propios; `secrets` incluye las claves de los proveedores y exige una `password` no vacía (`InvalidArgs`
+si falta); el archivo queda cifrado cuando hay `secrets` o `password`. Salida de la tarea:
+`{path, sections, own, encrypted}`.
+
+### `PreviewImport(s path, s password) → (s json)`
+
+No cambia nada. Devuelve `{file, rows, lists, notes}`: `file` (programa, versión, fecha, si está cifrado, secciones),
+`rows` con `{section, held, new, skipped, conflicts}` por sección respecto de lo que ya hay aquí,
+`lists` con los nombres de las listas del archivo y `notes` con avisos. `InvalidArgs` si el archivo
+está cifrado y falta la contraseña, `AccessDenied` si no sirve.
+
+### `ImportChosen(s path, s password, s choices_json) → (t job)`
+
+Agrega lo elegido. `choices_json` es `{"take": [secciones] | null, "lists": "join" | "both",
+"suffix": string}`; `take` nulo toma todo. Las secciones son `repositories`, `providers`, `lists`,
+`favourites`, `ratings`, `tags`, `installed`, `settings`, `own` y `secrets` (`InvalidArgs` si otra).
+`join` suma a la lista propia los elementos que le faltan; `both` conserva la importada al lado con
+`suffix` agregado a su nombre. Un repositorio que pide confirmación queda en `pending`, no hace
+fallar la importación. Salida: `{added, pending, unresolved, notes}`. Importar dos veces lo mismo
+no duplica nada en el modo `join`.
+
 ## The app: `io.github.reiwand`
 
 The desktop app owns `io.github.reiwand` (`APP_ID`) at `/io/github/reiwand` (`APP_PATH`)
@@ -3071,6 +3104,8 @@ while they wait for the library.
 | `link` | `Sync1.Link`, `Join`, `ShareKey`, `Restore` | `link`, `join <device id>`, `share <device>` or `restore` | `0/0` | `{device, encrypted, needs_key}`, `{from}`, `{device, code}` or `{epoch}` |
 | `account_sync` | `Sync1.SyncNow`, schedule | `""` | `0/0` | `{applied, records, quarantined, unsent}` |
 | `upload` | `Sync1.Upload`, `ShareFiles`, `FetchFile`, after a sync with private files | random id, `files` or `fetch` | bytes, or segments for `fetch` | `UploadOutput`, `{uploaded}` or `{item}` |
+| `carry_export` | `Carry1.Export` | file path | sections | `{path, sections, own, encrypted}` |
+| `carry_import` | `Carry1.ImportChosen` | file path | steps | `{added, pending, unresolved, notes}` |
 
 `CancelJob` drops a queued job; a running job stops at its next checkpoint (between scan
 batches of at most 256 files, imported files, analyzed items, provider downloads and download

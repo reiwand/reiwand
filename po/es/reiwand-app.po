@@ -20688,3 +20688,10 @@ msgstr "Tecla para aplicar el fondo de la tira"
 #: apps/reiwand-app/qml/facade/Labels.qml
 msgid "Key to close the strip without changing"
 msgstr "Tecla para cerrar la tira sin cambiar nada"
+#: apps/reiwand-app/qml/facade/LabelWords.qml
+msgid "Configuration export"
+msgstr "Exportación de la configuración"
+
+#: apps/reiwand-app/qml/facade/LabelWords.qml
+msgid "Configuration import"
+msgstr "Importación de la configuración"

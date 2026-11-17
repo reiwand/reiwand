@@ -14,7 +14,10 @@ mod benching;
 mod blanks;
 mod browsing;
 mod calls;
+mod calls_carry;
 mod capturing;
+mod carrying;
+mod carrying_show;
 mod catalog;
 mod caution;
 pub mod cli;
@@ -92,6 +95,7 @@ mod webshot;
 mod wording;
 
 pub use calls::CALLS;
+pub use calls_carry::CARRY_CALLS;
 pub use cli::{Cli, Command};
 pub use usage::{Usage, usage};
 
