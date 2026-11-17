@@ -9,7 +9,7 @@ fn handles_place_shapes_and_points_where_the_preview_draws_them() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
     edit(&mut p, "point", json!({ "point": 1, "at": [100, 50], "angle": 90 })).unwrap();
-    let around = json!({ "around": { "at": "p1", "count": 4, "radius": 10, "arc": 90 } });
+    let around = json!({ "around": {"axis": [0, 0, 1],  "at": "p1", "count": 4, "radius": 10, "arc": 90 } });
     edit(&mut p, "shape", json!({ "emitter": 0, "shape": around })).unwrap();
     let line = json!({ "between": { "from": [0, 0], "to": [100, 0], "count": 3, "arc": { "amount": 0.5, "side": 1 },
         "taper": { "position": 0.5, "size": 0.2 } } });
@@ -101,7 +101,7 @@ fn pulls_show_their_center_and_rings_where_the_preview_draws_them() {
     edit(&mut p, "point", json!({ "point": 0, "at": [100, 50] })).unwrap();
     let forces = [
         json!({ "attractor": { "target": "p0", "strength": 30, "radius": 40 } }),
-        json!({ "vortex": { "center": [10, 20], "strength": 5, "radius": 80, "inner": 5, "outer": 60,
+        json!({ "vortex": {"axis": [0, 0, 1],  "center": [10, 20], "strength": 5, "radius": 80, "inner": 5, "outer": 60,
             "ring": { "radius": 30, "width": 4, "pull": 2 } } }),
         json!({ "orbit": { "center": "cursor", "strength": 10 } }),
         json!({ "slow_near": { "target": [0, 0], "inner": 10, "outer": 20, "factor": 0.5 } }),

@@ -76,6 +76,9 @@ pub(super) fn spawn(
         }
     }
     let (mut host, mut deep) = ([0; 2], depth(s, id));
+    if s.shapes[e] == 6 && s.depth[2][3] > 0.5 {
+        deep[0] += extra[1];
+    }
     if let Some(ev) = ev {
         let bits = s.hatch[0][2] as u32;
         let (at, near) = drawn(s, ev.pos, ev.depth);

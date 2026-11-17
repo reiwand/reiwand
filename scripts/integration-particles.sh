@@ -3,7 +3,7 @@ set -euo pipefail
 declare draft
 ctl scene act "$draft" add_layer '{"id": "dust", "kind": "particles"}' >/dev/null || fail "no particles layer was added"
 ctl scene act "$draft" particles '{"point": {"angle": 15, "at": [40, 30], "follow": false, "point": 1, "system": "dust"}}' || fail "no control point was placed"
-ctl scene act "$draft" particles '{"shape": {"emitter": 0, "shape": {"around": {"at": "p1", "count": 12, "mode": "mirror", "radius": 20}}, "system": "dust"}}' ||
+ctl scene act "$draft" particles '{"shape": {"emitter": 0, "shape": {"around": {"axis": [0, 0, 1], "at": "p1", "count": 12, "mode": "mirror", "radius": 20}}, "system": "dust"}}' ||
   fail "the emitter was not put around a point"
 ctl scene act "$draft" particles '{"shape": {"emitter": 1, "shape": {"between": {"arc": {"amount": 0.2}, "count": 8, "from": "p0", "to": "p1"}}, "system": "dust"}}' ||
   fail "no emitter between two points was added"

@@ -37,7 +37,7 @@ fn pulls_reach_only_as_far_as_their_radius() {
     let mut far = driven(near_pull, json!({}));
     far.run(0.3);
     assert!(far.alive(0).iter().all(|p| p.vel == [0.0, 0.0]), "30 px is beyond the radius");
-    let swirl = json!([{ "vortex": { "center": [100, 60], "strength": 50, "falloff": "constant", "ring": { "radius": 20, "width": 5, "pull": 200 } } }]);
+    let swirl = json!([{ "vortex": {"axis": [0, 0, 1],  "center": [100, 60], "strength": 50, "falloff": "constant", "ring": { "radius": 20, "width": 5, "pull": 200 } } }]);
     let mut swirled = driven(swirl, json!({}));
     swirled.run(0.5);
     let spread = swirled

@@ -12,6 +12,7 @@ struct Sim {
     colors: array<vec4<f32>, 10>,
     tones: array<vec4<f32>, 3>,
     forces: array<vec4<f32>, 64>,
+    pivots: array<vec4<f32>, 16>,
     colliders: array<vec4<f32>, 32>,
     hatch: array<vec4<f32>, 2>,
     trail: vec4<u32>,

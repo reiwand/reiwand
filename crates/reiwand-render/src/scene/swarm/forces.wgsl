@@ -6,6 +6,7 @@ struct Pull {
     slow: f32,
     damp: f32,
     nudge: vec2<f32>,
+    lift: f32,
 };
 
 fn pull(p: ptr<function, Particle>, k: u32, t: f32, dt: f32, g: ptr<function, Pull>) {
@@ -35,12 +36,20 @@ fn pull(p: ptr<function, Particle>, k: u32, t: f32, dt: f32, g: ptr<function, Pu
             add = n * f.w * reach(r, a);
         }
         case 5u: {
-            var m = f.w * reach(r, a);
+            let pivot = sim.pivots[k].xyz;
+            let z = select(0.0, (*p).depth.x, sim.depth[2].w > 0.5);
+            let off = vec3<f32>(d, -z);
+            let perp = off - pivot * dot(pivot, off);
+            let rr = max(length(perp), 1e-3);
+            let toward = perp / rr;
+            var m = f.w * reach(rr, a);
             if a.w >= 0.0 {
-                m *= 1.0 - up(a.z, a.w, r);
+                m *= 1.0 - up(a.z, a.w, rr);
             }
-            let tug = select(0.0, b.z * clamp((r - b.x) / max(b.y, 1.0), -1.0, 1.0), b.w > 0.0);
-            add = vec2<f32>(-n.y * m + n.x * tug, n.x * m + n.y * tug);
+            let tug = select(0.0, b.z * clamp((rr - b.x) / max(b.y, 1.0), -1.0, 1.0), b.w > 0.0);
+            let acc = cross(pivot, toward) * m + toward * tug;
+            add = acc.xy;
+            (*g).lift += acc.z * w;
         }
         case 6u: {
             let k2 = f.w * reach(r, a);

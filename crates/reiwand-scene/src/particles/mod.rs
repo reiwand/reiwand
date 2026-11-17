@@ -1,4 +1,5 @@
 mod aim;
+mod axis;
 mod bake;
 mod birth;
 mod bound;
@@ -56,6 +57,7 @@ mod wall;
 mod walls;
 mod wave;
 
+pub use axis::{ring_point, toward_axis};
 pub use bake::{Bake, CPU_PARTICLES, MAX_POINTS, MAX_TRAIL};
 pub use birth::{fractal, particle_salt, remapped, swirl, turbulent_ray};
 pub use budget::{CPU_BOIDS, MAX_BOIDS, MAX_LONG, MAX_ROPE, cells};

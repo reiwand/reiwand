@@ -21,6 +21,7 @@ pub struct Sim {
     pub colors: [[f32; 4]; 10],
     pub tones: [[f32; 4]; 3],
     pub forces: [[f32; 4]; 64],
+    pub pivots: [[f32; 4]; 16],
     pub colliders: [[f32; 4]; 32],
     pub hatch: [[f32; 4]; 2],
     pub trail: [u32; 4],

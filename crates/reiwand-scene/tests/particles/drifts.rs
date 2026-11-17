@@ -43,7 +43,8 @@ fn time_phases_move_by_one_step_even_after_days_of_uptime() {
 
 #[test]
 fn births_around_a_point_turn_smoothly_after_days_of_uptime() {
-    let ring = json!({ "around": { "at": [100, 50], "count": 1, "radius": 20, "speed": 30 } });
+    let ring =
+        json!({ "around": {"axis": [0, 0, 1],  "at": [100, 50], "count": 1, "radius": 20, "speed": 30 } });
     let system = with(
         sparks(),
         json!({ "emitters": [{ "shape": ring, "rate": 60 }], "forces": [], "collide": [],

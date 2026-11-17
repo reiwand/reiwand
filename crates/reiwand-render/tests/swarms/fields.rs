@@ -59,8 +59,7 @@ fn layers() -> Value {
 #[test]
 fn shapes_around_and_between_points_agree_on_both_paths() {
     let Some(r) = renderer() else { return };
-    let around =
-        json!({ "around": { "at": [80, 40], "count": 12, "radius": 20, "mode": "mirror", "speed": 30 } });
+    let around = json!({ "around": {"axis": [0, 0, 1],  "at": [80, 40], "count": 12, "radius": 20, "mode": "mirror", "speed": 30 } });
     let between = json!({ "between": { "from": "p1", "to": [140, 60], "count": 16,
         "arc": { "amount": 0.3, "side": 0 }, "taper": { "position": 0.5, "size": 0.2, "speed": 0.5 } } });
     for (name, shape) in [("around", around), ("between", between)] {

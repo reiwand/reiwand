@@ -63,6 +63,9 @@ impl Sim {
     pub(super) fn sow(&mut self, s: &System) {
         let i = &s.init;
         for (k, em) in s.emitters.iter().take(8).enumerate() {
+            if let super::EmitShape::Around(a) = &em.shape {
+                self.paths[2 * k] = [a.axis[0], a.axis[1], a.axis[2], 0.0];
+            }
             if let super::EmitShape::Between(b) = &em.shape {
                 let (bow, taper) =
                     (b.arc.unwrap_or(super::Bow { amount: 0.0, side: 1.0 }), b.taper.unwrap_or_default());

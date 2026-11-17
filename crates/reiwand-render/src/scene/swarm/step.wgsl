@@ -24,7 +24,7 @@ fn simulate(@builtin(global_invocation_id) gid: vec3<u32>) {
         follow(&p);
     }
     let t = clamp(p.age / p.life, 0.0, 1.0);
-    var g = Pull(vec2<f32>(0.0), vec2<f32>(0.0), vec2<f32>(1.0), 0.0, 1.0, 0.0, vec2<f32>(0.0));
+    var g = Pull(vec2<f32>(0.0), vec2<f32>(0.0), vec2<f32>(1.0), 0.0, 1.0, 0.0, vec2<f32>(0.0), 0.0);
     if sim.flock.y > 0u {
         let o = sim.flock.w + 2u * i;
         g.nudge = vec2<f32>(bitcast<f32>(state.data[o]), bitcast<f32>(state.data[o + 1u]));
@@ -33,7 +33,11 @@ fn simulate(@builtin(global_invocation_id) gid: vec3<u32>) {
     for (var k = 0u; k < forces && p.age < p.life; k++) {
         pull(&p, k, t, dt, &g);
     }
-    p.vel = (p.vel + g.acc * dt) * (exp(-g.drag * dt) * g.slow);
+    let keep = exp(-g.drag * dt) * g.slow;
+    p.vel = (p.vel + g.acc * dt) * keep;
+    if sim.depth[2].w > 0.5 {
+        p.depth.y += g.lift * dt * keep;
+    }
     for (var k = 0u; k < forces; k++) {
         let f = sim.forces[k * 4u];
         let w = window(sim.forces[k * 4u + 3u], t);

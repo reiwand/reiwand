@@ -19,8 +19,7 @@ fn alive(system: Json, frames: usize) -> Vec<Particle> {
 
 #[test]
 fn births_go_around_a_point_in_turn_and_back_with_mirror() {
-    let ring =
-        json!({ "around": { "at": [100, 50], "count": 4, "radius": 10, "arc": 90, "mode": "mirror" } });
+    let ring = json!({ "around": {"axis": [0, 0, 1],  "at": [100, 50], "count": 4, "radius": 10, "arc": 90, "mode": "mirror" } });
     let all = alive(shaped(ring, json!({})), 10);
     assert!(all.len() >= 8, "{}", all.len());
     let angle = |p: &Particle| (p.pos[1] - 50.0).atan2(p.pos[0] - 100.0).to_degrees().round() as i32;
@@ -78,7 +77,10 @@ fn a_layer_that_holds_the_system_cannot_be_its_source() {
 
 #[test]
 fn bursts_around_points_settle_once_their_particles_are_gone() {
-    let mut s = shaped(json!({ "around": { "count": 8, "radius": 10 } }), json!({ "life": [0.2, 0.2] }));
+    let mut s = shaped(
+        json!({ "around": {"axis": [0, 0, 1],  "count": 8, "radius": 10 } }),
+        json!({ "life": [0.2, 0.2] }),
+    );
     s["emitters"][0] = json!({ "shape": s["emitters"][0]["shape"], "bursts": [{ "count": 16 }] });
     let mut rt = runtime(&scene(s, true));
     let mut wake = Wake::Frame;

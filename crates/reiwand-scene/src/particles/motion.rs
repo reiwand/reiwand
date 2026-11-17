@@ -14,7 +14,8 @@ pub(super) fn simulate(p: &mut Particle, s: &Sim, mirror: &[Event], points: &[[f
     }
     let t = (p.age / p.life).clamp(0.0, 1.0);
     let (mut acc, mut drag, mut slow, mut damp) = ([0.0f32; 2], 0.0f32, 1.0f32, 0.0f32);
-    let (mut shift, mut look) = ([0.0f32; 2], [1.0f32; 2]);
+    let (mut shift, mut look, mut lift) = ([0.0f32; 2], [1.0f32; 2], 0.0f32);
+    let z = if s.depth[2][3] > 0.5 { p.depth[0] } else { 0.0 };
     for k in 0..(s.counts[2] as usize).min(16) {
         let (f, a, b) = (s.forces[4 * k], s.forces[4 * k + 1], s.forces[4 * k + 2]);
         if p.age >= p.life {
@@ -41,13 +42,18 @@ pub(super) fn simulate(p: &mut Particle, s: &Sim, mirror: &[Event], points: &[[f
             }
             4 => n.map(|v| v * f[3] * reach(r, a)),
             5 => {
+                let pivot = s.pivots[k];
+                let axis = [pivot[0], pivot[1], pivot[2]];
+                let (n, r) = super::axis::toward_axis(axis, [d[0], d[1], -z]);
                 let mut m = f[3] * reach(r, a);
                 if a[3] >= 0.0 {
                     m *= 1.0 - up(a[2], a[3], r);
                 }
                 let pull =
                     if b[3] > 0.0 { b[2] * ((r - b[0]) / b[1].max(1.0)).clamp(-1.0, 1.0) } else { 0.0 };
-                [-n[1] * m + n[0] * pull, n[0] * m + n[1] * pull]
+                let t = super::axis::cross(axis, n);
+                lift += (t[2] * m + n[2] * pull) * w;
+                [t[0] * m + n[0] * pull, t[1] * m + n[1] * pull]
             }
             6 => {
                 let (k, v2) = (f[3] * reach(r, a), p.vel[0] * p.vel[0] + p.vel[1] * p.vel[1]);
@@ -91,6 +97,9 @@ pub(super) fn simulate(p: &mut Particle, s: &Sim, mirror: &[Event], points: &[[f
     }
     let keep = (-drag * dt).exp() * slow;
     p.vel = [0, 1].map(|i| (p.vel[i] + acc[i] * dt) * keep);
+    if s.depth[2][3] > 0.5 {
+        p.depth[1] += lift * dt * keep;
+    }
     for k in 0..(s.counts[2] as usize).min(16) {
         let f = s.forces[4 * k];
         let w = window(s.forces[4 * k + 3], t);

@@ -8,7 +8,8 @@ fn shapes_points_and_layer_sources_are_set_undone_and_checked() {
     edit(&mut p, "point", json!({ "point": 1, "at": [300, 200], "angle": 45 })).unwrap();
     assert_eq!(system(&p)["points"], json!([{ "at": [0, 0] }, { "at": [300.0, 200.0], "angle": 45.0 }]));
     undone(&mut p, &before);
-    let around = json!({ "around": { "at": "p1", "count": 12, "radius": 40, "mode": "mirror" } });
+    let around =
+        json!({ "around": {"axis": [0, 0, 1],  "at": "p1", "count": 12, "radius": 40, "mode": "mirror" } });
     let before = p.doc.clone();
     edit(&mut p, "shape", json!({ "emitter": 0, "shape": around })).unwrap();
     assert_eq!(system(&p)["emitters"][0]["shape"]["around"]["count"], 12);
@@ -35,10 +36,16 @@ fn shapes_points_and_layer_sources_are_set_undone_and_checked() {
     edit(&mut p, "point", json!({ "point": 2, "remove": true })).unwrap();
     assert_eq!(system(&p)["points"].as_array().map(Vec::len), Some(2));
     let bad = [
-        ("shape", json!({ "emitter": 0, "shape": { "around": { "count": 0, "radius": 4 } } })),
+        (
+            "shape",
+            json!({ "emitter": 0, "shape": { "around": {"axis": [0, 0, 1],  "count": 0, "radius": 4 } } }),
+        ),
         ("shape", json!({ "emitter": 5, "shape": "edge" })),
         ("shape", json!({ "emitter": 0, "shape": { "spiral": {} } })),
-        ("shape", json!({ "emitter": 0, "shape": { "around": { "at": "p6", "count": 3, "radius": 4 } } })),
+        (
+            "shape",
+            json!({ "emitter": 0, "shape": { "around": {"axis": [0, 0, 1],  "at": "p6", "count": 3, "radius": 4 } } }),
+        ),
         ("point", json!({ "point": 9, "at": [0, 0] })),
         ("point", json!({ "point": 0, "remove": true })),
         ("point", json!({ "point": 1, "angle": 400 })),

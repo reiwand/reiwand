@@ -33,7 +33,8 @@ pub(super) fn forces(sim: &mut Sim, s: &System, room: &Room, cx: &Context) {
             Force::Attractor { target, strength, radius, falloff } => {
                 (pull(4.0, target, strength.get(cx)), reach(*radius, *falloff, 2.0), NONE)
             }
-            Force::Vortex { center, strength, radius, falloff, inner, outer, ring } => {
+            Force::Vortex { center, strength, radius, falloff, inner, outer, ring, axis } => {
+                sim.pivots[k] = [axis[0], axis[1], axis[2], 0.0];
                 let mut r = reach(*radius, *falloff, 1.0);
                 (r[2], r[3]) = (inner.unwrap_or(0.0), outer.or(*inner).unwrap_or(-1.0));
                 let ring = ring.map_or(NONE, |g| [g.radius, g.width, g.pull, 1.0]);

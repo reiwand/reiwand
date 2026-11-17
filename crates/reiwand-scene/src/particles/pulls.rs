@@ -42,6 +42,11 @@ impl Check<'_> {
         }
     }
 
+    pub(super) fn axis(&mut self, path: &str, axis: [f32; 3]) {
+        let length = axis.iter().map(|v| v * v).sum::<f32>().sqrt();
+        self.range(path, length, 0.999, 1.001);
+    }
+
     fn force2(&mut self, q: &str, force: &Force, s: &System) {
         let reach = |c: &mut Self, radius: &Option<f32>, falloff: bool| {
             c.uses(radius.is_some() || falloff, "particles2");
@@ -67,7 +72,8 @@ impl Check<'_> {
                 self.target(q, t, s);
                 reach(self, radius, falloff.is_some());
             }
-            Force::Vortex { center, strength, radius, falloff, inner, outer, ring } => {
+            Force::Vortex { center, strength, radius, falloff, inner, outer, ring, axis } => {
+                self.axis(&format!("{q}/axis"), *axis);
                 self.value(&format!("{q}/strength"), strength);
                 self.target(q, center, s);
                 reach(self, radius, falloff.is_some());

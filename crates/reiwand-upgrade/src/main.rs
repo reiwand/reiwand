@@ -14,9 +14,9 @@ usage:
       held, into from-server.reiwand (bring it in with reiwand-ctl import); if the server does not answer, nothing is
       changed and the run is repeated later; --skip-download goes on without it. Upgrade the desktop before the server
 
-  reiwand-upgrade scenes DIR...
-      rewrites every scene.json under the folders so that each chroma_key effect carries distance and keep
-      (the values that reproduce the old look); republish the packages built from them afterwards
+  reiwand-upgrade scenes DIR
+      adds the axis of every vortex force and around emitter to the scene.json files under DIR (version 2 to 3 of
+      the scene format); packed .wpak files are unpacked, upgraded and packed again by their author
 
 It is safe to run again: a folder that is already current is left alone.";
 
@@ -31,11 +31,9 @@ fn user_data() -> anyhow::Result<PathBuf> {
 fn main() -> anyhow::Result<()> {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let what = args.first().map(String::as_str);
-    if what == Some("scenes") && args.len() > 1 {
-        let roots: Vec<PathBuf> = args[1..].iter().map(PathBuf::from).collect();
-        for path in reiwand_upgrade::scenes::run(&roots)? {
-            println!("{}: upgraded", path.display());
-        }
+    if what == Some("scenes") {
+        let dir = args.get(1).context("scenes needs a folder")?;
+        println!("{dir}: {} scenes upgraded", reiwand_upgrade::scenes::run(std::path::Path::new(dir))?);
         return Ok(());
     }
     let given = args.iter().position(|a| a == "--data").and_then(|at| args.get(at + 1));

@@ -129,6 +129,7 @@ impl Check<'_> {
                 self.num(&format!("{p}/around/arc"), &a.arc, 0.0, 360.0);
                 self.num(&format!("{p}/around/radius"), &a.radius, 0.0, 1e5);
                 self.num(&format!("{p}/around/speed"), &a.speed, -1e4, 1e4);
+                self.axis(&format!("{p}/around/axis"), a.axis);
             }
             EmitShape::Between(b) => {
                 self.uses(true, "particle_fields");

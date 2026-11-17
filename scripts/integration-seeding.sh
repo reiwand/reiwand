@@ -23,7 +23,7 @@ ctl scene act "$craft" particles '{"render": {"cycles": 2, "frames": "life", "or
 ctl scene act "$craft" particles '{"force": {"force": {"turbulence": {"mask": [0.2, 0.8], "scale": 0.01, "strength": 5, "time_scale": 2}}, "system": "dust"}}' || fail "the turbulence took no mask"
 for force in '{"noise": 30}' '{"cap": 200}' '{"torque": -90}' '{"spin_drag": 0.5}' \
   '{"orbit": {"center": "p0", "radius": 200, "strength": 40}}' \
-  '{"vortex": {"center": "cursor", "inner": 5, "ring": {"pull": 2, "radius": 80, "width": 20}, "strength": -60}}' \
+  '{"vortex": {"axis": [0, 0, 1], "center": "cursor", "inner": 5, "ring": {"pull": 2, "radius": 80, "width": 20}, "strength": -60}}' \
   '{"slow_near": {"factor": 0.5, "inner": 10, "outer": 60, "target": "p0"}}'; do
   ctl scene act "$craft" particles '{"force": {"force": '"$force"', "system": "dust"}}' || fail "no $force force was added"
 done

@@ -6,6 +6,7 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
+mod axis;
 mod deep;
 mod drawn;
 mod families;

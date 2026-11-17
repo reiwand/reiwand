@@ -3,6 +3,7 @@ use serde_json::{Value as Json, json};
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
+mod axis;
 mod capped;
 mod drifts;
 mod extremes;

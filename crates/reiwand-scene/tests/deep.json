@@ -66,7 +66,7 @@
           "duration": 5, "delay": 1, "periodic": { "on": [1, 2], "off": [0.5, 3] }, "max_per_step": 1, "audio_gate": true },
         { "shape": { "circle": { "center": [0, 0], "radius": 50, "scale": [2, 1], "sign": [1, 0], "at": "p2" } }, "rate": 10 },
         { "shape": { "layer": { "id": "fox", "threshold": 0.4, "color": true, "inherit": true, "jitter": 2, "refresh": "on_change" } }, "rate": 10 },
-        { "shape": { "around": { "at": "p0", "count": 12, "radius": 100, "speed": 30, "mode": "mirror" } }, "rate": 10 },
+        { "shape": { "around": {"axis": [0, 0, 1],  "at": "p0", "count": 12, "radius": 100, "speed": 30, "mode": "mirror" } }, "rate": 10 },
         { "shape": { "between": { "from": "p0", "to": "cursor", "count": 20, "arc": { "amount": 0.5 }, "taper": { "size": 0.2 } } }, "rate": 10 }
       ],
       "init": {
@@ -81,7 +81,7 @@
       "forces": [
         { "gravity": [0, 98], "window": [0, 0.1, 0.8, 1] },
         { "attractor": { "target": "p1", "strength": 200, "radius": 300, "falloff": "linear" } },
-        { "vortex": { "center": [960, 540], "strength": 50, "inner": 10, "outer": 400, "ring": { "radius": 200, "width": 40, "pull": 2 } } },
+        { "vortex": {"axis": [0, 0, 1],  "center": [960, 540], "strength": 50, "inner": 10, "outer": 400, "ring": { "radius": 200, "width": 40, "pull": 2 } } },
         { "turbulence": { "strength": 20, "scale": 0.01, "speed": 2, "time_scale": 0.5, "mask": [1, 0] } },
         { "oscillate": { "what": "alpha", "freq": [0.5, 2], "scale": [0.2, 0.6], "phase": [0, 1] } },
         { "cap": 400 }, { "torque": 10 }, { "spin_drag": 0.5 },

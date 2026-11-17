@@ -61,6 +61,9 @@ fn spawn(e: u32, id: u32, ev: Event, hatched: bool, order: u32) -> Particle {
     p.host = vec2<u32>(0u);
     p.look = vec2<f32>(1.0);
     p.depth = vec2<f32>(deep(sim.depth[0], id, KEY + 44u), deep(sim.depth[1], id, KEY + 45u));
+    if sim.shapes[e / 4u][e % 4u] == 6u && sim.depth[2].w > 0.5 {
+        p.depth.x += shape[2].y;
+    }
     p.spare = vec2<f32>(0.0);
     if hatched {
         let bits = u32(sim.hatch[0].z);

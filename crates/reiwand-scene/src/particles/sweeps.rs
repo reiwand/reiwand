@@ -22,6 +22,7 @@ pub struct Around {
     pub arc: Num,
     #[schemars(extend("x-unit" = "px"))]
     pub radius: Num,
+    pub axis: [f32; 3],
     #[serde(default)]
     pub speed: Num,
     #[serde(default)]

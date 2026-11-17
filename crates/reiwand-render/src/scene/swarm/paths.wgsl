@@ -20,7 +20,12 @@ fn sweep(e: u32, id: u32, order: u32, kind: u32) -> array<vec2<f32>, 3> {
         let i = f32(turn(b.x, b.z > 0.5, order).x);
         let steps = select(b.x - 1.0, b.x, a.w >= 360.0);
         let angle = radians(i / max(steps, 1.0) * a.w + b.y + b.w);
-        return array(a.xy + a.z * vec2<f32>(cos(angle), sin(angle)), a.xy, vec2<f32>(1.0, 0.0));
+        let pivot = sim.paths[e * 2u].xyz;
+        let helper = select(vec3<f32>(0.0, 1.0, 0.0), vec3<f32>(1.0, 0.0, 0.0), abs(pivot.x) <= abs(pivot.y));
+        let perp = helper - pivot * dot(pivot, helper);
+        let first = perp / length(perp);
+        let o = first * cos(angle) + cross(pivot, first) * sin(angle);
+        return array(a.xy + a.z * o.xy, a.xy, vec2<f32>(1.0, a.z * o.z));
     }
     if kind == 7u {
         let r = turn(b.x, b.z > 0.5, order);

@@ -58,6 +58,7 @@ pub enum Force {
         outer: Option<f32>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         ring: Option<Ring>,
+        axis: [f32; 3],
     },
     Orbit {
         center: Target,

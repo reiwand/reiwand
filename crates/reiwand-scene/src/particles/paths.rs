@@ -30,7 +30,9 @@ pub(super) fn sweep(s: &Sim, e: usize, id: u32, order: u32, points: &[[f32; 2]])
             let (i, _) = turn(b[0], b[2] > 0.5, order);
             let steps = if a[3] >= 360.0 { b[0] } else { b[0] - 1.0 };
             let angle = (i / steps.max(1.0) * a[3] + b[1] + b[3]).to_radians();
-            Some(([a[0] + a[2] * angle.cos(), a[1] + a[2] * angle.sin()], [a[0], a[1]], [1.0, 0.0]))
+            let [x, y, z] =
+                super::axis::ring_point([s.paths[2 * e][0], s.paths[2 * e][1], s.paths[2 * e][2]], angle);
+            Some(([a[0] + a[2] * x, a[1] + a[2] * y], [a[0], a[1]], [1.0, a[2] * z]))
         }
         7 => {
             let (i, round) = turn(b[0], b[2] > 0.5, order);
