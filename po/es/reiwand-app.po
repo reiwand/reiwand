@@ -21236,3 +21236,11 @@ msgstr "Bajar desde lo alto"
 #: apps/reiwand-app/qml/SceneSwarmWaves.qml
 msgid "Rise from the floor"
 msgstr "Subir desde el piso"
+
+#: apps/reiwand-app/qml/facade/SceneValues.qml
+msgid "Floor"
+msgstr "Piso"
+
+#: apps/reiwand-app/qml/facade/SceneValues.qml
+msgid "Relative"
+msgstr "Relativo"
