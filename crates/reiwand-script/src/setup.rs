@@ -64,7 +64,7 @@ fn rig(layer: &Layer, scene: &Scene) -> Json {
             json!({ "name": j.name, "parent": j.parent, "position": [x / unit, -y / unit], "rotation": turn, "scale": [s[0], s[1]] })
         })
         .collect();
-    let size = size.unwrap_or(scene.canvas.size.map(|v| v as f32));
+    let size = size.or(scene.canvas.size.map(|v| v as f32));
     json!({ "size": size, "bones": bones, "shapes": r.shapes, "hit": hit })
 }
 
