@@ -2,6 +2,9 @@ use reiwand_scene::*;
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
+#[path = "../prefill/mod.rs"]
+mod prefill;
+
 mod bindings;
 mod conditions;
 mod forms;

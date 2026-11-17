@@ -2,6 +2,9 @@ use reiwand_scene::Scene;
 use serde_json::{Value as Json, json};
 use std::collections::BTreeMap;
 
+#[path = "../prefill/mod.rs"]
+mod prefill;
+
 mod particles;
 mod scripts;
 
@@ -16,6 +19,7 @@ fn faults(changes: &[(&str, Json)]) -> Vec<String> {
             None => doc.pointer_mut(parent).unwrap_or_else(|| panic!("{path}"))[key] = value.clone(),
         }
     }
+    doc["particles"] = prefill::all(doc["particles"].take());
     match Scene::from_json(&doc.to_string()) {
         Ok(scene) => scene.validate(&BTreeMap::new()).iter().map(ToString::to_string).collect(),
         Err(e) => vec![e.to_string()],

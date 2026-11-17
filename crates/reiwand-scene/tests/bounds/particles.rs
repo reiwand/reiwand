@@ -38,7 +38,7 @@ fn particle_systems_name_their_broken_fields() {
             format!("{f}/emitters/3/shape/around/count is 0"),
         ),
         (
-            vec![(format!("{f}/init/alpha"), json!([0.5, 2]))],
+            vec![(format!("{f}/init/alpha"), json!([0.5, 2, 1]))],
             format!("{f}/init/alpha/1 is 2, expected 0.5..=1"),
         ),
         (
@@ -46,7 +46,10 @@ fn particle_systems_name_their_broken_fields() {
             format!("{f}/init/life/2 is 20, expected 0.1..=10"),
         ),
         (
-            vec![(format!("{f}/init/hsv"), json!({ "hue": [0, 90] }))],
+            vec![(
+                format!("{f}/init/hsv"),
+                json!({ "hue": [0, 90], "steps": 0, "sat": [1, 1], "val": [1, 1] }),
+            )],
             format!("{f}/init/palette does not fit"),
         ),
         (

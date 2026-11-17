@@ -1,3 +1,5 @@
+#[path = "prefill/mod.rs"]
+mod prefill;
 use reiwand_scene::*;
 use serde_json::{Value as Json, json};
 use std::collections::BTreeMap;
@@ -38,7 +40,7 @@ fn lighting_maps_must_be_pictures() {
 
 #[test]
 fn lit_particles_still_name_their_own_feature() {
-    let doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "particles": { "snow": { "capacity": 10, "emitters": [{ "shape": "edge" }] } },
+    let doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "particles": prefill::all(json!({ "snow": { "capacity": 10, "emitters": [{ "shape": "edge" }] } })),
         "layers": [{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "snow", "lighting": {} }] });
     let scene = Scene::from_json(&doc.to_string()).unwrap();
     assert!(scene.features().contains("particle_lighting"));

@@ -62,7 +62,7 @@ fn followers_ride_their_parents_and_die_with_them() {
 fn families_are_bounded() {
     let chain = |next: &str| still(json!({ "children": [{ "system": next, "on": "death" }] }));
     let systems = json!({ "a": chain("b"), "b": chain("c"), "c": chain("d"), "d": still(json!({})) });
-    let text = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layer("a"), "particles": systems }).to_string();
+    let text = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layer("a"), "particles": prefill::all(systems) }).to_string();
     let scene = Scene::from_json(&text).unwrap();
     assert!(scene.validate(&BTreeMap::new()).iter().any(|i| matches!(i, Issue::Generations(_))));
     assert_eq!(flocks(&scene)[0].parts.len(), 3, "the engine keeps two generations");
@@ -73,9 +73,9 @@ fn families_are_bounded() {
     };
     let mut systems = json!({ "s2": still(json!({ "capacity": 10 })) });
     (0..2).for_each(|n| systems[format!("s{n}")] = wide(n + 1));
-    let layers = json!((0..4).map(|i| json!({ "blend_space": "canvas", "id": format!("l{i}"), "type": "particles", "system": "s0", "instance": { "count": 1 } })).collect::<Vec<_>>());
+    let layers = json!((0..4).map(|i| json!({ "blend_space": "canvas", "id": format!("l{i}"), "type": "particles", "system": "s0", "instance": prefill::instance(json!({ "count": 1 })) })).collect::<Vec<_>>());
     let text =
-        json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layers, "particles": systems })
+        json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layers, "particles": prefill::all(systems) })
             .to_string();
     let scene = Scene::from_json(&text).unwrap();
     let issues = scene.validate(&BTreeMap::new());

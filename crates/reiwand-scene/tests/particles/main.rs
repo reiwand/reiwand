@@ -73,3 +73,8 @@ fn run(text: &str, frames: usize, quality: Quality) -> Cloud {
 fn issues(system: Json) -> Vec<Issue> {
     Scene::from_json(&scene(system, true)).unwrap().validate(&props())
 }
+
+fn done(mut doc: Json) -> String {
+    doc["particles"] = prefill::all(doc["particles"].take());
+    doc.to_string()
+}

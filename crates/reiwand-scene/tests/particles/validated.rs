@@ -43,7 +43,7 @@ fn systems_are_validated_against_their_limits() {
     let curve = with(sparks(), json!({ "render": { "size_over_life": [[0.5, 1], [0.1, 0]] } }));
     assert_eq!(issues(curve), [Issue::Unsorted(format!("{p}/render/size_over_life"))]);
     let mut big = Scene::from_json(&scene(sparks(), true)).unwrap();
-    let huge: System = serde_json::from_value(with(sparks(), json!({ "capacity": 150_000 }))).unwrap();
+    let huge: System = prefill::system(with(sparks(), json!({ "capacity": 150_000 })));
     big.particles.extend((0..32).map(|i| (format!("s{i}"), huge.clone())));
     let found = big.validate(&props());
     assert_eq!(found[0], Issue::TooMany { path: "/particles".into(), count: 33, max: 32 });
@@ -53,7 +53,7 @@ fn systems_are_validated_against_their_limits() {
         json!({ "render": { "texture": "dot", "frames": "life", "color_over_life": [[0, "#ffffff"], [1, "#ff000000"]], "trail": { "length": 8, "width": 0.5 } } }),
     );
     assert_eq!(issues(textured.clone()), []);
-    let system: System = serde_json::from_value(textured).unwrap();
+    let system: System = prefill::system(textured);
     let (sizes, colors) = system.render.luts();
     assert_eq!((sizes[0], sizes[63], colors[0], colors[63]), (1.0, 1.0, [1.0; 4], [1.0, 0.0, 0.0, 0.0]));
     assert!((colors[32][1] - (1.0 - 32.0 / 63.0)).abs() < 1e-5);

@@ -8,8 +8,8 @@ fn masks_and_particle_textures_follow_settings() {
         json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] },
             "assets": { "one": { "path": "one.png" }, two: { "path": "two.png" } },
             "layers": [{ "blend_space": "canvas", "id": "veil", "type": "solid", "color": "#000000", "size": [64, 32], "mask": { "texture": mapped } }],
-            "particles": { "dust": { "capacity": 10, "emitters": [{ "shape": { "point": [32, 16] }, "rate": 5 }],
-                "init": { "life": [1, 2] }, "render": { "texture": mapped } } } })
+            "particles": prefill::all(json!({ "dust": { "capacity": 10, "emitters": [{ "shape": { "point": [32, 16] }, "rate": 5 }],
+                "init": { "life": [1, 2] }, "render": { "texture": mapped } } })) })
         .to_string()
     };
     assert!(Scene::load(&scene("other"), &props).is_err());

@@ -37,18 +37,21 @@ fn emitters_outside_their_ranges_do_not_fit() {
 
 #[test]
 fn fluid_takes_any_number_of_point_and_line_emitters_up_to_the_cap() {
-    let list: Vec<Json> = (0..12).map(|i| json!({ "from": [i as f32 / 12.0, 0.9], "strength": 4 })).collect();
+    let list: Vec<Json> = (0..12)
+        .map(|i| json!({ "from": [i as f32 / 12.0, 0.9], "to": null, "angle": 0, "strength": 4 }))
+        .collect();
     let mut list = list;
     list.push(json!({ "from": [0.1, 1], "to": [0.9, 1], "angle": -80, "strength": 6 }));
     assert_eq!(
         issues(effect(json!({ "effect": "fluid", "params": { "emitters": list } }))),
         Vec::<String>::new()
     );
-    let crowd: Vec<Json> = (0..65).map(|_| json!({ "from": [0.5, 0.5], "strength": 1 })).collect();
+    let crowd: Vec<Json> =
+        (0..65).map(|_| json!({ "from": [0.5, 0.5], "to": null, "angle": 0, "strength": 1 })).collect();
     let cases = [
         json!({ "emitters": crowd }),
-        json!({ "emitters": [{ "from": [0.5, 0.5], "strength": 70 }] }),
-        json!({ "emitters": [{ "from": [0.5, 0.5], "angle": 400, "strength": 1 }] }),
+        json!({ "emitters": [{ "from": [0.5, 0.5], "to": null, "angle": 0, "strength": 70 }] }),
+        json!({ "emitters": [{ "from": [0.5, 0.5], "to": null, "angle": 400, "strength": 1 }] }),
         json!({ "emitters": { "prop": "flow" } }),
         json!({ "emitters": 3 }),
     ];
@@ -59,7 +62,7 @@ fn fluid_takes_any_number_of_point_and_line_emitters_up_to_the_cap() {
     let unknown = Scene::from_json(
         &json!({ "schema": SCHEMA, "canvas": { "size": [8, 8] },
         "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#000", "effects": [{ "effect": "fluid",
-        "params": { "emitters": [{ "from": [0.5, 0.5], "strength": 1, "spin": 2 }] } }] }] })
+        "params": { "emitters": [{ "from": [0.5, 0.5], "to": null, "angle": 0, "strength": 1, "spin": 2 }] } }] }] })
         .to_string(),
     );
     assert!(
@@ -70,8 +73,8 @@ fn fluid_takes_any_number_of_point_and_line_emitters_up_to_the_cap() {
 
 #[test]
 fn emitter_lists_may_be_keyframed_or_follow_a_property_through_a_map() {
-    let a = json!([{ "from": [0.2, 0.9], "angle": -90, "strength": 2 }]);
-    let b = json!([{ "from": [0.6, 0.5], "angle": 0, "strength": 6 }]);
+    let a = json!([{ "from": [0.2, 0.9], "to": null, "angle": -90, "strength": 2 }]);
+    let b = json!([{ "from": [0.6, 0.5], "to": null, "angle": 0, "strength": 6 }]);
     let keyed = json!({ "emitters": { "keys": [[0, a], [2, b]] } });
     let mut doc = effect(json!({ "effect": "fluid", "params": keyed }));
     assert_eq!(issues(doc.clone()), Vec::<String>::new());
@@ -97,14 +100,14 @@ fn emitter_lists_may_be_keyframed_or_follow_a_property_through_a_map() {
 
 #[test]
 fn emitter_lists_follow_no_number_and_refuse_keys_outside_their_ranges() {
-    let a = json!([{ "from": [0.2, 0.9], "strength": 2 }]);
+    let a = json!([{ "from": [0.2, 0.9], "to": null, "angle": 0, "strength": 2 }]);
     let cases = [
         json!({ "audio": "bass", "kind": "relative", "unit": "db" }),
         json!({ "cursor": "x" }),
-        json!({ "keys": [[0, a], [1, [{ "from": [9, 0.5], "strength": 1 }]]] }),
+        json!({ "keys": [[0, a], [1, [{ "from": [9, 0.5], "to": null, "angle": 0, "strength": 1 }]]] }),
         json!({ "keys": [[0, a], [1, 3]] }),
         json!({ "keys": [[0, a]], "scale": 2 }),
-        json!({ "prop": "flow", "map": { "true": [{ "from": [0.5, 0.5], "strength": 99 }] } }),
+        json!({ "prop": "flow", "map": { "true": [{ "from": [0.5, 0.5], "to": null, "angle": 0, "strength": 99 }] } }),
     ];
     for bound in cases {
         let doc = effect(json!({ "effect": "fluid", "params": { "emitters": bound.clone() } }));

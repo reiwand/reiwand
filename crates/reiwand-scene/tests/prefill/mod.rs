@@ -27,18 +27,18 @@ fn key(path: &str) -> String {
     }
 }
 
-fn slot<'a>(root: &'a mut Value, path: &str) -> &'a mut Value {
+fn slot<'a>(root: &'a mut Value, path: &str) -> Option<&'a mut Value> {
     let mut at = root;
     for part in path.split('.') {
         let (name, indexes) = part.split_once('[').map_or((part, ""), |(n, i)| (n, i));
         if !name.is_empty() {
-            at = &mut at[name];
+            at = at.get_mut(name)?;
         }
         for index in indexes.split('[').filter(|i| !i.is_empty()) {
-            at = &mut at[index.trim_end_matches(']').parse::<usize>().unwrap()];
+            at = at.get_mut(index.trim_end_matches(']').parse::<usize>().ok()?)?;
         }
     }
-    at
+    Some(at)
 }
 
 pub fn completed(mut system: Value) -> Value {
@@ -46,9 +46,9 @@ pub fn completed(mut system: Value) -> Value {
     loop {
         let Err(e) = read::<System>("system", &system) else { return system };
         if e.fault != Fault::Missing {
-            let at = slot(&mut system, &e.path);
+            let Some(at) = slot(&mut system, &e.path) else { return system };
             match at.as_array_mut() {
-                Some(list) if list.len() == 2 && list.iter().all(Value::is_number) => {
+                Some(list) if list.len() == 2 => {
                     list.push(Value::from(1.0));
                     continue;
                 }
@@ -56,13 +56,18 @@ pub fn completed(mut system: Value) -> Value {
             }
         }
         let name = key(&e.path);
-        let value = table
+        let Some(value) = table
             .get(name.as_str())
             .unwrap_or_else(|| panic!("no prefill row for {name} ({})", e.path))
             .clone()
-            .unwrap_or_else(|| panic!("{} has no prefill: write it", e.path));
+        else {
+            return system;
+        };
         let (parent, field) = e.path.rsplit_once('.').unwrap_or(("", &e.path));
-        let target = if parent.is_empty() { &mut system } else { slot(&mut system, parent) };
+        let Some(target) = (if parent.is_empty() { Some(&mut system) } else { slot(&mut system, parent) })
+        else {
+            return system;
+        };
         target[field] = value;
     }
 }
@@ -120,4 +125,16 @@ pub fn all(systems: Value) -> Value {
         *one = completed(one.take());
     }
     systems
+}
+
+pub fn render(render: Value) -> Value {
+    completed(serde_json::json!({ "capacity": 1, "emitters": [], "render": render }))["render"].clone()
+}
+
+pub fn instance(mut one: Value) -> Value {
+    for name in ["alpha", "size", "count", "speed", "life", "time_scale", "brightness", "color"] {
+        one.as_object_mut().unwrap().entry(name).or_insert(Value::Null);
+    }
+    one.as_object_mut().unwrap().entry("points").or_insert_with(|| serde_json::json!([]));
+    one
 }

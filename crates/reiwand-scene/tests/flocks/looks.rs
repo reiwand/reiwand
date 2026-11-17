@@ -2,7 +2,7 @@ use super::*;
 
 fn scene(system: Json, assets: Json) -> Scene {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layer("a"),
-        "particles": { "a": system }, "assets": assets });
+        "particles": prefill::all(json!({ "a": system })), "assets": assets });
     Scene::from_json(&text.to_string()).unwrap_or_else(|e| panic!("{e}"))
 }
 

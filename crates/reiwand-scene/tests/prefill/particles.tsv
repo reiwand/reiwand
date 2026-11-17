@@ -130,7 +130,7 @@ periodic.on	!
 perspective.focal	!
 plane.normal	!
 plane.point	!
-points.angle	null
+points.angle	0.0
 points.at	null
 points.follow	null
 points.space	"local"
