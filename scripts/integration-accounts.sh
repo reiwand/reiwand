@@ -42,8 +42,8 @@ CONF
 acct_env() {
   local dir=$WORK/$1
   printf '%s\n' DBUS_SESSION_BUS_ADDRESS="unix:path=$dir/bus" XDG_RUNTIME_DIR="$dir/run" PIPEWIRE_RUNTIME_DIR="$PIPEWIRE_RUNTIME_DIR" XDG_CONFIG_HOME="$dir/config" \
-    XDG_DATA_HOME="$dir/data" XDG_CACHE_HOME="$dir/cache" REIWAND_PRIVATE_BUS_ONLY=1 \
-    REIWAND_PRIVATE_BUS_ADDRESS="unix:path=$dir/bus"
+    XDG_DATA_HOME="$dir/data" XDG_CACHE_HOME="$dir/cache" REIWAND_PRIVATE_BUS_ONLY=1 LANGUAGE=en LC_ALL=C.UTF-8 \
+    REIWAND_PRIVATE_BUS_ADDRESS="unix:path=$dir/bus" ${ACCT_EXTRA:+"$ACCT_EXTRA"}
 }
 acct_start() {
   local name=$1 env
@@ -78,7 +78,7 @@ grep -q "reiwand-upgrade client" "$WORK/reiwandd-refused.log" || fail "the refus
 if [ ! -x "$BIN/reiwand-upgrade" ]; then
   echo "SKIP: no reiwand-upgrade in $BIN"
 else
-  env "${env[@]}" "$BIN/reiwand-upgrade" client --data "$data" >"$WORK/upgrade.out" 2>&1 || fail "upgrade: $(cat "$WORK/upgrade.out")"
+  env "${env[@]}" "$BIN/reiwand-upgrade" client --skip-download --data "$data" >"$WORK/upgrade.out" 2>&1 || fail "upgrade: $(cat "$WORK/upgrade.out")"
   grep -q "upgraded from version 1 to 2" "$WORK/upgrade.out" || fail "upgrade said: $(cat "$WORK/upgrade.out")"
   [ ! -e "$data/sync.json" ] || fail "the old account file was left"
   grep -q '"server/server"' "$data/secrets.json" && fail "the old access item was left"
@@ -93,9 +93,15 @@ else
   x old export "$WORK/with.reiwand" --secrets --password-file <(printf 'pw\n') >/dev/null || fail "the export with accounts failed"
   acct_start dst
   x dst provider store file 2>/dev/null
-  x dst import "$WORK/with.reiwand" --take repos --take secrets --password-file <(printf 'pw\n') >"$WORK/import.out" 2>&1 || true
+  x dst import "$WORK/with.reiwand" --take repositories --take secrets --password-file <(printf 'pw\n') >"$WORK/import.out" 2>&1 || true
   grep -qi "sign in again" "$WORK/import.out" || [ "$(x dst account ls --json | jq_ "len(r['accounts'])")" = 0 ] ||
     fail "the import neither copied the session nor asked to sign in again: $(cat "$WORK/import.out")"
+fi
+if [ -x "$BIN/reiwand-server" ]; then
+  source "$(dirname "$0")"/integration-accounts-servers.sh
+  source "$(dirname "$0")"/integration-accounts-flows.sh
+else
+  echo "SKIP: no reiwand-server in $BIN"
 fi
 status=0
 echo "accounts checks passed"
