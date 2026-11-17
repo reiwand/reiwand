@@ -1,4 +1,5 @@
 use crate::stream::{CHUNK, Got, stream};
+use crate::tokens::Tokens;
 use crate::{AGENT, Result, local, redirect, refused};
 use reiwand_format::Fetch;
 use reqwest::blocking::Client;
@@ -27,6 +28,7 @@ pub struct HttpFetch {
     window: Duration,
     origins: Origins,
     pinned: Vec<(String, Client)>,
+    tokens: Tokens,
 }
 
 impl HttpFetch {
@@ -44,13 +46,19 @@ impl HttpFetch {
         #[cfg(target_os = "android")]
         let builder = builder.tls_certs_only(reiwand_core::roots::certificates());
         let client = builder.connect_timeout(Duration::from_secs(10)).timeout(window).build()?;
-        Ok(Self { client, cancel, window, origins, pinned: Vec::new() })
+        Ok(Self { client, cancel, window, origins, pinned: Vec::new(), tokens: Tokens::default() })
     }
 
     pub fn within(self, bases: &[String]) -> Self {
         let parsed = bases.iter().filter_map(|base| Url::parse(base).ok());
         declared(&self.origins).extend(parsed.map(|url| origin(&url)));
         self
+    }
+
+    pub fn account(mut self, base: &str, token: &str) -> Result<Self> {
+        let url = Url::parse(base).map_err(|e| crate::Error::Invalid(e.to_string()))?;
+        self.tokens.add(&url, token);
+        Ok(self)
     }
 
     pub fn pinned(mut self, base: &str, tls: impl Any) -> Result<Self> {
@@ -101,13 +109,22 @@ impl Fetch for HttpFetch {
             Some((_, client)) => client,
             None => &self.client,
         };
-        let request = client.get(url);
+        let request = match self.tokens.of(&url) {
+            Some(token) => client.get(url).bearer_auth(token),
+            None => client.get(url),
+        };
         thread::Builder::new().name("fetch".into()).spawn(move || stream(request, max, &tx))?;
         let (mut since, mut window) = (Instant::now(), 0);
         loop {
             self.live()?;
             match rx.recv_timeout(TICK) {
                 Ok(Got::Status(StatusCode::NOT_FOUND | StatusCode::GONE)) => return Ok(false),
+                Ok(Got::Status(StatusCode::UNAUTHORIZED)) => {
+                    return Err(io::Error::new(
+                        io::ErrorKind::PermissionDenied,
+                        "HTTP status 401 Unauthorized",
+                    ));
+                }
                 Ok(Got::Status(status)) if !status.is_success() => {
                     return Err(io::Error::other(format!("HTTP status {status}")));
                 }

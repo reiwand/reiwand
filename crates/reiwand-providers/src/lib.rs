@@ -5,6 +5,7 @@ mod fetch;
 mod immich;
 mod local;
 mod stream;
+mod tokens;
 pub mod wallhaven;
 mod webdav;
 mod wikimedia;
