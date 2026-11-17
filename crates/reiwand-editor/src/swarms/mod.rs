@@ -71,7 +71,11 @@ pub(crate) fn render(
     let copy = doc.pointer(&format!("{sys}/render")).cloned().unwrap_or(json!({}));
     let mut ops = if found.get("render").is_some() { Vec::new() } else { set(doc, &own, copy) };
     let mut probe = doc.clone();
+    let mut ops = ops;
     apply(&mut probe, &ops)?;
+    let filled = crate::fill::ops(&probe);
+    apply(&mut probe, &filled)?;
+    ops.extend(filled);
     let squares = squared(&probe, &own);
     apply(&mut probe, &squares)?;
     ops.extend(squares);
@@ -95,9 +99,12 @@ pub(crate) fn put(doc: &Value, path: &str, value: Option<Value>) -> Vec<Op> {
 }
 
 fn parsed<T: serde::de::DeserializeOwned>(v: &Value, what: &str) -> Result<()> {
-    serde_json::from_value::<T>(v.clone())
-        .map(drop)
-        .map_err(|e| anyhow!(said("editor.particle_value", "%1 does not fit: %2", &[&what, &e])))
+    match reiwand_core::explicit::read::<T>(what, v) {
+        Err(e) if e.fault != reiwand_core::explicit::Fault::Missing => {
+            Err(anyhow!(said("editor.particle_value", "%1 does not fit: %2", &[&what, &e])))
+        }
+        _ => Ok(()),
+    }
 }
 
 fn issues(dir: &Path, doc: &Value) -> Result<Vec<(String, String)>> {
@@ -110,7 +117,11 @@ fn issues(dir: &Path, doc: &Value) -> Result<Vec<(String, String)>> {
 
 pub(crate) fn checked(dir: &Path, doc: &Value, ops: Vec<Op>) -> Result<Vec<Op>> {
     let mut probe = doc.clone();
+    let mut ops = ops;
     apply(&mut probe, &ops)?;
+    let filled = crate::fill::ops(&probe);
+    apply(&mut probe, &filled)?;
+    ops.extend(filled);
     let before = issues(dir, doc).unwrap_or_default();
     let fresh = issues(dir, &probe)?.into_iter().find(|i| !before.contains(i));
     if let Some((_, message)) = fresh {

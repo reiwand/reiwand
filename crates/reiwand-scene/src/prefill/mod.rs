@@ -2,15 +2,19 @@ use crate::System;
 use reiwand_core::explicit::{Fault, read};
 use serde_json::Value;
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 
 pub const TABLE: &str = include_str!("particles.tsv");
 
-pub fn rows() -> BTreeMap<&'static str, Option<Value>> {
-    TABLE
-        .lines()
-        .filter_map(|line| line.split_once('\t'))
-        .map(|(key, text)| (key, (text != "!").then(|| serde_json::from_str(text).unwrap())))
-        .collect()
+pub fn rows() -> &'static BTreeMap<&'static str, Option<Value>> {
+    static ROWS: OnceLock<BTreeMap<&'static str, Option<Value>>> = OnceLock::new();
+    ROWS.get_or_init(|| {
+        TABLE
+            .lines()
+            .filter_map(|line| line.split_once('\t'))
+            .map(|(key, text)| (key, (text != "!").then(|| serde_json::from_str(text).unwrap())))
+            .collect()
+    })
 }
 
 fn key(path: &str) -> String {
@@ -41,7 +45,6 @@ fn slot<'a>(root: &'a mut Value, path: &str) -> Option<&'a mut Value> {
 }
 
 pub fn completed(mut system: Value) -> Value {
-    let table = rows();
     loop {
         let Err(e) = read::<System>("system", &system) else { return system };
         if e.fault != Fault::Missing {
@@ -55,13 +58,7 @@ pub fn completed(mut system: Value) -> Value {
             }
         }
         let name = key(&e.path);
-        let Some(value) = table
-            .get(name.as_str())
-            .unwrap_or_else(|| panic!("no prefill row for {name} ({})", e.path))
-            .clone()
-        else {
-            return system;
-        };
+        let Some(Some(value)) = rows().get(name.as_str()).cloned() else { return system };
         let (parent, field) = e.path.rsplit_once('.').unwrap_or(("", &e.path));
         let Some(target) = (if parent.is_empty() { Some(&mut system) } else { slot(&mut system, parent) })
         else {

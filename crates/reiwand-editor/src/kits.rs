@@ -14,7 +14,7 @@ fn fall(h: f64) -> Value {
 }
 
 pub fn kit(name: &str, [w, h]: [f64; 2]) -> Result<Value> {
-    Ok(match name {
+    Ok(reiwand_scene::prefill::completed(match name {
         "snow" => json!({"capacity": 3000, "prewarm": 14,
             "emitters": [{"shape": {"box": {"from": [-100, -50], "to": [w + 100.0, -20]}}, "rate": 90}],
             "init": {"life": [12, 18], "speed": [40, 80], "angle": [80, 100], "size": [3, 8],
@@ -45,5 +45,5 @@ pub fn kit(name: &str, [w, h]: [f64; 2]) -> Result<Value> {
             "%1 is not a starting kit; use one of %2",
             &[&other, &(KITS.join(", "))]
         )),
-    })
+    }))
 }

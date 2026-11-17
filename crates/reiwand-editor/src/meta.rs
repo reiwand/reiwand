@@ -87,6 +87,10 @@ pub fn detected(doc: &Value, dir: Option<&Path>) -> BTreeSet<Input> {
 }
 
 pub fn sync(doc: &Value, before: &BTreeSet<Input>, dir: Option<&Path>) -> Vec<Op> {
+    let filled = crate::fill::ops(doc);
+    if !filled.is_empty() {
+        return filled;
+    }
     let mut ops = synced(doc, &doc["scene"], before, dir);
     ops.extend(crate::rgb::permission(doc));
     ops
