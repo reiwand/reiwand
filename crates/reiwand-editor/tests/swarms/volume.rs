@@ -27,7 +27,7 @@ fn a_sphere_shape_is_stored_whole_and_shown_with_its_handles() {
 fn a_sphere_without_every_field_is_refused() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
-    for field in ["center", "depth", "radius", "inner", "sign"] {
+    for field in ["center", "depth", "radius", "inner"] {
         let mut shape = ball();
         shape["sphere"].as_object_mut().unwrap().remove(field);
         assert!(edit(&mut p, "shape", json!({ "emitter": 0, "shape": shape })).is_err(), "{field}");

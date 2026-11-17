@@ -15,7 +15,7 @@ fn a_system_is_created_without_a_layer_and_started_from_another() {
     assert!(act(&mut p, json!({"particles": {"create": {"system": "Bad Id"}}})).is_err());
     assert!(act(&mut p, json!({"particles": {"delete": {"system": "sparks"}}})).is_err());
     act(&mut p, json!({"particles": {"delete": {"system": "embers"}}})).unwrap();
-    assert!(p.doc["scene"]["particles"].get("embers").is_none());
+    assert!(p.doc["scene"]["particles"]["embers"].is_null());
 }
 
 #[test]
@@ -37,7 +37,7 @@ fn settings_and_starting_ranges_are_set_and_checked() {
     edit(&mut p, "start", json!({ "ranges": ranges })).unwrap();
     assert_eq!(system(&p)["init"]["velocity"], json!([[-5, 0], [5, 10]]));
     edit(&mut p, "start", json!({"clear": ["alpha", "velocity"]})).unwrap();
-    assert!(system(&p)["init"].get("alpha").is_none() && system(&p)["init"]["size"] == json!([4, 9]));
+    assert!(system(&p)["init"]["alpha"].is_null() && system(&p)["init"]["size"] == json!([4, 9]));
     assert!(edit(&mut p, "start", json!({"ranges": {"wobble": [0, 1]}})).is_err());
     assert!(edit(&mut p, "start", json!({"clear": ["life"]})).is_err());
     assert!(edit(&mut p, "start", json!({"ranges": {"alpha": [0, 3]}})).is_err());
@@ -51,14 +51,15 @@ fn children_curves_and_the_render_look_are_edited() {
     act(&mut p, json!({"particles": {"create": {"system": "sparks"}}})).unwrap();
     edit(&mut p, "child", json!({"child": {"system": "sparks", "on": "static", "scale": 2}})).unwrap();
     edit(&mut p, "child", json!({"index": 0, "child": {"system": "sparks", "on": "spawn"}})).unwrap();
-    assert_eq!(system(&p)["children"], json!([{"system": "sparks", "on": "spawn"}]));
+    assert_eq!(system(&p)["children"][0]["system"], json!("sparks"));
+    assert_eq!(system(&p)["children"][0]["on"], json!("spawn"));
     assert!(edit(&mut p, "child", json!({"child": {"system": "nope", "on": "spawn"}})).is_err());
     assert!(
         edit(&mut p, "child", json!({"child": {"system": "sparks", "on": "spawn", "probability": 3}}))
             .is_err()
     );
     edit(&mut p, "child", json!({"index": 0, "remove": true})).unwrap();
-    assert!(system(&p).get("children").is_none());
+    assert!(system(&p)["children"].is_null());
     edit(&mut p, "over", json!({"size": [[0, 1], [1, 0]], "color": [[0, "#ffffff"], [1, "#ff000000"]]}))
         .unwrap();
     let r = &system(&p)["render"];
@@ -67,7 +68,7 @@ fn children_curves_and_the_render_look_are_edited() {
         (&json!([[0.0, 1.0], [1.0, 0.0]]), &json!("#ff000000"))
     );
     edit(&mut p, "over", json!({"size": []})).unwrap();
-    assert!(system(&p)["render"].get("size_over_life").is_none());
+    assert!(system(&p)["render"]["size_over_life"].is_null());
     let look = json!({"stretch": {"mode": "add", "depth": "flat", "time": 0.1, "min": 0, "max": 40}, "frames": "random", "fps": 8, "mix": true, "brightness": 3});
     edit(&mut p, "render", look).unwrap();
     let r = &system(&p)["render"];
@@ -76,7 +77,7 @@ fn children_curves_and_the_render_look_are_edited() {
     assert!(edit(&mut p, "render", json!({"frames": "sometimes"})).is_err());
     edit(&mut p, "render", json!({"stretch": "none", "frames": "none", "mix": false})).unwrap();
     let r = &system(&p)["render"];
-    assert!(r.get("stretch").is_none() && r.get("frames").is_none() && r.get("mix").is_none());
+    assert!(r["stretch"].is_null() && r["frames"].is_null() && r["mix"].is_null());
 }
 
 #[test]

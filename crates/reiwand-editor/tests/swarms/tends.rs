@@ -126,8 +126,12 @@ fn ropes_trails_textures_and_the_budget_follow_the_system() {
     let mut p = project(&root);
     let before = p.doc.clone();
     edit(&mut p, "strand", json!({ "strand": "rope", "settings": { "subdivide": 3, "width": 6 } })).unwrap();
-    edit(&mut p, "strand", json!({ "strand": "trail", "settings": { "length": 48, "segments": 8 } }))
-        .unwrap();
+    edit(
+        &mut p,
+        "strand",
+        json!({ "strand": "trail", "settings": { "length": 48, "width": 0.5, "segments": 8 } }),
+    )
+    .unwrap();
     edit(&mut p, "texture", json!({ "texture": "pic" })).unwrap();
     let render = system(&p)["render"].clone();
     assert_eq!(render["rope"], json!({ "subdivide": 3, "width": 6 }));
@@ -153,7 +157,7 @@ fn ropes_trails_textures_and_the_budget_follow_the_system() {
     assert!(budget["trails"].as_array().unwrap().iter().any(|t| t.as_array().unwrap().len() > 2));
     edit(&mut p, "texture", json!({})).unwrap();
     edit(&mut p, "strand", json!({ "strand": "trail", "off": true })).unwrap();
-    assert!(system(&p)["render"].get("trail").is_none() && system(&p)["render"].get("texture").is_none());
+    assert!(system(&p)["render"]["trail"].is_null() && system(&p)["render"]["texture"].is_null());
     refused(
         &mut p,
         &[

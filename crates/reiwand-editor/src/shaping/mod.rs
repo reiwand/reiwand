@@ -48,7 +48,11 @@ pub(crate) fn checked(dir: Option<&Path>, doc: &Value, ops: Vec<Op>) -> Result<V
 
 fn probed(dir: Option<&Path>, doc: &Value, ops: Vec<Op>) -> Result<Vec<Op>> {
     let mut probe = doc.clone();
+    let mut ops = ops;
     apply(&mut probe, &ops)?;
+    let filled = crate::fill::ops(&probe);
+    apply(&mut probe, &filled)?;
+    ops.extend(filled);
     let before: Vec<String> = review(doc, dir).into_iter().map(|p| p.message).collect();
     let fresh = review(&probe, dir).into_iter().find(|p| !p.warning && !before.contains(&p.message));
     if let Some(problem) = fresh {

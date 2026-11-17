@@ -6,7 +6,10 @@ fn shapes_points_and_layer_sources_are_set_undone_and_checked() {
     let mut p = project(&root);
     let before = p.doc.clone();
     edit(&mut p, "point", json!({ "point": 1, "at": [300, 200], "angle": 45 })).unwrap();
-    assert_eq!(system(&p)["points"], json!([{ "at": [0, 0] }, { "at": [300.0, 200.0], "angle": 45.0 }]));
+    assert_eq!(
+        system(&p)["points"],
+        json!([{ "at": [0, 0], "angle": 0.0, "follow": null, "space": "local" }, { "at": [300.0, 200.0], "angle": 45.0, "follow": null, "space": "local" }])
+    );
     undone(&mut p, &before);
     let around =
         json!({ "around": {"axis": [0, 0, 1],  "at": "p1", "count": 12, "radius": 40, "mode": "mirror" } });
@@ -96,13 +99,13 @@ fn remaps_looks_depth_children_and_shaders_are_set_undone_and_checked() {
     );
     assert_eq!(
         (s["perspective"]["focal"].clone(), s["init"]["depth"].clone()),
-        (json!(600.0), json!([-100, 300]))
+        (json!(600.0), json!([-100, 300, 1.0]))
     );
     edit(&mut p, "orient", json!({ "layer": "flakes", "orient": "velocity" })).unwrap();
     let own = &p.doc["scene"]["layers"][1]["render"];
     assert_eq!((own["orient"].clone(), own["cutout"].clone()), (json!("velocity"), json!([0.2, 0.6, 0.8])));
     edit(&mut p, "perspective", json!({ "off": true })).unwrap();
-    assert!(system(&p).get("perspective").is_none() && system(&p)["init"].get("depth").is_none());
+    assert!(system(&p)["perspective"].is_null() && system(&p)["init"]["depth"].is_null());
     let child = json!({ "capacity": 10, "emitters": [{ "shape": { "point": [0, 0] } }] });
     act(&mut p, json!({ "set": { "pointer": "/scene/particles/spark", "value": child } })).unwrap();
     act(&mut p, json!({ "set": { "pointer": "/scene/particles/flakes/children", "value": [{ "system": "spark", "on": "follow" }] } })).unwrap();
@@ -111,7 +114,7 @@ fn remaps_looks_depth_children_and_shaders_are_set_undone_and_checked() {
     assert_eq!(system(&p)["children"][0]["follow_inherit"], json!(true));
     let after = p.doc.clone();
     act(&mut p, json!({ "undo": {} })).unwrap();
-    assert!(system(&p)["children"][0].get("inherit").is_none());
+    assert!(system(&p)["children"][0]["inherit"].is_null());
     act(&mut p, json!({ "redo": {} })).unwrap();
     assert_eq!(p.doc, after);
     let _ = before;

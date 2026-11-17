@@ -91,3 +91,23 @@ pub fn instance(mut one: Value) -> Value {
     one.as_object_mut().unwrap().entry("points").or_insert_with(|| serde_json::json!([]));
     one
 }
+
+pub fn part(path: &str, value: Value) -> Value {
+    let mut nested = value;
+    for step in path.rsplit('.') {
+        nested = match step.strip_suffix("[0]") {
+            Some(name) => serde_json::json!({ name: [nested] }),
+            None => serde_json::json!({ step: nested }),
+        };
+    }
+    let mut root = serde_json::json!({ "capacity": 1, "emitters": [] });
+    root.as_object_mut().unwrap().extend(nested.as_object().unwrap().clone());
+    let mut found = completed(root);
+    for step in path.split('.') {
+        found = match step.strip_suffix("[0]") {
+            Some(name) => found[name][0].take(),
+            None => found[step].take(),
+        };
+    }
+    found
+}
