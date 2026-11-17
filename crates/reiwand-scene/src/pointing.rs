@@ -144,7 +144,7 @@ impl Runtime {
                     left -= 1;
                     let size = match self.script.layers.get(&t.layer).and_then(|s| s.size) {
                         Some(crate::Extent::Box(b)) => b,
-                        _ => m.size.unwrap_or(canvas),
+                        _ => m.size.or(canvas),
                     };
                     p.bone_at(m, [t.local[0] - size[0] / 2.0, size[1] / 2.0 - t.local[1]]).map(str::to_owned)
                 }

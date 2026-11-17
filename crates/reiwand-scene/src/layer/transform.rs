@@ -3,22 +3,24 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Transform {
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "px"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub position: Option<Value<Vec2>>,
     pub scale: Value<Vec2>,
     #[schemars(extend("x-unit" = "°", "x-range" = [-360, 360]))]
     pub rotation: Value<f32>,
     pub skew: Value<Vec2>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub origin: Option<[f32; 2]>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub origin: crate::Ctx<[f32; 2], { crate::ANCHOR }>,
     #[schemars(extend("x-unit" = "°", "x-range" = [-89, 89]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub tilt: Option<Value<Vec2>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "px"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub z: Option<Value<f32>>,
 }
 
@@ -76,11 +78,7 @@ impl Default for Transform {
     }
 }
 
-impl Transform {
-    pub(super) fn is_default(&self) -> bool {
-        *self == Transform::default()
-    }
-}
+impl Transform {}
 
 impl Anchor {
     pub fn fraction(self) -> [f32; 2] {

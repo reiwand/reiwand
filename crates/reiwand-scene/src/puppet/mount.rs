@@ -24,7 +24,8 @@ pub(crate) fn mount(cx: &Context, layer: &Layer, size: [f32; 2]) -> Affine {
 pub(crate) fn mount_on(cx: &Context, layer: &Layer, size: [f32; 2], world: Affine) -> Affine {
     let set = cx.script.layers.get(&layer.id).unwrap_or(&crate::input::UNSET);
     let t = &layer.transform;
-    let origin = set.origin.or(t.origin).or(layer.anchor.map(|a| a.fraction())).unwrap_or([0.5; 2]);
+    let origin =
+        set.origin.unwrap_or_else(|| t.origin.or_else(|| layer.anchor.map_or([0.5; 2], |a| a.fraction())));
     let corner = Affine::translate([-origin[0] * size[0], -origin[1] * size[1]]);
     world.then(corner).then(boxed(size))
 }

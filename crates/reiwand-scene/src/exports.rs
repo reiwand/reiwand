@@ -50,6 +50,7 @@ pub use crate::figure::{
 pub use crate::film::{film_file, film_seconds};
 pub use crate::finish_maps::{LINEAR_SLOTS as LINEAR_MAP_SLOTS, MaterialMaps};
 pub use crate::flash::{Calming, FLASH_GRID, FlashGuard, SAFE_FLASHES};
+pub use crate::follow::{ANCHOR, CANVAS, Ctx, END, SOURCE};
 pub use crate::footage::Tape;
 pub use crate::form::{form, labels, order};
 pub use crate::gltf::{

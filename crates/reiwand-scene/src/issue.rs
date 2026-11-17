@@ -154,6 +154,7 @@ impl crate::SceneError {
     pub fn message(&self) -> Message {
         match self {
             crate::SceneError::Json(e) => said("scene.json", "invalid scene: %1", &[e]),
+            crate::SceneError::Read(e) => e.said(),
             crate::SceneError::Invalid(issue) => {
                 said("scene.invalid", "invalid scene: %1", &[issue]).with(1, issue.message())
             }

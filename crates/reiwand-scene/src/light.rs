@@ -1,5 +1,4 @@
 use crate::Color;
-use crate::content::white;
 use crate::value::Value;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -20,65 +19,57 @@ pub enum Beam {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Light {
-    #[serde(default)]
     pub light: Beam,
-    #[serde(default = "white")]
     pub color: Value<Color>,
-    #[serde(default = "one")]
     #[schemars(extend("x-range" = [0, 100]))]
     pub intensity: Value<f32>,
-    #[serde(default = "reach")]
     #[schemars(extend("x-unit" = "px", "x-range" = [1, 100000]))]
     pub radius: Value<f32>,
-    #[serde(default = "height")]
     #[schemars(extend("x-unit" = "px", "x-range" = [-100000, 100000]))]
     pub z: Value<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "°", "x-range" = [0, 180]))]
-    pub cone: Option<[f32; 2]>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cone: [f32; 2],
     #[schemars(extend("x-unit" = "px", "x-range" = [1, 100000]))]
-    pub length: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub length: f32,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub volumetric: Option<Volumetric>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "image"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub texture: Option<Value<String>>,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub shadows: bool,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "px", "x-range" = [256, 4096]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub shadow_resolution: Option<u32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [0, 1]))]
-    pub shadow_bias: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shadow_bias: f32,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub position3d: Option<Value<crate::Vec3>>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub aim3d: Option<Value<crate::Vec3>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Volumetric {
     #[schemars(extend("x-range" = [0, 1]))]
     pub density: f32,
     #[schemars(extend("x-range" = [4, 64]))]
     pub samples: u32,
-    #[serde(skip_serializing_if = "none")]
     #[schemars(extend("x-range" = [0, 1]))]
     pub shafts: f32,
 }
 
-fn none(v: &f32) -> bool {
-    *v == 0.0
-}
-
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Lighting {
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "image"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub normal: Option<String>,
     #[schemars(extend("x-range" = [0, 1]))]
     pub roughness: Value<f32>,
@@ -88,14 +79,17 @@ pub struct Lighting {
     pub emissive: Value<f32>,
     #[schemars(extend("x-range" = [0, 1]))]
     pub strength: Value<f32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "image"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub env: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "image"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub roughness_map: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "image"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub emissive_map: Option<String>,
 }
 
@@ -111,18 +105,6 @@ impl Default for Lighting {
         let (normal, env, roughness_map, emissive_map) = Default::default();
         Lighting { normal, roughness, reflection, emissive, strength, env, roughness_map, emissive_map }
     }
-}
-
-fn one() -> Value<f32> {
-    Value::Fixed(1.0)
-}
-
-fn reach() -> Value<f32> {
-    Value::Fixed(512.0)
-}
-
-fn height() -> Value<f32> {
-    Value::Fixed(100.0)
 }
 
 impl crate::Quality {

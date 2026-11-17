@@ -12,12 +12,15 @@ pub const MAX_SCRIPT_LISTENS: usize = 4;
 pub struct Listen {
     pub kind: AudioKind,
     pub unit: AudioUnit,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub window: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub reference: Option<Reference>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub hold_silence: Option<bool>,
 }
 

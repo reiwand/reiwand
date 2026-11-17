@@ -147,15 +147,14 @@ impl Runtime {
         let t = &layer.transform;
         let size = match &layer.kind {
             Kind::Text(text) => Some(Extent::Points(text.size)),
-            Kind::Image { size, .. } | Kind::Video { size, .. } | Kind::Solid { size, .. } => {
-                size.map(Extent::Box)
-            }
+            Kind::Image { size, .. } | Kind::Video { size, .. } => size.0.map(Extent::Box),
+            Kind::Solid { size, .. } => size.0.map(Extent::Box),
             Kind::Spectrum(s) => Some(Extent::Box(s.size)),
             _ => None,
         };
         let color = match &layer.kind {
             Kind::Image { color, .. } | Kind::Video { color, .. } | Kind::Group { color, .. } => {
-                color.as_ref().map(|c| c.get(&cx).0)
+                Some(color.get(&cx).0)
             }
             Kind::Solid { color, .. } => Some(color.get(&cx).0),
             Kind::Text(text) => Some(text.color.get(&cx).0),
@@ -172,7 +171,9 @@ impl Runtime {
             scale: set.scale.unwrap_or_else(|| t.scale.get(&cx).0),
             rotation: set.rotation.unwrap_or_else(|| t.rotation.get(&cx)),
             skew: set.skew.unwrap_or_else(|| t.skew.get(&cx).0),
-            origin: set.origin.or(t.origin).unwrap_or([0.5; 2]),
+            origin: set
+                .origin
+                .unwrap_or_else(|| t.origin.or_else(|| layer.anchor.map_or([0.5; 2], |a| a.fraction()))),
             opacity: set.opacity.unwrap_or_else(|| layer.opacity.get(&cx)),
             visible: set.visible.unwrap_or_else(|| layer.visible.get(&cx)),
             color: set.color.or(color).unwrap_or([1.0; 4]),

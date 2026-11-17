@@ -28,7 +28,7 @@ impl<'a> Check<'a> {
         let mut deep: HashMap<&str, bool> = HashMap::new();
         for l in scene.layers() {
             let inside = deep.get(l.id.as_str()).copied().unwrap_or(false);
-            let space = matches!(l.kind, Kind::Group { space: Some(Space::Depth), .. });
+            let space = matches!(l.kind, Kind::Group { space: Space::Depth, .. });
             self.uses(space, "model3d");
             deep.extend(l.children().iter().map(|c| (c.id.as_str(), inside || space)));
         }

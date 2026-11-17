@@ -21,7 +21,7 @@ pub(crate) fn content<'a>(
         Kind::Image { image, size, playback, .. } => {
             let asset = set.file.as_deref().map_or_else(|| named(cx, image), Cow::Borrowed);
             let frame = crate::sheet::frame(cx, &asset, playback.as_ref(), quality);
-            Content::Image { asset, size: boxed(*size), frame }
+            Content::Image { asset, size: boxed(size.0), frame }
         }
         Kind::Video { video, size, .. } => {
             let picked = || {
@@ -29,7 +29,7 @@ pub(crate) fn content<'a>(
                 crate::lanes::lane(cx.scene, layer, &asset).map_or(asset, Cow::Owned)
             };
             let asset = set.file.as_deref().map_or_else(picked, Cow::Borrowed);
-            Content::Video { asset, size: boxed(*size) }
+            Content::Video { asset, size: boxed(size.0) }
         }
         Kind::Text(t) => {
             let ink = t.ink(cx, quality);
@@ -50,7 +50,7 @@ pub(crate) fn content<'a>(
                 layout: Layout {
                     wrap: t.wrap,
                     line_height: t.line_height,
-                    padding: t.padding.unwrap_or(0.0),
+                    padding: t.padding,
                     backing: t.background.as_ref().map(|b| (b.color.get(cx), b.padding, b.radius)),
                     spacing: t.spacing(cx),
                     reach: ink.map_or(0.0, |i| i.reach),
@@ -71,7 +71,7 @@ pub(crate) fn content<'a>(
             Content::Spectrum { spectrum, color: tint(spectrum.color.get(cx)) }
         }
         Kind::Solid { color, size } => {
-            Content::Solid { color: tint(color.get(cx)), size: boxed(*size).unwrap_or(canvas) }
+            Content::Solid { color: tint(color.get(cx)), size: boxed(size.0).unwrap_or(canvas) }
         }
         Kind::Particles { system, .. } => {
             let index = cx.scene.particles.keys().position(|k| k == system).unwrap_or(usize::MAX);
@@ -92,14 +92,14 @@ pub(crate) fn content<'a>(
             let texture = m.texture.as_ref().map(|t| named(cx, t));
             Content::Mesh {
                 layer: &layer.id,
-                size: boxed(m.size).unwrap_or(canvas),
+                size: boxed(m.size.0).unwrap_or(canvas),
                 pose,
                 texture,
                 relief: None,
             }
         }
         Kind::Model(m) => {
-            let size = boxed(m.size).unwrap_or(canvas);
+            let size = boxed(m.size.0).unwrap_or(canvas);
             Content::Model { layer: &layer.id, stage: usize::MAX, slice: 0, size, key: 0 }
         }
         Kind::Adjustment { .. } | Kind::Sound(_) | Kind::Light(_) => Content::Adjustment,
@@ -108,17 +108,15 @@ pub(crate) fn content<'a>(
 
 pub(crate) fn painted(layer: &Layer) -> Option<&crate::Value<Color>> {
     match &layer.kind {
-        Kind::Image { color, .. } | Kind::Video { color, .. } | Kind::Particles { color, .. } => {
-            color.as_ref()
-        }
-        Kind::Group { color, .. } => color.as_ref(),
-        Kind::Mesh(m) => m.color.as_ref(),
+        Kind::Image { color, .. } | Kind::Video { color, .. } | Kind::Particles { color, .. } => Some(color),
+        Kind::Group { color, .. } => Some(color),
+        Kind::Mesh(m) => Some(&m.color),
         _ => None,
     }
 }
 
 pub(crate) fn strength(cx: &Context, mask: Option<&Mask>) -> f32 {
-    mask.and_then(|m| m.strength.as_ref()).map_or(1.0, |s| s.get(cx).clamp(0.0, 1.0))
+    mask.map_or(1.0, |m| m.strength.get(cx).clamp(0.0, 1.0))
 }
 
 pub(crate) fn masked<'a>(cx: &Context<'a>, mask: Option<&'a Mask>) -> Option<Cow<'a, str>> {

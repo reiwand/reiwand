@@ -12,36 +12,29 @@ const MAX_FADE: f32 = 60.0;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Sound {
-    #[serde(default, skip_serializing_if = "String::is_empty")]
     #[schemars(extend("x-ref" = "sound"))]
     pub sound: String,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[schemars(extend("x-ref" = "sound"))]
     pub sounds: Vec<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub mode: Option<Order>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mode: Order,
     #[schemars(extend("x-unit" = "s", "x-range" = [0, 600]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub pause: Option<[f32; 2]>,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub stream: bool,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "trigger"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub play_on: Option<String>,
-    #[serde(default = "yes", rename = "loop")]
+    #[serde(rename = "loop")]
     pub repeat: bool,
-    #[serde(default = "playing")]
     pub play: Value<bool>,
-    #[serde(default = "full")]
     #[schemars(extend("x-range" = [0, 1]))]
     pub volume: Value<f32>,
-    #[serde(default = "centered")]
     #[schemars(extend("x-range" = [-1, 1]))]
     pub pan: Value<f32>,
-    #[serde(default)]
     #[schemars(extend("x-unit" = "s", "x-range" = [0, 60]))]
     pub fade_in: f32,
-    #[serde(default)]
     #[schemars(extend("x-unit" = "s", "x-range" = [0, 60]))]
     pub fade_out: f32,
 }
@@ -69,7 +62,7 @@ impl Sound {
     }
 
     pub fn newer(&self) -> bool {
-        let more = self.mode.is_some() || self.pause.is_some() || self.play_on.is_some();
+        let more = self.mode != Order::Sequence || self.pause.is_some() || self.play_on.is_some();
         more || self.stream || !self.sounds.is_empty()
     }
 
@@ -146,7 +139,7 @@ impl Check<'_> {
             self.uses(asset.is_some_and(|a| a.extension() == "mp3"), "sound2");
         }
         self.uses(s.newer(), "sound2");
-        if s.mode.is_some() && s.sounds.is_empty() {
+        if s.mode != Order::Sequence && s.sounds.is_empty() {
             self.issues.push(Issue::Type(format!("{p}/mode")));
         }
         if let Some([lo, hi]) = s.pause {
@@ -179,20 +172,4 @@ impl Check<'_> {
 
 fn follows<T>(b: &crate::Binding<T>) -> bool {
     b.audio.is_some() || b.cursor.is_some() || b.clock.is_some() || b.script.is_some()
-}
-
-fn yes() -> bool {
-    true
-}
-
-fn playing() -> Value<bool> {
-    Value::Fixed(true)
-}
-
-fn full() -> Value<f32> {
-    Value::Fixed(1.0)
-}
-
-fn centered() -> Value<f32> {
-    Value::Fixed(0.0)
 }

@@ -38,6 +38,7 @@ mod figure;
 mod film;
 mod finish_maps;
 mod flash;
+mod follow;
 mod footage;
 mod form;
 mod fx;
@@ -134,7 +135,7 @@ mod words;
 
 pub use exports::*;
 
-pub const SCHEMA: &str = "reiwand.scene/1";
+pub const SCHEMA: &str = "reiwand.scene/2";
 pub const MAX_SIZE: u32 = 16_384;
 pub const MAX_LAYERS: usize = 256;
 pub const MAX_DEPTH: usize = 8;

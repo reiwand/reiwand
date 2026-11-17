@@ -18,7 +18,7 @@ impl Check<'_> {
             w.lines.iter().for_each(|n| self.range(&format!("{p}/wrap/lines"), *n as f32, 1.0, 1000.0));
         }
         t.line_height.iter().for_each(|h| self.range(&format!("{p}/line_height"), *h, 0.5, 4.0));
-        t.padding.iter().for_each(|v| self.range(&format!("{p}/padding"), *v, 0.0, 1024.0));
+        self.range(&format!("{p}/padding"), t.padding, 0.0, 1024.0);
         if let Some(b) = &t.background {
             self.value(&format!("{p}/background/color"), &b.color);
             let sizes =
@@ -56,27 +56,25 @@ impl Check<'_> {
         self.number(&format!("{p}/z"), &l.z, -1e5, 1e5);
         let only = |on: bool, beams: &[Beam]| on && !beams.contains(&l.light);
         let misplaced = [
-            ("cone", only(l.cone.is_some(), &[Beam::Spot])),
-            ("length", only(l.length.is_some(), &[Beam::Tube])),
             ("volumetric", only(l.volumetric.is_some(), &[Beam::Point, Beam::Spot])),
             ("texture", only(l.texture.is_some(), &[Beam::Spot])),
             ("shadows", only(l.shadows, &[Beam::Point, Beam::Spot, Beam::Directional])),
             ("shadow_resolution", l.shadow_resolution.is_some() && !l.shadows),
-            ("shadow_bias", l.shadow_bias.is_some() && !l.shadows),
         ];
         l.shadow_resolution
             .iter()
             .for_each(|r| self.range(&format!("{p}/shadow_resolution"), *r as f32, 256.0, 4096.0));
-        l.shadow_bias.iter().for_each(|b| self.range(&format!("{p}/shadow_bias"), *b, 0.0, 1.0));
+        self.range(&format!("{p}/shadow_bias"), l.shadow_bias, 0.0, 1.0);
         self.uses(l.shadows, "shadows");
         for (name, _) in misplaced.into_iter().filter(|(_, wrong)| *wrong) {
             self.issues.push(Issue::Type(format!("{p}/{name}")));
         }
-        if let Some([inner, outer]) = l.cone {
+        {
+            let [inner, outer] = l.cone;
             self.range(&format!("{p}/cone/0"), inner, 0.0, 180.0);
             self.range(&format!("{p}/cone/1"), outer, inner, 180.0);
         }
-        l.length.iter().for_each(|v| self.range(&format!("{p}/length"), *v, 1.0, 1e5));
+        self.range(&format!("{p}/length"), l.length, 1.0, 1e5);
         if let Some(v) = l.volumetric {
             self.uses(true, "volumetric_lights");
             self.range(&format!("{p}/volumetric/density"), v.density, 0.0, 1.0);

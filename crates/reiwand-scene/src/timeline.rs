@@ -23,28 +23,25 @@ pub enum Loop {
 #[serde(deny_unknown_fields)]
 pub struct Timeline {
     pub id: String,
-    #[serde(default, skip_serializing_if = "is_zero")]
     #[schemars(extend("x-unit" = "s"))]
     pub duration: f32,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [1, 240]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub fps: Option<f32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub frames: Option<u32>,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub wrap: bool,
-    #[serde(default, rename = "loop")]
+    #[serde(rename = "loop")]
     pub repeat: Loop,
-    #[serde(default = "one")]
     pub speed: f32,
-    #[serde(default)]
     pub delay: f32,
-    #[serde(default = "yes")]
     pub autoplay: bool,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-ref" = "trigger"))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub trigger: Option<String>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub events: Vec<Event>,
 }
 
@@ -57,11 +54,14 @@ pub struct Event {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Handles {
-    #[serde(rename = "in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "in")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub before: Option<Side>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub out: Option<Side>,
 }
 
@@ -123,16 +123,4 @@ impl Timeline {
             _ => self.duration,
         }
     }
-}
-
-fn is_zero(v: &f32) -> bool {
-    *v == 0.0
-}
-
-fn one() -> f32 {
-    1.0
-}
-
-fn yes() -> bool {
-    true
 }

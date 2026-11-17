@@ -133,7 +133,7 @@ pub(crate) fn after<'a>(
                 pose,
             });
         }
-        Kind::Group { space: Some(Space::Depth), .. } if !group::merged(cx, frame, at) => {
+        Kind::Group { space: Space::Depth, .. } if !group::merged(cx, frame, at) => {
             group::gather(cx, layer, (at, placed), frame, canvas)
         }
         _ => {}

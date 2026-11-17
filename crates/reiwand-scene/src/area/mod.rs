@@ -58,10 +58,10 @@ impl Scene {
     fn size(&self, layer: &Layer) -> Option<[f32; 2]> {
         let canvas = self.canvas.size.map(|v| v as f32);
         match &layer.kind {
-            Kind::Image { size, .. } | Kind::Video { size, .. } => *size,
-            Kind::Solid { size, .. } => Some(size.unwrap_or(canvas)),
-            Kind::Mesh(m) => Some(m.size.unwrap_or(canvas)),
-            Kind::Model(m) => Some(m.size.unwrap_or(canvas)),
+            Kind::Image { size, .. } | Kind::Video { size, .. } => size.0,
+            Kind::Solid { size, .. } => Some(size.or(canvas)),
+            Kind::Mesh(m) => Some(m.size.or(canvas)),
+            Kind::Model(m) => Some(m.size.or(canvas)),
             Kind::Shape { shape: s, stroke, .. } => {
                 let margin = stroke.as_ref().map_or(0.0, |s| s.width.abs());
                 Some(shape(s).map(|v| v + margin))

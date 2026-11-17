@@ -25,10 +25,10 @@ pub(crate) fn figure(layer: &Layer) -> Option<Fig<'_>> {
     match &layer.kind {
         Kind::Mesh(m) => {
             let sort = m.depth.is_some_and(|d| d.sort);
-            Some(Fig { rig: &m.rig, parts: &m.parts, size: m.size, unit: 1.0, root: false, sort })
+            Some(Fig { rig: &m.rig, parts: &m.parts, size: m.size.0, unit: 1.0, root: false, sort })
         }
         Kind::Model(m) if !m.rig.is_empty() || m.root_motion => {
-            let (parts, size, root) = (&NO_PARTS, m.size, m.root_motion);
+            let (parts, size, root) = (&NO_PARTS, m.size.0, m.root_motion);
             Some(Fig { rig: &m.rig, parts, size, unit: MODEL_UNIT, root, sort: false })
         }
         _ => None,

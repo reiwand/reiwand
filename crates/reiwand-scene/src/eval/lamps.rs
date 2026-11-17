@@ -102,7 +102,7 @@ fn lamp<'a>(
 ) -> Option<Lamp<'a>> {
     let place = cx.place(layer, outer);
     let tilt = layer.transform.tilt.as_ref().map_or(0.0, |t| t.get(cx).0[0].clamp(-89.0, 89.0));
-    let cone = l.cone.unwrap_or([30.0, 60.0]);
+    let cone = l.cone;
     let picture = l.texture.as_ref().filter(|_| l.light == Beam::Spot).map(|t| match t {
         Value::Bound(b) if b.layer.is_some() => Picture::Layer(b.layer.as_deref().unwrap_or_default()),
         t => Picture::Asset(super::shown::named(cx, t)),
@@ -123,7 +123,7 @@ fn lamp<'a>(
         radius: l.radius.get(cx).clamp(1.0, 1e5),
         z: l.z.get(cx).clamp(-1e5, 1e5),
         cone: [cone[0].clamp(0.0, 180.0), cone[1].clamp(0.0, 180.0).max(cone[0])],
-        length: l.length.unwrap_or(256.0).clamp(1.0, 1e5),
+        length: l.length.clamp(1.0, 1e5),
         air: l
             .volumetric
             .filter(|_| quality != Quality::Q0 && matches!(l.light, Beam::Point | Beam::Spot))
@@ -131,9 +131,7 @@ fn lamp<'a>(
         picture,
         slot: 0,
         within: usize::MAX,
-        shadow: l
-            .shadows
-            .then(|| (l.shadow_resolution, l.shadow_bias.unwrap_or(SHADOW_BIAS).clamp(0.0, 1.0))),
+        shadow: l.shadows.then(|| (l.shadow_resolution, l.shadow_bias.clamp(0.0, 1.0))),
         space: l.position3d.as_ref().map(|v| v.get(cx).0.map(|x| x.clamp(-1e6, 1e6))),
         aim: l.aim3d.as_ref().map(|v| v.get(cx).0.map(|x| x.clamp(-1e6, 1e6))),
     })

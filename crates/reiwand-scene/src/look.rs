@@ -5,7 +5,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Glide {
     #[schemars(extend("x-range" = [0, 4]))]
     pub amount: Value<f32>,
@@ -13,14 +13,9 @@ pub struct Glide {
     pub delay: f32,
     #[schemars(extend("x-range" = [0, 1]))]
     pub pointer: Value<f32>,
-    #[serde(skip_serializing_if = "centered")]
     #[schemars(extend("x-range" = [-1, 1]))]
     pub offset: Value<Vec2>,
     pub gyro: bool,
-}
-
-fn centered(v: &Value<Vec2>) -> bool {
-    matches!(v, Value::Fixed(Vec2(v)) if *v == [0.0; 2])
 }
 
 impl Glide {
@@ -31,21 +26,21 @@ impl Glide {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Camera {
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "px"))]
-    pub center: Option<Value<Vec2>>,
+    pub center: crate::Ctx<Value<Vec2>, { crate::CANVAS }>,
     #[schemars(extend("x-range" = [0.1, 10]))]
     pub zoom: Value<f32>,
     #[schemars(extend("x-unit" = "°", "x-range" = [-360, 360]))]
     pub rotation: Value<f32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub shake: Option<Shake>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Shake {
     pub enabled: Value<bool>,
     #[schemars(extend("x-unit" = "px", "x-range" = [0, 1000]))]
@@ -57,7 +52,7 @@ pub struct Shake {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Bloom {
     #[schemars(extend("x-range" = [0, 4]))]
     pub threshold: Value<f32>,
@@ -66,7 +61,8 @@ pub struct Bloom {
     #[schemars(extend("x-unit" = "px", "x-range" = [0, 128]))]
     pub radius: Value<f32>,
     pub tint: Value<Color>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub hdr: Option<Glare>,
 }
 
@@ -89,7 +85,7 @@ pub enum Tonemap {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Playback {
     #[schemars(extend("x-range" = [0, 16]))]
     pub rate: Value<f32>,
@@ -98,12 +94,11 @@ pub struct Playback {
     pub repeat: bool,
     #[schemars(extend("x-unit" = "s"))]
     pub start: f32,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "s"))]
-    pub end: Option<f32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end: crate::Ctx<f32, { crate::END }>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub frame: Option<Value<f32>>,
-    #[serde(skip_serializing_if = "std::ops::Not::not")]
     pub own_clock: bool,
 }
 
@@ -117,7 +112,7 @@ impl Default for Glide {
 impl Default for Camera {
     fn default() -> Self {
         let (zoom, rotation) = (Value::Fixed(1.0), Value::Fixed(0.0));
-        Camera { center: None, zoom, rotation, shake: None }
+        Camera { center: crate::Ctx::word(), zoom, rotation, shake: None }
     }
 }
 
@@ -142,7 +137,7 @@ impl Default for Playback {
             playing: shown(),
             repeat: true,
             start: 0.0,
-            end: None,
+            end: crate::Ctx::word(),
             frame: None,
             own_clock: false,
         }

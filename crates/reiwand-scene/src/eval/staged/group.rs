@@ -34,7 +34,7 @@ fn holds(outer: &Layer, inner: &Layer) -> bool {
 }
 
 fn deep(layer: &Layer) -> bool {
-    matches!(layer.kind, Kind::Group { space: Some(Space::Depth), .. })
+    matches!(layer.kind, Kind::Group { space: Space::Depth, .. })
 }
 
 pub(super) fn merged(cx: &Context, frame: &Frame, at: usize) -> bool {

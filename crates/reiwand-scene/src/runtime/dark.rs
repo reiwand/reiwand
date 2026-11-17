@@ -9,7 +9,7 @@ pub(crate) fn veil(scene: &crate::Scene) -> Veil {
     let black = cam.fade.is_some_and(|f| f.to == FadeTo::Black && f.duration > 0.0);
     (black && cam.paths.len() > 1).then(|| {
         let color = Value::Fixed(Color([0.0, 0.0, 0.0, 1.0]));
-        Box::new(Layer::new("", Kind::Solid { color, size: None }))
+        Box::new(Layer::new("", Kind::Solid { color, size: crate::Ctx::word() }))
     })
 }
 

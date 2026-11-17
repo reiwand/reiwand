@@ -37,7 +37,7 @@ impl Playlist {
     pub fn of(sound: &Sound, lengths: &BTreeMap<String, f32>, seed: u64) -> Playlist {
         let lengths = sound.clips().map(|id| f64::from(lengths.get(id).copied().unwrap_or(0.0))).collect();
         let pause = sound.pause.map_or([0.0; 2], |p| p.map(f64::from));
-        Playlist { lengths, order: sound.mode.unwrap_or_default(), pause, repeat: sound.repeat, seed }
+        Playlist { lengths, order: sound.mode, pause, repeat: sound.repeat, seed }
     }
 
     fn item(&self, k: u64, last: Option<usize>) -> (usize, f64) {

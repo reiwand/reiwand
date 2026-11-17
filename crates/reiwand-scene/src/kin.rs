@@ -32,10 +32,12 @@ impl Scene {
 
 pub(crate) fn origin_of(layer: &Layer, set: &LayerOverride) -> [f32; 2] {
     let valign = match &layer.kind {
-        Kind::Text(text) => text.valign.unwrap_or_default().fraction(),
+        Kind::Text(text) => text.valign.fraction(),
         _ => 0.5,
     };
-    set.origin.or(layer.transform.origin).or(layer.anchor.map(|a| a.fraction())).unwrap_or([0.5, valign])
+    set.origin.unwrap_or_else(|| {
+        layer.transform.origin.or_else(|| layer.anchor.map_or([0.5, valign], |a| a.fraction()))
+    })
 }
 
 pub(crate) fn parent_of<'a>(layer: &'a Layer, set: &'a LayerOverride) -> Option<&'a String> {

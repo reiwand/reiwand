@@ -27,22 +27,12 @@ pub enum Smooth {
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Hearing {
-    #[serde(default = "attack")]
     #[schemars(extend("x-unit" = "s", "x-range" = [0.001, 2]))]
     pub attack: f32,
-    #[serde(default = "release")]
     #[schemars(extend("x-unit" = "s", "x-range" = [0.01, 10]))]
     pub release: f32,
     #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 10], "default" = 5))]
     pub gain_release: f32,
-}
-
-fn attack() -> f32 {
-    Hearing::default().attack
-}
-
-fn release() -> f32 {
-    Hearing::default().release
 }
 
 pub fn db01(power: f32, floor_db: f32) -> f32 {

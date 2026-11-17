@@ -8,7 +8,8 @@ impl Runtime {
         let t = &self.tapes[i];
         let layer = t.layer.as_ref().and_then(|id| self.scene.layer(id));
         let p: Option<&Playback> = layer.and_then(|l| match &l.kind {
-            Kind::Video { playback, .. } | Kind::Image { playback, .. } => playback.as_ref(),
+            Kind::Video { playback, .. } => Some(playback),
+            Kind::Image { playback, .. } => playback.as_ref(),
             _ => None,
         });
         let cx = self.context();

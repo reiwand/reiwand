@@ -45,7 +45,7 @@ impl<'a> Check<'a> {
             .flatten()
             .enumerate()
             .for_each(|(i, v)| self.range(&format!("{p}/size/{i}"), *v, 1e-3, 1e5));
-        m.color.iter().for_each(|c| self.value(&format!("{p}/color"), c));
+        self.value(&format!("{p}/color"), &m.color);
         self.count(&format!("{p}/parts"), m.parts.len(), crate::gltf::MAX_MORPHS);
         for (name, part) in &m.parts {
             let q = format!("{p}/parts/{name}");

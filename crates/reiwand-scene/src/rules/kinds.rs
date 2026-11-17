@@ -7,21 +7,25 @@ impl Check<'_> {
     pub(super) fn kind(&mut self, p: &str, kind: &Kind, depth: usize) {
         match kind {
             Kind::Group { layers, color, .. } => {
-                self.tint(p, color.as_ref());
+                self.tint(p, Some(color));
                 self.layers(&format!("{p}/layers"), layers, depth + 1)
             }
-            Kind::Image { image: named, size, color, playback }
-            | Kind::Video { video: named, size, color, playback } => {
+            Kind::Image { image: named, size, color, .. } | Kind::Video { video: named, size, color, .. } => {
+                let playback = match kind {
+                    Kind::Image { playback, .. } => playback.as_ref(),
+                    Kind::Video { playback, .. } => Some(playback),
+                    _ => None,
+                };
                 let field = if matches!(kind, Kind::Image { .. }) { "image" } else { "video" };
                 let pooled = matches!(named, crate::Value::Fixed(id) if field == "video" && self.scene.pools.contains_key(id));
                 match pooled {
                     true => self.uses(true, "script_geometry"),
                     false => self.named(&format!("{p}/{field}"), named),
                 }
-                self.size(&format!("{p}/size"), *size);
-                self.tint(p, color.as_ref());
+                self.size(&format!("{p}/size"), size.0);
+                self.tint(p, Some(color));
                 playback.iter().for_each(|b| self.playback(&format!("{p}/playback"), b));
-                if playback.as_ref().is_some_and(|b| b.own_clock) {
+                if playback.is_some_and(|b| b.own_clock) {
                     let film = |a: &String| {
                         let path = self.scene.assets.get(a).map(|a| a.extension());
                         path.is_some_and(|e| crate::stage::VIDEOS.contains(&e.as_str()))
@@ -64,7 +68,7 @@ impl Check<'_> {
             Kind::Particles { system, color, instance, render } => {
                 let known = self.scene.particles.get(system);
                 self.known(&format!("{p}/system"), "particle system", system, known.is_some());
-                self.tint(p, color.as_ref());
+                self.tint(p, Some(color));
                 if let Some(r) = render {
                     self.uses(true, "particles2");
                     self.render(p, r);
@@ -88,15 +92,15 @@ impl Check<'_> {
             }
             Kind::Solid { color, size } => {
                 self.value(&format!("{p}/color"), color);
-                self.size(&format!("{p}/size"), *size);
+                self.size(&format!("{p}/size"), size.0);
             }
             Kind::Adjustment { size, redraw, .. } => {
                 let [w, h] = self.scene.canvas.size.map(|v| 2.0 * v as f32);
-                if let Some([x, y]) = size {
-                    self.range(&format!("{p}/size/0"), *x, 1.0, w);
-                    self.range(&format!("{p}/size/1"), *y, 1.0, h);
+                if let Some([x, y]) = size.0 {
+                    self.range(&format!("{p}/size/0"), x, 1.0, w);
+                    self.range(&format!("{p}/size/1"), y, 1.0, h);
                 }
-                self.uses(size.is_some() || *redraw, "capture");
+                self.uses(!size.follows() || *redraw, "capture");
             }
             Kind::Sound(_) | Kind::Light(_) | Kind::Mesh(_) | Kind::Model(_) => {}
         }

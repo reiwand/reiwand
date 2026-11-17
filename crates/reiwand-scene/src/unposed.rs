@@ -1,4 +1,3 @@
-use crate::content::MaskChannel;
 use crate::{Kind, Layer, Mask, Scene, Value};
 
 fn pictured(mask: &Mask) -> Option<&str> {
@@ -14,7 +13,7 @@ fn feeder(mesh: &Layer, id: String, texture: &str) -> Layer {
     (fed.mask, fed.effects, fed.lighting, fed.brightness) = (None, Vec::new(), None, None);
     (fed.blend, fed.solid, fed.cache) = Default::default();
     if let Kind::Mesh(m) = &mut fed.kind {
-        (m.texture, m.color) = (Some(Value::Fixed(texture.to_owned())), None);
+        (m.texture, m.color) = (Some(Value::Fixed(texture.to_owned())), crate::content::white());
     }
     fed
 }
@@ -40,7 +39,6 @@ fn posed(mesh: &mut Layer, taken: &mut Taken) -> Vec<Layer> {
                 id
             }
         };
-        mask.channel = Some(mask.channel.unwrap_or(MaskChannel::Luminance));
         (mask.texture, mask.layer) = (None, Some(id));
     }
     fed.into_iter().map(|(_, l)| l).collect()

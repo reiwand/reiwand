@@ -23,7 +23,7 @@ pub(crate) fn frame(cx: &Context, id: &str, playback: Option<&Playback>, quality
     let still = Playback::default();
     let p = playback.unwrap_or(&still);
     let start = p.start.clamp(0.0, total);
-    let end = p.end.unwrap_or(total).clamp(start, total);
+    let end = p.end.or(total).clamp(start, total);
     let rate = p.rate.get(cx).clamp(0.0, 16.0);
     let span = end - start;
     let runs = quality > Quality::Q0 && p.playing.get(cx) && rate > 0.0 && span > 0.0;

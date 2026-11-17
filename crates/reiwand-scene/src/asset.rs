@@ -8,36 +8,39 @@ pub const COLLECTIONS: [&str; 3] = ["ttc", "otc", "woff2"];
 #[serde(deny_unknown_fields)]
 pub struct Asset {
     pub path: String,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub linear: bool,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub atlas: Option<[u32; 2]>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub filter: Option<Filter>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub wrap: Option<Wrapping>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub mipmaps: Option<bool>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [0, 255]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub face: Option<u32>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[schemars(extend("x-unit" = "px"))]
     pub rects: Vec<[u32; 4]>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [1, 256]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub frames: Option<u32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-range" = [0.1, 120]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub fps: Option<f32>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[schemars(extend("x-unit" = "s"))]
     pub durations: Vec<f32>,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub animated: bool,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub media: Option<crate::Cover>,
-    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
     pub shapes: std::collections::BTreeMap<String, String>,
 }
 

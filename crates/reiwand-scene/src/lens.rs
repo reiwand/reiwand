@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 pub const MAX_PATHS: usize = 16;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Camera3d {
     #[schemars(extend("x-unit" = "°", "x-range" = [1, 179]))]
     pub fov: Value<f32>,
@@ -17,10 +17,10 @@ pub struct Camera3d {
     pub eye: Value<Vec3>,
     pub center: Value<Vec3>,
     pub up: Vec3,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub paths: Vec<CameraPath>,
     pub order: PathOrder,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub fade: Option<Fade>,
 }
 
@@ -37,9 +37,10 @@ pub enum PathOrder {
 pub struct CameraPath {
     pub id: String,
     pub keys: Vec<CameraKey>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub ease: Option<Ease>,
-    #[serde(default, rename = "loop", skip_serializing_if = "std::ops::Not::not")]
+    #[serde(rename = "loop")]
     pub closed: bool,
 }
 
@@ -50,10 +51,12 @@ pub struct CameraKey {
     pub t: f32,
     pub eye: Vec3,
     pub center: Vec3,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub up: Option<Vec3>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schemars(extend("x-unit" = "°", "x-range" = [1, 179]))]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub fov: Option<f32>,
 }
 
@@ -68,7 +71,6 @@ pub enum FadeTo {
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Fade {
-    #[serde(default)]
     pub to: FadeTo,
     #[schemars(extend("x-unit" = "s", "x-range" = [0, 10]))]
     pub duration: f32,

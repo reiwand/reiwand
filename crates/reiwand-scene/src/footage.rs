@@ -33,17 +33,14 @@ fn named(v: &Value<String>, asset: &str) -> bool {
 fn shows<'a>(scene: &Scene, layer: &'a Layer, asset: &str) -> Option<Option<&'a Playback>> {
     match &layer.kind {
         _ if !owned(scene, &layer.kind).is_empty() => None,
-        Kind::Video { video: v, playback, .. } | Kind::Image { image: v, playback, .. }
-            if named(v, asset) =>
-        {
-            Some(playback.as_ref())
-        }
+        Kind::Video { video: v, playback, .. } if named(v, asset) => Some(Some(playback)),
+        Kind::Image { image: v, playback, .. } if named(v, asset) => Some(playback.as_ref()),
         _ => None,
     }
 }
 
 pub(crate) fn owned<'a>(scene: &Scene, kind: &'a Kind) -> Vec<&'a String> {
-    let Kind::Video { video, playback: Some(p), .. } = kind else { return Vec::new() };
+    let Kind::Video { video, playback: p, .. } = kind else { return Vec::new() };
     let mut names: Vec<&String> = match video {
         Value::Fixed(id) => vec![id],
         Value::Bound(b) if b.map.is_none() => b.prop.iter().collect(),
@@ -57,7 +54,7 @@ pub(crate) fn owned<'a>(scene: &Scene, kind: &'a Kind) -> Vec<&'a String> {
 
 fn fresh(id: &str, owner: Option<(&Layer, Option<&Playback>)>) -> Tape {
     let p = owner.and_then(|(_, p)| p).cloned().unwrap_or_default();
-    let (start, end) = (f64::from(p.start), p.end.map(f64::from));
+    let (start, end) = (f64::from(p.start), p.end.0.map(f64::from));
     let (layer, held, speed) = (owner.map(|(l, _)| l.id.clone()), None, None);
     let (jumps, shown, ended, playing, rate) = (0, true, false, true, 1.0);
     let asset = id.to_owned();
@@ -81,7 +78,8 @@ fn fresh(id: &str, owner: Option<(&Layer, Option<&Playback>)>) -> Tape {
 
 pub(crate) fn played(l: &Layer) -> Option<&Playback> {
     match &l.kind {
-        Kind::Video { playback, .. } | Kind::Image { playback, .. } => playback.as_ref(),
+        Kind::Video { playback, .. } => Some(playback),
+        Kind::Image { playback, .. } => playback.as_ref(),
         _ => None,
     }
 }

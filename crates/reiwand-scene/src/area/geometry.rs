@@ -22,7 +22,7 @@ pub(super) fn union(a: Bounds, b: Bounds) -> Bounds {
 }
 
 pub(super) fn quad(layer: &Layer, [w, h]: [f32; 2], m: Affine) -> [f32; 4] {
-    let origin = layer.transform.origin.unwrap_or([0.5; 2]);
+    let origin = layer.transform.origin.or([0.5; 2]);
     let corners = [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
         .map(|[u, v]| m.apply([(u - origin[0]) * w, (v - origin[1]) * h]));
     let xs = corners.map(|p| p[0]);

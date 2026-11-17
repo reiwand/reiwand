@@ -15,7 +15,7 @@ fn layer(b: &Bloom, threshold: Json, strength: Json) -> Box<Layer> {
     let params = [("threshold", threshold), ("intensity", strength), ("radius", radius), ("tint", tint)];
     let params = params.into_iter().filter_map(|(k, v)| Some((k.to_owned(), param(v)?))).collect();
     let (effect, name, enabled, mask, optional) = ("bloom".into(), None, Value::Fixed(true), None, false);
-    let mut layer = Layer::new("", Kind::Adjustment { size: None, redraw: false, rgb: false });
+    let mut layer = Layer::new("", Kind::Adjustment { size: crate::Ctx::word(), redraw: false, rgb: false });
     layer.effects = vec![EffectUse { effect, name, enabled, mask, params, optional }];
     Box::new(layer)
 }

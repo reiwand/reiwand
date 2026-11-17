@@ -19,7 +19,7 @@ impl TextLayer {
     }
 
     pub(crate) fn ink(&self, cx: &Context, quality: Quality) -> Option<Ink> {
-        let field = self.render == Some(Glyphs::Sdf);
+        let field = self.render == Glyphs::Sdf;
         let drawn = self.outline.is_some() || self.shadow.is_some() || self.blur.is_some();
         if !(drawn || field) {
             return None;
@@ -34,7 +34,7 @@ impl TextLayer {
         let width = outline.map_or(0.0, |o| o.1);
         let cast = shadow.map_or(0.0, |(_, [x, y], b)| x.abs().max(y.abs()) + b + width);
         let reach = 2f32.powf((width.max(cast).max(blur) + 2.0).log2().ceil()).max(4.0);
-        let field = field || (drawn && self.render != Some(Glyphs::Raster));
+        let field = field || (drawn && self.render != Glyphs::Raster);
         Some(Ink { outline, shadow, blur, field, reach })
     }
 }

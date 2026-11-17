@@ -25,68 +25,61 @@ pub enum Solid {
 pub enum Kind {
     Group {
         layers: Vec<Layer>,
-        #[serde(default)]
         clip: bool,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        color: Option<Value<Color>>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        space: Option<Space>,
+        color: Value<Color>,
+        space: Space,
     },
     Image {
         #[schemars(extend("x-ref" = "image"))]
         image: Value<String>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        size: Option<[f32; 2]>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        color: Option<Value<Color>>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        size: crate::Ctx<[f32; 2], { crate::SOURCE }>,
+        color: Value<Color>,
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         playback: Option<Playback>,
     },
     Video {
         #[schemars(extend("x-ref" = "video"))]
         video: Value<String>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        size: Option<[f32; 2]>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        color: Option<Value<Color>>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        playback: Option<Playback>,
+        size: crate::Ctx<[f32; 2], { crate::SOURCE }>,
+        color: Value<Color>,
+        playback: Playback,
     },
     Text(Box<TextLayer>),
     Shape {
         shape: Shape,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         fill: Option<Value<Color>>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         gradient: Option<Gradient>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         stroke: Option<Stroke>,
     },
     Particles {
         #[schemars(extend("x-ref" = "system"))]
         system: String,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        color: Option<Value<Color>>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        color: Value<Color>,
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         instance: Option<Box<Instance>>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[schemars(required)]
         render: Option<Box<Render>>,
     },
     Spectrum(Spectrum),
     Sound(Sound),
     Solid {
         color: Value<Color>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        size: Option<[f32; 2]>,
+        size: crate::Ctx<[f32; 2], { crate::CANVAS }>,
     },
     Light(Box<Light>),
     Adjustment {
-        #[serde(default, skip_serializing_if = "Option::is_none")]
         #[schemars(extend("x-unit" = "px"))]
-        size: Option<[f32; 2]>,
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        size: crate::Ctx<[f32; 2], { crate::CANVAS }>,
         redraw: bool,
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
         rgb: bool,
     },
     Mesh(Box<MeshLayer>),

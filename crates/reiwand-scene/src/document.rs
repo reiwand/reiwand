@@ -9,6 +9,7 @@ use std::sync::Arc;
 #[error("{}", self.message())]
 pub enum SceneError {
     Json(#[from] serde_json::Error),
+    Read(#[from] reiwand_core::explicit::ReadError),
     Invalid(Issue),
 }
 
@@ -20,33 +21,25 @@ pub struct Color(pub [f32; 4]);
 pub struct Scene {
     pub schema: String,
     pub canvas: Canvas,
-    #[serde(default)]
     pub clock: Clock,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub assets: BTreeMap<String, Asset>,
-    #[serde(default)]
     pub layers: Vec<Layer>,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub particles: BTreeMap<String, System>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub timelines: Vec<Timeline>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub scripts: Vec<Script>,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub effects: BTreeMap<String, EffectFiles>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub audio: Option<Hearing>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub listens: Vec<crate::value::Listen>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub camera3d: Option<Camera3d>,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub templates: BTreeMap<String, Layer>,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub pools: BTreeMap<String, Pool>,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub ext: BTreeMap<String, Json>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required)]
     pub transition: Option<crate::Transition>,
     #[serde(skip)]
     #[schemars(skip)]
@@ -125,7 +118,12 @@ impl Scene {
     }
 
     pub fn from_json(text: &str) -> Result<Scene, SceneError> {
-        Ok(serde_json::from_str(text)?)
+        let value: Json = serde_json::from_str(text)?;
+        match value.get("schema").and_then(Json::as_str) {
+            Some(SCHEMA) | None => {}
+            Some(other) => return Err(SceneError::Invalid(Issue::Schema(other.to_owned()))),
+        }
+        Ok(reiwand_core::explicit::read("scene.json", &value)?)
     }
 
     pub fn load(text: &str, props: &BTreeMap<String, Property>) -> Result<Scene, SceneError> {
