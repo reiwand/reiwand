@@ -30,6 +30,7 @@ ColumnLayout {
             }
         }, {
             "vortex": {
+                "axis": [0, 0, 1],
                 "center": "p0",
                 "strength": 100,
                 "radius": 300

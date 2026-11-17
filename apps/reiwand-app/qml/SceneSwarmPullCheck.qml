@@ -35,6 +35,21 @@ QtObject {
         SceneSwarmGrips.spot(pulls, pulls.list[0], pulls.list[0].ref, [420, 310], (v, p) => v[pulls.list[0].field] = p);
         if (JSON.stringify(read("/scene/particles/flakes/forces/" + index + "/attractor/target")) !== "[420,310]")
             throw new Error("pulls: dragging the center did not move it");
+        swarm.edit("force", {
+                "force": {
+                    "vortex": {
+                        "axis": [0, 0, 1],
+                        "center": [400, 300],
+                        "strength": 50,
+                        "radius": 100
+                    }
+                }
+            });
+        const spin = pulls.list.find(p => p.kind === "vortex");
+        pulls.aim(spin, [spin.at[0], spin.at[1] + 0.3 * pulls.spoke + 0.7 * pulls.spoke * 0.5]);
+        const axis = read("/scene/particles/flakes/forces/" + spin.index + "/vortex/axis");
+        if (Math.abs(axis[1] - 0.5) > 0.01 || Math.abs(axis[0]) > 0.01)
+            throw new Error("pulls: aiming the axis did not turn it: " + JSON.stringify(axis));
         pulls.destroy();
         swarm.destroy();
     }

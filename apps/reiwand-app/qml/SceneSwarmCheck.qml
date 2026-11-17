@@ -101,6 +101,7 @@ QtObject {
                     "emitter": 0,
                     "shape": {
                         "around": {
+                            "axis": [0, 0, 1],
                             "at": "p1",
                             "count": 8,
                             "radius": 60

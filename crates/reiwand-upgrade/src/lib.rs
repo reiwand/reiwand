@@ -1,6 +1,5 @@
 mod accounts;
 pub mod client;
-pub mod scenes;
 #[cfg(feature = "client")]
 mod download;
 pub mod scenes;

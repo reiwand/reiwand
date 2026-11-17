@@ -36,7 +36,9 @@ fn give(v: &mut Value) -> bool {
     match v {
         Value::Object(map) => {
             let mut done = false;
-            if matches!(map.get("kind").and_then(Value::as_str), Some("vortex" | "around")) && !map.contains_key("axis") {
+            if matches!(map.get("kind").and_then(Value::as_str), Some("vortex" | "around"))
+                && !map.contains_key("axis")
+            {
                 map.insert("axis".into(), json!([0, 0, 1]));
                 done = true;
             }

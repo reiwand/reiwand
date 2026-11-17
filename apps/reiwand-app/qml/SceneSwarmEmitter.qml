@@ -36,6 +36,7 @@ ColumnLayout {
             "edge": "edge",
             "around": {
                 "around": {
+                    "axis": [0, 0, 1],
                     "at": "p0",
                     "count": 24,
                     "radius": 120

@@ -50,6 +50,24 @@ Item {
         }
     }
 
+    readonly property real spoke: 80
+
+    function tip(e) {
+        const turn = e.angles[1] * Math.PI / 180;
+        const far = pulls.spoke * (0.3 + 0.7 * Math.sin(e.angles[0] * Math.PI / 180));
+        return [e.at[0] + far * Math.cos(turn), e.at[1] + far * Math.sin(turn)];
+    }
+
+    function aim(e, to) {
+        const dx = to[0] - e.at[0], dy = to[1] - e.at[1];
+        const lean = Math.min(1, Math.max(0, (Math.hypot(dx, dy) / pulls.spoke - 0.3) / 0.7));
+        swarm.edit("aim", {
+                "target": "force:" + e.index,
+                "tilt": Math.round(Math.asin(lean) * 1800 / Math.PI) / 10,
+                "turn": Math.round(Math.atan2(dy, dx) * 1800 / Math.PI) / 10
+            });
+    }
+
     SceneRepeater {
         id: listed2
 
@@ -70,6 +88,16 @@ Item {
                 tint: Look.ambar
                 tip: App.tr("Drag to move the center of the force")
                 onMoved: (to, done) => SceneSwarmGrips.spot(pulls, pull.modelData, pull.modelData.ref, to, (v, p) => v[pull.modelData.field] = p)
+            }
+
+            SceneKnob {
+                visible: pull.modelData.kind === "vortex"
+                at: visible ? pulls.tip(pull.modelData) : pull.modelData.at
+                ratio: pulls.r
+                label: App.tr("Axis")
+                tint: Look.ambar
+                tip: App.tr("Drag to aim the axis the particles turn around: the direction sets the turn, the distance from the center sets the tilt")
+                onMoved: (to, done) => pulls.aim(pull.modelData, to)
             }
 
             SceneRepeater {

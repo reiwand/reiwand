@@ -184,7 +184,12 @@ fn aim_turns_a_vortex_and_an_around_emitter_and_shows_the_angles() {
     let pulls = handles(&p);
     let vortex = pulls["pulls"].as_array().unwrap().iter().find(|e| e["kind"] == "vortex").unwrap().clone();
     assert!(near(&vortex["axis"], [1.0, 0.0]) && vortex["angles"][0] == 90.0, "{vortex}");
-    edit(&mut p, "shape", json!({ "emitter": 0, "shape": { "around": { "axis": [0, 0, 1], "count": 4, "radius": 10 } } })).unwrap();
+    edit(
+        &mut p,
+        "shape",
+        json!({ "emitter": 0, "shape": { "around": { "axis": [0, 0, 1], "count": 4, "radius": 10 } } }),
+    )
+    .unwrap();
     edit(&mut p, "aim", json!({ "target": "emitter:0", "tilt": 30, "turn": 90 })).unwrap();
     let axis = system(&p)["emitters"][0]["shape"]["around"]["axis"].clone();
     assert!((axis[1].as_f64().unwrap() - 0.5).abs() < 1e-4, "{axis}");

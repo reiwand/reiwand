@@ -23,7 +23,11 @@ pub(super) fn aim(doc: &Value, sys: &str, target: &str, tilt: f64, turn: f64) ->
     };
     ensure!(
         doc.pointer(&at).is_some(),
-        said("editor.no_axis", "%1 has no axis: aim a vortex force (force:N) or an around emitter (emitter:N)", &[&target])
+        said(
+            "editor.no_axis",
+            "%1 has no axis: aim a vortex force (force:N) or an around emitter (emitter:N)",
+            &[&target]
+        )
     );
     Ok(set(doc, &at, json!(unit(tilt, turn))))
 }

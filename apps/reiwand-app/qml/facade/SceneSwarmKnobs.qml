@@ -98,6 +98,17 @@ QtObject {
                     "at": e.ends[1],
                     "tip": App.tr("Drag to change the arc"),
                     "act": to => shape.patch(s => s.arc = Math.round(((Math.atan2(to[1] - e.center[1], to[0] - e.center[0]) * 180 / Math.PI - e.start) % 360 + 360) % 360) || 360)
+                },
+                {
+                    "at": [e.center[0] + 80 * (0.3 + 0.7 * Math.sin(e.angles[0] * Math.PI / 180)) * Math.cos(e.angles[1] * Math.PI / 180), e.center[1] + 80 * (0.3 + 0.7 * Math.sin(e.angles[0] * Math.PI / 180)) * Math.sin(e.angles[1] * Math.PI / 180)],
+                    "label": App.tr("Axis"),
+                    "tip": App.tr("Drag to aim the axis the births turn around: the direction sets the turn, the distance from the center sets the tilt"),
+                    "act": to => shape.patch(s => {
+                            const dx = to[0] - e.center[0], dy = to[1] - e.center[1];
+                            const tilt = Math.asin(Math.min(1, Math.max(0, (Math.hypot(dx, dy) / 80 - 0.3) / 0.7)));
+                            const turn = Math.atan2(dy, dx);
+                            s.axis = [Math.sin(tilt) * Math.cos(turn), Math.sin(tilt) * Math.sin(turn), Math.cos(tilt)].map(v => Math.round(v * 1e5) / 1e5);
+                        })
                 }
             ];
         case "between":
