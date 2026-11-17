@@ -8,6 +8,6 @@ pub fn upgrade<'a>(mut env: EnvUnowned<'a>, _: JObject<'a>, files: JString<'a>) 
     on(&mut env, |env| {
         let files = files.try_to_string(env)?;
         reiwand_upgrade::client::run(std::path::Path::new(&files))?;
-        Ok(1)
+        Ok(true)
     })
 }

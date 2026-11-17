@@ -24,7 +24,7 @@ fn operator_commands_parse() {
         ),
         (
             "moderate --server https://example.org hide org.example.dawn --repo main --reason spam-reason",
-            r#"Moderate(Moderate { server: "https://example.org", action: Hide { id: "org.example.dawn", reason: "spam-reason" } })"#,
+            r#"Moderate(Moderate { server: "https://example.org", action: Hide { id: "org.example.dawn", repo: "main", reason: "spam-reason" } })"#,
         ),
         ("pack check src --json", r#"Pack(Check { path: "src", json: true })"#),
         (

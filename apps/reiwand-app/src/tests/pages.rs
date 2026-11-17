@@ -64,9 +64,11 @@ fn the_tray_leaves_every_advanced_setting_to_the_settings_page() {
 #[test]
 fn the_tray_offers_the_app_only_where_it_is_installed() {
     let flatpak = read("../../packaging/flatpak/io.github.reiwand.Reiwand.yml");
-    assert!(flatpak.contains("integrations/plasma-tray") && flatpak.contains("command: reiwand-app\n"));
+    assert!(flatpak.contains("integrations/plasma-tray") && flatpak.contains("command: reiwand-launch\n"));
     assert!(flatpak.contains("for f in packaging/dbus/*.service"));
-    assert!(flatpak.contains(" -p reiwand-app\n") && flatpak.contains(" target/release/reiwand-app\n"));
+    assert!(flatpak.contains(" -p reiwand-app ") && flatpak.contains(" target/release/reiwand-app "));
+    let launch = read("../../packaging/flatpak/reiwand-launch.sh");
+    assert!(launch.contains("set -- reiwand-app") && launch.contains("exec \"$@\""));
     let info = read("../../packaging/flatpak/io.github.reiwand.Reiwand.metainfo.xml");
     assert!(
         info.contains("<binary>reiwand-app</binary>") && info.contains("<launchable type=\"desktop-id\">")

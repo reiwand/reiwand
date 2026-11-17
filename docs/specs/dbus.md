@@ -1807,7 +1807,7 @@ them next to the update and leave the package out of their "update all" action.
 A preview queued by `RequestPreviews` is ready, or could not be made (`path = ""`: unknown
 package, no preview, or a failed download or check).
 
-### Upgrading from 1.x
+**Upgrading from 1.x.**
 
 The daemon knows only the current format of `~/.local/share/reiwand` (`format-version`, 2). When the
 folder holds repositories of 1.x it refuses to start and logs "the stored repositories were made by an
