@@ -45,6 +45,7 @@ Timer {
         publish.openWith(sample.wpak);
         publish.memory.target = "";
         const where = publish.where;
+        where.pick("server");
         const targets = where.server.targets;
         const repos = [repo(home, {
                 "name": "One"
