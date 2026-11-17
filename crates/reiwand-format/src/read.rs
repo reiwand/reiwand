@@ -79,6 +79,16 @@ pub fn read<R: Read + Seek>(reader: R, limits: &Limits) -> Result<Package<R>> {
 }
 
 impl<R: Read + Seek> Package<R> {
+    pub fn weigh(&mut self) -> Result<()> {
+        if !matches!(self.manifest.kind, Kind::Scene | Kind::Assets) {
+            return Ok(());
+        }
+        let scene = self.scene()?;
+        scene.read_inked(&mut crate::archive::Entries(self));
+        crate::weigh(&mut self.facts, &scene);
+        Ok(())
+    }
+
     pub fn scene(&mut self) -> Result<Scene> {
         let entry = self.manifest.entry.clone();
         let size = self.entries.iter().find(|e| e.path == entry).map_or(0, |e| e.size);

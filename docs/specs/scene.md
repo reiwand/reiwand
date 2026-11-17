@@ -212,9 +212,10 @@ in the scene) counts as the whole canvas. A
 single-pass effect that the render draws only over a box (`bounded`, or a fixed texture mask in `strength` mode that is
 not inverted, feathered or weaker than 1) counts its units times the share of its texture that the lit texels' box covers
 (the box of the channels the mask reads, or of red, green and blue for `bounded`; the box of both when it has both),
-with a floor of 5 % for the fixed cost of the pass; the boxes are read from the pictures when the package loads, in
-`Scene::read_files`, and a texture that does not clamp counts whole, as does a multi-pass effect. The estimate ignores
-the growth by `reach` of that box. `pack check`, `scene catalog`, the effect panel (`reach` query), the phone and the
+with a floor of 5 % for the fixed cost of the pass; the box grows on every side by the `reach` of the effect (its value over the canvas size). The boxes come from the
+pictures the renderer already decodes (`SceneAssets::ink_scene`, before the quality level is chosen), so loading a
+wallpaper decodes nothing twice; where no renderer exists (editor, `pack check`, `scene catalog`) `Scene::read_inked`
+decodes them. A texture that does not clamp counts whole, as does a multi-pass effect. `pack check`, `scene catalog`, the effect panel (`reach` query), the phone and the
 automatic quality level all use that same function (`Scene::effect_units`). A
 layer that masks or feeds others adds one more unit times its share, once however many read it,
 since it is drawn on its own at most once a frame. Particles add their overdraw, `canvas.bloom` adds the units of its effect over the whole canvas, a

@@ -77,7 +77,9 @@ fn found(doc: &Value, manifest: &Manifest, json: &Value, dir: Option<&Path>) -> 
     if let Some(dir) = dir {
         crate::cache::read_files(&mut scene, dir);
     }
-    Some(facts(manifest, Some(&scene), None))
+    let mut found = facts(manifest, Some(&scene), None);
+    reiwand_format::weigh(&mut found, &scene);
+    Some(found)
 }
 
 pub fn detected(doc: &Value, dir: Option<&Path>) -> BTreeSet<Input> {

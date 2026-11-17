@@ -59,6 +59,7 @@ pub mod values;
 mod version;
 mod video;
 mod web;
+mod weigh;
 
 #[cfg(feature = "sign")]
 pub use admin::sign_root;
@@ -118,6 +119,7 @@ pub use validate::{FileEntry, Limits, MANIFEST, SIGNATURE, check_path, validate}
 pub use version::{DATA_VERSION, check_data};
 pub use video::{Playback, VIDEO_PROPERTIES};
 pub use web::{PresetFile, Web, kept_allowance, web_notice, web_restrict};
+pub use weigh::weigh;
 
 use std::path::PathBuf;
 

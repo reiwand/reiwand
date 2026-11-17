@@ -85,7 +85,6 @@ impl Scene {
             self.loaded.insert(id.clone(), compiled(&id, &json, &wgsl).map_err(|e| fail(at, e))?);
         }
         self.read_passages(&mut files);
-        self.read_inked(&mut files);
         self.read_models(&mut files, fail)
     }
 }

@@ -72,7 +72,7 @@ pub struct Scene {
     pub rooted: BTreeMap<String, Vec<Layer>>,
     #[serde(skip)]
     #[schemars(skip)]
-    pub inked: BTreeMap<String, crate::Inked>,
+    pub inked: std::sync::OnceLock<BTreeMap<String, crate::Inked>>,
 }
 
 impl Default for Color {

@@ -27,13 +27,14 @@ fn scene(effect: Value, mask: Option<Value>, lit: [u32; 4]) -> Scene {
         "layers": [{ "id": "a", "type": "image", "image": "a", "size": [1000, 500], "effects": [used] }] });
     let mut s = Scene::from_json(&text.to_string()).unwrap();
     let (json, picture) = (effect.to_string(), png(lit));
-    let files = move |path: &str, _: usize| match path {
+    let mut files = move |path: &str, _: usize| match path {
         "push.json" => Ok(json.clone().into_bytes()),
         "push.wgsl" => Ok(WGSL.as_bytes().to_vec()),
         "box.png" => Ok(picture.clone()),
         other => Err(format!("no {other}")),
     };
-    s.adopt(&Default::default(), files).unwrap();
+    s.adopt(&Default::default(), files.clone()).unwrap();
+    s.read_inked(&mut files);
     s
 }
 
@@ -43,6 +44,7 @@ fn descriptor(bounded: bool) -> Value {
         "passes": [{ "entry": "fs_push" }] });
     if bounded {
         d["bounded"] = json!(["area"]);
+        d["reach"] = json!("by");
     }
     d
 }
@@ -76,4 +78,14 @@ fn the_box_cost_keeps_a_floor_for_the_fixed_cost_of_the_pass() {
     let mut plain = empty.clone();
     plain.layers[0].effects.clear();
     assert!(cost(&empty) > cost(&plain), "{} against {}", cost(&empty), cost(&plain));
+}
+
+#[test]
+fn the_box_grows_by_the_reach_of_the_effect() {
+    let near = scene(descriptor(true), None, [40, 40, 50, 50]);
+    let mut far = scene(descriptor(true), None, [40, 40, 50, 50]);
+    far.layers[0].effects[0]
+        .params
+        .insert("by".into(), reiwand_scene::Value::Fixed(reiwand_scene::Param::Number(200.0)));
+    assert!(cost(&far) > cost(&near), "{} against {}", cost(&far), cost(&near));
 }

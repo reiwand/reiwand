@@ -43,6 +43,7 @@ impl SceneAssets {
                 assets.luts.insert(id.clone(), Arc::new(lut));
             }
         }
+        assets.ink_scene(scene);
         Ok(assets)
     }
 

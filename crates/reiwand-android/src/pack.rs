@@ -1,5 +1,4 @@
-use crate::said;
-use crate::{Error, store};
+use crate::{Error, said, store};
 use image::RgbaImage;
 use reiwand_format::{Kind, Package};
 use reiwand_render::{Pictures, SceneAssets};
@@ -158,6 +157,7 @@ pub(crate) fn load(path: &Path) -> Result<Arc<Pack>, Error> {
     assets.luts.extend(package.luts(&scene)?);
     let sounds = sounds::extract(&mut package, &scene, path)?;
     let (file, kept) = (path.to_owned(), stamp.clone());
+    assets.ink_scene(&scene);
     assets.reloadable(&scene, move || {
         self::stamp(&file).ok().filter(|now| *now == kept)?;
         let mut package = self::scene(&file).ok()?;

@@ -87,6 +87,7 @@ fn facts_of(source: &Path, manifest: &Manifest) -> Result<Facts> {
             None => Ok((fs::read(source.join(path))?, Vec::new())),
         })?;
         scene.adopt(&manifest.properties, Folder(source)).map_err(invalid)?;
+        scene.read_inked(&mut Folder(source));
     }
     let mut head = Vec::new();
     if manifest.kind == Kind::Image {
@@ -94,6 +95,9 @@ fn facts_of(source: &Path, manifest: &Manifest) -> Result<Facts> {
     }
     let size = media::probe(&head).map(|m| [m.width, m.height]);
     let mut found = facts(manifest, scene.as_ref(), size);
+    if let Some(scene) = scene.as_ref() {
+        crate::weigh(&mut found, scene);
+    }
     found.notes.extend(scene.iter().flat_map(|s| uneven(source, s)));
     found.notes.extend(manifest.unread_texts(locale_names(source)));
     for path in media::videos(manifest, scene.as_ref()) {

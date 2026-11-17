@@ -80,11 +80,13 @@ pub fn read_files(scene: &mut Scene, dir: &Path) -> Option<Issue> {
             Err(SceneError::Invalid(issue)) => Some(issue),
             _ => None,
         };
-        (probe.loaded, probe.models, probe.inked, issue)
+        probe.read_inked(&mut Folder(dir));
+        (probe.loaded, probe.models, probe.inked.get().cloned().unwrap_or_default(), issue)
     };
     let passing = |issue: &Issue| [STOPPED, UNCHECKED].iter().all(|t| !issue.to_string().contains(t));
     let kept = |read: &Read| read.3.as_ref().is_none_or(passing);
     let (loaded, models, inked, issue) = remembered(&FILES, dir, key, make, kept);
-    (scene.loaded, scene.models, scene.inked) = (loaded, models, inked);
+    (scene.loaded, scene.models) = (loaded, models);
+    scene.fill_inked(inked);
     issue
 }

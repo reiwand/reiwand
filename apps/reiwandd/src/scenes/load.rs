@@ -57,6 +57,7 @@ impl Daemon {
         }
         assets.luts.extend(package.luts(&scene)?);
         let file = wpak.to_owned();
+        assets.ink_scene(&scene);
         assets.reloadable(&scene, move || {
             std::fs::metadata(&file).ok().filter(|m| (m.mtime(), m.len()) == stamp)?;
             let mut package = crate::decode::open(&file).ok()?;
