@@ -152,7 +152,6 @@ pub fn topic(iface: &str, member: &str) -> &'static str {
         ("Providers1", _) => "providers",
         ("Repos1", _) => "repos",
         ("Inputs1", _) => "inputs",
-        ("Sync1", _) => "account",
         ("Publish1", _) => "accounts",
         _ => "",
     }

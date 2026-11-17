@@ -55,7 +55,6 @@ pub mod qobject {
         #[qinvokable]
         fn set_secret(self: Pin<&mut Backend>, tag: &QString, id: &QString, secret: &QString);
         #[qinvokable]
-        fn passphrase(self: Pin<&mut Backend>, tag: &QString, member: &QString, passphrase: &QString);
         #[qinvokable]
         fn scene_secret(
             self: Pin<&mut Backend>,
@@ -157,7 +156,7 @@ impl Backend {
         self.run(tag, handled, async move {
             let args: Vec<Value> = serde_json::from_str(&args).map_err(|e| invalid(e.to_string()))?;
             if carries_secret(&iface, &member, &args) {
-                return Err(invalid("use setSecret, addProvider or passphrase"));
+                return Err(invalid("use setSecret or addProvider"));
             }
             bus::call(&iface, &member, args).await
         });

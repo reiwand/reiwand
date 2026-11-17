@@ -31,7 +31,7 @@ Rectangle {
     readonly property alias sign: sign
     readonly property alias where: where
     readonly property alias done: done
-    readonly property bool linked: ["ready", "paused", "error"].includes(account ? account.state : "")
+    readonly property bool linked: account !== null
     readonly property string title: App.tr("Publish “%1”", name)
     readonly property list<QtObject> actions: [
         Kirigami.Action {
@@ -49,8 +49,8 @@ Rectangle {
         if (!shown && result !== null)
             restart();
         reload();
-        publish.account = null;
         sign.refresh();
+        where.server.targets.load();
         shown = true;
         review.refresh();
         Qt.callLater(() => publish && publish.focusStep());
@@ -97,6 +97,7 @@ Rectangle {
 
         property string place: "file"
         property string repos: "[]"
+        property string target: ""
         property string copied: "[]"
 
         location: Core.StandardPaths.writableLocation(Core.StandardPaths.ConfigLocation) + "/reiwand/publish.conf"

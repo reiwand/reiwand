@@ -4,16 +4,11 @@ use crate::methods::METHODS;
 use crate::service::SERVICE;
 use std::path::Path;
 
-const RETIRED: &str = "Sync1";
-
 #[test]
 fn qml_calls_name_documented_methods() {
     for line in qml().iter().flat_map(|file| file.lines().map(String::from).collect::<Vec<_>>()) {
         for member in literals(&line, ".query(").into_iter().chain(literals(&line, ".act(")) {
             let iface = iface(&line);
-            if iface == RETIRED {
-                continue;
-            }
             let known = METHODS.contains_key(&format!("{iface}.{member}"))
                 || SERVICE.iter().any(|(i, m, _)| (*i, *m) == (iface, member));
             assert!(known, "{iface}.{member} in {line}");

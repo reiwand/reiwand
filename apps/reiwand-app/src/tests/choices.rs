@@ -30,11 +30,6 @@ fn secrets_never_travel_through_the_generic_call() {
     assert!(carries_secret("Providers1", "Add", &add("hunter2")));
     assert!(!carries_secret("Providers1", "Add", &add("")));
     assert!(!carries_secret("Library1", "Add", &add("x")));
-    assert!(carries_secret("Sync1", "SetEscrow", &[json!("copper lantern drifts over harbor")]));
-    assert!(carries_secret("Sync1", "Restore", &[json!("copper lantern drifts over harbor")]));
-    assert!(!carries_secret("Sync1", "SetEscrow", &[json!("")]));
-    assert!(carries_secret("Sync1", "ApproveDevice", &[json!("BCDF-GHJK"), json!("correct horse")]));
-    assert!(carries_secret("Sync1", "RevokeDevice", &[json!("0a0a"), json!("correct horse")]));
     assert!(carries_secret("Carry1", "PreviewImport", &[json!("/a.reiwand"), json!("")]));
     assert!(carries_secret("io.github.reiwand.Carry1", "Export", &[json!("/a.reiwand"), json!("{}")]));
 }

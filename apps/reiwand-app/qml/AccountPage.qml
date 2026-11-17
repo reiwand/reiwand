@@ -1,189 +1,113 @@
 import QtQuick
-import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 import io.github.reiwand.app
 
-Kirigami.Page {
+Kirigami.ScrollablePage {
     id: page
 
-    property var account: null
+    property var accounts: []
+    property bool loaded: false
     property string error
-    property string code
-    property string address
-    property string failure
-    property string failureDetail
-    property string lastName
-    property bool lastPlain
-    property bool plain: false
-    property string level
-    readonly property alias filer: filer
-    readonly property alias panels: panels
-    readonly property alias secrets: secrets
-    readonly property alias codes: codes
-    readonly property alias revoker: revoker
-    readonly property alias shown: shown
-    readonly property string phase: account ? account.state : ""
-    readonly property bool keyed: ["ready", "paused", "error"].includes(phase)
-    readonly property bool linked: !!account && !!account.device
-    readonly property var levels: ({
-            "server": App.tr("Server"),
-            "devices": App.tr("Devices of the account"),
-            "repos": App.tr("Repositories of your other devices"),
-            "more": App.tr("More"),
-            "details": App.tr("Details")
-        })
-    property var route: level === "" ? [] : [App.tr("Account"), levels[level]]
-    readonly property var backHint: ({
-            "keys": ["Esc"],
-            "text": level === "" ? App.tr("Menu") : App.tr("Back")
-        })
-    property var keyHints: !account ? [{
-            "keys": ["Intro"],
-            "text": App.tr("Open")
-        }, backHint] : [{
+    readonly property alias list: list
+    readonly property alias empty: empty
+    readonly property alias move: move
+    readonly property var keyHints: [{
             "keys": ["up", "down"],
             "text": App.tr("Move")
         }, {
             "keys": ["Intro"],
             "text": App.tr("Open")
-        }, backHint]
+        }, {
+            "keys": ["Esc"],
+            "text": App.tr("Menu")
+        }]
 
     function load() {
-        page.account = null;
-        page.error = "";
-    }
-
-    function call(member, args) {
-        App.query(member, args, "Sync1", reply => {
+        App.query("List", [], "Accounts1", reply => {
             if (!page)
                 return;
-            page.failure = "";
-            page.code = reply[0];
-            page.address = reply[1];
-        }, error => {
-            if (!page)
-                return;
-            page.failure = error.name.endsWith("KeyringUnavailable") ? "keyring" : "other";
-            page.failureDetail = error.message;
-        });
+            page.accounts = reply.accounts;
+            page.error = "";
+            page.loaded = true;
+        }, failure => page && (page.error = failure.message));
     }
 
-    function link(name, plaintext) {
-        lastName = name;
-        lastPlain = plaintext;
-        call("Connect", [name]);
+    function repoNames(account) {
+        return account.repos.map(r => r.url.replace(/^[a-z]+:\/\//i, "").replace(/\/+$/, "")).join(", ");
     }
 
-    function relink() {
-        page.link(page.lastName, page.lastPlain);
-    }
-
-    function open(name) {
-        level = name;
-        Qt.callLater(() => page && shown.item && shown.item.enter && shown.item.enter());
-    }
-
-    function enter() {
-        if (shown.item && shown.item.enter)
-            shown.item.enter();
-    }
-
-    function routeBack() {
-        const from = level;
-        level = "";
-        Qt.callLater(() => page && shown.item && shown.item.enter && shown.item.enter(from));
+    function exercise() {
+        Qt.createComponent("AccountCheck.qml").createObject(page, {
+            "page": page
+        }).exercise();
     }
 
     title: App.tr("Account")
     header: PrivateLine {}
-    padding: 0
-    background: null
-    actions: [
-        Kirigami.Action {
-            text: App.tr("Sync now")
-            icon.name: "arrows-clockwise"
-            visible: page.keyed && !(page.account && page.account.paused)
-            enabled: !App.cut
-            onTriggered: App.act("SyncNow", [], "Sync1")
-        }
-    ]
     Component.onCompleted: load()
 
     Connections {
         target: App.backend
 
         function onChanged(topic) {
-            if (topic === "account" || topic === "jobs")
+            if (topic === "repos" || topic === "accounts")
                 page.load();
         }
     }
 
-    Connections {
-        target: page.Window.window
+    Column {
+        spacing: Look.e4
 
-        function onActiveFocusItemChanged() {
-            const item = page.Window.activeFocusItem;
-            if (!item || !page.contains(item.mapToItem(page, 0, 0)))
-                return;
-            const top = item.mapToItem(flick.contentItem, 0, 0).y;
-            if (top < flick.contentY)
-                flick.contentY = Math.max(0, top - Look.e4);
-            else if (top + item.height > flick.contentY + flick.height)
-                flick.contentY = Math.min(flick.contentHeight - flick.height, top + item.height - flick.height + Look.e4);
+        Vacio {
+            id: empty
+
+            visible: page.loaded && page.accounts.length === 0
+            title: App.tr("No accounts yet")
+            text: App.tr("An account appears when a private repository asks for one or when you publish to a repository. Each account is linked to the repositories it is used for.")
+            action: App.tr("Add a repository")
+            actionIcon: "link-simple"
+            onActed: applicationWindow().activate("add:")
         }
-    }
 
-    Flickable {
-        id: flick
+        Filas {
+            visible: page.accounts.length > 0
 
-        anchors.fill: parent
-        clip: true
-        contentWidth: width
-        contentHeight: shown.height + Look.e4
-        boundsBehavior: Flickable.StopAtBounds
-        QQC2.ScrollBar.vertical: QQC2.ScrollBar {}
+            Seccion {
+                text: App.tr("Your accounts")
+            }
 
-        Loader {
-            id: shown
+            Estado {
+                visible: page.error !== ""
+                text: page.error
+                tone: "coral"
+                icon: "warning"
+            }
 
-            width: flick.width
-            source: ({
-                    "": "AccountMain.qml",
-                    "server": "AccountServer.qml",
-                    "devices": "AccountDevices.qml",
-                    "repos": "AccountShared.qml",
-                    "more": "AccountMore.qml",
-                    "details": "AccountSummary.qml"
-                })[page.level]
-            onLoaded: item.page = page
+            Repeater {
+                id: list
+
+                model: page.accounts
+
+                AccountRow {
+                    required property var modelData
+
+                    width: parent.width
+                    account: modelData
+                    repos: page.repoNames(modelData)
+                }
+            }
         }
-    }
 
-    AccountPanels {
-        id: panels
+        Filas {
+            Fila {
+                id: move
 
-        page: page
-    }
-
-    AccountSecrets {
-        id: secrets
-
-        page: page
-    }
-
-    SecretFiler {
-        id: filer
-
-        onChosen: page.relink()
-    }
-
-    AccountRevoke {
-        id: revoker
-    }
-
-    AccountCodes {
-        id: codes
-
-        account: page.account
+                text: App.tr("Move your configuration")
+                kind: "pliega"
+                note: App.tr("Settings › Device")
+                explain: App.tr("Accounts are not synchronized. To take your repositories, lists and favorites to another computer, export them to a file in Settings and import it there.")
+                onOpened: applicationWindow().activate("settings")
+            }
+        }
     }
 }

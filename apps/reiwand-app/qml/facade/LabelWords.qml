@@ -58,8 +58,6 @@ QtObject {
             "repo_refresh": App.tr("Repository refresh"),
             "install": App.tr("Package install"),
             "account": App.tr("Server account"),
-            "link": App.tr("Device link"),
-            "account_sync": App.tr("Server sync"),
             "upload": App.tr("Transfer with the server"),
             "layers": App.tr("Depth layers"),
             "carry_export": App.tr("Configuration export"),

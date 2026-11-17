@@ -100,7 +100,7 @@ Rectangle {
                 BrowseVotes {
                     id: votes
 
-                    visible: more.pkg !== null && more.catalog.voteRepo !== "" && more.pkg.repo_id === more.catalog.voteRepo
+                    visible: more.pkg !== null && more.catalog.voteRepos.includes(more.pkg.repo_id)
                     counts: more.catalog.votes[more.key] ?? null
                     shown: more.catalog.counted
                     packageId: more.key

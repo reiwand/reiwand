@@ -21,11 +21,8 @@ pub fn fail(error: zbus::Error) -> Error {
 pub fn carries_secret(iface: &str, member: &str, args: &[Value]) -> bool {
     let at = |n: usize| args.get(n).and_then(Value::as_str).is_some_and(|s| !s.is_empty());
     let provider = iface.ends_with("Providers1") && (member == "SetSecret" || member == "Add" && at(3));
-    let approval = ["ApproveDevice", "RevokeDevice"].contains(&member) && at(1);
     let carry = iface.ends_with("Carry1") && ["Export", "PreviewImport", "ImportChosen"].contains(&member);
-    provider
-        || carry
-        || iface.ends_with("Sync1") && (["SetEscrow", "Restore"].contains(&member) && at(0) || approval)
+    provider || carry
 }
 
 pub const MAX_PAGE: u64 = 500;

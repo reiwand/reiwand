@@ -25,7 +25,7 @@ Column {
             readonly property bool failed: modelData.state === "failed"
             readonly property string what: modelData.kind === "analyze" ? App.tr("Making the thumbnails") : Labels.value(modelData.kind)
             readonly property string said: (modelData.error && modelData.error.message) || ""
-            readonly property bool unreachable: ["account", "link", "account_sync", "upload"].includes(modelData.kind) && Publishing.upload(said) === "red"
+            readonly property bool unreachable: ["account", "upload"].includes(modelData.kind) && Publishing.upload(said) === "red"
 
             anchors.right: parent ? parent.right : undefined
             spacing: Look.e2

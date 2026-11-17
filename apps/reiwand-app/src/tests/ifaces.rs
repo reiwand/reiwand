@@ -6,7 +6,6 @@ pub fn iface(line: &str) -> &'static str {
         "Providers1",
         "Repos1",
         "Inputs1",
-        "Sync1",
         "Accounts1",
         "Publish1",
         "Rgb1",

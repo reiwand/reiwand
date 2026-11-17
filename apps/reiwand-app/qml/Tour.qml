@@ -107,6 +107,10 @@ Timer {
                 Qt.createComponent("PublishUploadCheck.qml").createObject(host, {
                     "host": host
                 }).start();
+            if (App.backend.claim("target"))
+                Qt.createComponent("PublishTargetCheck.qml").createObject(host, {
+                    "host": host
+                }).start();
             if (App.backend.claim("reach"))
                 Qt.createComponent("PublishReachCheck.qml").createObject(host, {
                     "host": host

@@ -58,21 +58,6 @@ impl Backend {
             }
         });
     }
-
-    pub fn passphrase(self: Pin<&mut Self>, tag: &QString, member: &QString, _passphrase: &QString) {
-        let member = member.to_string();
-        self.run(tag, false, async move {
-            match (bus::daemon().await?, member.as_str()) {
-                (Daemon::Bus(_), "SetEscrow" | "Restore" | "ApproveDevice" | "RevokeDevice") => {
-                    Err(invalid(format!("{member} is no longer offered by the service")))
-                }
-                (Daemon::Fixtures, "SetEscrow" | "Restore" | "ApproveDevice" | "RevokeDevice") => {
-                    Ok(fixture("Sync1", &member))
-                }
-                _ => Err(invalid(format!("{member} takes no passphrase"))),
-            }
-        });
-    }
 }
 
 async fn keyring<T: Out>(call: impl Future<Output = zbus::Result<T>>) -> Result<String, Error> {

@@ -77,10 +77,6 @@ QtObject {
         backend.setSecret(remember(onDone, onError), id, secret);
     }
 
-    function passphrase(member, text, onDone, onError) {
-        backend.passphrase(remember(onDone, onError), member, text);
-    }
-
     function sceneSecret(output, key, text, onDone, onError) {
         backend.sceneSecret(remember(onDone, onError), output, key, text);
     }

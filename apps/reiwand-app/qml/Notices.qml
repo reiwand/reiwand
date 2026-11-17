@@ -16,7 +16,7 @@ Column {
     readonly property string refusal: App.backend.lastError
     property string waved: ""
     readonly property bool refusing: refusal !== "" && refusal !== banner && refusal !== waved && !told
-    readonly property bool busy: failing || account.visible
+    readonly property bool busy: failing
 
     function show(message, timeout, actionText, onAction) {
         const notice = message !== null && typeof message === "object" ? message : {
@@ -62,14 +62,6 @@ Column {
         text: notices.refusal
         tone: "coral"
         onClosed: notices.waved = notices.refusal
-    }
-
-    AccountNotice {
-        id: account
-
-        width: Math.min(notices.width, implicitWidth)
-        host: notices.host
-        visible: phase === "signed_out" && !dismissed && !notices.failing
     }
 
     Aviso {

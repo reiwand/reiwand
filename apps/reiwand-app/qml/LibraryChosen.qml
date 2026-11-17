@@ -101,9 +101,6 @@ Seleccion {
                 "icon": "warning",
                 "off": !line.items.flashing
             }, {
-                "text": App.tr("Send files to my other computers"),
-                "icon": "cloud-arrow-up"
-            }, {
                 "separator": true
             }, {
                 "text": App.tr("Remove…"),
@@ -118,9 +115,7 @@ Seleccion {
                 line.tools.chosen("rater", more);
             else if (index === 2)
                 line.tools.chosen("allower", more);
-            else if (index === 3)
-                line.tools.share();
-            else if (index === 5)
+            else if (index === 4)
                 line.tools.chosen("remover", more);
         }
     }

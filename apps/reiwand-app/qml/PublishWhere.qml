@@ -14,13 +14,13 @@ PublishStep {
     property string note: ""
     readonly property var account: publish.account ?? ({})
     readonly property string host: String(account.url ?? "").replace(/^[a-z]+:\/\//, "").replace(/\/.*$/, "")
-    readonly property string server: account.name ? App.tr("%1, at %2", account.name, host) : host
     readonly property string suggested: publish.editing ? Publishing.parent(publish.page.editor.folder) + "/" + (publish.manifest.id ?? "package") + "-" + publish.version + ".wpak" : publish.file
     readonly property string target: out !== "" ? out : suggested
     readonly property alias repo: repo
+    readonly property alias server: server
     readonly property alias actions: actions
     readonly property var trouble: publish.place === "server" ? server.fault : publish.place === "repo" ? repoFault : fileFault
-    readonly property string action: publish.place === "server" ? App.tr("Upload to %1", host) : publish.place === "repo" ? (repo.making ? App.tr("Create and publish") : App.tr("Add and publish")) : App.tr("Save the file")
+    readonly property string action: publish.place === "server" ? App.tr("Upload to %1", account.name ?? host) : publish.place === "repo" ? (repo.making ? App.tr("Create and publish") : App.tr("Add and publish")) : App.tr("Save the file")
     readonly property bool can: publish.place === "server" ? publish.linked : publish.place === "repo" ? repo.ready : publish.editing
 
     function pick(name) {

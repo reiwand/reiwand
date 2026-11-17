@@ -45,7 +45,7 @@ Item {
         stage = "upload";
         job = null;
         lastPath = path;
-        work.act("UploadAs", [path, publish.where.hidden ? "unlisted" : "public"], "Publish1", reply => work && (work.job = Array.isArray(reply) ? reply[0] : reply), error => work && work.refused(String(error.message ?? error)));
+        work.act("UploadAs", [publish.account.repo ?? "", path, publish.where.hidden ? "unlisted" : "public"], "Publish1", reply => work && (work.job = Array.isArray(reply) ? reply[0] : reply), error => work && work.refused(String(error.message ?? error)));
     }
 
     function check() {

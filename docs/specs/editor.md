@@ -1782,7 +1782,7 @@ after a result.
    has none after it (`reiwand_editor::package::publish`), so the review of the next publish does not warn
    about an earlier signature. `reiwand-ctl pack sign` still signs the folder.
 3. *Where?* offers *Save the file* (`<id>-<version>.wpak` next to the folder, or another path),
-   *Upload to my server* (public or hidden, through `UploadAs` of `Sync1`, off while no server is
+   *Upload to my server* (public or hidden, through `UploadAs` of `Publish1`, off while no server is
    connected) and *Add to a repository in a folder* (a recent one, *Open another…* or *Create one
    here…*, which makes its key, the repository, signs its root, adds the package and publishes its
    index). The last destination is remembered. Errors keep the page and offer their own way out: a

@@ -12,6 +12,7 @@ Column {
     property string code
     property string link
     property var accounts: []
+    property bool publishing: false
     property var found: []
     readonly property alias choices: choices
     readonly property alias trust: trust
@@ -42,7 +43,7 @@ Column {
 
     function head() {
         return {
-            "account": App.tr("This repository is private"),
+            "account": publishing ? App.tr("Publishing here needs an account") : App.tr("This repository is private"),
             "certificate": App.tr("This server uses its own certificate"),
             "server": App.tr("This is the address of a server"),
             "approve": App.tr("Approve the sign-in in your browser"),
@@ -53,7 +54,7 @@ Column {
 
     function body() {
         if (stage === "account")
-            return accounts.length > 0 ? App.tr("Use one of your accounts on %1 or sign in with another one.", host) : App.tr("Sign in with an account of %1 to open it.", host);
+            return publishing ? (accounts.length > 0 ? App.tr("Use one of your accounts on %1 or sign in with another one to publish here.", host) : App.tr("Sign in with an account of %1 to publish here.", host)) : accounts.length > 0 ? App.tr("Use one of your accounts on %1 or sign in with another one.", host) : App.tr("Sign in with an account of %1 to open it.", host);
         if (stage === "certificate")
             return App.tr("Its fingerprint is %1. Add it only if you trust this server: the fingerprint is then remembered for this server alone.", digest);
         if (stage === "server")

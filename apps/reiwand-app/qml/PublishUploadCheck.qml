@@ -9,13 +9,9 @@ Timer {
     property var sample: null
     property var calls: []
     property int ticks: 0
+    property bool started: false
     readonly property Stall probe: Stall {}
     readonly property PublishBench bench: PublishBench {}
-    readonly property var account: ({
-            "state": "ready",
-            "name": "Check server",
-            "url": "http://127.0.0.1:9/"
-        })
 
     function serve(name, args, iface, done, failed) {
         calls = calls.concat([name]);
@@ -49,12 +45,8 @@ Timer {
         });
         publish.work.act = serve;
         publish.openWith(sample.wpak);
-        publish.account = account;
         publish.sign.chosen = sample.root_key;
         publish.where.pick("server");
-        if (!publish.where.can)
-            return finish("a linked server cannot be uploaded to");
-        publish.where.go();
         running = true;
     }
 
@@ -83,7 +75,14 @@ Timer {
     interval: 20
     repeat: true
     onTriggered: {
-        publish.account = account;
+        if (!started) {
+            if (publish.where.server.reply.visible)
+                return finish("an account of that repository is needed but none is offered");
+            if (!publish.where.can)
+                return ++ticks > 300 ? finish("the repository of the account is not offered as a destination") : undefined;
+            started = true;
+            return publish.where.go();
+        }
         if (publish.fault !== null)
             return finish("it failed: " + publish.fault.title + " " + (publish.fault.details ?? ""));
         if (publish.result !== null)
