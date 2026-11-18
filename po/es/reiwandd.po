@@ -135,25 +135,26 @@ msgstr ""
 
 #: apps/reiwandd/src/words.rs
 msgid ""
-"Web wallpapers cannot be shown here: this Flatpak runs on the KDE runtime, "
-"which has no WPE WebKit 2.54 or newer, the engine that draws them. Install "
-"Reiwand from a package of your distribution that has wpewebkit (Arch Linux, "
-"Fedora)."
+"Web wallpapers cannot be shown here: this Flatpak does not include Qt "
+"WebEngine 6.5 or newer, the engine that draws them. Install the Qt WebEngine "
+"base app of the Flatpak runtime, or install Reiwand from a package of your "
+"distribution."
 msgstr ""
-"Aquí no se pueden mostrar fondos web: este Flatpak usa el runtime de KDE, "
-"que no trae WPE WebKit 2.54 o posterior, el motor que los dibuja. Instala "
-"Reiwand desde un paquete de tu distribución que tenga wpewebkit (Arch Linux, "
-"Fedora)."
+"Aquí no se pueden mostrar fondos web: este Flatpak no incluye Qt WebEngine "
+"6.5 o posterior, el motor que los dibuja. Instala la aplicación base de Qt "
+"WebEngine del runtime de Flatpak, o instala Reiwand desde un paquete de tu "
+"distribución."
 
 #: apps/reiwandd/src/words.rs
 msgid ""
-"Web wallpapers cannot be shown here: they need WPE WebKit 2.54 or newer, "
-"which is not installed. Ubuntu 24.04 does not ship it; Arch Linux and Fedora "
-"do (wpewebkit)."
+"Web wallpapers cannot be shown here: they need Qt WebEngine 6.5 or newer, "
+"which is not installed. Ubuntu 24.04 ships Qt 6.4, which is too old; install "
+"qt6-qtwebengine on Fedora or qt6-webengine on Arch Linux."
 msgstr ""
-"Aquí no se pueden mostrar fondos web: necesitan WPE WebKit 2.54 o posterior, "
-"que no está instalado. Ubuntu 24.04 no lo trae; Arch Linux y Fedora sí "
-"(wpewebkit)."
+"Aquí no se pueden mostrar fondos web: necesitan Qt WebEngine 6.5 o "
+"posterior, que no está instalado. Ubuntu 24.04 trae Qt 6.4, que es "
+"demasiado antiguo; instala qt6-qtwebengine en Fedora o qt6-webengine en Arch "
+"Linux."
 
 #: apps/reiwandd/src/words.rs
 msgid "The wallpaper cannot be shown (%1); the background color shows instead."
@@ -163,9 +164,9 @@ msgstr ""
 
 #: apps/reiwandd/src/words.rs
 msgid ""
-"Web wallpapers cannot be shown here: they need WPE WebKit 2.54 or newer (%1)."
+"Web wallpapers cannot be shown here: they need Qt WebEngine 6.5 or newer (%1)."
 msgstr ""
-"Aquí no se pueden mostrar fondos web: necesitan WPE WebKit 2.54 o posterior "
+"Aquí no se pueden mostrar fondos web: necesitan Qt WebEngine 6.5 o posterior "
 "(%1)."
 
 #: apps/reiwandd/src/words.rs

@@ -163,3 +163,17 @@ fn clearing_the_data_of_a_page_waits_for_its_helper_and_then_removes_it() {
     assert!(!data.exists(), "nothing writes into the data of a page once it is cleared");
     assert!(quiet(&data));
 }
+
+#[test]
+fn an_idle_helper_is_closed_and_comes_back_only_when_a_view_is_shown() {
+    let now = Instant::now();
+    let mut slot = PageSlot::new(spec(true), now);
+    slot.sleep();
+    assert!(slot.asleep && slot.link.is_none() && slot.due.is_none());
+    assert!(!slot.starts(now), "a sleeping page stays closed while nothing is visible");
+    let mut view = super::view::ViewSlot::new(1, (1, 1));
+    view.live = true;
+    slot.views.insert("a".into(), view);
+    assert!(slot.starts(now), "a visible view wakes the page");
+    assert!(!slot.asleep);
+}

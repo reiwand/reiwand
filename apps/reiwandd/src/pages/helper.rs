@@ -27,8 +27,10 @@ fn probe() -> Result<String, String> {
 
 fn refusal(said: &str, flatpak: bool) -> String {
     match said {
-        s if s.contains("libWPEWebKit") => crate::words::web_engine(flatpak),
         s if s.contains("older than") => crate::words::web_old(s),
+        s if s.contains("libQt6WebEngine") || s.contains("Qt WebEngine is missing") => {
+            crate::words::web_engine(flatpak)
+        }
         s => crate::words::web_broken(s),
     }
 }
@@ -62,11 +64,12 @@ mod tests {
 
     #[test]
     fn a_missing_engine_is_explained_for_the_flatpak_and_for_the_rest() {
-        let missing = "libWPEWebKit-2.0.so.1: cannot open shared object file";
+        let missing = "libQt6WebEngineQuick.so.6: cannot open shared object file";
         let (flatpak, other) = (refusal(missing, true), refusal(missing, false));
-        assert!(flatpak.contains("Flatpak") && flatpak.contains("WPE WebKit"), "{flatpak}");
-        assert!(other.contains("Ubuntu 24.04") && other.contains("WPE WebKit"), "{other}");
-        assert!(refusal("WPE WebKit 2.52 is older than 2.54", false).contains("2.52"));
+        assert!(flatpak.contains("Flatpak") && flatpak.contains("Qt WebEngine"), "{flatpak}");
+        assert!(other.contains("Ubuntu 24.04") && other.contains("Qt WebEngine"), "{other}");
+        assert!(refusal("Qt 6.4.2 is older than 6.5", false).contains("6.4.2"));
+        assert!(refusal("Qt WebEngine is missing: qmake was not found", false).contains("Qt WebEngine 6.5"));
         assert!(refusal("boom", true).contains("boom"));
     }
 }

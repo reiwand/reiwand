@@ -12,8 +12,14 @@ pub struct Isolation {
     pub limits: bool,
 }
 
-const LIMITS: [&str; 5] =
-    ["CPUQuota=100%", "CPUWeight=20", "MemoryMax=1536M", "MemorySwapMax=0", "TasksMax=512"];
+const LIMITS: [&str; 6] = [
+    "CPUQuota=100%",
+    "CPUWeight=20",
+    "MemoryHigh=768M",
+    "MemoryMax=1536M",
+    "MemorySwapMax=0",
+    "TasksMax=512",
+];
 static SCOPES: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(true);
 
 pub fn scope() -> Option<std::path::PathBuf> {
