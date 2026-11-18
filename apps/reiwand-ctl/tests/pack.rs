@@ -38,7 +38,9 @@ fn check_explains_what_a_package_needs() {
         "requires": {"features": ["inputs.audio", "inputs.media", "media_info"]},
         "properties": {"color": {"type": "color", "default": "#ffffff"}, "show": {"type": "combo",
         "default": "both", "options": ["circle", "bars", "both"]}, "glitch": {"type": "bool", "default": true}}}"##;
-    std::fs::write(src.join("manifest.json"), manifest).unwrap();
+    let mut whole: Value = serde_json::from_str(manifest).unwrap();
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut whole);
+    std::fs::write(src.join("manifest.json"), whole.to_string()).unwrap();
     let path = src.to_str().unwrap();
     let new: Value = serde_json::from_str(&ok(&["pack", "check", path, "--json"])).unwrap();
     assert_eq!(

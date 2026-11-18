@@ -102,11 +102,41 @@ pub fn build(name: &str, case: &Value, dir: &Path) -> reiwand_format::Result<Pat
     reiwand_format::build(&source, &out, &reiwand_format::Limits::default()).map(|_| out)
 }
 
+fn moved(p: &reiwand_scene::ParamDef) -> Value {
+    let prefill = json!(p.prefill);
+    match &prefill {
+        Value::Bool(b) => json!(!b),
+        Value::Number(n) => {
+            let n = n.as_f64().unwrap_or_default();
+            json!(
+                p.min
+                    .map(f64::from)
+                    .filter(|m| *m != n)
+                    .or(p.max.map(f64::from).filter(|m| *m != n))
+                    .unwrap_or(n + 1.0)
+            )
+        }
+        Value::Array(list) => {
+            json!(list.iter().map(|x| x.as_f64().unwrap_or_default() * 0.5 + 0.25).collect::<Vec<_>>())
+        }
+        Value::String(s) if s.starts_with('#') => json!("#123456"),
+        Value::String(s) if p.values.is_empty() => json!(if s == "add" { "multiply" } else { "add" }),
+        Value::String(s) => json!(
+            p.values
+                .iter()
+                .map(|e| json!(e)["value"].clone())
+                .find(|v| v != &json!(s))
+                .unwrap_or(prefill.clone())
+        ),
+        _ => prefill,
+    }
+}
+
 fn whole(d: &reiwand_scene::Descriptor) -> Value {
     let params: Map<String, Value> = d
         .params
         .iter()
-        .map(|p| (p.id.clone(), if p.kind.asset() { json!("sky") } else { json!(p.prefill) }))
+        .map(|p| (p.id.clone(), if p.kind.asset() { json!("sky") } else { moved(p) }))
         .collect();
     json!({ "effect": d.id, "params": params })
 }

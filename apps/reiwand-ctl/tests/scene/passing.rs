@@ -27,5 +27,5 @@ fn a_transition_is_made_changed_asked_and_removed_from_the_command_line() {
     assert_eq!(show(dir, "/scene/transition/in/duration_ms"), json!(1800));
     ok(dir, &["scene", "act", "s", "transition", r#"{"way": "in", "remove": true}"#]);
     let scene = show(dir, "/scene");
-    assert!(scene["transition"].is_null(), "{scene}");
+    assert!(scene["transition"]["in"].is_null(), "{scene}");
 }

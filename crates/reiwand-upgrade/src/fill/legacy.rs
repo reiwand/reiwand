@@ -35,7 +35,11 @@ pub(super) fn follows(def: &str, name: &str, map: &Map<String, Value>) -> Option
     Some(match (def, name) {
         ("Transform", "origin") => json!("anchor"),
         ("Camera", "center") => json!("canvas"),
-        ("Playback", "end") => json!("end"),
+        ("Playback", "end")
+            if !["speed", "volume", "max_fps", "muted"].iter().any(|k| map.contains_key(*k)) =>
+        {
+            json!("end")
+        }
         ("Layer", "size") if matches!(kind, "image" | "video") => json!("source"),
         ("Layer", "size") if matches!(kind, "solid" | "adjustment" | "mesh" | "model") => json!("canvas"),
         ("Layer", "color")

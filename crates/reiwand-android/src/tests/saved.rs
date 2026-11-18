@@ -6,17 +6,19 @@ use std::fs::{self, File};
 pub(super) fn saved_settings() {
     let source = tempfile::tempdir().unwrap();
     let layers = json!([{ "blend_space": "canvas", "id": "sky", "type": "solid", "color": "#336699" }]);
-    let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers,
+    let mut text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers,
         "timelines": [{ "id": "glow", "duration": 1, "autoplay": false, "trigger": "prop:again" }] });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Scene, &mut text);
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
     let properties = json!({ "mood": { "type": "combo", "default": 1, "options": [1, 2] },
         "again": { "type": "button", "enabled_if": "mood == 2" }, "key": { "type": "text", "secret": true },
         "tools": { "type": "group", "enabled_if": "mood == 2" }, "later": { "type": "button", "group": "tools" },
-        "photos": { "type": "folder" } });
-    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.knobs", "version": "1.2.0", "title": "Knobs",
+        "photos": { "type": "folder", "every": 60, "pick": "sequence", "accept": ["image"] } });
+    let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.knobs", "version": "1.2.0", "title": "Knobs",
         "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" },
         "photosensitive": false, "origin": { "kind": "original" }, "properties": properties,
         "requires": { "features": ["folder", "properties2"] } });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let built = source.path().join("knobs.wpak");
     reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();

@@ -8,9 +8,13 @@ fn page_with(playback: Value) -> (String, std::path::PathBuf) {
 fn page_named(name: &str, playback: Value, properties: Value) -> (String, std::path::PathBuf) {
     let source = store::dir().unwrap().join(format!("paced-{name}/{name}"));
     fs::create_dir_all(&source).unwrap();
-    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": format!("org.example.{name}"), "version": "1.0.0",
+    let mut shown = json!({ "speed": null, "start": null, "end": null, "volume": null, "max_fps": null, "muted": null, "loop": null });
+    shown.as_object_mut().unwrap().extend(playback.as_object().unwrap().clone());
+    let playback = shown;
+    let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": format!("org.example.{name}"), "version": "1.0.0",
         "title": "Paced", "license": "CC0-1.0", "kind": "web", "entry": "index.html", "content": { "rating": "general" },
         "photosensitive": false, "origin": { "kind": "original" }, "playback": playback, "properties": properties });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
     fs::write(source.join("manifest.json"), manifest.to_string()).unwrap();
     fs::write(source.join("index.html"), "<!DOCTYPE html>\n<html><body></body></html>").unwrap();
     let uids = ask(json!({ "op": "examples", "dir": source.parent().unwrap() }));

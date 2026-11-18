@@ -205,13 +205,6 @@
   "requires": {
     "engine": null,
     "features": [
-      "effect.film_grain.bias",
-      "effect.film_grain.blend",
-      "effect.film_grain.mono",
-      "effect.god_rays.angle",
-      "effect.god_rays.edges",
-      "effect.god_rays.mode",
-      "effect.god_rays.noise",
       "folder",
       "properties2",
       "sound"

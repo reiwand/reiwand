@@ -26,6 +26,7 @@ padding	Layer	1	reiwand-scene/src/eval/shown.rs:53	0.0	1
 parallax	Canvas	2	reiwand-scene/src/kin.rs:135	derived	2
 position	Display,Layer,Transform	2	reiwand-scene/src/kin.rs:134	derived	2
 reduce	Binding_for_Array_size_2_of_float,Binding_for_Color,Binding_for_Param	1	reiwand-scene/src/resolve.rs:98	derived	2
+requires	Manifest	1	reiwand-format/src/facts.rs:43	empty	2
 rotation	BonePhysics,Layer	5	reiwand-scene/src/camera.rs:17	derived	2
 scale	Binding_for_Array_size_2_of_float,Binding_for_Color,Binding_for_Param	5	reiwand-scene/src/kin.rs:140	derived	2
 seed	Clock	1	reiwand-scene/src/runtime.rs:98	derived	2

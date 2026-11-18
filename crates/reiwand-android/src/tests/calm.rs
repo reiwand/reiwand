@@ -4,13 +4,15 @@ fn blink(id: &str, photosensitive: bool) -> (String, std::path::PathBuf) {
     let source = tempfile::tempdir().unwrap();
     let opacity = json!({ "timeline": "blink", "keys": [[0, 0], [0.05, 1], [0.1, 0]] });
     let layers = json!([{ "blend_space": "canvas", "id": "flash", "type": "solid", "color": "#ffffff", "opacity": opacity }]);
-    let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32], "background": "#000000" },
+    let mut text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32], "background": "#000000" },
         "clock": { "poster_time": 0.03 }, "layers": layers,
         "timelines": [{ "id": "blink", "duration": 0.1, "loop": "repeat" }] });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Scene, &mut text);
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
-    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": id, "version": "1.0.0", "title": "Blink",
+    let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": id, "version": "1.0.0", "title": "Blink",
         "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" },
         "photosensitive": photosensitive, "origin": { "kind": "original" } });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let built = source.path().join("blink.wpak");
     reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();

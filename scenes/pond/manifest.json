@@ -132,11 +132,6 @@
   "requires": {
     "engine": null,
     "features": [
-      "effect.water_ripple.perspective",
-      "effect.water_ripple.reflection",
-      "effect.water_ripple.speed",
-      "effect.water_ripple.tint",
-      "effect.water_ripple.walls",
       "inputs.clicks",
       "inputs.pointer",
       "sound"

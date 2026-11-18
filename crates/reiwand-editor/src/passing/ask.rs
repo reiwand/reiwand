@@ -26,7 +26,7 @@ pub fn shape(curve: &Value) -> Vec<f32> {
 }
 
 fn way(dir: &Path, doc: &Value, way: Way) -> Value {
-    let Some(value) = doc.pointer(&path(way)) else { return Value::Null };
+    let Some(value) = doc.pointer(&path(way)).filter(|v| !v.is_null()) else { return Value::Null };
     let mut out = value.clone();
     out["duration_ms"] = json!(value["duration_ms"].as_u64().unwrap_or(1000));
     out["curve"] = value.get("curve").cloned().unwrap_or(json!("linear"));

@@ -14,15 +14,17 @@ fn album_of() -> (String, std::sync::Arc<pack::Pack>) {
 fn packed(layers: Value, properties: Value) -> (String, std::sync::Arc<pack::Pack>) {
     let source = tempfile::tempdir().unwrap();
     let scripts = json!([{ "path": "list.js", "uses": ["folders"] }]);
-    let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [32, 16] }, "layers": layers, "scripts": scripts,
+    let mut text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [32, 16] }, "layers": layers, "scripts": scripts,
         "assets": { "clip": { "path": "clip.webm" } } });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Scene, &mut text);
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
     fs::write(source.path().join("list.js"), "export function update() {}\n").unwrap();
     fs::copy(Path::new(FIXTURES).join("magenta-64x32.webm"), source.path().join("clip.webm")).unwrap();
-    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.album", "version": "1.0.0",
+    let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.album", "version": "1.0.0",
         "title": "Album", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json",
         "content": { "rating": "general" }, "photosensitive": false, "origin": { "kind": "original" },
         "properties": properties });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let wpak = source.path().join("album.wpak");
     reiwand_format::build(source.path(), &wpak, &reiwand_format::Limits::default()).unwrap();

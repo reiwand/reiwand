@@ -9,12 +9,14 @@ pub(super) fn flown() {
             "init": { "life": [0.3, 0.3], "speed": [0, 0], "size": [4, 4] } }
     });
     let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "fuse", "blend": "add", "instance": { "color": "#ff0000" } }]);
-    let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32], "background": "#000000" },
+    let mut text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32], "background": "#000000" },
         "layers": layers, "particles": systems });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Scene, &mut text);
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
-    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.fuse", "version": "1.0.0", "title": "Fuse",
+    let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.fuse", "version": "1.0.0", "title": "Fuse",
         "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" },
         "photosensitive": false, "origin": { "kind": "original" } });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let built = source.path().join("fuse.wpak");
     reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();

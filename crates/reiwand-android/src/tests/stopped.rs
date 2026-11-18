@@ -23,13 +23,15 @@ fn heavy() -> (String, std::path::PathBuf) {
     let fade = json!({ "blend_space": "canvas", "id": "fade", "type": "solid", "color": "#ffffff",
         "opacity": { "timeline": "fade", "keys": [[0, 0], [1, 1]] } });
     let layers: Vec<_> = std::iter::once(fade).chain((0..120).map(blur)).collect();
-    let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [960, 540], "background": "#203040" },
+    let mut text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [960, 540], "background": "#203040" },
         "clock": { "poster_time": 0.5 }, "layers": layers,
         "timelines": [{ "id": "fade", "duration": 1.0, "loop": "repeat" }] });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Scene, &mut text);
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
-    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.heavy", "version": "1.0.0",
+    let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.heavy", "version": "1.0.0",
         "title": "Heavy", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json",
         "content": { "rating": "general" }, "photosensitive": false, "origin": { "kind": "original" } });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let built = source.path().join("heavy.wpak");
     reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();

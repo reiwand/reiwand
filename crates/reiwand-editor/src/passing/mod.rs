@@ -31,7 +31,7 @@ pub(crate) fn act(dir: &Path, doc: &Value, e: &TransitionEdit) -> Result<Vec<Op>
             doc.pointer(&at).is_some_and(|v| !v.is_null()),
             said("editor.transition_none", "there is no transition %1 to remove", &[&key])
         );
-        return Ok(set(doc, &at, Value::Null));
+        return Ok(put(doc, e.way, Value::Null));
     }
     let mut way = match doc.pointer(&at).filter(|v| !v.is_null()) {
         Some(v) => v.clone(),
@@ -63,7 +63,18 @@ pub(crate) fn act(dir: &Path, doc: &Value, e: &TransitionEdit) -> Result<Vec<Op>
         way["params"] = json!({});
     }
     check(dir, e.way, &way)?;
-    Ok(set(doc, &at, way))
+    Ok(put(doc, e.way, way))
+}
+
+fn put(doc: &Value, way: Way, value: Value) -> Vec<Op> {
+    let whole =
+        doc.pointer("/scene/transition").is_some_and(|t| t.get("in").is_some() && t.get("out").is_some());
+    if whole {
+        return set(doc, &path(way), value);
+    }
+    let mut both = json!({ "in": null, "out": null });
+    both[way.key()] = value;
+    set(doc, "/scene/transition", both)
 }
 
 fn wgsl_of(descriptor: &str) -> String {

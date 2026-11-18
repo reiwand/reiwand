@@ -79,12 +79,6 @@
   ],
   "requires": {
     "features": [
-      "effect.blur_motion.follow",
-      "effect.blur_motion.shutter",
-      "effect.depth_parallax.scale",
-      "effect.depth_parallax.smooth",
-      "inputs.audio",
-      "inputs.media",
       "inputs.pointer"
     ]
   },

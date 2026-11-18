@@ -22,10 +22,11 @@ fn the_poster_of_a_scene_with_scripts_is_the_preview_its_author_made_never_a_dra
     RgbaImage::from_pixel(8, 8, Rgba([0, 0, 255, 255]))
         .save(source.path().join("assets/preview.png"))
         .unwrap();
-    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.posted", "version": "1.0.0",
+    let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.posted", "version": "1.0.0",
         "title": "Posted", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json",
         "content": { "rating": "general" }, "photosensitive": false, "origin": { "kind": "original" },
         "previews": { "thumbnail": "assets/preview.png" } });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let built = source.path().join("posted.wpak");
     reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();

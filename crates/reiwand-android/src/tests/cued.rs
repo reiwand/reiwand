@@ -12,13 +12,15 @@ pub(super) fn cued() {
     let timelines = json!([{ "id": "clock", "duration": 4, "events": events },
         { "id": "fade", "duration": 1, "trigger": "event:go" },
         { "id": "wave", "duration": 2, "loop": "repeat", "wrap": true, "autoplay": false }]);
-    let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers,
+    let mut text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers,
         "timelines": timelines });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Scene, &mut text);
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
-    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.cued", "version": "1.0.0", "title": "Cued",
+    let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.cued", "version": "1.0.0", "title": "Cued",
         "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" },
         "photosensitive": false, "origin": { "kind": "original" },
         "requires": { "features": ["timeline_events", "timeline_wrap"] } });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let built = source.path().join("cued.wpak");
     reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();

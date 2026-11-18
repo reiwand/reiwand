@@ -146,8 +146,6 @@
   "requires": {
     "engine": null,
     "features": [
-      "effect.chromatic_aberration.angle",
-      "effect.chromatic_aberration.mode",
       "inputs.audio",
       "inputs.media",
       "media_info"

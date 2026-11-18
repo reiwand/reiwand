@@ -10,6 +10,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, PoisonError, Weak};
 use std::time::SystemTime;
 
+mod blank;
 mod drawn;
 mod info;
 pub(crate) mod key;
@@ -19,6 +20,7 @@ mod sounds;
 
 use drawn::{decode, drawn};
 
+pub(crate) use blank::blank;
 pub(crate) use info::{about, animated, check, entry, examples, lacks, media};
 pub(crate) use lanes::lanes;
 pub(crate) use mirror::flip;
@@ -53,10 +55,6 @@ pub(crate) struct Pack {
     pub(crate) web: Option<crate::page::Web>,
     pub(crate) video: Option<Arc<reiwand_format::Manifest>>,
     pub(crate) tried: Option<(reiwand_scene::Values, Arc<Pack>)>,
-}
-
-pub(crate) fn blank() -> Result<Scene, Error> {
-    Ok(serde_json::from_value(serde_json::json!({"schema": SCHEMA, "canvas": {"size": [1, 1]}}))?)
 }
 
 fn open(path: &Path) -> Result<Package<BufReader<fs::File>>, Error> {

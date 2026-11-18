@@ -95,7 +95,7 @@ fn a_system_revealed_live_starts_from_its_prewarm_only() {
     let layers = json!([{ "id": "p", "type": "particles", "system": "a", "visible": { "prop": "soft" } }]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layers,
         "particles": { "a": flowing(json!({})) } });
-    let scene = Scene::load(&text.to_string(), &props).unwrap();
+    let scene = Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &props).unwrap();
     let mut values = effective(&props, &[]);
     values.insert("soft".into(), json!(false));
     let mut fly = Fly::new(Runtime::new(Arc::new(scene), values.clone()));

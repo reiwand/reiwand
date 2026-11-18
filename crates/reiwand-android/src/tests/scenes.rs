@@ -133,10 +133,12 @@ pub(super) fn scenes() {
     let layers = json!([{ "blend_space": "canvas", "id": "clip", "type": "video", "video": "clip" },
         { "blend_space": "canvas", "id": "own", "type": "video", "video": "clip", "playback": { "own_clock": true } },
         { "blend_space": "canvas", "id": "picked", "type": "video", "video": { "prop": "pick" }, "playback": { "own_clock": true } }]);
-    let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "clip": { "path": "clip.webm" } }, "layers": layers });
+    let mut text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "clip": { "path": "clip.webm" } }, "layers": layers });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Scene, &mut text);
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
-    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.clip", "version": "1.0.0", "title": "Clip", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" }, "photosensitive": false, "origin": { "kind": "original" },
-        "properties": { "pick": { "type": "file", "accept": ["video"], "default_asset": "clip" } } });
+    let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.clip", "version": "1.0.0", "title": "Clip", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" }, "photosensitive": false, "origin": { "kind": "original" },
+        "properties": serde_json::to_value(reiwand_scene::prefill::properties(json!({ "pick": { "type": "file", "accept": ["video"], "default_asset": "clip" } }))).unwrap() });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let built = source.path().join("clip.wpak");
     reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();

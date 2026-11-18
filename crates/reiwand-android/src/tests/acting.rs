@@ -21,14 +21,16 @@ fn made(name: &str, script: &str, uses: Value, properties: Value) -> String {
         { "blend_space": "canvas", "id": "note", "type": "text", "text": "", "size": 8, "color": "#ffffff", "font": "sans-serif" }]);
     let timelines = json!([{ "id": "light", "duration": 0.1, "autoplay": false, "trigger": "click:button" }]);
     let scripts = json!([{ "path": "tap.js", "events": ["init", "click"], "uses": uses }]);
-    let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers,
+    let mut text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers,
         "timelines": timelines, "scripts": scripts });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Scene, &mut text);
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
     fs::write(source.path().join("tap.js"), script).unwrap();
-    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": format!("org.example.{name}"), "version": "1.0.0",
+    let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": format!("org.example.{name}"), "version": "1.0.0",
         "title": name, "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" },
         "photosensitive": false, "origin": { "kind": "original" }, "inputs": ["pointer", "clicks"],
         "properties": properties });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let wpak = source.path().join(format!("{name}.wpak"));
     reiwand_format::build(source.path(), &wpak, &reiwand_format::Limits::default()).unwrap();

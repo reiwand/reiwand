@@ -8,11 +8,14 @@ pub(super) fn scenes_follow_the_phone() {
     let source = tempfile::tempdir().unwrap();
     let layers = json!([{ "blend_space": "canvas", "id": "sky", "type": "solid", "color": "#336699" },
         { "blend_space": "canvas", "id": "hill", "type": "solid", "color": "#88aa44", "size": [32, 16], "parallax": [0.5, 0.5] }]);
-    let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers });
+    let mut text =
+        json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Scene, &mut text);
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
-    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.hills", "version": "1.0.0",
+    let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.hills", "version": "1.0.0",
         "title": "Hills", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json",
         "content": { "rating": "general" }, "photosensitive": false, "origin": { "kind": "original" }, "inputs": ["pointer"] });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let built = source.path().join("hills.wpak");
     reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();
