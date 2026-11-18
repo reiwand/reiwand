@@ -4,14 +4,8 @@ use serde_json::json;
 const WGSL: &str = "override o: u32 = 1u; override z: u32 = 4u / o;
     @fragment fn fs_v(in: VertexOut) -> @location(0) vec4<f32> { return tap(in.uv) * f32(z) * 0.25; }";
 
-fn whole_use(mut v: serde_json::Value) -> serde_json::Value {
-    let o = v.as_object_mut().unwrap();
-    o.entry("name").or_insert(serde_json::Value::Null);
-    o.entry("enabled").or_insert(serde_json::json!(true));
-    o.entry("mask").or_insert(serde_json::Value::Null);
-    o.entry("optional").or_insert(serde_json::json!(false));
-    o.entry("params").or_insert(serde_json::json!({}));
-    v
+fn whole_use(v: serde_json::Value) -> serde_json::Value {
+    reiwand_scene::prefill::of("EffectUse", v)
 }
 
 fn used(params: serde_json::Value) -> EffectUse {
