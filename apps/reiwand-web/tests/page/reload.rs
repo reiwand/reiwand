@@ -4,22 +4,21 @@ use serde_json::json;
 use std::time::{Duration, Instant};
 
 fn web_processes(pid: u32) -> Vec<u32> {
-    let children = |pid: u32| -> Vec<u32> {
-        let tasks = std::fs::read_dir(format!("/proc/{pid}/task")).into_iter().flatten().flatten();
-        let lists = tasks.filter_map(|t| std::fs::read_to_string(t.path().join("children")).ok());
-        lists
-            .flat_map(|l| l.split_whitespace().filter_map(|p| p.parse().ok()).collect::<Vec<u32>>())
-            .collect()
+    let parent = |p: u32| -> Option<u32> {
+        let stat = std::fs::read_to_string(format!("/proc/{p}/stat")).ok()?;
+        stat.rsplit_once(')')?.1.split_whitespace().nth(1)?.parse().ok()
     };
-    let (mut all, mut todo) = (Vec::new(), children(pid));
-    while let Some(pid) = todo.pop() {
-        todo.extend(children(pid));
-        all.push(pid);
-    }
-    let named = |pid: &u32| {
-        std::fs::read_to_string(format!("/proc/{pid}/comm")).is_ok_and(|c| c.trim() == "WPEWebProcess")
+    let depth = |mut p: u32| {
+        let mut depth = 0;
+        while p != pid && depth < 8 {
+            p = parent(p).unwrap_or(pid);
+            depth += 1;
+        }
+        depth
     };
-    all.into_iter().filter(named).collect()
+    let all = reiwand_web::members(pid);
+    let leaf = |p: &u32| all.iter().all(|q| parent(*q) != Some(*p));
+    all.iter().copied().filter(|p| depth(*p) >= 3 && leaf(p)).collect()
 }
 
 fn crash(page: &mut Page) {
@@ -44,7 +43,7 @@ fn reloaded(page: &mut Page) -> serde_json::Value {
 #[test]
 fn a_crashed_page_loads_with_its_latest_values_and_gives_up_after_three_reloads() {
     if !available() {
-        return eprintln!("skipped: no WPE WebKit 2.54");
+        return eprintln!("skipped: no Qt WebEngine 6.5");
     }
     let dir = tempfile::tempdir().unwrap();
     let mut page =
@@ -71,7 +70,7 @@ fn a_crashed_page_loads_with_its_latest_values_and_gives_up_after_three_reloads(
 #[test]
 fn a_page_that_stops_answering_loads_again() {
     if !available() {
-        return eprintln!("skipped: no WPE WebKit 2.54");
+        return eprintln!("skipped: no Qt WebEngine 6.5");
     }
     let dir = tempfile::tempdir().unwrap();
     let spin: &[u8] = b"console.log('probe load 1');\nsetTimeout(() => { for (;;) {} }, 1000);\n";

@@ -16,7 +16,7 @@ fn moved(page: &mut Page, at: (f64, f64)) {
 #[test]
 fn a_real_click_reaches_the_page_once_and_only_when_allowed() {
     if !available() {
-        return eprintln!("skipped: no WPE WebKit 2.54");
+        return eprintln!("skipped: no Qt WebEngine 6.5");
     }
     let dir = tempfile::tempdir().unwrap();
     let mut page =

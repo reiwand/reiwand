@@ -32,6 +32,7 @@ void rw_scripts(uint32_t view, const char *json);
 void rw_load(uint32_t view, const char *url);
 void rw_eval(uint32_t view, const char *code);
 void rw_ping(uint32_t view);
+int64_t rw_renderer(uint32_t view);
 void rw_muted(int muted);
 void rw_copy();
 void rw_released(uint32_t view, uint32_t id);

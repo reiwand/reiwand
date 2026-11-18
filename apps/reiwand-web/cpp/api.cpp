@@ -39,6 +39,11 @@ void rw_eval(uint32_t view, const char *code) {
     if (Page *page = pageOf(view)) page->call("run", QString::fromUtf8(code));
 }
 
+int64_t rw_renderer(uint32_t view) {
+    Page *page = pageOf(view);
+    return page && page->web() ? page->web()->property("renderProcessPid").toLongLong() : 0;
+}
+
 void rw_ping(uint32_t view) {
     if (Page *page = pageOf(view)) page->call("ping", QVariant());
 }
@@ -59,13 +64,10 @@ void rw_pointer(uint32_t view, int present, double x, double y) {
     Page *page = pageOf(view);
     if (!page) return;
     if (!present) {
-        QEvent leave(QEvent::Leave);
-        QCoreApplication::sendEvent(page->surface(), &leave);
+        page->leave();
         return;
     }
-    const QPointF at(x, y);
-    QMouseEvent move(QEvent::MouseMove, at, at, at, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
-    QCoreApplication::sendEvent(page->surface(), &move);
+    page->hover(QPointF(x, y));
 }
 
 static Qt::MouseButton buttonOf(uint32_t button) {

@@ -5,7 +5,7 @@ use serde_json::json;
 #[test]
 fn a_file_changed_in_place_is_told_as_changed() {
     if !available() {
-        return eprintln!("skipped: no WPE WebKit 2.54");
+        return eprintln!("skipped: no Qt WebEngine 6.5");
     }
     let dir = tempfile::tempdir().unwrap();
     let mut page =

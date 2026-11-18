@@ -7,7 +7,7 @@ use std::time::{Duration, Instant};
 #[test]
 fn a_frame_is_copied_on_request_from_the_page_as_it_is_shown() {
     if !available() {
-        return eprintln!("skipped: no WPE WebKit 2.54");
+        return eprintln!("skipped: no Qt WebEngine 6.5");
     }
     let dir = tempfile::tempdir().unwrap();
     let start = Start { device: None, storage: None, mask_gpu: true, ..start(dir.path(), 9) };
@@ -36,6 +36,7 @@ fn a_frame_is_copied_on_request_from_the_page_as_it_is_shown() {
         None
     };
     let (view, ..) = next(&mut page, &mut ring, Instant::now() + Duration::from_secs(20)).expect("no frame");
+    assert_eq!(page.wait("visits", 20), "1");
     page.link.send(&ToWeb::Visible { view, visible: false }, &[]).unwrap();
     assert_eq!(page.wait("paused", 5), true);
     while next(&mut page, &mut ring, Instant::now() + Duration::from_millis(1500)).is_some() {}

@@ -10,15 +10,6 @@ pub fn beat(view: Rc<View>) {
     crate::qt::later(BEAT, move || tick(view));
 }
 
-fn renderers() -> Vec<u32> {
-    let me = std::process::id();
-    let renderer = |pid: &u32| {
-        std::fs::read(format!("/proc/{pid}/cmdline"))
-            .is_ok_and(|c| String::from_utf8_lossy(&c).contains("--type=renderer"))
-    };
-    reiwand_web::members(me).into_iter().filter(|p| *p != me).filter(renderer).collect()
-}
-
 fn tick(watched: Rc<View>) {
     if view(watched.id).is_none_or(|v| !Rc::ptr_eq(&v, &watched)) {
         return;
@@ -30,9 +21,10 @@ fn tick(watched: Rc<View>) {
         (false, true) => {
             watched.answered.set(now);
             crate::state::send(&FromWeb::Said("the page stopped answering and loads again".into()));
-            renderers().into_iter().for_each(|pid| unsafe {
-                libc::kill(pid as i32, libc::SIGKILL);
-            });
+            let pid = crate::qt::renderer(watched.id);
+            if pid > 1 {
+                unsafe { libc::kill(pid as i32, libc::SIGKILL) };
+            }
         }
         (false, false) => crate::qt::ping(watched.id),
     }

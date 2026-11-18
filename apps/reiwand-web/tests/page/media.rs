@@ -31,7 +31,7 @@ fn until(page: &mut Page, name: &str, want: impl Fn(&Value) -> bool) -> Value {
 #[test]
 fn packaged_sound_and_video_play_at_the_wallpaper_volume() {
     if !available() {
-        return eprintln!("skipped: no WPE WebKit 2.54");
+        return eprintln!("skipped: no Qt WebEngine 6.5");
     }
     let dir = tempfile::tempdir().unwrap();
     let (wav, clip) = (tone(), include_bytes!("../../../../tests/fixtures/magenta-64x32.webm"));

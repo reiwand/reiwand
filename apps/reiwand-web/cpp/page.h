@@ -23,6 +23,8 @@ public:
     void setFps(uint32_t value);
     void released(uint32_t buffer);
     void shot();
+    void hover(QPointF at);
+    void leave();
     void install(const QJsonArray &list);
     void call(const char *method, const QVariant &argument);
     QObject *web() const;
@@ -59,6 +61,8 @@ private:
     GLuint fbo = 0;
     GLuint scratch = 0;
     GLuint source = 0;
+    QQuickItem *input = nullptr;
+    QPointF last;
     int latest = 0;
     QSize pixels;
 };

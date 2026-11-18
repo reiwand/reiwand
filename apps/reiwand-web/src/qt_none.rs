@@ -27,6 +27,9 @@ pub unsafe fn rw_scripts(_: u32, _: *const c_char) {}
 pub unsafe fn rw_load(_: u32, _: *const c_char) {}
 pub unsafe fn rw_eval(_: u32, _: *const c_char) {}
 pub unsafe fn rw_ping(_: u32) {}
+pub unsafe fn rw_renderer(_: u32) -> i64 {
+    0
+}
 pub unsafe fn rw_muted(_: c_int) {}
 pub unsafe fn rw_copy() {}
 pub unsafe fn rw_released(_: u32, _: u32) {}

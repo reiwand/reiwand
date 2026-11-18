@@ -36,6 +36,7 @@ mod sys {
         pub fn rw_load(view: u32, url: *const c_char);
         pub fn rw_eval(view: u32, code: *const c_char);
         pub fn rw_ping(view: u32);
+        pub fn rw_renderer(view: u32) -> i64;
         pub fn rw_muted(muted: c_int);
         pub fn rw_copy();
         pub fn rw_released(view: u32, id: u32);
@@ -99,6 +100,10 @@ pub fn load(view: u32, url: &str) {
 
 pub fn eval(view: u32, code: &str) {
     unsafe { sys::rw_eval(view, text(code).as_ptr()) }
+}
+
+pub fn renderer(view: u32) -> i64 {
+    unsafe { sys::rw_renderer(view) }
 }
 
 pub fn ping(view: u32) {

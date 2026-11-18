@@ -219,5 +219,6 @@ void Page::install(const QJsonArray &list) {
         script.setRunsOnSubFrames(entry["frames"].toBool());
         items.append(script);
     }
+    QMetaObject::invokeMethod(scripts, "clear");
     QMetaObject::invokeMethod(scripts, "insert", Q_ARG(QList<QWebEngineScript>, items));
 }
