@@ -132,7 +132,7 @@ fn a_scene_frame_that_changed_nothing_is_not_composed_again() {
       "timelines": [{ "id": "t", "duration": 4, "loop": "repeat" }],
       "layers": [{ "blend_space": "canvas", "id": "card", "type": "solid", "color": "#4060ff", "size": [16, 9],
         "transform": { "rotation": { "timeline": "t", "keys": [[0, 0], [4, 360]] } } }] }"##;
-    let pack = Arc::new(ScenePack::bare(Scene::from_json(text).unwrap(), Default::default(), Vec::new()));
+    let pack = Arc::new(ScenePack::bare(Scene::from_json(&crate::whole::scene(text)).unwrap(), Default::default(), Vec::new()));
     let spec = SceneSpec { values: Default::default(), pack, ..snowfall() };
     let (content, fit, background) = (Content::Scene(spec.clone()), Fit::Stretch, [0; 3]);
     let (image, transition, uv, relief, scene) = (None, None, None, None, Some(SceneState::new(spec, power)));

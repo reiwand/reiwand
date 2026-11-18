@@ -142,7 +142,7 @@ fn a_small_moving_layer_damages_only_its_box_on_the_screen() {
       "layers": [{ "blend_space": "canvas", "id": "back", "type": "solid", "color": "#203040", "size": [160, 90] },
         { "blend_space": "canvas", "id": "dot", "type": "solid", "color": "#ffffff", "size": [8, 8],
           "transform": { "position": { "keys": [[0, [120, 20]], [4, [140, 20]]] } } }] }"##;
-    let pack = Arc::new(ScenePack::bare(Scene::from_json(text).unwrap(), Default::default(), Vec::new()));
+    let pack = Arc::new(ScenePack::bare(Scene::from_json(&crate::whole::scene(text)).unwrap(), Default::default(), Vec::new()));
     let spec = SceneSpec {
         values: Default::default(),
         pack,

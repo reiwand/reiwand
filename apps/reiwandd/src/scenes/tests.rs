@@ -10,7 +10,7 @@ fn layers_with_their_own_clock_get_a_reel_of_their_own() {
         { "blend_space": "canvas", "id": "c", "type": "video", "video": "clip", "playback": { "own_clock": false } }]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "clip": { "path": "clip.webm" } },
         "layers": layers });
-    let scene = Scene::from_json(&text.to_string()).unwrap();
+    let scene = Scene::from_json(&crate::whole::scene(&text.to_string())).unwrap();
     let mut videos = vec![("clip".to_string(), Reel::plain("/tmp/clip.webm".into()))];
     lanes(&scene, &Default::default(), &mut videos);
     assert_eq!(videos.len(), 2);
@@ -24,7 +24,7 @@ fn a_video_a_file_property_picks_gets_a_reel_for_each_own_clock() {
     let layers = json!([{ "blend_space": "canvas", "id": "a", "type": "video", "video": { "prop": "pick" } },
         { "blend_space": "canvas", "id": "b", "type": "video", "video": { "prop": "pick" }, "playback": { "own_clock": true } }]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers });
-    let scene = Scene::from_json(&text.to_string()).unwrap();
+    let scene = Scene::from_json(&crate::whole::scene(&text.to_string())).unwrap();
     let reels = picked(&scene, "pick", std::path::Path::new("/tmp/chosen.webm"));
     assert_eq!(reels.len(), 1);
     assert_eq!((reels[0].0.as_str(), reels[0].1.lane.as_str()), ("pick@b", "pick@b"));
@@ -37,10 +37,10 @@ fn an_own_clock_on_a_file_property_plays_its_default_video_until_a_file_is_picke
         { "blend_space": "canvas", "id": "b", "type": "video", "video": { "prop": "pick" }, "playback": { "own_clock": true } }]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "clip": { "path": "clip.webm" } },
         "layers": layers });
-    let scene = Scene::from_json(&text.to_string()).unwrap();
+    let scene = Scene::from_json(&crate::whole::scene(&text.to_string())).unwrap();
     let pick =
         json!({ "pick": { "type": "file", "accept": ["video"], "default_asset": "clip", "label": "Pick" } });
-    let properties = serde_json::from_value(pick).unwrap();
+    let properties = serde_json::from_value(crate::whole::properties(pick)).unwrap();
     let mut videos = vec![("clip".to_string(), Reel::plain("/tmp/clip.webm".into()))];
     lanes(&scene, &properties, &mut videos);
     let own = videos.iter().find(|(key, _)| key == "pick@b").map(|(_, reel)| reel);

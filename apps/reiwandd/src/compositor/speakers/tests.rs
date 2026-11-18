@@ -33,7 +33,7 @@ fn delayed() -> SceneState {
         "assets": { "wind": { "path": "wind.ogg" } }, "timelines": [{ "id": "t", "duration": 9 }],
         "layers": [{ "blend_space": "canvas", "id": "wind", "type": "sound", "sound": "wind",
                      "play": { "timeline": "t", "keys": [[0, false], [1.5, true]] } }] });
-    let scene = Scene::from_json(&text.to_string()).unwrap();
+    let scene = Scene::from_json(&crate::whole::scene(&text.to_string())).unwrap();
     let sounds = vec![("wind".into(), PathBuf::from("/wind.ogg"))];
     let pack = Arc::new(ScenePack::bare(scene, Default::default(), sounds));
     let spec = SceneSpec {

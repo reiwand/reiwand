@@ -32,6 +32,8 @@ mod error;
 mod examples;
 #[cfg(test)]
 mod exit_tests;
+#[cfg(test)]
+mod whole;
 mod flatpak;
 mod folders;
 mod gpus;

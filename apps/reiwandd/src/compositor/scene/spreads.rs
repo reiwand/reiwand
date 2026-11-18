@@ -14,7 +14,7 @@ fn halves() -> Arc<ScenePack> {
     let timelines = [json!({ "id": "t", "duration": 100, "loop": "repeat" })];
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 16], "background": "#000000", "blend_space": "srgb" },
         "timelines": timelines, "layers": [solid("left", "#ff0000", 16.0), solid("right", "#0000ff", 48.0)] });
-    Arc::new(ScenePack::bare(Scene::from_json(&text.to_string()).unwrap(), Default::default(), Vec::new()))
+    Arc::new(ScenePack::bare(Scene::from_json(&crate::whole::scene(&text.to_string())).unwrap(), Default::default(), Vec::new()))
 }
 
 fn part(pack: &Arc<ScenePack>, span: [f32; 4]) -> SceneState {

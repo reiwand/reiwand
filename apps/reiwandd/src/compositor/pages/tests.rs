@@ -13,7 +13,7 @@ pub(in crate::compositor) fn page(language: bool, more: Json) -> PageSpec {
     let mut properties = json!({"mood": {"type": "combo", "default": "calm", "label": "Mood",
         "options": [{"value": "calm", "label": {"en": "Calm", "es": "Calma"}}]}});
     properties.as_object_mut().unwrap().extend(more.as_object().unwrap().clone());
-    let properties = serde_json::from_value(properties).unwrap();
+    let properties = serde_json::from_value(crate::whole::properties(properties)).unwrap();
     let languages = vec!["es_AR.UTF-8".to_owned(), "en".to_owned()];
     let props = Props {
         path: "/p.wpak".into(),

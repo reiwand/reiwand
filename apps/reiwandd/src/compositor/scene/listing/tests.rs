@@ -9,10 +9,10 @@ pub(super) fn state(folder: Option<&std::path::Path>) -> SceneState {
     let scene = json!({ "schema": "reiwand.scene/1", "canvas": { "size": [16, 9] },
         "scripts": [{ "path": "main.js", "uses": ["folders"] }],
         "layers": [{ "blend_space": "canvas", "id": "photo", "type": "solid", "color": "#ffffff" }] });
-    let scene = Scene::from_json(&scene.to_string()).unwrap();
-    let properties = serde_json::from_value(
+    let scene = Scene::from_json(&crate::whole::scene(&scene.to_string())).unwrap();
+    let properties = serde_json::from_value(crate::whole::properties(
         json!({ "album": { "type": "folder", "mode": "all", "accept": ["image", "video"] } }),
-    )
+    ))
     .unwrap();
     let pack = Arc::new(ScenePack::bare(scene, properties, Vec::new()));
     let chosen = folder.map(|f| json!({ "album": f }));

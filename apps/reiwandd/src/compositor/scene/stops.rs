@@ -9,7 +9,7 @@ fn heavy() -> SceneSpec {
     let blur = |i: usize| json!({ "blend_space": "canvas", "id": format!("b{i}"), "type": "adjustment", "effects": [{ "effect": "blur", "params": { "radius": 30 } }] });
     let layers: Vec<_> = (0..120).map(blur).collect();
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [960, 540] }, "clock": { "poster_time": 2.0 }, "layers": layers });
-    let scene = Scene::from_json(&text.to_string()).unwrap();
+    let scene = Scene::from_json(&crate::whole::scene(&text.to_string())).unwrap();
     let pack = Arc::new(ScenePack::bare(scene, Default::default(), Vec::new()));
     let (values, extra, clips) = (pack.props.values(&[]), Vec::new(), Vec::new());
     SceneSpec {
@@ -55,7 +55,7 @@ fn a_fixed_level_never_freezes_a_scene_too_heavy_for_the_device_and_automatic_st
 fn light() -> SceneSpec {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [960, 540] }, "layers": [] });
     let pack = Arc::new(ScenePack::bare(
-        Scene::from_json(&text.to_string()).unwrap(),
+        Scene::from_json(&crate::whole::scene(&text.to_string())).unwrap(),
         Default::default(),
         Vec::new(),
     ));

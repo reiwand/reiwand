@@ -21,7 +21,7 @@ fn staged(layers: serde_json::Value, particles: serde_json::Value, poster: f32) 
     let text = json!({ "schema": SCHEMA, "canvas": canvas, "clock": clock, "timelines": timelines, "layers": layers,
         "particles": particles });
     let pack = Arc::new(ScenePack::bare(
-        Scene::from_json(&text.to_string()).unwrap(),
+        Scene::from_json(&crate::whole::scene(&text.to_string())).unwrap(),
         Default::default(),
         Vec::new(),
     ));
