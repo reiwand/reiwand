@@ -52,7 +52,12 @@ fn a_full_scene_written_again_gives_the_same_bytes() {
 
 #[test]
 fn a_scene_with_its_unused_blocks_written_as_null_reads_like_one_without_them() {
-    let nulled = sample();
+    let mut nulled = sample();
+    for layer in nulled["layers"].as_array_mut().unwrap().iter_mut().filter_map(Value::as_object_mut) {
+        for block in ["anchor", "attach", "brightness", "inherit", "lighting", "mask", "parent"] {
+            layer.entry(block).or_insert(Value::Null);
+        }
+    }
     let root = schema();
     assert!(!null_blocks(&root, &root, &nulled).is_empty());
     let mut bare = nulled.clone();
