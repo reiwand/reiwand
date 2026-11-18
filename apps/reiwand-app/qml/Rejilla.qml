@@ -10,6 +10,7 @@ Coleccion {
     readonly property int cell: Math.floor(room / columns)
     readonly property real cover: cell - Look.huecoEstante
     property int lead: 0
+    readonly property alias corte: corte
 
     view: grid
     Accessible.role: Accessible.List
@@ -59,6 +60,10 @@ Coleccion {
         }
 
         RejillaCorte {
+            id: corte
+
+            // A child of a GridView stays on the view; the cut belongs to the covers and scrolls with them.
+            parent: grid.contentItem
             lead: rejilla.lead
             columns: rejilla.columns
             cellWidth: grid.cellWidth

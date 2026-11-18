@@ -66,6 +66,8 @@ QtObject {
         const found = [order.unique(["a", "", "a", "b"]).join("+"), order.mark("x"), cut.rows, cut.rest, cut.visible];
         cut.destroy();
         must(found.join() === "a+b,,1,2,true", "the group of what is in use is not cut from the rest of the grid: " + found.join());
+        const grid = covers.grid;
+        must(grid.corte.parent === grid.view.contentItem, "the cut of the grid stays on the screen instead of scrolling with the covers");
     }
 
     function wheel() {
