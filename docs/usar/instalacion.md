@@ -83,7 +83,7 @@ La versión 2.0.0 ya no entiende los formatos de la 1.x dentro de los programas:
 - Servidor: la imagen lo ejecuta al arrancar; sin la imagen, `reiwand-upgrade server --data DIR` con el
   servidor parado. Antes guarda una copia de la base junto a ella.
 
-- Escenas propias (para quien crea): `reiwand-upgrade scenes CARPETA` lleva cada `scene.json` bajo la
+- Escenas propias (para quien crea): `reiwand-upgrade file CARPETA` lleva cada `scene.json` bajo la
   carpeta al formato actual con los valores que dan el aspecto de antes: el `blend_space` de cada capa,
   `distance` y `keep` de cada `chroma_key`, `reach` de cada `depth_parallax`, el eje de las fuerzas `vortex` y las formas `around`, el modo
   y la profundidad de `stretch`, la base de `oscillate`, la inclinación y la proporción de los sprites de

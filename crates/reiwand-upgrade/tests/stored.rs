@@ -1,4 +1,5 @@
 use reiwand_account::File;
+use reiwand_upgrade::sink::Sink;
 use reiwand_upgrade::stored;
 use std::fs;
 
@@ -16,8 +17,8 @@ fn old_files_are_refused_and_converted_files_load_with_their_content() {
     let refused = File::read(&data.join("accounts.json")).unwrap_err().to_string();
     assert!(refused.contains("reiwand-upgrade client"), "{refused}");
     assert_eq!(fs::read_to_string(data.join("accounts.json")).unwrap(), ACCOUNTS);
-    assert_eq!(stored::files(&data, &copies).unwrap(), 2);
-    assert_eq!(fs::read_to_string(copies.join("inputs.json")).unwrap(), GRANTS);
+    assert_eq!(stored::files(&data, &mut Sink::copying(&copies)).unwrap(), 2);
+    assert_eq!(fs::read_to_string(copies.join("1-inputs.json")).unwrap(), GRANTS);
     let file = File::read(&data.join("accounts.json")).unwrap();
     assert_eq!((file.accounts[0].user.as_str(), file.accounts[0].user_id), ("ana", 4));
     let grants: std::collections::BTreeMap<String, std::collections::BTreeMap<String, Vec<String>>> =
@@ -29,8 +30,8 @@ fn old_files_are_refused_and_converted_files_load_with_their_content() {
 fn converting_twice_changes_nothing() {
     let dir = tempfile::tempdir().unwrap();
     fs::write(dir.path().join("inputs.json"), GRANTS).unwrap();
-    assert_eq!(stored::files(dir.path(), &dir.path().join("c")).unwrap(), 1);
-    assert_eq!(stored::files(dir.path(), &dir.path().join("c")).unwrap(), 0);
+    assert_eq!(stored::files(dir.path(), &mut Sink::copying(&dir.path().join("c"))).unwrap(), 1);
+    assert_eq!(stored::files(dir.path(), &mut Sink::copying(&dir.path().join("c"))).unwrap(), 0);
 }
 
 #[test]
@@ -50,9 +51,9 @@ fn the_registry_files_are_converted_and_the_installed_list_names_signer_and_revo
     fs::write(data.join("anchors.json"), "[]").unwrap();
     fs::write(data.join("repo-pins.json"), r#"{"https://s.example": "ab"}"#).unwrap();
     assert!(reiwand_format::installed(data).unwrap_err().to_string().contains("reiwand-upgrade client"));
-    assert_eq!(stored::files(data, &copies).unwrap(), 3);
+    assert_eq!(stored::files(data, &mut Sink::copying(&copies)).unwrap(), 3);
     let list = reiwand_format::installed(data).unwrap();
     assert!(list[0].signer.is_none() && list[0].revoked.is_none());
     assert!(reiwand_format::anchors(data).unwrap().is_empty());
-    assert_eq!(stored::files(data, &copies).unwrap(), 0);
+    assert_eq!(stored::files(data, &mut Sink::copying(&copies)).unwrap(), 0);
 }

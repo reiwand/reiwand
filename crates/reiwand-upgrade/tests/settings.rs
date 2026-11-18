@@ -1,5 +1,6 @@
 use reiwand_core::{Config, Fit};
 use reiwand_upgrade::settings;
+use reiwand_upgrade::sink::Sink;
 use std::path::PathBuf;
 
 const ORIGINAL: &str = include_str!("pairs/config.realistic.toml");
@@ -72,8 +73,8 @@ fn run_converts_in_place_and_keeps_the_original_copy() {
     let (config, copies) = (dir.path().join("config"), dir.path().join("copies"));
     std::fs::create_dir_all(&config).unwrap();
     std::fs::write(config.join("config.toml"), ORIGINAL).unwrap();
-    assert!(settings::run(&config, &copies).unwrap());
-    assert_eq!(std::fs::read_to_string(copies.join("config.toml")).unwrap(), ORIGINAL);
+    assert!(settings::run(&config, &mut Sink::copying(&copies)).unwrap());
+    assert_eq!(std::fs::read_to_string(copies.join("1-config.toml")).unwrap(), ORIGINAL);
     Config::load(&config.join("config.toml")).unwrap();
-    assert!(!settings::run(&config, &copies).unwrap());
+    assert!(!settings::run(&config, &mut Sink::copying(&copies)).unwrap());
 }

@@ -364,10 +364,10 @@ msgstr "El relleno elegido no está instalado."
 #: crates/reiwand-core/src/explicit/error.rs
 msgid ""
 "%1: \"%2\" is missing. Reiwand does not fill in values: write it, or run "
-"reiwand-upgrade on the file."
+"`reiwand-upgrade file PATH` on it."
 msgstr ""
-"%1: falta «%2». Reiwand no completa valores: escríbelo, o corre reiwand-"
-"upgrade sobre el archivo."
+"%1: falta «%2». Reiwand no completa valores: escríbelo, o corre "
+"`reiwand-upgrade file RUTA` sobre el archivo."
 
 #: crates/reiwand-core/src/explicit/error.rs
 msgid "%1: \"%2\" is not valid: %3"
@@ -5201,11 +5201,11 @@ msgstr "la versión %1 del manifiesto"
 
 #: crates/reiwand-format/src/manifest/read.rs
 msgid ""
-"%1 is no longer read; run reiwand-upgrade on the package folder and sign it "
-"again"
+"%1 is no longer read; run `reiwand-upgrade file FOLDER` on the package "
+"folder and sign it again"
 msgstr ""
-"%1 ya no se lee; ejecuta reiwand-upgrade sobre la carpeta del paquete y vuelve "
-"a firmarlo"
+"%1 ya no se lee; ejecuta `reiwand-upgrade file CARPETA` sobre la carpeta del "
+"paquete y vuelve a firmarlo"
 
 #: crates/reiwand-format/src/media.rs
 msgid "%1 must be a %2 image of at most %3 pixels a side"

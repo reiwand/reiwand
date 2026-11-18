@@ -19,10 +19,11 @@ fn stored_repositories_without_the_mark_are_refused_until_upgraded() {
     let refused = check_data(data).unwrap_err();
     assert!(matches!(refused, Error::Upgrade(_)));
     assert!(refused.to_string().contains("reiwand-upgrade client"));
-    fs::write(data.join("format-version"), "2\n").unwrap();
+    fs::write(data.join("format-version"), format!("{DATA_VERSION}\n")).unwrap();
     check_data(data).unwrap();
-    fs::write(data.join("format-version"), "1\n").unwrap();
-    assert!(matches!(check_data(data), Err(Error::Upgrade(_))));
+    fs::write(data.join("format-version"), format!("{}\n", DATA_VERSION - 1)).unwrap();
+    let old = check_data(data).unwrap_err().to_string();
+    assert!(old.contains("reiwand-upgrade client --data"), "{old}");
 }
 
 #[test]

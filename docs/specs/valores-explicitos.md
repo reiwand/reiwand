@@ -12,7 +12,7 @@ motor usaba hasta ahora para él. El dato se lee exactamente igual antes y despu
   explícita); clase 3: ausencia (`null`, `[]`, `{}`). Se rehace con `cargo test -p reiwand-upgrade --test table
   -- --ignored write_table`.
 - `table/render-defaults.tsv`: los números que el código de dibujo pone cuando un campo opcional falta.
-- `reiwand-upgrade scenes DIR` recorre las escenas con este motor; un paquete `.wpak` lo desempaqueta,
+- `reiwand-upgrade file DIR` recorre las escenas con este motor; un paquete `.wpak` lo desempaqueta,
   completa y empaqueta su autor. `config.toml` conserva sus comentarios (`toml_edit`) y no puede escribir
   `null`: TOML no lo tiene.
 - Pruebas: `tests/identical.rs` (lectura idéntica sobre ejemplos y fixtures; con `REIWAND_CORPUS=DIR` suma

@@ -1,24 +1,33 @@
 use crate::fill::{Customs, Format, complete_with};
+use crate::sink::Sink;
 use serde_json::Value;
 use std::fs;
 use std::path::Path;
 
 pub fn run(root: &Path) -> anyhow::Result<usize> {
+    walk_in(root, &mut Sink::plain())
+}
+
+pub fn walk_in(root: &Path, sink: &mut Sink) -> anyhow::Result<usize> {
     let mut changed = 0;
-    walk(root, &mut changed)?;
+    walk(root, &mut changed, sink)?;
     Ok(changed)
 }
 
-fn walk(dir: &Path, changed: &mut usize) -> anyhow::Result<()> {
+fn walk(dir: &Path, changed: &mut usize, sink: &mut Sink) -> anyhow::Result<()> {
     let Ok(items) = fs::read_dir(dir) else { return Ok(()) };
     for item in items.flatten() {
         let path = item.path();
         if path.is_dir() {
-            walk(&path, changed)?;
+            walk(&path, changed, sink)?;
         } else if path.file_name().is_some_and(|n| n == "scene.json") {
-            *changed += usize::from(scene(&path)?);
+            *changed += usize::from(scene(&path, sink)?);
         } else if path.file_name().is_some_and(|n| n == "manifest.json") {
-            *changed += usize::from(manifest(&path)?);
+            *changed += usize::from(manifest(&path, sink)?);
+        } else if path.extension().is_some_and(|e| e == "wpak") {
+            *changed += usize::from(crate::packages::wpak(&path, sink)?);
+        } else if path.file_name().is_some_and(|n| n.to_string_lossy().ends_with(".reiwand.json")) {
+            *changed += usize::from(crate::edits::file(&path, sink)?);
         }
     }
     Ok(())
@@ -46,8 +55,8 @@ pub fn customs(dir: &Path, doc: &Value) -> Customs {
     found
 }
 
-pub fn effect(path: &Path) -> anyhow::Result<bool> {
-    crate::descriptors::file(path)
+pub fn effect(path: &Path, sink: &mut Sink) -> anyhow::Result<bool> {
+    crate::descriptors::file(path, sink)
 }
 
 pub fn text(doc: &Value) -> anyhow::Result<String> {
@@ -62,28 +71,25 @@ fn version(doc: &mut Value) -> bool {
     true
 }
 
-pub fn scene(path: &Path) -> anyhow::Result<bool> {
+pub fn scene(path: &Path, sink: &mut Sink) -> anyhow::Result<bool> {
     let Ok(mut doc) = serde_json::from_slice::<Value>(&fs::read(path)?) else { return Ok(false) };
-    let customs = customs(path.parent().unwrap_or(Path::new(".")), &doc);
+    let dir = path.parent().unwrap_or(Path::new("."));
+    let customs = customs(dir, &doc);
     let dropped = crate::gain::fixed(&mut doc);
-    let renamed = crate::descriptors::rewrite(path.parent().unwrap_or(Path::new(".")), &doc)? > 0;
+    let renamed = crate::descriptors::rewrite(dir, &doc, sink)? > 0;
     let versioned = version(&mut doc);
     if complete_with(Format::Scene, &mut doc, &customs).written == 0 && !dropped && !versioned {
         return Ok(renamed);
     }
-    let staged = path.with_extension("json.upgrading");
-    fs::write(&staged, text(&doc)?)?;
-    fs::rename(staged, path)?;
+    sink.save(path, text(&doc)?.as_bytes())?;
     Ok(true)
 }
 
-pub fn manifest(path: &Path) -> anyhow::Result<bool> {
+pub fn manifest(path: &Path, sink: &mut Sink) -> anyhow::Result<bool> {
     let Ok(mut doc) = serde_json::from_slice::<Value>(&fs::read(path)?) else { return Ok(false) };
     if !crate::manifests::convert(&mut doc) {
         return Ok(false);
     }
-    let staged = path.with_extension("json.upgrading");
-    fs::write(&staged, text(&doc)?)?;
-    fs::rename(staged, path)?;
+    sink.save(path, text(&doc)?.as_bytes())?;
     Ok(true)
 }

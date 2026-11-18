@@ -407,7 +407,7 @@ sombreador. Un enlace de escena (`audio` en un valor) elige además cómo se mid
   promedio se congela durante el silencio, para que una pausa no recargue el siguiente golpe).
 
 El selector de bandas del editor muestra estos campos con el medidor en vivo, ya rellenos con
-`relative`, `db`, ventana de 1 s, `band` y `false`. `reiwand-upgrade scenes` convierte las escenas
+`relative`, `db`, ventana de 1 s, `band` y `false`. `reiwand-upgrade file` convierte las escenas
 anteriores: el antiguo `gain` pasa a `kind` (`fixed` a `absolute`, `auto` a `relative`) y cada enlace
 recibe `unit: "db"`.
 

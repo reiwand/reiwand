@@ -1,5 +1,6 @@
 use reiwand_core::Edit;
 use reiwand_upgrade::edits;
+use reiwand_upgrade::sink::Sink;
 use serde_json::Value;
 
 const ORIGINAL: &str = include_str!("pairs/edit.original.json");
@@ -58,8 +59,8 @@ fn a_folder_is_converted_with_a_copy_of_each_original() {
     let (edits_dir, copies) = (dir.path().join("edits"), dir.path().join("upgrade-copias"));
     std::fs::create_dir_all(&edits_dir).unwrap();
     std::fs::write(edits_dir.join("a.json"), ORIGINAL).unwrap();
-    assert_eq!(edits::folder(&edits_dir, &copies).unwrap(), 1);
-    assert_eq!(std::fs::read_to_string(copies.join("a.json")).unwrap(), ORIGINAL);
+    assert_eq!(edits::folder(&edits_dir, &mut Sink::copying(&copies)).unwrap(), 1);
+    assert_eq!(std::fs::read_to_string(copies.join("1-a.json")).unwrap(), ORIGINAL);
     assert!(Edit::parse(&std::fs::read_to_string(edits_dir.join("a.json")).unwrap()).is_ok());
-    assert_eq!(edits::folder(&edits_dir, &copies).unwrap(), 0);
+    assert_eq!(edits::folder(&edits_dir, &mut Sink::copying(&copies)).unwrap(), 0);
 }

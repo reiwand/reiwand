@@ -69,7 +69,7 @@ Ajustes > Equipo > «Mover mi configuración» ofrece «Exportar mi configuraci�
 ## Formato 2: valores explícitos
 
 - `carry.json` y `files/content.json` llevan todos los campos. Un valor opcional sin contenido se escribe como `null`; no se omite. El lector (`reiwand_carry::read`) rechaza el archivo y nombra la ruta del campo que falta.
-- Un archivo de formato 1, también cifrado, se rechaza con un mensaje que nombra la salida: `reiwand-upgrade export ARCHIVO` en un ordenador. Si el archivo está cifrado sigue cifrado y la herramienta pide la contraseña. El resultado se escribe junto al original (el original no se toca si la conversión falla) y es el que se importa, en el ordenador o en el teléfono.
+- Un archivo de formato 1, también cifrado, se rechaza con un mensaje que nombra la salida: `reiwand-upgrade file ARCHIVO` en un ordenador. Si el archivo está cifrado sigue cifrado y la herramienta pide la contraseña. El resultado se escribe junto al original (el original no se toca si la conversión falla) y es el que se importa, en el ordenador o en el teléfono.
 - Tabla de valores sugeridos: `reiwand_carry::PREFILL` (una por formato). Los campos `Option` se clasifican como `bloque` (bloque opcional que podría faltar más adelante: `List.rules`, `Content.secrets`) o `valor` (el `null` significa algo y siempre se escribe: `Item.repo_id`, `Repository.pin`, `List.query`).
 
 ## Teléfono: ajustes propios

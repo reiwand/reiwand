@@ -15,6 +15,10 @@ const STEPS: [&str; 4] = [
 ];
 
 pub fn run(data: &Path) -> anyhow::Result<Outcome> {
+    run_checked(data, false)
+}
+
+pub fn run_checked(data: &Path, check: bool) -> anyhow::Result<Outcome> {
     let path = data.join("db/reiwand.sqlite");
     if !path.is_file() {
         return Ok(Outcome::Nothing);
@@ -31,6 +35,9 @@ pub fn run(data: &Path) -> anyhow::Result<Outcome> {
     }
     if !(FIRST..CURRENT).contains(&found) {
         bail!("the database is at schema {found}; this upgrade reads {FIRST} to {}", CURRENT - 1);
+    }
+    if check {
+        return Ok(Outcome::Upgraded { from: found, to: CURRENT });
     }
     let copy = path.with_extension(format!("sqlite.before-v{CURRENT}-from-v{found}"));
     if !copy.exists() {

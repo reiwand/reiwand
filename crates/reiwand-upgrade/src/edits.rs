@@ -1,4 +1,5 @@
 use crate::fill::{Format, complete};
+use crate::sink::Sink;
 use anyhow::Context;
 use serde_json::{Map, Value, json};
 use std::fs;
@@ -61,40 +62,29 @@ pub fn edit(text: &str) -> anyhow::Result<String> {
     Ok(serde_json::to_string_pretty(&doc)? + "\n")
 }
 
-pub fn file(path: &Path, copies: &Path) -> anyhow::Result<bool> {
-    let Ok(original) = fs::read_to_string(path) else { return Ok(false) };
-    let converted = edit(&original).with_context(|| format!("cannot convert {}", path.display()))?;
-    if converted == original {
-        return Ok(false);
-    }
-    fs::create_dir_all(copies)?;
-    let name = path.file_name().context("no file name")?;
-    fs::write(copies.join(name), &original)?;
-    let staged = path.with_extension("json.upgrading");
-    fs::write(&staged, converted)?;
-    fs::rename(staged, path)?;
-    Ok(true)
+pub fn file(path: &Path, sink: &mut Sink) -> anyhow::Result<bool> {
+    sink.text(path, edit)
 }
 
-pub fn folder(dir: &Path, copies: &Path) -> anyhow::Result<usize> {
+pub fn folder(dir: &Path, sink: &mut Sink) -> anyhow::Result<usize> {
     let mut done = 0;
     for entry in fs::read_dir(dir).into_iter().flatten().flatten() {
         let path = entry.path();
         if path.extension().is_some_and(|e| e == "json") {
-            done += usize::from(file(&path, copies)?);
+            done += usize::from(file(&path, sink)?);
         }
     }
     Ok(done)
 }
 
-pub fn sidecars(dir: &Path, copies: &Path) -> anyhow::Result<usize> {
+pub fn sidecars(dir: &Path, sink: &mut Sink) -> anyhow::Result<usize> {
     let mut done = 0;
     for entry in fs::read_dir(dir).into_iter().flatten().flatten() {
         let path = entry.path();
         if path.is_dir() {
-            done += sidecars(&path, copies)?;
+            done += sidecars(&path, sink)?;
         } else if path.file_name().is_some_and(|n| n.to_string_lossy().ends_with(".reiwand.json")) {
-            done += usize::from(file(&path, copies)?);
+            done += usize::from(file(&path, sink)?);
         }
     }
     Ok(done)

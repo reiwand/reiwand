@@ -1,3 +1,4 @@
+use crate::sink::Sink;
 use anyhow::Context;
 use std::fs;
 use std::path::Path;
@@ -14,7 +15,7 @@ const PREFILL: [(&str, &[&str], &str); 6] = [
     ("private_mode", &["off", "on"], "off"),
 ];
 
-pub(crate) fn settings(data: &Path) -> anyhow::Result<()> {
+pub(crate) fn settings(data: &Path, sink: &mut Sink) -> anyhow::Result<()> {
     let path = data.join(FILE);
     let text = match fs::read_to_string(&path) {
         Ok(text) => text,
@@ -32,7 +33,7 @@ pub(crate) fn settings(data: &Path) -> anyhow::Result<()> {
         }
     }
     if changed {
-        fs::write(&path, table.to_string()).with_context(|| format!("writing {FILE}"))?;
+        sink.save(&path, table.to_string().as_bytes()).with_context(|| format!("writing {FILE}"))?;
     }
     Ok(())
 }

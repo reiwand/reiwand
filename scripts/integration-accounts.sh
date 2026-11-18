@@ -79,7 +79,7 @@ if [ ! -x "$BIN/reiwand-upgrade" ]; then
   echo "SKIP: no reiwand-upgrade in $BIN"
 else
   env "${env[@]}" "$BIN/reiwand-upgrade" client --skip-download --data "$data" >"$WORK/upgrade.out" 2>&1 || fail "upgrade: $(cat "$WORK/upgrade.out")"
-  grep -q "upgraded from version 1 to 2" "$WORK/upgrade.out" || fail "upgrade said: $(cat "$WORK/upgrade.out")"
+  grep -q "upgraded from version 1 to 3" "$WORK/upgrade.out" || fail "upgrade said: $(cat "$WORK/upgrade.out")"
   [ ! -e "$data/sync.json" ] || fail "the old account file was left"
   grep -q '"server/server"' "$data/secrets.json" && fail "the old access item was left"
   grep -q '"server/account ' "$data/secrets.json" || fail "the access did not move to the account: $(cat "$data/secrets.json")"

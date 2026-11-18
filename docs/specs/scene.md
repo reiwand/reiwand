@@ -57,7 +57,7 @@ degrees (36 by default).
   from the canvas composites as a whole: a group is flattened first and then mixed in its own space, and its children
   use their own `blend_space` (`canvas` means the canvas, it is not inherited). An adjustment layer uses its space
   only for the final fade when its opacity is below 1. Effects always read `canvas.blend_space`. Scenes written before
-  this field are converted once with `reiwand-upgrade scenes DIR`. The `layer` action edits it:
+  this field are converted once with `reiwand-upgrade file DIR`. The `layer` action edits it:
   `{"blend_space": {"layer": "smoke", "space": "srgb"}}`.
 - `clock.max_fps` caps the frame rate (`1..=240`, or `"display"`, also `0`, to follow the refresh
   rate of each output for motion that gains from it; default 60), `poster_time` is the instant
@@ -104,7 +104,7 @@ that reference falls toward the current level after a loud sound (the system use
 hit and recover before the next one. The reference
 is kept by the scene runtime from the unnormalised band powers of each audio frame (`AudioFrame.power`),
 so scripts' and shaders' `band()` and every binding see the same values; the audio frames also carry the
-default reference for scenes without an `audio` block. `reiwand-upgrade scenes DIR` writes `gain_release: 5`
+default reference for scenes without an `audio` block. `reiwand-upgrade file DIR` writes `gain_release: 5`
 into the existing `audio` blocks. The editor shows it as a slider next to `attack` and `release`, and the
 band meter of the sound panel draws the bands against that reference live.
 
