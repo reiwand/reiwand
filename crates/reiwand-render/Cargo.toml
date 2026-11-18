@@ -43,6 +43,7 @@ path = "tests/timing/main.rs"
 
 [dev-dependencies]
 reiwand-video.workspace = true
+reiwand-upgrade.workspace = true
 ab_glyph.workspace = true
 fontdb.workspace = true
 reiwand-ktx2 = { workspace = true, features = ["encode"] }

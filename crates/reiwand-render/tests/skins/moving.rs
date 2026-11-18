@@ -61,7 +61,7 @@ fn frames(r: &Renderer, amplitude: f64, grouped: bool, mask: Mask) -> (Vec<Vec<u
         json!({ "pic": { "path": "pic.png" }, "ink": { "path": "ink.png" }, "mesh": { "path": "mesh.glb" } });
     let canvas = json!({ "size": [SIDE, SIDE], "background": "#000000" });
     let doc = json!({ "schema": SCHEMA, "canvas": canvas, "assets": assets, "layers": layers(amplitude, grouped, mask) });
-    let mut doc = Scene::from_json(&doc.to_string()).unwrap();
+    let mut doc = Scene::from_json(&crate::gpu::whole(&doc.to_string())).unwrap();
     let glb = sketch(false);
     doc.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     let images =

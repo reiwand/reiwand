@@ -21,7 +21,7 @@ fn glow(layers: Value) -> Scene {
     let files = json!({ "halo": { "descriptor": "fx/halo.json", "wgsl": "fx/halo.wgsl" } });
     let text =
         json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers, "effects": files });
-    let mut scene = Scene::from_json(&text.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::gpu::whole(&text.to_string())).unwrap();
     let read = |path: &str, _: usize| {
         Ok::<_, &str>(if path.ends_with(".json") { json.to_string() } else { GLOW.to_string() }.into_bytes())
     };

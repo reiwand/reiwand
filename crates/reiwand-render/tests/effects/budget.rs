@@ -14,7 +14,7 @@ pub(super) fn packaged(json: &Value, wgsl: &str, layers: Vec<Value>) -> Option<R
         std::iter::once(json!({ "blend_space": "canvas", "id": "bg", "type": "solid", "color": "#336699" })).chain(layers).collect();
     let canvas = json!({ "size": [3840, 2160] });
     let text = json!({ "schema": SCHEMA, "canvas": canvas, "layers": list, "effects": effects });
-    let mut scene = Scene::from_json(&text.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::gpu::whole(&text.to_string())).unwrap();
     let descriptor = json.to_string();
     let files = |path: &str, _: usize| {
         Ok::<_, &str>(if path.ends_with(".json") { descriptor.clone() } else { wgsl.to_string() }.into_bytes())

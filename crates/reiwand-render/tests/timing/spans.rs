@@ -18,7 +18,7 @@ fn many(n: usize, side: f64, wgsl: String) -> Scene {
     let size = [COLUMNS as u32 * side as u32, n.div_ceil(COLUMNS) as u32 * side as u32];
     let files = json!({ "busy": { "descriptor": "fx/busy.json", "wgsl": "fx/busy.wgsl" } });
     let text = json!({ "schema": SCHEMA, "canvas": { "size": size }, "layers": layers, "effects": files });
-    let mut scene = Scene::from_json(&text.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::gpu::whole(&text.to_string())).unwrap();
     let json = json!({ "id": "busy", "cost": {}, "passes": [{ "entry": "fs_e" }] }).to_string();
     let read = |path: &str, _: usize| {
         Ok::<_, &str>(if path.ends_with(".json") { json.clone() } else { wgsl.clone() }.into_bytes())

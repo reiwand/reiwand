@@ -7,7 +7,7 @@ use image::{Rgba, RgbaImage};
 use reiwand_scene::{Budget, Quality, Runtime, Scene, Spare, Tier, Values};
 use std::sync::Arc;
 
-pub(crate) const SCENE: &str = r##"{ "schema": "reiwand.scene/1",
+pub(crate) const SCENE: &str = r##"{ "schema": "reiwand.scene/2",
   "canvas": { "size": [320, 180], "background": "#102030" },
   "assets": { "photo": { "path": "p.png", "mipmaps": true, "wrap": "repeat" },
               "sheet": { "path": "s.png", "atlas": [1, 4], "fps": 8 } },
@@ -29,7 +29,7 @@ pub(crate) const SCENE: &str = r##"{ "schema": "reiwand.scene/1",
     { "blend_space": "canvas", "id": "post", "type": "adjustment", "effects": [{ "effect": "vignette", "params": { "intensity": 0.4 } }] }
   ] }"##;
 
-const OWN: &str = r##"{ "schema": "reiwand.scene/1",
+const OWN: &str = r##"{ "schema": "reiwand.scene/2",
   "canvas": { "size": [320, 180], "background": "#102030" },
   "effects": { "smear": { "descriptor": "fx/smear.json", "wgsl": "fx/smear.wgsl" } },
   "layers": [
@@ -129,7 +129,7 @@ fn steady_scene_frames_allocate_nothing_beyond_their_gpu_calls() {
     };
     let r = &own;
     let (mut view, runtime, [extra, evaluated], passes) =
-        measure(r, Scene::load(SCENE, &Default::default()).unwrap());
+        measure(r, Scene::load(&crate::whole::whole(SCENE), &Default::default()).unwrap());
     assert!(passes >= 5 && view.stats().created == 0, "{:?}", view.stats());
     assert_eq!(evaluated, 0, "evaluating a steady frame allocated");
     let power = Budget { heat: reiwand_scene::Heat::Warm, ..Budget::new(Tier::T1, false, 0) };
@@ -170,7 +170,7 @@ fn steady_scene_frames_allocate_nothing_beyond_their_gpu_calls() {
 fn steady_package_effect_frames_allocate_nothing_beyond_their_gpu_calls() {
     let Ok(own) = Renderer::new() else { return };
     let r = &own;
-    let mut scene = Scene::load(OWN, &Default::default()).unwrap();
+    let mut scene = Scene::load(&crate::whole::whole(OWN), &Default::default()).unwrap();
     let files = |path: &str, _: usize| match path {
         "fx/smear.json" => Ok(TRAIL.as_bytes().to_vec()),
         "fx/smear.wgsl" => Ok(SHADER.as_bytes().to_vec()),
@@ -187,7 +187,7 @@ fn steady_package_effect_frames_allocate_nothing_beyond_their_gpu_calls() {
 #[test]
 fn a_loaded_scene_draws_its_first_frames_without_compiling() {
     let Ok(r) = Renderer::shared() else { return };
-    let scene = Scene::load(SCENE, &Default::default()).unwrap();
+    let scene = Scene::load(&crate::whole::whole(SCENE), &Default::default()).unwrap();
     let mut runtime = Runtime::new(Arc::new(scene), Values::new());
     let mut view = r.scene_view(&runtime.scene, &assets(), runtime.props()).unwrap();
     for _ in 0..3 {

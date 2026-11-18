@@ -5,7 +5,7 @@ fn bright(canvas: Value) -> Scene {
         "layers": [{ "blend_space": "canvas", "id": "glow", "type": "solid", "color": "#ff4020", "brightness": 4 },
                    { "blend_space": "canvas", "id": "mid", "type": "solid", "color": "#808080", "size": [16, 16] }] });
     canvas.as_object().unwrap().iter().for_each(|(k, v)| doc["canvas"][k] = v.clone());
-    Scene::from_json(&doc.to_string()).unwrap()
+    Scene::from_json(&crate::gpu::whole(&doc.to_string())).unwrap()
 }
 
 #[test]

@@ -19,7 +19,7 @@ fn skins(layers: &[&str]) -> Vec<RgbaImage> {
         "assets": { "a": { "path": "a.png" }, "b": { "path": "b.png" }, "c": { "path": "c.png" },
             "mesh": { "path": "mesh.glb" } },
         "layers": layers.iter().map(layer).collect::<Vec<_>>() });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::whole::whole(&doc.to_string())).unwrap();
     scene.adopt(&Default::default(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     let picture = |k: u8| {
         let alpha = |x: u32, y: u32| if (x + y * k as u32) % 7 < 2 { 0 } else { (x * 4) as u8 | 3 };

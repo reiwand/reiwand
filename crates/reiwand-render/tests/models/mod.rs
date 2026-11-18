@@ -60,7 +60,7 @@ pub fn scene(extra: Value, layers: Value, models: BTreeMap<&'static str, Vec<u8>
             _ => doc[k] = v.clone(),
         }
     }
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::gpu::whole(&doc.to_string())).unwrap();
     let files = move |path: &str, _: usize| {
         let id = path.trim_end_matches(".glb");
         models.get(id).cloned().ok_or_else(|| format!("no {path}"))

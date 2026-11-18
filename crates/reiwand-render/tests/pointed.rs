@@ -11,7 +11,7 @@ use crate::gpu::renderer;
 fn scene(layers: Value, timelines: Value) -> Scene {
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [160, 90], "background": "#102030" },
         "assets": { "half": { "path": "half.png" } }, "layers": layers, "timelines": timelines });
-    Scene::load(&doc.to_string(), &Default::default()).unwrap()
+    Scene::load(&crate::gpu::whole(&doc.to_string()), &Default::default()).unwrap()
 }
 
 fn assets() -> SceneAssets {
@@ -79,7 +79,7 @@ fn a_tilted_layer_takes_the_pointer_where_its_projected_outline_is() {
         "transform": { "position": [80, 45], "tilt": [60, 0] } }]);
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [160, 90], "background": "#102030", "perspective": 120 },
         "layers": layers });
-    let scene = Scene::load(&doc.to_string(), &Default::default()).unwrap();
+    let scene = Scene::load(&crate::gpu::whole(&doc.to_string()), &Default::default()).unwrap();
     let mut view = r.scene_view(&scene, &assets(), &Values::new()).unwrap();
     let runtime = Runtime::new(Arc::new(scene), Values::new());
     draw(r, &mut view, &runtime);

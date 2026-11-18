@@ -11,7 +11,7 @@ fn scene(layers: serde_json::Value) -> Scene {
     let assets = json!({ "photo": { "path": "photo.png", "mipmaps": true } });
     let text =
         json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "assets": assets, "layers": layers });
-    Scene::load(&text.to_string(), &Default::default()).unwrap()
+    Scene::load(&crate::gpu::whole(&text.to_string()), &Default::default()).unwrap()
 }
 
 fn draw(r: &Renderer, view: &mut SceneView, runtime: &Runtime) {

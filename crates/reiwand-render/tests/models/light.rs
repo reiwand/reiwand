@@ -5,7 +5,7 @@ fn glowing() -> Scene {
         "canvas": { "size": [SIDE, SIDE], "background": "#000000", "hdr": true, "tonemap": "aces" },
         "layers": [{ "blend_space": "canvas", "id": "glow", "type": "solid", "color": "#ff4020", "brightness": 4 },
                    { "blend_space": "canvas", "id": "mid", "type": "solid", "color": "#808080", "size": [16, 16] }] });
-    Scene::from_json(&doc.to_string()).unwrap()
+    Scene::from_json(&crate::gpu::whole(&doc.to_string())).unwrap()
 }
 
 fn lit(r: &Renderer, headroom: f32) -> (Vec<[f32; 4]>, wgpu::TextureFormat) {

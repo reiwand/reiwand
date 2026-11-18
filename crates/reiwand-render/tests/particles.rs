@@ -20,7 +20,8 @@ impl Run {
         let canvas = json!({ "size": [SIZE.0, SIZE.1], "background": "#000000" });
         let assets = json!({ "pair": { "path": "pair.png", "atlas": [1, 2] } });
         let text = json!({ "schema": SCHEMA, "canvas": canvas, "layers": layers, "particles": systems, "assets": assets });
-        let scene = Scene::load(&text.to_string(), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"));
+        let scene = Scene::load(&crate::gpu::whole(&text.to_string()), &BTreeMap::new())
+            .unwrap_or_else(|e| panic!("{e}"));
         let pair =
             RgbaImage::from_fn(2, 1, |x, _| Rgba(if x == 0 { [255, 0, 0, 255] } else { [0, 0, 255, 255] }));
         let images = [("pair".to_string(), reiwand_render::Pixels::new(pair))].into();

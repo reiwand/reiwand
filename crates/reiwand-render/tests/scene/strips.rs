@@ -49,9 +49,9 @@ fn the_rgb_layer_leaves_the_picture_alone() {
     assert_eq!(shot(true), shot(false));
     let scene = |rgb: bool| {
         Scene::load(
-            &json!({ "schema": SCHEMA, "canvas": canvas("#000000"), "assets": { "p": { "path": "p.png" } },
+            &crate::gpu::whole(&json!({ "schema": SCHEMA, "canvas": canvas("#000000"), "assets": { "p": { "path": "p.png" } },
                 "layers": layers(rgb) })
-            .to_string(),
+            .to_string()),
             &BTreeMap::new(),
         )
     };

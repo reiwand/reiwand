@@ -93,7 +93,7 @@ impl Fx {
             .collect();
         let text =
             json!({ "schema": SCHEMA, "canvas": canvas, "assets": assets, "layers": layers, "effects": own });
-        let mut scene = Scene::from_json(&text.to_string()).unwrap_or_else(|e| panic!("{e}"));
+        let mut scene = Scene::from_json(&crate::gpu::whole(&text.to_string())).unwrap_or_else(|e| panic!("{e}"));
         let files = |path: &str, _: usize| {
             let (id, ext) = path.trim_start_matches("fx/").split_once('.').unwrap_or_default();
             let (_, json, wgsl) = self.own.iter().find(|(i, ..)| i == id).ok_or("missing")?;

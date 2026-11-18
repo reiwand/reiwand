@@ -16,7 +16,7 @@ fn scene() -> Scene {
     let layers = json!([{ "blend_space": "canvas", "id": "m", "type": "model", "model": "ball", "materials": { "skin": { "shader": "coat" } } }]);
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "assets": { "ball": { "path": "ball.glb" } },
         "effects": { "coat": { "descriptor": "fx/coat.json", "wgsl": "fx/coat.wgsl" } }, "layers": layers });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::gpu::whole(&doc.to_string())).unwrap();
     let read = move |path: &str, _: usize| match path {
         "ball.glb" => Ok(glb.clone()),
         "fx/coat.json" => Ok(br#"{ "id": "coat", "stage": "material", "cost": {} }"#.to_vec()),

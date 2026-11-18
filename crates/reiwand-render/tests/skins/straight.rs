@@ -15,7 +15,7 @@ fn drawn(r: &Renderer, shown: Value, tiled: bool) -> (Vec<u8>, u32) {
     let assets = json!({ "pic": { "path": "pic.png" }, "mesh": { "path": "mesh.glb" } });
     let canvas = json!({ "size": [SIDE, SIDE], "background": "#000000" });
     let doc = json!({ "schema": SCHEMA, "canvas": canvas, "assets": assets, "layers": [hidden, shown] });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::gpu::whole(&doc.to_string())).unwrap();
     let glb = sketch(false);
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     r.force_tiled(tiled);

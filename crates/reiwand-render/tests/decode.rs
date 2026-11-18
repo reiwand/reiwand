@@ -85,8 +85,11 @@ fn ids_that_share_an_animated_picture_decode_it_once_and_all_play() {
         encoder.encode_frame(image::Frame::from_parts(image, 0, 0, delay)).unwrap();
     }
     drop(encoder);
-    let asset: reiwand_scene::Asset =
-        serde_json::from_str(r#"{ "path": "a.gif", "animated": true }"#).unwrap();
+    let asset: reiwand_scene::Asset = serde_json::from_value(reiwand_scene::prefill::of(
+        "Asset",
+        serde_json::json!({ "path": "a.gif", "animated": true }),
+    ))
+    .unwrap();
     let (mut assets, mut pictures, mut reads) = (SceneAssets::default(), Pictures::default(), 0);
     for id in ["one", "two"] {
         let read = || -> Result<_, image::ImageError> {

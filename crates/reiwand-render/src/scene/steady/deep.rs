@@ -21,7 +21,7 @@ fn deep() -> Scene {
             { "blend_space": "canvas", "id": "world", "type": "group", "space": "3d", "layers": [
                 model("a", [0.0, 0.0, 0.0]), card("near", 0.5), model("b", [1.0, 0.0, -2.0]), card("far", -1.0),
                 { "blend_space": "canvas", "id": "flat", "type": "solid", "color": "#ffffff", "size": [8, 8] } ] } ] });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::whole::whole(&doc.to_string())).unwrap();
     scene.adopt(&Default::default(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     scene
 }

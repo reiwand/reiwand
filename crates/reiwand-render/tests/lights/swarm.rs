@@ -46,7 +46,7 @@ fn shown_sized(
         "mask": { "path": "mask.png", "linear": true } });
     let text = json!({ "schema": SCHEMA, "canvas": canvas, "assets": assets, "layers": layers,
         "particles": { "s": sized(render, side) } });
-    let scene = Scene::load(&text.to_string(), &Default::default()).unwrap();
+    let scene = Scene::load(&crate::gpu::whole(&text.to_string()), &Default::default()).unwrap();
     let view = r.scene_view(&scene, &files([255, 128, 128, 255]), &Values::new()).unwrap();
     let mut shot = Shot { runtime: Runtime::new(Arc::new(scene), Values::new()), view };
     if !shot.view.set_gpu_particles(r, gpu) {
