@@ -68,6 +68,50 @@ KWindowSystem y plasma-workspace; en Debian y Ubuntu vienen en `qml6-module-org-
 Kirigami y el estilo de escritorio de KDE (`qml6-module-org-kde-kirigami` y
 `qml6-module-org-kde-qqc2desktopstyle`). La ventana de cambio de fondo muestra la escena o el vídeo elegido con KPipeWire (el mismo módulo del plugin de fondo, sin QtMultimedia); si falta, la tarjeta central queda como imagen fija. En el Flatpak y en `install.sh` no hace falta nada más.
 
+## Actualizar desde 6.x a 7.0
+
+La 7.0.0 cambia todos los formatos guardados: cada valor se escribe, nada se completa en silencio. Los
+programas ya no leen los formatos de la 6.x: un programa aparte, `reiwand-upgrade`, los convierte una sola
+vez, se puede repetir sin riesgo y no cambia lo que ya está al día. Primero se actualiza el escritorio y el
+teléfono, después el servidor (los equipos bajan de él lo que solo él guardaba; ver `servidor.md`).
+
+- `reiwand-upgrade client`: convierte toda tu carpeta de datos: ajustes (`config.toml`), ediciones de
+  imágenes, permisos de entradas, cuentas, base de la biblioteca, registros de repositorios, paquetes
+  instalados y las escenas y paquetes de las carpetas de tu biblioteca (`--also CARPETA` suma otras, como
+  proyectos del editor). `install.sh`, el servicio de usuario, el RPM y el Flatpak lo ejecutan solos antes
+  de arrancar el demonio; el teléfono convierte su parte al actualizarse la app.
+- `reiwand-upgrade file RUTA...`: convierte una carpeta de escena o de paquete (con todo lo que tiene
+  debajo), un `.wpak`, una edición de imagen, un descriptor de efecto o un archivo `.reiwand` exportado (uno
+  cifrado sigue cifrado y pide su contraseña, o `--password-file`). Es la orden de quien crea, y de quien
+  tiene un archivo exportado de la 6.x que quiere abrir en el teléfono.
+- `reiwand-upgrade server --data CARPETA`: la carpeta de datos y la base del servidor (ver `servidor.md`).
+- `--check` en cualquiera de ellas dice qué cambiaría y no escribe nada; conviene correrlo primero.
+
+Cada archivo que cambia se copia antes en `upgrade-copias/<tiempo>/` dentro de la carpeta de datos, con un
+`index.txt` que dice de dónde vino cada copia; para volver atrás basta devolver el archivo a su sitio. Las
+copias no se borran solas. Repetir la orden no cambia nada.
+
+Paquetes firmados: convertir un paquete instalado cambia el archivo, así que la firma del repositorio ya no
+le corresponde. Los paquetes convertidos siguen funcionando en tu equipo y aparecen como **Local · Sin firma
+verificada**. Para volver a tener la firma, el autor convierte su carpeta con `reiwand-upgrade file`,
+empaqueta, firma y publica una versión nueva; esa versión se instala como cualquier otra. Un repositorio
+con paquetes viejos no los convierte por ti.
+
+Si un programa se niega a arrancar o a abrir algo diciendo que es de una versión anterior, nombra la orden:
+
+| Quién | Qué dice | Orden |
+|-------|----------|-------|
+| Demonio, ajustes, ediciones, permisos, cuentas, biblioteca | «run `reiwand-upgrade client` once to convert it; nothing was overwritten» | `reiwand-upgrade client` |
+| Cualquier lector de escenas, paquetes y ediciones | «"CAMPO" is missing. Reiwand does not fill in values: write it, or run `reiwand-upgrade file PATH` on it» | `reiwand-upgrade file RUTA` |
+| Lector de paquetes (`pack build`, biblioteca) | «… is no longer read; run `reiwand-upgrade file FOLDER` on the package folder and sign it again» | `reiwand-upgrade file CARPETA` |
+| Registros de repositorios | «the stored repositories were made by an older version: run reiwand-upgrade client --data "CARPETA" once» | `reiwand-upgrade client --data CARPETA` |
+| Archivo exportado (terminal y app) | «the file has format 1 …; convert it with `reiwand-upgrade file FILE` on a computer» | `reiwand-upgrade file ARCHIVO` |
+| Teléfono, archivo exportado | «This file has the older format … On a computer run reiwand-upgrade file FILE» | `reiwand-upgrade file ARCHIVO` en un computador |
+| Servidor | «the database has schema N but this program reads M; … run `reiwand-upgrade server --data <data folder>` once» | `reiwand-upgrade server --data CARPETA` |
+| Servidor, ajustes guardados | «the saved settings lack "CLAVE"; run `reiwand-upgrade server --data <data folder>` once» | `reiwand-upgrade server --data CARPETA` |
+
+Ningún programa sobrescribe lo que rechaza: el archivo queda como estaba hasta que corras la conversión.
+
 ## Actualizar desde 1.x
 
 La versión 2.0.0 ya no entiende los formatos de la 1.x dentro de los programas: un programa aparte,
