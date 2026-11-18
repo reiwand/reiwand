@@ -19,7 +19,10 @@ fn scene() -> Scene {
     let mut scene = Scene::from_json(&crate::gpu::whole(&doc.to_string())).unwrap();
     let read = move |path: &str, _: usize| match path {
         "ball.glb" => Ok(glb.clone()),
-        "fx/coat.json" => Ok(br#"{ "id": "coat", "stage": "material", "cost": {} }"#.to_vec()),
+        "fx/coat.json" => Ok(reiwand_upgrade::descriptors::completed(
+            r#"{ "id": "coat", "stage": "material", "cost": {} }"#,
+        )
+        .into_bytes()),
         "fx/coat.wgsl" => Ok(TINT.as_bytes().to_vec()),
         p => Err(format!("no {p}")),
     };

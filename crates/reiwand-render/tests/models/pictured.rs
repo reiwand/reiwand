@@ -22,7 +22,7 @@ fn pictured(params: Value) -> Scene {
         .glb();
     let read = move |path: &str, _: usize| match path {
         "ball.glb" => Ok(glb.clone()),
-        "effects/coat.json" => Ok(coat().into_bytes()),
+        "effects/coat.json" => Ok(reiwand_upgrade::descriptors::completed(&coat()).into_bytes()),
         "effects/coat.wgsl" => Ok(SAMPLED.as_bytes().to_vec()),
         p => Err(format!("no {p}")),
     };

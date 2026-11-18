@@ -75,7 +75,12 @@ fn fx(params: Value) -> Fx {
 }
 
 fn with(params: Value, pack: Value) -> Fx {
-    let fx = Fx::new("pack", params).own(pack, PACK);
+    let mut base: Map<String, Value> = (0..8).map(|k| (format!("t{k}"), json!(""))).collect();
+    base.insert("amount".into(), json!(0.25));
+    base.insert("boost".into(), json!(1));
+    base.insert("flip".into(), json!(false));
+    base.extend(params.as_object().cloned().unwrap_or_default());
+    let fx = Fx::new("pack", Value::Object(base)).own(pack, PACK);
     (0..8u32).fold(fx, |fx, k| {
         let red = (32 * (k + 1) - 1) as u8;
         fx.image(&format!("t{k}"), RgbaImage::from_pixel(k + 1, 1, Rgba([red, 0, 0, 255])), false)
@@ -87,6 +92,7 @@ fn package_effects_run_passes_targets_variants_grids_and_eight_textures() {
     let textures = (0..8).map(|k| (format!("t{k}"), json!(format!("t{k}"))));
     let mut params: Map<String, Value> = textures.collect();
     params.insert("boost".into(), json!(2));
+    params.insert("flip".into(), json!(true));
     let Some(mut run) = fx(Value::Object(params.clone())).run() else { return };
     let shot = run.shot();
     assert!(run.view.left_out().is_empty(), "{:?}", run.view.left_out());
@@ -150,11 +156,11 @@ fn an_option_waiting_for_a_texture_turns_on_when_a_layer_feeds_it() {
         "options": [{ "id": "lit", "values": [false, true], "default": false, "when_bound": "shape" }],
         "passes": [{ "entry": "fs_lit", "inputs": ["previous", "asset:shape"] }] });
     let dot = json!({ "blend_space": "canvas", "id": "dot", "type": "solid", "color": "#ffffff", "size": [8, 8], "visible": false });
-    let fed = Fx::new("lit", json!({ "shape": { "layer": "dot" } })).own(json.clone(), wgsl).layer(dot);
+    let fed = Fx::new("lit", json!({ "shape": { "layer": "dot" }, "lit": true })).own(json.clone(), wgsl).layer(dot);
     let Some(mut run) = fed.run() else { return };
     run.shot().check(&[((32, 16), [255, 0, 0])]);
     assert_eq!(run.stats().compiled, 0, "the variant was built with the scene");
-    let Some(plain) = Fx::new("lit", json!({})).own(json, wgsl).shot() else { return };
+    let Some(plain) = Fx::new("lit", json!({ "shape": "", "lit": false })).own(json, wgsl).shot() else { return };
     plain.check(&[((32, 16), [0, 0, 255])]);
 }
 

@@ -37,7 +37,8 @@ pub struct Run {
 pub struct Shot(pub RgbaImage);
 
 pub fn probe(json: Value, wgsl: &str) {
-    register(Descriptor::parse(&json.to_string(), wgsl).unwrap()).unwrap();
+    register(Descriptor::parse(&reiwand_upgrade::descriptors::completed(&json.to_string()), wgsl).unwrap())
+        .unwrap();
 }
 
 pub fn solid([r, g, b]: [u8; 3]) -> RgbaImage {

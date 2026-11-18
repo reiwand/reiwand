@@ -9,7 +9,7 @@ fn unpainted_masks_and_generic_textures_read_their_defaults() {
         { "id": "cover", "type": "mask", "default": "", "paint": "#ff0000" },
         { "id": "flat", "type": "texture", "default": "normal_flat" }],
         "passes": [{ "entry": "fs_paint", "inputs": ["previous", "asset:cover", "asset:flat"] }] });
-    let Some(shot) = Fx::new("paint", json!({})).own(json, wgsl).shot() else { return };
+    let Some(shot) = Fx::new("paint", json!({ "cover": "", "flat": "normal_flat" })).own(json, wgsl).shot() else { return };
     let mid = super::package::enc(128.0 / 255.0);
     shot.check(&[((8, 16), [255, 0, 0]), ((56, 16), [mid, mid, 255])]);
 }

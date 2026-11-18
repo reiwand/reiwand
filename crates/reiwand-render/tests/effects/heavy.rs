@@ -66,7 +66,7 @@ fn package_effects_at_the_limits_build_and_draw_in_time() {
     let fast = Renderer::shared().is_ok_and(|r| !r.software());
     for (wgsl, name) in cases {
         let d =
-            Descriptor::packaged("heavy", &json.to_string(), &wgsl).unwrap_or_else(|e| panic!("{name}: {e}"));
+            Descriptor::packaged("heavy", &reiwand_upgrade::descriptors::completed(&json.to_string()), &wgsl).unwrap_or_else(|e| panic!("{name}: {e}"));
         assert!(d.size <= MAX_INLINED && d.ops <= MAX_OPS as f32, "{name}: {} {}", d.size, d.ops);
         assert!(!name.starts_with("scattered") || d.ops * 2.0 > MAX_OPS as f32, "{name}: {}", d.ops);
         let started = Instant::now();

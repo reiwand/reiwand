@@ -27,7 +27,7 @@ fn stretched(grid: u32) -> Value {
 #[test]
 fn a_grid_that_stretches_its_cells_draws_each_pixel_a_bounded_number_of_times() {
     let units: Vec<f32> = [1, 8, 64]
-        .map(|g| Descriptor::packaged("over", &stretched(g).to_string(), STRETCH).unwrap().units())
+        .map(|g| Descriptor::packaged("over", &reiwand_upgrade::descriptors::completed(&stretched(g).to_string()), STRETCH).unwrap().units())
         .to_vec();
     assert!(units[0] >= 2.0 && units[1] >= 9.0 && units[2] == units[1], "{units:?}");
     for (g, most) in [(1, 1.2), (4, 9.5), (8, 9.5)] {

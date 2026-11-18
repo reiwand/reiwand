@@ -172,7 +172,7 @@ fn steady_package_effect_frames_allocate_nothing_beyond_their_gpu_calls() {
     let r = &own;
     let mut scene = Scene::load(&crate::whole::whole(OWN), &Default::default()).unwrap();
     let files = |path: &str, _: usize| match path {
-        "fx/smear.json" => Ok(TRAIL.as_bytes().to_vec()),
+        "fx/smear.json" => Ok(reiwand_upgrade::descriptors::completed(TRAIL).into_bytes()),
         "fx/smear.wgsl" => Ok(SHADER.as_bytes().to_vec()),
         _ => Err("missing"),
     };

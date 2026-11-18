@@ -63,7 +63,10 @@ fn owned(depth: f32) -> Scene {
     let glb = cube(unlit("paint", [1.0, 0.0, 0.0, 1.0]));
     let files = move |path: &str, _: usize| match path {
         "red.glb" => Ok(glb.clone()),
-        "effects/same.json" => Ok(br#"{ "id": "same", "stage": "particle", "cost": {} }"#.to_vec()),
+        "effects/same.json" => Ok(reiwand_upgrade::descriptors::completed(
+            r#"{ "id": "same", "stage": "particle", "cost": {} }"#,
+        )
+        .into_bytes()),
         "effects/same.wgsl" => Ok(SAME.as_bytes().to_vec()),
         _ => Err(format!("no {path}")),
     };

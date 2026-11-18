@@ -103,7 +103,16 @@ pub fn packaged(layers: Value, files: &[(&'static str, &'static str)]) -> Scene 
         "assets": { "ball": { "path": "ball.glb" } }, "layers": layers, "effects": effects });
     let mut scene = Scene::from_json(&crate::gpu::whole(&doc.to_string())).unwrap();
     let glb = ball(unlit("skin", [1.0; 4]));
-    let files: BTreeMap<&str, Vec<u8>> = files.iter().map(|(p, t)| (*p, t.as_bytes().to_vec())).collect();
+    let files: BTreeMap<&str, Vec<u8>> = files
+        .iter()
+        .map(|(p, t)| {
+            (
+                *p,
+                if p.ends_with(".json") { reiwand_upgrade::descriptors::completed(t) } else { t.to_string() }
+                    .into_bytes(),
+            )
+        })
+        .collect();
     let read = move |path: &str, _: usize| match path {
         "ball.glb" => Ok(glb.clone()),
         p => files.get(p).cloned().ok_or_else(|| format!("no {p}")),

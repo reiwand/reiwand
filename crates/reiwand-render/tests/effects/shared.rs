@@ -46,7 +46,7 @@ fn luts_and_texture_assets_reach_the_shader() {
     data.check(&[((10, 16), [0, 255, 188]), ((54, 16), [0, 255, 255])]);
     let Some(photo) = fx("photo").shot() else { return };
     photo.check(&[((10, 16), [0, 255, 128])]);
-    let Some(none) = Fx::new("probe_assets", json!({})).shot() else { return };
+    let Some(none) = Fx::new("probe_assets", json!({ "grade": "", "depth": "" })).shot() else { return };
     none.check(&[((10, 16), [0, 0, 0])]);
 }
 
