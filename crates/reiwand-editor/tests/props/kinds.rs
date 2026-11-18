@@ -42,7 +42,7 @@ fn properties_move_within_and_between_groups() {
     assert_eq!(order(&doc), ["tools", "speed", "go", "photo", "secret", "tint", "mood"]);
     assert_eq!(rows(&doc)[1]["depth"], 1);
     run(&mut doc, json!({"move_property": {"id": "go", "to": 9, "group": ""}}));
-    assert!(doc["manifest"]["properties"]["go"].get("group").is_none());
+    assert!(doc["manifest"]["properties"]["go"]["group"].is_null());
     assert_eq!(order(&doc).last().unwrap(), "go");
     run(&mut doc, json!({"add_property": {"kind": "bool", "id": "rain", "group": "tools"}}));
     assert_eq!(doc["manifest"]["properties"]["rain"]["order"], 2);

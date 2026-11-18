@@ -46,7 +46,7 @@ fn parts_are_ordered_hidden_and_shown_only_over_others() {
     }
     act(&mut p, json!({ "redo": {} })).unwrap();
     act(&mut p, edit(json!({ "order": { "chest": 0, "legs": 0 } }))).unwrap();
-    assert_eq!(shown(&p), json!({ "chest": { "order": 0.0 }, "legs": { "order": 0.0 } }));
+    assert_eq!(shown(&p), json!({ "chest": { "order": 0.0, "visible": null, "clip_to": null }, "legs": { "order": 0.0, "visible": null, "clip_to": null } }));
     let rims = reiwand_editor::rigs::outline(&p.dir, &p.doc, "body");
     assert_eq!(rims.as_object().unwrap().keys().collect::<Vec<_>>(), ["chest", "legs"]);
     for (part, edges) in rims.as_object().unwrap() {

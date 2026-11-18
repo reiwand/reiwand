@@ -17,10 +17,29 @@ pub fn complete(doc: &Value, op: Op) -> Op {
     let schema = unwrapped(root, schema);
     let mut full = value.clone();
     fill(root, &schema, &mut full);
+    if path.starts_with("/manifest") {
+        no_conditions(&mut full);
+    }
     match op {
         Op::Add { path, .. } => Op::Add { path, value: full },
         Op::Replace { path, .. } => Op::Replace { path, value: full },
         other => other,
+    }
+}
+
+fn no_conditions(value: &mut Value) {
+    match value {
+        Value::Object(map) => {
+            for (key, inner) in map.iter_mut() {
+                if matches!(key.as_str(), "visible_if" | "enabled_if") && inner == "" {
+                    *inner = Value::Object(Default::default());
+                } else {
+                    no_conditions(inner);
+                }
+            }
+        }
+        Value::Array(list) => list.iter_mut().for_each(no_conditions),
+        _ => {}
     }
 }
 

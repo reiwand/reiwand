@@ -43,13 +43,13 @@ pub fn remove_property(doc: &Value, id: &str) -> Result<Vec<Op>> {
     });
     for prop in props {
         if prop.get("group").is_some_and(|g| g == id) {
-            prop.remove("group");
+            prop.insert("group".into(), Value::Null);
         }
         for key in ["visible_if", "enabled_if"] {
             if let Some(Value::Object(map)) = prop.get_mut(key) {
                 map.remove(id);
                 if map.is_empty() {
-                    prop.remove(key);
+                    prop.insert(key.into(), Value::Object(Default::default()));
                 }
             }
         }
@@ -129,10 +129,5 @@ pub fn condition(doc: &Value, id: &str, enabled: bool, text: &str) -> Result<Vec
     if let Some(reason) = problem(doc, &pointer, text) {
         bail!(said("editor.text_2", "%1: %2 %3", &[&id, &key, &reason]));
     }
-    Ok(match parse(text) {
-        c if c.is_empty() => {
-            doc.pointer(&pointer).map(|_| Op::Remove { path: pointer.clone() }).into_iter().collect()
-        }
-        c => set(doc, &pointer, serde_json::to_value(c)?),
-    })
+    Ok(set(doc, &pointer, serde_json::to_value(parse(text))?))
 }

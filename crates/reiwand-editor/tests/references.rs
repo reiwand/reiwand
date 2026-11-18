@@ -73,13 +73,13 @@ fn removing_a_property_drops_its_values_and_refuses_while_something_names_it() {
     run(&mut doc, json!({"set": {"pointer": "/scene/layers/0/mask", "value": {"texture": "storm"}}}));
     run(&mut doc, json!({"remove_property": {"id": "mood"}}));
     let props = &doc["manifest"]["properties"];
-    assert!(props.get("mood").is_none() && props["rain"].get("visible_if").is_none());
+    assert!(props.get("mood").is_none() && props["rain"]["visible_if"] == json!({}));
     assert_eq!(doc["manifest"]["presets"][0]["values"], json!({"wind": 1}));
     run(&mut doc, json!({"remove_property": {"id": "go"}}));
     run(&mut doc, json!({"remove": {"pointer": "/scene/layers/0/opacity"}}));
     run(&mut doc, json!({"remove": {"pointer": "/scene/timelines"}}));
     run(&mut doc, json!({"remove_property": {"id": "look"}}));
-    assert!(doc["manifest"]["properties"]["wind"].get("group").is_none());
+    assert!(doc["manifest"]["properties"]["wind"]["group"].is_null());
     assert_eq!(errors(&doc), []);
     assert!(refused(&doc, json!({"remove_property": {"id": "gone"}})).contains("no property"));
     let mut bare = starter("empty", "org.example.bare", "Bare", "en").unwrap();
@@ -97,7 +97,7 @@ fn problems_of_conditions_and_presets_point_at_what_to_fix() {
     let found = errors(&doc);
     assert_eq!(found[0].pointer, "/manifest/properties/rain/visible_if", "{found:?}");
     assert!(!found[0].message.contains("presets"), "{found:?}");
-    run(&mut doc, json!({"remove": {"pointer": "/manifest/properties/rain/visible_if"}}));
+    run(&mut doc, json!({"set": {"pointer": "/manifest/properties/rain/visible_if", "value": {}}}));
     assert_eq!(errors(&doc)[0].pointer, "/manifest/presets/0/values/mood");
 }
 
@@ -154,7 +154,7 @@ fn the_list_follows_the_settings_form_and_new_combos_carry_no_words() {
     let combo = &doc["manifest"]["properties"]["combo_1"];
     assert_eq!(
         combo["options"],
-        json!([{"value": "option_1", "label": ""}, {"value": "option_2", "label": ""}])
+        json!([{"value": "option_1", "label": "", "icon": null}, {"value": "option_2", "label": "", "icon": null}])
     );
     assert_eq!(field(&doc, "/manifest/properties/combo_1", "default").names, ["option_1", "option_2"]);
     let props: BTreeMap<String, Property> =
