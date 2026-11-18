@@ -37,6 +37,15 @@ impl Daemon {
         })
     }
 
+    pub fn drop_animated(&self, uid: &str) {
+        let prefix = format!("animated-{uid}-");
+        let found = std::fs::read_dir(self.store.cache.join("previews")).into_iter().flatten().flatten();
+        found
+            .map(|e| e.path())
+            .filter(|p| p.file_name().is_some_and(|n| n.to_string_lossy().starts_with(&prefix)))
+            .for_each(|p| drop(std::fs::remove_file(p)));
+    }
+
     pub fn animated(&self, item: &Item, manifest: &reiwand_format::Manifest) -> Option<String> {
         let name = manifest.animated()?;
         let ext = std::path::Path::new(name).extension()?.to_str()?.to_ascii_lowercase();

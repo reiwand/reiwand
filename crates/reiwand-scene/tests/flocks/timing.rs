@@ -64,3 +64,45 @@ fn prewarm_runs_in_coarse_steps() {
     let steps: Vec<usize> = (0..2).map(|i| rt.swarm(i).unwrap().count()).collect();
     assert_eq!(steps, [150, 150], "the scene shares one warm-up budget");
 }
+
+fn first_frame_at(seek: f64, extra: Json) -> (usize, u32) {
+    let mut fly = Fly::of(json!({ "a": flowing(extra) }));
+    fly.rt.seek(seek);
+    fly.frame(0.0);
+    (fly.rt.swarm(0).unwrap().count(), fly.births)
+}
+
+#[test]
+fn a_seek_simulates_the_scene_time_on_top_of_the_prewarm() {
+    let none = first_frame_at(0.0, json!({}));
+    let (one, three) = (first_frame_at(1.0, json!({})), first_frame_at(3.0, json!({})));
+    assert_eq!(none.0, 1, "no time, no warm-up");
+    assert_eq!((one.0, three.0), (15, 45), "steps of the prewarm length");
+    assert!((55..=65).contains(&one.1) && (175..=185).contains(&three.1), "{one:?} {three:?}");
+    let warm = still(json!({ "prewarm": 1, "emitters": [{ "shape": { "point": [100, 50] }, "rate": 60 }] }));
+    let mut fly = Fly::of(json!({ "a": warm }));
+    fly.rt.seek(2.0);
+    fly.frame(0.0);
+    assert_eq!(fly.rt.swarm(0).unwrap().count(), 45, "prewarm plus time");
+    let far = first_frame_at(100.0, json!({}));
+    assert_eq!(far.0, 450, "capped like the prewarm");
+}
+
+#[test]
+fn a_system_revealed_live_starts_from_its_prewarm_only() {
+    let props: BTreeMap<String, Property> = serde_json::from_str(include_str!("../props.json")).unwrap();
+    let layers = json!([{ "id": "p", "type": "particles", "system": "a", "visible": { "prop": "soft" } }]);
+    let text = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layers,
+        "particles": { "a": flowing(json!({})) } });
+    let scene = Scene::load(&text.to_string(), &props).unwrap();
+    let mut values = effective(&props, &[]);
+    values.insert("soft".into(), json!(false));
+    let mut fly = Fly::new(Runtime::new(Arc::new(scene), values.clone()));
+    fly.rt.advance(5.0);
+    fly.rt.frame(VIEW, Quality::Q3);
+    assert!(fly.rt.swarm(0).is_none_or(|s| s.count() == 0), "hidden systems do not run");
+    values.insert("soft".into(), json!(true));
+    fly.rt.set_props(values);
+    fly.rt.frame(VIEW, Quality::Q3);
+    assert_eq!(fly.rt.swarm(0).unwrap().count(), 1, "no warm-up for the time already elapsed");
+}

@@ -74,6 +74,7 @@ pub use crate::layer::{Anchor, Inherit, Kind, Layer, Parallax, Solid, Transform}
 pub use crate::lean::Lean;
 pub use crate::lens::{Camera3d, CameraKey, CameraPath, Fade, FadeTo, MAX_PATHS, PathOrder};
 pub use crate::light::{Beam, Light, Lighting, MAX_LIGHTS, MAX_PROJECTIONS, Volumetric};
+pub use crate::lit::{Inked, ink_bounds};
 pub use crate::look::{Bloom, Camera, Glare, Glide, Playback, Shake, Tonemap};
 pub use crate::loops::{MAX_INLINED, MAX_LOOP, MAX_OPS, MAX_SHADER_NODES, MAX_WORK};
 pub use crate::measure::MAX_BUILD;

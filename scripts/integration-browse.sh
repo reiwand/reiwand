@@ -42,10 +42,49 @@ got=$(ctl next -o TEST-31 --preview --from library --json | js "r['source'], r['
 [ "$got" = "('library', True)" ] || fail "browse the library: $got"
 ctl browse cancel -o TEST-31 >/dev/null
 expect "$shown" "$cyan"
+opened() { [ -e "$WORK/preview-opened" ] && wc -l <"$WORK/preview-opened" || echo 0; }
+window() {
+  dbus-send --session --print-reply --dest=org.freedesktop.DBus /org/freedesktop/DBus \
+    org.freedesktop.DBus.NameHasOwner string:io.github.reiwand.Switcher | grep -q "boolean $1"
+}
+before=$(opened)
+ctl next -o TEST-31 --preview >/dev/null
+[ "$(opened)" = $((before + 1)) ] || fail "beginning to browse did not open the preview window"
+[ "$(tail -n 1 "$WORK/preview-opened")" = "--browse TEST-31" ] || fail "the window opened for another screen"
+ctl next -o TEST-31 --preview >/dev/null
+[ "$(opened)" = $((before + 1)) ] || fail "moving opened a second preview window"
+ctl browse apply -o TEST-31 >/dev/null
+expect "$shown" "$gold"
 ctl next -o TEST-31 --preview >/dev/null
 expired() { [ "$(ctl browse show -o TEST-31 --json | js "r['active']")" = False ]; }
 wait_for 20 expired || fail "an idle session did not expire"
-expect "$shown" "$cyan"
+expect "$shown" "$gold"
+[ "$(opened)" = $((before + 2)) ] || fail "an expired session left no trace of its window"
+if [ -x "$BIN/reiwand-app" ] && python3 -c 'import dbus' 2>/dev/null; then
+  python3 -c 'import dbus, time; dbus.SessionBus().request_name("io.github.reiwand.Switcher"); time.sleep(60)' &
+  holder=$!
+  wait_for 10 window true || fail "the stand-in window did not take its name"
+  ctl next -o TEST-31 --preview >/dev/null
+  [ "$(opened)" = $((before + 2)) ] || fail "a session opened a second window over the one shown"
+  sleep 12
+  [ "$(ctl browse show -o TEST-31 --json | js "r['active']")" = True ] || fail "a session expired while its window was open"
+  timeout 20 "$BIN/reiwand-app" --browse TEST-31 || fail "a second preview window did not leave"
+  window true || fail "the second window took the first one's place"
+  ctl browse cancel -o TEST-31 >/dev/null
+  kill "$holder" 2>/dev/null || true
+  wait "$holder" 2>/dev/null || true
+  echo "single preview window checks passed"
+fi
+kirigami=$(qtpaths6 --query QT_INSTALL_QML 2>/dev/null || true)/org/kde/kirigami
+if [ -x "$BIN/reiwand-app" ] && [ -d "$kirigami" ]; then
+  touch "$WORK/preview-real"
+  ctl next -o TEST-31 --preview >/dev/null
+  wait_for 30 window true || fail "the preview window did not open"
+  ctl browse apply -o TEST-31 >/dev/null
+  wait_for 20 window false || fail "the preview window stayed after applying"
+  rm -f "$WORK/preview-real"
+  echo "preview window checks passed"
+fi
 ctl playlist stop -o TEST-31
 ctl playlist rm Browsing
 ctl lib unsource "$bro_source"

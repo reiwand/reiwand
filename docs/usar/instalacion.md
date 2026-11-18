@@ -66,7 +66,7 @@ GStreamer 1.24 o posterior, y el paquete RPM lo exige. El plugin de fondo usa lo
 KWindowSystem y plasma-workspace; en Debian y Ubuntu vienen en `qml6-module-org-kde-pipewire`,
 `qml6-module-org-kde-kwindowsystem` y `plasma-workspace`. La app de escritorio usa Qt 6 Quick,
 Kirigami y el estilo de escritorio de KDE (`qml6-module-org-kde-kirigami` y
-`qml6-module-org-kde-qqc2desktopstyle`).
+`qml6-module-org-kde-qqc2desktopstyle`). La ventana de cambio de fondo muestra la escena o el vídeo elegido con KPipeWire (el mismo módulo del plugin de fondo, sin QtMultimedia); si falta, la tarjeta central queda como imagen fija. En el Flatpak y en `install.sh` no hace falta nada más.
 
 ## Actualizar desde 1.x
 

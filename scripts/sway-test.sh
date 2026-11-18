@@ -167,7 +167,6 @@ echo "video output flap checks passed"
 source "$(dirname "$0")"/sway-namespace.sh
 source "$(dirname "$0")"/sway-spread.sh
 source "$(dirname "$0")"/sway-clear.sh
-source "$(dirname "$0")"/sway-strip.sh
 source "$(dirname "$0")"/sway-inputs.sh
 
 status=0

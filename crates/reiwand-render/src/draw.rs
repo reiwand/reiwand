@@ -117,7 +117,6 @@ impl Renderer {
             color_attachments: &[Some(attachment)],
             ..Default::default()
         });
-        let clipped = layers.iter().any(|l| l.clip.is_some());
         if let Some(c) = clip {
             pass.set_scissor_rect(c.x, c.y, c.width, c.height);
         }
@@ -126,11 +125,6 @@ impl Renderer {
             let chosen = deck.as_ref().filter(|_| slot.decked());
             let [opaque, blended] = chosen.unwrap_or(&flat);
             pass.set_pipeline(if fading { blended } else { opaque });
-            let cut = layer.clip.map(|c| c.within(size)).or(clip).filter(|c| !c.is_empty());
-            let cut = cut.or(clipped.then_some(Region::whole(size)));
-            if let Some(c) = cut {
-                pass.set_scissor_rect(c.x, c.y, c.width, c.height);
-            }
             if fading {
                 let c = f64::from(layer.opacity);
                 pass.set_blend_constant(wgpu::Color { r: c, g: c, b: c, a: c });

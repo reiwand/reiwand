@@ -26,6 +26,14 @@ Para qué sirve: ver y poner los fondos que ya tienes.
 - **Editar una copia…**: en una escena guardada como paquete; la copia es un proyecto nuevo y el
   original no cambia.
 - **Clic derecho**, o la tecla de menú, sobre una tapa abre un menú con las mismas acciones.
+- **Importar fondo…**: elige uno o varios archivos `.wpak` y los deja en tu biblioteca; no hace falta
+  preguntar dónde quedan. También se importan arrastrando archivos `.wpak` a la ventana, con doble
+  clic sobre uno (o «Abrir con Reiwand») y con `reiwand-ctl pkg import`. Se comprueba que el paquete
+  no esté dañado ni alterado: uno alterado se rechaza con un aviso. Si no tiene firma conocida se
+  importa igual y su ficha dice «Sin firma verificada». Importar una versión más nueva actualiza el
+  fondo que ya tienes; con una más antigua la app avisa y ofrece «Usar la más antigua». El filtro
+  **Local** del estante muestra solo estos fondos; se quitan desde su tapa con *Quitar de la
+  biblioteca*.
 - **Marcas en la tapa**: «En uso», o «En …» con el nombre de la pantalla; una nota si el archivo
   falta o está dañado, o si tiene destellos y están apagados.
 - **Filtros** de la barra: Todos, Escenas, Imágenes, Vídeos, Web, De fuentes y Favoritos, cada uno
@@ -161,6 +169,14 @@ listas, favoritos, valoraciones, etiquetas, fondos instalados y ajustes de este 
 propios y las claves solo si lo marcas; las claves cifran el archivo con una contraseña), e importa
 uno hecho en otro equipo: muestra qué trae, solo suma lo que marcas y deja unir o tener las dos
 listas con el mismo nombre. Es el mismo archivo que usa el teléfono y `reiwand-ctl export` e `import`.
+
+## Cambiar de fondo con vista previa
+
+Desde la bandeja, un atajo o `reiwand-ctl next --preview` se abre una ventanita centrada en tu
+pantalla, con el resto atenuado. El fondo elegido se ve grande en el centro y los vecinos, nítidos, a
+los lados; debajo, su nombre y su posición. ← y →, la rueda o un clic en un vecino mueven la selección;
+Intro o un clic en el central aplican y cierran; Esc o un clic fuera cierran sin cambiar nada. Más en
+[cambiar de fondo con el teclado](cambiar-con-el-teclado.md).
 
 ## La bandeja
 

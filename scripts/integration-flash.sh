@@ -10,6 +10,7 @@ flash() {
   ctl pack build "$WORK/flash" -o "$WORK/import/flash.wpak" >/dev/null
   job=$(bus Library1 Import asb 1 "$WORK/import/flash.wpak" false | out "d[0]")
   wait_for 20 finished "$job" || fail "flashing scene import: $(bus Daemon1 GetJob t "$job")"
+  second=$(reply "r['job']['output']['imported'][0]['uid']" Daemon1 GetJob t "$job")
 }
 flash org.example.flash
 flashing=$(reply "r['items'][0]['uid']" Library1 Search suu "flash" 0 1)
@@ -19,6 +20,7 @@ ctl config playback.allow_flashing true && ctl lib apply "$flashing" -o TEST-7
 ctl config playback.allow_flashing false
 stormy=$(ctl profile save Stormy --no-options)
 flash org.example.flash2
+variant=$second
 ctl profile use "$stormy"
 expect "s['outputs']['TEST-7']['item'], 'allowed in the settings' in (s['outputs']['TEST-7']['error'] or '')" "(None, True)"
 ctl stream TEST-20 160 90 >/dev/null && ctl background '#203040' -o TEST-20
@@ -54,4 +56,4 @@ expect "s['outputs']['TEST-7']['left_out']" "[]"
 leave && bus Library1 Remove asb 1 "$blink" false >/dev/null
 ctl lib apply "$storm" -o TEST-7
 echo "flash guard checks passed"
-bus Library1 Remove asb 1 "$flashing" false >/dev/null
+bus Library1 Remove asb 2 "$flashing" "$variant" false >/dev/null

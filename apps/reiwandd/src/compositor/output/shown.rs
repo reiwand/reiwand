@@ -71,17 +71,7 @@ impl Shown {
                 Relief { depth, shift, focus: p.focus, steps: p.steps.min(steps), overscan: way.zoom }
             });
         let (flip, grade) = (self.tone.flip, self.tone.grade);
-        Layer {
-            image,
-            fit,
-            background: self.background,
-            opacity,
-            uv: framed,
-            relief,
-            flip,
-            grade,
-            clip: None,
-        }
+        Layer { image, fit, background: self.background, opacity, uv: framed, relief, flip, grade }
     }
 }
 

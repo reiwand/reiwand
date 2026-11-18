@@ -109,6 +109,8 @@ Column {
         text: ahora.title
         width: Math.min(implicitWidth, Look.tapaFoco * 2)
         elide: Text.ElideRight
+        fontSizeMode: Text.HorizontalFit
+        minimumPixelSize: Look.tPortada * 0.6
         horizontalAlignment: Text.AlignRight
         font.family: Look.letraTitulo
         font.pixelSize: Look.tPortada

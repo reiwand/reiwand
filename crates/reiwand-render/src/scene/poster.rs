@@ -43,6 +43,7 @@ impl SceneAssets {
                 assets.luts.insert(id.clone(), Arc::new(lut));
             }
         }
+        assets.ink_scene(scene);
         Ok(assets)
     }
 
@@ -167,7 +168,6 @@ impl Renderer {
             relief: None,
             flip: [false; 2],
             grade: None,
-            clip: None,
         };
         self.render_layers(target, &[layer], pixels)?;
         let mut rgba = pixels.clone();

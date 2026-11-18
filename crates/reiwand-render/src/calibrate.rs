@@ -141,7 +141,6 @@ impl Renderer {
             relief: None,
             flip: [false; 2],
             grade: None,
-            clip: None,
         };
         let layers: Vec<Layer> = (0..passes.max(1)).map(layer).collect();
         let (start, mut times) = (Instant::now(), Vec::new());

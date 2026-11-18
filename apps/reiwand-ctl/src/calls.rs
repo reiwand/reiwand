@@ -62,6 +62,7 @@ pub const CALLS: &[(&str, &str, &str, &[&str])] = &[
     ("Library1", "ListSources", "lib sources", &[]),
     ("Library1", "Rescan", "lib scan", &["SOURCE"]),
     ("Library1", "Import", "lib import", &["FILE", "--copy"]),
+    ("Library1", "ImportPackages", "pkg import", &["FILE", "--allow-older"]),
     ("Library1", "Resolve", "lib show", &["ITEM"]),
     ("Library1", "Remove", "lib rm", &["ITEM", "--delete-files"]),
     ("Library1", "Search", "lib search", &["QUERY", "--offset", "--limit"]),

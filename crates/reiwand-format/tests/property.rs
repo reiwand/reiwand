@@ -1,6 +1,6 @@
 mod common;
 
-use common::{manifest, manifest_text, properties};
+use common::{manifest, properties};
 use reiwand_format::{Choice, Control, Error, Kind, Property, Result, Slider};
 use serde_json::json;
 

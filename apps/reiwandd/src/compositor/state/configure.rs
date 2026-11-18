@@ -96,7 +96,11 @@ impl State {
             None => {
                 let sink =
                     self.windows.remove(&name).map_or(Sink::Stream(None), |w| Sink::Surface(Screen::new(w)));
-                self.outputs.insert(name.clone(), Output::new(size, shown, sink, refresh));
+                let nothing = name.starts_with(reiwand_core::config::PRIVATE_PREFIX)
+                    && matches!(shown.content, Content::Color);
+                let mut output = Output::new(size, shown, sink, refresh);
+                output.blank = nothing;
+                self.outputs.insert(name.clone(), output);
             }
         }
         self.pictures.prune(&self.outputs);

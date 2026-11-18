@@ -33,15 +33,16 @@ impl Taps {
 
     fn take(&mut self, bytes: &[u8]) {
         let channels = self.channels;
-        let frames = bytes.chunks_exact(4 * channels);
-        let slots = self.producer.slots() / 2;
-        let Ok(chunk) = self.producer.write_chunk_uninit(frames.len().min(slots) * 2) else { return };
         let sample = |f: &[u8], c: usize| {
             f.get(4 * c..4 * c + 4).map_or(0.0, |b| f32::from_le_bytes(b.try_into().unwrap_or_default()))
         };
-        let mut loudest = 0.0f32;
-        let samples = frames.flat_map(|f| [sample(f, 0), sample(f, (channels > 1).into())]);
-        chunk.fill_from_iter(samples.inspect(|s| loudest = loudest.max(s.abs())));
+        let pair = |f: &[u8]| [sample(f, 0), sample(f, (channels > 1).into())];
+        let loudest = (bytes.chunks_exact(4 * channels)).flat_map(pair).fold(0.0f32, |m, s| m.max(s.abs()));
+        let frames = bytes.chunks_exact(4 * channels);
+        let slots = self.producer.slots() / 2;
+        if let Ok(chunk) = self.producer.write_chunk_uninit(frames.len().min(slots) * 2) {
+            chunk.fill_from_iter(frames.flat_map(pair));
+        }
         if loudest > AUDIBLE && self.woke.elapsed() >= WAKE {
             self.woke = Instant::now();
             (self.wake)();
@@ -158,4 +159,31 @@ fn connect(stream: &pw::stream::StreamRc) -> Result<(), pw::Error> {
     let mut pods = [spa::pod::Pod::from_bytes(&bytes).ok_or(pw::Error::CreationFailed)?];
     let flags = pw::stream::StreamFlags::AUTOCONNECT | pw::stream::StreamFlags::MAP_BUFFERS;
     stream.connect(spa::utils::Direction::Input, None, flags, &mut pods)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::atomic::AtomicUsize;
+
+    fn bytes(level: f32, frames: usize) -> Vec<u8> {
+        (0..frames * 2).flat_map(|_| level.to_le_bytes()).collect()
+    }
+
+    #[test]
+    fn sound_wakes_even_when_nobody_drained_the_ring() {
+        let (producer, _samples) = rtrb::RingBuffer::new(64);
+        let woken = Arc::new(AtomicUsize::new(0));
+        let count = woken.clone();
+        let wake = Box::new(move || {
+            count.fetch_add(1, Relaxed);
+        });
+        let mut taps = Taps::new(producer, Arc::new(AtomicU32::new(0)), wake);
+        taps.woke = Instant::now() - WAKE;
+        taps.take(&bytes(0.0, 256));
+        assert_eq!(woken.load(Relaxed), 0);
+        taps.woke = Instant::now() - WAKE;
+        taps.take(&bytes(0.5, 256));
+        assert_eq!(woken.load(Relaxed), 1);
+    }
 }

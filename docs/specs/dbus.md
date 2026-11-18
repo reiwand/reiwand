@@ -144,6 +144,10 @@ A stream exists while at least one claim holds it. Claims are kept per output an
 Coverage is also tracked per claimant. An output counts as covered only when every claimant
 reports it covered. `SetOutputCovered` from a client without a claim applies to the held claim.
 
+A stream whose name starts with `preview:` is private: it never shows the content of the desktop
+(`default`), only what its own `Library1.Apply` (or a draft) gives it, and an output that has not
+shown content yet shows the first content applied to it without a transition.
+
 Output names are trimmed and an empty name means `default` in `RequestStream`, `HoldStream`,
 `ReleaseStream` and `SetOutputCovered`.
 
@@ -977,8 +981,24 @@ place did not change is not written at all, so other writers never wait for file
 Imports files one by one in an `import` job. Each path must be absolute (no URI); directories go
 through `AddSource`. With `copy = false` the file is cataloged where it is. With `copy = true`
 it is first copied to `~/.local/share/reiwand/files/` (on a name collision as
-`<stem> (2).<ext>`, `(3)`, …) and takes the original file name without extension as title. A
+`<stem> (2).<ext>`, `(3)`, …; the copy keeps the modification time of the original) and takes
+the original file name without extension as title. A `.wpak` file always goes through the rules
+of `ImportPackages` (verification, version rules, always copied; `copy` is ignored), refusing an
+older version. A
 file that fails is listed in `ImportReport.failed`; the job fails only on a global error.
+
+### `ImportPackages(as paths, b allow_older) → (t job)`
+
+Imports `.wpak` files into the library as the implicit local source, in an `import` job; the
+files are always copied to `~/.local/share/reiwand/files/`. Each package is opened and its content
+hashes are verified; a damaged or modified one is listed in `ImportReport.failed` with the reason.
+There is no signature requirement: a package whose author is not known imports and the app shows
+«Sin firma verificada». A package whose id is installed from a repository is refused. Importing the
+same version again returns the existing item, or, when the file changed, updates it in place; a newer version updates the item in place (same uid,
+its decisions and favorite stay); an older version is listed in `failed` with `older = true` unless
+`allow_older` is true. The search key `local:yes` matches the items imported this way (files cataloged
+by path and packages installed from a repository are excluded), and `source:none` matches every item
+without a source. `ImportReport.failed[]` entries carry `path`, `error` and `older`.
 
 ### `Resolve(as refs) → (as uids)`
 
@@ -1324,10 +1344,13 @@ A `HistoryReply`, newest first. `output` is a connector name; `limit` is `1..=10
 
 **Browsing wallpapers.** A browsing session lets the user look at wallpapers one by one on a screen and keep one, without
 changing anything until they apply it. It belongs to one output (`""` means the only screen when
-there is one; with several screens it browses the library for every screen at once). It holds a
-candidate, never changes the wallpaper (the strip drawn over it and the tray read the
-`BrowseState` data), and ends by itself after 30 s without input. Nothing runs while nobody
-browses: one timer per open session.
+there is one; with several screens and an empty `output`, the daemon asks KWin (`org.kde.KWin /KWin activeOutputName`, 150 ms timeout) for the screen with the pointer and the switcher panel opens full screen on that screen and browses its list; without KWin the first open session or the first screen is used). It holds a
+candidate, never changes the wallpaper (the switcher panel and the tray read the
+`BrowseState` data), and ends by itself after 30 s without input when no switcher panel holds it: while the panel
+is open the daemon checks every 30 s that the panel still holds its bus name and keeps the session,
+and the panel itself closes (like Esc, changing nothing) after 5 s without a key, wheel turn,
+shortcut or pointer movement over it, never while a button is held on it. Nothing runs while nobody browses:
+one timer per open session.
 
 `source` is `playlist` (the playlist the screen plays: the candidate is exactly the item `Next`
 or `Previous` would show, shuffle and history included, and `position` is its place in the list),
@@ -1338,7 +1361,7 @@ screen plays one, else the library. Every method answers with a `BrowseState` an
 `expired`; only in the reply or signal that ends a session), `source`, `playlist`,
 `playlist_name`, `steps` (how far the candidate is from what the screen shows), `position`,
 `count`, `shown` (uid shown when browsing began), `candidate` (an `ItemSummary`: title, kind,
-thumbnail and package), `now` (the `ItemSummary` the screen shows), `ahead` (up to two
+thumbnail and package), `now` (the `ItemSummary` the screen shows), `behind` and `ahead` (up to two
 `ItemSummary` that follow the candidate, without repeats), `plays` (how the candidate would come
 in: `kind` `fade`, `none` or `own`; `why` `chosen` for the transition picked with
 `BrowseTransition`, `screen` for the screen's own setting, `general` for the general one, `calm`
@@ -1346,16 +1369,21 @@ when the system asks for less motion and `still` when the user does; `duration_m
 otherwise), `path`, `transition`, `idle_ms` (time left before it ends by itself) and `shortcuts`
 (`off`, `asking`, `bound`, `refused`, `unavailable`).
 
-**The strip.** Whenever a session begins, whoever began it (a shortcut, the tray or
-`reiwand-ctl next --preview`), the daemon composes a strip into the frames of the output (or of every real
-output when the session is `""` with several): the live wallpaper dimmed, the candidate framed in the
-middle (animated when its preview is a GIF or WebP, a still otherwise) with its name below, and still
-thumbnails of the neighbours at both sides. No window or surface is created and no keyboard focus is
-taken; it works on every presentation path (layer-shell, Plasma streams, X11 root). Moving slides the
-strip (instant with `transition.less_motion`). The real wallpaper does not change until `BrowseApply`;
-`BrowseCancel` or the idle end remove the strip. While a session is active the wheel over the
-output moves the selection by one per notch, a left click on the middle thumbnail applies and a click on
-another one selects it; this goes through the daemon's own pointer path and only exists during a session.
+**The panel.** Whenever a session begins, whoever began it (a shortcut, the tray or
+`reiwand-ctl next --preview`), the daemon starts `reiwand-app --browse OUTPUT` (the program named by
+`REIWAND_PREVIEW_APP` when set), which claims the bus name `<app id>.Switcher` so that only one panel exists
+per output. It is a window of its own with keyboard focus: a centred panel over a dimmed screen with
+the candidate large in the middle (a scene or video plays there, rendered by the daemon into a muted
+`preview:card-*` stream requested through `RequestStream` and `Apply`, as the library cards do, and released when the
+candidate changes or the panel closes; other kinds use an animated GIF or WebP preview when the package has one),
+sharp still neighbours
+at both sides, its name and position below and a line of keys. It reads and drives the session through
+`GetBrowse`, `Browse`, `BrowseApply` and `BrowseCancel`: arrows, the wheel and clicks on a neighbour
+move, Enter or a click on the middle one applies, Esc or a click outside cancels. The daemon draws
+nothing into the wallpaper frames. After `BrowseApply` or `BrowseCancel` the window hides and the process stays resident for 5 minutes without
+working, hearing the `browse` signal; the next session shows the same process at once (the daemon sees the
+bus name taken and does not start another). After 5 minutes hidden it exits. Exit code 3 of the panel means "open the library" (shown when the
+screen has a single wallpaper). The real wallpaper does not change until `BrowseApply`.
 
 ### `Browse(s output, s source, i steps) → (s json)`
 
@@ -1396,7 +1424,7 @@ keys: `browse-next`, `browse-previous`, `browse-apply` and `browse-cancel`, prop
 `shortcuts.previous`, `shortcuts.apply` and `shortcuts.cancel`
 (`LOGO+ALT+N`, `LOGO+ALT+P`, `LOGO+ALT+Return` and `LOGO+ALT+Escape`; the desktop may show its own dialog and let the user pick other
 keys). A key press starts or moves a session on the only screen (on every screen with several)
-and the strip appears as said above; the other two keys apply or cancel. Where the desktop
+and the panel opens as said above; the other two keys apply or cancel. Where the desktop
 has no such portal (wlroots compositors, X11) the state is `unavailable` and the user binds
 `reiwand-ctl next --preview`, `prev --preview`, `browse apply` and `browse cancel` to keys in the compositor.
 The daemon opens its own session-bus connection for this, so that the first portal call of that

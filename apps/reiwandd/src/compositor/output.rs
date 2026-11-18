@@ -29,6 +29,7 @@ pub(super) struct Output {
     pub(super) stale: bool,
     pub(super) sink: Sink,
     pub(super) last_render: Option<Instant>,
+    pub(super) blank: bool,
     pub(super) offset: [f32; 2],
     pub(super) moving: bool,
     pub(super) refresh: u32,
@@ -42,7 +43,6 @@ pub(super) struct Output {
     pub(super) lit: [reiwand_render::Lit; 2],
     pub(super) passing: Option<super::crossing::Passing>,
     pub(super) told: super::status::Passage,
-    pub(super) strip: Option<super::strip::Strip>,
 }
 
 impl Output {
@@ -50,9 +50,11 @@ impl Output {
         let (fade, last_render) = (None, None);
         let (active, dirty, missing_frame, stale, moving) = (true, true, false, true, false);
         let (offset, covered, failed) = ([0.0; 2], false, 0);
+        let blank = false;
         Self {
             size,
             shown,
+            blank,
             fade,
             active,
             dirty,
@@ -73,7 +75,6 @@ impl Output {
             lit: Default::default(),
             passing: None,
             told: Default::default(),
-            strip: None,
         }
     }
 
@@ -102,13 +103,15 @@ impl Output {
     }
 
     pub(super) fn animates(&self, transition: bool, streaming: bool, resized: bool) -> bool {
-        transition && self.watched(streaming) && !resized && self.active && self.last_render.is_some()
+        let live = self.active && !self.blank && self.last_render.is_some();
+        transition && live && self.watched(streaming) && !resized
     }
 
     pub(super) fn show(&mut self, shown: Shown, size: (u32, u32), transition: bool, streaming: bool) {
         let resized = std::mem::replace(&mut self.size, size) != size;
         let animate = self.animates(transition, streaming, resized);
         let old = std::mem::replace(&mut self.shown, shown);
+        self.blank = false;
         self.fade = (animate && !old.content.same_source(&self.shown.content)).then_some((old, None));
         self.passing = None;
         let kept = std::mem::take(&mut self.lit[0]);
@@ -135,10 +138,7 @@ impl Output {
     }
 
     pub(super) fn damage(&self) -> Option<Region> {
-        let plain = self.strip.is_none()
-            && self.fade.is_none()
-            && self.shown.relief.is_none()
-            && self.shown.uv.is_none();
+        let plain = self.fade.is_none() && self.shown.relief.is_none() && self.shown.uv.is_none();
         self.shown.scene.as_ref().filter(|_| plain && !self.stale)?.damage
     }
 
@@ -170,7 +170,7 @@ impl Output {
         let moving =
             |s: &Shown| !s.videos().is_empty() || s.scene.as_ref().is_some_and(|sc| sc.due.is_some());
         let moving = |s: &Shown| moving(s) || s.content.page().is_some();
-        self.fade.is_some() || self.moving || self.strip.is_some() || self.layers().any(moving)
+        self.fade.is_some() || self.moving || self.layers().any(moving)
     }
 
     pub(super) fn fading(&self) -> bool {

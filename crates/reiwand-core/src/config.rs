@@ -47,6 +47,8 @@ pub struct Resolved {
     pub background: [u8; 3],
 }
 
+pub const PRIVATE_PREFIX: &str = "preview:";
+
 impl Config {
     pub fn normalize(&mut self) -> Vec<String> {
         let before = self.options();
@@ -73,7 +75,12 @@ impl Config {
     }
 
     pub fn resolve(&self, output: &str) -> Resolved {
-        let content = (self.outputs.get(output)).filter(|o| o.sets_content()).unwrap_or(&self.default);
+        let own = self.outputs.get(output).filter(|o| o.sets_content());
+        let content = match (own, output.starts_with(PRIVATE_PREFIX)) {
+            (Some(own), _) => own,
+            (None, true) => &OutputConfig::default(),
+            (None, false) => &self.default,
+        };
         let (fit, background) = self.chosen(output);
         Resolved {
             image: content.image.clone().filter(|_| content.playlist.is_none()),

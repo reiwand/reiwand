@@ -38,7 +38,11 @@ with zipfile.ZipFile(sys.argv[1], "w") as out:
     for name, data in files.items():
         out.writestr(name, data)
 TWIN
-sea_uid=$(imported "$scene/sea.wpak") && spin_uid=$(imported "$scene/spin.wpak") && twin_uid=$(imported "$scene/twin.wpak")
+sea_uid=$(imported "$scene/sea.wpak") && spin_uid=$(imported "$scene/spin.wpak")
+mkdir -p "$scene/twins" && mv "$scene/twin.wpak" "$scene/twins/"
+read -r twin_source twin_job < <(bus Library1 AddSource sb "$scene/twins" true | out "' '.join(map(str, d))")
+wait_for 20 finished "$twin_job" || fail "twin source scan: $(bus Daemon1 GetJob t "$twin_job")"
+twin_uid=$(reply "r['items'][0]['uid']" Library1 Search suu "folder:\"$scene/twins\"" 0 1)
 analysing() {
   local dump
   dump=$(pw-dump 2>/dev/null) || return 1
@@ -80,6 +84,26 @@ wait_for 10 analysing || fail "no PipeWire stream for the audio analysis"
 sleep 4
 [ "$(bands TEST-12 "r['listening'] is True and (r['sound'] is False or len(r['raw'][0]) == 64)")" = True ] ||
   fail "the levels have the wrong shape: $(ctl input bands TEST-12)"
+python3 - "$WORK/tone.wav" <<'TONE'
+import math, struct, sys, wave
+with wave.open(sys.argv[1], "wb") as out:
+    out.setnchannels(2)
+    out.setsampwidth(2)
+    out.setframerate(48000)
+    out.writeframes(b"".join(struct.pack("<hh", *[int(12000 * math.sin(i * 0.0917))] * 2) for i in range(48000 * 2)))
+TONE
+pw-cli create-node adapter '{ factory.name=support.null-audio-sink node.name=reiwand-audio-sink
+  media.class=Audio/Sink object.linger=true audio.position=[FL FR] }' >/dev/null
+sleep 2
+tone() { pw-cat --playback --target reiwand-audio-sink "$WORK/tone.wav" >/dev/null 2>&1; }
+heard() { [ "$(bands TEST-12 "r['sound'] is True and max(r['raw'][0]) > 0")" = True ]; }
+tone & pids+=($!)
+wait_for 15 heard || fail "the spectrum did not read the first sound: $(ctl input bands TEST-12)"
+wait $! 2>/dev/null || true
+sleep 5
+tone & pids+=($!)
+wait_for 15 heard || fail "the spectrum stayed frozen after a silence: $(ctl input bands TEST-12)"
+wait $! 2>/dev/null || true
 ctl config pause.when_covered false && ctl covered TEST-12 true
 wait_for 10 reads "r['capturing']" False || fail "the sound of a covered screen was captured"
 ctl covered TEST-12 false && ctl config pause.when_covered true
@@ -130,5 +154,6 @@ ctl input revoke "$sea" audio
 grep -q "$sea" "$XDG_DATA_HOME/reiwand/inputs.json" && fail "a revoked grant was kept"
 [ "$(bands TEST-12 "(r['granted'], r['listening'])")" = "(False, False)" ] ||
   fail "the levels outlived the grant: $(ctl input bands TEST-12)"
-bus Library1 Remove asb 3 "$sea_uid" "$spin_uid" "$twin_uid" false >/dev/null
+bus Library1 Remove asb 2 "$sea_uid" "$spin_uid" false >/dev/null
+bus Library1 RemoveSource s "$twin_source" >/dev/null
 echo "audio and script scene checks passed"

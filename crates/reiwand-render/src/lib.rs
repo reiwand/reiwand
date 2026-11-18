@@ -127,7 +127,6 @@ pub struct Layer<'a> {
     pub relief: Option<Relief<'a>>,
     pub flip: [bool; 2],
     pub grade: Option<reiwand_core::Grade>,
-    pub clip: Option<reiwand_core::Region>,
 }
 
 pub fn log_allowed(last: &AtomicU64) -> bool {

@@ -124,6 +124,7 @@ impl Playlists {
         steps: i32,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<String> {
+        let output = crate::browse::pointer::resolve(&self.0, emitter.connection(), output).await;
         let told = library(&self.0)?.run(move |d| d.browse_move(&output, &source, steps)).await?;
         crate::browse::told(&self.0, emitter, told).await
     }

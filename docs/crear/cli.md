@@ -232,7 +232,7 @@ Imprime los archivos que escribió. Dibuja lo mismo que la vista previa del edit
 | Opción | Qué hace |
 |--------|----------|
 | `-o ARCHIVO` | `.png`, `.jpg`, `.webp`, `.avif` o `.gif` (animado). Obligatorio. |
-| `--time S` | El segundo de la escena del primer cuadro. |
+| `--time S` | El segundo de la escena del primer cuadro. Las partículas llevan simulados `prewarm` más S segundos (con tope de 30 s en total). |
 | `--time-of-day HORA` | La hora de pared que ven la escena y sus scripts: `HH:MM[:SS]` de hoy o `AAAA-MM-DD HH:MM[:SS]`. Sin ella, la hora de este equipo; ponla para que la imagen salga igual siempre. |
 | `--media ARCHIVO` | Una pista inventada del reproductor (JSON: `title`, `artist`, `album`, `playing`, `position`, `duration`, `rate`, `cover`…; la carátula es una imagen de la carpeta) que ven los scripts y las imágenes que siguen a la carátula. Sin ella, no hay reproductor. |
 | `--quality q0`…`q3` | El nivel de calidad más alto (`q3` por defecto). |

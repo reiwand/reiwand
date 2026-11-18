@@ -54,6 +54,7 @@ modules:
       - for f in packaging/dbus/*.service; do sed 's|@BINDIR@|/app/bin|' "$f" > "/app/share/dbus-1/services/${f##*/}"; done
       - sed -i 's|^Exec=/app/bin/|Exec=/app/bin/reiwand-launch /app/bin/|' /app/share/dbus-1/services/io.github.reiwand.Daemon.service /app/share/dbus-1/services/io.github.reiwand.service
       - sed -e 's|@BINDIR@|/app/bin|' -e '/^DBusActivatable=/d' packaging/desktop/io.github.reiwand.desktop > /app/share/applications/io.github.reiwand.desktop
+      - install -Dm644 packaging/mime/io.github.reiwand.xml /app/share/mime/packages/io.github.reiwand.Reiwand.xml
       - install -Dm644 -t /app/share/icons/hicolor/scalable/apps packaging/icons/io.github.reiwand.svg
       - for png in packaging/icons/hicolor/*/apps/io.github.reiwand.png; do size=$(basename "$(dirname "$(dirname "$png")")"); install -Dm644 -t "/app/share/icons/hicolor/$size/apps" "$png"; done
       - install -Dm644 -t /app/share/metainfo packaging/flatpak/io.github.reiwand.Reiwand.metainfo.xml

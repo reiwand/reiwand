@@ -54,6 +54,8 @@ pub mod pack;
 mod passing;
 mod paths;
 pub mod pkg;
+pub mod pkg_import;
+pub mod pkg_preview;
 pub mod playlists;
 pub mod presets;
 mod presetting;

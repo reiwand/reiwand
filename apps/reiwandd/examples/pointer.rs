@@ -1,8 +1,5 @@
 use smithay_client_toolkit::reexports::client::globals::{GlobalListContents, registry_queue_init};
-use smithay_client_toolkit::reexports::client::protocol::{
-    wl_pointer::{Axis, ButtonState},
-    wl_registry::WlRegistry,
-};
+use smithay_client_toolkit::reexports::client::protocol::{wl_pointer::ButtonState, wl_registry::WlRegistry};
 use smithay_client_toolkit::reexports::client::{Connection, Dispatch, QueueHandle, delegate_noop};
 use smithay_client_toolkit::reexports::protocols_wlr::virtual_pointer::v1::client::{
     zwlr_virtual_pointer_manager_v1::ZwlrVirtualPointerManagerV1 as Manager,
@@ -35,18 +32,7 @@ fn main() -> anyhow::Result<()> {
     queue.roundtrip(&mut Seat)?;
     println!("ready");
     for line in std::io::stdin().lock().lines() {
-        let line = line?;
-        if let Some(turns) = line.strip_prefix("wheel ").and_then(|n| n.trim().parse::<i32>().ok()) {
-            pointer.axis_source(
-                smithay_client_toolkit::reexports::client::protocol::wl_pointer::AxisSource::Wheel,
-            );
-            pointer.axis_discrete(0, Axis::VerticalScroll, f64::from(turns) * 15.0, turns);
-            pointer.frame();
-            queue.roundtrip(&mut Seat)?;
-            println!("done");
-            continue;
-        }
-        let words: Vec<u32> = line.split_whitespace().filter_map(|w| w.parse().ok()).collect();
+        let words: Vec<u32> = line?.split_whitespace().filter_map(|w| w.parse().ok()).collect();
         match words[..] {
             [x, y, width, height] => pointer.motion_absolute(0, x, y, width, height),
             [button, down] => {

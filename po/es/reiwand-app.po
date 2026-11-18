@@ -71,7 +71,10 @@ msgid ""
 "An account appears when a private repository asks for one or when you "
 "publish to a repository. Each account is linked to the repositories it is "
 "used for."
-msgstr "Una cuenta aparece cuando un repositorio privado la pide o cuando publicas en un repositorio. Cada cuenta queda vinculada a los repositorios para los que se usa."
+msgstr ""
+"Una cuenta aparece cuando un repositorio privado la pide o cuando publicas "
+"en un repositorio. Cada cuenta queda vinculada a los repositorios para los "
+"que se usa."
 
 #: apps/reiwand-app/qml/AccountPage.qml
 msgid "Your accounts"
@@ -86,7 +89,10 @@ msgid ""
 "Accounts are not synchronized. To take your repositories, lists and "
 "favorites to another computer, export them to a file in Settings and import "
 "it there."
-msgstr "Las cuentas no se sincronizan. Para llevar tus repositorios, listas y favoritos a otro equipo, expórtalos a un archivo en Ajustes e impórtalos allí."
+msgstr ""
+"Las cuentas no se sincronizan. Para llevar tus repositorios, listas y "
+"favoritos a otro equipo, expórtalos a un archivo en Ajustes e impórtalos "
+"allí."
 
 #: apps/reiwand-app/qml/AccountRow.qml apps/reiwand-app/qml/CarryResult.qml
 #: apps/reiwand-app/qml/facade/CarryWords.qml
@@ -133,7 +139,9 @@ msgstr "¿Quitar la cuenta de %1?"
 msgid ""
 "Its saved access is deleted and its repositories stop using it. The "
 "wallpapers you installed stay."
-msgstr "Se borra su acceso guardado y sus repositorios dejan de usarla. Los fondos que instalaste se quedan."
+msgstr ""
+"Se borra su acceso guardado y sus repositorios dejan de usarla. Los fondos "
+"que instalaste se quedan."
 
 #: apps/reiwand-app/qml/AccountRow.qml apps/reiwand-app/qml/EditOps.qml
 #: apps/reiwand-app/qml/LibraryCard.qml apps/reiwand-app/qml/LibraryMore.qml
@@ -6560,7 +6568,8 @@ msgstr "No se agregó"
 #: apps/reiwand-app/qml/RepoAddAnswer.qml
 msgid ""
 "Use one of your accounts on %1 or sign in with another one to publish here."
-msgstr "Usa una de tus cuentas en %1 o inicia sesión con otra para publicar aquí."
+msgstr ""
+"Usa una de tus cuentas en %1 o inicia sesión con otra para publicar aquí."
 
 #: apps/reiwand-app/qml/RepoAddAnswer.qml
 msgid "Sign in with an account of %1 to publish here."
@@ -21172,8 +21181,12 @@ msgstr "Retirado por su repositorio"
 msgid "Has flashes, turned off"
 msgstr "Tiene destellos, deshabilitado"
 
-msgid "The public keys with which you sign the packages you upload. Create a pair in the build dialog of the editor; only the public key goes here."
-msgstr "Las claves públicas con las que firmas los paquetes que subes. Crea el par en el diálogo de compilación del editor; aquí solo va la clave pública."
+msgid ""
+"The public keys with which you sign the packages you upload. Create a pair "
+"in the build dialog of the editor; only the public key goes here."
+msgstr ""
+"Las claves públicas con las que firmas los paquetes que subes. Crea el par "
+"en el diálogo de compilación del editor; aquí solo va la clave pública."
 
 msgid "Registered"
 msgstr "Registrada"
@@ -21187,8 +21200,12 @@ msgstr "Registrar una clave desde un archivo…"
 msgid "Hand over to a new key"
 msgstr "Traspasar a una clave nueva"
 
-msgid "Sign the hand-over with the old key in Manage keys… of the step “Sign it” when you publish, and paste the signature here."
-msgstr "Firma el traspaso con la clave antigua en Administrar claves… del paso «Fírmalo» al publicar y pega aquí la firma."
+msgid ""
+"Sign the hand-over with the old key in Manage keys… of the step “Sign it” "
+"when you publish, and paste the signature here."
+msgstr ""
+"Firma el traspaso con la clave antigua en Administrar claves… del paso "
+"«Fírmalo» al publicar y pega aquí la firma."
 
 msgid "Repository · %1"
 msgstr "Repositorio · %1"
@@ -21202,8 +21219,12 @@ msgstr "Aún no has subido nada a este repositorio"
 msgid "Unlisted"
 msgstr "Oculto"
 
-msgid "Unlisted versions stay out of the catalog and search; whoever has their link can still install them."
-msgstr "Las versiones ocultas quedan fuera del catálogo y de la búsqueda; quien tenga su enlace aún puede instalarlas."
+msgid ""
+"Unlisted versions stay out of the catalog and search; whoever has their link "
+"can still install them."
+msgstr ""
+"Las versiones ocultas quedan fuera del catálogo y de la búsqueda; quien "
+"tenga su enlace aún puede instalarlas."
 
 msgid "Upload not finished"
 msgstr "Subida sin terminar"
@@ -21214,36 +21235,62 @@ msgstr "Cancelarla"
 msgid "Sign in again at %1"
 msgstr "Inicia sesión de nuevo en %1"
 
-msgid "The server no longer accepts your account. Sign in again to keep publishing; nothing was lost."
-msgstr "El servidor ya no acepta tu cuenta. Inicia sesión de nuevo para seguir publicando; no se perdió nada."
+msgid ""
+"The server no longer accepts your account. Sign in again to keep publishing; "
+"nothing was lost."
+msgstr ""
+"El servidor ya no acepta tu cuenta. Inicia sesión de nuevo para seguir "
+"publicando; no se perdió nada."
 
 #: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Shows a strip over the wallpaper and moves to the next one. To change the combination, press Enter and then the new keys."
-msgstr "Muestra una tira sobre el fondo y pasa al siguiente. Para cambiar la combinación, pulsa Intro y luego las teclas nuevas."
+msgid ""
+"Shows a strip over the wallpaper and moves to the next one. To change the "
+"combination, press Enter and then the new keys."
+msgstr ""
+"Muestra una tira sobre el fondo y pasa al siguiente. Para cambiar la "
+"combinación, pulsa Intro y luego las teclas nuevas."
 
 #: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Shows a strip over the wallpaper and moves to the one before. To change the combination, press Enter and then the new keys."
-msgstr "Muestra una tira sobre el fondo y pasa al anterior. Para cambiar la combinación, pulsa Intro y luego las teclas nuevas."
+msgid ""
+"Shows a strip over the wallpaper and moves to the one before. To change the "
+"combination, press Enter and then the new keys."
+msgstr ""
+"Muestra una tira sobre el fondo y pasa al anterior. Para cambiar la "
+"combinación, pulsa Intro y luego las teclas nuevas."
 
 #: apps/reiwand-app/qml/SettingsMore.qml
 msgid "Apply the wallpaper of the strip"
 msgstr "Aplicar el fondo de la tira"
 
 #: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Keeps the wallpaper in the middle of the strip. The wheel moves the strip and a click on the middle one applies it. To change the combination, press Enter and then the new keys."
-msgstr "Deja el fondo que está en el centro de la tira. La rueda mueve la tira y un clic en el del centro lo aplica. Para cambiar la combinación, pulsa Intro y luego las teclas nuevas."
+msgid ""
+"Keeps the wallpaper in the middle of the strip. The wheel moves the strip "
+"and a click on the middle one applies it. To change the combination, press "
+"Enter and then the new keys."
+msgstr ""
+"Deja el fondo que está en el centro de la tira. La rueda mueve la tira y un "
+"clic en el del centro lo aplica. Para cambiar la combinación, pulsa Intro y "
+"luego las teclas nuevas."
 
 #: apps/reiwand-app/qml/SettingsMore.qml
 msgid "Close the strip without changing"
 msgstr "Cerrar la tira sin cambiar nada"
 
 #: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Closes the strip and leaves the wallpaper as it was. To change the combination, press Enter and then the new keys."
-msgstr "Cierra la tira y deja el fondo como estaba. Para cambiar la combinación, pulsa Intro y luego las teclas nuevas."
+msgid ""
+"Closes the strip and leaves the wallpaper as it was. To change the "
+"combination, press Enter and then the new keys."
+msgstr ""
+"Cierra la tira y deja el fondo como estaba. Para cambiar la combinación, "
+"pulsa Intro y luego las teclas nuevas."
 
 #: apps/reiwand-app/qml/SettingsMore.qml
-msgid "The desktop did not give the keys: bind reiwand-ctl next --preview, prev --preview, browse apply and browse cancel to your own keys"
-msgstr "El escritorio no dio los atajos: ata reiwand-ctl next --preview, prev --preview, browse apply y browse cancel a tus propias teclas"
+msgid ""
+"The desktop did not give the keys: bind reiwand-ctl next --preview, prev --"
+"preview, browse apply and browse cancel to your own keys"
+msgstr ""
+"El escritorio no dio los atajos: ata reiwand-ctl next --preview, prev --"
+"preview, browse apply y browse cancel a tus propias teclas"
 
 #: apps/reiwand-app/qml/SettingsMore.qml
 msgid "The desktop is asked for these four combinations"
@@ -21262,12 +21309,20 @@ msgid "Axis"
 msgstr "Eje"
 
 #: apps/reiwand-app/qml/SceneSwarmPulls.qml
-msgid "Drag to aim the axis the particles turn around: the direction sets the turn, the distance from the center sets the tilt"
-msgstr "Arrastra para orientar el eje alrededor del que giran las partículas: la dirección fija el giro y la distancia al centro, la inclinación"
+msgid ""
+"Drag to aim the axis the particles turn around: the direction sets the turn, "
+"the distance from the center sets the tilt"
+msgstr ""
+"Arrastra para orientar el eje alrededor del que giran las partículas: la "
+"dirección fija el giro y la distancia al centro, la inclinación"
 
 #: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
-msgid "Drag to aim the axis the births turn around: the direction sets the turn, the distance from the center sets the tilt"
-msgstr "Arrastra para orientar el eje alrededor del que nacen las partículas: la dirección fija el giro y la distancia al centro, la inclinación"
+msgid ""
+"Drag to aim the axis the births turn around: the direction sets the turn, "
+"the distance from the center sets the tilt"
+msgstr ""
+"Arrastra para orientar el eje alrededor del que nacen las partículas: la "
+"dirección fija el giro y la distancia al centro, la inclinación"
 
 #: apps/reiwand-app/qml/SceneSwarmStretch.qml
 msgid "Add pixels to the side"
@@ -21391,7 +21446,9 @@ msgstr "Arrastra para cambiar el radio vertical"
 
 #: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
 msgid "Drag to hollow the ball: the second ring keeps births outside it"
-msgstr "Arrastra para ahuecar la esfera: el segundo anillo deja los nacimientos fuera de él"
+msgstr ""
+"Arrastra para ahuecar la esfera: el segundo anillo deja los nacimientos "
+"fuera de él"
 
 #: apps/reiwand-app/qml/SceneSwarmVolume.qml
 msgid "Horizontal: both sides"
@@ -21444,3 +21501,97 @@ msgstr "Núcleo hueco"
 #: apps/reiwand-app/qml/facade/SceneTerms.qml
 msgid "Audio inputs"
 msgstr "Entradas de sonido"
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid ""
+"Opens the wallpaper switcher on the next one. To change the combination, "
+"press Enter and then the new keys."
+msgstr ""
+"Abre el cambiador de fondos en el siguiente. Para cambiar la combinación, "
+"pulsa Intro y luego las teclas nuevas."
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid ""
+"Opens the wallpaper switcher on the one before. To change the combination, "
+"press Enter and then the new keys."
+msgstr ""
+"Abre el cambiador de fondos en el anterior. Para cambiar la combinación, "
+"pulsa Intro y luego las teclas nuevas."
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid "Apply the wallpaper of the switcher"
+msgstr "Aplicar el fondo del cambiador"
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid ""
+"Keeps the wallpaper in the middle of the switcher. Enter and a click on the "
+"middle one do the same. To change the combination, press Enter and then the "
+"new keys."
+msgstr ""
+"Se queda con el fondo del centro del cambiador. Intro y un clic en el del "
+"centro hacen lo mismo. Para cambiar la combinación, pulsa Intro y luego las "
+"teclas nuevas."
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid "Close the switcher without changing"
+msgstr "Cerrar el cambiador sin cambiar nada"
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid ""
+"Closes the switcher and leaves the wallpaper as it was. Esc does the same. "
+"To change the combination, press Enter and then the new keys."
+msgstr ""
+"Cierra el cambiador y deja el fondo como estaba. Esc hace lo mismo. Para "
+"cambiar la combinación, pulsa Intro y luego las teclas nuevas."
+
+#: apps/reiwand-app/qml/Preview.qml
+msgid "Change wallpaper · %1"
+msgstr "Cambiar de fondo · %1"
+
+#: apps/reiwand-app/qml/Preview.qml
+msgid "List «%1»"
+msgstr "Lista «%1»"
+
+#: apps/reiwand-app/qml/PreviewHints.qml
+msgid "Move, or use the wheel"
+msgstr "Mover o usar la rueda"
+
+#: apps/reiwand-app/qml/PreviewPanel.qml
+msgid "This screen has only one wallpaper"
+msgstr "Esta pantalla tiene un solo fondo"
+
+#: apps/reiwand-app/qml/PreviewPanel.qml
+msgid "Add more wallpapers to the library to switch between them."
+msgstr "Añade más fondos a la biblioteca para poder cambiar entre ellos."
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "Import wallpaper…"
+msgstr "Importar fondo…"
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "Import wallpaper"
+msgstr "Importar fondo"
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "Wallpaper packages (*.wpak)"
+msgstr "Paquetes de fondo (*.wpak)"
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "A newer version of this wallpaper is already in your library."
+msgstr "Ya tienes una versión más nueva de este fondo en tu biblioteca."
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "Use the older one"
+msgstr "Usar la más antigua"
+
+#: apps/reiwand-app/qml/ItemFacts.qml
+msgid "Source:"
+msgstr "Origen:"
+
+#: apps/reiwand-app/qml/ItemFacts.qml
+msgid "Local · Unverified signature"
+msgstr "Local · Sin firma verificada"
+
+#: apps/reiwand-app/qml/FirstStart.qml
+msgid "Wallpaper packages you downloaded, as .wpak files."
+msgstr "Paquetes de fondo que descargaste, como archivos .wpak."

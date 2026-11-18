@@ -12,7 +12,6 @@ reiwand-client.workspace = true
 reiwand-render.workspace = true
 reiwand-depth = { workspace = true, features = ["infer"] }
 reiwand-scene.workspace = true
-reiwand-type.workspace = true
 reiwand-pipewire.workspace = true
 reiwand-video.workspace = true
 reiwand-wayland.workspace = true

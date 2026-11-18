@@ -1,4 +1,4 @@
-use super::Do;
+use super::act::Do;
 use super::list::moved;
 use super::shortcuts::{action, proposed};
 use super::{Browsing, source};
@@ -61,16 +61,4 @@ fn shortcuts_propose_valid_triggers_only() {
     assert_eq!(action(shown[2].0), Some(Do::Apply));
     assert_eq!(action(shown[3].0), Some(Do::Cancel));
     assert_eq!(action("other"), None);
-}
-
-#[test]
-fn the_strip_shows_neighbours_without_repeating_the_middle() {
-    use super::stage::around;
-    assert_eq!(around(0, Some(0), 3), vec![]);
-    assert_eq!(around(1, Some(0), 3), vec![]);
-    assert_eq!(around(3, Some(0), 3), vec![(1, 1), (-1, 2)]);
-    assert_eq!(around(4, Some(1), 3), vec![(1, 2), (-1, 0), (2, 3)]);
-    let wide = around(20, Some(10), 3);
-    assert_eq!(wide.len(), 6);
-    assert!(wide.contains(&(-3, 7)) && wide.contains(&(3, 13)));
 }

@@ -6,18 +6,18 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{LazyLock, Mutex};
 use std::time::{Duration, Instant};
 
+mod act;
 mod list;
+pub(crate) mod pointer;
 mod reply;
 mod session;
 pub(crate) mod shortcuts;
-mod stage;
 mod strip;
 #[cfg(test)]
 mod tests;
 mod transition;
 
 pub use reply::told;
-pub(crate) use stage::{Do, attach, pointer, run, wheel};
 
 pub static IDLE: LazyLock<Duration> = LazyLock::new(|| {
     let ms = std::env::var("REIWAND_BROWSE_IDLE_MS").ok().and_then(|v| v.parse().ok());
@@ -52,7 +52,6 @@ pub struct Browsing {
     sessions: Mutex<HashMap<String, Session>>,
     held: Mutex<HashMap<String, (Duration, Instant)>>,
     shortcuts: Mutex<Option<ShortcutsState>>,
-    stages: Mutex<HashMap<String, stage::Stage>>,
     made: AtomicU64,
 }
 
@@ -109,6 +108,13 @@ impl Daemon {
         match (real.next(), real.next()) {
             (Some(only), None) => only.clone(),
             _ => String::new(),
+        }
+    }
+
+    pub fn browse_keep(&self, output: &str, serial: u64) {
+        if let Some(s) = lock(&self.rotations.browse.sessions).get_mut(output).filter(|s| s.serial == serial)
+        {
+            s.until = Instant::now() + *IDLE;
         }
     }
 

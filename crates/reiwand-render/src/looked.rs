@@ -29,7 +29,6 @@ impl Renderer {
             relief: None,
             flip: [false; 2],
             grade: None,
-            clip: None,
         };
         let mut bgra = Vec::new();
         self.render_layers(&mut drawn, &[layer], &mut bgra).ok()?;

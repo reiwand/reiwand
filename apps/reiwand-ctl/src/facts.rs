@@ -12,6 +12,7 @@ pub fn check(path: &Path, json: bool) -> Result<()> {
         true => inspect(path),
         false => open(path, &Limits::default()).and_then(|mut package| {
             package.look_closer()?;
+            package.weigh()?;
             Ok((package.manifest, package.facts))
         }),
     };

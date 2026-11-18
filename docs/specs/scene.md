@@ -225,6 +225,14 @@ scaled by fixed transforms of its own and its groups, grown by the `reach` of it
 whose place can change while it plays (a bound or animated `position`, `rotation`, `skew` or
 `scale`, a `tilt`, an `anchor`, `parallax`, a `parent`, an `attach`, a bound `reach`, or any script
 in the scene) counts as the whole canvas. A
+single-pass effect that the render draws only over a box (`bounded`, or a fixed texture mask in `strength` mode that is
+not inverted, feathered or weaker than 1) counts its units times the share of its texture that the lit texels' box covers
+(the box of the channels the mask reads, or of red, green and blue for `bounded`; the box of both when it has both),
+with a floor of 5 % for the fixed cost of the pass; the box grows on every side by the `reach` of the effect (its value over the canvas size). The boxes come from the
+pictures the renderer already decodes (`SceneAssets::ink_scene`, before the quality level is chosen), so loading a
+wallpaper decodes nothing twice; where no renderer exists (editor, `pack check`, `scene catalog`) `Scene::read_inked`
+decodes them. A texture that does not clamp counts whole, as does a multi-pass effect. `pack check`, `scene catalog`, the effect panel (`reach` query), the phone and the
+automatic quality level all use that same function (`Scene::effect_units`). A
 layer that masks or feeds others adds one more unit times its share, once however many read it,
 since it is drawn on its own at most once a frame. Particles add their overdraw (`capacity·size²·min(aspect, 1/aspect)` over the canvas), `canvas.bloom` adds the units of its effect over the whole canvas, a
 `canvas.camera` makes every layer count as the whole canvas, and every frame costs 1.5 units for composing and copying.
@@ -1801,7 +1809,9 @@ The simulation advances in fixed steps of 1/60 s, at most 15 per frame; a longer
 equal steps up to a second, so particles keep real time down to one frame per second and never
 catch up more than a second, and the same seed and the same frames give the same particles. While
 no particle lives and none is emitted, the system skips ahead to its next timed burst. A paused
-scene frees its particles and starts them again, prewarmed, when it resumes. It runs in compute shaders
+scene frees its particles and starts them again, prewarmed, when it resumes. A still render, a poster or a seek to the second T (`--time`) starts each system at `prewarm` plus T seconds of
+simulation, in the same steps of 1/15 s and under the same 30 s and shared-budget caps as `prewarm`, so beyond 30 s
+the system is as it is at 30 s. Only an explicit seek does this; a system revealed while the scene runs starts from its `prewarm` alone. It runs in compute shaders
 on the GPU, and on the CPU with software rendering or where compute shaders are missing. Particles
 only move while their layer is shown and the scene runs, and a scene keeps rendering only while
 particles live, are emitted or wait for their next timed burst. A scene holds at most 2 000

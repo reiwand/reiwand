@@ -111,7 +111,7 @@ impl Daemon {
         Ok(())
     }
 
-    fn repoint(&self, from: &std::path::Path, to: &std::path::Path) -> Result<()> {
+    pub(crate) fn repoint(&self, from: &std::path::Path, to: &std::path::Path) -> Result<()> {
         let shown = |c: &reiwand_core::Config| {
             c.default.image.as_deref() == Some(from)
                 || c.outputs.values().any(|o| o.image.as_deref() == Some(from))

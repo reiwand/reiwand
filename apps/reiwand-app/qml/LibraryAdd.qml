@@ -24,9 +24,28 @@ PanelChico {
         chooser.open();
     }
 
+    function pick() {
+        packages.open();
+    }
+
     function bring(paths, copy) {
-        if (paths.length > 0)
-            App.act("Import", [paths, copy], "Library1", reply => add && add.follow(Number(Array.isArray(reply) ? reply[0] : reply)));
+        const wpak = paths.filter(path => path.toLowerCase().endsWith(".wpak"));
+        const rest = paths.filter(path => !wpak.includes(path));
+        if (wpak.length > 0)
+            App.act("ImportPackages", [wpak, false], "Library1", reply => add && add.follow(Number(Array.isArray(reply) ? reply[0] : reply)));
+        if (rest.length > 0)
+            App.act("Import", [rest, copy], "Library1", reply => add && add.follow(Number(Array.isArray(reply) ? reply[0] : reply)));
+    }
+
+    function older(failed) {
+        const paths = failed.filter(one => one.older).map(one => one.path);
+        if (paths.length === 0)
+            return false;
+        applicationWindow().showPassiveNotification(App.tr("A newer version of this wallpaper is already in your library."), "long", App.tr("Use the older one"), () => {
+            if (add)
+                App.act("ImportPackages", [paths, true], "Library1", reply => add && add.follow(Number(Array.isArray(reply) ? reply[0] : reply)));
+        });
+        return true;
     }
 
     function follow(job) {
@@ -43,6 +62,8 @@ PanelChico {
             const imported = (output.imported ?? []).length;
             const failed = output.failed ?? [];
             if (imported + failed.length === 0)
+                return;
+            if (imported === 0 && older(failed))
                 return;
             if (imported === 0)
                 return applicationWindow().showPassiveNotification(App.tr("The files could not be added: %1", failed[0].error), "long");
@@ -105,6 +126,15 @@ PanelChico {
         height: Look.e6 * 4
         placeholderText: App.tr("One path per line")
         Accessible.name: App.tr("Paths to import")
+    }
+
+    Chooser {
+        id: packages
+
+        mode: Chooser.Files
+        title: App.tr("Import wallpaper")
+        nameFilters: [App.tr("Wallpaper packages (*.wpak)")]
+        onAccepted: add.bring(Array.from(selectedFiles, file => App.path(file)), true)
     }
 
     Chooser {

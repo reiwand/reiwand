@@ -55,6 +55,7 @@ FocusScope {
 
     required property var run
     required property var adder
+    property var importer: null
     required property var page
     readonly property bool banded: (page.band?.width ?? 0) > 0
     readonly property real low: Math.max(explore.height, side.height) + Look.e4 + (shelf.visible ? shelf.implicitHeight : 0)
@@ -109,6 +110,13 @@ FocusScope {
                 title: App.tr("Add a source")
                 text: App.tr("Pictures that renew themselves, like a picture of the day.")
                 onChosen: applicationWindow().showPage(3)
+            }
+
+            Path {
+                visible: !!start.importer
+                title: App.tr("Import wallpaper…")
+                text: App.tr("Wallpaper packages you downloaded, as .wpak files.")
+                onChosen: start.importer?.pick()
             }
 
             Path {

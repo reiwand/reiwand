@@ -162,6 +162,9 @@ importa un mapa hecho en el escritorio, el PNG de 16 bits que guarda junto a la 
 `foto.jpg.depth.png`), si tiene la misma proporción. En *Ajustes*, *Permitir descargar el modelo de
 profundidad* (`models.allow_download`) bloquea la descarga, y ahí mismo se puede borrar el modelo.
 
+En el teléfono, *Abrir un paquete* guarda el `.wpak` en la misma biblioteca única del aparato, sin
+preguntar dónde; no hay repositorio local que elegir.
+
 Los filtros *Escenas* y *Páginas web* de la biblioteca tienen *Fondos de ejemplo*, que
 vuelve a añadir el repositorio local «Example wallpapers» que la app añade al primer arranque (con las
 seis escenas y la página web *Luces* que trae el APK, los mismos ejemplos que el escritorio) y abre

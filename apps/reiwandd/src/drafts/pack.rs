@@ -112,6 +112,7 @@ impl Daemon {
                 _ => {}
             }
         }
+        assets.ink_scene(&scene);
         let scripts = scene.scripts.iter().map(|s| {
             let text = std::fs::read_to_string(file(&s.path)?)
                 .map_err(|_| invalid(format!("{} is not text", s.path)))?;

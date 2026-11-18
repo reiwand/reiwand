@@ -4,9 +4,9 @@ use crate::input::confirm;
 use crate::items::range;
 use crate::show::{self, bytes, list, prefix, short, table, text};
 use crate::told::{fill, told, tr};
-use anyhow::{Context, Result, bail, ensure};
+use anyhow::{Context, Result, ensure};
 use clap::Subcommand;
-use futures_util::{StreamExt, TryFutureExt};
+use futures_util::TryFutureExt;
 use reiwand_client::{Client, error_name, parse};
 use reiwand_core::dbus::error::STALE;
 use reiwand_core::model::{BrowsePage, InstalledReply};
@@ -49,6 +49,15 @@ pub enum Pkg {
         #[command(flatten)]
         wait: Wait,
     },
+    #[command(about = "Import package files into the library, or update the ones already imported")]
+    Import {
+        #[arg(required = true, value_name = "FILE", help = "Package files (.wpak) to import")]
+        files: Vec<String>,
+        #[arg(long, help = "Allow a version older than the imported one")]
+        allow_older: bool,
+        #[command(flatten)]
+        wait: Wait,
+    },
     #[command(about = "Install every available update")]
     Upgrade {
         #[arg(long, help = "Install even when the signed index of a repository expired")]
@@ -82,7 +91,11 @@ pub async fn run(client: &Client, command: Pkg) -> Result<()> {
         }
         Pkg::Reveal { spec } => repos.reveal(&spec).await?,
         Pkg::Preview { spec, animated } => {
-            let path = tokio::time::timeout(Duration::from_secs(60), preview(client, &spec, animated)).await;
+            let path = tokio::time::timeout(
+                Duration::from_secs(60),
+                crate::pkg_preview::preview(client, &spec, animated),
+            )
+            .await;
             let path = path.context(tr(told("no preview arrived within 60 s")))??;
             ensure!(!path.is_empty(), "{}", tr(told("no preview")));
             println!("{path}")
@@ -102,30 +115,13 @@ pub async fn run(client: &Client, command: Pkg) -> Result<()> {
             }
             declined.map_or(Ok(()), Err)?
         }
+        Pkg::Import { files, allow_older, wait } => {
+            crate::pkg_import::run(client, &files, allow_older, &wait).await?
+        }
         Pkg::Uninstall { id, version } => repos.uninstall(&id, &version).await?,
         Pkg::Ls { json } => show::reply(repos.list_installed().await?, json, installed)?,
     }
     Ok(())
-}
-
-async fn preview(client: &Client, spec: &str, animated: bool) -> Result<String> {
-    let mut ready = client.repos.receive_preview_ready().await?;
-    let cached = match animated {
-        true => client.repos.request_animated_previews(&[spec]).await?,
-        false => client.repos.request_previews(&[spec]).await?,
-    };
-    if let Some(path) = cached.get(spec) {
-        return Ok(path.clone());
-    }
-    let wanted = if animated { format!("animated:{spec}") } else { spec.to_owned() };
-    while let Some(signal) = ready.next().await {
-        if let Ok(args) = signal.args()
-            && args.spec == wanted
-        {
-            return Ok(args.path.into());
-        }
-    }
-    bail!("{}", tr(told("the connection to the session bus was closed")))
 }
 
 async fn install(

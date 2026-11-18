@@ -151,7 +151,6 @@ mod tests {
             relief: None,
             flip: [false; 2],
             grade: None,
-            clip: None,
         };
         let mut draw = |layers: &[Layer<'_>]| {
             r.render_layers(&mut target, layers, &mut pixels).unwrap();

@@ -133,6 +133,15 @@ impl Library {
         Ok(self.db.query_row(sql, params![pkg_id, what], |row| row.get::<_, i64>(0))? > 0)
     }
 
+    pub fn loose_packages(&self, pkg_id: &str) -> Result<Vec<(String, std::path::PathBuf, String)>> {
+        let sql =
+            "SELECT uid, path, coalesce(pkg_version, '') FROM items WHERE pkg_id = ?1 AND source_id IS NULL";
+        let map = |r: &rusqlite::Row<'_>| {
+            Ok((r.get(0)?, std::path::PathBuf::from(r.get::<_, String>(1)?), r.get(2)?))
+        };
+        crate::db::rows(&self.db, sql, [pkg_id], map)
+    }
+
     pub fn copies(&self, pkg_id: &str) -> Result<u32> {
         let sql = "SELECT count(*) FROM items WHERE pkg_id = ?1";
         Ok(self.db.query_row(sql, [pkg_id], |row| row.get::<_, u32>(0))?)

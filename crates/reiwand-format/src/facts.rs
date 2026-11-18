@@ -2,7 +2,7 @@ use crate::features::{lacks, refused};
 use crate::validate::extension;
 use crate::{Input, Kind, Manifest, Platform, Result, Scene, Span};
 use reiwand_core::message::{Message, said};
-use reiwand_scene::{EffectUse, Quality, Uses, needs, newer_params, source, tells_time};
+use reiwand_scene::{EffectUse, Uses, needs, newer_params, source, tells_time};
 use std::collections::BTreeSet;
 
 pub const BUILTIN: &str = "bloom blur blur_motion blur_radial chroma_key chromatic_aberration clouds \
@@ -123,13 +123,7 @@ pub fn facts(manifest: &Manifest, scene: Option<&Scene>, size: Option<[u32; 2]>)
     let missing = |i: &&Input| !manifest.inputs.contains(i);
     let found =
         scene.map_or(Vec::new(), |s| inputs.iter().filter(missing).map(|i| (*i, place(s, *i))).collect());
-    let heavy = scene.and_then(|s| {
-        let (cost, budget) = s.heavy_cost()?;
-        let layers = s.heaviest(Quality::Q2, 3);
-        let layers: Vec<String> = layers.iter().map(|(id, units)| format!("{id} ({units:.1})")).collect();
-        Some((format!("{cost:.1}"), budget.to_string(), layers.join(", ")))
-    });
-    Facts { features, inputs, facets, found, notes: Vec::new(), heavy }
+    Facts { features, inputs, facets, found, notes: Vec::new(), heavy: None }
 }
 
 fn place(scene: &Scene, input: Input) -> String {

@@ -36,7 +36,7 @@ for scene in "$SRC"/scenes/*/; do
   "$BIN/reiwand-ctl" pack build "$scene" -o "$D/examples/$(basename "$scene").wpak" >/dev/null
 done
 cp "$SRC/scenes/LICENSE" "$D/examples/"
-cp -r "$SRC/packaging/systemd" "$SRC/packaging/dbus" "$SRC/packaging/desktop" "$SRC/packaging/icons" "$D/packaging/"
+cp -r "$SRC/packaging/systemd" "$SRC/packaging/dbus" "$SRC/packaging/desktop" "$SRC/packaging/icons" "$SRC/packaging/mime" "$D/packaging/"
 install -m755 "$SRC/packaging/install.sh" "$SRC/packaging/uninstall.sh" "$D/"
 cp "$SRC/LICENSE" "$SRC/README.md" "$SRC/packaging/THIRD-PARTY-NOTICES" "$D/"
 

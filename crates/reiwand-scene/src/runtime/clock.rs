@@ -19,6 +19,7 @@ impl Runtime {
             let left = t - self.t;
             self.advance(if left > SETTLE { (left - SETTLE).min(MAX_GAP) } else { left.min(MAX_STEP) });
         }
+        self.swarms.get_mut().iter_mut().for_each(|s| s.seeked_at(t));
         self.fired.clear();
         self.played = Default::default();
     }

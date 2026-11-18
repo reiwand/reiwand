@@ -51,6 +51,7 @@ Item {
         run: first
         page: state.page
         adder: folders
+        importer: state.bar?.tools?.dialogs?.importer ?? null
     }
 
     FirstRun {
