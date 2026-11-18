@@ -1,34 +1,51 @@
 {
-  "id": "shine",
-  "name": { "en": "Shine" },
+  "audio": [],
+  "bounded": [],
   "category": "light",
-  "description": { "en": "Sweeps a shine or glint band across the picture.", "es": "Pasa una franja de brillo por encima de la imagen." },
-  "min_fps": 30,
-  "mask_mode": "strength",
-  "params": [
-    { "id": "angle", "type": "float", "unit": "degrees", "prefill": 30, "min": -360, "max": 360 },
-    { "id": "width", "type": "float", "prefill": 0.12, "min": 0, "max": 1 },
-    { "id": "softness", "type": "float", "prefill": 0.6, "min": 0, "max": 1 },
-    { "id": "intensity", "type": "float", "prefill": 0.4, "min": 0, "max": 4 },
-    { "id": "color", "type": "color", "prefill": "#ffffff" },
-    { "id": "speed", "type": "float", "prefill": 0.25, "min": -4, "max": 4, "uses": "time" },
-    { "id": "gap", "type": "float", "prefill": 1, "min": 0, "max": 8 },
-    { "id": "phase", "type": "float", "prefill": 0, "min": 0, "max": 1 },
-    { "id": "blend", "type": "blend", "prefill": "add" },
-    { "id": "gradient", "type": "texture", "tools": ["ramp"], "prefill": "" },
-    {
-      "id": "style",
-      "type": "enum",
-      "prefill": 0,
-      "values": [
-        { "value": 0, "label": { "en": "Line", "es": "Línea" } },
-        { "value": 1, "label": { "en": "Double line", "es": "Línea doble" } },
-        { "value": 2, "label": { "en": "Ring", "es": "Anillo" } },
-        { "value": 3, "label": { "en": "Glint", "es": "Destello" } }
-      ]
-    }
-  ],
-  "passes": [{ "entry": "fs_shine", "inputs": ["previous", "asset:gradient"] }],
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Sweeps a shine or glint band across the picture.",
+    "es": "Pasa una franja de brillo por encima de la imagen."
+  },
   "fuse": "color",
-  "pace": { "sweep": ["speed", "gap", "phase"] }
+  "id": "shine",
+  "lighter": null,
+  "mask_mode": "strength",
+  "min_fps": 30,
+  "name": {
+    "en": "Shine"
+  },
+  "options": [],
+  "pace": {
+    "sweep": ["speed", "gap", "phase"]
+  },
+  "params": [
+    {"id": "angle", "type": "float", "channels": null, "help": {}, "label": {}, "max": 360, "min": -360, "paint": null, "prefill": 30, "tool": null, "tools": [], "unit": "degrees", "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "width", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.12, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "softness", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.6, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "intensity", "type": "float", "channels": null, "help": {}, "label": {}, "max": 4, "min": 0, "paint": null, "prefill": 0.4, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "color", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#ffffff", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "speed", "type": "float", "channels": null, "help": {}, "label": {}, "max": 4, "min": -4, "paint": null, "prefill": 0.25, "tool": null, "tools": [], "unit": null, "uses": "time", "values": [], "waits_for": null, "yields_to": null},
+    {"id": "gap", "type": "float", "channels": null, "help": {}, "label": {}, "max": 8, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "phase", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "blend", "type": "blend", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "add", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "gradient", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": ["ramp"], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "style", "type": "enum", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [{"label": {"en": "Line", "es": "Línea"}, "value": 0}, {"label": {"en": "Double line", "es": "Línea doble"}, "value": 1}, {"label": {"en": "Ring", "es": "Anillo"}, "value": 2}, {"label": {"en": "Glint", "es": "Destello"}, "value": 3}], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_shine", "grid": null, "inputs": ["previous", "asset:gradient"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

@@ -1,15 +1,43 @@
 {
-  "id": "blend_texture",
-  "name": { "en": "Blend texture" },
+  "audio": [],
+  "bounded": [],
   "category": "blend",
-  "description": { "en": "Blends a texture over the picture with a chosen blend mode.", "es": "Mezcla una textura sobre la imagen con el modo de fusión que elijas." },
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Blends a texture over the picture with a chosen blend mode.",
+    "es": "Mezcla una textura sobre la imagen con el modo de fusión que elijas."
+  },
+  "fuse": null,
+  "id": "blend_texture",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Blend texture"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "texture", "type": "texture", "prefill": "" },
-    { "id": "blend", "type": "blend", "prefill": "multiply" },
-    { "id": "amount", "type": "float", "prefill": 1, "min": 0, "max": 1 },
-    { "id": "offset", "type": "vec2", "prefill": [0, 0], "min": -2, "max": 2 },
-    { "id": "scale", "type": "vec2", "prefill": [1, 1], "min": 0.01, "max": 16 }
+    {"id": "texture", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "blend", "type": "blend", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "multiply", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "amount", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "offset", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 2, "min": -2, "paint": null, "prefill": [0, 0], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "scale", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 16, "min": 0.01, "paint": null, "prefill": [1, 1], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
   ],
-  "passes": [{ "entry": "fs_blend_texture", "inputs": ["previous", "asset:texture"] }]
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_blend_texture", "grid": null, "inputs": ["previous", "asset:texture"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

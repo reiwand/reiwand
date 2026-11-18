@@ -1,33 +1,37 @@
 {
+  "audio": [],
+  "bounded": [],
+  "category": null,
+  "compose": false,
   "cost": {
     "passes": 1,
     "scale": 1,
     "taps": 1
   },
+  "description": null,
   "fuse": "color",
   "id": "duotono",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": null,
   "name": {
     "en": "Duotone",
     "es": "Duotono"
   },
+  "options": [],
+  "pace": null,
   "params": [
-    {
-      "id": "sombra",
-      "prefill": "#1b1b3a",
-      "type": "color"
-    },
-    {
-      "id": "luz",
-      "prefill": "#ffd9a0",
-      "type": "color"
-    },
-    {
-      "id": "cantidad",
-      "max": 1,
-      "min": 0,
-      "prefill": 1,
-      "type": "float"
-    }
-  ]
+    {"id": "sombra", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#1b1b3a", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "luz", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#ffd9a0", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "cantidad", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

@@ -1,15 +1,42 @@
 {
-  "id": "glitter",
-  "name": { "en": "Glitter" },
+  "audio": [],
+  "bounded": [],
   "category": "stylize",
-  "description": { "en": "Scatters small sparkling points over the picture.", "es": "Esparce pequeños puntos brillantes sobre la imagen." },
-  "mask_mode": "strength",
-  "params": [
-    { "id": "density", "type": "float", "prefill": 0.3, "min": 0, "max": 1 },
-    { "id": "size", "type": "float", "prefill": 2, "min": 0.5, "max": 16 },
-    { "id": "speed", "type": "float", "prefill": 1, "min": 0, "max": 8, "uses": "time" },
-    { "id": "color", "type": "color", "prefill": "#ffffff" }
-  ],
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Scatters small sparkling points over the picture.",
+    "es": "Esparce pequeños puntos brillantes sobre la imagen."
+  },
   "fuse": "color",
-  "pace": { "rate": "speed" }
+  "id": "glitter",
+  "lighter": null,
+  "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Glitter"
+  },
+  "options": [],
+  "pace": {
+    "rate": "speed"
+  },
+  "params": [
+    {"id": "density", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.3, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "size", "type": "float", "channels": null, "help": {}, "label": {}, "max": 16, "min": 0.5, "paint": null, "prefill": 2, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "speed", "type": "float", "channels": null, "help": {}, "label": {}, "max": 8, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": "time", "values": [], "waits_for": null, "yields_to": null},
+    {"id": "color", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#ffffff", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

@@ -15,6 +15,8 @@ const OPS: f32 = 512.0;
 impl Descriptor {
     pub fn parse(json: &str, wgsl: &str) -> Result<Descriptor, serde_json::Error> {
         let mut d: Descriptor = serde_json::from_str(json)?;
+        let custom = <serde_json::Error as serde::de::Error>::custom;
+        d.params.iter().try_for_each(ParamDef::fits_kind).map_err(custom)?;
         d.wgsl = wgsl.into();
         if d.passes.is_empty() && d.fuse.is_some() {
             let inputs = vec!["previous".into()];

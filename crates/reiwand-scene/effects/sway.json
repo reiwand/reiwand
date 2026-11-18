@@ -1,24 +1,49 @@
 {
-  "id": "sway",
-  "name": { "en": "Sway" },
+  "audio": [],
+  "bounded": [],
   "category": "motion",
-  "description": { "en": "Sways the picture like something hanging, with stiffness and spread, or makes foliage tremble.", "es": "Hace oscilar la imagen como algo colgado, con rigidez y dispersión, o hace temblar el follaje." },
-  "min_fps": 30,
-  "mask_mode": "strength",
-  "params": [
-    { "id": "amplitude", "type": "float", "prefill": 6, "min": 0, "max": 256, "uses": "time" },
-    { "id": "speed", "type": "float", "prefill": 0.4, "min": 0, "max": 10 },
-    { "id": "stiffness", "type": "float", "prefill": 2, "min": 0, "max": 8 },
-    { "id": "spread", "type": "float", "prefill": 1.5, "min": 0, "max": 64 },
-    { "id": "swing", "type": "bool", "prefill": false },
-    { "id": "angle", "type": "float", "prefill": 3, "min": 0, "max": 90 },
-    { "id": "pivot", "type": "vec2", "prefill": [0.5, 0], "min": -1, "max": 2 },
-    { "id": "double", "type": "bool", "prefill": false },
-    { "id": "phase", "type": "texture", "tools": ["gray"], "prefill": "" },
-    { "id": "foliage", "type": "bool", "prefill": false },
-    { "id": "ratio", "type": "float", "prefill": 1, "min": 0.1, "max": 10 }
-  ],
-  "passes": [{ "entry": "fs_sway", "inputs": ["previous", "asset:phase"] }],
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Sways the picture like something hanging, with stiffness and spread, or makes foliage tremble.",
+    "es": "Hace oscilar la imagen como algo colgado, con rigidez y dispersión, o hace temblar el follaje."
+  },
   "fuse": "uv",
-  "reach": "amplitude"
+  "id": "sway",
+  "lighter": null,
+  "mask_mode": "strength",
+  "min_fps": 30,
+  "name": {
+    "en": "Sway"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "amplitude", "type": "float", "channels": null, "help": {}, "label": {}, "max": 256, "min": 0, "paint": null, "prefill": 6, "tool": null, "tools": [], "unit": null, "uses": "time", "values": [], "waits_for": null, "yields_to": null},
+    {"id": "speed", "type": "float", "channels": null, "help": {}, "label": {}, "max": 10, "min": 0, "paint": null, "prefill": 0.4, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "stiffness", "type": "float", "channels": null, "help": {}, "label": {}, "max": 8, "min": 0, "paint": null, "prefill": 2, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "spread", "type": "float", "channels": null, "help": {}, "label": {}, "max": 64, "min": 0, "paint": null, "prefill": 1.5, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "swing", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "angle", "type": "float", "channels": null, "help": {}, "label": {}, "max": 90, "min": 0, "paint": null, "prefill": 3, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "pivot", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 2, "min": -1, "paint": null, "prefill": [0.5, 0], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "double", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "phase", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": ["gray"], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "foliage", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "ratio", "type": "float", "channels": null, "help": {}, "label": {}, "max": 10, "min": 0.1, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_sway", "grid": null, "inputs": ["previous", "asset:phase"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {},
+  "reach": "amplitude",
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

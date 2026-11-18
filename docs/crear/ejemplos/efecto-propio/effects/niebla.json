@@ -1,32 +1,38 @@
 {
+  "audio": [],
+  "bounded": [],
+  "category": null,
+  "compose": false,
   "cost": {
     "passes": 1,
     "scale": 1,
     "taps": 1
   },
+  "description": null,
+  "fuse": null,
   "id": "niebla",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": null,
   "name": {
     "en": "Haze",
     "es": "Niebla"
   },
+  "options": [],
+  "pace": null,
   "params": [
-    {
-      "id": "color",
-      "prefill": "#c8d4f0",
-      "type": "color"
-    },
-    {
-      "id": "cantidad",
-      "max": 1,
-      "min": 0,
-      "prefill": 0.4,
-      "type": "float"
-    }
+    {"id": "color", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#c8d4f0", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "cantidad", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.4, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
   ],
   "passes": [
-    {
-      "entry": "fs_niebla"
-    }
-  ]
+    {"blend": null, "copy": null, "entry": "fs_niebla", "grid": null, "inputs": ["previous"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

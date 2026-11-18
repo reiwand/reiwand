@@ -1,0 +1,51 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": null,
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": null,
+  "fuse": null,
+  "id": "glow",
+  "lighter": {
+    "cost": {"passes": 1, "scale": 1, "taps": 2},
+    "passes": [{"blend": null, "copy": null, "entry": "fs_glow_lite", "grid": null, "inputs": ["previous"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}],
+    "up_to": null
+  },
+  "mask_mode": "mix",
+  "min_fps": null,
+  "name": {
+    "en": "Glow"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "tint", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#ffffff", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "amount", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.5, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "mode", "type": "enum", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [{"label": {}, "value": 0}, {"label": {"en": "Wide"}, "value": 1}], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_glow", "grid": null, "inputs": ["previous"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null},
+    {"blend": null, "copy": null, "entry": "fs_mix", "grid": null, "inputs": ["previous", "half"], "output": "next", "scale": 1, "swap": null, "target": "half", "vertex": null}
+  ],
+  "quality": {
+    "q3": {"freeze": true, "params": {}, "scale": null}
+  },
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": {
+    "fade": null,
+    "scale": 1,
+    "settle": 0.3
+  },
+  "targets": {
+    "half": {"format": "rgba8", "scale": 0.5}
+  },
+  "uses": [],
+  "velocity": null
+}

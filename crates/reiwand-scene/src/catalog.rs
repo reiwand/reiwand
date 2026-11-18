@@ -22,6 +22,8 @@ fn known() -> &'static Known {
     KNOWN.get_or_init(|| {
         let catalog: Catalog = serde_json::from_str(include_str!("catalog.json"))
             .unwrap_or_else(|e| panic!("catalog.json: {e}"));
+        let checked = catalog.params.values().flatten().try_for_each(ParamDef::fits_kind);
+        checked.unwrap_or_else(|e| panic!("catalog.json: {e}"));
         let parse = |v: &serde_json::Value| {
             Descriptor::parse(&v.to_string(), "").unwrap_or_else(|e| panic!("catalog.json: {e}"))
         };

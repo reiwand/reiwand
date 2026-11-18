@@ -6,14 +6,40 @@ pub const DESCRIPTOR: &str = "transitions/opening.json";
 const WGSL: &str = "transitions/opening.wgsl";
 
 const JSON_TEXT: &str = r##"{
+  "audio": [],
+  "bounded": [],
+  "category": null,
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": null,
+  "fuse": null,
   "id": "opening",
-  "name": { "en": "Soft reveal", "es": "Apertura suave" },
-  "stage": "transition",
-  "cost": { "taps": 1, "passes": 1, "scale": 1 },
+  "lighter": null,
+  "mask_mode": "mix",
+  "min_fps": null,
+  "name": {
+    "en": "Soft reveal",
+    "es": "Apertura suave"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "center", "type": "vec2", "prefill": [0.5, 0.5], "label": { "en": "Center", "es": "Centro" } },
-    { "id": "edge", "type": "float", "prefill": 0.2, "min": 0.01, "max": 1, "label": { "en": "Edge", "es": "Borde" } }
-  ]
+    {"id": "center", "type": "vec2", "channels": null, "help": {}, "label": {"en": "Center", "es": "Centro"}, "max": 1, "min": 0, "paint": null, "prefill": [0.5, 0.5], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "edge", "type": "float", "channels": null, "help": {}, "label": {"en": "Edge", "es": "Borde"}, "max": 1, "min": 0.01, "paint": null, "prefill": 0.2, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "transition",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }
 "##;
 

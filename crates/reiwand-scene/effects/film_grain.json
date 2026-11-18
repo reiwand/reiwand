@@ -1,17 +1,44 @@
 {
-  "id": "film_grain",
-  "name": { "en": "Film grain" },
+  "audio": [],
+  "bounded": [],
   "category": "stylize",
-  "description": { "en": "Adds animated film grain.", "es": "Añade grano de película animado." },
-  "mask_mode": "strength",
-  "params": [
-    { "id": "amount", "type": "float", "prefill": 0.05, "min": 0, "max": 1 },
-    { "id": "size", "type": "float", "prefill": 1.5, "min": 0.5, "max": 16 },
-    { "id": "fps", "type": "float", "prefill": 0, "min": 0, "max": 60, "uses": "time" },
-    { "id": "mono", "type": "bool", "prefill": false },
-    { "id": "bias", "type": "float", "prefill": 0, "min": -1, "max": 1 },
-    { "id": "blend", "type": "blend", "prefill": "overlay" }
-  ],
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Adds animated film grain.",
+    "es": "Añade grano de película animado."
+  },
   "fuse": "color",
-  "pace": { "rate": "fps" }
+  "id": "film_grain",
+  "lighter": null,
+  "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Film grain"
+  },
+  "options": [],
+  "pace": {
+    "rate": "fps"
+  },
+  "params": [
+    {"id": "amount", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.05, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "size", "type": "float", "channels": null, "help": {}, "label": {}, "max": 16, "min": 0.5, "paint": null, "prefill": 1.5, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "fps", "type": "float", "channels": null, "help": {}, "label": {}, "max": 60, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": "time", "values": [], "waits_for": null, "yields_to": null},
+    {"id": "mono", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "bias", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": -1, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "blend", "type": "blend", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "overlay", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

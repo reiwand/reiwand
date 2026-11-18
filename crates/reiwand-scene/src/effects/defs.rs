@@ -35,6 +35,21 @@ pub struct ParamDef {
     pub tool: Option<Tool>,
 }
 
+impl ParamDef {
+    pub fn fits_kind(&self) -> Result<(), String> {
+        let ranged = matches!(self.kind, ParamKind::Float | ParamKind::Int | ParamKind::Vec2);
+        let id = &self.id;
+        let state = |need: bool, has: bool, field: &str| match (need, has) {
+            (true, false) => Err(format!("parameter {id}: a {:?} needs \"{field}\"", self.kind)),
+            (false, true) => Err(format!("parameter {id}: a {:?} has no \"{field}\"", self.kind)),
+            _ => Ok(()),
+        };
+        state(ranged, self.min.is_some(), "min")?;
+        state(ranged, self.max.is_some(), "max")?;
+        state(self.kind == ParamKind::Enum, !self.values.is_empty(), "values")
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PassDef {

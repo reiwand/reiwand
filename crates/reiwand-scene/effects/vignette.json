@@ -1,16 +1,42 @@
 {
-  "id": "vignette",
-  "name": { "en": "Vignette" },
+  "audio": [],
+  "bounded": [],
   "category": "light",
-  "description": { "en": "Darkens the corners of the picture.", "es": "Oscurece las esquinas de la imagen." },
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Darkens the corners of the picture.",
+    "es": "Oscurece las esquinas de la imagen."
+  },
+  "fuse": "color",
+  "id": "vignette",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Vignette"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "intensity", "type": "float", "prefill": 0.35, "min": 0, "max": 1 },
-    { "id": "radius", "type": "float", "prefill": 1, "min": 0, "max": 2 },
-    { "id": "softness", "type": "float", "prefill": 0.65, "min": 0, "max": 1 },
-    { "id": "roundness", "type": "float", "prefill": 1, "min": 0, "max": 1 },
-    { "id": "center", "type": "vec2", "prefill": [0.5, 0.5], "min": -1, "max": 2 },
-    { "id": "color", "type": "color", "prefill": "#000000" }
+    {"id": "intensity", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.35, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "radius", "type": "float", "channels": null, "help": {}, "label": {}, "max": 2, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "softness", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.65, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "roundness", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "center", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 2, "min": -1, "paint": null, "prefill": [0.5, 0.5], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "color", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#000000", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
   ],
-  "fuse": "color"
+  "passes": [],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

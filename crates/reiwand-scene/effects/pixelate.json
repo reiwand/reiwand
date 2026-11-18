@@ -1,11 +1,38 @@
 {
-  "id": "pixelate",
-  "name": { "en": "Pixelate" },
+  "audio": [],
+  "bounded": [],
   "category": "distort",
-  "description": { "en": "Blocks the picture into large square or hexagonal pixels.", "es": "Convierte la imagen en grandes píxeles cuadrados o hexagonales." },
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Blocks the picture into large square or hexagonal pixels.",
+    "es": "Convierte la imagen en grandes píxeles cuadrados o hexagonales."
+  },
+  "fuse": "uv",
+  "id": "pixelate",
+  "lighter": null,
+  "mask_mode": "mix",
+  "min_fps": null,
+  "name": {
+    "en": "Pixelate"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "size", "type": "float", "prefill": 8, "min": 1, "max": 256 },
-    { "id": "hex", "type": "bool", "prefill": false }
+    {"id": "size", "type": "float", "channels": null, "help": {}, "label": {}, "max": 256, "min": 1, "paint": null, "prefill": 8, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "hex", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
   ],
-  "fuse": "uv"
+  "passes": [],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }
