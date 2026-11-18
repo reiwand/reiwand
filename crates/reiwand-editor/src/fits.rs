@@ -13,7 +13,10 @@ pub(crate) fn scene(doc: &Value, action: &Action, ops: &[Op]) -> Result<()> {
         return Ok(());
     }
     let mut staged = doc.clone();
-    if apply(&mut staged, ops).is_err() || crate::keys::reads(&staged) || !crate::keys::reads(doc) {
+    if apply(&mut staged, &crate::completing::complete_all(doc, ops.to_vec())).is_err()
+        || crate::keys::reads(&staged)
+        || !crate::keys::reads(doc)
+    {
         return Ok(());
     }
     let like = match doc.pointer(pointer) {

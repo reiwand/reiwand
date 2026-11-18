@@ -85,7 +85,7 @@ pub fn keyframe(doc: &Value, e: &KeyframeEdit) -> Result<Vec<Op>> {
                 })?;
                 let removed = keys.remove(i);
                 reach(pointer, old, &keys)?;
-                let base = current.and_then(|c| c.get("base")).filter(|_| !e.absolute);
+                let base = current.and_then(|c| c.get("base")).filter(|b| !e.absolute && !b.is_null());
                 let last = match base {
                     Some(b) => added(b, &removed[1]).ok_or_else(|| {
                         anyhow!(said(

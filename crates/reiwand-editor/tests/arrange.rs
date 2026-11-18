@@ -27,14 +27,14 @@ fn hiding_and_showing_again_keeps_bindings_and_keyframes() {
     act(&mut doc, json!({"hide": {"id": "seconds", "hidden": true}})).unwrap();
     assert_eq!(doc.pointer(seconds), Some(&json!(false)));
     act(&mut doc, json!({"hide": {"id": "seconds", "hidden": false}})).unwrap();
-    assert_eq!(doc.pointer(seconds), Some(&json!({"prop": "show"})));
+    assert_eq!(doc.pointer(seconds).map(|v| &v["prop"]), Some(&json!("show")));
     assert_eq!(doc["scene"]["ext"]["editor"]["hidden"], json!({}));
     let keyed = json!({"keys": [[0.0, true], [2.0, false]]});
     act(&mut doc, json!({"set": {"pointer": "/scene/layers/1/visible", "value": keyed}})).unwrap();
     act(&mut doc, json!({"hide": {"id": "time", "hidden": true}})).unwrap();
     act(&mut doc, json!({"duplicate_layer": {"id": "time"}})).unwrap();
     act(&mut doc, json!({"hide": {"id": "time_copy", "hidden": false}})).unwrap();
-    assert_eq!(doc.pointer("/scene/layers/2/visible"), Some(&keyed));
+    assert_eq!(doc.pointer("/scene/layers/2/visible/keys"), Some(&keyed["keys"]));
     act(&mut doc, json!({"remove_layer": {"id": "time"}})).unwrap();
     assert_eq!(doc["scene"]["ext"]["editor"]["hidden"], json!({}));
     assert_eq!(check(&doc), []);

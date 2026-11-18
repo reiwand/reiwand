@@ -39,7 +39,7 @@ pub fn hide(doc: &Value, id: &str, hidden: bool) -> Result<Vec<Op>> {
         }
         (false, true) => match doc.pointer(&stash(id)) {
             Some(v) => vec![Op::Replace { path: field, value: v.clone() }, Op::Remove { path: stash(id) }],
-            None => vec![Op::Remove { path: field }],
+            None => vec![Op::Replace { path: field, value: json!(true) }],
         },
         _ => Vec::new(),
     })
@@ -96,6 +96,10 @@ pub fn ungroup(doc: &Value, id: &str) -> Result<Vec<Op>> {
     let (path, value) = layer(doc, id)?;
     ensure!(value["type"] == "group", said("editor.not_group", "%1 is not a group", &[&id]));
     let plain = json!({ "blend_space": "canvas", "id": id, "type": "group", "layers": value["layers"]});
+    let plain = match crate::completing::complete(doc, Op::Replace { path: path.clone(), value: plain }) {
+        Op::Replace { value, .. } => value,
+        _ => Value::Null,
+    };
     let normal = |v: &Value| {
         let layer = serde_json::from_value::<reiwand_scene::Layer>(v.clone()).ok()?;
         serde_json::to_value(layer).ok()?.as_object().cloned()

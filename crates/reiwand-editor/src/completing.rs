@@ -1,5 +1,5 @@
 use crate::ops::Op;
-use crate::schema::{at, fill, properties, root_of, sample};
+use crate::schema::{at, branches, deref, fill, properties, root_of, sample};
 use serde_json::Value;
 
 pub fn complete(doc: &Value, op: Op) -> Op {
@@ -14,12 +14,24 @@ pub fn complete(doc: &Value, op: Op) -> Op {
         return op;
     };
     let Some(schema) = at(doc, path) else { return op };
+    let schema = unwrapped(root, schema);
     let mut full = value.clone();
     fill(root, &schema, &mut full);
     match op {
         Op::Add { path, .. } => Op::Add { path, value: full },
         Op::Replace { path, .. } => Op::Replace { path, value: full },
         other => other,
+    }
+}
+
+fn unwrapped(root: &Value, mut schema: Value) -> Value {
+    loop {
+        let list = branches(&schema);
+        let present: Vec<&Value> = list.iter().filter(|b| deref(root, b).0["type"] != "null").collect();
+        match present[..] {
+            [only] if list.len() == 2 => schema = only.clone(),
+            _ => return schema,
+        }
     }
 }
 
@@ -49,9 +61,9 @@ fn blank(doc: &Value, path: &str) -> Option<Op> {
     let schema = at(doc, parent)?;
     let shown = doc.pointer(parent)?;
     let prop = properties(root, &schema, shown).get(key)?.clone();
-    let listed = doc.pointer(path).is_some_and(|v| v.is_array() || v.is_object());
+    doc.pointer(path)?;
     let required = crate::schema::deref(root, &schema).0["required"].as_array()?.iter().any(|r| r == key);
-    (listed && required).then(|| Op::Replace { path: path.to_owned(), value: sample(root, &prop) })
+    required.then(|| Op::Replace { path: path.to_owned(), value: sample(root, &prop) })
 }
 
 pub fn ops(doc: &Value) -> Vec<Op> {
