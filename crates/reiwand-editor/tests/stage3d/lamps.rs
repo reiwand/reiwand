@@ -44,7 +44,7 @@ fn a_light_is_placed_in_3d_dragged_there_and_sent_back_to_the_plane() {
     assert!(edit(&mut p, json!({ "light": { "layer": "lamp", "position": [1e9, 0, 0] } })).is_err());
     assert!(edit(&mut p, json!({ "light": { "layer": "doll", "flat": true } })).is_err());
     edit(&mut p, json!({ "light": { "layer": "lamp", "flat": true } })).unwrap();
-    assert!(layer(&p, "lamp").get("position3d").is_none() && layer(&p, "lamp").get("aim3d").is_none());
+    assert!(layer(&p, "lamp")["position3d"].is_null() && layer(&p, "lamp")["aim3d"].is_null());
     edit(&mut p, json!({ "light": { "layer": "lamp", "position": [0, 1, 2] } })).unwrap();
     let doc: reiwand_scene::Scene = serde_json::from_value(p.doc["scene"].clone()).unwrap();
     let issues: Vec<String> = doc.validate(&Default::default()).iter().map(|i| i.to_string()).collect();

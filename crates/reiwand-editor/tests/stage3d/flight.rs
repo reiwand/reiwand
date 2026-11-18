@@ -66,7 +66,7 @@ fn shadows_are_switched_sized_biased_and_shown_per_tier() {
     assert_eq!(tiers[3]["low"], 512);
     assert!(!shown["lights"][0]["frustum"].as_array().unwrap().is_empty());
     edit(&mut p, json!({ "shadows": { "layer": "sun", "automatic": true } })).unwrap();
-    assert!(layer(&p, "sun").get("shadow_resolution").is_none());
+    assert!(layer(&p, "sun")["shadow_resolution"].is_null());
     for bad in [
         json!({ "layer": "sun", "resolution": 100 }),
         json!({ "layer": "sun", "bias": 3 }),
@@ -90,7 +90,7 @@ fn shadows_are_switched_sized_biased_and_shown_per_tier() {
     edit(&mut p, json!({ "debug": {} })).unwrap();
     assert!(p.doc.pointer("/scene/ext/editor/debug3d").is_none());
     edit(&mut p, json!({ "shadows": { "layer": "sun", "on": false } })).unwrap();
-    assert!(layer(&p, "sun").get("shadows").is_none());
+    assert_eq!(layer(&p, "sun")["shadows"], false);
 }
 
 #[test]
@@ -157,7 +157,7 @@ fn package_material_shaders_take_pictures_of_the_package_for_their_images() {
     assert!(edit(&mut p, set(json!({ "picture": 3 }))).is_err());
     assert!(edit(&mut p, set(json!({ "nothing": 1 }))).is_err());
     edit(&mut p, set(json!({ "picture": null }))).unwrap();
-    assert!(layer(&p, "doll")["materials"]["paint"]["params"].get("picture").is_none());
+    assert!(layer(&p, "doll")["materials"]["paint"]["params"]["picture"].is_null());
     let pbr = json!({ "material": { "layer": "doll", "name": "trim", "values": { "picture": "sky" } } });
     assert!(edit(&mut p, pbr).is_err(), "only package shaders take values");
 }

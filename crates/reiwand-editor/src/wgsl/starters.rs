@@ -12,47 +12,89 @@ const MATERIAL: &str = include_str!("starters/material.wgsl");
 
 const PARTICLE: &str = include_str!("starters/particle.wgsl");
 
+fn param(id: &str, kind: &str, prefill: Value, range: [Value; 2], unit: Value) -> Value {
+    json!({ "id": id, "type": kind, "prefill": prefill, "min": range[0], "max": range[1], "uses": null,
+        "unit": unit, "tools": [], "label": {}, "help": {}, "values": [], "channels": null, "paint": null,
+        "yields_to": null, "waits_for": null, "tool": null })
+}
+
+fn plain(id: &str, kind: &str, prefill: Value) -> Value {
+    param(id, kind, prefill, [Value::Null, Value::Null], Value::Null)
+}
+
 fn float(id: &str, default: f64, range: [f64; 2]) -> Value {
-    json!({ "id": id, "type": "float", "prefill": default, "min": range[0], "max": range[1] })
+    param(id, "float", json!(default), [json!(range[0]), json!(range[1])], Value::Null)
 }
 
 pub fn starter(name: &str, template: &str) -> Option<(Value, String)> {
     let (descriptor, wgsl) = match template {
         "color" => (
             json!({ "category": "color", "fuse": "color", "cost": { "taps": 1, "passes": 1, "scale": 1 },
-                "params": [float("amount", 1.0, [0.0, 1.0]), { "id": "color", "type": "color", "prefill": "#ff8800" }] }),
+                "params": [float("amount", 1.0, [0.0, 1.0]), plain("color", "color", json!("#ff8800"))] }),
             COLOR,
         ),
         "distort" => (
             json!({ "category": "distort", "fuse": "uv", "cost": { "taps": 1, "passes": 1, "scale": 1 },
-                "params": [{ "id": "center", "type": "position", "prefill": [0.5, 0.5] },
+                "params": [plain("center", "position", json!([0.5, 0.5])),
                     float("strength", 0.3, [-1.0, 1.0]), float("radius", 0.25, [0.01, 1.0])] }),
             DISTORT,
         ),
         "passes" => (
             json!({ "category": "blur", "cost": { "taps": 9, "passes": 2, "scale": 1 },
                 "params": [float("length", 8.0, [0.0, 64.0]),
-                    { "id": "angle", "type": "float", "prefill": 0, "min": -180, "max": 180, "unit": "degrees" }],
+                    param("angle", "float", json!(0), [json!(-180), json!(180)], json!("degrees"))],
                 "passes": [{ "entry": "fs_NAME_soft", "scale": 0.5 },
                     { "entry": "fs_NAME", "inputs": ["pass:0", "input"] }] }),
             PASSES,
         ),
         "material" => (
-            json!({ "stage": "material", "cost": {},
-                "params": [{ "id": "tint", "type": "color", "prefill": "#ffffff" }, float("glow", 0.0, [0.0, 4.0]),
-                    { "id": "picture", "type": "texture", "prefill": "white" }] }),
+            json!({ "stage": "material", "cost": { "taps": 1, "passes": 1, "scale": 1 },
+                "params": [plain("tint", "color", json!("#ffffff")), float("glow", 0.0, [0.0, 4.0]),
+                    plain("picture", "texture", json!("white"))] }),
             MATERIAL,
         ),
         "particle" => (
-            json!({ "stage": "particle", "cost": {}, "params": [float("pulse", 0.3, [0.0, 1.0])] }),
+            json!({ "stage": "particle", "cost": { "taps": 1, "passes": 1, "scale": 1 }, "params": [float("pulse", 0.3, [0.0, 1.0])] }),
             PARTICLE,
         ),
         _ => return None,
     };
     let mut descriptor = descriptor;
     descriptor["id"] = json!(name);
+    for (key, value) in whole() {
+        if let Some(d) = descriptor.as_object_mut() {
+            d.entry(key).or_insert(value);
+        }
+    }
     let text = serde_json::to_string(&descriptor).unwrap_or_default().replace("NAME", name);
     Some((serde_json::from_str(&text).unwrap_or(descriptor), wgsl.replace("NAME", name)))
+}
+
+fn whole() -> [(&'static str, Value); 21] {
+    let none = Value::Null;
+    [
+        ("name", json!({})),
+        ("category", none.clone()),
+        ("description", none.clone()),
+        ("uses", json!([])),
+        ("audio", json!([])),
+        ("mask_mode", json!("mix")),
+        ("passes", json!([])),
+        ("fuse", none.clone()),
+        ("reach", none.clone()),
+        ("bounded", json!([])),
+        ("min_fps", none.clone()),
+        ("velocity", none.clone()),
+        ("state", none.clone()),
+        ("solve", none.clone()),
+        ("pace", none.clone()),
+        ("quality", json!({})),
+        ("targets", json!({})),
+        ("options", json!([])),
+        ("stage", json!("layer")),
+        ("compose", json!(false)),
+        ("lighter", none),
+    ]
 }
 
 pub(crate) fn lighter(
