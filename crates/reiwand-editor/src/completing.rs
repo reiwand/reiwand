@@ -8,7 +8,11 @@ pub fn complete(doc: &Value, op: Op) -> Op {
         Op::Remove { path } => return blank(doc, path).unwrap_or(op),
         _ => return op,
     };
-    let Some((root, _)) = root_of(path).filter(|_| path.starts_with("/scene")) else { return op };
+    let Some((root, _)) = root_of(path)
+        .filter(|_| path.starts_with("/scene") || path == "/manifest" || path.starts_with("/manifest/"))
+    else {
+        return op;
+    };
     let Some(schema) = at(doc, path) else { return op };
     let mut full = value.clone();
     fill(root, &schema, &mut full);
@@ -21,6 +25,15 @@ pub fn complete(doc: &Value, op: Op) -> Op {
 
 pub fn complete_all(doc: &Value, ops: Vec<Op>) -> Vec<Op> {
     ops.into_iter().map(|op| complete(doc, op)).collect()
+}
+
+pub fn manifest_doc(doc: &mut Value) {
+    let Some(manifest) = doc.get("manifest").cloned() else { return };
+    if let Op::Replace { value, .. } =
+        complete(doc, Op::Replace { path: "/manifest".into(), value: manifest })
+    {
+        doc["manifest"] = value;
+    }
 }
 
 pub fn scene_doc(doc: &mut Value) {

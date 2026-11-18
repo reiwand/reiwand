@@ -10,7 +10,7 @@ use serde_json::{Value, json};
 fn act(doc: &mut Value, action: Value) {
     let action: Action = serde_json::from_value(action).unwrap();
     assert!(ACTIONS.contains(&action.name().as_str()));
-    apply(doc, &plan(doc, &action).unwrap()).unwrap();
+    apply(doc, &reiwand_editor::completing::complete_all(doc, plan(doc, &action).unwrap())).unwrap();
 }
 
 fn ids(doc: &Value, list: &str) -> Vec<String> {

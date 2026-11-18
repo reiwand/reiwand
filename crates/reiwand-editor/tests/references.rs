@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use reiwand_editor::Problem;
 use reiwand_editor::actions::{Action, plan};
 use reiwand_editor::check::check;
@@ -12,7 +14,7 @@ use std::collections::BTreeMap;
 
 fn run(doc: &mut Value, value: Value) {
     let ops = plan(doc, &serde_json::from_value::<Action>(value).unwrap()).unwrap();
-    apply(doc, &ops).unwrap();
+    apply(doc, &reiwand_editor::completing::complete_all(doc, ops)).unwrap();
 }
 
 fn refused(doc: &Value, value: Value) -> String {
@@ -46,6 +48,7 @@ fn sample() -> Value {
         json!({"calm": {"path": "assets/calm.png"}, "storm": {"path": "assets/storm.png"}});
     doc["scene"]["layers"] = json!([{ "blend_space": "canvas", "id": "sky", "type": "image", "image": "calm",
         "mask": {"texture": {"prop": "mood", "map": {"calm": "calm"}}}}]);
+    whole::document(&mut doc);
     doc
 }
 

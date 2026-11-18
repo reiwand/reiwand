@@ -134,7 +134,11 @@ fn the_preview_of_a_picture_or_video_package_is_a_scene_that_shows_the_file_as_t
     assert_eq!((m["kind"].as_str(), m["entry"].as_str()), (Some("scene"), Some("scene.json")));
     assert_eq!(m["playback"], json!({"max_fps": 30}));
     assert!(m.get("display").is_none() && m.get("presets").is_none());
-    assert_eq!(scene["canvas"], json!({"size": [2160, 1080], "fit": "fit", "background": "#102030"}));
+    let canvas = &scene["canvas"];
+    assert_eq!(
+        (&canvas["size"], &canvas["fit"], &canvas["background"]),
+        (&json!([2160, 1080]), &json!("fit"), &json!("#102030"))
+    );
     let layer = &scene["layers"][0];
     assert_eq!((layer["type"].as_str(), layer["video"].as_str()), (Some("video"), Some("media")));
     assert_eq!(layer["size"], json!([2160, 1080]));

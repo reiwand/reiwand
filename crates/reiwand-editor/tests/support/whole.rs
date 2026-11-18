@@ -54,3 +54,22 @@ pub fn empty(value: &Value) -> bool {
 pub fn same(project: &Project, pointer: &str, expected: Value) -> Value {
     at(project, pointer, &expected)
 }
+
+pub fn document(doc: &mut Value) {
+    reiwand_editor::completing::scene_doc(doc);
+    reiwand_editor::completing::manifest_doc(doc);
+    let mut paths: Vec<String> = Vec::new();
+    for key in ["properties", "presets"] {
+        match doc["manifest"].get(key) {
+            Some(Value::Object(map)) => paths.extend(map.keys().map(|k| format!("/manifest/{key}/{k}"))),
+            Some(Value::Array(list)) => paths.extend((0..list.len()).map(|i| format!("/manifest/{key}/{i}"))),
+            _ => {}
+        }
+    }
+    for path in paths {
+        let Some(old) = doc.pointer(&path).cloned() else { continue };
+        if let Op::Replace { value, .. } = complete(doc, Op::Replace { path: path.clone(), value: old }) {
+            *doc.pointer_mut(&path).unwrap() = value;
+        }
+    }
+}

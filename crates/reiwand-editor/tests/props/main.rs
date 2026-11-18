@@ -1,3 +1,5 @@
+#[path = "../support/whole.rs"]
+mod whole;
 use reiwand_editor::actions::{Action, plan};
 use reiwand_editor::check::check;
 use reiwand_editor::inspect::{Field, fields};
@@ -30,7 +32,7 @@ fn action(value: Value) -> Action {
 
 fn run(doc: &mut Value, value: Value) {
     let ops = plan(doc, &action(value)).unwrap();
-    apply(doc, &ops).unwrap();
+    apply(doc, &reiwand_editor::completing::complete_all(doc, ops)).unwrap();
 }
 
 fn refused(doc: &Value, value: Value) -> String {
@@ -63,5 +65,6 @@ fn sample() -> Value {
         json!({"calm": {"path": "assets/calm.png"}, "storm": {"path": "assets/storm.png"}});
     doc["scene"]["timelines"] = json!([{"id": "pulse", "duration": 1, "trigger": "prop:go"}]);
     doc["scene"]["layers"] = json!([{ "blend_space": "canvas", "id": "sky", "type": "image", "image": {"prop": "mood", "map": {"calm": "calm"}}}]);
+    whole::document(&mut doc);
     doc
 }

@@ -8,7 +8,7 @@ use serde_json::{Value, json};
 
 fn act(doc: &mut Value, action: Value) -> anyhow::Result<()> {
     let action: Action = serde_json::from_value(whole::action_doc(doc, action))?;
-    apply(doc, &plan(doc, &action)?).map(drop)
+    apply(doc, &reiwand_editor::completing::complete_all(doc, plan(doc, &action)?)).map(drop)
 }
 
 fn run(p: &mut Project, action: Value) -> anyhow::Result<()> {
