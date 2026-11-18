@@ -62,7 +62,12 @@ fn add(doc: &mut Value, path: &str, value: Value) -> Result<Op> {
     if !parent.is_empty() && doc.pointer(parent).is_none() && (key == "-" || key == "0") {
         return add(doc, parent, Value::Array(vec![value]));
     }
-    match container(doc, parent)? {
+    let held = container(doc, parent)?;
+    if held.is_null() && key != "-" && !key.bytes().all(|b| b.is_ascii_digit()) {
+        *held = Value::Object(serde_json::Map::from_iter([(key, value)]));
+        return Ok(Op::Replace { path: parent.into(), value: Value::Null });
+    }
+    match held {
         Value::Array(items) => {
             let i = if key == "-" { items.len() } else { index(&key, items.len())? };
             items.insert(i, value);

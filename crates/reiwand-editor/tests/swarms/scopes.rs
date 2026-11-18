@@ -25,7 +25,7 @@ fn a_layer_render_is_started_shown_apart_and_given_back_to_the_system() {
     undone(&mut p, &before);
     edit(&mut p, "scope", json!({ "layer": id, "own": true })).unwrap();
     edit(&mut p, "strand", json!({ "strand": "rope", "settings": { "width": 2 }, "layer": id })).unwrap();
-    edit(&mut p, "render", json!({ "layer": id, "fps": 12 })).unwrap();
+    edit(&mut p, "render", json!({ "layer": id, "fps": 24 })).unwrap();
     assert_eq!(system_render(&p)["rope"]["width"], json!(6), "the system keeps its own");
     let layer = seen(&p, Some(&id));
     assert_eq!(layer["scope"]["own"], json!(true));

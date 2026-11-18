@@ -64,7 +64,7 @@ fn a_drag_over_the_model_combs_its_fur_into_a_map_and_undoes() {
     edit(&mut p, json!({ "comb": stroke.clone() })).unwrap();
     edit(&mut p, json!({ "material": { "layer": "doll", "name": "paint", "maps": { "comb": null } } }))
         .unwrap();
-    assert!(layer(&p, "doll")["materials"]["paint"].get("maps").is_none(), "the combing is cleared");
+    assert!(layer(&p, "doll")["materials"]["paint"]["maps"]["comb"].is_null(), "the combing is cleared");
     let mut erase = stroke.clone();
     erase["erase"] = json!(true);
     edit(&mut p, json!({ "comb": erase })).unwrap();

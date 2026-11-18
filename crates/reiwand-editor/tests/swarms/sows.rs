@@ -7,7 +7,14 @@ fn a_system_is_created_without_a_layer_and_started_from_another() {
     let mut p = project(&root);
     let create = json!({"create": {"system": "sparks", "parent": "flakes", "on": "death"}});
     act(&mut p, json!({ "particles": create })).unwrap();
-    assert_eq!(system(&p)["children"], json!([{"system": "sparks", "on": "death"}]));
+    assert_eq!(
+        system(&p)["children"][0],
+        super::whole::same(
+            &p,
+            "/scene/particles/flakes/children/0",
+            json!({"system": "sparks", "on": "death"})
+        )
+    );
     assert!(p.doc["scene"]["particles"]["sparks"]["emitters"].is_array());
     act(&mut p, json!({"particles": {"create": {"system": "embers", "from": "sparks"}}})).unwrap();
     assert_eq!(p.doc["scene"]["particles"]["embers"], p.doc["scene"]["particles"]["sparks"]);
@@ -24,7 +31,7 @@ fn settings_and_starting_ranges_are_set_and_checked() {
     let mut p = project(&root);
     let bound = edit(&mut p, "settings", json!({"rate": 40})).unwrap_err().to_string();
     assert!(bound.contains("another source"), "{bound}");
-    assert_eq!(system(&p)["emitters"][0]["rate"], json!({"prop": "density"}));
+    assert_eq!(system(&p)["emitters"][0]["rate"]["prop"], json!("density"));
     let settings =
         json!({"capacity": 500, "seed": 7, "prewarm": 2, "space": "world", "rate": 40, "replace": true});
     edit(&mut p, "settings", settings).unwrap();
@@ -35,9 +42,9 @@ fn settings_and_starting_ranges_are_set_and_checked() {
     assert!(edit(&mut p, "settings", json!({"prewarm": 900})).is_err());
     let ranges = json!({"life": [1, 2], "size": [4, 9], "color": ["#ff0000", "#00ff00"], "alpha": [0.2, 0.8], "velocity": [[-5, 0], [5, 10]]});
     edit(&mut p, "start", json!({ "ranges": ranges })).unwrap();
-    assert_eq!(system(&p)["init"]["velocity"], json!([[-5, 0], [5, 10]]));
+    assert_eq!(system(&p)["init"]["velocity"], json!([[-5, 0], [5, 10], 1.0]));
     edit(&mut p, "start", json!({"clear": ["alpha", "velocity"]})).unwrap();
-    assert!(system(&p)["init"]["alpha"].is_null() && system(&p)["init"]["size"] == json!([4, 9]));
+    assert!(system(&p)["init"]["alpha"].is_null() && system(&p)["init"]["size"] == json!([4, 9, 1.0]));
     assert!(edit(&mut p, "start", json!({"ranges": {"wobble": [0, 1]}})).is_err());
     assert!(edit(&mut p, "start", json!({"clear": ["life"]})).is_err());
     assert!(edit(&mut p, "start", json!({"ranges": {"alpha": [0, 3]}})).is_err());
@@ -59,7 +66,7 @@ fn children_curves_and_the_render_look_are_edited() {
             .is_err()
     );
     edit(&mut p, "child", json!({"index": 0, "remove": true})).unwrap();
-    assert!(system(&p)["children"].is_null());
+    assert!(system(&p)["children"].as_array().unwrap().is_empty());
     edit(&mut p, "over", json!({"size": [[0, 1], [1, 0]], "color": [[0, "#ffffff"], [1, "#ff000000"]]}))
         .unwrap();
     let r = &system(&p)["render"];
@@ -68,7 +75,7 @@ fn children_curves_and_the_render_look_are_edited() {
         (&json!([[0.0, 1.0], [1.0, 0.0]]), &json!("#ff000000"))
     );
     edit(&mut p, "over", json!({"size": []})).unwrap();
-    assert!(system(&p)["render"]["size_over_life"].is_null());
+    assert_eq!(system(&p)["render"]["size_over_life"], json!([]));
     let look = json!({"stretch": {"mode": "add", "depth": "flat", "time": 0.1, "min": 0, "max": 40}, "frames": "random", "fps": 8, "mix": true, "brightness": 3});
     edit(&mut p, "render", look).unwrap();
     let r = &system(&p)["render"];
@@ -77,7 +84,7 @@ fn children_curves_and_the_render_look_are_edited() {
     assert!(edit(&mut p, "render", json!({"frames": "sometimes"})).is_err());
     edit(&mut p, "render", json!({"stretch": "none", "frames": "none", "mix": false})).unwrap();
     let r = &system(&p)["render"];
-    assert!(r["stretch"].is_null() && r["frames"].is_null() && r["mix"].is_null());
+    assert!(r["stretch"].is_null() && r["frames"].is_null() && r["mix"] == json!(false));
 }
 
 #[test]
@@ -85,12 +92,13 @@ fn a_starting_range_keeps_the_ends_and_the_curve_it_is_not_given() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
     let start = |ranges: serde_json::Value| json!({"ranges": ranges});
-    edit(&mut p, "start", start(json!({"life": [1, {"prop": "density"}, 2]}))).unwrap();
+    let bound = super::whole::same(&p, "/scene/particles/flakes/emitters/0/rate", json!({"prop": "density"}));
+    edit(&mut p, "start", start(json!({"life": [1, bound, 2]}))).unwrap();
     edit(&mut p, "start", start(json!({"life": [1.5, null, null]}))).unwrap();
-    assert_eq!(system(&p)["init"]["life"], json!([1.5, {"prop": "density"}, 2]));
+    assert_eq!(system(&p)["init"]["life"], json!([1.5, bound, 2]));
     edit(&mut p, "start", start(json!({"life": [1, 4, null]}))).unwrap();
     assert_eq!(system(&p)["init"]["life"], json!([1, 4, 2]));
     edit(&mut p, "start", start(json!({"life": [1, 4, 1]}))).unwrap();
-    assert_eq!(system(&p)["init"]["life"], json!([1, 4]));
+    assert_eq!(system(&p)["init"]["life"], json!([1, 4, 1]));
     assert!(edit(&mut p, "start", start(json!({"radial": [null, 4, null]}))).is_err());
 }

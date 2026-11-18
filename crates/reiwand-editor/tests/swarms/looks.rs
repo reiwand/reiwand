@@ -27,8 +27,9 @@ fn particle_shaders_offer_package_effects_of_the_particle_stage() {
     std::fs::create_dir_all(p.dir.join("effects")).unwrap();
     let wgsl =
         "fn particle(p: Sprite) -> Sprite {\n    var o = p;\n    o.size = p.size * 2.0;\n    return o;\n}\n";
-    std::fs::write(p.dir.join("effects/grow.json"), r#"{ "id": "grow", "stage": "particle", "cost": {} }"#)
-        .unwrap();
+    let mut grow = json!({ "id": "grow", "stage": "particle", "cost": {} });
+    reiwand_upgrade::descriptors::complete(&mut grow);
+    std::fs::write(p.dir.join("effects/grow.json"), grow.to_string()).unwrap();
     std::fs::write(p.dir.join("effects/grow.wgsl"), wgsl).unwrap();
     let files = json!({ "descriptor": "effects/grow.json", "wgsl": "effects/grow.wgsl" });
     act(&mut p, json!({ "set": { "pointer": "/scene/effects/grow", "value": files } })).unwrap();
@@ -46,7 +47,7 @@ fn fields_that_name_a_control_point_offer_the_points_of_the_system() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
     edit(&mut p, "point", json!({ "point": 2, "at": [10, 10] })).unwrap();
-    let ring = json!({ "circle": { "center": [0, 0], "radius": 10, "at": "p1" } });
+    let ring = json!({ "circle": { "center": [0, 0], "radius": 10, "inner": 0, "scale": [1, 1], "sign": [0, 0], "at": "p1" } });
     edit(&mut p, "shape", json!({ "emitter": 0, "shape": ring })).unwrap();
     let fields = reiwand_editor::inspect::fields_from(
         None,

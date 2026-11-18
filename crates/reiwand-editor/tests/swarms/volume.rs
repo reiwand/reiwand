@@ -9,7 +9,10 @@ fn a_sphere_shape_is_stored_whole_and_shown_with_its_handles() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
     edit(&mut p, "shape", json!({ "emitter": 0, "shape": ball() })).unwrap();
-    assert_eq!(p.doc.pointer("/scene/particles/flakes/emitters/0/shape").unwrap(), &ball());
+    assert_eq!(
+        p.doc.pointer("/scene/particles/flakes/emitters/0/shape").unwrap(),
+        &super::whole::same(&p, "/scene/particles/flakes/emitters/0/shape", ball())
+    );
     let h = &handles(&p)["emitters"][0];
     assert_eq!(h["kind"], "sphere");
     let near = |a: &Value, x: f64, y: f64| {

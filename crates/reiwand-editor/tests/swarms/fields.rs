@@ -19,7 +19,10 @@ fn turbulent_starts_are_set_undone_and_refused_past_their_limits() {
     edit(&mut p, "turbulent", json!({ "turbulent": { "phase": 2 }, "quiet": true })).unwrap();
     assert_eq!(
         system(&p)["init"]["turbulent"],
-        json!({ "forward": 90, "scale": 0.5, "speed": [20, 40], "phase": 2 })
+        reiwand_scene::prefill::part(
+            "init.turbulent",
+            json!({ "forward": 90, "scale": 0.5, "speed": [20, 40], "phase": 2 })
+        )
     );
     undone(&mut p, &before);
     let kept = p.doc.clone();
@@ -67,7 +70,7 @@ fn the_fan_and_the_offset_arrows_are_what_the_engine_computes() {
     let mut p = project(&root);
     let gust = json!({ "forward": 30, "scale": 0.25, "noise_speed": 2, "offset": 4, "speed": [10, 80] });
     edit(&mut p, "turbulent", json!({ "turbulent": gust })).unwrap();
-    edit(&mut p, "offset", json!({ "offset": { "distance": 20, "octaves": 2, "scale": 3 } })).unwrap();
+    edit(&mut p, "offset", json!({ "offset": { "distance": 20, "octaves": 2, "scale": 3, "sign": [0, 0], "noise_scale": 1, "noise_speed": 0 } })).unwrap();
     let h = reiwand_editor::swarms::handles(&p.dir, &p.doc, "flakes", None, 1.5);
     let fan = &h["fields"]["turbulent"];
     assert_eq!((fan["forward"].clone(), fan["fan"].clone()), (json!(30.0), json!([-15.0, 75.0])));
@@ -102,7 +105,7 @@ fn anchored_boxes_and_circles_carry_the_inverse_their_handles_need() {
     edit(&mut p, "point", json!({ "point": 1, "at": [100, 50], "angle": 30 })).unwrap();
     let boxed = json!({ "box": { "from": [-10, -5], "to": [10, 5], "at": "p1" } });
     edit(&mut p, "shape", json!({ "emitter": 0, "shape": boxed })).unwrap();
-    let ring = json!({ "circle": { "center": [4, 0], "radius": 8, "at": "p1" } });
+    let ring = json!({ "circle": { "center": [4, 0], "radius": 8, "inner": 0, "scale": [1, 1], "sign": [0, 0], "at": "p1" } });
     edit(&mut p, "shape", json!({ "emitter": 1, "shape": ring })).unwrap();
     let h = handles(&p);
     let (b, c) = (&h["emitters"][0], &h["emitters"][1]);

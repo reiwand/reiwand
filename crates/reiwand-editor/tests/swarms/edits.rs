@@ -35,7 +35,10 @@ fn shapes_points_and_layer_sources_are_set_undone_and_checked() {
     assert_eq!((source["id"].clone(), source["refresh"].clone()), (json!("logo"), json!("on_change")));
     undone(&mut p, &before);
     edit(&mut p, "point", json!({ "point": 2, "follow": true })).unwrap();
-    assert_eq!(system(&p)["points"][2], json!({ "follow": "cursor" }));
+    assert_eq!(
+        system(&p)["points"][2],
+        super::whole::same(&p, "/scene/particles/flakes/points/2", json!({ "follow": "cursor" }))
+    );
     edit(&mut p, "point", json!({ "point": 2, "remove": true })).unwrap();
     assert_eq!(system(&p)["points"].as_array().map(Vec::len), Some(2));
     let bad = [
@@ -114,7 +117,7 @@ fn remaps_looks_depth_children_and_shaders_are_set_undone_and_checked() {
     assert_eq!(system(&p)["children"][0]["follow_inherit"], json!(true));
     let after = p.doc.clone();
     act(&mut p, json!({ "undo": {} })).unwrap();
-    assert!(system(&p)["children"][0]["inherit"].is_null());
+    assert!(super::whole::empty(&system(&p)["children"][0]["inherit"]));
     act(&mut p, json!({ "redo": {} })).unwrap();
     assert_eq!(p.doc, after);
     let _ = before;

@@ -37,12 +37,12 @@ fn a_force_acts_inside_a_window_of_the_life_and_a_system_locks_values() {
     let kept = &system(&p)["forces"][last];
     assert_eq!((&kept["gravity"], &kept["window"]), (&json!([0, 200]), &json!([0.0, 0.1, 0.8, 1.0])));
     edit(&mut p, "window", json!({"index": last})).unwrap();
-    assert!(system(&p)["forces"][last]["window"].is_null());
+    assert_eq!(system(&p)["forces"][last]["window"], json!([0.0, 0.0, 1.0, 1.0]));
     edit(&mut p, "settings", json!({"lock": ["alpha", "size"]})).unwrap();
     assert_eq!(system(&p)["lock"], json!(["alpha", "size"]));
     assert!(edit(&mut p, "settings", json!({"lock": ["wobble"]})).is_err());
     edit(&mut p, "settings", json!({"lock": ["none"]})).unwrap();
-    assert!(system(&p)["lock"].is_null());
+    assert_eq!(system(&p)["lock"], json!([]));
     edit(&mut p, "render", json!({"frames": "life", "cycles": 3, "order": "oldest"})).unwrap();
     assert_eq!(
         (&system(&p)["render"]["cycles"], &system(&p)["render"]["order"]),
@@ -73,7 +73,7 @@ fn starting_colors_come_from_hues_a_palette_or_a_gradient() {
         edit(&mut p, "start", json!({"ranges": {"palette": {"colors": [], "noise": [2, 0, 0]}}})).is_err()
     );
     edit(&mut p, "start", json!({"clear": ["hsv", "palette", "gradient"]})).unwrap();
-    assert!(["hsv", "palette", "gradient"].iter().all(|k| system(&p)["init"][*k].is_null()));
+    assert!(["hsv", "palette", "gradient"].iter().all(|k| super::whole::empty(&system(&p)["init"][*k])));
 }
 
 #[test]

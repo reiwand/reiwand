@@ -27,7 +27,7 @@ fn points(s: &Value, f: &Frame, t: f64) -> Vec<Value> {
     (0..list.len().max(1))
         .map(|k| {
             let p = list.get(k).cloned().unwrap_or(json!({}));
-            let follow = p.get("follow").is_some();
+            let follow = p.get("follow").is_some_and(|f| !f.is_null());
             let local = pair(&value_at(&p["at"], t)).unwrap_or([0.0; 2]);
             let world = p["space"] == "world";
             let at = if world { local } else { f.apply(local) };
@@ -119,7 +119,7 @@ pub fn heard(dir: &Path, doc: &Value, system: &str, layer: Option<&str>, (t, sou
         "sprite": super::proportion::sprite(s, render),
         "stretch": super::streaks::stretch(s, render),
         "waves": super::streaks::waves(s),
-        "orient": { "mode": render.get("orient").unwrap_or(&json!("screen")), "angle": render["angle"].as_f64().unwrap_or(0.0) },
+        "orient": { "mode": render.get("orient").filter(|o| !o.is_null()).unwrap_or(&json!("screen")), "angle": render["angle"].as_f64().unwrap_or(0.0) },
         "children": children.collect::<Vec<_>>(),
         "shaders": looks::shaders(doc, dir, render),
         "sources": looks::sources(doc, system),

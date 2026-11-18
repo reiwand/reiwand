@@ -48,7 +48,7 @@ fn groups_turn_3d_and_their_flat_layers_choose_depth() {
     assert_eq!(layer(&p, "card")["depth_test"], true);
     assert!(edit(&mut p, json!({ "depth_test": { "layer": "doll", "on": true } })).is_err());
     edit(&mut p, json!({ "space": { "layer": "world", "deep": false } })).unwrap();
-    assert!(layer(&p, "world").get("space").is_none());
+    assert_eq!(layer(&p, "world")["space"], "2d");
     assert!(edit(&mut p, json!({ "space": { "layer": "card", "deep": true } })).is_err());
     edit(&mut p, json!({ "group": { "id": "empty" } })).unwrap();
     assert_eq!(
@@ -81,7 +81,7 @@ fn materials_change_by_name_and_check_their_values() {
         assert!(edit(&mut p, json!({ "material": bad.clone() })).is_err(), "{bad}");
     }
     edit(&mut p, json!({ "material": { "layer": "doll", "name": "paint", "clear": true } })).unwrap();
-    assert!(layer(&p, "doll")["materials"].get("paint").is_none());
+    assert!(layer(&p, "doll")["materials"]["paint"].is_null());
 }
 
 #[test]

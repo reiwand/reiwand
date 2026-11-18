@@ -93,6 +93,6 @@ fn the_wind_is_set_by_angle_strength_and_gusts() {
     }
     act(&mut p, json!({ "wind": { "off": true } })).unwrap();
     let canvas = &p.doc["scene"]["canvas"];
-    assert!(canvas.get("wind").is_none() && canvas.get("gusts").is_none());
+    assert!(canvas["wind"].is_null() && canvas["gusts"].is_null());
     assert_eq!(reiwand_editor::rigs::wind_arrow(&p.doc)["fixed"], json!(true));
 }

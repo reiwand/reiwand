@@ -58,7 +58,7 @@ fn a_material_map_is_chosen_from_the_pictures_imported_into_its_slot_and_removed
     let before = p.doc.clone();
     let pick = json!({ "material": { "layer": "doll", "name": "paint", "maps": { "base": "sky" } } });
     edit(&mut p, pick).unwrap();
-    assert_eq!(layer(&p, "doll")["materials"]["paint"]["maps"], json!({ "base": "sky" }));
+    assert_eq!(layer(&p, "doll")["materials"]["paint"]["maps"]["base"], "sky");
     undone(&mut p, &before);
     let wrong = json!({ "material": { "layer": "doll", "name": "paint", "maps": { "shine": "sky" } } });
     assert!(edit(&mut p, wrong).is_err());
@@ -77,7 +77,7 @@ fn a_material_map_is_chosen_from_the_pictures_imported_into_its_slot_and_removed
     edit(&mut p, gone).unwrap();
     let base = json!({ "material": { "layer": "doll", "name": "paint", "maps": { "base": null } } });
     edit(&mut p, base).unwrap();
-    assert!(layer(&p, "doll")["materials"]["paint"].get("maps").is_none());
+    assert!(layer(&p, "doll")["materials"]["paint"]["maps"]["base"].is_null());
 }
 
 #[test]

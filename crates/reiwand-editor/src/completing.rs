@@ -60,9 +60,20 @@ fn blank(doc: &Value, path: &str) -> Option<Op> {
     let (root, _) = root_of(path).filter(|_| path.starts_with("/scene/"))?;
     let schema = at(doc, parent)?;
     let shown = doc.pointer(parent)?;
-    let prop = properties(root, &schema, shown).get(key)?.clone();
+    let mut resolved = crate::schema::deref(root, &schema).0;
+    while !resolved["properties"].is_object() && !crate::schema::branches(resolved).is_empty() {
+        let next = crate::schema::deref(root, crate::schema::choose(root, resolved, shown)).0;
+        if std::ptr::eq(next, resolved) {
+            break;
+        }
+        resolved = next;
+    }
+    let prop = properties(root, resolved, shown).get(key)?.clone();
     doc.pointer(path)?;
-    let required = crate::schema::deref(root, &schema).0["required"].as_array()?.iter().any(|r| r == key);
+    let variant =
+        resolved["oneOf"].as_array().into_iter().flatten().find(|v| crate::schema::fits(root, v, shown));
+    let listed_in = |s: &Value| s["required"].as_array().is_some_and(|r| r.iter().any(|r| r == key));
+    let required = listed_in(resolved) || variant.is_some_and(listed_in);
     required.then(|| Op::Replace { path: path.to_owned(), value: sample(root, &prop) })
 }
 
@@ -93,5 +104,70 @@ fn layers(list: &Value, base: &str, out: &mut Vec<String>) {
             out.push(format!("{here}/instance"));
         }
         layers(&layer["layers"], &format!("{here}/layers"), out);
+    }
+}
+
+pub fn require(doc: &Value, path: &str, value: &Value) -> anyhow::Result<()> {
+    match lacking(doc, path, value) {
+        Some(field) => anyhow::bail!(reiwand_core::message::said(
+            "editor.missing_value",
+            "%1 needs a value for %2",
+            &[&path.rsplit('/').next().unwrap_or_default(), &field]
+        )),
+        None => Ok(()),
+    }
+}
+
+pub fn lacking(doc: &Value, path: &str, value: &Value) -> Option<String> {
+    let (root, _) = root_of(path)?;
+    let schema = at(doc, path)?;
+    gap(root, &schema, value, "")
+}
+
+fn gap(root: &Value, schema: &Value, value: &Value, base: &str) -> Option<String> {
+    match value {
+        Value::Object(map) => {
+            let (resolved, _) = crate::schema::deref(root, schema);
+            let shown = value.clone();
+            let chosen = if resolved["properties"].is_object() {
+                resolved
+            } else {
+                let objects =
+                    crate::schema::branches(resolved).iter().map(|b| crate::schema::deref(root, b).0);
+                objects
+                    .clone()
+                    .find(|b| b["properties"].is_object() && crate::schema::fits(root, b, &shown))
+                    .or_else(|| objects.clone().find(|b| b["properties"].is_object()))
+                    .unwrap_or(resolved)
+            };
+            let props = properties(root, chosen, &shown);
+            let variant = chosen["oneOf"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .find(|v| crate::schema::fits(root, v, &shown));
+            let listed = |s: &Value| s["required"].as_array().cloned().unwrap_or_default();
+            let required = listed(chosen).into_iter().chain(variant.map(listed).unwrap_or_default());
+            for key in required.filter_map(|k| k.as_str().map(str::to_owned)) {
+                let given = map.contains_key(&key);
+                let prop = props.get(&key);
+                let fixed = prop.is_some_and(|p| {
+                    p.get("default").or_else(|| crate::schema::deref(root, p).0.get("default")).is_some()
+                        || sample(root, p).is_null()
+                });
+                if !given && !fixed {
+                    return Some(format!("{base}/{key}"));
+                }
+            }
+            map.iter().find_map(|(key, inner)| {
+                let next = crate::schema::child(root, chosen, key, &shown)?;
+                gap(root, &next, inner, &format!("{base}/{key}"))
+            })
+        }
+        Value::Array(list) => list.iter().enumerate().find_map(|(i, inner)| {
+            let next = crate::schema::child(root, schema, &i.to_string(), &Value::Null)?;
+            gap(root, &next, inner, &format!("{base}/{i}"))
+        }),
+        _ => None,
     }
 }

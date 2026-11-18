@@ -16,7 +16,11 @@ fn layers_inside_a_template_follow_reach_for_and_mask_by_layers_of_the_scene() {
     let badge = templated(&mut p, "badge");
     act(&mut p, json!({ "attach": { "layer": "badge", "to": "net", "bone": "arm" } })).unwrap();
     let copied = &p.doc["scene"]["templates"][&badge];
-    assert_eq!(copied["attach"], json!({ "layer": "net", "bone": "arm" }), "{copied}");
+    assert_eq!(
+        copied["attach"],
+        json!({ "layer": "net", "bone": "arm", "point": null, "offset": null, "inherit": null }),
+        "{copied}"
+    );
     let outline = reiwand_editor::outline::outline(&p, 0.0, &[]);
     assert!(outline["outside"].as_array().unwrap().iter().any(|l| l["id"] == "net" && l["type"] == "mesh"));
     let shown = outline["followed"].as_array().unwrap();

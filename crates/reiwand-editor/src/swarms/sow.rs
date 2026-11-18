@@ -76,18 +76,12 @@ fn start(doc: &Value, sys: &str, ranges: &Map<String, Value>, clear: &[String]) 
     let at = format!("{sys}/init");
     let mut init = object(doc, &at);
     for key in ranges.keys() {
-        let known = RANGES.contains(&key.as_str());
-        ensure!(
-            known,
-            said("editor.no_start_range", "%1 is not a starting range: %2", &[key, &RANGES.join(", ")])
-        );
+        let msg = said("editor.no_start_range", "%1 is not a starting range: %2", &[key, &RANGES.join(", ")]);
+        ensure!(RANGES.contains(&key.as_str()), msg);
     }
     for key in clear {
-        let known = CLEARED.contains(&key.as_str());
-        ensure!(
-            known,
-            said("editor.start_cleared", "only %1 can be cleared, not %2", &[&CLEARED.join(", "), key])
-        );
+        let msg = said("editor.start_cleared", "only %1 can be cleared, not %2", &[&CLEARED.join(", "), key]);
+        ensure!(CLEARED.contains(&key.as_str()), msg);
         init.remove(key);
     }
     let colors = ranges.get("color").and_then(Value::as_array).into_iter().flatten();
@@ -95,12 +89,13 @@ fn start(doc: &Value, sys: &str, ranges: &Map<String, Value>, clear: &[String]) 
         bail!(said("editor.not_color", "%1 is not a color such as #ffcc88", &[&bad]));
     }
     let tints = TINTS.iter().filter(|t| ranges.contains_key(**t)).count();
-    ensure!(
-        tints <= 1,
-        said("editor.one_tint", "particles start with hues, a palette or a gradient, one of them", &[])
-    );
+    let one = said("editor.one_tint", "particles start with hues, a palette or a gradient, one of them", &[]);
+    ensure!(tints <= 1, one);
     if tints == 1 {
         TINTS.iter().for_each(|t| drop(init.remove(*t)));
+    }
+    if let Some(tilt) = ranges.get("tilt") {
+        crate::completing::require(doc, &format!("{at}/tilt"), tilt)?;
     }
     init.entry("tilt").or_insert_with(|| json!({"angle": [[0, 0], [0, 0]], "spin": [[0, 0], [0, 0]]}));
     for (k, v) in ranges {
@@ -173,6 +168,9 @@ pub(super) fn edit(doc: &Value, e: &S) -> Result<Vec<Op>> {
                 parsed::<reiwand_scene::Stack>(&json!(o), "order")?;
             }
             super::streaks::checked(stretch.as_ref())?;
+            if let Some(look) = stretch.as_ref().filter(|v| v.is_object()) {
+                crate::completing::require(doc, &format!("{}/render/stretch", system(doc, s)?), look)?;
+            }
             if let Some(f) = frames.as_deref().filter(|f| *f != "none") {
                 parsed::<Frames>(&json!(f), "frames")?;
             }

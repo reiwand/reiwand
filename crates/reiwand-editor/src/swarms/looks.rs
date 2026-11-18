@@ -100,7 +100,7 @@ pub(super) fn shaders(doc: &Value, dir: &std::path::Path, render: &Value) -> Val
     let loaded = scene.map(|s| s.loaded).unwrap_or_default();
     let offered: Vec<&String> =
         loaded.iter().filter(|(_, d)| d.stage == reiwand_scene::Stage::Particle).map(|(id, _)| id).collect();
-    json!({ "current": render["shader"], "offered": offered, "warning": render.get("shader").is_some() })
+    json!({ "current": render["shader"], "offered": offered, "warning": !render["shader"].is_null() })
 }
 
 pub(super) fn domains() -> Value {

@@ -7,7 +7,7 @@ fn emitters_are_added_at_the_next_index_and_removed_by_index() {
     let count =
         |p: &Project| p.doc.pointer("/scene/particles/flakes/emitters").unwrap().as_array().unwrap().len();
     let before = count(&p);
-    let circle = json!({ "circle": { "center": [0, 0], "radius": 10 } });
+    let circle = json!({ "circle": { "center": [0, 0], "radius": 10, "inner": 0, "scale": [1, 1], "sign": [0, 0], "at": null } });
     edit(&mut p, "shape", json!({ "emitter": before, "shape": circle })).unwrap();
     assert_eq!(count(&p), before + 1);
     edit(&mut p, "shape", json!({ "emitter": before, "remove": true })).unwrap();

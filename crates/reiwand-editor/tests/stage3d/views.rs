@@ -38,7 +38,7 @@ fn the_scene_camera_is_set_rolled_and_taken_from_the_view() {
     let eye = p.doc["scene"]["camera3d"]["eye"].clone();
     assert!(eye[0].as_f64().unwrap() > 7.0, "{eye}");
     edit(&mut p, json!({ "camera": { "clear": true } })).unwrap();
-    assert!(p.doc["scene"].get("camera3d").is_none());
+    assert!(p.doc["scene"]["camera3d"].is_null());
 }
 
 #[test]
@@ -67,9 +67,9 @@ fn the_view_orbits_pans_zooms_frames_and_looks_through_the_camera() {
     edit(&mut p, json!({ "view": { "through": true } })).unwrap();
     let mut scene = p.doc["scene"].clone();
     reiwand_editor::stage3d::preview(&mut scene);
-    assert!(scene.get("camera3d").is_none());
+    assert!(scene["camera3d"].is_null());
     edit(&mut p, json!({ "view": { "reset": true } })).unwrap();
-    assert!(p.doc["scene"]["ext"]["editor"].get("view3d").is_none());
+    assert!(p.doc["scene"]["ext"]["editor"]["view3d"].is_null());
 }
 
 #[test]
@@ -86,10 +86,11 @@ fn tone_maps_need_hdr_and_the_split_preview_is_kept_for_the_editor() {
     assert!(edit(&mut p, json!({ "tones": { "tonemap": "filmic" } })).is_err());
     assert!(edit(&mut p, json!({ "tones": { "split": 2 } })).is_err());
     edit(&mut p, json!({ "tones": { "split": 0 } })).unwrap();
-    assert!(p.doc["scene"]["ext"]["editor"].get("tonemap_split").is_none());
+    assert!(p.doc["scene"]["ext"]["editor"]["tonemap_split"].is_null());
     edit(&mut p, json!({ "tones": { "hdr": false, "tonemap": "none" } })).unwrap();
-    assert!(
-        p.doc["scene"]["canvas"].get("hdr").is_none() && p.doc["scene"]["canvas"].get("tonemap").is_none()
+    assert_eq!(
+        (&p.doc["scene"]["canvas"]["hdr"], &p.doc["scene"]["canvas"]["tonemap"]),
+        (&json!(false), &Value::Null)
     );
 }
 

@@ -101,7 +101,7 @@ fn between(b: &Value, f: &Frame, spots: &[Value], t: f64) -> Value {
     let count = b["count"].as_u64().unwrap_or(1).max(1);
     let (span, amount) = (num(&b["span"], t, 1.0), b["arc"]["amount"].as_f64().unwrap_or(0.0));
     let side = b["arc"]["side"].as_f64().filter(|s| *s != 0.0).unwrap_or(1.0);
-    let taped = b.get("taper").is_some();
+    let taped = !b["taper"].is_null();
     let (pos, size) =
         (b["taper"]["position"].as_f64().unwrap_or(0.5), b["taper"]["size"].as_f64().unwrap_or(0.5));
     let point = |u: f64| {

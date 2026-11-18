@@ -12,6 +12,7 @@ pub(super) fn shape(doc: &Value, sys: &str, emitter: usize, shape: &Value, remov
         return Ok(vec![Op::Remove { path: format!("{sys}/emitters/{emitter}") }]);
     }
     parsed::<reiwand_scene::EmitShape>(shape, "shape")?;
+    crate::completing::require(doc, &format!("{sys}/emitters/{emitter}/shape"), shape)?;
     ensure!(emitter <= count, said("editor.no_emitter", "the system has no emitter %1", &[&emitter]));
     if emitter == count {
         let value = json!({ "shape": shape, "rate": 10 });
@@ -64,7 +65,7 @@ pub(super) fn point(
             point["follow"] = json!("cursor");
             point.as_object_mut().map(|o| o.remove("at"));
         }
-        Some(false) if point.get("at").is_none() => {
+        Some(false) if point["at"].is_null() => {
             point["at"] = json!([0, 0]);
             point.as_object_mut().map(|o| o.remove("follow"));
         }
