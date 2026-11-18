@@ -12,6 +12,7 @@ ctl scene act "$made" set '{"pointer": "/scene/layers/0", "value": { "blend_spac
 ctl scene act "$made" add_layer '{"id": "flakes", "kind": "particles"}' >/dev/null
 printf '%s' '{"id": "throb", "name": {"en": "Pulse"}, "cost": {"taps": 1}, "passes": [{"entry": "fs_throb"}],
   "params": [{"id": "gain", "type": "float", "default": 1, "min": 0, "max": 4}, {"id": "speed", "type": "float", "default": 0}]}' >"$WORK/throb.json"
+"$BIN/reiwand-upgrade" effects "$WORK/throb.json" >/dev/null
 printf '%s' '@fragment fn fs_throb(in: VertexOut) -> @location(0) vec4<f32> { return tap(in.uv) * param(0u).x; }' >"$WORK/throb.wgsl"
 ctl scene act "$made" import_effect '{"descriptor": "'"$WORK"'/throb.json"}' >/dev/null || fail "the package effect was not imported"
 ctl scene act "$made" effect_rule '{"effect": "throb", "param": "gain", "uses": "time", "waits_for": "speed"}' || fail "the wake rule was not changed"

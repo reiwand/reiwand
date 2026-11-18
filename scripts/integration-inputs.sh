@@ -160,10 +160,10 @@ ctl scene act "$draft" solo && ctl scene act "$draft" hide '{"hidden": false, "i
 ctl scene act "$draft" keyframe '{"pointer": "/scene/layers/0/color", "time": 0, "value": "#ff0000"}'
 ctl scene act "$draft" keyframe '{"pointer": "/scene/layers/0/color", "time": 16, "value": "#0000ff"}'
 "$BIN/probe" "$s15" 10 --hold >"$WORK/play-frames.out" 2>&1 & player=$!; pids+=("$player")
-looks_at "$draft" -o preview:1
+ctl scene preview "$draft" -o preview:1
 sleep 6
 ctl scene act "$draft" set '{"pointer": "/scene/canvas/background", "value": "#00ff00"}'
-looks_at "$draft" -o preview:1
+ctl scene preview "$draft" -o preview:1
 read -r b g r _ < <("$BIN/probe" "$s15" 3 | sed 's/.*center bgra \[\(.*\)\]/\1/; s/,/ /g')
 [ "$b" -gt 85 ] || fail "an edit restarted the playing preview: bgra $b $g $r"
 wait "$player" || fail "the playing preview stopped: $(cat "$WORK/play-frames.out")"

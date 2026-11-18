@@ -127,7 +127,7 @@ ctl scene act "$tuning" asset '{"asset": "previous_cover", "cover": "previous", 
 doc() { python3 -c "import json, sys; d = json.load(open(sys.argv[2])); print(eval(sys.argv[1]))" "$1" "$tuning/scene.json"; }
 [ "$(doc "d['layers'][1]['text']['placeholder']")" = "{'en': 'Nothing plays', 'es': 'No suena nada'}" ] ||
   fail "the text while nothing plays: $(doc "d['layers'][1]['text']")"
-[ "$(doc "'media' in d['assets']['previous_cover'], d['assets'][d['layers'][2]['image']]['media']")" = "(False, 'previous')" ] ||
+[ "$(doc "d['assets']['previous_cover']['media'], d['assets'][d['layers'][2]['image']]['media']")" = "(None, 'previous')" ] ||
   fail "choosing the previous cover for a field: $(doc "d['assets'], d['layers'][2]")"
 if ctl scene act "$tuning" asset '{"asset": "cover", "cover": "none", "field": "/scene/layers/2/image"}' 2>/dev/null; then fail "a field took no cover"; fi
 cp "$WORK/blue cover.png" "$tuning/blue.png"
