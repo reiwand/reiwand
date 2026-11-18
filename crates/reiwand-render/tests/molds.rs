@@ -13,7 +13,7 @@ use crate::gpu::renderer;
 fn scene(extra: Value) -> Scene {
     let mut doc = json!({ "schema": SCHEMA, "canvas": { "size": [160, 90], "background": "#102030" } });
     doc.as_object_mut().unwrap().extend(extra.as_object().unwrap().clone());
-    Scene::load(&doc.to_string(), &Default::default()).unwrap()
+    Scene::load(&crate::gpu::whole(&doc.to_string()), &Default::default()).unwrap()
 }
 
 fn pixels(r: &Renderer, scene: Scene, outputs: ScriptOutputs) -> Vec<u8> {

@@ -13,7 +13,7 @@ use crate::gpu::renderer;
 fn scene(layers: Value, templates: Value) -> Scene {
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [160, 90], "background": "#102030" },
         "templates": templates, "layers": layers });
-    Scene::load(&doc.to_string(), &Default::default()).unwrap()
+    Scene::load(&crate::gpu::whole(&doc.to_string()), &Default::default()).unwrap()
 }
 
 fn pixels(r: &Renderer, scene: Scene, outputs: ScriptOutputs) -> Vec<u8> {

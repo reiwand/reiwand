@@ -18,7 +18,7 @@ fn option_values_outside_the_built_variants_never_build_on_the_render_thread() {
     let layers = json!([{ "blend_space": "canvas", "id": "bg", "type": "solid", "color": "#ff0000", "effects": [used] }]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers,
         "effects": { "vv": { "descriptor": "fx/vv.json", "wgsl": "fx/vv.wgsl" } } });
-    let mut scene = Scene::from_json(&text.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::gpu::whole(&text.to_string())).unwrap();
     let props: BTreeMap<String, Property> = serde_json::from_value(json!({
         "p": { "type": "slider", "min": 0, "max": 1, "step": 1, "integer": true, "default": 0 } }))
     .unwrap();

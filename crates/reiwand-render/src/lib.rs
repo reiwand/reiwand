@@ -44,6 +44,9 @@ mod platform;
 mod pq;
 mod readback;
 mod save;
+#[cfg(test)]
+#[path = "../tests/whole.rs"]
+mod whole;
 mod scene;
 mod shader;
 mod stack;

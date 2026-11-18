@@ -24,7 +24,7 @@ pub fn scene(effects: &[(&str, String)]) -> Scene {
     let layer = json!({ "blend_space": "canvas", "id": "l", "type": "solid", "color": "#ff0000", "size": [64, 32], "effects": uses });
     let text =
         json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "layers": [layer], "effects": files });
-    let mut scene = Scene::from_json(&text.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::gpu::whole(&text.to_string())).unwrap();
     let read = |path: &str, _: usize| {
         let (id, ext) = path.trim_start_matches("fx/").split_once('.').unwrap_or_default();
         let (_, wgsl) = effects.iter().find(|(i, _)| *i == id).ok_or("missing")?;

@@ -53,7 +53,7 @@ impl Shot {
         text["schema"] = json!(SCHEMA);
         let props: BTreeMap<String, Property> =
             serde_json::from_value(json!({ "tone": { "type": "color", "default": "#00ff00" } })).unwrap();
-        let scene = Scene::load(&text.to_string(), &props).unwrap();
+        let scene = Scene::load(&crate::gpu::whole(&text.to_string()), &props).unwrap();
         let assets = SceneAssets {
             images: images.iter().map(|(id, i)| (id.to_string(), i.clone())).collect(),
             ..Default::default()

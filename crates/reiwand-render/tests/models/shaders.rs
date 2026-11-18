@@ -101,7 +101,7 @@ pub fn packaged(layers: Value, files: &[(&'static str, &'static str)]) -> Scene 
         .collect();
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [SIDE, SIDE], "background": "#000000" },
         "assets": { "ball": { "path": "ball.glb" } }, "layers": layers, "effects": effects });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::gpu::whole(&doc.to_string())).unwrap();
     let glb = ball(unlit("skin", [1.0; 4]));
     let files: BTreeMap<&str, Vec<u8>> = files.iter().map(|(p, t)| (*p, t.as_bytes().to_vec())).collect();
     let read = move |path: &str, _: usize| match path {

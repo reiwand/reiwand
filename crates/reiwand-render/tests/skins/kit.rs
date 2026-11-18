@@ -42,7 +42,7 @@ pub fn sketch(shapes: bool) -> Vec<u8> {
 pub fn scene(layer: Value, glb: Vec<u8>) -> Scene {
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [SIDE, SIDE], "background": "#000000" },
         "assets": { "pic": { "path": "pic.png" }, "mesh": { "path": "mesh.glb" } }, "layers": [layer] });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::gpu::whole(&doc.to_string())).unwrap();
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     scene
 }

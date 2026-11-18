@@ -10,7 +10,7 @@ fn grown(scale: f32, side: u32, quality: Quality) -> (u32, u32) {
         "assets": { "pic": { "path": "pic.png" }, "mesh": { "path": "mesh.glb" } },
         "layers": [{ "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "mesh", "texture": "pic", "size": [64, 64],
             "transform": { "scale": [scale, scale] } }] });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::whole::whole(&doc.to_string())).unwrap();
     scene.adopt(&Default::default(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     let picture = RgbaImage::from_pixel(side, side, Rgba([200, 100, 50, 255]));
     let assets = super::super::SceneAssets {

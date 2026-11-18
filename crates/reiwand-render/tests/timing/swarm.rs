@@ -22,7 +22,7 @@ fn scene(wgsl: &str) -> Scene {
     let effects = json!({ "own": { "descriptor": "fx/own.json", "wgsl": "fx/own.wgsl" } });
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 32] }, "particles": { "s": system }, "effects": effects,
         "layers": [{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s" }] });
-    let mut scene = Scene::from_json(&text.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::gpu::whole(&text.to_string())).unwrap();
     let read = |path: &str, _: usize| {
         let json = r#"{ "id": "own", "stage": "particle", "cost": {} }"#;
         Ok::<_, &str>(if path.ends_with(".json") { json.to_owned() } else { wgsl.to_owned() }.into_bytes())

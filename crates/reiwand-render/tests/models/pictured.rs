@@ -15,7 +15,7 @@ fn pictured(params: Value) -> Scene {
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [SIDE, SIDE], "background": "#000000" },
         "assets": { "ball": { "path": "ball.glb" }, "red": { "path": "red.png" }, "blue": { "path": "blue.png" } },
         "layers": layers, "effects": { "coat": { "descriptor": "effects/coat.json", "wgsl": "effects/coat.wgsl" } } });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::gpu::whole(&doc.to_string())).unwrap();
     let glb = Forge::default()
         .material(unlit("skin", [1.0; 4]))
         .part("ball", ForgeShape::Sphere(12), [0.0; 3], 2.0, 0)

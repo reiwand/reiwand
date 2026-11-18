@@ -10,3 +10,5 @@ pub fn renderer() -> Option<&'static Renderer> {
         Err(e) => panic!("GPU required but unavailable: {e}"),
     }
 }
+
+include!("whole.rs");

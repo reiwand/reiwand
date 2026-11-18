@@ -16,7 +16,7 @@ fn puppet() -> Scene {
             "clips": [{ "id": "swing", "loop": "pingpong", "bones": { "arm": { "rotation": [[0, 0], [1, 60]] } } }],
             "animations": [{ "clip": "swing" }], "ik": [{ "chain": ["root", "arm"], "target": [40, 20], "weight": 0.5 }],
             "physics": [{ "bone": "arm", "mode": "rope", "gravity": 1 }] }], "canvas": { "size": [64, 64], "wind": [30, 0] } });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::whole::whole(&doc.to_string())).unwrap();
     scene.adopt(&Default::default(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     scene
 }

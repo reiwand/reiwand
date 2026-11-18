@@ -27,7 +27,7 @@ fn setup(r: &Renderer, post: Value) -> (Runtime, SceneView, SceneAssets) {
     let canvas = json!({ "size": [160, 90], "background": "#203040" });
     let assets = json!({ "photo": { "path": "photo.png" } });
     let text = json!({ "schema": SCHEMA, "canvas": canvas, "assets": assets, "timelines": timelines, "layers": layers(post) });
-    let scene = Scene::load(&text.to_string(), &Default::default()).unwrap();
+    let scene = Scene::load(&crate::gpu::whole(&text.to_string()), &Default::default()).unwrap();
     let photo = RgbaImage::from_fn(64, 64, |x, y| Rgba([x as u8 * 4, y as u8 * 4, (x ^ y) as u8 * 4, 255]));
     let files =
         SceneAssets { images: [("photo".to_string(), Pixels::new(photo))].into(), ..Default::default() };
@@ -91,7 +91,7 @@ fn the_luminance_grid_follows_the_bright_parts_of_the_frame() {
     let half = json!([{ "blend_space": "canvas", "id": "white", "type": "solid", "color": "#ffffff", "size": [80, 90], "transform": { "position": [40, 45] } }]);
     let text =
         json!({ "schema": SCHEMA, "canvas": { "size": [160, 90], "background": "#000000" }, "layers": half });
-    let scene = Scene::load(&text.to_string(), &Default::default()).unwrap();
+    let scene = Scene::load(&crate::gpu::whole(&text.to_string()), &Default::default()).unwrap();
     let mut view = r.scene_view(&scene, &SceneAssets::default(), &Values::new()).unwrap();
     let runtime = Runtime::new(Arc::new(scene), Values::new());
     let mut luma = Vec::new();
@@ -130,7 +130,7 @@ fn property_and_script_colour_changes_redraw_the_layers_they_touch() {
     let timelines = [json!({ "id": "t", "duration": 4, "loop": "repeat" })];
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [160, 90], "background": "#000000" },
         "timelines": timelines, "layers": [dot, lit, hue] });
-    let scene = Scene::from_json(&text.to_string()).unwrap();
+    let scene = Scene::from_json(&crate::gpu::whole(&text.to_string())).unwrap();
     let values = |b: f32, c: &str| -> Values {
         [("b".into(), json!(b)), ("c".into(), json!(c))].into_iter().collect()
     };

@@ -33,7 +33,7 @@ pub fn scene(layers: Value, canvas: Value) -> Scene {
     let timelines = [json!({ "id": "go", "duration": 4, "loop": "repeat" })];
     let text =
         json!({ "schema": SCHEMA, "canvas": c, "assets": assets, "timelines": timelines, "layers": layers });
-    Scene::load(&text.to_string(), &Default::default()).unwrap()
+    Scene::load(&crate::gpu::whole(&text.to_string()), &Default::default()).unwrap()
 }
 
 pub fn files(bump: [u8; 4]) -> SceneAssets {

@@ -41,7 +41,7 @@ fn scenes_without_a_preview_are_drawn_at_their_poster_time() {
     text["schema"] = json!(SCHEMA);
     text["canvas"]["size"] = json!([200, 100]);
     text["clock"] = json!({ "poster_time": 3 });
-    let scene = Scene::from_json(&text.to_string()).unwrap();
+    let scene = Scene::from_json(&crate::gpu::whole(&text.to_string())).unwrap();
     let poster = |wall: f64| r.poster(&scene, &SceneAssets::default(), &Default::default(), (wall, "en"), 50);
     let night = poster(0.0).unwrap();
     assert_eq!(night.dimensions(), (50, 25));

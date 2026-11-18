@@ -24,7 +24,7 @@ fn shown(r: &Renderer, quality: Quality, pic: serde_json::Value) -> Vec<u8> {
     let layer = json!({ "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "mesh", "texture": "pic", "size": [OUT, OUT] });
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [OUT, OUT], "background": "#000000" },
         "assets": { "pic": pic, "mesh": { "path": "mesh.glb" } }, "layers": [layer] });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::gpu::whole(&doc.to_string())).unwrap();
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     let assets =
         SceneAssets { images: [("pic".to_string(), Pixels::new(disk()))].into(), ..Default::default() };

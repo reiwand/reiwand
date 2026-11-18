@@ -59,7 +59,7 @@ fn owned(depth: f32) -> Scene {
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [SIDE, SIDE], "background": "#000000" },
         "assets": { "red": { "path": "red.glb" } }, "layers": group(layer), "particles": extra["particles"],
         "effects": extra["effects"] });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&crate::gpu::whole(&doc.to_string())).unwrap();
     let glb = cube(unlit("paint", [1.0, 0.0, 0.0, 1.0]));
     let files = move |path: &str, _: usize| match path {
         "red.glb" => Ok(glb.clone()),
