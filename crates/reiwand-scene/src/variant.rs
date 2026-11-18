@@ -72,19 +72,21 @@ impl Descriptor {
     }
 
     pub fn choices(&self, e: &EffectUse) -> Vec<Vec<usize>> {
-        let picks = self.options.iter().map(|o| match e.params.get(&o.id).filter(|v| !matches!(v, Value::Fixed(Param::Auto))) {
-            Some(Value::Fixed(v)) => vec![o.at(v).unwrap_or(o.base())],
-            Some(Value::Bound(b)) => match &b.map {
-                Some(map) => map.values().filter_map(|v| o.at(v)).collect(),
-                None => (0..o.values.len()).collect(),
-            },
-            None => match o.when_bound.as_deref().map(|t| (t, e.params.get(t))) {
-                Some((_, Some(Value::Fixed(Param::Text(t))))) if !t.is_empty() => vec![o.on()],
-                Some((_, Some(Value::Bound(b)))) if b.layer.is_some() => vec![o.on()],
-                Some((_, Some(Value::Bound(_)))) => vec![o.base(), o.on()],
-                Some((t, None)) if self.painted(t) => vec![o.on()],
-                _ => vec![o.base()],
-            },
+        let picks = self.options.iter().map(|o| {
+            match e.params.get(&o.id).filter(|v| !matches!(v, Value::Fixed(Param::Auto))) {
+                Some(Value::Fixed(v)) => vec![o.at(v).unwrap_or(o.base())],
+                Some(Value::Bound(b)) => match &b.map {
+                    Some(map) => map.values().filter_map(|v| o.at(v)).collect(),
+                    None => (0..o.values.len()).collect(),
+                },
+                None => match o.when_bound.as_deref().map(|t| (t, e.params.get(t))) {
+                    Some((_, Some(Value::Fixed(Param::Text(t))))) if !t.is_empty() => vec![o.on()],
+                    Some((_, Some(Value::Bound(b)))) if b.layer.is_some() => vec![o.on()],
+                    Some((_, Some(Value::Bound(_)))) => vec![o.base(), o.on()],
+                    Some((t, None)) if self.painted(t) => vec![o.on()],
+                    _ => vec![o.base()],
+                },
+            }
         });
         let tidy = |(o, mut c): (&Variant, Vec<usize>)| {
             c.sort_unstable();

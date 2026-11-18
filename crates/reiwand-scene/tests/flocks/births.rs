@@ -38,7 +38,8 @@ fn initializers_lean_pick_colors_and_aim() {
     assert!(
         green.iter().all(|p| p.color.iter().zip([0.0, 1.0, 0.0, 1.0]).all(|(a, b)| (a - b).abs() < 1e-3))
     );
-    let stepped = born(point.clone(), json!({ "hsv": { "hue": [0, 240], "sat": [1, 1], "val": [1, 1], "steps": 3 } }));
+    let stepped =
+        born(point.clone(), json!({ "hsv": { "hue": [0, 240], "sat": [1, 1], "val": [1, 1], "steps": 3 } }));
     let hues = |c: [f32; 4]| [c[0] > 0.5, c[1] > 0.5, c[2] > 0.5];
     assert!(stepped.iter().all(|p| {
         [[true, false, false], [false, true, false], [false, false, true]].contains(&hues(p.color))

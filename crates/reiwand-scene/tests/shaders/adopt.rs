@@ -97,8 +97,11 @@ fn package_effects_compile_once_and_share_a_shader_budget() {
         let id = path.trim_start_matches("fx/").split('.').next().unwrap_or_default();
         let mut d = descriptor();
         d["id"] = json!(id);
-        let text =
-            if path.ends_with("json") { reiwand_upgrade::descriptors::completed(&d.to_string()) } else { format!("{WGSL}{}", " ".repeat(60 << 10)) };
+        let text = if path.ends_with("json") {
+            reiwand_upgrade::descriptors::completed(&d.to_string())
+        } else {
+            format!("{WGSL}{}", " ".repeat(60 << 10))
+        };
         Some(text.into_bytes()).filter(|b| b.len() <= max).ok_or("too large")
     };
     let fault = many.adopt(&BTreeMap::new(), files).unwrap_err().to_string();

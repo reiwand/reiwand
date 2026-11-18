@@ -82,7 +82,12 @@ fn descriptors_check_their_new_fields() {
         (pass(json!({ "entry": "fs_a", "vertex": "vs_a", "grid": [65, 8] })), "a grid of 1 to 64"),
         (pass(json!({ "entry": "fs_a", "inputs": vec!["input"; 10] })), "more than 9 inputs"),
         (pass(json!({ "entry": "fs_a", "inputs": ["target:nowhere"] })), "unknown input target:nowhere"),
-        (params(json!({ "id": "k", "type": "enum", "prefill": 0, "values": vec![json!({ "value": 0, "label": { "en": "a" } }); 65] })), "needs 1 to 64 values"),
+        (
+            params(
+                json!({ "id": "k", "type": "enum", "prefill": 0, "values": vec![json!({ "value": 0, "label": { "en": "a" } }); 65] }),
+            ),
+            "needs 1 to 64 values",
+        ),
         (params(json!({ "id": "k", "type": "float", "prefill": 0, "channels": 3 })), "is no mask"),
         (
             params(json!({ "id": "k", "type": "mask", "prefill": "", "channels": 2 })),

@@ -118,10 +118,11 @@ fn bound_birth_ranges_and_shapes_follow_their_sources() {
 
 #[test]
 fn new_looks_are_validated_and_named() {
-    let (found, features) =
-        issues(json!({ "init": { "life": [1, 1], "gradient": [[0, "#ff0000"], [1, "#0000ff"]] },
+    let (found, features) = issues(
+        json!({ "init": { "life": [1, 1], "gradient": [[0, "#ff0000"], [1, "#0000ff"]] },
         "render": { "order": "newest", "trail": { "length": 8, "width": 0.5, "segments": null, "subdivide": 0, "uv_scale": 1, "uv_scroll": 0, "textured": false } },
-        "collide": [{ "bounds": { "mask": { "texture": "floor" } } }] }));
+        "collide": [{ "bounds": { "mask": { "texture": "floor" } } }] }),
+    );
     assert!(
         found.is_empty() && features.contains("particles2") && !features.contains("particle_ropes"),
         "{found:?}"
@@ -140,6 +141,8 @@ fn new_looks_are_validated_and_named() {
     for b in bad {
         assert!(!issues(b.clone()).0.is_empty(), "{b}");
     }
-    let (_, long) = issues(json!({ "render": { "trail": { "length": 32, "width": 0.5, "segments": null, "subdivide": 0, "uv_scale": 1, "uv_scroll": 0, "textured": false } } }));
+    let (_, long) = issues(
+        json!({ "render": { "trail": { "length": 32, "width": 0.5, "segments": null, "subdivide": 0, "uv_scale": 1, "uv_scroll": 0, "textured": false } } }),
+    );
     assert!(long.contains("particle_ropes"), "long trails stay with ropes");
 }

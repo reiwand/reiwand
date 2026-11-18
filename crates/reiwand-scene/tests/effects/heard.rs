@@ -37,8 +37,12 @@ fn an_effect_with_a_surge_input_reads_above_one_after_silence_and_decays() {
 #[test]
 fn effect_audio_inputs_state_every_surge_field_and_stay_within_the_cap() {
     let fine = |audio: serde_json::Value| {
-        let audio: Vec<serde_json::Value> =
-            audio.as_array().unwrap().iter().map(|l| reiwand_scene::prefill::of("Listen", l.clone())).collect();
+        let audio: Vec<serde_json::Value> = audio
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|l| reiwand_scene::prefill::of("Listen", l.clone()))
+            .collect();
         let d = json!({ "id": "probe_bad_audio", "audio": audio, "passes": [{ "entry": "fs_a" }] });
         Descriptor::parse(&reiwand_upgrade::descriptors::completed(&d.to_string()), "")
             .unwrap()

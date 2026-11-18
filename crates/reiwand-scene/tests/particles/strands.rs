@@ -30,8 +30,11 @@ fn strung_after(system: Json, frames: usize, quality: Quality) -> (Cloud, Sim) {
 
 #[test]
 fn ropes_join_particles_newest_first_through_their_subdivisions() {
-    let (cloud, sim) =
-        strung_after(roped(json!({ "rope": { "subdivide": 3, "width": 6, "smooth": true } }), 30.0), 20, Quality::Q3);
+    let (cloud, sim) = strung_after(
+        roped(json!({ "rope": { "subdivide": 3, "width": 6, "smooth": true } }), 30.0),
+        20,
+        Quality::Q3,
+    );
     let alive = cloud.particles.iter().filter(|p| p.age < p.life).count();
     let drawn: Vec<&Strand> = cloud.rope.iter().take_while(|s| s[7] > 0.5).collect();
     assert_eq!(drawn.len(), (alive - 1) * 4 + 1, "{alive}");
@@ -40,8 +43,11 @@ fn ropes_join_particles_newest_first_through_their_subdivisions() {
     assert!(drawn.iter().enumerate().all(|(q, s)| (s[4] - q as f32 / 4.0).abs() < 1e-4));
     assert!(drawn.iter().all(|s| (s[2].hypot(s[3]) - 1.0).abs() < 1e-3));
     assert_eq!(sim.rope[2], 3 | 1 << 8);
-    let (_, low) =
-        strung_after(roped(json!({ "rope": { "subdivide": 3, "width": 6, "smooth": true } }), 30.0), 4, Quality::Q1);
+    let (_, low) = strung_after(
+        roped(json!({ "rope": { "subdivide": 3, "width": 6, "smooth": true } }), 30.0),
+        4,
+        Quality::Q1,
+    );
     assert_eq!(low.rope[2] & 255, 1);
     assert_eq!([Tier::T0, Tier::T1, Tier::T3].map(Tier::rope), [1024, 2048, MAX_ROPE]);
 }
