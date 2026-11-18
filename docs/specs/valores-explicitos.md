@@ -95,3 +95,11 @@ Lo usan los cargadores de todos los formatos; ningún formato escribe su propia 
   (`crates/reiwand-upgrade/src/stored.rs`): envuelve el contenido, deja el original en
   `upgrade-copias/<segundos>/` y es idempotente. Pruebas: `crates/reiwand-upgrade/tests/stored.rs`,
   `apps/reiwandd/src/inputs/tests.rs`.
+
+## Archivos internos de instalación (`installed.json`, `anchors.json`, `repo-pins.json`)
+
+- Los tres llevan `{"format": 3, "content": ...}`; en `installed.json` `signer` y `revoked` se escriben
+  siempre (`null` si no hay). `state.json` de cada repositorio ya exigía todos sus campos y no cambia.
+- Un archivo de otro formato o dañado hace que el demonio no arranque (`reiwand-upgrade client`) y nunca se
+  sobrescribe. Conversión de única vez: `crates/reiwand-upgrade/src/stored.rs`; prueba en
+  `crates/reiwand-upgrade/tests/stored.rs`.
