@@ -16,7 +16,8 @@ mod spread;
 const VIEW: [f32; 4] = [0.0, 0.0, 64.0, 32.0];
 
 fn probe(json: serde_json::Value, wgsl: &str) -> &'static Descriptor {
-    register(Descriptor::parse(&json.to_string(), wgsl).unwrap()).unwrap()
+    register(Descriptor::parse(&reiwand_upgrade::descriptors::completed(&json.to_string()), wgsl).unwrap())
+        .unwrap()
 }
 
 fn scene(effects: serde_json::Value) -> Scene {

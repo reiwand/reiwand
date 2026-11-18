@@ -2,8 +2,12 @@ use super::*;
 
 pub(super) fn accepted_shaders_run_the_helper_once(book: &Path) {
     let runs = helper_runs();
-    let (d, first) = timed(|| Descriptor::packaged("h", &json("h"), GOOD).unwrap());
-    let (_, cached) = timed(|| Descriptor::packaged("h", &json("h"), GOOD).unwrap());
+    let (d, first) = timed(|| {
+        Descriptor::packaged("h", &reiwand_upgrade::descriptors::completed(&json("h")), GOOD).unwrap()
+    });
+    let (_, cached) = timed(|| {
+        Descriptor::packaged("h", &reiwand_upgrade::descriptors::completed(&json("h")), GOOD).unwrap()
+    });
     println!("an accepted shader took {first:?} with the helper and {cached:?} from the cache");
     assert_eq!(helper_runs(), runs + 1);
     guarded(&d).unwrap();
@@ -15,11 +19,18 @@ pub(super) fn accepted_shaders_run_the_helper_once(book: &Path) {
 
 pub(super) fn refused_shaders_return_the_message_of_the_helper(book: &Path) {
     set_checker(None);
-    let inside = Descriptor::packaged("h", &json("h"), ENDLESS).unwrap_err();
+    let inside =
+        Descriptor::packaged("h", &reiwand_upgrade::descriptors::completed(&json("h")), ENDLESS).unwrap_err();
     checker(|_| ());
     let runs = helper_runs();
-    assert_eq!(Descriptor::packaged("h", &json("h"), ENDLESS).unwrap_err(), inside);
-    assert_eq!(Descriptor::packaged("h", &json("h"), ENDLESS).unwrap_err(), inside);
+    assert_eq!(
+        Descriptor::packaged("h", &reiwand_upgrade::descriptors::completed(&json("h")), ENDLESS).unwrap_err(),
+        inside
+    );
+    assert_eq!(
+        Descriptor::packaged("h", &reiwand_upgrade::descriptors::completed(&json("h")), ENDLESS).unwrap_err(),
+        inside
+    );
     assert_eq!(helper_runs(), runs + 1);
     let kept = lines(&book.with_file_name("checked-effects"));
     let quoted = serde_json::Value::from(inside.as_str()).to_string();
@@ -40,7 +51,9 @@ pub(super) fn the_disk_cache_survives_a_new_process(book: &Path) {
 pub(super) fn again(book: &str) {
     keep_strikes(Path::new(book));
     check_out_of_process(true);
-    Descriptor::packaged("h", &json("h"), GOOD).unwrap();
-    assert!(Descriptor::packaged("h", &json("h"), ENDLESS).is_err());
+    Descriptor::packaged("h", &reiwand_upgrade::descriptors::completed(&json("h")), GOOD).unwrap();
+    assert!(
+        Descriptor::packaged("h", &reiwand_upgrade::descriptors::completed(&json("h")), ENDLESS).is_err()
+    );
     println!("runs {}", helper_runs());
 }

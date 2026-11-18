@@ -8,7 +8,7 @@ fn targets_shader_size_and_expressions_have_limits() {
     assert!(fault.contains(&format!("more than {MAX_TARGETS} targets")), "{fault}");
     let padded = format!("{}{}", shader(""), " ".repeat(MAX_WGSL));
     let d = json!({ "id": "w", "cost": {}, "passes": [{ "entry": "fs_w" }] }).to_string();
-    let fault = Descriptor::packaged("w", &d, &padded).unwrap_err();
+    let fault = Descriptor::packaged("w", &reiwand_upgrade::descriptors::completed(&d), &padded).unwrap_err();
     assert!(fault.contains(&format!("larger than {} KiB", MAX_WGSL >> 10)), "{fault}");
     let long = "c=c*c*c*c*c*c*c*c;".repeat(MAX_SHADER_NODES / 14);
     let fault = effect(|_| (), &long).unwrap_err();
@@ -70,7 +70,8 @@ fn package_costs_count_their_passes_and_heavy_scenes_warn() {
     };
     let tint = scene(json!([{ "effect": "tint" }]));
     let json = json!({ "id": "under_cost", "passes": [{ "entry": "fs_under_cost", "inputs": ["previous", "backdrop"] }] });
-    register(Descriptor::parse(&json.to_string(), "").unwrap()).unwrap();
+    register(Descriptor::parse(&reiwand_upgrade::descriptors::completed(&json.to_string()), "").unwrap())
+        .unwrap();
     let read = scene(json!([{ "effect": "tint" }, { "effect": "under_cost" }]));
     assert!((read - tint - 3.0).abs() < 1e-3, "{tint} {read}");
     let masked = |mask: Json| {

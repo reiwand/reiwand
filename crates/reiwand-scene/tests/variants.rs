@@ -22,7 +22,8 @@ fn used(params: serde_json::Value) -> EffectUse {
 fn values_outside_the_prebuilt_variants_draw_a_prebuilt_one() {
     let json = json!({ "id": "vv", "cost": {}, "options": [{ "id": "o", "values": [1, 0], "prefill": 1 }],
         "passes": [{ "entry": "fs_v" }] });
-    let d = Descriptor::packaged("vv", &json.to_string(), WGSL).unwrap();
+    let d = Descriptor::packaged("vv", &reiwand_upgrade::descriptors::completed(&json.to_string()), WGSL)
+        .unwrap();
     let zero = |_: &str| Some(Param::Number(0.0));
     let mapped = used(json!({ "o": { "prop": "p", "map": { "a": 1 } } }));
     assert_eq!(d.variants(&mapped).unwrap(), [0]);

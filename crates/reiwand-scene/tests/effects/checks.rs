@@ -68,7 +68,7 @@ fn descriptors_are_checked_and_tuned_per_quality() {
     ];
     for (mut json, problem) in broken {
         json["id"] = json!("probe_bad");
-        let d = Descriptor::parse(&json.to_string(), "").unwrap();
+        let d = Descriptor::parse(&reiwand_upgrade::descriptors::completed(&json.to_string()), "").unwrap();
         assert!(d.problems().iter().any(|p| p.contains(problem)), "{problem}: {:?}", d.problems());
         assert!(register(d).is_err());
     }

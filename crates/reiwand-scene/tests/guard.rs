@@ -56,9 +56,11 @@ fn counted(body: &Block) -> bool {
 fn every_loop_of_a_package_shader_gets_a_counter_even_ones_the_check_never_saw() {
     let plain = "@fragment fn fs_g(in: VertexOut) -> @location(0) vec4<f32> { return tap(in.uv); }";
     let json = json!({ "id": "g", "cost": {}, "passes": [{ "entry": "fs_g" }] }).to_string();
-    let checked = Descriptor::packaged("g", &json, plain).unwrap();
+    let checked = Descriptor::packaged("g", &reiwand_upgrade::descriptors::completed(&json), plain).unwrap();
     assert!(
-        Descriptor::packaged("g", &json, ENDLESS).unwrap_err().contains("a counter that a literal limits")
+        Descriptor::packaged("g", &reiwand_upgrade::descriptors::completed(&json), ENDLESS)
+            .unwrap_err()
+            .contains("a counter that a literal limits")
     );
     let module = guarded(&Descriptor { wgsl: ENDLESS.into(), ..checked }).unwrap();
     let mut found = Vec::new();

@@ -4,7 +4,8 @@ fn legit(name: &str) -> Descriptor {
     let path = format!("{}/tests/checks/legit/{name}.wgsl", env!("CARGO_MANIFEST_DIR"));
     let wgsl = std::fs::read_to_string(&path).unwrap();
     let json = json!({ "id": "e", "cost": {}, "passes": [{ "entry": "fs_e" }] }).to_string();
-    Descriptor::packaged("e", &json, &wgsl).unwrap_or_else(|e| panic!("{name}: {e}"))
+    Descriptor::packaged("e", &reiwand_upgrade::descriptors::completed(&json), &wgsl)
+        .unwrap_or_else(|e| panic!("{name}: {e}"))
 }
 
 #[test]

@@ -30,7 +30,11 @@ fn every_built_in_effect_fits_the_package_limits_with_room_to_spare() {
         json["id"] = id.clone().into();
         json["cost"] = json.get("cost").cloned().unwrap_or(json!({}));
         let json = json.to_string().replace(r#""output":"step""#, r#""output":"next""#);
-        let checked = Descriptor::packaged(&id, &json, &renamed(&d.wgsl, &d.id));
+        let checked = Descriptor::packaged(
+            &id,
+            &reiwand_upgrade::descriptors::completed(&json),
+            &renamed(&d.wgsl, &d.id),
+        );
         if UNIFORM_LOOPS.contains(&d.id.as_str()) {
             let fault = checked.err().unwrap_or_else(|| panic!("{} was accepted", d.id));
             assert!(fault.contains("a counter that a literal limits"), "{}: {fault}", d.id);

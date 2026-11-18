@@ -43,8 +43,10 @@ fn up_to_takes_the_variant_at_its_level_and_below_and_a_variant_that_does_not_fi
     assert_eq!(forms(big, true), [Form::Frozen, Form::Out, Form::Full, Form::Full]);
     let fused = json!({ "id": "lt_fused", "fuse": "uv", "cost": { "taps": 2 },
         "lighter": { "passes": [{ "entry": "fs_lt_a" }], "cost": { "taps": 1 } } });
-    let fused =
-        Descriptor::parse(&fused.to_string(), "fn uv_lt_fused(uv: vec2<f32>) -> vec2<f32> { return uv; }");
+    let fused = Descriptor::parse(
+        &reiwand_upgrade::descriptors::completed(&fused.to_string()),
+        "fn uv_lt_fused(uv: vec2<f32>) -> vec2<f32> { return uv; }",
+    );
     let problems = fused.unwrap().problems();
     assert!(problems.iter().any(|p| p.contains("cannot belong to a fused effect")), "{problems:?}");
 }

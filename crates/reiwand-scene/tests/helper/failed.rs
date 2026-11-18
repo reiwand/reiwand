@@ -12,13 +12,17 @@ pub(super) fn failed_helpers_refuse_without_strikes(book: &Path) {
     for (id, expected, change) in cases {
         checker(change);
         let runs = helper_runs();
-        let (fault, took) = timed(|| Descriptor::packaged(id, &json(id), GOOD).unwrap_err());
+        let (fault, took) = timed(|| {
+            Descriptor::packaged(id, &reiwand_upgrade::descriptors::completed(&json(id)), GOOD).unwrap_err()
+        });
         println!("{id}: {fault} after {took:?}");
         assert_eq!(fault, format!("its shader could not be checked: {expected}"));
         assert!(lines(book).is_empty(), "{id}: {:?}", lines(book));
         assert_eq!(lines(&book.with_file_name("checked-effects")).len(), 2);
         if id == "abort" {
-            assert!(Descriptor::packaged(id, &json(id), GOOD).is_err());
+            assert!(
+                Descriptor::packaged(id, &reiwand_upgrade::descriptors::completed(&json(id)), GOOD).is_err()
+            );
             assert_eq!(helper_runs(), runs + 2, "a crash is not remembered");
         }
     }
@@ -52,7 +56,7 @@ pub(super) fn limited(book: &str) {
     keep_strikes(Path::new(book));
     check_out_of_process(true);
     let good = GOOD.replace("tap(in.uv)", "tap(in.uv).bgra");
-    match Descriptor::packaged("h", &json("h"), &good) {
+    match Descriptor::packaged("h", &reiwand_upgrade::descriptors::completed(&json("h")), &good) {
         Ok(_) => println!("accepted"),
         Err(e) => println!("{e}"),
     }
@@ -72,12 +76,12 @@ pub(super) fn a_process_killed_while_the_helper_runs_gets_no_strike(book: &Path)
     keep_strikes(book);
     assert!(lines(book).is_empty(), "{:?}", lines(book));
     set_checker(None);
-    Descriptor::packaged("s", &json("s"), SLOW).unwrap();
+    Descriptor::packaged("s", &reiwand_upgrade::descriptors::completed(&json("s")), SLOW).unwrap();
     checker(|_| ());
 }
 
 pub(super) fn slow(book: &str, script: &str) {
     keep_strikes(Path::new(book));
     checker(|c| c.program = script.into());
-    drop(Descriptor::packaged("s", &json("s"), SLOW));
+    drop(Descriptor::packaged("s", &reiwand_upgrade::descriptors::completed(&json("s")), SLOW));
 }

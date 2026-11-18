@@ -33,7 +33,11 @@ fn soft_json(lighter: Json) -> Json {
 }
 
 fn soft(lighter: Json) -> Result<Descriptor, String> {
-    Descriptor::packaged("soft", &soft_json(lighter).to_string(), SOFT)
+    Descriptor::packaged(
+        "soft",
+        &reiwand_upgrade::descriptors::completed(&soft_json(lighter).to_string()),
+        SOFT,
+    )
 }
 
 fn single(entry: &str) -> Json {

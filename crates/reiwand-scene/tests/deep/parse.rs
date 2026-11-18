@@ -112,16 +112,23 @@ fn shader_stages_are_checked_against_their_use() {
     adopt(&mut scene, &figure()).unwrap();
     let wrong = Descriptor::packaged(
         "glass",
-        &json!({ "id": "glass", "stage": "material", "cost": {} }).to_string(),
+        &reiwand_upgrade::descriptors::completed(
+            &json!({ "id": "glass", "stage": "material", "cost": {} }).to_string(),
+        ),
         "fn other() {}",
     );
     assert!(wrong.unwrap_err().contains("fn material(value: Surface) -> Surface"));
     let passes =
         json!({ "id": "glass", "stage": "material", "cost": {}, "passes": [{ "entry": "fs_glass" }] });
-    assert!(Descriptor::packaged("glass", &passes.to_string(), GLASS).is_err());
+    assert!(
+        Descriptor::packaged("glass", &reiwand_upgrade::descriptors::completed(&passes.to_string()), GLASS)
+            .is_err()
+    );
     let sparkle = Descriptor::packaged(
         "sparkle",
-        &json!({ "id": "sparkle", "stage": "particle", "cost": {} }).to_string(),
+        &reiwand_upgrade::descriptors::completed(
+            &json!({ "id": "sparkle", "stage": "particle", "cost": {} }).to_string(),
+        ),
         SPARKLE,
     )
     .unwrap();

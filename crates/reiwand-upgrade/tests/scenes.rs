@@ -167,7 +167,8 @@ fn a_manifest_next_to_the_scene_is_completed() {
     let dir = std::path::PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("scenes-manifest");
     let _ = std::fs::create_dir_all(dir.join("a"));
     let file = dir.join("a/manifest.json");
-    std::fs::write(&file, json!({"properties": {"speed": {"type": "bool", "default": true}}}).to_string()).unwrap();
+    std::fs::write(&file, json!({"properties": {"speed": {"type": "bool", "default": true}}}).to_string())
+        .unwrap();
     assert_eq!(reiwand_upgrade::scenes::run(&dir).unwrap(), 1);
     let after: Value = serde_json::from_slice(&std::fs::read(&file).unwrap()).unwrap();
     assert!(after["properties"]["speed"].get("help").is_some_and(Value::is_null));
