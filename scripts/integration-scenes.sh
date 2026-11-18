@@ -122,9 +122,9 @@ scene = {"schema": "reiwand.scene/1", "canvas": {"size": [64, 32], "fit": "stret
                     { "blend_space": "canvas", "id": "flash", "type": "solid", "color": "#ffffff", "size": [64, 32],
                      "visible": {"timeline": "flash", "keys": [[0, False], [0.05, True], [2, False]]}}]}
 reel = dict(common, id="org.example.reel", title="Reel", kind="video", entry="loop.webm",
-            requires={"features": ["video_properties", "accent"]}, playback={"speed": 2, "start": 0.6, "volume": 0.5},
+            requires={"features": ["video_properties", "accent"]}, playback=dict(end=None, loop=None, max_fps=None, muted=None, speed=2, start=0.6, volume=0.5),
             properties={"mark": {"type": "color", "label": "Mark", "default": "#123456"}},
-            display={"fit": "stretch", "zoom": 2, "position": [0.5, 0.5], "accent": {"prop": "mark"}},
+            display=dict(fit="stretch", zoom=2, position=[0.5, 0.5], background=None, span=None, flip=None, accent={"prop": "mark"}),
             presets=[{"id": "slow", "values": {"speed": 0.5}}])
 for name, manifest, files in [("knobs", knobs, {"scene.json": json.dumps(scene)}), ("reel", reel, {})]:
     with zipfile.ZipFile(f"{sys.argv[1]}/{name}.wpak", "w") as package:

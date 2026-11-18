@@ -47,6 +47,7 @@ cat >"$packed/picture/manifest.json" <<'MANIFEST'
  "content": {"rating": "general"}, "photosensitive": false, "origin": {"kind": "original"},
  "license": "CC0-1.0", "kind": "image", "entry": "image.ktx2"}
 MANIFEST
+complete "$packed/picture"
 ctl pack build "$packed/picture" -o "$packed/picture.wpak" >/dev/null || fail "the KTX2 picture was not built"
 read -r _ _ _ s12 < <(ctl stream TEST-12 160 90)
 uids=()

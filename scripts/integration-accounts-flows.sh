@@ -51,6 +51,7 @@ cat >"$noon/manifest.json" <<'MANIFEST'
  "content": {"rating": "general"}, "photosensitive": false, "origin": {"kind": "original"},
  "license": "CC0-1.0", "kind": "image", "entry": "image.png", "previews": {"thumbnail": "preview.png"}}
 MANIFEST
+complete "$noon"
 frost=$WORK/frost
 mkdir -p "$frost"
 cp "$noon"/*.png "$frost/"

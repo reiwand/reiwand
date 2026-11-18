@@ -25,7 +25,7 @@ def package(name, kind, entry, data, flip):
     manifest["requires"] = {"features": ["display2"] if kind == "image" else []}
     if flip:
         manifest["requires"]["features"] += ["flip"] + (["video_properties"] if kind == "video" else [])
-        manifest["display"] = {"flip": flip}
+        manifest["display"] = {"fit": None, "zoom": None, "position": None, "background": None, "span": None, "flip": flip, "accent": None}
     with zipfile.ZipFile(f"{sys.argv[1]}/{name}.wpak", "w") as out:
         out.writestr("manifest.json", json.dumps(manifest))
         out.write(sys.argv[2], "preview.png")
@@ -40,6 +40,7 @@ package("reel", "video", "loop.webm", clip, None)
 package("reel_across", "video", "loop.webm", clip, "horizontal")
 package("reel_upside", "video", "loop.webm", clip, "vertical")
 PACKAGE
+complete "$flip"/*.wpak
 read -r _ _ _ flipped < <(ctl stream TEST-15 64 32)
 frame_hash() { "$BIN/probe" "$flipped" 3 2>/dev/null | sed -n 's/.* hash \([0-9a-f]*\)$/\1/p'; }
 bring() {

@@ -2,6 +2,7 @@
 set -euo pipefail
 
 BIN=$(realpath "${1:?usage: $0 <bin-dir>}")
+source "$(dirname "$0")"/integration-complete.sh
 WORK=$(mktemp -d /tmp/reiwand-accounts.XXXXXX)
 export PIPEWIRE_RUNTIME_DIR=$WORK/run
 mkdir -p "$PIPEWIRE_RUNTIME_DIR" && chmod 700 "$PIPEWIRE_RUNTIME_DIR"

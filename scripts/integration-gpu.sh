@@ -25,8 +25,10 @@ if [ -n "$bus" ]; then
 fi
 started() {
   stop_daemon "$daemon"
-  printf '[render]\ngpu = "%s"\n' "$1" >"$WORK/gpu.toml"
-  start_daemon "$WORK/gpu-$2.log" --config "$WORK/gpu.toml"
+  mkdir -p "$WORK/gpu-config" "$WORK/gpu-data"
+  printf '[render]\ngpu = "%s"\n' "$1" >"$WORK/gpu-config/config.toml"
+  "$BIN/reiwand-upgrade" client --data "$WORK/gpu-data" --config "$WORK/gpu-config" --skip-download >/dev/null
+  start_daemon "$WORK/gpu-$2.log" --config "$WORK/gpu-config/config.toml"
   read -r _ _ _ serial < <(ctl stream TEST-G 160 90)
   ctl set "$ROOT/tests/fixtures/green-64x32.png" -o TEST-G --fit fit
   retry 10 sh -c "'$BIN/probe' $serial 3 | grep -q 'center bgra \[0, 255, 0, 255\]'" ||

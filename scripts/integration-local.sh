@@ -6,6 +6,7 @@ cat >"$WORK/local/manifest.json" <<'LOCAL'
  "kind": "image", "entry": "image.png", "origin": {"kind": "original"}, "content": {"rating": "general"},
  "photosensitive": false}
 LOCAL
+complete "$WORK/local"
 ctl pack build "$WORK/local" -o "$WORK/out/hush-1.2.wpak" >/dev/null
 sed -i 's/"1.2.0"/"1.1.0"/' "$WORK/local/manifest.json"
 ctl pack build "$WORK/local" -o "$WORK/out/hush-1.1.wpak" >/dev/null

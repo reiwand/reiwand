@@ -9,6 +9,7 @@ cat >"$site/src/manifest.json" <<'MANIFEST'
  "content": {"rating": "general"}, "photosensitive": false, "origin": {"kind": "original"},
  "license": "CC0-1.0", "kind": "image", "entry": "image.png", "previews": {"thumbnail": "preview.png"}, "tags": ["sky"]}
 MANIFEST
+complete "$site/src"
 (
   cd "$site"
   ctl repo keygen root --no-password >/dev/null
@@ -19,7 +20,9 @@ MANIFEST
   python3 -c "import json, sys; m = json.load(open(sys.argv[1])); m['previews']['animated'] = 'moving.gif'
 json.dump(m, open(sys.argv[1], 'w'))" dusk/manifest.json
   ctl pack build dusk -o dusk.wpak >/dev/null
-  cp -r src night && sed -i 's/dawn/night/; s/"Dawn"/"Night"/; s/"sky"/"dark"/; s/{"rating": "general"}/{"rating": "mature", "descriptors": ["violence"]}/' night/manifest.json
+  cp -r src night && python3 -c "import json, sys; m = json.load(open(sys.argv[1])); m['id'] = 'org.example.night'; m['title'] = 'Night'; m['tags'] = ['dark']
+m['content'] = {'rating': 'mature', 'descriptors': ['violence']}
+json.dump(m, open(sys.argv[1], 'w'))" night/manifest.json
   ctl pack build night -o night.wpak >/dev/null
   ctl repo init repo --name Example --root-key root.pub --online-key online.pub >/dev/null 2>&1
   ctl repo sign-root repo --key root.key >/dev/null

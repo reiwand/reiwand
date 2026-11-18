@@ -27,10 +27,9 @@ GridLayout {
             "root_days": days.value,
             "entry_max_days": entries.value,
             "mirrors": mirrors.text.split(",").map(m => m.trim()).filter(m => m !== ""),
-            "shard_bits": shards.value
+            "shard_bits": shards.value,
+            "max_package_size": size.value !== Math.round(bytes / 1048576) ? size.value * 1048576 : null
         };
-        if (size.value !== Math.round(bytes / 1048576))
-            out.max_package_size = size.value * 1048576;
         return out;
     }
 

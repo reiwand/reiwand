@@ -10,7 +10,7 @@ SCENE
 cat >"$WORK/spread/manifest.json" <<'MANIFEST'
 {"schema": "reiwand.wpak/2", "id": "org.example.spread", "version": "1.0.0", "title": "Spread", "license": "CC0-1.0",
  "kind": "scene", "entry": "scene.json", "content": {"rating": "general"}, "photosensitive": false,
- "origin": {"kind": "original"}, "display": {"span": "all-outputs"}, "requires": {"features": ["spanned_scenes"]}}
+ "origin": {"kind": "original"}, "display": {"fit": null, "zoom": null, "position": null, "background": null, "span": "all-outputs", "flip": null, "accent": null}, "requires": {"features": ["spanned_scenes"]}}
 MANIFEST
 complete "$WORK/spread"
 ctl pack build "$WORK/spread" -o "$WORK/spread.wpak" >/dev/null

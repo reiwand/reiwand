@@ -34,14 +34,14 @@ PanelChico {
 
     function written() {
         const out = {
+            "name": fresh ? name.text : null,
             "root_keys": roots.keys,
             "online_keys": onlines.keys,
+            "authors": {},
             "removed": removed,
             "threshold": threshold.value
         };
         Object.assign(out, policy.written());
-        if (fresh)
-            out.name = name.text;
         if (author.text !== "" && writers.keys.length > 0)
             out.authors = {
                 [author.text]: writers.keys

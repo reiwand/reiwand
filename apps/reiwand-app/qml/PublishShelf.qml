@@ -86,7 +86,15 @@ Item {
             "root_keys": [rootPublic],
             "online_keys": [reply["public"]],
             "authors": authors,
-            "threshold": 1
+            "removed": [],
+            "threshold": 1,
+            "require_author_signature": null,
+            "online_authors": null,
+            "root_days": null,
+            "entry_max_days": null,
+            "max_package_size": null,
+            "mirrors": null,
+            "shard_bits": null
         }));
     }
 

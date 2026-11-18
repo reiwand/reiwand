@@ -98,7 +98,11 @@ impl Daemon {
             (self.thumbs.cached(&item, 512), self.installed(&item), self.credit(&item.path));
         let revoked =
             installed.as_ref().and_then(|i| i.revoked).map(|r| merged(r, Value::Null)).transpose()?;
-        let installed = installed.map(|i| merged(i, json!({"item": uid, "update": null}))).transpose()?;
+        let installed = installed
+            .map(|i| {
+                merged(i, json!({"item": uid, "update": null, "changes": "", "asks": [], "missing": []}))
+            })
+            .transpose()?;
         let presets = presets.into_iter().map(preset).collect();
         let playlists = playlists.into_iter().map(|p| PlaylistRef { uid: p.uid, name: p.name }).collect();
         let peeked = item.package.as_ref().and_then(|_| reiwand_format::peek(&item.path).ok());

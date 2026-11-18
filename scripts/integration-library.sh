@@ -84,6 +84,7 @@ with zipfile.ZipFile(sys.argv[1], "w") as package:
     package.writestr("manifest.json", json.dumps(manifest))
     package.write(sys.argv[2], "image.png")
 PACKAGE
+complete "$WORK/import/calm.wpak"
 job=$(bus Library1 Import asb 1 "$WORK/import/calm.wpak" false | out "d[0]")
 wait_for 20 finished "$job" || fail "package import: $(bus Daemon1 GetJob t "$job")"
 calm=$(reply "r['job']['output']['imported'][0]['uid']" Daemon1 GetJob t "$job")
@@ -102,8 +103,9 @@ cat >"$WORK/storm/manifest.json" <<'STORM'
  "title": {"en": "Storm", "es": "Tormenta"}, "description": "Lightning over **the sea**.", "license": "CC0-1.0",
  "kind": "image", "entry": "image.png", "previews": {"thumbnail": "preview.png", "animated": "moving.gif"},
  "origin": {"kind": "original"}, "content": {"rating": "mature", "descriptors": ["violence"]}, "photosensitive": true,
- "display": {"background": "#ff0000"}}
+ "display": {"fit": null, "zoom": null, "position": null, "background": "#ff0000", "span": null, "flip": null, "accent": null}}
 STORM
+complete "$WORK/storm"
 ctl pack check "$WORK/storm" | grep '^rating = mature (violence)$' >/dev/null || fail "pack check: $(ctl pack check "$WORK/storm")"
 ctl pack build "$WORK/storm" -o "$WORK/import/storm.wpak" >/dev/null
 job=$(bus Library1 Import asb 1 "$WORK/import/storm.wpak" false | out "d[0]")

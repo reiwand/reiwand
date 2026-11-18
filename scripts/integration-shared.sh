@@ -24,4 +24,4 @@ scene_doc "$user" /manifest/credits | grep '"id": "org.example.parts"' >/dev/nul
 scene_doc "$user" /manifest/origin | grep '"derived"' >/dev/null || fail "the origin does not name the parts"
 ctl pack check "$user" >/dev/null || fail "the imported part left the scene invalid"
 ctl scene act "$user" undo >/dev/null
-if scene_doc "$user" /manifest/credits >/dev/null 2>&1; then fail "undo kept the credits of the import"; fi
+if scene_doc "$user" /manifest/credits 2>/dev/null | grep '"id": "org.example.parts"' >/dev/null; then fail "undo kept the credits of the import"; fi

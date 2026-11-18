@@ -3,6 +3,7 @@ set -euo pipefail
 
 BIN=$(realpath "${1:?usage: $0 <bin-dir>}")
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
+source "$ROOT/scripts/integration-complete.sh"
 WORK=$(mktemp -d /tmp/reiwand-carry.XXXXXX)
 export PIPEWIRE_RUNTIME_DIR=$WORK/run
 mkdir -p "$PIPEWIRE_RUNTIME_DIR" && chmod 700 "$PIPEWIRE_RUNTIME_DIR"
@@ -75,6 +76,7 @@ cat >"$site/src/manifest.json" <<'MANIFEST'
  "content": {"rating": "general"}, "photosensitive": false, "origin": {"kind": "original"},
  "license": "CC0-1.0", "kind": "image", "entry": "image.png", "previews": {"thumbnail": "preview.png"}, "tags": ["sky"]}
 MANIFEST
+complete "$site/src"
 (
   cd "$site"
   x src repo keygen root --no-password >/dev/null

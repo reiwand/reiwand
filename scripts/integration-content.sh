@@ -8,16 +8,16 @@ common = {"schema": "reiwand.wpak/2", "license": "CC0-1.0", "photosensitive": Fa
           "content": {"rating": "general"}, "origin": {"kind": "original"}, "previews": {"thumbnail": "preview.png"}}
 base = dict(common, id="org.example.base", version="1.2.0", title="Base", kind="scene", entry="scene.json",
             properties={"tint": {"type": "color", "label": "Tint", "default": "#0000ff"}},
-            display={"accent": {"prop": "tint"}}, playback={"max_fps": 12},
+            display=dict(fit=None, zoom=None, position=None, background=None, span=None, flip=None, accent={"prop": "tint"}), playback=dict(end=None, loop=None, max_fps=12, muted=None, speed=None, start=None, volume=None),
             requires={"features": ["accent", "playback2"]})
 scene = {"schema": "reiwand.scene/1", "canvas": {"size": [64, 32], "fit": "stretch"},
          "layers": [{ "blend_space": "canvas", "id": "tint", "type": "solid", "color": {"prop": "tint"}, "size": [64, 32]}]}
 preset = dict(common, id="org.example.base-green", version="1.0.0", title="Base in green", kind="preset",
               entry="preset.json", requires={"features": ["packages", "preset"],
               "packages": [{"id": "org.example.base", "version": "^1.2"}]})
-values = {"base": {"id": "org.example.base", "version": "^1.2"}, "values": {"tint": "#00ff00", "gone": 3}}
+values = {"base": {"id": "org.example.base", "version": "^1.2"}, "values": {"tint": "#00ff00", "gone": 3}, "files": {}}
 picture = dict(common, id="org.example.marked", version="1.0.0", title="Marked", kind="image", entry="image.png",
-               display={"accent": "#ff0000"}, requires={"features": ["accent", "display2"]})
+               display=dict(fit=None, zoom=None, position=None, background=None, span=None, flip=None, accent="#ff0000"), requires={"features": ["accent", "display2"]})
 for name, manifest, files in [("base", base, {"scene.json": scene}), ("green", preset, {"preset.json": values}),
                               ("picture", picture, {})]:
     with zipfile.ZipFile(f"{sys.argv[1]}/{name}.wpak", "w") as package:

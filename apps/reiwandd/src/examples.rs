@@ -29,8 +29,13 @@ fn shipped() -> Vec<PathBuf> {
 
 impl Daemon {
     fn examples_record(&self) -> Record {
-        let read = std::fs::read(self.store.data.join("examples-repo.json")).ok();
-        read.and_then(|bytes| serde_json::from_slice(&bytes).ok()).unwrap_or_default()
+        match reiwand_core::stored::read(&self.store.data.join("examples-repo.json")) {
+            Ok(found) => found.unwrap_or_default(),
+            Err(e) => {
+                tracing::warn!("ignoring the unreadable example repository record: {e}");
+                Record::default()
+            }
+        }
     }
 
     fn examples_keep(&self, record: &Record) {
