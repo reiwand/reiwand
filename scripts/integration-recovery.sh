@@ -34,7 +34,7 @@ ctl set "$ROOT/tests/fixtures/green-64x32.png" --fit fit
 green="buffers 4 center bgra \[0, 255, 0, 255\]"
 retry 10 sh -c "'$BIN/probe' $gpu 3 --dmabuf | grep -q 'type DmaBuf modifier 0x0 $green'" ||
   fail "no frame in GPU memory: $("$BIN/probe" "$gpu" 3 --dmabuf 2>&1)"
-first=$("$BIN/probe" "$gpu" 3 2>&1)
+first=$("$BIN/probe" "$gpu" 3 2>&1) || true
 grep -q "type MemFd $green" <<<"$first" || fail "the first frame in shared memory after GPU memory: $first"
 "$BIN/probe" "$gpu" 5 --dmabuf --late | grep "type DmaBuf" >/dev/null || fail "a late GPU memory consumer waited"
 ctl set "$ROOT/tests/fixtures/magenta-64x32.webm" --fit stretch
