@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Reiwand\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 00:00+0000\n"
+"POT-Creation-Date: 2026-11-18 00:00+0000\n"
 "PO-Revision-Date: 2026-10-30 00:00+0000\n"
 "Last-Translator: Reiwand contributors\n"
 "Language-Team: Reiwand contributors\n"
@@ -355,11 +355,11 @@ msgstr "El relleno elegido no está instalado."
 
 #: crates/reiwand-core/src/explicit/error.rs
 msgid ""
-"%1: \"%2\" is missing. Reiwand does not fill in values: write it, or open it "
-"in the editor, which fills it in."
+"%1: \"%2\" is missing. Reiwand does not fill in values: write it, or run "
+"reiwand-upgrade on the file."
 msgstr ""
-"%1: falta «%2». Reiwand no completa valores: escríbelo, o ábrelo en el "
-"editor, que lo prellena."
+"%1: falta «%2». Reiwand no completa valores: escríbelo, o corre reiwand-"
+"upgrade sobre el archivo."
 
 #: crates/reiwand-core/src/explicit/error.rs
 msgid "%1: \"%2\" is not valid: %3"
@@ -4529,10 +4529,6 @@ msgstr "%1 no es un campo que edite este formulario"
 msgid "there is already a parameter %1"
 msgstr "ya hay un parámetro %1"
 
-#: crates/reiwand-editor/src/wgsl/form.rs
-msgid "there is no pass %1"
-msgstr "no hay ninguna pasada %1"
-
 #: crates/reiwand-editor/src/wgsl/mod.rs
 msgid "there is already a shader named %1"
 msgstr "ya hay un shader llamado %1"
@@ -4546,6 +4542,10 @@ msgid "a shader is at most 64 KiB and the shaders of a scene 256 KiB together"
 msgstr ""
 "un shader ocupa como mucho 64 KiB y los shaders de una escena, 256 KiB en "
 "total"
+
+#: crates/reiwand-editor/src/wgsl/pass_form.rs
+msgid "there is no pass %1"
+msgstr "no hay ninguna pasada %1"
 
 #: crates/reiwand-format/src/admin.rs
 msgid "no folder was given for the repository"
@@ -4573,8 +4573,8 @@ msgid "scene file size"
 msgstr "tamaño del archivo de escena"
 
 #: crates/reiwand-format/src/authors.rs
-msgid "expected a wpak-repo-authors/1.0 of this repository"
-msgstr "se esperaba un wpak-repo-authors/1.0 de este repositorio"
+msgid "expected a wpak-repo-authors/2.0 of this repository"
+msgstr "se esperaba un wpak-repo-authors/2.0 de este repositorio"
 
 #: crates/reiwand-format/src/authors.rs
 msgid "expected unique ids"
@@ -4656,8 +4656,8 @@ msgid "is required with strings or localized texts"
 msgstr "es obligatorio con cadenas o textos traducidos"
 
 #: crates/reiwand-format/src/check.rs
-msgid "expected reiwand.wpak/2"
-msgstr "se esperaba reiwand.wpak/2"
+msgid "expected reiwand.wpak/3"
+msgstr "se esperaba reiwand.wpak/3"
 
 #: crates/reiwand-format/src/check.rs
 msgid "expected a lowercase reverse-DNS name like org.example.name"
@@ -4724,10 +4724,6 @@ msgstr "los textos sin formato no llevan < ni >"
 #: crates/reiwand-format/src/check/v2.rs
 msgid "authors and tags have no < or >"
 msgstr "los autores y las etiquetas no llevan < ni >"
-
-#: crates/reiwand-format/src/check/v2.rs
-msgid "is called previews.thumbnail in reiwand.wpak/2"
-msgstr "se llama previews.thumbnail en reiwand.wpak/2"
 
 #: crates/reiwand-format/src/check/v2.rs
 msgid "at most 256 properties and 64 presets"
@@ -4848,8 +4844,8 @@ msgstr ""
 "muestra su costo en cada nivel de calidad"
 
 #: crates/reiwand-format/src/featured.rs
-msgid "expected a wpak-repo-featured/1.0 of this repository"
-msgstr "se esperaba un wpak-repo-featured/1.0 de este repositorio"
+msgid "expected a wpak-repo-featured/2.0 of this repository"
+msgstr "se esperaba un wpak-repo-featured/2.0 de este repositorio"
 
 #: crates/reiwand-format/src/featured.rs
 msgid "expected at most 64 package ids, each once, with short notes"
@@ -5058,8 +5054,8 @@ msgid "%1 needs unique ascending valid releases"
 msgstr "%1 necesita versiones válidas, únicas y en orden ascendente"
 
 #: crates/reiwand-format/src/index.rs
-msgid "expected a wpak-repo-revoked/1.0 of this repository"
-msgstr "se esperaba un wpak-repo-revoked/1.0 de este repositorio"
+msgid "expected a wpak-repo-revoked/2.0 of this repository"
+msgstr "se esperaba un wpak-repo-revoked/2.0 de este repositorio"
 
 #: crates/reiwand-format/src/install.rs
 msgid "is offered by several repositories; prefix it with the repository id"
@@ -5188,12 +5184,20 @@ msgid "expected one file per language named like locale/pt-BR.json"
 msgstr "se esperaba un archivo por idioma con nombres como locale/pt-BR.json"
 
 #: crates/reiwand-format/src/manifest/read.rs
+msgid "the manifest names no schema: expected %1"
+msgstr "el manifiesto no indica su esquema: se esperaba %1"
+
+#: crates/reiwand-format/src/manifest/read.rs
 msgid "manifest version %1"
 msgstr "la versión %1 del manifiesto"
 
 #: crates/reiwand-format/src/manifest/read.rs
-msgid "reiwand.wpak/1 is no longer read; the package needs reiwand.wpak/2"
-msgstr "reiwand.wpak/1 ya no se lee; el paquete necesita reiwand.wpak/2"
+msgid ""
+"%1 is no longer read; run reiwand-upgrade on the package folder and sign it "
+"again"
+msgstr ""
+"%1 ya no se lee; ejecuta reiwand-upgrade sobre la carpeta del paquete y vuelve "
+"a firmarlo"
 
 #: crates/reiwand-format/src/media.rs
 msgid "%1 must be a %2 image of at most %3 pixels a side"
@@ -5296,8 +5300,8 @@ msgid "LUT data"
 msgstr "datos de la LUT"
 
 #: crates/reiwand-format/src/repo.rs
-msgid "expected wpak-repo-root/1.0"
-msgstr "se esperaba wpak-repo-root/1.0"
+msgid "expected wpak-repo-root/2.0"
+msgstr "se esperaba wpak-repo-root/2.0"
 
 #: crates/reiwand-format/src/repo.rs
 msgid "does not match the file name"
@@ -6302,19 +6306,3 @@ msgstr "capa que recibe el puntero"
 #: crates/reiwand-scene/src/validate.rs
 msgid "trigger"
 msgstr "disparador"
-
-#: crates/reiwand-format/src/fetch.rs
-msgid "expected 64 hex digits"
-msgstr "se esperaban 64 cifras hexadecimales"
-
-#: crates/reiwand-format/src/said.rs
-msgid "the fingerprint does not match the repository at %1"
-msgstr "la huella no coincide con el repositorio de %1"
-
-#: crates/reiwand-core/src/explicit/error.rs
-msgid ""
-"%1: \"%2\" is missing. Reiwand does not fill in values: write it, or run "
-"reiwand-upgrade on the file."
-msgstr ""
-"%1: falta «%2». Reiwand no completa valores: escríbelo, o corre reiwand-"
-"upgrade sobre el archivo."

@@ -1,32 +1,16 @@
-use crate::authors::trust;
-use crate::broken::{scan, sound};
-use crate::browse::{available, listing, newer};
-use crate::download::package;
+pub use crate::record::Installed;
 use crate::store::{Snapshot, load, locked, optional, write};
+use crate::{Error, Fetch, Listing, OnlineAuthor, Release, Result, Trusted, anchors, ensure, require};
 use crate::{
-    Error, Fetch, Listing, OnlineAuthor, Reason, Release, Result, Trusted, anchors, ensure, require,
+    authors::trust,
+    broken::{scan, sound},
+    browse::{available, listing, newer},
+    download::package,
 };
 use reiwand_core::message::said;
 use semver::Version;
-use serde::{Deserialize, Serialize};
-use std::fs;
-use std::io;
-use std::path::{Path, PathBuf};
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct Installed {
-    pub repo_id: String,
-    pub id: String,
-    pub version: String,
-    pub sha256: String,
-    pub size: u64,
-    pub path: PathBuf,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    pub signer: Option<String>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    pub revoked: Option<Reason>,
-}
+use std::path::Path;
+use std::{fs, io};
 
 pub fn install<F: Fetch>(
     data: &Path,

@@ -40,6 +40,7 @@ mod parts;
 #[cfg(feature = "sign")]
 mod publish;
 mod read;
+mod record;
 mod refusal;
 mod release;
 mod renames;
