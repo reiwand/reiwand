@@ -16,7 +16,7 @@ fn spots_project_pictures_videos_and_layers_without_loops() {
     light(&mut p, json!({ "projection": { "layer": "s", "asset": "clip" } })).unwrap();
     assert_eq!(layer(&p, "s")["texture"], "clip");
     light(&mut p, json!({ "projection": { "layer": "s", "from": "logo" } })).unwrap();
-    assert_eq!(layer(&p, "s")["texture"], json!({ "layer": "logo" }));
+    crate::whole::holds(&layer(&p, "s")["texture"], json!({ "layer": "logo" }));
     assert!(light(&mut p, json!({ "projection": { "layer": "s", "asset": "song" } })).is_err());
     assert!(light(&mut p, json!({ "projection": { "layer": "s", "from": "nothing" } })).is_err());
     assert!(light(&mut p, json!({ "projection": { "layer": "s" } })).is_err());

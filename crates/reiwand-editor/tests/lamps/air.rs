@@ -11,7 +11,7 @@ fn volumetrics_are_set_checked_undone_and_dropped_with_the_type() {
     undone(&mut p, &before);
     crate::whole::holds(&layer(&p, "s")["volumetric"], json!({ "density": 0.4, "samples": 24 }));
     light(&mut p, json!({ "volumetric": { "layer": "s", "samples": 8 } })).unwrap();
-    assert_eq!(layer(&p, "s")["volumetric"], json!({ "density": 0.4, "samples": 8 }));
+    assert_eq!(layer(&p, "s")["volumetric"], json!({ "density": 0.4, "samples": 8, "shafts": 0 }));
     let before = p.doc.clone();
     light(&mut p, json!({ "volumetric": { "layer": "s", "shafts": 0.7 } })).unwrap();
     undone(&mut p, &before);
@@ -25,7 +25,7 @@ fn volumetrics_are_set_checked_undone_and_dropped_with_the_type() {
     let k = dark.as_f64().unwrap() / full.as_f64().unwrap();
     assert!((k - 0.3).abs() < 1e-3, "over a dark part the glow keeps what the shafts let through: {k}");
     light(&mut p, json!({ "volumetric": { "layer": "s", "shafts": 0 } })).unwrap();
-    assert_eq!(layer(&p, "s")["volumetric"], json!({ "density": 0.4, "samples": 8 }));
+    assert_eq!(layer(&p, "s")["volumetric"], json!({ "density": 0.4, "samples": 8, "shafts": 0 }));
     for bad in [
         json!({ "shafts": 1.5 }),
         json!({ "shafts": -1 }),

@@ -61,7 +61,7 @@ pub(crate) fn edit(dir: &Path, doc: &Value, e: &SwarmLight) -> Result<Vec<Op>> {
 
 fn mean_size(doc: &Value, id: &str) -> f64 {
     let init = &doc["scene"]["particles"][id]["init"]["size"];
-    init.as_array().map_or(16.0, |l| l.iter().filter_map(Value::as_f64).sum::<f64>() / 2.0)
+    init.as_array().map_or(16.0, |l| l.iter().take(2).filter_map(Value::as_f64).sum::<f64>() / 2.0)
 }
 
 fn refraction(

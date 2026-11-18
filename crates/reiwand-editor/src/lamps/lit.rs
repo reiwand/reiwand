@@ -51,6 +51,7 @@ pub(crate) fn lighting(doc: &Value, e: &LightingEdit) -> Result<Vec<Op>> {
     if e.off {
         return Ok(layer
             .get("lighting")
+            .filter(|l| !l.is_null())
             .map(|_| Op::Remove { path: format!("{path}/lighting") })
             .into_iter()
             .collect());
