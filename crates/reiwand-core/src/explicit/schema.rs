@@ -73,7 +73,11 @@ fn tagged(node: &Value, tag: Option<&str>) -> bool {
 
 fn fill(node: &mut Value, field: &str, tag: Option<&str>, value: &Value) -> bool {
     let mut hit = false;
-    if tagged(node, tag)
+    if let Some((head, rest)) = field.split_once('.') {
+        if let Some(child) = node.get_mut("properties").and_then(|p| p.get_mut(head)) {
+            hit |= fill(child, rest, tag, value);
+        }
+    } else if tagged(node, tag)
         && let Some(Value::Object(property)) = node.get_mut("properties").and_then(|p| p.get_mut(field))
     {
         if value.is_null() {

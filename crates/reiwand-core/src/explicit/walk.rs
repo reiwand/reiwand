@@ -1,3 +1,4 @@
+use super::loose::kind;
 use serde_json::{Map, Value, json};
 
 static NULL: Value = Value::Null;
@@ -9,18 +10,6 @@ pub fn deref<'a>(root: &'a Value, mut schema: &'a Value) -> (&'a Value, &'a str)
         schema = root.pointer(target.trim_start_matches('#')).unwrap_or(&NULL);
     }
     (schema, name)
-}
-
-fn kind(value: &Value) -> &'static str {
-    match value {
-        Value::Null => "null",
-        Value::Bool(_) => "boolean",
-        Value::Number(n) if n.is_i64() || n.is_u64() => "integer",
-        Value::Number(_) => "number",
-        Value::String(_) => "string",
-        Value::Array(_) => "array",
-        Value::Object(_) => "object",
-    }
 }
 
 pub fn branches(schema: &Value) -> &[Value] {
@@ -76,6 +65,7 @@ pub fn choose<'a>(root: &'a Value, schema: &'a Value, value: &Value) -> &'a Valu
     list.iter()
         .filter(usable)
         .find(|b| fits(root, b, value))
+        .or(list.iter().filter(usable).find(|b| super::loose::loose(root, b, value)))
         .or(list.iter().find(|b| usable(b)))
         .unwrap_or(schema)
 }
@@ -161,8 +151,8 @@ pub fn fill(root: &Value, schema: &Value, value: &mut Value) {
                 resolved
             } else {
                 let objects = branches(resolved).iter().map(|b| deref(root, b).0);
-                let shaped = objects.clone().find(|b| b["properties"].is_object() && fits(root, b, &shown));
-                shaped
+                let fitting = objects.clone().find(|b| b["properties"].is_object() && fits(root, b, &shown));
+                fitting
                     .or_else(|| objects.clone().find(|b| b["properties"].is_object()))
                     .unwrap_or_else(|| deref(root, choose(root, resolved, &shown)).0)
             };
@@ -188,8 +178,10 @@ pub fn fill(root: &Value, schema: &Value, value: &mut Value) {
             }
         }
         Value::Array(list) => {
+            super::pad::pad(root, schema, list);
+            let whole = Value::Array(list.clone());
             for (i, inner) in list.iter_mut().enumerate() {
-                if let Some(next) = child(root, schema, &i.to_string(), &Value::Null) {
+                if let Some(next) = child(root, schema, &i.to_string(), &whole) {
                     fill(root, &next, inner);
                 }
             }

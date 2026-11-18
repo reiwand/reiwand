@@ -5938,8 +5938,8 @@ msgid "%1 has no axis: aim a vortex force (force:N) or an around emitter (emitte
 msgstr "%1 no tiene eje: orienta una fuerza de vórtice (force:N) o un emisor alrededor de un punto (emitter:N)"
 
 #: crates/reiwand-core/src/explicit/error.rs
-msgid "%1: \"%2\" is missing. Reiwand does not fill in values: write it, or open it in the editor, which fills it in."
-msgstr "%1: falta «%2». Reiwand no completa valores: escríbelo, o ábrelo en el editor, que lo prellena."
+msgid "%1: \"%2\" is missing. Reiwand does not fill in values: write it, or run reiwand-upgrade on the file."
+msgstr "%1: falta «%2». Reiwand no completa valores: escríbelo, o corre reiwand-upgrade sobre el archivo."
 
 #: crates/reiwand-core/src/explicit/error.rs
 msgid "%1: \"%2\" is not valid: %3"
