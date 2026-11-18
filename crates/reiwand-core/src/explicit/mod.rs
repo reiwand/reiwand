@@ -1,4 +1,5 @@
 mod blocks;
+mod classes;
 mod error;
 mod loose;
 mod omit;
@@ -12,6 +13,7 @@ pub mod walk;
 mod words;
 
 pub use blocks::{block_at, null_blocks, prune_blocks};
+pub use classes::declared;
 pub use error::{Fault, ReadError};
 pub use omit::{omission, round_trip};
 pub use read::{Try, block, either, null, read, read_str, untagged};

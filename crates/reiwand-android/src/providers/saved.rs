@@ -13,11 +13,11 @@ static LOCK: Mutex<()> = Mutex::new(());
 pub(super) struct Credit {
     pub(super) uid: String,
     pub(super) title: String,
-    #[serde(deserialize_with = "explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "explicit::block")]
     pub(super) attribution: Option<String>,
-    #[serde(deserialize_with = "explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "explicit::block")]
     pub(super) license: Option<String>,
-    #[serde(deserialize_with = "explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "explicit::block")]
     pub(super) link: Option<String>,
 }
 
@@ -27,9 +27,9 @@ pub(super) struct Entry {
     pub(super) kind: String,
     pub(super) options: Options,
     pub(super) on: bool,
-    #[serde(deserialize_with = "explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "explicit::block")]
     pub(super) last_sync: Option<i64>,
-    #[serde(deserialize_with = "explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "explicit::block")]
     pub(super) last_error: Option<serde_json::Value>,
     pub(super) seen: Vec<String>,
     pub(super) credits: Vec<Credit>,

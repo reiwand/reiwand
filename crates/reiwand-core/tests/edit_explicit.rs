@@ -1,7 +1,7 @@
 #![cfg(feature = "schema")]
 
 use reiwand_core::Edit;
-use reiwand_core::explicit::{Rule, all_required, omission, read, round_trip, scan};
+use reiwand_core::explicit::{Rule, all_required, block_at, omission, read, round_trip, scan};
 use serde_json::{Value, json};
 use std::path::Path;
 
@@ -28,11 +28,14 @@ fn the_schema_requires_every_field() {
 #[test]
 fn every_removed_key_is_refused_with_its_path() {
     load(&sample()).unwrap();
+    let schema = serde_json::to_value(schemars::schema_for!(Edit)).unwrap();
+    let value = sample();
     let wrong = omission(
-        &sample(),
+        &value,
         |p| {
             matches!(p.split('.').collect::<Vec<_>>()[..], ["masks" | "outputs", _])
                 || p.contains(".strokes[")
+                || block_at(&schema, &schema, &value, p)
         },
         load,
     );

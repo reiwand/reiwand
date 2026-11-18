@@ -134,7 +134,7 @@ fn an_edited_copy_of_a_signed_scene_carries_no_signature_of_the_original() {
     let ancestor = json!({"author": "Ana", "title": "orig", "license": "CC0-1.0", "url": null});
     assert_eq!(
         show_in(dir, "copy", "/manifest/origin"),
-        json!({"kind": "derived", "derived_from": [ancestor], "provider": null, "source_url": null})
+        json!({"kind": "derived", "derived_from": [ancestor], "source_url": null})
     );
     assert_eq!(show_in(dir, "copy", "/manifest/authors"), json!([]));
     act(dir, "copy", "set", json!({"pointer": "/scene/canvas/background", "value": "#ff0000"}));

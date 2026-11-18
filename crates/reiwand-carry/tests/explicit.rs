@@ -50,10 +50,20 @@ fn manifest_is_refused_key_by_key() {
 }
 
 #[test]
-fn optional_values_are_written_as_null() {
+fn values_are_written_as_null_and_unused_blocks_are_left_out() {
     let text = serde_json::to_string_pretty(&common::content()).unwrap();
-    assert!(text.contains("\"pin\": null") && text.contains("\"secrets\": null"));
-    assert!(text.contains("\"query\": null") && text.contains("\"rules\": null"));
+    assert!(text.contains("\"pin\": null") && text.contains("\"query\": null"));
+    assert!(!text.contains("\"secrets\"") && !text.contains("\"rules\""));
+}
+
+#[test]
+fn the_classes_are_the_ones_the_source_declares() {
+    let src = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+    for (row, class) in reiwand_carry::OPTIONAL {
+        let (ty, field) = row.split_once('.').unwrap();
+        let want = if *class == "bloque" { "bloque" } else { "valor" };
+        assert_eq!(reiwand_core::explicit::declared(&src, Some(ty), field), Some(want), "{row}");
+    }
 }
 
 #[test]

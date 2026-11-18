@@ -43,7 +43,7 @@ model! {
 
     pub struct HistoryEntry {
         pub at: Time,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub item: Option<ItemSummary>,
     }
 
@@ -62,7 +62,7 @@ model! {
         pub background: Option<String>,
         #[serde(deserialize_with = "crate::explicit::null")]
         pub preset: Option<Uid>,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub filter: Option<crate::Filter>,
     }
 
@@ -145,9 +145,9 @@ model! {
         pub count: u32,
         #[serde(deserialize_with = "crate::explicit::null")]
         pub shown: Option<Uid>,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub candidate: Option<ItemSummary>,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub now: Option<ItemSummary>,
         pub ahead: Vec<ItemSummary>,
         pub behind: Vec<ItemSummary>,

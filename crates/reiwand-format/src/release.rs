@@ -15,7 +15,11 @@ pub struct Release {
     pub size: u64,
     pub sha256: String,
     pub manifest_sha256: String,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
     pub preview: Option<Preview>,
     pub published: Time,
     pub schema: String,
@@ -23,14 +27,26 @@ pub struct Release {
     pub default_locale: Option<String>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub changes: Option<Text>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
     pub content: Option<Rated>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub photosensitive: Option<bool>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
     pub requires: Option<Needs>,
     pub facets: Vec<String>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
     pub animated: Option<Preview>,
     pub platforms: Vec<String>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]

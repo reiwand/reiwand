@@ -36,8 +36,33 @@ fn option_field(t: &str) -> bool {
         .is_some_and(|(name, _)| !name.is_empty() && name.chars().all(|c| c.is_alphanumeric() || c == '_'))
 }
 
+fn joined(text: &str) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    let mut open: Option<usize> = None;
+    for line in text.lines() {
+        match open {
+            Some(at) => {
+                out[at].push_str(line.trim());
+                out.push("#[]".to_owned());
+                if line.trim_start().starts_with(")]") {
+                    open = None;
+                }
+            }
+            None => {
+                let t = line.trim();
+                if (t.starts_with("#[serde(") || t.starts_with("#[schemars(")) && t.ends_with('(') {
+                    open = Some(out.len());
+                }
+                out.push(line.to_owned());
+            }
+        }
+    }
+    out
+}
+
 fn check(file: &Path, text: &str, rules: &[Rule], out: &mut Vec<Violation>) {
-    let lines: Vec<&str> = text.lines().collect();
+    let whole = joined(text);
+    let lines: Vec<&str> = whole.iter().map(String::as_str).collect();
     for (i, line) in lines.iter().enumerate() {
         let t = line.trim();
         if t.starts_with("#[cfg(test)]") {
@@ -48,7 +73,11 @@ fn check(file: &Path, text: &str, rules: &[Rule], out: &mut Vec<Violation>) {
                 out.push(Violation { file: file.to_owned(), line: i + 1, rule });
             }
         };
-        let marked = t.contains("explicit::block") || t.contains("deserialize_with = \"block\"");
+        let marked = t.contains("explicit::block")
+            || t.contains("deserialize_with = \"block\"")
+            || ["general", "empty", "none", "auto"]
+                .iter()
+                .any(|w| t.contains(&format!("explicit::{w}::deserialize")));
         hit(
             Rule::SerdeDefault,
             !marked && (t.contains("serde(default") || t.contains("serde(alias") && t.contains("default")),

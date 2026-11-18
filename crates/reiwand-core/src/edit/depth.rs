@@ -20,8 +20,8 @@ pub struct Depth {
     pub gamma: f32,
     pub smooth: u32,
     pub dilate: u32,
-    #[cfg_attr(feature = "schema", schemars(required))]
-    #[serde(deserialize_with = "crate::explicit::null")]
+    #[cfg_attr(feature = "schema", schemars(extend("x-null" = true, "x-block" = true)))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "crate::explicit::block")]
     pub cuts: Option<Vec<f32>>,
     pub strokes: Vec<Touch>,
     pub fills: Vec<Touch>,

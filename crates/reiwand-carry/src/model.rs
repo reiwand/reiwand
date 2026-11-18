@@ -53,8 +53,8 @@ pub struct List {
     #[serde(deserialize_with = "explicit::null")]
     #[cfg_attr(feature = "schema", schemars(required))]
     pub query: Option<String>,
-    #[serde(deserialize_with = "explicit::null")]
-    #[cfg_attr(feature = "schema", schemars(required, with = "Option<serde_json::Map<String, Value>>"))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "explicit::block")]
+    #[cfg_attr(feature = "schema", schemars(with = "Option<serde_json::Map<String, Value>>", extend("x-null" = true, "x-block" = true)))]
     pub rules: Option<serde_json::Value>,
 }
 
@@ -115,8 +115,8 @@ pub struct Content {
     pub installed: Vec<Installed>,
     pub settings: BTreeMap<String, Value>,
     pub own: Vec<OwnFile>,
-    #[serde(deserialize_with = "explicit::null")]
-    #[cfg_attr(feature = "schema", schemars(required))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "explicit::block")]
+    #[cfg_attr(feature = "schema", schemars(extend("x-null" = true, "x-block" = true)))]
     pub secrets: Option<Secrets>,
 }
 

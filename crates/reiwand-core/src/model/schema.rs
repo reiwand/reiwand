@@ -40,7 +40,7 @@ model! {
         pub kind: String,
         pub hosts: Vec<String>,
         pub options: Vec<Field>,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub secret: Option<SecretField>,
     }
 

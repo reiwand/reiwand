@@ -220,7 +220,8 @@ msgstr "da un trazo, o usa clear para quitar las divisiones"
 
 #: crates/reiwand-core/src/edit/regions.rs
 msgid "give a point of the region, or clear to put the regions back"
-msgstr "da un punto de la región, o usa clear para devolver las regiones a su sitio"
+msgstr ""
+"da un punto de la región, o usa clear para devolver las regiones a su sitio"
 
 #: crates/reiwand-core/src/edit/regions.rs
 msgid "say how far with by: above 0 moves it nearer, below 0 farther"
@@ -284,8 +285,14 @@ msgid "give the cuts or auto"
 msgstr "da los cortes o auto"
 
 #: crates/reiwand-core/src/edit/travel.rs
-msgid "The picture stays still: the depth model is not installed. Download it (%1) with reiwand-ctl models download depth-anything-v2-small or from the app; nothing is downloaded until you ask."
-msgstr "La imagen queda quieta: el modelo de profundidad no está instalado. Descárgalo (%1) con reiwand-ctl models download depth-anything-v2-small o desde la app; no se descarga nada hasta que lo pidas."
+msgid ""
+"The picture stays still: the depth model is not installed. Download it (%1) "
+"with reiwand-ctl models download depth-anything-v2-small or from the app; "
+"nothing is downloaded until you ask."
+msgstr ""
+"La imagen queda quieta: el modelo de profundidad no está instalado. "
+"Descárgalo (%1) con reiwand-ctl models download depth-anything-v2-small o "
+"desde la app; no se descarga nada hasta que lo pidas."
 
 #: crates/reiwand-core/src/edit/travel.rs
 msgid "The picture stays still: it has no depth map yet."
@@ -293,39 +300,74 @@ msgstr "La imagen queda quieta: todavía no tiene mapa de profundidad."
 
 #: crates/reiwand-core/src/edit/travel.rs
 msgid "The picture stays still until its depth layers are built."
-msgstr "La imagen queda quieta hasta que estén listas sus capas de profundidad."
+msgstr ""
+"La imagen queda quieta hasta que estén listas sus capas de profundidad."
 
 #: crates/reiwand-core/src/edit/travel.rs
-msgid "The picture stays still until its depth layers are built. They are built with the simple fill because LaMa, which fills the hidden parts better, is not installed. To get it (%1) run reiwand-ctl models download lama-big-fp32 or use the app; nothing is downloaded until you ask."
-msgstr "La imagen queda quieta hasta que se construyan sus capas de profundidad. Se construyen con el relleno simple porque LaMa, que rellena mejor las partes ocultas, no está instalado. Para tenerlo (%1) ejecuta reiwand-ctl models download lama-big-fp32 o usa la app; no se descarga nada hasta que lo pidas."
+msgid ""
+"The picture stays still until its depth layers are built. They are built "
+"with the simple fill because LaMa, which fills the hidden parts better, is "
+"not installed. To get it (%1) run reiwand-ctl models download lama-big-fp32 "
+"or use the app; nothing is downloaded until you ask."
+msgstr ""
+"La imagen queda quieta hasta que se construyan sus capas de profundidad. Se "
+"construyen con el relleno simple porque LaMa, que rellena mejor las partes "
+"ocultas, no está instalado. Para tenerlo (%1) ejecuta reiwand-ctl models "
+"download lama-big-fp32 o usa la app; no se descarga nada hasta que lo pidas."
 
 #: crates/reiwand-core/src/edit/travel.rs
-msgid "The picture stays still: this computer draws with its processor, so depth movement is off. Turn it on with reiwand-ctl config playback.software_parallax true or in the settings; it then moves in 8 steps at up to 15 frames per second."
-msgstr "La imagen queda quieta: este equipo dibuja con el procesador, así que el movimiento en profundidad está apagado. Actívalo con reiwand-ctl config playback.software_parallax true o en los ajustes; entonces se mueve en 8 pasos y a lo sumo 15 cuadros por segundo."
+msgid ""
+"The picture stays still: this computer draws with its processor, so depth "
+"movement is off. Turn it on with reiwand-ctl config playback."
+"software_parallax true or in the settings; it then moves in 8 steps at up to "
+"15 frames per second."
+msgstr ""
+"La imagen queda quieta: este equipo dibuja con el procesador, así que el "
+"movimiento en profundidad está apagado. Actívalo con reiwand-ctl config "
+"playback.software_parallax true o en los ajustes; entonces se mueve en 8 "
+"pasos y a lo sumo 15 cuadros por segundo."
 
 #: crates/reiwand-core/src/edit/travel.rs
 msgid "The picture stays still: its depth layers could not be built."
-msgstr "La imagen queda quieta: no se pudieron construir sus capas de profundidad."
+msgstr ""
+"La imagen queda quieta: no se pudieron construir sus capas de profundidad."
 
 #: crates/reiwand-core/src/edit/travel.rs
-msgid "The picture stays still: building its depth layers was cancelled. Apply it again or try again to build them."
-msgstr "La imagen queda quieta: se canceló la creación de sus capas de profundidad. Vuelve a aplicarla o inténtalo de nuevo para crearlas."
+msgid ""
+"The picture stays still: building its depth layers was cancelled. Apply it "
+"again or try again to build them."
+msgstr ""
+"La imagen queda quieta: se canceló la creación de sus capas de profundidad. "
+"Vuelve a aplicarla o inténtalo de nuevo para crearlas."
 
 #: crates/reiwand-core/src/edit/travel.rs
-msgid "The picture stays still: its depth gives no movement that would not stretch it."
-msgstr "La imagen queda quieta: su profundidad no permite moverla sin estirarla."
+msgid ""
+"The picture stays still: its depth gives no movement that would not stretch "
+"it."
+msgstr ""
+"La imagen queda quieta: su profundidad no permite moverla sin estirarla."
 
 #: crates/reiwand-core/src/edit/travel.rs
-msgid "LaMa or ONNX Runtime is not installed. Install it from the depth tool or with reiwand-ctl models download lama-big-fp32; nothing is downloaded until you ask."
-msgstr "LaMa o ONNX Runtime no está instalado. Instálalo desde la herramienta de profundidad o con reiwand-ctl models download lama-big-fp32; no se descarga nada hasta que lo pidas."
+msgid ""
+"LaMa or ONNX Runtime is not installed. Install it from the depth tool or "
+"with reiwand-ctl models download lama-big-fp32; nothing is downloaded until "
+"you ask."
+msgstr ""
+"LaMa o ONNX Runtime no está instalado. Instálalo desde la herramienta de "
+"profundidad o con reiwand-ctl models download lama-big-fp32; no se descarga "
+"nada hasta que lo pidas."
 
 #: crates/reiwand-core/src/edit/travel.rs
 msgid "The chosen fill is not installed."
 msgstr "El relleno elegido no está instalado."
 
 #: crates/reiwand-core/src/explicit/error.rs
-msgid "%1: \"%2\" is missing. Reiwand does not fill in values: write it, or run `reiwand-upgrade file PATH` on it."
-msgstr "%1: falta «%2». Reiwand no completa valores: escríbelo, o corre `reiwand-upgrade file RUTA` sobre el archivo."
+msgid ""
+"%1: \"%2\" is missing. Reiwand does not fill in values: write it, or run "
+"`reiwand-upgrade file PATH` on it."
+msgstr ""
+"%1: falta «%2». Reiwand no completa valores: escríbelo, o corre `reiwand-"
+"upgrade file RUTA` sobre el archivo."
 
 #: crates/reiwand-core/src/explicit/error.rs
 msgid "%1: \"%2\" is not valid: %3"
@@ -376,8 +418,11 @@ msgid "%1 is not auto, cpu or cuda"
 msgstr "%1 no es auto, cpu ni cuda"
 
 #: crates/reiwand-depth/src/infer.rs
-msgid "this ONNX Runtime cannot use CUDA; give one built with CUDA in ORT_DYLIB_PATH"
-msgstr "este ONNX Runtime no puede usar CUDA; indica uno compilado con CUDA en ORT_DYLIB_PATH"
+msgid ""
+"this ONNX Runtime cannot use CUDA; give one built with CUDA in ORT_DYLIB_PATH"
+msgstr ""
+"este ONNX Runtime no puede usar CUDA; indica uno compilado con CUDA en "
+"ORT_DYLIB_PATH"
 
 #: crates/reiwand-depth/src/infer.rs
 msgid "cannot run the model with CUDA"
@@ -429,7 +474,8 @@ msgstr "%1 del archivo comprimido tiene otro SHA-256"
 
 #: crates/reiwand-depth/src/made.rs
 msgid "the depth model is not installed; see reiwand-ctl models list"
-msgstr "el modelo de profundidad no está instalado; mira reiwand-ctl models list"
+msgstr ""
+"el modelo de profundidad no está instalado; mira reiwand-ctl models list"
 
 #: crates/reiwand-depth/src/made.rs
 msgid "the model input must be a multiple of 14 from 196 to 1036"
@@ -487,15 +533,20 @@ msgstr "no se puede cargar ONNX Runtime: %1"
 
 #: crates/reiwand-depth/src/store.rs
 msgid "the map is %1x%2 and the image %3x%4: their shapes differ by over 2 %"
-msgstr "el mapa mide %1x%2 y la imagen %3x%4: sus proporciones difieren en más de un 2 %"
+msgstr ""
+"el mapa mide %1x%2 y la imagen %3x%4: sus proporciones difieren en más de un "
+"2 %"
 
 #: crates/reiwand-editor/src/actions.rs crates/reiwand-editor/src/layers.rs
 msgid "there is no layer \"%1\""
 msgstr "no hay ninguna capa «%1»"
 
 #: crates/reiwand-editor/src/actions.rs
-msgid "requires.features is computed from what the package uses, except locale_files"
-msgstr "requires.features se calcula a partir de lo que usa el paquete, salvo locale_files"
+msgid ""
+"requires.features is computed from what the package uses, except locale_files"
+msgstr ""
+"requires.features se calcula a partir de lo que usa el paquete, salvo "
+"locale_files"
 
 #: crates/reiwand-editor/src/actions.rs crates/reiwand-editor/src/bring.rs
 #: crates/reiwand-editor/src/ids/rename.rs crates/reiwand-editor/src/props.rs
@@ -569,7 +620,8 @@ msgstr "no se puede leer la imagen: %1"
 
 #: crates/reiwand-editor/src/assets.rs
 msgid "only pictures, videos, sounds, fonts and .cube tables can be imported"
-msgstr "solo se pueden importar imágenes, vídeos, sonidos, fuentes y tablas .cube"
+msgstr ""
+"solo se pueden importar imágenes, vídeos, sonidos, fuentes y tablas .cube"
 
 #: crates/reiwand-editor/src/assets.rs
 msgid "the file is larger than 1 GiB"
@@ -657,7 +709,9 @@ msgstr "no hay ningún hueso «%1»"
 
 #: crates/reiwand-editor/src/author_keys.rs
 msgid "a key name has 1 to 64 letters, digits, dots, dashes or underscores"
-msgstr "un nombre de clave tiene de 1 a 64 letras, dígitos, puntos, guiones o guiones bajos"
+msgstr ""
+"un nombre de clave tiene de 1 a 64 letras, dígitos, puntos, guiones o "
+"guiones bajos"
 
 #: crates/reiwand-editor/src/author_keys.rs
 msgid "the password is empty; leave it out for a key without one"
@@ -862,8 +916,12 @@ msgid "%1 signs an earlier version; sign again or delete it"
 msgstr "%1 firma una versión anterior; vuelve a firmar o bórrala"
 
 #: crates/reiwand-editor/src/check.rs
-msgid "%1 is not used by the scene but goes into the package; remove it from the folder to make the package smaller, or use it in the scene"
-msgstr "la escena no usa %1, pero entra en el paquete; quítalo de la carpeta para que el paquete pese menos, o úsalo en la escena"
+msgid ""
+"%1 is not used by the scene but goes into the package; remove it from the "
+"folder to make the package smaller, or use it in the scene"
+msgstr ""
+"la escena no usa %1, pero entra en el paquete; quítalo de la carpeta para "
+"que el paquete pese menos, o úsalo en la escena"
 
 #: crates/reiwand-editor/src/clips.rs
 msgid "a clip id has 1 to 32 small letters, digits or _"
@@ -875,7 +933,8 @@ msgstr "no hay ningún clip «%1»"
 
 #: crates/reiwand-editor/src/clips.rs
 msgid "only a clip being added starts playing in a new animation layer"
-msgstr "solo un clip que se añade empieza a sonar en una capa de animación nueva"
+msgstr ""
+"solo un clip que se añade empieza a sonar en una capa de animación nueva"
 
 #: crates/reiwand-editor/src/clips.rs crates/reiwand-editor/src/motion/mod.rs
 #: crates/reiwand-editor/src/scripts/rigcalls.rs
@@ -942,8 +1001,12 @@ msgid "there is no part \"%1\""
 msgstr "no hay ninguna parte «%1»"
 
 #: crates/reiwand-editor/src/clips/keyed.rs
-msgid "%1 of the key cannot take %2; give a number from -%3 to %3, or a list of 2 or 3 such numbers"
-msgstr "%1 de la clave no admite %2; da un número de -%3 a %3, o una lista de 2 o 3 números así"
+msgid ""
+"%1 of the key cannot take %2; give a number from -%3 to %3, or a list of 2 "
+"or 3 such numbers"
+msgstr ""
+"%1 de la clave no admite %2; da un número de -%3 a %3, o una lista de 2 o 3 "
+"números así"
 
 #: crates/reiwand-editor/src/clips/keyed.rs
 msgid "the clip has no key there at %1 s"
@@ -958,8 +1021,12 @@ msgid "%1 needs a value for %2"
 msgstr "%1 necesita un valor para %2"
 
 #: crates/reiwand-editor/src/copying.rs
-msgid "%1 by %2 is licensed %3, which allows no changed versions: publish this copy only if its author allows it"
-msgstr "%1 de %2 tiene la licencia %3, que no permite versiones modificadas: publica esta copia solo si su autor lo permite"
+msgid ""
+"%1 by %2 is licensed %3, which allows no changed versions: publish this copy "
+"only if its author allows it"
+msgstr ""
+"%1 de %2 tiene la licencia %3, que no permite versiones modificadas: publica "
+"esta copia solo si su autor lo permite"
 
 #: crates/reiwand-editor/src/copying.rs crates/reiwand-editor/src/diverged.rs
 #: crates/reiwand-editor/src/offer.rs crates/reiwand-editor/src/project.rs
@@ -1000,15 +1067,20 @@ msgstr "%1 está animada, y una carátula es una imagen fija"
 
 #: crates/reiwand-editor/src/credit.rs crates/reiwand-editor/src/credits.rs
 msgid "a package has at most 64 credits; credit folders instead of files"
-msgstr "un paquete tiene como mucho 64 créditos; acredita carpetas en vez de archivos"
+msgstr ""
+"un paquete tiene como mucho 64 créditos; acredita carpetas en vez de archivos"
 
 #: crates/reiwand-editor/src/credit.rs
 msgid "a package is derived from at most 64 works"
 msgstr "un paquete deriva de 64 obras como mucho"
 
 #: crates/reiwand-editor/src/credits.rs
-msgid "%1 files have no credit: %2 and %3 more; credit them, or their folder, if someone else made them"
-msgstr "%1 archivos no tienen crédito: %2 y %3 más; acredítalos, o su carpeta, si los hizo otra persona"
+msgid ""
+"%1 files have no credit: %2 and %3 more; credit them, or their folder, if "
+"someone else made them"
+msgstr ""
+"%1 archivos no tienen crédito: %2 y %3 más; acredítalos, o su carpeta, si "
+"los hizo otra persona"
 
 #: crates/reiwand-editor/src/credits.rs
 msgid "a credit needs files, a license and who it is attributed to"
@@ -1059,12 +1131,20 @@ msgid "a sprite sheet plays between 1 frame and all its frames"
 msgstr "una hoja de sprites reproduce entre 1 cuadro y todos los suyos"
 
 #: crates/reiwand-editor/src/depthmap.rs
-msgid "the depth model is not installed: run %1, or install it from the depth dialog of the app"
-msgstr "el modelo de profundidad no está instalado: ejecuta %1, o instálalo desde el diálogo de profundidad de la app"
+msgid ""
+"the depth model is not installed: run %1, or install it from the depth "
+"dialog of the app"
+msgstr ""
+"el modelo de profundidad no está instalado: ejecuta %1, o instálalo desde el "
+"diálogo de profundidad de la app"
 
 #: crates/reiwand-editor/src/depthmap.rs
-msgid "the library that runs the depth model is not installed: run reiwand-ctl models download onnxruntime"
-msgstr "la biblioteca que ejecuta el modelo de profundidad no está instalada: ejecuta reiwand-ctl models download onnxruntime"
+msgid ""
+"the library that runs the depth model is not installed: run reiwand-ctl "
+"models download onnxruntime"
+msgstr ""
+"la biblioteca que ejecuta el modelo de profundidad no está instalada: "
+"ejecuta reiwand-ctl models download onnxruntime"
 
 #: crates/reiwand-editor/src/depthmap.rs
 msgid "the model input is a multiple of 14 from 196 to 1036"
@@ -1142,16 +1222,24 @@ msgid "%1 cannot take the value %2; give %3"
 msgstr "%1 no admite el valor %2; da %3"
 
 #: crates/reiwand-editor/src/fits.rs
-msgid "%1 cannot take %2; give one of %3, or four numbers [x1, y1, x2, y2] of a cubic Bézier"
-msgstr "%1 no admite %2; da uno de %3, o cuatro números [x1, y1, x2, y2] de una Bézier cúbica"
+msgid ""
+"%1 cannot take %2; give one of %3, or four numbers [x1, y1, x2, y2] of a "
+"cubic Bézier"
+msgstr ""
+"%1 no admite %2; da uno de %3, o cuatro números [x1, y1, x2, y2] de una "
+"Bézier cúbica"
 
 #: crates/reiwand-editor/src/flashes.rs
 msgid "measure from 0.1 to 60 s at 1 to 30 frames a second"
 msgstr "mide de 0,1 a 60 s a 1 a 30 fotogramas por segundo"
 
 #: crates/reiwand-editor/src/flashes.rs
-msgid "the scene flashed more than %1 times a second near second %2 of a render; if people can see that, set photosensitive"
-msgstr "la escena destelló más de %1 veces por segundo cerca del segundo %2 de un dibujo; si alguien puede verlo, marca photosensitive"
+msgid ""
+"the scene flashed more than %1 times a second near second %2 of a render; if "
+"people can see that, set photosensitive"
+msgstr ""
+"la escena destelló más de %1 veces por segundo cerca del segundo %2 de un "
+"dibujo; si alguien puede verlo, marca photosensitive"
 
 #: crates/reiwand-editor/src/graph/bend.rs
 msgid "handles bend one key at a time: one pick with one time"
@@ -1160,11 +1248,16 @@ msgstr "las asas curvan una clave por vez: un pick con un solo tiempo"
 #: crates/reiwand-editor/src/graph/bend.rs
 #: crates/reiwand-editor/src/straight.rs
 msgid "straighten the curve after a keyframe on its own, without other changes"
-msgstr "endereza la curva después de un fotograma clave por sí sola, sin otros cambios"
+msgstr ""
+"endereza la curva después de un fotograma clave por sí sola, sin otros "
+"cambios"
 
 #: crates/reiwand-editor/src/graph/bend.rs
-msgid "link the parts of the handles of a keyframe on its own, without other changes"
-msgstr "une las partes de las asas de un fotograma clave por sí solo, sin otros cambios"
+msgid ""
+"link the parts of the handles of a keyframe on its own, without other changes"
+msgstr ""
+"une las partes de las asas de un fotograma clave por sí solo, sin otros "
+"cambios"
 
 #: crates/reiwand-editor/src/graph/bend.rs
 #: crates/reiwand-editor/src/graph/mod.rs
@@ -1172,13 +1265,19 @@ msgid "the key of %1 at %2 s has no part %3"
 msgstr "la clave de %1 en %2 s no tiene la parte %3"
 
 #: crates/reiwand-editor/src/graph/bend.rs
-msgid "the keyframe of %1 at %2 s has no neighbour on that side to bend its curve towards"
-msgstr "el fotograma clave de %1 en %2 s no tiene vecino de ese lado hacia el que curvar su curva"
+msgid ""
+"the keyframe of %1 at %2 s has no neighbour on that side to bend its curve "
+"towards"
+msgstr ""
+"el fotograma clave de %1 en %2 s no tiene vecino de ese lado hacia el que "
+"curvar su curva"
 
 #: crates/reiwand-editor/src/graph/clip.rs
 #: crates/reiwand-editor/src/graph/mod.rs
 msgid "picks names the keys to change: a pointer and the times of its keys"
-msgstr "picks nombra las claves que se cambian: un puntero y los tiempos de sus claves"
+msgstr ""
+"picks nombra las claves que se cambian: un puntero y los tiempos de sus "
+"claves"
 
 #: crates/reiwand-editor/src/graph/mod.rs crates/reiwand-editor/src/keys.rs
 #: crates/reiwand-editor/src/straight.rs
@@ -1195,8 +1294,10 @@ msgid "two keys of %1 would meet at %2 s"
 msgstr "dos claves de %1 quedarían juntas en %2 s"
 
 #: crates/reiwand-editor/src/graph/mod.rs
-msgid "shift, pivot, lift, value, value_scale, value_pivot and at are finite numbers"
-msgstr "shift, pivot, lift, value, value_scale, value_pivot y at son números finitos"
+msgid ""
+"shift, pivot, lift, value, value_scale, value_pivot and at are finite numbers"
+msgstr ""
+"shift, pivot, lift, value, value_scale, value_pivot y at son números finitos"
 
 #: crates/reiwand-editor/src/graph/mod.rs
 msgid "times lists the seconds of the keys of %1 to change"
@@ -1204,7 +1305,8 @@ msgstr "times lista los segundos de las claves de %1 que se cambian"
 
 #: crates/reiwand-editor/src/graph/mod.rs
 msgid "scale is a number over 0 that stretches the times of the picked keys"
-msgstr "scale es un número mayor que 0 que estira los tiempos de las claves elegidas"
+msgstr ""
+"scale es un número mayor que 0 que estira los tiempos de las claves elegidas"
 
 #: crates/reiwand-editor/src/graph/mod.rs
 msgid "keep at least one key of %1; the keyframe action removes the last one"
@@ -1216,24 +1318,40 @@ msgid "the keys of %1 would move before 0 s"
 msgstr "las claves de %1 quedarían antes de 0 s"
 
 #: crates/reiwand-editor/src/graph/mod.rs
-msgid "part names the part to set in keys of lists and colors: 0 for x or red, 1 for y or green and so on"
-msgstr "part nombra la parte que se fija en claves de listas y colores: 0 para x o rojo, 1 para y o verde, y así"
+msgid ""
+"part names the part to set in keys of lists and colors: 0 for x or red, 1 "
+"for y or green and so on"
+msgstr ""
+"part nombra la parte que se fija en claves de listas y colores: 0 para x o "
+"rojo, 1 para y o verde, y así"
 
 #: crates/reiwand-editor/src/graph/paste.rs
 msgid "at is the second where the first pasted key goes"
 msgstr "at es el segundo donde va la primera clave pegada"
 
 #: crates/reiwand-editor/src/graph/paste.rs
-msgid "a pasted key is [time, value], [time, value, easing] or [time, value, {\"in\", \"out\"}]"
-msgstr "una clave pegada es [tiempo, valor], [tiempo, valor, suavizado] o [tiempo, valor, {\"in\", \"out\"}]"
+msgid ""
+"a pasted key is [time, value], [time, value, easing] or [time, value, "
+"{\"in\", \"out\"}]"
+msgstr ""
+"una clave pegada es [tiempo, valor], [tiempo, valor, suavizado] o [tiempo, "
+"valor, {\"in\", \"out\"}]"
 
 #: crates/reiwand-editor/src/graph/values.rs
-msgid "lift or scale the keys of several values only when they are of one kind and unit; %1 and %2 are not"
-msgstr "sube o escala las claves de varios valores solo si son de un mismo tipo y unidad; %1 y %2 no lo son"
+msgid ""
+"lift or scale the keys of several values only when they are of one kind and "
+"unit; %1 and %2 are not"
+msgstr ""
+"sube o escala las claves de varios valores solo si son de un mismo tipo y "
+"unidad; %1 y %2 no lo son"
 
 #: crates/reiwand-editor/src/handles.rs
-msgid "a Bézier handle reaches from 0 s up to the neighbouring keyframe and by -1000000 to 1000000 in value"
-msgstr "un tirador Bézier llega de 0 s hasta el fotograma clave vecino y de -1000000 a 1000000 en valor"
+msgid ""
+"a Bézier handle reaches from 0 s up to the neighbouring keyframe and by "
+"-1000000 to 1000000 in value"
+msgstr ""
+"un tirador Bézier llega de 0 s hasta el fotograma clave vecino y de -1000000 "
+"a 1000000 en valor"
 
 #: crates/reiwand-editor/src/handles.rs
 msgid "a keyframe eases or has Bézier handles, not both"
@@ -1244,12 +1362,17 @@ msgid "give a base or make the value absolute, not both"
 msgstr "da una base o haz absoluto el valor, no ambos"
 
 #: crates/reiwand-editor/src/handles.rs
-msgid "a handle of the keyframe of %1 at %2 s reaches past the neighbouring keyframe; it reaches up to %3 s"
-msgstr "un tirador del fotograma clave de %1 en %2 s pasa del fotograma clave vecino; llega hasta %3 s"
+msgid ""
+"a handle of the keyframe of %1 at %2 s reaches past the neighbouring "
+"keyframe; it reaches up to %3 s"
+msgstr ""
+"un tirador del fotograma clave de %1 en %2 s pasa del fotograma clave "
+"vecino; llega hasta %3 s"
 
 #: crates/reiwand-editor/src/handles.rs
 msgid "Bézier handles shape keyframes of numbers, lists of numbers and colors"
-msgstr "las asas Bézier dan forma a claves de números, listas de números y colores"
+msgstr ""
+"las asas Bézier dan forma a claves de números, listas de números y colores"
 
 #: crates/reiwand-editor/src/handles.rs
 msgid "only a value with keyframes adds them to a base"
@@ -1260,16 +1383,27 @@ msgid "each number of the base of %1 is from -1000000 to 1000000"
 msgstr "cada número de la base de %1 va de -1000000 a 1000000"
 
 #: crates/reiwand-editor/src/handles.rs
-msgid "the base of %1 is a number, a list of numbers or a color like its keyframes"
-msgstr "la base de %1 es un número, una lista de números o un color, como sus fotogramas clave"
+msgid ""
+"the base of %1 is a number, a list of numbers or a color like its keyframes"
+msgstr ""
+"la base de %1 es un número, una lista de números o un color, como sus "
+"fotogramas clave"
 
 #: crates/reiwand-editor/src/hidden.rs
-msgid "The layer \"%1\" never shows: \"%2\", above it, covers the whole canvas with no transparency; hide or move \"%2\", or move \"%1\" above it"
-msgstr "La capa «%1» nunca se ve: «%2», que está encima, tapa todo el lienzo sin transparencia; oculta o mueve «%2», o sube «%1» por encima de ella"
+msgid ""
+"The layer \"%1\" never shows: \"%2\", above it, covers the whole canvas with "
+"no transparency; hide or move \"%2\", or move \"%1\" above it"
+msgstr ""
+"La capa «%1» nunca se ve: «%2», que está encima, tapa todo el lienzo sin "
+"transparencia; oculta o mueve «%2», o sube «%1» por encima de ella"
 
 #: crates/reiwand-editor/src/hidden.rs
-msgid "The layer \"%1\" lies completely outside the canvas, so it never shows; move it inside the canvas"
-msgstr "La capa «%1» está del todo fuera del lienzo, así que nunca se ve; muévela dentro del lienzo"
+msgid ""
+"The layer \"%1\" lies completely outside the canvas, so it never shows; move "
+"it inside the canvas"
+msgstr ""
+"La capa «%1» está del todo fuera del lienzo, así que nunca se ve; muévela "
+"dentro del lienzo"
 
 #: crates/reiwand-editor/src/hulls.rs
 msgid "the model has no bone named %1"
@@ -1317,8 +1451,12 @@ msgid "%1 already has a keyframe at %2 s"
 msgstr "%1 ya tiene un fotograma clave en %2 s"
 
 #: crates/reiwand-editor/src/keys.rs
-msgid "the base of %1 does not add to its last keyframe; remove it with absolute to keep the keyframe value"
-msgstr "la base de %1 no se suma a su último fotograma clave; quítalo con absolute para quedarte con el valor del fotograma clave"
+msgid ""
+"the base of %1 does not add to its last keyframe; remove it with absolute to "
+"keep the keyframe value"
+msgstr ""
+"la base de %1 no se suma a su último fotograma clave; quítalo con absolute "
+"para quedarte con el valor del fotograma clave"
 
 #: crates/reiwand-editor/src/keys.rs crates/reiwand-editor/src/shaping/mod.rs
 #: crates/reiwand-editor/src/starts.rs
@@ -1359,8 +1497,12 @@ msgid "%1 is not a picture or video of the scene"
 msgstr "%1 no es una imagen ni un vídeo de la escena"
 
 #: crates/reiwand-editor/src/lamps/cast.rs
-msgid "the layer %1 cannot be projected: it is missing, takes light or reads a lit layer"
-msgstr "la capa %1 no se puede proyectar: no existe, recibe luz o lee una capa iluminada"
+msgid ""
+"the layer %1 cannot be projected: it is missing, takes light or reads a lit "
+"layer"
+msgstr ""
+"la capa %1 no se puede proyectar: no existe, recibe luz o lee una capa "
+"iluminada"
 
 #: crates/reiwand-editor/src/lamps/cast.rs
 msgid "give a picture, a video or a layer to project"
@@ -1392,7 +1534,9 @@ msgstr "una capa de partículas solo toma fuerza y emisión"
 
 #: crates/reiwand-editor/src/lamps/lit.rs
 msgid "lighting is for image, video, text, mesh, model and particles layers"
-msgstr "la iluminación es para capas de imagen, vídeo, texto, malla, modelo y partículas"
+msgstr ""
+"la iluminación es para capas de imagen, vídeo, texto, malla, modelo y "
+"partículas"
 
 #: crates/reiwand-editor/src/lamps/lit.rs
 msgid "%1 goes from 0 to %2"
@@ -1474,7 +1618,9 @@ msgstr "un texto tiene como mucho %1 fuentes de respaldo"
 
 #: crates/reiwand-editor/src/limbs.rs
 msgid "a chain goes from a bone down to one that hangs below it, 2 to %1 bones"
-msgstr "una cadena va de un hueso a otro que cuelga por debajo de él, de 2 a %1 huesos"
+msgstr ""
+"una cadena va de un hueso a otro que cuelga por debajo de él, de 2 a %1 "
+"huesos"
 
 #: crates/reiwand-editor/src/limbs.rs
 msgid "a chain reaches for cursor, bone:<name>, layer:<id> or a point [x, y]"
@@ -1529,16 +1675,30 @@ msgid "texts by key need %1 and a language such as en or pt-BR"
 msgstr "los textos por clave necesitan %1 y un idioma como en o pt-BR"
 
 #: crates/reiwand-editor/src/locales.rs
-msgid "a key has up to 64 letters, digits, _, . or -, and reiwand. keys belong to the engine"
-msgstr "una clave tiene hasta 64 letras, dígitos, _, . o -, y las claves reiwand. son del motor"
+msgid ""
+"a key has up to 64 letters, digits, _, . or -, and reiwand. keys belong to "
+"the engine"
+msgstr ""
+"una clave tiene hasta 64 letras, dígitos, _, . o -, y las claves reiwand. "
+"son del motor"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Set the value at a JSON Pointer, creating the objects on the way; a value of the wrong kind is refused, one that breaks a rule is kept and the problems it adds are listed"
-msgstr "Fija el valor en un puntero JSON, creando los objetos del camino; se rechaza un valor de tipo equivocado, y uno que rompe una regla se conserva y se listan los problemas que agrega"
+msgid ""
+"Set the value at a JSON Pointer, creating the objects on the way; a value of "
+"the wrong kind is refused, one that breaks a rule is kept and the problems "
+"it adds are listed"
+msgstr ""
+"Fija el valor en un puntero JSON, creando los objetos del camino; se rechaza "
+"un valor de tipo equivocado, y uno que rompe una regla se conserva y se "
+"listan los problemas que agrega"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Insert a value into a list or an object at a JSON Pointer; the problems it adds are listed as for set"
-msgstr "Inserta un valor en una lista o un objeto en un puntero JSON; los problemas que agrega se listan como en set"
+msgid ""
+"Insert a value into a list or an object at a JSON Pointer; the problems it "
+"adds are listed as for set"
+msgstr ""
+"Inserta un valor en una lista o un objeto en un puntero JSON; los problemas "
+"que agrega se listan como en set"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Remove the value at a JSON Pointer"
@@ -1549,8 +1709,12 @@ msgid "Move the value at one JSON Pointer to another"
 msgstr "Mueve el valor de un puntero JSON a otro"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Add a layer of a kind, optionally from a source, into a group or at a position"
-msgstr "Agrega una capa de un tipo, opcionalmente desde una fuente, en un grupo o en una posición"
+msgid ""
+"Add a layer of a kind, optionally from a source, into a group or at a "
+"position"
+msgstr ""
+"Agrega una capa de un tipo, opcionalmente desde una fuente, en un grupo o en "
+"una posición"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Remove a layer by id"
@@ -1577,8 +1741,14 @@ msgid "Show or hide a layer"
 msgstr "Muestra u oculta una capa"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Mark a layer locked or unlocked; only the canvas handles of the app honour the mark, while actions, the inspector and reiwand-ctl still change a locked layer"
-msgstr "Marca una capa como bloqueada o desbloqueada; solo las asas del lienzo de la app respetan la marca, mientras que las acciones, el inspector y reiwand-ctl siguen cambiando una capa bloqueada"
+msgid ""
+"Mark a layer locked or unlocked; only the canvas handles of the app honour "
+"the mark, while actions, the inspector and reiwand-ctl still change a locked "
+"layer"
+msgstr ""
+"Marca una capa como bloqueada o desbloqueada; solo las asas del lienzo de la "
+"app respetan la marca, mientras que las acciones, el inspector y reiwand-ctl "
+"siguen cambiando una capa bloqueada"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Show only one layer, or all of them when no id is given"
@@ -1590,7 +1760,8 @@ msgstr "Agrega, cambia o quita un fotograma clave de un valor animado"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Import a picture as an asset, optionally as a linear image or an atlas"
-msgstr "Importa una imagen como recurso, opcionalmente como imagen lineal o atlas"
+msgstr ""
+"Importa una imagen como recurso, opcionalmente como imagen lineal o atlas"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Import an effect from a descriptor and its shader"
@@ -1601,40 +1772,61 @@ msgid "Remove an imported effect"
 msgstr "Quita un efecto importado"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Copy the script module in file into the scene, or make one from a template, which needs no file"
-msgstr "Copia el módulo de script del archivo a la escena, o crea uno desde una plantilla, que no necesita archivo"
+msgid ""
+"Copy the script module in file into the scene, or make one from a template, "
+"which needs no file"
+msgstr ""
+"Copia el módulo de script del archivo a la escena, o crea uno desde una "
+"plantilla, que no necesita archivo"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Copy assets from another package into the scene"
 msgstr "Copia recursos de otro paquete a la escena"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Change how an asset is stored: texture compression, cover, placeholder, cube faces"
-msgstr "Cambia cómo se guarda un recurso: compresión de textura, portada, marcador de posición, caras de cubo"
+msgid ""
+"Change how an asset is stored: texture compression, cover, placeholder, cube "
+"faces"
+msgstr ""
+"Cambia cómo se guarda un recurso: compresión de textura, portada, marcador "
+"de posición, caras de cubo"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Turn the lighting of a layer on or off, or set its zone size"
-msgstr "Activa o desactiva la iluminación de una capa, o fija el tamaño de su zona"
+msgstr ""
+"Activa o desactiva la iluminación de una capa, o fija el tamaño de su zona"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Set, add or remove the text of a manifest field or of a text layer in one language"
-msgstr "Fija, agrega o quita el texto de un campo del manifiesto o de una capa de texto en un idioma"
+msgid ""
+"Set, add or remove the text of a manifest field or of a text layer in one "
+"language"
+msgstr ""
+"Fija, agrega o quita el texto de un campo del manifiesto o de una capa de "
+"texto en un idioma"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Rename a layer, timeline, asset or particle system and what refers to it"
-msgstr "Renombra una capa, línea de tiempo, recurso o sistema de partículas y lo que se refiere a él"
+msgid ""
+"Rename a layer, timeline, asset or particle system and what refers to it"
+msgstr ""
+"Renombra una capa, línea de tiempo, recurso o sistema de partículas y lo que "
+"se refiere a él"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Paste layers copied with the copy query, into a group or at a position"
-msgstr "Pega capas copiadas con la consulta copy, en un grupo o en una posición"
+msgstr ""
+"Pega capas copiadas con la consulta copy, en un grupo o en una posición"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Set the thumbnail of the package, or its animated preview"
 msgstr "Fija la miniatura del paquete o su vista previa animada"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Draw the scene: keep a frame as the thumbnail, record a short gif as the animated preview, or measure how much it flashes"
-msgstr "Dibuja la escena: guarda un cuadro como miniatura, graba un gif corto como vista previa animada o mide cuánto destella"
+msgid ""
+"Draw the scene: keep a frame as the thumbnail, record a short gif as the "
+"animated preview, or measure how much it flashes"
+msgstr ""
+"Dibuja la escena: guarda un cuadro como miniatura, graba un gif corto como "
+"vista previa animada o mide cuánto destella"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Add a user property to the manifest"
@@ -1653,8 +1845,10 @@ msgid "Remove a user property"
 msgstr "Quita una propiedad de usuario"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Add, change or remove a condition that shows or hides parts of the scene"
-msgstr "Agrega, cambia o quita una condición que muestra u oculta partes de la escena"
+msgid ""
+"Add, change or remove a condition that shows or hides parts of the scene"
+msgstr ""
+"Agrega, cambia o quita una condición que muestra u oculta partes de la escena"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Set the scheduling rules of an effect parameter"
@@ -1669,8 +1863,11 @@ msgid "Paint a stroke into the mask picture of an effect parameter"
 msgstr "Pinta un trazo en la imagen de máscara de un parámetro de efecto"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Comb a flow map of an effect parameter so that it points along the stroke"
-msgstr "Peina un mapa de flujo de un parámetro de efecto para que apunte a lo largo del trazo"
+msgid ""
+"Comb a flow map of an effect parameter so that it points along the stroke"
+msgstr ""
+"Peina un mapa de flujo de un parámetro de efecto para que apunte a lo largo "
+"del trazo"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Make a mesh from the outline of the picture of a layer"
@@ -1701,16 +1898,30 @@ msgid "Set or remove a key of a bone in a clip"
 msgstr "Fija o quita una clave de un hueso en un clip"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Edit keys picked in the curve editor: move, scale, lift or set a part of them, bend or straighten handles of every part or of one part, link the parts of the handles, remove, or paste copied keys"
-msgstr "Edita las claves elegidas en el editor de curvas: mover, escalar, subir o fijar una parte de ellas, curvar o enderezar las asas de todas las partes o de una, enlazar las partes de las asas, quitar o pegar claves copiadas"
+msgid ""
+"Edit keys picked in the curve editor: move, scale, lift or set a part of "
+"them, bend or straighten handles of every part or of one part, link the "
+"parts of the handles, remove, or paste copied keys"
+msgstr ""
+"Edita las claves elegidas en el editor de curvas: mover, escalar, subir o "
+"fijar una parte de ellas, curvar o enderezar las asas de todas las partes o "
+"de una, enlazar las partes de las asas, quitar o pegar claves copiadas"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Add, move, rename or remove a named event of a clip, which fires when the clip passes it"
-msgstr "Agrega, mueve, renombra o quita un evento con nombre de un clip, que se dispara cuando el clip lo pasa"
+msgid ""
+"Add, move, rename or remove a named event of a clip, which fires when the "
+"clip passes it"
+msgstr ""
+"Agrega, mueve, renombra o quita un evento con nombre de un clip, que se "
+"dispara cuando el clip lo pasa"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Sculpt a blend shape of a mesh with a brush that pushes, pulls, smooths or erases, making the shape when it is new"
-msgstr "Esculpe una forma combinada de una malla con un pincel que empuja, tira, suaviza o borra, creando la forma si es nueva"
+msgid ""
+"Sculpt a blend shape of a mesh with a brush that pushes, pulls, smooths or "
+"erases, making the shape when it is new"
+msgstr ""
+"Esculpe una forma combinada de una malla con un pincel que empuja, tira, "
+"suaviza o borra, creando la forma si es nueva"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Add, change or remove a facial expression of a rig"
@@ -1725,8 +1936,12 @@ msgid "Make bones follow physics: stiffness, damping and mode"
 msgstr "Hace que los huesos sigan la física: rigidez, amortiguación y modo"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Add, change or remove a capsule or sphere that keeps the swinging bones of a model or a mesh out"
-msgstr "Agrega, cambia o quita una cápsula o esfera que mantiene fuera los huesos oscilantes de un modelo o una malla"
+msgid ""
+"Add, change or remove a capsule or sphere that keeps the swinging bones of a "
+"model or a mesh out"
+msgstr ""
+"Agrega, cambia o quita una cápsula o esfera que mantiene fuera los huesos "
+"oscilantes de un modelo o una malla"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Add, change or remove a rule that drives a bone from another"
@@ -1749,12 +1964,20 @@ msgid "Order, hide or show the parts of a layered picture"
 msgstr "Ordena, oculta o muestra las partes de una imagen por capas"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Edit a particle system: starting kits, shape, bursts, forces, colliders, strands, lighting and settings"
-msgstr "Edita un sistema de partículas: kits iniciales, forma, ráfagas, fuerzas, colisionadores, hebras, iluminación y ajustes"
+msgid ""
+"Edit a particle system: starting kits, shape, bursts, forces, colliders, "
+"strands, lighting and settings"
+msgstr ""
+"Edita un sistema de partículas: kits iniciales, forma, ráfagas, fuerzas, "
+"colisionadores, hebras, iluminación y ajustes"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Add, change, mute or remove the lights of the scene; add places a light at a position in its group, set moves it to a point of the canvas"
-msgstr "Agrega, cambia, silencia o quita las luces de la escena; add pone una luz en una posición de su grupo, set la mueve a un punto del lienzo"
+msgid ""
+"Add, change, mute or remove the lights of the scene; add places a light at a "
+"position in its group, set moves it to a point of the canvas"
+msgstr ""
+"Agrega, cambia, silencia o quita las luces de la escena; add pone una luz en "
+"una posición de su grupo, set la mueve a un punto del lienzo"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Set the lighting model of the scene"
@@ -1769,36 +1992,63 @@ msgid "Paint a roughness or emissive map"
 msgstr "Pinta un mapa de rugosidad o emisivo"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Make a gradient picture or color table from color stops and use it in an effect parameter"
-msgstr "Crea una imagen de degradado o tabla de colores a partir de paradas de color y la usa en un parámetro de efecto"
+msgid ""
+"Make a gradient picture or color table from color stops and use it in an "
+"effect parameter"
+msgstr ""
+"Crea una imagen de degradado o tabla de colores a partir de paradas de color "
+"y la usa en un parámetro de efecto"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Make a grey depth map of a picture with the depth model and use it in an effect parameter"
-msgstr "Crea un mapa de profundidad gris de una imagen con el modelo de profundidad y lo usa en un parámetro de efecto"
+msgid ""
+"Make a grey depth map of a picture with the depth model and use it in an "
+"effect parameter"
+msgstr ""
+"Crea un mapa de profundidad gris de una imagen con el modelo de profundidad "
+"y lo usa en un parámetro de efecto"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Set the ambient light"
 msgstr "Fija la luz ambiente"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Edit a 3D layer: models, materials, sculpted shapes, camera, view, tones, shadows, camera paths and 3D handle drags"
-msgstr "Edita una capa 3D: modelos, materiales, formas esculpidas, cámara, vista, tonos, sombras, trayectorias de cámara y arrastres de asas 3D"
+msgid ""
+"Edit a 3D layer: models, materials, sculpted shapes, camera, view, tones, "
+"shadows, camera paths and 3D handle drags"
+msgstr ""
+"Edita una capa 3D: modelos, materiales, formas esculpidas, cámara, vista, "
+"tonos, sombras, trayectorias de cámara y arrastres de asas 3D"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Edit the animation of a mesh or model layer: clips, presets and morphs"
-msgstr "Edita la animación de una capa de malla o modelo: clips, preajustes y morfos"
+msgstr ""
+"Edita la animación de una capa de malla o modelo: clips, preajustes y morfos"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Add, set, remove, move or mask the effects of a layer, and drag their handles and masks on the canvas"
-msgstr "Agrega, fija, quita, mueve o enmascara los efectos de una capa, y arrastra sus asas y máscaras en el lienzo"
+msgid ""
+"Add, set, remove, move or mask the effects of a layer, and drag their "
+"handles and masks on the canvas"
+msgstr ""
+"Agrega, fija, quita, mueve o enmascara los efectos de una capa, y arrastra "
+"sus asas y máscaras en el lienzo"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Edit the transform, blend or instancing of a layer, or start from a ready-made clock or date text and a movement that spins or drifts forever"
-msgstr "Edita la transformación, la mezcla o la instanciación de una capa, o parte de un texto de reloj o fecha listo y un movimiento que gira o deriva sin fin"
+msgid ""
+"Edit the transform, blend or instancing of a layer, or start from a ready-"
+"made clock or date text and a movement that spins or drifts forever"
+msgstr ""
+"Edita la transformación, la mezcla o la instanciación de una capa, o parte "
+"de un texto de reloj o fecha listo y un movimiento que gira o deriva sin fin"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Edit the manifest: origin, license, tags, authors, credits, texts by key, locale files, display, playback, web, network, inputs, and the title and thumbnail of each part a resource package offers"
-msgstr "Edita el manifiesto: origen, licencia, etiquetas, autores, créditos, textos por clave, archivos de idioma, pantalla, reproducción, web, red, entradas y el título y la miniatura de cada parte que ofrece un paquete de recursos"
+msgid ""
+"Edit the manifest: origin, license, tags, authors, credits, texts by key, "
+"locale files, display, playback, web, network, inputs, and the title and "
+"thumbnail of each part a resource package offers"
+msgstr ""
+"Edita el manifiesto: origen, licencia, etiquetas, autores, créditos, textos "
+"por clave, archivos de idioma, pantalla, reproducción, web, red, entradas y "
+"el título y la miniatura de cada parte que ofrece un paquete de recursos"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Edit a user property of the manifest"
@@ -1813,36 +2063,65 @@ msgid "Add, change or remove a timeline and its events"
 msgstr "Agrega, cambia o quita una línea de tiempo y sus eventos"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Attach, remove, move or declare a script, write its code, or set its typed settings"
-msgstr "Une, quita, mueve o declara un script, escribe su código o fija sus ajustes tipados"
+msgid ""
+"Attach, remove, move or declare a script, write its code, or set its typed "
+"settings"
+msgstr ""
+"Une, quita, mueve o declara un script, escribe su código o fija sus ajustes "
+"tipados"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Make a template from layers, or rename or remove one"
 msgstr "Hace una plantilla a partir de capas, o renombra o quita una"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Add, change or remove a mesh pool: the shapes that scripts build and shapes layers draw"
-msgstr "Agrega, cambia o quita un grupo de mallas: las formas que construyen los scripts y que dibujan las capas de formas"
+msgid ""
+"Add, change or remove a mesh pool: the shapes that scripts build and shapes "
+"layers draw"
+msgstr ""
+"Agrega, cambia o quita un grupo de mallas: las formas que construyen los "
+"scripts y que dibujan las capas de formas"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Declare the parts of the scripting interface a script uses, or take undeclared ones from its source"
-msgstr "Declara las partes de la interfaz de scripts que usa un script, o toma las no declaradas de su fuente"
+msgid ""
+"Declare the parts of the scripting interface a script uses, or take "
+"undeclared ones from its source"
+msgstr ""
+"Declara las partes de la interfaz de scripts que usa un script, o toma las "
+"no declaradas de su fuente"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Trim a video layer to a part of the video, set its speed, or size its box from the video"
-msgstr "Recorta una capa de video a una parte del video, fija su velocidad o dimensiona su caja según el video"
+msgid ""
+"Trim a video layer to a part of the video, set its speed, or size its box "
+"from the video"
+msgstr ""
+"Recorta una capa de video a una parte del video, fija su velocidad o "
+"dimensiona su caja según el video"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Cut a picture into frames with a grid or drawn rectangles, or change, add, remove and reorder them"
-msgstr "Corta una imagen en cuadros con una cuadrícula o rectángulos dibujados, o cambia, agrega, quita y reordena los cuadros"
+msgid ""
+"Cut a picture into frames with a grid or drawn rectangles, or change, add, "
+"remove and reorder them"
+msgstr ""
+"Corta una imagen en cuadros con una cuadrícula o rectángulos dibujados, o "
+"cambia, agrega, quita y reordena los cuadros"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Write a package effect or material shader: make one from a template, write its WGSL or descriptor, or edit its parameters, passes and fields"
-msgstr "Escribe un shader de efecto o material del paquete: crea uno desde una plantilla, escribe su WGSL o descriptor, o edita sus parámetros, pasadas y campos"
+msgid ""
+"Write a package effect or material shader: make one from a template, write "
+"its WGSL or descriptor, or edit its parameters, passes and fields"
+msgstr ""
+"Escribe un shader de efecto o material del paquete: crea uno desde una "
+"plantilla, escribe su WGSL o descriptor, o edita sus parámetros, pasadas y "
+"campos"
 
 #: crates/reiwand-editor/src/manual/about.rs
-msgid "Make, change or remove the transition the scene comes in or leaves with: its effect, duration, curve and values"
-msgstr "Crea, cambia o quita la transición con la que la escena entra o sale: su efecto, duración, curva y valores"
+msgid ""
+"Make, change or remove the transition the scene comes in or leaves with: its "
+"effect, duration, curve and values"
+msgstr ""
+"Crea, cambia o quita la transición con la que la escena entra o sale: su "
+"efecto, duración, curva y valores"
 
 #: crates/reiwand-editor/src/manual/about.rs
 msgid "Undo the last change"
@@ -1869,8 +2148,12 @@ msgid "the query %1 needs the argument %2"
 msgstr "la consulta %1 necesita el argumento %2"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "Bones, points, parts and clips of a layer; what is asked when no other query is named"
-msgstr "Huesos, puntos, partes y clips de una capa; lo que se consulta cuando no se nombra otra consulta"
+msgid ""
+"Bones, points, parts and clips of a layer; what is asked when no other query "
+"is named"
+msgstr ""
+"Huesos, puntos, partes y clips de una capa; lo que se consulta cuando no se "
+"nombra otra consulta"
 
 #: crates/reiwand-editor/src/manual/asks.rs
 msgid "Weights of a bone over the mesh of a layer, as a heat map"
@@ -1969,20 +2252,32 @@ msgid "Bounds of a 3D model"
 msgstr "Límites de un modelo 3D"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The model surface under a point of the 3D view: layer, material, texture place and color"
-msgstr "La superficie del modelo bajo un punto de la vista 3D: capa, material, lugar de textura y color"
+msgid ""
+"The model surface under a point of the 3D view: layer, material, texture "
+"place and color"
+msgstr ""
+"La superficie del modelo bajo un punto de la vista 3D: capa, material, lugar "
+"de textura y color"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "How a layer inside a 3D group is hidden behind nearer models: one particle at a time or as a plane, and why"
-msgstr "Cómo una capa dentro de un grupo 3D queda oculta tras modelos más cercanos: una partícula a la vez o como un plano, y por qué"
+msgid ""
+"How a layer inside a 3D group is hidden behind nearer models: one particle "
+"at a time or as a plane, and why"
+msgstr ""
+"Cómo una capa dentro de un grupo 3D queda oculta tras modelos más cercanos: "
+"una partícula a la vez o como un plano, y por qué"
 
 #: crates/reiwand-editor/src/manual/asks.rs
 msgid "Clips and motion of a mesh or model layer"
 msgstr "Clips y movimiento de una capa de malla o modelo"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "Bones, blend shapes and bodies of a mesh or model for a script, and with kind, name and what the call that moves one"
-msgstr "Huesos, formas combinadas y cuerpos de una malla o modelo para un script, con su tipo, nombre y la llamada que mueve cada uno"
+msgid ""
+"Bones, blend shapes and bodies of a mesh or model for a script, and with "
+"kind, name and what the call that moves one"
+msgstr ""
+"Huesos, formas combinadas y cuerpos de una malla o modelo para un script, "
+"con su tipo, nombre y la llamada que mueve cada uno"
 
 #: crates/reiwand-editor/src/manual/asks.rs
 msgid "Outline of the picture of a layer"
@@ -2002,7 +2297,8 @@ msgstr "Las paradas de color de una rampa hecha por la acción ramp"
 
 #: crates/reiwand-editor/src/manual/asks.rs
 msgid "Whether the depth model and the library that runs it are installed"
-msgstr "Si el modelo de profundidad y la biblioteca que lo ejecuta están instalados"
+msgstr ""
+"Si el modelo de profundidad y la biblioteca que lo ejecuta están instalados"
 
 #: crates/reiwand-editor/src/manual/asks.rs
 msgid "Scheduling rules of the parameters of an effect"
@@ -2013,136 +2309,247 @@ msgid "Cost of an effect"
 msgstr "Costo de un efecto"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "Video layers that run their own clock (playback.own_clock) with where each clock is at a time, and optional thumbnails of the video"
-msgstr "Capas de video que corren su propio reloj (playback.own_clock) con el punto de cada reloj en un tiempo, y miniaturas opcionales del video"
+msgid ""
+"Video layers that run their own clock (playback.own_clock) with where each "
+"clock is at a time, and optional thumbnails of the video"
+msgstr ""
+"Capas de video que corren su propio reloj (playback.own_clock) con el punto "
+"de cada reloj en un tiempo, y miniaturas opcionales del video"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "Mesh pools of the scene with the layers that draw them and the scripts that build them"
-msgstr "Grupos de mallas de la escena con las capas que los dibujan y los scripts que los construyen"
+msgid ""
+"Mesh pools of the scene with the layers that draw them and the scripts that "
+"build them"
+msgstr ""
+"Grupos de mallas de la escena con las capas que los dibujan y los scripts "
+"que los construyen"
 
 #: crates/reiwand-editor/src/manual/asks.rs
 msgid "What each script declares, what its source uses and what it lacks"
 msgstr "Lo que declara cada script, lo que usa su fuente y lo que le falta"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "Which part of the canvas each simulated screen shows when the scene spans several outputs, for a dual, triple, vertical or own layout"
-msgstr "Qué parte del lienzo muestra cada pantalla simulada cuando la escena abarca varias salidas, para una disposición doble, triple, vertical o propia"
+msgid ""
+"Which part of the canvas each simulated screen shows when the scene spans "
+"several outputs, for a dual, triple, vertical or own layout"
+msgstr ""
+"Qué parte del lienzo muestra cada pantalla simulada cuando la escena abarca "
+"varias salidas, para una disposición doble, triple, vertical o propia"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "Descriptor, WGSL, parameter kinds and fields of a package effect or material shader"
-msgstr "Descriptor, WGSL, tipos de parámetros y campos de un shader de efecto o material del paquete"
+msgid ""
+"Descriptor, WGSL, parameter kinds and fields of a package effect or material "
+"shader"
+msgstr ""
+"Descriptor, WGSL, tipos de parámetros y campos de un shader de efecto o "
+"material del paquete"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "Check a package effect as readers do, optionally with unsaved descriptor or WGSL text; reports the line and column of an error and the canvas handles"
-msgstr "Revisa un efecto del paquete como lo hacen los lectores, opcionalmente con texto de descriptor o WGSL sin guardar; informa la línea y columna de un error y las asas del lienzo"
+msgid ""
+"Check a package effect as readers do, optionally with unsaved descriptor or "
+"WGSL text; reports the line and column of an error and the canvas handles"
+msgstr ""
+"Revisa un efecto del paquete como lo hacen los lectores, opcionalmente con "
+"texto de descriptor o WGSL sin guardar; informa la línea y columna de un "
+"error y las asas del lienzo"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The table of texts by key: languages, keys with the languages they lack, files and the texts of the engine"
-msgstr "La tabla de textos por clave: idiomas, claves con los idiomas que les faltan, archivos y los textos del motor"
+msgid ""
+"The table of texts by key: languages, keys with the languages they lack, "
+"files and the texts of the engine"
+msgstr ""
+"La tabla de textos por clave: idiomas, claves con los idiomas que les "
+"faltan, archivos y los textos del motor"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "What the last measure of the flashes found for the scene as it is now, kept between calls, or null; run measures first"
-msgstr "Lo que halló la última medición de destellos para la escena tal como está, conservada entre llamadas, o null; ejecuta measure primero"
+msgid ""
+"What the last measure of the flashes found for the scene as it is now, kept "
+"between calls, or null; run measures first"
+msgstr ""
+"Lo que halló la última medición de destellos para la escena tal como está, "
+"conservada entre llamadas, o null; ejecuta measure primero"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "What a preset package still lacks before it is published: base package, values, title, license, preview and a clean check, each done or not"
-msgstr "Lo que aún le falta a un paquete de preajustes antes de publicarse: paquete base, valores, título, licencia, vista previa y una revisión limpia, cada uno hecho o no"
+msgid ""
+"What a preset package still lacks before it is published: base package, "
+"values, title, license, preview and a clean check, each done or not"
+msgstr ""
+"Lo que aún le falta a un paquete de preajustes antes de publicarse: paquete "
+"base, valores, título, licencia, vista previa y una revisión limpia, cada "
+"uno hecho o no"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The files of the package that can be credited, the credits and the files with none"
-msgstr "Los archivos del paquete que pueden acreditarse, los créditos y los archivos sin ninguno"
+msgid ""
+"The files of the package that can be credited, the credits and the files "
+"with none"
+msgstr ""
+"Los archivos del paquete que pueden acreditarse, los créditos y los archivos "
+"sin ninguno"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "Keys of an animated value or of a clip channel, part by part, with their handles and the sampled curve"
-msgstr "Claves de un valor animado o de un canal de clip, parte por parte, con sus asas y la curva muestreada"
+msgid ""
+"Keys of an animated value or of a clip channel, part by part, with their "
+"handles and the sampled curve"
+msgstr ""
+"Claves de un valor animado o de un canal de clip, parte por parte, con sus "
+"asas y la curva muestreada"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "Copied keys as a clipboard text, or the keys a clipboard text holds (none for any other text)"
-msgstr "Claves copiadas como texto de portapapeles, o las claves que contiene un texto de portapapeles (ninguna para cualquier otro texto)"
+msgid ""
+"Copied keys as a clipboard text, or the keys a clipboard text holds (none "
+"for any other text)"
+msgstr ""
+"Claves copiadas como texto de portapapeles, o las claves que contiene un "
+"texto de portapapeles (ninguna para cualquier otro texto)"
 
 #: crates/reiwand-editor/src/manual/asks.rs
 msgid "The timelines and sound layers a trigger starts"
 msgstr "Las líneas de tiempo y capas de sonido que inicia un disparador"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "What a sound binding reacts to: the levels of the bands read from the preview folded to 16, 32 or 64, the marked bands and the value it gives"
-msgstr "A qué reacciona un enlace de sonido: los niveles de las bandas leídos de la vista previa plegados a 16, 32 o 64, las bandas marcadas y el valor que da"
+msgid ""
+"What a sound binding reacts to: the levels of the bands read from the "
+"preview folded to 16, 32 or 64, the marked bands and the value it gives"
+msgstr ""
+"A qué reacciona un enlace de sonido: los niveles de las bandas leídos de la "
+"vista previa plegados a 16, 32 o 64, las bandas marcadas y el valor que da"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The response of smooth to a step up and down: points of time and value and the seconds it takes to settle"
-msgstr "La respuesta de smooth a un escalón de subida y bajada: puntos de tiempo y valor y los segundos que tarda en asentarse"
+msgid ""
+"The response of smooth to a step up and down: points of time and value and "
+"the seconds it takes to settle"
+msgstr ""
+"La respuesta de smooth a un escalón de subida y bajada: puntos de tiempo y "
+"valor y los segundos que tarda en asentarse"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The sound layers of the scene with their sounds, trigger and fades, and the sound assets"
-msgstr "Las capas de sonido de la escena con sus sonidos, disparador y fundidos, y los recursos de sonido"
+msgid ""
+"The sound layers of the scene with their sounds, trigger and fades, and the "
+"sound assets"
+msgstr ""
+"Las capas de sonido de la escena con sus sonidos, disparador y fundidos, y "
+"los recursos de sonido"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The peaks of a sound asset in the given number of buckets, computed once and kept in the cache"
-msgstr "Los picos de un recurso de sonido en el número de cubos dado, calculados una vez y guardados en la caché"
+msgid ""
+"The peaks of a sound asset in the given number of buckets, computed once and "
+"kept in the cache"
+msgstr ""
+"Los picos de un recurso de sonido en el número de cubos dado, calculados una "
+"vez y guardados en la caché"
 
 #: crates/reiwand-editor/src/manual/asks.rs
 msgid "Where the made-up pointer of the preview is at a second"
 msgstr "Dónde está en un segundo el puntero inventado de la vista previa"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The layers to copy as a text the paste action takes back, with the assets, particle systems and effects they use"
-msgstr "Las capas a copiar como texto que la acción paste recupera, con los recursos, sistemas de partículas y efectos que usan"
+msgid ""
+"The layers to copy as a text the paste action takes back, with the assets, "
+"particle systems and effects they use"
+msgstr ""
+"Las capas a copiar como texto que la acción paste recupera, con los "
+"recursos, sistemas de partículas y efectos que usan"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The video of a layer: its file, size, length, trim, speed and optional thumbnails along its length"
-msgstr "El video de una capa: su archivo, tamaño, duración, recorte, velocidad y miniaturas opcionales a lo largo de su duración"
+msgid ""
+"The video of a layer: its file, size, length, trim, speed and optional "
+"thumbnails along its length"
+msgstr ""
+"El video de una capa: su archivo, tamaño, duración, recorte, velocidad y "
+"miniaturas opcionales a lo largo de su duración"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The frames a picture asset is cut into: its rectangles, atlas, speed and durations"
-msgstr "Los cuadros en que se corta un recurso de imagen: sus rectángulos, atlas, velocidad y duraciones"
+msgid ""
+"The frames a picture asset is cut into: its rectangles, atlas, speed and "
+"durations"
+msgstr ""
+"Los cuadros en que se corta un recurso de imagen: sus rectángulos, atlas, "
+"velocidad y duraciones"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "Where the scene uses an asset: the pointers that name it and the layer that owns each"
-msgstr "Dónde usa la escena un recurso: los punteros que lo nombran y la capa que posee cada uno"
+msgid ""
+"Where the scene uses an asset: the pointers that name it and the layer that "
+"owns each"
+msgstr ""
+"Dónde usa la escena un recurso: los punteros que lo nombran y la capa que "
+"posee cada uno"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The layers whose references would be lost if a layer or group were removed"
-msgstr "Las capas cuyas referencias se perderían si se quitara una capa o un grupo"
+msgid ""
+"The layers whose references would be lost if a layer or group were removed"
+msgstr ""
+"Las capas cuyas referencias se perderían si se quitara una capa o un grupo"
 
 #: crates/reiwand-editor/src/manual/asks.rs
 msgid "The lines of the scripts that name an id in quotes"
 msgstr "Las líneas de los scripts que nombran un id entre comillas"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The problems and notes of the package as the problem list of the editor shows them, with its signature state"
-msgstr "Los problemas y notas del paquete como los muestra la lista de problemas del editor, con el estado de su firma"
+msgid ""
+"The problems and notes of the package as the problem list of the editor "
+"shows them, with its signature state"
+msgstr ""
+"Los problemas y notas del paquete como los muestra la lista de problemas del "
+"editor, con el estado de su firma"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "Whether a package folder or file is signed, by whom and whether the signature holds, checked against the given keys"
-msgstr "Si una carpeta o archivo de paquete está firmado, por quién y si la firma se sostiene, comprobada con las claves dadas"
+msgid ""
+"Whether a package folder or file is signed, by whom and whether the "
+"signature holds, checked against the given keys"
+msgstr ""
+"Si una carpeta o archivo de paquete está firmado, por quién y si la firma se "
+"sostiene, comprobada con las claves dadas"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The form of the user properties with the values of a preset or some values tried on top of the defaults"
-msgstr "La forma de las propiedades de usuario con los valores de un preajuste o algunos valores probados sobre los predeterminados"
+msgid ""
+"The form of the user properties with the values of a preset or some values "
+"tried on top of the defaults"
+msgstr ""
+"La forma de las propiedades de usuario con los valores de un preajuste o "
+"algunos valores probados sobre los predeterminados"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The picture or video of a media package: its file, size and length; null for other packages"
-msgstr "La imagen o el video de un paquete multimedia: su archivo, tamaño y duración; null para otros paquetes"
+msgid ""
+"The picture or video of a media package: its file, size and length; null for "
+"other packages"
+msgstr ""
+"La imagen o el video de un paquete multimedia: su archivo, tamaño y "
+"duración; null para otros paquetes"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "What a property is at each quality level and which levels set it themselves"
-msgstr "Qué es una propiedad en cada nivel de calidad y qué niveles la fijan ellos mismos"
+msgid ""
+"What a property is at each quality level and which levels set it themselves"
+msgstr ""
+"Qué es una propiedad en cada nivel de calidad y qué niveles la fijan ellos "
+"mismos"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The properties of the package a preset package is for, with the values the preset gives them"
-msgstr "Las propiedades del paquete al que sirve un paquete de preajustes, con los valores que el preajuste les da"
+msgid ""
+"The properties of the package a preset package is for, with the values the "
+"preset gives them"
+msgstr ""
+"Las propiedades del paquete al que sirve un paquete de preajustes, con los "
+"valores que el preajuste les da"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The audio bands, with their frequency ranges, at 16, 32 or 64 bands, or what a band pick or pointer direction reads"
-msgstr "Las bandas de audio, con sus rangos de frecuencia, a 16, 32 o 64 bandas, o lo que lee una selección de banda o dirección del puntero"
+msgid ""
+"The audio bands, with their frequency ranges, at 16, 32 or 64 bands, or what "
+"a band pick or pointer direction reads"
+msgstr ""
+"Las bandas de audio, con sus rangos de frecuencia, a 16, 32 o 64 bandas, o "
+"lo que lee una selección de banda o dirección del puntero"
 
 #: crates/reiwand-editor/src/manual/asks.rs
 msgid "The layers and bones that take the pointer and how they take it"
 msgstr "Las capas y huesos que toman el puntero y cómo lo toman"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The handles on the canvas of the shape of a layer at a time, and its gradient ends"
-msgstr "Las asas en el lienzo de la forma de una capa en un tiempo, y los extremos de su degradado"
+msgid ""
+"The handles on the canvas of the shape of a layer at a time, and its "
+"gradient ends"
+msgstr ""
+"Las asas en el lienzo de la forma de una capa en un tiempo, y los extremos "
+"de su degradado"
 
 #: crates/reiwand-editor/src/manual/asks.rs
 msgid "The size, lines and handles of a text layer at a time"
@@ -2154,39 +2561,70 @@ msgstr "Las fuentes que puede usar una capa de texto y las que ha elegido"
 
 #: crates/reiwand-editor/src/manual/asks.rs
 msgid "A clock pattern shown at a wall-clock time and when it changes next"
-msgstr "Un patrón de reloj mostrado a una hora de pared y cuándo cambia a continuación"
+msgstr ""
+"Un patrón de reloj mostrado a una hora de pared y cuándo cambia a "
+"continuación"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The tokens a clock pattern takes with a sample of each and the numbers a clock gives"
-msgstr "Las fichas que acepta un patrón de reloj con una muestra de cada una y los números que da un reloj"
+msgid ""
+"The tokens a clock pattern takes with a sample of each and the numbers a "
+"clock gives"
+msgstr ""
+"Las fichas que acepta un patrón de reloj con una muestra de cada una y los "
+"números que da un reloj"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The mask of an effect of a layer at a time: its source, area, feather and handles"
-msgstr "La máscara de un efecto de una capa en un tiempo: su fuente, área, difuminado y asas"
+msgid ""
+"The mask of an effect of a layer at a time: its source, area, feather and "
+"handles"
+msgstr ""
+"La máscara de un efecto de una capa en un tiempo: su fuente, área, "
+"difuminado y asas"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "A picture asset prepared as a mask on one channel, optionally inverted or tinted, as a picture file"
-msgstr "Un recurso de imagen preparado como máscara en un canal, opcionalmente invertido o teñido, como archivo de imagen"
+msgid ""
+"A picture asset prepared as a mask on one channel, optionally inverted or "
+"tinted, as a picture file"
+msgstr ""
+"Un recurso de imagen preparado como máscara en un canal, opcionalmente "
+"invertido o teñido, como archivo de imagen"
 
 #: crates/reiwand-editor/src/manual/asks.rs
 msgid "The handles on the canvas of an effect of a layer at a time"
 msgstr "Las asas en el lienzo de un efecto de una capa en un tiempo"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The capture zone of an adjustment layer at a time: its size, limits and corner handles"
-msgstr "La zona de captura de una capa de ajuste en un tiempo: su tamaño, límites y asas de esquina"
+msgid ""
+"The capture zone of an adjustment layer at a time: its size, limits and "
+"corner handles"
+msgstr ""
+"La zona de captura de una capa de ajuste en un tiempo: su tamaño, límites y "
+"asas de esquina"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "What a quality level does: scale, density, particles, the effects it keeps and the cost, optionally on battery"
-msgstr "Lo que hace un nivel de calidad: escala, densidad, partículas, los efectos que conserva y el costo, opcionalmente con batería"
+msgid ""
+"What a quality level does: scale, density, particles, the effects it keeps "
+"and the cost, optionally on battery"
+msgstr ""
+"Lo que hace un nivel de calidad: escala, densidad, partículas, los efectos "
+"que conserva y el costo, opcionalmente con batería"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The steps that undo would take back (oldest first) and redo would bring back (next first), and whether the scene has unsaved changes"
-msgstr "Los pasos que deshacer retrocedería (el más antiguo primero) y rehacer traería de vuelta (el siguiente primero), y si la escena tiene cambios sin guardar"
+msgid ""
+"The steps that undo would take back (oldest first) and redo would bring back "
+"(next first), and whether the scene has unsaved changes"
+msgstr ""
+"Los pasos que deshacer retrocedería (el más antiguo primero) y rehacer "
+"traería de vuelta (el siguiente primero), y si la escena tiene cambios sin "
+"guardar"
 
 #: crates/reiwand-editor/src/manual/asks.rs
-msgid "The transitions of the scene: their effect, values, curve as points, the quality levels they play at and what breaks a rule"
-msgstr "Las transiciones de la escena: su efecto, valores, curva como puntos, los niveles de calidad en los que se ven y lo que no cumple una regla"
+msgid ""
+"The transitions of the scene: their effect, values, curve as points, the "
+"quality levels they play at and what breaks a rule"
+msgstr ""
+"Las transiciones de la escena: su efecto, valores, curva como puntos, los "
+"niveles de calidad en los que se ven y lo que no cumple una regla"
 
 #: crates/reiwand-editor/src/motion/mod.rs
 #: crates/reiwand-editor/src/stage3d/edit.rs
@@ -2311,7 +2749,8 @@ msgstr "la calidad va de 1 a 100, no %1"
 
 #: crates/reiwand-editor/src/packing/source.rs
 msgid "a cube map comes from one panorama or six faces, never an animation"
-msgstr "un mapa cúbico sale de un panorama o de seis caras, nunca de una animación"
+msgstr ""
+"un mapa cúbico sale de un panorama o de seis caras, nunca de una animación"
 
 #: crates/reiwand-editor/src/packing/source.rs
 msgid "the picture cannot become KTX2: %1"
@@ -2338,6 +2777,10 @@ msgid "the transition breaks a rule: %1"
 msgstr "la transición no cumple una regla: %1"
 
 #: crates/reiwand-editor/src/passing/mod.rs
+msgid "the transition has no duration_ms"
+msgstr "la transición no tiene duration_ms"
+
+#: crates/reiwand-editor/src/passing/mod.rs
 msgid "a transition lasts from %1 to %2 s"
 msgstr "una transición dura de %1 a %2 s"
 
@@ -2346,20 +2789,32 @@ msgid "a transition takes at most %1 values"
 msgstr "una transición lleva como máximo %1 valores"
 
 #: crates/reiwand-editor/src/passing/mod.rs
-msgid "this effect costs too much for a transition: only light and medium effects, at most %1 units"
-msgstr "este efecto cuesta demasiado para una transición: solo efectos livianos y medios, como máximo %1 unidades"
+msgid ""
+"this effect costs too much for a transition: only light and medium effects, "
+"at most %1 units"
+msgstr ""
+"este efecto cuesta demasiado para una transición: solo efectos livianos y "
+"medios, como máximo %1 unidades"
 
 #: crates/reiwand-editor/src/passing/mod.rs
-msgid "this effect is not a transition: its descriptor needs \"stage\": \"transition\""
-msgstr "este efecto no es una transición: su descriptor necesita \"stage\": \"transition\""
+msgid ""
+"this effect is not a transition: its descriptor needs \"stage\": "
+"\"transition\""
+msgstr ""
+"este efecto no es una transición: su descriptor necesita \"stage\": "
+"\"transition\""
 
 #: crates/reiwand-editor/src/passing/mod.rs
 msgid "the effect of the transition does not work: %1"
 msgstr "el efecto de la transición no funciona: %1"
 
 #: crates/reiwand-editor/src/placing.rs
-msgid "a %1 layer cannot show %2; image, video, sound, mesh and model layers take a file of their kind"
-msgstr "una capa %1 no puede mostrar %2; las capas image, video, sound, mesh y model toman un archivo de su tipo"
+msgid ""
+"a %1 layer cannot show %2; image, video, sound, mesh and model layers take a "
+"file of their kind"
+msgstr ""
+"una capa %1 no puede mostrar %2; las capas image, video, sound, mesh y model "
+"toman un archivo de su tipo"
 
 #: crates/reiwand-editor/src/pools.rs
 msgid "a pool id has 1 to 32 small letters, digits or _"
@@ -2411,8 +2866,12 @@ msgid "choose a png, jpeg, webp or gif picture"
 msgstr "elige una imagen png, jpeg, webp o gif"
 
 #: crates/reiwand-editor/src/previews.rs
-msgid "an animated preview is a gif or webp of at most 640 pixels a side, 15 s and 8 MiB"
-msgstr "una vista previa animada es un gif o webp de como mucho 640 píxeles de lado, 15 s y 8 MiB"
+msgid ""
+"an animated preview is a gif or webp of at most 640 pixels a side, 15 s and "
+"8 MiB"
+msgstr ""
+"una vista previa animada es un gif o webp de como mucho 640 píxeles de lado, "
+"15 s y 8 MiB"
 
 #: crates/reiwand-editor/src/project.rs
 msgid "the entry %1 is not a scene file"
@@ -2420,11 +2879,14 @@ msgstr "la entrada %1 no es un archivo de escena"
 
 #: crates/reiwand-editor/src/project.rs
 msgid "the files of %1 changed outside the editor; open the folder again"
-msgstr "los archivos de %1 cambiaron fuera del editor; vuelve a abrir la carpeta"
+msgstr ""
+"los archivos de %1 cambiaron fuera del editor; vuelve a abrir la carpeta"
 
 #: crates/reiwand-editor/src/props.rs
 msgid "a property id is a letter followed by at most 63 letters, digits or _"
-msgstr "el id de una propiedad es una letra seguida de como mucho 63 letras, cifras o _"
+msgstr ""
+"el id de una propiedad es una letra seguida de como mucho 63 letras, cifras "
+"o _"
 
 #: crates/reiwand-editor/src/props.rs
 msgid "a group cannot go into another group"
@@ -2642,16 +3104,23 @@ msgid "a script has at most %1 settings"
 msgstr "un script tiene como mucho %1 ajustes"
 
 #: crates/reiwand-editor/src/scripts/reference.rs
-msgid "A layer by id: position, scale, rotation, opacity, visible, color and text can be read and written; on(event, handler) handles the pointer"
-msgstr "Una capa por su id: se leen y escriben su posición, escala, giro, opacidad, visibilidad, color y texto; on(evento, manejador) atiende al puntero"
+msgid ""
+"A layer by id: position, scale, rotation, opacity, visible, color and text "
+"can be read and written; on(event, handler) handles the pointer"
+msgstr ""
+"Una capa por su id: se leen y escriben su posición, escala, giro, opacidad, "
+"visibilidad, color y texto; on(evento, manejador) atiende al puntero"
 
 #: crates/reiwand-editor/src/scripts/reference.rs
 msgid "The ids of the top-level layers in drawing order"
 msgstr "Los ids de las capas de primer nivel en orden de dibujo"
 
 #: crates/reiwand-editor/src/scripts/reference.rs
-msgid "Draws a copy of a template of the scene and gives its handle (declare layers)"
-msgstr "Dibuja una copia de una plantilla de la escena y devuelve su manejador (declara layers)"
+msgid ""
+"Draws a copy of a template of the scene and gives its handle (declare layers)"
+msgstr ""
+"Dibuja una copia de una plantilla de la escena y devuelve su manejador "
+"(declara layers)"
 
 #: crates/reiwand-editor/src/scripts/reference.rs
 msgid "Removes a copy made with spawn"
@@ -2662,52 +3131,91 @@ msgid "Moves a layer to a place in the drawing order"
 msgstr "Mueve una capa a un lugar del orden de dibujo"
 
 #: crates/reiwand-editor/src/scripts/reference.rs
-msgid "An effect of the layer by its name or position: enabled, set(param, value), get and reset (declare effects)"
-msgstr "Un efecto de la capa por su nombre o posición: enabled, set(param, valor), get y reset (declara effects)"
+msgid ""
+"An effect of the layer by its name or position: enabled, set(param, value), "
+"get and reset (declare effects)"
+msgstr ""
+"Un efecto de la capa por su nombre o posición: enabled, set(param, valor), "
+"get y reset (declara effects)"
 
 #: crates/reiwand-editor/src/scripts/reference.rs
-msgid "time, dt, daytime (0 to 1), fps, quality, locale, language, canvas, screen, device and mode"
-msgstr "time, dt, daytime (de 0 a 1), fps, quality, locale, language, canvas, screen, device y mode"
+msgid ""
+"time, dt, daytime (0 to 1), fps, quality, locale, language, canvas, screen, "
+"device and mode"
+msgstr ""
+"time, dt, daytime (de 0 a 1), fps, quality, locale, language, canvas, "
+"screen, device y mode"
 
 #: crates/reiwand-editor/src/scripts/reference.rs
-msgid "The value of a user setting; color(id), label(id), pressed(id) and all() read the rest"
-msgstr "El valor de un ajuste de quien usa el fondo; color(id), label(id), pressed(id) y all() leen el resto"
+msgid ""
+"The value of a user setting; color(id), label(id), pressed(id) and all() "
+"read the rest"
+msgstr ""
+"El valor de un ajuste de quien usa el fondo; color(id), label(id), "
+"pressed(id) y all() leen el resto"
 
 #: crates/reiwand-editor/src/scripts/reference.rs
-msgid "The sound levels, from 0 to 1; bands(16, 32 or 64) and buffers(n) give the spectrum"
-msgstr "Los niveles de sonido, de 0 a 1; bands(16, 32 o 64) y buffers(n) dan el espectro"
+msgid ""
+"The sound levels, from 0 to 1; bands(16, 32 or 64) and buffers(n) give the "
+"spectrum"
+msgstr ""
+"Los niveles de sonido, de 0 a 1; bands(16, 32 o 64) y buffers(n) dan el "
+"espectro"
 
 #: crates/reiwand-editor/src/scripts/reference.rs
-msgid "x and y as fractions of the screen, inside, buttons and left (the last two need clicks)"
-msgstr "x e y como fracciones de la pantalla, inside, buttons y left (los dos últimos necesitan clics)"
+msgid ""
+"x and y as fractions of the screen, inside, buttons and left (the last two "
+"need clicks)"
+msgstr ""
+"x e y como fracciones de la pantalla, inside, buttons y left (los dos "
+"últimos necesitan clics)"
 
 #: crates/reiwand-editor/src/scripts/reference.rs
-msgid "What the media player plays: state, title, artist, album, position, duration, colors and has_cover"
-msgstr "Lo que reproduce el reproductor multimedia: state, title, artist, album, position, duration, colors y has_cover"
+msgid ""
+"What the media player plays: state, title, artist, album, position, "
+"duration, colors and has_cover"
+msgstr ""
+"Lo que reproduce el reproductor multimedia: state, title, artist, album, "
+"position, duration, colors y has_cover"
 
 #: crates/reiwand-editor/src/scripts/reference.rs
-msgid "play, pause, reverse, stop, seek(t), speed, time, duration and on(name, handler)"
-msgstr "play, pause, reverse, stop, seek(t), speed, time, duration y on(nombre, manejador)"
+msgid ""
+"play, pause, reverse, stop, seek(t), speed, time, duration and on(name, "
+"handler)"
+msgstr ""
+"play, pause, reverse, stop, seek(t), speed, time, duration y on(nombre, "
+"manejador)"
 
 #: crates/reiwand-editor/src/scripts/reference/more.rs
-msgid "Timers on the scene clock; they return a function that cancels them (declare timers)"
-msgstr "Temporizadores en el reloj de la escena; devuelven una función que los cancela (declara timers)"
+msgid ""
+"Timers on the scene clock; they return a function that cancels them (declare "
+"timers)"
+msgstr ""
+"Temporizadores en el reloj de la escena; devuelven una función que los "
+"cancela (declara timers)"
 
 #: crates/reiwand-editor/src/scripts/reference/more.rs
 msgid "Writes to the console of the preview; at most 20 lines a second"
-msgstr "Escribe en la consola de la vista previa; como mucho 20 líneas por segundo"
+msgstr ""
+"Escribe en la consola de la vista previa; como mucho 20 líneas por segundo"
 
 #: crates/reiwand-editor/src/scripts/reference/more.rs
 msgid "What the scripts keep between runs; delete, clear and keys too"
-msgstr "Lo que los scripts guardan entre ejecuciones; también delete, clear y keys"
+msgstr ""
+"Lo que los scripts guardan entre ejecuciones; también delete, clear y keys"
 
 #: crates/reiwand-editor/src/scripts/reference/more.rs
 msgid "An object the modules of the scene share; values are copied when set"
-msgstr "Un objeto que comparten los módulos de la escena; los valores se copian al asignarlos"
+msgstr ""
+"Un objeto que comparten los módulos de la escena; los valores se copian al "
+"asignarlos"
 
 #: crates/reiwand-editor/src/scripts/reference/more.rs
-msgid "play, pause, stop, emit(n), point, from and wall for the particles of a layer"
-msgstr "play, pause, stop, emit(n), point, from y wall para las partículas de una capa"
+msgid ""
+"play, pause, stop, emit(n), point, from and wall for the particles of a layer"
+msgstr ""
+"play, pause, stop, emit(n), point, from y wall para las partículas de una "
+"capa"
 
 #: crates/reiwand-editor/src/scripts/reference/more.rs
 msgid "play, pause, stop, playing and volume of a sound layer"
@@ -2723,15 +3231,23 @@ msgstr "Vec2 y ayudas como smoothstep, que se importan de reiwand/math"
 
 #: crates/reiwand-editor/src/scripts/reference/more.rs
 msgid "Called when the module starts, stops and when the canvas changes size"
-msgstr "Se llama cuando el módulo arranca, se detiene y cuando el lienzo cambia de tamaño"
+msgstr ""
+"Se llama cuando el módulo arranca, se detiene y cuando el lienzo cambia de "
+"tamaño"
 
 #: crates/reiwand-editor/src/scripts/reference/more.rs
-msgid "Called every frame; what it returns is the value of a value bound to the module without fn"
-msgstr "Se llama en cada fotograma; lo que devuelve es el valor de un valor enlazado al módulo sin fn"
+msgid ""
+"Called every frame; what it returns is the value of a value bound to the "
+"module without fn"
+msgstr ""
+"Se llama en cada fotograma; lo que devuelve es el valor de un valor enlazado "
+"al módulo sin fn"
 
 #: crates/reiwand-editor/src/scripts/reference/more.rs
 msgid "Called with the user settings, and with the language, fps and quality"
-msgstr "Se llama con los ajustes de quien usa el fondo, y con el idioma, los fps y la calidad"
+msgstr ""
+"Se llama con los ajustes de quien usa el fondo, y con el idioma, los fps y "
+"la calidad"
 
 #: crates/reiwand-editor/src/scripts/reference/more.rs
 msgid "Called for each event of a timeline or clip"
@@ -2742,12 +3258,17 @@ msgid "Called as the media player changes (declare media)"
 msgstr "Se llama cuando cambia el reproductor multimedia (declara media)"
 
 #: crates/reiwand-editor/src/scripts/reference/more.rs
-msgid "The click, down, up, enter, leave and move of a solid layer or a hit bone"
-msgstr "El click, down, up, enter, leave y move de una capa sólida o de un hueso tocable"
+msgid ""
+"The click, down, up, enter, leave and move of a solid layer or a hit bone"
+msgstr ""
+"El click, down, up, enter, leave y move de una capa sólida o de un hueso "
+"tocable"
 
 #: crates/reiwand-editor/src/scripts/reference/more.rs
 msgid "A function a value follows by name: ctx has path, layer, key and params"
-msgstr "Una función que un valor sigue por su nombre: ctx tiene path, layer, key y params"
+msgstr ""
+"Una función que un valor sigue por su nombre: ctx tiene path, layer, key y "
+"params"
 
 #: crates/reiwand-editor/src/scripts/reference/more.rs
 msgid "The same with a first call and a call every frame"
@@ -2782,8 +3303,11 @@ msgid "a file needs a folder"
 msgstr "un archivo necesita una carpeta"
 
 #: crates/reiwand-editor/src/session.rs
-msgid "unsaved changes of an earlier session wait; recover or discard them first"
-msgstr "hay cambios sin guardar de una sesión anterior; recupéralos o descártalos antes"
+msgid ""
+"unsaved changes of an earlier session wait; recover or discard them first"
+msgstr ""
+"hay cambios sin guardar de una sesión anterior; recupéralos o descártalos "
+"antes"
 
 #: crates/reiwand-editor/src/shaders.rs
 msgid "%1 is larger than %2 KiB"
@@ -2894,8 +3418,12 @@ msgid "the simulated tilt goes from -1 to 1 on each side"
 msgstr "la inclinación simulada va de -1 a 1 en cada lado"
 
 #: crates/reiwand-editor/src/shaping/grips.rs
-msgid "%1 cannot follow %2: it is itself, not drawn, follows %1 already or the chain would pass 8 layers"
-msgstr "%1 no puede seguir a %2: es la misma capa, no se dibuja, ya sigue a %1 o la cadena pasaría de 8 capas"
+msgid ""
+"%1 cannot follow %2: it is itself, not drawn, follows %1 already or the "
+"chain would pass 8 layers"
+msgstr ""
+"%1 no puede seguir a %2: es la misma capa, no se dibuja, ya sigue a %1 o la "
+"cadena pasaría de 8 capas"
 
 #: crates/reiwand-editor/src/shaping/keyed.rs
 msgid "a part of %1 follows another source; write over it with replace"
@@ -2975,7 +3503,8 @@ msgstr "un paquete requiere como máximo %1 paquetes más"
 
 #: crates/reiwand-editor/src/shaping/offered.rs
 msgid "a part title has 1 to 128 characters on one line, without < or >"
-msgstr "un título de parte tiene de 1 a 128 caracteres en una línea, sin < ni >"
+msgstr ""
+"un título de parte tiene de 1 a 128 caracteres en una línea, sin < ni >"
 
 #: crates/reiwand-editor/src/shaping/offered.rs
 msgid "only a package of resources offers parts"
@@ -3004,7 +3533,8 @@ msgstr "%1 no es una entrada; usa una de %2"
 
 #: crates/reiwand-editor/src/shaping/page.rs
 msgid "a page declares network exactly when it lists the origins it reaches"
-msgstr "una página declara network justo cuando lista los orígenes a los que llega"
+msgstr ""
+"una página declara network justo cuando lista los orígenes a los que llega"
 
 #: crates/reiwand-editor/src/shaping/page.rs
 msgid "files are added this way only to web, picture and video packages"
@@ -3020,15 +3550,20 @@ msgstr "%1 no es un archivo para un paquete de tipo %2"
 
 #: crates/reiwand-editor/src/shelf.rs
 msgid "name a part as layer:ID, particles:ID, script:PATH or effect:ID, not %1"
-msgstr "nombra una parte como layer:ID, particles:ID, script:RUTA o effect:ID, no %1"
+msgstr ""
+"nombra una parte como layer:ID, particles:ID, script:RUTA o effect:ID, no %1"
 
 #: crates/reiwand-editor/src/shelf.rs
 msgid "choose at least one part"
 msgstr "elige al menos una parte"
 
 #: crates/reiwand-editor/src/shotmedia.rs
-msgid "a web page is drawn by the web engine of the daemon, not here: use reiwand-ctl scene thumbnail with --capture, or the capture button of the app"
-msgstr "una página web la dibuja el motor web del demonio, no el editor: usa reiwand-ctl scene thumbnail con --capture, o el botón de captura de la aplicación"
+msgid ""
+"a web page is drawn by the web engine of the daemon, not here: use reiwand-"
+"ctl scene thumbnail with --capture, or the capture button of the app"
+msgstr ""
+"una página web la dibuja el motor web del demonio, no el editor: usa reiwand-"
+"ctl scene thumbnail con --capture, o el botón de captura de la aplicación"
 
 #: crates/reiwand-editor/src/shotmedia.rs
 msgid "the video cannot be read: %1"
@@ -3043,8 +3578,12 @@ msgid "name the installed file of the base package to draw the preset"
 msgstr "indica el archivo instalado del paquete base para dibujar el preajuste"
 
 #: crates/reiwand-editor/src/shotmedia.rs
-msgid "only a preset of a scene, a picture or a video can be drawn here; a web page is drawn with reiwand-ctl scene thumbnail --capture"
-msgstr "aquí solo se puede dibujar el preajuste de una escena, una imagen o un video; una página web se dibuja con reiwand-ctl scene thumbnail --capture"
+msgid ""
+"only a preset of a scene, a picture or a video can be drawn here; a web page "
+"is drawn with reiwand-ctl scene thumbnail --capture"
+msgstr ""
+"aquí solo se puede dibujar el preajuste de una escena, una imagen o un "
+"video; una página web se dibuja con reiwand-ctl scene thumbnail --capture"
 
 #: crates/reiwand-editor/src/shotmedia.rs crates/reiwand-editor/src/shots.rs
 msgid "a picture does not move: keep a frame instead"
@@ -3052,7 +3591,8 @@ msgstr "una imagen no se mueve: conserva un fotograma en su lugar"
 
 #: crates/reiwand-editor/src/shots.rs
 msgid "only a scene can be drawn here; choose a picture for other packages"
-msgstr "aquí solo se puede dibujar una escena; para otros paquetes elige una imagen"
+msgstr ""
+"aquí solo se puede dibujar una escena; para otros paquetes elige una imagen"
 
 #: crates/reiwand-editor/src/shots.rs
 msgid "there is no graphics device to draw the scene: %1"
@@ -3168,8 +3708,12 @@ msgid "only a fur material is combed"
 msgstr "solo se peina un material de pelo"
 
 #: crates/reiwand-editor/src/stage3d/combed.rs
-msgid "a comb stroke has 2 to %1 points, a radius in pixels and a strength from 0 to 1"
-msgstr "un trazo de peinado tiene de 2 a %1 puntos, un radio en píxeles y una fuerza de 0 a 1"
+msgid ""
+"a comb stroke has 2 to %1 points, a radius in pixels and a strength from 0 "
+"to 1"
+msgstr ""
+"un trazo de peinado tiene de 2 a %1 puntos, un radio en píxeles y una fuerza "
+"de 0 a 1"
 
 #: crates/reiwand-editor/src/stage3d/combed.rs
 msgid "the stroke does not cross that material"
@@ -3194,8 +3738,11 @@ msgid "%1 of a model goes from %2 to %3"
 msgstr "%1 de un modelo va de %2 a %3"
 
 #: crates/reiwand-editor/src/stage3d/edit.rs
-msgid "the %1 of the model is keyed or bound: add a keyframe or change the binding"
-msgstr "el campo %1 del modelo tiene claves o un enlace: añade una clave o cambia el enlace"
+msgid ""
+"the %1 of the model is keyed or bound: add a keyframe or change the binding"
+msgstr ""
+"el campo %1 del modelo tiene claves o un enlace: añade una clave o cambia el "
+"enlace"
 
 #: crates/reiwand-editor/src/stage3d/edit.rs
 msgid "a model cannot be scaled to nothing"
@@ -3248,8 +3795,12 @@ msgid "a point of a light is within a million units"
 msgstr "un punto de una luz está dentro del millón de unidades"
 
 #: crates/reiwand-editor/src/stage3d/maps.rs
-msgid "%1 is not a map of a material; use base, orm, normal, occlusion, emissive or comb"
-msgstr "%1 no es un mapa de un material; usa base, orm, normal, occlusion, emissive o comb"
+msgid ""
+"%1 is not a map of a material; use base, orm, normal, occlusion, emissive or "
+"comb"
+msgstr ""
+"%1 no es un mapa de un material; usa base, orm, normal, occlusion, emissive "
+"o comb"
 
 #: crates/reiwand-editor/src/stage3d/material.rs
 msgid "a material color is #rrggbb or #rrggbbaa"
@@ -3273,8 +3824,10 @@ msgid "only chroma materials take a key color"
 msgstr "solo los materiales de croma llevan un color clave"
 
 #: crates/reiwand-editor/src/stage3d/painted.rs
-msgid "%1 is not a map of a material; use base, orm, normal, occlusion or emissive"
-msgstr "%1 no es un mapa de un material; usa base, orm, normal, occlusion o emissive"
+msgid ""
+"%1 is not a map of a material; use base, orm, normal, occlusion or emissive"
+msgstr ""
+"%1 no es un mapa de un material; usa base, orm, normal, occlusion o emissive"
 
 #: crates/reiwand-editor/src/stage3d/painted.rs
 msgid "a stroke of a map has 1 to %1 points and a color of numbers"
@@ -3753,8 +4306,11 @@ msgid "%1 is not an assets package"
 msgstr "%1 no es un paquete de recursos"
 
 #: crates/reiwand-editor/src/swarms/aim.rs
-msgid "%1 has no axis: aim a vortex force (force:N) or an around emitter (emitter:N)"
-msgstr "%1 no tiene eje: orienta una fuerza de vórtice (force:N) o un emisor alrededor de un punto (emitter:N)"
+msgid ""
+"%1 has no axis: aim a vortex force (force:N) or an around emitter (emitter:N)"
+msgstr ""
+"%1 no tiene eje: orienta una fuerza de vórtice (force:N) o un emisor "
+"alrededor de un punto (emitter:N)"
 
 #: crates/reiwand-editor/src/swarms/check.rs
 msgid "%1 does not fit: %2"
@@ -3794,7 +4350,8 @@ msgstr "el sistema no tiene la reasignación %1"
 
 #: crates/reiwand-editor/src/swarms/looks.rs
 msgid "give a remap to add or set, or the index of one to remove"
-msgstr "da una reasignación para añadir o cambiar, o el índice de una para quitar"
+msgstr ""
+"da una reasignación para añadir o cambiar, o el índice de una para quitar"
 
 #: crates/reiwand-editor/src/swarms/mod.rs
 msgid "there is no particle system \"%1\""
@@ -3859,8 +4416,11 @@ msgid "only the last control point can go"
 msgstr "solo se puede quitar el último punto de control"
 
 #: crates/reiwand-editor/src/swarms/spots.rs
-msgid "a control point lies within a million pixels and turns up to 360 degrees"
-msgstr "un punto de control queda a menos de un millón de píxeles y gira hasta 360 grados"
+msgid ""
+"a control point lies within a million pixels and turns up to 360 degrees"
+msgstr ""
+"un punto de control queda a menos de un millón de píxeles y gira hasta 360 "
+"grados"
 
 #: crates/reiwand-editor/src/swarms/tend.rs
 msgid "give what to add or set, or the index of one to remove"
@@ -3896,11 +4456,14 @@ msgstr "el texto de %1 necesita un texto en el idioma por defecto"
 
 #: crates/reiwand-editor/src/texts.rs
 msgid "the text of this layer follows a value; make it a fixed text first"
-msgstr "el texto de esta capa sigue un valor; haz primero que sea un texto fijo"
+msgstr ""
+"el texto de esta capa sigue un valor; haz primero que sea un texto fijo"
 
 #: crates/reiwand-editor/src/texts.rs
-msgid "name a language such as en or pt-BR and a text of the manifest or the scene"
-msgstr "indica un idioma como en o pt-BR y un texto del manifiesto o de la escena"
+msgid ""
+"name a language such as en or pt-BR and a text of the manifest or the scene"
+msgstr ""
+"indica un idioma como en o pt-BR y un texto del manifiesto o de la escena"
 
 #: crates/reiwand-editor/src/texts.rs
 msgid "write the text in the default language first"
@@ -3988,7 +4551,9 @@ msgstr "no hay ninguna plantilla de shader %1"
 
 #: crates/reiwand-editor/src/wgsl/mod.rs
 msgid "a shader is at most 64 KiB and the shaders of a scene 256 KiB together"
-msgstr "un shader ocupa como mucho 64 KiB y los shaders de una escena, 256 KiB en total"
+msgstr ""
+"un shader ocupa como mucho 64 KiB y los shaders de una escena, 256 KiB en "
+"total"
 
 #: crates/reiwand-editor/src/wgsl/pass_form.rs
 msgid "there is no pass %1"
@@ -4028,20 +4593,35 @@ msgid "expected unique ids"
 msgstr "se esperaban identificadores únicos"
 
 #: crates/reiwand-format/src/build.rs
-msgid "it signs another version of manifest.json; run pack sign again, or delete it to build unsigned"
-msgstr "firma otra versión de manifest.json; vuelve a firmar con pack sign o bórrala para construir sin firma"
+msgid ""
+"it signs another version of manifest.json; run pack sign again, or delete it "
+"to build unsigned"
+msgstr ""
+"firma otra versión de manifest.json; vuelve a firmar con pack sign o bórrala "
+"para construir sin firma"
 
 #: crates/reiwand-format/src/build.rs
-msgid "it signs other files than this folder holds; run pack sign again, or delete it to build unsigned"
-msgstr "firma otros archivos que los que tiene esta carpeta; vuelve a firmar con pack sign o bórrala para construir sin firma"
+msgid ""
+"it signs other files than this folder holds; run pack sign again, or delete "
+"it to build unsigned"
+msgstr ""
+"firma otros archivos que los que tiene esta carpeta; vuelve a firmar con "
+"pack sign o bórrala para construir sin firma"
 
 #: crates/reiwand-format/src/build.rs
-msgid "it carries no hash of manifest.json and no key was given to check it; run pack sign again or pass --key"
-msgstr "no lleva el hash de manifest.json y no se dio ninguna clave para comprobarla; vuelve a firmar con pack sign o pasa --key"
+msgid ""
+"it carries no hash of manifest.json and no key was given to check it; run "
+"pack sign again or pass --key"
+msgstr ""
+"no lleva el hash de manifest.json y no se dio ninguna clave para "
+"comprobarla; vuelve a firmar con pack sign o pasa --key"
 
 #: crates/reiwand-format/src/build.rs
-msgid "it was not signed by any of the given keys; pass the key that signed it with --key"
-msgstr "no la firmó ninguna de las claves dadas; pasa con --key la clave que la firmó"
+msgid ""
+"it was not signed by any of the given keys; pass the key that signed it with "
+"--key"
+msgstr ""
+"no la firmó ninguna de las claves dadas; pasa con --key la clave que la firmó"
 
 #: crates/reiwand-format/src/catalog.rs crates/reiwand-format/src/download.rs
 msgid "package size"
@@ -4105,7 +4685,8 @@ msgstr "se esperaban como mucho 64 autores de 1 a 128 caracteres cada uno"
 
 #: crates/reiwand-format/src/check.rs
 msgid "expected an SPDX license expression of at most 256 characters"
-msgstr "se esperaba una expresión de licencia SPDX de 256 caracteres como mucho"
+msgstr ""
+"se esperaba una expresión de licencia SPDX de 256 caracteres como mucho"
 
 #: crates/reiwand-format/src/check.rs
 msgid "expected at most 32 tags of 1 to 32 characters"
@@ -4133,7 +4714,8 @@ msgstr "@%1 no está en los textos del idioma predeterminado"
 
 #: crates/reiwand-format/src/check/texts.rs
 msgid "needs a text in the default language and languages like en or pt-BR"
-msgstr "necesita un texto en el idioma predeterminado e idiomas como en o pt-BR"
+msgstr ""
+"necesita un texto en el idioma predeterminado e idiomas como en o pt-BR"
 
 #: crates/reiwand-format/src/check/texts.rs
 msgid "has no text"
@@ -4205,11 +4787,15 @@ msgstr "no fija la raíz actual"
 
 #: crates/reiwand-format/src/entry.rs
 msgid "lists files larger than a client reads (32 MiB each, 256 MiB in all)"
-msgstr "enumera archivos más grandes de lo que lee un cliente (32 MiB cada uno, 256 MiB en total)"
+msgstr ""
+"enumera archivos más grandes de lo que lee un cliente (32 MiB cada uno, 256 "
+"MiB en total)"
 
 #: crates/reiwand-format/src/entry.rs
 msgid "must be listed exactly when the root lets authors register online"
-msgstr "debe figurar exactamente cuando la raíz deja que los autores se registren en línea"
+msgstr ""
+"debe figurar exactamente cuando la raíz deja que los autores se registren en "
+"línea"
 
 #: crates/reiwand-format/src/entry.rs
 msgid "expected 2^shard_bits shards named by SHA-256"
@@ -4240,12 +4826,34 @@ msgid "requires.features lists %1, which the package does not use"
 msgstr "requires.features incluye %1, que el paquete no usa"
 
 #: crates/reiwand-format/src/facts.rs
-msgid "the scene costs %1 units a frame at quality level 2, more than the %2 that older integrated and phone GPUs have, so they show it with fewer details. To lower it, remove the layers and effects you do not need, or make the heaviest effects lighter in the panel of each effect, which shows its cost at every quality level"
-msgstr "la escena cuesta %1 unidades por fotograma en el nivel de calidad 2, más que las %2 que tienen las tarjetas gráficas integradas antiguas y las de los teléfonos, así que las muestran con menos detalle. Para bajarlo, quita las capas y los efectos que no necesites, o aligera los efectos más pesados en el panel de cada efecto, que muestra su costo en cada nivel de calidad"
+msgid ""
+"the scene costs %1 units a frame at quality level 2, more than the %2 that "
+"older integrated and phone GPUs have, so they show it with fewer details. To "
+"lower it, remove the layers and effects you do not need, or make the "
+"heaviest effects lighter in the panel of each effect, which shows its cost "
+"at every quality level"
+msgstr ""
+"la escena cuesta %1 unidades por fotograma en el nivel de calidad 2, más que "
+"las %2 que tienen las tarjetas gráficas integradas antiguas y las de los "
+"teléfonos, así que las muestran con menos detalle. Para bajarlo, quita las "
+"capas y los efectos que no necesites, o aligera los efectos más pesados en "
+"el panel de cada efecto, que muestra su costo en cada nivel de calidad"
 
 #: crates/reiwand-format/src/facts.rs
-msgid "the scene costs %1 units a frame at quality level 2, more than the %2 that older integrated and phone GPUs have, so they show it with fewer details. The layers that weigh the most (with their units) are %3. To lower it, remove those layers or the effects you do not need on them, or make their effects lighter in the panel of each effect, which shows its cost at every quality level"
-msgstr "la escena cuesta %1 unidades por fotograma en el nivel de calidad 2, más que las %2 que tienen las tarjetas gráficas integradas antiguas y las de los teléfonos, así que las muestran con menos detalle. Las capas que más pesan (con sus unidades) son %3. Para bajarlo, quita esas capas o los efectos que no necesites en ellas, o aligera sus efectos en el panel de cada efecto, que muestra su costo en cada nivel de calidad"
+msgid ""
+"the scene costs %1 units a frame at quality level 2, more than the %2 that "
+"older integrated and phone GPUs have, so they show it with fewer details. "
+"The layers that weigh the most (with their units) are %3. To lower it, "
+"remove those layers or the effects you do not need on them, or make their "
+"effects lighter in the panel of each effect, which shows its cost at every "
+"quality level"
+msgstr ""
+"la escena cuesta %1 unidades por fotograma en el nivel de calidad 2, más que "
+"las %2 que tienen las tarjetas gráficas integradas antiguas y las de los "
+"teléfonos, así que las muestran con menos detalle. Las capas que más pesan "
+"(con sus unidades) son %3. Para bajarlo, quita esas capas o los efectos que "
+"no necesites en ellas, o aligera sus efectos en el panel de cada efecto, que "
+"muestra su costo en cada nivel de calidad"
 
 #: crates/reiwand-format/src/featured.rs
 msgid "expected a wpak-repo-featured/2.0 of this repository"
@@ -4253,7 +4861,8 @@ msgstr "se esperaba un wpak-repo-featured/2.0 de este repositorio"
 
 #: crates/reiwand-format/src/featured.rs
 msgid "expected at most 64 package ids, each once, with short notes"
-msgstr "se esperaban como mucho 64 ids de paquete, cada uno una vez, con notas cortas"
+msgstr ""
+"se esperaban como mucho 64 ids de paquete, cada uno una vez, con notas cortas"
 
 #: crates/reiwand-format/src/featured.rs
 msgid "has 1 to 200 characters on one line without < or >"
@@ -4349,7 +4958,8 @@ msgstr "atribuye archivos al paquete del que vienen"
 
 #: crates/reiwand-format/src/features.rs
 msgid "sets the color around its picture or spreads over every screen"
-msgstr "fija el color alrededor de su imagen o se extiende por todas las pantallas"
+msgstr ""
+"fija el color alrededor de su imagen o se extiende por todas las pantallas"
 
 #: crates/reiwand-format/src/features.rs
 msgid "suggests an accent color for the desktop"
@@ -4432,8 +5042,12 @@ msgid "the features %1"
 msgstr "las funciones %1"
 
 #: crates/reiwand-format/src/fetch.rs
-msgid "a repository address has no parameters: use the plain address, without ?fingerprint= or ?repo_id="
-msgstr "una dirección de repositorio no lleva parámetros: usa la dirección simple, sin ?fingerprint= ni ?repo_id="
+msgid ""
+"a repository address has no parameters: use the plain address, without ?"
+"fingerprint= or ?repo_id="
+msgstr ""
+"una dirección de repositorio no lleva parámetros: usa la dirección simple, "
+"sin ?fingerprint= ni ?repo_id="
 
 #: crates/reiwand-format/src/fetch.rs
 msgid "download size"
@@ -4469,51 +5083,89 @@ msgstr "%1 %2 es anterior a la %3 instalada; confirma que quieres volver atrás"
 
 #: crates/reiwand-format/src/licenses.rs
 msgid "Public domain: anyone may use, change and share it with no conditions"
-msgstr "Dominio público: cualquiera puede usarlo, cambiarlo y compartirlo sin condiciones"
+msgstr ""
+"Dominio público: cualquiera puede usarlo, cambiarlo y compartirlo sin "
+"condiciones"
 
 #: crates/reiwand-format/src/licenses.rs
-msgid "Anyone may use, change and share it, even commercially, if they credit you"
-msgstr "Cualquiera puede usarlo, cambiarlo y compartirlo, incluso con fines comerciales, si te da el crédito"
+msgid ""
+"Anyone may use, change and share it, even commercially, if they credit you"
+msgstr ""
+"Cualquiera puede usarlo, cambiarlo y compartirlo, incluso con fines "
+"comerciales, si te da el crédito"
 
 #: crates/reiwand-format/src/licenses.rs
-msgid "Like CC-BY, and whatever is made from it must be shared under the same license"
-msgstr "Como CC-BY, y lo que se haga a partir de él debe compartirse con la misma licencia"
+msgid ""
+"Like CC-BY, and whatever is made from it must be shared under the same "
+"license"
+msgstr ""
+"Como CC-BY, y lo que se haga a partir de él debe compartirse con la misma "
+"licencia"
 
 #: crates/reiwand-format/src/licenses.rs
-msgid "Anyone may change and share it if they credit you, but not for commercial use"
-msgstr "Cualquiera puede cambiarlo y compartirlo si te da el crédito, pero no para uso comercial"
+msgid ""
+"Anyone may change and share it if they credit you, but not for commercial use"
+msgstr ""
+"Cualquiera puede cambiarlo y compartirlo si te da el crédito, pero no para "
+"uso comercial"
 
 #: crates/reiwand-format/src/licenses.rs
-msgid "Credit you, no commercial use, and whatever is made from it uses the same license"
-msgstr "Dar el crédito, sin uso comercial, y lo que se haga a partir de él usa la misma licencia"
+msgid ""
+"Credit you, no commercial use, and whatever is made from it uses the same "
+"license"
+msgstr ""
+"Dar el crédito, sin uso comercial, y lo que se haga a partir de él usa la "
+"misma licencia"
 
 #: crates/reiwand-format/src/licenses.rs
-msgid "Anyone may share it unchanged if they credit you; changed versions are not allowed"
-msgstr "Cualquiera puede compartirlo sin cambios si te da el crédito; no se permiten versiones modificadas"
+msgid ""
+"Anyone may share it unchanged if they credit you; changed versions are not "
+"allowed"
+msgstr ""
+"Cualquiera puede compartirlo sin cambios si te da el crédito; no se permiten "
+"versiones modificadas"
 
 #: crates/reiwand-format/src/licenses.rs
-msgid "Anyone may share it unchanged, for free, if they credit you; changed versions are not allowed"
-msgstr "Cualquiera puede compartirlo sin cambios y sin cobrar si te da el crédito; no se permiten versiones modificadas"
+msgid ""
+"Anyone may share it unchanged, for free, if they credit you; changed "
+"versions are not allowed"
+msgstr ""
+"Cualquiera puede compartirlo sin cambios y sin cobrar si te da el crédito; "
+"no se permiten versiones modificadas"
 
 #: crates/reiwand-format/src/licenses.rs
-msgid "Anyone may use, change and share it, even commercially, if they keep your copyright notice"
-msgstr "Cualquiera puede usarlo, cambiarlo y compartirlo, incluso con fines comerciales, si conserva tu aviso de derechos de autor"
+msgid ""
+"Anyone may use, change and share it, even commercially, if they keep your "
+"copyright notice"
+msgstr ""
+"Cualquiera puede usarlo, cambiarlo y compartirlo, incluso con fines "
+"comerciales, si conserva tu aviso de derechos de autor"
 
 #: crates/reiwand-format/src/licenses.rs
-msgid "Like MIT, and it also grants patent rights and asks to note what was changed"
-msgstr "Como MIT, además concede derechos de patente y pide indicar qué se cambió"
+msgid ""
+"Like MIT, and it also grants patent rights and asks to note what was changed"
+msgstr ""
+"Como MIT, además concede derechos de patente y pide indicar qué se cambió"
 
 #: crates/reiwand-format/src/licenses.rs
-msgid "Anyone may use, change and share it, but every shared version must stay free under the same terms"
-msgstr "Cualquiera puede usarlo, cambiarlo y compartirlo, pero toda versión compartida debe seguir siendo libre con las mismas condiciones"
+msgid ""
+"Anyone may use, change and share it, but every shared version must stay free "
+"under the same terms"
+msgstr ""
+"Cualquiera puede usarlo, cambiarlo y compartirlo, pero toda versión "
+"compartida debe seguir siendo libre con las mismas condiciones"
 
 #: crates/reiwand-format/src/licenses.rs
 msgid "Your own terms: the package must explain them where it is published"
 msgstr "Tus propias condiciones: el paquete debe explicarlas donde se publique"
 
 #: crates/reiwand-format/src/licenses.rs
-msgid "Not one of the usual licenses: read its terms before using or changing the package"
-msgstr "No es una de las licencias habituales: lee sus condiciones antes de usar o cambiar el paquete"
+msgid ""
+"Not one of the usual licenses: read its terms before using or changing the "
+"package"
+msgstr ""
+"No es una de las licencias habituales: lee sus condiciones antes de usar o "
+"cambiar el paquete"
 
 #: crates/reiwand-format/src/licenses.rs
 msgid "credit the original author"
@@ -4552,8 +5204,12 @@ msgid "manifest version %1"
 msgstr "la versión %1 del manifiesto"
 
 #: crates/reiwand-format/src/manifest/read.rs
-msgid "%1 is no longer read; run `reiwand-upgrade file FOLDER` on the package folder and sign it again"
-msgstr "%1 ya no se lee; ejecuta `reiwand-upgrade file CARPETA` sobre la carpeta del paquete y vuelve a firmarlo"
+msgid ""
+"%1 is no longer read; run `reiwand-upgrade file FOLDER` on the package "
+"folder and sign it again"
+msgstr ""
+"%1 ya no se lee; ejecuta `reiwand-upgrade file CARPETA` sobre la carpeta del "
+"paquete y vuelve a firmarlo"
 
 #: crates/reiwand-format/src/media.rs
 msgid "%1 must be a %2 image of at most %3 pixels a side"
@@ -4772,8 +5428,12 @@ msgid "%1 does not match its signed hash or size"
 msgstr "%1 no coincide con su hash o tamaño firmados"
 
 #: crates/reiwand-format/src/said.rs
-msgid "the stored repositories were made by an older version: run reiwand-upgrade client --data \"%1\" once"
-msgstr "los repositorios guardados los hizo una versión anterior: ejecuta una vez reiwand-upgrade client --data \"%1\""
+msgid ""
+"the stored repositories were made by an older version: run reiwand-upgrade "
+"client --data \"%1\" once"
+msgstr ""
+"los repositorios guardados los hizo una versión anterior: ejecuta una vez "
+"reiwand-upgrade client --data \"%1\""
 
 #: crates/reiwand-format/src/said.rs
 msgid "the signature of the repository at %1 changed; nothing was applied"
@@ -4829,7 +5489,8 @@ msgstr "usa vídeos como máscaras, texturas de efectos o proyecciones de luz"
 
 #: crates/reiwand-format/src/scenery.rs
 msgid "sets the speed, range or frame of its videos and moving pictures"
-msgstr "fija la velocidad, el tramo o el fotograma de sus vídeos e imágenes animadas"
+msgstr ""
+"fija la velocidad, el tramo o el fotograma de sus vídeos e imágenes animadas"
 
 #: crates/reiwand-format/src/scenery.rs
 msgid "plays the same video in several layers, each on its own clock"
@@ -4861,7 +5522,9 @@ msgstr "usa colecciones de fuentes, fuentes comprimidas o fuentes de respaldo"
 
 #: crates/reiwand-format/src/scenery.rs
 msgid "plays MP3 or long sounds, lists of sounds or sounds started by events"
-msgstr "reproduce sonidos MP3 o largos, listas de sonidos o sonidos que arrancan con eventos"
+msgstr ""
+"reproduce sonidos MP3 o largos, listas de sonidos o sonidos que arrancan con "
+"eventos"
 
 #: crates/reiwand-format/src/scenery.rs
 msgid "moves, zooms, turns or shakes the whole scene"
@@ -4949,7 +5612,9 @@ msgstr "reacciona a tramos de frecuencias del sonido"
 
 #: crates/reiwand-format/src/scenery.rs
 msgid "shapes how values react with limits, an exponent or uneven smoothing"
-msgstr "da forma a la reacción de los valores con límites, un exponente o un suavizado desigual"
+msgstr ""
+"da forma a la reacción de los valores con límites, un exponente o un "
+"suavizado desigual"
 
 #: crates/reiwand-format/src/scenery.rs
 msgid "sets how fast it reacts to sound"
@@ -4973,7 +5638,9 @@ msgstr "ejecuta shaders de efectos con campos o funciones de ayuda más nuevos"
 
 #: crates/reiwand-format/src/scenery.rs
 msgid "draws lighter variants of its effect shaders at low quality levels"
-msgstr "dibuja variantes livianas de sus shaders de efectos en los niveles de calidad bajos"
+msgstr ""
+"dibuja variantes livianas de sus shaders de efectos en los niveles de "
+"calidad bajos"
 
 #: crates/reiwand-format/src/scenery.rs
 msgid "bends pictures with a skeleton"
@@ -5045,7 +5712,8 @@ msgstr "hace nacer partículas con ruido, recorridos o valores reasignados"
 
 #: crates/reiwand-format/src/scenery.rs
 msgid "keeps particles at distances or remaps their values as they live"
-msgstr "mantiene las partículas a distancia o reasigna sus valores mientras viven"
+msgstr ""
+"mantiene las partículas a distancia o reasigna sus valores mientras viven"
 
 #: crates/reiwand-format/src/scenery.rs
 msgid "binds the ranges of births or the shapes of emitters"
@@ -5053,7 +5721,8 @@ msgstr "enlaza los rangos de nacimiento o las formas de los emisores"
 
 #: crates/reiwand-format/src/scenery.rs
 msgid "makes particles hit boxes, lines, layers or the inside of circles"
-msgstr "hace chocar partículas con cajas, líneas, capas o el interior de círculos"
+msgstr ""
+"hace chocar partículas con cajas, líneas, capas o el interior de círculos"
 
 #: crates/reiwand-format/src/scenery.rs
 msgid "moves particles in flocks"
@@ -5113,7 +5782,8 @@ msgstr "reacciona al puntero sobre sus capas"
 
 #: crates/reiwand-format/src/scenery.rs
 msgid "shows the title, cover or progress of what the media player plays"
-msgstr "muestra el título, la carátula o el avance de lo que suena en el reproductor"
+msgstr ""
+"muestra el título, la carátula o el avance de lo que suena en el reproductor"
 
 #: crates/reiwand-format/src/scenery.rs
 msgid "sends its colors to RGB lighting"
@@ -5137,7 +5807,9 @@ msgstr "se esperaban de 1 a 16 bloques minisign"
 
 #: crates/reiwand-format/src/source.rs
 msgid "misses %1; run pack sign again, which fills the list before signing"
-msgstr "le falta %1; vuelve a ejecutar pack sign, que rellena la lista antes de firmar"
+msgstr ""
+"le falta %1; vuelve a ejecutar pack sign, que rellena la lista antes de "
+"firmar"
 
 #: crates/reiwand-format/src/store.rs
 msgid "expected 64 lowercase hex digits"
@@ -5181,7 +5853,8 @@ msgstr "incluye la base del ajuste"
 
 #: crates/reiwand-format/src/web.rs
 msgid "assets packages are copied into scenes and need none"
-msgstr "los paquetes de recursos se copian en las escenas y no necesitan ninguno"
+msgstr ""
+"los paquetes de recursos se copian en las escenas y no necesitan ninguno"
 
 #: crates/reiwand-format/src/web.rs
 msgid "preset and assets packages have none"
@@ -5240,7 +5913,8 @@ msgid "the network, to reach the sites it names"
 msgstr "la red, para llegar a los sitios que nombra"
 
 #: crates/reiwand-format/src/web.rs
-msgid "This web wallpaper uses %1. You can restrict each of them in its settings."
+msgid ""
+"This web wallpaper uses %1. You can restrict each of them in its settings."
 msgstr "Este fondo web usa %1. Puedes restringir cada cosa en sus ajustes."
 
 #: crates/reiwand-format/src/web.rs
@@ -5289,7 +5963,9 @@ msgstr "el uid o el nombre de una lista manual"
 
 #: crates/reiwand-library/src/filter.rs
 msgid "an absolute folder path: the items inside it and its subfolders"
-msgstr "la ruta absoluta de una carpeta: los elementos que contiene y los de sus subcarpetas"
+msgstr ""
+"la ruta absoluta de una carpeta: los elementos que contiene y los de sus "
+"subcarpetas"
 
 #: crates/reiwand-library/src/filter.rs
 msgid "an age like <7d"
@@ -5308,12 +5984,20 @@ msgid "general, mature or unrated"
 msgstr "general, mature o unrated"
 
 #: crates/reiwand-library/src/filter.rs
-msgid "a package facet such as audio, pointer, sound, customizable, photosensitive or 4k"
-msgstr "una faceta del paquete, como audio, pointer, sound, customizable, photosensitive o 4k"
+msgid ""
+"a package facet such as audio, pointer, sound, customizable, photosensitive "
+"or 4k"
+msgstr ""
+"una faceta del paquete, como audio, pointer, sound, customizable, "
+"photosensitive o 4k"
 
 #: crates/reiwand-library/src/filter.rs
-msgid "added, title, rating, used, random or random:<seed>, with a - suffix for descending"
-msgstr "added, title, rating, used, random o random:<semilla>, con el sufijo - para orden descendente"
+msgid ""
+"added, title, rating, used, random or random:<seed>, with a - suffix for "
+"descending"
+msgstr ""
+"added, title, rating, used, random o random:<semilla>, con el sufijo - para "
+"orden descendente"
 
 #: crates/reiwand-library/src/filter.rs
 msgid "up to 500 item uids separated by commas"
@@ -5321,7 +6005,9 @@ msgstr "hasta 500 uids de elementos separados por comas"
 
 #: crates/reiwand-library/src/filter.rs
 msgid "up to 500 item uids separated by commas, shown first in that order"
-msgstr "hasta 500 uids de elementos separados por comas, que se muestran primero en ese orden"
+msgstr ""
+"hasta 500 uids de elementos separados por comas, que se muestran primero en "
+"ese orden"
 
 #: crates/reiwand-library/src/filter.rs
 msgid "invalid value in \"%1:%2\", expected %3"
@@ -5452,7 +6138,8 @@ msgstr "%1 no tiene el parámetro obligatorio «%2»"
 
 #: crates/reiwand-scene/src/issue.rs
 msgid "%1 needs exactly one source: prop, keys, audio, cursor, clock or script"
-msgstr "%1 necesita exactamente una fuente: prop, keys, audio, cursor, clock o script"
+msgstr ""
+"%1 necesita exactamente una fuente: prop, keys, audio, cursor, clock o script"
 
 #: crates/reiwand-scene/src/issue.rs
 msgid "%1 does not fit the type of this field"
@@ -5475,12 +6162,20 @@ msgid "invalid color \"%1\", expected #rrggbb or #rrggbbaa"
 msgstr "color no válido «%1»; se esperaba #rrggbb o #rrggbbaa"
 
 #: crates/reiwand-scene/src/issue.rs
-msgid "%1 is a sound layer: only id, type, sound, sounds, mode, pause, stream, play_on, loop, play, volume, pan, fade_in and fade_out apply"
-msgstr "%1 es una capa de sonido: solo se aplican id, type, sound, sounds, mode, pause, stream, play_on, loop, play, volume, pan, fade_in y fade_out"
+msgid ""
+"%1 is a sound layer: only id, type, sound, sounds, mode, pause, stream, "
+"play_on, loop, play, volume, pan, fade_in and fade_out apply"
+msgstr ""
+"%1 es una capa de sonido: solo se aplican id, type, sound, sounds, mode, "
+"pause, stream, play_on, loop, play, volume, pan, fade_in y fade_out"
 
 #: crates/reiwand-scene/src/issue.rs
-msgid "%1 is a light layer: only id, type, transform, anchor, visible, parent, inherit, attach and the fields of the light apply"
-msgstr "%1 es una capa de luz: solo se aplican id, type, transform, anchor, visible, parent, inherit, attach y los campos de la luz"
+msgid ""
+"%1 is a light layer: only id, type, transform, anchor, visible, parent, "
+"inherit, attach and the fields of the light apply"
+msgstr ""
+"%1 es una capa de luz: solo se aplican id, type, transform, anchor, visible, "
+"parent, inherit, attach y los campos de la luz"
 
 #: crates/reiwand-scene/src/issue.rs
 msgid "the scene has %1 light layers, at most 12 are allowed"
@@ -5507,8 +6202,11 @@ msgid "the scene has %1 sound layers, at most 8 are allowed"
 msgstr "la escena tiene %1 capas de sonido; se permiten como mucho 8"
 
 #: crates/reiwand-scene/src/issue.rs
-msgid "/properties/volume of a scene with sound must be a slider within 0..=100"
-msgstr "/properties/volume de una escena con sonido debe ser un deslizador entre 0..=100"
+msgid ""
+"/properties/volume of a scene with sound must be a slider within 0..=100"
+msgstr ""
+"/properties/volume de una escena con sonido debe ser un deslizador entre 0.."
+"=100"
 
 #: crates/reiwand-scene/src/issue.rs
 msgid "%1 nests particle systems more than two levels deep"
@@ -5524,11 +6222,13 @@ msgstr "%1 nombra «%2», que su modelo no tiene"
 
 #: crates/reiwand-scene/src/issue.rs
 msgid "the scene has %1 mesh and model layers, at most 16 are allowed"
-msgstr "la escena tiene %1 capas de malla y de modelo; se permiten como mucho 16"
+msgstr ""
+"la escena tiene %1 capas de malla y de modelo; se permiten como mucho 16"
 
 #: crates/reiwand-scene/src/issue.rs
 msgid "the scene has %1 lights that cast shadows, at most 2 are allowed"
-msgstr "la escena tiene %1 luces que proyectan sombras; se permiten como mucho 2"
+msgstr ""
+"la escena tiene %1 luces que proyectan sombras; se permiten como mucho 2"
 
 #: crates/reiwand-scene/src/issue.rs
 msgid "%1 applies inside a group with space 3d only"
@@ -5551,12 +6251,20 @@ msgid "%1 must list bones that each hang from the one before"
 msgstr "%1 debe listar huesos que cuelguen cada uno del anterior"
 
 #: crates/reiwand-scene/src/issue.rs
-msgid "%1 names a system that starts particles from a layer, which a child born from its parent cannot do"
-msgstr "%1 nombra un sistema que hace nacer partículas desde una capa, algo que no puede hacer un hijo que nace de su padre"
+msgid ""
+"%1 names a system that starts particles from a layer, which a child born "
+"from its parent cannot do"
+msgstr ""
+"%1 nombra un sistema que hace nacer partículas desde una capa, algo que no "
+"puede hacer un hijo que nace de su padre"
 
 #: crates/reiwand-scene/src/issue.rs
-msgid "%1 applies to video layers that name a video file, pick videos through a map or take a file property that may hold a video"
-msgstr "%1 solo se aplica a capas de vídeo que nombran un archivo de vídeo, eligen vídeos con un mapa o toman una propiedad de archivo que puede tener un vídeo"
+msgid ""
+"%1 applies to video layers that name a video file, pick videos through a map "
+"or take a file property that may hold a video"
+msgstr ""
+"%1 solo se aplica a capas de vídeo que nombran un archivo de vídeo, eligen "
+"vídeos con un mapa o toman una propiedad de archivo que puede tener un vídeo"
 
 #: crates/reiwand-scene/src/issue.rs
 msgid "invalid scene: %1"
@@ -5610,15 +6318,3 @@ msgstr "capa que recibe el puntero"
 #: crates/reiwand-scene/src/validate.rs
 msgid "trigger"
 msgstr "disparador"
-
-#: crates/reiwand-core/src/explicit/error.rs
-msgid "%1: \"%2\" is missing. Reiwand does not fill in values: write it, or run reiwand-upgrade on the file."
-msgstr "%1: falta «%2». Reiwand no completa valores: escríbelo, o corre reiwand-upgrade sobre el archivo."
-
-#: crates/reiwand-editor/src/passing/mod.rs
-msgid "the transition has no duration_ms"
-msgstr "la transición no tiene duration_ms"
-
-#: crates/reiwand-format/src/manifest/read.rs
-msgid "%1 is no longer read; run reiwand-upgrade on the package folder and sign it again"
-msgstr "%1 ya no se lee; ejecuta reiwand-upgrade sobre la carpeta del paquete y vuelve a firmarlo"

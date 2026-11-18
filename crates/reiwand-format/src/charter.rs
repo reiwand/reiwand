@@ -24,7 +24,7 @@ pub struct Charter {
     pub entry_max_days: Option<u32>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub max_package_size: Option<u64>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, deserialize_with = "reiwand_core::explicit::block")]
     pub mirrors: Option<Vec<String>>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub shard_bits: Option<u8>,

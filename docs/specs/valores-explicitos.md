@@ -149,9 +149,21 @@ automático) es un **valor** y se escribe siempre.
   en el editor borra la clave.
 - Cuando el significado de un bloque depende del modo (`Binding.loop` con `keys`), la comprobación semántica
   sigue pidiéndolo; el editor lo escribe (`contextual::fill`).
-- Alcance: escenas y descriptores de efectos. Manifiesto, ajustes, ediciones y exportación quedan como estaban.
+- Alcance: escenas, descriptores de efectos y, desde la 7.0, el manifiesto, los ajustes, las ediciones, la biblioteca, la exportación y las credenciales de la copia (ver abajo).
 - Tamaño: las escenas de `scenes/` pasan de 166193 a 105339 bytes (−37 %) y las escenas, ejemplos y efectos
   del repositorio de 524270 a 390665 bytes.
+
+### Bloques de los demás formatos (7.0)
+
+Los mismos criterios se aplican a los formatos de la parte 2. Cada campo clasificado `bloque` en las tablas
+`crates/reiwand-core/prefill/{model,edit,config}.tsv`, `crates/reiwand-format/src/prefill.tsv` y
+`crates/reiwand-carry/src/prefill.rs` se declara con `explicit::block`: puede faltar, y si está lleva todos sus
+campos. Quien escribe no emite bloques nulos; quien lee acepta ausente y `null`. `reiwand-upgrade` guarda la copia
+congelada `frozen/blocks-formats.tsv` y no rellena un bloque nulo.
+
+- Guarda: `reiwand_core::explicit::declared` lee la clase que declara el código fuente (bloque o valor) y las
+  pruebas `classes` de `reiwand-core`, `reiwand-format`, `reiwand-carry` y `reiwand-android` exigen que coincida
+  con la tabla.
 
 ## Acciones del editor y comando `scene` sin valores inventados
 

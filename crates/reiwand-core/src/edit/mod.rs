@@ -43,14 +43,14 @@ pub struct Edit {
     pub ops: Vec<Op>,
     pub masks: BTreeMap<String, Mask>,
     pub outputs: BTreeMap<String, OutputCrop>,
-    #[cfg_attr(feature = "schema", schemars(required))]
-    #[serde(deserialize_with = "crate::explicit::null")]
+    #[cfg_attr(feature = "schema", schemars(extend("x-null" = true, "x-block" = true)))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "crate::explicit::block")]
     pub span: Option<Span>,
-    #[cfg_attr(feature = "schema", schemars(required))]
-    #[serde(deserialize_with = "crate::explicit::null")]
+    #[cfg_attr(feature = "schema", schemars(extend("x-null" = true, "x-block" = true)))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "crate::explicit::block")]
     pub depth: Option<Depth>,
-    #[cfg_attr(feature = "schema", schemars(required))]
-    #[serde(deserialize_with = "crate::explicit::null")]
+    #[cfg_attr(feature = "schema", schemars(extend("x-null" = true, "x-block" = true)))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "crate::explicit::block")]
     pub parallax: Option<Parallax>,
     #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
     #[serde(with = "crate::explicit::general")]
@@ -69,8 +69,8 @@ pub struct Source {
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct Geometry {
-    #[cfg_attr(feature = "schema", schemars(required))]
-    #[serde(deserialize_with = "crate::explicit::null")]
+    #[cfg_attr(feature = "schema", schemars(extend("x-null" = true, "x-block" = true)))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "crate::explicit::block")]
     pub crop: Option<[f32; 4]>,
     pub rotate: u16,
     pub straighten: f32,
@@ -85,8 +85,8 @@ pub struct Op {
     #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
     #[serde(with = "crate::explicit::empty")]
     pub mask: Option<String>,
-    #[cfg_attr(feature = "schema", schemars(required))]
-    #[serde(deserialize_with = "crate::explicit::null")]
+    #[cfg_attr(feature = "schema", schemars(extend("x-null" = true, "x-block" = true)))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "crate::explicit::block")]
     pub opacity: Option<f32>,
     #[serde(flatten)]
     pub kind: Kind,

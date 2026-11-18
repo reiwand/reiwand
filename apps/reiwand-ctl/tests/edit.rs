@@ -110,7 +110,7 @@ fn every_editor_action_edits_the_file_beside_the_image() {
     edit(&["apply", "new.json"]);
     assert_eq!(
         show()["ops"],
-        json!([{"id": "e", "enabled": true, "mask": "", "opacity": null, "type": "exposure", "ev": 2.0}])
+        json!([{"id": "e", "enabled": true, "mask": "", "type": "exposure", "ev": 2.0}])
     );
     edit(&["reset"]);
     assert!(!dir.join("hills.png.reiwand.json").exists() && dir.join("hills.png").exists());

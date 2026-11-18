@@ -20,9 +20,17 @@ pub struct Entry {
     pub shard_bits: u8,
     pub shards: Vec<Blob>,
     pub revoked: Blob,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
     pub authors: Option<Blob>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
     pub featured: Option<Blob>,
 }
 

@@ -77,3 +77,31 @@ fn manifests_read_the_same_after_step_a() {
 fn the_frozen_block_table_is_the_one_of_the_scene_format() {
     assert_eq!(include_str!("../frozen/blocks.tsv"), include_str!("../../reiwand-scene/src/classes.tsv"));
 }
+
+fn block_rows(table: &str) -> Vec<String> {
+    let cells = |l: &str| l.split('\t').map(str::to_owned).collect::<Vec<_>>();
+    table.lines().map(cells).filter(|c| c[1] == "bloque").map(|c| c[0].clone()).collect()
+}
+
+#[test]
+fn the_frozen_block_table_of_the_other_formats_is_the_one_their_tables_give() {
+    let mut rows = block_rows(include_str!("../../reiwand-core/prefill/edit.tsv"));
+    rows.extend(block_rows(include_str!("../../reiwand-core/prefill/config.tsv")));
+    for line in include_str!("../../reiwand-format/src/prefill.tsv").lines() {
+        let cells: Vec<&str> = line.split('\t').collect();
+        if cells[0] == "manifest" && cells[2] == "bloque" {
+            rows.extend([cells[1].to_owned()]);
+        }
+    }
+    let carry = include_str!("../../reiwand-carry/src/prefill.rs");
+    rows.extend(
+        carry
+            .lines()
+            .filter_map(|l| l.trim().strip_prefix("(\"")?.strip_suffix("\", \"bloque\"),"))
+            .map(str::to_owned),
+    );
+    rows.sort();
+    rows.dedup();
+    let text: String = rows.iter().map(|r| format!("{r}\tblock\n")).collect();
+    assert_eq!(include_str!("../frozen/blocks-formats.tsv"), text);
+}

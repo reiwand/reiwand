@@ -29,8 +29,10 @@ fn a_missing_field_is_an_error_naming_it() {
         let e = read::<Work>("reply", &cut).unwrap_err();
         assert_eq!(e.path, key);
     }
-    let e = read::<HistoryEntry>("reply", &json!({"at": 1})).unwrap_err();
-    assert_eq!(e.path, "item");
+    assert!(read::<HistoryEntry>("reply", &json!({"at": 1})).is_ok());
+    assert!(read::<HistoryEntry>("reply", &json!({"at": 1, "item": null})).is_ok());
+    let e = read::<HistoryEntry>("reply", &json!({"item": null})).unwrap_err();
+    assert_eq!(e.path, "at");
     let e = read::<MediaStatus>("reply", &json!({})).unwrap_err();
     assert_eq!(e.path, "listening");
 }

@@ -22,8 +22,12 @@ pub enum OriginKind {
 pub struct Origin {
     pub kind: OriginKind,
     pub derived_from: Vec<Ancestor>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub provider: Option<Provider>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]

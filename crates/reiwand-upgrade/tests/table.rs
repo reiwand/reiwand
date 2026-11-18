@@ -91,7 +91,7 @@ fn table_covers_every_optional_property_of_the_live_schemas() {
                 .filter_map(Value::as_str)
                 .collect();
             for (prop, ps) in object.get("properties").and_then(Value::as_object).into_iter().flatten() {
-                if required.contains(&prop.as_str()) || ps.is_boolean() {
+                if required.contains(&prop.as_str()) || ps.is_boolean() || ps["x-block"] == true {
                     continue;
                 }
                 seen += 1;

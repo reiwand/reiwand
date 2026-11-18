@@ -67,19 +67,19 @@ model! {
         pub item: Option<Uid>,
         #[serde(deserialize_with = "crate::explicit::null")]
         pub preset: Option<Uid>,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub playlist: Option<OutputPlaylist>,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub credit: Option<Credit>,
         pub edited: bool,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub screen: Option<Screen>,
         #[serde(deserialize_with = "crate::explicit::null")]
         pub mm: Option<[f64; 4]>,
         #[serde(deserialize_with = "crate::explicit::null")]
         pub follows: Option<String>,
         pub parallax: bool,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub still: Option<crate::travel::Still>,
         pub frames: u64,
         pub page_frames: u64,
@@ -111,9 +111,9 @@ model! {
         pub helper: Option<u32>,
         #[serde(deserialize_with = "crate::explicit::null")]
         pub accent: Option<String>,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub tones: Option<super::Tones>,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub filter: Option<Filter>,
         pub hdr: HdrState,
         pub transition: TransitionState,

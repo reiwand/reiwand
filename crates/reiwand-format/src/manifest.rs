@@ -42,12 +42,20 @@ pub struct Manifest {
     pub authors: Vec<String>,
     pub license: String,
     pub credits: Vec<Credit>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     #[schemars(extend("x-required" = true))]
     pub origin: Option<Origin>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     #[schemars(extend("x-required" = true))]
     pub content: Option<Content>,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
@@ -56,29 +64,57 @@ pub struct Manifest {
     pub photosensitive: Option<bool>,
     pub kind: Kind,
     pub entry: String,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub previews: Option<Previews>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub links: Option<Links>,
     pub tags: Vec<String>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub requires: Option<Requires>,
     pub platforms: Vec<Platform>,
     pub inputs: Vec<Input>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub permissions: Option<Permissions>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub web: Option<Web>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub playback: Option<Playback>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "reiwand_core::explicit::block"
+    )]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub display: Option<Display>,
     pub properties: BTreeMap<String, Property>,
     pub presets: Vec<Preset>,

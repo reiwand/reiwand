@@ -21,15 +21,8 @@ fn word(map: &mut Map<String, Value>, key: &str, word: &str) {
 }
 
 fn blocks(doc: &mut Map<String, Value>) {
-    for key in ["span", "depth", "parallax"] {
-        put(doc, key, Value::Null);
-    }
     word(doc, "fit", "general");
-    if let Some(Value::Object(geometry)) = doc.get_mut("geometry") {
-        put(geometry, "crop", Value::Null);
-    }
     if let Some(Value::Object(depth)) = doc.get_mut("depth") {
-        put(depth, "cuts", Value::Null);
         for key in ["strokes", "fills", "joins", "splits", "moves"] {
             put(depth, key, json!([]));
         }
@@ -44,7 +37,6 @@ fn ops(doc: &mut Map<String, Value>) {
     for op in doc.get_mut("ops").and_then(Value::as_array_mut).into_iter().flatten() {
         if let Some(op) = op.as_object_mut() {
             word(op, "mask", "");
-            put(op, "opacity", Value::Null);
         }
     }
 }

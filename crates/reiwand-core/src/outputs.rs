@@ -24,14 +24,22 @@ pub struct OutputConfig {
     #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
     #[serde(with = "crate::explicit::empty")]
     pub preset: Option<String>,
-    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
-    #[serde(with = "crate::explicit::none")]
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value", extend("x-null" = true, "x-block" = true)))]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::explicit::none::deserialize"
+    )]
     pub blank: Option<crate::blank::Kept>,
     #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
     #[serde(with = "crate::explicit::general")]
     pub clicks: Option<bool>,
-    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
-    #[serde(with = "crate::explicit::general")]
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value", extend("x-null" = true, "x-block" = true)))]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::explicit::general::deserialize"
+    )]
     pub filter: Option<Filter>,
     #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
     #[serde(with = "crate::explicit::general")]

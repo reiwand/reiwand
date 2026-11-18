@@ -82,7 +82,7 @@ fn the_package_details_are_edited_from_the_command_line() {
     assert_eq!(show_in(dir, "dusk", "/manifest/title"), json!({"en": "Dusk"}));
     let schema: Value = serde_json::from_str(&ok(dir, &["scene", "schema", "--manifest"])).unwrap();
     assert!(
-        schema["properties"]["content"]["required"] == json!(["rating", "descriptors"])
+        schema["$defs"]["Content"]["required"] == json!(["rating", "descriptors"])
             && schema["required"].as_array().unwrap().contains(&json!("photosensitive"))
     );
 }

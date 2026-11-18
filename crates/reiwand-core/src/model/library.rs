@@ -45,7 +45,7 @@ model! {
         pub color: Option<u32>,
         #[serde(deserialize_with = "crate::explicit::null")]
         pub error: Option<String>,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub package: Option<PackageInfo>,
         pub tags: Vec<String>,
         pub rating: u8,
@@ -89,7 +89,7 @@ model! {
         pub sound_volume: Option<u8>,
         #[serde(deserialize_with = "crate::explicit::null")]
         pub thumb: Option<PathBuf>,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub package: Option<PackageInfo>,
         #[serde(deserialize_with = "crate::explicit::null")]
         pub provider: Option<String>,
@@ -112,16 +112,16 @@ model! {
         pub thumb: Option<PathBuf>,
         pub presets: Vec<Preset>,
         pub playlists: Vec<PlaylistRef>,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub credit: Option<Credit>,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub installed: Option<InstalledPackage>,
         #[serde(deserialize_with = "crate::explicit::null")]
         pub revoked: Option<Reason>,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub about: Option<About>,
         pub variants: Vec<PlaylistRef>,
-        #[serde(deserialize_with = "crate::explicit::null")]
+        #[serde(default, deserialize_with = "crate::explicit::block")]
         pub base: Option<PlaylistRef>,
     }
 

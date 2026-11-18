@@ -6,7 +6,7 @@ use toml_edit::{DocumentMut, Item, Table, TableLike, value};
 
 pub const FORMAT: i64 = 3;
 
-const GENERAL: [&str; 7] = ["fit", "background", "clicks", "filter", "quality", "hdr", "transition"];
+const GENERAL: [&str; 6] = ["fit", "background", "clicks", "quality", "hdr", "transition"];
 const EMPTY: [&str; 3] = ["image", "playlist", "preset"];
 
 fn text(item: &mut dyn TableLike, key: &str, word: &str) {
@@ -24,7 +24,6 @@ fn table(item: &mut dyn TableLike, key: &str) {
 fn output(section: &mut dyn TableLike) {
     EMPTY.iter().for_each(|key| text(section, key, ""));
     GENERAL.iter().for_each(|key| text(section, key, "general"));
-    text(section, "blank", "none");
     if let Some(kept) = section.get_mut("blank").and_then(Item::as_table_like_mut) {
         EMPTY.iter().for_each(|key| text(kept, key, ""));
     }
