@@ -70,8 +70,8 @@ async fn report(
     let detail = format!("{}: {}", r.category, r.details.trim());
     let latest = "SELECT id FROM versions WHERE repo = ?2 AND package_id = ?1 AND state = 'published' \
                   ORDER BY published_at DESC LIMIT 1";
-    let insert = "INSERT INTO cases (version_id, reason, detail, priority, created_at) \
-                  VALUES (?1, 'report', ?2, 1, ?3)";
+    let insert = "INSERT INTO cases (version_id, reason, detail, priority, state, created_at) \
+                  VALUES (?1, 'report', ?2, 1, 'open', ?3)";
     let case = app.db.run(move |c| {
         let version: Option<i64> = c.query_row(latest, [&sc.id, &sc.repo], |r| r.get(0)).optional()?;
         c.execute(insert, params![version.ok_or_else(|| Problem::missing("package"))?, detail, now()])?;

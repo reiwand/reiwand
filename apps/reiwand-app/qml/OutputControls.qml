@@ -45,7 +45,7 @@ ColumnLayout {
                     }))
             textRole: "text"
             valueRole: "value"
-            currentIndex: Math.max(0, host.fits.indexOf(host.info.fit ?? "fill"))
+            currentIndex: Math.max(0, host.fits.indexOf(host.info.fit))
             onActivated: host.daemon.act("SetWallpaper", ["", host.name, currentValue])
         }
 
@@ -118,7 +118,7 @@ ColumnLayout {
             visible: host.sound !== ""
             from: 0
             to: 1
-            value: host.daemon.state?.volume ?? 0
+            value: host.daemon.state?.volume
             onMoved: debounce.restart()
         }
 

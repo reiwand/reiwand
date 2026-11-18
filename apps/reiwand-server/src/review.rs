@@ -79,8 +79,8 @@ pub async fn record(app: &App, user: i64, upload: &str, sha: &str, size: i64, re
         }
         let sql = "INSERT INTO versions (repo, package_id, version, sha256, size, kind, title, description, \
                    license, tags, authors, state, uploaded_by, created_at, content, photosensitive, facets, \
-                   signer, asks) \
-                   VALUES (?18, ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, 'pending', ?11, ?12, ?13, ?14, ?15, ?16, ?17)";
+                   listed, signer, asks) \
+                   VALUES (?18, ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, 'pending', ?11, ?12, ?13, ?14, ?15, 1, ?16, ?17)";
         let (id, number, title, text, license, kind) =
             (r.id, r.version, r.title, r.description, r.license, r.kind.to_string());
         let (content, flashing, facets) = (r.content, r.photosensitive, serde_json::to_string(&r.facets)?);
@@ -111,7 +111,7 @@ pub async fn record(app: &App, user: i64, upload: &str, sha: &str, size: i64, re
         tx.execute(sql, params![upload, version])?;
         let sql = "UPDATE uploads SET state = 'done', errors = NULL, version_id = ?2 WHERE id = ?1";
         tx.execute(sql, params![upload, version])?;
-        let sql = "INSERT INTO cases (version_id, reason, created_at) VALUES (?1, 'upload', ?2)";
+        let sql = "INSERT INTO cases (version_id, reason, detail, priority, state, created_at) VALUES (?1, 'upload', '', 0, 'open', ?2)";
         tx.execute(sql, params![version, now()])?;
         let case = tx.last_insert_rowid();
         tx.commit()?;

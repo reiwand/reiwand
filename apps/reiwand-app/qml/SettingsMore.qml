@@ -7,7 +7,7 @@ FocusScope {
     required property var page
     readonly property var options: App.state.options ?? {}
     readonly property var sizes: [128, 256, 512, 1024, 2048, 4096, 8192]
-    readonly property int cache: Number(options["library.thumb_cache_mb"] ?? 512)
+    readonly property int cache: Number(options["library.thumb_cache_mb"])
     readonly property var cached: sizes.includes(cache) ? sizes : sizes.concat([cache]).sort((a, b) => a - b)
 
     readonly property bool wanted: options["shortcuts.enabled"] === true
@@ -48,7 +48,7 @@ FocusScope {
         Fila {
             text: App.tr("Change wallpaper with the keyboard")
             kind: "captura"
-            keys: SettingsFolder.keys(part.options["shortcuts.next"] ?? "LOGO+ALT+N")
+            keys: SettingsFolder.keys(part.options["shortcuts.next"])
             explain: App.tr("Opens the wallpaper switcher on the next one. To change the combination, press Enter and then the new keys.")
             onCaptured: keys => App.act("SetOption", ["shortcuts.next", SettingsFolder.joined(keys)])
         }
@@ -56,7 +56,7 @@ FocusScope {
         Fila {
             text: App.tr("Previous wallpaper with the keyboard")
             kind: "captura"
-            keys: SettingsFolder.keys(part.options["shortcuts.previous"] ?? "LOGO+ALT+P")
+            keys: SettingsFolder.keys(part.options["shortcuts.previous"])
             explain: App.tr("Opens the wallpaper switcher on the one before. To change the combination, press Enter and then the new keys.")
             onCaptured: keys => App.act("SetOption", ["shortcuts.previous", SettingsFolder.joined(keys)])
         }
@@ -64,7 +64,7 @@ FocusScope {
         Fila {
             text: App.tr("Apply the wallpaper of the switcher")
             kind: "captura"
-            keys: SettingsFolder.keys(part.options["shortcuts.apply"] ?? "LOGO+ALT+Return")
+            keys: SettingsFolder.keys(part.options["shortcuts.apply"])
             explain: App.tr("Keeps the wallpaper in the middle of the switcher. Enter and a click on the middle one do the same. To change the combination, press Enter and then the new keys.")
             onCaptured: keys => App.act("SetOption", ["shortcuts.apply", SettingsFolder.joined(keys)])
         }
@@ -72,7 +72,7 @@ FocusScope {
         Fila {
             text: App.tr("Close the switcher without changing")
             kind: "captura"
-            keys: SettingsFolder.keys(part.options["shortcuts.cancel"] ?? "LOGO+ALT+Escape")
+            keys: SettingsFolder.keys(part.options["shortcuts.cancel"])
             explain: App.tr("Closes the switcher and leaves the wallpaper as it was. Esc does the same. To change the combination, press Enter and then the new keys.")
             onCaptured: keys => App.act("SetOption", ["shortcuts.cancel", SettingsFolder.joined(keys)])
         }

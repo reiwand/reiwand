@@ -37,7 +37,7 @@ QtObject {
     }
 
     function quality(several, output, info, options) {
-        const general = String(options["playback.quality"] ?? "auto");
+        const general = String(options["playback.quality"]);
         const chosen = several ? String(info.quality_choice ?? "none") : general;
         const values = (several ? ["none"] : []).concat(["auto", "q0", "q3"]);
         if (!values.includes(chosen))
@@ -54,7 +54,7 @@ QtObject {
     }
 
     function transition(several, output, info, options) {
-        const general = String(options["transition.kind"] ?? "own");
+        const general = String(options["transition.kind"]);
         const state = info.transition ?? {};
         const chosen = several ? String(state.own ?? "general") : general;
         const values = (several ? ["general"] : []).concat(passages);

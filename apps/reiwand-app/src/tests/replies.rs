@@ -158,9 +158,15 @@ fn animated_previews_play_only_when_shown_allowed_and_on_mains() {
             "playing: visible && thumbnail.moving && thumbnail.Window.visibility !== Window.Hidden"
         ));
     }
-    for text in [app("OutputRow.qml"), std::fs::read_to_string(tray.join("ScreenRow.qml")).unwrap()] {
+    for (text, moving) in [
+        (app("OutputRow.qml"), "moving: !(row.daemon.state?.on_battery ?? false)"),
+        (
+            std::fs::read_to_string(tray.join("ScreenRow.qml")).unwrap(),
+            "moving: row.daemon.state?.on_battery === false",
+        ),
+    ] {
         assert!(text.contains("animated: row.pkg.photosensitive === true && !row.allowed ? \"\" :"));
-        assert!(text.contains("moving: !(row.daemon.state?.on_battery ?? false)"));
+        assert!(text.contains(moving));
     }
     assert!(app("ItemHost.qml").contains("readonly property string animated: flashing ? \"\" :"));
     assert!(app("LibraryPanel.qml").contains("playing: visible && !(App.state.on_battery ?? false)"));

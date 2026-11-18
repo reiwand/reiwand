@@ -67,7 +67,8 @@ async fn start(State(app): St, client: Client, Input(d): Input<NewDevice>) -> Re
     app.db
         .run(move |c| {
             let sql = "INSERT INTO device_codes (code_hash, user_code, platform, client, \
-                   created_at, expires_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)";
+                   state, interval_s, polled_at, created_at, expires_at) \
+                   VALUES (?1, ?2, ?3, ?4, 'pending', 5, 0, ?5, ?6)";
             let t = now();
             Ok(c.execute(sql, params![hash, shown, d.platform, name, t, t + 10 * MINUTE])?)
         })

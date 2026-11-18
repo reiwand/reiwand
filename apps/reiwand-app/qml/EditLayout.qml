@@ -105,7 +105,7 @@ ColumnLayout {
         text: App.tr("Width of each screen frame (mm)")
         to: 100
         stepSize: 0.5
-        value: App.state.options?.["layout.bezel_mm"] ?? 0
+        value: App.state.options?.["layout.bezel_mm"]
         onMoved: value => App.act("SetOption", ["layout.bezel_mm", String(value)])
     }
 

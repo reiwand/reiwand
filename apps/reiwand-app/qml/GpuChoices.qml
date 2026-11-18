@@ -5,7 +5,7 @@ QtObject {
     id: picker
 
     readonly property var adapters: App.state.adapters ?? []
-    readonly property string chosen: String((App.state.options ?? {})["render.gpu"] ?? "auto")
+    readonly property string chosen: String((App.state.options ?? {})["render.gpu"])
     readonly property var kinds: ({
             "integrated": App.tr("integrated"),
             "dedicated": App.tr("dedicated"),

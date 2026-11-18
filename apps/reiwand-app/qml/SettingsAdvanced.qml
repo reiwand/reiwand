@@ -8,7 +8,7 @@ FocusScope {
     required property var page
     readonly property var options: App.state.options ?? {}
     readonly property var hdrWords: ["auto", "on", "off"]
-    readonly property string hdr: String(options["playback.hdr"] ?? "auto")
+    readonly property string hdr: String(options["playback.hdr"])
 
     function move(item, ahead) {
         const next = item.nextItemInFocusChain(ahead);

@@ -124,6 +124,21 @@ async fn the_stored_choice_wins_over_the_starting_environment() {
     let reopened = reiwand_server::App::open(server.cfg.clone()).unwrap();
     assert_eq!(reopened.settings().access(), reiwand_server::settings::Access::Closed);
     assert!(reopened.settings().done);
+    let db = rusqlite::Connection::open(server.cfg.data.join("db/reiwand.sqlite")).unwrap();
+    let keys: Vec<String> = db
+        .prepare("SELECT key FROM settings ORDER BY key")
+        .unwrap()
+        .query_map([], |r| r.get(0))
+        .unwrap()
+        .collect::<Result<_, _>>()
+        .unwrap();
+    let all =
+        ["admin", "auto_publish", "cert_path", "key_path", "network", "registration", "repo_name", "setup"];
+    assert_eq!(keys, all);
+    db.execute("DELETE FROM settings WHERE key = 'registration'", []).unwrap();
+    let refused = reiwand_server::App::open(server.cfg.clone()).err().unwrap();
+    assert!(format!("{refused:#}").contains("lack \"registration\""), "{refused:#}");
+    db.execute("INSERT INTO settings (key, value) VALUES ('registration', 'closed')", []).unwrap();
     let path = "/api/v1/admin/settings";
     let (status, stored) =
         server.json(Method::PATCH, path, &admin, Some(json!({"auto_publish": "never"}))).await;

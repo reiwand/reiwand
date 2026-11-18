@@ -10,7 +10,7 @@ ColumnLayout {
     property string output: ""
     property var info: ({})
     readonly property var hdr: info.hdr ?? null
-    readonly property string general: String((daemon.state?.options ?? {})["playback.hdr"] ?? "auto")
+    readonly property string general: String((daemon.state?.options ?? {})["playback.hdr"])
     readonly property string chosen: output ? (hdr?.own ?? "none") : general
     readonly property var words: ({
             "auto": daemon.tr("Automatic: on HDR screens, on mains power, for scenes with bright colors at the highest quality"),

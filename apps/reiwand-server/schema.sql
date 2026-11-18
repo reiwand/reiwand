@@ -2,8 +2,8 @@ CREATE TABLE users (
   id INTEGER PRIMARY KEY,
   handle TEXT NOT NULL UNIQUE COLLATE NOCASE,
   password_hash TEXT,
-  role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'trusted', 'moderator', 'admin')),
-  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'suspended')),
+  role TEXT NOT NULL CHECK (role IN ('user', 'trusted', 'moderator', 'admin')),
+  status TEXT NOT NULL CHECK (status IN ('active', 'suspended')),
   quota_bytes INTEGER NOT NULL,
   created_at INTEGER NOT NULL
 ) STRICT;
@@ -64,11 +64,11 @@ CREATE TABLE device_codes (
   user_code TEXT NOT NULL UNIQUE,
   platform TEXT NOT NULL,
   user_id INTEGER REFERENCES users ON DELETE CASCADE,
-  state TEXT NOT NULL DEFAULT 'pending' CHECK (state IN ('pending', 'approved', 'denied')),
-  interval_s INTEGER NOT NULL DEFAULT 5,
-  polled_at INTEGER NOT NULL DEFAULT 0,
+  state TEXT NOT NULL CHECK (state IN ('pending', 'approved', 'denied')),
+  interval_s INTEGER NOT NULL,
+  polled_at INTEGER NOT NULL,
   expires_at INTEGER NOT NULL
-, client TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL DEFAULT 0) STRICT, WITHOUT ROWID;
+, client TEXT NOT NULL, created_at INTEGER NOT NULL) STRICT, WITHOUT ROWID;
 
 CREATE TABLE author_keys (
   fingerprint TEXT PRIMARY KEY,
@@ -83,20 +83,20 @@ CREATE TABLE repos (
   folder TEXT NOT NULL UNIQUE,
   online_key TEXT NOT NULL,
   repo_id TEXT,
-  dirty INTEGER NOT NULL DEFAULT 1,
-  signed_at INTEGER NOT NULL DEFAULT 0,
+  dirty INTEGER NOT NULL,
+  signed_at INTEGER NOT NULL,
   failed_at INTEGER,
   failed_raw TEXT,
   created_at INTEGER NOT NULL,
-  private INTEGER NOT NULL DEFAULT 0,
-  publishing TEXT NOT NULL DEFAULT 'open' CHECK (publishing IN ('open', 'members'))
+  private INTEGER NOT NULL,
+  publishing TEXT NOT NULL CHECK (publishing IN ('open', 'members'))
 ) STRICT;
 
 CREATE TABLE repo_members (
   repo TEXT NOT NULL REFERENCES repos(name) ON DELETE CASCADE ON UPDATE CASCADE,
   user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
-  may_read INTEGER NOT NULL DEFAULT 1,
-  may_publish INTEGER NOT NULL DEFAULT 0,
+  may_read INTEGER NOT NULL,
+  may_publish INTEGER NOT NULL,
   PRIMARY KEY (repo, user_id)
 ) STRICT, WITHOUT ROWID;
 
@@ -131,10 +131,10 @@ CREATE TABLE versions (
   published_at INTEGER,
   content TEXT,
   photosensitive INTEGER,
-  facets TEXT NOT NULL DEFAULT '[]',
-  listed INTEGER NOT NULL DEFAULT 1,
+  facets TEXT NOT NULL,
+  listed INTEGER NOT NULL,
   signer TEXT,
-  asks TEXT NOT NULL DEFAULT '[]',
+  asks TEXT NOT NULL,
   band_sheet TEXT,
   UNIQUE (repo, package_id, version),
   FOREIGN KEY (repo, package_id) REFERENCES packages
@@ -154,7 +154,7 @@ CREATE TABLE uploads (
   version_id INTEGER REFERENCES versions ON DELETE SET NULL,
   created_at INTEGER NOT NULL,
   expires_at INTEGER NOT NULL
-, listed INTEGER NOT NULL DEFAULT 1, repo TEXT NOT NULL DEFAULT '') STRICT, WITHOUT ROWID;
+, listed INTEGER NOT NULL, repo TEXT NOT NULL) STRICT, WITHOUT ROWID;
 
 CREATE INDEX uploads_user ON uploads(user_id, created_at);
 
@@ -162,9 +162,9 @@ CREATE TABLE cases (
   id INTEGER PRIMARY KEY,
   version_id INTEGER NOT NULL REFERENCES versions ON DELETE CASCADE,
   reason TEXT NOT NULL CHECK (reason IN ('upload', 'report', 'notice', 'counter')),
-  detail TEXT NOT NULL DEFAULT '',
-  priority INTEGER NOT NULL DEFAULT 0,
-  state TEXT NOT NULL DEFAULT 'open' CHECK (state IN ('open', 'actioned', 'dismissed')),
+  detail TEXT NOT NULL,
+  priority INTEGER NOT NULL,
+  state TEXT NOT NULL CHECK (state IN ('open', 'actioned', 'dismissed')),
   decision TEXT,
   statement TEXT,
   decided_by INTEGER REFERENCES users ON DELETE SET NULL,
@@ -208,7 +208,7 @@ CREATE TABLE audit (
   actor_id INTEGER,
   action TEXT NOT NULL,
   subject TEXT NOT NULL,
-  detail TEXT NOT NULL DEFAULT ''
+  detail TEXT NOT NULL
 ) STRICT;
 
 CREATE INDEX audit_at ON audit(at);
@@ -268,8 +268,8 @@ CREATE TABLE mail_queue (
   case_id INTEGER REFERENCES cases(id) ON DELETE SET NULL,
   subject TEXT NOT NULL,
   body TEXT NOT NULL,
-  state TEXT NOT NULL DEFAULT 'queued' CHECK (state IN ('queued', 'sent', 'failed')),
-  tries INTEGER NOT NULL DEFAULT 0,
+  state TEXT NOT NULL CHECK (state IN ('queued', 'sent', 'failed')),
+  tries INTEGER NOT NULL,
   next_at INTEGER NOT NULL,
   created_at INTEGER NOT NULL,
   sent_at INTEGER

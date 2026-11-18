@@ -38,8 +38,8 @@ pub struct Register {
 }
 
 pub fn insert_user(c: &Connection, handle: &str, hash: Option<&str>, role: &str, quota: u64) -> Res<i64> {
-    let sql = "INSERT INTO users (handle, password_hash, role, quota_bytes, created_at) \
-               VALUES (?1, ?2, ?3, ?4, ?5)";
+    let sql = "INSERT INTO users (handle, password_hash, role, status, quota_bytes, created_at) \
+               VALUES (?1, ?2, ?3, 'active', ?4, ?5)";
     match c.execute(sql, params![handle, hash, role, quota as i64, now()]) {
         Err(rusqlite::Error::SqliteFailure(e, _)) if e.code == ErrorCode::ConstraintViolation => {
             Err(Problem::conflict("handle_taken", "this handle is taken"))

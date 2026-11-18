@@ -8,10 +8,10 @@ FocusScope {
     readonly property var options: App.state.options ?? {}
     readonly property bool several: page.outputs.length > 1
     readonly property var info: (App.state.outputs ?? {})[page.output] ?? {}
-    readonly property string fps: String(options["playback.max_fps"] ?? "display")
+    readonly property string fps: String(options["playback.max_fps"])
     readonly property var rates: ["display", "15", "24", "30", "60", "120"].concat(["display", "15", "24", "30", "60", "120"].includes(fps) ? [] : [fps])
     readonly property var levels: (several ? ["none"] : []).concat(SettingsWords.levels)
-    readonly property string level: several ? String(info.quality_choice ?? "none") : String(options["playback.quality"] ?? "auto")
+    readonly property string level: several ? String(info.quality_choice ?? "none") : String(options["playback.quality"])
 
     implicitHeight: filas.height
 
@@ -55,7 +55,7 @@ FocusScope {
             from: 0
             to: 100
             stepSize: 5
-            at: Number(part.options["playback.lowest_below_percent"] ?? 0)
+            at: Number(part.options["playback.lowest_below_percent"])
             number: at > 0 ? App.tr("%1 %", Math.round(at)) : App.tr("Never")
             explain: App.tr("Below this charge every scene plays at the lowest quality, whatever you fixed.")
             onMoved: value => App.act("SetOption", ["playback.lowest_below_percent", String(Math.round(value))])
@@ -68,7 +68,7 @@ FocusScope {
             from: 0
             to: 3000
             stepSize: 100
-            at: Number(part.options["transition.duration_ms"] ?? 600)
+            at: Number(part.options["transition.duration_ms"])
             number: App.tr("%1 ms", Math.round(at))
             onMoved: value => App.act("SetOption", ["transition.duration_ms", String(Math.round(value))])
         }

@@ -81,7 +81,7 @@ ColumnLayout {
                 Layout.rightMargin: Look.e3
                 from: 0
                 to: 1
-                value: head.current.volume ?? 0
+                value: head.current.volume
                 Accessible.name: i18n("Master volume")
                 onMoved: debounce.restart()
             }

@@ -14,7 +14,7 @@ pub const HOUR: i64 = 60 * MINUTE;
 pub const DAY: i64 = 24 * HOUR;
 
 const SCHEMA: &str = include_str!("../schema.sql");
-pub const SCHEMA_VERSION: i64 = 15;
+pub const SCHEMA_VERSION: i64 = 16;
 
 pub fn now() -> i64 {
     SystemTime::now().duration_since(UNIX_EPOCH).map_or(0, |d| d.as_millis() as i64)

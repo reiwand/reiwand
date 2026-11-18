@@ -113,8 +113,8 @@ async fn start(app: &App, auth: &Auth, size: u64, sha256: String, state: &'stati
                 "the upload does not fit in your storage quota",
             )?;
             let (id, t) = (hex(&random::<16>()), now());
-            let sql = "INSERT INTO uploads (id, user_id, size, sha256, state, created_at, expires_at) \
-                       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)";
+            let sql = "INSERT INTO uploads (id, user_id, size, sha256, state, listed, repo, created_at, expires_at) \
+                       VALUES (?1, ?2, ?3, ?4, ?5, 1, '', ?6, ?7)";
             c.execute(sql, params![id, user, size as i64, sha256, state, t, t + DAY])?;
             Ok(id)
         })

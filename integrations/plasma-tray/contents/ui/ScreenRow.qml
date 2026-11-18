@@ -81,7 +81,7 @@ ColumnLayout {
             item: row.item
             source: row.daemon.url(row.thumb)
             animated: row.pkg.photosensitive === true && !row.allowed ? "" : row.daemon.url(row.animated)
-            moving: !(row.daemon.state?.on_battery ?? false)
+            moving: row.daemon.state?.on_battery === false
             scene: false
             color: row.info.background || Look.nocheAlta
         }
@@ -117,7 +117,7 @@ ColumnLayout {
             item: row.item
             source: row.daemon.url(row.thumb)
             animated: row.pkg.photosensitive === true && !row.allowed ? "" : row.daemon.url(row.animated)
-            moving: !(row.daemon.state?.on_battery ?? false)
+            moving: row.daemon.state?.on_battery === false
             scene: row.info.kind === "scene"
         }
 

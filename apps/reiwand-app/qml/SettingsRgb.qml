@@ -9,8 +9,8 @@ FocusScope {
     property string problem: ""
     property var options: App.state.options ?? {}
     readonly property bool on: options["rgb.enabled"] === true
-    readonly property string server: String(options["rgb.server"] ?? "127.0.0.1:6742")
-    readonly property string covered: String(options["rgb.when_covered"] ?? "pause")
+    readonly property string server: String(options["rgb.server"])
+    readonly property string covered: String(options["rgb.when_covered"])
     readonly property bool pauses: options["pause.when_covered"] !== false
     readonly property var devices: status.devices ?? []
     readonly property alias coveredRow: coveredRow

@@ -143,8 +143,8 @@ async fn notice(State(app): St, auth: Option<Auth>, client: Client, Form(n): For
     let shown = receipt.clone();
     let latest = "SELECT id FROM versions WHERE repo = ?2 AND package_id = ?1 \
                   ORDER BY (state = 'published') DESC, created_at DESC";
-    let case = "INSERT INTO cases (version_id, reason, detail, priority, created_at) \
-                VALUES (?1, ?2, ?3, ?4, ?5)";
+    let case = "INSERT INTO cases (version_id, reason, detail, priority, state, created_at) \
+                VALUES (?1, ?2, ?3, ?4, 'open', ?5)";
     let notice = "INSERT INTO notices (id, case_id, kind, name, email, location, work, explanation, \
                   signature, received_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)";
     let stored = app.db.run(move |c| {

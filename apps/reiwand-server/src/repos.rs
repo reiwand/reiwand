@@ -89,7 +89,8 @@ pub fn prepare(cfg: &Config, name: &str) -> anyhow::Result<Repo> {
 pub fn record(cfg: &Config, repo: &Repo) -> anyhow::Result<()> {
     let id = reiwand_format::status(&repo.dir).map(|s| s.repo_id).context("the repository has no root")?;
     let (folder, key) = (repo.folder(), repo.key_name());
-    let sql = "INSERT INTO repos (name, folder, online_key, repo_id, created_at) VALUES (?1, ?2, ?3, ?4, ?5) \
+    let sql = "INSERT INTO repos (name, folder, online_key, repo_id, dirty, signed_at, created_at, private, publishing) \
+               VALUES (?1, ?2, ?3, ?4, 1, 0, ?5, 0, 'open') \
                ON CONFLICT (name) DO UPDATE SET repo_id = ?4, dirty = 1";
     open(cfg)?.read(|c| c.execute(sql, params![repo.name, folder, key, id, now()]))?;
     Ok(())

@@ -138,8 +138,8 @@ pub async fn enqueue(
     let queued = app.db.run(move |c| {
         let Some(setup) = setup(c)? else { return Ok(false) };
         let (subject, body) = within(setup.lang, || write(&setup));
-        let sql = "INSERT INTO mail_queue (topic, case_id, subject, body, next_at, created_at) \
-                   VALUES (?1, ?2, ?3, ?4, ?5, ?5)";
+        let sql = "INSERT INTO mail_queue (topic, case_id, subject, body, state, tries, next_at, created_at) \
+                   VALUES (?1, ?2, ?3, ?4, 'queued', 0, ?5, ?5)";
         c.execute(sql, params![topic, case, subject, body, now()])?;
         Ok(true)
     });

@@ -9,7 +9,7 @@ PanelChico {
 
     property string item
     property string shade
-    readonly property var fits: [""].concat(App.schema.fits ?? ["fill", "fit", "stretch", "center", "tile"])
+    readonly property var fits: [""].concat(App.schema.fits ?? [])
 
     title: item ? App.tr("New preset for this item") : App.tr("New preset")
     quiet: App.tr("Cancel")

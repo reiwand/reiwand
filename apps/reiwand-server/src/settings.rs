@@ -102,6 +102,16 @@ pub fn load(conn: &Connection, cfg: &Config) -> anyhow::Result<Settings> {
     let stored: HashMap<String, String> =
         statement.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<Result<_, _>>()?;
     let get = |key: &str| stored.get(key).map(String::as_str);
+    let done = get("setup") == Some("done");
+    if done {
+        let own = get("network").is_some_and(|n| n != "home");
+        let keys = [REQUIRED.as_slice(), if own { &["cert_path", "key_path"] } else { &[] }].concat();
+        if let Some(key) = keys.into_iter().find(|key| !stored.contains_key(*key)) {
+            anyhow::bail!(
+                "the saved settings lack \"{key}\"; run `reiwand-upgrade server --data <data folder>` once"
+            );
+        }
+    }
     let network = match get("network") {
         Some("home") => Some(Network::Home),
         Some(_) => Some(Network::Own {
@@ -117,10 +127,32 @@ pub fn load(conn: &Connection, cfg: &Config) -> anyhow::Result<Settings> {
         auto_publish: get("auto_publish").and_then(parse_publish).unwrap_or(cfg.auto_publish),
         network_chosen: network.is_some(),
         network: network.unwrap_or(started),
-        done: get("setup") == Some("done"),
+        done,
         repo_name: get("repo_name").map(str::to_owned),
         admin_handle: conn.query_row(HANDLE, [], |r| r.get(0)).optional()?,
     })
+}
+
+const REQUIRED: [&str; 5] = ["registration", "auto_publish", "network", "repo_name", "admin"];
+
+pub fn whole(settings: &Settings, name: &str) -> Vec<(&'static str, String)> {
+    let (kind, cert, key) = match &settings.network {
+        Network::Home => ("home", String::new(), String::new()),
+        Network::Own { cert, key } => ("own", cert.clone(), key.clone()),
+    };
+    vec![
+        ("registration", settings.access().value().to_owned()),
+        ("auto_publish", publish_value(settings.auto_publish).to_owned()),
+        ("network", kind.to_owned()),
+        ("cert_path", cert),
+        ("key_path", key),
+        ("repo_name", settings.repo_name.clone().unwrap_or_else(|| name.to_owned())),
+    ]
+}
+
+pub fn put_whole(conn: &Connection, pairs: &[(&str, String)]) -> Res<()> {
+    let pairs: Vec<(&str, &str)> = pairs.iter().map(|(k, v)| (*k, v.as_str())).collect();
+    put(conn, &pairs)
 }
 
 pub fn put(conn: &Connection, pairs: &[(&str, &str)]) -> Res<()> {
