@@ -20,14 +20,14 @@ Qué instalar en cada sistema:
   falta igualmente, porque el motor no viene con el sistema base. Con el Flatpak no hace falta nada.
 - **Arch y derivadas:** `sudo pacman -S qt6-webengine`.
 - **Flatpak:** nada; el motor llega con la base de Qt WebEngine (unos 600 MB más al instalar) y la
-  página corre además dentro del aislamiento de Chromium de Flatpak.
+  página queda aislada por el Flatpak; si este no deja crear los espacios de nombres, el sandbox de
+  Chromium se apaga y `reiwand-ctl state` muestra `reduced` (ver `docs/usar/flatpak.md`).
 - **Ubuntu 24.04 y Debian 12:** no se pueden mostrar; el fondo se rechaza con el motivo.
 
-El motor pesa más que el WebView del teléfono: una página a 1080p gasta del orden de 400 MiB y de 1,5 a
-2 veces el procesador de lo que gastaba el motor anterior, y mientras una página no cambia no dibuja
+El motor pesa más que el WebView del teléfono: una página a 1080p gasta del orden de 400 MiB, y mientras una página no cambia no dibuja
 nada. El Qt WebEngine de Fedora usa el `libavcodec-free` del sistema, una compilación de ffmpeg "limitada en
 el número de códecs" (así la describe su paquete): se espera que no reproduzca H.264 ni AAC, aunque
-no lo hemos probado con un vídeo real en Fedora 45; VP8, VP9, Opus y Vorbis se esperan bien (AV1 sin probar). En Arch el motor usa el
+no lo hemos probado con un vídeo real en Fedora 44 ni 45; VP8, VP9, Opus y Vorbis se esperan bien (AV1 sin probar). En Arch el motor usa el
 `ffmpeg` completo del sistema. `docs/specs/web.md` explica el
 motor, el aislamiento y la interfaz de la página, y `docs/crear/fondos-web.md` es la guía para quien
 los hace. El fundido hacia una página empieza cuando la página dibuja su primer fotograma (o falla),

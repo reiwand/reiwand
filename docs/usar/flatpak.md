@@ -38,8 +38,10 @@ relativa apunta a otro sitio, así que conviene usar la ruta completa: `reiwand-
 
 El Flatpak se construye sobre `io.qt.qtwebengine.BaseApp` (rama 6.11), que trae Qt WebEngine
 fuera del runtime de KDE, y por eso muestra los fondos web (unos 600 MB más al instalar). Lo único
-que pide es `--share=ipc`, que ya tiene: Chromium se aísla con la ayuda de sandbox de la base, no
-con `QTWEBENGINE_DISABLE_SANDBOX`.
+que pide es `--share=ipc`, que ya tiene. El ayudante comprueba si puede crear los espacios de nombres
+de usuario, de procesos y de red; si el Flatpak no lo permite, arranca Qt WebEngine con su sandbox
+apagado (`QTWEBENGINE_DISABLE_SANDBOX`) y `reiwand-ctl state` muestra `reduced`: entonces la
+página queda aislada solo por el propio Flatpak.
 
 Permisos: la GPU, el socket de PipeWire, que publica los streams, lleva el sonido de los vídeos y de
 las escenas y permite capturar el sonido solo para las escenas con permiso (no hace falta el de
