@@ -101,7 +101,7 @@ Añade una capa de un tipo, al final de la lista (arriba del todo) o donde se pi
 |-----------|------|---------------|
 | `kind` | texto (obligatorio) | Tipo de capa. Uno de los de la tabla de abajo. |
 | `id` | texto | Id de la capa. Si falta, sale de `name` o del tipo (`image`, `image_2`...). Si ya está en uso, la acción falla. |
-| `name` | texto | Nombre para construir el id. En una capa `text` es además el texto que muestra (por defecto, `Text`). |
+| `name` | texto | Nombre para construir el id. En una capa `text` es además el texto que muestra (prellenado, `Text`). |
 | `source` | texto | De dónde sale lo que muestra la capa. Ver abajo. |
 | `file` | texto | Archivo (ruta desde donde ejecutas el comando) que se importa como recurso y se usa en la capa nueva. Debe ser del tipo de la capa: imagen, video, sonido o `.glb`. Solo vale para `image`, `video`, `sound`, `mesh` y `model`. |
 | `into` | texto | Id de un grupo donde meter la capa. Sin él va a la lista principal. |
@@ -116,7 +116,7 @@ Añade una capa de un tipo, al final de la lista (arriba del todo) o donde se pi
 | `shape` | Una forma (rectángulo de 480 por 320 px). | No se usa. |
 | `solid` | Un color liso que llena el lienzo. | No se usa. |
 | `spectrum` | Un espectro del audio (960 por 240 px). | No se usa. |
-| `particles` | Una capa que dibuja un sistema de partículas. | Nombre del sistema. Si no existe, se crea uno con valores por defecto. Sin él, usa el id de la capa. |
+| `particles` | Una capa que dibuja un sistema de partículas. | Nombre del sistema. Si no existe, se crea uno con valores prellenados. Sin él, usa el id de la capa. |
 | `group` | Un grupo de capas. | No se usa. |
 | `adjustment` | Una capa de ajuste: sus efectos cambian lo que hay debajo. | No se usa. |
 | `mesh` | Una malla articulada de un archivo `.glb`. | Id de un recurso `.glb`. |
@@ -592,7 +592,7 @@ Hace que una capa gire o se desplace sin parar, sin construir claves a mano: esc
 | `seconds` | número | Lo que dura una vuelta (`spin`) o un trayecto (`drift`), de 0,5 a 86400 segundos. Por defecto 20. |
 | `reverse` | sí/no | Gira en sentido contrario, o se desplaza al otro lado. Por defecto `false`. |
 | `by` | lista de 2 números | Solo con `drift`: cuánto se desplaza, en píxeles del lienzo. Por defecto `[200, 0]`. |
-| `back` | sí/no | Solo con `drift`: `true` (por defecto) va y vuelve suavemente; `false` salta al principio y repite el trayecto. |
+| `back` | sí/no | Solo con `drift`: `true` (prellenado) va y vuelve suavemente; `false` salta al principio y repite el trayecto. |
 
 Parte del giro o de la posición que la capa tiene ahora (sin posición, el centro del lienzo) y reemplaza las claves que hubiera. Si el giro o la posición siguen otra fuente (el sonido, una propiedad…), la acción lo rechaza: fija antes un valor con `transform` y `replace`.
 
@@ -605,7 +605,7 @@ reiwand-ctl scene act mi-escena layer '{"start":{"forever":{"layer":"nube","moti
 
 #### `import`
 
-Copia un archivo a `assets/` y lo declara como recurso. Imprime el id del recurso (por defecto, el nombre del archivo sin extensión). Si ya hay un archivo igual en `assets/`, lo reutiliza. Admite imágenes, videos, sonidos, fuentes, tablas `.cube` y `.glb`.
+Copia un archivo a `assets/` y lo declara como recurso. Imprime el id del recurso (prellenado, el nombre del archivo sin extensión). Si ya hay un archivo igual en `assets/`, lo reutiliza. Admite imágenes, videos, sonidos, fuentes, tablas `.cube` y `.glb`.
 
 | Argumento | Tipo | Qué significa |
 |-----------|------|---------------|
@@ -663,7 +663,7 @@ Corta una rejilla regular. Reemplaza los cuadros anteriores.
 | `asset` | texto (obligatorio) | Id de la imagen. |
 | `columns` | entero (obligatorio) | Columnas de la rejilla. |
 | `rows` | entero (obligatorio) | Filas de la rejilla. |
-| `count` | entero | Cuántos cuadros usar; por defecto todos. |
+| `count` | entero | Cuántos cuadros usar; prellenado todos. |
 | `margin` | entero | Borde de la imagen sin usar, en píxeles. Por defecto 0. |
 | `spacing` | entero | Espacio entre cuadros, en píxeles. Por defecto 0. |
 | `order` | texto | Orden de lectura: `rows` (por filas), `columns` (por columnas), `rows_reversed`, `columns_reversed`. Por defecto `rows`. |
@@ -832,7 +832,7 @@ Copia partes de otro paquete de recursos (un `.wpak` de tipo recursos) a la esce
 | Argumento | Tipo | Qué significa |
 |-----------|------|---------------|
 | `package` | texto (obligatorio) | Archivo `.wpak` del paquete de recursos. |
-| `parts` | lista de textos | Qué partes traer: `layer:ID`, `particles:ID`, `script:RUTA` o `effect:ID`. Vacía (por defecto), todas. |
+| `parts` | lista de textos | Qué partes traer: `layer:ID`, `particles:ID`, `script:RUTA` o `effect:ID`. Vacía (prellenado), todas. |
 
 ```sh
 reiwand-ctl scene new origen
@@ -879,7 +879,7 @@ reiwand-ctl scene act mi-escena canvas '{"clock":{"fresh":true}}'
 
 ##### variante `bloom`
 
-Hace que lo brillante «brille» (resplandor). Lo que no se nombra empieza con los valores por defecto la primera vez.
+Hace que lo brillante «brille» (resplandor). Lo que no se nombra empieza con los valores prellenados la primera vez.
 
 | Argumento | Tipo | Qué significa |
 |-----------|------|---------------|

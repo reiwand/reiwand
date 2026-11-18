@@ -152,7 +152,7 @@ La tabla lista los efectos que trae el programa, en el orden y con los nombres d
 
 1. Cada parámetro es un campo con su nombre. Pasa el cursor por el nombre para ver su ayuda.
 2. Un número tiene un deslizador y una caja para escribirlo. Un parámetro en grados tiene además un dial. Un color tiene su selector. Una imagen se elige de una lista de las imágenes del paquete.
-3. El botón **Valor por defecto** (el icono de volver) deja el parámetro como viene de fábrica.
+3. El botón **Valor prellenado** (el icono de volver) deja el parámetro como viene de fábrica.
 4. El menú de al lado de cada campo que se puede animar permite poner un fotograma clave, seguir una propiedad de usuario, el puntero o el sonido, o dejarlo fijo. Mira [editor-animacion](editor-animacion.md) y [editor-propiedades](editor-propiedades.md).
 5. Un parámetro que sigue algo muestra un botón **Sigue …**; púlsalo para editar el origen.
 
@@ -416,7 +416,7 @@ fn color_tinte(color: vec4<f32>, uv: vec2<f32>) -> vec4<f32> {
 2. En **Parámetros** hay una fila por parámetro, de izquierda a derecha:
    - el id;
    - el tipo, con su nombre en inglés (`float`, `color`, `texture`, `position`…);
-   - **Valor por defecto**, que se escribe como JSON, y **Mín.** y **Máx.** (vacíos quitan el límite);
+   - **Valor prellenado**, que se escribe como JSON, y **Mín.** y **Máx.** (vacíos quitan el límite);
    - **Grados**, en los números: el parámetro se mide en grados y recibe un dial;
    - en los parámetros de imagen o de máscara, qué herramientas ofrece: **Herramientas según su id**, **Paradas de degradado**, **Pincel gris**, **Pinceles gris y de dirección** o **Pincel gris y mapa de profundidad**;
    - qué asa recibe sobre el lienzo: «un punto sobre el lienzo», «una esquina sobre el lienzo», «una flecha sobre el lienzo» o «un dial sobre el lienzo», con el parámetro con el que hace pareja;

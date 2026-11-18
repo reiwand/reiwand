@@ -2270,7 +2270,7 @@ turns into pointer events of its `solid` layers (`Touch`). A scene only renders 
 uses. The pointer follows the reported position with a critically damped spring that settles in
 about 0.15 s and returns to the center when the pointer leaves the screen. Audio and the pointer
 need the user's grant for the scene (`dbus.md`, `Inputs1`), which the app and the tray ask for once
-when such a scene is shown; a `reiwand.wpak/2` manifest declares them in `inputs`
+when such a scene is shown; a `reiwand.wpak/3` manifest declares them in `inputs`
 (`package.md`), and a scene of such a package receives only the inputs its manifest declares. What
 the media player plays (`media` values, cover assets, `media:` triggers and scripts that declare
 it) is the `media` input, and clicks on `solid` layers the `clicks` input. Clicks are off on every

@@ -21,7 +21,7 @@ Una escena es una carpeta con tres cosas:
 
 | Campo | Qué es |
 |-------|--------|
-| `schema` | Siempre `"reiwand.scene/1"`. |
+| `schema` | Siempre `"reiwand.scene/2"`. |
 | `canvas` | El lienzo: tamaño, ajuste, fondo y efectos de toda la escena. |
 | `clock` | El reloj: cuántos fotogramas por segundo y qué momento sirve de póster. |
 | `assets` | Los recursos, cada uno con un id. |
@@ -370,7 +370,7 @@ la música baja y la fuerte llenan el mismo rango.
   "reduce": "max" }`, con `of` 16, 32 o 64 y `reduce` `mean` o `max`).
 - Los nombres: `bass` (bajo 250 Hz), `mid` (hasta 4 kHz), `treble` (por encima), `level` (todo el
   sonido) y `beat` (1 en cada golpe).
-- `channel` es `average` (por defecto), `left` o `right`.
+- `channel` es `average` (prellenado), `left` o `right`.
 - El valor sube en 20 ms y baja en 200 ms, salvo que la escena cambie `audio`, abajo.
 
 Una escena con `audio` necesita la entrada de audio. Todo lo que sigue al sonido es 0 mientras no

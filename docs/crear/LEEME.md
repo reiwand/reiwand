@@ -182,7 +182,7 @@ reiwand-ctl scene act mi-escena set '{"pointer":"/scene/layers/1/fill","value":{
 
 *Editor:* pestaña *Paquete*, *Propiedades de usuario*, *Añadir una propiedad* de tipo *Color*:
 nace con el id `color_1`; con *Cambiar el nombre…* llámala `color_sol`, y ponle la etiqueta
-«Color del sol» y el valor por defecto `#ffd23f`. En *Color de relleno* de la capa del sol, pulsa el
+«Color del sol» y el valor prellenado `#ffd23f`. En *Color de relleno* de la capa del sol, pulsa el
 rombo y elige *Seguir una propiedad de usuario* y la propiedad. El relleno queda como
 `{ "prop": "color_sol" }`, sin más datos, y el sol se ve del color de la propiedad.
 
@@ -239,7 +239,7 @@ su `scene.json` entero es:
 
 ```json
 {
-  "schema": "reiwand.scene/1",
+  "schema": "reiwand.scene/2",
   "canvas": { "size": [1920, 1080], "fit": "fill", "background": "#000000" },
   "clock": { "max_fps": "display" },
   "assets": { "cielo": { "path": "assets/cielo.png" } },

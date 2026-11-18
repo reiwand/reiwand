@@ -1,6 +1,6 @@
 # Paquetes: clasificación, idiomas y créditos
 
-El manifiesto de un paquete (`docs/specs/package.md`) lo describe. En `reiwand.wpak/2`
+El manifiesto de un paquete (`docs/specs/package.md`) lo describe. En `reiwand.wpak/3`
 declara su clasificación (para todos los públicos o para adultos, con sus motivos), si destella o
 muestra patrones rápidos que pueden provocar crisis a personas con epilepsia fotosensible, si es
 una obra original o rehecha a mano a partir de otras (con el nombre de sus autores), los créditos

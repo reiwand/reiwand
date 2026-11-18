@@ -90,7 +90,7 @@ de triángulo, 256 huesos y partes, 64 primitivas dibujadas, 524 288 vértices d
 
 ## Partes
 
-Las partes se dibujan por `order` (de -1000 a 1000, 0 por defecto; puede seguir claves) y, si
+Las partes se dibujan por `order` (de -1000 a 1000, 0 prellenado; puede seguir claves) y, si
 empatan, en el orden del archivo. `clip_to` es otra parte sobre la que esta solo se ve (un
 recorte con plantilla), y `visible` la oculta.
 
@@ -100,8 +100,8 @@ recorte con plantilla), y `visible` la oculta.
 
 `depth` hace que la profundidad de los vértices (la z del archivo, hacia quien mira, en píxeles)
 los empuje con la perspectiva de `canvas.perspective` o de la cámara 3D, incluso bajo `tilt`.
-`scale` va de 0 a 10 (1 por defecto), `cull` esconde los triángulos vistos por detrás y `sort`
-(`true` por defecto) dibuja las partes de atrás adelante cada fotograma. Con `depth`, los
+`scale` va de 0 a 10 (1 prellenado), `cull` esconde los triángulos vistos por detrás y `sort`
+(`true` prellenado) dibuja las partes de atrás adelante cada fotograma. Con `depth`, los
 vértices más cercanos tapan a los lejanos sea cual sea el orden de sus partes.
 
 ## Clips
@@ -234,7 +234,7 @@ actúan a la vez sobre cada parte: las más pesadas.
 | `layer` | La capa de malla o de modelo a la que se pega. |
 | `bone` o `point` | El hueso o el punto de enganche. |
 | `offset` | `[x, y]` en píxeles a lo largo del hueso. |
-| `inherit` | Lo que toma: `position`, `rotation` y `scale` (todo por defecto). Sin `position`, la capa se queda en el origen de la malla. |
+| `inherit` | Lo que toma: `position`, `rotation` y `scale` (todo prellenado). Sin `position`, la capa se queda en el origen de la malla. |
 
 La capa se oculta con su malla, y su propio `transform` se aplica encima. Una capa no puede
 seguirse a sí misma, ni a través de otras. Con `reiwand-ctl scene act CARPETA attach` y `scene act CARPETA point` se pegan

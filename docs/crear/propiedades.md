@@ -136,7 +136,7 @@ propiedad escoge entre variantes de tu escena.
 ### Texto
 
 `default`, `max_len`, `multiline` (una caja de varias líneas) y `secret`. Un texto secreto no tiene
-valor por defecto, se guarda en el llavero del sistema (en el teléfono, sellado por el almacén de
+valor prellenado, se guarda en el llavero del sistema (en el teléfono, sellado por el almacén de
 claves de Android) y nunca en la configuración, los registros, los preajustes, los ajustes
 exportados. Una escena lo lee como un texto vacío: solo el contenido que puede
 usar la red lo recibe.
@@ -301,7 +301,7 @@ Las etiquetas, las ayudas, las opciones y los preajustes llevan texto de tres fo
 
 Con textos por idioma o con `strings`, el manifiesto debe llevar `default_locale` y cada texto
 tiene que tener valor en ese idioma. Los idiomas son etiquetas como `es`, `en` o `pt-BR`; el
-programa elige la de quien lo usa, y si no está, la del idioma por defecto. Un manifiesto admite hasta 64
+programa elige la de quien lo usa, y si no está, la del idioma principal. Un manifiesto admite hasta 64
 idiomas, con hasta 2048 claves cada uno. Las traducciones de un idioma también pueden ir en
 `locale/<idioma>.json` si el paquete lo declara (ver [paquete.md](paquete.md)).
 

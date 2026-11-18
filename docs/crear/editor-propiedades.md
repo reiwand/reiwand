@@ -86,16 +86,16 @@ reiwand-ctl scene act mi-escena set '{"pointer":"/manifest/properties/velocidad/
 reiwand-ctl scene act mi-escena set '{"pointer":"/manifest/properties/velocidad/help","value":"Cuanto mas, mas rapido"}'
 ```
 
-## Cómo fijar el rango, el paso y el valor por defecto de un deslizador
+## Cómo fijar el rango, el paso y el valor prellenado de un deslizador
 
-Dónde está: inspector de una propiedad de tipo **Deslizador**. Arriba hay cuatro casillas: **Mínimo**, **Máximo**, **Paso** y **Valor por defecto**. Más abajo están **Decimales**, **Números enteros**, **Unidad**, **Casilla numérica** y **Escala logarítmica**.
+Dónde está: inspector de una propiedad de tipo **Deslizador**. Arriba hay cuatro casillas: **Mínimo**, **Máximo**, **Paso** y **Valor prellenado**. Más abajo están **Decimales**, **Números enteros**, **Unidad**, **Casilla numérica** y **Escala logarítmica**.
 
 Pasos:
 
 1. Elige el deslizador en la pestaña **Opciones**.
 2. Escribe el **Mínimo** y el **Máximo**. Los dos valores se aceptan tal como los escribes, aunque no caigan justo en un paso.
 3. Escribe el **Paso**, lo que salta el deslizador cada vez. Si lo dejas vacío, el deslizador se mueve según sus decimales.
-4. Escribe el **Valor por defecto**: lo que verá quien no toque el ajuste. Se recorta al rango.
+4. Escribe el **Valor prellenado**: lo que verá quien no toque el ajuste. Se recorta al rango.
 5. Si quieres un cartel con la medida (por ejemplo «s» o «%»), escribe la **Unidad**.
 6. Pon **Números enteros** para que solo valgan enteros, y **Decimales** (de 0 a 6) para fijar cuántos decimales se redondean y se muestran.
 7. Pon **Casilla numérica** para que, además del deslizador, haya una casilla donde escribir el número.
@@ -117,18 +117,18 @@ reiwand-ctl scene act mi-escena set '{"pointer":"/manifest/properties/velocidad/
 
 Cada tipo muestra en el inspector solo los campos que le tocan. Todos los tienen en común **Etiqueta**, **Ayuda**, **Grupo**, **Orden**, **Icono**, **Visible cuando** y **Activo cuando**.
 
-- **Interruptor**: **Valor por defecto**, encendido o apagado. Tiene también **Valores por nivel de calidad**.
-- **Color**: **Valor por defecto** con el selector de color. **Transparencia** hace que el usuario pueda elegir también la opacidad; sin ella el color es opaco.
-- **Selección**: la lista **Opciones**, con el botón **Añadir**. Cada opción tiene un valor y una etiqueta; una opción con la etiqueta vacía muestra su valor. **Añadir** pone una opción con la etiqueta vacía y un valor que ninguna otra tiene (`option_3`...). El **Valor por defecto** es una caja con las opciones, nombradas por su etiqueta. Hay un máximo de 64 opciones, todas del mismo tipo de valor (textos, números o sí y no).
-- **Texto**: **Valor por defecto**, **Longitud máxima** (de 1 a 1024 caracteres), **Varias líneas** y **Secreto**. Un texto secreto no tiene valor por defecto, el sistema lo guarda aparte y la escena lo ve vacío; solo lo recibe un contenido al que le hayas dado permiso de red.
-- **Archivo**: **Archivos admitidos** (casillas **Imagen** y **Vídeo**) y **Recurso por defecto**, la imagen o vídeo de tu paquete que se usa mientras el usuario no elija otro.
+- **Interruptor**: **Valor prellenado**, encendido o apagado. Tiene también **Valores por nivel de calidad**.
+- **Color**: **Valor prellenado** con el selector de color. **Transparencia** hace que el usuario pueda elegir también la opacidad; sin ella el color es opaco.
+- **Selección**: la lista **Opciones**, con el botón **Añadir**. Cada opción tiene un valor y una etiqueta; una opción con la etiqueta vacía muestra su valor. **Añadir** pone una opción con la etiqueta vacía y un valor que ninguna otra tiene (`option_3`...). El **Valor prellenado** es una caja con las opciones, nombradas por su etiqueta. Hay un máximo de 64 opciones, todas del mismo tipo de valor (textos, números o sí y no).
+- **Texto**: **Valor prellenado**, **Longitud máxima** (de 1 a 1024 caracteres), **Varias líneas** y **Secreto**. Un texto secreto no tiene valor prellenado, el sistema lo guarda aparte y la escena lo ve vacío; solo lo recibe un contenido al que le hayas dado permiso de red.
+- **Archivo**: **Archivos admitidos** (casillas **Imagen** y **Vídeo**) y **Recurso prellenado**, la imagen o vídeo de tu paquete que se usa mientras el usuario no elija otro.
 - **Carpeta**: **Archivos admitidos**, **Elegir los archivos** (**Al azar** o **En orden**), **Cada** (los segundos entre un archivo y el siguiente, de 10 a 86400), **Máximo de archivos** (de 1 a 1000), **Qué puede leer el contenido** (**Un archivo cada vez** o **Todos los archivos**, esto último solo importa a las páginas web) y **Niveles de subcarpetas** (de 0 a 2).
 - **Atajo**, **Botón**, **Etiqueta** y **Separador**: no tienen campos propios. La etiqueta de un **Separador** puede quedar vacía; entonces solo se ve la línea. Un **Botón** se explica en [Cómo usar un botón como disparador](#cómo-usar-un-botón-como-disparador).
 - **Grupo**: tiene **Plegado**, para que en el formulario de usuario nazca cerrado.
 
-Para que un archivo o una carpeta de usuario aparezca en la escena, enlaza el valor de una capa a la propiedad (mira [Cómo hacer que una capa siga una propiedad](#cómo-hacer-que-una-capa-siga-una-propiedad)). Un archivo elegido por el usuario también reemplaza al **Recurso por defecto** allí donde la escena lo use.
+Para que un archivo o una carpeta de usuario aparezca en la escena, enlaza el valor de una capa a la propiedad (mira [Cómo hacer que una capa siga una propiedad](#cómo-hacer-que-una-capa-siga-una-propiedad)). Un archivo elegido por el usuario también reemplaza al **Recurso prellenado** allí donde la escena lo use.
 
-En la terminal: `set` sobre `/manifest/properties/ID/CAMPO`, por ejemplo el valor por defecto, las opciones o el límite de un texto. Mira [acciones](acciones.md).
+En la terminal: `set` sobre `/manifest/properties/ID/CAMPO`, por ejemplo el valor prellenado, las opciones o el límite de un texto. Mira [acciones](acciones.md).
 
 ```sh
 reiwand-ctl scene act mi-escena add_property '{"kind":"combo","id":"clima"}'
@@ -218,7 +218,7 @@ Una **Selección** o un **Interruptor** pueden dar un valor distinto de la capa 
 3. Elige una opción y pulsa **Añadir**. Aparece una fila con esa opción (en un interruptor, **Encendido** y **Apagado**) y el control del propio valor: la lista de imágenes, el selector de color, un interruptor.
 4. Pon el valor de cada fila.
 
-Una opción sin fila se queda con el valor de la propiedad tal cual lo elija el usuario. Para quitar una fila usa el botón **Valor por defecto** de su campo.
+Una opción sin fila se queda con el valor de la propiedad tal cual lo elija el usuario. Para quitar una fila usa el botón **Valor prellenado** de su campo.
 
 En la terminal: `set` con el puntero del valor y `{"prop": "ID"}`, con `"map"` si cada opción da un valor. Mira [acciones](acciones.md).
 
@@ -296,7 +296,7 @@ Pasos:
 1. Elige la propiedad.
 2. En **Valores por nivel de calidad** hay una fila por nivel: **Q0, la más baja**, **Q1**, **Q2** y **Q3, la más alta**. Cada fila usa el control de la propiedad (el deslizador con su rango, la caja de opciones, el interruptor).
 3. Fija el valor de los niveles que quieras. Un nivel con valor propio vale para él y para los más bajos hasta que otro nivel fije el suyo.
-4. Para quitar el valor de un nivel, pulsa **Valor por defecto** en su fila.
+4. Para quitar el valor de un nivel, pulsa **Valor prellenado** en su fila.
 5. Más abajo, **Valor vigente en cada nivel** lista lo que acaba valiendo cada nivel («Q1: 3», o «Q2: 3 (heredado)» si lo toma de otro). El nivel que usa la vista previa está en negrita.
 6. Con el selector de calidad que hay en esa zona, eliges Q0 a Q3 y la vista previa se ve con los valores de ese nivel.
 
@@ -320,11 +320,11 @@ Dónde está: inspector de una propiedad, un preajuste o el paquete, en cada cam
 Pasos para añadir un idioma:
 
 1. Debajo de las filas hay una casilla con el texto de ayuda **Idioma, como es o pt-BR**. Escribe el código del idioma (dos o tres letras, con región si hace falta: `es`, `pt-BR`).
-2. Pulsa **Traducir**. Se añade una fila para ese idioma, que parte del texto del idioma por defecto del paquete. **Traducir** nunca pisa un texto que ya existe.
+2. Pulsa **Traducir**. Se añade una fila para ese idioma, que parte del texto del idioma principal del paquete. **Traducir** nunca pisa un texto que ya existe.
 3. Escribe el texto de la fila. Al salir de la casilla se guarda.
 4. Para quitar un idioma, pulsa **Quitar este idioma** al final de su fila. Un texto vacío también lo quita. El último texto de un título no se puede quitar.
 
-Hasta que añadas un segundo idioma, el campo tiene un solo texto, en el idioma por defecto. Quien usa el fondo ve el texto de su idioma y, si no está, el del idioma por defecto. El idioma por defecto del paquete se elige en los datos del paquete (**Idioma por defecto**, mira [paquete](paquete.md)).
+Hasta que añadas un segundo idioma, el campo tiene un solo texto, en el idioma principal. Quien usa el fondo ve el texto de su idioma y, si no está, el del idioma principal. El idioma principal del paquete se elige en los datos del paquete (**Idioma principal**, mira [paquete](paquete.md)).
 
 Si el paquete usa el formato antiguo de datos, aparece el aviso con el botón **Actualizar** y los textos en varios idiomas esperan a que lo uses.
 
@@ -370,9 +370,9 @@ Pasos:
 
 1. Pulsa **Añadir un preajuste**. Se añade uno con id `preset_1` (el número siguiente que esté libre), vacío, y queda elegido en el inspector.
 2. En el inspector pon la **Etiqueta** (con idiomas, como cualquier texto). El **Id** se puede cambiar si quieres.
-3. Debajo está **Valores**. Hay una fila por cada propiedad que un preajuste puede fijar: no están los archivos, las carpetas, los atajos, los textos secretos, los botones, los grupos, las etiquetas ni los separadores. Cada fila usa el control de su propiedad. Una fila que el preajuste fija muestra su valor; las demás muestran el valor por defecto de la propiedad.
+3. Debajo está **Valores**. Hay una fila por cada propiedad que un preajuste puede fijar: no están los archivos, las carpetas, los atajos, los textos secretos, los botones, los grupos, las etiquetas ni los separadores. Cada fila usa el control de su propiedad. Una fila que el preajuste fija muestra su valor; las demás muestran el valor prellenado de la propiedad.
 4. Cambia las filas que quieras: el preajuste fija solo esas.
-5. Para que una propiedad deje de formar parte del preajuste, pulsa **Valor por defecto** en su fila.
+5. Para que una propiedad deje de formar parte del preajuste, pulsa **Valor prellenado** en su fila.
 6. Para borrar el preajuste, pulsa **Quitar** en su fila de la lista.
 
 Los preajustes se guardan con el resto del paquete cuando guardas la carpeta (mira [editor](editor.md)). Si renombras o quitas una propiedad, sus valores en los preajustes se renombran o desaparecen con ella. Un valor que no cabe en la propiedad (fuera de rango, una opción que ya no existe) aparece en la lista de problemas, apuntando al valor concreto del preajuste.
@@ -401,7 +401,7 @@ Pasos:
 1. Abre la pestaña **Probar**. Si el paquete no tiene propiedades, dice **El paquete no declara propiedades para probar.**
 2. Mueve un deslizador, cambia un color, pulsa un interruptor. La vista previa lo muestra al momento. Los campos que dependen de una condición aparecen y desaparecen como lo harán para el usuario.
 3. Si el paquete tiene preajustes, elige uno en la caja **Preajuste** (la primera entrada, **Valores del paquete**, es sin preajuste). Los controles toman sus valores.
-4. Para dejar la prueba, pulsa **Volver a los valores por defecto**.
+4. Para dejar la prueba, pulsa **Volver a los valores prellenados**.
 
 Lo que pruebas no se guarda en el paquete ni cambia ninguna pantalla real. Para probar los niveles de calidad usa el selector de calidad de la vista previa (mira [Cómo cambiar un valor según el nivel de calidad](#cómo-cambiar-un-valor-según-el-nivel-de-calidad)).
 
@@ -423,7 +423,7 @@ Pasos:
 2. En la sección **Preajuste**, elige el **Paquete base** en la caja (lista los paquetes instalados; también puedes escribir su id a mano).
 3. Escribe el **Rango de versiones** con el que es compatible (por ejemplo `^1.2`). Si el paquete base está instalado, la casilla sugiere «Compatible con» su versión y puedes dejarla vacía.
 4. Pulsa **Usar como base**. La línea de arriba pasa a decir «Preajuste para ID, versión RANGO».
-5. Si el paquete base está instalado, debajo aparece un control por cada ajuste suyo, con la misma forma que en su formulario: deslizadores, colores, interruptores, cajas de opciones y textos. Los ajustes que este preajuste fija salen en negrita y muestran su valor; los demás muestran el valor por defecto del paquete base. Cambia los que quieras. **Valor por defecto** a la derecha de una fila devuelve ese ajuste al paquete base.
+5. Si el paquete base está instalado, debajo aparece un control por cada ajuste suyo, con la misma forma que en su formulario: deslizadores, colores, interruptores, cajas de opciones y textos. Los ajustes que este preajuste fija salen en negrita y muestran su valor; los demás muestran el valor prellenado del paquete base. Cambia los que quieras. **Valor prellenado** a la derecha de una fila devuelve ese ajuste al paquete base.
 6. Los ajustes de imagen o vídeo tienen un botón **Imagen o vídeo…** con el que eliges un archivo, que se copia dentro del paquete. Una fila sin archivo dice **Ningún archivo**.
 7. Si el paquete base no está instalado, el editor dice «Instala el paquete base para elegir los ajustes que fija este preajuste.» Instálalo o rellena los valores desde la terminal.
 

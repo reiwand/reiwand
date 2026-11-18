@@ -140,8 +140,8 @@ Cambia el material `name` de la capa `layer`. Solo se guarda lo que pones. Se co
 | `shader` | texto | `pbr` (físico, el normal), `unlit` (sin luz), `fur` (pelo), `foliage` (vegetación), `chroma` (croma) o el id de un shader de material del paquete (ver `new_material`). |
 | `lit` | sí/no | `false` lo dibuja sin luz. |
 | `double_sided` | sí/no | Dibuja las dos caras de cada triángulo. |
-| `cast_shadows` | sí/no | Si da sombra (por defecto sí). |
-| `receive_shadows` | sí/no | Si recibe sombra (por defecto sí). |
+| `cast_shadows` | sí/no | Si da sombra (valor prellenado sí). |
+| `receive_shadows` | sí/no | Si recibe sombra (valor prellenado sí). |
 | `color` | texto | Tinte, como `"#rrggbb"` o `"#rrggbbaa"`. `null` lo quita. |
 | `emissive` | texto o lista | Brillo propio, mismo formato que `color`. `null` lo quita. |
 | `params` | objeto de números | Números del shader. `pbr`: `metallic`, `roughness`, `occlusion` (0 a 1) y `normal_scale` (0 a 10). `fur`: `layers` (1 a 32), `length` (0 a 100), `density` (0 a 1), `comb_x`, `comb_y`, `comb_z` (−1 a 1). `foliage`: `strength` y `speed` (0 a 10). `chroma`: `threshold` y `softness` (0 a 1). |
@@ -299,15 +299,15 @@ Cambia la cámara 3D de la escena. Solo se tocan los campos que das. En la aplic
 
 | Argumento | Tipo | Qué significa |
 |---|---|---|
-| `fov` | número | Campo de visión en grados, de 1 a 179 (por defecto 60). |
-| `near` | número | Distancia más cercana que se dibuja, de 0.001 a 1000 (por defecto 0.1). |
-| `far` | número | Distancia más lejana, mayor que `near` y hasta 1 000 000 (por defecto 1000). |
+| `fov` | número | Campo de visión en grados, de 1 a 179 (valor prellenado 60). |
+| `near` | número | Distancia más cercana que se dibuja, de 0.001 a 1000 (valor prellenado 0.1). |
+| `far` | número | Distancia más lejana, mayor que `near` y hasta 1 000 000 (valor prellenado 1000). |
 | `eye` | lista de 3 números | Dónde está la cámara. Por defecto `[0, 0, 5]`. |
 | `center` | lista de 3 números | Punto al que mira. Por defecto `[0, 0, 0]`. |
 | `up` | lista de 3 números | Qué dirección es «arriba»; no puede ser `[0, 0, 0]`. Por defecto `[0, 1, 0]`. |
 | `roll` | número | Giro de la cámara sobre su línea de visión, de −180 a 180 grados, contado desde la vertical. Cambia `up`. |
 | `from_view` | sí/no | `true` pone la cámara donde mira ahora la vista de edición. Por defecto `false`. En la aplicación es **Poner la cámara desde la vista**. |
-| `clear` | sí/no | `true` borra la cámara y vuelve a la de por defecto. Por defecto `false`. |
+| `clear` | sí/no | `true` borra la cámara y vuelve a la de prellenado. Por defecto `false`. |
 
 ```sh
 reiwand-ctl scene act mi-escena scene3d '{"camera":{"fov":45,"eye":[0,2,8],"center":[0,1,0]}}'

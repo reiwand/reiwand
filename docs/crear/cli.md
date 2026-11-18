@@ -235,13 +235,13 @@ Imprime los archivos que escribió. Dibuja lo mismo que la vista previa del edit
 | `--time S` | El segundo de la escena del primer cuadro. Las partículas llevan simulados `prewarm` más S segundos (con tope de 30 s en total). |
 | `--time-of-day HORA` | La hora de pared que ven la escena y sus scripts: `HH:MM[:SS]` de hoy o `AAAA-MM-DD HH:MM[:SS]`. Sin ella, la hora de este equipo; ponla para que la imagen salga igual siempre. |
 | `--media ARCHIVO` | Una pista inventada del reproductor (JSON: `title`, `artist`, `album`, `playing`, `position`, `duration`, `rate`, `cover`…; la carátula es una imagen de la carpeta) que ven los scripts y las imágenes que siguen a la carátula. Sin ella, no hay reproductor. |
-| `--quality q0`…`q3` | El nivel de calidad más alto (`q3` por defecto). |
-| `--size PX` | El lado mayor de la imagen (1280 por defecto). |
+| `--quality q0`…`q3` | El nivel de calidad más alto (`q3` prellenado). |
+| `--size PX` | El lado mayor de la imagen (1280 prellenado). |
 | `--frames N`, `--fps F` | Con más de un cuadro, un clip: `.gif`, o una secuencia `NOMBRE-0001.EXT` (hasta 600 cuadros). |
 | `--pointer X,Y[:X,Y]`, `--click` | Un puntero inventado en esas fracciones del lienzo, que se mueve al segundo par y pulsa hacia la mitad del clip. |
 | `--against q0`, `--without-bloom`, `--split F` | La parte derecha se ve a otro nivel o sin brillo, para comparar. |
 | `--battery`, `--calm` | Como con batería, o con menos movimiento. |
-| `--language IDIOMA` | El idioma que ven los textos por idioma y los scripts (`es`, `pt-BR`); si el paquete no lo tiene, el idioma por defecto. |
+| `--language IDIOMA` | El idioma que ven los textos por idioma y los scripts (`es`, `pt-BR`); si el paquete no lo tiene, el idioma principal. |
 
 **Ejecuta los scripts.** Para los cuadros que dibuja, corre los scripts de la escena con la hora de
 pared de `--time-of-day` (o la de este equipo) y escribe en la salida de error lo que imprimen con
@@ -268,8 +268,8 @@ Pone una vista previa en `assets/` y la escribe en `previews.thumbnail` del mani
 que das, reducida si pasa de 1024 píxeles o 1 MiB; o, con `--capture`, un cuadro que dibuja la
 tarjeta gráfica (con demonio). Con `--animated`, un `.gif` o `.webp` de hasta 640 píxeles de lado,
 15 s y 8 MiB (`assets/preview-animated.gif`, en `previews.animated`). `--time` es el segundo que se
-guarda, `--from` donde empieza la grabación, `--seconds` (0,1 a 15; 4 por defecto) cuánto dura y
-`--fps` (1 a 30; 10 por defecto) a cuántos cuadros por segundo. Con `--capture` los scripts de la
+guarda, `--from` donde empieza la grabación, `--seconds` (0,1 a 15; 4 prellenado) cuánto dura y
+`--fps` (1 a 30; 10 prellenado) a cuántos cuadros por segundo. Con `--capture` los scripts de la
 escena sí corren, en el proceso aislado de siempre y con la hora de este equipo, así que un texto
 que llenan sale con su valor y no con el inicial. No simula el reproductor. El cuadro sale sin sonido ni puntero: una escena que reacciona a ellos se ve en reposo.
 
@@ -317,7 +317,7 @@ reiwand-ctl pack check reloj.wpak
 ```
 
 ```
-ok scene org.example.reloj 1.0.0 (reiwand.wpak/2)
+ok scene org.example.reloj 1.0.0 (reiwand.wpak/3)
 title = Reloj con script
 rating = general
 photosensitive = no
@@ -335,7 +335,7 @@ líneas `problem:` debajo de la primera línea, que entonces dice `problems scen
 `ok scene …`, y la orden termina con `Error: N problems` y el código 1:
 
 ```
-problems scene org.example.reloj 1.0.0 (reiwand.wpak/2)
+problems scene org.example.reloj 1.0.0 (reiwand.wpak/3)
 problem: scripts/reloj.js:4: unexpected token in expression: ';'
 ```
 

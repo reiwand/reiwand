@@ -44,7 +44,7 @@ origen y más…*).
 
 | Campo | Tipo | Obligatorio | Qué es |
 |-------|------|-------------|--------|
-| `schema` | texto | sí | `reiwand.wpak/2`. La versión `/1` sigue funcionando, pero no admite lo marcado abajo como «solo `/2`». |
+| `schema` | texto | sí | `reiwand.wpak/3`. La versión `/1` sigue funcionando, pero no admite lo marcado abajo como «solo `/2`». |
 | `id` | texto | sí | Un nombre único en minúsculas, con puntos, como `org.example.reloj`. Cada parte son letras minúsculas, cifras, `_` o `-`. No lo cambies entre versiones. |
 | `version` | texto | sí | Una versión semántica: `1.0.0`, `1.2.3`. Sube la versión en cada publicación. |
 | `kind` | texto | sí | `scene`, `web`, `image`, `video`, `preset` o `assets`. |
@@ -68,7 +68,7 @@ origen y más…*).
 | `inputs` | lista | no, pero la escena puede exigirla | `audio`, `pointer`, `clicks`, `media` o `network`: lo que el paquete pide al usuario. Declararlo no lo concede: el usuario lo permite por paquete. Ver «Entradas». Solo `/2`. |
 | `permissions` | objeto | no | `{ network: { allow: [...] }, rgb }`: los orígenes de red de una página web y el permiso para enviar colores a la iluminación RGB. Solo `/2`. En una página web se marca con la casilla «Envía sus colores a la iluminación RGB» entre sus entradas; en una escena se pone y se quita sola según las capas con `rgb`. |
 | `web` | objeto | solo en `kind: web` | `{ preload, background, storage_kib }`. Ver `fondos-web.md`. |
-| `playback` | objeto | no | Cómo se reproduce por defecto: `speed`, `start`, `end`, `loop`, `max_fps`, `volume`, `muted`. Para vídeos, páginas y escenas. |
+| `playback` | objeto | no | Cómo se reproduce prellenado: `speed`, `start`, `end`, `loop`, `max_fps`, `volume`, `muted`. Para vídeos, páginas y escenas. |
 | `display` | objeto | no | Cómo se coloca una imagen o un vídeo (`fit`, `background`, `span`, `flip`, `zoom`, `position`) y el color de acento que sugiere (`accent`). |
 | `properties` | objeto | no | Las propiedades que el usuario cambia (`propiedades.md`). |
 | `presets` | lista | no | Valores ya elegidos de las propiedades, con nombre (`propiedades.md`). |
@@ -77,7 +77,7 @@ Un manifiesto completo:
 
 ```json
 {
-  "schema": "reiwand.wpak/2",
+  "schema": "reiwand.wpak/3",
   "id": "org.example.atardecer",
   "version": "1.3.0",
   "kind": "scene",
@@ -156,7 +156,7 @@ autor lo permite:
 - en la terminal, `reiwand-ctl scene open CARPETA --from paquete.wpak --mine`. Sin `--mine` falla con
   «<licencia> does not allow derived works».
 
-Un servidor propio solo acepta las licencias de su lista (por defecto `CC0-1.0`, `CC-BY-4.0` y
+Un servidor propio solo acepta las licencias de su lista (prellenado `CC0-1.0`, `CC-BY-4.0` y
 `CC-BY-SA-4.0`; quien lo administra puede cambiarla). Un repositorio estático acepta cualquiera.
 
 ### Clasificación
@@ -247,7 +247,7 @@ Un paquete sano:
 
 ```
 $ reiwand-ctl pack check docs/crear/ejemplos/sigue-puntero
-ok scene org.example.sigue_puntero 1.0.0 (reiwand.wpak/2)
+ok scene org.example.sigue_puntero 1.0.0 (reiwand.wpak/3)
 title = Sigue al puntero
 rating = general
 photosensitive = no
@@ -413,7 +413,7 @@ un servidor no necesita ser de confianza.
 | Rol | Qué firma | Cómo se guarda |
 |-----|-----------|----------------|
 | **raíz** (`root`) | La raíz: la lista de claves y las reglas del repositorio. | Fuera de línea. Se usa pocas veces al año. Puede haber varias y exigir que firmen *t* de *n*. |
-| **en línea** (`online`) | El índice, que caduca (7 días por defecto). | En el equipo que publica, sin contraseña si lo hace un programa. Se usa en cada publicación. |
+| **en línea** (`online`) | El índice, que caduca (7 días prellenado). | En el equipo que publica, sin contraseña si lo hace un programa. Se usa en cada publicación. |
 | **autor** | El `manifest.json` de cada paquete. | La del autor: la misma `autor.key` de arriba. |
 
 ### Crear el repositorio
@@ -442,7 +442,7 @@ address = file:///ruta/a/mi-repo/
 
 `--author ID=autor.pub` registra a un autor con su clave pública (repítelo para varios) y
 `--require-author-signature true` rechaza los paquetes que no firmó ningún autor de la raíz. Hay
-más ajustes: `--threshold`, `--root-days` (la raíz dura 365 días por defecto), `--entry-max-days`
+más ajustes: `--threshold`, `--root-days` (la raíz dura 365 días prellenado), `--entry-max-days`
 (14), `--max-package-size`, `--mirror URL`, `--online-authors` (deja que los autores se
 registren en un servidor).
 
