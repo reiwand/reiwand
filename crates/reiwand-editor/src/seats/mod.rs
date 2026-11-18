@@ -110,7 +110,7 @@ pub(crate) fn parsed(scene: &Value) -> Option<Scene> {
         scene["schema"] = json!(reiwand_scene::SCHEMA);
     }
     if scene.pointer("/canvas/size").is_none() {
-        scene["canvas"] = json!({ "size": [1920, 1080] });
+        scene["canvas"] = reiwand_scene::prefill::offer("canvas", "", json!({}));
     }
     if let Ok(found) = Scene::from_json(&scene.to_string()) {
         return Some(found);
@@ -126,7 +126,8 @@ pub(crate) fn parsed(scene: &Value) -> Option<Scene> {
 pub(crate) fn canvas_of(doc: &Value) -> [f64; 2] {
     let size = doc.pointer("/scene/canvas/size").and_then(Value::as_array);
     let at = |i: usize| size.and_then(|s| s.get(i)?.as_f64());
-    [at(0).unwrap_or(1920.0), at(1).unwrap_or(1080.0)]
+    let fallback = reiwand_scene::prefill::canvas();
+    [at(0).unwrap_or(fallback[0]), at(1).unwrap_or(fallback[1])]
 }
 
 pub fn seats(dir: &Path, doc: &Value, t: f64) -> Vec<Seat> {

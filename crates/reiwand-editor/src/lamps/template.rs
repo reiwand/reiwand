@@ -14,18 +14,24 @@ pub fn template(doc: &Value, id: &str, source: Option<&str>) -> Result<Value> {
             ))
         })?,
     };
-    let size = &doc["scene"]["canvas"]["size"];
-    let middle = [0, 1].map(|i| size[i].as_f64().unwrap_or([1920.0, 1080.0][i]) / 2.0);
-    let mut l = json!({ "blend_space": "canvas", "id": id, "type": "light", "light": beam, "transform": { "position": middle } });
-    let extra = match beam {
-        Beam::Point => json!({ "radius": 400, "z": 120 }),
-        Beam::Spot => json!({ "radius": 900, "z": 150, "intensity": 2, "cone": [25, 45] }),
-        Beam::Tube => json!({ "radius": 240, "z": 60, "length": 400 }),
-        Beam::Directional => json!({ "intensity": 0.8 }),
+    let size = crate::seats::canvas_of(doc);
+    let middle = size.map(|s| s / 2.0);
+    let own = json!({ "id": id, "type": "light", "light": beam, "transform": { "position": middle } });
+    let name = match beam {
+        Beam::Point => "point",
+        Beam::Spot => "spot",
+        Beam::Tube => "tube",
+        Beam::Directional => "directional",
     };
-    l.as_object_mut().into_iter().for_each(|m| m.extend(extra.as_object().cloned().unwrap_or_default()));
-    if matches!(beam, Beam::Spot | Beam::Directional) {
-        l["transform"]["tilt"] = json!([if beam == Beam::Spot { 45 } else { 50 }, 0]);
+    let mut l = own;
+    let row = reiwand_scene::prefill::offer(&format!("light.{name}"), "", json!({}));
+    if let Some(into) = l.as_object_mut() {
+        for (key, put) in row.as_object().into_iter().flatten().filter(|(k, _)| k.as_str() != "transform") {
+            into.insert(key.clone(), put.clone());
+        }
+    }
+    if let Some(tilt) = row.pointer("/transform/tilt") {
+        l["transform"]["tilt"] = tilt.clone();
     }
     Ok(l)
 }

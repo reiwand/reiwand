@@ -14,7 +14,7 @@ pub(crate) fn fill(value: &mut Value) {
             }
             let indexed = map.get("audio").is_some_and(|a| a.is_u64() || a.is_array());
             if indexed && map.get("of").is_some_and(Value::is_null) {
-                map.insert("of".into(), json!(64));
+                map.insert("of".into(), reiwand_scene::prefill::offer("audio", "", json!({}))["of"].clone());
             }
         }
         _ => {}

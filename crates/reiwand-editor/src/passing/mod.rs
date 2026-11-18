@@ -91,7 +91,7 @@ fn fresh(dir: &Path, doc: &Value, e: &TransitionEdit) -> Result<Value> {
     };
     let wgsl = wgsl_of(&descriptor);
     Ok(
-        json!({ "descriptor": descriptor, "wgsl": wgsl, "duration_ms": 1200, "curve": "out_cubic", "params": {} }),
+        json!({ "descriptor": descriptor, "wgsl": wgsl, "duration_ms": reiwand_scene::prefill::arg::<u32>("transition.duration_ms"), "curve": reiwand_scene::prefill::arg::<String>("transition.curve"), "params": {} }),
     )
 }
 

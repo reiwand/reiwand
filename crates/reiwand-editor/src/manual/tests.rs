@@ -123,3 +123,20 @@ fn every_description_has_a_spanish_text() {
         assert!(ids.iter().any(|id| id == about), "{name} is not translated");
     }
 }
+
+#[test]
+fn every_prefill_row_of_an_action_is_shown_by_the_listing() {
+    let mut missed = Vec::new();
+    for (row, value) in reiwand_scene::prefill::rows().filter(|(r, _)| r.starts_with("Action.")) {
+        let path = &row["Action.".len()..];
+        let (name, field) = path.split_once('.').unwrap();
+        let text = describe(name).unwrap_or_default();
+        let leaf = field.rsplit('.').next().unwrap();
+        if !text.lines().any(|l| {
+            l.trim_start().starts_with(&format!("{leaf}:")) && l.contains(&format!("prefill {value}"))
+        }) {
+            missed.push(row.clone());
+        }
+    }
+    assert!(missed.is_empty(), "{missed:?}");
+}

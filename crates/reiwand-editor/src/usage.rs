@@ -123,7 +123,10 @@ pub(crate) fn declare(dir: &Path, doc: &Value, e: &UsesEdit) -> Result<Vec<Op>> 
     }
     let pools = doc["scene"]["pools"].as_object().is_some_and(|p| !p.is_empty());
     if geometry && !pools {
-        let pool = json!({ "type": "mesh", "max": 16, "max_vertices": 1024, "texture": null, "size": null });
+        let pool = reiwand_scene::prefill::of(
+            "Pool",
+            json!({ "type": "mesh", "max": reiwand_scene::prefill::arg::<u32>("pool.max"), "max_vertices": reiwand_scene::prefill::arg::<u32>("pool.max_vertices") }),
+        );
         ops.extend(set(doc, "/scene/pools/shapes", pool));
     }
     crate::shaping::refused(dir, doc, ops)

@@ -74,7 +74,8 @@ pub(crate) fn solid(layer: &Value) -> bool {
 }
 
 pub(crate) fn size(doc: &Value, layer: &Value) -> [f32; 2] {
-    let canvas = doc.pointer("/scene/canvas/size").cloned().unwrap_or(json!([1920, 1080]));
+    let canvas =
+        doc.pointer("/scene/canvas/size").cloned().unwrap_or_else(|| json!(reiwand_scene::prefill::canvas()));
     let size = layer.get("size").filter(|s| s.is_array()).unwrap_or(&canvas);
     [0, 1].map(|k| size[k].as_f64().unwrap_or(1.0).max(1.0) as f32)
 }

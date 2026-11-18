@@ -79,7 +79,7 @@ pub(crate) fn clip(dir: &std::path::Path, doc: &Value, c: &ClipEdit) -> Result<V
                 clips.len() < MAX_CLIPS_PER_MODEL,
                 said("editor.clips_most", "a mesh has at most %1 clips", &[&MAX_CLIPS_PER_MODEL])
             );
-            let mut new = json!({ "id": id, "to": length.unwrap_or(2.0) });
+            let mut new = json!({ "id": id, "to": length.unwrap_or_else(|| reiwand_scene::prefill::arg("clip.length")) });
             new.as_object_mut()
                 .into_iter()
                 .for_each(|m| m.extend(seed(dir, doc, l).as_object().cloned().unwrap_or_default()));

@@ -91,7 +91,7 @@ pub(crate) fn view_edit(dir: &Path, doc: &Value, e: &ViewEdit) -> Result<Vec<Op>
     }
     if let Some([dx, dy]) = e.pan {
         let eye = v.eye(&base);
-        let h = scene["canvas"]["size"][1].as_f64().unwrap_or(1080.0) as f32;
+        let h = scene["canvas"]["size"][1].as_f64().unwrap_or(reiwand_scene::prefill::canvas()[1]) as f32;
         let (r, u, _) = eye.basis();
         let k = eye.unit(h);
         v.target = std::array::from_fn(|i| v.target[i] - r[i] * dx as f32 * k + u[i] * dy as f32 * k);

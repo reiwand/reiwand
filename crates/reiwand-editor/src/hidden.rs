@@ -151,7 +151,7 @@ fn walk(list: &Value, base: &str, canvas: [f64; 2], out: &mut Vec<Problem>) {
 }
 
 pub(crate) fn problems(scene: &Value) -> Vec<Problem> {
-    let canvas = pair(&scene["canvas"]["size"]).unwrap_or([1920.0, 1080.0]);
+    let canvas = pair(&scene["canvas"]["size"]).unwrap_or_else(reiwand_scene::prefill::canvas);
     let mut out = Vec::new();
     walk(&scene["layers"], "/scene/layers", canvas, &mut out);
     let mut seen = Vec::new();

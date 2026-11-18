@@ -92,7 +92,11 @@ pub(crate) fn sculpt(dir: &Path, doc: &Value, s: &SculptStroke) -> Result<Vec<Op
         model,
         palette,
         (&seen, &p.matrix),
-        (&s.points, s.radius, s.softness.unwrap_or(0.5)),
+        (
+            &s.points,
+            s.radius,
+            s.softness.unwrap_or_else(|| reiwand_scene::prefill::arg("scene3d.sculpt.softness")),
+        ),
         &moved,
     );
     super::carving::apply(model, s, &reached, &mut moved);

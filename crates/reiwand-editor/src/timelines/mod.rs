@@ -59,7 +59,7 @@ fn lengths(line: &mut Map<String, Value>, e: &TimelineEdit) -> Result<()> {
     }
     let timed = ["duration", "fps", "frames"].iter().any(|k| line.contains_key(*k));
     if !timed {
-        line.insert("duration".into(), json!(5));
+        line.insert("duration".into(), reiwand_scene::prefill::arg::<Value>("timeline.duration"));
     }
     Ok(())
 }

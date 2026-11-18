@@ -52,7 +52,8 @@ pub(crate) fn act(doc: &Value, e: &RgbEdit) -> Result<Vec<Op>> {
         said("editor.rgb_layer", "%1 is not an adjustment layer", &[&e.layer])
     );
     let canvas = doc.pointer("/scene/canvas/size").and_then(Value::as_array).cloned().unwrap_or_default();
-    let most = |i: usize| canvas.get(i).and_then(Value::as_f64).unwrap_or(1920.0) * 2.0;
+    let most =
+        |i: usize| canvas.get(i).and_then(Value::as_f64).unwrap_or(reiwand_scene::prefill::canvas()[i]) * 2.0;
     let mut new = doc.clone();
     let target = new.pointer_mut(&pointer).and_then(Value::as_object_mut);
     let Some(target) = target else { return Ok(Vec::new()) };

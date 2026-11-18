@@ -15,7 +15,7 @@ pub(super) fn shape(doc: &Value, sys: &str, emitter: usize, shape: &Value, remov
     crate::completing::require(doc, &format!("{sys}/emitters/{emitter}/shape"), shape)?;
     ensure!(emitter <= count, said("editor.no_emitter", "the system has no emitter %1", &[&emitter]));
     if emitter == count {
-        let value = json!({ "shape": shape, "rate": 10 });
+        let value = json!({ "shape": shape, "rate": reiwand_scene::prefill::arg::<Value>("particles.settings.rate") });
         return Ok(set(doc, &format!("{sys}/emitters/{emitter}"), value));
     }
     Ok(set(doc, &format!("{sys}/emitters/{emitter}/shape"), shape.clone()))

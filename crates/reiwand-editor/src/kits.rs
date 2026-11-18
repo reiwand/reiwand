@@ -6,7 +6,8 @@ pub const KITS: [&str; 4] = ["snow", "sparks", "rain", "dust"];
 
 pub fn size(doc: &Value) -> [f64; 2] {
     let side = |i: usize| doc.pointer(&format!("/scene/canvas/size/{i}")).and_then(Value::as_f64);
-    [side(0).unwrap_or(1920.0), side(1).unwrap_or(1080.0)]
+    let fallback = reiwand_scene::prefill::canvas();
+    [side(0).unwrap_or(fallback[0]), side(1).unwrap_or(fallback[1])]
 }
 
 fn fall(h: f64) -> Value {

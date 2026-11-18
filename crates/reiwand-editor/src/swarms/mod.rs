@@ -91,7 +91,11 @@ pub(crate) fn render(
 fn squared(doc: &Value, at: &str) -> Vec<Op> {
     match doc.pointer(&format!("{at}/aspect")) {
         Some(_) => Vec::new(),
-        None => set(doc, &format!("{at}/aspect"), json!(1)),
+        None => set(
+            doc,
+            &format!("{at}/aspect"),
+            reiwand_scene::prefill::offer("render", "", json!({}))["aspect"].clone(),
+        ),
     }
 }
 

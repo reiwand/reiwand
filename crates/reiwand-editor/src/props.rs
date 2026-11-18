@@ -13,21 +13,9 @@ pub(crate) fn path(id: &str) -> String {
 }
 
 fn template(kind: &str) -> Option<Value> {
-    Some(match kind {
-        "slider" => json!({"type": kind, "min": 0, "max": 100, "step": 1, "default": 50}),
-        "bool" => json!({"type": kind, "default": false}),
-        "color" => json!({"type": kind, "default": "#ffffff"}),
-        "combo" => {
-            json!({"type": kind, "options": [{"value": "option_1", "label": ""}, {"value": "option_2", "label": ""}],
-            "default": "option_1"})
-        }
-        "text" => json!({"type": kind, "default": ""}),
-        "file" => json!({"type": kind, "accept": ["image"], "default_asset": null}),
-        "folder" => json!({"type": kind, "accept": ["image"], "pick": "random", "every": 60, "mode": "one",
-            "max_files": 1000, "recursive": 0}),
-        "shortcut" | "button" | "group" | "label" | "divider" => json!({"type": kind}),
-        _ => return None,
-    })
+    PROPERTY_KINDS
+        .contains(&kind)
+        .then(|| reiwand_scene::prefill::offer(&format!("property.{kind}"), "", json!({ "type": kind })))
 }
 
 pub(crate) fn clash(doc: &Value, id: &str, except: &str) -> bool {

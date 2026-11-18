@@ -3,10 +3,55 @@ use std::sync::LazyLock;
 
 const TABLE: &str = include_str!("prefill.json");
 
+static TABLE_ROWS: LazyLock<serde_json::Map<String, Json>> =
+    LazyLock::new(|| serde_json::from_str(TABLE).unwrap_or_default());
+
+fn offered(row: &str) -> bool {
+    row.starts_with("Action.") || row.starts_with("Offer.")
+}
+
 static ROWS: LazyLock<Vec<(String, String)>> = LazyLock::new(|| {
-    let table: serde_json::Map<String, Json> = serde_json::from_str(TABLE).unwrap_or_default();
-    table.into_iter().map(|(row, value)| (row, value.to_string())).collect()
+    TABLE_ROWS
+        .iter()
+        .filter(|(row, _)| !offered(row))
+        .map(|(row, value)| (row.clone(), value.to_string()))
+        .collect()
 });
+
+pub fn action(path: &str) -> Option<&'static Json> {
+    TABLE_ROWS.get(&format!("Action.{path}"))
+}
+
+fn row(name: &str) -> &'static Json {
+    TABLE_ROWS.get(name).expect("a row of the prefill table")
+}
+
+pub fn arg<T: serde::de::DeserializeOwned>(path: &str) -> T {
+    serde_json::from_value(row(&format!("Action.{path}")).clone()).expect("a prefill row of the type asked")
+}
+
+pub fn offer(name: &str, def: &str, mut value: Json) -> Json {
+    let base = row(&format!("Offer.{name}"));
+    if let (Some(into), Some(base)) = (value.as_object_mut(), base.as_object()) {
+        for (key, put) in base {
+            if !into.contains_key(key) {
+                into.insert(key.clone(), put.clone());
+            }
+        }
+    }
+    match def.is_empty() {
+        true => value,
+        false => of(def, value),
+    }
+}
+
+pub fn canvas() -> [f64; 2] {
+    serde_json::from_value(row("Offer.canvas")["size"].clone()).expect("the canvas size of the offers")
+}
+
+pub fn rows() -> impl Iterator<Item = (&'static String, &'static Json)> {
+    TABLE_ROWS.iter().filter(|(row, _)| offered(row))
+}
 
 pub fn prefill(raw: &mut Json) -> reiwand_core::explicit::Annotated {
     let rows: Vec<(&str, &str)> = ROWS.iter().map(|(row, value)| (row.as_str(), value.as_str())).collect();
