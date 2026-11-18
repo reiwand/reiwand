@@ -80,14 +80,14 @@ fn refraction(
     if by == "size" {
         let from_pixels = was["shift"].as_f64().map(|s| (s / half).clamp(0.0, 1.0));
         let amount = amount.or(if before == Some("pixels") { from_pixels } else { was["amount"].as_f64() });
-        let amount = amount.unwrap_or(0.3);
+        let amount = amount.unwrap_or_else(|| reiwand_scene::prefill::arg("particles.refract.amount"));
         let fits = amount.is_finite() && (0.0..=1.0).contains(&amount);
         ensure!(fits, said("editor.refract_amount", "the amount of refraction goes from 0 to 1", &[]));
         return Ok(json!({ "normal": normal, "units": "size", "amount": amount }));
     }
     let from_size = was["amount"].as_f64().map(|a| (a * half).clamp(0.0, 256.0));
     let shift = shift.or(if before == Some("size") { from_size } else { was["shift"].as_f64() });
-    let shift = shift.unwrap_or(8.0);
+    let shift = shift.unwrap_or_else(|| reiwand_scene::prefill::arg("particles.refract.shift"));
     let fits = shift.is_finite() && (0.0..=256.0).contains(&shift);
     ensure!(fits, said("editor.refract_shift", "the shift of refraction goes from 0 to 256 pixels", &[]));
     Ok(json!({ "normal": normal, "units": "pixels", "shift": shift }))

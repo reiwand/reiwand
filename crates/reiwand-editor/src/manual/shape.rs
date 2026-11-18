@@ -105,10 +105,12 @@ pub(super) fn brief(v: &Value, defs: &Value) -> String {
     }
 }
 
-fn note(v: &Value, required: bool) -> String {
+fn note(v: &Value, required: bool, path: &str) -> String {
     let default = v.get("default").filter(|d| !d.is_null() && !required).map(|d| format!(", default {d}"));
+    let prefill =
+        reiwand_scene::prefill::action(path).filter(|_| !required).map(|d| format!(", prefill {d}"));
     let level = if required { "required" } else { "optional" };
-    format!(" ({level}{})", default.unwrap_or_default())
+    format!(" ({level}{}{})", default.unwrap_or_default(), prefill.unwrap_or_default())
 }
 
 pub(super) fn lines(v: &Value, defs: &Value, at: &str, depth: usize, out: &mut Vec<String>) {
@@ -137,7 +139,7 @@ fn fields(v: &Value, defs: &Value, place: (&str, usize), depth: usize, variant: 
             let shown = resolved(field, defs);
             let forced = NEEDED.contains(&(at, key.as_str()));
             let required = (forced || need.contains(&key.as_str())) && !nullable(&shown);
-            let tag = if variant { String::new() } else { note(&shown, required) };
+            let tag = if variant { String::new() } else { note(&shown, required, &format!("{at}.{key}")) };
             out.push(format!("{pad}{key}: {}{tag}", brief(field, defs)));
             if depth > 0 {
                 let here = format!("{at}.{key}");

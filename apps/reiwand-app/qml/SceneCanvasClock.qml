@@ -6,7 +6,7 @@ QQC2.ToolButton {
     id: clock
 
     required property var page
-    readonly property var size: page.view.canvas?.size ?? [1920, 1080]
+    readonly property var size: page.view.canvas?.size ?? App.fill("Offer.canvas").size
     readonly property bool fresh: JSON.parse(page.editor.value("/scene/clock") || "{}")?.seed === null
 
     function canvas(args) {

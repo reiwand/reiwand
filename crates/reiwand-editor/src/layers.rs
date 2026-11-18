@@ -102,6 +102,10 @@ pub fn assets_of<'a>(doc: &'a Value, kind: &str) -> Vec<&'a str> {
         .collect()
 }
 
+fn offer(kind: &str, own: Value) -> Value {
+    reiwand_scene::prefill::offer(&format!("layer.{kind}"), "", own)
+}
+
 pub fn template(
     doc: &Value,
     kind: &str,
@@ -114,43 +118,45 @@ pub fn template(
         let article = if what == "image" { "an" } else { "a" };
         found.ok_or_else(|| anyhow!(said("editor.import", "import %1 %2 first", &[&article, &what])))
     };
-    Ok(match kind {
-        "image" => json!({ "blend_space": "canvas", "id": id, "type": "image", "image": asset("image")?}),
-        "video" => json!({ "blend_space": "canvas", "id": id, "type": "video", "video": asset("video")?}),
-        "sound" => json!({ "blend_space": "canvas", "id": id, "type": "sound", "sound": asset("sound")?}),
-        "mesh" => json!({ "blend_space": "canvas", "id": id, "type": "mesh", "mesh": asset("model")?}),
-        "model" => json!({ "blend_space": "canvas", "id": id, "type": "model", "model": asset("model")?}),
+    let made = match kind {
+        "image" => json!({ "id": id, "type": "image", "image": asset("image")?}),
+        "video" => json!({ "id": id, "type": "video", "video": asset("video")?}),
+        "sound" => json!({ "id": id, "type": "sound", "sound": asset("sound")?}),
+        "mesh" => json!({ "id": id, "type": "mesh", "mesh": asset("model")?}),
+        "model" => json!({ "id": id, "type": "model", "model": asset("model")?}),
         "shapes" => {
             let pools = doc.pointer("/scene/pools").and_then(Value::as_object);
             let first = pools.and_then(|p| p.keys().next().cloned());
             let pool = source.map(String::from).or(first);
             let pool = pool.ok_or_else(|| anyhow!(said("editor.add_pool", "add a pool first", &[])))?;
-            json!({ "blend_space": "canvas", "id": id, "type": "video", "video": pool})
+            json!({ "id": id, "type": "video", "video": pool})
         }
         "group3d" => {
-            json!({ "blend_space": "canvas", "id": id, "type": "group", "space": "3d", "layers": []})
+            json!({ "id": id, "type": "group", "space": "3d", "layers": []})
         }
         "text" => {
-            json!({ "blend_space": "canvas", "id": id, "type": "text", "text": name.unwrap_or("Text"), "size": 96, "color": "#ffffff"})
+            let mut own = json!({ "id": id, "type": "text" });
+            name.into_iter().for_each(|n| own["text"] = json!(n));
+            offer("text", own)
         }
-        "shape" => {
-            json!({ "blend_space": "canvas", "id": id, "type": "shape", "shape": {"rect": {"size": [480, 320], "radius": 24}},
-            "fill": "#4a90d9"})
-        }
-        "solid" => json!({ "blend_space": "canvas", "id": id, "type": "solid", "color": "#203040"}),
-        "spectrum" => json!({ "blend_space": "canvas", "id": id, "type": "spectrum", "size": [960, 240]}),
+        "shape" => offer("shape", json!({ "id": id, "type": "shape" })),
+        "solid" => offer("solid", json!({ "id": id, "type": "solid" })),
+        "spectrum" => offer("spectrum", json!({ "id": id, "type": "spectrum" })),
         "particles" => {
-            json!({ "blend_space": "canvas", "id": id, "type": "particles", "system": source.unwrap_or(id)})
+            json!({ "id": id, "type": "particles", "system": source.unwrap_or(id)})
         }
-        "group" => json!({ "blend_space": "canvas", "id": id, "type": "group", "layers": []}),
-        "adjustment" => json!({ "blend_space": "canvas", "id": id, "type": "adjustment", "effects": []}),
+        "group" => json!({ "id": id, "type": "group", "layers": []}),
+        "adjustment" => json!({ "id": id, "type": "adjustment", "effects": []}),
         "light" => crate::lamps::template(doc, id, source)?,
         _ => bail!(said(
             "editor.not_layer_type",
             "%1 is not a layer type; use one of %2",
             &[&kind, &(KINDS.join(", "))]
         )),
-    })
+    };
+    let mut made = made;
+    made["blend_space"] = reiwand_scene::prefill::of("Layer", json!({}))["blend_space"].clone();
+    Ok(made)
 }
 
 pub fn system(doc: &Value) -> Value {

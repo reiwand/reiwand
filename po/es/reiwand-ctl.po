@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Reiwand\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 00:00+0000\n"
+"POT-Creation-Date: 2026-11-18 00:00+0000\n"
 "PO-Revision-Date: 2026-11-06 00:00+0000\n"
 "Last-Translator: Reiwand contributors\n"
 "Language-Team: Reiwand contributors\n"
@@ -68,7 +68,9 @@ msgstr "Dejar de usar una cuenta en un repositorio; la cuenta se conserva"
 msgid ""
 "Sign out of an account: its saved access is deleted and its links stay; sign "
 "in again to use it"
-msgstr "Cierra la sesión de una cuenta: se borra su acceso guardado y sus vínculos se conservan; vuelve a iniciar sesión para usarla"
+msgstr ""
+"Cierra la sesión de una cuenta: se borra su acceso guardado y sus vínculos "
+"se conservan; vuelve a iniciar sesión para usarla"
 
 #: apps/reiwand-ctl/src/accounts.rs
 msgid "Forget an account on this computer, with its saved access"
@@ -3599,6 +3601,20 @@ msgid "Allow a version older than the installed one"
 msgstr "Permitir una versión anterior a la instalada"
 
 #: apps/reiwand-ctl/src/pkg.rs
+msgid ""
+"Import package files into the library, or update the ones already imported"
+msgstr ""
+"Importa archivos de paquete a la biblioteca, o actualiza los ya importados"
+
+#: apps/reiwand-ctl/src/pkg.rs
+msgid "Package files (.wpak) to import"
+msgstr "Archivos de paquete (.wpak) que importar"
+
+#: apps/reiwand-ctl/src/pkg.rs
+msgid "Allow a version older than the imported one"
+msgstr "Permite una versión más antigua que la importada"
+
+#: apps/reiwand-ctl/src/pkg.rs
 msgid "Install every available update"
 msgstr "Instalar todas las actualizaciones disponibles"
 
@@ -3627,10 +3643,6 @@ msgid "no preview"
 msgstr "sin vista previa"
 
 #: apps/reiwand-ctl/src/pkg.rs
-msgid "the connection to the session bus was closed"
-msgstr "se cerró la conexión con el bus de sesión"
-
-#: apps/reiwand-ctl/src/pkg.rs
 msgid "Repository %1 is stale (its signed index expired). Install anyway?"
 msgstr ""
 "El repositorio %1 está desactualizado (caducó su índice firmado). ¿Instalar "
@@ -3653,6 +3665,14 @@ msgstr ""
 "\n"
 "Novedades de %1 %2:\n"
 "%3\n"
+
+#: apps/reiwand-ctl/src/pkg_import.rs
+msgid "%1 packages were not imported"
+msgstr "No se importaron %1 paquetes"
+
+#: apps/reiwand-ctl/src/pkg_preview.rs
+msgid "the connection to the session bus was closed"
+msgstr "se cerró la conexión con el bus de sesión"
 
 #: apps/reiwand-ctl/src/playlists.rs
 msgid "Playlist uid or name"
@@ -5145,6 +5165,14 @@ msgstr ""
 "siempre: %1"
 
 #: apps/reiwand-ctl/src/server.rs
+msgid ""
+"Repository whose account is used (address or id); required when several "
+"repositories have an account"
+msgstr ""
+"Repositorio cuya cuenta se usa (dirección o id); obligatorio cuando varios "
+"repositorios tienen cuenta"
+
+#: apps/reiwand-ctl/src/server.rs
 msgid "Upload a .wpak package to the repository of your account"
 msgstr "Subir un paquete .wpak al repositorio de tu cuenta"
 
@@ -5163,6 +5191,12 @@ msgstr ""
 "no es privado"
 
 #: apps/reiwand-ctl/src/server.rs
+msgid ""
+"Repository to publish to; required when several repositories have an account"
+msgstr ""
+"Repositorio donde publicar; obligatorio cuando varios repositorios tienen "
+"cuenta"
+
 #: apps/reiwand-ctl/src/server.rs
 msgid ""
 "List the packages this account uploaded, with their state and visibility"
@@ -6296,23 +6330,3 @@ msgstr "Invierno"
 #: apps/reiwand-ctl/src/wording.rs
 msgid "Yellow"
 msgstr "Amarillo"
-
-msgid "Repository whose account is used (address or id); required when several repositories have an account"
-msgstr "Repositorio cuya cuenta se usa (dirección o id); obligatorio cuando varios repositorios tienen cuenta"
-
-msgid "Repository to publish to; required when several repositories have an account"
-msgstr "Repositorio donde publicar; obligatorio cuando varios repositorios tienen cuenta"
-
-#: apps/reiwand-ctl/src/pkg.rs
-msgid "%1 packages were not imported"
-msgstr "No se importaron %1 paquetes"
-
-#: apps/reiwand-ctl/src/pkg.rs
-msgid "Import package files into the library, or update the ones already imported"
-msgstr "Importa archivos de paquete a la biblioteca, o actualiza los ya importados"
-
-msgid "Package files (.wpak) to import"
-msgstr "Archivos de paquete (.wpak) que importar"
-
-msgid "Allow a version older than the imported one"
-msgstr "Permite una versión más antigua que la importada"

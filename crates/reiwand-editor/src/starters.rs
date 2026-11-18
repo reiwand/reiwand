@@ -106,7 +106,7 @@ pub fn starter(name: &str, id: &str, title: &str, locale: &str) -> Result<Value>
     (manifest["kind"], manifest["entry"], manifest["properties"]) =
         (json!("scene"), json!("scene.json"), properties);
     let mut scene = json!({"schema": reiwand_scene::SCHEMA,
-        "canvas": {"size": [1920, 1080], "fit": "fill", "background": "#000000"},
+        "canvas": reiwand_scene::prefill::offer("canvas", "", json!({})),
         "clock": {"max_fps": "display"}, "layers": layers});
     if particles.as_object().is_some_and(|p| !p.is_empty()) {
         scene["particles"] = particles;

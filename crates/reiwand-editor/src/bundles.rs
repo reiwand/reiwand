@@ -11,6 +11,6 @@ pub(crate) fn document(name: &str, base: Value) -> Option<Value> {
     manifest["entry"] = json!("assets.json");
     manifest["requires"] = json!({ "features": ["assets"] });
     let scene = json!({"schema": reiwand_scene::SCHEMA,
-        "canvas": {"size": [1920, 1080], "fit": "fill", "background": "#000000"}, "layers": []});
+        "canvas": reiwand_scene::prefill::offer("canvas", "", json!({})), "layers": []});
     Some(json!({ "manifest": manifest, "scene": scene }))
 }

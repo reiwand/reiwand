@@ -50,8 +50,11 @@ pub fn list(doc: &Value) -> Value {
 fn fresh(e: &PoolEdit) -> Map<String, Value> {
     let mut pool = Map::new();
     pool.insert("type".into(), json!("mesh"));
-    pool.insert("max".into(), json!(e.max.unwrap_or(16)));
-    pool.insert("max_vertices".into(), json!(e.max_vertices.unwrap_or(1024)));
+    pool.insert("max".into(), json!(e.max.unwrap_or_else(|| reiwand_scene::prefill::arg("pool.max"))));
+    pool.insert(
+        "max_vertices".into(),
+        json!(e.max_vertices.unwrap_or_else(|| reiwand_scene::prefill::arg("pool.max_vertices"))),
+    );
     pool.insert("texture".into(), Value::Null);
     pool.insert("size".into(), Value::Null);
     pool

@@ -11,7 +11,7 @@ fn pair(v: &Value) -> Option<[f64; 2]> {
 }
 
 pub(super) fn frame(dir: &Path, doc: &Value, layer: Option<&str>, t: f64) -> Frame {
-    let canvas = pair(&doc["scene"]["canvas"]["size"]).unwrap_or([1920.0, 1080.0]);
+    let canvas = pair(&doc["scene"]["canvas"]["size"]).unwrap_or_else(reiwand_scene::prefill::canvas);
     let found = layer.and_then(|id| crate::canvas::gizmos(dir, doc, t).into_iter().find(|g| g.id == id));
     let Some(g) = found else { return Frame::new([1.0, 0.0, 0.0, 1.0, 0.0, 0.0]) };
     let at = [g.offset[0] + g.position[0], g.offset[1] + g.position[1]];

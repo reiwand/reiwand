@@ -49,7 +49,7 @@ pub(super) fn perspective(doc: &Value, sys: &str, focal: Option<f64>, off: bool)
     let mut ops = Vec::new();
     focal.iter().for_each(|f| ops.extend(set(doc, &at("perspective"), json!({ "focal": f }))));
     if focal.is_none() && doc.pointer(&at("perspective")).is_none() {
-        ops.extend(set(doc, &at("perspective"), json!({ "focal": 800 })));
+        ops.extend(set(doc, &at("perspective"), reiwand_scene::prefill::offer("perspective", "", json!({}))));
     }
     ops
 }

@@ -70,6 +70,8 @@ pub mod qobject {
         #[qinvokable]
         fn tr(self: &Backend, text: &QString) -> QString;
         #[qinvokable]
+        fn prefill(self: &Backend) -> QString;
+        #[qinvokable]
         fn url(self: &Backend, path: &QString) -> QString;
         #[qinvokable]
         fn requested(self: &Backend) -> QString;
@@ -164,6 +166,10 @@ impl Backend {
 
     pub fn tr(&self, text: &QString) -> QString {
         QString::from(&tr::tr(&text.to_string()))
+    }
+
+    pub fn prefill(&self) -> QString {
+        QString::from(&reiwand_scene::prefill::table())
     }
 
     pub fn requested(&self) -> QString {

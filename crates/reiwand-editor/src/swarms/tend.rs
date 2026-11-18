@@ -92,7 +92,7 @@ fn flock(doc: &Value, sys: &str, change: Option<&Value>, off: bool) -> Result<Ve
         let path = |i| if list.len() == 1 { at.clone() } else { format!("{at}/{i}") };
         return Ok(found.map(|i| vec![Op::Remove { path: path(i) }]).unwrap_or_default());
     }
-    let fresh = json!({ "boids": { "radius": 40, "separation": 1, "alignment": 1, "cohesion": 0.5, "max_speed": 200 } });
+    let fresh = json!({ "boids": reiwand_scene::prefill::of("Boids", json!({})) });
     let mut entry = found.map_or(fresh, |i| list[i].clone());
     entry["boids"] = merged(entry["boids"].take(), change);
     parsed::<Operator>(&entry, "boids")?;
@@ -112,7 +112,7 @@ fn strand(
 ) -> Result<Vec<Op>> {
     let (key, fresh) = match kind {
         Strand::Rope => ("rope", json!({})),
-        Strand::Trail => ("trail", json!({ "length": 32, "width": 0.5 })),
+        Strand::Trail => ("trail", reiwand_scene::prefill::offer("trail", "", json!({}))),
     };
     render(doc, sys, layer, |d, at| {
         let path = format!("{at}/{key}");

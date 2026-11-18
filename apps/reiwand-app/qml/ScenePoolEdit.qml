@@ -14,8 +14,8 @@ Kirigami.Dialog {
     function show(existing) {
         pool = existing;
         name.text = existing?.id ?? "";
-        shapes.value = existing?.max ?? 16;
-        vertices.value = existing?.max_vertices ?? 1024;
+        shapes.value = existing?.max ?? App.fill("Action.pool.max");
+        vertices.value = existing?.max_vertices ?? App.fill("Action.pool.max_vertices");
         picture.currentIndex = existing?.texture ? pictures.indexOf(existing.texture) + 1 : 0;
         own.checked = existing?.size !== null && existing?.size !== undefined;
         wide.value = existing?.size?.[0] ?? 256;

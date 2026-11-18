@@ -152,3 +152,17 @@ automático) es un **valor** y se escribe siempre.
 - Alcance: escenas y descriptores de efectos. Manifiesto, ajustes, ediciones y exportación quedan como estaban.
 - Tamaño: las escenas de `scenes/` pasan de 166193 a 105339 bytes (−37 %) y las escenas, ejemplos y efectos
   del repositorio de 524270 a 390665 bytes.
+
+## Acciones del editor y comando `scene` sin valores inventados
+
+- La tabla `crates/reiwand-scene/src/prefill.json` lleva, además de las filas `Tipo.campo`, dos familias que no
+  anotan el esquema: `Action.<acción>.<ruta>` (valor sugerido de un argumento escalar de una acción) y
+  `Offer.<nombre>` (objeto parcial que el editor ofrece al crear algo: cámara, estela, perspectiva, lienzo,
+  capas de texto o forma, luces, propiedades). El código del editor las lee con `prefill::arg`, `prefill::offer`
+  y `prefill::canvas`; no quedan constantes en las acciones de crear.
+- `reiwand-ctl scene actions NOMBRE` muestra cada argumento opcional como `(optional, prefill X)`.
+- Toda acción de crear completa el archivo con `completing`; `apps/reiwand-ctl/tests/scene/examples.rs` carga
+  de forma estricta `manifest.json` y `scene.json` tras cada ejemplo de `scene act`.
+- Pruebas: `crates/reiwand-editor/tests/offers.rs` y `manual/tests.rs`.
+- Límite: el QML del editor aún lleva alternativas literales (`?? 16`, `?? [1920, 1080]` y similares) que
+  repiten filas de la tabla; se sustituyen cuando el editor entregue la tabla a la interfaz.

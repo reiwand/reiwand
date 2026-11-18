@@ -57,7 +57,7 @@ ColumnLayout {
             Layout.fillWidth: true
             from: 0
             to: pixels ? 256 : 1
-            value: pixels ? (bend.bent?.shift ?? 8) : (bend.bent?.amount ?? 0.3)
+            value: pixels ? (bend.bent?.shift ?? App.fill("Action.particles.refract.shift")) : (bend.bent?.amount ?? App.fill("Action.particles.refract.amount"))
             onMoved: bend.put(pixels ? {
                 "shift": Math.round(value)
             } : {

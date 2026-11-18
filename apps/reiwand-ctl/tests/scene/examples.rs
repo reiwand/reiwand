@@ -74,7 +74,24 @@ fn tried(kind: &str, name: &str, tmp: &Path, ready: bool) -> Option<String> {
     if !ready && name == "depth_map" {
         return None;
     }
-    failure(kind, name, &lines, &shell(&work, &scene(last)), kind == "ask")
+    if let Some(why) = failure(kind, name, &lines, &shell(&work, &scene(last)), kind == "ask") {
+        return Some(why);
+    }
+    kind.eq("act").then(|| incomplete(name, &work.join("mi-escena"))).flatten()
+}
+
+fn incomplete(name: &str, dir: &Path) -> Option<String> {
+    let manifest = std::fs::read_to_string(dir.join("manifest.json")).expect("manifest.json");
+    let mut faults = Vec::new();
+    if let Err(e) = reiwand_format::Manifest::from_json(manifest.as_bytes()) {
+        faults.push(format!("manifest: {e}"));
+    }
+    if let Ok(text) = std::fs::read_to_string(dir.join("scene.json"))
+        && let Err(e) = reiwand_scene::Scene::from_json(&text)
+    {
+        faults.push(format!("scene: {e}"));
+    }
+    (!faults.is_empty()).then(|| format!("act {name} leaves an incomplete result:\n{}", faults.join("\n")))
 }
 
 #[test]

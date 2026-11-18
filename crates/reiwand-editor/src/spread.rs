@@ -5,7 +5,8 @@ use serde_json::{Value, json};
 fn canvas(doc: &Value) -> [u32; 2] {
     let read = |i: usize| doc.pointer(&format!("/scene/canvas/size/{i}")).and_then(Value::as_u64);
     let side = |i, or| read(i).and_then(|v| u32::try_from(v).ok()).filter(|v| *v > 0).unwrap_or(or);
-    [side(0, 1920), side(1, 1080)]
+    let fallback = reiwand_scene::prefill::canvas();
+    [side(0, fallback[0] as u32), side(1, fallback[1] as u32)]
 }
 
 fn given(list: &Value) -> Result<Vec<Monitor>, String> {

@@ -33,7 +33,7 @@ QQC2.ToolButton {
             height: visible ? implicitHeight : 0
             onTriggered: tool.camera2d({
                 "camera": {
-                    "zoom": 1
+                    "zoom": App.fill("Offer.camera").zoom
                 }
             })
         }

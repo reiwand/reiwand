@@ -46,7 +46,9 @@ pub(super) fn probe(
     ensure!(leaning, said("editor.probe_tilt", "the simulated tilt goes from -1 to 1 on each side", &[]));
     let kept = |k: &str, d: Value| doc.pointer(PROBE).and_then(|p| p.get(k)).cloned().unwrap_or(d);
     let r = |p: [f64; 2]| json!(p.map(|v| (v * 1e4).round() / 1e4));
-    let pointer = pointer.map_or_else(|| kept("pointer", json!([0.5, 0.5])), r);
-    let tilt = tilt.map_or_else(|| kept("tilt", json!([0, 0])), r);
+    let pointer = pointer
+        .map_or_else(|| kept("pointer", reiwand_scene::prefill::arg::<Value>("canvas.probe.pointer")), r);
+    let tilt =
+        tilt.map_or_else(|| kept("tilt", reiwand_scene::prefill::arg::<Value>("canvas.probe.tilt")), r);
     Ok(set(doc, PROBE, json!({ "pointer": pointer, "tilt": tilt })))
 }

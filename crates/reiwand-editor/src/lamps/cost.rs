@@ -51,7 +51,9 @@ pub fn cost(dir: &Path, doc: &Value, t: f64, quality: Quality) -> Value {
     let (lit_swarms, bent) = swarms(doc);
     let canvas = doc["scene"]["canvas"]["size"]
         .as_array()
-        .map_or(1920.0 * 1080.0, |s| s.iter().filter_map(Value::as_f64).product::<f64>());
+        .map_or(reiwand_scene::prefill::canvas().iter().product::<f64>(), |s| {
+            s.iter().filter_map(Value::as_f64).product::<f64>()
+        });
     let level = |q: Quality, tier: Tier| {
         let baked = q == Quality::Q0;
         let per_frame = if baked || !animated { 0.0 } else { pixels * lights as f64 };

@@ -93,7 +93,16 @@ pub(crate) fn param(json: &mut Value, c: &ParamChange) -> Result<()> {
         Some(at) => at,
         None => {
             crate::clips::valid(c.id)?;
-            let kind = c.set.get("type").and_then(Value::as_str).unwrap_or("float");
+            let kind = c.set.get("type").and_then(Value::as_str).map_or_else(
+                || {
+                    reiwand_scene::prefill::offered_row("wgsl.param")["type"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .to_owned()
+                },
+                str::to_owned,
+            );
+            let kind = kind.as_str();
             params.push(super::whole::param(c.id, kind, default_of(kind)));
             params.len() - 1
         }
@@ -105,7 +114,7 @@ pub(crate) fn param(json: &mut Value, c: &ParamChange) -> Result<()> {
         p[k] = v.clone();
     }
     if p["type"] != kind_before && !c.set.contains_key("prefill") {
-        p["prefill"] = default_of(p["type"].as_str().unwrap_or("float"));
+        p["prefill"] = default_of(p["type"].as_str().unwrap_or_default());
     }
     for k in c.clear {
         keyed(k, &PARAM_KEYS_ALL[2..])?;

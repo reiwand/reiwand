@@ -8,7 +8,7 @@ Item {
     required property var page
     required property real ratio
     readonly property var held: page.view.probe ?? null
-    readonly property var size: page.view.canvas?.size ?? [1920, 1080]
+    readonly property var size: page.view.canvas?.size ?? App.fill("Offer.canvas").size
     readonly property bool gyro: page.view.canvas?.parallax?.gyro ?? false
 
     function send(args) {

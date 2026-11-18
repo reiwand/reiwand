@@ -18,6 +18,7 @@ QtObject {
     }
     readonly property var state: JSON.parse(backend.state || "{}")
     readonly property var schema: JSON.parse(backend.schema || "{}")
+    readonly property var prefills: JSON.parse(backend.prefill())
     readonly property bool unveiled: state.options?.["library.show_mature"] === true
     readonly property bool cut: state.options?.["network.private"] === true
     readonly property var jobs: JSON.parse(backend.jobs || "[]")
@@ -25,6 +26,10 @@ QtObject {
     readonly property bool checking: backend.checking
     property string media
     property var libraryFilter: ({})
+
+    function fill(row) {
+        return prefills[row];
+    }
 
     function takeMedia() {
         const taken = media;
