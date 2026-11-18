@@ -17,3 +17,6 @@ libc.workspace = true
 [[test]]
 name = "host"
 harness = false
+
+[dev-dependencies]
+reiwand-upgrade.workspace = true

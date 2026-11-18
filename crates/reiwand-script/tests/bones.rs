@@ -24,7 +24,7 @@ fn rigged(uses: &[&str], source: &str) -> (Script, Vec<String>) {
         "scripts": [{ "path": "main.js", "uses": uses, "events": ["down"] }],
         "layers": [{ "blend_space": "canvas", "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" },
             { "blend_space": "canvas", "id": "fox", "type": "mesh", "mesh": "rig", "size": [64, 64], "hit": ["arm"] }] });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     let bytes = glb();
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(bytes.clone())).unwrap();
     let names = scene.rigs["rig"].joints.iter().map(|j| j.name.clone()).collect();

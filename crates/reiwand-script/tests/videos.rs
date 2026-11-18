@@ -54,7 +54,7 @@ fn the_runtime_plays_seeks_and_ends_videos_from_scripts() {
     let doc = filmed(&["animations"]);
     let mut text = doc.clone();
     (text["schema"], text["canvas"]) = (json!(reiwand_scene::SCHEMA), json!({ "size": [1920, 1080] }));
-    let scene = Scene::from_json(&text.to_string()).unwrap();
+    let scene = Scene::from_json(&reiwand_upgrade::fill::whole(&text.to_string())).unwrap();
     let mut rt = Runtime::new(Arc::new(scene), Values::new());
     rt.set_lengths([("rain".to_string(), 3.0)].into());
     rt.advance(1.0);

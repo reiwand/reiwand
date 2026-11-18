@@ -15,7 +15,7 @@ pub fn setup(scene: serde_json::Value, files: &[(&str, &str)]) -> Setup {
     let mut scene = scene;
     scene["schema"] = json!(reiwand_scene::SCHEMA);
     scene["canvas"] = json!({ "size": [200, 100] });
-    let scene = Scene::from_json(&scene.to_string()).unwrap();
+    let scene = Scene::from_json(&reiwand_upgrade::fill::whole(&scene.to_string())).unwrap();
     Setup::new(&scene, &sources(files), 1, ("en", &json!({})))
 }
 

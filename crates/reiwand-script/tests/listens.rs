@@ -11,7 +11,7 @@ fn listening(source: &str, listens: usize) -> Script {
         "listens": entries,
         "scripts": [{ "path": "main.js", "uses": ["audio", "layers"] }],
         "layers": [{ "blend_space": "canvas", "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" }] });
-    let scene = Scene::from_json(&doc.to_string()).unwrap();
+    let scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     let setup = Setup::new(&scene, &sources(&[("main.js", source)]), 1, ("en", &json!({})));
     Script::load(&setup, Limits::default()).unwrap()
 }

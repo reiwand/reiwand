@@ -12,7 +12,7 @@ fn modelled(source: &str) -> Script {
         "scripts": [{ "path": "main.js", "uses": ["animations", "layers"] }],
         "layers": [{ "blend_space": "canvas", "id": "a", "type": "text", "text": "", "size": 10, "font": "serif" },
             { "blend_space": "canvas", "id": "m", "type": "model", "model": "toy", "clips": [{ "id": "bend", "animation": "bend" }], "hit": ["tip"] }] });
-    let mut scene = Scene::from_json(&doc.to_string()).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
     let glb = ForgeRig::new(2.0, 0.5).glb();
     scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
     let setup = Setup::new(&scene, &sources(&[("main.js", source)]), 1, ("en", &json!({})));
