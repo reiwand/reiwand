@@ -39,10 +39,10 @@ fn package_effects_are_imported_listed_and_inspected() {
         Project::create(&dir, starter("empty", "org.example.glow", "Glow", "en").unwrap()).unwrap();
     let source = root.path().join("source");
     fs::create_dir_all(&source).unwrap();
-    fs::write(source.join("glow.json"), descriptor("glow").to_string()).unwrap();
+    fs::write(source.join("glow.json"), whole::descriptor(&descriptor("glow").to_string())).unwrap();
     fs::write(source.join("glow.wgsl"), WGSL).unwrap();
-    fs::write(source.join("blur.json"), descriptor("blur").to_string()).unwrap();
-    fs::write(source.join("loop.json"), descriptor("loop").to_string()).unwrap();
+    fs::write(source.join("blur.json"), whole::descriptor(&descriptor("blur").to_string())).unwrap();
+    fs::write(source.join("loop.json"), whole::descriptor(&descriptor("loop").to_string())).unwrap();
     fs::write(source.join("loop.wgsl"), WGSL.replace("return", "loop { }\n    return")).unwrap();
     let import = |p: &mut Project, name: &str, wgsl: Option<&str>| {
         let wgsl = wgsl.map(|w| source.join(w));
@@ -63,7 +63,7 @@ fn package_effects_are_imported_listed_and_inspected() {
     let layer = json!({"add_layer": {"kind": "solid", "id": "fill"}});
     project.act(&serde_json::from_value::<Action>(whole::action(&project, layer)).unwrap()).unwrap();
     let pointer = reiwand_editor::layers::find(&project.doc, "fill").unwrap();
-    let effect = json!({"add": {"pointer": format!("{pointer}/effects"), "value": [{ "effect": "glow", "params": { "gain": 2 } }]}});
+    let effect = json!({"add": {"pointer": format!("{pointer}/effects"), "value": [{ "effect": "glow", "params": { "gain": 2, "style": 0, "shape": "", "soft": false } }]}});
     project.act(&serde_json::from_value::<Action>(whole::action(&project, effect)).unwrap()).unwrap();
     let at = format!("{pointer}/effects/0");
     assert!(fields_from(None, &project.doc, &at, 0.0, &Default::default()).iter().all(|f| f.key != "gain"));
@@ -75,7 +75,7 @@ fn package_effects_are_imported_listed_and_inspected() {
         (style.widget.as_str(), style.names.clone()),
         ("enum", vec!["Soft".to_string(), "Hard".into()])
     );
-    let shape = fields.iter().find(|f| f.key == "shape").unwrap();
+    let shape = fields.iter().find(|f| f.pointer.ends_with("/params/shape")).unwrap();
     assert_eq!((shape.widget.as_str(), shape.help.as_str()), ("ref:image", "What the glow follows"));
     assert!(!shape.options.contains(&json!({ "layer": "fill" })), "{:?}", shape.options);
     assert!(["white", "black", "noise", "normal_flat"].iter().all(|g| shape.options.contains(&json!(g))));
@@ -90,7 +90,7 @@ fn package_effects_are_imported_listed_and_inspected() {
     let pointer = reiwand_editor::layers::find(&project.doc, "fill").unwrap();
     let at = format!("{pointer}/effects/0");
     let fields = fields_from(None, &project.doc, &at, 0.0, &project.effects());
-    let shape = fields.iter().find(|f| f.key == "shape").unwrap();
+    let shape = fields.iter().find(|f| f.pointer.ends_with("/params/shape")).unwrap();
     assert!(shape.options.contains(&json!({ "layer": "light" })), "{:?}", shape.options);
     let calm = json!({"add_property": {"kind": "bool", "id": "calm"}});
     project.act(&serde_json::from_value::<Action>(whole::action(&project, calm)).unwrap()).unwrap();
@@ -99,8 +99,10 @@ fn package_effects_are_imported_listed_and_inspected() {
         project.act(&serde_json::from_value::<Action>(whole::action(&project, set)).unwrap()).unwrap();
     }
     let fields = fields_from(None, &project.doc, &at, 0.0, &project.effects());
-    let found = |key: &str| fields.iter().find(|f| f.key == key).unwrap().clone();
-    assert_eq!((found("shape").value, found("soft").source), (json!({ "layer": "light" }), "prop".into()));
+    let found = |key: &str| {
+        fields.iter().find(|f| f.key == key && f.pointer.contains("/params/")).unwrap().clone()
+    };
+    assert_eq!((found("shape").value["layer"].clone(), found("soft").source), (json!("light"), "prop".into()));
     assert!(
         reiwand_editor::check::review(&project.doc, Some(&dir)).iter().all(|p| p.warning),
         "{:?}",
@@ -146,7 +148,7 @@ fn the_wake_rules_of_package_effects_are_shown_and_changed_in_their_descriptor()
     let mut p = Project::create(&dir, starter("empty", "org.example.rules", "Rules", "en").unwrap()).unwrap();
     let source = root.path().join("source");
     fs::create_dir_all(&source).unwrap();
-    fs::write(source.join("glow.json"), descriptor("glow").to_string()).unwrap();
+    fs::write(source.join("glow.json"), whole::descriptor(&descriptor("glow").to_string())).unwrap();
     fs::write(source.join("glow.wgsl"), WGSL).unwrap();
     p.act(&Action::ImportEffect { descriptor: source.join("glow.json"), wgsl: None }).unwrap();
     let rule = |p: &mut Project, rule: Value| {
@@ -159,7 +161,7 @@ fn the_wake_rules_of_package_effects_are_shown_and_changed_in_their_descriptor()
     assert_eq!((&written["uses"], &written["waits_for"]), (&json!("time"), &json!("style")));
     assert!(p.dirty(), "a changed rule is a change of the project");
     p.act(&Action::Undo {}).unwrap();
-    assert!(read(&p)["params"][0].get("waits_for").is_none(), "undo puts the old rule back");
+    assert!(read(&p)["params"][0]["waits_for"].is_null(), "undo puts the old rule back");
     p.act(&Action::Redo {}).unwrap();
     assert_eq!(read(&p)["params"][0]["waits_for"], json!("style"), "redo brings the new rule again");
     let shown = reiwand_editor::rigs::query(&p.dir, &p.doc, "", &json!({ "rules": { "effect": "glow" } }));
@@ -171,7 +173,7 @@ fn the_wake_rules_of_package_effects_are_shown_and_changed_in_their_descriptor()
     );
     rule(&mut p, json!({ "effect": "glow", "param": "gain", "uses": "", "waits_for": "" })).unwrap();
     let cleared = read(&p);
-    assert!(cleared["params"][0].get("uses").is_none() && cleared["params"][0].get("waits_for").is_none());
+    assert!(cleared["params"][0]["uses"].is_null() && cleared["params"][0]["waits_for"].is_null());
     let fluid = reiwand_editor::rigs::query(&p.dir, &p.doc, "", &json!({ "rules": { "effect": "fluid" } }));
     assert_eq!(fluid["own"], json!(false));
     assert!(fluid["params"].as_array().unwrap().iter().any(|q| q["waits_for"] == "strength"), "{fluid}");

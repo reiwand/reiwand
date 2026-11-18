@@ -11,11 +11,10 @@ fn the_pictures_a_preset_chooses_replace_the_default_of_their_setting_when_it_is
         json!({"preset": {"values": {}, "files": {"photo": "assets/sky.png", "gone": "assets/none.png"}}});
     let files = chosen_files(dir.path(), &doc);
     assert_eq!(files.len(), 2);
-    let properties: BTreeMap<String, reiwand_format::Property> = serde_json::from_value(json!({
-        "photo": {"type": "file", "default_asset": "backdrop", "accept": ["image"]},
+    let properties: BTreeMap<String, reiwand_format::Property> = reiwand_scene::prefill::properties(json!({
+        "photo": {"type": "file", "default_asset": "backdrop", "accept": ["image"], },
         "gone": {"type": "file", "default_asset": "other", "accept": ["image"]},
-    }))
-    .unwrap();
+    }));
     let mut assets = reiwand_render::SceneAssets::default();
     swap(&mut assets, &properties, &files);
     assert_eq!(assets.images.keys().collect::<Vec<_>>(), ["backdrop"]);

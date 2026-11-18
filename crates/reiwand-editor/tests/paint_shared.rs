@@ -25,7 +25,7 @@ fn painting_a_picture_another_effect_uses_makes_a_copy_for_the_painted_one() {
         starter("empty", "org.example.veil", "Veil", "en").unwrap(),
     )
     .unwrap();
-    let effect = json!({ "effect": "blend_gradient" });
+    let effect = json!({ "effect": "blend_gradient", "params": { "texture": "", "map": "", "progress": 0.5, "softness": 0.1 } });
     let layers = json!([
         { "blend_space": "canvas", "id": "a", "type": "solid", "color": "#ffffff", "effects": [effect] },
         { "blend_space": "canvas", "id": "b", "type": "solid", "color": "#ffffff", "effects": [effect] }

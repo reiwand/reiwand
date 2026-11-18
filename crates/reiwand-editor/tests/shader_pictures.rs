@@ -33,14 +33,14 @@ fn position_mask_and_texture_params_of_a_package_effect_offer_the_generic_pictur
         Project::create(&dir, starter("empty", "org.example.pics", "Pics", "en").unwrap()).unwrap();
     let source = root.path().join("source");
     fs::create_dir_all(&source).unwrap();
-    fs::write(source.join("pics.json"), descriptor().to_string()).unwrap();
+    fs::write(source.join("pics.json"), whole::descriptor(&descriptor().to_string())).unwrap();
     fs::write(source.join("pics.wgsl"), WGSL).unwrap();
     act(&mut project, json!({ "import_effect": { "descriptor": source.join("pics.json") } }));
     act(&mut project, json!({"add_layer": {"kind": "solid", "id": "fill"}}));
     let pointer = reiwand_editor::layers::find(&project.doc, "fill").unwrap();
     act(
         &mut project,
-        json!({"add": {"pointer": format!("{pointer}/effects"), "value": [{ "effect": "pics" }]}}),
+        json!({"add": {"pointer": format!("{pointer}/effects"), "value": [{ "effect": "pics", "params": { "at": [0.5, 0.5], "cover": "", "tex": "", "brush": "" } }]}}),
     );
     let at = format!("{pointer}/effects/0");
     let fields = fields_from(None, &project.doc, &at, 0.0, &project.effects());

@@ -87,6 +87,7 @@ fn the_settings_of_the_base_come_with_their_widgets_and_what_the_preset_sets() {
         "photo": {"type": "file", "accept": ["image"], "order": 6},
         "go": {"type": "button", "order": 7}
     });
+    reiwand_editor::completing::manifest_doc(&mut doc);
     let base = Project::create(&root.path().join("base"), doc).unwrap();
     act(&mut project, json!({"manifest": {"preset": {"values": {"speed": 2.5}}}})).unwrap();
     let found = reiwand_editor::bases::settings(&base.dir, &project.doc["preset"]);
