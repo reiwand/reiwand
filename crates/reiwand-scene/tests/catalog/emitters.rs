@@ -151,5 +151,7 @@ fn scripts_set_the_emitter_list_a_fluid_draws() {
 }
 
 fn flow() -> BTreeMap<String, Property> {
-    serde_json::from_value(json!({ "flow": { "type": "bool", "label": "Flow", "default": true } })).unwrap()
+    reiwand_scene::prefill::properties(
+        json!({ "flow": { "type": "bool", "label": "Flow", "default": true } }),
+    )
 }

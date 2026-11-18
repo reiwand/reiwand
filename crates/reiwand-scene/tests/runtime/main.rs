@@ -14,7 +14,7 @@ mod values;
 mod waiting;
 
 fn props() -> BTreeMap<String, Property> {
-    serde_json::from_str(include_str!("../props.json")).unwrap()
+    reiwand_scene::prefill::properties(serde_json::from_str(include_str!("../props.json")).unwrap())
 }
 
 fn runtime(text: &str) -> Runtime {

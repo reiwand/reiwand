@@ -7,7 +7,7 @@ mod valid;
 const SAMPLE: &str = include_str!("../sample.json");
 
 fn props() -> BTreeMap<String, Property> {
-    serde_json::from_str(include_str!("../props.json")).unwrap()
+    reiwand_scene::prefill::properties(serde_json::from_str(include_str!("../props.json")).unwrap())
 }
 
 fn sample() -> Scene {

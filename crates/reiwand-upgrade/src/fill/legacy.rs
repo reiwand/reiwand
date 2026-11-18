@@ -43,6 +43,10 @@ pub(super) fn follows(def: &str, name: &str, map: &Map<String, Value>) -> Option
         {
             json!("#ffffff")
         }
+        ("Emitter", "delay") | ("Burst", "at") | ("Child", "angle") => json!(0),
+        ("Trail", "subdivide") | ("Trail", "uv_scroll") | ("Hsv", "steps") => json!(0),
+        ("Trail", "uv_scale") => json!(1),
+        ("Transform", "position") => json!([0, 0]),
         ("Mask", "channel") => {
             json!(if map.get("texture").is_some_and(|t| !t.is_null()) { "luminance" } else { "a" })
         }
