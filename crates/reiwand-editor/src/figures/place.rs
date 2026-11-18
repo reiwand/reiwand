@@ -40,7 +40,7 @@ pub(crate) fn hold(
     (at, replace): (Option<f64>, bool),
 ) -> Result<Vec<Op>> {
     let mut staged = doc.clone();
-    apply(&mut staged, ops)?;
+    apply(&mut staged, &crate::completing::complete_all(doc, ops.to_vec()))?;
     let after = seat(dir, &staged, id, at.unwrap_or(0.0)).ok_or_else(|| {
         anyhow!(said("editor.grip_unplaced", "the layer %1 is not placed on the canvas", &[&id]))
     })?;
