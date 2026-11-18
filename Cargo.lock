@@ -4551,6 +4551,7 @@ version = "1.0.0"
 dependencies = [
  "bytemuck",
  "half",
+ "image",
  "libc",
  "naga",
  "reiwand-core",
@@ -4770,7 +4771,6 @@ dependencies = [
  "reiwand-scene",
  "reiwand-schedule",
  "reiwand-script",
- "reiwand-type",
  "reiwand-upgrade",
  "reiwand-video",
  "reiwand-wayland",
