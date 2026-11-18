@@ -12,7 +12,7 @@ ctl scene act "$craft" effects '{"mask": {"channel": "luminance", "from": "hole"
 ctl scene act "$craft" effects '{"move": {"index": 1, "layer": "card", "to": 0}}' || fail "the effect was not moved"
 ctl scene act "$craft" effects '{"remove": {"index": 1, "layer": "card"}}' || fail "the effect was not removed"
 ctl scene act "$craft" add '{"pointer": "/scene/layers/1/effects/-", "value": {"effect": "vignette"}}' || fail "the list of effects was not created"
-ctl scene preview "$craft" -o preview:1 --time 0.5 || fail "a scene with masked effects was not previewed"
+looks_at "$craft" -o preview:1 --time 0.5 || fail "a scene with masked effects was not previewed"
 ctl scene act "$craft" add_layer '{"id": "dust", "kind": "particles"}' >/dev/null
 ctl scene act "$craft" particles '{"create": {"on": "static", "parent": "dust", "system": "sparks"}}' || fail "no child system was created"
 ctl scene act "$craft" particles '{"settings": {"capacity": 300, "prewarm": 1, "rate": 30, "seed": 4, "space": "world", "system": "dust"}}' || fail "the system was not set"
@@ -37,7 +37,7 @@ ctl scene act "$craft" particles '{"render": {"brightness": 2.5, "fps": 8, "fram
   fail "the look of the particles was not set"
 ctl scene act "$craft" particles '{"create": {"system": "lone"}}' || fail "no lone system was created"
 ctl scene act "$craft" particles '{"delete": {"system": "lone"}}' || fail "a lone system was not deleted"
-ctl scene preview "$craft" -o preview:1 --time 0.5 || fail "a scene with every particle field was not previewed"
+looks_at "$craft" -o preview:1 --time 0.5 || fail "a scene with every particle field was not previewed"
 ctl scene act "$craft" layer '{"transform": {"layer": "card", "position": [100, -20], "rotation": -15, "scale": [2, 2], "size": [300, 200]}}' || fail "the layer was not placed"
 ctl scene act "$craft" layer '{"blend": {"blend": "screen", "layer": "card"}}' || fail "the blend mode was not set"
 ctl scene act "$craft" layer '{"transform": {"layer": "card", "tilt": [20, -10], "z": 120}}' || fail "the layer was not tilted"
@@ -62,7 +62,7 @@ ctl scene act "$craft" canvas '{"bloom": {"radius": 24, "strength": 2}}' || fail
 ctl scene act "$craft" canvas '{"parallax": {"amount": 1.5, "gyro": true}}' || fail "the canvas has no parallax"
 ctl scene import "$craft" "$ROOT/tests/fixtures/green-64x32.png" --id sheet --atlas 2,4 >/dev/null || fail "no sprite sheet was imported"
 ctl scene import "$craft" "$ROOT/tests/fixtures/green-64x32.png" --id bumps --linear >/dev/null || fail "no linear picture was imported"
-ctl scene preview "$craft" -o preview:1 --time 0.5 || fail "a scene with authored layers, canvas and manifest was not previewed"
+looks_at "$craft" -o preview:1 --time 0.5 || fail "a scene with authored layers, canvas and manifest was not previewed"
 ctl scene act "$craft" add_layer '{"kind": "solid", "id": "generic"}' >/dev/null || fail "scene act added no layer"
 ctl scene act "$craft" set '{"pointer": "/scene/canvas/background", "value": "#204060"}' || fail "scene act set no value"
 [ "$(scene_doc "$craft" /scene/canvas/background)" = '"#204060"' ] || fail "scene act did not change the background"
@@ -71,8 +71,8 @@ scene_doc "$craft" /scene/ext/editor | grep -q generic || fail "the batch did no
 ctl scene act "$craft" undo || fail "a batch was not undone"
 if scene_doc "$craft" /scene/ext/editor 2>/dev/null | grep -q generic; then fail "a batch was not undone as one step"; fi
 ctl scene actions add_layer | grep -q "kind: string (required)" || fail "scene actions did not describe add_layer"
-ctl scene preview "$craft" -o preview:1 --time 0.5 --quality q1 --battery --calm || fail "a preview on battery with reduced motion was refused"
-ctl scene preview "$craft" -o preview:1 --time 0.5 --without-bloom || fail "a preview without the glow was refused"
+looks_at "$craft" -o preview:1 --time 0.5 --quality q1 --battery --calm || fail "a preview on battery with reduced motion was refused"
+looks_at "$craft" -o preview:1 --time 0.5 --without-bloom || fail "a preview without the glow was refused"
 ctl scene preview "$craft" -o preview:1 --stop
 shots=$scene/shots
 mkdir -p "$shots"

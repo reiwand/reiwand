@@ -2,7 +2,6 @@
 set -euo pipefail
 declare scene
 draft=$scene/draft
-looks_at() { local copy; copy=$(mktemp -d "$WORK/look.XXXXXX"); cp -r "$1/." "$copy"; complete "$copy"; shift; ctl scene preview "$copy" "$@"; }
 ctl scene new "$draft" >/dev/null
 ctl scene act "$draft" set '{"pointer": "/scene/canvas/background", "value": "#00ff00"}'
 read -r _ _ _ s15 < <(ctl stream preview:1 160 90)

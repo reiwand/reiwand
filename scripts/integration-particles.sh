@@ -5,7 +5,7 @@ ctl scene act "$draft" add_layer '{"id": "dust", "kind": "particles"}' >/dev/nul
 ctl scene act "$draft" particles '{"point": {"angle": 15, "at": [40, 30], "follow": false, "point": 1, "system": "dust"}}' || fail "no control point was placed"
 ctl scene act "$draft" particles '{"shape": {"emitter": 0, "shape": {"around": {"axis": [0, 0, 1], "at": "p1", "count": 12, "mode": "mirror", "radius": 20}}, "system": "dust"}}' ||
   fail "the emitter was not put around a point"
-ctl scene act "$draft" particles '{"shape": {"emitter": 1, "shape": {"between": {"arc": {"amount": 0.2}, "count": 8, "from": "p0", "to": "p1"}}, "system": "dust"}}' ||
+ctl scene act "$draft" particles '{"shape": {"emitter": 1, "shape": {"between": {"arc": {"amount": 0.2, "side": 1}, "count": 8, "from": "p0", "to": "p1"}}, "system": "dust"}}' ||
   fail "no emitter between two points was added"
 ctl scene act "$draft" particles '{"layer": {"color": true, "emitter": 1, "id": "badge", "inherit": true, "refresh": "on_change", "system": "dust", "threshold": 0.4}}' ||
   fail "the emitter does not take a layer"
@@ -27,7 +27,7 @@ ctl scene act "$draft" particles '{"turbulent": {"system": "dust", "turbulent": 
 ctl scene act "$draft" particles '{"turbulent": {"quiet": true, "system": "dust", "turbulent": {}}}' || fail "the turbulent start still follows the sound"
 ctl scene act "$draft" particles '{"offset": {"offset": {"distance": 12, "octaves": 3, "sign": [0, 1]}, "system": "dust"}}' || fail "no fractal offset was set"
 scene_doc "$draft" /manifest/requires/features | grep particle_depth >/dev/null || fail "depth left particle_depth out"
-ctl scene preview "$draft" -o preview:1 --time 0.5 || fail "a scene with newer particles was not previewed"
+looks_at "$draft" -o preview:1 --time 0.5 || fail "a scene with newer particles was not previewed"
 ctl scene act "$draft" particles '{"perspective": {"off": true, "system": "dust"}}' || fail "the depth was not removed"
 ctl scene act "$draft" particles '{"collider": {"collider": {"bounce": 0.5, "bounds": {"box": {"from": [0, 0], "inside": true, "to": [400, 300]}}}, "system": "dust"}}' ||
   fail "no box collider was added"
@@ -53,8 +53,8 @@ ctl scene act "$draft" particles '{"pace": {"max_per_step": 1, "system": "dust"}
 scene_doc "$draft" /scene/particles/dust/emitters/1/max_per_step | grep -x 1 >/dev/null || fail "an emitter was not paced"
 ctl scene act "$draft" particles '{"strand": {"settings": {"length": 48, "segments": 8, "subdivide": 2, "textured": true}, "strand": "trail", "system": "dust"}}' || fail "no long trail was drawn"
 ctl scene act "$draft" particles '{"texture": {"system": "dust"}}' || fail "the texture was not cleared"
-ctl scene preview "$draft" -o preview:1 --time 0.5 --quality q1 --restart || fail "the particles were not previewed at a lower quality"
-ctl scene preview "$draft" -o preview:1 --time 0.5 --quality q1 --restart || fail "the particles were not restarted"
+looks_at "$draft" -o preview:1 --time 0.5 --quality q1 --restart || fail "the particles were not previewed at a lower quality"
+looks_at "$draft" -o preview:1 --time 0.5 --quality q1 --restart || fail "the particles were not restarted"
 ctl scene act "$draft" particles '{"turbulent": {"off": true, "system": "dust", "turbulent": {}}}' && ctl scene act "$draft" particles '{"offset": {"off": true, "offset": {}, "system": "dust"}}'
 ctl scene act "$draft" particles '{"force": {"index": 3, "remove": true, "system": "dust"}}' && ctl scene act "$draft" particles '{"boids": {"boids": {}, "off": true, "system": "dust"}}'
 ctl scene act "$draft" particles '{"strand": {"off": true, "strand": "rope", "system": "dust"}}' || fail "the rope was not removed"

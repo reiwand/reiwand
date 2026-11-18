@@ -40,14 +40,14 @@ ctl pack check "$draft" >/dev/null || fail "the scene with lit air and particles
 for f in volumetric_lights light_textures particle_lighting; do
   scene_doc "$draft" /manifest/requires/features | grep "$f" >/dev/null || fail "the scene left $f out"
 done
-ctl scene preview "$draft" -o preview:1 --time 0.5 || fail "lit air and particles were not previewed"
+looks_at "$draft" -o preview:1 --time 0.5 || fail "lit air and particles were not previewed"
 ctl scene act "$draft" particles '{"refract": {"off": true, "system": "dust"}}' && ctl scene act "$draft" particles '{"lit": {"lit": false, "normal": "", "system": "dust"}}'
 ctl scene act "$draft" lighting '{"layer": "dust", "off": true}' || fail "the particles layer kept its lighting"
 ctl scene act "$draft" light '{"projection": {"layer": "beam", "off": true}}' && ctl scene act "$draft" light '{"volumetric": {"layer": "beam", "off": true}}'
 ctl scene act "$draft" light '{"remove": {"layer": "beam"}}' || fail "the second spot light was not removed"
 ctl pack check "$draft" >/dev/null || fail "the lit scene is not valid"
 scene_doc "$draft" /manifest/requires/features | grep lighting2d >/dev/null || fail "lighting left lighting2d out"
-ctl scene preview "$draft" -o preview:1 --time 0.5 || fail "a lit scene was not previewed"
+looks_at "$draft" -o preview:1 --time 0.5 || fail "a lit scene was not previewed"
 ctl scene act "$draft" light '{"remove": {"layer": "tube"}}' || fail "the tube light was not removed"
 ctl scene act "$draft" light '{"remove": {"layer": "lamp"}}' || fail "the spot light was not removed"
 ctl scene act "$draft" ambient '{"clear": true}' || fail "the ambient light was not cleared"

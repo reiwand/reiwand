@@ -22,7 +22,7 @@ ctl scene act "$draft" scene3d '{"view": {"orbit": [10, 5]}}' || fail "a 3D edit
 ctl scene act "$draft" scene3d '{"view": {"reset": true}}' || fail "the authoring view was not reset"
 ctl scene act "$draft" scene3d '{"tones": {"hdr": true, "split": 0.5, "tonemap": "aces"}}' || fail "the tone map was not set"
 ctl pack check "$draft" >/dev/null || fail "the 3D scene is not valid"
-ctl scene preview "$draft" -o preview:1 --time 0.2 || fail "the 3D scene was not previewed"
+looks_at "$draft" -o preview:1 --time 0.2 || fail "the 3D scene was not previewed"
 ctl scene act "$draft" scene3d '{"tones": {"hdr": false, "split": 0, "tonemap": "none"}}' || fail "the tone map was not turned off"
 rig=$ROOT/tests/fixtures/rig.glb
 ctl scene import "$draft" "$rig" --id rig3d >/dev/null || fail "no rigged model was imported"
@@ -54,7 +54,7 @@ ctl scene act "$draft" scene3d '{"path": {"set": {"ease": "in_out_sine", "loop":
 ctl scene act "$draft" scene3d '{"path": {"order": {"order": "random"}}}' || fail "the paths were not ordered"
 ctl scene act "$draft" scene3d '{"path": {"fade": {"duration": 0.5, "to": "cross"}}}' || fail "the paths were not faded"
 ctl pack check "$draft" >/dev/null || fail "the animated 3D scene is not valid"
-ctl scene preview "$draft" -o preview:1 --time 0.5 || fail "the animated 3D scene was not previewed"
+looks_at "$draft" -o preview:1 --time 0.5 || fail "the animated 3D scene was not previewed"
 ctl scene act "$draft" scene3d '{"path": {"remove": {"path": "tour"}}}' || fail "the path was not removed"
 ctl scene act "$draft" scene3d '{"camera": {"clear": true}}' || fail "the 3D camera was not removed"
 ctl scene act "$draft" remove_layer '{"id": "world"}' >/dev/null || fail "the 3D group was not removed"
