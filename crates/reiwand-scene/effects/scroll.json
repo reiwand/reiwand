@@ -1,93 +1,13 @@
 {
-  "audio": [],
-  "bounded": [],
-  "category": "motion",
-  "compose": false,
-  "cost": {
-    "passes": 1,
-    "scale": 1.0,
-    "taps": 1.0
-  },
-  "description": {
-    "en": "Scrolls the picture, repeating at the edges.",
-    "es": "Desplaza la imagen y la repite en los bordes."
-  },
-  "fuse": "uv",
   "id": "scroll",
-  "lighter": null,
+  "name": { "en": "Scroll" },
+  "category": "motion",
+  "description": { "en": "Scrolls the picture, repeating at the edges.", "es": "Desplaza la imagen y la repite en los bordes." },
   "mask_mode": "strength",
-  "min_fps": null,
-  "name": {
-    "en": "Scroll"
-  },
-  "options": [],
-  "pace": null,
   "params": [
-    {
-      "channels": null,
-      "help": {},
-      "id": "speed",
-      "label": {},
-      "max": 4,
-      "min": -4,
-      "paint": null,
-      "prefill": [
-        0.01,
-        0
-      ],
-      "tool": null,
-      "tools": [],
-      "type": "vec2",
-      "unit": null,
-      "uses": "time",
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "repeat_x",
-      "label": {},
-      "max": null,
-      "min": null,
-      "paint": null,
-      "prefill": true,
-      "tool": null,
-      "tools": [],
-      "type": "bool",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "repeat_y",
-      "label": {},
-      "max": null,
-      "min": null,
-      "paint": null,
-      "prefill": true,
-      "tool": null,
-      "tools": [],
-      "type": "bool",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    }
+    { "id": "speed", "type": "vec2", "prefill": [0.01, 0], "min": -4, "max": 4, "uses": "time" },
+    { "id": "repeat_x", "type": "bool", "prefill": true },
+    { "id": "repeat_y", "type": "bool", "prefill": true }
   ],
-  "passes": [],
-  "quality": {},
-  "reach": null,
-  "solve": null,
-  "stage": "layer",
-  "state": null,
-  "targets": {},
-  "uses": [],
-  "velocity": null
+  "fuse": "uv"
 }

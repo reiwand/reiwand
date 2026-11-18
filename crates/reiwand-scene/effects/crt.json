@@ -1,167 +1,17 @@
 {
-  "audio": [],
-  "bounded": [],
-  "category": "stylize",
-  "compose": false,
-  "cost": {
-    "passes": 1,
-    "scale": 1.0,
-    "taps": 1.0
-  },
-  "description": {
-    "en": "Simulates an old CRT screen with scanlines and curvature.",
-    "es": "Imita una pantalla antigua de tubo, con líneas y curvatura."
-  },
-  "fuse": null,
   "id": "crt",
-  "lighter": null,
+  "name": { "en": "CRT screen" },
+  "category": "stylize",
+  "description": { "en": "Simulates an old CRT screen with scanlines and curvature.", "es": "Imita una pantalla antigua de tubo, con líneas y curvatura." },
   "mask_mode": "strength",
-  "min_fps": null,
-  "name": {
-    "en": "CRT screen"
-  },
-  "options": [],
-  "pace": null,
   "params": [
-    {
-      "channels": null,
-      "help": {},
-      "id": "curvature",
-      "label": {},
-      "max": 1,
-      "min": 0,
-      "paint": null,
-      "prefill": 0.1,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "pitch",
-      "label": {},
-      "max": 64,
-      "min": 2,
-      "paint": null,
-      "prefill": 4,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "scan",
-      "label": {},
-      "max": 1,
-      "min": 0,
-      "paint": null,
-      "prefill": 0.3,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "phosphor",
-      "label": {},
-      "max": 1,
-      "min": 0,
-      "paint": null,
-      "prefill": 0.15,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "vignette",
-      "label": {},
-      "max": 1,
-      "min": 0,
-      "paint": null,
-      "prefill": 0.25,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "glow",
-      "label": {},
-      "max": 1,
-      "min": 0,
-      "paint": null,
-      "prefill": 0.15,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    }
+    { "id": "curvature", "type": "float", "prefill": 0.1, "min": 0, "max": 1 },
+    { "id": "pitch", "type": "float", "prefill": 4, "min": 2, "max": 64 },
+    { "id": "scan", "type": "float", "prefill": 0.3, "min": 0, "max": 1 },
+    { "id": "phosphor", "type": "float", "prefill": 0.15, "min": 0, "max": 1 },
+    { "id": "vignette", "type": "float", "prefill": 0.25, "min": 0, "max": 1 },
+    { "id": "glow", "type": "float", "prefill": 0.15, "min": 0, "max": 1 }
   ],
-  "passes": [
-    {
-      "blend": null,
-      "copy": null,
-      "entry": "fs_crt",
-      "grid": null,
-      "inputs": [
-        "previous"
-      ],
-      "output": "next",
-      "scale": 1.0,
-      "swap": null,
-      "target": null,
-      "vertex": null
-    }
-  ],
-  "quality": {
-    "q1": {
-      "freeze": false,
-      "params": {
-        "glow": 0
-      },
-      "scale": null
-    }
-  },
-  "reach": null,
-  "solve": null,
-  "stage": "layer",
-  "state": null,
-  "targets": {},
-  "uses": [],
-  "velocity": null
+  "passes": [{ "entry": "fs_crt" }],
+  "quality": { "q1": { "params": { "glow": 0 } } }
 }

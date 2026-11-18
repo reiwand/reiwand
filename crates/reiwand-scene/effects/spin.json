@@ -1,111 +1,14 @@
 {
-  "audio": [],
-  "bounded": [],
-  "category": "motion",
-  "compose": false,
-  "cost": {
-    "passes": 1,
-    "scale": 1.0,
-    "taps": 1.0
-  },
-  "description": {
-    "en": "Spins the picture around a center point.",
-    "es": "Hace girar la imagen alrededor de un punto central."
-  },
-  "fuse": "uv",
   "id": "spin",
-  "lighter": null,
+  "name": { "en": "Spin" },
+  "category": "motion",
+  "description": { "en": "Spins the picture around a center point.", "es": "Hace girar la imagen alrededor de un punto central." },
   "mask_mode": "strength",
-  "min_fps": null,
-  "name": {
-    "en": "Spin"
-  },
-  "options": [],
-  "pace": null,
   "params": [
-    {
-      "channels": null,
-      "help": {},
-      "id": "center",
-      "label": {},
-      "max": null,
-      "min": null,
-      "paint": null,
-      "prefill": [
-        0.5,
-        0.5
-      ],
-      "tool": null,
-      "tools": [],
-      "type": "position",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "angle",
-      "label": {},
-      "max": 360,
-      "min": -360,
-      "paint": null,
-      "prefill": 0,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": "degrees",
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "speed",
-      "label": {},
-      "max": 720,
-      "min": -720,
-      "paint": null,
-      "prefill": 0,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": "time",
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "radius",
-      "label": {},
-      "max": 2,
-      "min": 0,
-      "paint": null,
-      "prefill": 0.5,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    }
+    { "id": "center", "type": "position", "prefill": [0.5, 0.5] },
+    { "id": "angle", "type": "float", "unit": "degrees", "prefill": 0, "min": -360, "max": 360 },
+    { "id": "speed", "type": "float", "prefill": 0, "min": -720, "max": 720, "uses": "time" },
+    { "id": "radius", "type": "float", "prefill": 0.5, "min": 0, "max": 2 }
   ],
-  "passes": [],
-  "quality": {},
-  "reach": null,
-  "solve": null,
-  "stage": "layer",
-  "state": null,
-  "targets": {},
-  "uses": [],
-  "velocity": null
+  "fuse": "uv"
 }

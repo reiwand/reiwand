@@ -1,89 +1,12 @@
 {
-  "audio": [],
-  "bounded": [],
-  "category": "color",
-  "compose": false,
-  "cost": {
-    "passes": 1,
-    "scale": 1.0,
-    "taps": 1.0
-  },
-  "description": {
-    "en": "Grades color using a LUT image.",
-    "es": "Da un tratamiento de color con una imagen de tabla de colores."
-  },
-  "fuse": null,
   "id": "color_lut",
-  "lighter": null,
+  "name": { "en": "Color grading" },
+  "category": "color",
+  "description": { "en": "Grades color using a LUT image.", "es": "Da un tratamiento de color con una imagen de tabla de colores." },
   "mask_mode": "strength",
-  "min_fps": null,
-  "name": {
-    "en": "Color grading"
-  },
-  "options": [],
-  "pace": null,
   "params": [
-    {
-      "channels": null,
-      "help": {},
-      "id": "lut",
-      "label": {},
-      "max": null,
-      "min": null,
-      "paint": null,
-      "prefill": "",
-      "tool": null,
-      "tools": [
-        "table"
-      ],
-      "type": "lut",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "intensity",
-      "label": {},
-      "max": 1,
-      "min": 0,
-      "paint": null,
-      "prefill": 1,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    }
+    { "id": "lut", "type": "lut", "tools": ["table"], "prefill": "" },
+    { "id": "intensity", "type": "float", "prefill": 1, "min": 0, "max": 1 }
   ],
-  "passes": [
-    {
-      "blend": null,
-      "copy": null,
-      "entry": "fs_color_lut",
-      "grid": null,
-      "inputs": [
-        "previous"
-      ],
-      "output": "next",
-      "scale": 1.0,
-      "swap": null,
-      "target": null,
-      "vertex": null
-    }
-  ],
-  "quality": {},
-  "reach": null,
-  "solve": null,
-  "stage": "layer",
-  "state": null,
-  "targets": {},
-  "uses": [],
-  "velocity": null
+  "passes": [{ "entry": "fs_color_lut" }]
 }

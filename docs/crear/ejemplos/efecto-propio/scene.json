@@ -64,7 +64,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": "#ffffff",
+      "color": null,
       "depth_test": false,
       "effects": [
         {
@@ -147,7 +147,7 @@
       ],
       "solid": false,
       "transform": {
-        "origin": "anchor",
+        "origin": null,
         "position": null,
         "rotation": 0.0,
         "scale": [

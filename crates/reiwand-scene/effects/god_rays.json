@@ -1,344 +1,38 @@
 {
-  "audio": [],
-  "bounded": [],
-  "category": "light",
-  "compose": false,
-  "cost": {
-    "passes": 4,
-    "scale": 0.5,
-    "taps": 3
-  },
-  "description": {
-    "en": "Draws light rays spreading from a bright source.",
-    "es": "Dibuja rayos de luz que salen de una fuente brillante."
-  },
-  "fuse": null,
   "id": "god_rays",
-  "lighter": null,
+  "name": { "en": "Light rays" },
+  "category": "light",
+  "description": { "en": "Draws light rays spreading from a bright source.", "es": "Dibuja rayos de luz que salen de una fuente brillante." },
   "mask_mode": "strength",
-  "min_fps": null,
-  "name": {
-    "en": "Light rays"
-  },
-  "options": [],
-  "pace": null,
   "params": [
+    { "id": "source", "type": "vec2", "prefill": [0.5, 0.15], "min": -1, "max": 2 },
+    { "id": "threshold", "type": "float", "prefill": 0.7, "min": 0, "max": 4 },
+    { "id": "density", "type": "float", "prefill": 0.8, "min": 0, "max": 1 },
+    { "id": "decay", "type": "float", "prefill": 0.96, "min": 0.5, "max": 1 },
+    { "id": "exposure", "type": "float", "prefill": 0.6, "min": 0, "max": 4 },
+    { "id": "color", "type": "color", "prefill": "#fff4e0" },
+    { "id": "samples", "type": "float", "prefill": 12, "min": 4, "max": 16 },
+    { "id": "follow", "type": "bool", "prefill": false, "uses": "cursor" },
     {
-      "channels": null,
-      "help": {},
-      "id": "source",
-      "label": {},
-      "max": 2,
-      "min": -1,
-      "paint": null,
-      "prefill": [
-        0.5,
-        0.15
-      ],
-      "tool": null,
-      "tools": [],
-      "type": "vec2",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "threshold",
-      "label": {},
-      "max": 4,
-      "min": 0,
-      "paint": null,
-      "prefill": 0.7,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "density",
-      "label": {},
-      "max": 1,
-      "min": 0,
-      "paint": null,
-      "prefill": 0.8,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "decay",
-      "label": {},
-      "max": 1,
-      "min": 0.5,
-      "paint": null,
-      "prefill": 0.96,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "exposure",
-      "label": {},
-      "max": 4,
-      "min": 0,
-      "paint": null,
-      "prefill": 0.6,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "color",
-      "label": {},
-      "max": null,
-      "min": null,
-      "paint": null,
-      "prefill": "#fff4e0",
-      "tool": null,
-      "tools": [],
-      "type": "color",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "samples",
-      "label": {},
-      "max": 16,
-      "min": 4,
-      "paint": null,
-      "prefill": 12,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "follow",
-      "label": {},
-      "max": null,
-      "min": null,
-      "paint": null,
-      "prefill": false,
-      "tool": null,
-      "tools": [],
-      "type": "bool",
-      "unit": null,
-      "uses": "cursor",
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
       "id": "mode",
-      "label": {},
-      "max": null,
-      "min": null,
-      "paint": null,
-      "prefill": 0,
-      "tool": null,
-      "tools": [],
       "type": "enum",
-      "unit": null,
-      "uses": null,
-      "values": [
-        {
-          "label": {
-            "en": "Radial",
-            "es": "Radial"
-          },
-          "value": 0
-        },
-        {
-          "label": {
-            "en": "Directional",
-            "es": "Direccional"
-          },
-          "value": 1
-        },
-        {
-          "label": {
-            "en": "Star",
-            "es": "Estrella"
-          },
-          "value": 2
-        }
-      ],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "angle",
-      "label": {},
-      "max": 360,
-      "min": -360,
-      "paint": null,
-      "prefill": 90,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": "degrees",
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "noise",
-      "label": {},
-      "max": 1,
-      "min": 0,
-      "paint": null,
       "prefill": 0,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": "time",
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
+      "values": [
+        { "value": 0, "label": { "en": "Radial", "es": "Radial" } },
+        { "value": 1, "label": { "en": "Directional", "es": "Direccional" } },
+        { "value": 2, "label": { "en": "Star", "es": "Estrella" } }
+      ]
     },
-    {
-      "channels": null,
-      "help": {},
-      "id": "edges",
-      "label": {},
-      "max": 16,
-      "min": 2,
-      "paint": null,
-      "prefill": 6,
-      "tool": null,
-      "tools": [],
-      "type": "int",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    }
+    { "id": "angle", "type": "float", "unit": "degrees", "prefill": 90, "min": -360, "max": 360 },
+    { "id": "noise", "type": "float", "prefill": 0, "min": 0, "max": 1, "uses": "time" },
+    { "id": "edges", "type": "int", "prefill": 6, "min": 2, "max": 16 }
   ],
   "passes": [
-    {
-      "blend": null,
-      "copy": null,
-      "entry": "fs_god_rays_bright",
-      "grid": null,
-      "inputs": [
-        "previous"
-      ],
-      "output": "next",
-      "scale": 0.5,
-      "swap": null,
-      "target": null,
-      "vertex": null
-    },
-    {
-      "blend": null,
-      "copy": null,
-      "entry": "fs_god_rays_march",
-      "grid": null,
-      "inputs": [
-        "previous"
-      ],
-      "output": "next",
-      "scale": 0.5,
-      "swap": null,
-      "target": null,
-      "vertex": null
-    },
-    {
-      "blend": null,
-      "copy": null,
-      "entry": "fs_god_rays_march",
-      "grid": null,
-      "inputs": [
-        "previous"
-      ],
-      "output": "next",
-      "scale": 0.5,
-      "swap": null,
-      "target": null,
-      "vertex": null
-    },
-    {
-      "blend": null,
-      "copy": null,
-      "entry": "fs_god_rays_mix",
-      "grid": null,
-      "inputs": [
-        "input",
-        "pass:2"
-      ],
-      "output": "next",
-      "scale": 1.0,
-      "swap": null,
-      "target": null,
-      "vertex": null
-    }
+    { "entry": "fs_god_rays_bright", "scale": 0.5 },
+    { "entry": "fs_god_rays_march", "scale": 0.5 },
+    { "entry": "fs_god_rays_march", "scale": 0.5 },
+    { "entry": "fs_god_rays_mix", "inputs": ["input", "pass:2"] }
   ],
-  "quality": {
-    "q1": {
-      "freeze": false,
-      "params": {
-        "edges": 8,
-        "samples": 8
-      },
-      "scale": null
-    }
-  },
-  "reach": null,
-  "solve": null,
-  "stage": "layer",
-  "state": null,
-  "targets": {},
-  "uses": [],
-  "velocity": null
+  "cost": { "taps": 3, "passes": 4, "scale": 0.5 },
+  "quality": { "q1": { "params": { "samples": 8, "edges": 8 } } }
 }

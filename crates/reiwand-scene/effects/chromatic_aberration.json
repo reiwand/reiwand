@@ -1,155 +1,25 @@
 {
-  "audio": [],
-  "bounded": [],
-  "category": "distort",
-  "compose": false,
-  "cost": {
-    "passes": 1,
-    "scale": 1.0,
-    "taps": 1.0
-  },
-  "description": {
-    "en": "Splits color channels apart near the edges, like a cheap lens.",
-    "es": "Separa los canales de color cerca de los bordes, como una lente barata."
-  },
-  "fuse": null,
   "id": "chromatic_aberration",
-  "lighter": null,
+  "name": { "en": "Chromatic aberration" },
+  "category": "distort",
+  "description": { "en": "Splits color channels apart near the edges, like a cheap lens.", "es": "Separa los canales de color cerca de los bordes, como una lente barata." },
   "mask_mode": "strength",
-  "min_fps": null,
-  "name": {
-    "en": "Chromatic aberration"
-  },
-  "options": [],
-  "pace": null,
   "params": [
+    { "id": "amount", "type": "float", "prefill": 3, "min": -64, "max": 64 },
+    { "id": "center", "type": "vec2", "prefill": [0.5, 0.5], "min": -1, "max": 2 },
     {
-      "channels": null,
-      "help": {},
-      "id": "amount",
-      "label": {},
-      "max": 64,
-      "min": -64,
-      "paint": null,
-      "prefill": 3,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "center",
-      "label": {},
-      "max": 2,
-      "min": -1,
-      "paint": null,
-      "prefill": [
-        0.5,
-        0.5
-      ],
-      "tool": null,
-      "tools": [],
-      "type": "vec2",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
       "id": "mode",
-      "label": {},
-      "max": null,
-      "min": null,
-      "paint": null,
-      "prefill": 0,
-      "tool": null,
-      "tools": [],
       "type": "enum",
-      "unit": null,
-      "uses": null,
-      "values": [
-        {
-          "label": {
-            "en": "Expansion",
-            "es": "Expansión"
-          },
-          "value": 0
-        },
-        {
-          "label": {
-            "en": "Directional",
-            "es": "Direccional"
-          },
-          "value": 1
-        },
-        {
-          "label": {
-            "en": "Radial",
-            "es": "Radial"
-          },
-          "value": 2
-        },
-        {
-          "label": {
-            "en": "Barrel",
-            "es": "Barril"
-          },
-          "value": 3
-        }
-      ],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "angle",
-      "label": {},
-      "max": 360,
-      "min": -360,
-      "paint": null,
       "prefill": 0,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": "degrees",
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    }
+      "values": [
+        { "value": 0, "label": { "en": "Expansion", "es": "Expansión" } },
+        { "value": 1, "label": { "en": "Directional", "es": "Direccional" } },
+        { "value": 2, "label": { "en": "Radial", "es": "Radial" } },
+        { "value": 3, "label": { "en": "Barrel", "es": "Barril" } }
+      ]
+    },
+    { "id": "angle", "type": "float", "unit": "degrees", "prefill": 0, "min": -360, "max": 360 }
   ],
-  "passes": [
-    {
-      "blend": null,
-      "copy": null,
-      "entry": "fs_chromatic_aberration",
-      "grid": null,
-      "inputs": [
-        "previous"
-      ],
-      "output": "next",
-      "scale": 1.0,
-      "swap": null,
-      "target": null,
-      "vertex": null
-    }
-  ],
-  "quality": {},
-  "reach": "amount",
-  "solve": null,
-  "stage": "layer",
-  "state": null,
-  "targets": {},
-  "uses": [],
-  "velocity": null
+  "passes": [{ "entry": "fs_chromatic_aberration" }],
+  "reach": "amount"
 }

@@ -1,138 +1,14 @@
 {
-  "audio": [],
-  "bounded": [],
-  "category": "transform",
-  "compose": false,
-  "cost": {
-    "passes": 1,
-    "scale": 1.0,
-    "taps": 1.0
-  },
-  "description": {
-    "en": "Offsets, scales, rotates and skews the picture.",
-    "es": "Desplaza, escala, gira e inclina la imagen."
-  },
-  "fuse": "uv",
   "id": "transform",
-  "lighter": null,
-  "mask_mode": "mix",
-  "min_fps": null,
-  "name": {
-    "en": "Transform"
-  },
-  "options": [],
-  "pace": null,
+  "name": { "en": "Transform" },
+  "category": "transform",
+  "description": { "en": "Offsets, scales, rotates and skews the picture.", "es": "Desplaza, escala, gira e inclina la imagen." },
   "params": [
-    {
-      "channels": null,
-      "help": {},
-      "id": "offset",
-      "label": {},
-      "max": 2,
-      "min": -2,
-      "paint": null,
-      "prefill": [
-        0,
-        0
-      ],
-      "tool": null,
-      "tools": [],
-      "type": "vec2",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "scale",
-      "label": {},
-      "max": 16,
-      "min": 0.01,
-      "paint": null,
-      "prefill": [
-        1,
-        1
-      ],
-      "tool": null,
-      "tools": [],
-      "type": "vec2",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "angle",
-      "label": {},
-      "max": 360,
-      "min": -360,
-      "paint": null,
-      "prefill": 0,
-      "tool": null,
-      "tools": [],
-      "type": "float",
-      "unit": "degrees",
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "skew",
-      "label": {},
-      "max": 89,
-      "min": -89,
-      "paint": null,
-      "prefill": [
-        0,
-        0
-      ],
-      "tool": null,
-      "tools": [],
-      "type": "vec2",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    },
-    {
-      "channels": null,
-      "help": {},
-      "id": "pivot",
-      "label": {},
-      "max": null,
-      "min": null,
-      "paint": null,
-      "prefill": [
-        0.5,
-        0.5
-      ],
-      "tool": null,
-      "tools": [],
-      "type": "position",
-      "unit": null,
-      "uses": null,
-      "values": [],
-      "waits_for": null,
-      "yields_to": null
-    }
+    { "id": "offset", "type": "vec2", "prefill": [0, 0], "min": -2, "max": 2 },
+    { "id": "scale", "type": "vec2", "prefill": [1, 1], "min": 0.01, "max": 16 },
+    { "id": "angle", "type": "float", "unit": "degrees", "prefill": 0, "min": -360, "max": 360 },
+    { "id": "skew", "type": "vec2", "prefill": [0, 0], "min": -89, "max": 89 },
+    { "id": "pivot", "type": "position", "prefill": [0.5, 0.5] }
   ],
-  "passes": [],
-  "quality": {},
-  "reach": null,
-  "solve": null,
-  "stage": "layer",
-  "state": null,
-  "targets": {},
-  "uses": [],
-  "velocity": null
+  "fuse": "uv"
 }
