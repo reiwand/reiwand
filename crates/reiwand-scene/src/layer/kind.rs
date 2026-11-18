@@ -7,6 +7,7 @@ use crate::particles::{Instance, Render};
 use crate::typeset::TextLayer;
 use crate::value::Value;
 use crate::{Color, Sound};
+use reiwand_core::explicit::block;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -34,8 +35,8 @@ pub enum Kind {
         image: Value<String>,
         size: crate::Ctx<[f32; 2], { crate::SOURCE }>,
         color: Value<Color>,
-        #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required, extend("x-null" = true))]
+        #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+        #[schemars(extend("x-null" = true, "x-block" = true))]
         playback: Option<Playback>,
     },
     Video {
@@ -48,25 +49,25 @@ pub enum Kind {
     Text(Box<TextLayer>),
     Shape {
         shape: Shape,
-        #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required, extend("x-null" = true))]
+        #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+        #[schemars(extend("x-null" = true, "x-block" = true))]
         fill: Option<Value<Color>>,
-        #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required, extend("x-null" = true))]
+        #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+        #[schemars(extend("x-null" = true, "x-block" = true))]
         gradient: Option<Gradient>,
-        #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required, extend("x-null" = true))]
+        #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+        #[schemars(extend("x-null" = true, "x-block" = true))]
         stroke: Option<Stroke>,
     },
     Particles {
         #[schemars(extend("x-ref" = "system"))]
         system: String,
         color: Value<Color>,
-        #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required, extend("x-null" = true))]
+        #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+        #[schemars(extend("x-null" = true, "x-block" = true))]
         instance: Option<Box<Instance>>,
-        #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required, extend("x-null" = true))]
+        #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+        #[schemars(extend("x-null" = true, "x-block" = true))]
         render: Option<Box<Render>>,
     },
     Spectrum(Spectrum),

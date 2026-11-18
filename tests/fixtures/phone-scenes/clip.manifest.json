@@ -1,0 +1,39 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": null,
+  "description": "",
+  "display": null,
+  "entry": "scene.json",
+  "id": "org.example.clip",
+  "inputs": [],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
+  "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "preview": null,
+  "previews": null,
+  "properties": {},
+  "requires": null,
+  "schema": "reiwand.wpak/2",
+  "strings": {},
+  "tags": [],
+  "title": "Clip",
+  "version": "1.0.0",
+  "web": null
+}

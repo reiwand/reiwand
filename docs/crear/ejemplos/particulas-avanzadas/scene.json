@@ -1,26 +1,15 @@
 {
   "assets": {},
-  "audio": null,
-  "camera3d": null,
   "canvas": {
-    "ambient": null,
     "background": "#05070f",
     "blend_space": "linear",
-    "bloom": null,
-    "camera": null,
     "clear": true,
     "fit": "fill",
-    "gusts": null,
     "hdr": false,
-    "parallax": null,
-    "perspective": null,
     "size": [
       1920,
       1080
-    ],
-    "sky": null,
-    "tonemap": null,
-    "wind": null
+    ]
   },
   "clock": {
     "max_fps": 60,
@@ -32,32 +21,22 @@
   "ext": {},
   "layers": [
     {
-      "anchor": null,
-      "attach": null,
       "blend": "add",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "cohetes",
-      "inherit": null,
-      "instance": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
-      "render": null,
       "solid": false,
       "system": "cohetes",
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -66,40 +45,28 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "particles",
       "visible": true
     },
     {
-      "anchor": null,
-      "attach": null,
       "blend": "add",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "estrellas",
-      "inherit": null,
-      "instance": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
-      "render": null,
       "solid": false,
       "system": "estrellas",
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -108,50 +75,34 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "particles",
       "visible": true
     },
     {
-      "anchor": null,
-      "attach": null,
       "blend": "add",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "luciernagas",
-      "inherit": null,
       "instance": {
         "alpha": 0.8,
         "brightness": 1.2,
-        "color": null,
         "count": 1,
-        "life": null,
-        "points": [],
-        "size": null,
-        "speed": null,
-        "time_scale": null
+        "points": []
       },
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
-      "render": null,
       "solid": false,
       "system": "luciernagas",
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -160,9 +111,7 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "particles",
       "visible": true
@@ -179,7 +128,6 @@
           "inherit": [
             "color"
           ],
-          "max": null,
           "offset": [
             0,
             0
@@ -199,16 +147,12 @@
             {
               "at": 0,
               "count": 1,
-              "every": 1.6,
-              "on": null
+              "every": 1.6
             }
           ],
           "delay": 0,
           "duration": null,
-          "follow": null,
           "inherit": 0,
-          "max_per_step": null,
-          "periodic": null,
           "rate": 0,
           "shape": {
             "point": [
@@ -233,7 +177,6 @@
         }
       ],
       "init": {
-        "alpha": null,
         "angle": [
           255,
           285,
@@ -244,24 +187,17 @@
           "#ffb347",
           1
         ],
-        "depth": null,
-        "depth_speed": null,
         "frame": [
           0.0,
           0.0,
           1
         ],
         "gradient": [],
-        "hsv": null,
-        "inherit": null,
         "life": [
           1.1,
           1.5,
           1
         ],
-        "offset_noise": null,
-        "palette": null,
-        "radial": null,
         "remap": [],
         "rotation": [
           0.0,
@@ -304,34 +240,20 @@
               0
             ]
           ]
-        },
-        "turbulent": null,
-        "velocity": null
+        }
       },
       "lock": [],
-      "perspective": null,
       "points": [],
       "prewarm": 0.0,
       "render": {
         "angle": null,
         "aspect": 1,
-        "brightness": null,
         "color_over_life": [],
-        "cutout": null,
         "cycles": null,
         "fps": 12.0,
-        "frames": null,
         "lit": false,
         "mix": false,
-        "normal": null,
-        "order": null,
-        "orient": null,
-        "refract": null,
-        "rope": null,
-        "shader": null,
         "size_over_life": [],
-        "stretch": null,
-        "texture": null,
         "trail": {
           "length": 12,
           "segments": null,
@@ -356,16 +278,12 @@
             {
               "at": 0,
               "count": 60,
-              "every": null,
-              "on": null
+              "every": null
             }
           ],
           "delay": 0,
           "duration": null,
-          "follow": null,
           "inherit": 0,
-          "max_per_step": null,
-          "periodic": null,
           "rate": 0,
           "shape": {
             "point": [
@@ -399,7 +317,6 @@
         }
       ],
       "init": {
-        "alpha": null,
         "angle": [
           0,
           360,
@@ -410,24 +327,17 @@
           "#9ad1ff",
           1
         ],
-        "depth": null,
-        "depth_speed": null,
         "frame": [
           0.0,
           0.0,
           1
         ],
         "gradient": [],
-        "hsv": null,
-        "inherit": null,
         "life": [
           0.9,
           1.6,
           1
         ],
-        "offset_noise": null,
-        "palette": null,
-        "radial": null,
         "remap": [],
         "rotation": [
           0.0,
@@ -470,18 +380,14 @@
               0
             ]
           ]
-        },
-        "turbulent": null,
-        "velocity": null
+        }
       },
       "lock": [],
-      "perspective": null,
       "points": [],
       "prewarm": 0.0,
       "render": {
         "angle": null,
         "aspect": 1,
-        "brightness": null,
         "color_over_life": [
           [
             0,
@@ -492,18 +398,10 @@
             "#ffffff00"
           ]
         ],
-        "cutout": null,
         "cycles": null,
         "fps": 12.0,
-        "frames": null,
         "lit": false,
         "mix": false,
-        "normal": null,
-        "order": null,
-        "orient": null,
-        "refract": null,
-        "rope": null,
-        "shader": null,
         "size_over_life": [
           [
             0,
@@ -513,10 +411,7 @@
             1,
             0
           ]
-        ],
-        "stretch": null,
-        "texture": null,
-        "trail": null
+        ]
       },
       "seed": 0,
       "space": "local"
@@ -531,7 +426,6 @@
           "bursts": [],
           "delay": 0,
           "duration": null,
-          "follow": null,
           "inherit": 0,
           "max_per_step": 4,
           "periodic": {
@@ -650,8 +544,6 @@
           "#ffffff",
           1
         ],
-        "depth": null,
-        "depth_speed": null,
         "frame": [
           0.0,
           0.0,
@@ -673,36 +565,27 @@
             1
           ]
         },
-        "inherit": null,
         "life": [
           3,
           6,
           1
         ],
-        "offset_noise": null,
-        "palette": null,
-        "radial": null,
         "remap": [
           {
             "clamp_in": false,
             "clamp_out": false,
-            "hold_silence": null,
             "in": [
               3,
               6
             ],
             "input": "life",
-            "kind": null,
             "op": "mul",
             "out": [
               1,
               0.3
             ],
             "output": "size",
-            "reference": null,
-            "unit": null,
-            "wave": "none",
-            "window": null
+            "wave": "none"
           }
         ],
         "rotation": [
@@ -746,12 +629,9 @@
               0
             ]
           ]
-        },
-        "turbulent": null,
-        "velocity": null
+        }
       },
       "lock": [],
-      "perspective": null,
       "points": [
         {
           "angle": 0,
@@ -759,12 +639,10 @@
             960,
             540
           ],
-          "follow": null,
           "space": "local"
         },
         {
           "angle": 0,
-          "at": null,
           "follow": "cursor",
           "space": "local"
         }
@@ -773,7 +651,6 @@
       "render": {
         "angle": null,
         "aspect": 1,
-        "brightness": null,
         "color_over_life": [],
         "cutout": [
           0.1,
@@ -782,15 +659,9 @@
         ],
         "cycles": null,
         "fps": 12.0,
-        "frames": null,
         "lit": false,
         "mix": false,
-        "normal": null,
         "order": "newest",
-        "orient": null,
-        "refract": null,
-        "rope": null,
-        "shader": null,
         "size_over_life": [
           [
             0,
@@ -804,10 +675,7 @@
             1,
             0
           ]
-        ],
-        "stretch": null,
-        "texture": null,
-        "trail": null
+        ]
       },
       "seed": 0,
       "space": "world"
@@ -817,6 +685,5 @@
   "schema": "reiwand.scene/2",
   "scripts": [],
   "templates": {},
-  "timelines": [],
-  "transition": null
+  "timelines": []
 }

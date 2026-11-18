@@ -27,7 +27,7 @@ fn a_handle_of_one_part_bends_that_track_alone() {
     act(&mut p, json!({"edit_keys": {"picks": pick(2.0), "part": 1, "out_handle": [0.5, 30]}})).unwrap();
     assert_eq!(
         third(&p, 1),
-        json!({"in": null, "out": [[0.667, -13.333333], [0.5, 30.0]]}),
+        json!({"out": [[0.667, -13.333333], [0.5, 30.0]]}),
         "the other part keeps its curve"
     );
     let keys: Vec<Key<Vec2>> = serde_json::from_value(at(&p, &format!("{PLACE}/keys"))).unwrap();
@@ -68,14 +68,10 @@ fn linking_the_parts_keeps_the_shape_of_one_part_for_all() {
     keyed(&mut p, &[(0.0, json!([0, 0])), (2.0, json!([40, 20]))]);
     act(&mut p, json!({"edit_keys": {"picks": pick(0.0), "part": 1, "out_handle": [1, 10]}})).unwrap();
     act(&mut p, json!({"edit_keys": {"picks": pick(0.0), "part": 1, "link": true}})).unwrap();
-    assert_eq!(third(&p, 0), json!({"in": null, "out": [1.0, 0.5]}), "a share of the way taken from y");
+    assert_eq!(third(&p, 0), json!({"out": [1.0, 0.5]}), "a share of the way taken from y");
     act(&mut p, json!({"edit_keys": {"picks": pick(0.0), "part": 0, "out_handle": [1, 10]}})).unwrap();
     act(&mut p, json!({"edit_keys": {"picks": pick(0.0), "out_handle": [0.5, 0.2]}})).unwrap();
-    assert_eq!(
-        third(&p, 0),
-        json!({"in": null, "out": [0.5, 0.2]}),
-        "a handle for every part links them again"
-    );
+    assert_eq!(third(&p, 0), json!({"out": [0.5, 0.2]}), "a handle for every part links them again");
     let mixed =
         refused(&mut p, json!({"edit_keys": {"picks": pick(0.0), "link": true, "out_handle": [1, 1]}}));
     assert!(mixed.contains("on its own"), "{mixed}");
@@ -85,7 +81,7 @@ fn linking_the_parts_keeps_the_shape_of_one_part_for_all() {
         json!({"edit_keys": {"picks": [{"pointer": PLACE, "times": [0.5, 2]}], "scale": 0.5, "pivot": 0.5}}),
     )
     .unwrap();
-    assert_eq!(third(&p, 0), json!({"in": null, "out": [0.25, 0.2]}));
+    assert_eq!(third(&p, 0), json!({"out": [0.25, 0.2]}));
 }
 
 #[test]
@@ -96,13 +92,9 @@ fn split_handles_stretch_and_shorten_part_by_part() {
     act(&mut p, json!({"edit_keys": {"picks": pick(0.0), "part": 1, "out_handle": [1.5, 10]}})).unwrap();
     act(&mut p, json!({"edit_keys": {"picks": [{"pointer": PLACE, "times": [0, 2]}], "scale": 0.5}}))
         .unwrap();
-    assert_eq!(third(&p, 0), json!({"in": null, "out": [[0.334, 13.333333], [0.75, 10.0]]}));
+    assert_eq!(third(&p, 0), json!({"out": [[0.334, 13.333333], [0.75, 10.0]]}));
     act(&mut p, json!({"edit_keys": {"picks": pick(1.0), "shift": -0.5}})).unwrap();
-    assert_eq!(
-        third(&p, 0),
-        json!({"in": null, "out": [[0.334, 13.333333], [0.5, 10.0]]}),
-        "the long one is cut"
-    );
+    assert_eq!(third(&p, 0), json!({"out": [[0.334, 13.333333], [0.5, 10.0]]}), "the long one is cut");
     act(&mut p, json!({"keyframe": {"pointer": PLACE, "time": 0, "out_handle": [0.2, 0.1]}})).unwrap();
-    assert_eq!(third(&p, 0), json!({"in": null, "out": [0.2, 0.1]}));
+    assert_eq!(third(&p, 0), json!({"out": [0.2, 0.1]}));
 }

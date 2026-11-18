@@ -97,6 +97,7 @@ pub fn run(command: Rendering) -> Result<()> {
         split,
     } = command;
     let project = Project::open(&dir)?;
+    reiwand_render::set_step_budget(None);
     let renderer = Renderer::new()?;
     let played = media.map(|file| reiwand_editor::media::played(&file, &project.dir)).transpose()?;
     let wanted = Rehearsal {

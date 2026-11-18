@@ -48,11 +48,12 @@ fn check(file: &Path, text: &str, rules: &[Rule], out: &mut Vec<Violation>) {
                 out.push(Violation { file: file.to_owned(), line: i + 1, rule });
             }
         };
+        let marked = t.contains("explicit::block") || t.contains("deserialize_with = \"block\"");
         hit(
             Rule::SerdeDefault,
-            t.contains("serde(default") || t.contains("serde(alias") && t.contains("default"),
+            !marked && (t.contains("serde(default") || t.contains("serde(alias") && t.contains("default")),
         );
-        hit(Rule::SkipSerializing, t.contains("skip_serializing_if"));
+        hit(Rule::SkipSerializing, !marked && t.contains("skip_serializing_if"));
         hit(
             Rule::UnwrapOr,
             t.contains(".unwrap_or(") || t.contains(".unwrap_or_default(") || t.contains(".unwrap_or_else("),
@@ -63,10 +64,19 @@ fn check(file: &Path, text: &str, rules: &[Rule], out: &mut Vec<Violation>) {
         );
         hit(Rule::DeriveDefault, t.starts_with("impl Default for "));
         let block = attribute_block(&lines, i);
-        let written = block.contains("deserialize_with = \"null\"")
-            || ["null", "general", "empty", "none", "namespace"]
-                .iter()
-                .any(|w| block.contains(&format!("explicit::{w}")));
+        let written = [
+            "deserialize_with = \"null\"",
+            "explicit::null",
+            "deserialize_with = \"block\"",
+            "explicit::block",
+            "explicit::general",
+            "explicit::empty",
+            "explicit::none",
+            "explicit::auto",
+            "explicit::namespace",
+        ]
+        .iter()
+        .any(|m| block.contains(m));
         let loose = option_field(t) && !written;
         hit(Rule::OptionWithoutNull, loose);
     }

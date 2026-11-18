@@ -1,14 +1,6 @@
 package io.github.reiwand
 
-const val PROBE_MANIFEST = """{ "schema": "reiwand.wpak/2", "id": "org.example.probe", "version": "1.0.0",
-    "title": "Probe", "license": "CC0-1.0", "kind": "web", "entry": "index.html", "origin": { "kind": "original" },
-    "content": { "rating": "general" }, "photosensitive": false, "inputs": ["pointer", "clicks"],
-    "web": { "preload": "early.js", "background": "#102030", "storage_kib": 64 },
-    "properties": {
-        "tint": { "type": "color", "default": "#ff8000", "label": "Tint" },
-        "port": { "type": "slider", "min": 1, "max": 65535, "step": 1, "default": 9, "label": "Port" },
-        "photo": { "type": "file", "accept": ["image"], "label": "Photo" }
-    } }"""
+val PROBE_MANIFEST: String get() = sample("probe", "manifest")
 
 const val PROBE_PAGE = """<!doctype html>
 <html><body style="margin:0;height:100vh"><script src="probe.js"></script></body></html>"""

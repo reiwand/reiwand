@@ -1,0 +1,30 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": null,
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": null,
+  "fuse": null,
+  "id": "mark",
+  "lighter": null,
+  "mask_mode": "mix",
+  "min_fps": null,
+  "name": {},
+  "options": [],
+  "pace": null,
+  "params": [],
+  "passes": [],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "transition",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
+}

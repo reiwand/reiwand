@@ -1,3 +1,4 @@
+use reiwand_core::explicit::null;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -6,7 +7,7 @@ use serde::{Deserialize, Serialize};
 pub struct Trail {
     pub length: u32,
     pub width: f32,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     #[schemars(required, extend("x-null" = true))]
     pub segments: Option<u32>,
     #[schemars(extend("x-range" = [0, 7]))]

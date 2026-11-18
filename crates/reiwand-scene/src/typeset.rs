@@ -1,6 +1,7 @@
 use crate::Color;
 use crate::content::{Align, white};
 use crate::value::{Value, Vec2};
+use reiwand_core::explicit::{block, null};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -22,8 +23,8 @@ pub struct TextLayer {
     #[schemars(extend("x-multiline" = true))]
     pub text: crate::words::Words,
     #[schemars(extend("x-ref" = "font"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub font: Option<String>,
     #[schemars(extend("x-ref" = "font"))]
     pub fallback: Vec<String>,
@@ -32,31 +33,31 @@ pub struct TextLayer {
     pub color: Value<Color>,
     pub align: Align,
     pub valign: Valign,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     #[schemars(required, extend("x-null" = true))]
     pub wrap: Option<Wrap>,
     #[schemars(extend("x-range" = [0.5, 4]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     #[schemars(required, extend("x-null" = true))]
     pub line_height: Option<f32>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub background: Option<Backing>,
     #[schemars(extend("x-unit" = "px", "x-range" = [0, 1024]))]
     pub padding: f32,
     #[schemars(extend("x-unit" = "px", "x-range" = [-100, 1000]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub letter_spacing: Option<Value<f32>>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub outline: Option<Outline>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub shadow: Option<Shadow>,
     #[schemars(extend("x-unit" = "px", "x-range" = [0, 64]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub blur: Option<Value<f32>>,
     pub render: Glyphs,
 }
@@ -85,8 +86,8 @@ pub struct Wrap {
     #[schemars(extend("x-unit" = "px", "x-range" = [1, 16384]))]
     pub width: f32,
     #[schemars(extend("x-range" = [1, 1000]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub lines: Option<u32>,
     pub ellipsis: bool,
 }

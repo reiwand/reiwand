@@ -1,5 +1,6 @@
 use crate::Color;
 use crate::value::{AudioChannel, Param, Value};
+use reiwand_core::explicit::block;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -8,15 +9,15 @@ use std::collections::BTreeMap;
 #[serde(deny_unknown_fields)]
 pub struct Mask {
     #[schemars(extend("x-ref" = "image"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub texture: Option<Value<String>>,
     #[schemars(extend("x-ref" = "layer"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub layer: Option<String>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub shape: Option<Shape>,
     pub channel: MaskChannel,
     pub invert: bool,
@@ -40,12 +41,12 @@ pub enum MaskChannel {
 pub struct EffectUse {
     #[schemars(extend("x-ref" = "effect"))]
     pub effect: String,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub name: Option<String>,
     pub enabled: Value<bool>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub mask: Option<Mask>,
     pub params: BTreeMap<String, Value<Param>>,
     pub optional: bool,

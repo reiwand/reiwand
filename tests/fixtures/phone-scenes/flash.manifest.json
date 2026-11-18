@@ -1,0 +1,47 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [
+      "violence"
+    ],
+    "rating": "mature"
+  },
+  "credits": [],
+  "default_locale": "en",
+  "description": {
+    "en": "Fast **flashes**.",
+    "es": "Destellos **rápidos**."
+  },
+  "display": null,
+  "entry": "scene.json",
+  "id": "org.example.flash",
+  "inputs": [],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
+  "photosensitive": true,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "preview": null,
+  "previews": null,
+  "properties": {},
+  "requires": null,
+  "schema": "reiwand.wpak/2",
+  "strings": {},
+  "tags": [],
+  "title": {
+    "en": "Flash",
+    "es": "Destello"
+  },
+  "version": "1.0.0",
+  "web": null
+}

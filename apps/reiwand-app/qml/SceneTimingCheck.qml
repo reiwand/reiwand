@@ -86,7 +86,7 @@ QtObject {
         const after = read(pointer + "/keys") ?? [];
         if (page.view.history.done.length !== steps + 1)
             throw new Error("timing: straightening a curve did not take exactly one undo step");
-        if (JSON.stringify(after.slice(1)) !== "[[1,1,{\"in\":[0.3,0.1],\"out\":null}],[2,0,{\"in\":null,\"out\":[0.3,0.1]}]]")
+        if (JSON.stringify(after.slice(1)) !== "[[1,1,{\"in\":[0.3,0.1]}],[2,0,{\"out\":[0.3,0.1]}]]")
             throw new Error("timing: straightening a curve bent the neighbouring curves: " + JSON.stringify(after));
         page.run("undo");
         page.run("undo");

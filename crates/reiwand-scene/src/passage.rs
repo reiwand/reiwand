@@ -4,6 +4,7 @@ use crate::effects::{Descriptor, Stage};
 use crate::validate::{Check, Issue};
 use crate::value::Param;
 use crate::{Ease, MAX_PARAMS, Quality, Scene};
+use reiwand_core::explicit::block;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
@@ -20,11 +21,11 @@ pub const MAX_TRANSITION_MS: u32 = 10_000;
 #[serde(deny_unknown_fields)]
 pub struct Transition {
     #[serde(rename = "in")]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub coming: Option<Passage>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub out: Option<Passage>,
 }
 

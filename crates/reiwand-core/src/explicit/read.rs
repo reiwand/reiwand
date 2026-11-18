@@ -6,6 +6,10 @@ pub fn null<'de, D: Deserializer<'de>, T: Deserialize<'de>>(d: D) -> Result<Opti
     Option::<T>::deserialize(d)
 }
 
+pub fn block<'de, D: Deserializer<'de>, T: Deserialize<'de>>(d: D) -> Result<Option<T>, D::Error> {
+    Option::<T>::deserialize(d)
+}
+
 fn missing_field(message: &str) -> Option<(&str, &str)> {
     let rest = message.strip_prefix("missing field `")?;
     let (name, tail) = rest.split_once('`')?;

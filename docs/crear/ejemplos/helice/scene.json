@@ -1,26 +1,16 @@
 {
   "assets": {},
-  "audio": null,
-  "camera3d": null,
   "canvas": {
-    "ambient": null,
     "background": "#05070f",
     "blend_space": "linear",
-    "bloom": null,
-    "camera": null,
     "clear": true,
     "fit": "fill",
-    "gusts": null,
     "hdr": false,
-    "parallax": null,
     "perspective": 900,
     "size": [
       1920,
       1080
-    ],
-    "sky": null,
-    "tonemap": null,
-    "wind": null
+    ]
   },
   "clock": {
     "max_fps": 60,
@@ -32,32 +22,22 @@
   "ext": {},
   "layers": [
     {
-      "anchor": null,
-      "attach": null,
       "blend": "add",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "helice",
-      "inherit": null,
-      "instance": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
-      "render": null,
       "solid": false,
       "system": "helice",
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -66,9 +46,7 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "particles",
       "visible": true
@@ -86,10 +64,7 @@
           "bursts": [],
           "delay": 0,
           "duration": null,
-          "follow": null,
           "inherit": 0,
-          "max_per_step": null,
-          "periodic": null,
           "rate": 60,
           "shape": {
             "around": {
@@ -125,7 +100,6 @@
             "inner": 0,
             "outer": null,
             "radius": 0,
-            "ring": null,
             "strength": 160
           },
           "window": [
@@ -146,7 +120,6 @@
         }
       ],
       "init": {
-        "alpha": null,
         "angle": [
           0,
           360,
@@ -157,24 +130,17 @@
           "#c3a6ff",
           1
         ],
-        "depth": null,
-        "depth_speed": null,
         "frame": [
           0.0,
           0.0,
           1
         ],
         "gradient": [],
-        "hsv": null,
-        "inherit": null,
         "life": [
           3,
           4,
           1
         ],
-        "offset_noise": null,
-        "palette": null,
-        "radial": null,
         "remap": [],
         "rotation": [
           0.0,
@@ -217,12 +183,9 @@
               0
             ]
           ]
-        },
-        "turbulent": null,
-        "velocity": null
+        }
       },
       "lock": [],
-      "perspective": null,
       "points": [
         {
           "angle": 0,
@@ -230,7 +193,6 @@
             960,
             540
           ],
-          "follow": null,
           "space": "local"
         }
       ],
@@ -238,24 +200,12 @@
       "render": {
         "angle": null,
         "aspect": 1,
-        "brightness": null,
         "color_over_life": [],
-        "cutout": null,
         "cycles": null,
         "fps": 12.0,
-        "frames": null,
         "lit": false,
         "mix": false,
-        "normal": null,
-        "order": null,
-        "orient": null,
-        "refract": null,
-        "rope": null,
-        "shader": null,
-        "size_over_life": [],
-        "stretch": null,
-        "texture": null,
-        "trail": null
+        "size_over_life": []
       },
       "seed": 0,
       "space": "local"
@@ -265,6 +215,5 @@
   "schema": "reiwand.scene/2",
   "scripts": [],
   "templates": {},
-  "timelines": [],
-  "transition": null
+  "timelines": []
 }

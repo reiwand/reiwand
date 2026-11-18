@@ -94,3 +94,6 @@ fun hush(): AutoCloseable {
     Thread.sleep(NOTIFICATION_SOUND_MS)
     return AutoCloseable { set(before) }
 }
+
+fun sample(name: String, kind: String): String =
+    InstrumentationRegistry.getInstrumentation().context.assets.open("phone-scenes/$name.$kind.json").use { String(it.readBytes()) }

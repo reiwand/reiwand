@@ -1,3 +1,4 @@
+use reiwand_core::explicit::{block, null};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -8,16 +9,16 @@ const DECIMALS: u32 = 2;
 pub struct Slider {
     pub min: f64,
     pub max: f64,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     #[schemars(required, extend("x-null" = true))]
     pub step: Option<f64>,
     pub default: f64,
     pub integer: bool,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub unit: Option<String>,
     #[schemars(extend("x-range" = [0, 6]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     #[schemars(required, extend("x-null" = true))]
     pub decimals: Option<u8>,
     pub editable: bool,

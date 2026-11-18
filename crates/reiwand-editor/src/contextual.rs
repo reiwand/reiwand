@@ -9,7 +9,7 @@ pub(crate) fn fill(value: &mut Value) {
             let keyed = map.get("keys").is_some_and(Value::is_array)
                 && map.get("timeline").is_none_or(Value::is_null)
                 && map.get("loop").is_none_or(Value::is_null);
-            if keyed && map.contains_key("base") {
+            if keyed {
                 map.insert("loop".into(), json!("once"));
             }
             let indexed = map.get("audio").is_some_and(|a| a.is_u64() || a.is_array());

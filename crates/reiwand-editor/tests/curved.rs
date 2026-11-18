@@ -36,7 +36,7 @@ fn a_pair_key_is_written_back_as_a_pair_and_a_number_is_refused() {
         serde_json::from_value(json!([[0, [1, 1], {"in": null, "out": [1, 0.5]}], [2, [3, 3]]])).unwrap();
     assert_eq!(
         serde_json::to_value(&keys).unwrap(),
-        json!([[0.0, [1.0, 1.0], {"in": null, "out": [1.0, 0.5]}], [2.0, [3.0, 3.0]]])
+        json!([[0.0, [1.0, 1.0], {"out": [1.0, 0.5]}], [2.0, [3.0, 3.0]]])
     );
     assert!(serde_json::from_value::<Vec<Key<Vec3>>>(json!([[0, 0.5]])).is_err());
     assert!(serde_json::from_value::<Vec<Key<Color>>>(json!([[0, 0.5]])).is_err(), "a color is no number");

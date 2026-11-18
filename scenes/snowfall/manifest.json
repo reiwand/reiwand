@@ -76,9 +76,6 @@
     "clouds": {
       "default": true,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Clouds",
         "es": "Nubes"
@@ -93,9 +90,6 @@
       "default": 80.0,
       "editable": false,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "integer": true,
       "label": {
         "en": "Snowflakes per second",
@@ -117,12 +111,10 @@
       ],
       "enabled_if": {},
       "every": 600,
-      "group": null,
       "help": {
         "en": "Shows the pictures of a folder you choose behind the falling snow, a new one every ten minutes.",
         "es": "Muestra las imágenes de una carpeta que elijas tras la nieve que cae, una nueva cada diez minutos."
       },
-      "icon": null,
       "label": {
         "en": "Pictures behind the snow",
         "es": "Imágenes tras la nieve"
@@ -141,9 +133,6 @@
       "default": 100.0,
       "editable": false,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "integer": true,
       "label": {
         "en": "Wind volume",
@@ -162,9 +151,6 @@
     "wind": {
       "default": "breeze",
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Wind",
         "es": "Viento"

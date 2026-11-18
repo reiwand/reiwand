@@ -2,14 +2,12 @@
   "assets": {
     "cielo": {
       "animated": false,
-      "atlas": null,
       "durations": [],
       "face": null,
       "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
-      "media": null,
       "mipmaps": null,
       "path": "assets/cielo.png",
       "rects": [],
@@ -17,14 +15,10 @@
       "wrap": "clamp"
     }
   },
-  "audio": null,
-  "camera3d": null,
   "canvas": {
-    "ambient": null,
     "background": "#0b1020",
     "blend_space": "linear",
     "bloom": {
-      "hdr": null,
       "radius": 24,
       "strength": 0.6,
       "threshold": 0.8,
@@ -43,7 +37,6 @@
     },
     "clear": true,
     "fit": "fill",
-    "gusts": null,
     "hdr": false,
     "parallax": {
       "amount": 1,
@@ -55,14 +48,10 @@
       ],
       "pointer": 1
     },
-    "perspective": null,
     "size": [
       1920,
       1080
-    ],
-    "sky": null,
-    "tonemap": null,
-    "wind": null
+    ]
   },
   "clock": {
     "max_fps": 30,
@@ -74,27 +63,19 @@
   "ext": {},
   "layers": [
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "fondo",
       "image": "cielo",
-      "inherit": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0.01,
         0.01
       ],
-      "parent": null,
-      "playback": null,
       "size": [
         2000,
         1125
@@ -102,7 +83,6 @@
       "solid": false,
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -111,9 +91,7 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "image",
       "visible": true
@@ -121,12 +99,8 @@
     {
       "align": "center",
       "anchor": "center",
-      "attach": null,
-      "background": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "blur": null,
-      "brightness": null,
       "cache": false,
       "color": "#ffffff",
       "depth_test": false,
@@ -134,65 +108,22 @@
       "fallback": [],
       "font": "sans-serif",
       "id": "hora",
-      "inherit": null,
-      "letter_spacing": null,
-      "lighting": null,
       "line_height": null,
-      "mask": null,
       "opacity": 1.0,
-      "outline": null,
       "padding": 0,
       "parallax": [
         0.03,
         0.03
       ],
-      "parent": null,
       "render": "auto",
-      "shadow": null,
       "size": 220,
       "solid": false,
       "text": {
-        "a": null,
-        "audio": null,
-        "b": null,
-        "base": null,
-        "bounds": null,
-        "channel": null,
-        "clamp": null,
         "clock": "HH:mm",
-        "cursor": null,
-        "date": null,
-        "exponent": null,
-        "fn": null,
-        "g": null,
-        "hold_silence": null,
-        "invert": false,
-        "keys": null,
-        "kind": null,
-        "layer": null,
-        "loop": null,
-        "map": null,
-        "media": null,
-        "of": null,
-        "offset": null,
-        "params": null,
-        "placeholder": null,
-        "prop": null,
-        "r": null,
-        "reduce": null,
-        "reference": null,
-        "scale": null,
-        "script": null,
-        "smooth": null,
-        "timeline": null,
-        "unit": null,
-        "window": null,
-        "x": null,
-        "y": null
+        "invert": false
       },
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -201,9 +132,7 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "text",
       "valign": "center",
@@ -213,12 +142,8 @@
     {
       "align": "center",
       "anchor": "bottom",
-      "attach": null,
-      "background": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "blur": null,
-      "brightness": null,
       "cache": false,
       "color": "#cfe0ff",
       "depth_test": false,
@@ -226,61 +151,19 @@
       "fallback": [],
       "font": "sans-serif",
       "id": "fecha",
-      "inherit": null,
-      "letter_spacing": null,
-      "lighting": null,
       "line_height": null,
-      "mask": null,
       "opacity": 1.0,
-      "outline": null,
       "padding": 0,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
       "render": "auto",
-      "shadow": null,
       "size": 56,
       "solid": false,
       "text": {
-        "a": null,
-        "audio": null,
-        "b": null,
-        "base": null,
-        "bounds": null,
-        "channel": null,
-        "clamp": null,
-        "clock": null,
-        "cursor": null,
         "date": "EEEE d 'de' MMMM",
-        "exponent": null,
-        "fn": null,
-        "g": null,
-        "hold_silence": null,
-        "invert": false,
-        "keys": null,
-        "kind": null,
-        "layer": null,
-        "loop": null,
-        "map": null,
-        "media": null,
-        "of": null,
-        "offset": null,
-        "params": null,
-        "placeholder": null,
-        "prop": null,
-        "r": null,
-        "reduce": null,
-        "reference": null,
-        "scale": null,
-        "script": null,
-        "smooth": null,
-        "timeline": null,
-        "unit": null,
-        "window": null,
-        "x": null,
-        "y": null
+        "invert": false
       },
       "transform": {
         "origin": "anchor",
@@ -296,9 +179,7 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "text",
       "valign": "center",
@@ -312,6 +193,5 @@
   "schema": "reiwand.scene/2",
   "scripts": [],
   "templates": {},
-  "timelines": [],
-  "transition": null
+  "timelines": []
 }

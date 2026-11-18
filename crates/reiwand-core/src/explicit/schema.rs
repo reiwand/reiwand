@@ -8,38 +8,6 @@ pub struct Annotated {
     pub uncovered: Vec<String>,
 }
 
-pub fn all_required(schema: &Value) -> Vec<String> {
-    let mut found = Vec::new();
-    walk(schema, "", &mut found);
-    found
-}
-
-fn walk(node: &Value, at: &str, found: &mut Vec<String>) {
-    match node {
-        Value::Object(map) => {
-            if let Some(Value::Object(props)) = map.get("properties") {
-                let required: Vec<&str> = map
-                    .get("required")
-                    .and_then(Value::as_array)
-                    .map(|a| a.iter().filter_map(Value::as_str).collect())
-                    .unwrap_or_default();
-                for name in props.keys().filter(|k| !required.contains(&k.as_str())) {
-                    found.push(format!("{at}/properties/{name}"));
-                }
-            }
-            for (key, child) in map {
-                walk(child, &format!("{at}/{key}"), found);
-            }
-        }
-        Value::Array(items) => {
-            for (i, child) in items.iter().enumerate() {
-                walk(child, &format!("{at}/{i}"), found);
-            }
-        }
-        _ => {}
-    }
-}
-
 fn type_names(schema: &Value) -> Vec<String> {
     let defs = schema.get("$defs").and_then(Value::as_object);
     let title = schema.get("title").and_then(Value::as_str);
@@ -147,7 +115,11 @@ fn names(node: &Value, into: &mut Vec<String>) {
 
 fn require(node: &mut Value) {
     if let Some(Value::Object(props)) = node.get("properties") {
-        let mut fields: Vec<String> = props.keys().cloned().collect();
+        let mut fields: Vec<String> = props
+            .iter()
+            .filter(|(_, p)| p.get("x-block") != Some(&Value::Bool(true)))
+            .map(|(k, _)| k.clone())
+            .collect();
         fields.sort();
         node["required"] = fields.into_iter().map(Value::String).collect();
     }

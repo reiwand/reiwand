@@ -1,6 +1,7 @@
 use crate::Color;
 use crate::content::{shown, white};
 use crate::value::{Value, Vec2};
+use reiwand_core::explicit::block;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -34,8 +35,8 @@ pub struct Camera {
     pub zoom: Value<f32>,
     #[schemars(extend("x-unit" = "°", "x-range" = [-360, 360]))]
     pub rotation: Value<f32>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub shake: Option<Shake>,
 }
 
@@ -61,8 +62,8 @@ pub struct Bloom {
     #[schemars(extend("x-unit" = "px", "x-range" = [0, 128]))]
     pub radius: Value<f32>,
     pub tint: Value<Color>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub hdr: Option<Glare>,
 }
 
@@ -96,8 +97,8 @@ pub struct Playback {
     pub start: f32,
     #[schemars(extend("x-unit" = "s"))]
     pub end: crate::Ctx<f32, { crate::END }>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub frame: Option<Value<f32>>,
     pub own_clock: bool,
 }

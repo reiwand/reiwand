@@ -1,5 +1,6 @@
 use crate::Ease;
 use crate::value::{Value, Vec3};
+use reiwand_core::explicit::{block, null};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -19,8 +20,8 @@ pub struct Camera3d {
     pub up: Vec3,
     pub paths: Vec<CameraPath>,
     pub order: PathOrder,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub fade: Option<Fade>,
 }
 
@@ -37,7 +38,7 @@ pub enum PathOrder {
 pub struct CameraPath {
     pub id: String,
     pub keys: Vec<CameraKey>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     #[schemars(required, extend("x-null" = true))]
     pub ease: Option<Ease>,
     #[serde(rename = "loop")]
@@ -51,11 +52,11 @@ pub struct CameraKey {
     pub t: f32,
     pub eye: Vec3,
     pub center: Vec3,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub up: Option<Vec3>,
     #[schemars(extend("x-unit" = "°", "x-range" = [1, 179]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     #[schemars(required, extend("x-null" = true))]
     pub fov: Option<f32>,
 }

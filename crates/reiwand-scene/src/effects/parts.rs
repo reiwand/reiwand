@@ -1,4 +1,5 @@
 use crate::value::Param;
+use reiwand_core::explicit::null;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
@@ -48,7 +49,7 @@ pub struct Variant {
     pub id: String,
     pub values: Vec<Param>,
     pub prefill: Param,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     pub when_bound: Option<String>,
 }
 

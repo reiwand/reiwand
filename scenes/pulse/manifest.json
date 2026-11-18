@@ -59,9 +59,6 @@
       "alpha": false,
       "default": "#5ee7ff",
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Color",
         "es": "Color"
@@ -74,9 +71,6 @@
     "glitch": {
       "default": true,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Glitch on beats",
         "es": "Interferencias con el ritmo"
@@ -88,9 +82,6 @@
     },
     "note": {
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Allow audio for this scene to make it move with the sound, and the media player to show the cover and title of what plays.",
         "es": "Permite el audio a esta escena para que se mueva con el sonido, y el reproductor multimedia para que muestre la carátula y el título de lo que suena."
@@ -103,9 +94,6 @@
     "show": {
       "default": "both",
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Spectrum",
         "es": "Espectro"

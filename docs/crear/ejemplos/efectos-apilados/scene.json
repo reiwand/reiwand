@@ -2,14 +2,12 @@
   "assets": {
     "cielo": {
       "animated": false,
-      "atlas": null,
       "durations": [],
       "face": null,
       "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
-      "media": null,
       "mipmaps": null,
       "path": "assets/cielo.png",
       "rects": [],
@@ -18,14 +16,12 @@
     },
     "mancha": {
       "animated": false,
-      "atlas": null,
       "durations": [],
       "face": null,
       "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": true,
-      "media": null,
       "mipmaps": null,
       "path": "assets/mancha.png",
       "rects": [],
@@ -33,27 +29,16 @@
       "wrap": "clamp"
     }
   },
-  "audio": null,
-  "camera3d": null,
   "canvas": {
-    "ambient": null,
     "background": "#000000",
     "blend_space": "linear",
-    "bloom": null,
-    "camera": null,
     "clear": true,
     "fit": "fill",
-    "gusts": null,
     "hdr": false,
-    "parallax": null,
-    "perspective": null,
     "size": [
       1920,
       1080
-    ],
-    "sky": null,
-    "tonemap": null,
-    "wind": null
+    ]
   },
   "clock": {
     "max_fps": 60,
@@ -65,11 +50,8 @@
   "ext": {},
   "layers": [
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "color": "#ffffff",
       "depth_test": false,
@@ -77,45 +59,9 @@
         {
           "effect": "color_adjust",
           "enabled": {
-            "a": null,
-            "audio": null,
-            "b": null,
-            "base": null,
-            "bounds": null,
-            "channel": null,
-            "clamp": null,
-            "clock": null,
-            "cursor": null,
-            "date": null,
-            "exponent": null,
-            "fn": null,
-            "g": null,
-            "hold_silence": null,
             "invert": false,
-            "keys": null,
-            "kind": null,
-            "layer": null,
-            "loop": null,
-            "map": null,
-            "media": null,
-            "of": null,
-            "offset": null,
-            "params": null,
-            "placeholder": null,
-            "prop": "color_vivo",
-            "r": null,
-            "reduce": null,
-            "reference": null,
-            "scale": null,
-            "script": null,
-            "smooth": null,
-            "timeline": null,
-            "unit": null,
-            "window": null,
-            "x": null,
-            "y": null
+            "prop": "color_vivo"
           },
-          "mask": null,
           "name": "color",
           "optional": false,
           "params": {
@@ -132,12 +78,9 @@
             "channel": "r",
             "feather": 0,
             "invert": false,
-            "layer": null,
-            "shape": null,
             "strength": 1,
             "texture": "mancha"
           },
-          "name": null,
           "optional": false,
           "params": {
             "amplitude": 10,
@@ -157,7 +100,6 @@
             "channel": "a",
             "feather": 0.0,
             "invert": true,
-            "layer": null,
             "shape": {
               "rect": {
                 "radius": 0.0,
@@ -167,10 +109,8 @@
                 ]
               }
             },
-            "strength": 0.8,
-            "texture": null
+            "strength": 0.8
           },
-          "name": null,
           "optional": true,
           "params": {
             "amount": 1.0,
@@ -181,16 +121,11 @@
       ],
       "id": "fondo",
       "image": "cielo",
-      "inherit": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
-      "playback": null,
       "size": [
         1920,
         1080
@@ -198,7 +133,6 @@
       "solid": false,
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -207,27 +141,20 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "image",
       "visible": true
     },
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "depth_test": false,
       "effects": [
         {
           "effect": "bloom",
           "enabled": true,
-          "mask": null,
-          "name": null,
           "optional": false,
           "params": {
             "intensity": 0.8,
@@ -240,8 +167,6 @@
         {
           "effect": "vignette",
           "enabled": true,
-          "mask": null,
-          "name": null,
           "optional": false,
           "params": {
             "center": [
@@ -258,8 +183,6 @@
         {
           "effect": "film_grain",
           "enabled": true,
-          "mask": null,
-          "name": null,
           "optional": false,
           "params": {
             "amount": 0.04,
@@ -272,22 +195,17 @@
         }
       ],
       "id": "pantalla",
-      "inherit": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
       "redraw": false,
       "rgb": false,
       "size": "canvas",
       "solid": false,
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -296,9 +214,7 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "adjustment",
       "visible": true
@@ -310,6 +226,5 @@
   "schema": "reiwand.scene/2",
   "scripts": [],
   "templates": {},
-  "timelines": [],
-  "transition": null
+  "timelines": []
 }

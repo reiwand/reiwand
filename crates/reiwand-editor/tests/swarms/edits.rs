@@ -8,7 +8,7 @@ fn shapes_points_and_layer_sources_are_set_undone_and_checked() {
     edit(&mut p, "point", json!({ "point": 1, "at": [300, 200], "angle": 45 })).unwrap();
     assert_eq!(
         system(&p)["points"],
-        json!([{ "at": [0, 0], "angle": 0.0, "follow": null, "space": "local" }, { "at": [300.0, 200.0], "angle": 45.0, "follow": null, "space": "local" }])
+        json!([{ "at": [0, 0], "angle": 0.0, "space": "local" }, { "at": [300.0, 200.0], "angle": 45.0, "space": "local" }])
     );
     undone(&mut p, &before);
     let around =

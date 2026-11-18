@@ -36,7 +36,5 @@ window.going = null;
 window.go = (name) => { clearInterval(window.going); window.going = name ? setInterval(() => { try { ways[name](); } catch (e) {} }, 200) : null; };
 </script></body></html>"""
 
-fun privateManifest(origin: String) = """{ "schema": "reiwand.wpak/2", "id": "org.example.cut${System.nanoTime()}", "version": "1.0.0",
-    "title": "Cut", "license": "CC0-1.0", "kind": "web", "entry": "index.html", "origin": { "kind": "original" },
-    "content": { "rating": "general" }, "photosensitive": false, "inputs": ["network"],
-    "permissions": { "network": { "allow": ["https://$origin"] } } }"""
+fun privateManifest(origin: String) =
+    sample("cut", "manifest").replace("org.example.cut", "org.example.cut${System.nanoTime()}").replace("ORIGIN", origin)

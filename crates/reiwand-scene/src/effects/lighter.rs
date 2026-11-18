@@ -1,5 +1,6 @@
 use super::{Cost, Descriptor, PassDef};
 use crate::Quality;
+use reiwand_core::explicit::block;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -8,7 +9,7 @@ use std::sync::Arc;
 pub struct Lighter {
     pub passes: Vec<PassDef>,
     pub cost: Cost,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub up_to: Option<Quality>,
 }
 

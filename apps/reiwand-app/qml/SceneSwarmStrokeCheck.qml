@@ -36,7 +36,7 @@ QtObject {
             throw new Error("stretch: the longest slider did not write the maximum: " + JSON.stringify(render().stretch));
         on.checked = false;
         on.toggled();
-        if (render()?.stretch !== null)
+        if (render()?.stretch !== undefined)
             throw new Error("stretch: switching it off left the stretch");
         const slim = find("aspectSlider");
         slim.value = Math.log(0.25);

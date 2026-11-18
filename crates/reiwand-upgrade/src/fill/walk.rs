@@ -174,6 +174,7 @@ impl<'a> Walk<'a> {
             if !map.contains_key(name)
                 && (!self.required_only || required(name))
                 && let Some(value) = self.hidden(ps, required(name), def, ctx, name)
+                && !(value.is_null() && super::blocks::is_block(def, name))
             {
                 map.insert(name.clone(), value);
                 self.report.note(if def.is_empty() { ctx } else { def }, name);

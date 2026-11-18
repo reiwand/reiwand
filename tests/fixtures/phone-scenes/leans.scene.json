@@ -1,0 +1,211 @@
+{
+  "assets": {},
+  "audio": null,
+  "camera3d": null,
+  "canvas": {
+    "ambient": null,
+    "background": "#000000",
+    "blend_space": "linear",
+    "bloom": {
+      "hdr": null,
+      "radius": 4,
+      "strength": 1.0,
+      "threshold": 0.5,
+      "tint": "#ffd0a0"
+    },
+    "camera": {
+      "center": "canvas",
+      "rotation": 5,
+      "shake": null,
+      "zoom": 1.2
+    },
+    "clear": false,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": 120,
+    "size": [
+      64,
+      32
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "color": "#4080ff",
+      "depth_test": false,
+      "effects": [],
+      "id": "card",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "size": [
+        30,
+        20
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": [
+          20,
+          30
+        ],
+        "z": 10
+      },
+      "type": "solid",
+      "visible": true
+    },
+    {
+      "align": "center",
+      "anchor": null,
+      "attach": null,
+      "background": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "blur": null,
+      "brightness": null,
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "fallback": [],
+      "font": null,
+      "id": "word",
+      "inherit": null,
+      "letter_spacing": 2,
+      "lighting": null,
+      "line_height": null,
+      "mask": null,
+      "opacity": 1.0,
+      "outline": {
+        "color": "#000000",
+        "width": 1
+      },
+      "padding": 0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "render": "auto",
+      "shadow": {
+        "blur": 1,
+        "color": "#000000",
+        "offset": [
+          1,
+          1
+        ]
+      },
+      "size": 12,
+      "solid": false,
+      "text": "Hi",
+      "transform": {
+        "origin": "anchor",
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "text",
+      "valign": "center",
+      "visible": true,
+      "wrap": null
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "id": "lens",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "redraw": true,
+      "rgb": false,
+      "size": [
+        16,
+        16
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          32,
+          16
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.5,
+          1.5
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "adjustment",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": [],
+  "transition": null
+}

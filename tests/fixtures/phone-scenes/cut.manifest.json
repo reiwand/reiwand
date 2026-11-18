@@ -1,0 +1,48 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": null,
+  "description": "",
+  "display": null,
+  "entry": "index.html",
+  "id": "org.example.cut",
+  "inputs": [
+    "network"
+  ],
+  "kind": "web",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": {
+    "network": {
+      "allow": [
+        "https://ORIGIN"
+      ]
+    },
+    "rgb": false
+  },
+  "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "preview": null,
+  "previews": null,
+  "properties": {},
+  "requires": null,
+  "schema": "reiwand.wpak/2",
+  "strings": {},
+  "tags": [],
+  "title": "Cut",
+  "version": "1.0.0",
+  "web": null
+}

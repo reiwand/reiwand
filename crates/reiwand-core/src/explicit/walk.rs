@@ -85,7 +85,7 @@ pub fn properties(root: &Value, schema: &Value, value: &Value) -> Map<String, Va
     props
 }
 
-pub fn child<'a>(root: &'a Value, schema: &'a Value, token: &str, value: &Value) -> Option<Value> {
+pub fn settled<'a>(root: &'a Value, schema: &'a Value, value: &Value) -> &'a Value {
     let (mut chosen, _) = deref(root, schema);
     while !chosen["properties"].is_object() && !branches(chosen).is_empty() {
         let next = deref(root, choose(root, chosen, value)).0;
@@ -94,6 +94,11 @@ pub fn child<'a>(root: &'a Value, schema: &'a Value, token: &str, value: &Value)
         }
         chosen = next;
     }
+    chosen
+}
+
+pub fn child<'a>(root: &'a Value, schema: &'a Value, token: &str, value: &Value) -> Option<Value> {
+    let chosen = settled(root, schema, value);
     if let Some(p) = properties(root, chosen, value).get(token) {
         return Some(p.clone());
     }

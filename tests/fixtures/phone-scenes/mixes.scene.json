@@ -1,0 +1,316 @@
+{
+  "assets": {},
+  "audio": null,
+  "camera3d": null,
+  "canvas": {
+    "ambient": null,
+    "background": "#000000",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
+    "size": [
+      64,
+      32
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#00ff00",
+      "gradient": null,
+      "id": "spot",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "shape": {
+        "ellipse": {
+          "size": [
+            20,
+            20
+          ]
+        }
+      },
+      "solid": false,
+      "stroke": null,
+      "transform": {
+        "origin": "anchor",
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "shape",
+      "visible": false
+    },
+    {
+      "anchor": null,
+      "attach": null,
+      "blend": "linear_burn",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "light_shafts",
+          "enabled": true,
+          "mask": null,
+          "name": null,
+          "optional": false,
+          "params": {
+            "angle": 30.0,
+            "center": [
+              0.5,
+              0.0
+            ],
+            "color": "#fff2cc",
+            "direction": 0.0,
+            "exponent": 1.0,
+            "feather": 0.3,
+            "gradient": "",
+            "intensity": 1.0,
+            "smoothness": 0.5,
+            "speed": 0
+          }
+        },
+        {
+          "effect": "tint",
+          "enabled": true,
+          "mask": {
+            "channel": "a",
+            "feather": 0.0,
+            "invert": false,
+            "layer": null,
+            "shape": {
+              "ellipse": {
+                "size": [
+                  30,
+                  20
+                ]
+              }
+            },
+            "strength": 1,
+            "texture": null
+          },
+          "name": null,
+          "optional": false,
+          "params": {
+            "amount": 1.0,
+            "blend": "multiply",
+            "color": "#ff8800",
+            "mode": 0.0
+          }
+        },
+        {
+          "effect": "blend_texture",
+          "enabled": true,
+          "mask": {
+            "channel": "a",
+            "feather": 0.0,
+            "invert": false,
+            "layer": "spot",
+            "shape": null,
+            "strength": 1,
+            "texture": null
+          },
+          "name": null,
+          "optional": false,
+          "params": {
+            "amount": 1.0,
+            "blend": "multiply",
+            "offset": [
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "texture": {
+              "a": null,
+              "audio": null,
+              "b": null,
+              "base": null,
+              "bounds": null,
+              "channel": null,
+              "clamp": null,
+              "clock": null,
+              "cursor": null,
+              "date": null,
+              "exponent": null,
+              "fn": null,
+              "g": null,
+              "hold_silence": null,
+              "invert": false,
+              "keys": null,
+              "kind": null,
+              "layer": "spot",
+              "loop": null,
+              "map": null,
+              "media": null,
+              "of": null,
+              "offset": null,
+              "params": null,
+              "placeholder": null,
+              "prop": null,
+              "r": null,
+              "reduce": null,
+              "reference": null,
+              "scale": null,
+              "script": null,
+              "smooth": null,
+              "timeline": null,
+              "unit": null,
+              "window": null,
+              "x": null,
+              "y": null
+            }
+          }
+        },
+        {
+          "effect": "glitter",
+          "enabled": true,
+          "mask": null,
+          "name": null,
+          "optional": false,
+          "params": {
+            "color": "#ffffff",
+            "density": 0.3,
+            "size": 2.0,
+            "speed": 0
+          }
+        },
+        {
+          "effect": "trail",
+          "enabled": true,
+          "mask": null,
+          "name": null,
+          "optional": false,
+          "params": {
+            "persistence": 0.8
+          }
+        },
+        {
+          "effect": "god_rays",
+          "enabled": true,
+          "mask": null,
+          "name": null,
+          "optional": false,
+          "params": {
+            "angle": 90.0,
+            "color": "#fff4e0",
+            "decay": 0.96,
+            "density": 0.8,
+            "edges": 6.0,
+            "exposure": 0.6,
+            "follow": false,
+            "mode": 2,
+            "noise": 0.0,
+            "samples": 12.0,
+            "source": [
+              0.5,
+              0.15
+            ],
+            "threshold": 0.7
+          }
+        },
+        {
+          "effect": "fluid",
+          "enabled": true,
+          "mask": null,
+          "name": null,
+          "optional": false,
+          "params": {
+            "blend": "normal",
+            "color": "#ffffff",
+            "dye_decay": 0.97,
+            "emitters": [],
+            "gradient": "",
+            "opaque": false,
+            "perspective": 0.0,
+            "push": 0,
+            "render": 0.0,
+            "strength": 1.0,
+            "velocity_decay": 0.98
+          }
+        }
+      ],
+      "id": "fill",
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "size": "canvas",
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "solid",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": [],
+  "transition": null
+}

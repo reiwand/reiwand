@@ -1,3 +1,4 @@
+mod blocks;
 mod hidden;
 mod legacy;
 mod params;

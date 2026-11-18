@@ -1,3 +1,4 @@
+use reiwand_core::explicit::{block, null};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -26,10 +27,10 @@ pub struct Timeline {
     #[schemars(extend("x-unit" = "s"))]
     pub duration: f32,
     #[schemars(extend("x-range" = [1, 240]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     #[schemars(required, extend("x-null" = true))]
     pub fps: Option<f32>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     #[schemars(required, extend("x-null" = true))]
     pub frames: Option<u32>,
     pub wrap: bool,
@@ -39,8 +40,8 @@ pub struct Timeline {
     pub delay: f32,
     pub autoplay: bool,
     #[schemars(extend("x-ref" = "trigger"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub trigger: Option<String>,
     pub events: Vec<Event>,
 }
@@ -57,11 +58,11 @@ pub struct Event {
 #[serde(deny_unknown_fields)]
 pub struct Handles {
     #[serde(rename = "in")]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub before: Option<Side>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub out: Option<Side>,
 }
 

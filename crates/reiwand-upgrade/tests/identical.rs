@@ -72,3 +72,8 @@ fn manifests_read_the_same_after_step_a() {
     }
     assert!(read >= 20, "the corpus is too small: {read}");
 }
+
+#[test]
+fn the_frozen_block_table_is_the_one_of_the_scene_format() {
+    assert_eq!(include_str!("../frozen/blocks.tsv"), include_str!("../../reiwand-scene/src/classes.tsv"));
+}

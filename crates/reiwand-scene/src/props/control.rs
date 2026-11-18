@@ -1,5 +1,6 @@
 use super::Text;
 use super::slider::Slider;
+use reiwand_core::explicit::{block, null};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value as Json;
@@ -24,7 +25,7 @@ pub enum Control {
     Text {
         default: String,
         #[schemars(extend("x-range" = [1, 1024]))]
-        #[serde(deserialize_with = "reiwand_core::explicit::null")]
+        #[serde(deserialize_with = "null")]
         #[schemars(required, extend("x-null" = true))]
         max_len: Option<u32>,
         multiline: bool,
@@ -34,8 +35,8 @@ pub enum Control {
         #[schemars(extend("items" = {"type": "string", "enum": ["image", "video"]}))]
         accept: Vec<String>,
         #[schemars(extend("x-ref" = "media"))]
-        #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required, extend("x-null" = true))]
+        #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+        #[schemars(extend("x-null" = true, "x-block" = true))]
         default_asset: Option<String>,
     },
     Folder {
@@ -83,8 +84,8 @@ pub enum Choice {
         value: Json,
         label: Text,
         #[schemars(extend("x-ref" = "icon"))]
-        #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required, extend("x-null" = true))]
+        #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+        #[schemars(extend("x-null" = true, "x-block" = true))]
         icon: Option<String>,
     },
     Plain(Json),

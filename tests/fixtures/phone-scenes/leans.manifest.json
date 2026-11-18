@@ -1,0 +1,51 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": null,
+  "description": "",
+  "display": null,
+  "entry": "scene.json",
+  "id": "org.example.leans",
+  "inputs": [],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
+  "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "preview": null,
+  "previews": null,
+  "properties": {},
+  "requires": {
+    "engine": null,
+    "features": [
+      "bloom",
+      "camera",
+      "capture",
+      "keep_frame",
+      "text_styles",
+      "tilt"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/2",
+  "strings": {},
+  "tags": [],
+  "title": "Leans",
+  "version": "1.0.0",
+  "web": null
+}

@@ -1,3 +1,4 @@
+use reiwand_core::explicit::{block, null};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -9,33 +10,33 @@ pub const COLLECTIONS: [&str; 3] = ["ttc", "otc", "woff2"];
 pub struct Asset {
     pub path: String,
     pub linear: bool,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub atlas: Option<[u32; 2]>,
     pub filter: Filter,
     pub wrap: Wrapping,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     #[schemars(required, extend("x-null" = true))]
     pub mipmaps: Option<bool>,
     #[schemars(extend("x-range" = [0, 255]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     #[schemars(required, extend("x-null" = true))]
     pub face: Option<u32>,
     #[schemars(extend("x-unit" = "px"))]
     pub rects: Vec<[u32; 4]>,
     #[schemars(extend("x-range" = [1, 256]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     #[schemars(required, extend("x-null" = true))]
     pub frames: Option<u32>,
     #[schemars(extend("x-range" = [0.1, 120]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     #[schemars(required, extend("x-null" = true))]
     pub fps: Option<f32>,
     #[schemars(extend("x-unit" = "s"))]
     pub durations: Vec<f32>,
     pub animated: bool,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub media: Option<crate::Cover>,
     pub shapes: std::collections::BTreeMap<String, String>,
 }
