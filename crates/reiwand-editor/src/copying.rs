@@ -83,7 +83,7 @@ pub fn extract(file: &Path, dir: &Path, id: Option<&str>, mine: bool) -> Result<
     let path = dir.join(MANIFEST);
     let mut manifest: Value = serde_json::from_slice(&fs::read(&path)?)?;
     if let Some(fields) = manifest.as_object_mut() {
-        fields.remove("authors");
+        fields.insert("authors".into(), json!([]));
         fields.insert("origin".into(), serde_json::to_value(crate::package::derived(&original))?);
     }
     manifest["id"] = json!(id);

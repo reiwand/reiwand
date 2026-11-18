@@ -53,6 +53,7 @@ fn manifests_read_the_same_after_step_a() {
         let Ok(before) = serde_json::from_str::<reiwand_format::Manifest>(&text) else { continue };
         let mut doc: Value = serde_json::from_str(&text).unwrap();
         complete_with(Format::Manifest, &mut doc, &Customs::new());
+        reiwand_upgrade::manifests::reshape(&mut doc);
         let after: reiwand_format::Manifest = serde_json::from_value(doc.clone())
             .unwrap_or_else(|e| panic!("{}: not readable after step A: {e}", path.display()));
         let (x, y) = (serde_json::to_value(&before).unwrap(), serde_json::to_value(&after).unwrap());

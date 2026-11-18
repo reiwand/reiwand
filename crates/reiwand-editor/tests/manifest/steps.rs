@@ -8,23 +8,25 @@ fn inputs_and_features_follow_every_step() {
     let mut project =
         Project::create(&dir, starter("empty", "org.example.sea", "Sea", "en").unwrap()).unwrap();
     let act = |project: &mut Project, value: Value| project.act(&action(value));
-    assert!(project.doc["manifest"].get("requires").is_none());
+    assert!(project.doc["manifest"]["requires"].is_null());
     act(&mut project, json!({"add_layer": {"kind": "spectrum"}})).unwrap();
     assert_eq!(project.doc["manifest"]["inputs"], json!(["audio"]));
-    assert_eq!(project.doc["manifest"]["requires"], json!({"features": ["inputs.audio"]}));
+    assert_eq!(
+        project.doc["manifest"]["requires"],
+        json!({"engine": null, "features": ["inputs.audio"], "gpu": null, "packages": []})
+    );
     act(&mut project, json!({"set": {"pointer": "/manifest/inputs", "value": ["network"]}})).unwrap();
     assert_eq!(project.doc["manifest"]["inputs"], json!(["audio", "network"]));
     let typed = json!({"set": {"pointer": "/manifest/requires/features", "value": []}});
     assert!(act(&mut project, typed).is_err(), "features are never typed");
     act(&mut project, json!({"undo": {}})).unwrap();
     act(&mut project, json!({"undo": {}})).unwrap();
-    assert!(
-        project.doc["manifest"].get("requires").is_none() && project.doc["manifest"].get("inputs").is_none()
-    );
+    assert!(project.doc["manifest"]["requires"].is_null() && project.doc["manifest"]["inputs"] == json!([]));
     act(&mut project, json!({"redo": {}})).unwrap();
     project.save().unwrap();
     let mut manifest: Value = serde_json::from_slice(&fs::read(dir.join("manifest.json")).unwrap()).unwrap();
-    manifest.as_object_mut().unwrap().retain(|k, _| k != "inputs" && k != "requires");
+    manifest["inputs"] = json!([]);
+    manifest["requires"] = Value::Null;
     fs::write(dir.join("manifest.json"), manifest.to_string()).unwrap();
     let mut project = Project::open(&dir).unwrap();
     assert!(at(&check(&project.doc), "/manifest/inputs"));
@@ -45,14 +47,17 @@ fn inputs_the_editor_added_go_with_what_needed_them() {
     let manifest = |project: &Project, key: &str| project.doc["manifest"].get(key).cloned();
     act(&mut project, json!({"set": {"pointer": "/manifest/requires", "value": {}}}));
     act(&mut project, json!({"set": {"pointer": "/manifest/requires/engine", "value": ">=0.1"}}));
-    assert_eq!(manifest(&project, "requires"), Some(json!({"engine": ">=0.1"})));
+    assert_eq!(
+        manifest(&project, "requires"),
+        Some(json!({"engine": ">=0.1", "features": [], "gpu": null, "packages": []}))
+    );
     act(&mut project, json!({"add_layer": {"kind": "spectrum"}}));
     act(&mut project, json!({"set": {"pointer": "/manifest/inputs", "value": ["audio", "media"]}}));
     act(&mut project, json!({"remove_layer": {"id": "spectrum"}}));
     assert_eq!(manifest(&project, "inputs"), Some(json!(["media"])));
     assert_eq!(
         manifest(&project, "requires"),
-        Some(json!({"engine": ">=0.1", "features": ["inputs.media"]}))
+        Some(json!({"engine": ">=0.1", "features": ["inputs.media"], "gpu": null, "packages": []}))
     );
     act(&mut project, json!({"undo": {}}));
     assert_eq!(manifest(&project, "inputs"), Some(json!(["audio", "media"])));

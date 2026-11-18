@@ -34,7 +34,7 @@ fn the_titles_and_thumbnails_of_an_open_resource_package_are_edited_in_place() {
         act(&mut kit, json!({"add_layer": {"kind": "solid", "id": id}})).unwrap();
     }
     let part = |extra: Value| {
-        let mut body = json!({"kind": "layer", "id": "mist"});
+        let mut body = json!({"kind": "layer", "id": "mist", "title": null, "thumbnail": null});
         body.as_object_mut().unwrap().extend(extra.as_object().unwrap().clone());
         json!({"manifest": {"part": body}})
     };
@@ -42,7 +42,7 @@ fn the_titles_and_thumbnails_of_an_open_resource_package_are_edited_in_place() {
     act(&mut kit, edit).unwrap();
     let parts = kit.doc["scene"]["ext"]["parts"].as_array().unwrap().clone();
     assert_eq!(parts.len(), 2);
-    assert_eq!(parts[0], json!({"kind": "layer", "id": "backdrop"}));
+    assert_eq!(parts[0], json!({"kind": "layer", "id": "backdrop", "title": null, "thumbnail": null}));
     assert_eq!(
         (parts[1]["title"].as_str(), parts[1]["thumbnail"].as_str()),
         (Some("Soft mist"), Some("parts/1.jpg"))
@@ -54,7 +54,10 @@ fn the_titles_and_thumbnails_of_an_open_resource_package_are_edited_in_place() {
     let listed = stock::browse(&wpak, None).unwrap();
     assert_eq!(listed["parts"][1]["title"], "Soft mist");
     act(&mut kit, part(json!({"title": "", "clear_thumbnail": true}))).unwrap();
-    assert_eq!(kit.doc["scene"]["ext"]["parts"][1], json!({"kind": "layer", "id": "mist"}));
+    assert_eq!(
+        kit.doc["scene"]["ext"]["parts"][1],
+        json!({"kind": "layer", "id": "mist", "title": null, "thumbnail": null})
+    );
     assert!(act(&mut kit, part(json!({"title": "<b>"}))).is_err());
     assert!(
         act(&mut kit, json!({"manifest": {"part": {"kind": "layer", "id": "ghost", "title": "x"}}})).is_err()

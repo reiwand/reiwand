@@ -58,7 +58,8 @@ impl Walk<'_> {
                 _ => self.field(&meta, value.get(&key), path, &key, depth),
             }
             if let Some(f) = self.out.get_mut(first) {
-                f.required = required.contains(&&json!(key)) || meta["x-required"] == true;
+                f.required =
+                    (required.contains(&&json!(key)) && meta["x-null"] != true) || meta["x-required"] == true;
             }
         }
     }

@@ -9,6 +9,7 @@ pub mod author_keys;
 pub mod bands;
 pub mod bases;
 mod batch;
+mod blanking;
 mod blend;
 mod bodies;
 mod bring;

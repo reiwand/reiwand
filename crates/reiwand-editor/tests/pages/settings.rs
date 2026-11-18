@@ -16,7 +16,10 @@ fn a_page_sets_its_preload_background_and_storage() {
     let listed = reiwand_editor::pages::files(&project.dir, &project.doc);
     assert!(listed.iter().any(|f| f["path"] == "early.js" && f["role"] == "preload"));
     manifest(&mut project, json!({"web": {"clear": ["preload", "storage_kib"]}})).unwrap();
-    assert_eq!(project.doc["manifest"]["web"], json!({"background": "#102030"}));
+    assert_eq!(
+        project.doc["manifest"]["web"],
+        json!({"preload": null, "background": "#102030", "storage_kib": 0})
+    );
     for refused in [
         json!({"web": {"values": {"background": "red"}}}),
         json!({"web": {"values": {"storage_kib": 99999}}}),
@@ -24,7 +27,10 @@ fn a_page_sets_its_preload_background_and_storage() {
     ] {
         assert!(manifest(&mut project, refused.clone()).is_err(), "{refused} was accepted");
     }
-    assert_eq!(project.doc["manifest"]["web"], json!({"background": "#102030"}));
+    assert_eq!(
+        project.doc["manifest"]["web"],
+        json!({"preload": null, "background": "#102030", "storage_kib": 0})
+    );
 }
 
 #[test]
@@ -46,7 +52,7 @@ fn network_origins_keep_the_network_input_in_step() {
     manifest(&mut project, json!({"network": {"origins": ["https://b.example.org"], "remove": true}}))
         .unwrap();
     let m = &project.doc["manifest"];
-    assert!(m.get("permissions").is_none() && m["inputs"].as_array().is_none_or(Vec::is_empty), "{m}");
+    assert!(m["permissions"].is_null() && m["inputs"].as_array().is_none_or(Vec::is_empty), "{m}");
     act(&mut project, json!({"undo": {}})).unwrap();
     assert_eq!(project.doc["manifest"]["inputs"], json!(["network"]));
 }
@@ -69,7 +75,7 @@ fn a_page_sets_its_playback() {
     let mut project = page(root.path());
     let values = json!({"playback": {"values": {"max_fps": 30, "volume": 0.4, "muted": true}}});
     manifest(&mut project, values).unwrap();
-    let playback = json!({"max_fps": 30, "volume": 0.4, "muted": true});
+    let playback = json!({"max_fps": 30, "volume": 0.4, "muted": true, "speed": null, "start": null, "end": null, "loop": null});
     assert_eq!(project.doc["manifest"]["playback"], playback);
     manifest(&mut project, json!({"playback": {"values": {"max_fps": "display"}}})).unwrap();
     assert_eq!(project.doc["manifest"]["playback"]["max_fps"], "display");
@@ -81,7 +87,7 @@ fn a_page_sets_its_playback() {
         assert!(manifest(&mut project, refused.clone()).is_err(), "{refused} was accepted");
     }
     manifest(&mut project, json!({"playback": {"clear": ["max_fps", "volume", "muted"]}})).unwrap();
-    assert!(project.doc["manifest"].get("playback").is_none());
+    assert!(project.doc["manifest"]["playback"].is_null());
 }
 
 #[test]

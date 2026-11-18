@@ -97,7 +97,7 @@ pub fn credit(
         c["license"] == license
             && c["attribution"] == attribution
             && c["url"].as_str() == url
-            && c.get("source").is_none()
+            && c["source"].is_null()
     };
     let at = next.iter().position(|c| same(c) && paths(c).len() < PATHS);
     let mut held: Vec<String> =

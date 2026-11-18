@@ -47,7 +47,7 @@ fn an_adjustment_layer_sends_to_rgb_lighting_with_its_permission_in_one_step() {
     act(&mut p, json!({ "redo": {} })).unwrap();
     act(&mut p, json!({ "rgb": { "layer": "glow", "on": false } })).unwrap();
     assert_eq!(layer(&p)["rgb"], json!(false));
-    assert!(p.doc["manifest"].get("permissions").is_none(), "{}", p.doc["manifest"]);
+    assert!(p.doc["manifest"]["permissions"].is_null(), "{}", p.doc["manifest"]);
     act(&mut p, json!({ "undo": {} })).unwrap();
     assert_eq!(p.doc["manifest"]["permissions"]["rgb"], json!(true));
 }
@@ -75,7 +75,7 @@ fn the_permission_follows_the_layers_that_send_colors_whatever_the_edit() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
     let features = |p: &Project| p.doc["manifest"]["requires"]["features"].clone();
-    assert!(p.doc["manifest"].get("permissions").is_none());
+    assert!(p.doc["manifest"]["permissions"].is_null());
     act(&mut p, json!({ "set": { "pointer": "/scene/layers/0/rgb", "value": true } })).unwrap();
     assert_eq!(p.doc["manifest"]["permissions"]["rgb"], json!(true));
     assert!(features(&p).as_array().is_some_and(|f| f.contains(&json!("rgb"))), "{}", features(&p));
@@ -84,7 +84,7 @@ fn the_permission_follows_the_layers_that_send_colors_whatever_the_edit() {
     assert_eq!(p.doc["manifest"]["permissions"]["rgb"], json!(true));
     let copy = p.doc["scene"]["layers"][0]["id"].as_str().unwrap().to_owned();
     act(&mut p, json!({ "remove_layer": { "id": copy } })).unwrap();
-    assert!(p.doc["manifest"].get("permissions").is_none(), "{}", p.doc["manifest"]);
+    assert!(p.doc["manifest"]["permissions"].is_null(), "{}", p.doc["manifest"]);
     assert!(!features(&p).as_array().is_some_and(|f| f.contains(&json!("rgb"))), "{}", features(&p));
     act(&mut p, json!({ "undo": {} })).unwrap();
     assert_eq!(p.doc["manifest"]["permissions"]["rgb"], json!(true));

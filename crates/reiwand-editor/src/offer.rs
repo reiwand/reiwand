@@ -63,7 +63,7 @@ pub fn make(dir: &Path, doc: &Value, picks: &[Pick], out: &Path, offer: &Offer) 
     let copied: Vec<String> = files(&parts).into_iter().collect();
     let (mut listed, mut pictures) = (Vec::new(), Vec::new());
     for (n, pick) in picks.iter().enumerate() {
-        let mut part = json!({ "kind": pick.kind, "id": pick.id });
+        let mut part = json!({ "kind": pick.kind, "id": pick.id, "title": null, "thumbnail": null });
         if let Some(title) = offer.titles.get(&pick.key()).filter(|t| !t.trim().is_empty()) {
             part["title"] = json!(title.trim());
         }
@@ -94,7 +94,9 @@ pub fn make(dir: &Path, doc: &Value, picks: &[Pick], out: &Path, offer: &Offer) 
     if let Some(file) = &offer.thumbnail {
         manifest["previews"] = json!({ "thumbnail": picture(file, "preview", &mut pictures)? });
     }
-    let mut project = Project::create(out, json!({ "manifest": manifest, "scene": parts }))?;
+    let mut whole = json!({ "manifest": manifest, "scene": parts });
+    crate::completing::manifest_doc(&mut whole);
+    let mut project = Project::create(out, whole)?;
     for path in &copied {
         put(out, path, |target| fs::copy(dir.join(path), target).map(drop))?;
     }

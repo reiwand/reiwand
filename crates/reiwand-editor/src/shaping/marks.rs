@@ -23,7 +23,11 @@ fn display(doc: &Value, values: &Map<String, Value>, clear: &[String]) -> Result
     }
     clear.iter().for_each(|k| drop(next.remove(k)));
     values.iter().for_each(|(k, v)| drop(next.insert(k.clone(), v.clone())));
-    Ok(super::effects::put(doc, "/manifest/display", (!next.is_empty()).then_some(Value::Object(next))))
+    Ok(super::effects::put(
+        doc,
+        "/manifest/display",
+        (!next.values().all(Value::is_null)).then_some(Value::Object(next)),
+    ))
 }
 
 fn written(dir: &Path, doc: &Value, (ops, writes): (Vec<Op>, Vec<crate::locales::Write>)) -> Result<Vec<Op>> {

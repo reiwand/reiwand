@@ -17,14 +17,15 @@ fn permitted(doc: &Value) -> bool {
 }
 
 fn grant(m: &mut serde_json::Map<String, Value>, wanted: bool) {
-    let permissions = m.entry("permissions").or_insert_with(|| json!({}));
-    match (wanted, permissions.as_object_mut()) {
-        (true, Some(p)) => drop(p.insert("rgb".into(), json!(true))),
-        (false, Some(p)) => drop(p.remove("rgb")),
-        _ => {}
+    let permissions = m.entry("permissions").or_insert(Value::Null);
+    if permissions.is_null() {
+        *permissions = json!({"network": null, "rgb": wanted});
     }
-    if permissions.as_object().is_some_and(serde_json::Map::is_empty) {
-        m.remove("permissions");
+    if let Some(p) = permissions.as_object_mut() {
+        p.insert("rgb".into(), json!(wanted));
+    }
+    if permissions == &json!({"network": null, "rgb": false}) {
+        *permissions = Value::Null;
     }
 }
 

@@ -117,7 +117,7 @@ fn asset_packages_are_made_from_chosen_parts_and_imported_with_credits() {
     assert_eq!(doc["manifest"]["origin"]["derived_from"][0]["title"], "Parts");
     project.act(&Action::Undo {}).unwrap();
     assert!(project.doc["scene"]["assets"].get("sky").is_none());
-    assert!(project.doc["manifest"].get("credits").is_none());
+    assert!(project.doc["manifest"]["credits"] == json!([]));
     project.act(&Action::Redo {}).unwrap();
     assert_eq!(project.doc["manifest"]["credits"].as_array().unwrap().len(), 1);
     let all = ImportAssets { package: wpak.clone(), parts: Vec::new() };

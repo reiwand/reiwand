@@ -45,7 +45,7 @@ fn a_package_that_credits_others_is_warned_of_files_without_credit() {
     assert!(warned(&p, "/manifest/credits").is_empty());
     let gone = json!({ "manifest": { "uncredit": { "paths": ["assets/tree.png", "assets/rock.png"] } } });
     act(&mut p, gone).unwrap();
-    assert!(p.doc["manifest"].get("credits").is_none(), "{}", p.doc["manifest"]);
+    assert!(p.doc["manifest"]["credits"] == json!([]), "{}", p.doc["manifest"]);
 }
 
 #[test]

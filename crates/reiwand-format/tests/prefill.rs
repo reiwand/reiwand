@@ -17,7 +17,7 @@ fn every_row_names_its_format_its_class_and_a_null_prefill() {
 }
 
 const FILES: [&str; 9] =
-    ["catalog", "charter", "entry", "featured", "index", "install", "parts", "release", "repo"];
+    ["catalog", "charter", "entry", "featured", "index", "parts", "record", "release", "repo"];
 
 #[test]
 fn every_option_of_the_repository_files_has_a_row() {

@@ -56,7 +56,7 @@ fn texts_are_translated_where_they_live() {
     run(&mut doc, description("", "Hills at **dusk**."));
     assert_eq!(doc["manifest"]["description"], "Hills at **dusk**.");
     run(&mut doc, description("", ""));
-    assert!(doc["manifest"].get("description").is_none());
+    assert_eq!(doc["manifest"]["description"], "");
     let changes = json!({"translate": {"pointer": "/manifest/changes", "language": "de", "text": "Neu"}});
     assert!(plan(&doc, &action(changes)).is_err(), "a text starts in the default language");
     doc["manifest"]["changes"] = json!({"de": "Neu"});

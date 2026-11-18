@@ -84,9 +84,10 @@ pub fn preview_document(dir: &Path, doc: &Value, look: &Value) -> Value {
     }
     let mut manifest = m.clone();
     if let Some(fields) = manifest.as_object_mut() {
-        for key in ["display", "presets", "requires", "playback", "previews", "preview"] {
-            fields.remove(key);
+        for key in ["display", "requires", "playback", "previews"] {
+            fields.insert(key.into(), Value::Null);
         }
+        fields.insert("presets".into(), json!([]));
         fields.insert("kind".into(), json!("scene"));
         fields.insert("entry".into(), json!("scene.json"));
     }
@@ -101,6 +102,7 @@ pub fn preview_document(dir: &Path, doc: &Value, look: &Value) -> Value {
         "assets": { "media": { "path": entry } } });
     let mut document = json!({ "manifest": manifest, "scene": scene });
     crate::completing::scene_doc(&mut document);
+    crate::completing::manifest_doc(&mut document);
     crate::rigs::staged(look).into_iter().for_each(|s| document["preview"] = s);
     document
 }

@@ -23,7 +23,7 @@ fn every_kind_of_property_starts_valid_and_the_features_follow() {
     assert_eq!(project.doc["manifest"]["requires"]["features"], json!(["properties2"]));
     remove(&mut project, "button_1");
     remove(&mut project, "divider_1");
-    assert!(project.doc["manifest"].get("requires").is_none());
+    assert!(project.doc["manifest"]["requires"].is_null());
     let doc = &project.doc;
     assert!(refused(doc, json!({"add_property": {"kind": "knob"}})).contains("not a kind of property"));
     assert!(refused(doc, json!({"add_property": {"kind": "bool", "id": "Slider_1"}})).contains("in use"));

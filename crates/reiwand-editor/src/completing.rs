@@ -5,7 +5,7 @@ use serde_json::Value;
 pub fn complete(doc: &Value, op: Op) -> Op {
     let (path, value) = match &op {
         Op::Add { path, value } | Op::Replace { path, value } => (path, value),
-        Op::Remove { path } => return blank(doc, path).unwrap_or(op),
+        Op::Remove { path } => return crate::blanking::blank(doc, path).unwrap_or(op),
         _ => return op,
     };
     let Some((root, _)) = root_of(path)
@@ -77,31 +77,6 @@ pub fn scene_doc(doc: &mut Value) {
     if let Op::Replace { value, .. } = complete(doc, Op::Replace { path: "/scene".into(), value: scene }) {
         doc["scene"] = value;
     }
-}
-
-fn blank(doc: &Value, path: &str) -> Option<Op> {
-    let (parent, key) = path.rsplit_once('/')?;
-    let (root, _) = root_of(path).filter(|_| path.starts_with("/scene/"))?;
-    let schema = at(doc, parent)?;
-    let shown = doc.pointer(parent)?;
-    let mut resolved = crate::schema::deref(root, &schema).0;
-    while !resolved["properties"].is_object() && !crate::schema::branches(resolved).is_empty() {
-        let next = crate::schema::deref(root, crate::schema::choose(root, resolved, shown)).0;
-        if std::ptr::eq(next, resolved) {
-            break;
-        }
-        resolved = next;
-    }
-    let prop = properties(root, resolved, shown).get(key)?.clone();
-    doc.pointer(path)?;
-    let variant =
-        resolved["oneOf"].as_array().into_iter().flatten().find(|v| crate::schema::fits(root, v, shown));
-    let listed_in = |s: &Value| s["required"].as_array().is_some_and(|r| r.iter().any(|r| r == key));
-    let required = listed_in(resolved) || variant.is_some_and(listed_in);
-    let nullable =
-        prop["x-null"] == true || branches(&prop).iter().any(|b| deref(root, b).0["type"] == "null");
-    let value = if nullable { Value::Null } else { sample(root, &prop) };
-    required.then(|| Op::Replace { path: path.to_owned(), value })
 }
 
 pub fn ops(doc: &Value) -> Vec<Op> {

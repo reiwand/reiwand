@@ -21,7 +21,7 @@ fn implicit(scene: &Value) -> Vec<Value> {
         scene[map].as_object().into_iter().flatten().map(|(k, _)| k.clone()).collect()
     };
     let named = |kind: &'static str, list: Vec<String>| {
-        list.into_iter().map(move |id| json!({ "kind": kind, "id": id }))
+        list.into_iter().map(move |id| json!({ "kind": kind, "id": id, "title": null, "thumbnail": null }))
     };
     named("layer", ids("layers", "id"))
         .chain(named("particles", keys("particles")))
@@ -76,18 +76,18 @@ pub(super) fn part(
                 list.len() < MOST_PARTS,
                 said("editor.parts_most", "a package offers at most %1 parts", &[&MOST_PARTS])
             );
-            list.push(json!({ "kind": kind, "id": id }));
+            list.push(json!({ "kind": kind, "id": id, "title": null, "thumbnail": null }));
             list.len() - 1
         }
     };
     if let Some(title) = title {
         match titled(title)? {
             Some(text) => list[at]["title"] = json!(text),
-            None => drop(list[at].as_object_mut().and_then(|o| o.remove("title"))),
+            None => list[at]["title"] = Value::Null,
         }
     }
     if clear {
-        drop(list[at].as_object_mut().and_then(|o| o.remove("thumbnail")));
+        list[at]["thumbnail"] = Value::Null;
     }
     if let Some(file) = thumbnail {
         list[at]["thumbnail"] = json!(pictured(dir, file, at)?);

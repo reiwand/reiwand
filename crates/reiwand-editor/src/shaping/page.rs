@@ -61,7 +61,8 @@ pub(super) fn section(
     clear.iter().for_each(|k| drop(next.remove(k)));
     values.iter().for_each(|(k, v)| drop(next.insert(k.clone(), v.clone())));
     let at = format!("/manifest/{name}");
-    Ok(super::effects::put(doc, &at, (!next.is_empty()).then_some(Value::Object(next))))
+    let bare = next.iter().all(|(k, v)| v.is_null() || (name == "web" && k == "storage_kib" && v == 0));
+    Ok(super::effects::put(doc, &at, (!bare).then_some(Value::Object(next))))
 }
 
 fn origin(text: &str) -> String {
@@ -78,10 +79,12 @@ pub(super) fn network(doc: &Value, origins: &[String], add: bool, remove: bool) 
     let next = merged(old, &given, add, remove);
     let mut permissions = doc["manifest"]["permissions"].as_object().cloned().unwrap_or_default();
     match next.is_empty() {
-        true => drop(permissions.remove("network")),
+        true => drop(permissions.insert("network".into(), Value::Null)),
         false => drop(permissions.insert("network".into(), json!({ "allow": next }))),
     }
-    let kept = (!permissions.is_empty()).then_some(Value::Object(permissions));
+    let bare =
+        permissions.get("network").is_none_or(Value::is_null) && permissions.get("rgb") != Some(&json!(true));
+    let kept = (!bare).then_some(Value::Object(permissions));
     let mut ops = super::effects::put(doc, "/manifest/permissions", kept);
     let mut inputs = strings(&doc["manifest"]["inputs"]);
     inputs.retain(|i| i != "network");

@@ -132,8 +132,11 @@ fn the_preview_of_a_picture_or_video_package_is_a_scene_that_shows_the_file_as_t
     let document = reiwand_editor::reels::preview_document(&video.dir, &video.doc, &json!({"quality": "q1"}));
     let (m, scene) = (&document["manifest"], &document["scene"]);
     assert_eq!((m["kind"].as_str(), m["entry"].as_str()), (Some("scene"), Some("scene.json")));
-    assert_eq!(m["playback"], json!({"max_fps": 30}));
-    assert!(m.get("display").is_none() && m.get("presets").is_none());
+    assert_eq!(
+        m["playback"],
+        json!({"max_fps": 30, "volume": null, "muted": null, "speed": null, "start": null, "end": null, "loop": null})
+    );
+    assert!(m["display"].is_null() && m["presets"] == json!([]));
     let canvas = &scene["canvas"];
     assert_eq!(
         (&canvas["size"], &canvas["fit"], &canvas["background"]),

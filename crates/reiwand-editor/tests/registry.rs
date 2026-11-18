@@ -30,10 +30,15 @@ fn shown(doc: &Value, pointer: &str, missing: &mut Vec<String>) {
         Value::Object(map) if !BOUND.iter().any(|b| map.contains_key(*b)) => {
             let keys: Vec<String> = fields(doc, pointer).into_iter().map(|f| f.key).collect();
             let top = if pointer == "/manifest" { reiwand_editor::meta::TOP.to_vec() } else { Vec::new() };
-            let wanted = map.iter().flat_map(|(k, v)| match k.as_str() {
-                "params" => v.as_object().into_iter().flatten().map(|(p, _)| p.clone()).collect(),
-                _ => vec![k.clone()],
-            });
+            let wanted = map
+                .iter()
+                .filter(|(k, v)| {
+                    !v.is_null() || reiwand_editor::meta::applies(doc, &format!("{pointer}/{k}"))
+                })
+                .flat_map(|(k, v)| match k.as_str() {
+                    "params" => v.as_object().into_iter().flatten().map(|(p, _)| p.clone()).collect(),
+                    _ => vec![k.clone()],
+                });
             let map_like = keys.iter().all(|k| pointer.rsplit('/').next() == Some(k.as_str()));
             let skipped = |k: &String| map_like || SKIPPED.contains(&k.as_str()) || top.contains(&k.as_str());
             missing.extend(

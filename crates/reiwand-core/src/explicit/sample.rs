@@ -12,10 +12,13 @@ pub fn sample(root: &Value, schema: &Value) -> Value {
     if let Some(d) = schema.get("default").or_else(|| schema.get("const")) {
         return d.clone();
     }
+    if schema["x-null"] == true {
+        return Value::Null;
+    }
     if let Some(first) = schema["enum"].get(0) {
         return first.clone();
     }
-    if schema["x-null"] == true || branches(schema).iter().any(|b| deref(root, b).0["type"] == "null") {
+    if branches(schema).iter().any(|b| deref(root, b).0["type"] == "null") {
         return Value::Null;
     }
     if let Some(first) = branches(schema).first() {

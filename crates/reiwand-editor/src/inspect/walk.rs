@@ -32,7 +32,7 @@ impl Walk<'_> {
             pointer: pointer.clone(),
             key: key.into(),
             value: current.clone(),
-            set: value.is_some(),
+            set: value.is_some_and(|v| !v.is_null()),
             depth,
             ..Field::default()
         };

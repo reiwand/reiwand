@@ -21,12 +21,15 @@ fn the_details_of_the_package_are_set_with_the_checks_of_the_manifest() {
     assert!(act(&mut p, json!({"manifest": {"display": {"values": {"fit": "fit"}}}})).is_err());
     act(&mut p, json!({"manifest": {"display": {"values": {"span": "all-outputs", "accent": "#ff8800"}}}}))
         .unwrap();
-    assert_eq!(at(&p, "/manifest/display"), json!({"span": "all-outputs", "accent": "#ff8800"}));
+    assert_eq!(
+        at(&p, "/manifest/display"),
+        json!({"fit": null, "zoom": null, "position": null, "background": null, "span": "all-outputs", "flip": null, "accent": "#ff8800"})
+    );
     assert!(refused(&mut p, json!({"manifest": {"display": {"values": {"wobble": 1}}}})).contains("wobble"));
     act(&mut p, json!({"manifest": {"display": {"clear": ["span", "accent"]}}})).unwrap();
     assert_eq!(at(&p, "/manifest/display"), serde_json::Value::Null);
     act(&mut p, json!({"manifest": {"authors": {"authors": []}}})).unwrap();
-    assert_eq!(at(&p, "/manifest/authors"), serde_json::Value::Null);
+    assert_eq!(at(&p, "/manifest/authors"), json!([]));
 }
 
 #[test]
@@ -106,7 +109,10 @@ fn a_scene_sets_its_frame_rate_sound_and_start_without_video_settings() {
         assert_eq!(at(&p, "/manifest/playback/max_fps"), rate);
     }
     act(&mut p, json!({"manifest": {"playback": {"values": {"volume": 0.4, "muted": true}}}})).unwrap();
-    assert_eq!(at(&p, "/manifest/playback"), json!({"max_fps": 45, "volume": 0.4, "muted": true}));
+    assert_eq!(
+        at(&p, "/manifest/playback"),
+        json!({"max_fps": 45, "volume": 0.4, "muted": true, "speed": null, "start": null, "end": null, "loop": null})
+    );
     for refused in
         [json!({"max_fps": 0}), json!({"max_fps": 500}), json!({"speed": 2}), json!({"loop": false})]
     {

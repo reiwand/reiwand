@@ -28,7 +28,7 @@ fn required_packages_take_a_range_or_the_range_of_a_version() {
         .unwrap();
     manifest(&mut project, json!({"requires": {"packages": [{"id": "org.example.sky"}], "remove": true}}))
         .unwrap();
-    assert!(project.doc["manifest"]["requires"]["packages"].is_null());
+    assert_eq!(project.doc["manifest"]["requires"]["packages"], json!([]));
     assert!(
         !project.doc["manifest"]["requires"]["features"]
             .as_array()

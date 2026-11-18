@@ -12,8 +12,8 @@ entry	authors	bloque	null
 entry	featured	bloque	null
 featured	note	valor	null
 index	author	valor	null
-install	signer	valor	null
-install	revoked	valor	null
+record	signer	valor	null
+record	revoked	valor	null
 parts	title	valor	null
 parts	thumbnail	valor	null
 release	preview	bloque	null

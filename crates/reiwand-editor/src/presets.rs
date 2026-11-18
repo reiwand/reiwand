@@ -11,7 +11,7 @@ pub const ENTRY: &str = "preset.json";
 const BASE: &str = "/preset/base";
 
 pub fn blank() -> Value {
-    json!({"base": {"id": "", "version": "*"}})
+    json!({"base": {"id": "", "version": "*"}, "values": {}, "files": {}})
 }
 
 pub(crate) fn attach(dir: &Path, mut doc: Value) -> Result<Value> {
@@ -103,12 +103,7 @@ pub(crate) fn edit(
     }
     for (key, next) in [("values", now), ("files", copies)] {
         let at = format!("/preset/{key}");
-        let kept = (!next.is_empty()).then_some(Value::Object(next));
-        match kept {
-            Some(v) => ops.extend(set(doc, &at, v)),
-            None if doc.pointer(&at).is_some() => ops.push(Op::Remove { path: at }),
-            None => {}
-        }
+        ops.extend(set(doc, &at, Value::Object(next)));
     }
     Ok(ops)
 }

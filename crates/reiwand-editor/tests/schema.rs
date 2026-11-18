@@ -52,7 +52,7 @@ fn every_new_manifest_field_round_trips_through_its_schema() {
         "origin": { "kind": "imported" }, "playback": { "max_fps": 30 },
         "display": { "fit": "span", "background": "#101010", "span": "all-outputs", "flip": "horizontal", "accent": "#336699" }
     });
-    for value in [web, video] {
+    for value in [web, video].map(whole::manifest) {
         deep(&MANIFEST, &MANIFEST, &value, "");
         let manifest: Manifest = serde_json::from_value(value.clone()).unwrap();
         manifest.check().unwrap();
@@ -126,8 +126,9 @@ fn advanced_scene_fields_round_trip_and_show_in_the_inspector() {
     deep(&SCENE, &SCENE, &serde_json::to_value(&parsed).unwrap(), "");
     let mut doc = starter("empty", "org.example.deep", "Deep", "en").unwrap();
     doc["scene"] = scene;
-    doc["manifest"]["permissions"] = json!({ "rgb": true });
-    doc["manifest"]["display"] = json!({ "span": "all-outputs" });
+    doc["manifest"]["permissions"] = json!({ "network": null, "rgb": true });
+    doc["manifest"]["display"] = json!({ "fit": null, "zoom": null, "position": null, "background": null,
+        "span": "all-outputs", "flip": null, "accent": null });
     deep(&MANIFEST, &MANIFEST, &doc["manifest"], "/manifest");
     let keys = |pointer: &str| fields(&doc, pointer).into_iter().map(|f| f.key).collect::<Vec<_>>();
     let shown = [

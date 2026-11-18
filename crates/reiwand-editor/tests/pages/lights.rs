@@ -11,5 +11,5 @@ fn a_page_asks_for_the_lights_with_the_permission_of_its_manifest() {
     let problems = reiwand_editor::package::problems(&project.dir, &project.doc);
     assert!(problems.iter().all(|p| p.warning || !p.pointer.contains("permissions")), "{problems:?}");
     act(&mut project, json!({ "remove": { "pointer": "/manifest/permissions/rgb" } })).unwrap();
-    assert!(project.doc["manifest"]["permissions"]["rgb"].is_null());
+    assert_eq!(project.doc["manifest"]["permissions"]["rgb"], false);
 }

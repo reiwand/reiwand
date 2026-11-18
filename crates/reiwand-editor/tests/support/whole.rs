@@ -9,7 +9,7 @@ pub fn at(project: &Project, pointer: &str, value: &Value) -> Value {
 }
 
 pub fn at_doc(doc: &Value, pointer: &str, value: &Value) -> Value {
-    if !pointer.starts_with("/scene") {
+    if !pointer.starts_with("/scene") && !pointer.starts_with("/manifest") {
         return value.clone();
     }
     let landing = match pointer.rsplit_once('/') {
@@ -89,4 +89,9 @@ pub fn descriptor(text: &str) -> String {
 
 pub fn unset(value: &Value) -> bool {
     matches!(value, Value::Bool(false)) || empty(value)
+}
+
+pub fn manifest(value: Value) -> Value {
+    let text = reiwand_upgrade::manifests::whole(&value.to_string());
+    serde_json::from_str(&text).unwrap()
 }

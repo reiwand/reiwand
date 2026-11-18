@@ -15,7 +15,7 @@ fn package(root: &Path, license: &str, kind: &str) -> PathBuf {
         "photosensitive": false,
         "credits": [{"paths": ["image.png"], "license": license, "attribution": "Ana"}]
     });
-    fs::write(src.join("manifest.json"), manifest.to_string()).unwrap();
+    fs::write(src.join("manifest.json"), reiwand_upgrade::manifests::whole(&manifest.to_string())).unwrap();
     image::RgbaImage::from_pixel(4, 4, image::Rgba([40, 80, 120, 255])).save(src.join("image.png")).unwrap();
     let out = root.join(format!("{kind}-{license}.wpak"));
     reiwand_format::build(&src, &out, &Default::default()).unwrap();
@@ -41,7 +41,7 @@ fn a_picture_package_is_unpacked_as_a_copy_with_a_new_id_keeping_credits_and_lic
     assert_eq!(manifest["credits"][0]["attribution"], "Ana");
     assert_eq!(manifest["origin"]["kind"], "derived");
     assert_eq!(manifest["origin"]["derived_from"][0]["author"], "Ana");
-    assert!(manifest.get("authors").is_none());
+    assert!(manifest["authors"] == json!([]));
     assert!(dir.join("image.png").is_file() && !dir.join("SIGNATURE").exists());
     assert!(extract(&file, &dir, None, false).is_err(), "a folder in use was overwritten");
 }

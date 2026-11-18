@@ -169,8 +169,11 @@ pub fn set(doc: &Value, path: &str, value: Value) -> Vec<Op> {
     let parts: Vec<&str> = path.split('/').skip(1).collect();
     for part in &parts[..parts.len().saturating_sub(1)] {
         at = format!("{at}/{part}");
-        if doc.pointer(&at).is_none() {
-            ops.push(Op::Add { path: at.clone(), value: Value::Object(Default::default()) });
+        let empty = Value::Object(Default::default());
+        match doc.pointer(&at) {
+            None => ops.push(Op::Add { path: at.clone(), value: empty }),
+            Some(Value::Null) => ops.push(Op::Replace { path: at.clone(), value: empty }),
+            Some(_) => {}
         }
     }
     ops.push(Op::Add { path: path.into(), value });
