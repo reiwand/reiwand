@@ -9,19 +9,41 @@ pub struct Sink {
     copies: PathBuf,
     kept: usize,
     changed: Vec<PathBuf>,
+    unsigned: Vec<String>,
 }
 
 impl Sink {
     pub fn copying(copies: &Path) -> Self {
-        Sink { check: false, plain: false, copies: copies.to_path_buf(), kept: 0, changed: Vec::new() }
+        Sink {
+            check: false,
+            plain: false,
+            copies: copies.to_path_buf(),
+            kept: 0,
+            changed: Vec::new(),
+            unsigned: Vec::new(),
+        }
     }
 
     pub fn plain() -> Self {
-        Sink { check: false, plain: true, copies: PathBuf::new(), kept: 0, changed: Vec::new() }
+        Sink {
+            check: false,
+            plain: true,
+            copies: PathBuf::new(),
+            kept: 0,
+            changed: Vec::new(),
+            unsigned: Vec::new(),
+        }
     }
 
     pub fn checking() -> Self {
-        Sink { check: true, plain: false, copies: PathBuf::new(), kept: 0, changed: Vec::new() }
+        Sink {
+            check: true,
+            plain: false,
+            copies: PathBuf::new(),
+            kept: 0,
+            changed: Vec::new(),
+            unsigned: Vec::new(),
+        }
     }
 
     pub fn is_check(&self) -> bool {
@@ -30,6 +52,14 @@ impl Sink {
 
     pub fn changed(&self) -> &[PathBuf] {
         &self.changed
+    }
+
+    pub fn unsigned(&self) -> &[String] {
+        &self.unsigned
+    }
+
+    pub fn lost_signature(&mut self, package: String) {
+        self.unsigned.push(package);
     }
 
     pub fn copies(&self) -> &Path {

@@ -25,3 +25,6 @@ viejos se niegan a arrancar y nombran la orden exacta que corre la conversión.
 - El recorrido de escenas y paquetes es uno solo (`scenes::walk_in`): `client` y `file` lo usan.
 - Un paquete firmado que se reescribe pierde su firma de autor (el archivo ya no es el que firmó); quien lo publicó
   lo firma de nuevo con `file` sobre su carpeta de trabajo.
+  En `client`, el paquete instalado que estaba firmado pasa a mostrarse «Local, sin firma verificada» (como uno importado):
+  se le quita la firma, `signer` queda en `null` en `installed.json` y el informe nombra cada paquete («lost its signature:
+  id versión») para que su autor lo publique de nuevo.

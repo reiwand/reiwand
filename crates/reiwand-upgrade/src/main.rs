@@ -53,11 +53,21 @@ fn then(args: &[String]) -> anyhow::Result<()> {
     Ok(())
 }
 
+fn say_unsigned(unsigned: &[String], check: bool) {
+    for package in unsigned {
+        let verb = if check { "would lose" } else { "lost" };
+        println!(
+            "{verb} its signature: {package} (now local, with an unverified signature; its author can publish it again)"
+        );
+    }
+}
+
 fn report(sink: &Sink, check: bool) {
     let mut seen = std::collections::BTreeSet::new();
     for path in sink.changed().iter().filter(|p| seen.insert(p.as_path())) {
         println!("{} {}", if check { "would change" } else { "changed" }, path.display());
     }
+    say_unsigned(sink.unsigned(), check);
     if !check && !seen.is_empty() {
         println!("the originals are in {}", sink.copies().display());
     }
@@ -83,6 +93,7 @@ fn clients(args: &[String]) -> anyhow::Result<()> {
     for path in &done.changed {
         println!("{} {}", if check { "would change" } else { "changed" }, path.display());
     }
+    say_unsigned(&done.unsigned, check);
     println!("{}: {}", data.display(), done.outcome);
     if !check && (!done.changed.is_empty() || !settings.changed().is_empty()) {
         println!("the originals are in {}", done.copies.display());

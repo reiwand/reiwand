@@ -20,6 +20,7 @@ pub struct Options {
 pub struct Done {
     pub outcome: Outcome,
     pub changed: Vec<PathBuf>,
+    pub unsigned: Vec<String>,
     pub copies: PathBuf,
 }
 
@@ -104,7 +105,7 @@ pub fn convert(data: &Path, vault: &mut dyn crate::Vault, options: &Options) -> 
     let copies = options.copies.clone().unwrap_or_else(|| copies_of(data));
     let mut sink = if options.check { Sink::checking() } else { Sink::copying(&copies) };
     if !data.is_dir() {
-        return Ok(Done { outcome: Outcome::Nothing, changed: Vec::new(), copies });
+        return Ok(Done { outcome: Outcome::Nothing, changed: Vec::new(), unsigned: Vec::new(), copies });
     }
     let found = match fs::read_to_string(data.join(MARK)) {
         Ok(text) => text.trim().parse::<i64>().context("the version mark is damaged")?,
@@ -133,7 +134,7 @@ pub fn convert(data: &Path, vault: &mut dyn crate::Vault, options: &Options) -> 
         true => Outcome::Upgraded { from: found, to: CURRENT },
         false => Outcome::Nothing,
     };
-    Ok(Done { outcome, changed: sink.changed().to_vec(), copies })
+    Ok(Done { outcome, changed: sink.changed().to_vec(), unsigned: sink.unsigned().to_vec(), copies })
 }
 
 #[cfg(not(any(feature = "client", feature = "server")))]
