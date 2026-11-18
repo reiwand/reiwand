@@ -53,6 +53,7 @@ void Page::call(const char *method, const QVariant &argument) {
 }
 
 void Page::changed() {
+    control->polishItems();
     dirty = true;
     schedule();
 }
