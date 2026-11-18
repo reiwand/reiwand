@@ -72,7 +72,7 @@ pub const TEXTS: super::Texts = &[
         "El contenido convertido desde otros formatos o productos necesita una prueba de que puedes compartirlo.",
     ),
     (
-        "Packages that flash or show fast patterns must set \"photosensitive\": true in their reiwand.wpak/2 manifest: they can trigger seizures in people with photosensitive epilepsy, and clients warn before showing them.",
-        "Los paquetes con destellos o patrones rápidos deben poner \"photosensitive\": true en su manifiesto reiwand.wpak/2: pueden provocar convulsiones en personas con epilepsia fotosensible, y los clientes avisan antes de mostrarlos.",
+        "Packages that flash or show fast patterns must set \"photosensitive\": true in their reiwand.wpak/3 manifest: they can trigger seizures in people with photosensitive epilepsy, and clients warn before showing them.",
+        "Los paquetes con destellos o patrones rápidos deben poner \"photosensitive\": true en su manifiesto reiwand.wpak/3: pueden provocar convulsiones en personas con epilepsia fotosensible, y los clientes avisan antes de mostrarlos.",
     ),
 ];

@@ -10,7 +10,6 @@ ColumnLayout {
     required property var info
     property string uid
     property var pkg: null
-    readonly property bool styled: info.schema === "reiwand.wpak/2"
     readonly property bool asks: !!pkg && pkg.flash_disabled === true
     readonly property var works: (info.derived_from ?? []).map(w => w.title ? App.tr("%1 by %2", w.title, w.author) : w.author)
 
@@ -36,8 +35,8 @@ ColumnLayout {
     QQC2.Label {
         Layout.fillWidth: true
         visible: text !== ""
-        text: about.styled ? App.markup(about.info.description) : (about.info.description ?? "")
-        textFormat: about.styled ? Text.StyledText : Text.PlainText
+        text: App.markup(about.info.description)
+        textFormat: Text.StyledText
         wrapMode: Text.Wrap
         onLinkActivated: link => browsing.ask(link, null)
     }

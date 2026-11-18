@@ -62,7 +62,7 @@ class ReelTest {
     @Test
     fun aFilterOfTheLockScreenSendsOnlyItsVideoThroughTheGraphicsCard() {
         assertEquals(VIDEO, install(fixture(CLIP)))
-        val shown = filter(true, JSONObject().put("look", "warm"))
+        val shown = filter(true, JSONObject(WARM))
         assertEquals("warm", shown.getJSONObject("filter").getString("look"))
         listOf(home, lock).forEach { it.attach() }
         assertTrue(home.plays())
@@ -99,5 +99,6 @@ class ReelTest {
         const val SIDE = 64
         const val FRAMES = 5
         const val CLIP = "magenta-64x32.webm"
+        const val WARM = """{"look": "warm", "strength": 1.0, "exposure": 0.0, "contrast": 0.0, "saturation": 0.0, "warmth": 0.0, "hue": 0.0}"""
     }
 }

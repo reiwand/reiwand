@@ -71,7 +71,7 @@ pub fn content(c: &Config) -> Markup {
             li { (t("Upload only your own work or work whose licence allows sharing, and credit its authors.")) }
             li { (t("Content converted from other formats or products needs proof that you may share it.")) }
             li { (t("Packages that flash or show fast patterns must set \"photosensitive\": true in their \
-                reiwand.wpak/2 manifest: they can trigger seizures in people with photosensitive \
+                reiwand.wpak/3 manifest: they can trigger seizures in people with photosensitive \
                 epilepsy, and clients warn before showing them.")) }
         }
     }

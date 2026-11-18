@@ -26,7 +26,6 @@
   "platforms": [],
   "playback": null,
   "presets": [],
-  "preview": null,
   "previews": null,
   "properties": {},
   "requires": {
@@ -42,7 +41,7 @@
     "gpu": null,
     "packages": []
   },
-  "schema": "reiwand.wpak/2",
+  "schema": "reiwand.wpak/3",
   "strings": {},
   "tags": [],
   "title": "Leans",
