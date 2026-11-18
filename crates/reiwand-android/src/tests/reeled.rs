@@ -10,8 +10,8 @@ fn built() -> (String, std::path::PathBuf) {
         "playback": { "speed": 0.75, "start": 0.5, "end": 1.25, "volume": 0.4, "loop": false, "max_fps": 24 },
         "display": { "zoom": 1.5, "position": [0, -0.5] },
         "presets": [{ "id": "calm", "label": "Calm", "values": { "speed": 0.5, "volume": 20 } }] });
-    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
-    fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
+    fs::write(source.path().join("manifest.json"), reiwand_upgrade::manifests::whole(&manifest.to_string()))
+        .unwrap();
     let wpak = source.path().join("reel.wpak");
     reiwand_format::build(source.path(), &wpak, &reiwand_format::Limits::default()).unwrap();
     let uid = store::store(&mut File::open(&wpak).unwrap(), "reel.wpak").unwrap().0;
