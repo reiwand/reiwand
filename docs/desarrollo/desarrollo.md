@@ -117,8 +117,8 @@ la imagen del servidor con un BuildKit fijado, le adjunta los SBOM y la proceden
 GHCR, firma su resumen y le añade la atestación con el SBOM de las fuentes. La primera imagen crea
 el paquete `reiwand-server` como privado: hay que hacerlo público una vez en sus ajustes de GitHub.
 
-Los fondos web se prueban donde hay WPE WebKit: el trabajo *Web wallpapers* de la CI ejecuta,
-en un contenedor de Arch con `wpewebkit`, la prueba del auxiliar (`apps/reiwand-web/tests/page.rs`:
+Los fondos web se prueban donde hay Qt WebEngine: el trabajo *Web wallpapers* de la CI ejecuta,
+en un contenedor de Arch con `qt6-webengine`, la prueba del auxiliar (`apps/reiwand-web/tests/page.rs`:
 la interfaz `window.reiwand`, el límite de FPS, la pausa, que la página no llega a la red, a otros
 paquetes ni a archivos del equipo) y `scripts/web-test.sh` con el servicio, `reiwand-ctl` y una
 página de color. En Ubuntu, `scripts/integration-test.sh` comprueba que el fondo se rechaza con su

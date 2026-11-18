@@ -46,6 +46,8 @@ fn limits_wrap_the_helper_in_a_user_scope_only_where_a_user_manager_runs() {
             "-p",
             "CPUWeight=20",
             "-p",
+            "MemoryHigh=768M",
+            "-p",
             "MemoryMax=1536M",
             "-p",
             "MemorySwapMax=0",

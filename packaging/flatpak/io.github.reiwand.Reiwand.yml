@@ -2,6 +2,8 @@ app-id: io.github.reiwand.Reiwand
 runtime: org.kde.Platform
 runtime-version: '6.11'
 sdk: org.kde.Sdk
+base: io.qt.qtwebengine.BaseApp
+base-version: '6.11'
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.llvm22
 command: reiwand-launch
@@ -12,6 +14,7 @@ finish-args:
   - --device=dri
   - --share=network
   - --share=ipc
+  - --env=QTWEBENGINEPROCESS_PATH=/app/bin/QtWebEngineProcess
   - --filesystem=xdg-run/pipewire-0:ro
   - --socket=wayland
   - --socket=fallback-x11
@@ -27,10 +30,17 @@ finish-args:
   - --filesystem=xdg-videos:ro
   - --filesystem=xdg-download:ro
   - --filesystem=xdg-data/reiwand/edits:create
+cleanup-commands:
+  - /app/cleanup-BaseApp.sh
 modules:
   - name: reiwand
     buildsystem: simple
     build-options:
+      arch:
+        x86_64:
+          prepend-pkg-config-path: /app/lib/x86_64-linux-gnu/pkgconfig
+        aarch64:
+          prepend-pkg-config-path: /app/lib/aarch64-linux-gnu/pkgconfig
       append-path: /run/build/reiwand/rust/bin:/usr/lib/sdk/llvm22/bin
       prepend-ld-library-path: /usr/lib/sdk/llvm22/lib
       cflags: -ffile-prefix-map=/run/build/reiwand=/src
