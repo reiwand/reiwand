@@ -1,26 +1,15 @@
 {
   "assets": {},
-  "audio": null,
-  "camera3d": null,
   "canvas": {
-    "ambient": null,
     "background": "#000000",
     "blend_space": "linear",
-    "bloom": null,
-    "camera": null,
     "clear": true,
     "fit": "fill",
-    "gusts": null,
     "hdr": false,
-    "parallax": null,
-    "perspective": null,
     "size": [
       1920,
       1080
-    ],
-    "sky": null,
-    "tonemap": null,
-    "wind": null
+    ]
   },
   "clock": {
     "max_fps": "display",
@@ -32,15 +21,11 @@
   "ext": {},
   "layers": [
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "depth_test": false,
       "effects": [],
-      "fill": null,
       "gradient": {
         "from": [
           0.0,
@@ -63,15 +48,11 @@
         ]
       },
       "id": "fondo",
-      "inherit": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
       "shape": {
         "rect": {
           "radius": 0.0,
@@ -82,10 +63,8 @@
         }
       },
       "solid": false,
-      "stroke": null,
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -94,34 +73,24 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "shape",
       "visible": true
     },
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "depth_test": false,
       "effects": [],
       "fill": "#5ee7ff",
-      "gradient": null,
       "id": "cola",
-      "inherit": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 0.3,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
       "shape": {
         "ellipse": {
           "size": [
@@ -131,10 +100,8 @@
         }
       },
       "solid": false,
-      "stroke": null,
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -143,34 +110,24 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "shape",
       "visible": true
     },
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "depth_test": false,
       "effects": [],
       "fill": "#5ee7ff",
-      "gradient": null,
       "id": "medio",
-      "inherit": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 0.6,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
       "shape": {
         "ellipse": {
           "size": [
@@ -180,10 +137,8 @@
         }
       },
       "solid": false,
-      "stroke": null,
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -192,34 +147,24 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "shape",
       "visible": true
     },
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "depth_test": false,
       "effects": [],
       "fill": "#5ee7ff",
-      "gradient": null,
       "id": "cabeza",
-      "inherit": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
       "shape": {
         "ellipse": {
           "size": [
@@ -229,10 +174,8 @@
         }
       },
       "solid": false,
-      "stroke": null,
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -241,9 +184,7 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "shape",
       "visible": true
@@ -266,6 +207,5 @@
     }
   ],
   "templates": {},
-  "timelines": [],
-  "transition": null
+  "timelines": []
 }

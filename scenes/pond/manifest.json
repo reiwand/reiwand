@@ -55,9 +55,6 @@
   "properties": {
     "note": {
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Allow touch for this scene, then touch the water or move the pointer over it.",
         "es": "Permite el tacto a esta escena y toca el agua o mueve el puntero sobre ella."
@@ -70,9 +67,6 @@
     "pads": {
       "default": true,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Lily pads",
         "es": "Nenúfares"
@@ -87,9 +81,6 @@
       "default": 40.0,
       "editable": false,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "integer": false,
       "label": {
         "en": "Ripple strength",
@@ -110,9 +101,6 @@
       "default": 100.0,
       "editable": false,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "integer": true,
       "label": {
         "en": "Water volume",

@@ -32,9 +32,6 @@
     "color_vivo": {
       "default": true,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "es": "Colores vivos"
       },

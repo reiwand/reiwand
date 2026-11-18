@@ -36,7 +36,7 @@ fn bezier_handles_reach_only_up_to_the_neighbouring_keyframe_so_the_scene_stays_
     act(&mut p, key(json!({"time": 1.5, "value": 0.5}))).unwrap();
     act(&mut p, key(json!({"time": 5, "from": 3}))).unwrap();
     sound(&p);
-    assert_eq!(at(&p, "/scene/layers/0/opacity/keys/2/2"), json!({"in": [1.0, 0.0], "out": null}));
+    assert_eq!(at(&p, "/scene/layers/0/opacity/keys/2/2"), json!({"in": [1.0, 0.0]}));
 }
 
 #[test]

@@ -2,14 +2,12 @@
   "assets": {
     "cielo": {
       "animated": false,
-      "atlas": null,
       "durations": [],
       "face": null,
       "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
-      "media": null,
       "mipmaps": null,
       "path": "assets/cielo.png",
       "rects": [],
@@ -18,14 +16,12 @@
     },
     "profundidad": {
       "animated": false,
-      "atlas": null,
       "durations": [],
       "face": null,
       "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": true,
-      "media": null,
       "mipmaps": null,
       "path": "assets/profundidad.png",
       "rects": [],
@@ -33,17 +29,11 @@
       "wrap": "clamp"
     }
   },
-  "audio": null,
-  "camera3d": null,
   "canvas": {
-    "ambient": null,
     "background": "#000000",
     "blend_space": "linear",
-    "bloom": null,
-    "camera": null,
     "clear": true,
     "fit": "fill",
-    "gusts": null,
     "hdr": false,
     "parallax": {
       "amount": 1,
@@ -59,10 +49,7 @@
     "size": [
       1920,
       1080
-    ],
-    "sky": null,
-    "tonemap": null,
-    "wind": null
+    ]
   },
   "clock": {
     "max_fps": 60,
@@ -74,11 +61,8 @@
   "ext": {},
   "layers": [
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "color": "#ffffff",
       "depth_test": false,
@@ -86,8 +70,6 @@
         {
           "effect": "depth_parallax",
           "enabled": true,
-          "mask": null,
-          "name": null,
           "optional": false,
           "params": {
             "depth": "profundidad",
@@ -108,16 +90,11 @@
       ],
       "id": "fondo",
       "image": "cielo",
-      "inherit": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
-      "playback": null,
       "size": [
         1920,
         1080
@@ -125,7 +102,6 @@
       "solid": false,
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -134,34 +110,24 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "image",
       "visible": true
     },
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "depth_test": false,
       "effects": [],
       "fill": "#ffffffcc",
-      "gradient": null,
       "id": "cartel",
-      "inherit": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0.03,
         0.03
       ],
-      "parent": null,
       "shape": {
         "rect": {
           "radius": 30,
@@ -172,7 +138,6 @@
         }
       },
       "solid": false,
-      "stroke": null,
       "transform": {
         "origin": "anchor",
         "position": [
@@ -199,13 +164,8 @@
     },
     {
       "align": "center",
-      "anchor": null,
-      "attach": null,
-      "background": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "blur": null,
-      "brightness": null,
       "cache": false,
       "color": "#1b2440",
       "depth_test": false,
@@ -213,21 +173,14 @@
       "fallback": [],
       "font": "sans-serif",
       "id": "titulo",
-      "inherit": null,
-      "letter_spacing": null,
-      "lighting": null,
       "line_height": null,
-      "mask": null,
       "opacity": 1.0,
-      "outline": null,
       "padding": 0,
       "parallax": [
         0.04,
         0.04
       ],
-      "parent": null,
       "render": "auto",
-      "shadow": null,
       "size": 110,
       "solid": false,
       "text": "Profundidad",
@@ -264,6 +217,5 @@
   "schema": "reiwand.scene/2",
   "scripts": [],
   "templates": {},
-  "timelines": [],
-  "transition": null
+  "timelines": []
 }

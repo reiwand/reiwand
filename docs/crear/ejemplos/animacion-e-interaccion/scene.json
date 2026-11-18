@@ -12,7 +12,6 @@
       "fps": 6,
       "frames": 4,
       "linear": false,
-      "media": null,
       "mipmaps": null,
       "path": "assets/bola.png",
       "rects": [],
@@ -21,14 +20,12 @@
     },
     "toque": {
       "animated": false,
-      "atlas": null,
       "durations": [],
       "face": null,
       "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
-      "media": null,
       "mipmaps": null,
       "path": "assets/zumbido.wav",
       "rects": [],
@@ -36,27 +33,16 @@
       "wrap": "clamp"
     }
   },
-  "audio": null,
-  "camera3d": null,
   "canvas": {
-    "ambient": null,
     "background": "#10141f",
     "blend_space": "linear",
-    "bloom": null,
-    "camera": null,
     "clear": true,
     "fit": "fill",
-    "gusts": null,
     "hdr": false,
-    "parallax": null,
-    "perspective": null,
     "size": [
       1920,
       1080
-    ],
-    "sky": null,
-    "tonemap": null,
-    "wind": null
+    ]
   },
   "clock": {
     "max_fps": 60,
@@ -68,29 +54,21 @@
   "ext": {},
   "layers": [
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "baile",
       "image": "bola",
-      "inherit": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
       "playback": {
         "end": "end",
-        "frame": null,
         "loop": true,
         "own_clock": false,
         "playing": true,
@@ -116,34 +94,24 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "image",
       "visible": true
     },
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "depth_test": false,
       "effects": [],
       "fill": "#3b82f6",
-      "gradient": null,
       "id": "boton",
-      "inherit": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
       "shape": {
         "rect": {
           "radius": 70,
@@ -154,7 +122,6 @@
         }
       },
       "solid": true,
-      "stroke": null,
       "transform": {
         "origin": "anchor",
         "position": [
@@ -163,20 +130,6 @@
         ],
         "rotation": 0.0,
         "scale": {
-          "a": null,
-          "audio": null,
-          "b": null,
-          "base": null,
-          "bounds": null,
-          "channel": null,
-          "clamp": null,
-          "clock": null,
-          "cursor": null,
-          "date": null,
-          "exponent": null,
-          "fn": null,
-          "g": null,
-          "hold_silence": null,
           "invert": false,
           "keys": [
             [
@@ -203,47 +156,20 @@
               "out_back"
             ]
           ],
-          "kind": null,
-          "layer": null,
-          "loop": null,
-          "map": null,
-          "media": null,
-          "of": null,
-          "offset": null,
-          "params": null,
-          "placeholder": null,
-          "prop": null,
-          "r": null,
-          "reduce": null,
-          "reference": null,
-          "scale": null,
-          "script": null,
-          "smooth": null,
-          "timeline": "pulsar",
-          "unit": null,
-          "window": null,
-          "x": null,
-          "y": null
+          "timeline": "pulsar"
         },
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "shape",
       "visible": true
     },
     {
       "align": "center",
-      "anchor": null,
-      "attach": null,
-      "background": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "blur": null,
-      "brightness": null,
       "cache": false,
       "color": "#ffffff",
       "depth_test": false,
@@ -255,12 +181,8 @@
         "transform",
         "visible"
       ],
-      "letter_spacing": null,
-      "lighting": null,
       "line_height": null,
-      "mask": null,
       "opacity": 1.0,
-      "outline": null,
       "padding": 0,
       "parallax": [
         0,
@@ -268,13 +190,11 @@
       ],
       "parent": "boton",
       "render": "auto",
-      "shadow": null,
       "size": 54,
       "solid": false,
       "text": "Toca aquí",
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -283,9 +203,7 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "text",
       "valign": "center",
@@ -293,21 +211,15 @@
       "wrap": null
     },
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "depth_test": false,
       "effects": [],
       "fade_in": 0.0,
       "fade_out": 0.0,
       "id": "sonido",
-      "inherit": null,
-      "lighting": null,
       "loop": false,
-      "mask": null,
       "mode": "sequence",
       "opacity": 1.0,
       "pan": 0.0,
@@ -315,8 +227,6 @@
         0,
         0
       ],
-      "parent": null,
-      "pause": null,
       "play": true,
       "play_on": "event:golpe",
       "solid": false,
@@ -325,7 +235,6 @@
       "stream": false,
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -334,9 +243,7 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "sound",
       "visible": true,
@@ -368,6 +275,5 @@
       "trigger": "click:boton",
       "wrap": false
     }
-  ],
-  "transition": null
+  ]
 }

@@ -56,9 +56,6 @@
   "properties": {
     "abrir": {
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Open on click",
         "es": "Abrir al hacer clic"
@@ -71,9 +68,6 @@
     "apariencia": {
       "collapsed": false,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Look",
         "es": "Apariencia"
@@ -89,9 +83,6 @@
       ],
       "enabled_if": "ver_galeria",
       "every": 30,
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Photo folder",
         "es": "Carpeta de fotos"
@@ -110,8 +101,6 @@
       "default": "#ffb347",
       "enabled_if": {},
       "group": "apariencia",
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Disc color",
         "es": "Color del disco"
@@ -123,9 +112,6 @@
     },
     "destello": {
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Flash",
         "es": "Destello"
@@ -138,9 +124,6 @@
     "estilo": {
       "default": "dia",
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Style",
         "es": "Estilo"
@@ -174,9 +157,6 @@
       ],
       "default_asset": "cielo",
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Background picture",
         "es": "Imagen de fondo"
@@ -190,8 +170,6 @@
       "default": "Hola",
       "enabled_if": {},
       "group": "apariencia",
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Message",
         "es": "Mensaje"
@@ -206,9 +184,6 @@
     },
     "nota": {
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": "@nota",
       "order": 0,
       "quality": {},
@@ -225,7 +200,6 @@
         "en": "How solid the disc looks.",
         "es": "Qué tan sólido se ve el disco."
       },
-      "icon": null,
       "integer": true,
       "label": {
         "en": "Disc opacity",
@@ -246,9 +220,6 @@
     },
     "separador": {
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Pictures",
         "es": "Imágenes"
@@ -261,9 +232,6 @@
     "ver_galeria": {
       "default": false,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Show the gallery",
         "es": "Enseñar la galería"

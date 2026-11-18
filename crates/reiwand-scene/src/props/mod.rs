@@ -15,6 +15,7 @@ pub use slider::Slider;
 pub use text::tag;
 pub use values::{effective, exposed, stale, veiled};
 
+use reiwand_core::explicit::block;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value as Json;
@@ -36,15 +37,15 @@ pub enum Text {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct Property {
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub label: Option<Text>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub help: Option<Text>,
     #[schemars(extend("x-ref" = "group"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub group: Option<String>,
     #[schemars(extend("x-condition" = true))]
     pub visible_if: Condition,
@@ -53,8 +54,8 @@ pub struct Property {
     #[serde(serialize_with = "whole")]
     pub order: f64,
     #[schemars(extend("x-ref" = "icon"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub icon: Option<String>,
     pub quality: BTreeMap<crate::Quality, Json>,
     #[serde(flatten)]
@@ -72,8 +73,8 @@ pub enum Condition {
 #[serde(deny_unknown_fields)]
 pub struct Preset {
     pub id: String,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub label: Option<Text>,
     pub values: Values,
 }

@@ -1,6 +1,7 @@
 use super::tools::Tool;
 use super::{Entry, ParamKind, PassBlend, Unit, Use};
 use crate::value::Param;
+use reiwand_core::explicit::block;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
@@ -11,27 +12,27 @@ pub struct ParamDef {
     #[serde(rename = "type")]
     pub kind: ParamKind,
     pub prefill: Param,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub min: Option<f32>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub max: Option<f32>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub uses: Option<Use>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub unit: Option<Unit>,
     pub tools: Vec<Tool>,
     pub label: BTreeMap<String, String>,
     pub help: BTreeMap<String, String>,
     pub values: Vec<Entry>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub channels: Option<u32>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub paint: Option<Param>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub yields_to: Option<String>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub waits_for: Option<String>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub tool: Option<Tool>,
 }
 
@@ -57,17 +58,17 @@ pub struct PassDef {
     pub scale: f32,
     pub inputs: Vec<String>,
     pub output: Output,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub target: Option<String>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub copy: Option<String>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub blend: Option<PassBlend>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub vertex: Option<String>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub grid: Option<[u32; 2]>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub swap: Option<[String; 2]>,
 }
 
@@ -93,7 +94,7 @@ pub struct Cost {
 pub struct State {
     pub scale: f32,
     pub settle: f32,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub fade: Option<String>,
 }
 
@@ -101,7 +102,7 @@ pub struct State {
 #[serde(deny_unknown_fields)]
 pub struct Tune {
     pub params: BTreeMap<String, Param>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub scale: Option<f32>,
     pub freeze: bool,
 }

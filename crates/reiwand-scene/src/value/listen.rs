@@ -1,6 +1,7 @@
 use super::{AudioKind, AudioUnit, Band, Binding, Reference};
 use crate::Issue;
 use crate::input::{AudioFrame, BANDS, Usual, read};
+use reiwand_core::explicit::block;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -13,14 +14,14 @@ pub struct Listen {
     pub kind: AudioKind,
     pub unit: AudioUnit,
     #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub window: Option<f32>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub reference: Option<Reference>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub hold_silence: Option<bool>,
 }
 

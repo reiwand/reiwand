@@ -26,7 +26,7 @@ fn bones_swing_with_their_settings_and_a_rope_is_drawn() {
     act(&mut p, physics(json!({ "bones": ["arm"], "mode": "rigid", "damping": 0.9 }))).unwrap();
     assert_eq!(
         bodies(&p),
-        json!([{ "bone": "arm", "mode": "rigid", "stiffness": 0.2, "damping": 0.9, "gravity": 3.0, "rotation": [-30.0, 30.0], "translation": null, "inertia": 0.5, "wind": 0.0 }])
+        json!([{ "bone": "arm", "mode": "rigid", "stiffness": 0.2, "damping": 0.9, "gravity": 3.0, "rotation": [-30.0, 30.0], "inertia": 0.5, "wind": 0.0 }])
     );
     let rope = json!({ "bones": ["tail"], "rope": [[0.5, 0.6], [0.6, 0.8], [0.7, 0.9]], "parent": "arm", "wind": 0.5 });
     act(&mut p, physics(rope)).unwrap();
@@ -84,7 +84,7 @@ fn bounds_show_on_the_preview_and_can_be_lifted_again() {
     act(&mut p, physics(json!({ "bones": ["arm"], "free": ["rotation"] }))).unwrap();
     assert_eq!(
         bodies(&p),
-        json!([{ "bone": "arm", "mode": "spring", "translation": [-5.0, 5.0], "rotation": null, "stiffness": 0.5, "damping": 0.5, "gravity": 0.0, "inertia": 0.5, "wind": 0.0 }])
+        json!([{ "bone": "arm", "mode": "spring", "translation": [-5.0, 5.0], "stiffness": 0.5, "damping": 0.5, "gravity": 0.0, "inertia": 0.5, "wind": 0.0 }])
     );
     assert!(act(&mut p, physics(json!({ "bones": ["arm"], "free": ["gravity"] }))).is_err());
     act(&mut p, json!({ "undo": {} })).unwrap();

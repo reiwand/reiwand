@@ -1,4 +1,4 @@
-use reiwand_core::explicit::{Try, null, read, untagged};
+use reiwand_core::explicit::{Try, block, null, read, untagged};
 use schemars::JsonSchema;
 use serde::{Deserialize, Deserializer, Serialize};
 
@@ -9,10 +9,19 @@ pub struct Sample {
     #[serde(deserialize_with = "null")]
     #[schemars(required)]
     pub parent: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub badge: Option<Badge>,
     pub layers: Vec<Layer>,
     #[serde(flatten)]
     pub paint: Paint,
     pub shape: Shape,
+}
+
+#[derive(Serialize, Deserialize, JsonSchema)]
+pub struct Badge {
+    pub label: String,
+    pub size: f32,
 }
 
 #[derive(Serialize, Deserialize, JsonSchema)]

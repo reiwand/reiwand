@@ -1,6 +1,7 @@
 use super::Target;
 use crate::Color;
 use crate::value::{AudioKind, AudioUnit, Band, Binding, Reference};
+use reiwand_core::explicit::block;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -46,24 +47,24 @@ pub struct Turbulent {
     pub offset: f32,
     pub speed: [f32; 2],
     pub phase: f32,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub audio: Option<Band>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub kind: Option<AudioKind>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub unit: Option<AudioUnit>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
     pub window: Option<f32>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub reference: Option<Reference>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub hold_silence: Option<bool>,
 }
 
@@ -124,21 +125,21 @@ pub struct Remap {
     pub clamp_out: bool,
     pub op: RemapOp,
     pub wave: Wave,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub kind: Option<AudioKind>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub unit: Option<AudioUnit>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     #[schemars(extend("x-unit" = "s", "x-range" = [0.05, 60]))]
     pub window: Option<f32>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub reference: Option<Reference>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub hold_silence: Option<bool>,
 }
 

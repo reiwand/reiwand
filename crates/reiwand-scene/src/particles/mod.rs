@@ -99,6 +99,7 @@ pub use tilt::Tilt;
 pub(crate) use tune::tuned;
 pub use wall::Wall;
 
+use reiwand_core::explicit::block;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -125,8 +126,8 @@ pub struct System {
     pub collide: Vec<Collider>,
     pub render: Render,
     pub space: Placement,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub perspective: Option<Perspective>,
     pub points: Vec<ControlPoint>,
     pub children: Vec<Child>,

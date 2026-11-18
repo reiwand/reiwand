@@ -24,13 +24,10 @@ fn parts_are_ordered_hidden_and_shown_only_over_others() {
     .unwrap();
     assert_eq!(
         shown(&p),
-        json!({ "chest": { "order": -2.0, "clip_to": "legs", "visible": null }, "legs": { "order": 1.0, "visible": false, "clip_to": null } })
+        json!({ "chest": { "order": -2.0, "clip_to": "legs" }, "legs": { "order": 1.0, "visible": false } })
     );
     act(&mut p, edit(json!({ "show": ["legs"], "unclip": ["chest"] }))).unwrap();
-    assert_eq!(
-        shown(&p),
-        json!({ "chest": { "order": -2.0, "clip_to": null, "visible": null }, "legs": { "order": 1.0, "clip_to": null, "visible": null } })
-    );
+    assert_eq!(shown(&p), json!({ "chest": { "order": -2.0 }, "legs": { "order": 1.0 } }));
     act(&mut p, json!({ "undo": {} })).unwrap();
     assert_eq!(shown(&p)["chest"]["clip_to"], json!("legs"));
     for bad in [
@@ -46,10 +43,7 @@ fn parts_are_ordered_hidden_and_shown_only_over_others() {
     }
     act(&mut p, json!({ "redo": {} })).unwrap();
     act(&mut p, edit(json!({ "order": { "chest": 0, "legs": 0 } }))).unwrap();
-    assert_eq!(
-        shown(&p),
-        json!({ "chest": { "order": 0.0, "visible": null, "clip_to": null }, "legs": { "order": 0.0, "visible": null, "clip_to": null } })
-    );
+    assert_eq!(shown(&p), json!({ "chest": { "order": 0.0 }, "legs": { "order": 0.0 } }));
     let rims = reiwand_editor::rigs::outline(&p.dir, &p.doc, "body");
     assert_eq!(rims.as_object().unwrap().keys().collect::<Vec<_>>(), ["chest", "legs"]);
     for (part, edges) in rims.as_object().unwrap() {

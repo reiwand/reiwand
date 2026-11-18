@@ -1,7 +1,7 @@
 #[path = "prefill/mod.rs"]
 mod prefill;
 
-use reiwand_core::explicit::{Rule, all_required, omission, read, round_trip, scan};
+use reiwand_core::explicit::{Rule, all_required, block_at, null_blocks, omission, read, round_trip, scan};
 use reiwand_scene::{System, schema, uncovered};
 use serde_json::Value;
 use std::collections::BTreeSet;
@@ -91,11 +91,13 @@ fn the_source_has_no_hidden_values() {
 #[test]
 fn every_written_key_is_refused_when_removed() {
     let load = |v: &Value| read::<System>("system", v).map(|_| ());
+    let (root, target) = (schema(), serde_json::json!({ "$ref": "#/$defs/System" }));
+    let value = sample();
     let tag = |path: &str| {
         let last = path.rsplit('.').next().unwrap_or(path);
-        path.ends_with(']') || TAGS.contains(&last)
+        path.ends_with(']') || TAGS.contains(&last) || block_at(&root, &target, &value, path)
     };
-    let wrong = omission(&sample(), tag, load);
+    let wrong = omission(&value, tag, load);
     assert!(wrong.is_empty(), "{wrong:#?}");
 }
 
@@ -108,6 +110,9 @@ fn writing_the_sample_again_gives_the_same_bytes() {
     };
     let canonical = again(&text).unwrap();
     round_trip(&canonical, again).unwrap();
+    let (root, target) = (schema(), serde_json::json!({ "$ref": "#/$defs/System" }));
+    let written: Value = serde_json::from_str(&canonical).unwrap();
+    assert!(null_blocks(&root, &target, &written).is_empty());
 }
 
 #[test]

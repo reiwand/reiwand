@@ -32,9 +32,6 @@
     "momento": {
       "default": "auto",
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Moment",
         "es": "Momento"

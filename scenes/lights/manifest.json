@@ -43,9 +43,6 @@
     "clock": {
       "default": true,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Show the time",
         "es": "Mostrar la hora"
@@ -59,9 +56,6 @@
       "alpha": false,
       "default": "#7fd4ff",
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Color",
         "es": "Color"
@@ -76,9 +70,6 @@
       "default": 16,
       "editable": false,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "integer": false,
       "label": {
         "en": "Lights",
@@ -100,9 +91,6 @@
       ],
       "enabled_if": {},
       "every": 60,
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Photos",
         "es": "Fotos"
@@ -121,9 +109,6 @@
       "default": 1,
       "editable": false,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "integer": false,
       "label": {
         "en": "Speed",

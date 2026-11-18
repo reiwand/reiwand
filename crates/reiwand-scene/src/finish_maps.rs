@@ -1,3 +1,4 @@
+use reiwand_core::explicit::block;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::hash::{Hash, Hasher};
@@ -6,28 +7,28 @@ use std::hash::{Hash, Hasher};
 #[serde(deny_unknown_fields)]
 pub struct MaterialMaps {
     #[schemars(extend("x-ref" = "image"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub base: Option<String>,
     #[schemars(extend("x-ref" = "image"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub orm: Option<String>,
     #[schemars(extend("x-ref" = "image"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub normal: Option<String>,
     #[schemars(extend("x-ref" = "image"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub occlusion: Option<String>,
     #[schemars(extend("x-ref" = "image"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub emissive: Option<String>,
     #[schemars(extend("x-ref" = "image"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub comb: Option<String>,
 }
 

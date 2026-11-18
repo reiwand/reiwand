@@ -2,14 +2,12 @@
   "assets": {
     "cielo": {
       "animated": false,
-      "atlas": null,
       "durations": [],
       "face": null,
       "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
-      "media": null,
       "mipmaps": null,
       "path": "assets/cielo.png",
       "rects": [],
@@ -18,14 +16,12 @@
     },
     "muneco": {
       "animated": false,
-      "atlas": null,
       "durations": [],
       "face": null,
       "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
-      "media": null,
       "mipmaps": null,
       "path": "assets/muneco.glb",
       "rects": [],
@@ -33,7 +29,6 @@
       "wrap": "clamp"
     }
   },
-  "audio": null,
   "camera3d": {
     "center": [
       0,
@@ -45,7 +40,6 @@
       0,
       5
     ],
-    "fade": null,
     "far": 1000,
     "fov": 60,
     "near": 0.1,
@@ -58,24 +52,15 @@
     ]
   },
   "canvas": {
-    "ambient": null,
     "background": "#101820",
     "blend_space": "linear",
-    "bloom": null,
-    "camera": null,
     "clear": true,
     "fit": "fill",
-    "gusts": null,
     "hdr": false,
-    "parallax": null,
-    "perspective": null,
     "size": [
       1920,
       1080
-    ],
-    "sky": null,
-    "tonemap": null,
-    "wind": null
+    ]
   },
   "clock": {
     "max_fps": 60,
@@ -87,7 +72,6 @@
   "ext": {},
   "layers": [
     {
-      "anchor": null,
       "animations": [
         {
           "additive": false,
@@ -100,14 +84,11 @@
           "weight": 1
         }
       ],
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "clips": [
         {
-          "animation": null,
           "bones": {
             "neck": {
               "angles": [],
@@ -154,7 +135,6 @@
       ],
       "colliders": [],
       "color": "#ffffff",
-      "depth": null,
       "depth_test": false,
       "effects": [],
       "expressions": {},
@@ -180,26 +160,18 @@
           "weight": 0.3
         }
       ],
-      "inherit": null,
-      "lighting": null,
-      "mask": null,
       "mesh": "muneco",
       "opacity": 1.0,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
       "parts": {
         "chest": {
-          "clip_to": null,
-          "order": 1,
-          "visible": null
+          "order": 1
         },
         "legs": {
-          "clip_to": null,
-          "order": 0,
-          "visible": null
+          "order": 0
         }
       },
       "physics": [
@@ -209,9 +181,7 @@
           "gravity": 0.0,
           "inertia": 0.5,
           "mode": "spring",
-          "rotation": null,
           "stiffness": 0.6,
-          "translation": null,
           "wind": 0.0
         }
       ],
@@ -233,7 +203,6 @@
       "texture": "cielo",
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           8,
@@ -242,9 +211,7 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "mesh",
       "visible": true
@@ -256,6 +223,5 @@
   "schema": "reiwand.scene/2",
   "scripts": [],
   "templates": {},
-  "timelines": [],
-  "transition": null
+  "timelines": []
 }

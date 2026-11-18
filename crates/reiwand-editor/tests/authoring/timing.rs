@@ -61,10 +61,7 @@ fn keyframes_take_a_base_and_bezier_handles_that_the_editor_samples() {
     act(&mut p, key(json!({"time": 0, "out_handle": [1.0, 0.0]}))).unwrap();
     act(&mut p, key(json!({"time": 2, "in_handle": [1.0, 0.0]}))).unwrap();
     let keys = at(&p, "/scene/layers/0/opacity/keys");
-    assert_eq!(
-        keys,
-        json!([[0.0, 0, {"in": null, "out": [1.0, 0.0]}], [2.0, 1, {"in": [1.0, 0.0], "out": null}]])
-    );
+    assert_eq!(keys, json!([[0.0, 0, {"out": [1.0, 0.0]}], [2.0, 1, {"in": [1.0, 0.0]}]]));
     let keys = keys.as_array().unwrap();
     let early = reiwand_editor::keys::sample(keys, 0.4).unwrap().as_f64().unwrap();
     assert!(early < 0.2 * 0.5, "a flat handle starts slowly: {early}");

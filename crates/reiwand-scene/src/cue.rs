@@ -3,6 +3,7 @@ use crate::resolve::Context;
 use crate::timeline::{Key, Loop, Playhead, sample};
 use crate::value::Binding;
 use crate::{Runtime, Timeline, Wake};
+use reiwand_core::explicit::block;
 use serde::{Deserialize, Serialize};
 
 pub const MAX_FIRED: usize = 64;
@@ -10,7 +11,7 @@ pub const MAX_FIRED: usize = 64;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Fired {
     pub timeline: String,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub name: Option<String>,
     pub t: f32,
 }

@@ -105,7 +105,13 @@ impl Walk<'_> {
         let banded =
             all.iter().all(|b| b.get("enum").is_some() || b["type"] == "integer" || b["type"] == "array");
         let listed = all.iter().find_map(|b| b["enum"].as_array().cloned()).filter(|_| banded);
-        let named: Vec<Value> = all.iter().filter_map(|b| b.get("const").cloned()).collect();
+        let follows = schema.get("x-follows").is_some();
+        let named: Vec<Value> = all
+            .iter()
+            .filter_map(|b| {
+                b.get("const").cloned().or_else(|| b["enum"].as_array()?.first().cloned().filter(|_| follows))
+            })
+            .collect();
         let counted =
             all.iter().filter_map(|b| b["type"].as_str()).find(|t| ["integer", "number"].contains(t));
         let counted = counted.filter(|_| !named.is_empty() && named.len() + 1 == all.len());

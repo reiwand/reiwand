@@ -154,7 +154,7 @@ fn the_list_follows_the_settings_form_and_new_combos_carry_no_words() {
     let combo = &doc["manifest"]["properties"]["combo_1"];
     assert_eq!(
         combo["options"],
-        json!([{"value": "option_1", "label": "", "icon": null}, {"value": "option_2", "label": "", "icon": null}])
+        json!([{"value": "option_1", "label": ""}, {"value": "option_2", "label": ""}])
     );
     assert_eq!(field(&doc, "/manifest/properties/combo_1", "default").names, ["option_1", "option_2"]);
     let props: BTreeMap<String, Property> =

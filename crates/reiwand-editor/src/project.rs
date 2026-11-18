@@ -21,7 +21,7 @@ pub struct Project {
 }
 
 pub fn stamp(doc: &Value) -> String {
-    sha256(doc.to_string().as_bytes()).unwrap_or_default()
+    sha256(crate::plain::doc(doc).to_string().as_bytes()).unwrap_or_default()
 }
 
 pub use crate::skew::{now, skip_clock};
@@ -56,7 +56,7 @@ impl Project {
         let doc = read(dir)?;
         let base = stamp(&doc);
         let (history, pending) = match crate::session::saved(dir).filter(|s| s.files == base) {
-            Some(s) if s.doc == doc => (s.history, None),
+            Some(s) if crate::plain::doc(&s.doc) == doc => (s.history, None),
             Some(s) => (History::default(), Some((s.doc, s.history))),
             None => (History::default(), None),
         };
@@ -87,7 +87,11 @@ impl Project {
         let pretty = |v: &Value| serde_json::to_string_pretty(v).map(|t| t + "\n");
         write(&self.dir.join(MANIFEST), &pretty(&self.doc["manifest"])?, 0o644)?;
         if crate::pages::scened(&self.doc) {
-            write(&self.dir.join(entry(&self.doc)?), &pretty(&self.doc["scene"])?, 0o644)?;
+            write(
+                &self.dir.join(entry(&self.doc)?),
+                &pretty(&crate::plain::scene(&self.doc["scene"]))?,
+                0o644,
+            )?;
         }
         crate::presets::write(&self.dir, &self.doc)?;
         self.base = stamp(&self.doc);

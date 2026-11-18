@@ -143,7 +143,7 @@ fn shortcuts_lists_of_folders_and_quality_values_are_checked() {
     assert_eq!(
         serde_json::to_value(&quiet).unwrap()["properties"]["photos"],
         json!({ "type": "folder", "accept": [], "pick": "random", "every": 60, "mode": "one", "max_files": 1000,
-            "recursive": 0, "label": null, "help": null, "group": null, "icon": null, "order": 0,
+            "recursive": 0, "order": 0,
             "visible_if": {}, "enabled_if": {}, "quality": {} })
     );
 }

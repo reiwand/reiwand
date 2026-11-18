@@ -47,12 +47,10 @@
       ],
       "default_asset": null,
       "enabled_if": {},
-      "group": null,
       "help": {
         "en": "Shows a picture or a video you choose behind the planets.",
         "es": "Muestra una imagen o un vídeo que elijas tras los planetas."
       },
-      "icon": null,
       "label": {
         "en": "Picture or video behind",
         "es": "Imagen o vídeo de fondo"
@@ -65,9 +63,6 @@
     "clock": {
       "default": true,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "en": "Clock",
         "es": "Reloj"
@@ -82,9 +77,6 @@
       "default": 1,
       "editable": false,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "integer": false,
       "label": {
         "en": "Speed",

@@ -35,9 +35,6 @@
     "nombre": {
       "default": "Hola",
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "es": "Texto de bienvenida"
       },
@@ -52,9 +49,6 @@
     "tema": {
       "default": "dia",
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "es": "Tema"
       },

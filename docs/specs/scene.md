@@ -52,7 +52,7 @@ degrees (36 by default).
   `fit`, `stretch`, `center`). `background` is `#rrggbb[aa]`.
   `blend_space` is `linear` (default) or `srgb`, which mixes encoded values as most editors do.
   Every layer carries a required `blend_space` of its own (`canvas`, `linear` or `srgb`; there is no default and an
-  omitted value is an error). `canvas` follows `canvas.blend_space`; the other two decide how that layer composites
+  omitted value is an error; an unused optional block such as `mask` or `trail` may be absent). `canvas` follows `canvas.blend_space`; the other two decide how that layer composites
   onto what is below it, for every blend mode and every drawn type (particles included). A layer whose space differs
   from the canvas composites as a whole: a group is flattened first and then mixed in its own space, and its children
   use their own `blend_space` (`canvas` means the canvas, it is not inherited). An adjustment layer uses its space

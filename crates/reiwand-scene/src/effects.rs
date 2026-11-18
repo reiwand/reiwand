@@ -1,4 +1,5 @@
 use crate::{Quality, Text};
+use reiwand_core::explicit::block;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::sync::{OnceLock, RwLock};
@@ -43,9 +44,9 @@ const FILES: &[(&str, &str, &str)] = &include!(concat!(env!("OUT_DIR"), "/effect
 pub struct Descriptor {
     pub id: String,
     pub name: BTreeMap<String, String>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub category: Option<String>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub description: Option<Text>,
     pub uses: Vec<Use>,
     pub audio: Vec<crate::value::Listen>,
@@ -53,27 +54,27 @@ pub struct Descriptor {
     pub params: Vec<ParamDef>,
     pub passes: Vec<PassDef>,
     pub cost: Cost,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub fuse: Option<Fuse>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub reach: Option<String>,
     pub bounded: Vec<String>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub min_fps: Option<u32>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub velocity: Option<String>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub state: Option<State>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub solve: Option<Solve>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub pace: Option<Pace>,
     pub quality: BTreeMap<Quality, Tune>,
     pub targets: BTreeMap<String, RenderTarget>,
     pub options: Vec<Variant>,
     pub stage: Stage,
     pub compose: bool,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub lighter: Option<Lighter>,
     #[serde(skip)]
     pub lite: Option<std::sync::Arc<Descriptor>>,

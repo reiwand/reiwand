@@ -34,9 +34,6 @@
     "sonido_activo": {
       "default": true,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "es": "Sonido ambiente"
       },
@@ -48,9 +45,6 @@
     "ver_anillo": {
       "default": true,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "label": {
         "es": "Anillo del espectro"
       },

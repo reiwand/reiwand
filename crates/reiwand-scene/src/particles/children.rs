@@ -1,3 +1,4 @@
+use reiwand_core::explicit::block;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -29,8 +30,8 @@ pub struct Child {
     pub on: Moment,
     #[schemars(extend("x-range" = [0, 1]))]
     pub probability: f32,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub max: Option<u32>,
     #[schemars(extend("x-unit" = "px"))]
     pub offset: [f32; 2],

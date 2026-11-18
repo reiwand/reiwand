@@ -12,7 +12,7 @@ ctl scene act "$craft" particles '{"start": {"ranges": {"life": [1.0, 4.0, null]
 [ "$(scene_doc "$craft" /scene/particles/dust/init/life | tr -d " \n")" = '[1.0,4.0,2.0]' ] || fail "setting the ends dropped the curve"
 ctl scene act "$craft" particles '{"start": {"ranges": {"palette": {"colors": ["#ff0000", "#00ff00"], "noise": [0.1, 0, 0]}}, "system": "dust"}}' || fail "the particles took no palette"
 ctl scene act "$craft" particles '{"start": {"ranges": {"gradient": [[0, "#000000"], [1, "#ffffff"]]}, "system": "dust"}}' || fail "the particles took no gradient"
-[ "$(scene_doc "$craft" /scene/particles/dust/init/palette)" = null ] || fail "the palette stayed beside the gradient"
+[ -z "$(scene_doc "$craft" /scene/particles/dust/init/palette)" ] || fail "the palette stayed beside the gradient"
 ctl scene act "$craft" particles '{"start": {"clear": ["gradient"], "system": "dust"}}' || fail "the gradient was not removed"
 ctl scene act "$craft" particles '{"window": {"index": 0, "system": "dust", "window": [0.0, 0.2, 0.8, 1.0]}}' || fail "the force took no window of the life"
 ctl scene act "$craft" particles '{"force": {"force": {"gravity": [0, 200]}, "index": 0, "system": "dust"}}' || fail "the force was not replaced"

@@ -35,7 +35,7 @@ fn remove(value: &mut Value, path: &[String]) {
     }
 }
 
-fn steps(path: &str) -> Vec<String> {
+pub(super) fn steps(path: &str) -> Vec<String> {
     let mut out = Vec::new();
     for part in path.split('.') {
         let (name, mut rest) = part.split_once('[').map_or((part, ""), |(n, r)| (n, r));

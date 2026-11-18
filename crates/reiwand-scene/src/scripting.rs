@@ -1,4 +1,5 @@
 use crate::value::Param;
+use reiwand_core::explicit::{block, null};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -83,11 +84,11 @@ pub struct ScriptParam {
     #[serde(rename = "type")]
     pub kind: ParamType,
     pub default: Param,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub min: Option<f32>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub max: Option<f32>,
 }
 
@@ -107,11 +108,11 @@ pub struct Pool {
     #[schemars(extend("x-range" = [3, 65536]))]
     pub max_vertices: u32,
     #[schemars(extend("x-ref" = "image"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub texture: Option<String>,
     #[schemars(extend("x-unit" = "px", "x-range" = [1, 4096]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     #[schemars(required, extend("x-null" = true))]
     pub size: Option<[u32; 2]>,
 }

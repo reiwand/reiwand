@@ -1,4 +1,5 @@
 use crate::value::{Value, Vec2};
+use reiwand_core::explicit::block;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -6,8 +7,8 @@ use serde::{Deserialize, Serialize};
 #[serde(deny_unknown_fields)]
 pub struct Transform {
     #[schemars(extend("x-unit" = "px"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub position: Option<Value<Vec2>>,
     pub scale: Value<Vec2>,
     #[schemars(extend("x-unit" = "°", "x-range" = [-360, 360]))]
@@ -15,12 +16,12 @@ pub struct Transform {
     pub skew: Value<Vec2>,
     pub origin: crate::Ctx<[f32; 2], { crate::ANCHOR }>,
     #[schemars(extend("x-unit" = "°", "x-range" = [-89, 89]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub tilt: Option<Value<Vec2>>,
     #[schemars(extend("x-unit" = "px"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub z: Option<Value<f32>>,
 }
 

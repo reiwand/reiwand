@@ -29,8 +29,8 @@ fn unknown_fields_and_values_are_rejected() {
         ("\"loop\": \"repeat\"", "\"loop\": \"forever\""),
         ("\"out_cubic\"", "\"out_cubical\""),
         (
-            "\"scale\": 0.8,\n        \"script\"",
-            "\"scale\": 0.8,\n        \"jitter\": 1,\n        \"script\"",
+            "\"scale\": 0.8,\n        \"smooth\"",
+            "\"scale\": 0.8,\n        \"jitter\": 1,\n        \"smooth\"",
         ),
         ("\"fill\": \"#ff8800\"", "\"fill\": \"#ff88\""),
         ("\"capacity\": 4000", "\"capacity\": 4000, \"gravity\": 1"),

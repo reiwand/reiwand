@@ -1,3 +1,4 @@
+use reiwand_core::explicit::block;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::hash::{DefaultHasher, Hash, Hasher};
@@ -9,8 +10,8 @@ pub const EMITTER_TEXELS: usize = 3;
 #[serde(deny_unknown_fields)]
 pub struct EffectEmitter {
     pub from: [f32; 2],
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub to: Option<[f32; 2]>,
     #[schemars(extend("x-range" = [-360, 360]))]
     pub angle: f32,

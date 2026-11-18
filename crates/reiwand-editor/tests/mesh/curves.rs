@@ -44,8 +44,8 @@ fn handles_bend_one_channel_and_travel_with_the_key() {
     let (_root, mut p) = keyed();
     act(&mut p, key(0.0, json!({ "rotation": 0, "out_handle": [0.5, 60] }))).unwrap();
     act(&mut p, key(2.0, json!({ "rotation": 40, "in_handle": [0.5, -20] }))).unwrap();
-    assert_eq!(rotation(&p)[0], json!([0.0, 0.0, { "in": null, "out": [0.5, 60.0] }]));
-    assert_eq!(rotation(&p)[1], json!([2.0, 40.0, { "in": [0.5, -20.0], "out": null }]));
+    assert_eq!(rotation(&p)[0], json!([0.0, 0.0, { "out": [0.5, 60.0] }]));
+    assert_eq!(rotation(&p)[1], json!([2.0, 40.0, { "in": [0.5, -20.0] }]));
     act(&mut p, key(3.0, json!({ "rotation": 10 }))).unwrap();
     act(&mut p, key(2.0, json!({ "rotation": 40, "out_handle": [1.0, 5] }))).unwrap();
     assert_eq!(rotation(&p)[1][2], json!({ "in": [0.5, -20.0], "out": [1.0, 5.0] }));
@@ -55,7 +55,7 @@ fn handles_bend_one_channel_and_travel_with_the_key() {
     assert!(serde_json::from_value::<reiwand_scene::Scene>(p.doc["scene"].clone()).is_ok());
     let rows = query(&p, "net", json!({ "keys": "wave" }));
     let row = rows["rows"].as_array().unwrap().iter().find(|r| r["channel"] == "rotation").unwrap();
-    assert_eq!(row["keys"][0]["ease"], json!({ "in": null, "out": [0.5, 60.0] }));
+    assert_eq!(row["keys"][0]["ease"], json!({ "out": [0.5, 60.0] }));
     let mid = reiwand_editor::keys::sample(rotation(&p).as_array().unwrap(), 0.8).unwrap();
     assert!((mid.as_f64().unwrap() - 20.0).abs() > 1e-3);
 }
@@ -82,7 +82,7 @@ fn the_curve_editor_moves_bends_and_reads_the_keys_of_a_clip_channel() {
     let pick = json!([{ "pointer": channel, "times": [2] }]);
     act(&mut p, json!({ "edit_keys": { "picks": pick, "in_handle": [1, -10] } })).unwrap();
     act(&mut p, json!({ "edit_keys": { "picks": pick, "shift": 1, "lift": 5 } })).unwrap();
-    assert_eq!(rotation(&p)[1], json!([3.0, 45.0, { "in": [1.0, -10.0], "out": null }]));
+    assert_eq!(rotation(&p)[1], json!([3.0, 45.0, { "in": [1.0, -10.0] }]));
     let curves = reiwand_editor::graph::curves(&p.doc, &json!({ "pointer": channel, "samples": 4 }));
     assert_eq!(curves["list"], json!(channel));
     let row = json!({ "layer": "net", "clip": "wave", "row": ["bones", "arm", "rotation"] });

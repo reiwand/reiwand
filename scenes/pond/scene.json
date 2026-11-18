@@ -2,14 +2,12 @@
   "assets": {
     "water": {
       "animated": false,
-      "atlas": null,
       "durations": [],
       "face": null,
       "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
-      "media": null,
       "mipmaps": null,
       "path": "assets/water.ogg",
       "rects": [],
@@ -17,27 +15,16 @@
       "wrap": "clamp"
     }
   },
-  "audio": null,
-  "camera3d": null,
   "canvas": {
-    "ambient": null,
     "background": "#06222c",
     "blend_space": "linear",
-    "bloom": null,
-    "camera": null,
     "clear": true,
     "fit": "fill",
-    "gusts": null,
     "hdr": false,
-    "parallax": null,
-    "perspective": null,
     "size": [
       1920,
       1080
-    ],
-    "sky": null,
-    "tonemap": null,
-    "wind": null
+    ]
   },
   "clock": {
     "max_fps": "display",
@@ -49,21 +36,15 @@
   "ext": {},
   "layers": [
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "depth_test": false,
       "effects": [],
       "fade_in": 2,
       "fade_out": 2,
       "id": "lapping",
-      "inherit": null,
-      "lighting": null,
       "loop": true,
-      "mask": null,
       "mode": "sequence",
       "opacity": 1.0,
       "pan": 0.0,
@@ -71,17 +52,13 @@
         0,
         0
       ],
-      "parent": null,
-      "pause": null,
       "play": true,
-      "play_on": null,
       "solid": false,
       "sound": "water",
       "sounds": [],
       "stream": false,
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -90,24 +67,18 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "sound",
       "visible": true,
       "volume": 0.8
     },
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "depth_test": false,
       "effects": [],
-      "fill": null,
       "gradient": {
         "from": [
           0.0,
@@ -134,15 +105,11 @@
         ]
       },
       "id": "water",
-      "inherit": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0.01,
         0.01
       ],
-      "parent": null,
       "shape": {
         "rect": {
           "radius": 0.0,
@@ -153,10 +120,8 @@
         }
       },
       "solid": false,
-      "stroke": null,
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -165,23 +130,17 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "shape",
       "visible": true
     },
     {
-      "anchor": null,
-      "attach": null,
       "blend": "add",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "depth_test": false,
       "effects": [],
-      "fill": null,
       "gradient": {
         "from": [
           0.5,
@@ -212,15 +171,11 @@
         ]
       },
       "id": "light",
-      "inherit": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0.02,
         0.02
       ],
-      "parent": null,
       "shape": {
         "ellipse": {
           "size": [
@@ -230,7 +185,6 @@
         }
       },
       "solid": false,
-      "stroke": null,
       "transform": {
         "origin": "anchor",
         "position": [
@@ -245,48 +199,34 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "shape",
       "visible": true
     },
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "clip": false,
       "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "pads",
-      "inherit": null,
       "layers": [
         {
-          "anchor": null,
-          "attach": null,
           "blend": "normal",
           "blend_space": "canvas",
-          "brightness": null,
           "cache": false,
           "depth_test": false,
           "effects": [],
           "fill": "#2f7d4d",
-          "gradient": null,
           "id": "a",
-          "inherit": null,
-          "lighting": null,
-          "mask": null,
           "opacity": 1.0,
           "parallax": [
             0,
             0
           ],
-          "parent": null,
           "shape": {
             "ellipse": {
               "size": [
@@ -296,7 +236,6 @@
             }
           },
           "solid": false,
-          "stroke": null,
           "transform": {
             "origin": "anchor",
             "position": [
@@ -311,34 +250,24 @@
             "skew": [
               0.0,
               0.0
-            ],
-            "tilt": null,
-            "z": null
+            ]
           },
           "type": "shape",
           "visible": true
         },
         {
-          "anchor": null,
-          "attach": null,
           "blend": "normal",
           "blend_space": "canvas",
-          "brightness": null,
           "cache": false,
           "depth_test": false,
           "effects": [],
           "fill": "#3a8f58",
-          "gradient": null,
           "id": "b",
-          "inherit": null,
-          "lighting": null,
-          "mask": null,
           "opacity": 1.0,
           "parallax": [
             0,
             0
           ],
-          "parent": null,
           "shape": {
             "ellipse": {
               "size": [
@@ -348,7 +277,6 @@
             }
           },
           "solid": false,
-          "stroke": null,
           "transform": {
             "origin": "anchor",
             "position": [
@@ -363,34 +291,24 @@
             "skew": [
               0.0,
               0.0
-            ],
-            "tilt": null,
-            "z": null
+            ]
           },
           "type": "shape",
           "visible": true
         },
         {
-          "anchor": null,
-          "attach": null,
           "blend": "normal",
           "blend_space": "canvas",
-          "brightness": null,
           "cache": false,
           "depth_test": false,
           "effects": [],
           "fill": "#2a6f45",
-          "gradient": null,
           "id": "c",
-          "inherit": null,
-          "lighting": null,
-          "mask": null,
           "opacity": 1.0,
           "parallax": [
             0,
             0
           ],
-          "parent": null,
           "shape": {
             "ellipse": {
               "size": [
@@ -400,7 +318,6 @@
             }
           },
           "solid": false,
-          "stroke": null,
           "transform": {
             "origin": "anchor",
             "position": [
@@ -415,34 +332,24 @@
             "skew": [
               0.0,
               0.0
-            ],
-            "tilt": null,
-            "z": null
+            ]
           },
           "type": "shape",
           "visible": true
         },
         {
-          "anchor": null,
-          "attach": null,
           "blend": "normal",
           "blend_space": "canvas",
-          "brightness": null,
           "cache": false,
           "depth_test": false,
           "effects": [],
           "fill": "#3a8f58",
-          "gradient": null,
           "id": "d",
-          "inherit": null,
-          "lighting": null,
-          "mask": null,
           "opacity": 1.0,
           "parallax": [
             0,
             0
           ],
-          "parent": null,
           "shape": {
             "ellipse": {
               "size": [
@@ -452,7 +359,6 @@
             }
           },
           "solid": false,
-          "stroke": null,
           "transform": {
             "origin": "anchor",
             "position": [
@@ -467,34 +373,24 @@
             "skew": [
               0.0,
               0.0
-            ],
-            "tilt": null,
-            "z": null
+            ]
           },
           "type": "shape",
           "visible": true
         },
         {
-          "anchor": null,
-          "attach": null,
           "blend": "normal",
           "blend_space": "canvas",
-          "brightness": null,
           "cache": false,
           "depth_test": false,
           "effects": [],
           "fill": "#2f7d4d",
-          "gradient": null,
           "id": "e",
-          "inherit": null,
-          "lighting": null,
-          "mask": null,
           "opacity": 1.0,
           "parallax": [
             0,
             0
           ],
-          "parent": null,
           "shape": {
             "ellipse": {
               "size": [
@@ -504,7 +400,6 @@
             }
           },
           "solid": false,
-          "stroke": null,
           "transform": {
             "origin": "anchor",
             "position": [
@@ -519,34 +414,24 @@
             "skew": [
               0.0,
               0.0
-            ],
-            "tilt": null,
-            "z": null
+            ]
           },
           "type": "shape",
           "visible": true
         },
         {
-          "anchor": null,
-          "attach": null,
           "blend": "normal",
           "blend_space": "canvas",
-          "brightness": null,
           "cache": false,
           "depth_test": false,
           "effects": [],
           "fill": "#f6c8db",
-          "gradient": null,
           "id": "f1",
-          "inherit": null,
-          "lighting": null,
-          "mask": null,
           "opacity": 1.0,
           "parallax": [
             0,
             0
           ],
-          "parent": null,
           "shape": {
             "star": {
               "inner": 0.45,
@@ -555,7 +440,6 @@
             }
           },
           "solid": false,
-          "stroke": null,
           "transform": {
             "origin": "anchor",
             "position": [
@@ -570,34 +454,24 @@
             "skew": [
               0.0,
               0.0
-            ],
-            "tilt": null,
-            "z": null
+            ]
           },
           "type": "shape",
           "visible": true
         },
         {
-          "anchor": null,
-          "attach": null,
           "blend": "normal",
           "blend_space": "canvas",
-          "brightness": null,
           "cache": false,
           "depth_test": false,
           "effects": [],
           "fill": "#fbe3ec",
-          "gradient": null,
           "id": "f2",
-          "inherit": null,
-          "lighting": null,
-          "mask": null,
           "opacity": 1.0,
           "parallax": [
             0,
             0
           ],
-          "parent": null,
           "shape": {
             "star": {
               "inner": 0.45,
@@ -606,7 +480,6 @@
             }
           },
           "solid": false,
-          "stroke": null,
           "transform": {
             "origin": "anchor",
             "position": [
@@ -621,27 +494,21 @@
             "skew": [
               0.0,
               0.0
-            ],
-            "tilt": null,
-            "z": null
+            ]
           },
           "type": "shape",
           "visible": true
         }
       ],
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0.04,
         0.04
       ],
-      "parent": null,
       "solid": false,
       "space": "2d",
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -650,65 +517,23 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "group",
       "visible": {
-        "a": null,
-        "audio": null,
-        "b": null,
-        "base": null,
-        "bounds": null,
-        "channel": null,
-        "clamp": null,
-        "clock": null,
-        "cursor": null,
-        "date": null,
-        "exponent": null,
-        "fn": null,
-        "g": null,
-        "hold_silence": null,
         "invert": false,
-        "keys": null,
-        "kind": null,
-        "layer": null,
-        "loop": null,
-        "map": null,
-        "media": null,
-        "of": null,
-        "offset": null,
-        "params": null,
-        "placeholder": null,
-        "prop": "pads",
-        "r": null,
-        "reduce": null,
-        "reference": null,
-        "scale": null,
-        "script": null,
-        "smooth": null,
-        "timeline": null,
-        "unit": null,
-        "window": null,
-        "x": null,
-        "y": null
+        "prop": "pads"
       }
     },
     {
-      "anchor": null,
-      "attach": null,
       "blend": "normal",
       "blend_space": "canvas",
-      "brightness": null,
       "cache": false,
       "depth_test": false,
       "effects": [
         {
           "effect": "water_ripple",
           "enabled": true,
-          "mask": null,
-          "name": null,
           "optional": false,
           "params": {
             "beat": 0,
@@ -721,43 +546,8 @@
             "specular": 0.3,
             "speed": 1.0,
             "strength": {
-              "a": null,
-              "audio": null,
-              "b": null,
-              "base": null,
-              "bounds": null,
-              "channel": null,
-              "clamp": null,
-              "clock": null,
-              "cursor": null,
-              "date": null,
-              "exponent": null,
-              "fn": null,
-              "g": null,
-              "hold_silence": null,
               "invert": false,
-              "keys": null,
-              "kind": null,
-              "layer": null,
-              "loop": null,
-              "map": null,
-              "media": null,
-              "of": null,
-              "offset": null,
-              "params": null,
-              "placeholder": null,
-              "prop": "ripples",
-              "r": null,
-              "reduce": null,
-              "reference": null,
-              "scale": null,
-              "script": null,
-              "smooth": null,
-              "timeline": null,
-              "unit": null,
-              "window": null,
-              "x": null,
-              "y": null
+              "prop": "ripples"
             },
             "tint": "#ffffff",
             "walls": ""
@@ -766,8 +556,6 @@
         {
           "effect": "vignette",
           "enabled": true,
-          "mask": null,
-          "name": null,
           "optional": false,
           "params": {
             "center": [
@@ -783,22 +571,17 @@
         }
       ],
       "id": "ripples",
-      "inherit": null,
-      "lighting": null,
-      "mask": null,
       "opacity": 1.0,
       "parallax": [
         0,
         0
       ],
-      "parent": null,
       "redraw": false,
       "rgb": false,
       "size": "canvas",
       "solid": false,
       "transform": {
         "origin": "anchor",
-        "position": null,
         "rotation": 0.0,
         "scale": [
           1.0,
@@ -807,9 +590,7 @@
         "skew": [
           0.0,
           0.0
-        ],
-        "tilt": null,
-        "z": null
+        ]
       },
       "type": "adjustment",
       "visible": true
@@ -821,6 +602,5 @@
   "schema": "reiwand.scene/2",
   "scripts": [],
   "templates": {},
-  "timelines": [],
-  "transition": null
+  "timelines": []
 }

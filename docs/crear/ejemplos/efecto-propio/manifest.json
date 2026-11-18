@@ -34,9 +34,6 @@
       "default": 1,
       "editable": false,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "integer": false,
       "label": {
         "es": "Intensidad del duotono"

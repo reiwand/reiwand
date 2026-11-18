@@ -3,6 +3,7 @@ use crate::figure::Attach;
 use crate::light::Lighting;
 use crate::value::Value;
 use crate::{Blend, LayerSpace};
+use reiwand_core::explicit::block;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -16,16 +17,16 @@ pub use transform::{Anchor, Inherit, Parallax, Transform};
 pub struct Layer {
     pub id: String,
     pub transform: Transform,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub anchor: Option<Anchor>,
     #[schemars(extend("x-range" = [0, 1]))]
     pub opacity: Value<f32>,
     pub visible: Value<bool>,
     pub blend: Blend,
     pub blend_space: LayerSpace,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub mask: Option<Mask>,
     pub effects: Vec<EffectUse>,
     #[schemars(extend("x-range" = [-1, 1], "default" = 0))]
@@ -34,21 +35,21 @@ pub struct Layer {
     pub solid: Solid,
     pub cache: bool,
     #[schemars(extend("x-range" = [0, 16]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub brightness: Option<Value<f32>>,
     #[schemars(extend("x-ref" = "layer"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub parent: Option<String>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub inherit: Option<Vec<Inherit>>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub lighting: Option<Lighting>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub attach: Option<Attach>,
     pub depth_test: bool,
     #[serde(flatten)]

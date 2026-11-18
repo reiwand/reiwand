@@ -1,6 +1,7 @@
 use crate::resolve::Context;
 use crate::validate::{Check, Issue};
 use crate::{Control, Kind, Layer, Property, Scene, Slider, Text, Value, clip};
+use reiwand_core::explicit::block;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -18,13 +19,13 @@ pub struct Sound {
     pub sounds: Vec<String>,
     pub mode: Order,
     #[schemars(extend("x-unit" = "s", "x-range" = [0, 600]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub pause: Option<[f32; 2]>,
     pub stream: bool,
     #[schemars(extend("x-ref" = "trigger"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub play_on: Option<String>,
     #[serde(rename = "loop")]
     pub repeat: bool,

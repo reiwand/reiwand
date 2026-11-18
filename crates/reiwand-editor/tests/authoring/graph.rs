@@ -103,7 +103,7 @@ fn aligned_handles_keep_one_slope_and_straighten_is_one_step() {
     let before = steps(&p);
     act(&mut p, json!({"edit_keys": {"picks": pick, "straighten": true}})).unwrap();
     assert_eq!(steps(&p), before + 1);
-    assert_eq!(keys(&p, opacity)[1][2], json!({"in": [0.25, -0.3], "out": null}));
+    assert_eq!(keys(&p, opacity)[1][2], json!({"in": [0.25, -0.3]}));
 }
 
 #[test]

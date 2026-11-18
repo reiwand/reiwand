@@ -171,6 +171,6 @@ fn a_manifest_next_to_the_scene_is_completed() {
         .unwrap();
     assert_eq!(reiwand_upgrade::scenes::run(&dir).unwrap(), 1);
     let after: Value = serde_json::from_slice(&std::fs::read(&file).unwrap()).unwrap();
-    assert!(after["properties"]["speed"].get("help").is_some_and(Value::is_null));
+    assert!(after["properties"]["speed"].get("help").is_none());
     assert_eq!(reiwand_upgrade::scenes::run(&dir).unwrap(), 0);
 }

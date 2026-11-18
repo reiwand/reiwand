@@ -34,9 +34,6 @@
       "default": 120,
       "editable": false,
       "enabled_if": {},
-      "group": null,
-      "help": null,
-      "icon": null,
       "integer": true,
       "label": {
         "es": "Cantidad de chispas"

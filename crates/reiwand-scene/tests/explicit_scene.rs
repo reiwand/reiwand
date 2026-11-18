@@ -1,4 +1,4 @@
-use reiwand_core::explicit::{all_required, omission, read, round_trip};
+use reiwand_core::explicit::{all_required, block_at, null_blocks, omission, prune_blocks, read, round_trip};
 use reiwand_scene::{Scene, schema};
 use serde_json::Value;
 
@@ -17,7 +17,9 @@ fn every_scene_property_is_required() {
 fn a_full_scene_is_refused_key_by_key_when_it_loses_one() {
     let load = |v: &Value| read::<Scene>("scene.json", v).map(|_| ());
     load(&sample()).unwrap();
-    let wrong = omission(&sample(), |_| false, load);
+    let (root, target) = (schema(), schema());
+    let value = sample();
+    let wrong = omission(&value, |path| block_at(&root, &target, &value, path), load);
     let untagged = |line: &&String| {
         let (path, rest) = line.split_once(": ").unwrap();
         let reported = rest.strip_prefix("reported \"").and_then(|r| r.split('"').next());
@@ -44,4 +46,20 @@ fn a_full_scene_written_again_gives_the_same_bytes() {
     };
     let canonical = again(&text).unwrap();
     round_trip(&canonical, again).unwrap();
+    let written: Value = serde_json::from_str(&canonical).unwrap();
+    assert!(null_blocks(&schema(), &schema(), &written).is_empty());
+}
+
+#[test]
+fn a_scene_with_its_unused_blocks_written_as_null_reads_like_one_without_them() {
+    let nulled = sample();
+    let root = schema();
+    assert!(!null_blocks(&root, &root, &nulled).is_empty());
+    let mut bare = nulled.clone();
+    prune_blocks(&root, &root, &mut bare);
+    assert!(null_blocks(&root, &root, &bare).is_empty());
+    assert!(bare.to_string().len() < nulled.to_string().len());
+    let (a, b) = (read::<Scene>("a", &nulled).unwrap(), read::<Scene>("b", &bare).unwrap());
+    assert_eq!(a, b);
+    assert_eq!(a.to_json().unwrap(), b.to_json().unwrap());
 }

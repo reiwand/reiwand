@@ -4,7 +4,8 @@
 mod sample;
 
 use reiwand_core::explicit::{
-    Prefill, Rule, all_required, annotate, omission, read, read_str, round_trip, scan,
+    Prefill, Rule, all_required, annotate, block_at, null_blocks, omission, prune_blocks, read, read_str,
+    round_trip, scan,
 };
 use sample::{FULL, Sample};
 use serde_json::Value;
@@ -131,4 +132,55 @@ fn bindings_inside_tuples_are_completed() {
     let mut value = serde_json::json!([1.0, { "keys": [] }]);
     reiwand_core::explicit::walk::fill(&schema, &schema, &mut value);
     assert_eq!(value, serde_json::json!([1.0, { "keys": [], "prop": null }]));
+}
+
+fn schema() -> Value {
+    serde_json::to_value(schemars::schema_for!(Sample)).unwrap()
+}
+
+fn badged() -> Value {
+    let mut v = full();
+    v["badge"] = serde_json::json!({ "label": "new", "size": 2.0 });
+    v
+}
+
+#[test]
+fn a_block_may_be_absent_or_null_and_means_the_same() {
+    let absent = full();
+    let mut nulled = full();
+    nulled["badge"] = Value::Null;
+    let a = read::<Sample>("x", &absent).unwrap();
+    let b = read::<Sample>("x", &nulled).unwrap();
+    assert_eq!(serde_json::to_string(&a).unwrap(), serde_json::to_string(&b).unwrap());
+    assert!(a.badge.is_none() && b.badge.is_none());
+    assert!(!serde_json::to_string(&a).unwrap().contains("badge"));
+}
+
+#[test]
+fn removing_a_whole_block_is_allowed_but_not_a_field_inside_it() {
+    let schema = schema();
+    let value = badged();
+    read::<Sample>("x", &value).unwrap();
+    let wrong = omission(&value, |p| block_at(&schema, &schema, &value, p), load);
+    assert!(wrong.is_empty(), "{wrong:#?}");
+    let loose = omission(&value, |_| false, load);
+    assert_eq!(loose, ["badge: accepted without it"]);
+    let mut cut = value.clone();
+    cut["badge"].as_object_mut().unwrap().remove("size");
+    assert_eq!(load(&cut).unwrap_err().path, "badge.size");
+}
+
+#[test]
+fn the_schema_lets_blocks_be_absent_and_the_writer_leaves_no_null_block() {
+    let mut schema = schema();
+    assert!(all_required(&schema).is_empty(), "{:?}", all_required(&schema));
+    annotate(&mut schema, &Prefill(&[("Sample.badge", "null")]));
+    assert!(schema["required"].as_array().unwrap().iter().all(|k| k != "badge"));
+    let mut nulled = full();
+    nulled["badge"] = Value::Null;
+    assert_eq!(null_blocks(&schema, &schema, &nulled), ["badge"]);
+    prune_blocks(&schema, &schema, &mut nulled);
+    assert_eq!(nulled, full());
+    let written = serde_json::to_string_pretty(&read::<Sample>("x", &badged()).unwrap()).unwrap();
+    assert!(null_blocks(&schema, &schema, &serde_json::from_str(&written).unwrap()).is_empty());
 }

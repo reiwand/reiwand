@@ -18,8 +18,8 @@ fn straightening_a_curve_is_one_step_that_keeps_the_neighbouring_curves() {
     act(&mut p, key(json!({"time": 1, "straighten": true}))).unwrap();
     assert_eq!(p.history.done.len(), before + 1);
     let got = at(&p, "/scene/layers/0/opacity/keys");
-    assert_eq!(got[1], json!([1, 1, {"in": [0.3, 0.1], "out": null}]));
-    assert_eq!(got[2], json!([2, 0, {"in": null, "out": [0.3, 0.1]}]));
+    assert_eq!(got[1], json!([1, 1, {"in": [0.3, 0.1]}]));
+    assert_eq!(got[2], json!([2, 0, {"out": [0.3, 0.1]}]));
     assert_eq!((&got[0], &got[3]), (&keys["keys"][0], &keys["keys"][3]));
     act(&mut p, key(json!({"time": 0, "ease": "in_out_sine"}))).unwrap();
     act(&mut p, key(json!({"time": 0, "straighten": true}))).unwrap();

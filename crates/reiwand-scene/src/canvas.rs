@@ -2,6 +2,7 @@ use crate::look::{Bloom, Camera, Glide, Tonemap};
 use crate::value::{Value, Vec2};
 use crate::{Color, schema};
 use reiwand_core::Fit;
+use reiwand_core::explicit::{block, null};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -40,37 +41,37 @@ pub struct Canvas {
     pub fit: Fit,
     pub background: Color,
     pub blend_space: BlendSpace,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub parallax: Option<Glide>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub camera: Option<Camera>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub bloom: Option<Bloom>,
     pub hdr: bool,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub tonemap: Option<Tonemap>,
     pub clear: bool,
     #[schemars(extend("x-unit" = "px", "x-range" = [100, 100000]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub perspective: Option<f32>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub ambient: Option<Color>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub sky: Option<Color>,
     #[schemars(extend("x-unit" = "px/s"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub wind: Option<Value<Vec2>>,
     #[schemars(extend("x-range" = [0, 1]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub gusts: Option<f32>,
 }
 
@@ -82,7 +83,7 @@ pub struct Clock {
     pub max_fps: u32,
     #[schemars(extend("x-unit" = "s"))]
     pub poster_time: f32,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[serde(deserialize_with = "null")]
     #[schemars(required, extend("x-null" = true))]
     pub seed: Option<u64>,
     #[schemars(extend("x-unit" = "s", "x-range" = [1, 3600]))]

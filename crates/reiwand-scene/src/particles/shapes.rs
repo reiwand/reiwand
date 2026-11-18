@@ -1,4 +1,5 @@
 use super::{Around, Between, Handle, Num, Source};
+use reiwand_core::explicit::block;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -13,8 +14,8 @@ pub enum EmitShape {
         inner: Num,
         scale: [f32; 2],
         sign: [i8; 2],
-        #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required, extend("x-null" = true))]
+        #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+        #[schemars(extend("x-null" = true, "x-block" = true))]
         at: Option<Handle>,
     },
     Sphere {
@@ -23,8 +24,8 @@ pub enum EmitShape {
         radius: [f32; 3],
         inner: f32,
         sign: [i8; 3],
-        #[serde(deserialize_with = "reiwand_core::explicit::null")]
-        #[schemars(required, extend("x-null" = true))]
+        #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+        #[schemars(extend("x-null" = true, "x-block" = true))]
         at: Option<Handle>,
     },
     Line([[f32; 2]; 2]),
@@ -45,7 +46,7 @@ pub struct Area {
     pub from: [f32; 2],
     pub to: [f32; 2],
     pub inner: [f32; 2],
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
     pub at: Option<Handle>,
 }
