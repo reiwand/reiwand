@@ -1,6 +1,6 @@
 use image::{Rgb, RgbImage};
 use reiwand_core::Fit;
-use reiwand_render::{Layer, Pixels, Renderer, SceneAssets, SceneView, set_step_budget};
+use reiwand_render::{Layer, Pixels, Renderer, SceneAssets, SceneView};
 use reiwand_scene::{Census, Quality, Runtime, SCHEMA, Scene, Values};
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
@@ -24,10 +24,7 @@ mod volume;
 
 const SIZE: (u32, u32) = (160, 80);
 
-fn renderer() -> Option<&'static Renderer> {
-    set_step_budget(None);
-    crate::gpu::renderer()
-}
+use crate::gpu::renderer;
 
 struct Run {
     runtime: Runtime,
