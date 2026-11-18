@@ -24,7 +24,7 @@ GridLayout {
         onToggled: {
             if (checked) {
                 deep.tools.edit("perspective", {
-                    "focal": 800
+                    "focal": App.fill("Offer.perspective").focal
                 });
                 deep.tools.edit("start", {
                     "ranges": {
@@ -49,7 +49,7 @@ GridLayout {
         visible: !!deep.focal
         from: 50
         to: 4000
-        value: deep.focal?.focal ?? 800
+        value: deep.focal?.focal ?? App.fill("Offer.perspective").focal
         onMoved: deep.tools.edit("perspective", {
             "focal": Math.round(value)
         }, true)

@@ -11,7 +11,7 @@ ColumnLayout {
     required property var node
     readonly property var entry: node?.type === "adjustment" ? JSON.parse(page.editor.value(node.pointer) || "null") : null
     readonly property bool lit: entry?.rgb === true
-    readonly property var canvas: page.view.canvas?.size ?? [1920, 1080]
+    readonly property var canvas: page.view.canvas?.size ?? App.fill("Offer.canvas").size
     property var strip: null
 
     function edit(args) {

@@ -11,7 +11,7 @@ ColumnLayout {
     readonly property var mesh: page.mesh
     property var shown: null
     property var chosen: null
-    readonly property real length: Math.max(0.1, shown?.length ?? 2)
+    readonly property real length: Math.max(0.1, shown?.length ?? App.fill("Action.clip.length"))
     readonly property string repeat: shown?.loop ?? "repeat"
     readonly property real now: local(page.clock)
     readonly property var picked: chosen ? (rows.find(r => same(r, chosen.row))?.keys ?? []).find(k => Math.abs(k.t - chosen.t) < 1e-3) ?? null : null

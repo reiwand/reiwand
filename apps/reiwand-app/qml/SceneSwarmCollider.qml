@@ -79,7 +79,7 @@ GridLayout {
 
     QQC2.Label {
         visible: row.wall.kind === "mask"
-        text: App.tr("Solid from opacity %1", Math.round((row.wall.threshold ?? 0.5) * 100) / 100)
+        text: App.tr("Solid from opacity %1", Math.round((row.wall.threshold ?? App.fill("Source.threshold")) * 100) / 100)
     }
 
     SceneSlider {
@@ -87,7 +87,7 @@ GridLayout {
         visible: row.wall.kind === "mask"
         from: 0
         to: 1
-        value: row.wall.threshold ?? 0.5
+        value: row.wall.threshold ?? App.fill("Source.threshold")
         onMoved: row.patch(v => v.bounds.mask.threshold = Math.round(value * 100) / 100, true)
     }
 

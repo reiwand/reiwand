@@ -88,7 +88,7 @@ QtObject {
         gizmo.destroy();
         const tools = search(page, item => typeof item.fit === "function" && item.chosen !== undefined);
         tools.fit("stretch");
-        const size = page.view.canvas?.size ?? [1920, 1080];
+        const size = page.view.canvas?.size ?? App.fill("Offer.canvas").size;
         if (!near(seat("seat_kid").outline[0], [0, 0]) || !near(seat("seat_kid").outline[2], size))
             throw new Error("seats: stretching to the canvas left " + JSON.stringify(seat("seat_kid").outline));
         while (page.view.history.done.length > steps)

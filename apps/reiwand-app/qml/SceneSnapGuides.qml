@@ -19,7 +19,7 @@ Item {
     }
 
     function found(me) {
-        const size = page.view.canvas?.size ?? [1920, 1080];
+        const size = page.view.canvas?.size ?? App.fill("Offer.canvas").size;
         const targets = [[0, size[0] / 2, size[0]], [0, size[1] / 2, size[1]]];
         for (const other of gizmos) {
             if (other.id === me.id || other.pointer.startsWith(me.pointer + "/") || other.parent === me.id)

@@ -7,7 +7,7 @@ ColumnLayout {
     id: canvas
 
     required property var page
-    readonly property var size: page.view.canvas?.size ?? [1920, 1080]
+    readonly property var size: page.view.canvas?.size ?? App.fill("Offer.canvas").size
     readonly property real fitted: Math.min(area.width / size[0], area.height / size[1]) * 0.94
     readonly property real ratio: fitted * zoom
     property real zoom: 1

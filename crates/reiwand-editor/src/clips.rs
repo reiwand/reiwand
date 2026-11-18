@@ -108,7 +108,8 @@ pub(crate) fn clip(dir: &std::path::Path, doc: &Value, c: &ClipEdit) -> Result<V
                 f.is_finite() && (0.0..=MAX_LENGTH).contains(f),
                 said("editor.time_must_more", "the time must be 0 or more seconds", &[])
             );
-            let span = c["to"].as_f64().unwrap_or(2.0) - c["from"].as_f64().unwrap_or(0.0);
+            let span = c["to"].as_f64().unwrap_or_else(|| reiwand_scene::prefill::arg("clip.length"))
+                - c["from"].as_f64().unwrap_or(0.0);
             let end = match c["animation"].as_str() {
                 Some(a) => crate::skin::rigged(dir, doc, l)?
                     .2

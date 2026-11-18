@@ -6,6 +6,8 @@ const TABLE: &str = include_str!("prefill.json");
 static TABLE_ROWS: LazyLock<serde_json::Map<String, Json>> =
     LazyLock::new(|| serde_json::from_str(TABLE).unwrap_or_default());
 
+static TABLE_ROWS_TEXT: LazyLock<String> = LazyLock::new(|| Json::Object(TABLE_ROWS.clone()).to_string());
+
 fn offered(row: &str) -> bool {
     row.starts_with("Action.") || row.starts_with("Offer.")
 }
@@ -45,8 +47,16 @@ pub fn offer(name: &str, def: &str, mut value: Json) -> Json {
     }
 }
 
+pub fn offered_row(name: &str) -> Json {
+    row(&format!("Offer.{name}")).clone()
+}
+
 pub fn canvas() -> [f64; 2] {
     serde_json::from_value(row("Offer.canvas")["size"].clone()).expect("the canvas size of the offers")
+}
+
+pub fn table() -> String {
+    TABLE_ROWS_TEXT.clone()
 }
 
 pub fn rows() -> impl Iterator<Item = (&'static String, &'static Json)> {

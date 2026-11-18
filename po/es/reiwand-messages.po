@@ -2777,6 +2777,10 @@ msgid "the transition breaks a rule: %1"
 msgstr "la transición no cumple una regla: %1"
 
 #: crates/reiwand-editor/src/passing/mod.rs
+msgid "the transition has no duration_ms"
+msgstr "la transición no tiene duration_ms"
+
+#: crates/reiwand-editor/src/passing/mod.rs
 msgid "a transition lasts from %1 to %2 s"
 msgstr "una transición dura de %1 a %2 s"
 
@@ -5204,8 +5208,8 @@ msgid ""
 "%1 is no longer read; run reiwand-upgrade on the package folder and sign it "
 "again"
 msgstr ""
-"%1 ya no se lee; ejecuta reiwand-upgrade sobre la carpeta del paquete y vuelve "
-"a firmarlo"
+"%1 ya no se lee; ejecuta reiwand-upgrade sobre la carpeta del paquete y "
+"vuelve a firmarlo"
 
 #: crates/reiwand-format/src/media.rs
 msgid "%1 must be a %2 image of at most %3 pixels a side"

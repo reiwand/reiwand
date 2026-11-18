@@ -159,7 +159,7 @@ ColumnLayout {
     RowLayout {
         Repeater {
             model: [["duration", App.tr("Stop after a while"), lane.length > 0, {
-                        "duration": 5
+                        "duration": App.fill("Action.timeline.duration")
                     }], ["periodic", App.tr("Emit in bursts and pauses"), lane.on !== null, {
                         "periodic": {
                             "on": [1, 1],

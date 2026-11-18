@@ -49,7 +49,7 @@ GridLayout {
         from: 0
         to: 1
         stepSize: 0.01
-        value: source.emitter.threshold ?? 0.5
+        value: source.emitter.threshold ?? App.fill("Source.threshold")
         onMoved: source.set({
             "threshold": Math.round(value * 100) / 100
         })

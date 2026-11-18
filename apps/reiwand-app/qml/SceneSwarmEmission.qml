@@ -36,7 +36,7 @@ ColumnLayout {
 
     RowLayout {
         QQC2.Label {
-            text: emission.driven ? App.tr("Rate follows keyframes or a link") : App.tr("%1 a second", Math.round((emission.emitter.rate ?? 0) * 10) / 10)
+            text: emission.driven ? App.tr("Rate follows keyframes or a link") : App.tr("%1 a second", Math.round((emission.emitter.rate ?? App.fill("Emitter.rate")) * 10) / 10)
         }
 
         SceneSlider {
@@ -102,14 +102,14 @@ ColumnLayout {
 
     RowLayout {
         QQC2.Label {
-            text: App.tr("Speed taken from the emitter %1", Math.round((emission.emitter.inherit ?? 0) * 100) / 100)
+            text: App.tr("Speed taken from the emitter %1", Math.round((emission.emitter.inherit ?? App.fill("Emitter.inherit")) * 100) / 100)
         }
 
         SceneSlider {
             Layout.fillWidth: true
             from: 0
             to: 1
-            value: emission.emitter.inherit ?? 0
+            value: emission.emitter.inherit ?? App.fill("Emitter.inherit")
             onMoved: emission.put({
                     "inherit": Math.round(value * 100) / 100
                 }, true)

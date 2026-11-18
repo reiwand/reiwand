@@ -72,7 +72,7 @@ QQC2.Menu {
         onTriggered: root.timeline.page.run("timeline", {
             "id": root.fresh(),
             "add": true,
-            "duration": 5,
+            "duration": App.fill("Action.timeline.duration"),
             "loop": "repeat"
         })
     }

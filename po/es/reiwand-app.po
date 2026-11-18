@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Reiwand\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 00:00+0000\n"
+"POT-Creation-Date: 2026-11-18 00:00+0000\n"
 "PO-Revision-Date: 2026-10-22 00:00+0000\n"
 "Last-Translator: Reiwand contributors\n"
 "Language-Team: Reiwand contributors\n"
@@ -36,9 +36,133 @@ msgid "Not linked to a repository"
 msgstr "Sin repositorio vinculado"
 
 #: apps/reiwand-app/qml/AccountCheck.qml apps/reiwand-app/qml/AccountRow.qml
-#: apps/reiwand-app/qml/RepoAddAnswer.qml
+#: apps/reiwand-app/qml/RepoAddAnswer.qml apps/reiwand-app/qml/SignInAgain.qml
 msgid "Open in the browser"
 msgstr "Abrir en el navegador"
+
+#: apps/reiwand-app/qml/AccountCheck.qml apps/reiwand-app/qml/AccountRow.qml
+#: apps/reiwand-app/qml/CarryResult.qml apps/reiwand-app/qml/SignInAgain.qml
+#: apps/reiwand-app/qml/facade/CarryWords.qml
+msgid "Sign in again"
+msgstr "Iniciar sesión otra vez"
+
+#: apps/reiwand-app/qml/AccountKeys.qml apps/reiwand-app/qml/PublishSign.qml
+#: apps/reiwand-app/qml/RepoKeys.qml apps/reiwand-app/qml/SceneKeys.qml
+msgid "Author keys"
+msgstr "Claves de autor"
+
+#: apps/reiwand-app/qml/AccountKeys.qml
+msgid ""
+"The public keys with which you sign the packages you upload. Create a pair "
+"in the build dialog of the editor; only the public key goes here."
+msgstr ""
+"Las claves públicas con las que firmas los paquetes que subes. Crea el par "
+"en el diálogo de compilación del editor; aquí solo va la clave pública."
+
+#: apps/reiwand-app/qml/AccountKeys.qml
+msgid "Registered"
+msgstr "Registrada"
+
+#: apps/reiwand-app/qml/AccountKeys.qml
+msgid "Hand over…"
+msgstr "Traspasar…"
+
+#: apps/reiwand-app/qml/AccountKeys.qml apps/reiwand-app/qml/AccountRow.qml
+#: apps/reiwand-app/qml/EditOps.qml apps/reiwand-app/qml/LibraryCard.qml
+#: apps/reiwand-app/qml/LibraryMore.qml apps/reiwand-app/qml/ListaFondos.qml
+#: apps/reiwand-app/qml/PackageInspector.qml
+#: apps/reiwand-app/qml/PackageNetwork.qml
+#: apps/reiwand-app/qml/PackagePresets.qml
+#: apps/reiwand-app/qml/PackageRequires.qml
+#: apps/reiwand-app/qml/RepoDetails.qml apps/reiwand-app/qml/SceneAssetRow.qml
+#: apps/reiwand-app/qml/SceneBoneRow.qml apps/reiwand-app/qml/SceneBroken.qml
+#: apps/reiwand-app/qml/SceneClipEventMark.qml
+#: apps/reiwand-app/qml/SceneEffectsList.qml
+#: apps/reiwand-app/qml/SceneEmitterList.qml
+#: apps/reiwand-app/qml/SceneFontPicker.qml
+#: apps/reiwand-app/qml/SceneInputHead.qml
+#: apps/reiwand-app/qml/SceneInspector.qml
+#: apps/reiwand-app/qml/SceneLayerMenu.qml
+#: apps/reiwand-app/qml/SceneLayerTools.qml
+#: apps/reiwand-app/qml/SceneMenuCheck.qml
+#: apps/reiwand-app/qml/SceneModelColliders.qml
+#: apps/reiwand-app/qml/SceneModelReach.qml
+#: apps/reiwand-app/qml/SceneModelSwing.qml apps/reiwand-app/qml/ScenePairs.qml
+#: apps/reiwand-app/qml/ScenePools.qml apps/reiwand-app/qml/SceneProperties.qml
+#: apps/reiwand-app/qml/SceneRigIk.qml apps/reiwand-app/qml/SceneRigPhysics.qml
+#: apps/reiwand-app/qml/SceneRigRow.qml apps/reiwand-app/qml/SceneRigRules.qml
+#: apps/reiwand-app/qml/SceneScriptParam.qml
+#: apps/reiwand-app/qml/SceneScriptRow.qml
+#: apps/reiwand-app/qml/SceneSettingMenu.qml
+#: apps/reiwand-app/qml/SceneShapes.qml
+#: apps/reiwand-app/qml/SceneSwarmOverLife.qml
+#: apps/reiwand-app/qml/SceneSwarmPoints.qml
+#: apps/reiwand-app/qml/SceneTemplateTree.qml
+#: apps/reiwand-app/qml/SceneTimelineEvents.qml
+#: apps/reiwand-app/qml/SelectionDialogs.qml
+#: apps/reiwand-app/qml/SettingsFolders.qml
+#: apps/reiwand-app/qml/SourceDetail.qml apps/reiwand-app/qml/Sublista.qml
+msgid "Remove"
+msgstr "Quitar"
+
+#: apps/reiwand-app/qml/AccountKeys.qml
+msgid "Register a key from a file…"
+msgstr "Registrar una clave desde un archivo…"
+
+#: apps/reiwand-app/qml/AccountKeys.qml
+msgid "Hand over to a new key"
+msgstr "Traspasar a una clave nueva"
+
+#: apps/reiwand-app/qml/AccountKeys.qml
+msgid ""
+"Sign the hand-over with the old key in Manage keys… of the step “Sign it” "
+"when you publish, and paste the signature here."
+msgstr ""
+"Firma el traspaso con la clave antigua en Administrar claves… del paso "
+"«Fírmalo» al publicar y pega aquí la firma."
+
+#: apps/reiwand-app/qml/AccountKeys.qml apps/reiwand-app/qml/AhoraTarea.qml
+#: apps/reiwand-app/qml/BrowseOwn.qml apps/reiwand-app/qml/CarryExport.qml
+#: apps/reiwand-app/qml/CarryImport.qml apps/reiwand-app/qml/DepthDialog.qml
+#: apps/reiwand-app/qml/EditDepth.qml apps/reiwand-app/qml/EditDepthCompare.qml
+#: apps/reiwand-app/qml/EditLayersProgress.qml
+#: apps/reiwand-app/qml/EditParallax.qml apps/reiwand-app/qml/Installer.qml
+#: apps/reiwand-app/qml/ItemPresets.qml apps/reiwand-app/qml/LibraryAdd.qml
+#: apps/reiwand-app/qml/PackageAbout.qml apps/reiwand-app/qml/PresetDialog.qml
+#: apps/reiwand-app/qml/PresetMaker.qml apps/reiwand-app/qml/RepoCharter.qml
+#: apps/reiwand-app/qml/RepoPublish.qml apps/reiwand-app/qml/RepoRevoke.qml
+#: apps/reiwand-app/qml/RepoStatic.qml apps/reiwand-app/qml/RotateDialogs.qml
+#: apps/reiwand-app/qml/SceneBroken.qml apps/reiwand-app/qml/SceneWhere.qml
+#: apps/reiwand-app/qml/SecretFiler.qml
+#: apps/reiwand-app/qml/SelectionDialogs.qml
+#: apps/reiwand-app/qml/SettingsFolders.qml
+#: apps/reiwand-app/qml/SettingsLayoutName.qml
+#: apps/reiwand-app/qml/SettingsLayoutSave.qml
+#: apps/reiwand-app/qml/SettingsLayouts.qml apps/reiwand-app/qml/SourceAdd.qml
+#: apps/reiwand-app/qml/SourceDetail.qml
+#: apps/reiwand-app/qml/SourceKeyPanel.qml
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: apps/reiwand-app/qml/AccountKeys.qml apps/reiwand-app/qml/PackageAbout.qml
+#: apps/reiwand-app/qml/PresetDialog.qml apps/reiwand-app/qml/RepoCharter.qml
+#: apps/reiwand-app/qml/RepoPublish.qml apps/reiwand-app/qml/RepoRevoke.qml
+#: apps/reiwand-app/qml/RepoStatic.qml
+msgid "OK"
+msgstr "Aceptar"
+
+#: apps/reiwand-app/qml/AccountKeys.qml apps/reiwand-app/qml/SceneHandover.qml
+msgid "New public key:"
+msgstr "Clave pública nueva:"
+
+#: apps/reiwand-app/qml/AccountKeys.qml apps/reiwand-app/qml/SceneHandover.qml
+msgid "Signature:"
+msgstr "Firma:"
+
+#: apps/reiwand-app/qml/AccountKeys.qml apps/reiwand-app/qml/PublishVerify.qml
+#: apps/reiwand-app/qml/RepoKeyList.qml apps/reiwand-app/qml/SceneHandover.qml
+msgid "Public keys"
+msgstr "Claves públicas"
 
 #: apps/reiwand-app/qml/AccountPage.qml
 #: apps/reiwand-app/qml/SceneBonePose3d.qml
@@ -94,10 +218,9 @@ msgstr ""
 "favoritos a otro equipo, expórtalos a un archivo en Ajustes e impórtalos "
 "allí."
 
-#: apps/reiwand-app/qml/AccountRow.qml apps/reiwand-app/qml/CarryResult.qml
-#: apps/reiwand-app/qml/facade/CarryWords.qml
-msgid "Sign in again"
-msgstr "Iniciar sesión otra vez"
+#: apps/reiwand-app/qml/AccountRepo.qml
+msgid "Repository · %1"
+msgstr "Repositorio · %1"
 
 #: apps/reiwand-app/qml/AccountRow.qml
 msgid "Signed in"
@@ -119,7 +242,7 @@ msgstr "Se usa para · %1"
 msgid "Used for · no repository yet"
 msgstr "Se usa para · ningún repositorio todavía"
 
-#: apps/reiwand-app/qml/AccountRow.qml
+#: apps/reiwand-app/qml/AccountRow.qml apps/reiwand-app/qml/SignInAgain.qml
 msgid "Open %1 and enter the code %2"
 msgstr "Abre %1 y escribe el código %2"
 
@@ -143,43 +266,43 @@ msgstr ""
 "Se borra su acceso guardado y sus repositorios dejan de usarla. Los fondos "
 "que instalaste se quedan."
 
-#: apps/reiwand-app/qml/AccountRow.qml apps/reiwand-app/qml/EditOps.qml
-#: apps/reiwand-app/qml/LibraryCard.qml apps/reiwand-app/qml/LibraryMore.qml
-#: apps/reiwand-app/qml/ListaFondos.qml
-#: apps/reiwand-app/qml/PackageInspector.qml
-#: apps/reiwand-app/qml/PackageNetwork.qml
-#: apps/reiwand-app/qml/PackagePresets.qml
-#: apps/reiwand-app/qml/PackageRequires.qml
-#: apps/reiwand-app/qml/RepoDetails.qml apps/reiwand-app/qml/SceneAssetRow.qml
-#: apps/reiwand-app/qml/SceneBoneRow.qml apps/reiwand-app/qml/SceneBroken.qml
-#: apps/reiwand-app/qml/SceneClipEventMark.qml
-#: apps/reiwand-app/qml/SceneEffectsList.qml
-#: apps/reiwand-app/qml/SceneEmitterList.qml
-#: apps/reiwand-app/qml/SceneFontPicker.qml
-#: apps/reiwand-app/qml/SceneInputHead.qml
-#: apps/reiwand-app/qml/SceneInspector.qml
-#: apps/reiwand-app/qml/SceneLayerMenu.qml
-#: apps/reiwand-app/qml/SceneLayerTools.qml
-#: apps/reiwand-app/qml/SceneMenuCheck.qml
-#: apps/reiwand-app/qml/SceneModelColliders.qml
-#: apps/reiwand-app/qml/SceneModelReach.qml
-#: apps/reiwand-app/qml/SceneModelSwing.qml apps/reiwand-app/qml/ScenePairs.qml
-#: apps/reiwand-app/qml/ScenePools.qml apps/reiwand-app/qml/SceneProperties.qml
-#: apps/reiwand-app/qml/SceneRigIk.qml apps/reiwand-app/qml/SceneRigPhysics.qml
-#: apps/reiwand-app/qml/SceneRigRow.qml apps/reiwand-app/qml/SceneRigRules.qml
-#: apps/reiwand-app/qml/SceneScriptParam.qml
-#: apps/reiwand-app/qml/SceneScriptRow.qml
-#: apps/reiwand-app/qml/SceneSettingMenu.qml
-#: apps/reiwand-app/qml/SceneShapes.qml
-#: apps/reiwand-app/qml/SceneSwarmOverLife.qml
-#: apps/reiwand-app/qml/SceneSwarmPoints.qml
-#: apps/reiwand-app/qml/SceneTemplateTree.qml
-#: apps/reiwand-app/qml/SceneTimelineEvents.qml
-#: apps/reiwand-app/qml/SelectionDialogs.qml
-#: apps/reiwand-app/qml/SettingsFolders.qml
-#: apps/reiwand-app/qml/SourceDetail.qml apps/reiwand-app/qml/Sublista.qml
-msgid "Remove"
-msgstr "Quitar"
+#: apps/reiwand-app/qml/AccountUploads.qml
+msgid "My uploads"
+msgstr "Mis subidas"
+
+#: apps/reiwand-app/qml/AccountUploads.qml
+msgid "Nothing uploaded to this repository yet"
+msgstr "Aún no has subido nada a este repositorio"
+
+#: apps/reiwand-app/qml/AccountUploads.qml
+#: apps/reiwand-app/qml/SceneSwarmCollider.qml
+msgid "%1 %2"
+msgstr "%1 %2"
+
+#: apps/reiwand-app/qml/AccountUploads.qml
+#: apps/reiwand-app/qml/PublishServer.qml
+msgid "Public"
+msgstr "Público"
+
+#: apps/reiwand-app/qml/AccountUploads.qml
+msgid "Unlisted"
+msgstr "Oculto"
+
+#: apps/reiwand-app/qml/AccountUploads.qml
+msgid ""
+"Unlisted versions stay out of the catalog and search; whoever has their link "
+"can still install them."
+msgstr ""
+"Las versiones ocultas quedan fuera del catálogo y de la búsqueda; quien "
+"tenga su enlace aún puede instalarlas."
+
+#: apps/reiwand-app/qml/AccountUploads.qml
+msgid "Upload not finished"
+msgstr "Subida sin terminar"
+
+#: apps/reiwand-app/qml/AccountUploads.qml
+msgid "Cancel it"
+msgstr "Cancelarla"
 
 #: apps/reiwand-app/qml/Actions.qml
 msgid "The rotation of “%1” stopped because you set “%2”."
@@ -206,15 +329,13 @@ msgstr "Aún sin fondo puesto"
 msgid "You have no wallpapers yet"
 msgstr "Aún no tienes fondos"
 
-#: apps/reiwand-app/qml/Ahora.qml apps/reiwand-app/qml/PreviewCheck.qml
-#: apps/reiwand-app/qml/PreviewText.qml apps/reiwand-app/qml/PublishPicture.qml
+#: apps/reiwand-app/qml/Ahora.qml apps/reiwand-app/qml/PublishPicture.qml
 #: apps/reiwand-app/qml/facade/LabelWords.qml
 #: apps/reiwand-app/qml/facade/SceneNames.qml apps/reiwand-app/src/covers.rs
 msgid "Scene"
 msgstr "Escena"
 
-#: apps/reiwand-app/qml/Ahora.qml apps/reiwand-app/qml/PreviewText.qml
-#: apps/reiwand-app/qml/SceneEmpty.qml
+#: apps/reiwand-app/qml/Ahora.qml apps/reiwand-app/qml/SceneEmpty.qml
 #: apps/reiwand-app/qml/facade/LabelWords.qml
 #: apps/reiwand-app/qml/facade/SceneTerms.qml
 #: apps/reiwand-app/qml/facade/SceneValues.qml apps/reiwand-app/src/covers.rs
@@ -223,7 +344,7 @@ msgstr "Imagen"
 
 #: apps/reiwand-app/qml/Ahora.qml apps/reiwand-app/qml/CreateStarters.qml
 #: apps/reiwand-app/qml/PackageSections.qml
-#: apps/reiwand-app/qml/PreviewText.qml apps/reiwand-app/qml/SceneFilmTrim.qml
+#: apps/reiwand-app/qml/SceneFilmTrim.qml
 #: apps/reiwand-app/qml/facade/LabelWords.qml
 #: apps/reiwand-app/qml/facade/SceneLabels.qml
 #: apps/reiwand-app/qml/facade/SceneValues.qml apps/reiwand-app/src/covers.rs
@@ -286,12 +407,10 @@ msgid "The list that rotates"
 msgstr "La lista que rota"
 
 #: apps/reiwand-app/qml/AhoraLista.qml apps/reiwand-app/qml/OutputControls.qml
-#: apps/reiwand-app/qml/Preview.qml
 msgid "Previous"
 msgstr "Anterior"
 
 #: apps/reiwand-app/qml/AhoraLista.qml apps/reiwand-app/qml/OutputControls.qml
-#: apps/reiwand-app/qml/Preview.qml
 msgid "Next"
 msgstr "Siguiente"
 
@@ -363,36 +482,13 @@ msgstr "%1: %2 de %3"
 #: apps/reiwand-app/qml/BrowseOwn.qml apps/reiwand-app/qml/CarryImport.qml
 #: apps/reiwand-app/qml/CreateCopy.qml apps/reiwand-app/qml/Frame.qml
 #: apps/reiwand-app/qml/ItemCopy.qml apps/reiwand-app/qml/PageLights.qml
-#: apps/reiwand-app/qml/Preview.qml apps/reiwand-app/qml/Publish.qml
+#: apps/reiwand-app/qml/PreviewHints.qml apps/reiwand-app/qml/Publish.qml
 #: apps/reiwand-app/qml/PublishDone.qml apps/reiwand-app/qml/RepoAddLink.qml
 #: apps/reiwand-app/qml/RepoKeys.qml apps/reiwand-app/qml/RepoRoot.qml
 #: apps/reiwand-app/qml/SelectionDialogs.qml
 #: apps/reiwand-app/qml/SettingsLayoutRules.qml
 msgid "Close"
 msgstr "Cerrar"
-
-#: apps/reiwand-app/qml/AhoraTarea.qml apps/reiwand-app/qml/BrowseOwn.qml
-#: apps/reiwand-app/qml/CarryExport.qml apps/reiwand-app/qml/CarryImport.qml
-#: apps/reiwand-app/qml/DepthDialog.qml apps/reiwand-app/qml/EditDepth.qml
-#: apps/reiwand-app/qml/EditDepthCompare.qml
-#: apps/reiwand-app/qml/EditLayersProgress.qml
-#: apps/reiwand-app/qml/EditParallax.qml apps/reiwand-app/qml/Installer.qml
-#: apps/reiwand-app/qml/ItemPresets.qml apps/reiwand-app/qml/LibraryAdd.qml
-#: apps/reiwand-app/qml/PackageAbout.qml apps/reiwand-app/qml/PresetDialog.qml
-#: apps/reiwand-app/qml/PresetMaker.qml apps/reiwand-app/qml/Preview.qml
-#: apps/reiwand-app/qml/RepoCharter.qml apps/reiwand-app/qml/RepoPublish.qml
-#: apps/reiwand-app/qml/RepoRevoke.qml apps/reiwand-app/qml/RepoStatic.qml
-#: apps/reiwand-app/qml/RotateDialogs.qml apps/reiwand-app/qml/SceneBroken.qml
-#: apps/reiwand-app/qml/SceneWhere.qml apps/reiwand-app/qml/SecretFiler.qml
-#: apps/reiwand-app/qml/SelectionDialogs.qml
-#: apps/reiwand-app/qml/SettingsFolders.qml
-#: apps/reiwand-app/qml/SettingsLayoutName.qml
-#: apps/reiwand-app/qml/SettingsLayoutSave.qml
-#: apps/reiwand-app/qml/SettingsLayouts.qml apps/reiwand-app/qml/SourceAdd.qml
-#: apps/reiwand-app/qml/SourceDetail.qml
-#: apps/reiwand-app/qml/SourceKeyPanel.qml
-msgid "Cancel"
-msgstr "Cancelar"
 
 #: apps/reiwand-app/qml/AlignPad.qml apps/reiwand-app/qml/SceneSwarmSteer.qml
 #: apps/reiwand-app/qml/facade/SceneWords.qml
@@ -579,6 +675,7 @@ msgid "Installing “%1”…"
 msgstr "Instalando «%1»…"
 
 #: apps/reiwand-app/qml/BrowseRow.qml apps/reiwand-app/qml/LibraryBar.qml
+#: apps/reiwand-app/qml/Preview.qml apps/reiwand-app/qml/PreviewCheck.qml
 msgid "%1 of %2"
 msgstr "%1 de %2"
 
@@ -611,6 +708,7 @@ msgstr "Instalar"
 #: apps/reiwand-app/qml/Hints.qml apps/reiwand-app/qml/KeyCap.qml
 #: apps/reiwand-app/qml/LibraryCard.qml apps/reiwand-app/qml/LibraryKeys.qml
 #: apps/reiwand-app/qml/LibraryPanel.qml apps/reiwand-app/qml/ListasEstante.qml
+#: apps/reiwand-app/qml/PreviewHints.qml apps/reiwand-app/qml/PreviewKey.qml
 #: apps/reiwand-app/qml/ShellCheck.qml
 msgctxt "key"
 msgid "Enter"
@@ -669,7 +767,7 @@ msgid "Download again"
 msgstr "Descargar otra vez"
 
 #: apps/reiwand-app/qml/BrowseTrouble.qml apps/reiwand-app/qml/OutputRow.qml
-#: apps/reiwand-app/qml/Preview.qml apps/reiwand-app/qml/PreviewText.qml
+#: apps/reiwand-app/qml/PreviewHints.qml apps/reiwand-app/qml/PreviewPanel.qml
 #: apps/reiwand-app/qml/PublishFault.qml apps/reiwand-app/qml/SourceCard.qml
 #: apps/reiwand-app/qml/SourceList.qml
 msgid "Try again"
@@ -1842,6 +1940,7 @@ msgstr "Mostrar el mapa de profundidad sobre la imagen"
 #: apps/reiwand-app/qml/EditDepthView.qml apps/reiwand-app/qml/EditEffects.qml
 #: apps/reiwand-app/qml/SceneSwarmInstance.qml
 #: apps/reiwand-app/qml/SceneSwarmLook.qml
+#: apps/reiwand-app/qml/SceneSwarmWaves.qml
 #: apps/reiwand-app/qml/facade/SceneTerms.qml
 msgid "Opacity"
 msgstr "Opacidad"
@@ -2754,6 +2853,14 @@ msgstr "Añadir una fuente"
 msgid "Pictures that renew themselves, like a picture of the day."
 msgstr "Fotos que se renuevan solas, como una foto del día."
 
+#: apps/reiwand-app/qml/FirstStart.qml apps/reiwand-app/qml/LibraryImport.qml
+msgid "Import wallpaper…"
+msgstr "Importar fondo…"
+
+#: apps/reiwand-app/qml/FirstStart.qml
+msgid "Wallpaper packages you downloaded, as .wpak files."
+msgstr "Paquetes de fondo que descargaste, como archivos .wpak."
+
 #: apps/reiwand-app/qml/FirstStart.qml
 msgid "Add a folder"
 msgstr "Añadir una carpeta"
@@ -3124,6 +3231,14 @@ msgid "signed by %1"
 msgstr "firmado por %1"
 
 #: apps/reiwand-app/qml/ItemFacts.qml
+msgid "Source:"
+msgstr "Origen:"
+
+#: apps/reiwand-app/qml/ItemFacts.qml
+msgid "Local · Unverified signature"
+msgstr "Local · Sin firma verificada"
+
+#: apps/reiwand-app/qml/ItemFacts.qml
 msgid "Revoked:"
 msgstr "Revocado:"
 
@@ -3464,6 +3579,14 @@ msgstr ""
 "con menos fotogramas por segundo y más gasto de batería."
 
 #: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "A newer version of this wallpaper is already in your library."
+msgstr "Ya tienes una versión más nueva de este fondo en tu biblioteca."
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "Use the older one"
+msgstr "Usar la más antigua"
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
 msgid "The files could not be added: %1"
 msgstr "No se pudieron añadir los archivos: %1"
 
@@ -3542,6 +3665,14 @@ msgstr "Una ruta por línea"
 msgid "Paths to import"
 msgstr "Rutas que importar"
 
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "Import wallpaper"
+msgstr "Importar fondo"
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "Wallpaper packages (*.wpak)"
+msgstr "Paquetes de fondo (*.wpak)"
+
 #: apps/reiwand-app/qml/LibraryBar.qml
 msgid "Scenes"
 msgstr "Escenas"
@@ -3563,6 +3694,11 @@ msgstr "De fuentes"
 #: apps/reiwand-app/qml/facade/CarryWords.qml
 msgid "Favorites"
 msgstr "Favoritos"
+
+#: apps/reiwand-app/qml/LibraryBar.qml
+#: apps/reiwand-app/qml/facade/SceneValues.qml
+msgid "Local"
+msgstr "Local"
 
 #: apps/reiwand-app/qml/LibraryBar.qml
 msgid "Packages"
@@ -3707,7 +3843,7 @@ msgstr "Permitir estos fondos…"
 msgid "Remove…"
 msgstr "Quitar…"
 
-#: apps/reiwand-app/qml/LibraryCovers.qml
+#: apps/reiwand-app/qml/LibraryCovers.qml apps/reiwand-app/qml/Preview.qml
 #: apps/reiwand-app/qml/SettingsWallpapers.qml
 msgid "Your library"
 msgstr "Tu biblioteca"
@@ -3818,7 +3954,8 @@ msgstr "Prueba otra palabra, o busca en todos los tipos de fondo."
 msgid "Clear the filters"
 msgstr "Quitar los filtros"
 
-#: apps/reiwand-app/qml/LibraryState.qml apps/reiwand-app/src/app.rs
+#: apps/reiwand-app/qml/LibraryState.qml apps/reiwand-app/qml/PreviewPanel.qml
+#: apps/reiwand-app/src/app.rs
 msgid "The wallpaper service does not answer"
 msgstr "El servicio de fondos no responde"
 
@@ -3914,7 +4051,8 @@ msgstr ""
 msgid "Which screen"
 msgstr "Pantalla"
 
-#: apps/reiwand-app/qml/ListaEditor.qml apps/reiwand-app/qml/SettingsPage.qml
+#: apps/reiwand-app/qml/ListaEditor.qml apps/reiwand-app/qml/PreviewReel.qml
+#: apps/reiwand-app/qml/SettingsPage.qml
 msgid "Wallpapers"
 msgstr "Fondos"
 
@@ -4435,12 +4573,6 @@ msgstr ""
 "Los fondos que destellan o muestran patrones rápidos pueden provocar crisis "
 "a personas con epilepsia fotosensible. Permítelos solo si es seguro para "
 "quien vea tus pantallas; después cualquier pantalla o lista podrá mostrarlos."
-
-#: apps/reiwand-app/qml/PackageAbout.qml apps/reiwand-app/qml/PresetDialog.qml
-#: apps/reiwand-app/qml/RepoCharter.qml apps/reiwand-app/qml/RepoPublish.qml
-#: apps/reiwand-app/qml/RepoRevoke.qml apps/reiwand-app/qml/RepoStatic.qml
-msgid "OK"
-msgstr "Aceptar"
 
 #: apps/reiwand-app/qml/PackageAbout.qml
 msgid "Open this address in the browser?"
@@ -5573,138 +5705,48 @@ msgid ""
 "Pictures and videos (*.png *.jpg *.jpeg *.webp *.gif *.webm *.mp4 *.mkv)"
 msgstr "Imágenes y vídeos (*.png *.jpg *.jpeg *.webp *.gif *.webm *.mp4 *.mkv)"
 
-#: apps/reiwand-app/qml/Preview.qml apps/reiwand-app/qml/PreviewText.qml
-msgid "Open the library"
-msgstr "Abrir la biblioteca"
-
 #: apps/reiwand-app/qml/Preview.qml
-msgid "Change screen"
-msgstr "Cambiar de pantalla"
-
-#: apps/reiwand-app/qml/Preview.qml
-msgid "Apply"
-msgstr "Aplicar"
-
-#: apps/reiwand-app/qml/Preview.qml
-msgid "The wallpaper service does not answer."
-msgstr "El servicio de fondos no responde."
+msgid "Change wallpaper · %1"
+msgstr "Cambiar de fondo · %1"
 
 #: apps/reiwand-app/qml/Preview.qml
 msgid "Change wallpaper"
 msgstr "Cambiar de fondo"
 
-#: apps/reiwand-app/qml/PreviewCheck.qml apps/reiwand-app/qml/PreviewText.qml
-msgid "Still picture of the scene: it moves once applied"
-msgstr "Imagen quieta de la escena: se mueve al aplicarla"
+#: apps/reiwand-app/qml/Preview.qml
+msgid "List «%1»"
+msgstr "Lista «%1»"
 
-#: apps/reiwand-app/qml/PreviewStrip.qml
-msgid "List «%1» · %2 of %3"
-msgstr "Lista «%1» · %2 de %3"
+#: apps/reiwand-app/qml/Preview.qml
+msgid "The wallpaper service does not answer."
+msgstr "El servicio de fondos no responde."
 
-#: apps/reiwand-app/qml/PreviewStrip.qml
-msgid "Your library · %1 of %2"
-msgstr "Tu biblioteca · %1 de %2"
+#: apps/reiwand-app/qml/PreviewCard.qml
+#: apps/reiwand-app/qml/SettingsLayouts.qml
+#: apps/reiwand-app/qml/SettingsTabsCheck.qml apps/reiwand-app/qml/Uso.qml
+msgid "In use"
+msgstr "En uso"
 
-#: apps/reiwand-app/qml/PreviewStrip.qml
-msgid "%1 · now"
-msgstr "%1 · ahora"
+#: apps/reiwand-app/qml/PreviewCheck.qml apps/reiwand-app/qml/PreviewHints.qml
+#: apps/reiwand-app/qml/PreviewPanel.qml
+msgid "Open the library"
+msgstr "Abrir la biblioteca"
 
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "Still picture of the video: it moves once applied"
-msgstr "Imagen quieta del vídeo: se mueve al aplicarlo"
+#: apps/reiwand-app/qml/PreviewHints.qml
+msgid "Move, or use the wheel"
+msgstr "Mover o usar la rueda"
 
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "chosen for this change"
-msgstr "elegido para este cambio"
+#: apps/reiwand-app/qml/PreviewHints.qml
+msgid "Apply"
+msgstr "Aplicar"
 
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "the setting of this screen"
-msgstr "el ajuste de esta pantalla"
+#: apps/reiwand-app/qml/PreviewPanel.qml
+msgid "This screen has only one wallpaper"
+msgstr "Esta pantalla tiene un solo fondo"
 
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "your general setting"
-msgstr "tu ajuste general"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "simple fade · your system asks for less motion"
-msgstr "fundido simple · tu sistema pide menos movimiento"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "simple fade · you asked for less motion"
-msgstr "fundido simple · pediste menos movimiento"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "no transition, %1"
-msgstr "sin transición, %1"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "its author's transition, or a fade if it has none"
-msgstr "la transición de su autor, o un fundido si no trae una"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "fade · %1 s, %2"
-msgstr "fundido · %1 s, %2"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid ""
-"Your library has no wallpapers yet. Add some and the shortcut %1 goes "
-"through them one by one, with their preview."
-msgstr ""
-"Tu biblioteca todavía no tiene fondos. Añade algunos y el atajo %1 los "
-"recorre uno a uno, con su vista previa."
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid ""
-"The list «%1» has only «%2», which is already set. Add more wallpapers to it "
-"and the shortcut %3 goes through them one by one, with their preview."
-msgstr ""
-"La lista «%1» tiene solo «%2», que ya está puesto. Añádele más fondos y el "
-"atajo %3 los recorre uno a uno, con su vista previa."
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid ""
-"Your library has only «%1», which is already set. Add more wallpapers and "
-"the shortcut %2 goes through them one by one, with their preview."
-msgstr ""
-"Tu biblioteca tiene solo «%1», que ya está puesto. Añade más fondos y el "
-"atajo %2 los recorre uno a uno, con su vista previa."
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "%1 · My files"
-msgstr "%1 · Mis archivos"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "This is how it comes in: %1"
-msgstr "Así entra: %1"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "Once applied: %1"
-msgstr "Al aplicar: %1"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "There is no other wallpaper to change to"
-msgstr "No hay otro fondo al que cambiar"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid "The preview could not open"
-msgstr "No se pudo abrir la vista previa"
-
-#: apps/reiwand-app/qml/PreviewText.qml
-msgid ""
-"The wallpaper service does not answer. What you have set stays as it is."
-msgstr "El servicio de fondos no responde. Lo que tienes puesto sigue igual."
-
-#: apps/reiwand-app/qml/PreviewTop.qml
-msgid "Now on your desktop: %1"
-msgstr "Ahora en tu escritorio: %1"
-
-#: apps/reiwand-app/qml/PreviewTop.qml
-msgid "Changes: every screen"
-msgstr "Cambia: todas las pantallas"
-
-#: apps/reiwand-app/qml/PreviewTop.qml
-msgid "Changes: %1"
-msgstr "Cambia: %1"
+#: apps/reiwand-app/qml/PreviewPanel.qml
+msgid "Add more wallpapers to the library to switch between them."
+msgstr "Añade más fondos a la biblioteca para poder cambiar entre ellos."
 
 #: apps/reiwand-app/qml/PrivacyNotice.qml
 msgid "your time zone"
@@ -6157,10 +6199,6 @@ msgid "None of your repositories takes uploads yet."
 msgstr "Ninguno de tus repositorios acepta subidas todavía."
 
 #: apps/reiwand-app/qml/PublishServer.qml
-msgid "Public"
-msgstr "Público"
-
-#: apps/reiwand-app/qml/PublishServer.qml
 msgid "in the catalog and its search"
 msgstr "en el catálogo y su búsqueda"
 
@@ -6234,11 +6272,6 @@ msgstr "Se firma con tu clave <b>%1</b>"
 #: apps/reiwand-app/qml/PublishSign.qml
 msgid "Where to keep a copy of your signature"
 msgstr "Dónde guardar una copia de tu firma"
-
-#: apps/reiwand-app/qml/PublishSign.qml apps/reiwand-app/qml/RepoKeys.qml
-#: apps/reiwand-app/qml/SceneKeys.qml
-msgid "Author keys"
-msgstr "Claves de autor"
 
 #: apps/reiwand-app/qml/PublishStep.qml
 msgid "Change: %1"
@@ -6343,11 +6376,6 @@ msgstr "Firma válida, hecha por %1"
 msgid "Signature not valid: %1"
 msgstr "Firma no válida: %1"
 
-#: apps/reiwand-app/qml/PublishVerify.qml apps/reiwand-app/qml/RepoKeyList.qml
-#: apps/reiwand-app/qml/SceneHandover.qml
-msgid "Public keys"
-msgstr "Claves públicas"
-
 #: apps/reiwand-app/qml/PublishWhere.qml
 msgid "Upload to %1"
 msgstr "Subir a %1"
@@ -6431,6 +6459,18 @@ msgstr "Registrando tu firma…"
 #: apps/reiwand-app/qml/PublishWork.qml
 msgid "Publishing…"
 msgstr "Publicando…"
+
+#: apps/reiwand-app/qml/PublishWork.qml
+msgid "Sign in again at %1"
+msgstr "Inicia sesión de nuevo en %1"
+
+#: apps/reiwand-app/qml/PublishWork.qml
+msgid ""
+"The server no longer accepts your account. Sign in again to keep publishing; "
+"nothing was lost."
+msgstr ""
+"El servidor ya no acepta tu cuenta. Inicia sesión de nuevo para seguir "
+"publicando; no se perdió nada."
 
 #: apps/reiwand-app/qml/PublishWork.qml
 msgid "Version %1 already exists at %2"
@@ -7501,6 +7541,64 @@ msgstr "Imágenes, vídeos, sonidos, fuentes, tablas de color y modelos"
 msgid "Drag to move %1 along what it follows"
 msgstr "Arrastra para mover %1 a lo largo de lo que sigue"
 
+#: apps/reiwand-app/qml/SceneBandHeard.qml
+#: apps/reiwand-app/qml/facade/SceneNames.qml
+msgid "Measured as"
+msgstr "Se mide como"
+
+#: apps/reiwand-app/qml/SceneBandHeard.qml
+#: apps/reiwand-app/qml/facade/SceneNames.qml
+msgid "Relative to the music"
+msgstr "Relativo a la música"
+
+#: apps/reiwand-app/qml/SceneBandHeard.qml
+#: apps/reiwand-app/qml/SceneKeyBase.qml
+#: apps/reiwand-app/qml/facade/SceneNames.qml
+msgid "Absolute"
+msgstr "Absoluto"
+
+#: apps/reiwand-app/qml/SceneBandHeard.qml
+#: apps/reiwand-app/qml/facade/SceneNames.qml
+msgid "Surge over the usual"
+msgstr "Salto sobre lo habitual"
+
+#: apps/reiwand-app/qml/SceneBandHeard.qml
+#: apps/reiwand-app/qml/facade/SceneNames.qml
+msgid "Scale"
+msgstr "Escala"
+
+#: apps/reiwand-app/qml/SceneBandHeard.qml
+#: apps/reiwand-app/qml/facade/SceneNames.qml
+msgid "Decibels"
+msgstr "Decibelios"
+
+#: apps/reiwand-app/qml/SceneBandHeard.qml
+#: apps/reiwand-app/qml/facade/SceneWords.qml
+msgid "Amplitude"
+msgstr "Amplitud"
+
+#: apps/reiwand-app/qml/SceneBandHeard.qml
+msgid "Usual over (tenths of a second)"
+msgstr "Lo habitual en (décimas de segundo)"
+
+#: apps/reiwand-app/qml/SceneBandHeard.qml
+#: apps/reiwand-app/qml/facade/SceneNames.qml
+msgid "Usual of"
+msgstr "Lo habitual de"
+
+#: apps/reiwand-app/qml/SceneBandHeard.qml
+msgid "Its own band"
+msgstr "Su propia banda"
+
+#: apps/reiwand-app/qml/SceneBandHeard.qml
+msgid "All bands together"
+msgstr "Todas las bandas juntas"
+
+#: apps/reiwand-app/qml/SceneBandHeard.qml
+#: apps/reiwand-app/qml/facade/SceneNames.qml
+msgid "Keep the usual during silence"
+msgstr "Mantener lo habitual durante el silencio"
+
 #: apps/reiwand-app/qml/SceneBandPicker.qml
 #: apps/reiwand-app/qml/SceneBindSound.qml
 #: apps/reiwand-app/qml/SceneSwarmFields.qml
@@ -7581,42 +7679,6 @@ msgstr "Varias bandas cuentan como"
 #: apps/reiwand-app/qml/SceneBandPicker.qml
 msgid "Their average"
 msgstr "Su promedio"
-
-#: apps/reiwand-app/qml/SceneBandPicker.qml
-msgid "Measured as"
-msgstr "Se mide como"
-
-#: apps/reiwand-app/qml/SceneBandPicker.qml
-msgid "Relative to the music"
-msgstr "Relativo a la música"
-
-#: apps/reiwand-app/qml/SceneBandPicker.qml
-msgid "Surge over the usual"
-msgstr "Salto sobre lo habitual"
-
-#: apps/reiwand-app/qml/SceneBandPicker.qml
-msgid "Decibels"
-msgstr "Decibelios"
-
-#: apps/reiwand-app/qml/SceneBandPicker.qml
-msgid "Usual over (tenths of a second)"
-msgstr "Lo habitual en (décimas de segundo)"
-
-#: apps/reiwand-app/qml/SceneBandPicker.qml
-msgid "Usual of"
-msgstr "Lo habitual de"
-
-#: apps/reiwand-app/qml/SceneBandPicker.qml
-msgid "Its own band"
-msgstr "Su propia banda"
-
-#: apps/reiwand-app/qml/SceneBandPicker.qml
-msgid "All bands together"
-msgstr "Todas las bandas juntas"
-
-#: apps/reiwand-app/qml/SceneBandPicker.qml
-msgid "Keep the usual during silence"
-msgstr "Mantener lo habitual durante el silencio"
 
 #: apps/reiwand-app/qml/SceneBandPicker.qml
 msgid "The loudest"
@@ -9507,20 +9569,12 @@ msgid "Password of the old key:"
 msgstr "Contraseña de la clave vieja:"
 
 #: apps/reiwand-app/qml/SceneHandover.qml
-msgid "New public key:"
-msgstr "Clave pública nueva:"
-
-#: apps/reiwand-app/qml/SceneHandover.qml
 msgid "Author id:"
 msgstr "Id del autor:"
 
 #: apps/reiwand-app/qml/SceneHandover.qml
 msgid "Sign the hand-over"
 msgstr "Firmar el traspaso"
-
-#: apps/reiwand-app/qml/SceneHandover.qml
-msgid "Signature:"
-msgstr "Firma:"
 
 #: apps/reiwand-app/qml/SceneIkKnobs.qml
 msgid "Bends clockwise; click to bend the other way"
@@ -9582,10 +9636,6 @@ msgstr "Un número, [x, y] o un color"
 #: apps/reiwand-app/qml/SceneKeyBase.qml
 msgid "Set the base"
 msgstr "Fijar la base"
-
-#: apps/reiwand-app/qml/SceneKeyBase.qml
-msgid "Absolute"
-msgstr "Absoluto"
 
 #: apps/reiwand-app/qml/SceneKeyCurve.qml
 msgid "Curve to the next keyframe"
@@ -10194,10 +10244,6 @@ msgid "Drag to move this end of the tube"
 msgstr "Arrastra para mover este extremo del tubo"
 
 #: apps/reiwand-app/qml/SceneLightTools.qml
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "Pixels"
-msgstr "Píxeles"
-
 #: apps/reiwand-app/qml/SceneSwarmEmitter.qml
 #: apps/reiwand-app/qml/facade/SceneNames.qml
 #: apps/reiwand-app/qml/facade/SceneValues.qml
@@ -10441,6 +10487,7 @@ msgstr "Pintar el mapa %1"
 #: apps/reiwand-app/qml/SceneModelTurn.qml
 #: apps/reiwand-app/qml/SceneSwarmKin.qml
 #: apps/reiwand-app/qml/SceneSwarmStart.qml
+#: apps/reiwand-app/qml/SceneSwarmWaves.qml
 #: apps/reiwand-app/qml/facade/SceneNames.qml
 msgid "Size"
 msgstr "Tamaño"
@@ -13199,10 +13246,6 @@ msgid "Every %1 s"
 msgstr "Cada %1 s"
 
 #: apps/reiwand-app/qml/SceneSwarmCollider.qml
-msgid "%1 %2"
-msgstr "%1 %2"
-
-#: apps/reiwand-app/qml/SceneSwarmCollider.qml
 #: apps/reiwand-app/qml/facade/SceneWords.qml
 msgid "Bounce"
 msgstr "Rebote"
@@ -13282,6 +13325,14 @@ msgstr "Perspectiva"
 msgid "Focal length"
 msgstr "Distancia focal"
 
+#: apps/reiwand-app/qml/SceneSwarmDrops.qml
+msgid "Nearest drop: %1 px"
+msgstr "Gota más cercana: %1 px"
+
+#: apps/reiwand-app/qml/SceneSwarmDrops.qml
+msgid "Farthest drop: %1 px"
+msgstr "Gota más lejana: %1 px"
+
 #: apps/reiwand-app/qml/SceneSwarmEmission.qml
 msgid "Rate follows keyframes or a link"
 msgstr "El ritmo sigue claves o un enlace"
@@ -13346,6 +13397,10 @@ msgstr "Emisor %1"
 #: apps/reiwand-app/qml/SceneSwarmEmitter.qml
 msgid "Remove this emitter"
 msgstr "Quitar este emisor"
+
+#: apps/reiwand-app/qml/SceneSwarmEmitter.qml
+msgid "Ball"
+msgstr "Esfera"
 
 #: apps/reiwand-app/qml/SceneSwarmEmitter.qml
 #: apps/reiwand-app/qml/facade/SceneTerms.qml
@@ -13753,6 +13808,20 @@ msgstr "%1: %2 px"
 #: apps/reiwand-app/qml/SceneSwarmPulls.qml
 msgid "Drag to move the center of the force"
 msgstr "Arrastra para mover el centro de la fuerza"
+
+#: apps/reiwand-app/qml/SceneSwarmPulls.qml
+#: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
+#: apps/reiwand-app/qml/facade/SceneWords.qml
+msgid "Axis"
+msgstr "Eje"
+
+#: apps/reiwand-app/qml/SceneSwarmPulls.qml
+msgid ""
+"Drag to aim the axis the particles turn around: the direction sets the turn, "
+"the distance from the center sets the tilt"
+msgstr ""
+"Arrastra para orientar el eje alrededor del que giran las partículas: la "
+"dirección fija el giro y la distancia al centro, la inclinación"
 
 #: apps/reiwand-app/qml/SceneSwarmPulls.qml
 msgid "Drag to change how far the force reaches"
@@ -14189,6 +14258,51 @@ msgstr "Puntos entre los puntos guardados"
 msgid "Show the texture along the trail"
 msgstr "Mostrar la textura a lo largo de la estela"
 
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+#: apps/reiwand-app/qml/facade/SceneNames.qml
+msgid "Stretch by speed"
+msgstr "Estirar según la velocidad"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Add pixels to the side"
+msgstr "Sumar píxeles al lado"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Multiply the side"
+msgstr "Multiplicar el lado"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Trail from the speed without perspective"
+msgstr "Estela por la velocidad sin perspectiva"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Trail follows the motion on screen"
+msgstr "La estela sigue el movimiento en pantalla"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Seconds of motion"
+msgstr "Segundos de movimiento"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Shortest, in sides"
+msgstr "Mínimo, en lados"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Shortest, in pixels"
+msgstr "Mínimo, en píxeles"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Longest, in sides"
+msgstr "Máximo, en lados"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Longest, in pixels"
+msgstr "Máximo, en píxeles"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "%1 px long at %2 px/s, side %3 px"
+msgstr "%1 px de largo a %2 px/s, lado de %3 px"
+
 #: apps/reiwand-app/qml/SceneSwarmSwirl.qml
 msgid "%1°"
 msgstr "%1°"
@@ -14233,6 +14347,34 @@ msgstr "Quitar el sistema"
 msgid "Add a system without a layer"
 msgstr "Añadir un sistema sin capa"
 
+#: apps/reiwand-app/qml/SceneSwarmTilt.qml
+msgid "Turn about the horizontal line"
+msgstr "Giro sobre la línea horizontal"
+
+#: apps/reiwand-app/qml/SceneSwarmTilt.qml
+msgid "Turn about the vertical line"
+msgstr "Giro sobre la línea vertical"
+
+#: apps/reiwand-app/qml/SceneSwarmTilt.qml
+msgid "Spin about the horizontal line, per second"
+msgstr "Giro continuo sobre la línea horizontal, por segundo"
+
+#: apps/reiwand-app/qml/SceneSwarmTilt.qml
+msgid "Spin about the vertical line, per second"
+msgstr "Giro continuo sobre la línea vertical, por segundo"
+
+#: apps/reiwand-app/qml/SceneSwarmTilt.qml
+msgid "Turn sprites in depth"
+msgstr "Girar los sprites en profundidad"
+
+#: apps/reiwand-app/qml/SceneSwarmTilt.qml
+msgid "From %1"
+msgstr "Desde %1"
+
+#: apps/reiwand-app/qml/SceneSwarmTilt.qml
+msgid "To %1"
+msgstr "Hasta %1"
+
 #: apps/reiwand-app/qml/SceneSwarmTint.qml
 msgid "Starting colors"
 msgstr "Colores iniciales"
@@ -14263,9 +14405,73 @@ msgstr "Emisores"
 msgid "Add an emitter"
 msgstr "Añadir un emisor"
 
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Horizontal: both sides"
+msgstr "Horizontal: ambos lados"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Horizontal: right side"
+msgstr "Horizontal: lado derecho"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Horizontal: left side"
+msgstr "Horizontal: lado izquierdo"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Vertical: both sides"
+msgstr "Vertical: ambos lados"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Vertical: lower side"
+msgstr "Vertical: lado inferior"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Vertical: upper side"
+msgstr "Vertical: lado superior"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Depth: both sides"
+msgstr "Profundidad: ambos lados"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Depth: far side"
+msgstr "Profundidad: lado lejano"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Depth: near side"
+msgstr "Profundidad: lado cercano"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Side view of the ball"
+msgstr "Vista lateral de la esfera"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Depth radius"
+msgstr "Radio en profundidad"
+
+#: apps/reiwand-app/qml/SceneSwarmVolume.qml
+msgid "Hollow core"
+msgstr "Núcleo hueco"
+
 #: apps/reiwand-app/qml/SceneSwarmWalls.qml
 msgid "Drag to move the collider"
 msgstr "Arrastra para mover el colisionador"
+
+#: apps/reiwand-app/qml/SceneSwarmWaves.qml
+msgid "Fades and pulses"
+msgstr "Fundidos y pulsos"
+
+#: apps/reiwand-app/qml/SceneSwarmWaves.qml
+msgid "Add a pulse"
+msgstr "Añadir un pulso"
+
+#: apps/reiwand-app/qml/SceneSwarmWaves.qml
+msgid "Dive from the top"
+msgstr "Bajar desde lo alto"
+
+#: apps/reiwand-app/qml/SceneSwarmWaves.qml
+msgid "Rise from the floor"
+msgstr "Subir desde el piso"
 
 #: apps/reiwand-app/qml/SceneSwarmWindows.qml
 msgid "When in the life each force acts"
@@ -14667,7 +14873,7 @@ msgid "springy"
 msgstr "elástica"
 
 #: apps/reiwand-app/qml/SceneTransitionFoot.qml
-#: apps/reiwand-app/qml/facade/SceneValues.qml
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
 msgid "bouncing"
 msgstr "con rebote"
 
@@ -15507,11 +15713,6 @@ msgid "Only when you choose it"
 msgstr "Solo cuando la eliges"
 
 #: apps/reiwand-app/qml/SettingsLayouts.qml
-#: apps/reiwand-app/qml/SettingsTabsCheck.qml apps/reiwand-app/qml/Uso.qml
-msgid "In use"
-msgstr "En uso"
-
-#: apps/reiwand-app/qml/SettingsLayouts.qml
 #: apps/reiwand-app/qml/SettingsScreens.qml
 msgid "Save this layout…"
 msgstr "Guardar esta disposición…"
@@ -15791,11 +15992,11 @@ msgstr "Cambiar de fondo con el teclado"
 
 #: apps/reiwand-app/qml/SettingsMore.qml
 msgid ""
-"Goes to the next wallpaper of the list. To change the combination, press "
-"Enter and then the new keys."
+"Opens the wallpaper switcher on the next one. To change the combination, "
+"press Enter and then the new keys."
 msgstr ""
-"Pasa al siguiente fondo de la lista. Para cambiar la combinación, pulsa "
-"Intro y luego las teclas nuevas."
+"Abre el cambiador de fondos en el siguiente. Para cambiar la combinación, "
+"pulsa Intro y luego las teclas nuevas."
 
 #: apps/reiwand-app/qml/SettingsMore.qml
 #: apps/reiwand-app/qml/SettingsWallpapers.qml
@@ -15804,11 +16005,39 @@ msgstr "Volver al fondo anterior con el teclado"
 
 #: apps/reiwand-app/qml/SettingsMore.qml
 msgid ""
-"Goes back to the wallpaper before. To change the combination, press Enter "
-"and then the new keys."
+"Opens the wallpaper switcher on the one before. To change the combination, "
+"press Enter and then the new keys."
 msgstr ""
-"Vuelve al fondo de antes. Para cambiar la combinación, pulsa Intro y luego "
-"las teclas nuevas."
+"Abre el cambiador de fondos en el anterior. Para cambiar la combinación, "
+"pulsa Intro y luego las teclas nuevas."
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+#: apps/reiwand-app/qml/SettingsWallpapers.qml
+msgid "Apply the wallpaper of the switcher"
+msgstr "Aplicar el fondo del cambiador"
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid ""
+"Keeps the wallpaper in the middle of the switcher. Enter and a click on the "
+"middle one do the same. To change the combination, press Enter and then the "
+"new keys."
+msgstr ""
+"Se queda con el fondo del centro del cambiador. Intro y un clic en el del "
+"centro hacen lo mismo. Para cambiar la combinación, pulsa Intro y luego las "
+"teclas nuevas."
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+#: apps/reiwand-app/qml/SettingsWallpapers.qml
+msgid "Close the switcher without changing"
+msgstr "Cerrar el cambiador sin cambiar nada"
+
+#: apps/reiwand-app/qml/SettingsMore.qml
+msgid ""
+"Closes the switcher and leaves the wallpaper as it was. Esc does the same. "
+"To change the combination, press Enter and then the new keys."
+msgstr ""
+"Cierra el cambiador y deja el fondo como estaba. Esc hace lo mismo. Para "
+"cambiar la combinación, pulsa Intro y luego las teclas nuevas."
 
 #: apps/reiwand-app/qml/SettingsMore.qml
 #: apps/reiwand-app/qml/SettingsTabsCheck.qml
@@ -15818,15 +16047,15 @@ msgstr "Atajos de teclado"
 
 #: apps/reiwand-app/qml/SettingsMore.qml
 msgid ""
-"The desktop did not give the keys: bind reiwand-ctl next --preview and "
-"reiwand-ctl prev --preview to your own keys"
+"The desktop did not give the keys: bind reiwand-ctl next --preview, prev --"
+"preview, browse apply and browse cancel to your own keys"
 msgstr ""
-"El escritorio no dio los atajos: ata reiwand-ctl next --preview y reiwand-"
-"ctl prev --preview a tus propias teclas"
+"El escritorio no dio los atajos: ata reiwand-ctl next --preview, prev --"
+"preview, browse apply y browse cancel a tus propias teclas"
 
 #: apps/reiwand-app/qml/SettingsMore.qml
-msgid "The desktop is asked for these two combinations"
-msgstr "Se le piden al escritorio estas dos combinaciones"
+msgid "The desktop is asked for these four combinations"
+msgstr "Se le piden al escritorio estas cuatro combinaciones"
 
 #: apps/reiwand-app/qml/SettingsMore.qml
 msgid ""
@@ -17753,12 +17982,12 @@ msgid "Follow the system"
 msgstr "Seguir al sistema"
 
 #: apps/reiwand-app/qml/facade/LabelWords.qml
-#: apps/reiwand-app/qml/facade/SceneValues.qml
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
 msgid "the sound"
 msgstr "el sonido"
 
 #: apps/reiwand-app/qml/facade/LabelWords.qml
-#: apps/reiwand-app/qml/facade/SceneValues.qml
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
 msgid "the pointer"
 msgstr "el puntero"
 
@@ -18034,6 +18263,14 @@ msgstr "Tecla para el fondo siguiente"
 #: apps/reiwand-app/qml/facade/Labels.qml
 msgid "Key for the previous wallpaper"
 msgstr "Tecla para el fondo anterior"
+
+#: apps/reiwand-app/qml/facade/Labels.qml
+msgid "Key to apply the wallpaper of the strip"
+msgstr "Tecla para aplicar el fondo de la tira"
+
+#: apps/reiwand-app/qml/facade/Labels.qml
+msgid "Key to close the strip without changing"
+msgstr "Tecla para cerrar la tira sin cambiar nada"
 
 #: apps/reiwand-app/qml/facade/Labels.qml
 msgid "Less motion: plain fades instead of transitions"
@@ -18982,6 +19219,15 @@ msgid "Taper"
 msgstr "Afinado"
 
 #: apps/reiwand-app/qml/facade/SceneLabels.qml
+#: apps/reiwand-app/qml/facade/SceneValues.qml
+msgid "Flat"
+msgstr "Plano"
+
+#: apps/reiwand-app/qml/facade/SceneLabels.qml
+msgid "Projected"
+msgstr "Proyectada"
+
+#: apps/reiwand-app/qml/facade/SceneLabels.qml
 msgid "Textured"
 msgstr "Con textura"
 
@@ -19117,6 +19363,67 @@ msgstr "Tramo activo"
 #: apps/reiwand-app/qml/facade/SceneLabels.qml
 msgid "Wrap"
 msgstr "Ajuste de línea"
+
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
+msgid "overshoot"
+msgstr "con retroceso"
+
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
+msgid "circular"
+msgstr "circular"
+
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
+msgid "cubic"
+msgstr "cúbica"
+
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
+msgid "elastic"
+msgstr "elástica"
+
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
+msgid "exponential"
+msgstr "exponencial"
+
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
+msgid "quadratic"
+msgstr "cuadrática"
+
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
+msgid "quartic"
+msgstr "cuártica"
+
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
+msgid "quintic"
+msgstr "quíntica"
+
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
+msgid "sine"
+msgstr "sinusoidal"
+
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
+msgid "the clock"
+msgstr "el reloj"
+
+#
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
+msgid "the date"
+msgstr "la fecha"
+
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
+msgid "the keyframes"
+msgstr "los fotogramas clave"
+
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
+msgid "the media player"
+msgstr "el reproductor multimedia"
+
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
+msgid "a user property"
+msgstr "una propiedad de usuario"
+
+#: apps/reiwand-app/qml/facade/SceneLinkWords.qml
+msgid "a script"
+msgstr "un script"
 
 #: apps/reiwand-app/qml/facade/SceneLook.qml
 #, no-c-format
@@ -19425,8 +19732,8 @@ msgid "Saturation range"
 msgstr "Rango de saturación"
 
 #: apps/reiwand-app/qml/facade/SceneNames.qml
-msgid "Scale"
-msgstr "Escala"
+msgid "Pointer reach"
+msgstr "Alcance del puntero"
 
 #: apps/reiwand-app/qml/facade/SceneNames.qml
 msgid "Scan lines"
@@ -19451,10 +19758,6 @@ msgstr "Segmentos"
 #: apps/reiwand-app/qml/facade/SceneNames.qml
 msgid "Opacity kept"
 msgstr "Opacidad que se conserva"
-
-#: apps/reiwand-app/qml/facade/SceneNames.qml
-msgid "Pointer reach"
-msgstr "Alcance del puntero"
 
 #: apps/reiwand-app/qml/facade/SceneNames.qml
 msgid "Shade"
@@ -19582,10 +19885,6 @@ msgid "Stream"
 msgstr "En flujo"
 
 #: apps/reiwand-app/qml/facade/SceneNames.qml
-msgid "Stretch by speed"
-msgstr "Estirar según la velocidad"
-
-#: apps/reiwand-app/qml/facade/SceneNames.qml
 msgid "Stretch seconds"
 msgstr "Segundos de estirado"
 
@@ -19706,12 +20005,38 @@ msgid "Drag to move the circle away from its control point"
 msgstr "Arrastra para alejar el círculo de su punto de control"
 
 #: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
+msgid "Drag to move the ball away from its control point"
+msgstr "Arrastra para alejar la esfera de su punto de control"
+
+#: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
+msgid "Drag to change the horizontal radius"
+msgstr "Arrastra para cambiar el radio horizontal"
+
+#: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
+msgid "Drag to change the vertical radius"
+msgstr "Arrastra para cambiar el radio vertical"
+
+#: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
+msgid "Drag to hollow the ball: the second ring keeps births outside it"
+msgstr ""
+"Arrastra para ahuecar la esfera: el segundo anillo deja los nacimientos "
+"fuera de él"
+
+#: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
 msgid "center"
 msgstr "centro"
 
 #: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
 msgid "Drag to change the arc"
 msgstr "Arrastra para cambiar el arco"
+
+#: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
+msgid ""
+"Drag to aim the axis the births turn around: the direction sets the turn, "
+"the distance from the center sets the tilt"
+msgstr ""
+"Arrastra para orientar el eje alrededor del que nacen las partículas: la "
+"dirección fija el giro y la distancia al centro, la inclinación"
 
 #: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
 msgid "Drag to bow the line"
@@ -19915,6 +20240,10 @@ msgid "Limits"
 msgstr "Límites"
 
 #: apps/reiwand-app/qml/facade/SceneTerms.qml
+msgid "Audio inputs"
+msgstr "Entradas de sonido"
+
+#: apps/reiwand-app/qml/facade/SceneTerms.qml
 msgid "Line height"
 msgstr "Altura de línea"
 
@@ -20055,10 +20384,6 @@ msgid "Overscan"
 msgstr "Margen extra"
 
 #: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "Flat"
-msgstr "Plano"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
 msgid "3D"
 msgstr "3D"
 
@@ -20171,6 +20496,10 @@ msgid "Fixed"
 msgstr "Fija"
 
 #: apps/reiwand-app/qml/facade/SceneValues.qml
+msgid "Floor"
+msgstr "Piso"
+
+#: apps/reiwand-app/qml/facade/SceneValues.qml
 msgid "Front"
 msgstr "Delante"
 
@@ -20237,10 +20566,6 @@ msgstr "Sobreexposición lineal"
 #: apps/reiwand-app/qml/facade/SceneValues.qml
 msgid "Linear light"
 msgstr "Luz lineal"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "Local"
-msgstr "Local"
 
 #: apps/reiwand-app/qml/facade/SceneValues.qml
 msgid "Lowest on top"
@@ -20315,6 +20640,10 @@ msgid "Pin light"
 msgstr "Luz focal"
 
 #: apps/reiwand-app/qml/facade/SceneValues.qml
+msgid "Pixels"
+msgstr "Píxeles"
+
+#: apps/reiwand-app/qml/facade/SceneValues.qml
 msgid "Main color"
 msgstr "Color principal"
 
@@ -20330,6 +20659,10 @@ msgstr "Mapa de bits"
 #: apps/reiwand-app/qml/facade/SceneValues.qml
 msgid "Reflect"
 msgstr "Reflejar"
+
+#: apps/reiwand-app/qml/facade/SceneValues.qml
+msgid "Relative"
+msgstr "Relativo"
 
 #: apps/reiwand-app/qml/facade/SceneValues.qml
 msgid "Resized"
@@ -20429,67 +20762,6 @@ msgid "World"
 msgstr "Mundo"
 
 #: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "overshoot"
-msgstr "con retroceso"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "circular"
-msgstr "circular"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "cubic"
-msgstr "cúbica"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "elastic"
-msgstr "elástica"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "exponential"
-msgstr "exponencial"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "quadratic"
-msgstr "cuadrática"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "quartic"
-msgstr "cuártica"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "quintic"
-msgstr "quíntica"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "sine"
-msgstr "sinusoidal"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "the clock"
-msgstr "el reloj"
-
-#
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "the date"
-msgstr "la fecha"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "the keyframes"
-msgstr "los fotogramas clave"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "the media player"
-msgstr "el reproductor multimedia"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "a user property"
-msgstr "una propiedad de usuario"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "a script"
-msgstr "un script"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
 msgid "Solid color"
 msgstr "Color sólido"
 
@@ -20536,10 +20808,6 @@ msgstr "Transparencia"
 #: apps/reiwand-app/qml/facade/SceneWords.qml
 msgid "Ambient light"
 msgstr "Luz ambiente"
-
-#: apps/reiwand-app/qml/facade/SceneWords.qml
-msgid "Amplitude"
-msgstr "Amplitud"
 
 #: apps/reiwand-app/qml/facade/SceneWords.qml
 msgid "Anchor"
@@ -21180,418 +21448,3 @@ msgstr "Retirado por su repositorio"
 #: apps/reiwand-app/src/covers.rs
 msgid "Has flashes, turned off"
 msgstr "Tiene destellos, deshabilitado"
-
-msgid ""
-"The public keys with which you sign the packages you upload. Create a pair "
-"in the build dialog of the editor; only the public key goes here."
-msgstr ""
-"Las claves públicas con las que firmas los paquetes que subes. Crea el par "
-"en el diálogo de compilación del editor; aquí solo va la clave pública."
-
-msgid "Registered"
-msgstr "Registrada"
-
-msgid "Hand over…"
-msgstr "Traspasar…"
-
-msgid "Register a key from a file…"
-msgstr "Registrar una clave desde un archivo…"
-
-msgid "Hand over to a new key"
-msgstr "Traspasar a una clave nueva"
-
-msgid ""
-"Sign the hand-over with the old key in Manage keys… of the step “Sign it” "
-"when you publish, and paste the signature here."
-msgstr ""
-"Firma el traspaso con la clave antigua en Administrar claves… del paso "
-"«Fírmalo» al publicar y pega aquí la firma."
-
-msgid "Repository · %1"
-msgstr "Repositorio · %1"
-
-msgid "My uploads"
-msgstr "Mis subidas"
-
-msgid "Nothing uploaded to this repository yet"
-msgstr "Aún no has subido nada a este repositorio"
-
-msgid "Unlisted"
-msgstr "Oculto"
-
-msgid ""
-"Unlisted versions stay out of the catalog and search; whoever has their link "
-"can still install them."
-msgstr ""
-"Las versiones ocultas quedan fuera del catálogo y de la búsqueda; quien "
-"tenga su enlace aún puede instalarlas."
-
-msgid "Upload not finished"
-msgstr "Subida sin terminar"
-
-msgid "Cancel it"
-msgstr "Cancelarla"
-
-msgid "Sign in again at %1"
-msgstr "Inicia sesión de nuevo en %1"
-
-msgid ""
-"The server no longer accepts your account. Sign in again to keep publishing; "
-"nothing was lost."
-msgstr ""
-"El servidor ya no acepta tu cuenta. Inicia sesión de nuevo para seguir "
-"publicando; no se perdió nada."
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid ""
-"Shows a strip over the wallpaper and moves to the next one. To change the "
-"combination, press Enter and then the new keys."
-msgstr ""
-"Muestra una tira sobre el fondo y pasa al siguiente. Para cambiar la "
-"combinación, pulsa Intro y luego las teclas nuevas."
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid ""
-"Shows a strip over the wallpaper and moves to the one before. To change the "
-"combination, press Enter and then the new keys."
-msgstr ""
-"Muestra una tira sobre el fondo y pasa al anterior. Para cambiar la "
-"combinación, pulsa Intro y luego las teclas nuevas."
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Apply the wallpaper of the strip"
-msgstr "Aplicar el fondo de la tira"
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid ""
-"Keeps the wallpaper in the middle of the strip. The wheel moves the strip "
-"and a click on the middle one applies it. To change the combination, press "
-"Enter and then the new keys."
-msgstr ""
-"Deja el fondo que está en el centro de la tira. La rueda mueve la tira y un "
-"clic en el del centro lo aplica. Para cambiar la combinación, pulsa Intro y "
-"luego las teclas nuevas."
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Close the strip without changing"
-msgstr "Cerrar la tira sin cambiar nada"
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid ""
-"Closes the strip and leaves the wallpaper as it was. To change the "
-"combination, press Enter and then the new keys."
-msgstr ""
-"Cierra la tira y deja el fondo como estaba. Para cambiar la combinación, "
-"pulsa Intro y luego las teclas nuevas."
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid ""
-"The desktop did not give the keys: bind reiwand-ctl next --preview, prev --"
-"preview, browse apply and browse cancel to your own keys"
-msgstr ""
-"El escritorio no dio los atajos: ata reiwand-ctl next --preview, prev --"
-"preview, browse apply y browse cancel a tus propias teclas"
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid "The desktop is asked for these four combinations"
-msgstr "Se le piden al escritorio estas cuatro combinaciones"
-
-#: apps/reiwand-app/qml/facade/Labels.qml
-msgid "Key to apply the wallpaper of the strip"
-msgstr "Tecla para aplicar el fondo de la tira"
-
-#: apps/reiwand-app/qml/facade/Labels.qml
-msgid "Key to close the strip without changing"
-msgstr "Tecla para cerrar la tira sin cambiar nada"
-
-#: apps/reiwand-app/qml/SceneSwarmPulls.qml
-msgid "Axis"
-msgstr "Eje"
-
-#: apps/reiwand-app/qml/SceneSwarmPulls.qml
-msgid ""
-"Drag to aim the axis the particles turn around: the direction sets the turn, "
-"the distance from the center sets the tilt"
-msgstr ""
-"Arrastra para orientar el eje alrededor del que giran las partículas: la "
-"dirección fija el giro y la distancia al centro, la inclinación"
-
-#: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
-msgid ""
-"Drag to aim the axis the births turn around: the direction sets the turn, "
-"the distance from the center sets the tilt"
-msgstr ""
-"Arrastra para orientar el eje alrededor del que nacen las partículas: la "
-"dirección fija el giro y la distancia al centro, la inclinación"
-
-#: apps/reiwand-app/qml/SceneSwarmStretch.qml
-msgid "Add pixels to the side"
-msgstr "Sumar píxeles al lado"
-
-#: apps/reiwand-app/qml/SceneSwarmStretch.qml
-msgid "Multiply the side"
-msgstr "Multiplicar el lado"
-
-#: apps/reiwand-app/qml/SceneSwarmStretch.qml
-msgid "Seconds of motion"
-msgstr "Segundos de movimiento"
-
-#: apps/reiwand-app/qml/SceneSwarmStretch.qml
-msgid "Shortest, in sides"
-msgstr "Mínimo, en lados"
-
-#: apps/reiwand-app/qml/SceneSwarmStretch.qml
-msgid "Longest, in sides"
-msgstr "Máximo, en lados"
-
-#: apps/reiwand-app/qml/SceneSwarmStretch.qml
-msgid "Shortest, in pixels"
-msgstr "Mínimo, en píxeles"
-
-#: apps/reiwand-app/qml/SceneSwarmStretch.qml
-msgid "Longest, in pixels"
-msgstr "Máximo, en píxeles"
-
-#: apps/reiwand-app/qml/SceneSwarmStretch.qml
-msgid "%1 px long at %2 px/s, side %3 px"
-msgstr "%1 px de largo a %2 px/s, lado de %3 px"
-
-#: apps/reiwand-app/qml/SceneSwarmWaves.qml
-msgid "Fades and pulses"
-msgstr "Fundidos y pulsos"
-
-#: apps/reiwand-app/qml/SceneSwarmWaves.qml
-msgid "Add a pulse"
-msgstr "Añadir un pulso"
-
-#: apps/reiwand-app/qml/SceneSwarmWaves.qml
-msgid "Dive from the top"
-msgstr "Bajar desde lo alto"
-
-#: apps/reiwand-app/qml/SceneSwarmWaves.qml
-msgid "Rise from the floor"
-msgstr "Subir desde el piso"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "Floor"
-msgstr "Piso"
-
-#: apps/reiwand-app/qml/facade/SceneValues.qml
-msgid "Relative"
-msgstr "Relativo"
-
-#: apps/reiwand-app/qml/facade/SceneLabels.qml
-msgid "Projected"
-msgstr "Proyectada"
-
-#: apps/reiwand-app/qml/SceneSwarmStretch.qml
-msgid "Trail from the speed without perspective"
-msgstr "Estela por la velocidad sin perspectiva"
-
-#: apps/reiwand-app/qml/SceneSwarmStretch.qml
-msgid "Trail follows the motion on screen"
-msgstr "La estela sigue el movimiento en pantalla"
-
-#: apps/reiwand-app/qml/SceneSwarmDrops.qml
-msgid "Nearest drop: %1 px"
-msgstr "Gota más cercana: %1 px"
-
-#: apps/reiwand-app/qml/SceneSwarmDrops.qml
-msgid "Farthest drop: %1 px"
-msgstr "Gota más lejana: %1 px"
-
-#: apps/reiwand-app/qml/SceneSwarmTilt.qml
-msgid "Turn about the horizontal line"
-msgstr "Giro sobre la línea horizontal"
-
-#: apps/reiwand-app/qml/SceneSwarmTilt.qml
-msgid "Turn about the vertical line"
-msgstr "Giro sobre la línea vertical"
-
-#: apps/reiwand-app/qml/SceneSwarmTilt.qml
-msgid "Spin about the horizontal line, per second"
-msgstr "Giro continuo sobre la línea horizontal, por segundo"
-
-#: apps/reiwand-app/qml/SceneSwarmTilt.qml
-msgid "Spin about the vertical line, per second"
-msgstr "Giro continuo sobre la línea vertical, por segundo"
-
-#: apps/reiwand-app/qml/SceneSwarmTilt.qml
-msgid "From %1"
-msgstr "Desde %1"
-
-#: apps/reiwand-app/qml/SceneSwarmTilt.qml
-msgid "To %1"
-msgstr "Hasta %1"
-
-#: apps/reiwand-app/qml/SceneSwarmTilt.qml
-msgid "Turn sprites in depth"
-msgstr "Girar los sprites en profundidad"
-
-#: apps/reiwand-app/qml/SceneSwarmEmitter.qml
-msgid "Ball"
-msgstr "Esfera"
-
-#: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
-msgid "Drag to move the ball away from its control point"
-msgstr "Arrastra para alejar la esfera de su punto de control"
-
-#: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
-msgid "Drag to change the horizontal radius"
-msgstr "Arrastra para cambiar el radio horizontal"
-
-#: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
-msgid "Drag to change the vertical radius"
-msgstr "Arrastra para cambiar el radio vertical"
-
-#: apps/reiwand-app/qml/facade/SceneSwarmKnobs.qml
-msgid "Drag to hollow the ball: the second ring keeps births outside it"
-msgstr ""
-"Arrastra para ahuecar la esfera: el segundo anillo deja los nacimientos "
-"fuera de él"
-
-#: apps/reiwand-app/qml/SceneSwarmVolume.qml
-msgid "Horizontal: both sides"
-msgstr "Horizontal: ambos lados"
-
-#: apps/reiwand-app/qml/SceneSwarmVolume.qml
-msgid "Horizontal: right side"
-msgstr "Horizontal: lado derecho"
-
-#: apps/reiwand-app/qml/SceneSwarmVolume.qml
-msgid "Horizontal: left side"
-msgstr "Horizontal: lado izquierdo"
-
-#: apps/reiwand-app/qml/SceneSwarmVolume.qml
-msgid "Vertical: both sides"
-msgstr "Vertical: ambos lados"
-
-#: apps/reiwand-app/qml/SceneSwarmVolume.qml
-msgid "Vertical: lower side"
-msgstr "Vertical: lado inferior"
-
-#: apps/reiwand-app/qml/SceneSwarmVolume.qml
-msgid "Vertical: upper side"
-msgstr "Vertical: lado superior"
-
-#: apps/reiwand-app/qml/SceneSwarmVolume.qml
-msgid "Depth: both sides"
-msgstr "Profundidad: ambos lados"
-
-#: apps/reiwand-app/qml/SceneSwarmVolume.qml
-msgid "Depth: far side"
-msgstr "Profundidad: lado lejano"
-
-#: apps/reiwand-app/qml/SceneSwarmVolume.qml
-msgid "Depth: near side"
-msgstr "Profundidad: lado cercano"
-
-#: apps/reiwand-app/qml/SceneSwarmVolume.qml
-msgid "Side view of the ball"
-msgstr "Vista lateral de la esfera"
-
-#: apps/reiwand-app/qml/SceneSwarmVolume.qml
-msgid "Depth radius"
-msgstr "Radio en profundidad"
-
-#: apps/reiwand-app/qml/SceneSwarmVolume.qml
-msgid "Hollow core"
-msgstr "Núcleo hueco"
-
-#: apps/reiwand-app/qml/facade/SceneTerms.qml
-msgid "Audio inputs"
-msgstr "Entradas de sonido"
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid ""
-"Opens the wallpaper switcher on the next one. To change the combination, "
-"press Enter and then the new keys."
-msgstr ""
-"Abre el cambiador de fondos en el siguiente. Para cambiar la combinación, "
-"pulsa Intro y luego las teclas nuevas."
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid ""
-"Opens the wallpaper switcher on the one before. To change the combination, "
-"press Enter and then the new keys."
-msgstr ""
-"Abre el cambiador de fondos en el anterior. Para cambiar la combinación, "
-"pulsa Intro y luego las teclas nuevas."
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Apply the wallpaper of the switcher"
-msgstr "Aplicar el fondo del cambiador"
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid ""
-"Keeps the wallpaper in the middle of the switcher. Enter and a click on the "
-"middle one do the same. To change the combination, press Enter and then the "
-"new keys."
-msgstr ""
-"Se queda con el fondo del centro del cambiador. Intro y un clic en el del "
-"centro hacen lo mismo. Para cambiar la combinación, pulsa Intro y luego las "
-"teclas nuevas."
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid "Close the switcher without changing"
-msgstr "Cerrar el cambiador sin cambiar nada"
-
-#: apps/reiwand-app/qml/SettingsMore.qml
-msgid ""
-"Closes the switcher and leaves the wallpaper as it was. Esc does the same. "
-"To change the combination, press Enter and then the new keys."
-msgstr ""
-"Cierra el cambiador y deja el fondo como estaba. Esc hace lo mismo. Para "
-"cambiar la combinación, pulsa Intro y luego las teclas nuevas."
-
-#: apps/reiwand-app/qml/Preview.qml
-msgid "Change wallpaper · %1"
-msgstr "Cambiar de fondo · %1"
-
-#: apps/reiwand-app/qml/Preview.qml
-msgid "List «%1»"
-msgstr "Lista «%1»"
-
-#: apps/reiwand-app/qml/PreviewHints.qml
-msgid "Move, or use the wheel"
-msgstr "Mover o usar la rueda"
-
-#: apps/reiwand-app/qml/PreviewPanel.qml
-msgid "This screen has only one wallpaper"
-msgstr "Esta pantalla tiene un solo fondo"
-
-#: apps/reiwand-app/qml/PreviewPanel.qml
-msgid "Add more wallpapers to the library to switch between them."
-msgstr "Añade más fondos a la biblioteca para poder cambiar entre ellos."
-
-#: apps/reiwand-app/qml/LibraryAdd.qml
-msgid "Import wallpaper…"
-msgstr "Importar fondo…"
-
-#: apps/reiwand-app/qml/LibraryAdd.qml
-msgid "Import wallpaper"
-msgstr "Importar fondo"
-
-#: apps/reiwand-app/qml/LibraryAdd.qml
-msgid "Wallpaper packages (*.wpak)"
-msgstr "Paquetes de fondo (*.wpak)"
-
-#: apps/reiwand-app/qml/LibraryAdd.qml
-msgid "A newer version of this wallpaper is already in your library."
-msgstr "Ya tienes una versión más nueva de este fondo en tu biblioteca."
-
-#: apps/reiwand-app/qml/LibraryAdd.qml
-msgid "Use the older one"
-msgstr "Usar la más antigua"
-
-#: apps/reiwand-app/qml/ItemFacts.qml
-msgid "Source:"
-msgstr "Origen:"
-
-#: apps/reiwand-app/qml/ItemFacts.qml
-msgid "Local · Unverified signature"
-msgstr "Local · Sin firma verificada"
-
-#: apps/reiwand-app/qml/FirstStart.qml
-msgid "Wallpaper packages you downloaded, as .wpak files."
-msgstr "Paquetes de fondo que descargaste, como archivos .wpak."

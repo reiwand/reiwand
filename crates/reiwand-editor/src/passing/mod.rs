@@ -114,7 +114,9 @@ pub fn readied(dir: &Path, way: Way, value: &Value) -> Result<Readied> {
 }
 
 pub fn check(dir: &Path, way: Way, value: &Value) -> Result<()> {
-    let ms = value["duration_ms"].as_u64().unwrap_or(1000);
+    let ms = value["duration_ms"]
+        .as_u64()
+        .ok_or_else(|| said("editor.transition_missing", "the transition has no duration_ms", &[]))?;
     let (low, high) = (MIN_TRANSITION_MS as f64 / 1000.0, MAX_TRANSITION_MS as f64 / 1000.0);
     ensure!(
         (MIN_TRANSITION_MS as u64..=MAX_TRANSITION_MS as u64).contains(&ms),
