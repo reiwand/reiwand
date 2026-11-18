@@ -12,19 +12,27 @@ const TAIL: f64 = 0.5;
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Playback {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub speed: Option<f64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub start: Option<f64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub end: Option<f64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub volume: Option<f64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub max_fps: Option<FrameRate>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub muted: Option<bool>,
-    #[serde(default, rename = "loop", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "loop")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub repeat: Option<bool>,
 }
 

@@ -105,12 +105,16 @@ pub(crate) fn write(dest: &Path, bytes: &[u8], private: bool) -> Result<()> {
 }
 
 pub(crate) fn json<T: DeserializeOwned>(path: &Path) -> Result<T> {
-    Ok(serde_json::from_slice(&fs::read(path)?)?)
+    crate::strict::read(&file_name(path), &fs::read(path)?)
+}
+
+fn file_name(path: &Path) -> String {
+    path.file_name().map_or_else(String::new, |n| n.to_string_lossy().into_owned())
 }
 
 pub(crate) fn optional<T: DeserializeOwned + Default>(path: &Path) -> Result<T> {
     match fs::read(path) {
-        Ok(bytes) => Ok(serde_json::from_slice(&bytes)?),
+        Ok(bytes) => crate::strict::read(&file_name(path), &bytes),
         Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(T::default()),
         Err(e) => Err(e.into()),
     }
@@ -127,9 +131,9 @@ pub(crate) fn load(data: &Path, repo_id: &str) -> Result<Snapshot> {
         Ok((fs::read(dir.join(name))?, fs::read_to_string(dir.join(format!("{name}.minisig")))?))
     };
     let ((root_json, root_sig), (entry_json, entry_sig)) = (read("root.json")?, read("entry.json")?);
-    let root = Doc { value: serde_json::from_slice(&root_json)?, json: root_json, sig: root_sig };
+    let root = Doc { value: crate::strict::read("root.json", &root_json)?, json: root_json, sig: root_sig };
     let entry: Doc<Entry> =
-        Doc { value: serde_json::from_slice(&entry_json)?, json: entry_json, sig: entry_sig };
+        Doc { value: crate::strict::read("entry.json", &entry_json)?, json: entry_json, sig: entry_sig };
     let value = &entry.value;
     let blobs = value.shards.iter().chain([&value.revoked]).chain(&value.authors).chain(&value.featured);
     let blobs = blobs.map(|blob| match fs::read(dir.join("blobs").join(format!("{}.json", blob.sha256))) {

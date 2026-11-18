@@ -1,14 +1,43 @@
 {
-  "schema": "reiwand.wpak/2",
-  "id": "org.example.reaccionsonido",
-  "version": "1.0.0",
-  "kind": "scene",
-  "entry": "scene.json",
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
   "default_locale": "en",
-  "title": { "en": "Sound pulse", "es": "Pulso con el sonido" },
+  "description": "",
+  "display": null,
+  "entry": "scene.json",
+  "id": "org.example.reaccionsonido",
+  "inputs": [
+    "audio"
+  ],
+  "kind": "scene",
   "license": "CC0-1.0",
-  "origin": { "kind": "original" },
-  "content": { "rating": "general" },
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
   "photosensitive": false,
-  "inputs": ["audio"]
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "previews": null,
+  "properties": {},
+  "requires": null,
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": {
+    "en": "Sound pulse",
+    "es": "Pulso con el sonido"
+  },
+  "version": "1.0.0",
+  "web": null
 }

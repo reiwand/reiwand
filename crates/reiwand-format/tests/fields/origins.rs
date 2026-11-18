@@ -49,10 +49,8 @@ fn display_and_playback_fields_belong_to_their_kinds() {
         ..shown(Kind::Scene, json!({ "accent": { "prop": "tint" } }))
     };
     tinted.check().unwrap();
-    let wrong = Manifest {
-        display: serde_json::from_value(json!({ "accent": { "prop": "on" } })).unwrap(),
-        ..tinted
-    };
+    let wrong =
+        Manifest { display: common::member("display", json!({ "accent": { "prop": "on" } })), ..tinted };
     assert_eq!(field(wrong.check()), "display.accent");
     assert_eq!(field(shown(Kind::Scene, json!({ "flip": "vertical" })).check()), "display");
     assert_eq!(field(shown(Kind::Image, json!({ "zoom": 2 })).check()), "display");
@@ -64,7 +62,8 @@ fn display_and_playback_fields_belong_to_their_kinds() {
     assert_eq!(named(&video), ["playback2", "video_properties"]);
     assert_eq!(
         serde_json::to_value(&video).unwrap()["playback"],
-        json!({ "max_fps": "display", "muted": true, "loop": false })
+        json!({ "max_fps": "display", "muted": true, "loop": false, "start": null, "end": null,
+            "speed": null, "volume": null })
     );
     play(Kind::Web, json!({ "max_fps": 30, "volume": 0.5 })).check().unwrap();
     assert_eq!(field(play(Kind::Video, json!({ "max_fps": 0 })).check()), "playback");
@@ -132,10 +131,10 @@ fn shortcuts_lists_of_folders_and_quality_values_are_checked() {
     }
     let shortcut = json!({ "open": { "type": "shortcut" } });
     let preset = Manifest {
-        presets: serde_json::from_value(
+        presets: common::member(
+            "presets",
             json!([{ "id": "p", "label": null, "values": { "open": { "uri": "https://example.org" } } }]),
-        )
-        .unwrap(),
+        ),
         ..props(shortcut)
     };
     assert_eq!(field(preset.check()), "presets.0.values.open");

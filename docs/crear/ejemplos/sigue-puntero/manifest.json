@@ -1,14 +1,43 @@
 {
-  "schema": "reiwand.wpak/2",
-  "id": "org.example.sigue_puntero",
-  "version": "1.0.0",
-  "kind": "scene",
-  "entry": "scene.json",
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
   "default_locale": "en",
-  "title": { "en": "Pointer follower", "es": "Sigue al puntero" },
+  "description": "",
+  "display": null,
+  "entry": "scene.json",
+  "id": "org.example.sigue_puntero",
+  "inputs": [
+    "pointer"
+  ],
+  "kind": "scene",
   "license": "CC0-1.0",
-  "origin": { "kind": "original" },
-  "content": { "rating": "general" },
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
   "photosensitive": false,
-  "inputs": ["pointer"]
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "previews": null,
+  "properties": {},
+  "requires": null,
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": {
+    "en": "Pointer follower",
+    "es": "Sigue al puntero"
+  },
+  "version": "1.0.0",
+  "web": null
 }

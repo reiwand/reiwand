@@ -40,7 +40,7 @@ fn featuring_takes_known_packages_and_short_notes() {
     assert!(featured(&repo.dir).unwrap().is_empty());
     feature(&repo.dir, DAWN, Some(" "), true).unwrap();
     assert_eq!(featured(&repo.dir).unwrap()[0].note, None);
-    let forged = serde_json::json!({"format": "wpak-repo-featured/1.0", "repo_id": "r",
+    let forged = serde_json::json!({"format": "wpak-repo-featured/2.0", "repo_id": "r",
         "items": [{"id": DAWN}, {"id": DAWN}]});
     assert!(Featured::parse(forged.to_string().as_bytes(), "r").is_err());
 }

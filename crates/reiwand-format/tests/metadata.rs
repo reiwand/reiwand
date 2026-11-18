@@ -77,7 +77,6 @@ fn origin_credits_and_links_are_checked() {
         let links = Links { donate: Some(url.into()), ..Links::default() };
         assert_eq!(field(with(|m| m.links = Some(links))), "links", "{url}");
     }
-    assert_eq!(field(with(|m| m.preview = Some("preview.png".into()))), "preview");
 }
 
 #[test]
@@ -126,7 +125,7 @@ fn property_ids_grow_in_version_two() {
 
 #[test]
 fn the_first_version_is_refused() {
-    let json = manifest(Kind::Image).to_json().unwrap().replace("wpak/2", "wpak/1");
+    let json = manifest(Kind::Image).to_json().unwrap().replace("wpak/3", "wpak/1");
     assert_eq!(field(Manifest::from_json(json.as_bytes()).map(drop)), "schema");
 }
 
@@ -134,14 +133,18 @@ fn the_first_version_is_refused() {
 fn readers_say_when_a_newer_version_is_needed() {
     let json = v2(Kind::Image).to_json().unwrap();
     let newer = |json: String| matches!(Manifest::from_json(json.as_bytes()), Err(Error::Newer(_)));
-    assert!(newer(json.replace("wpak/2", "wpak/3")));
-    let required = |r: &str| json.replacen("\"id\"", &format!("\"requires\": {r}, \"id\""), 1);
+    assert!(newer(json.replace("wpak/3", "wpak/4")));
+    let required = |r: &str| {
+        let mut value: serde_json::Value = serde_json::from_str(&json).unwrap();
+        value["requires"] = serde_json::from_str(r).unwrap();
+        value.to_string()
+    };
     assert!(newer(required(r#"{"features": ["hologram"], "colors": 9}"#)));
     assert!(newer(required(r#"{"engine": ">=99.0"}"#)));
     assert!(newer(required(r#"{"features": ["effect.no_such_effect"]}"#)));
     assert!(!newer(required(r#"{"engine": ">=0.1", "features": ["inputs.audio", "sound"]}"#)));
     let unknown = json.replacen("\"id\"", "\"hologram\": true, \"id\"", 1);
-    assert!(matches!(Manifest::from_json(unknown.as_bytes()), Err(Error::Json(_))));
+    assert!(matches!(Manifest::from_json(unknown.as_bytes()), Err(Error::Invalid { .. })));
     let later = required(r#"{"features": ["hologram"], "colors": 9}"#);
     let dir = tempfile::tempdir().unwrap();
     let path = dir.path().join("later.wpak");

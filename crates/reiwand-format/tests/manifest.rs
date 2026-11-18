@@ -46,7 +46,7 @@ fn parses_minimal_json_with_typed_properties() {
 fn unknown_fields_and_kinds_are_rejected() {
     let json = manifest(Kind::Image).to_json().unwrap();
     for bad in [json.replace("\"kind\"", "\"extra\": 1, \"kind\""), json.replace("\"image\"", "\"page\"")] {
-        assert!(matches!(Manifest::from_json(bad.as_bytes()), Err(Error::Json(_))), "{bad}");
+        assert!(matches!(Manifest::from_json(bad.as_bytes()), Err(Error::Invalid { .. })), "{bad}");
     }
 }
 

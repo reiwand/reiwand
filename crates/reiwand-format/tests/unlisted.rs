@@ -42,7 +42,7 @@ fn listing_names_a_known_package_and_version() {
     repo.add(DAWN, "1.0.0");
     assert!(matches!(list(&repo.dir, "org.example.none", None, false), Err(Error::NotFound(_))));
     assert!(matches!(list(&repo.dir, DAWN, Some("2.0.0"), false), Err(Error::NotFound(_))));
-    assert!(!std::fs::read_to_string(repo.dir.join("catalog.json")).unwrap().contains("listed"));
+    assert!(!std::fs::read_to_string(repo.dir.join("catalog.json")).unwrap().contains("\"listed\":false"));
 }
 
 #[test]

@@ -677,12 +677,12 @@ Deletes a saved preset.
 ### `ExportSceneValues(s output, s preset) → (s values)`
 
 The current values of the package shown on `output`, or those of a preset when `preset` is not
-`""`, as a small document `{"format": "wpak-values/1", "package", "version", "values"}` that the
+`""`, as a small document `{"format": "wpak-values/2", "package", "version", "values"}` that the
 user may keep, copy or share. Files, folders and secrets are left out.
 
 ### `ImportSceneValues(s output, s json, s name) → (as warnings)`
 
-Reads a `wpak-values/1` document of the package shown on `output` (at most 256 KiB): with
+Reads a `wpak-values/2` document of the package shown on `output` (at most 256 KiB): with
 `name = ""` its values are stored as `SetSceneProperty` would, otherwise they are saved as a preset
 named `name`. A document of another package returns `InvalidArgs`; settings that the package does
 not have or no longer accepts, files, folders and secrets are skipped and listed in `warnings`.

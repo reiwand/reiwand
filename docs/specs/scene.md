@@ -2224,7 +2224,7 @@ or buttons. Values are changed through `GetSceneProperties`, `SetSceneProperty`,
 and changes the shared ones until it gets its own copy (`ShareSceneValues`, `reiwand-ctl prop share`,
 *Same settings on every screen* in the app), which it keeps even when emptied by a reset. The
 user can also save the current values as a preset of their own, rename, delete, export it to a
-small file and import it back (`{"format": "wpak-values/1", "package", "version", "values"}`); saved
+small file and import it back (`{"format": "wpak-values/2", "package", "version", "values"}`); saved
 presets belong to the package id, survive updates and travel with sync. A stored value whose
 property no longer exists, changed its type or falls outside its range after an update of the
 package is ignored for the default, with a warning in the log, in `GetSceneProperties`

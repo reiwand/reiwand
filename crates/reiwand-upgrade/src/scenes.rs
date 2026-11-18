@@ -79,7 +79,7 @@ pub fn scene(path: &Path) -> anyhow::Result<bool> {
 
 pub fn manifest(path: &Path) -> anyhow::Result<bool> {
     let Ok(mut doc) = serde_json::from_slice::<Value>(&fs::read(path)?) else { return Ok(false) };
-    if complete_with(Format::Manifest, &mut doc, &Customs::new()).written == 0 {
+    if !crate::manifests::convert(&mut doc) {
         return Ok(false);
     }
     let staged = path.with_extension("json.upgrading");

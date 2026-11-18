@@ -78,9 +78,12 @@ fn mirrors_are_kept_replaced_or_dropped_and_the_root_keeps_its_lifetime() {
     let none = none.unwrap();
     assert!(none.mirrors.is_empty(), "an emptied list of mirrors left {:?}", none.mirrors);
     assert_eq!(none.root_days, 400);
-    let charter: Charter = serde_json::from_str(r#"{"mirrors": []}"#).unwrap();
-    assert_eq!(charter.mirrors, Some(vec![]));
-    assert_eq!(serde_json::from_str::<Charter>("{}").unwrap().mirrors, None);
+    let full = serde_json::to_string(&serde_json::json!({ "name": null, "root_keys": [], "online_keys": [],
+        "authors": {}, "removed": [], "threshold": null, "require_author_signature": null, "online_authors": null,
+        "root_days": null, "entry_max_days": null, "max_package_size": null, "mirrors": [], "shard_bits": null }))
+    .unwrap();
+    assert_eq!(serde_json::from_str::<Charter>(&full).unwrap().mirrors, Some(vec![]));
+    assert!(serde_json::from_str::<Charter>("{}").is_err());
 }
 
 #[test]

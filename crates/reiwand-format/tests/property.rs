@@ -96,7 +96,7 @@ fn presets_keep_whole_numbers_on_sliders_and_colors_in_any_case() {
     .unwrap();
     let preset: reiwand_format::PresetFile = serde_json::from_value(json!({
         "base": { "id": "org.example.base", "version": "^1" },
-        "values": { "speed": 1, "count": 5, "tint": "#00FF00" }
+        "values": { "speed": 1, "count": 5, "tint": "#00FF00" }, "files": {}
     }))
     .unwrap();
     let chosen = reiwand_format::values::chosen(&preset, &props);
@@ -105,7 +105,7 @@ fn presets_keep_whole_numbers_on_sliders_and_colors_in_any_case() {
     assert_eq!((chosen.values["speed"].as_f64(), chosen.values["count"].as_f64()), (Some(1.0), Some(5.0)));
     let far: reiwand_format::PresetFile = serde_json::from_value(json!({
         "base": { "id": "org.example.base", "version": "^1" },
-        "values": { "speed": 9, "count": -1 }
+        "values": { "speed": 9, "count": -1 }, "files": {}
     }))
     .unwrap();
     let chosen = reiwand_format::values::chosen(&far, &props);

@@ -24,7 +24,6 @@ pub enum Descriptor {
 #[serde(deny_unknown_fields)]
 pub struct Content {
     pub rating: Rating,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub descriptors: Vec<Descriptor>,
 }
 
@@ -34,9 +33,11 @@ pub struct Credit {
     pub paths: Vec<String>,
     pub license: String,
     pub attribution: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub url: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub source: Option<Source>,
 }
 
@@ -50,23 +51,29 @@ pub struct Source {
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Links {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub homepage: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub source: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub support: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub donate: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Previews {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     #[schemars(extend("x-ref" = "thumbnail"))]
     pub thumbnail: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     #[schemars(extend("x-ref" = "animated"))]
     pub animated: Option<String>,
 }

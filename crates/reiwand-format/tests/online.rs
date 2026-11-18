@@ -82,12 +82,8 @@ fn closed_repositories_refuse_online_authors() {
     assert!(matches!(register_author(&repo.dir, "ana", &key().public), Err(Error::Invalid { .. })));
     repo.add(DAWN, "1.0.0");
     repo.publish(NOW);
-    let entry = std::fs::read_to_string(repo.dir.join("entry/1.json")).unwrap();
     assert!(
-        !entry.contains("authors")
-            && !std::fs::read_to_string(repo.dir.join("root/1.json"))
-                .unwrap()
-                .contains("\"authors\":\"online\"")
+        !std::fs::read_to_string(repo.dir.join("root/1.json")).unwrap().contains("\"authors\":\"online\"")
     );
 }
 

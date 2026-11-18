@@ -14,7 +14,7 @@ mod shelf;
 fn manifest(kind: Kind, entry: &str, more: Value) -> Manifest {
     let mut value = serde_json::to_value(Manifest { entry: entry.into(), ..v2(kind) }).unwrap();
     value.as_object_mut().unwrap().extend(more.as_object().unwrap().clone());
-    serde_json::from_value(value).unwrap()
+    common::manifest_of(value)
 }
 
 fn load(manifest: &Manifest, files: &[(&str, &[u8])]) -> Result<Package<Cursor<Vec<u8>>>, Error> {

@@ -81,7 +81,6 @@ impl Repo {
             content: Some(Content { rating: Rating::Mature, descriptors: vec![Descriptor::Violence] }),
             photosensitive: Some(true),
             origin: Some(Origin::default()),
-            preview: None,
             previews: Some(Previews {
                 thumbnail: Some("preview.png".into()),
                 animated: Some("loop.gif".into()),
@@ -108,12 +107,12 @@ impl Repo {
             content: Some(Content { rating: Rating::General, descriptors: Vec::new() }),
             photosensitive: Some(false),
             origin: Some(Origin::default()),
-            preview: None,
             previews: Some(Previews { thumbnail: Some("preview.png".into()), animated: None }),
             ..manifest(id, version)
         };
         let mut json = serde_json::to_value(manifest).unwrap();
-        json["requires"] = serde_json::json!({ "features": ["web"] });
+        json["requires"] =
+            serde_json::json!({ "engine": null, "features": ["web"], "gpu": null, "packages": [] });
         fs::write(src.join("manifest.json"), json.to_string()).unwrap();
         fs::write(src.join("index.html"), "<!doctype html>").unwrap();
         fs::write(src.join("preview.png"), picture(image::ImageFormat::Png)).unwrap();

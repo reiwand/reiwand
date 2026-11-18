@@ -1,7 +1,7 @@
 mod common;
 
 use common::{entry, files, manifest};
-use reiwand_format::{Error, FileEntry, Kind, Limits, Manifest, Result, check_path, validate};
+use reiwand_format::{Error, FileEntry, Kind, Limits, Manifest, Previews, Result, check_path, validate};
 
 fn run(manifest: &Manifest, files: &[FileEntry]) -> Result<()> {
     validate(manifest, files, &Limits::default())
@@ -53,9 +53,9 @@ fn referenced_files_must_exist_and_fit_the_kind() {
     assert!(matches!(run(&video, &list), Err(Error::Invalid { field, .. }) if field == "entry"));
     let mut scene = common::manifest(Kind::Scene);
     let list = files(&scene);
-    scene.preview = Some("scene.json".into());
-    assert!(matches!(run(&scene, &list), Err(Error::Invalid { field, .. }) if field == "preview"));
-    scene.preview = None;
+    scene.previews = Some(Previews { thumbnail: Some("scene.json".into()), animated: None });
+    assert!(matches!(run(&scene, &list), Err(Error::Invalid { field, .. }) if field == "previews.thumbnail"));
+    scene.previews = None;
     scene.entry = "manifest.json".into();
     assert!(matches!(run(&scene, &list), Err(Error::Invalid { field, .. }) if field == "entry"));
 }

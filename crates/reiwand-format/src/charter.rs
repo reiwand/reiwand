@@ -4,20 +4,29 @@ use std::collections::BTreeMap;
 use std::path::Path;
 
 #[derive(Debug, Clone, Default, PartialEq, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Charter {
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub name: Option<String>,
     pub root_keys: Vec<String>,
     pub online_keys: Vec<String>,
     pub authors: BTreeMap<String, Vec<String>>,
     pub removed: Vec<String>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub threshold: Option<usize>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub require_author_signature: Option<bool>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub online_authors: Option<bool>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub root_days: Option<u32>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub entry_max_days: Option<u32>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub max_package_size: Option<u64>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub mirrors: Option<Vec<String>>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub shard_bits: Option<u8>,
 }
 

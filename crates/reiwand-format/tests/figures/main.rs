@@ -36,7 +36,7 @@ fn manifest(features: &[&str], mut change: Value) -> Manifest {
     let mut value = serde_json::to_value(v2(Kind::Scene)).unwrap();
     value["requires"] = json!({ "features": features });
     value.as_object_mut().unwrap().extend(change.as_object().unwrap().clone());
-    serde_json::from_value(value).unwrap()
+    common::manifest_of(value)
 }
 
 fn load(

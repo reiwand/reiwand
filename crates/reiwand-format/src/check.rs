@@ -27,7 +27,7 @@ impl Manifest {
         let authors = self.authors.len() <= MAX_AUTHORS && self.authors.iter().all(|a| within(a, 128));
         let license = self.license.chars().count() <= MAX_LICENSE && valid_license(&self.license);
         let mut out = broken(&[
-            ("schema", schema, "expected reiwand.wpak/2"),
+            ("schema", schema, "expected reiwand.wpak/3"),
             ("id", valid_id(&self.id), "expected a lowercase reverse-DNS name like org.example.name"),
             ("version", semver::Version::parse(&self.version).is_ok(), "expected a semantic version"),
             ("authors", authors, "expected at most 64 authors of 1 to 128 characters each"),

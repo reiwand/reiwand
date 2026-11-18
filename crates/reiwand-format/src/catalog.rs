@@ -19,11 +19,9 @@ pub(crate) struct Catalog {
     pub packages: Vec<Listing>,
     pub revoked: Vec<Revocation>,
     pub keys: Vec<KeyRevocation>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub authors: Vec<OnlineAuthor>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub featured: Vec<crate::Pick>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub root_days: Option<u32>,
 }
 

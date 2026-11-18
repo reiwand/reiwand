@@ -21,11 +21,12 @@ pub enum OriginKind {
 #[serde(deny_unknown_fields)]
 pub struct Origin {
     pub kind: OriginKind,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub derived_from: Vec<Ancestor>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub provider: Option<Provider>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub source_url: Option<String>,
 }
 
@@ -33,11 +34,14 @@ pub struct Origin {
 #[serde(deny_unknown_fields)]
 pub struct Ancestor {
     pub author: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub title: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub url: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub license: Option<String>,
 }
 
@@ -47,7 +51,8 @@ pub struct Provider {
     pub name: String,
     pub item_url: String,
     pub credit: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub terms_url: Option<String>,
 }
 

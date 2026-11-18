@@ -14,12 +14,13 @@ pub const MAX_PRESET_VALUES: usize = 256;
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Web {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub preload: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     #[schemars(extend("x-color" = true))]
     pub background: Option<String>,
-    #[serde(default, skip_serializing_if = "is_zero")]
     #[schemars(extend("x-unit" = "KiB", "x-range" = [0, 5120]))]
     pub storage_kib: u32,
 }
@@ -32,14 +33,8 @@ pub fn kept_allowance(storage_kib: u32) -> u64 {
 #[serde(deny_unknown_fields)]
 pub struct PresetFile {
     pub base: Dependency,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub values: Values,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub files: BTreeMap<String, String>,
-}
-
-fn is_zero(v: &u32) -> bool {
-    *v == 0
 }
 
 pub(crate) fn rgb(text: &str) -> bool {
@@ -135,7 +130,7 @@ impl Manifest {
 
 impl PresetFile {
     pub fn parse(text: &[u8], manifest: &Manifest) -> Result<PresetFile> {
-        let file: PresetFile = serde_json::from_slice(text)?;
+        let file: PresetFile = crate::strict::read("preset.json", text)?;
         let invalid =
             |field: &str, reason: &str| Error::Invalid { field: field.into(), reason: reason.into() };
         let base = valid_id(&file.base.id) && VersionReq::parse(&file.base.version).is_ok();

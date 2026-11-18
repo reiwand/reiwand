@@ -33,13 +33,14 @@ pub(super) fn corrected(def: &str, name: &str) -> Option<Value> {
     })
 }
 
-pub(super) fn follows(def: &str, name: &str, map: &Map<String, Value>) -> Option<Value> {
+pub(super) fn follows(def: &str, name: &str, map: &Map<String, Value>, root: &Value) -> Option<Value> {
+    let package = root["title"] == "Manifest";
     let kind = map.get("type").and_then(Value::as_str).unwrap_or("");
     Some(match (def, name) {
         ("Transform", "origin") => json!("anchor"),
         ("Camera", "center") => json!("canvas"),
         ("Playback", "end")
-            if !["speed", "volume", "max_fps", "muted"].iter().any(|k| map.contains_key(*k)) =>
+            if !package && !["speed", "volume", "max_fps", "muted"].iter().any(|k| map.contains_key(*k)) =>
         {
             json!("end")
         }

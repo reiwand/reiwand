@@ -16,7 +16,7 @@ pub fn peek(path: impl AsRef<Path>) -> Result<Manifest> {
 pub fn thumbnail(path: impl AsRef<Path>) -> Result<Option<Vec<u8>>> {
     let mut archive = ZipArchive::new(BufReader::new(File::open(path)?))?;
     let value: serde_json::Value = serde_json::from_slice(&raw(&mut archive, MANIFEST, MAX_MANIFEST)?)?;
-    let name = value.pointer("/previews/thumbnail").or_else(|| value.get("preview")).and_then(|v| v.as_str());
+    let name = value.pointer("/previews/thumbnail").and_then(|v| v.as_str());
     let Some(name) = name else { return Ok(None) };
     check_path(name)?;
     raw(&mut archive, name, MAX_THUMBNAIL).map(Some)

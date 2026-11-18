@@ -165,7 +165,7 @@ ctl prop reset -o TEST-11 && ctl prop preset load mine -o TEST-11
 [ "$(ctl prop get tint -o TEST-11)" = '"#00ff00"' ] || fail "the saved preset was not loaded: $(ctl prop ls -o TEST-11)"
 ctl prop preset rename Mine Leaf -o TEST-11 && ctl prop preset export Leaf -f "$scene/leaf.json" -o TEST-11
 [ "$(js "r['format'], r['package'], r['values']['mood'], 'photo' in r['values']" <"$scene/leaf.json")" = \
-  "('wpak-values/1', 'org.example.knobs', 2, False)" ] || fail "exported values: $(cat "$scene/leaf.json")"
+  "('wpak-values/2', 'org.example.knobs', 2, False)" ] || fail "exported values: $(cat "$scene/leaf.json")"
 ctl prop preset rm Leaf -o TEST-11 && ctl prop reset -o TEST-11
 ctl prop preset import "$scene/leaf.json" --save Again -o TEST-11
 [ "$(ctl prop preset ls -o TEST-11 --json | js "[p['label'] for p in r['user_presets']]")" = "['Again']" ] ||

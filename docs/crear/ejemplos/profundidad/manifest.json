@@ -1,8 +1,14 @@
 {
+  "authors": [],
+  "changes": null,
   "content": {
+    "descriptors": [],
     "rating": "general"
   },
+  "credits": [],
   "default_locale": "es",
+  "description": "",
+  "display": null,
   "entry": "scene.json",
   "id": "org.example.profundidad",
   "inputs": [
@@ -10,19 +16,34 @@
   ],
   "kind": "scene",
   "license": "CC0-1.0",
+  "links": null,
   "origin": {
-    "kind": "original"
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
   },
+  "permissions": null,
   "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "previews": null,
   "properties": {},
   "requires": {
+    "engine": null,
     "features": [
       "inputs.pointer",
       "parallax2",
       "tilt"
-    ]
+    ],
+    "gpu": null,
+    "packages": []
   },
-  "schema": "reiwand.wpak/2",
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
   "title": "Profundidad y perspectiva",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "web": null
 }

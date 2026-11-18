@@ -34,7 +34,6 @@
   "platforms": [],
   "playback": null,
   "presets": [],
-  "preview": null,
   "previews": {
     "animated": null,
     "thumbnail": "preview.png"
@@ -152,7 +151,7 @@
     "gpu": null,
     "packages": []
   },
-  "schema": "reiwand.wpak/2",
+  "schema": "reiwand.wpak/3",
   "strings": {},
   "tags": [
     "example",

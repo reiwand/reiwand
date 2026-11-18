@@ -42,7 +42,6 @@ impl Manifest {
                 "provider packages name their provider with a name of [a-z0-9-], https:// addresses and a \
                 credit without < or >; others name none",
             ),
-            ("preview", self.preview.is_none(), "is called previews.thumbnail in reiwand.wpak/2"),
             (
                 "credits",
                 credits,

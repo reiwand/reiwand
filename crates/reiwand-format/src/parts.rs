@@ -11,9 +11,9 @@ const THUMBNAIL_BYTES: u64 = 1 << 20;
 pub struct Part {
     pub kind: String,
     pub id: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub title: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub thumbnail: Option<String>,
 }
 
@@ -38,8 +38,7 @@ pub fn exists(scene: &Scene, kind: &str, id: &str) -> bool {
 pub fn parts(scene: &Scene) -> Result<Vec<Part>> {
     let Some(value) = scene.ext.get("parts") else { return Ok(offered(scene)) };
     let field = "ext.parts";
-    let list: Vec<Part> = serde_json::from_value(value.clone())
-        .map_err(|e| Error::Invalid { field: field.into(), reason: e.to_string().into() })?;
+    let list: Vec<Part> = crate::strict::value("scene.json", value)?;
     require(list.len() <= MAX_PARTS, field, "lists at most 256 parts")?;
     let mut seen = HashSet::new();
     for p in &list {

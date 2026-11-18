@@ -4,7 +4,7 @@ use chrono::TimeDelta;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
-pub const ENTRY_FORMAT: &str = "wpak-repo-entry/1.0";
+pub const ENTRY_FORMAT: &str = "wpak-repo-entry/2.0";
 const MAX_BLOB: u64 = 32 << 20;
 const MAX_BLOBS: u64 = 256 << 20;
 
@@ -20,9 +20,9 @@ pub struct Entry {
     pub shard_bits: u8,
     pub shards: Vec<Blob>,
     pub revoked: Blob,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub authors: Option<Blob>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub featured: Option<Blob>,
 }
 
@@ -91,7 +91,7 @@ pub(crate) fn contents(
         shard.check(KINDS_FORMAT, repo_id, index, entry.shard_bits).map(|()| shard)
     });
     let shards = shards.collect::<Result<Vec<_>>>()?;
-    let revoked: Revoked = serde_json::from_slice(get(&entry.revoked)?)?;
+    let revoked: Revoked = crate::strict::read("revoked.json", get(&entry.revoked)?)?;
     revoked.check(repo_id)?;
     Ok((shards, revoked))
 }

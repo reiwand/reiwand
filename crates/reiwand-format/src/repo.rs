@@ -5,12 +5,13 @@ use std::collections::{BTreeMap, BTreeSet};
 
 pub type Time = DateTime<Utc>;
 
-pub const ROOT_FORMAT: &str = "wpak-repo-root/1.0";
+pub const ROOT_FORMAT: &str = "wpak-repo-root/2.0";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Root {
     pub format: String,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub genesis: Option<String>,
     pub version: u64,
     pub expires: Time,
@@ -55,7 +56,7 @@ pub struct Policy {
     pub require_author_signature: bool,
     pub max_package_size: u64,
     pub entry_max_days: u32,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub authors: Option<String>,
 }
 
@@ -67,7 +68,7 @@ impl Policy {
 
 impl Root {
     pub fn check(&self, version: u64, repo_id: &str) -> Result<()> {
-        require(self.format == ROOT_FORMAT, "root.format", "expected wpak-repo-root/1.0")?;
+        require(self.format == ROOT_FORMAT, "root.format", "expected wpak-repo-root/2.0")?;
         require(self.version == version, "root.version", "does not match the file name")?;
         let genesis = self.genesis.as_deref() == (version > 1).then_some(repo_id);
         require(genesis, "root.genesis", "must be null in version 1 and the repository id after")?;

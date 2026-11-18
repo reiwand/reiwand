@@ -1,26 +1,45 @@
-use super::{Header, Manifest, PREFIX};
+use super::{Manifest, PREFIX};
 use crate::{Error, Result, features};
 use reiwand_core::message::said;
+use serde_json::Value;
+
+fn needs(value: &Value) -> (Option<&str>, Vec<String>) {
+    let requires = value.get("requires");
+    let engine = requires.and_then(|r| r.get("engine")).and_then(Value::as_str);
+    let listed = requires.and_then(|r| r.get("features")).and_then(Value::as_array);
+    (engine, listed.into_iter().flatten().filter_map(|f| f.as_str().map(String::from)).collect())
+}
 
 impl Manifest {
     pub fn from_json(bytes: &[u8]) -> Result<Self> {
-        let header: Header = serde_json::from_slice(bytes)?;
-        let major = header.schema.strip_prefix(PREFIX).and_then(|n| n.parse::<u32>().ok());
-        if let Some(major) = major.filter(|m| *m > 2) {
+        let value: Value = serde_json::from_slice(bytes)?;
+        let schema = value.get("schema").and_then(Value::as_str).ok_or_else(|| {
+            crate::refuse(
+                "schema",
+                said(
+                    "format.manifest_missing",
+                    "the manifest names no schema: expected %1",
+                    &[&super::SCHEMA],
+                ),
+            )
+        })?;
+        let major = schema.strip_prefix(PREFIX).and_then(|n| n.parse::<u32>().ok());
+        let current = PREFIX.to_owned() + "3";
+        if let Some(major) = major.filter(|m| *m > 3) {
             return Err(Error::Newer(
                 said("format.manifest_version", "manifest version %1", &[&major]).into(),
             ));
         }
-        if major == Some(1) {
+        if schema != current {
             let reason = said(
-                "format.first_version",
-                "reiwand.wpak/1 is no longer read; the package needs reiwand.wpak/2",
-                &[],
+                "format.old_manifest",
+                "%1 is no longer read; run reiwand-upgrade on the package folder and sign it again",
+                &[&schema],
             );
             return Err(crate::refuse("schema", reason));
         }
-        let needs = header.requires.unwrap_or_default();
-        features::supported(needs.engine.as_deref(), &needs.features)?;
-        Ok(serde_json::from_slice(bytes)?)
+        let (engine, listed) = needs(&value);
+        features::supported(engine, &listed)?;
+        crate::strict::value("manifest.json", &value)
     }
 }

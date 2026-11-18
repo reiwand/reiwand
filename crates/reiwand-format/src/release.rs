@@ -15,33 +15,29 @@ pub struct Release {
     pub size: u64,
     pub sha256: String,
     pub manifest_sha256: String,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub preview: Option<Preview>,
     pub published: Time,
-    #[serde(default, skip_serializing_if = "String::is_empty")]
     pub schema: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub default_locale: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub changes: Option<Text>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub content: Option<Rated>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub photosensitive: Option<bool>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub requires: Option<Needs>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub facets: Vec<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub animated: Option<Preview>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub platforms: Vec<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub base: Option<String>,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub hidden: bool,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub listed: Option<bool>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub asks: Vec<String>,
 }
 
@@ -55,25 +51,20 @@ pub struct Preview {
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Rated {
     pub rating: String,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub descriptors: Vec<String>,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Needs {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub engine: Option<String>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub features: Vec<String>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub packages: Vec<Wanted>,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Wanted {
-    #[serde(default)]
     pub id: String,
-    #[serde(default)]
     pub version: String,
 }
 

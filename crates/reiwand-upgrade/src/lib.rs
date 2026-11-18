@@ -5,6 +5,7 @@ pub mod descriptors;
 mod download;
 pub mod fill;
 pub mod gain;
+pub mod manifests;
 pub mod scenes;
 #[cfg(feature = "server")]
 pub mod server;

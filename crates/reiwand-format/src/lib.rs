@@ -53,6 +53,7 @@ mod sign;
 mod source;
 pub mod stall;
 mod store;
+mod strict;
 mod update;
 mod validate;
 pub mod values;

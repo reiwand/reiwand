@@ -118,7 +118,7 @@ fn video_packages_set_how_their_video_plays() {
 #[test]
 fn video_presets_set_the_playback_settings() {
     let presets = |values: serde_json::Value| {
-        serde_json::from_value(json!([{ "id": "slow", "label": "Slow", "values": values }])).unwrap()
+        common::member("presets", json!([{ "id": "slow", "label": "Slow", "values": values }]))
     };
     let video = Manifest { presets: presets(json!({ "speed": 0.5, "zoom": 1.5 })), ..v2(Kind::Video) };
     video.check().unwrap();

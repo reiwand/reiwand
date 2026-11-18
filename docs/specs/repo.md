@@ -83,7 +83,7 @@ values they do not know (also inside `content` and `requires`; an unknown rating
 
 | Field | Rule |
 |-------|------|
-| `format` | `wpak-repo-root/1.0` |
+| `format` | `wpak-repo-root/2.0` |
 | `genesis` | `null` in version 1, the `repo_id` after |
 | `version` | equals `N` |
 | `expires`, `name` | expiry and display name |
@@ -93,7 +93,7 @@ values they do not know (also inside `content` and `requires`; an unknown rating
 | `policy` | `{require_author_signature, max_package_size, entry_max_days}` and, only when it is not the default `root`, `authors: "online"`; roots without it keep their bytes, and versions of Reiwand before online authors refuse roots that set it |
 | `mirrors` | at most 16 `https://` or `file://` base URLs; `file://` mirrors are used only by clients that added the repository itself from a `file://` URL or a folder, and skipped for repositories fetched over the network |
 
-`entry/<N>.json` (at most 128 KiB): `format` (`wpak-repo-entry/1.0`), `repo_id`, `version`
+`entry/<N>.json` (at most 128 KiB): `format` (`wpak-repo-entry/2.0`), `repo_id`, `version`
 (= `N`), `timestamp`, `expires` (`0 < expires - timestamp ≤ entry_max_days`), `root`
 (`{version, sha256}` of the current root), `shard_bits` (0 to 8), `shards` (exactly
 `2^shard_bits` `{sha256, size}` in shard order), `revoked` (`{sha256, size}`) and, exactly when the
@@ -102,7 +102,7 @@ when the operator features packages, `featured` (`{sha256, size}` of the feature
 these files is at most 32 MiB and all of them together at most 256 MiB: clients refuse an entry that
 lists more before downloading anything, and `publish` refuses to write one.
 
-`index/<sha256>.json`: `format` (`wpak-repo-shard/3.0`), `repo_id`, `shard` (its position) and
+`index/<sha256>.json`: `format` (`wpak-repo-shard/4.0`), `repo_id`, `shard` (its position) and
 `packages`: `[{id, author, versions: [release…]}]`, with every release of every package. A package
 belongs to the shard given by the first `shard_bits` bits of SHA-256 of its id, so every id appears
 once in the repository. Ids follow the manifest rules; versions are canonical SemVer, unique and
@@ -154,7 +154,7 @@ key; it reads the signed index (see *Client update*), browses its packages in *E
 previews, installs them checked against that index (see *Package installation*) and checks them for
 updates.
 
-`featured/<sha256>.json` (optional): `format` (`wpak-repo-featured/1.0`), `repo_id` and `items`: at
+`featured/<sha256>.json` (optional): `format` (`wpak-repo-featured/2.0`), `repo_id` and `items`: at
 most 64 `{id, note?}`, ids of packages of the repository, each once, with a note of at most 200
 characters on one line without `<` or `>`. The entry cites it as `featured` (`{sha256, size}`), so the
 online signature covers it.
@@ -162,13 +162,13 @@ Clients mark these packages as featured when browsing and list them first. Nothi
 feature a package: only the operator does, with `reiwand-ctl repo feature DIR ID [--note TEXT]` and
 `repo unfeature DIR ID` (`feature(dir, id, note, on)`), then `publish`.
 
-`authors/<sha256>.json` (only with online authors): `format` (`wpak-repo-authors/1.0`), `repo_id`
+`authors/<sha256>.json` (only with online authors): `format` (`wpak-repo-authors/2.0`), `repo_id`
 and `authors`: `[{id, keys: {fingerprint: {minisign}}, rotations: [{from, to, sig}]}]`, ids as in
 the root and unique, `to` listed in `keys`, `sig` a minisign block of the key `from` over
 `wpak-author-rotate <id> <from> <to>`. The entry signed by the `online` key pins it, so it is
 signed indirectly.
 
-`revoked/<sha256>.json`: `format` (`wpak-repo-revoked/1.0`), `repo_id`, `packages`
+`revoked/<sha256>.json`: `format` (`wpak-repo-revoked/2.0`), `repo_id`, `packages`
 (`[{id, versions, reason, message}]`, `"*"` revokes every version) and `keys`
 (`[{fingerprint, reason}]`). Reasons: `malware`, `license`, `takedown`, `broken`, `other`.
 A revoked key invalidates every signature it made even while a root still lists it.

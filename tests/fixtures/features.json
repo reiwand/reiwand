@@ -11,7 +11,7 @@
  "user_videos": {"manifest": {"properties": {"clip": {"type": "file", "label": "Clip", "accept": ["image", "video"]}}}},
  "video_properties": {"kind": "video", "entry": "clip.webm", "manifest": {"playback": {"speed": 0.5}}, "files": {"clip.webm": "fixture:magenta-64x32.webm"}},
  "web": {"kind": "web", "entry": "index.html", "manifest": {"inputs": ["pointer"]}, "files": {"index.html": "<!doctype html><title>Page</title>"}},
- "preset": {"kind": "preset", "entry": "preset.json", "manifest": {"requires": {"packages": [{"id": "org.example.base", "version": "^1"}]}}, "files": {"preset.json": "{\"base\": {\"id\": \"org.example.base\", \"version\": \"^1\"}, \"values\": {\"speed\": 0.5}}"}},
+ "preset": {"kind": "preset", "entry": "preset.json", "manifest": {"requires": {"packages": [{"id": "org.example.base", "version": "^1"}]}}, "files": {"preset.json": "{\"base\": {\"id\": \"org.example.base\", \"version\": \"^1\"}, \"values\": {\"speed\": 0.5}, \"files\": {}}"}},
  "assets": {"kind": "assets", "entry": "assets.json"},
  "packages": {"manifest": {"requires": {"packages": [{"id": "org.example.base", "version": "^1"}]}}},
  "gpu": {"manifest": {"requires": {"gpu": "compute"}}},

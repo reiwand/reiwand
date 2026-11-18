@@ -20,7 +20,6 @@ pub struct Settings {
     pub max_package_size: u64,
     pub mirrors: Vec<String>,
     pub shard_bits: u8,
-    #[serde(default)]
     pub online_authors: bool,
 }
 

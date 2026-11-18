@@ -10,14 +10,14 @@ pub const MAX_ORIGINS: usize = 8;
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Requires {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub engine: Option<String>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[schemars(extend("x-computed" = true))]
     pub features: Vec<String>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub packages: Vec<Dependency>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub gpu: Option<Gpu>,
 }
 
@@ -55,16 +55,15 @@ pub enum Platform {
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Permissions {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub network: Option<Network>,
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub rgb: bool,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Network {
-    #[serde(default)]
     pub allow: Vec<String>,
 }
 

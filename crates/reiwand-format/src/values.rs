@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value as Json;
 use std::collections::BTreeMap;
 
-pub const VALUES_FORMAT: &str = "wpak-values/1";
+pub const VALUES_FORMAT: &str = "wpak-values/2";
 const MAX_VALUES: usize = 256 << 10;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -12,7 +12,6 @@ const MAX_VALUES: usize = 256 << 10;
 pub struct Exported {
     pub format: String,
     pub package: String,
-    #[serde(default)]
     pub version: String,
     pub values: Values,
 }
@@ -36,7 +35,8 @@ pub fn import(
     if text.len() > MAX_VALUES {
         return Err("the settings are larger than 256 KiB".into());
     }
-    let given: Exported = serde_json::from_str(text).map_err(|e| format!("these are not settings: {e}"))?;
+    let given: Exported = reiwand_core::explicit::read_str("values.json", text)
+        .map_err(|e| format!("these are not settings: {e}"))?;
     if given.format != VALUES_FORMAT {
         return Err(format!("expected settings in the {VALUES_FORMAT} format"));
     }

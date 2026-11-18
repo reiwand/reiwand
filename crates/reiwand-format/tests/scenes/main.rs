@@ -29,7 +29,7 @@ fn manifest(features: &[&str]) -> Manifest {
     let requires = json!({ "features": features });
     let mut value = serde_json::to_value(v2(Kind::Scene)).unwrap();
     value["requires"] = requires;
-    serde_json::from_value(value).unwrap()
+    common::manifest_of(value)
 }
 
 fn load(manifest: &Manifest, files: &[(&str, &[u8])]) -> Result<Package<Cursor<Vec<u8>>>, Error> {

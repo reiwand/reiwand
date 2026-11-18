@@ -4,7 +4,11 @@ fn shared() -> Manifest {
     manifest(Kind::Assets, "assets.json", json!({ "requires": { "features": ["assets"] } }))
 }
 
-fn document(parts: Value) -> String {
+fn document(mut parts: Value) -> String {
+    for part in parts.as_array_mut().into_iter().flatten().filter_map(Value::as_object_mut) {
+        part.entry("title").or_insert(Value::Null);
+        part.entry("thumbnail").or_insert(Value::Null);
+    }
     let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 64] },
         "layers": [{ "blend_space": "canvas", "id": "glow", "type": "solid", "color": "#ffcc00" }],
         "particles": { "snow": { "capacity": 10, "emitters": [{ "shape": { "point": [0, 0] } }] } }, "ext": { "parts": parts } })

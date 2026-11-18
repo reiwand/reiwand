@@ -67,16 +67,24 @@ pub fn whole(text: &str) -> String {
 }
 
 pub fn manifest_text(text: &str) -> String {
-    let Ok(mut doc) = serde_json::from_str::<serde_json::Value>(text) else { return text.to_owned() };
-    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut doc);
-    doc.to_string()
+    reiwand_upgrade::manifests::whole(text)
+}
+
+pub fn manifest_of(value: serde_json::Value) -> Manifest {
+    let text = manifest_text(&value.to_string());
+    Manifest::from_json(text.as_bytes()).unwrap_or_else(|e| panic!("{e:?} {text}"))
+}
+
+pub fn member<T: serde::de::DeserializeOwned>(field: &str, value: serde_json::Value) -> T {
+    let mut doc = serde_json::to_value(manifest(Kind::Scene)).unwrap();
+    doc[field] = value;
+    serde_json::from_value(serde_json::to_value(manifest_of(doc)).unwrap()[field].take()).unwrap()
 }
 
 pub fn properties(properties: serde_json::Value) -> serde_json::Value {
-    let mut doc = serde_json::json!({ "schema": "reiwand.wpak/2", "id": "org.example.props", "version": "1.0.0",
+    let doc = serde_json::json!({ "schema": "reiwand.wpak/3", "id": "org.example.props", "version": "1.0.0",
         "title": "Props", "license": "MIT", "kind": "scene", "entry": "scene.json", "properties": properties });
-    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut doc);
-    doc["properties"].take()
+    serde_json::from_str::<serde_json::Value>(&manifest_text(&doc.to_string())).unwrap()["properties"].take()
 }
 
 pub fn put(zip: &mut Zip, name: &str, data: &[u8]) {
@@ -84,6 +92,10 @@ pub fn put(zip: &mut Zip, name: &str, data: &[u8]) {
     let data = match std::str::from_utf8(data) {
         Ok(text) if name.ends_with("scene.json") => {
             done = whole(text);
+            done.as_bytes()
+        }
+        Ok(text) if name == MANIFEST => {
+            done = manifest_text(text);
             done.as_bytes()
         }
         _ => data,

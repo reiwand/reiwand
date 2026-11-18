@@ -92,7 +92,6 @@ pub fn validate(manifest: &Manifest, files: &[FileEntry], limits: &Limits) -> Re
     let previews = manifest.previews.clone().unwrap_or_default();
     let referenced = [
         ("entry", Some(&manifest.entry), entry_types, u64::MAX),
-        ("preview", manifest.preview.as_ref(), IMAGES, u64::MAX),
         ("previews.thumbnail", previews.thumbnail.as_ref(), THUMBNAILS, 1 << 20),
         ("previews.animated", previews.animated.as_ref(), ANIMATED, MAX_ANIMATED),
         ("web.preload", web.preload.as_ref(), &["js", "mjs"], u64::MAX),

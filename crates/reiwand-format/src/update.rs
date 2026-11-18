@@ -82,7 +82,7 @@ impl Run<'_> {
             ensure(anchor.repo_id.as_ref().is_none_or(|r| *r == id), || {
                 Error::Mismatch("root/1.json".into())
             })?;
-            let root: Root = serde_json::from_slice(&json)?;
+            let root: Root = crate::strict::read("root.json", &json)?;
             root.check(1, &id)?;
             root.meets(&root.roles.root, &json, &sig, &comment("root", 1, &id))?;
             Ok(Some(Doc { value: root, json, sig }))
@@ -100,7 +100,7 @@ impl Run<'_> {
                 let path = format!("root/{version}.json");
                 let Some((json, sig)) = self.signed(base, &path, MAX_ROOT)? else { return Ok(None) };
                 let verified = || {
-                    let new: Root = serde_json::from_slice(&json)?;
+                    let new: Root = crate::strict::read("root.json", &json)?;
                     new.check(version, &id)?;
                     let text = comment("root", version, &id);
                     root.value.meets(&root.value.roles.root, &json, &sig, &text)?;
@@ -151,7 +151,7 @@ impl Run<'_> {
         let Some((json, sig)) = self.signed(base, &path, MAX_ENTRY)? else { return Ok(None) };
         let (state, current) = (&self.state, &root.value);
         current.meets(&current.roles.online, &json, &sig, &comment("entry", version, &state.repo_id))?;
-        let entry: Entry = serde_json::from_slice(&json)?;
+        let entry: Entry = crate::strict::read("entry.json", &json)?;
         entry.check(version, &state.repo_id, current, &sha256(&root.json[..])?)?;
         let same = version != state.entry_version || sha256(&json[..])? == state.entry_sha256;
         ensure(same, || Error::Equivocation(version))?;

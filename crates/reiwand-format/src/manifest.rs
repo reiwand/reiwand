@@ -3,7 +3,7 @@ use crate::needs::{Input, Permissions, Platform, Requires};
 use crate::origin::Origin;
 use crate::video::Playback;
 use crate::web::Web;
-use crate::{Display, Needs, Preset, Property, Result, Text};
+use crate::{Display, Preset, Property, Result, Text};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -13,7 +13,7 @@ mod read;
 
 pub use kind::Kind;
 
-pub const SCHEMA: &str = "reiwand.wpak/2";
+pub const SCHEMA: &str = "reiwand.wpak/3";
 const PREFIX: &str = "reiwand.wpak/";
 
 pub type Strings = BTreeMap<String, BTreeMap<String, String>>;
@@ -25,70 +25,63 @@ pub struct Manifest {
     pub id: String,
     pub version: String,
     pub title: Text,
-    #[serde(default, skip_serializing_if = "Text::is_empty")]
     #[schemars(extend("x-markup" = true))]
     pub description: Text,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     #[schemars(extend("x-markup" = true))]
     pub changes: Option<Text>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     #[schemars(extend("x-ref" = "language"))]
     pub default_locale: Option<String>,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub strings: Strings,
     #[serde(skip)]
     #[schemars(skip)]
     pub string_files: Strings,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub authors: Vec<String>,
     pub license: String,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub credits: Vec<Credit>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     #[schemars(extend("x-required" = true))]
     pub origin: Option<Origin>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     #[schemars(extend("x-required" = true))]
     pub content: Option<Content>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     #[schemars(extend("x-required" = true))]
     pub photosensitive: Option<bool>,
     pub kind: Kind,
     pub entry: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[schemars(extend("x-ref" = "thumbnail"))]
-    pub preview: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub previews: Option<Previews>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub links: Option<Links>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub tags: Vec<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub requires: Option<Requires>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub platforms: Vec<Platform>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub inputs: Vec<Input>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub permissions: Option<Permissions>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub web: Option<Web>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub playback: Option<Playback>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
     pub display: Option<Display>,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub properties: BTreeMap<String, Property>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub presets: Vec<Preset>,
-}
-
-#[derive(Deserialize)]
-struct Header {
-    schema: String,
-    #[serde(default)]
-    requires: Option<Needs>,
 }
 
 pub fn manifest_schema() -> serde_json::Value {
@@ -101,7 +94,7 @@ impl Manifest {
     }
 
     pub fn thumbnail(&self) -> Option<&String> {
-        self.previews.as_ref().and_then(|p| p.thumbnail.as_ref()).or(self.preview.as_ref())
+        self.previews.as_ref().and_then(|p| p.thumbnail.as_ref())
     }
 
     pub fn animated(&self) -> Option<&String> {

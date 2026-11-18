@@ -22,7 +22,7 @@ fn packages_name_the_packages_they_need() {
     let json = manifest(Kind::Scene, "scene.json", json!({})).to_json().unwrap();
     let mut value: Value = serde_json::from_str(&json).unwrap();
     value["requires"] = unknown;
-    assert!(matches!(Manifest::from_json(value.to_string().as_bytes()), Err(Error::Json(_))));
+    assert!(matches!(Manifest::from_json(value.to_string().as_bytes()), Err(Error::Invalid { .. })));
     value["requires"]["features"] = json!(["packages", "holograms"]);
     assert!(matches!(Manifest::from_json(value.to_string().as_bytes()), Err(Error::Newer(_))));
 }
@@ -56,10 +56,8 @@ fn assets_packages_offer_scene_parts() {
     let mut package = load(&shared, &[("assets.json", scene.as_bytes())]).unwrap();
     assert_eq!(package.scene().unwrap().layers.len(), 1);
     assert!(package.facts.facets.iter().all(|f| !["android", "desktop", "animated"].contains(&f.as_str())));
-    let shown = Manifest {
-        display: serde_json::from_value(json!({ "accent": "#ff0000" })).unwrap(),
-        ..shared.clone()
-    };
+    let shown =
+        Manifest { display: common::member("display", json!({ "accent": "#ff0000" })), ..shared.clone() };
     assert_eq!(field(shown.check()), "display");
 }
 
@@ -94,8 +92,7 @@ fn folders_get_the_checks_of_packages() {
     };
     let html: [(&str, &[u8]); 3] = [("index.html", b"x"), ("compat.js", b"x"), ("app.wasm", b"notwasm")];
     assert_eq!(field(check(&page(json!({})), &html)), "app.wasm");
-    let file =
-        json!({ "base": { "id": "org.example.dusk", "version": "^1.2" }, "files": { "photo": "gone.png" } });
+    let file = json!({ "base": { "id": "org.example.dusk", "version": "^1.2" }, "values": {}, "files": { "photo": "gone.png" } });
     let text = file.to_string();
     assert!(matches!(
         check(&preset(Value::Null), &[("preset.json", text.as_bytes())]),

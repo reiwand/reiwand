@@ -4,14 +4,14 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::path::Path;
 
-pub const FEATURED_FORMAT: &str = "wpak-repo-featured/1.0";
+pub const FEATURED_FORMAT: &str = "wpak-repo-featured/2.0";
 pub const MAX_FEATURED: usize = 64;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Pick {
     pub id: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub note: Option<String>,
 }
 
@@ -32,9 +32,9 @@ impl Pick {
 
 impl Featured {
     pub fn parse(bytes: &[u8], repo_id: &str) -> Result<Featured> {
-        let featured: Featured = serde_json::from_slice(bytes)?;
+        let featured: Featured = crate::strict::read("featured.json", bytes)?;
         let own = featured.format == FEATURED_FORMAT && featured.repo_id == repo_id;
-        require(own, "featured", "expected a wpak-repo-featured/1.0 of this repository")?;
+        require(own, "featured", "expected a wpak-repo-featured/2.0 of this repository")?;
         let mut seen = HashSet::new();
         let items = &featured.items;
         let fine = items.len() <= MAX_FEATURED && items.iter().all(|p| p.valid() && seen.insert(&p.id));

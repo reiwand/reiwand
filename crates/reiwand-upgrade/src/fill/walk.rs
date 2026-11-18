@@ -179,7 +179,7 @@ impl<'a> Walk<'a> {
                 self.report.note(if def.is_empty() { ctx } else { def }, name);
             }
             if map.get(name).is_none_or(Value::is_null)
-                && let Some(word) = super::legacy::follows(def, name, map)
+                && let Some(word) = super::legacy::follows(def, name, map, self.root)
             {
                 map.insert(name.clone(), word);
                 self.report.note(def, name);

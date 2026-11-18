@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;
 
-pub const KINDS_FORMAT: &str = "wpak-repo-shard/3.0";
-pub const REVOKED_FORMAT: &str = "wpak-repo-revoked/1.0";
+pub const KINDS_FORMAT: &str = "wpak-repo-shard/4.0";
+pub const REVOKED_FORMAT: &str = "wpak-repo-revoked/2.0";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -22,6 +22,7 @@ pub struct Shard {
 #[serde(deny_unknown_fields)]
 pub struct Listing {
     pub id: String,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub author: Option<String>,
     pub versions: Vec<Release>,
 }
@@ -76,7 +77,7 @@ impl Shard {
                 _ => true,
             });
         }
-        Ok(serde_json::from_value(shard)?)
+        crate::strict::value("shard.json", &shard)
     }
 
     pub fn check(&self, format: &str, repo_id: &str, index: usize, bits: u8) -> Result<()> {
@@ -100,7 +101,7 @@ impl Shard {
 impl Revoked {
     pub fn check(&self, repo_id: &str) -> Result<()> {
         let own = self.format == REVOKED_FORMAT && self.repo_id == repo_id;
-        require(own, "revoked", "expected a wpak-repo-revoked/1.0 of this repository")
+        require(own, "revoked", "expected a wpak-repo-revoked/2.0 of this repository")
     }
 
     pub fn version(&self, id: &str, version: &str) -> Option<Reason> {

@@ -3,7 +3,7 @@ use crate::{Blob, Entry, Error, Key, KeyRevocation, Result, ensure, fingerprint,
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
-pub const AUTHORS_FORMAT: &str = "wpak-repo-authors/1.0";
+pub const AUTHORS_FORMAT: &str = "wpak-repo-authors/2.0";
 pub const ONLINE: &str = "online";
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -46,7 +46,7 @@ pub fn rotation_text(author: &str, from: &str, to: &str) -> String {
 impl Authors {
     pub fn check(&self, repo_id: &str) -> Result<()> {
         let own = self.format == AUTHORS_FORMAT && self.repo_id == repo_id;
-        require(own, "authors", "expected a wpak-repo-authors/1.0 of this repository")?;
+        require(own, "authors", "expected a wpak-repo-authors/2.0 of this repository")?;
         let mut ids = BTreeSet::new();
         let fine = |a: &OnlineAuthor| {
             let keys = a.keys.iter().all(|(fp, k)| fingerprint(&k.minisign).is_ok_and(|f| f == *fp));
@@ -59,7 +59,7 @@ impl Authors {
     pub fn parse(entry: &Entry, repo_id: &str, blobs: &BTreeMap<String, Vec<u8>>) -> Result<Option<Self>> {
         let Some(blob) = &entry.authors else { return Ok(None) };
         let bytes = blobs.get(&blob.sha256).ok_or_else(|| Error::Missing(blob.sha256.clone()))?;
-        let authors: Authors = serde_json::from_slice(bytes)?;
+        let authors: Authors = crate::strict::read("authors.json", bytes)?;
         authors.check(repo_id).map(|()| Some(authors))
     }
 

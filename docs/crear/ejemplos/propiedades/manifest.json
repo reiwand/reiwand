@@ -51,7 +51,6 @@
       }
     }
   ],
-  "preview": null,
   "previews": null,
   "properties": {
     "abrir": {
@@ -286,7 +285,7 @@
     "gpu": null,
     "packages": []
   },
-  "schema": "reiwand.wpak/2",
+  "schema": "reiwand.wpak/3",
   "strings": {
     "en": {
       "nota": "Change anything you like: the scene updates at once."

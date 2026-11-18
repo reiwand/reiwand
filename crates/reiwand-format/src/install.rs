@@ -22,7 +22,9 @@ pub struct Installed {
     pub sha256: String,
     pub size: u64,
     pub path: PathBuf,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub signer: Option<String>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub revoked: Option<Reason>,
 }
 

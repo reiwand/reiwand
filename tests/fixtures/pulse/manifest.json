@@ -1,15 +1,49 @@
 {
-  "schema": "reiwand.wpak/2",
-  "id": "org.example.pulse-page",
-  "version": "1.0.0",
-  "title": "Pulse",
-  "license": "CC0-1.0",
-  "origin": { "kind": "original" },
-  "content": { "rating": "general" },
-  "photosensitive": false,
-  "kind": "web",
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": null,
+  "description": "",
+  "display": null,
   "entry": "index.html",
+  "id": "org.example.pulse-page",
   "inputs": [],
-  "web": { "background": "#000000" },
-  "requires": { "features": ["web"] }
+  "kind": "web",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
+  "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "previews": null,
+  "properties": {},
+  "requires": {
+    "engine": null,
+    "features": [
+      "web"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "Pulse",
+  "version": "1.0.0",
+  "web": {
+    "background": "#000000",
+    "preload": null,
+    "storage_kib": 0
+  }
 }

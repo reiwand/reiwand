@@ -1,11 +1,252 @@
 {
-  "schema": "reiwand.wpak/2",
-  "id": "io.github.reiwand.example.dusk",
-  "version": "1.1.0",
-  "title": "@title",
-  "description": "@description",
+  "authors": [
+    "Reiwand contributors"
+  ],
   "changes": "@changes",
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
   "default_locale": "en",
+  "description": "@description",
+  "display": null,
+  "entry": "scene.json",
+  "id": "io.github.reiwand.example.dusk",
+  "inputs": [
+    "pointer"
+  ],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
+  "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [
+    {
+      "id": "golden",
+      "label": "@golden",
+      "values": {
+        "light": "#ffb347",
+        "mood": "dusk",
+        "warmth": 0.55
+      }
+    },
+    {
+      "id": "moonlight",
+      "label": "@moonlight",
+      "values": {
+        "light": "#7f9cff",
+        "mood": "night",
+        "stars": true,
+        "warmth": 0.2
+      }
+    }
+  ],
+  "previews": {
+    "animated": null,
+    "thumbnail": "preview.jpg"
+  },
+  "properties": {
+    "caption": {
+      "default": "",
+      "enabled_if": {},
+      "group": "words",
+      "help": "@caption_help",
+      "icon": null,
+      "label": "@caption",
+      "max_len": 40,
+      "multiline": false,
+      "order": 1,
+      "quality": {},
+      "secret": false,
+      "type": "text",
+      "visible_if": {}
+    },
+    "caption_color": {
+      "alpha": true,
+      "default": "#ffffffd0",
+      "enabled_if": {},
+      "group": "words",
+      "help": null,
+      "icon": null,
+      "label": "@caption_color",
+      "order": 2,
+      "quality": {},
+      "type": "color",
+      "visible_if": {}
+    },
+    "depth": {
+      "default": "pointer",
+      "enabled_if": {},
+      "group": "look",
+      "help": null,
+      "icon": null,
+      "label": "@depth",
+      "options": [
+        {
+          "icon": null,
+          "label": "@pointer",
+          "value": "pointer"
+        },
+        {
+          "icon": null,
+          "label": "@orbit",
+          "value": "orbit"
+        },
+        {
+          "icon": null,
+          "label": "@off",
+          "value": "off"
+        }
+      ],
+      "order": 7,
+      "quality": {},
+      "type": "combo",
+      "visible_if": {}
+    },
+    "light": {
+      "alpha": false,
+      "default": "#ff9a5c",
+      "enabled_if": {},
+      "group": "look",
+      "help": null,
+      "icon": null,
+      "label": "@light",
+      "order": 3,
+      "quality": {},
+      "type": "color",
+      "visible_if": {}
+    },
+    "look": {
+      "collapsed": false,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": "@look",
+      "order": 0,
+      "quality": {},
+      "type": "group",
+      "visible_if": {}
+    },
+    "mood": {
+      "default": "dusk",
+      "enabled_if": {},
+      "group": "look",
+      "help": null,
+      "icon": null,
+      "label": "@mood",
+      "options": [
+        {
+          "icon": null,
+          "label": "@dusk",
+          "value": "dusk"
+        },
+        {
+          "icon": null,
+          "label": "@night",
+          "value": "night"
+        }
+      ],
+      "order": 1,
+      "quality": {},
+      "type": "combo",
+      "visible_if": {}
+    },
+    "stars": {
+      "default": true,
+      "enabled_if": {},
+      "group": "look",
+      "help": null,
+      "icon": null,
+      "label": "@stars",
+      "order": 2,
+      "quality": {},
+      "type": "bool",
+      "visible_if": {}
+    },
+    "sun_size": {
+      "decimals": null,
+      "default": 1.0,
+      "editable": false,
+      "enabled_if": {},
+      "group": "look",
+      "help": null,
+      "icon": null,
+      "integer": false,
+      "label": "@sun_size",
+      "log": false,
+      "max": 1.5,
+      "min": 0.5,
+      "order": 5,
+      "quality": {},
+      "step": 0.05,
+      "type": "slider",
+      "unit": "×",
+      "visible_if": {}
+    },
+    "vignette": {
+      "default": true,
+      "enabled_if": {},
+      "group": "look",
+      "help": null,
+      "icon": null,
+      "label": "@vignette",
+      "order": 6,
+      "quality": {},
+      "type": "bool",
+      "visible_if": {}
+    },
+    "warmth": {
+      "decimals": null,
+      "default": 0.35,
+      "editable": false,
+      "enabled_if": {},
+      "group": "look",
+      "help": null,
+      "icon": null,
+      "integer": false,
+      "label": "@warmth",
+      "log": false,
+      "max": 1.0,
+      "min": 0.0,
+      "order": 4,
+      "quality": {},
+      "step": 0.05,
+      "type": "slider",
+      "unit": null,
+      "visible_if": {}
+    },
+    "words": {
+      "collapsed": false,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": "@words",
+      "order": 1,
+      "quality": {},
+      "type": "group",
+      "visible_if": {}
+    }
+  },
+  "requires": {
+    "engine": null,
+    "features": [
+      "inputs.pointer"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
   "strings": {
     "en": {
       "caption": "Text",
@@ -56,238 +297,12 @@
       "words": "Rótulo"
     }
   },
-  "authors": [
-    "Reiwand contributors"
-  ],
-  "license": "CC0-1.0",
-  "origin": {
-    "kind": "original"
-  },
-  "content": {
-    "rating": "general"
-  },
-  "photosensitive": false,
-  "kind": "scene",
-  "entry": "scene.json",
-  "previews": {
-    "thumbnail": "preview.jpg"
-  },
   "tags": [
     "example",
     "landscape",
     "depth"
   ],
-  "requires": {
-    "features": [
-      "inputs.pointer"
-    ]
-  },
-  "inputs": [
-    "pointer"
-  ],
-  "properties": {
-    "caption": {
-      "label": "@caption",
-      "help": "@caption_help",
-      "group": "words",
-      "visible_if": {},
-      "enabled_if": {},
-      "order": 1,
-      "icon": null,
-      "quality": {},
-      "type": "text",
-      "default": "",
-      "max_len": 40,
-      "multiline": false,
-      "secret": false
-    },
-    "caption_color": {
-      "label": "@caption_color",
-      "help": null,
-      "group": "words",
-      "visible_if": {},
-      "enabled_if": {},
-      "order": 2,
-      "icon": null,
-      "quality": {},
-      "type": "color",
-      "default": "#ffffffd0",
-      "alpha": true
-    },
-    "depth": {
-      "label": "@depth",
-      "help": null,
-      "group": "look",
-      "visible_if": {},
-      "enabled_if": {},
-      "order": 7,
-      "icon": null,
-      "quality": {},
-      "type": "combo",
-      "options": [
-        {
-          "value": "pointer",
-          "label": "@pointer",
-          "icon": null
-        },
-        {
-          "value": "orbit",
-          "label": "@orbit",
-          "icon": null
-        },
-        {
-          "value": "off",
-          "label": "@off",
-          "icon": null
-        }
-      ],
-      "default": "pointer"
-    },
-    "light": {
-      "label": "@light",
-      "help": null,
-      "group": "look",
-      "visible_if": {},
-      "enabled_if": {},
-      "order": 3,
-      "icon": null,
-      "quality": {},
-      "type": "color",
-      "default": "#ff9a5c",
-      "alpha": false
-    },
-    "look": {
-      "label": "@look",
-      "help": null,
-      "group": null,
-      "visible_if": {},
-      "enabled_if": {},
-      "order": 0,
-      "icon": null,
-      "quality": {},
-      "type": "group",
-      "collapsed": false
-    },
-    "mood": {
-      "label": "@mood",
-      "help": null,
-      "group": "look",
-      "visible_if": {},
-      "enabled_if": {},
-      "order": 1,
-      "icon": null,
-      "quality": {},
-      "type": "combo",
-      "options": [
-        {
-          "value": "dusk",
-          "label": "@dusk",
-          "icon": null
-        },
-        {
-          "value": "night",
-          "label": "@night",
-          "icon": null
-        }
-      ],
-      "default": "dusk"
-    },
-    "stars": {
-      "label": "@stars",
-      "help": null,
-      "group": "look",
-      "visible_if": {},
-      "enabled_if": {},
-      "order": 2,
-      "icon": null,
-      "quality": {},
-      "type": "bool",
-      "default": true
-    },
-    "sun_size": {
-      "label": "@sun_size",
-      "help": null,
-      "group": "look",
-      "visible_if": {},
-      "enabled_if": {},
-      "order": 5,
-      "icon": null,
-      "quality": {},
-      "type": "slider",
-      "min": 0.5,
-      "max": 1.5,
-      "step": 0.05,
-      "default": 1.0,
-      "integer": false,
-      "unit": "×",
-      "decimals": null,
-      "editable": false,
-      "log": false
-    },
-    "vignette": {
-      "label": "@vignette",
-      "help": null,
-      "group": "look",
-      "visible_if": {},
-      "enabled_if": {},
-      "order": 6,
-      "icon": null,
-      "quality": {},
-      "type": "bool",
-      "default": true
-    },
-    "warmth": {
-      "label": "@warmth",
-      "help": null,
-      "group": "look",
-      "visible_if": {},
-      "enabled_if": {},
-      "order": 4,
-      "icon": null,
-      "quality": {},
-      "type": "slider",
-      "min": 0.0,
-      "max": 1.0,
-      "step": 0.05,
-      "default": 0.35,
-      "integer": false,
-      "unit": null,
-      "decimals": null,
-      "editable": false,
-      "log": false
-    },
-    "words": {
-      "label": "@words",
-      "help": null,
-      "group": null,
-      "visible_if": {},
-      "enabled_if": {},
-      "order": 1,
-      "icon": null,
-      "quality": {},
-      "type": "group",
-      "collapsed": false
-    }
-  },
-  "presets": [
-    {
-      "id": "golden",
-      "label": "@golden",
-      "values": {
-        "light": "#ffb347",
-        "mood": "dusk",
-        "warmth": 0.55
-      }
-    },
-    {
-      "id": "moonlight",
-      "label": "@moonlight",
-      "values": {
-        "light": "#7f9cff",
-        "mood": "night",
-        "stars": true,
-        "warmth": 0.2
-      }
-    }
-  ]
+  "title": "@title",
+  "version": "1.1.0",
+  "web": null
 }
