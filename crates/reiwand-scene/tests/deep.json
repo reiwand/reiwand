@@ -459,7 +459,7 @@
       },
       "texture": "skin",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -495,7 +495,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "badge",
@@ -510,10 +510,10 @@
       ],
       "parent": null,
       "playback": null,
-      "size": null,
+      "size": "source",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -538,7 +538,7 @@
       "brightness": null,
       "cache": false,
       "clip": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "stage",
@@ -738,10 +738,10 @@
             1.5
           ],
           "shapes": {},
-          "size": null,
+          "size": "canvas",
           "solid": false,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -767,13 +767,16 @@
           "brightness": null,
           "cache": false,
           "color": "#ffffff",
-          "cone": null,
+          "cone": [
+            30,
+            60
+          ],
           "depth_test": false,
           "effects": [],
           "id": "sun",
           "inherit": null,
           "intensity": 1.0,
-          "length": null,
+          "length": 256,
           "light": "directional",
           "lighting": null,
           "mask": null,
@@ -785,13 +788,13 @@
           "parent": null,
           "position3d": null,
           "radius": 512.0,
-          "shadow_bias": null,
+          "shadow_bias": 0.2,
           "shadow_resolution": null,
           "shadows": true,
           "solid": false,
           "texture": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -871,13 +874,13 @@
           "mask": null,
           "opacity": 1.0,
           "outline": null,
-          "padding": null,
+          "padding": 0,
           "parallax": [
             0,
             0
           ],
           "parent": null,
-          "render": null,
+          "render": "auto",
           "shadow": null,
           "size": 48.0,
           "solid": false,
@@ -921,7 +924,7 @@
             "y": null
           },
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -936,7 +939,7 @@
             "z": null
           },
           "type": "text",
-          "valign": null,
+          "valign": "center",
           "visible": true,
           "wrap": null
         }
@@ -952,7 +955,7 @@
       "solid": false,
       "space": "3d",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -976,7 +979,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "show",
@@ -1030,7 +1033,7 @@
       "solid": false,
       "system": "fireworks",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -1120,10 +1123,10 @@
         0
       ],
       "parent": null,
-      "size": null,
+      "size": "canvas",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -1167,7 +1170,7 @@
       ],
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -2305,7 +2308,7 @@
       ],
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [

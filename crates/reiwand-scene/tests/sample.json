@@ -138,19 +138,19 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [
         {
           "effect": "waves",
           "enabled": true,
           "mask": {
-            "channel": null,
+            "channel": "luminance",
             "feather": 0.0,
             "invert": false,
             "layer": null,
             "shape": null,
-            "strength": null,
+            "strength": 1,
             "texture": "lake"
           },
           "name": null,
@@ -308,10 +308,10 @@
       ],
       "parent": null,
       "playback": null,
-      "size": null,
+      "size": "source",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -335,7 +335,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "sea",
@@ -348,11 +348,19 @@
         0
       ],
       "parent": null,
-      "playback": null,
-      "size": null,
+      "playback": {
+        "end": "end",
+        "frame": null,
+        "loop": true,
+        "own_clock": false,
+        "playing": true,
+        "rate": 1,
+        "start": 0
+      },
+      "size": "source",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           960,
           900
@@ -380,7 +388,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "sparks",
@@ -398,7 +406,7 @@
       "solid": false,
       "system": "sparks",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -524,13 +532,13 @@
         "y": null
       },
       "outline": null,
-      "padding": null,
+      "padding": 0,
       "parallax": [
         0,
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 96,
       "solid": false,
@@ -574,7 +582,7 @@
         "y": null
       },
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           -64,
           -64
@@ -592,7 +600,7 @@
         "z": null
       },
       "type": "text",
-      "valign": null,
+      "valign": "center",
       "visible": {
         "a": null,
         "audio": null,
@@ -642,7 +650,7 @@
       "brightness": null,
       "cache": false,
       "clip": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "badge",
@@ -680,7 +688,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -717,7 +725,7 @@
             "invert": true,
             "layer": "disc",
             "shape": null,
-            "strength": null,
+            "strength": 1,
             "texture": null
           },
           "opacity": 1.0,
@@ -741,7 +749,7 @@
             "width": 2
           },
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -768,9 +776,9 @@
       ],
       "parent": null,
       "solid": false,
-      "space": null,
+      "space": "2d",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           200,
           200
@@ -946,7 +954,7 @@
       "solid": false,
       "style": "bars",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           0,
           -40
@@ -1053,10 +1061,10 @@
       "parent": null,
       "redraw": false,
       "rgb": false,
-      "size": null,
+      "size": "canvas",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [

@@ -22,8 +22,8 @@ fn scenes_adopt_their_package_effects_and_check_their_uses() {
     let mut wide = descriptor();
     wide["options"] = json!([{ "id": "taps", "values": [1, 2, 3, 4, 5], "prefill": 1 },
         { "id": "tinted", "values": [false, true], "prefill": false }]);
-    let props: BTreeMap<String, Property> = serde_json::from_value(json!({
-        "q": { "type": "slider", "min": 1, "max": 8, "default": 1 }, "t": { "type": "bool", "default": false } })).unwrap();
+    let props: BTreeMap<String, Property> = reiwand_scene::prefill::properties(json!({
+        "q": { "type": "slider", "min": 1, "max": 8, "default": 1 }, "t": { "type": "bool", "default": false } }));
     let mut bound = scene(
         json!([{ "effect": "ripple", "params": { "taps": { "prop": "q" }, "tinted": { "prop": "t" } } }]),
     );

@@ -57,13 +57,13 @@
         "color": "#3b4a6b",
         "width": 6
       },
-      "padding": null,
+      "padding": 0,
       "parallax": [
         0,
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": {
         "blur": 12,
         "color": "#00000099",
@@ -79,7 +79,7 @@
         "es": "Buenos días"
       },
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           960,
           300
@@ -97,7 +97,7 @@
         "z": null
       },
       "type": "text",
-      "valign": null,
+      "valign": "center",
       "visible": true,
       "wrap": null
     },
@@ -131,19 +131,19 @@
       "mask": null,
       "opacity": 1.0,
       "outline": null,
-      "padding": null,
+      "padding": 0,
       "parallax": [
         0,
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 44,
       "solid": false,
       "text": "Un texto largo se parte en líneas del ancho que tú digas y termina con puntos suspensivos si no cabe.",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           510,
           520
@@ -192,13 +192,13 @@
       "mask": null,
       "opacity": 1.0,
       "outline": null,
-      "padding": null,
+      "padding": 0,
       "parallax": [
         0,
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 90,
       "solid": false,
@@ -242,7 +242,7 @@
         "y": null
       },
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           -80,
           -60
@@ -260,7 +260,7 @@
         "z": null
       },
       "type": "text",
-      "valign": null,
+      "valign": "center",
       "visible": true,
       "wrap": null
     },
@@ -287,13 +287,13 @@
       "mask": null,
       "opacity": 1.0,
       "outline": null,
-      "padding": null,
+      "padding": 0,
       "parallax": [
         0,
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 40,
       "solid": false,
@@ -337,7 +337,7 @@
         "y": null
       },
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           80,
           -60
@@ -355,7 +355,7 @@
         "z": null
       },
       "type": "text",
-      "valign": null,
+      "valign": "center",
       "visible": true,
       "wrap": null
     }

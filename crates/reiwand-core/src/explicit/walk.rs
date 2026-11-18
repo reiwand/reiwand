@@ -121,10 +121,14 @@ pub fn sample(root: &Value, schema: &Value) -> Value {
     if let Some(first) = schema["enum"].get(0) {
         return first.clone();
     }
+    if branches(schema).iter().any(|b| deref(root, b).0["type"] == "null") {
+        return Value::Null;
+    }
     if let Some(first) = branches(schema).first() {
         return sample(root, first);
     }
     let t = match &schema["type"] {
+        Value::Array(list) if list.iter().any(|t| t == "null") => "null",
         Value::Array(list) => list.first().and_then(Value::as_str).unwrap_or("null"),
         t => t.as_str().unwrap_or("object"),
     };

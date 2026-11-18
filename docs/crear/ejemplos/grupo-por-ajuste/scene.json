@@ -39,7 +39,7 @@
       "brightness": null,
       "cache": false,
       "clip": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "dia",
@@ -98,7 +98,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -147,7 +147,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": [
               1400,
               300
@@ -177,9 +177,9 @@
       ],
       "parent": null,
       "solid": false,
-      "space": null,
+      "space": "2d",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -204,7 +204,7 @@
       "brightness": null,
       "cache": false,
       "clip": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "noche",
@@ -263,7 +263,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -312,7 +312,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": [
               520,
               280
@@ -342,9 +342,9 @@
       ],
       "parent": null,
       "solid": false,
-      "space": null,
+      "space": "2d",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [

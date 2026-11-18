@@ -45,7 +45,7 @@ fn a_video_a_file_property_picks_keeps_a_clock_of_its_own() {
         { "blend_space": "canvas", "id": "b", "type": "video", "video": { "prop": "pick" }, "size": [20, 20], "playback": { "own_clock": true, "rate": 2 } }]);
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": layers });
     let props: BTreeMap<String, Property> =
-        serde_json::from_value(json!({ "pick": { "type": "file", "accept": ["video"] } })).unwrap();
+        reiwand_scene::prefill::properties(json!({ "pick": { "type": "file", "accept": ["video"] } }));
     let scene = Scene::load(&reiwand_upgrade::fill::whole(&doc.to_string()), &props).unwrap();
     assert!(scene.validate(&props).is_empty(), "{:?}", scene.validate(&props));
     let mut rt = Runtime::new(Arc::new(scene), effective(&props, &[]));
@@ -64,7 +64,7 @@ fn own_clocks_need_a_file_property_that_may_hold_a_video() {
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] },
         "assets": { "clip": { "path": "clip.webm" }, "sky": { "path": "sky.png" } }, "layers": [layer] });
     let said = |pick: serde_json::Value| {
-        let props: BTreeMap<String, Property> = serde_json::from_value(json!({ "pick": pick })).unwrap();
+        let props: BTreeMap<String, Property> = reiwand_scene::prefill::properties(json!({ "pick": pick }));
         let scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
         scene
             .validate(&props)

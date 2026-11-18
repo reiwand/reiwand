@@ -109,7 +109,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -224,7 +224,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -290,7 +290,7 @@
       "brightness": null,
       "cache": false,
       "clip": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "stars",
@@ -327,7 +327,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": [
               220,
               140
@@ -378,7 +378,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": [
               520,
               260
@@ -429,7 +429,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": [
               860,
               110
@@ -480,7 +480,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": [
               1240,
               210
@@ -531,7 +531,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": [
               1580,
               90
@@ -582,7 +582,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": [
               1790,
               300
@@ -653,9 +653,9 @@
       ],
       "parent": null,
       "solid": false,
-      "space": null,
+      "space": "2d",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -811,7 +811,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": {
           "a": null,
           "audio": null,
@@ -955,7 +955,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": {
           "a": null,
           "audio": null,
@@ -1093,7 +1093,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           760,
           1060
@@ -1166,7 +1166,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           960,
           985
@@ -1216,12 +1216,12 @@
       "inherit": null,
       "lighting": null,
       "mask": {
-        "channel": null,
+        "channel": "a",
         "feather": 0.0,
         "invert": false,
         "layer": "lake",
         "shape": null,
-        "strength": null,
+        "strength": 1,
         "texture": null
       },
       "opacity": 0.55,
@@ -1241,7 +1241,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           960,
           960
@@ -1293,7 +1293,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           180,
           1110
@@ -1345,7 +1345,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           1740,
           1130
@@ -1461,10 +1461,10 @@
         0
       ],
       "parent": null,
-      "size": null,
+      "size": "canvas",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -1651,10 +1651,10 @@
       "parent": null,
       "redraw": false,
       "rgb": false,
-      "size": null,
+      "size": "canvas",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -1732,13 +1732,13 @@
       "mask": null,
       "opacity": 1.0,
       "outline": null,
-      "padding": null,
+      "padding": 0,
       "parallax": [
         0,
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 56,
       "solid": false,
@@ -1782,7 +1782,7 @@
         "y": null
       },
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           72,
           -64
@@ -1800,7 +1800,7 @@
         "z": null
       },
       "type": "text",
-      "valign": null,
+      "valign": "center",
       "visible": true,
       "wrap": null
     },
@@ -1882,10 +1882,10 @@
       "parent": null,
       "redraw": false,
       "rgb": false,
-      "size": null,
+      "size": "canvas",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [

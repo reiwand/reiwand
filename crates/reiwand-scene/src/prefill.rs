@@ -15,6 +15,12 @@ pub fn prefill(raw: &mut Json) -> reiwand_core::explicit::Annotated {
 
 static ROOT: LazyLock<Json> = LazyLock::new(crate::schema::schema);
 
+static PROPERTY: LazyLock<Json> = LazyLock::new(|| {
+    let mut raw = crate::schema::property_schema();
+    prefill(&mut raw);
+    raw
+});
+
 pub fn of(def: &str, mut value: Json) -> Json {
     let target = serde_json::json!({ "$ref": format!("#/$defs/{def}") });
     reiwand_core::explicit::walk::fill(&ROOT, &target, &mut value);
@@ -62,4 +68,13 @@ pub fn part(path: &str, value: Json) -> Json {
         };
     }
     found
+}
+
+pub fn properties(mut declared: Json) -> std::collections::BTreeMap<String, crate::Property> {
+    for (_, one) in declared.as_object_mut().unwrap().iter_mut() {
+        let mut value = one.take();
+        reiwand_core::explicit::walk::fill(&PROPERTY, &serde_json::json!({ "$ref": "#" }), &mut value);
+        *one = value;
+    }
+    serde_json::from_value(declared).unwrap()
 }

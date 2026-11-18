@@ -63,7 +63,7 @@ fn families_are_bounded() {
     let chain = |next: &str| still(json!({ "children": [{ "system": next, "on": "death" }] }));
     let systems = json!({ "a": chain("b"), "b": chain("c"), "c": chain("d"), "d": still(json!({})) });
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layer("a"), "particles": prefill::all(systems) }).to_string();
-    let scene = Scene::from_json(&text).unwrap();
+    let scene = Scene::from_json(&reiwand_upgrade::fill::whole(&text)).unwrap();
     assert!(scene.validate(&BTreeMap::new()).iter().any(|i| matches!(i, Issue::Generations(_))));
     assert_eq!(flocks(&scene)[0].parts.len(), 3, "the engine keeps two generations");
     let wide = |n: usize| {
@@ -77,7 +77,7 @@ fn families_are_bounded() {
     let text =
         json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layers, "particles": prefill::all(systems) })
             .to_string();
-    let scene = Scene::from_json(&text).unwrap();
+    let scene = Scene::from_json(&reiwand_upgrade::fill::whole(&text)).unwrap();
     let issues = scene.validate(&BTreeMap::new());
     assert!(
         issues.contains(&Issue::TooMany { path: "/particles".into(), count: 84, max: MAX_PARTS }),

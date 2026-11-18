@@ -71,7 +71,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [
         {
@@ -134,7 +134,7 @@
             "invert": false,
             "layer": null,
             "shape": null,
-            "strength": null,
+            "strength": 1,
             "texture": "mancha"
           },
           "name": null,
@@ -154,7 +154,7 @@
           "effect": "blur",
           "enabled": true,
           "mask": {
-            "channel": null,
+            "channel": "a",
             "feather": 0.0,
             "invert": true,
             "layer": null,
@@ -197,7 +197,7 @@
       ],
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -283,10 +283,10 @@
       "parent": null,
       "redraw": false,
       "rgb": false,
-      "size": null,
+      "size": "canvas",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [

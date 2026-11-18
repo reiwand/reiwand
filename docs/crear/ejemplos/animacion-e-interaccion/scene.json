@@ -74,7 +74,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "baile",
@@ -89,7 +89,7 @@
       ],
       "parent": null,
       "playback": {
-        "end": null,
+        "end": "end",
         "frame": null,
         "loop": true,
         "own_clock": false,
@@ -103,7 +103,7 @@
       ],
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           700,
           540
@@ -156,7 +156,7 @@
       "solid": true,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           1250,
           540
@@ -261,19 +261,19 @@
       "mask": null,
       "opacity": 1.0,
       "outline": null,
-      "padding": null,
+      "padding": 0,
       "parallax": [
         0,
         0
       ],
       "parent": "boton",
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 54,
       "solid": false,
       "text": "Toca aquí",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -288,7 +288,7 @@
         "z": null
       },
       "type": "text",
-      "valign": null,
+      "valign": "center",
       "visible": true,
       "wrap": null
     },
@@ -308,7 +308,7 @@
       "lighting": null,
       "loop": false,
       "mask": null,
-      "mode": null,
+      "mode": "sequence",
       "opacity": 1.0,
       "pan": 0.0,
       "parallax": [
@@ -324,7 +324,7 @@
       "sounds": [],
       "stream": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [

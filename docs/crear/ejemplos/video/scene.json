@@ -55,7 +55,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "pelicula",
@@ -69,7 +69,7 @@
       ],
       "parent": null,
       "playback": {
-        "end": null,
+        "end": "end",
         "frame": null,
         "loop": true,
         "own_clock": false,
@@ -83,7 +83,7 @@
       ],
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -108,7 +108,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "pequena",
@@ -122,7 +122,7 @@
       ],
       "parent": null,
       "playback": {
-        "end": null,
+        "end": "end",
         "frame": null,
         "loop": true,
         "own_clock": true,
@@ -136,7 +136,7 @@
       ],
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           1700,
           960

@@ -171,7 +171,7 @@ fn every_parameter_must_be_written() {
         doc.as_object_mut().unwrap().extend(layer(json!({})).as_object().unwrap().clone());
         let mut doc: Json = serde_json::from_str(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
         doc["layers"][0]["effects"][0]["params"] = params;
-        Scene::from_json(&doc.to_string()).unwrap().validate(&BTreeMap::new())
+        Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap().validate(&BTreeMap::new())
     };
     let absent = |id: &str| Issue::Absent { path: "/layers/0/effects/0/params".into(), id: id.into() };
     let ids = ["key", "tolerance", "softness", "spill", "distance", "keep"];

@@ -14,7 +14,7 @@ scene	AnimLayer.enabled	Value_for_boolean	optional	1	true	dbus.md:600
 scene	AnimLayer.rate	Value_for_float	optional	1	1.0	dbus.md:2022
 scene	AnimLayer.weight	Value_for_float	optional	1	1.0	editor.md:73
 scene	Area.at	string|null	optional	3	null	dbus.md:1168
-scene	Area.inner	array|null	optional	3	null	editor.md:475
+scene	Area.inner	array|null	optional	1	[0,0]	editor.md:475
 scene	Around.arc	Value_for_float2	optional	1	360.0	scene.md:2003
 scene	Around.at	array|string|null	optional	3	null	dbus.md:1168
 scene	Around.mode	Sweep	optional	1	"repeat"	editor.md:70
@@ -360,7 +360,7 @@ scene	BonePhysics.stiffness	number	optional	1	0.5	editor.md:78
 scene	BonePhysics.translation	array|null	optional	3	null	editor.md:78
 scene	BonePhysics.wind	number	optional	1	0.0	editor.md:78
 scene	Bow.side	number	optional	1	0.0	scene.md:1684
-scene	Burst.at	number|null	optional	3	null	dbus.md:1168
+scene	Burst.at	number|null	optional	1	0	dbus.md:1168
 scene	Burst.every	number|null	optional	3	null	dbus.md:1257
 scene	Burst.on	string|null	optional	3	null	dbus.md:738
 scene	Camera.center	array|object|null	optional	3	null	dbus.md:505
@@ -395,11 +395,11 @@ scene	Canvas.sky	string|null	optional	3	null	editor.md:94
 scene	Canvas.tonemap	string|null	optional	3	null	editor.md:111
 scene	Canvas.wind	array|object|null	optional	3	null	editor.md:78
 scene	Carry.speed	array	optional	1	[1.0,1.0]	editor.md:85
-scene	Child.angle	number|null	optional	3	null	editor.md:80
+scene	Child.angle	number|null	optional	1	0	editor.md:80
 scene	Child.follow_inherit	boolean	optional	1	false	scene.md:1854
 scene	Child.inherit	array	optional	3	[]	editor.md:53
 scene	Child.max	number|null	optional	3	null	editor.md:67
-scene	Child.offset	array|null	optional	3	null	editor.md:79
+scene	Child.offset	array|null	optional	1	[0,0]	editor.md:79
 scene	Child.points_from	boolean	optional	1	false	scene.md:1933
 scene	Child.probability	number	optional	1	1.0	scene.md:1931
 scene	Child.scale	number	optional	1	1.0	dbus.md:395
@@ -411,7 +411,7 @@ scene	Collider.bounce	number	optional	1	0.0	editor.md:85
 scene	Collider.friction	number	optional	1	0	editor.md:85
 scene	Collider.kill	boolean	optional	1	false	editor.md:85
 scene	Collider.stick	boolean	optional	1	false	editor.md:85
-scene	ControlPoint.angle	number|object|null	optional	3	null	editor.md:80
+scene	ControlPoint.angle	number|object|null	optional	1	0	editor.md:80
 scene	ControlPoint.at	array|object|null	optional	3	null	dbus.md:1168
 scene	ControlPoint.follow	string|null	optional	3	null	dbus.md:767
 scene	ControlPoint.space	Placement	optional	1	"local"	editor.md:85
@@ -424,7 +424,7 @@ scene	EffectUse.optional	boolean	optional	1	false	dbus.md:2641
 scene	EffectUse.params	object	optional	3	{}	editor.md:95
 scene	Emitter.audio_gate	boolean	optional	1	false	editor.md:85
 scene	Emitter.bursts	array	optional	3	[]	editor.md:85
-scene	Emitter.delay	number|null	optional	3	null	editor.md:85
+scene	Emitter.delay	number|null	optional	1	0	editor.md:85
 scene	Emitter.duration	number|null	optional	3	null	dbus.md:2021
 scene	Emitter.follow	string|null	optional	3	null	dbus.md:767
 scene	Emitter.inherit	number	optional	1	0	editor.md:53
@@ -446,7 +446,7 @@ scene	Hearing.attack	number	optional	1	0.02	scene.md:108
 scene	Hearing.gain_release	number	required	1	5	scene.md:101
 scene	Hearing.release	number	optional	1	0.2	scene.md:108
 scene	Hsv.sat	array	optional	1	[1.0,1.0]	-
-scene	Hsv.steps	number|null	optional	3	null	dbus.md:1339
+scene	Hsv.steps	number|null	optional	1	0	dbus.md:1339
 scene	Hsv.val	array	optional	1	[1.0,1.0]	-
 scene	IkChain.bend	Bend	optional	1	"clockwise"	editor.md:77
 scene	IkChain.limits	object	optional	3	{}	editor.md:77
@@ -619,7 +619,7 @@ scene	OffsetNoise.scale	number	optional	1	1.0	dbus.md:395
 scene	OffsetNoise.sign	array	optional	1	[0,0]	editor.md:931
 scene	Operator.window	array|null	optional	3	null	editor.md:85
 scene	Oscillate.from	Base	required	1	"top"	dbus.md:176
-scene	Oscillate.mask	array|null	optional	3	null	dbus.md:2396
+scene	Oscillate.mask	array|null	optional	1	[1,1]	dbus.md:2396
 scene	Oscillate.phase	array	optional	1	[0.0,0.0]	editor.md:63
 scene	Outline.color	Value_for_Color	optional	1	"#000000"	dbus.md:575
 scene	Palette.noise	array	optional	1	[0.0,0.0,0.0]	editor.md:111
@@ -731,10 +731,10 @@ scene	Timeline.speed	number	optional	1	1.0	editor.md:85
 scene	Timeline.trigger	string|null	optional	3	null	dbus.md:689
 scene	Timeline.wrap	boolean	optional	1	false	editor.md:89
 scene	Trail.segments	number|null	optional	3	null	package.md:363
-scene	Trail.subdivide	number|null	optional	3	null	package.md:363
+scene	Trail.subdivide	number|null	optional	1	0	package.md:363
 scene	Trail.textured	boolean	optional	1	false	package.md:363
-scene	Trail.uv_scale	number|null	optional	3	null	package.md:363
-scene	Trail.uv_scroll	number|null	optional	3	null	package.md:363
+scene	Trail.uv_scale	number|null	optional	1	1	package.md:363
+scene	Trail.uv_scroll	number|null	optional	1	0	package.md:363
 scene	Transform.origin	array|null	optional	3	null	editor.md:113
 scene	Transform.position	array|object|null	optional	3	null	dbus.md:1206
 scene	Transform.rotation	Value_for_float	optional	1	0.0	editor.md:73

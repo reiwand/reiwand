@@ -30,6 +30,43 @@ pub(super) fn corrected(def: &str, name: &str) -> Option<Value> {
     })
 }
 
+pub(super) fn follows(def: &str, name: &str, map: &Map<String, Value>) -> Option<Value> {
+    let kind = map.get("type").and_then(Value::as_str).unwrap_or("");
+    Some(match (def, name) {
+        ("Transform", "origin") => json!("anchor"),
+        ("Camera", "center") => json!("canvas"),
+        ("Playback", "end") => json!("end"),
+        ("Layer", "size") if matches!(kind, "image" | "video") => json!("source"),
+        ("Layer", "size") if matches!(kind, "solid" | "adjustment" | "mesh" | "model") => json!("canvas"),
+        ("Layer", "color")
+            if matches!(kind, "group" | "image" | "video" | "particles" | "text" | "spectrum" | "mesh") =>
+        {
+            json!("#ffffff")
+        }
+        ("Emitter", "delay") | ("Burst", "at") | ("Child", "angle") => json!(0),
+        ("Trail", "subdivide") | ("Trail", "uv_scroll") | ("Hsv", "steps") => json!(0),
+        ("Trail", "uv_scale") => json!(1),
+        ("Mask", "channel") => {
+            json!(if map.get("texture").is_some_and(|t| !t.is_null()) { "luminance" } else { "a" })
+        }
+        ("Mask", "strength") => json!(1),
+        ("Shake", "enabled") => json!(true),
+        ("Shake", "roughness") => json!(0.5),
+        ("Layer", "space") if kind == "group" => json!("2d"),
+        ("Layer", "cone") if kind == "light" => json!([30, 60]),
+        ("Layer", "length") if kind == "light" => json!(256),
+        ("Layer", "shadow_bias") if kind == "light" => json!(0.2),
+        ("Layer", "padding") if kind == "text" => json!(0),
+        ("Layer", "valign") if kind == "text" => json!("center"),
+        ("Layer", "mode") if kind == "sound" => json!("sequence"),
+        ("Layer", "render") if kind == "text" => json!("auto"),
+        ("Layer", "playback") if kind == "video" => json!({
+            "rate": 1, "playing": true, "loop": true, "start": 0, "end": "end", "frame": null, "own_clock": false
+        }),
+        _ => return None,
+    })
+}
+
 pub(super) fn contextual(def: &str, name: &str) -> bool {
     matches!((def, name), ("Layer", "blend_space")) || heard_value(def, name).is_some()
 }

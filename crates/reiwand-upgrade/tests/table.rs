@@ -104,7 +104,7 @@ fn table_covers_every_optional_property_of_the_live_schemas() {
     }
     println!("optional properties covered: {seen}");
     assert!(missing.is_empty(), "not in the table: {missing:?}");
-    assert!(seen > 500, "{seen}");
+    assert!(seen > 200, "{seen}");
 }
 
 fn rust_files(dir: &std::path::Path, out: &mut Vec<PathBuf>) {

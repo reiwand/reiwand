@@ -3,12 +3,11 @@ use super::*;
 #[test]
 fn forms_order_localize_and_hide_properties() {
     let mut props = props();
-    let extra: BTreeMap<String, Property> = serde_json::from_value(json!({
+    let extra: BTreeMap<String, Property> = reiwand_scene::prefill::properties(json!({
         "look": { "type": "group", "label": { "en": "Look", "es": "Aspecto" }, "order": -1 },
         "glow": { "type": "slider", "group": "look", "min": 0, "max": 1, "step": 0.1, "default": 0.5,
                   "label": { "en": "Glow", "es-ES": "Brillo" } }
-    }))
-    .unwrap();
+    }));
     props.extend(extra);
     let presets: Vec<Preset> = serde_json::from_value(
         json!([{ "id": "calm", "label": { "en": "Calm", "es": "Calma" }, "values": {} }]),
@@ -37,7 +36,7 @@ fn forms_order_localize_and_hide_properties() {
     );
     let broken = |extra: serde_json::Value| {
         let mut props = props.clone();
-        props.extend(serde_json::from_value::<BTreeMap<String, Property>>(extra).unwrap());
+        props.extend(reiwand_scene::prefill::properties(extra));
         check_presets(&props, &[]).is_err()
     };
     assert!(!broken(json!({})));
@@ -45,15 +44,12 @@ fn forms_order_localize_and_hide_properties() {
     assert!(broken(json!({ "x": { "type": "bool", "default": true, "visible_if": { "nothing": true } } })));
     assert!(broken(json!({ "x": { "type": "bool", "default": true, "visible_if": { "soft": 3 } } })));
     let mut shown = props.clone();
-    shown.extend(
-        serde_json::from_value::<BTreeMap<String, Property>>(json!({
-            "a": { "type": "bool", "default": true, "visible_if": { "density": 120 } },
-            "b": { "type": "bool", "default": true, "visible_if": { "density": 120.0, "text_color": "#FFFFFF" } },
-            "c": { "type": "bool", "default": true, "visible_if": { "depth": 0.4 } },
-            "d": { "type": "bool", "default": true, "visible_if": { "depth": 1 } }
-        }))
-        .unwrap(),
-    );
+    shown.extend(reiwand_scene::prefill::properties(json!({
+        "a": { "type": "bool", "default": true, "visible_if": { "density": 120 } },
+        "b": { "type": "bool", "default": true, "visible_if": { "density": 120.0, "text_color": "#FFFFFF" } },
+        "c": { "type": "bool", "default": true, "visible_if": { "depth": 0.4 } },
+        "d": { "type": "bool", "default": true, "visible_if": { "depth": 1 } }
+    })));
     assert_eq!(check_presets(&shown, &[]), Ok(()));
     let fields = form(&shown, &[], &effective(&shown, &[]), &[]).0;
     let visible = |key: &str| fields.iter().any(|f| f.key == key && f.visible);

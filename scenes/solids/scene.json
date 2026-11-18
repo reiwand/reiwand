@@ -90,10 +90,10 @@
         0
       ],
       "parent": null,
-      "size": null,
+      "size": "canvas",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -118,7 +118,7 @@
       "brightness": null,
       "cache": false,
       "clip": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "stage",
@@ -192,10 +192,10 @@
             5
           ],
           "shapes": {},
-          "size": null,
+          "size": "canvas",
           "solid": false,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -306,10 +306,10 @@
           "rules": [],
           "scale": null,
           "shapes": {},
-          "size": null,
+          "size": "canvas",
           "solid": false,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -338,7 +338,7 @@
       "solid": false,
       "space": "3d",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -368,13 +368,16 @@
       "brightness": null,
       "cache": false,
       "color": "#fff1d6",
-      "cone": null,
+      "cone": [
+        30,
+        60
+      ],
       "depth_test": false,
       "effects": [],
       "id": "sun",
       "inherit": null,
       "intensity": 1.4,
-      "length": null,
+      "length": 256,
       "light": "directional",
       "lighting": null,
       "mask": null,
@@ -396,7 +399,7 @@
       "solid": false,
       "texture": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [

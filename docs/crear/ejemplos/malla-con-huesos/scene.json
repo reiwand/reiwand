@@ -131,7 +131,7 @@
         }
       ],
       "colliders": [],
-      "color": null,
+      "color": "#ffffff",
       "depth": null,
       "depth_test": false,
       "effects": [],
@@ -210,7 +210,7 @@
       "solid": false,
       "texture": "cielo",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
