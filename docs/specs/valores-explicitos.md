@@ -96,6 +96,21 @@ Lo usan los cargadores de todos los formatos; ningún formato escribe su propia 
   `upgrade-copias/<segundos>/` y es idempotente. Pruebas: `crates/reiwand-upgrade/tests/stored.rs`,
   `apps/reiwandd/src/inputs/tests.rs`.
 
+## Biblioteca (`library.db`, esquema 9) y estado de rotación
+
+- Los bloques JSON de la base ya no aceptan omisiones: `playlists.rules` (`Rules`: orden, intervalo, horas,
+  días, `synced`, `resume`, `advance_while_paused`, `skip_videos_on_battery`, `transition_ms` explícito o
+  `null`), `profiles.outputs` (cada salida lleva `item`, `path`, `playlist`, `fit`, `background`, `preset` y
+  `filter`, `null` si no se usa), `profiles.auto` (`outputs` y `on_battery`), `presets.value` (`fit` y
+  `background`, o `package` y `values` en los ajustes de paquete) y `rotation.state` (`anchor`, `since`,
+  `behind` y `ahead` siempre escritos, también `anchor` en cada elemento de `behind`/`ahead`).
+- El demonio escribe estos bloques completos (los `null` ya no se quitan). Una fila a la que le falte un valor
+  se rechaza al leerla nombrando el campo y `reiwand-upgrade client`.
+- La base lleva un número de esquema nuevo; una base con el número anterior se rechaza y el mensaje nombra
+  `reiwand-upgrade client`.
+- La conversión de única vez trabaja sobre una copia de la base, completa los bloques con los valores de hoy,
+  fija la versión 9, deja la original en `upgrade-copias/<segundos>/` y pone la copia en su lugar.
+
 ## Archivos internos de instalación (`installed.json`, `anchors.json`, `repo-pins.json`)
 
 - Los tres llevan `{"format": 3, "content": ...}`; en `installed.json` `signer` y `revoked` se escriben
