@@ -88,7 +88,7 @@ fn nested(depth: usize) -> String {
 
 #[test]
 fn a_scene_nested_too_deep_is_refused() {
-    assert!(Scene::load(&nested(3), &BTreeMap::new()).is_ok());
+    assert!(Scene::load(&reiwand_upgrade::fill::whole(&nested(3)), &BTreeMap::new()).is_ok());
     let scene = nested(2000);
     let loaded = capped("deep groups".into(), move || Scene::load(&scene, &BTreeMap::new()).is_err());
     assert!(loaded, "a scene with 2000 nested groups was accepted");

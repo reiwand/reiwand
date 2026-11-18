@@ -29,7 +29,10 @@ fn fox() -> Vec<u8> {
     )
 }
 
-fn manifest(features: &[&str], change: Value) -> Manifest {
+fn manifest(features: &[&str], mut change: Value) -> Manifest {
+    if let Some(properties) = change.get_mut("properties") {
+        *properties = common::properties(properties.take());
+    }
     let mut value = serde_json::to_value(v2(Kind::Scene)).unwrap();
     value["requires"] = json!({ "features": features });
     value.as_object_mut().unwrap().extend(change.as_object().unwrap().clone());

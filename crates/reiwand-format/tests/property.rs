@@ -1,6 +1,6 @@
 mod common;
 
-use common::manifest;
+use common::{manifest, manifest_text, properties};
 use reiwand_format::{Choice, Control, Error, Kind, Property, Result, Slider};
 use serde_json::json;
 
@@ -88,11 +88,11 @@ fn property_names_must_be_identifiers() {
 
 #[test]
 fn presets_keep_whole_numbers_on_sliders_and_colors_in_any_case() {
-    let props = serde_json::from_value(json!({
+    let props = serde_json::from_value(properties(json!({
         "speed": { "type": "slider", "min": 0.5, "max": 4, "decimals": 2, "default": 1 },
         "count": { "type": "slider", "min": 0, "max": 9.5, "default": 2 },
         "tint": { "type": "color", "default": "#000000" }
-    }))
+    })))
     .unwrap();
     let preset: reiwand_format::PresetFile = serde_json::from_value(json!({
         "base": { "id": "org.example.base", "version": "^1" },

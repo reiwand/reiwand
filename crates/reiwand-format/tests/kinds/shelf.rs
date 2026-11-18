@@ -5,10 +5,11 @@ fn shared() -> Manifest {
 }
 
 fn document(parts: Value) -> String {
-    json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 64] },
+    let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 64] },
         "layers": [{ "blend_space": "canvas", "id": "glow", "type": "solid", "color": "#ffcc00" }],
         "particles": { "snow": { "capacity": 10, "emitters": [{ "shape": { "point": [0, 0] } }] } }, "ext": { "parts": parts } })
-    .to_string()
+    .to_string();
+    common::whole(&text)
 }
 
 #[test]
@@ -24,6 +25,7 @@ fn parts_are_listed_with_their_titles_and_thumbnails() {
     let plain = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [8, 8] },
         "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#000000" }], "particles": { "b": { "capacity": 10, "emitters": [{ "shape": { "point": [0, 0] } }] } } })
     .to_string();
+    let plain = common::whole(&plain);
     let mut package = load(&shared(), &[("assets.json", plain.as_bytes())]).unwrap();
     let kinds: Vec<_> =
         reiwand_format::parts(&package.scene().unwrap()).unwrap().into_iter().map(|p| p.kind).collect();

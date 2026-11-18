@@ -17,7 +17,12 @@ fn scene(layers: Value, more: Value) -> String {
     let mut scene = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] },
         "assets": { "sky": { "path": "sky.png" } }, "layers": layers });
     scene.as_object_mut().unwrap().extend(more.as_object().unwrap().clone());
-    scene.to_string()
+    common::whole(&scene.to_string())
+}
+
+fn descriptor(mut descriptor: Value) -> String {
+    reiwand_upgrade::descriptors::complete(&mut descriptor);
+    descriptor.to_string()
 }
 
 fn manifest(features: &[&str]) -> Manifest {

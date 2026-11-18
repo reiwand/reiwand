@@ -46,7 +46,7 @@ fn package_effects_are_read_compiled_and_checked() {
         effects,
     );
     let descriptor =
-        json!({ "id": "ripple", "passes": [{ "entry": "fs_ripple" }], "cost": { "taps": 1 } }).to_string();
+        descriptor(json!({ "id": "ripple", "passes": [{ "entry": "fs_ripple" }], "cost": { "taps": 1 } }));
     let files = |wgsl: &'static str| -> Vec<(&'static str, Vec<u8>)> {
         vec![
             ("effects/ripple.json", descriptor.clone().into_bytes()),

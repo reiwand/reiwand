@@ -62,7 +62,32 @@ pub fn zip(add: impl FnOnce(&mut Zip)) -> Vec<u8> {
     zip.finish().unwrap().into_inner()
 }
 
+pub fn whole(text: &str) -> String {
+    reiwand_upgrade::fill::whole(&text.replace("reiwand.scene/1", "reiwand.scene/2"))
+}
+
+pub fn manifest_text(text: &str) -> String {
+    let Ok(mut doc) = serde_json::from_str::<serde_json::Value>(text) else { return text.to_owned() };
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut doc);
+    doc.to_string()
+}
+
+pub fn properties(properties: serde_json::Value) -> serde_json::Value {
+    let mut doc = serde_json::json!({ "schema": "reiwand.wpak/2", "id": "org.example.props", "version": "1.0.0",
+        "title": "Props", "license": "MIT", "kind": "scene", "entry": "scene.json", "properties": properties });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut doc);
+    doc["properties"].take()
+}
+
 pub fn put(zip: &mut Zip, name: &str, data: &[u8]) {
+    let done;
+    let data = match std::str::from_utf8(data) {
+        Ok(text) if name.ends_with("scene.json") => {
+            done = whole(text);
+            done.as_bytes()
+        }
+        _ => data,
+    };
     if name.ends_with('/') {
         zip.add_directory(name, SimpleFileOptions::default()).unwrap();
     } else {

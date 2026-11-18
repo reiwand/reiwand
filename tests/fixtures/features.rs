@@ -36,9 +36,10 @@ pub fn source(name: &str, case: &Value, dir: &Path) -> PathBuf {
         "license": "CC0-1.0", "kind": kind, "entry": entry, "content": { "rating": "general" },
         "photosensitive": false, "origin": { "kind": "original" }, "previews": { "thumbnail": "preview.png" } });
     merge(&mut manifest, &case["manifest"]);
-    let mut scene = json!({ "schema": "reiwand.scene/1", "canvas": { "size": [64, 32] },
+    let mut scene = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] },
         "assets": { "sky": { "path": "sky.png" } } });
     merge(&mut scene, &case["scene"]);
+    let scene = serde_json::from_str::<Value>(&reiwand_upgrade::fill::whole(&scene.to_string())).unwrap();
     let mut files = vec![("preview.png".to_owned(), bytes("fixture:green-64x32.png"))];
     files.push(("sky.png".to_owned(), bytes("fixture:green-64x32.png")));
     files.push(("manifest.json".to_owned(), manifest.to_string().into_bytes()));

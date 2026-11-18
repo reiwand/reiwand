@@ -14,13 +14,13 @@ use std::path::Path;
 
 mod checked;
 
-const SCENE: &str = r##"{"schema": "reiwand.scene/1", "canvas": {"size": [3840, 1600]},
+const SCENE: &str = r##"{"schema": "reiwand.scene/2", "canvas": {"size": [3840, 1600]},
     "layers": [{"blend_space": "canvas", "id": "glow", "type": "solid", "color": "#336699", "opacity": {"audio": "bass", "kind": "relative", "unit": "db"}}]}"##;
 
 fn source(dir: &Path, manifest: &Manifest) {
     fs::create_dir_all(dir).unwrap();
     fs::write(dir.join("manifest.json"), manifest.to_json().unwrap()).unwrap();
-    fs::write(dir.join("scene.json"), SCENE).unwrap();
+    fs::write(dir.join("scene.json"), common::whole(SCENE)).unwrap();
     fs::write(dir.join("preview.png"), image(320, 180, ImageFormat::Png)).unwrap();
 }
 

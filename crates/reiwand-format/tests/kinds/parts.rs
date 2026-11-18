@@ -51,6 +51,7 @@ fn assets_packages_offer_scene_parts() {
     let scene = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 64] },
         "layers": [{ "blend_space": "canvas", "id": "glow", "type": "solid", "color": "#ffcc00" }] })
     .to_string();
+    let scene = common::whole(&scene);
     let shared = manifest(Kind::Assets, "assets.json", json!({ "requires": { "features": ["assets"] } }));
     let mut package = load(&shared, &[("assets.json", scene.as_bytes())]).unwrap();
     assert_eq!(package.scene().unwrap().layers.len(), 1);

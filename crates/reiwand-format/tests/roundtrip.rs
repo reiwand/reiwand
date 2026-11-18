@@ -12,7 +12,7 @@ use std::sync::Arc;
 const FILES: [&str; 5] =
     ["manifest.json", "assets/effect.wgsl", "assets/textures/sky.png", "preview.webp", "scene.json"];
 
-const SCENE: &str = r#"{"schema": "reiwand.scene/1", "canvas": {"size": [64, 32]},
+const SCENE: &str = r#"{"schema": "reiwand.scene/2", "canvas": {"size": [64, 32]},
     "assets": {"sky": {"path": "assets/textures/sky.png"}},
     "layers": [{ "blend_space": "canvas", "id": "sky", "type": "image", "image": "sky"}, { "blend_space": "canvas", "id": "tint", "type": "solid", "color": {"prop": "tint"}}]}"#;
 
@@ -23,7 +23,7 @@ fn source(dir: &Path) -> Manifest {
         .insert("tint".into(), Property::new(Control::Color { default: "#336699".into(), alpha: false }));
     fs::create_dir_all(dir.join("assets/textures")).unwrap();
     fs::write(dir.join("manifest.json"), manifest.to_json().unwrap()).unwrap();
-    fs::write(dir.join("scene.json"), SCENE).unwrap();
+    fs::write(dir.join("scene.json"), common::whole(SCENE)).unwrap();
     fs::write(dir.join("preview.webp"), b"RIFF\0\0\0\0WEBP").unwrap();
     fs::write(dir.join("assets/textures/sky.png"), vec![7u8; 5000]).unwrap();
     fs::write(dir.join("assets/effect.wgsl"), b"@fragment fn main() {}").unwrap();
@@ -58,7 +58,7 @@ fn luts_are_read_once_per_file_and_within_limits() {
     fs::write(src.join("assets/grade.cube"), format!("LUT_3D_SIZE 2\n{corners}")).unwrap();
     let ids: String = (0..200).map(|i| format!(r#", "g{i}": {{"path": "assets/grade.cube"}}"#)).collect();
     let sky = r#""path": "assets/textures/sky.png"}"#;
-    fs::write(src.join("scene.json"), SCENE.replace(sky, &format!("{sky}{ids}"))).unwrap();
+    fs::write(src.join("scene.json"), common::whole(&SCENE.replace(sky, &format!("{sky}{ids}")))).unwrap();
     build(&src, &out, &Limits::default()).unwrap();
     let mut package = open(&out, &Limits::default()).unwrap();
     let scene = package.scene().unwrap();
@@ -88,12 +88,12 @@ fn build_rejects_invalid_sources() {
         matches!(build(&src, &out, &Limits::default()), Err(Error::Symlink(p)) if p == "assets/host.png")
     );
     fs::remove_file(src.join("assets/host.png")).unwrap();
-    fs::write(src.join("scene.json"), SCENE.replace("assets/textures/sky.png", "assets/gone.png")).unwrap();
+    fs::write(src.join("scene.json"), common::whole(&SCENE.replace("assets/textures/sky.png", "assets/gone.png"))).unwrap();
     assert!(
         matches!(build(&src, &out, &Limits::default()), Err(Error::Missing(p)) if p == "assets/gone.png")
     );
     assert!(!out.exists());
-    fs::write(src.join("scene.json"), SCENE.replace("\"prop\": \"tint\"", "\"prop\": \"shade\"")).unwrap();
+    fs::write(src.join("scene.json"), common::whole(&SCENE.replace("\"prop\": \"tint\"", "\"prop\": \"shade\""))).unwrap();
     assert!(
         matches!(build(&src, &out, &Limits::default()), Err(Error::Invalid { field, .. }) if field == "scene")
     );
@@ -104,7 +104,7 @@ fn build_rejects_invalid_sources() {
     };
     let pad: String = (0..9 << 20).map(|_| noise()).collect();
     let padded = SCENE.replace("\"layers\"", &format!("\"ext\": {{\"x_pad\": \"{pad}\"}}, \"layers\""));
-    fs::write(src.join("scene.json"), padded).unwrap();
+    fs::write(src.join("scene.json"), common::whole(&padded)).unwrap();
     let large = build(&src, &out, &Limits::default());
     assert!(matches!(large, Err(Error::Limit { what: "scene size", .. })), "{large:?}");
     fs::remove_file(src.join("scene.json")).unwrap();
@@ -157,7 +157,7 @@ fn sounds_are_checked_when_a_scene_is_built_or_read() {
     let sky = r#""path": "assets/textures/sky.png"}"#;
     let layer = r#"{ "blend_space": "canvas", "id": "rain", "type": "sound", "sound": "rain"}, { "blend_space": "canvas", "id": "sky""#;
     let scene = SCENE.replace(sky, &format!(r#"{sky}, "rain": {{"path": "assets/rain.wav"}}"#));
-    fs::write(src.join("scene.json"), scene.replacen(r#"{ "blend_space": "canvas", "id": "sky""#, layer, 1))
+    fs::write(src.join("scene.json"), common::whole(&scene.replacen(r#"{ "blend_space": "canvas", "id": "sky""#, layer, 1)))
         .unwrap();
     fs::write(src.join("assets/rain.wav"), wav(2)).unwrap();
     build(&src, &out, &Limits::default()).unwrap();
