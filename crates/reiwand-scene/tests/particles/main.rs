@@ -45,9 +45,9 @@ fn with(mut base: Json, patch: Json) -> Json {
 
 fn scene(system: Json, visible: bool) -> String {
     let layer = json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "dots", "visible": visible });
-    let assets = json!({ "dot": { "path": "dot.png", "atlas": [2, 2] } });
-    json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": [layer], "particles": { "dots": prefill::completed(system) }, "assets": assets })
-        .to_string()
+    let assets = json!({ "dot": { "path": "dot.png", "linear": true, "atlas": [2, 2] } });
+    let doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": [layer], "particles": { "dots": prefill::completed(system) }, "assets": assets });
+    reiwand_upgrade::fill::whole(&doc.to_string())
 }
 
 fn runtime(text: &str) -> Runtime {
@@ -79,5 +79,5 @@ fn issues(system: Json) -> Vec<Issue> {
 
 fn done(mut doc: Json) -> String {
     doc["particles"] = prefill::all(doc["particles"].take());
-    doc.to_string()
+    reiwand_upgrade::fill::whole(&doc.to_string())
 }
