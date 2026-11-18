@@ -3169,7 +3169,7 @@ key is refused (see below). TOML has no `null`, so a setting that is not chosen 
 `""` for an image, list, preset or profile, `"general"` for the fit, background, clicks, filter, quality, HDR and
 transition of a screen that fixes nothing (in `[default]` it means that the package or the factory value
 rules), `"none"` for `blank`, `"auto"` for `surfaces.layer_namespace`. Values out of range are clamped when the
-file is read and invalid colors fall back to the first color, with a warning naming the key. Saving keeps the user's file: its comments,
+file is read and invalid colors fall back to the template value, with a warning naming the key. Saving keeps the user's file: its comments,
 blank lines, key order (also within `[providers.*]`) and value spelling stay, only changed
 values are rewritten (keeping their trailing comments), removed keys go with the comments above
 them and new tables are added at the end. A file that does not parse, or whose merged form would
