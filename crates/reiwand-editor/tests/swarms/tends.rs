@@ -16,7 +16,7 @@ fn colliders_and_their_responses_are_set_undone_and_checked() {
     let before = p.doc.clone();
     let inside = json!({ "bounds": { "box": { "from": [100, 100], "to": [500, 400], "inside": true } }, "bounce": 0.5 });
     edit(&mut p, "collider", json!({ "collider": inside })).unwrap();
-    assert_eq!(system(&p)["collide"], json!([inside]));
+    assert_eq!(system(&p)["collide"][0], super::whole::same(&p, "/scene/particles/flakes/collide/0", inside));
     undone(&mut p, &before);
     let c = |p: &Project| system(p)["collide"][0].clone();
     for (response, more, want) in [
@@ -72,7 +72,7 @@ fn keeps_flocks_and_operators_are_set_undone_and_checked() {
     let before = p.doc.clone();
     let ring = json!({ "keep_distance": { "target": "p0", "distance": 50, "strength": 3 } });
     edit(&mut p, "force", json!({ "force": ring })).unwrap();
-    assert_eq!(system(&p)["forces"][2], ring);
+    assert_eq!(system(&p)["forces"][2], super::whole::same(&p, "/scene/particles/flakes/forces/2", ring));
     undone(&mut p, &before);
     edit(
         &mut p,
@@ -134,14 +134,31 @@ fn ropes_trails_textures_and_the_budget_follow_the_system() {
     .unwrap();
     edit(&mut p, "texture", json!({ "texture": "pic" })).unwrap();
     let render = system(&p)["render"].clone();
-    assert_eq!(render["rope"], json!({ "subdivide": 3, "width": 6 }));
-    assert_eq!(render["trail"], json!({ "length": 48, "width": 0.5, "segments": 8 }));
+    assert_eq!(
+        render["rope"],
+        super::whole::same(&p, "/scene/particles/flakes/render/rope", json!({ "subdivide": 3, "width": 6 }))
+    );
+    assert_eq!(
+        render["trail"],
+        super::whole::same(
+            &p,
+            "/scene/particles/flakes/render/trail",
+            json!({ "length": 48, "width": 0.5, "segments": 8 })
+        )
+    );
     let strands = handles(&p)["strands"].clone();
     assert_eq!((strands["texture"].clone(), strands["textures"].clone()), (json!("pic"), json!(["pic"])));
     edit(&mut p, "strand", json!({ "strand": "rope", "layer": "flakes", "settings": { "smooth": false } }))
         .unwrap();
     let own = crate_layer(&p);
-    assert_eq!(own["render"]["rope"], json!({ "subdivide": 3, "width": 6, "smooth": false }));
+    assert_eq!(
+        own["render"]["rope"],
+        super::whole::same(
+            &p,
+            "/scene/layers/1/render/rope",
+            json!({ "subdivide": 3, "width": 6, "smooth": false })
+        )
+    );
     let budget = reiwand_editor::swarms::budget(&p.dir, &p.doc, "flakes", None, 2.0, Quality::Q3);
     let low = reiwand_editor::swarms::budget(&p.dir, &p.doc, "flakes", None, 2.0, Quality::Q0);
     let alive = |b: &Value| b["alive"].as_u64().unwrap();

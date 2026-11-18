@@ -24,8 +24,8 @@ fn layers(starter: &str) -> Result<(Value, Value, Value)> {
         "particles" => {
             let system = reiwand_scene::prefill::completed(json!({"capacity": 3000, "seed": 7, "prewarm": 4,
                 "emitters": [{"shape": {"box": {"from": [0, -40], "to": [1920, 0]}}, "rate": {"prop": "density"}}],
-                "init": {"life": [8, 14], "speed": [40, 90], "angle": [80, 100], "size": [3, 9],
-                    "color": ["#ffffff", "#bcd4ff"],
+                "init": {"life": [8, 14, 1], "speed": [40, 90, 1], "angle": [80, 100, 1], "size": [3, 9, 1],
+                    "color": ["#ffffff", "#bcd4ff", 1],
                     "tilt": {"angle": [[0, 0], [0, 0]], "spin": [[0, 0], [0, 0]]}},
                 "forces": [{"turbulence": {"strength": 24, "scale": 0.003}}, {"drag": 0.1}],
                 "render": {"aspect": 1, "size_over_life": [[0, 0], [0.1, 1], [0.9, 1], [1, 0]]}}));

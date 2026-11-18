@@ -73,7 +73,8 @@ pub(crate) fn render(
     ensure!(fits, said("editor.not_particles", "the layer \"%1\" draws no particles of this system", &[&id]));
     let own = format!("{path}/render");
     let copy = doc.pointer(&format!("{sys}/render")).cloned().unwrap_or(json!({}));
-    let ops = if found.get("render").is_some() { Vec::new() } else { set(doc, &own, copy) };
+    let ops =
+        if found.get("render").is_some_and(|r| !r.is_null()) { Vec::new() } else { set(doc, &own, copy) };
     let mut probe = doc.clone();
     let mut ops = ops;
     apply(&mut probe, &ops)?;

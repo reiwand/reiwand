@@ -70,7 +70,8 @@ fn instance(
             v => drop(next.insert(key.clone(), v.clone())),
         }
     }
-    Ok(put(doc, &at, (!next.is_empty()).then_some(Value::Object(next))))
+    let set = next.values().any(|v| !v.is_null() && !v.as_array().is_some_and(Vec::is_empty));
+    Ok(put(doc, &at, set.then_some(Value::Object(next))))
 }
 
 fn points(old: Option<&Value>, each: &Map<String, Value>) -> Result<Vec<Value>> {
@@ -81,6 +82,8 @@ fn points(old: Option<&Value>, each: &Map<String, Value>) -> Result<Vec<Value>> 
         let bad = said("editor.point_index", "a control point goes from 0 to %1, not %2", &[&last, k]);
         ensure!(index.is_some(), bad);
         let index = index.unwrap_or_default();
+        let pair = v.is_null() || v.is_object() || v.as_array().is_some_and(|a| a.len() == 2);
+        ensure!(pair, said("editor.point_pair", "a control point is a pair [x, y] or a path of keys", &[]));
         if list.len() <= index {
             list.resize(index + 1, Value::Null);
         }

@@ -19,8 +19,13 @@ fn issues(dir: &Path, doc: &Value) -> Result<Vec<(String, String)>> {
 
 pub(crate) fn checked(dir: &Path, doc: &Value, ops: Vec<Op>) -> Result<Vec<Op>> {
     let mut probe = doc.clone();
-    let mut ops = ops;
-    apply(&mut probe, &ops)?;
+    let mut done = Vec::with_capacity(ops.len());
+    for op in ops {
+        let op = crate::completing::complete(&probe, op);
+        apply(&mut probe, std::slice::from_ref(&op))?;
+        done.push(op);
+    }
+    let mut ops = done;
     let filled = crate::completing::ops(&probe);
     apply(&mut probe, &filled)?;
     ops.extend(filled);

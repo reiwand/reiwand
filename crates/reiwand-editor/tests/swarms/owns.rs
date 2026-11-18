@@ -60,5 +60,9 @@ fn a_layer_copy_of_a_world_point_is_drawn_where_the_particles_feel_it() {
     own(&mut p, &id, json!({ "1": [500, 300] })).unwrap();
     let h = reiwand_editor::swarms::handles(&p.dir, &p.doc, "flakes", Some(&id), 0.0);
     assert_eq!(h["points"][1]["at"], json!([500.0, 300.0]), "{}", h["points"][1]);
-    assert_ne!(h["points"][0]["at"], h["points"][0]["local"], "a local point moves with the layer");
+    assert_ne!(
+        h["points"][0]["at"], h["points"][0]["local"],
+        "a local point moves with the layer {} {}",
+        h["points"][0], p.doc["scene"]["layers"][1]
+    );
 }

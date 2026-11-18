@@ -2,7 +2,7 @@ use anyhow::{Result, anyhow};
 use reiwand_core::message::said;
 use serde_json::{Map, Value};
 
-const SPREADS: [&str; 12] = [
+const SPREADS: [&str; 13] = [
     "life",
     "speed",
     "angle",
@@ -13,6 +13,7 @@ const SPREADS: [&str; 12] = [
     "color",
     "alpha",
     "radial",
+    "velocity",
     "depth",
     "depth_speed",
 ];
@@ -33,8 +34,8 @@ pub(super) fn kept(init: &Map<String, Value>, key: &str, given: &Value) -> Resul
             _ => out.push(v.clone()),
         }
     }
-    if out.get(2).and_then(Value::as_f64).is_some_and(|c| (c - 1.0).abs() < 1e-3) {
-        out.truncate(2);
+    if out.len() == 2 {
+        out.push(Value::from(1.0));
     }
     Ok(Value::Array(out))
 }

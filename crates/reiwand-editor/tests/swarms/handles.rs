@@ -12,7 +12,7 @@ fn handles_place_shapes_and_points_where_the_preview_draws_them() {
     let around = json!({ "around": {"axis": [0, 0, 1],  "at": "p1", "count": 4, "radius": 10, "arc": 90 } });
     edit(&mut p, "shape", json!({ "emitter": 0, "shape": around })).unwrap();
     let line = json!({ "between": { "from": [0, 0], "to": [100, 0], "count": 3, "arc": { "amount": 0.5, "side": 1 },
-        "taper": { "position": 0.5, "size": 0.2 } } });
+        "taper": { "position": 0.5, "speed": 0, "size": 0.2 } } });
     edit(&mut p, "shape", json!({ "emitter": 1, "shape": line })).unwrap();
     let h = handles(&p);
     assert_eq!(h["points"][1]["name"], "p1");
