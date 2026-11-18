@@ -50,7 +50,8 @@ pub struct Blob {
 
 impl Entry {
     pub fn check(&self, version: u64, repo_id: &str, root: &Root, root_sha256: &str) -> Result<()> {
-        let own = self.format == ENTRY_FORMAT && self.repo_id == repo_id && self.version == version;
+        crate::index::format_is("entry", &self.format, ENTRY_FORMAT)?;
+        let own = self.repo_id == repo_id && self.version == version;
         require(own, "entry.version", "does not match its file name or repository")?;
         let pin = Pin { version: root.version, sha256: root_sha256.into() };
         require(self.root == pin, "entry.root", "does not pin the current root")?;

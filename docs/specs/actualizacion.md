@@ -14,7 +14,10 @@ viejos se niegan a arrancar y nombran la orden exacta que corre la conversión.
   (`examples-repo`) cuya raíz ya no carga en el formato actual se rehace vacío con claves
   nuevas (el daemon vuelve a sumar los ejemplos), el nuevo `repo_id` se escribe en `examples-repo.json` (conservando `declined`) y en `installed.json`, la copia
   vieja del cliente en `repos/<id>` se aparta con las copias y el servicio vuelve a añadirlo sano al arrancar
-  (en el teléfono el registro recibe `stamp` 0 para que la app lo ofrezca de nuevo). Al terminar escribe la marca `format-version`.
+  (en el teléfono el registro recibe `stamp` 0 para que la app lo ofrezca de nuevo).
+  También convierte `examples-repo.json` si no lleva el envoltorio de formato, los `.wpak` de la biblioteca que la base
+  marca con error (los importados a `files/`: se reescriben y la fila recibe tamaño, fecha y hash nuevos y se vuelve a
+  leer) y los `*.reiwand.json` junto a imágenes importadas o de proveedores. Al terminar escribe la marca `format-version`.
 - `reiwand-upgrade file RUTA... [--password-file ARCHIVO] [--copies DIR] [--check]`: una carpeta de escena o de
   paquete (todo lo que hay debajo), un `.wpak`, un `.reiwand` (si está cifrado sigue cifrado), una edición
   (`nombre.ext.reiwand.json`) o un descriptor de efecto. Es la orden de quien crea, antes de volver a firmar.

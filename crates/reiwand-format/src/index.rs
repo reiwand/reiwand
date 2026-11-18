@@ -62,6 +62,17 @@ pub enum Reason {
     Other,
 }
 
+pub(crate) fn format_is(what: &str, found: &str, wanted: &str) -> Result<()> {
+    let wrong = || {
+        said(
+            "format.version",
+            "%1 is in format %2 but this version reads %3: whoever publishes the repository must run reiwand-upgrade server with this version and publish again",
+            &[&what, &found, &wanted],
+        )
+    };
+    ensure(found == wanted, || refuse(what, wrong()))
+}
+
 impl Shard {
     pub fn parse(bytes: &[u8]) -> Result<Shard> {
         let mut shard: serde_json::Value = serde_json::from_slice(bytes)?;
@@ -81,7 +92,8 @@ impl Shard {
     }
 
     pub fn check(&self, format: &str, repo_id: &str, index: usize, bits: u8) -> Result<()> {
-        let own = self.format == format && self.repo_id == repo_id && self.shard == index;
+        format_is("shard", &self.format, format)?;
+        let own = self.repo_id == repo_id && self.shard == index;
         require(own, "shard", "does not match its place in the entry")?;
         let mut ids = BTreeSet::new();
         self.packages.iter().try_for_each(|p| {
@@ -100,7 +112,8 @@ impl Shard {
 
 impl Revoked {
     pub fn check(&self, repo_id: &str) -> Result<()> {
-        let own = self.format == REVOKED_FORMAT && self.repo_id == repo_id;
+        format_is("revoked", &self.format, REVOKED_FORMAT)?;
+        let own = self.repo_id == repo_id;
         require(own, "revoked", "expected a wpak-repo-revoked/2.0 of this repository")
     }
 
@@ -116,4 +129,23 @@ impl Revoked {
 
 pub fn shard_of(id: &str, bits: u8) -> usize {
     usize::from(Sha256::digest(id.as_bytes())[0]) >> (8 - bits.min(8))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn an_older_format_is_named_with_what_to_do() {
+        let revoked = Revoked {
+            format: "wpak-repo-revoked/1.0".into(),
+            repo_id: "r".into(),
+            packages: Vec::new(),
+            keys: Vec::new(),
+        };
+        let said = revoked.check("r").unwrap_err().to_string();
+        assert!(said.contains("wpak-repo-revoked/1.0") && said.contains(REVOKED_FORMAT), "{said}");
+        assert!(said.contains("reiwand-upgrade server"), "{said}");
+        assert!(format_is("shard", KINDS_FORMAT, KINDS_FORMAT).is_ok());
+    }
 }

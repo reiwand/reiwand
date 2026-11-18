@@ -156,5 +156,10 @@ fn steps(data: &Path, sink: &mut Sink, also: &[PathBuf]) -> anyhow::Result<()> {
     }
     #[cfg(any(feature = "client", feature = "server"))]
     crate::library::run(data, sink)?;
+    #[cfg(any(feature = "client", feature = "server"))]
+    {
+        crate::imported::packages(data, sink)?;
+        crate::imported::edits(data, sink)?;
+    }
     Ok(())
 }

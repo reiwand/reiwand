@@ -33,7 +33,8 @@ impl Pick {
 impl Featured {
     pub fn parse(bytes: &[u8], repo_id: &str) -> Result<Featured> {
         let featured: Featured = crate::strict::read("featured.json", bytes)?;
-        let own = featured.format == FEATURED_FORMAT && featured.repo_id == repo_id;
+        crate::index::format_is("featured", &featured.format, FEATURED_FORMAT)?;
+        let own = featured.repo_id == repo_id;
         require(own, "featured", "expected a wpak-repo-featured/2.0 of this repository")?;
         let mut seen = HashSet::new();
         let items = &featured.items;

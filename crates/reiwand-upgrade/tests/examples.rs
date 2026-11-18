@@ -61,3 +61,16 @@ fn the_phone_record_stays_plain_and_asks_for_the_examples_again() {
     assert_eq!(record["stamp"], 0);
     assert!(record.get("content").is_none());
 }
+
+#[test]
+fn a_record_without_the_format_wrapper_is_converted_and_read_by_the_daemon() {
+    let dir = tempfile::tempdir().unwrap();
+    let data = dir.path();
+    let file = data.join("examples-repo.json");
+    fs::write(&file, json!({"repo_id": "ab", "declined": true}).to_string()).unwrap();
+    assert!(reiwand_core::stored::read::<Value>(&file).is_err());
+    client::run(data).unwrap();
+    let record: Value = reiwand_core::stored::read(&file).unwrap().unwrap();
+    assert_eq!(record, json!({"repo_id": "ab", "declined": true}));
+    assert_eq!(client::run(data).unwrap(), Outcome::Nothing);
+}

@@ -45,7 +45,8 @@ pub fn rotation_text(author: &str, from: &str, to: &str) -> String {
 
 impl Authors {
     pub fn check(&self, repo_id: &str) -> Result<()> {
-        let own = self.format == AUTHORS_FORMAT && self.repo_id == repo_id;
+        crate::index::format_is("authors", &self.format, AUTHORS_FORMAT)?;
+        let own = self.repo_id == repo_id;
         require(own, "authors", "expected a wpak-repo-authors/2.0 of this repository")?;
         let mut ids = BTreeSet::new();
         let fine = |a: &OnlineAuthor| {

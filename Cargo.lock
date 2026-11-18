@@ -4677,6 +4677,7 @@ dependencies = [
  "reiwand-carry",
  "reiwand-core",
  "reiwand-format",
+ "reiwand-library",
  "reiwand-scene",
  "reiwand-sync",
  "rusqlite",

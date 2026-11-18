@@ -996,7 +996,7 @@ carry	Content.repositories	array	optional	3	[]	dbus.md:108
 carry	Content.secrets	object|null	optional	3	null	dbus.md:2289
 carry	Content.settings	object	optional	3	{}	dbus.md:2304
 carry	Content.tags	array	optional	3	[]	dbus.md:2304
-carry	Item.repo_id	string|null	optional	3	null	dbus.md:107
+carry	Item.repo_id	string|null	optional	3	null	actualizacion.md:15
 carry	List.query	string|null	optional	3	null	dbus.md:1539
 carry	Provider.config	object|array|string|boolean|number|null	optional	3	null	-
 carry	Repository.name	string	optional	1	""	choose-pieces.md:32

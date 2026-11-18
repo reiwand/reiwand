@@ -10,6 +10,8 @@ pub mod file;
 pub mod fill;
 pub mod gain;
 #[cfg(any(feature = "client", feature = "server"))]
+mod imported;
+#[cfg(any(feature = "client", feature = "server"))]
 pub mod library;
 pub mod manifests;
 pub mod packages;

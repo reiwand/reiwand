@@ -16,8 +16,8 @@ required-features = ["server", "client"]
 
 [features]
 default = ["server", "client"]
-server = ["dep:rusqlite"]
-client = ["dep:zbus", "dep:tokio", "dep:serde", "dep:rusqlite"]
+server = ["dep:rusqlite", "dep:reiwand-library"]
+client = ["dep:zbus", "dep:tokio", "dep:serde", "dep:rusqlite", "dep:reiwand-library"]
 
 [dependencies]
 anyhow.workspace = true
@@ -25,6 +25,7 @@ reiwand-account.workspace = true
 reiwand-carry.workspace = true
 reiwand-core.workspace = true
 reiwand-format = { workspace = true, features = ["sign"] }
+reiwand-library = { workspace = true, optional = true }
 reiwand-sync.workspace = true
 rusqlite = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
