@@ -32,8 +32,6 @@ mod error;
 mod examples;
 #[cfg(test)]
 mod exit_tests;
-#[cfg(test)]
-mod whole;
 mod flatpak;
 mod folders;
 mod gpus;
@@ -113,6 +111,8 @@ mod variants;
 mod wallhaven;
 mod wallpaper;
 mod watch;
+#[cfg(test)]
+mod whole;
 mod words;
 mod worker;
 mod zone;

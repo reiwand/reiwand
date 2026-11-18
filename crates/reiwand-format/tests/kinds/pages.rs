@@ -71,7 +71,10 @@ fn presets_carry_values_and_pictures_for_a_base_package() {
     let twice: [(&str, &[u8]); 2] = [("preset.json", twice.as_bytes()), ("photo.png", &png)];
     assert_eq!(field(load(&preset(Value::Null), &twice).map(drop)), "preset.files.speed");
     let props = Manifest {
-        properties: serde_json::from_value(common::properties(json!({ "on": { "type": "bool", "default": true } }))).unwrap(),
+        properties: serde_json::from_value(common::properties(
+            json!({ "on": { "type": "bool", "default": true } }),
+        ))
+        .unwrap(),
         ..preset(Value::Null)
     };
     assert_eq!(field(props.check()), "properties");

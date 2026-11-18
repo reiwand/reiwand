@@ -88,12 +88,20 @@ fn build_rejects_invalid_sources() {
         matches!(build(&src, &out, &Limits::default()), Err(Error::Symlink(p)) if p == "assets/host.png")
     );
     fs::remove_file(src.join("assets/host.png")).unwrap();
-    fs::write(src.join("scene.json"), common::whole(&SCENE.replace("assets/textures/sky.png", "assets/gone.png"))).unwrap();
+    fs::write(
+        src.join("scene.json"),
+        common::whole(&SCENE.replace("assets/textures/sky.png", "assets/gone.png")),
+    )
+    .unwrap();
     assert!(
         matches!(build(&src, &out, &Limits::default()), Err(Error::Missing(p)) if p == "assets/gone.png")
     );
     assert!(!out.exists());
-    fs::write(src.join("scene.json"), common::whole(&SCENE.replace("\"prop\": \"tint\"", "\"prop\": \"shade\""))).unwrap();
+    fs::write(
+        src.join("scene.json"),
+        common::whole(&SCENE.replace("\"prop\": \"tint\"", "\"prop\": \"shade\"")),
+    )
+    .unwrap();
     assert!(
         matches!(build(&src, &out, &Limits::default()), Err(Error::Invalid { field, .. }) if field == "scene")
     );
@@ -157,8 +165,11 @@ fn sounds_are_checked_when_a_scene_is_built_or_read() {
     let sky = r#""path": "assets/textures/sky.png"}"#;
     let layer = r#"{ "blend_space": "canvas", "id": "rain", "type": "sound", "sound": "rain"}, { "blend_space": "canvas", "id": "sky""#;
     let scene = SCENE.replace(sky, &format!(r#"{sky}, "rain": {{"path": "assets/rain.wav"}}"#));
-    fs::write(src.join("scene.json"), common::whole(&scene.replacen(r#"{ "blend_space": "canvas", "id": "sky""#, layer, 1)))
-        .unwrap();
+    fs::write(
+        src.join("scene.json"),
+        common::whole(&scene.replacen(r#"{ "blend_space": "canvas", "id": "sky""#, layer, 1)),
+    )
+    .unwrap();
     fs::write(src.join("assets/rain.wav"), wav(2)).unwrap();
     build(&src, &out, &Limits::default()).unwrap();
     assert_eq!(open(&out, &Limits::default()).unwrap().scene().unwrap().sounds().count(), 1);

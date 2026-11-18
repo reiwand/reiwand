@@ -41,8 +41,10 @@ fn display_and_playback_fields_belong_to_their_kinds() {
     let platforms = Platform::ALL.map(|p| features::lacks(p.name(), &read));
     assert!(platforms.iter().all(Vec::is_empty), "{platforms:?}");
     let tinted = Manifest {
-        properties: serde_json::from_value(common::properties(json!({ "tint": { "type": "color", "default": "#ff8800" },
-            "on": { "type": "bool", "default": true } })))
+        properties: serde_json::from_value(common::properties(
+            json!({ "tint": { "type": "color", "default": "#ff8800" },
+            "on": { "type": "bool", "default": true } }),
+        ))
         .unwrap(),
         ..shown(Kind::Scene, json!({ "accent": { "prop": "tint" } }))
     };
