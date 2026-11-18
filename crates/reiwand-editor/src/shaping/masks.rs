@@ -44,5 +44,5 @@ pub(super) fn mask(dir: &Path, doc: &Value, e: &E) -> Result<Vec<Op>> {
     strength.iter().for_each(|s| drop(mask.insert("strength".into(), json!(s))));
     let sourced = SOURCES.iter().any(|k| mask.get(*k).is_some_and(|v| !v.is_null()));
     ensure!(sourced, said("editor.mask_source", "a mask needs a picture, a layer or a shape", &[]));
-    refused(dir, doc, put(doc, &at, Some(reiwand_scene::prefill::of("Mask", Value::Object(mask)))))
+    refused(dir, doc, put(doc, &at, Some(reiwand_scene::prefill::of("Layer", serde_json::json!({ "mask": Value::Object(mask) }))["mask"].clone())))
 }
