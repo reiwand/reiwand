@@ -43,3 +43,14 @@ pub(super) fn spread(def: &str, v: &mut Value) {
         list.push(json!(1));
     }
 }
+
+pub(super) fn sequence(def: &str, v: &mut Value) {
+    const AREA: [&str; 4] = ["from", "to", "inner", "at"];
+    if def == "Area"
+        && let Value::Array(list) = v
+        && list.len() <= AREA.len()
+    {
+        let named = AREA.iter().zip(list.drain(..)).map(|(k, x)| ((*k).to_owned(), x)).collect();
+        *v = Value::Object(named);
+    }
+}

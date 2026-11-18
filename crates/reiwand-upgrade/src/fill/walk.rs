@@ -129,6 +129,7 @@ impl<'a> Walk<'a> {
         let (s, named) = self.resolve(s);
         let def = named.unwrap_or(def);
         super::particles::spread(def, v);
+        super::particles::sequence(def, v);
         if let Value::Object(map) = v
             && let Some((name, value)) = super::legacy::tag(ctx, map)
         {
