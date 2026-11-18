@@ -39,9 +39,8 @@ pub(crate) fn samplings(scene: &Scene, assets: &SceneAssets) -> HashMap<String, 
             ([], None, _) => Vec::new(),
             (rects, ..) => rects.iter().map(|r| [0, 1, 2, 3].map(|i| r[i] as f32 / size[i % 2])).collect(),
         };
-        let nearest = a.filter == Some(Filter::Nearest);
-        let sampling =
-            Sampling { nearest, wrap: a.wrap.unwrap_or_default(), mipmaps: a.mipmaps, cells, inked: None };
+        let nearest = a.filter == Filter::Nearest;
+        let sampling = Sampling { nearest, wrap: a.wrap, mipmaps: a.mipmaps, cells, inked: None };
         (sampling != Sampling::default()).then(|| (id.clone(), sampling))
     };
     scene.assets.iter().filter_map(one).collect()

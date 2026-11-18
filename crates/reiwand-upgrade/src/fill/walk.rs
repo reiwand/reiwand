@@ -18,9 +18,7 @@ fn kind(v: &Value) -> &'static str {
         Value::Null => "null",
     }
 }
-
 const KINDS: [&str; 6] = ["object", "array", "string", "boolean", "number", "null"];
-
 fn canon(name: &str) -> Option<&'static str> {
     let name = if name == "integer" { "number" } else { name };
     KINDS.iter().copied().find(|k| *k == name)
@@ -167,6 +165,7 @@ impl<'a> Walk<'a> {
             map.insert(name.into(), value);
             self.report.note(def, name);
         }
+        super::legacy::looks(def, map, &mut self.report);
         super::particles::before(ctx, map);
         let props = s.get("properties").and_then(Value::as_object);
         let required =

@@ -37,9 +37,8 @@ pub use crate::effects::{
 };
 pub use crate::eval::lamps::{Lamp, Picture, SHADOW_BIAS};
 pub use crate::eval::{
-    CHROMA_KEY, Content, Draw, EffectDraw, FUR_LAYERS, FUR_LENGTH, Flight, Frame, Lit, Look, MAX_PLANES,
-    Placed, Shade, Stage3d, centripetal, cross_key, lamp3d, particle_plane, path_period, path_pose,
-    play_paths, sequence,
+    Content, Draw, EffectDraw, Flight, Frame, Lit, Look, MAX_PLANES, Placed, Shade, Stage3d, centripetal,
+    cross_key, lamp3d, particle_plane, path_period, path_pose, play_paths, sequence,
 };
 pub use crate::extrude::Relief;
 pub use crate::eye::{Eye, IDENTITY4, Mat4, apply4, mul4, placement, unit3, widen};

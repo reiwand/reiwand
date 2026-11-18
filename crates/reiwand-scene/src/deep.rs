@@ -107,11 +107,16 @@ impl<'a> Check<'a> {
         }
         mat.maps.comb.iter().for_each(|id| self.picture(&format!("{q}/maps/comb"), id));
         self.uses(mat.cast_shadows == Some(true) || mat.receive_shadows == Some(true), "shadows");
-        let shader = mat.shader.as_deref().unwrap_or("pbr");
+        let shader = mat.shader.as_str();
         let built = MATERIALS.contains(&shader);
         self.uses(!matches!(shader, "pbr" | "unlit"), "material_shaders");
         if !built {
             self.staged(&format!("{q}/shader"), shader, Stage::Material);
+        }
+        for (_, id, ..) in BUILT.iter().filter(|(s, ..)| *s == shader && *s != "pbr") {
+            if !mat.params.contains_key(*id) {
+                self.issues.push(Issue::Required(format!("{q}/params/{id}")));
+            }
         }
         for (id, value) in &mat.params {
             let path = format!("{q}/params/{id}");

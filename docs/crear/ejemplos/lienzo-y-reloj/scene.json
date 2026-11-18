@@ -68,7 +68,7 @@
     "max_fps": 30,
     "poster_time": 2,
     "seed": 7,
-    "step": null
+    "step": 60
   },
   "effects": {},
   "ext": {},

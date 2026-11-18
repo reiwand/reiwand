@@ -103,9 +103,7 @@ pub enum Coverage {
 #[serde(deny_unknown_fields)]
 pub struct Material {
     #[schemars(extend("x-ref" = "material"))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
-    pub shader: Option<String>,
+    pub shader: String,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
     pub color: Option<Value<Color>>,

@@ -1,5 +1,6 @@
 use super::{IMAGES, VIDEOS};
 use crate::MAX_FRAMES;
+use crate::asset::{Filter, Wrapping};
 use crate::validate::{Check, Issue};
 use crate::value::Value;
 
@@ -16,8 +17,8 @@ impl Check<'_> {
             let set =
                 |fields: [(&'static str, bool); 3]| fields.into_iter().find(|(_, on)| *on).map(|(n, _)| n);
             let sampled = set([
-                ("filter", a.filter.is_some()),
-                ("wrap", a.wrap.is_some()),
+                ("filter", a.filter != Filter::default()),
+                ("wrap", a.wrap != Wrapping::default()),
                 ("mipmaps", a.mipmaps.is_some()),
             ]);
             let timed = set([

@@ -4,10 +4,6 @@ use crate::resolve::Context;
 use crate::{Model, ModelLayer, Param, Quality, Value};
 use std::borrow::Cow;
 
-pub const FUR_LAYERS: f32 = 12.0;
-pub const FUR_LENGTH: f32 = 10.0;
-pub const CHROMA_KEY: [f32; 3] = [0.0, 1.0, 0.0];
-
 pub(crate) fn eye(cx: &Context) -> (Eye, Option<super::paths::Flight>) {
     let set = cx.script.stage.and_then(|s| s.camera3d).unwrap_or_default();
     let base = cx.scene.camera3d.clone().unwrap_or_default();
@@ -32,6 +28,14 @@ fn number(cx: &Context, v: Option<&Value<Param>>) -> Option<f32> {
     }
 }
 
+fn numbers<const N: usize>(cx: &Context, mat: &crate::Material, ids: [&str; N]) -> Option<[f32; N]> {
+    let mut out = [0.0; N];
+    for (slot, id) in out.iter_mut().zip(ids) {
+        *slot = number(cx, mat.params.get(id))?;
+    }
+    Some(out)
+}
+
 fn color(cx: &Context, v: Option<&Value<Param>>) -> Option<[f32; 3]> {
     match v?.get(cx) {
         Param::Color(c) => Some([c.0[0], c.0[1], c.0[2]]),
@@ -51,29 +55,33 @@ pub(super) fn looks<'a>(
         let Some(index) = model.material(name) else { continue };
         let param = |id: &str| number(cx, mat.params.get(id));
         let [r, g, b, _] = mat.emissive.as_ref().map_or([0.0; 4], |e| e.get(cx).0);
-        let shader = mat.shader.as_deref().unwrap_or("pbr");
+        let shader = mat.shader.as_str();
         let (mut extra, mut slots, mut package) = ([0.0; 8], [[0.0; 4]; 8], 0);
         let mut images = [None; crate::MAX_MATERIAL_IMAGES];
         let shade = match shader {
             "pbr" => Shade::Pbr,
             "unlit" => Shade::Unlit,
             "fur" => {
-                let layers = param("layers").unwrap_or(FUR_LAYERS).clamp(1.0, 32.0) as u32;
-                let shells = crate::model::fur_shells(layers, quality) as f32;
-                let comb = ["comb_x", "comb_y", "comb_z"].map(|k| param(k).unwrap_or(0.0));
-                let length = param("length").unwrap_or(FUR_LENGTH) * 0.01 * model.radius();
-                extra =
-                    [shells, length, param("density").unwrap_or(0.5), comb[0], comb[1], comb[2], 0.0, 0.0];
+                let Some([layers, length, density, x, y, z]) =
+                    numbers(cx, mat, ["layers", "length", "density", "comb_x", "comb_y", "comb_z"])
+                else {
+                    continue;
+                };
+                let shells = crate::model::fur_shells(layers.clamp(1.0, 32.0) as u32, quality) as f32;
+                extra = [shells, length * 0.01 * model.radius(), density, x, y, z, 0.0, 0.0];
                 Shade::Fur
             }
             "foliage" => {
-                extra[..2]
-                    .copy_from_slice(&[param("strength").unwrap_or(1.0), param("speed").unwrap_or(1.0)]);
+                let Some(both) = numbers(cx, mat, ["strength", "speed"]) else { continue };
+                extra[..2].copy_from_slice(&both);
                 Shade::Foliage
             }
             "chroma" => {
-                let key = color(cx, mat.params.get("key")).unwrap_or(CHROMA_KEY);
-                let (t, s) = (param("threshold").unwrap_or(0.4), param("softness").unwrap_or(0.1));
+                let (Some(key), Some([t, s])) =
+                    (color(cx, mat.params.get("key")), numbers(cx, mat, ["threshold", "softness"]))
+                else {
+                    continue;
+                };
                 extra = [key[0], key[1], key[2], t, s, 0.0, 0.0, 0.0];
                 Shade::Chroma
             }

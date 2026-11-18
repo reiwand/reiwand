@@ -5,7 +5,7 @@
       "atlas": null,
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": true,
@@ -14,14 +14,14 @@
       "path": "assets/lake-mask.png",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     },
     "mono": {
       "animated": false,
       "atlas": null,
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
@@ -30,14 +30,14 @@
       "path": "assets/mono.ttf",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     },
     "sea": {
       "animated": false,
       "atlas": null,
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
@@ -46,14 +46,14 @@
       "path": "assets/sea.webm",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     },
     "sky": {
       "animated": false,
       "atlas": null,
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
@@ -62,14 +62,14 @@
       "path": "assets/sky.png",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     },
     "sky_dawn": {
       "animated": false,
       "atlas": null,
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
@@ -78,7 +78,7 @@
       "path": "assets/sky-dawn.png",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     },
     "spark": {
       "animated": false,
@@ -88,7 +88,7 @@
       ],
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
@@ -97,7 +97,7 @@
       "path": "assets/spark.png",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     }
   },
   "audio": null,
@@ -126,7 +126,7 @@
     "max_fps": 60,
     "poster_time": 3.0,
     "seed": 42,
-    "step": null
+    "step": 60
   },
   "effects": {},
   "ext": {},

@@ -23,6 +23,9 @@ pub(super) fn corrected(def: &str, name: &str) -> Option<Value> {
         ("System", "space") => json!("local"),
         ("Manifest", "description") => json!(""),
         ("Canvas", "clear") => json!(true),
+        ("Clock", "step") => json!(60),
+        ("Asset", "filter") => json!("linear"),
+        ("Asset", "wrap") => json!("clamp"),
         ("Layer", "solid") => json!(false),
         ("Property", "mode") => json!("one"),
         ("Property", "max_files") => json!(1000),
@@ -64,6 +67,10 @@ pub(super) fn follows(def: &str, name: &str, map: &Map<String, Value>) -> Option
         ("Layer", "valign") if kind == "text" => json!("center"),
         ("Layer", "mode") if kind == "sound" => json!("sequence"),
         ("Layer", "render") if kind == "text" => json!("auto"),
+        ("Material", "shader") => json!("pbr"),
+        ("Scene", "camera3d") if solid(map.get("layers")) => camera(),
+        (d, "of") if d.starts_with("Binding_for_") && indexed(map) => json!(64),
+        (d, "loop") if d.starts_with("Binding_for_") && keyed(map) => json!("once"),
         ("Layer", "playback") if kind == "video" => json!({
             "rate": 1, "playing": true, "loop": true, "start": 0, "end": "end", "frame": null, "own_clock": false
         }),
@@ -108,4 +115,57 @@ pub(super) fn heard(def: &str, map: &Map<String, Value>) -> Vec<(&'static str, V
 pub(super) fn tag(ctx: &str, map: &Map<String, Value>) -> Option<(&'static str, Value)> {
     (ctx == "refract" && map.contains_key("normal") && !map.contains_key("units"))
         .then(|| ("units", json!("size")))
+}
+
+fn solid(layers: Option<&Value>) -> bool {
+    layers.and_then(Value::as_array).is_some_and(|list| {
+        list.iter().any(|l| {
+            matches!(l.get("type").and_then(Value::as_str), Some("mesh" | "model"))
+                || (l.get("type").and_then(Value::as_str) == Some("group")
+                    && l.get("space").and_then(Value::as_str) == Some("3d"))
+                || solid(l.get("layers"))
+        })
+    })
+}
+
+fn camera() -> Value {
+    json!({
+        "fov": 60, "near": 0.1, "far": 1000, "eye": [0, 0, 5], "center": [0, 0, 0],
+        "up": [0, 1, 0], "paths": [], "order": "sequential", "fade": null
+    })
+}
+
+fn indexed(map: &Map<String, Value>) -> bool {
+    map.get("audio").is_some_and(|a| a.is_number() || a.is_array())
+}
+
+fn keyed(map: &Map<String, Value>) -> bool {
+    map.get("keys").is_some_and(|k| !k.is_null()) && map.get("timeline").is_none_or(Value::is_null)
+}
+
+pub(super) fn looks(def: &str, map: &mut Map<String, Value>, report: &mut super::Report) {
+    if def != "Material" {
+        return;
+    }
+    let wanted: &[(&str, Value)] = match map.get("shader").and_then(Value::as_str) {
+        Some("fur") => &[
+            ("layers", json!(12)),
+            ("length", json!(10)),
+            ("density", json!(0.5)),
+            ("comb_x", json!(0)),
+            ("comb_y", json!(0)),
+            ("comb_z", json!(0)),
+        ],
+        Some("foliage") => &[("strength", json!(1)), ("speed", json!(1))],
+        Some("chroma") => &[("key", json!("#00ff00")), ("threshold", json!(0.4)), ("softness", json!(0.1))],
+        _ => return,
+    };
+    let params = map.entry("params").or_insert_with(|| Value::Object(Map::new()));
+    let Some(params) = params.as_object_mut() else { return };
+    for (id, value) in wanted {
+        if !params.contains_key(*id) {
+            params.insert((*id).to_owned(), value.clone());
+            report.note("Material.params", id);
+        }
+    }
 }

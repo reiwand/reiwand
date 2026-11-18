@@ -22,10 +22,11 @@ pub(super) fn fur(scene: &Scene, q: Quality) -> (u64, u64, u64) {
     for l in scene.layers() {
         let Kind::Model(m) = &l.kind else { continue };
         let Some(model) = scene.solids.get(&m.model) else { continue };
-        for (name, mat) in m.materials.iter().filter(|(_, x)| x.shader.as_deref() == Some("fur")) {
+        for (name, mat) in m.materials.iter().filter(|(_, x)| x.shader == "fur") {
             let layers = match mat.params.get("layers") {
                 Some(reiwand_scene::Value::Fixed(reiwand_scene::Param::Number(n))) => *n as u32,
-                _ => reiwand_scene::FUR_LAYERS as u32,
+                Some(_) => 32,
+                None => continue,
             };
             let n = u64::from(fur_shells(layers, q));
             let base = model.material(name).map_or(0, |i| triangles(model, i));

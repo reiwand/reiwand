@@ -57,10 +57,7 @@ impl Check<'_> {
             self.uses(true, "ambient_light");
             self.color(&format!("/canvas/{name}"), color);
         }
-        if let Some(step) = self.scene.clock.step {
-            self.uses(true, "clock_values");
-            self.range("/clock/step", step, 1.0, 3600.0);
-        }
+        self.range("/clock/step", self.scene.clock.step, 1.0, 3600.0);
         if let Some(a) = &self.scene.audio {
             self.uses(true, "audio_response");
             self.range("/audio/attack", a.attack, 0.001, 2.0);

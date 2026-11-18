@@ -5,7 +5,7 @@
       "atlas": null,
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
@@ -14,14 +14,14 @@
       "path": "assets/cielo.png",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     },
     "muneco": {
       "animated": false,
       "atlas": null,
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
@@ -30,11 +30,33 @@
       "path": "assets/muneco.glb",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     }
   },
   "audio": null,
-  "camera3d": null,
+  "camera3d": {
+    "center": [
+      0,
+      0,
+      0
+    ],
+    "eye": [
+      0,
+      0,
+      5
+    ],
+    "fade": null,
+    "far": 1000,
+    "fov": 60,
+    "near": 0.1,
+    "order": "sequential",
+    "paths": [],
+    "up": [
+      0,
+      1,
+      0
+    ]
+  },
   "canvas": {
     "ambient": null,
     "background": "#101820",
@@ -59,7 +81,7 @@
     "max_fps": 60,
     "poster_time": 0.0,
     "seed": 0,
-    "step": null
+    "step": 60
   },
   "effects": {},
   "ext": {},

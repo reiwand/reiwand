@@ -86,14 +86,12 @@ pub struct Clock {
     #[schemars(required, extend("x-null" = true))]
     pub seed: Option<u64>,
     #[schemars(extend("x-unit" = "s", "x-range" = [1, 3600]))]
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
-    pub step: Option<f32>,
+    pub step: f32,
 }
 
 impl Default for Clock {
     fn default() -> Self {
-        Clock { max_fps: 60, poster_time: 0.0, seed: Some(0), step: None }
+        Clock { max_fps: 60, poster_time: 0.0, seed: Some(0), step: 60.0 }
     }
 }
 

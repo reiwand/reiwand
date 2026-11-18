@@ -84,7 +84,7 @@ fn ranges_of_births_and_emitter_shapes_may_be_bound() {
     let bound = with(sparks(), json!({ "emitters": [{ "shape": circle, "rate": 10 }] }));
     let mut init = bound["init"].clone();
     init["size"] = json!([2, loud]);
-    init["life"] = json!([0.5, { "keys": [[0, 1], [2, 2]] }, 2]);
+    init["life"] = json!([0.5, { "keys": [[0, 1], [2, 2]], "loop": "once" }, 2]);
     let text = scene(with(bound, json!({ "init": init })), true);
     let parsed = Scene::from_json(&reiwand_upgrade::fill::whole(&text)).unwrap();
     let found = parsed.validate(&props());

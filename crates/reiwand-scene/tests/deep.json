@@ -5,7 +5,7 @@
       "atlas": null,
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
@@ -14,14 +14,14 @@
       "path": "nothing.png",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     },
     "drops": {
       "animated": false,
       "atlas": null,
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": true,
@@ -30,14 +30,14 @@
       "path": "drops.png",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     },
     "fox": {
       "animated": false,
       "atlas": null,
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
@@ -46,14 +46,14 @@
       "path": "models/fox.glb",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     },
     "robot": {
       "animated": false,
       "atlas": null,
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
@@ -62,14 +62,14 @@
       "path": "models/robot.glb",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     },
     "skin": {
       "animated": false,
       "atlas": null,
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
@@ -78,14 +78,14 @@
       "path": "skin.png",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     },
     "spark": {
       "animated": false,
       "atlas": null,
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
@@ -94,7 +94,7 @@
       "path": "spark.png",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     }
   },
   "audio": null,
@@ -193,7 +193,7 @@
     "max_fps": 60,
     "poster_time": 0.0,
     "seed": 0,
-    "step": null
+    "step": 60
   },
   "effects": {
     "glass": {
@@ -373,7 +373,7 @@
             ],
             "kind": null,
             "layer": null,
-            "loop": null,
+            "loop": "once",
             "map": null,
             "media": null,
             "of": null,
@@ -629,6 +629,10 @@
                 "orm": null
               },
               "params": {
+                "comb_x": 0,
+                "comb_y": 0,
+                "comb_z": 0,
+                "density": 0.5,
                 "layers": 12,
                 "length": 4
               },
@@ -711,7 +715,7 @@
             ],
             "kind": null,
             "layer": null,
-            "loop": null,
+            "loop": "once",
             "map": null,
             "media": null,
             "of": null,
@@ -2030,7 +2034,7 @@
             ],
             "kind": null,
             "layer": null,
-            "loop": null,
+            "loop": "once",
             "map": null,
             "media": null,
             "of": null,

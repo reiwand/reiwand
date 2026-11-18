@@ -62,7 +62,14 @@ impl<'a> Check<'a> {
             self.uses(true, "bone_physics");
             self.range("/canvas/gusts", g, 0.0, 1.0);
         }
-        let Some(cam) = &scene.camera3d else { return };
+        let Some(cam) = &scene.camera3d else {
+            let solid =
+                |l: &Layer| l.figure().is_some() || matches!(l.kind, Kind::Group { space: Space::Depth, .. });
+            if scene.layers().any(solid) {
+                self.issues.push(Issue::Required("/camera3d".into()));
+            }
+            return;
+        };
         self.uses(true, "camera3d");
         self.uses(!cam.paths.is_empty(), "camera_paths");
         self.number("/camera3d/fov", &cam.fov, 1.0, 179.0);
