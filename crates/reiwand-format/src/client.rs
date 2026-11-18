@@ -1,7 +1,7 @@
 use crate::broken::{recover, scan, wreck};
 use crate::browse::{available, listing, newer};
 use crate::fetch::bases;
-use crate::install::{records, save};
+use crate::registry::{records, save};
 use crate::store::{Snapshot, State, commit, load, locked, repo_dir};
 use crate::update::refresh;
 use crate::{Anchor, Error, Fetch, Installed, Result, Time, ensure, sha256};

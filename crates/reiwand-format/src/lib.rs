@@ -42,6 +42,7 @@ mod publish;
 mod read;
 mod record;
 mod refusal;
+mod registry;
 mod release;
 mod renames;
 mod repo;

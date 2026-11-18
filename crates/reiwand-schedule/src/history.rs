@@ -11,7 +11,7 @@ pub(crate) struct Shown {
     path: PathBuf,
     cycle: u32,
     position: usize,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "crate::state::null")]
     anchor: Option<(u32, usize)>,
 }
 

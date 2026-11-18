@@ -1,5 +1,5 @@
 use crate::broken::{scan, sound};
-use crate::install::records;
+use crate::registry::records;
 use crate::store::{Snapshot, locked};
 use crate::{Listing, Release, Result, Text};
 use semver::Version;

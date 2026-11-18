@@ -66,6 +66,13 @@ fn settings(args: &[String], data: &std::path::Path) -> anyhow::Result<()> {
             copies.display()
         );
     }
+    if reiwand_upgrade::library::run(data, &copies)? {
+        println!(
+            "library.db converted to schema {}, the original is in {}",
+            reiwand_upgrade::library::SCHEMA,
+            copies.display()
+        );
+    }
     Ok(())
 }
 

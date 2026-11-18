@@ -113,10 +113,13 @@ fn file_name(path: &Path) -> String {
 }
 
 pub(crate) fn optional<T: DeserializeOwned + Default>(path: &Path) -> Result<T> {
-    match fs::read(path) {
-        Ok(bytes) => crate::strict::read(&file_name(path), &bytes),
-        Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(T::default()),
-        Err(e) => Err(e.into()),
+    use reiwand_core::stored::{StoredError, read};
+    match read(path) {
+        Ok(found) => Ok(found.unwrap_or_default()),
+        Err(StoredError::Format { .. }) => {
+            Err(Error::Upgrade(path.parent().unwrap_or(Path::new(".")).display().to_string()))
+        }
+        Err(e) => Err(io::Error::new(io::ErrorKind::InvalidData, e.to_string()).into()),
     }
 }
 

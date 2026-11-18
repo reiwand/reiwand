@@ -1,4 +1,5 @@
-use crate::db::{ensure, json, label, remove, row_id, rows, uid, unique};
+use crate::blobs;
+use crate::db::{ensure, label, remove, row_id, rows, uid, unique};
 use crate::{Error, Library, Result};
 use rusqlite::{Row, params};
 use serde::{Deserialize, Serialize};
@@ -26,7 +27,14 @@ pub struct Profile {
 
 fn profile_row(row: &Row<'_>) -> rusqlite::Result<Profile> {
     let (uid, name, priority) = (row.get(0)?, row.get(1)?, row.get(5)?);
-    Ok(Profile { uid, name, outputs: json(row, 2)?, options: json(row, 3)?, auto: json(row, 4)?, priority })
+    Ok(Profile {
+        uid,
+        name,
+        outputs: blobs::outputs(row, 2)?,
+        options: blobs::options(row, 3)?,
+        auto: blobs::auto(row, 4)?,
+        priority,
+    })
 }
 
 impl Library {
@@ -44,7 +52,7 @@ impl Library {
         let sql = "SELECT p.uid, i.uid, p.name, p.value FROM presets p LEFT JOIN items i ON i.id = p.item_id \
             WHERE p.item_id IS ?1 ORDER BY p.name";
         rows(&self.db, sql, [item], |r| {
-            Ok(Preset { uid: r.get(0)?, item: r.get(1)?, name: r.get(2)?, value: json(r, 3)? })
+            Ok(Preset { uid: r.get(0)?, item: r.get(1)?, name: r.get(2)?, value: blobs::preset(r, 3)? })
         })
     }
 
@@ -52,15 +60,16 @@ impl Library {
         let sql = "SELECT p.uid, i.uid, p.name, p.value FROM presets p LEFT JOIN items i ON i.id = p.item_id \
             ORDER BY p.id";
         rows(&self.db, sql, [], |r| {
-            Ok(Preset { uid: r.get(0)?, item: r.get(1)?, name: r.get(2)?, value: json(r, 3)? })
+            Ok(Preset { uid: r.get(0)?, item: r.get(1)?, name: r.get(2)?, value: blobs::preset(r, 3)? })
         })
     }
 
     pub fn preset(&self, uid: &str) -> Result<Preset> {
         let sql = "SELECT p.uid, i.uid, p.name, p.value FROM presets p LEFT JOIN items i ON i.id = p.item_id \
             WHERE p.id = ?1";
-        let row =
-            |r: &Row<'_>| Ok(Preset { uid: r.get(0)?, item: r.get(1)?, name: r.get(2)?, value: json(r, 3)? });
+        let row = |r: &Row<'_>| {
+            Ok(Preset { uid: r.get(0)?, item: r.get(1)?, name: r.get(2)?, value: blobs::preset(r, 3)? })
+        };
         Ok(self.db.query_row(sql, [row_id(&self.db, "preset", uid)?], row)?)
     }
 

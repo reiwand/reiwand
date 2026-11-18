@@ -2,7 +2,7 @@ use crate::apply::parse_fit;
 use crate::daemon::Daemon;
 use crate::error::{Error, Result, invalid};
 use crate::items::{preset, reply};
-use crate::profiles::{sections, stored};
+use crate::profiles::{sections, whole};
 use reiwand_core::config::parse_hex_color;
 use reiwand_core::model::{MODEL, PresetValue, PresetsReply};
 use std::collections::HashMap;
@@ -50,7 +50,7 @@ impl Daemon {
 
     pub fn save_preset(&self, item: &str, name: &str, values: &HashMap<String, String>) -> Result<String> {
         let (value, item) = (preset_value(values)?, scope(item));
-        let json = stored(&value);
+        let json = whole(&value);
         let (uid, replaced) = self.store.write(|lib| {
             Ok::<_, Error>(
                 match lib
@@ -106,10 +106,10 @@ mod tests {
             |pairs: &[(&str, &str)]| pairs.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect();
         let value = preset_value(&values(&[("fit", "center"), ("background", "#A0B0C0")])).unwrap();
         assert_eq!((value.fit, value.background.as_deref()), (Some(Fit::Center), Some("#a0b0c0")));
-        assert_eq!(stored(&value), json!({"fit": "center", "background": "#a0b0c0"}));
+        assert_eq!(whole(&value), json!({"fit": "center", "background": "#a0b0c0"}));
         assert_eq!(
-            stored(PresetValue { fit: None, background: value.background }),
-            json!({"background": "#a0b0c0"})
+            whole(PresetValue { fit: None, background: value.background }),
+            json!({"fit": null, "background": "#a0b0c0"})
         );
         for bad in [&[][..], &[("fit", "zoom")], &[("background", "a0b0c0")], &[("speed", "2")]] {
             assert!(preset_value(&values(bad)).is_err(), "{bad:?}");

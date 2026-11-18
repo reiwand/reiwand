@@ -5,7 +5,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::time::Duration;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Rules {
     pub order: Order,
     #[serde(serialize_with = "write_interval", deserialize_with = "read_interval")]
@@ -17,6 +17,7 @@ pub struct Rules {
     pub resume: bool,
     pub advance_while_paused: bool,
     pub skip_videos_on_battery: bool,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub transition_ms: Option<u32>,
 }
 

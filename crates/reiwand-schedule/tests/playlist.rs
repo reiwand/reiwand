@@ -88,7 +88,7 @@ fn persisted_state_continues_the_same_sequence() {
     let mut state = PlaylistState::new(5);
     sequence(&mut state, &p, 9);
     state.seek(&p, 4);
-    let mut from_toml: PlaylistState = toml::from_str(&toml::to_string(&state).unwrap()).unwrap();
+    let mut from_toml: PlaylistState = serde_json::from_str(&serde_json::to_string(&state).unwrap()).unwrap();
     let mut from_json: PlaylistState = serde_json::from_str(&serde_json::to_string(&state).unwrap()).unwrap();
     let expected = sequence(&mut state, &p, 20);
     assert_eq!(sequence(&mut from_toml, &p, 20), expected);
@@ -145,8 +145,12 @@ fn seeking_keeps_the_item_and_a_shuffle_cycle_starts_from_it_without_repeats() {
 }
 
 #[test]
-fn states_saved_without_newer_fields_still_load() {
-    let state: PlaylistState = serde_json::from_str(r#"{"seed": 5, "cycle": 2, "position": 1}"#).unwrap();
+fn states_saved_without_a_field_are_refused() {
+    let short = r#"{"seed": 5, "cycle": 2, "position": 1}"#;
+    assert!(serde_json::from_str::<PlaylistState>(short).unwrap_err().to_string().contains("anchor"));
+    let whole =
+        r#"{"seed": 5, "cycle": 2, "position": 1, "anchor": null, "since": null, "behind": [], "ahead": []}"#;
+    let state: PlaylistState = serde_json::from_str(whole).unwrap();
     assert_eq!((state.cycle(), state.position()), (2, 1));
 }
 
@@ -179,5 +183,5 @@ fn going_back_in_a_shuffle_replays_the_exact_order_both_ways_across_cycles_and_l
         state.advance(&grown, t0());
     }
     let kept = serde_json::to_value(&state).unwrap();
-    assert_eq!((kept["behind"].as_array().unwrap().len(), kept.get("ahead")), (32, None));
+    assert_eq!((kept["behind"].as_array().unwrap().len(), kept["ahead"].as_array().unwrap().len()), (32, 0));
 }

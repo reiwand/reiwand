@@ -1,4 +1,5 @@
 mod batch;
+mod blobs;
 mod db;
 mod edits;
 mod entries;
@@ -80,7 +81,7 @@ pub enum Error {
     #[error("{0}")]
     Query(String),
     #[error(
-        "the database was made by another version of the program (schema {0}) and is not supported; it was left untouched"
+        "the database was made by another version of the program (schema {0}) and is not supported; it was left untouched. An older one is converted once with `reiwand-upgrade client`"
     )]
     Foreign(u32),
     #[error("the playlist changed; reload it")]

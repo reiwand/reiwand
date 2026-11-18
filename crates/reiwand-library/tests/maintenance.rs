@@ -121,7 +121,7 @@ fn relinking_keeps_the_item_its_user_data_and_tag_deletions_and_adds_new_package
     library.set_meta(&uid, &Meta { width: Some(64), height: Some(64), ..Meta::default() }).unwrap();
     let list = library.create_playlist("Calm", None, &Rules::default()).unwrap();
     library.add_to_playlist(&list, &[&uid]).unwrap();
-    library.create_preset(Some(&uid), "Dim", &json!({"fit": "fill"})).unwrap();
+    library.create_preset(Some(&uid), "Dim", &json!({"fit": "fill", "background": null})).unwrap();
     library.mark_used(&uid, "DP-1", NOW).unwrap();
     let new = package(dir.path(), "1.3.0", &["water", "night"], "new and larger pixels");
     library.relink_item(&uid, &new, NOW + 60).unwrap();

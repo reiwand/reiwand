@@ -1,5 +1,6 @@
 pub use crate::record::Installed;
-use crate::store::{Snapshot, load, locked, optional, write};
+use crate::registry::{keep_anchors, records, save};
+use crate::store::{Snapshot, load, locked};
 use crate::{Error, Fetch, Listing, OnlineAuthor, Release, Result, Trusted, anchors, ensure, require};
 use crate::{
     authors::trust,
@@ -72,8 +73,7 @@ pub fn install<F: Fetch>(
             None => list.push(done.clone()),
         }
         save(data, &list)?;
-        anchors
-            .map_or(Ok(()), |a| write(&data.join("anchors.json"), &serde_json::to_vec_pretty(&a)?, true))?;
+        anchors.map_or(Ok(()), |a| keep_anchors(data, &a))?;
         Ok(done)
     })
 }
@@ -166,14 +166,6 @@ fn whole(item: &Installed) -> bool {
 
 pub fn installed(data: &Path) -> Result<Vec<Installed>> {
     locked(data, false, || records(data))
-}
-
-pub(crate) fn records(data: &Path) -> Result<Vec<Installed>> {
-    optional(&data.join("installed.json"))
-}
-
-pub(crate) fn save(data: &Path, list: &[Installed]) -> Result<()> {
-    write(&data.join("installed.json"), &serde_json::to_vec_pretty(list)?, true)
 }
 
 fn pick<'a>(snap: &'a Snapshot, id: &str, version: Option<&str>) -> Option<(&'a Listing, &'a Release)> {

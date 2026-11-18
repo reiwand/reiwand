@@ -51,9 +51,13 @@ fn smart_playlists_follow_their_query_and_skip_missing_items() {
 }
 
 #[test]
-fn rules_use_defaults_and_reject_unknown_fields_and_bad_values() {
-    let value =
-        json!({"order": "shuffle", "interval": "1h30m", "at": ["07:30", "18:00"], "days": ["Mon", "Sat"]});
+fn rules_need_every_value_and_reject_unknown_fields_and_bad_values() {
+    let value = json!({"order": "shuffle", "interval": "1h30m", "at": ["07:30", "18:00"], "days": ["Mon", "Sat"],
+        "synced": false, "resume": true, "advance_while_paused": false, "skip_videos_on_battery": false,
+        "transition_ms": null});
+    let mut short = value.clone();
+    short.as_object_mut().unwrap().remove("synced");
+    assert!(serde_json::from_value::<Rules>(short).unwrap_err().to_string().contains("synced"));
     let rules: Rules = serde_json::from_value(value).unwrap();
     assert_eq!(
         (rules.order, rules.interval, rules.resume, rules.synced),

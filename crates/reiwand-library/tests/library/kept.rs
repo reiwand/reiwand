@@ -34,18 +34,18 @@ fn rotation_state_survives_reopening_the_library() {
 fn presets_and_profiles_reject_duplicate_names() {
     let dir = TempDir::new().unwrap();
     let (mut library, _, [a, ..]) = folder_with_three_items(&dir);
-    let calm = library.create_preset(None, "Calm", &json!({"fit": "cover"})).unwrap();
+    let calm = library.create_preset(None, "Calm", &json!({"fit": "cover", "background": null})).unwrap();
     let error = library.create_preset(None, "calm", &json!({})).unwrap_err();
     assert_eq!(error.to_string(), "preset \"calm\" already exists");
-    library.create_preset(Some(&a.uid), "Calm", &json!({"volume": 0.5})).unwrap();
+    library.create_preset(Some(&a.uid), "Calm", &json!({"fit": null, "background": "#102030"})).unwrap();
     assert!(matches!(
         library.create_preset(Some(&a.uid), "CALM", &json!({})),
         Err(Error::Exists("preset", _))
     ));
-    library.update_preset(&calm, &json!({"fit": "contain"})).unwrap();
-    assert_eq!(library.preset(&calm).unwrap().value, json!({"fit": "contain"}));
+    library.update_preset(&calm, &json!({"fit": "contain", "background": null})).unwrap();
+    assert_eq!(library.preset(&calm).unwrap().value, json!({"fit": "contain", "background": null}));
     assert!(matches!(library.preset("01J0000000000000000000NONE"), Err(Error::NotFound("preset", _))));
-    assert_eq!(library.presets(None).unwrap()[0].value, json!({"fit": "contain"}));
+    assert_eq!(library.presets(None).unwrap()[0].value, json!({"fit": "contain", "background": null}));
     assert_eq!(library.presets(Some(&a.uid)).unwrap()[0].item.as_deref(), Some(a.uid.as_str()));
     library.remove_preset(&calm).unwrap();
     assert!(library.presets(None).unwrap().is_empty());
@@ -63,10 +63,14 @@ fn presets_and_profiles_reject_duplicate_names() {
     assert!(matches!(library.rename_preset("01J0000000000000000000NONE", "x"), Err(Error::NotFound(..))));
 
     let empty = json!({});
-    let outputs = json!({"DP-1": {"playlist": "Morning"}});
-    library.create_profile("Work", &outputs, &empty, &json!({"on_battery": false}), 1).unwrap();
-    let home = library.create_profile("Home", &json!({"": {"color": "#000000"}}), &empty, &empty, 5).unwrap();
-    let error = library.create_profile("work", &empty, &empty, &empty, 0).unwrap_err();
+    let one = |playlist: Option<&str>| json!({"item": null, "path": null, "playlist": playlist, "fit": null, "background": null, "preset": null, "filter": null});
+    let auto = json!({"outputs": null, "on_battery": null});
+    let outputs = json!({"DP-1": one(Some("Morning"))});
+    library
+        .create_profile("Work", &outputs, &empty, &json!({"outputs": null, "on_battery": false}), 1)
+        .unwrap();
+    let home = library.create_profile("Home", &json!({"": one(None)}), &empty, &auto, 5).unwrap();
+    let error = library.create_profile("work", &empty, &empty, &auto, 0).unwrap_err();
     assert_eq!(error.to_string(), "profile \"work\" already exists");
     let mut profile = library.profile("Work").unwrap();
     assert_eq!(profile.outputs, outputs);

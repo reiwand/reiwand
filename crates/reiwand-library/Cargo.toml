@@ -20,4 +20,4 @@ chrono.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true
-reiwand-upgrade.workspace = true
+reiwand-upgrade = { workspace = true, features = ["server"] }

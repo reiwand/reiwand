@@ -9,7 +9,7 @@ use std::path::Path;
 
 const SCHEMA: &str = include_str!("schema.sql");
 
-pub const SCHEMA_VERSION: u32 = 8;
+pub const SCHEMA_VERSION: u32 = 9;
 
 impl Library {
     pub fn open(path: impl AsRef<Path>) -> Result<Self> {

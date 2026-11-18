@@ -55,7 +55,7 @@ fn the_old_account_keeps_its_session_in_the_new_store() {
     assert_eq!(vault.items.get(&format!("account {id}")).map(String::as_str), Some("tok"));
     assert!(!vault.items.contains_key("server") && !data.join("sync.json").exists());
     let pins: BTreeMap<String, String> =
-        serde_json::from_slice(&fs::read(data.join("repo-pins.json")).unwrap()).unwrap();
+        reiwand_core::stored::read(&data.join("repo-pins.json")).unwrap().unwrap();
     assert_eq!(pins["https://srv.example:8443"], "ab12cd");
 }
 

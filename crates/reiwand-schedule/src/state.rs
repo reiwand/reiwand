@@ -5,18 +5,22 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::path::Path;
 
+pub(crate) fn null<'de, D: serde::Deserializer<'de>, T: Deserialize<'de>>(
+    d: D,
+) -> Result<Option<T>, D::Error> {
+    Option::<T>::deserialize(d)
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PlaylistState {
     seed: u32,
     pub(crate) cycle: u32,
     pub(crate) position: usize,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "null")]
     pub(crate) anchor: Option<(u32, usize)>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "null")]
     pub(crate) since: Option<DateTime<Utc>>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub(crate) behind: Vec<Shown>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub(crate) ahead: Vec<Shown>,
 }
 

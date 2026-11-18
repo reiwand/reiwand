@@ -3,7 +3,6 @@ use crate::error::{Result, failed};
 use crate::jobs::Ctl;
 use reiwand_providers::HttpFetch;
 use std::collections::BTreeMap;
-use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
 
@@ -36,8 +35,7 @@ impl Daemon {
     }
 
     pub(crate) fn repo_pins(&self) -> BTreeMap<String, String> {
-        let read = fs::read(self.pins_path()).ok();
-        read.and_then(|bytes| serde_json::from_slice(&bytes).ok()).unwrap_or_default()
+        reiwand_core::stored::read(&self.pins_path()).ok().flatten().unwrap_or_default()
     }
 
     pub(crate) fn pin_origin(&self, origin: &str, pin: &str) -> Result<()> {
@@ -46,7 +44,7 @@ impl Daemon {
         let path = self.pins_path();
         let dir = path.parent().unwrap_or(std::path::Path::new("."));
         let mut file = tempfile::Builder::new().prefix(".tmp-").tempfile_in(dir)?;
-        file.write_all(&serde_json::to_vec(&pins).map_err(|e| failed(e.to_string()))?)?;
+        file.write_all(&reiwand_core::stored::text(&pins).map_err(|e| failed(e.to_string()))?)?;
         file.persist(&path).map_err(|e| crate::error::Error::from(e.error))?;
         Ok(())
     }

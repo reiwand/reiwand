@@ -52,7 +52,9 @@ fn at(text: &str) -> DateTime<Utc> {
 }
 
 fn rules(json: serde_json::Value) -> Rules {
-    serde_json::from_value(json).unwrap()
+    let mut whole = serde_json::to_value(Rules::default()).unwrap();
+    whole.as_object_mut().unwrap().extend(json.as_object().unwrap().clone());
+    serde_json::from_value(whole).unwrap()
 }
 
 fn list(uids: &[&str], order: Order) -> Resolved {

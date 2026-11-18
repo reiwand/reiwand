@@ -14,16 +14,8 @@ pub const DOWNLOADS: &str = "models.allow_download";
 const GPU: &str = "render.gpu";
 const QUALITY: &str = "playback.quality";
 
-pub fn stored(value: impl Serialize) -> Value {
-    fn strip(value: Value) -> Value {
-        match value {
-            Value::Object(map) => {
-                map.into_iter().filter(|(_, v)| !v.is_null()).map(|(k, v)| (k, strip(v))).collect()
-            }
-            other => other,
-        }
-    }
-    strip(serde_json::to_value(value).unwrap_or_default())
+pub fn whole(value: impl Serialize) -> Value {
+    serde_json::to_value(value).unwrap_or_default()
 }
 
 pub fn sections(c: &mut Config) -> impl Iterator<Item = &mut OutputConfig> {
@@ -77,7 +69,7 @@ impl Daemon {
             with_options && ![DOWNLOADS, GPU, QUALITY, LayerNamespace::KEY].contains(&k.as_str())
         });
         let options: BTreeMap<String, String> = options.map(|(k, v)| (k, text(v))).collect();
-        let (outputs, options) = (stored(&outputs), stored(&options));
+        let (outputs, options) = (whole(&outputs), whole(&options));
         let uid = self.store.write(|lib| {
             match lib.profiles()?.into_iter().find(|p| p.name.eq_ignore_ascii_case(name.trim())) {
                 Some(p) => {
@@ -85,9 +77,13 @@ impl Daemon {
                     lib.update_profile(&reiwand_library::Profile { outputs, options, ..p })?;
                     Ok::<_, Error>(uid)
                 }
-                None => {
-                    Ok(lib.create_profile(name, &outputs, &options, &Value::Object(Default::default()), 0)?)
-                }
+                None => Ok(lib.create_profile(
+                    name,
+                    &outputs,
+                    &options,
+                    &whole(ProfileAuto { outputs: None, on_battery: None }),
+                    0,
+                )?),
             }
         })?;
         self.changes.changed("profiles", vec![uid.clone()]);
@@ -133,7 +129,7 @@ impl Daemon {
                     )));
                 }
             }
-            p.auto = stored(&conditions);
+            p.auto = whole(&conditions);
             Ok(())
         })
     }

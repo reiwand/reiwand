@@ -40,11 +40,13 @@ fn write(path: &Path, bytes: Vec<u8>) -> anyhow::Result<()> {
 pub fn apply(data: &Path, vault: &mut dyn Vault) -> anyhow::Result<()> {
     let Ok(bytes) = fs::read(data.join("sync.json")) else { return Ok(()) };
     let sync: Value = serde_json::from_slice(&bytes)?;
-    let pins = fs::read(data.join("repo-pins.json")).ok().and_then(|b| serde_json::from_slice(&b).ok());
+    let pins = fs::read(data.join("repo-pins.json")).ok().and_then(|b| {
+        reiwand_core::stored::parse("repo-pins.json", &b).ok().or_else(|| serde_json::from_slice(&b).ok())
+    });
     let done = accounts_step(&sync, pins.unwrap_or_default(), vault)?;
     if done.moved && !data.join("accounts.json").exists() {
         write(&data.join("accounts.json"), done.accounts.text()?)?;
-        write(&data.join("repo-pins.json"), serde_json::to_vec(&done.pins)?)?;
+        write(&data.join("repo-pins.json"), reiwand_core::stored::text(&done.pins)?)?;
     }
     Ok(())
 }
@@ -148,7 +150,7 @@ mod tests {
         let file = File::read(&dir.path().join("accounts.json")).unwrap();
         assert!(file.accounts[0].pending);
         let pins: BTreeMap<String, String> =
-            serde_json::from_slice(&fs::read(dir.path().join("repo-pins.json")).unwrap()).unwrap();
+            reiwand_core::stored::read(&dir.path().join("repo-pins.json")).unwrap().unwrap();
         assert_eq!(pins["https://srv.example:8443"], "ab12");
     }
 

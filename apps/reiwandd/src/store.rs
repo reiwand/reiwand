@@ -97,7 +97,8 @@ mod tests {
     #[test]
     fn references_to_missing_rows_are_dropped() {
         let mut lib = Library::open_in_memory().unwrap();
-        let preset = lib.create_preset(None, "Dim", &serde_json::json!({"fit": "fit"})).unwrap();
+        let preset =
+            lib.create_preset(None, "Dim", &serde_json::json!({"fit": "fit", "background": null})).unwrap();
         let mut config = Config { profile: Some("01J0000000000000000000GONE".into()), ..Config::default() };
         config.default.preset = Some(preset);
         config.outputs.entry("DP-1".into()).or_default().playlist = Some("01J0000000000000000000GONE".into());

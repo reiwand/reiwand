@@ -40,3 +40,19 @@ fn an_account_without_a_value_is_refused_naming_it() {
     fs::write(dir.path().join("accounts.json"), text).unwrap();
     assert!(File::read(&dir.path().join("accounts.json")).unwrap_err().to_string().contains("missing field"));
 }
+
+#[test]
+fn the_registry_files_are_converted_and_the_installed_list_names_signer_and_revocation() {
+    let dir = tempfile::tempdir().unwrap();
+    let (data, copies) = (dir.path(), dir.path().join("copies"));
+    let rec = r#"[{"repo_id": "r", "id": "p", "version": "1", "sha256": "s", "size": 3, "path": "/x"}]"#;
+    fs::write(data.join("installed.json"), rec).unwrap();
+    fs::write(data.join("anchors.json"), "[]").unwrap();
+    fs::write(data.join("repo-pins.json"), r#"{"https://s.example": "ab"}"#).unwrap();
+    assert!(reiwand_format::installed(data).unwrap_err().to_string().contains("reiwand-upgrade client"));
+    assert_eq!(stored::files(data, &copies).unwrap(), 3);
+    let list = reiwand_format::installed(data).unwrap();
+    assert!(list[0].signer.is_none() && list[0].revoked.is_none());
+    assert!(reiwand_format::anchors(data).unwrap().is_empty());
+    assert_eq!(stored::files(data, &copies).unwrap(), 0);
+}
