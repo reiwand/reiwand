@@ -1,11 +1,13 @@
-use crate::ffi::{Ptr, get, text};
-use crate::glib::string;
 use crate::state::{engine, live};
 use reiwand_web::Start;
+use rustix::fs::{MemfdFlags, memfd_create};
+use std::cell::RefCell;
 use std::collections::HashSet;
 use std::io::Write;
-use std::os::fd::{IntoRawFd, OwnedFd};
+use std::os::fd::{AsRawFd, OwnedFd};
 use std::path::PathBuf;
+
+const KEPT: u64 = 64 << 20;
 
 pub fn package(start: &Start) -> Result<(HashSet<String>, Option<String>), String> {
     let mut package = reiwand_format::open(&start.package, &reiwand_format::Limits::default())
@@ -33,23 +35,67 @@ enum Found {
 fn find(uri: &str) -> Option<Found> {
     let engine = engine()?;
     let uri = uri.split(['?', '#']).next()?;
-    if let Some(rest) = uri.strip_prefix("wpak://") {
+    if let Some((scheme, rest)) = uri.split_once("://")
+        && scheme.eq_ignore_ascii_case("wpak")
+    {
         let (id, path) = rest.split_once('/')?;
         let path = reiwand_format::page::decoded(path)?;
         let path = if path.is_empty() { engine.start.entry.clone() } else { path };
-        let fine =
-            id == engine.start.id && engine.entries.contains(&path) && !path.starts_with("manifest.json");
+        let fine = id.eq_ignore_ascii_case(&engine.start.id)
+            && engine.entries.contains(&path)
+            && !path.starts_with("manifest.json");
         return fine.then(|| Found::Packed(engine.start.package.clone(), path));
     }
-    let file = live(|l| l.files.get(uri).cloned())?;
-    Some(Found::User(file))
+    live(|l| l.file(uri)).map(Found::User)
+}
+
+thread_local! {
+    static CACHE: RefCell<Vec<(String, OwnedFd, u64)>> = const { RefCell::new(Vec::new()) };
+}
+
+fn memory(reader: &mut impl std::io::Read) -> std::io::Result<(OwnedFd, u64)> {
+    let fd = memfd_create("reiwand-web-entry", MemfdFlags::CLOEXEC)?;
+    let mut file = std::fs::File::from(fd);
+    let size = std::io::copy(reader, &mut file)?;
+    file.flush()?;
+    Ok((file.into(), size))
+}
+
+fn reopen(fd: &OwnedFd) -> std::io::Result<OwnedFd> {
+    Ok(std::fs::File::open(format!("/proc/self/fd/{}", fd.as_raw_fd()))?.into())
+}
+
+fn packed(package: &PathBuf, path: &str) -> std::io::Result<(OwnedFd, u64)> {
+    let key = format!("{}:{path}", package.display());
+    let hit =
+        CACHE.with(|c| c.borrow().iter().find(|(k, ..)| *k == key).map(|(_, fd, size)| (reopen(fd), *size)));
+    if let Some((fd, size)) = hit {
+        return Ok((fd?, size));
+    }
+    let mut archive = zip::ZipArchive::new(std::fs::File::open(package)?).map_err(std::io::Error::other)?;
+    let mut entry = archive.by_name(path).map_err(std::io::Error::other)?;
+    let (fd, size) = memory(&mut entry)?;
+    let reader = reopen(&fd)?;
+    let held = size <= KEPT;
+    CACHE.with(|c| {
+        let mut c = c.borrow_mut();
+        if !held {
+            return;
+        }
+        while c.iter().map(|(.., s)| s).sum::<u64>() + size > KEPT {
+            c.remove(0);
+        }
+        c.push((key, fd, size));
+    });
+    Ok((reader, size))
 }
 
 fn opened(found: Found) -> std::io::Result<(OwnedFd, u64, String)> {
     match found {
         Found::User(path) => {
             use std::os::unix::fs::OpenOptionsExt;
-            let file = std::fs::OpenOptions::new().read(true).custom_flags(libc_nofollow()).open(&path)?;
+            let nofollow = rustix::fs::OFlags::NOFOLLOW.bits() as i32;
+            let file = std::fs::OpenOptions::new().read(true).custom_flags(nofollow).open(&path)?;
             let meta = file.metadata()?;
             if !meta.is_file() {
                 return Err(std::io::ErrorKind::InvalidInput.into());
@@ -57,47 +103,12 @@ fn opened(found: Found) -> std::io::Result<(OwnedFd, u64, String)> {
             Ok((file.into(), meta.len(), reiwand_web::mime(&path.to_string_lossy()).into()))
         }
         Found::Packed(package, path) => {
-            let (reader, writer) = rustix::pipe::pipe_with(rustix::pipe::PipeFlags::CLOEXEC)?;
-            let mut archive =
-                zip::ZipArchive::new(std::fs::File::open(&package)?).map_err(std::io::Error::other)?;
-            let size = archive.by_name(&path).map_err(std::io::Error::other)?.size();
-            let kind = reiwand_web::mime(&path).to_owned();
-            std::thread::spawn(move || {
-                let mut out = std::fs::File::from(writer);
-                if let Ok(mut file) = archive.by_name(&path) {
-                    let _ = std::io::copy(&mut file, &mut out).and_then(|_| out.flush());
-                }
-            });
-            Ok((reader, size, kind))
+            let (fd, size) = packed(&package, &path)?;
+            Ok((fd, size, reiwand_web::mime(&path).to_owned()))
         }
     }
 }
 
-fn libc_nofollow() -> i32 {
-    rustix::fs::OFlags::NOFOLLOW.bits() as i32
-}
-
-pub unsafe extern "C" fn serve(request: Ptr, _data: Ptr) {
-    let a = get();
-    let uri = unsafe { string((a.webkit_uri_scheme_request_get_uri)(request)) };
-    match find(&uri).map(opened) {
-        Some(Ok((fd, size, kind))) => unsafe {
-            let stream = (a.g_unix_input_stream_new)(fd.into_raw_fd(), 1);
-            let response = (a.webkit_uri_scheme_response_new)(stream, size as i64);
-            let kind = text(&kind);
-            (a.webkit_uri_scheme_response_set_content_type)(response, kind.as_ptr());
-            let headers = (a.soup_message_headers_new)(1);
-            (a.soup_message_headers_append)(headers, c"Access-Control-Allow-Origin".as_ptr(), c"*".as_ptr());
-            (a.webkit_uri_scheme_response_set_http_headers)(response, headers);
-            (a.webkit_uri_scheme_request_finish_with_response)(request, response);
-            (a.g_object_unref)(response);
-            (a.g_object_unref)(stream);
-        },
-        _ => unsafe {
-            let domain = (a.g_quark_from_static_string)(c"reiwand-web".as_ptr());
-            let error = (a.g_error_new_literal)(domain, 404, c"not in this package".as_ptr());
-            (a.webkit_uri_scheme_request_finish_error)(request, error);
-            (a.g_error_free)(error);
-        },
-    }
+pub fn serve(uri: &str) -> Option<(OwnedFd, u64, String)> {
+    find(uri).and_then(|found| opened(found).ok())
 }

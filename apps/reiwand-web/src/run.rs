@@ -1,40 +1,25 @@
-use crate::ffi::{Ptr, get};
+use crate::qt;
 use crate::script::tell;
-use crate::state::{VIEWS, View, all, live, view};
+use crate::state::{VIEWS, View, all, engine, live, send, view};
 use reiwand_web::{FromWeb, ToWeb};
 use serde_json::json;
-use std::ffi::c_int;
+use std::rc::Rc;
 use std::time::{Duration, Instant};
 
 const ASLEEP: Duration = Duration::from_secs(300);
+const RELOADS: u32 = 3;
+const STABLE: u32 = 60_000;
 
 pub fn handle(message: ToWeb) {
     match message {
         ToWeb::Start(_) => {}
-        ToWeb::Open { view, size, scale, properties } => {
-            live(|l| l.views.insert(view, properties.clone()));
-            match crate::state::FILTER.with(std::cell::Cell::get).is_null() {
-                true => crate::state::WAITING
-                    .with(|w| w.borrow_mut().push(ToWeb::Open { view, size, scale, properties })),
-                false => crate::view::open(view, size, scale),
-            }
-        }
+        ToWeb::Open { view, size, scale, properties } => open(view, size, scale, properties),
         ToWeb::Close(id) => close(id),
-        ToWeb::Resize { view: id, size, scale } => {
-            if let Some(view) = view(id) {
-                let a = get();
-                unsafe {
-                    let top = (a.wpe_view_get_toplevel)(view.wpe);
-                    (a.wpe_toplevel_resize)(top, size.0 as c_int, size.1 as c_int);
-                    (a.wpe_toplevel_scale_changed)(top, scale.max(0.25));
-                }
-            }
-        }
+        ToWeb::Resize { view: id, size, scale } => qt::resize(id, size, scale),
         ToWeb::Visible { view: id, visible } => view(id).into_iter().for_each(|v| show(&v, visible)),
-        ToWeb::Fps { view: id, fps } => view(id).into_iter().for_each(|v| v.fps.set(fps.max(1))),
+        ToWeb::Fps { view: id, fps } => qt::fps(id, fps.max(1)),
         ToWeb::Settings(settings) => {
-            let muted = c_int::from(settings.volume <= 0.0);
-            all().iter().for_each(|v| unsafe { (get().webkit_web_view_set_is_muted)(v.web, muted) });
+            qt::muted(settings.volume <= 0.0);
             tell(&json!({"settings": settings}));
             live(|l| l.settings = settings);
         }
@@ -53,118 +38,115 @@ pub fn handle(message: ToWeb) {
             }
         }
         ToWeb::Media(heard) => crate::script::heard(heard),
-        ToWeb::Pointer { view: id, at } => view(id).into_iter().for_each(|v| pointer(&v, at)),
-        ToWeb::Press { view: id, at, button } => view(id).into_iter().for_each(|v| press(&v, at, button)),
-        ToWeb::Folder(folder) => folders(folder),
+        ToWeb::Pointer { view: id, at } => pointer(id, at),
+        ToWeb::Press { view: id, at, button } => press(id, at, button),
+        ToWeb::Folder(folder) => crate::folders::update(folder),
         ToWeb::Files(files) => live(|l| l.files.extend(files)),
         ToWeb::Action(id) => tell(&json!({"action": id})),
-        ToWeb::Released { view: id, buffer } => {
-            view(id).into_iter().for_each(|v| crate::frames::release(&v, buffer))
+        ToWeb::Released { view: id, buffer } => qt::released(id, buffer),
+        ToWeb::Freed { view: id, slot } => {
+            view(id).into_iter().for_each(|v| v.ring.borrow_mut().iter_mut().for_each(|r| r.release(slot)));
+            qt::released(id, 0);
         }
-        ToWeb::Freed { view: id, slot } => view(id).into_iter().for_each(|v| crate::frames::freed(&v, slot)),
-        ToWeb::Copy => live(|l| l.copy = true),
-        ToWeb::Shot { view: id } => view(id).into_iter().for_each(|v| crate::frames::shot(&v)),
-        ToWeb::Quit => crate::quit::quit(0),
+        ToWeb::Copy => qt::copy(),
+        ToWeb::Shot { view: id } => qt::shot(id),
+        ToWeb::Quit => qt::quit(),
     }
 }
 
-fn folders(folder: reiwand_web::Folder) {
-    let old = live(|l| {
-        l.files.extend(folder.files.iter().map(|(t, p)| (t.clone(), p.clone())));
-        l.folders.insert(folder.prop.clone(), folder.clone())
-    });
-    let old = old.map(|f| f.files).unwrap_or_default();
-    let before: Vec<String> = old.iter().map(|(t, _)| t.clone()).collect();
-    let now: Vec<String> = folder.files.iter().map(|(t, _)| t.clone()).collect();
-    live(|l| before.iter().filter(|t| !now.contains(t)).for_each(|t| drop(l.files.remove(t))));
-    let paths: std::collections::HashMap<&str, &std::path::Path> =
-        old.iter().chain(&folder.files).map(|(t, p)| (t.as_str(), p.as_path())).collect();
-    let path = |t: &str| paths.get(t).map(|p| p.to_path_buf());
-    if let Some(notice) =
-        reiwand_format::page::files(&folder.prop, &before, &now, path).filter(|_| folder.all)
-    {
-        tell(&json!({ "files": notice }));
-    }
+fn open(id: u32, size: (u32, u32), scale: f64, properties: serde_json::Map<String, serde_json::Value>) {
+    live(|l| l.views.insert(id, properties));
+    let view = View {
+        id,
+        visible: true.into(),
+        hidden_at: None.into(),
+        crashes: 0.into(),
+        loaded: false.into(),
+        answered: Instant::now().into(),
+        ring: None.into(),
+    };
+    let view = Rc::new(view);
+    VIEWS.with(|v| v.borrow_mut().insert(id, view.clone()));
+    qt::open(id, size, scale);
+    qt::fps(id, live(|l| l.settings.fps).max(1));
+    load(id);
+    crate::watch::beat(view);
+}
+
+pub fn load(id: u32) {
+    let Some(view) = view(id) else { return };
+    crate::script::install(id);
+    let Some(engine) = engine() else { return };
+    view.answered.set(Instant::now());
+    qt::load(id, &format!("wpak://{}/{}", engine.start.id.to_ascii_lowercase(), engine.start.entry));
 }
 
 pub fn close(id: u32) {
-    if let Some(view) = VIEWS.with(|v| v.borrow_mut().remove(&id)) {
-        let a = get();
-        let held: Vec<Ptr> = view.held.borrow_mut().drain().map(|(_, b)| b).collect();
-        unsafe {
-            held.iter().for_each(|b| (a.wpe_view_buffer_released)(view.wpe, *b));
-            let (newest, _) = view.newest.replace((std::ptr::null_mut(), false));
-            if !newest.is_null() {
-                (a.g_object_unref)(newest);
-            }
-            (a.webkit_web_view_terminate_web_process)(view.web);
-            (a.g_object_unref)(view.web);
-            (a.g_object_unref)(view.manager);
-        }
+    if VIEWS.with(|v| v.borrow_mut().remove(&id)).is_some() {
+        qt::close(id);
     }
 }
 
-fn show(view: &std::rc::Rc<View>, visible: bool) {
+fn show(view: &Rc<View>, visible: bool) {
     if view.visible.replace(visible) == visible {
         return;
     }
-    unsafe { (get().wpe_view_set_visible)(view.wpe, c_int::from(visible)) };
+    qt::visible(view.id, visible);
     if visible {
         view.hidden_at.set(None);
-        if view.stopped.replace(false) {
-            view.loaded.set(false);
-            crate::view::load(view.id);
-        }
         return;
     }
     let at = Instant::now();
     view.hidden_at.set(Some(at));
     let view = view.clone();
-    crate::glib::later(ASLEEP.as_millis() as u32, move || {
-        if view.hidden_at.get() == Some(at) && !view.visible.get() {
-            view.stopped.set(true);
-            unsafe { (get().webkit_web_view_terminate_web_process)(view.web) };
-            crate::state::send(&FromWeb::Said("the hidden page was stopped to save memory".into()));
+    qt::later(ASLEEP.as_millis() as u32, move || {
+        let idle = all().iter().all(|v| !v.visible.get());
+        if view.hidden_at.get() == Some(at) && idle {
+            send(&FromWeb::Idle);
         }
     });
 }
 
-fn time() -> u32 {
-    std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.as_millis() as u32)
-}
-
-fn pointer(view: &View, at: Option<(f64, f64)>) {
-    if !live(|l| l.allowed.pointer || l.allowed.clicks) {
-        return;
-    }
-    let a = get();
-    let (kind, (x, y)) = match at {
-        Some(at) => (3, at),
-        None => (5, (0.0, 0.0)),
-    };
-    deliver(view, unsafe { (a.wpe_event_pointer_move_new)(kind, view.wpe, 0, time(), 0, x, y, 0.0, 0.0) });
-}
-
-fn deliver(view: &View, event: Ptr) {
-    if !event.is_null() {
-        let a = get();
-        unsafe {
-            (a.wpe_view_event)(view.wpe, event);
-            (a.wpe_event_unref)(event);
-        }
+pub fn loaded(id: u32) {
+    let Some(view) = view(id) else { return };
+    view.loaded.set(true);
+    send(&FromWeb::Loaded { view: id });
+    crate::script::replay(id);
+    let crashes = view.crashes.get();
+    if crashes > 0 {
+        qt::later(STABLE, move || {
+            view_stable(id, crashes);
+        });
     }
 }
 
-fn press(view: &View, (x, y): (f64, f64), button: u32) {
-    if !live(|l| l.allowed.clicks) {
-        return;
+fn view_stable(id: u32, crashes: u32) {
+    view(id).filter(|v| v.crashes.get() == crashes).iter().for_each(|v| v.crashes.set(0));
+}
+
+pub fn crashed(id: u32, _status: i32) {
+    let Some(view) = view(id) else { return };
+    let crashes = view.crashes.get() + 1;
+    view.crashes.set(crashes);
+    view.loaded.set(false);
+    send(&FromWeb::Crashed { view: id });
+    let wait = if crashes <= RELOADS { 1000 * crashes.pow(2) } else { u32::MAX };
+    view.answered.set(Instant::now() + Duration::from_millis(u64::from(wait)));
+    match crashes <= RELOADS {
+        true => qt::later(wait, move || load(id)),
+        false => send(&FromWeb::Broken { view: id }),
     }
-    let a = get();
-    pointer(view, Some((x, y)));
-    for (kind, modifiers, count) in [(1, 1 << (7 + button.clamp(1, 5)), 1), (2, 0, 0)] {
-        let event = unsafe {
-            (a.wpe_event_pointer_button_new)(kind, view.wpe, 0, time(), modifiers, button, x, y, count)
-        };
-        deliver(view, event);
+}
+
+fn pointer(id: u32, at: Option<(f64, f64)>) {
+    if live(|l| l.allowed.pointer || l.allowed.clicks) {
+        qt::pointer(id, at);
+    }
+}
+
+fn press(id: u32, at: (f64, f64), button: u32) {
+    if live(|l| l.allowed.clicks) {
+        qt::pointer(id, Some(at));
+        qt::press(id, at, button);
     }
 }

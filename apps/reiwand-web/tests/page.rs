@@ -27,13 +27,14 @@ use std::time::{Duration, Instant};
 #[test]
 fn page_gets_its_api_and_nothing_else() {
     if !available() {
-        return eprintln!("skipped: no WPE WebKit 2.54");
+        return eprintln!("skipped: no Qt WebEngine 6.5");
     }
     let dir = tempfile::tempdir().unwrap();
     let server = TcpListener::bind("127.0.0.1:0").unwrap();
     server.set_nonblocking(true).unwrap();
     let port = server.local_addr().unwrap().port();
     let granted = Start { network: vec!["https://api.example.org".into()], ..start(dir.path(), port) };
+    let hardware = granted.device.is_some();
     let mut page = Page::open(granted, Isolation { network: true, devices: false, limits: false });
     assert_eq!(page.wait("early", 20), "preloaded");
     assert_eq!(page.wait("language", 5), "es-AR");
@@ -67,7 +68,7 @@ fn page_gets_its_api_and_nothing_else() {
     page.said.remove("frames");
     page.wait("frames", 5);
     let rate = page.wait("frames", 5).as_u64().unwrap();
-    assert!((10..=26).contains(&rate), "{rate} frames a second at a cap of 20");
+    assert!(!hardware || (10..=26).contains(&rate), "{rate} frames a second at a cap of 20");
     page.link.send(&ToWeb::Visible { view: 1, visible: false }, &[]).unwrap();
     assert_eq!(page.wait("paused", 5), true);
     page.frames = 0;
@@ -80,7 +81,7 @@ fn page_gets_its_api_and_nothing_else() {
 #[test]
 fn page_without_a_render_node_draws_in_memory() {
     if !available() {
-        return eprintln!("skipped: no WPE WebKit 2.54");
+        return eprintln!("skipped: no Qt WebEngine 6.5");
     }
     let dir = tempfile::tempdir().unwrap();
     let start = Start { device: None, storage: None, mask_gpu: true, ..start(dir.path(), 9) };

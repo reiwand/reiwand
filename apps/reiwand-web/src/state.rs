@@ -1,4 +1,3 @@
-use crate::ffi::Ptr;
 use crate::ring::Ring;
 use reiwand_web::{Allowed, Folder, FromWeb, Link, Settings, Start};
 use std::cell::{Cell, OnceCell, RefCell};
@@ -10,29 +9,19 @@ use std::time::Instant;
 pub struct Engine {
     pub link: Link,
     pub start: Start,
-    pub context: Ptr,
-    pub session: Ptr,
     pub entries: HashSet<String>,
     pub preload: Option<String>,
+    pub nonce: String,
 }
 
 pub struct View {
     pub id: u32,
-    pub web: Ptr,
-    pub wpe: Ptr,
-    pub manager: Ptr,
-    pub fps: Cell<u32>,
-    pub last: Cell<Option<Instant>>,
     pub visible: Cell<bool>,
     pub hidden_at: Cell<Option<Instant>>,
-    pub stopped: Cell<bool>,
     pub crashes: Cell<u32>,
-    pub known: RefCell<Vec<(Ptr, u32)>>,
-    pub held: RefCell<HashMap<u32, Ptr>>,
-    pub ring: RefCell<Option<Ring>>,
     pub loaded: Cell<bool>,
     pub answered: Cell<Instant>,
-    pub newest: Cell<(Ptr, bool)>,
+    pub ring: RefCell<Option<Ring>>,
 }
 
 #[derive(Default)]
@@ -47,16 +36,32 @@ pub struct Live {
     pub audio: bool,
     pub media: bool,
     pub heard: Option<serde_json::Value>,
-    pub copy: bool,
     pub said: crate::said::Said,
+}
+
+impl Live {
+    pub fn file(&self, uri: &str) -> Option<PathBuf> {
+        let fold = |u: &str| match u.split_once("://") {
+            Some((scheme, rest)) => {
+                let (host, tail) = rest.split_once('/').unwrap_or((rest, ""));
+                format!("{scheme}://{}/{tail}", host.to_ascii_lowercase())
+            }
+            None => u.to_owned(),
+        };
+        self.files
+            .get(uri)
+            .or_else(|| {
+                let wanted = fold(uri);
+                self.files.iter().find(|(k, _)| fold(k) == wanted).map(|(_, v)| v)
+            })
+            .cloned()
+    }
 }
 
 thread_local! {
     static ENGINE: OnceCell<&'static Engine> = const { OnceCell::new() };
     pub static VIEWS: RefCell<BTreeMap<u32, Rc<View>>> = const { RefCell::new(BTreeMap::new()) };
     pub static LIVE: RefCell<Live> = RefCell::new(Live::default());
-    pub static FILTER: Cell<Ptr> = const { Cell::new(std::ptr::null_mut()) };
-    pub static WAITING: RefCell<Vec<reiwand_web::ToWeb>> = const { RefCell::new(Vec::new()) };
 }
 
 pub fn set_engine(engine: Engine) {
@@ -84,14 +89,6 @@ pub fn say(link: &Link, message: &FromWeb, fds: &[std::os::fd::BorrowedFd<'_>]) 
 
 pub fn view(id: u32) -> Option<Rc<View>> {
     VIEWS.with(|v| v.borrow().get(&id).cloned())
-}
-
-pub fn by_wpe(wpe: Ptr) -> Option<Rc<View>> {
-    VIEWS.with(|v| v.borrow().values().find(|v| v.wpe == wpe).cloned())
-}
-
-pub fn by_web(web: Ptr) -> Option<Rc<View>> {
-    VIEWS.with(|v| v.borrow().values().find(|v| v.web == web).cloned())
 }
 
 pub fn all() -> Vec<Rc<View>> {

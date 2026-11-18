@@ -140,6 +140,7 @@ dirs = "7"
 blake3 = "1"
 libc = "0.2"
 libloading = "0.8.9"
+cc = "1.9.0"
 smithay-client-toolkit = { version = "0.21.1", default-features = false, features = ["system"] }
 raw-window-handle = "0.6"
 jni = "0.22.4"

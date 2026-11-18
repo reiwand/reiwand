@@ -1,9 +1,7 @@
-mod engine;
-mod ffi;
-mod formats;
-mod frames;
+mod folders;
 mod gbm;
-mod glib;
+mod host;
+mod qt;
 mod quit;
 mod replay;
 mod ring;
@@ -12,46 +10,64 @@ mod said;
 mod scheme;
 mod script;
 mod state;
-mod view;
 mod watch;
 
-use ffi::{Ptr, get};
-use reiwand_web::{FromWeb, Link, ToWeb};
-use std::ffi::c_int;
+use reiwand_web::{FromWeb, Link, Start, ToWeb};
+use serde_json::json;
 use std::os::fd::{FromRawFd, OwnedFd};
 
 const SOCKET: i32 = 3;
-const UNSANDBOXED: &str = "Bubblewrap does not work";
+const FLAGS: &str = "--autoplay-policy=no-user-gesture-required --disable-breakpad --disable-sync \
+    --disable-background-networking --no-pings --disable-features=Translate,MediaRouter";
 
-fn version() -> Result<String, String> {
-    let a = ffi::api()?;
-    frames::patch()?;
-    let (major, minor) = unsafe { ((a.webkit_get_major_version)(), (a.webkit_get_minor_version)()) };
-    match (major, minor) >= (2, 54) {
-        true => Ok(format!("{major}.{minor}")),
-        false => Err(format!("WPE WebKit {major}.{minor} is older than 2.54")),
+fn sandbox_usable() -> bool {
+    match unsafe { libc::fork() } {
+        0 => {
+            let flags = libc::CLONE_NEWUSER | libc::CLONE_NEWPID | libc::CLONE_NEWNET;
+            unsafe { libc::_exit(i32::from(libc::unshare(flags) != 0)) }
+        }
+        pid if pid > 0 => {
+            let mut status = 0;
+            unsafe { libc::waitpid(pid, &mut status, 0) };
+            libc::WIFEXITED(status) && libc::WEXITSTATUS(status) == 0
+        }
+        _ => false,
     }
 }
 
-unsafe extern "C" fn logged(level: c_int, fields: Ptr, count: usize, data: Ptr) -> c_int {
-    let fields = unsafe { std::slice::from_raw_parts(fields.cast::<(ffi::Text, Ptr, isize)>(), count) };
-    let message = fields.iter().find(|(key, ..)| unsafe { glib::string(*key) } == "MESSAGE");
-    if message.is_some_and(|(_, value, _)| unsafe { glib::string(value.cast()) }.contains(UNSANDBOXED)) {
-        state::send(&FromWeb::Said("sandbox: off".into()));
-    }
-    unsafe { (get().g_log_writer_standard_streams)(level, fields.as_ptr() as Ptr, count, data) }
-}
-
-unsafe extern "C" fn readable(_fd: c_int, _condition: u32, _data: Ptr) -> c_int {
-    let Some(engine) = state::engine() else { return 0 };
-    loop {
-        match engine.link.recv::<ToWeb>(false) {
-            Ok(Some((message, _))) => run::handle(message),
-            Ok(None) => quit::quit(0),
-            Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => return 1,
-            Err(_) => quit::quit(1),
+fn environment(start: &Start) {
+    let off = std::env::var_os("QTWEBENGINE_DISABLE_SANDBOX").is_some() || !sandbox_usable();
+    unsafe {
+        if off {
+            std::env::set_var("QTWEBENGINE_DISABLE_SANDBOX", "1");
+        }
+        std::env::set_var("QTWEBENGINE_CHROMIUM_FLAGS", FLAGS);
+        if start.device.is_none() {
+            std::env::set_var("LIBGL_ALWAYS_SOFTWARE", "1");
         }
     }
+}
+
+fn nonce() -> String {
+    use std::io::Read;
+    let mut bytes = [0u8; 16];
+    let _ = std::fs::File::open("/dev/urandom").and_then(|mut f| f.read_exact(&mut bytes));
+    bytes.iter().map(|b| format!("{b:02x}")).collect()
+}
+
+fn config(start: &Start, nonce: &str) -> String {
+    json!({
+        "own": format!("wpak://{}/", start.id.to_ascii_lowercase()),
+        "prefix": script::prefix(nonce),
+        "policy": reiwand_web::csp(&start.network),
+        "background": start.background,
+        "network": start.network,
+        "storage": start.storage,
+        "languages": start.languages,
+        "modifiers": start.modifiers.iter().map(u64::to_string).collect::<Vec<_>>(),
+        "copy": false,
+    })
+    .to_string()
 }
 
 fn main() {
@@ -60,30 +76,24 @@ fn main() {
         std::process::exit(if gbm::allocates(&node) { 0 } else { 3 });
     }
     if std::env::args().nth(1).as_deref() == Some("--check") {
-        match version() {
-            Ok(version) => println!("{version}"),
-            Err(reason) => {
-                println!("{reason}");
-                std::process::exit(2);
-            }
-        }
-        return;
+        let (code, said) = match qt::check() {
+            Ok(version) => (0, format!("Qt {version}")),
+            Err(reason) => (2, reason),
+        };
+        println!("{said}");
+        std::process::exit(code);
     }
     let link = Link::from_fd(unsafe { OwnedFd::from_raw_fd(SOCKET) });
     let start = match link.recv::<ToWeb>(true) {
         Ok(Some((ToWeb::Start(start), _))) => *start,
         _ => std::process::exit(1),
     };
-    let version = match version() {
-        Ok(version) => version,
+    let (entries, preload) = match scheme::package(&start) {
+        Ok(found) => found,
         Err(reason) => {
-            state::say(&link, &FromWeb::Unavailable(reason), &[]);
-            std::process::exit(2);
+            state::say(&link, &FromWeb::Failed(reason), &[]);
+            std::process::exit(1);
         }
-    };
-    let a = get();
-    unsafe {
-        (a.g_log_set_writer_func)(logged as *const () as Ptr, std::ptr::null_mut(), std::ptr::null_mut())
     };
     state::live(|l| {
         (l.settings, l.allowed, l.properties) =
@@ -94,14 +104,13 @@ fn main() {
             l.folders.insert(folder.prop.clone(), folder.clone());
         }
     });
-    let raw = link.raw();
-    if let Err(reason) = engine::start(link, start) {
-        state::send(&FromWeb::Failed(reason));
-        std::process::exit(1);
+    environment(&start);
+    let (raw, nonce) = (link.raw(), nonce());
+    let config = config(&start, &nonce);
+    state::set_engine(state::Engine { link, start, entries, preload, nonce });
+    let code = qt::run(&config, &host::HOST, raw);
+    if code == 2 {
+        state::send(&FromWeb::Unavailable(host::last()));
     }
-    state::send(&FromWeb::Ready { version, sandboxed: true });
-    unsafe {
-        (a.g_unix_fd_add)(raw, 1 | 16, readable as *const () as Ptr, std::ptr::null_mut());
-        (a.g_main_loop_run)((a.g_main_loop_new)(std::ptr::null_mut(), 0));
-    }
+    quit::finish(code);
 }

@@ -1,15 +1,19 @@
-use crate::ffi::{Ptr, get, text};
 use crate::state::{all, engine, live, send};
 use reiwand_web::FromWeb;
 use serde_json::{Value, json};
-use std::ffi::c_int;
 
-const POST: &str = "(m) => window.webkit.messageHandlers.reiwand.postMessage(JSON.stringify(m))";
-const MEDIA: &str = include_str!("media.js");
-const ALL: c_int = 0;
-const TOP: c_int = 1;
+fn post(nonce: &str) -> String {
+    format!(
+        "(() => {{ const log = console.debug.bind(console); return (m) => log(\"{}\" + JSON.stringify(m)); }})()",
+        prefix(nonce)
+    )
+}
 
-fn source(view: u32) -> Vec<(String, c_int)> {
+pub fn prefix(nonce: &str) -> String {
+    format!("reiwand:{nonce}:")
+}
+
+fn sources(view: u32) -> Vec<(String, bool)> {
     let Some(engine) = engine() else { return Vec::new() };
     let init = live(|l| {
         let s = &l.settings;
@@ -21,28 +25,20 @@ fn source(view: u32) -> Vec<(String, c_int)> {
             "lights": l.lights.contains(&view),
         })
     });
-    let mut scripts = vec![(reiwand_format::page::api(&init, POST), TOP)];
+    let mut scripts = vec![(reiwand_format::page::api(&init, &post(&engine.nonce)), false)];
     if engine.start.mask_gpu {
-        scripts.push((format!("({})(globalThis);", reiwand_format::page::MASK.trim_end()), TOP));
+        scripts.push((format!("({})(globalThis);", reiwand_format::page::MASK.trim_end()), false));
     }
-    scripts.push((reiwand_format::page::VOLUME.into(), ALL));
-    scripts.push((MEDIA.into(), ALL));
-    scripts.extend(engine.preload.clone().map(|p| (p, TOP)));
+    scripts.push((format!("({})(globalThis);", reiwand_format::page::WEBRTC.trim_end()), true));
+    scripts.push((reiwand_format::page::VOLUME.into(), true));
+    scripts.extend(engine.preload.clone().map(|p| (p, false)));
     scripts
 }
 
-pub fn install(view: u32, manager: Ptr) {
-    let a = get();
-    unsafe {
-        (a.webkit_user_content_manager_remove_all_scripts)(manager);
-        for (source, frames) in source(view) {
-            let source = text(&source);
-            let script =
-                (a.webkit_user_script_new)(source.as_ptr(), frames, 0, std::ptr::null(), std::ptr::null());
-            (a.webkit_user_content_manager_add_script)(manager, script);
-            (a.webkit_user_script_unref)(script);
-        }
-    }
+pub fn install(view: u32) {
+    let list: Vec<Value> =
+        sources(view).into_iter().map(|(s, f)| json!({"source": s, "frames": f})).collect();
+    crate::qt::scripts(view, &Value::Array(list).to_string());
 }
 
 pub fn tell(message: &Value) {
@@ -50,22 +46,8 @@ pub fn tell(message: &Value) {
 }
 
 pub fn tell_view(id: u32, message: &Value) {
-    let code = text(&format!("window.__reiwand && window.__reiwand({message})"));
-    let a = get();
-    for view in crate::state::view(id).into_iter().filter(|v| v.loaded.get() && !v.stopped.get()) {
-        unsafe {
-            let null = std::ptr::null_mut();
-            (a.webkit_web_view_evaluate_javascript)(
-                view.web,
-                code.as_ptr(),
-                -1,
-                std::ptr::null(),
-                std::ptr::null(),
-                null,
-                null,
-                null,
-            )
-        };
+    if crate::state::view(id).is_some_and(|v| v.loaded.get()) {
+        crate::qt::eval(id, &format!("window.__reiwand && window.__reiwand({message})"));
     }
 }
 
@@ -74,21 +56,7 @@ fn reply(view: u32, id: u64, value: Value) {
 }
 
 fn direct(view: u32, message: &Value) {
-    let Some(view) = crate::state::view(view) else { return };
-    let code = text(&format!("window.__reiwand({message})"));
-    unsafe {
-        let null = std::ptr::null_mut();
-        (get().webkit_web_view_evaluate_javascript)(
-            view.web,
-            code.as_ptr(),
-            -1,
-            std::ptr::null(),
-            std::ptr::null(),
-            null,
-            null,
-            null,
-        )
-    };
+    crate::qt::eval(view, &format!("window.__reiwand({message})"));
 }
 
 fn tokens(prop: &str, every: bool) -> Option<Vec<String>> {
@@ -107,13 +75,9 @@ fn random(list: &[String]) -> Value {
     }
 }
 
-pub unsafe extern "C" fn message(_manager: Ptr, value: Ptr, data: Ptr) {
-    let a = get();
-    let raw = unsafe { (a.jsc_value_to_string)(value) };
-    let text = unsafe { crate::glib::string(raw) };
-    unsafe { (a.g_free)(raw.cast()) };
-    let Ok(Value::Object(message)) = serde_json::from_str::<Value>(&text) else { return };
-    let (view, id) = (data as usize as u32, message.get("id").and_then(Value::as_u64).unwrap_or(0));
+pub fn message(view: u32, text: &str) {
+    let Ok(Value::Object(message)) = serde_json::from_str::<Value>(text) else { return };
+    let id = message.get("id").and_then(Value::as_u64).unwrap_or(0);
     if message.get("audio").is_some() && !live(|l| std::mem::replace(&mut l.audio, true)) {
         send(&FromWeb::Wants { audio: true });
     }

@@ -4,6 +4,7 @@ pub use heard::heard;
 
 pub const API: &str = include_str!("page/api.js");
 pub const MASK: &str = include_str!("page/mask.js");
+pub const WEBRTC: &str = include_str!("page/webrtc.js");
 pub const VOLUME: &str = include_str!("page/volume.js");
 pub const INIT: &str = "__REIWAND_INIT__";
 pub const POST: &str = "__REIWAND_POST__";

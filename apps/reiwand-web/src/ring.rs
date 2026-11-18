@@ -30,14 +30,10 @@ impl Ring {
         self.size == size && self.stride == stride
     }
 
-    pub fn write(&mut self, data: &[u8]) -> Option<u32> {
+    pub fn claim(&mut self) -> Option<(u32, *mut u8)> {
         let slot = self.busy.iter().position(|b| !b)?;
-        let room = self.len / SLOTS;
-        let target = unsafe { std::slice::from_raw_parts_mut(self.map.add(slot * room), room) };
-        let n = room.min(data.len());
-        target[..n].copy_from_slice(&data[..n]);
         self.busy[slot] = true;
-        Some(slot as u32)
+        Some((slot as u32, unsafe { self.map.add(slot * (self.len / SLOTS)) }))
     }
 
     pub fn release(&mut self, slot: u32) {
