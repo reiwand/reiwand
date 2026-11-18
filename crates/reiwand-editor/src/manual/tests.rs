@@ -106,7 +106,20 @@ fn query_arguments_are_checked() {
 #[test]
 fn every_description_has_a_spanish_text() {
     let po = include_str!("../../../../po/es/reiwand-messages.po");
+    let mut ids: Vec<String> = Vec::new();
+    let mut open = false;
+    for line in po.lines() {
+        if let Some(rest) = line.strip_prefix("msgid ") {
+            ids.push(serde_json::from_str(rest).unwrap());
+            open = true;
+        } else if open && line.starts_with('"') {
+            let part: String = serde_json::from_str(line).unwrap();
+            ids.last_mut().unwrap().push_str(&part);
+        } else {
+            open = false;
+        }
+    }
     for (name, about) in ABOUT.iter().chain(ASKS.iter()) {
-        assert!(po.contains(&format!("msgid {about:?}\n")), "{name} is not translated");
+        assert!(ids.iter().any(|id| id == about), "{name} is not translated");
     }
 }

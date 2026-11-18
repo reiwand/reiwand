@@ -104,6 +104,9 @@ pub fn sample(root: &Value, schema: &Value) -> Value {
     if let Some(d) = schema.get("default") {
         return d.clone();
     }
+    if schema["x-condition"] == true {
+        return json!({});
+    }
     let (schema, _) = deref(root, schema);
     if let Some(d) = schema.get("default").or_else(|| schema.get("const")) {
         return d.clone();
@@ -142,6 +145,19 @@ pub fn sample(root: &Value, schema: &Value) -> Value {
     }
 }
 
+fn objects_of<'a>(root: &'a Value, schema: &'a Value) -> Vec<&'a Value> {
+    let mut found = Vec::new();
+    for branch in branches(schema) {
+        let (branch, _) = deref(root, branch);
+        if branch["properties"].is_object() {
+            found.extend([branch]);
+        } else {
+            found.extend(objects_of(root, branch));
+        }
+    }
+    found
+}
+
 pub fn fill(root: &Value, schema: &Value, value: &mut Value) {
     match value {
         Value::Object(map) => {
@@ -150,10 +166,10 @@ pub fn fill(root: &Value, schema: &Value, value: &mut Value) {
             let chosen = if resolved["properties"].is_object() {
                 resolved
             } else {
-                let objects = branches(resolved).iter().map(|b| deref(root, b).0);
-                let fitting = objects.clone().find(|b| b["properties"].is_object() && fits(root, b, &shown));
+                let objects = objects_of(root, resolved);
+                let fitting = objects.iter().copied().find(|b| fits(root, b, &shown));
                 fitting
-                    .or_else(|| objects.clone().find(|b| b["properties"].is_object()))
+                    .or_else(|| objects.first().copied())
                     .unwrap_or_else(|| deref(root, choose(root, resolved, &shown)).0)
             };
             let props = properties(root, chosen, &shown);
