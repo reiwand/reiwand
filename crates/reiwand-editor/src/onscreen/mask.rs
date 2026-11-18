@@ -52,7 +52,8 @@ fn shown(seat: &Seat, loops: Vec<Loop>) -> Vec<Vec<[f64; 2]>> {
 pub(super) fn view(dir: &Path, doc: &Value, id: &str, index: Option<usize>, t: f64) -> Result<Value> {
     let Target { seat, mask, .. } = open(dir, doc, id, index, t)?;
     let feather = mask["feather"].as_f64().unwrap_or(0.0).max(0.0);
-    let source = ["texture", "layer", "shape"].into_iter().find(|k| mask.get(k).is_some());
+    let source =
+        ["texture", "layer", "shape"].into_iter().find(|k| mask.get(k).is_some_and(|v| !v.is_null()));
     let sized = seat.size.iter().all(|s| s.abs() > 1e-6);
     let mut out = json!({
         "source": source,

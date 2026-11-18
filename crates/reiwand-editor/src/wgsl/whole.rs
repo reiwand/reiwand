@@ -5,6 +5,7 @@ pub(super) fn param(id: &str, kind: &str, prefill: Value) -> Value {
     for key in super::form::PARAM_KEYS_ALL.iter().skip(2) {
         made[key] = cleared_param(key);
     }
+    made["tool"] = Value::Null;
     made
 }
 

@@ -34,7 +34,7 @@ fn a_new_parent_keeps_the_layer_where_it_is() {
     let after = seat(&p, "c").outline();
     assert!(after.iter().zip(before).all(|(a, b)| near(*a, b, 0.05)), "{after:?} {before:?}");
     act(&mut p, json!({"layer": {"parent": {"layer": "c", "keep": true}}})).unwrap();
-    assert_eq!(p.doc.pointer("/scene/layers/2/parent"), None);
+    assert_eq!(p.doc.pointer("/scene/layers/2/parent"), Some(&Value::Null));
     let freed = seat(&p, "c").outline();
     assert!(freed.iter().zip(before).all(|(a, b)| near(*a, b, 0.05)), "{freed:?} {before:?}");
     let refused = act(&mut p, json!({"layer": {"parent": {"layer": "a", "parent": "b"}}})).unwrap_err();

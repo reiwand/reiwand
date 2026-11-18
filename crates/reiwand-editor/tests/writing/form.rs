@@ -19,7 +19,7 @@ fn the_form_edits_parameters_passes_and_fields_and_renames_their_uses() {
     );
     shader(&mut p, json!({ "param": { "effect": "bend", "id": "spin", "clear": ["unit"], "at": 0 } }))
         .unwrap();
-    assert!(descriptor(&p, "bend")["params"][0].get("unit").is_none());
+    assert!(descriptor(&p, "bend")["params"][0]["unit"].is_null());
     shader(&mut p, json!({ "param": { "effect": "bend", "id": "spin", "remove": true } })).unwrap();
     let bad = json!({ "effect": "bend", "id": "strength", "set": { "min": 2, "max": 1 } });
     assert!(shader(&mut p, json!({ "param": bad })).is_err(), "min above max");
@@ -28,7 +28,8 @@ fn the_form_edits_parameters_passes_and_fields_and_renames_their_uses() {
     shader(&mut p, json!({ "param": { "effect": "bend", "id": "strength", "to": "pull" } })).unwrap();
     let pointer = reiwand_editor::layers::find(&p.doc, "fill").unwrap();
     let uses = p.doc.pointer(&format!("{pointer}/effects/0/params")).unwrap();
-    assert_eq!(uses, &json!({ "pull": 0.5 }), "the uses follow the rename");
+    assert_eq!(uses["pull"], json!(0.5), "the uses follow the rename");
+    assert!(uses.get("strength").is_none(), "{uses}");
     let ramp = json!({ "effect": "bend", "id": "colors", "set": { "type": "texture", "tools": ["ramp"] } });
     shader(&mut p, json!({ "param": ramp })).unwrap();
     let source = ask(&p, json!({ "shader_source": { "effect": "bend" } }));
@@ -40,7 +41,7 @@ fn the_form_edits_parameters_passes_and_fields_and_renames_their_uses() {
     shader(&mut p, json!({ "field": cost })).unwrap();
     assert_eq!(descriptor(&p, "bend")["cost"]["taps"], 2);
     shader(&mut p, json!({ "field": { "effect": "bend", "field": "category", "value": null } })).unwrap();
-    assert!(descriptor(&p, "bend").get("category").is_none());
+    assert!(descriptor(&p, "bend")["category"].is_null());
     assert!(shader(&mut p, json!({ "field": { "effect": "bend", "field": "id", "value": "x" } })).is_err());
     shader(&mut p, json!({ "new": { "name": "soft", "template": "passes" } })).unwrap();
     shader(&mut p, json!({ "pass": { "effect": "soft", "index": 0, "set": { "scale": 0.25 } } })).unwrap();

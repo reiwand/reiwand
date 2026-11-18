@@ -6,7 +6,7 @@ use serde_json::json;
 
 fn broken(root: &tempfile::TempDir, bad: &str) -> Project {
     let mut p = scene(root, json!([]));
-    p.doc["scene"]["layers"] = trio(bad);
+    p.doc["scene"]["layers"] = super::whole::at_doc(&p.doc, "/scene/layers", &trio(bad));
     p
 }
 

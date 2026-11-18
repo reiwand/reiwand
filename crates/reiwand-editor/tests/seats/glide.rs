@@ -21,7 +21,7 @@ fn depth_is_set_per_side_and_kept_short() {
     act(&mut p, json!({"layer": {"depth": {"layer": "a", "depth": [3, 3]}}})).unwrap();
     assert_eq!(p.doc["scene"]["layers"][0]["parallax"], json!([3.0, 3.0]));
     act(&mut p, json!({"layer": {"depth": {"layer": "a", "depth": [0, 0]}}})).unwrap();
-    assert!(p.doc["scene"]["layers"][0].get("parallax").is_none());
+    assert_eq!(p.doc["scene"]["layers"][0]["parallax"], json!([0, 0]));
     assert!(act(&mut p, json!({"layer": {"depth": {"layer": "a", "depth": [11, 0]}}})).is_err());
 }
 

@@ -51,7 +51,7 @@ fn reparent(
     let pointer = format!("{path}/parent");
     let ops = match to {
         Some(p) => set(doc, &pointer, json!(p)),
-        None => doc.pointer(&pointer).map(|_| Op::Remove { path: pointer.clone() }).into_iter().collect(),
+        None => set(doc, &pointer, Value::Null),
     };
     if !keep {
         return Ok((ops, Moved::default()));

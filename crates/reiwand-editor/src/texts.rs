@@ -39,7 +39,8 @@ pub fn rows(doc: &Value, pointer: &str, value: &Value) -> Vec<Value> {
 fn textual(doc: &Value, pointer: &str) -> bool {
     let (Some((root, _)), Some(node)) = (root_of(pointer), at(doc, pointer)) else { return false };
     let (schema, name) = deref(root, &node);
-    let list = branches(schema);
+    let list: Vec<&Value> =
+        branches(schema).into_iter().flat_map(|b| [b].into_iter().chain(branches(b))).collect();
     let string = list.iter().any(|b| b["type"] == "string");
     let map = list.iter().any(|b| b["additionalProperties"]["type"] == "string");
     name == "Text" || list.iter().any(|b| deref(root, b).1 == "Text") || (string && map)

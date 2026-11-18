@@ -32,7 +32,9 @@ pub(super) fn r3(v: V3) -> Value {
 pub(super) fn put(doc: &Value, pointer: &str, value: Value, g: &Grab) -> Result<Vec<Op>> {
     let held = doc.pointer(pointer).and_then(Value::as_object);
     let keyed = held.is_some_and(|o| {
-        o.contains_key("keys") && o.keys().all(|k| ["keys", "timeline", "loop"].contains(&k.as_str()))
+        o.get("keys").is_some_and(|k| !k.is_null())
+            && o.iter()
+                .all(|(k, v)| v.is_null() || ["keys", "timeline", "loop", "invert"].contains(&k.as_str()))
     });
     if held.is_none() || g.replace {
         return Ok(set(doc, pointer, value));

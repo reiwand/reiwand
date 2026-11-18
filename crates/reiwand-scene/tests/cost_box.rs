@@ -21,12 +21,13 @@ fn scene(effect: Value, mask: Option<Value>, lit: [u32; 4]) -> Scene {
     if let Some(m) = mask {
         used["mask"] = m;
     }
-    let text = json!({ "schema": SCHEMA, "canvas": { "size": [1000, 500], "fit": "fill" },
+    let mut text = json!({ "schema": SCHEMA, "canvas": { "size": [1000, 500], "fit": "fill" },
         "assets": { "a": { "path": "a.png" }, "box": { "path": "box.png" } },
         "effects": { "push": { "descriptor": "push.json", "wgsl": "push.wgsl" } },
         "layers": [{ "id": "a", "type": "image", "image": "a", "size": [1000, 500], "effects": [used] }] });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Scene, &mut text);
     let mut s = Scene::from_json(&text.to_string()).unwrap();
-    let (json, picture) = (effect.to_string(), png(lit));
+    let (json, picture) = (reiwand_upgrade::descriptors::completed(&effect.to_string()), png(lit));
     let mut files = move |path: &str, _: usize| match path {
         "push.json" => Ok(json.clone().into_bytes()),
         "push.wgsl" => Ok(WGSL.as_bytes().to_vec()),

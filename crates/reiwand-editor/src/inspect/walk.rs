@@ -49,6 +49,9 @@ impl Walk<'_> {
             list.len() == 2 && deref(self.root, &list[1]).1.starts_with("Binding_for_")
         };
         let inline_value = !name.starts_with("Value_for_") && value_union(schema);
+        if name.is_empty() {
+            name = inlined(schema);
+        }
         if name == "Smooth" {
             f.widget = "smooth".into();
             f.range = json!([0, 60]);
@@ -164,5 +167,21 @@ impl Walk<'_> {
             _ => {}
         }
         self.out.push(f);
+    }
+}
+
+fn inlined(schema: &Value) -> &'static str {
+    let list = branches(schema);
+    let shaped = |i: usize, key: &str| list.get(i).is_some_and(|b| b.get(key).is_some());
+    match (list.len(), list.first().map(|b| &b["type"]), list.get(1).map(|b| &b["type"])) {
+        (2, Some(a), Some(b)) if a == "string" && b == "object" && shaped(1, "additionalProperties") => {
+            "Text"
+        }
+        (2, Some(a), Some(b))
+            if a == "number" && b == "object" && list[1]["properties"]["up"].is_object() =>
+        {
+            "Smooth"
+        }
+        _ => "",
     }
 }

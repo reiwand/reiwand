@@ -20,12 +20,13 @@ fn deep(root: &Value, schema: &Value, value: &Value, at: &str) {
 }
 
 fn properties() -> Value {
-    json!({
+    let declared = json!({
         "tint": { "type": "color", "default": "#ff9a3d", "label": "@tint" },
         "speed": { "type": "slider", "min": 0, "max": 2, "decimals": 2, "editable": true, "default": 1, "quality": { "q1": 0.5 } },
-        "photos": { "type": "folder", "accept": ["image"], "mode": "all", "max_files": 500, "recursive": 1 },
+        "photos": { "type": "folder", "accept": ["image"], "pick": "random", "every": 60, "mode": "all", "max_files": 500, "recursive": 1 },
         "open": { "type": "shortcut", "icon": "folder" }
-    })
+    });
+    serde_json::to_value(reiwand_scene::prefill::properties(declared)).unwrap()
 }
 
 #[test]
@@ -161,7 +162,7 @@ fn advanced_scene_fields_round_trip_and_show_in_the_inspector() {
     doc["scene"]["particles"]["embers"]["init"] = json!({ "life": [1, 2] });
     let init = fields(&doc, "/scene/particles/embers/init");
     let widget = |key: &str| init.iter().find(|f| f.key == key).map(|f| f.widget.clone()).unwrap_or_default();
-    assert_eq!((widget("life").as_str(), widget("speed").as_str()), ("vec2", "vec2"), "{init:?}");
+    assert_eq!((widget("life").as_str(), widget("speed").as_str()), ("list", "list"), "{init:?}");
 }
 
 #[test]

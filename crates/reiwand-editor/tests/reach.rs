@@ -108,14 +108,13 @@ fn a_render_draws_what_the_preview_draws_with_one_alone_and_a_pinned_seed() {
     assert!(shown["layers"][1]["visible"].is_null());
     assert!(shown["canvas"]["bloom"].is_object());
     assert_eq!(shown["clock"]["seed"], reiwand_editor::reach::shown(&doc, false)["clock"]["seed"]);
-    assert!(reiwand_editor::reach::shown(&doc, false)["canvas"].get("bloom").is_none());
+    assert!(reiwand_editor::reach::shown(&doc, false)["canvas"]["bloom"].is_null());
 }
 
 #[test]
 fn tried_values_override_the_defaults_of_a_capture() {
-    let doc = json!({"manifest": {"properties": {
-        "speed": {"type": "slider", "min": 0, "max": 10, "default": 1}
-    }}});
+    let declared = json!({ "speed": {"type": "slider", "min": 0, "max": 10, "default": 1} });
+    let doc = json!({"manifest": {"properties": reiwand_scene::prefill::properties(declared)}});
     let tried: reiwand_scene::Values = serde_json::from_value(json!({"speed": 7, "unknown": 3})).unwrap();
     let props = reiwand_editor::reach::tried(&doc, &tried);
     assert_eq!(props.get("speed"), Some(&json!(7.0)));

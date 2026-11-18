@@ -44,7 +44,7 @@ fn camera_paths_take_keys_from_the_view_and_show_their_spline() {
         "two keys stay"
     );
     edit(&mut p, json!({ "path": { "remove": { "path": "tour" } } })).unwrap();
-    assert!(p.doc.pointer("/scene/camera3d/paths").is_none());
+    assert_eq!(p.doc.pointer("/scene/camera3d/paths"), Some(&json!([])));
 }
 
 #[test]

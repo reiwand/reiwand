@@ -90,7 +90,8 @@ fn a_seek_simulates_the_scene_time_on_top_of_the_prewarm() {
 
 #[test]
 fn a_system_revealed_live_starts_from_its_prewarm_only() {
-    let props: BTreeMap<String, Property> = serde_json::from_str(include_str!("../props.json")).unwrap();
+    let props: BTreeMap<String, Property> =
+        reiwand_scene::prefill::properties(serde_json::from_str(include_str!("../props.json")).unwrap());
     let layers = json!([{ "id": "p", "type": "particles", "system": "a", "visible": { "prop": "soft" } }]);
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layers,
         "particles": { "a": flowing(json!({})) } });

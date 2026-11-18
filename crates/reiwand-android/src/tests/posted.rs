@@ -10,8 +10,9 @@ fn the_poster_of_a_scene_with_scripts_is_the_preview_its_author_made_never_a_dra
     fs::create_dir_all(source.path().join("scripts")).unwrap();
     let layers = json!([{ "blend_space": "canvas", "id": "sky", "type": "solid", "color": "#ff0000" }]);
     let script = json!({ "path": "scripts/paint.js", "events": ["update"], "uses": ["layers"] });
-    let text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers,
+    let mut text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] }, "layers": layers,
         "scripts": [script] });
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Scene, &mut text);
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
     fs::write(
         source.path().join("scripts/paint.js"),

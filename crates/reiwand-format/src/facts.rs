@@ -2,7 +2,7 @@ use crate::features::{lacks, refused};
 use crate::validate::extension;
 use crate::{Input, Kind, Manifest, Platform, Result, Scene, Span};
 use reiwand_core::message::{Message, said};
-use reiwand_scene::{EffectUse, Uses, needs, newer_params, source, tells_time};
+use reiwand_scene::{EffectUse, Param, Uses, Value, needs, newer_params, source, tells_time};
 use std::collections::BTreeSet;
 
 pub const BUILTIN: &str = "bloom blur blur_motion blur_radial chroma_key chromatic_aberration clouds \
@@ -30,7 +30,10 @@ fn effect_names(e: &EffectUse) -> Vec<String> {
     if !builtin_first(&e.effect) {
         return vec![format!("effect.{}", e.effect)];
     }
-    let newer = e.params.keys().filter(|p| newer_params(&e.effect).any(|d| &&d.id == p));
+    let moved = |(id, value): &(&String, &Value<Param>)| {
+        newer_params(&e.effect).any(|d| &d.id == *id && *value != &Value::Fixed(d.prefill.clone()))
+    };
+    let newer = e.params.iter().filter(moved).map(|(id, _)| id);
     newer.map(|p| format!("effect.{}.{p}", e.effect)).collect()
 }
 

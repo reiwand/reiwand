@@ -10,7 +10,7 @@ fn the_form_gives_an_effect_a_lighter_variant_with_its_passes_cost_and_level() {
     let made = descriptor(&p, "soft")["lighter"].clone();
     assert_eq!(
         made,
-        json!({ "passes": [{ "entry": "fs_soft_lite" }], "cost": { "taps": 1, "passes": 1, "scale": 1 }, "up_to": "q1" })
+        json!({ "passes": [{ "entry": "fs_soft_lite", "inputs": ["previous"], "output": "next", "scale": 1, "blend": null, "copy": null, "grid": null, "swap": null, "target": null, "vertex": null }], "cost": { "taps": 1, "passes": 1, "scale": 1 }, "up_to": "q1" })
     );
     let code = std::fs::read_to_string(p.dir.join("effects/soft.wgsl")).unwrap();
     assert!(code.contains("fn fs_soft_lite(") && code.contains("fn fs_soft_soft("), "{code}");
@@ -36,11 +36,11 @@ fn the_form_gives_an_effect_a_lighter_variant_with_its_passes_cost_and_level() {
     assert!(shader(&mut p, json!({ "lighter": { "effect": "soft", "set": { "passes": [] } } })).is_err());
     let cheap = json!({ "cost": { "taps": 1, "passes": 1, "scale": 1 }, "up_to": null });
     shader(&mut p, json!({ "lighter": { "effect": "soft", "set": cheap } })).unwrap();
-    assert!(descriptor(&p, "soft")["lighter"].get("up_to").is_none());
+    assert!(descriptor(&p, "soft")["lighter"]["up_to"].is_null());
     act(&mut p, json!({ "add_layer": { "kind": "solid", "id": "fill" } })).unwrap();
     act(&mut p, json!({ "effects": { "add": { "layer": "fill", "effect": "soft" } } })).unwrap();
     let cost = ask(&p, json!({ "effect_cost": { "effect": "soft", "optional": false } }));
     assert!(cost["levels"][3]["form"] == "full" && cost.get("lighter").is_some(), "{cost}");
     shader(&mut p, json!({ "lighter": { "effect": "soft", "remove": true } })).unwrap();
-    assert!(descriptor(&p, "soft").get("lighter").is_none());
+    assert!(descriptor(&p, "soft")["lighter"].is_null());
 }

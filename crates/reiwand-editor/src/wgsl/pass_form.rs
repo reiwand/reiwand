@@ -6,7 +6,7 @@ use serde_json::{Map, Value, json};
 pub(crate) fn lighter(json: &mut Value, set: &Map<String, Value>, remove: bool) -> Result<bool> {
     let id = json["id"].as_str().unwrap_or_default().to_owned();
     if remove {
-        drop(json.as_object_mut().and_then(|o| o.remove("lighter")));
+        json["lighter"] = Value::Null;
         return Ok(false);
     }
     let made = !json["lighter"].is_object();

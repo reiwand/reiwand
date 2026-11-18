@@ -29,7 +29,9 @@ fn released_scenes_keep_their_own_locale_files() {
     let source = tempfile::tempdir().unwrap();
     std::fs::create_dir(source.path().join("locale")).unwrap();
     let png = image(16, 16, ImageFormat::Png);
-    let text = (manifest(&[], texts).to_json().unwrap(), plain.to_string());
+    let mut whole = plain.clone();
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Scene, &mut whole);
+    let text = (manifest(&[], texts).to_json().unwrap(), whole.to_string());
     let written: [(&str, &[u8]); 7] = [
         ("manifest.json", text.0.as_bytes()),
         ("scene.json", text.1.as_bytes()),

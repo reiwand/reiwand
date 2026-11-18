@@ -85,9 +85,7 @@
       "effect.depth_parallax.smooth",
       "inputs.audio",
       "inputs.media",
-      "inputs.pointer",
-      "layer_color",
-      "mask_strength"
+      "inputs.pointer"
     ]
   },
   "inputs": [

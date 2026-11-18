@@ -20,7 +20,7 @@ pub fn whole(scene: &Value) -> bool {
 }
 
 pub fn lens(doc: &Value, t: f64) -> Option<Affine> {
-    doc.pointer("/scene/canvas/camera")?;
+    doc.pointer("/scene/canvas/camera").filter(|camera| !camera.is_null())?;
     let scene = parsed(&doc["scene"])?;
     let mut rt = Runtime::new(Arc::new(scene), Values::new());
     rt.advance(t.max(0.0));

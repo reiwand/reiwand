@@ -29,6 +29,7 @@ pub fn sample(root: &Value, schema: &Value) -> Value {
     match t {
         "boolean" => json!(false),
         "integer" | "number" => schema.get("minimum").cloned().unwrap_or(json!(0)),
+        "string" if schema["pattern"].as_str().is_some_and(|p| p.starts_with("^#")) => json!("#ffffff"),
         "string" => json!(""),
         "array" => {
             let n = schema["minItems"].as_u64().unwrap_or(0) as usize;
