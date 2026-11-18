@@ -1,0 +1,14 @@
+{
+  "id": "glow",
+  "name": { "en": "Glow" },
+  "params": [
+    { "id": "tint", "type": "color", "default": "#ffffff" },
+    { "id": "amount", "type": "float", "default": 0.5, "min": 0, "max": 1 },
+    { "id": "mode", "type": "enum", "default": 0, "values": [{ "value": 0 }, { "value": 1, "label": { "en": "Wide" } }] }
+  ],
+  "passes": [{ "entry": "fs_glow" }, { "entry": "fs_mix", "inputs": ["previous", "half"], "target": "half" }],
+  "targets": { "half": { "scale": 0.5 } },
+  "quality": { "q3": { "freeze": true } },
+  "state": { "settle": 0.3 },
+  "lighter": { "passes": [{ "entry": "fs_glow_lite" }], "cost": { "taps": 2 } }
+}

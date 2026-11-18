@@ -1,19 +1,45 @@
 {
-  "id": "blur_motion",
-  "name": { "en": "Motion blur" },
+  "audio": [],
+  "bounded": [],
   "category": "blur",
-  "description": { "en": "Blurs the picture in one direction, as if it moved fast.", "es": "Desenfoca la imagen en una dirección, como si se moviera rápido." },
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 2
+  },
+  "description": {
+    "en": "Blurs the picture in one direction, as if it moved fast.",
+    "es": "Desenfoca la imagen en una dirección, como si se moviera rápido."
+  },
+  "fuse": null,
+  "id": "blur_motion",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Motion blur"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "angle", "type": "float", "unit": "degrees", "prefill": 0, "min": -360, "max": 360 },
-    { "id": "length", "type": "float", "prefill": 16, "min": 0, "max": 256 },
-    { "id": "samples", "type": "float", "prefill": 12, "min": 2, "max": 32 },
-    { "id": "follow", "type": "bool", "prefill": false },
-    { "id": "shutter", "type": "float", "prefill": 0.05, "min": 0, "max": 0.5 }
+    {"id": "angle", "type": "float", "channels": null, "help": {}, "label": {}, "max": 360, "min": -360, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": "degrees", "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "length", "type": "float", "channels": null, "help": {}, "label": {}, "max": 256, "min": 0, "paint": null, "prefill": 16, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "samples", "type": "float", "channels": null, "help": {}, "label": {}, "max": 32, "min": 2, "paint": null, "prefill": 12, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "follow", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "shutter", "type": "float", "channels": null, "help": {}, "label": {}, "max": 0.5, "min": 0, "paint": null, "prefill": 0.05, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
   ],
-  "passes": [{ "entry": "fs_blur_motion" }],
-  "cost": { "taps": 2, "passes": 1, "scale": 1 },
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_blur_motion", "grid": null, "inputs": ["previous"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {
+    "q1": {"freeze": false, "params": {"samples": 8}, "scale": null}
+  },
   "reach": "length",
-  "velocity": "follow",
-  "quality": { "q1": { "params": { "samples": 8 } } }
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": "follow"
 }

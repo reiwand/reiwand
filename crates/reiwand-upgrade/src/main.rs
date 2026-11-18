@@ -19,6 +19,10 @@ usage:
       engine used for it until now, so the scene reads exactly as before; packed .wpak files are unpacked,
       completed and packed again by their author
 
+  reiwand-upgrade effects FILE...
+      writes into each effect descriptor (or descriptor catalog) every field it leaves out, with the value
+      applied until now, so each parameter and pass reads exactly as before
+
 It is safe to run again: a folder that is already current is left alone.";
 
 fn user_data() -> anyhow::Result<PathBuf> {
@@ -35,6 +39,14 @@ fn main() -> anyhow::Result<()> {
     if what == Some("scenes") {
         let dir = args.get(1).context("scenes needs a folder")?;
         println!("{dir}: {} scenes upgraded", reiwand_upgrade::scenes::run(std::path::Path::new(dir))?);
+        return Ok(());
+    }
+    if what == Some("effects") {
+        let mut changed = 0;
+        for file in &args[1..] {
+            changed += usize::from(reiwand_upgrade::scenes::effect(std::path::Path::new(file))?);
+        }
+        println!("{changed} effect descriptors upgraded");
         return Ok(());
     }
     let given = args.iter().position(|a| a == "--data").and_then(|at| args.get(at + 1));

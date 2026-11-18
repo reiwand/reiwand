@@ -1,18 +1,44 @@
 {
-  "id": "flow",
-  "name": { "en": "Flow" },
+  "audio": [],
+  "bounded": [],
   "category": "motion",
-  "description": { "en": "Distorts the picture along a flow map over time.", "es": "Deforma la imagen a lo largo de un mapa de flujo con el tiempo." },
-  "min_fps": 30,
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Distorts the picture along a flow map over time.",
+    "es": "Deforma la imagen a lo largo de un mapa de flujo con el tiempo."
+  },
+  "fuse": null,
+  "id": "flow",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": 30,
+  "name": {
+    "en": "Flow"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "map", "type": "texture", "tools": ["gray", "flow"], "prefill": "" },
-    { "id": "strength", "type": "float", "prefill": 8, "min": 0, "max": 512 },
-    { "id": "speed", "type": "float", "prefill": 0.25, "min": 0, "max": 8, "uses": "time" },
-    { "id": "direction", "type": "vec2", "prefill": [1, 0], "min": -1, "max": 1 },
-    { "id": "noise", "type": "bool", "prefill": false },
-    { "id": "phase", "type": "texture", "tools": ["gray"], "prefill": "" }
+    {"id": "map", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": ["gray", "flow"], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "strength", "type": "float", "channels": null, "help": {}, "label": {}, "max": 512, "min": 0, "paint": null, "prefill": 8, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "speed", "type": "float", "channels": null, "help": {}, "label": {}, "max": 8, "min": 0, "paint": null, "prefill": 0.25, "tool": null, "tools": [], "unit": null, "uses": "time", "values": [], "waits_for": null, "yields_to": null},
+    {"id": "direction", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 1, "min": -1, "paint": null, "prefill": [1, 0], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "noise", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "phase", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": ["gray"], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
   ],
-  "passes": [{ "entry": "fs_flow", "inputs": ["previous", "asset:map", "asset:phase"] }],
-  "reach": "strength"
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_flow", "grid": null, "inputs": ["previous", "asset:map", "asset:phase"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {},
+  "reach": "strength",
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

@@ -2,6 +2,7 @@ use reiwand_scene::*;
 use serde_json::{Value as Json, json};
 use std::collections::BTreeMap;
 
+mod descriptors;
 mod drawn;
 mod effects;
 mod emitters;

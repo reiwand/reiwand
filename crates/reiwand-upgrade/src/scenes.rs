@@ -44,6 +44,10 @@ pub fn customs(dir: &Path, doc: &Value) -> Customs {
     found
 }
 
+pub fn effect(path: &Path) -> anyhow::Result<bool> {
+    crate::descriptors::file(path)
+}
+
 pub fn text(doc: &Value) -> anyhow::Result<String> {
     let mut text = serde_json::to_string_pretty(doc)?;
     text.push('\n');

@@ -1,25 +1,44 @@
 {
-  "id": "displace",
-  "name": { "en": "Displace" },
+  "audio": [],
+  "bounded": [],
   "category": "distort",
-  "description": { "en": "Offsets pixels using a map of normals or offsets.", "es": "Desplaza los píxeles con un mapa de normales o de desplazamientos." },
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Offsets pixels using a map of normals or offsets.",
+    "es": "Desplaza los píxeles con un mapa de normales o de desplazamientos."
+  },
+  "fuse": null,
+  "id": "displace",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Displace"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "map", "type": "texture", "tools": ["gray", "flow"], "prefill": "" },
-    {
-      "id": "mode",
-      "type": "enum",
-      "prefill": 0,
-      "values": [
-        { "value": 0, "label": { "en": "Normals", "es": "Normales" } },
-        { "value": 1, "label": { "en": "Offsets", "es": "Desplazamientos" } }
-      ]
-    },
-    { "id": "scale", "type": "float", "prefill": 1, "min": 0.1, "max": 16 },
-    { "id": "strength", "type": "float", "prefill": 8, "min": 0, "max": 256 },
-    { "id": "scroll", "type": "vec2", "prefill": [0, 0], "min": -4, "max": 4, "uses": "time" },
-    { "id": "ratio", "type": "float", "prefill": 1, "min": 0.1, "max": 10 }
+    {"id": "map", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": ["gray", "flow"], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "mode", "type": "enum", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [{"label": {"en": "Normals", "es": "Normales"}, "value": 0}, {"label": {"en": "Offsets", "es": "Desplazamientos"}, "value": 1}], "waits_for": null, "yields_to": null},
+    {"id": "scale", "type": "float", "channels": null, "help": {}, "label": {}, "max": 16, "min": 0.1, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "strength", "type": "float", "channels": null, "help": {}, "label": {}, "max": 256, "min": 0, "paint": null, "prefill": 8, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "scroll", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 4, "min": -4, "paint": null, "prefill": [0, 0], "tool": null, "tools": [], "unit": null, "uses": "time", "values": [], "waits_for": null, "yields_to": null},
+    {"id": "ratio", "type": "float", "channels": null, "help": {}, "label": {}, "max": 10, "min": 0.1, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
   ],
-  "passes": [{ "entry": "fs_displace", "inputs": ["previous", "asset:map"] }],
-  "reach": "strength"
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_displace", "grid": null, "inputs": ["previous", "asset:map"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {},
+  "reach": "strength",
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

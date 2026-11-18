@@ -1,22 +1,46 @@
 {
-  "id": "tilt_shift",
-  "name": { "en": "Tilt-shift" },
+  "audio": [],
+  "bounded": [],
   "category": "blur",
-  "description": { "en": "Blurs out of a focus band, as in a tilt-shift photo.", "es": "Desenfoca fuera de una banda de enfoque, como en una foto de miniatura." },
+  "compose": false,
+  "cost": {
+    "passes": 3,
+    "scale": 0.5,
+    "taps": 3
+  },
+  "description": {
+    "en": "Blurs out of a focus band, as in a tilt-shift photo.",
+    "es": "Desenfoca fuera de una banda de enfoque, como en una foto de miniatura."
+  },
+  "fuse": null,
+  "id": "tilt_shift",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Tilt-shift"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "focus", "type": "float", "prefill": 0.5, "min": 0, "max": 1 },
-    { "id": "width", "type": "float", "prefill": 0.15, "min": 0, "max": 1 },
-    { "id": "softness", "type": "float", "prefill": 0.25, "min": 0, "max": 1 },
-    { "id": "angle", "type": "float", "unit": "degrees", "prefill": 0, "min": -360, "max": 360 },
-    { "id": "radius", "type": "float", "prefill": 12, "min": 0, "max": 64 },
-    { "id": "depth", "type": "texture", "tools": ["gray", "depth"], "prefill": "" }
+    {"id": "focus", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.5, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "width", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.15, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "softness", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.25, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "angle", "type": "float", "channels": null, "help": {}, "label": {}, "max": 360, "min": -360, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": "degrees", "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "radius", "type": "float", "channels": null, "help": {}, "label": {}, "max": 64, "min": 0, "paint": null, "prefill": 12, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "depth", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": ["gray", "depth"], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
   ],
   "passes": [
-    { "entry": "fs_tilt_shift_h", "scale": 0.5, "inputs": ["previous", "asset:depth"] },
-    { "entry": "fs_tilt_shift_v", "scale": 0.5, "inputs": ["previous", "asset:depth"] },
-    { "entry": "fs_tilt_shift_mix", "inputs": ["input", "pass:1", "asset:depth"] }
+    {"blend": null, "copy": null, "entry": "fs_tilt_shift_h", "grid": null, "inputs": ["previous", "asset:depth"], "output": "next", "scale": 0.5, "swap": null, "target": null, "vertex": null},
+    {"blend": null, "copy": null, "entry": "fs_tilt_shift_v", "grid": null, "inputs": ["previous", "asset:depth"], "output": "next", "scale": 0.5, "swap": null, "target": null, "vertex": null},
+    {"blend": null, "copy": null, "entry": "fs_tilt_shift_mix", "grid": null, "inputs": ["input", "pass:1", "asset:depth"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
   ],
-  "cost": { "taps": 3, "passes": 3, "scale": 0.5 },
-  "reach": "radius"
+  "quality": {},
+  "reach": "radius",
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

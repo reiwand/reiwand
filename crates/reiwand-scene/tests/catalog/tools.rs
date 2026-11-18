@@ -32,14 +32,16 @@ fn built_in_effects_declare_the_editor_tools_of_their_pictures() {
 #[test]
 fn declared_tools_override_the_id_and_must_fit_the_kind() {
     let made = |params: Json| {
-        let json = json!({ "id": "own", "cost": {}, "passes": [{ "entry": "fs_own" }], "params": params });
+        let mut json = json!({ "id": "own", "passes": [{ "entry": "fs_own" }], "params": params });
+        reiwand_upgrade::descriptors::complete(&mut json);
         Descriptor::parse(&json.to_string(), "").unwrap()
     };
     let d = made(json!([{ "id": "colors", "type": "texture", "prefill": "white", "tools": ["ramp"] }]));
     assert_eq!(d.params[0].tools("own"), [Tool::Ramp]);
     let plain = made(json!([{ "id": "map", "type": "texture", "prefill": "white" }]));
     assert_eq!(plain.params[0].tools("own"), [Tool::Gray, Tool::Flow], "the id is the fallback");
-    let wrong = made(json!([{ "id": "gain", "type": "float", "prefill": 0, "tools": ["gray"] }]));
+    let wrong =
+        made(json!([{ "id": "gain", "type": "float", "prefill": 0, "min": 0, "max": 1, "tools": ["gray"] }]));
     assert!(wrong.problems().iter().any(|p| p.contains("tools")), "{:?}", wrong.problems());
     let table = made(json!([{ "id": "grade", "type": "texture", "prefill": "white", "tools": ["table"] }]));
     assert!(table.problems().iter().any(|p| p.contains("tools")));

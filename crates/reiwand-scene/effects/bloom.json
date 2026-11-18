@@ -1,25 +1,50 @@
 {
-  "id": "bloom",
-  "name": { "en": "Glow" },
+  "audio": [],
+  "bounded": [],
   "category": "light",
-  "description": { "en": "Glows bright areas of the picture outward.", "es": "Hace que las zonas brillantes de la imagen irradien luz hacia fuera." },
+  "compose": false,
+  "cost": {
+    "passes": 4,
+    "scale": 0.5,
+    "taps": 3
+  },
+  "description": {
+    "en": "Glows bright areas of the picture outward.",
+    "es": "Hace que las zonas brillantes de la imagen irradien luz hacia fuera."
+  },
+  "fuse": null,
+  "id": "bloom",
+  "lighter": {
+    "cost": {"passes": 2, "scale": 0.5, "taps": 2},
+    "passes": [{"blend": null, "copy": null, "entry": "fs_bloom_lite", "grid": null, "inputs": ["previous"], "output": "next", "scale": 0.25, "swap": null, "target": null, "vertex": null}, {"blend": null, "copy": null, "entry": "fs_bloom_mix", "grid": null, "inputs": ["input", "pass:0"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}],
+    "up_to": null
+  },
+  "mask_mode": "mix",
+  "min_fps": null,
+  "name": {
+    "en": "Glow"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "threshold", "type": "float", "prefill": 0.8, "min": 0, "max": 4 },
-    { "id": "intensity", "type": "float", "prefill": 1, "min": 0, "max": 8 },
-    { "id": "radius", "type": "float", "prefill": 16, "min": 0, "max": 128 },
-    { "id": "knee", "type": "float", "prefill": 0.5, "min": 0, "max": 1 },
-    { "id": "tint", "type": "color", "prefill": "#ffffff" }
+    {"id": "threshold", "type": "float", "channels": null, "help": {}, "label": {}, "max": 4, "min": 0, "paint": null, "prefill": 0.8, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "intensity", "type": "float", "channels": null, "help": {}, "label": {}, "max": 8, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "radius", "type": "float", "channels": null, "help": {}, "label": {}, "max": 128, "min": 0, "paint": null, "prefill": 16, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "knee", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.5, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "tint", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#ffffff", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
   ],
   "passes": [
-    { "entry": "fs_bloom_bright", "scale": 0.5 },
-    { "entry": "fs_bloom_h", "scale": 0.25 },
-    { "entry": "fs_bloom_v", "scale": 0.25 },
-    { "entry": "fs_bloom_mix", "inputs": ["input", "pass:2"] }
+    {"blend": null, "copy": null, "entry": "fs_bloom_bright", "grid": null, "inputs": ["previous"], "output": "next", "scale": 0.5, "swap": null, "target": null, "vertex": null},
+    {"blend": null, "copy": null, "entry": "fs_bloom_h", "grid": null, "inputs": ["previous"], "output": "next", "scale": 0.25, "swap": null, "target": null, "vertex": null},
+    {"blend": null, "copy": null, "entry": "fs_bloom_v", "grid": null, "inputs": ["previous"], "output": "next", "scale": 0.25, "swap": null, "target": null, "vertex": null},
+    {"blend": null, "copy": null, "entry": "fs_bloom_mix", "grid": null, "inputs": ["input", "pass:2"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
   ],
-  "cost": { "taps": 3, "passes": 4, "scale": 0.5 },
-  "lighter": {
-    "passes": [{ "entry": "fs_bloom_lite", "scale": 0.25 }, { "entry": "fs_bloom_mix", "inputs": ["input", "pass:0"] }],
-    "cost": { "taps": 2, "passes": 2, "scale": 0.5 }
-  },
-  "reach": "radius"
+  "quality": {},
+  "reach": "radius",
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

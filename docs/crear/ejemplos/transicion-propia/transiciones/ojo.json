@@ -1,10 +1,36 @@
 {
+  "audio": [],
+  "bounded": [],
+  "category": null,
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": null,
+  "fuse": null,
   "id": "ojo",
-  "name": { "es": "Ojo de buey", "en": "Porthole" },
-  "stage": "transition",
-  "cost": { "taps": 1, "passes": 1, "scale": 1 },
+  "lighter": null,
+  "mask_mode": "mix",
+  "min_fps": null,
+  "name": {
+    "en": "Porthole",
+    "es": "Ojo de buey"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "borde", "type": "float", "default": 0.15, "min": 0, "max": 1, "label": { "es": "Borde", "en": "Edge" } },
-    { "id": "tinte", "type": "color", "default": "#ffffff", "label": { "es": "Tinte del borde", "en": "Edge tint" } }
-  ]
+    {"id": "borde", "type": "float", "channels": null, "help": {}, "label": {"en": "Edge", "es": "Borde"}, "max": 1, "min": 0, "paint": null, "prefill": 0.15, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "tinte", "type": "color", "channels": null, "help": {}, "label": {"en": "Edge tint", "es": "Tinte del borde"}, "max": null, "min": null, "paint": null, "prefill": "#ffffff", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "transition",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }
