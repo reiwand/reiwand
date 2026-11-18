@@ -76,17 +76,17 @@ looks_at "$craft" -o preview:1 --time 0.5 --without-bloom || fail "a preview wit
 ctl scene preview "$craft" -o preview:1 --stop
 shots=$scene/shots
 mkdir -p "$shots"
-ctl scene render "$craft" --out "$shots/full.png" --size 96 --time 0.5 >/dev/null || fail "the scene was not rendered to a picture"
-ctl scene render "$craft" --out "$shots/low.png" --size 96 --time 0.5 --quality q0 --battery >/dev/null || fail "the scene was not rendered at the lowest level on battery"
+render_of "$craft" --out "$shots/full.png" --size 96 --time 0.5 >/dev/null || fail "the scene was not rendered to a picture"
+render_of "$craft" --out "$shots/low.png" --size 96 --time 0.5 --quality q0 --battery >/dev/null || fail "the scene was not rendered at the lowest level on battery"
 for shot in full low; do [ -s "$shots/$shot.png" ] || fail "the picture $shot is empty"; done
-ctl scene render "$craft" --out "$shots/clip.gif" --size 64 --frames 4 --fps 10 --pointer 0.2,0.5:0.8,0.5 --click >/dev/null || fail "the clip was not rendered"
+render_of "$craft" --out "$shots/clip.gif" --size 64 --frames 4 --fps 10 --pointer 0.2,0.5:0.8,0.5 --click >/dev/null || fail "the clip was not rendered"
 [ "$(head -c 3 "$shots/clip.gif")" = GIF ] || fail "the clip is no animated picture"
-ctl scene render "$craft" --out "$shots/seq.png" --size 64 --frames 3 >/dev/null || fail "the image sequence was not rendered"
+render_of "$craft" --out "$shots/seq.png" --size 64 --frames 3 >/dev/null || fail "the image sequence was not rendered"
 for n in 0001 0003; do [ -s "$shots/seq-$n.png" ] || fail "the image sequence is missing frame $n"; done
-ctl scene render "$craft" --out "$shots/versus.png" --size 96 --time 0.5 --against q0 --without-bloom --split 0.25 >/dev/null || fail "the comparison was not rendered"
+render_of "$craft" --out "$shots/versus.png" --size 96 --time 0.5 --against q0 --without-bloom --split 0.25 >/dev/null || fail "the comparison was not rendered"
 [ -s "$shots/versus.png" ] || fail "the comparison picture is empty"
-if ctl scene render "$craft" --out "$shots/bad.png" --pointer 2,0.5 2>/dev/null; then fail "a pointer outside the canvas was taken"; fi
-if ctl scene render "$craft" --out "$shots/bad.txt" 2>/dev/null; then fail "a picture was written with an unknown extension"; fi
+if render_of "$craft" --out "$shots/bad.png" --pointer 2,0.5 2>/dev/null; then fail "a pointer outside the canvas was taken"; fi
+if render_of "$craft" --out "$shots/bad.txt" 2>/dev/null; then fail "a picture was written with an unknown extension"; fi
 lic=$scene/licensed
 ctl scene new "$lic" --id org.example.licensed >/dev/null
 ctl scene act "$lic" set '{"pointer": "/manifest/license", "value": "CC-BY-SA-4.0"}' >/dev/null

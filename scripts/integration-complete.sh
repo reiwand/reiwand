@@ -23,4 +23,6 @@ with zipfile.ZipFile(sys.argv[1], 'w') as z:
     fi
   done
 }
-looks_at() { local copy; copy=$(mktemp -d "$WORK/look.XXXXXX"); cp -r "$1/." "$copy"; complete "$copy"; shift; ctl scene preview "$copy" "$@"; }
+on_copy() { local verb=$1 copy; copy=$(mktemp -d "$WORK/look.XXXXXX"); cp -r "$2/." "$copy"; complete "$copy"; shift 2; ctl scene "$verb" "$copy" "$@"; }
+looks_at() { on_copy preview "$@"; }
+render_of() { on_copy render "$@"; }
