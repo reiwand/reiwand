@@ -76,7 +76,14 @@ impl Picture {
     }
 }
 
-pub fn export(file: &Path, edit: &Edit, out: &Path, quality: u32) -> Result<()> {
+pub struct Sent {
+    pub quality: u32,
+    pub size: Option<(u32, u32)>,
+    pub original: bool,
+}
+
+pub fn export(file: &Path, edit: &Edit, out: &Path, sent: Sent) -> Result<()> {
+    let edit = &if sent.original { edit.before() } else { edit.clone() };
     let renderer = Renderer::shared()?;
     let image = decode_image(file, renderer.max_edge())?;
     let depth = edit.depth.clone().unwrap_or_default();
@@ -84,8 +91,8 @@ pub fn export(file: &Path, edit: &Edit, out: &Path, quality: u32) -> Result<()> 
         true => Places::default().map(file, &edit.source.sha256, &depth, 4096)?,
         false => None,
     };
-    let pixels = renderer.export_edit(&image, edit, map.as_ref(), None)?;
-    Ok(reiwand_render::save(&pixels, out, quality.clamp(1, 100) as u8)?)
+    let pixels = renderer.export_edit(&image, edit, map.as_ref(), sent.size)?;
+    Ok(reiwand_render::save(&pixels, out, sent.quality.clamp(1, 100) as u8)?)
 }
 
 pub fn write(pixels: &RgbaImage) -> Result<PathBuf> {

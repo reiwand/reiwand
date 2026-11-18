@@ -55,7 +55,11 @@ impl Daemon {
                 let (name, message) = e.parts();
                 tracing::warn!(job = id, error = name, "job failed");
                 tracing::debug!(job = id, "job failure: {message}");
-                (JobState::Failed, None, Some(JobError { name, message }))
+                let listing = match &e {
+                    Error::Listing(_, found) => Some(found.clone()),
+                    _ => None,
+                };
+                (JobState::Failed, listing, Some(JobError { name, message }))
             }
         };
         let (name, message) =

@@ -138,7 +138,7 @@ FocusScope {
         id: rules
 
         opener: part.opener
-        profile: part.chosen
+        profile: part.page.profiles.find(at => at.uid === part.chosen?.uid) ?? part.chosen
     }
 
     SettingsLayoutName {
