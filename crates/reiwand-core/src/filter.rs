@@ -8,7 +8,7 @@ pub use looks::{LOOKS, Look};
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Filter {
     #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
     pub look: Look,

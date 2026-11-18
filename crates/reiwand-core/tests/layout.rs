@@ -58,12 +58,12 @@ fn configured_positions_win_and_zoom_moves_inside_the_image() {
     fixed.identity = "Maker Model 1".into();
     let text =
         "[layout]\nbezel_mm = 8.0\n[layout.monitors.\"Maker Model 1\"]\nmm = [5.0, 6.0, 500.0, 280.0]\n";
-    let layout = toml::from_str::<Config>(text).unwrap().layout;
+    let layout = Config::parse(&Config::complete(text)).unwrap().layout;
     assert_eq!(
         (layout.bezel_mm, &layout.monitors["Maker Model 1"]),
         (8.0, &Placed { mm: [5.0, 6.0, 500.0, 280.0] })
     );
-    assert!(!toml::to_string(&Config::default()).unwrap().contains("layout"));
+    assert!(toml::to_string(&Config::default()).unwrap().contains("[layout]\nbezel_mm = 0.0"));
     expect(layout.arrange([("DP-1", (1920, 1080), &fixed)])[0].mm, [5.0, 6.0, 500.0, 280.0]);
     let one = [Monitor { id: "A".into(), mm: [0.0, 0.0, 400.0, 200.0] }];
     expect(rect(&span(&one, (2000, 1000), 2.0, [0.5, 0.5])[0].1), [0.25, 0.25, 0.5, 0.5]);
@@ -140,7 +140,7 @@ fn outputs_without_a_place_follow_another_or_are_placed_by_hand() {
     assert!(c.layout.placed("STREAM-1") && c.layout.placed("S-0"), "a preview placed by hand spread nothing");
     assert!(!c.layout.placed("STREAM-2"));
     let text = "[layout.follow]\nA = \"A\"\nB = \"C\"\n\"\" = \"C\"\n";
-    let mut read: Config = toml::from_str(text).unwrap();
+    let mut read = Config::parse(&Config::complete(text)).unwrap();
     read.normalize();
     assert_eq!(read.layout.follow, [("B".to_string(), "C".to_string())].into());
 }

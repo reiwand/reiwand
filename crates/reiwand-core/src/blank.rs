@@ -4,10 +4,16 @@ use std::path::PathBuf;
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Kept {
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::empty")]
     pub image: Option<PathBuf>,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::empty")]
     pub playlist: Option<String>,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::empty")]
     pub preset: Option<String>,
 }
 

@@ -12,9 +12,12 @@ pub use crate::outputs::OutputConfig;
 pub use crate::store::ConfigError;
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Config {
+    pub format: u32,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::empty")]
     pub profile: Option<String>,
     pub default: OutputConfig,
     pub outputs: BTreeMap<String, OutputConfig>,
@@ -28,14 +31,10 @@ pub struct Config {
     pub network: crate::net::Network,
     pub rgb: crate::rgb::Rgb,
     pub shortcuts: crate::shortcuts::Shortcuts,
-    #[serde(skip_serializing_if = "Layout::is_default")]
     pub layout: Layout,
-    #[serde(skip_serializing_if = "Render::is_default")]
     pub render: Render,
-    #[serde(skip_serializing_if = "crate::Surfaces::is_default")]
     pub surfaces: crate::Surfaces,
     #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub providers: BTreeMap<String, toml::Value>,
 }
 
@@ -50,6 +49,8 @@ pub struct Resolved {
 pub const PRIVATE_PREFIX: &str = "preview:";
 
 impl Config {
+    pub const FORMAT: u32 = 3;
+
     pub fn normalize(&mut self) -> Vec<String> {
         let before = self.options();
         self.playback = self.playback.sanitized();

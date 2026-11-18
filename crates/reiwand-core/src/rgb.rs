@@ -27,12 +27,11 @@ impl Covered {
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Rgb {
     pub enabled: bool,
     pub server: String,
     pub when_covered: Covered,
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub places: BTreeMap<String, String>,
 }
 

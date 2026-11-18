@@ -84,8 +84,9 @@ impl Daemon {
         let store = Store::open();
         reiwand_format::check_data(&store.data)?;
         let closed = || Config { models: Models { allow_download: false }, ..Config::default() };
-        let (config, config_error) = load(&config_path, &store, true)
-            .map_or_else(|e| (closed(), Some(e.to_string())), |config| (config, None));
+        let loaded = setup::first_load(&config_path, &store)?;
+        let (config, config_error) =
+            loaded.map_or_else(|e| (closed(), Some(e.to_string())), |config| (config, None));
         match &config_error {
             Some(e) => {
                 tracing::error!("cannot use the configuration file; using the defaults until it is fixed");

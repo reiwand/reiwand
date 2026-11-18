@@ -42,7 +42,7 @@ fn fresh(item: &Item, last: &mut isize) -> Item {
     visit(&mut item, &mut |t| {
         *last += 1;
         t.set_position(Some(*last));
-        t.set_implicit(true);
+        t.set_implicit(!t.is_empty());
         t.decor_mut().set_prefix("\n");
     });
     item

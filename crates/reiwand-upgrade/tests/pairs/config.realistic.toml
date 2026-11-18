@@ -1,0 +1,56 @@
+# my desk
+profile = "night"
+
+[default]
+image = "/pictures/hills.jpg"
+fit = "fill"
+background = "#101820"
+quality = "q1"
+
+[outputs.DP-1]
+fit = "center"
+playlist = "evening"
+
+[outputs.HDMI-A-1]
+clicks = true
+hdr = "off"
+
+[outputs.HDMI-A-1.filter]
+look = "warm"
+strength = 0.5
+
+[outputs."preview:1"]
+image = "/pictures/preview.png"
+
+[outputs.DP-3]
+background = "#ffffff"
+transition = "fade"
+
+[outputs.DP-3.blank]
+image = "/pictures/hills.jpg"
+
+[playback]
+volume = 0.3
+max_fps = 30
+
+[transition]
+duration_ms = 900
+
+[library]
+watch = false
+
+[layout]
+bezel_mm = 6.0
+
+[layout.monitors."Maker Model 1"]
+mm = [5.0, 6.0, 500.0, 280.0]
+
+[rgb]
+enabled = true
+
+[surfaces]
+layer_namespace = "desktop-bg"
+
+[providers.daily]
+kind = "bing"
+market = "en-US"

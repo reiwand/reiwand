@@ -16,7 +16,7 @@ static MODE: AtomicU8 = AtomicU8::new(0);
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Network {
     pub private: bool,
 }

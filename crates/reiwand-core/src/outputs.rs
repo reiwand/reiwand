@@ -7,28 +7,42 @@ use std::path::PathBuf;
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct OutputConfig {
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::empty")]
     pub image: Option<PathBuf>,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::general")]
     pub fit: Option<Fit>,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::general")]
     pub background: Option<String>,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::empty")]
     pub playlist: Option<String>,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::empty")]
     pub preset: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::none")]
     pub blank: Option<crate::blank::Kept>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::general")]
     pub clicks: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::general")]
     pub filter: Option<Filter>,
     #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(with = "crate::explicit::general")]
     pub quality: Option<QualityChoice>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::general")]
     pub hdr: Option<crate::HdrChoice>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::general")]
     pub transition: Option<crate::TransitionKind>,
     #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub scenes: BTreeMap<String, BTreeMap<String, toml::Value>>,
 }
 

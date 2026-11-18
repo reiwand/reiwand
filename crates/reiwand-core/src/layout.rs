@@ -4,18 +4,16 @@ use std::collections::BTreeMap;
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Layout {
     pub bezel_mm: f64,
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub monitors: BTreeMap<String, Placed>,
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub follow: BTreeMap<String, String>,
 }
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Placed {
     pub mm: [f64; 4],
 }
@@ -99,10 +97,6 @@ impl Layout {
         }
         self.monitors.insert(id.into(), Placed { mm });
         Ok(())
-    }
-
-    pub fn is_default(&self) -> bool {
-        *self == Layout::default()
     }
 
     pub fn arrange<'a>(

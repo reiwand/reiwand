@@ -63,7 +63,10 @@ fn check(file: &Path, text: &str, rules: &[Rule], out: &mut Vec<Violation>) {
         );
         hit(Rule::DeriveDefault, t.starts_with("impl Default for "));
         let block = attribute_block(&lines, i);
-        let written = block.contains("deserialize_with = \"null\"") || block.contains("explicit::null");
+        let written = block.contains("deserialize_with = \"null\"")
+            || ["null", "general", "empty", "none", "namespace"]
+                .iter()
+                .any(|w| block.contains(&format!("explicit::{w}")));
         let loose = option_field(t) && !written;
         hit(Rule::OptionWithoutNull, loose);
     }

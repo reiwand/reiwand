@@ -65,7 +65,7 @@ fn damaged(rng: &mut Rng, text: &str, value: impl Fn(&mut Rng) -> String) -> Str
 }
 
 fn modern() -> String {
-    let mut config = Config::parse(CHANGED).unwrap();
+    let mut config = Config::parse(&Config::complete(CHANGED)).unwrap();
     config.set_image("DP-1", PathBuf::from("pictures/hills.jpg"), Some(Fit::Fill));
     config.set_playlist("HDMI-A-1", "evening".into());
     config.set_background("DP-1", "#102030").unwrap();
@@ -75,7 +75,7 @@ fn modern() -> String {
 #[test]
 fn a_damaged_configuration_is_refused_or_saved_back_the_same() {
     let mut rng = Rng(0x00c0_ffee_1234_9876);
-    for (index, text) in [CHANGED.to_string(), modern()].iter().enumerate() {
+    for (index, text) in [Config::complete(CHANGED), modern()].iter().enumerate() {
         let mut kept = 0;
         for round in 0..400 {
             let changed = damaged(&mut rng, text, |rng| VALUES[rng.below(VALUES.len())].into());

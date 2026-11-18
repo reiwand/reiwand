@@ -1,4 +1,4 @@
-use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error};
+use serde::{Deserialize, Serialize, Serializer};
 
 const KNOWN: [(&str, &str); 1] = [("KineticWE", "noctalia-wallpaper")];
 
@@ -111,23 +111,28 @@ impl Serialize for LayerNamespace {
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Surfaces {
     #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
-    #[serde(skip_serializing_if = "Option::is_none", deserialize_with = "read")]
+    #[serde(with = "namespace")]
     pub layer_namespace: Option<LayerNamespace>,
 }
 
 impl Surfaces {
-    pub fn is_default(&self) -> bool {
-        self.layer_namespace.is_none()
-    }
-
     pub fn layer_namespace(&self) -> &str {
         self.layer_namespace.as_ref().map_or(LayerNamespace::AUTO, LayerNamespace::as_str)
     }
 }
 
-fn read<'de, D: Deserializer<'de>>(d: D) -> Result<Option<LayerNamespace>, D::Error> {
-    LayerNamespace::parse(&String::deserialize(d)?).map_err(D::Error::custom)
+mod namespace {
+    use super::LayerNamespace;
+    use serde::{Deserialize, Deserializer, Serializer, de::Error};
+
+    pub fn serialize<S: Serializer>(value: &Option<LayerNamespace>, s: S) -> Result<S::Ok, S::Error> {
+        s.serialize_str(value.as_ref().map_or(LayerNamespace::AUTO, LayerNamespace::as_str))
+    }
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<Option<LayerNamespace>, D::Error> {
+        LayerNamespace::parse(&String::deserialize(d)?).map_err(D::Error::custom)
+    }
 }

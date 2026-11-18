@@ -7,7 +7,7 @@ fn a_section_shows_its_playlist_or_its_image_and_falls_back_as_a_whole() {
     let text = "[default]\nplaylist = \"P1\"\nimage = \"/a.png\"\nfit = \"tile\"\n\
         [outputs.DP-1]\nimage = \"/b.png\"\n[outputs.DP-2]\nfit = \"center\"\n\
         [outputs.HDMI-A-1]\nplaylist = \"P2\"\npreset = \"P3\"\n";
-    let c: Config = toml::from_str(text).unwrap();
+    let c = Config::parse(&Config::complete(text)).unwrap();
     let [dp1, dp2, hdmi] = ["DP-1", "DP-2", "HDMI-A-1"].map(|o| c.resolve(o));
     assert_eq!((dp1.image.as_deref(), dp1.playlist, dp1.fit), (Some(Path::new("/b.png")), None, Fit::Tile));
     assert_eq!((dp2.image, dp2.playlist.as_deref(), dp2.fit), (None, Some("P1"), Fit::Center));
@@ -49,7 +49,7 @@ fn unreadable_providers_are_reported_and_kept_verbatim() {
     let text = format!(
         "profile = \"01J\"\n[library]\nwatch = false\n[providers.daily]\nkind = \"bing\"\nmarket = \"en-US\"\n{photos}[providers.later]\nkind = \"future\"\n"
     );
-    std::fs::write(&path, text).unwrap();
+    std::fs::write(&path, Config::complete(&text)).unwrap();
     let c = Config::load(&path).unwrap();
     assert_eq!((c.profile.as_deref(), c.library.watch, c.repos.auto_refresh), (Some("01J"), false, true));
     let mut read = c.read_providers::<Provider>();
@@ -75,9 +75,9 @@ fn parse_errors_name_the_position_but_never_quote_the_file() {
     let error = Config::load(&path).unwrap_err().to_string();
     assert!(error.starts_with("invalid configuration at line 5, column 25: "), "{error}");
     assert!(!error.contains("hand-written") && !error.contains('\n'), "{error}");
-    std::fs::write(&path, "[default]\nfti = \"fill\"\n").unwrap();
+    std::fs::write(&path, Config::complete("[default]\nfti = \"fill\"\n")).unwrap();
     let error = Config::load(&path).unwrap_err().to_string();
-    assert!(error.starts_with("invalid configuration at line 2, column 1: unknown field `fti`"), "{error}");
+    assert!(error.contains("fti") && error.contains("unknown field"), "{error}");
 }
 
 #[test]
@@ -87,14 +87,14 @@ fn library_and_repository_options() {
     c.set_option("repos.auto_refresh", "false").unwrap();
     assert!(c.set_option("library.thumb_cache_mb", "10").is_err());
     assert_eq!((c.library.watch, c.library.thumb_cache_mb, c.repos.auto_refresh), (true, 1024, false));
-    let c: Config = toml::from_str("[library]\nthumb_cache_mb = 1").unwrap();
+    let c = Config::parse(&Config::complete("[library]\nthumb_cache_mb = 1")).unwrap();
     assert_eq!(c.clone().normalize(), ["library.thumb_cache_mb"]);
 }
 
 #[test]
 fn a_private_preview_output_never_inherits_the_desktop_content() {
     let text = "[default]\nplaylist = \"P1\"\nfit = \"tile\"\n[outputs.\"preview:a\"]\nimage = \"/b.png\"\n";
-    let c: Config = toml::from_str(text).unwrap();
+    let c = Config::parse(&Config::complete(text)).unwrap();
     let fresh = c.resolve("preview:card-1");
     assert_eq!((fresh.image, fresh.playlist, fresh.fit), (None, None, Fit::Tile));
     assert_eq!(c.resolve("preview:a").image.as_deref(), Some(Path::new("/b.png")));

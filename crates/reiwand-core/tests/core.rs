@@ -38,14 +38,14 @@ fn missing_file_is_default() {
 #[test]
 fn resolve_falls_back_per_field() {
     let text = "[default]\nimage = \"/a.png\"\nfit = \"fit\"\nbackground = \"#102030\"\n[outputs.DP-1]\nimage = \"/b.png\"";
-    let c: Config = toml::from_str(text).unwrap();
+    let c = Config::parse(&Config::complete(text)).unwrap();
     let dp = c.resolve("DP-1");
     assert_eq!(
         (dp.image.as_deref(), dp.fit, dp.background),
         (Some(Path::new("/b.png")), Fit::Fit, [16, 32, 48])
     );
     assert_eq!(c.resolve("HDMI-A-1").image.as_deref(), Some(Path::new("/a.png")));
-    assert!(toml::from_str::<Config>("[default]\nimgae = \"/x\"").is_err());
+    assert!(Config::parse(&Config::complete("[default]\nimgae = \"/x\"")).is_err());
 }
 
 #[test]
@@ -150,8 +150,11 @@ fn invalid_colors_are_rejected_when_set_and_ignored_when_loaded() {
     );
     let dir = tempfile::tempdir().unwrap();
     let path = dir.path().join("config.toml");
-    std::fs::write(&path, "[default]\nbackground = \"#102030\"\n[outputs.DP-1]\nbackground = \"red\"\n")
-        .unwrap();
+    std::fs::write(
+        &path,
+        Config::complete("[default]\nbackground = \"#102030\"\n[outputs.DP-1]\nbackground = \"red\"\n"),
+    )
+    .unwrap();
     let c = Config::load(&path).unwrap();
     assert_eq!((c.resolve("DP-1").background, c.outputs["DP-1"].background.as_deref()), ([16, 32, 48], None));
 }

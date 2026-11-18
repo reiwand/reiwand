@@ -15,6 +15,9 @@ impl Daemon {
             let mut st = self.state();
             let mut config = st.config.clone();
             change(&mut config).map_err(InvalidArgs)?;
+            if let Err(e @ reiwand_core::ConfigError::Format { .. }) = Config::load(&st.config_path) {
+                anyhow::bail!("{e}");
+            }
             if st.config_error.is_some() && st.config_path.exists() {
                 let backup = Config::backup_broken(&st.config_path)?;
                 tracing::warn!("kept a copy of the broken configuration");

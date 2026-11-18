@@ -6,7 +6,7 @@ pub use crate::services::{Media, Models, Repos};
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Playback {
     pub volume: f64,
     pub muted: bool,
@@ -109,7 +109,7 @@ pub enum TransitionKind {
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Transition {
     pub kind: TransitionKind,
     pub duration_ms: u32,
@@ -137,7 +137,7 @@ impl Transition {
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Pause {
     pub when_covered: bool,
     #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
@@ -153,7 +153,7 @@ impl Default for Pause {
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct Library {
     pub watch: bool,
     pub thumb_cache_mb: u32,

@@ -26,10 +26,10 @@ fn rgb_lighting_is_off_and_local_until_changed() {
 
 #[test]
 fn a_hand_written_bad_server_falls_back_to_this_computer() {
-    let mut c: Config = toml::from_str("[rgb]\nenabled = true\nserver = \"no port\"").unwrap();
+    let mut c = Config::parse(&Config::complete("[rgb]\nenabled = true\nserver = \"no port\"")).unwrap();
     c.normalize();
     assert_eq!((c.rgb.enabled, c.rgb.server.as_str()), (true, SERVER));
-    assert!(toml::from_str::<Config>("[rgb]\ncolour = 1").is_err());
+    assert!(Config::parse(&Config::complete("[rgb]\ncolour = 1")).is_err());
 }
 
 #[test]
@@ -45,14 +45,14 @@ fn the_lights_pause_while_covered_until_told_to_follow() {
     assert_eq!(c.rgb.when_covered, Covered::Follow);
     c.set_option(Covered::KEY, " pause ").unwrap();
     assert_eq!(c.rgb.when_covered, Covered::Pause);
-    let old: Config = toml::from_str("[rgb]\nenabled = true\nserver = \"127.0.0.1:1\"").unwrap();
+    let old = Config::parse(&Config::complete("[rgb]\nenabled = true\nserver = \"127.0.0.1:1\"")).unwrap();
     assert_eq!((old.rgb.enabled, old.rgb.when_covered), (true, Covered::Pause));
-    let kept: Config = toml::from_str("[rgb]\nwhen_covered = \"follow\"").unwrap();
+    let kept = Config::parse(&Config::complete("[rgb]\nwhen_covered = \"follow\"")).unwrap();
     assert!(toml::to_string(&kept).unwrap().contains("when_covered = \"follow\""));
-    assert!(toml::from_str::<Config>("[rgb]\nwhen_covered = \"always\"").is_err());
-    assert!(toml::from_str::<Config>("[rgb]\nwhen_covered = true").is_err());
+    assert!(Config::parse(&Config::complete("[rgb]\nwhen_covered = \"always\"")).is_err());
+    assert!(Config::parse(&Config::complete("[rgb]\nwhen_covered = true")).is_err());
     assert_eq!(
-        Covered::WORDS.map(|w| toml::from_str::<Config>(&format!("[rgb]\nwhen_covered = \"{w}\""))
+        Covered::WORDS.map(|w| Config::parse(&Config::complete(&format!("[rgb]\nwhen_covered = \"{w}\"")))
             .unwrap()
             .rgb
             .when_covered
@@ -78,7 +78,7 @@ fn devices_and_zones_are_placed_on_the_picture_and_bad_places_refused() {
     assert!(!c.options().contains_key("rgb.places"), "the places were listed as a setting");
     let text = toml::to_string(&c).unwrap();
     assert!(text.contains("[rgb.places]"));
-    assert_eq!(toml::from_str::<Config>(&text).unwrap().rgb, c.rgb);
+    assert_eq!(Config::parse(&Config::complete(&text)).unwrap().rgb, c.rgb);
     for bad in [
         "",
         "on",
@@ -109,9 +109,10 @@ fn devices_and_zones_are_placed_on_the_picture_and_bad_places_refused() {
         let _ = c.set_option(&format!("rgb.place.D{i}"), "off");
     }
     assert!(c.set_option("rgb.place.One more", "off").is_err(), "more places than allowed were kept");
-    let mut read: Config =
-        toml::from_str("[rgb.places]\nA = \"off\"\nB = \"2 0 1 1\"\n\"\" = \"off\"\nC = \"0 0 1 1 up\"")
-            .unwrap();
+    let mut read = Config::parse(&Config::complete(
+        "[rgb.places]\nA = \"off\"\nB = \"2 0 1 1\"\n\"\" = \"off\"\nC = \"0 0 1 1 up\"",
+    ))
+    .unwrap();
     read.normalize();
     assert_eq!(read.rgb.places.keys().collect::<Vec<_>>(), ["A", "C"]);
 }

@@ -14,6 +14,10 @@ pub enum ConfigError {
     Parse { line: usize, column: usize, message: String },
     #[error("cannot serialize configuration: {0}")]
     Serialize(#[from] toml::ser::Error),
+    #[error("{0}")]
+    Fields(#[from] crate::explicit::ReadError),
+    #[error("{path} is in format {found}, this version reads format {wanted}: {fix}")]
+    Format { path: String, found: String, wanted: u32, fix: String },
     #[error("no configuration directory could be determined")]
     NoConfigDir,
 }
@@ -37,7 +41,7 @@ impl Config {
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(Config::default()),
             Err(source) => return Err(ConfigError::Read { path: path.into(), source }),
         };
-        let mut config = Self::parse(&text)?;
+        let mut config = Self::parse(&text).map_err(|e| e.at(path))?;
         for key in config.normalize() {
             tracing::warn!(key, "invalid value replaced by the nearest valid one");
         }
@@ -45,7 +49,20 @@ impl Config {
     }
 
     pub fn parse(text: &str) -> Result<Config, ConfigError> {
-        toml::from_str::<Config>(text).map_err(|error| ConfigError::parse(text, &error))
+        let value = toml::from_str::<toml::Value>(text).map_err(|error| ConfigError::parse(text, &error))?;
+        ConfigError::check_format(&value, "config.toml")?;
+        let json = serde_json::to_value(&value).map_err(|e| ConfigError::Parse {
+            line: 1,
+            column: 1,
+            message: e.to_string(),
+        })?;
+        Ok(crate::explicit::read("config.toml", &json)?)
+    }
+
+    pub fn first_start(path: &Path) -> Result<Config, ConfigError> {
+        let config = Config::default();
+        config.save(path)?;
+        Ok(config)
     }
 
     pub fn save(&self, path: &Path) -> Result<(), ConfigError> {
@@ -64,6 +81,27 @@ impl Config {
 }
 
 impl ConfigError {
+    fn at(self, path: &Path) -> ConfigError {
+        match self {
+            ConfigError::Format { found, wanted, fix, .. } => {
+                ConfigError::Format { path: path.display().to_string(), found, wanted, fix }
+            }
+            other => other,
+        }
+    }
+
+    fn check_format(value: &toml::Value, path: &str) -> Result<(), ConfigError> {
+        let found = value.get("format").and_then(toml::Value::as_integer);
+        let wanted = Config::FORMAT;
+        let fix = match found {
+            Some(n) if n == i64::from(wanted) => return Ok(()),
+            Some(n) if n > i64::from(wanted) => "update Reiwand",
+            _ => "run `reiwand-upgrade client` once to convert it; nothing was overwritten",
+        };
+        let found = found.map_or_else(|| "none".to_owned(), |n| n.to_string());
+        Err(ConfigError::Format { path: path.to_owned(), found, wanted, fix: fix.to_owned() })
+    }
+
     fn parse(text: &str, error: &toml::de::Error) -> ConfigError {
         let before = text.get(..error.span().map_or(0, |span| span.start)).unwrap_or_default();
         let line = before.split('\n').count();

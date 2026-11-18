@@ -4,7 +4,7 @@ use reiwand_core::{Config, GpuChoice};
 fn the_graphics_card_setting_takes_words_or_part_of_a_name() {
     let mut c = Config::default();
     assert_eq!(c.options()["render.gpu"], toml::Value::String("auto".into()));
-    assert!(!toml::to_string(&c).unwrap().contains("[render]"), "an untouched configuration stays as it was");
+    assert!(toml::to_string(&c).unwrap().contains("[render]\ngpu = \"auto\""));
     c.set_option("render.gpu", "Dedicated").unwrap();
     assert_eq!(c.render.gpu, GpuChoice::Dedicated);
     assert!(toml::to_string(&c).unwrap().contains("[render]\ngpu = \"dedicated\""));
@@ -20,11 +20,11 @@ fn the_graphics_card_setting_takes_words_or_part_of_a_name() {
         );
     }
     assert_eq!(c.render.gpu, GpuChoice::Named("Graphics A".into()), "a refused value changes nothing");
-    assert!(toml::from_str::<Config>("[render]\ngpu = 3").is_err());
-    assert!(toml::from_str::<Config>("[render]\ngpu = \"\"").is_err());
-    assert!(toml::from_str::<Config>("[render]\ncard = \"auto\"").is_err());
+    assert!(Config::parse(&Config::complete("[render]\ngpu = 3")).is_err());
+    assert!(Config::parse(&Config::complete("[render]\ngpu = \"\"")).is_err());
+    assert!(Config::parse(&Config::complete("[render]\ncard = \"auto\"")).is_err());
     c.set_option("render.gpu", "auto").unwrap();
-    assert!(c.render.is_default() && !toml::to_string(&c).unwrap().contains("render"));
+    assert!(c.render == Config::default().render && toml::to_string(&c).unwrap().contains("gpu = \"auto\""));
     let words = GpuChoice::WORDS.map(|w| GpuChoice::parse(&w.to_uppercase()).unwrap());
     assert_eq!(words.map(|w| w.as_str().to_owned()), GpuChoice::WORDS.map(String::from));
     assert_eq!(GpuChoice::parse("software").unwrap(), GpuChoice::Software);

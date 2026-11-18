@@ -3,20 +3,22 @@ use std::time::Duration;
 
 #[test]
 fn settings_sections() {
-    let c: Config = toml::from_str("[default]\nimage = \"/a.mp4\"").unwrap();
+    let c = Config::parse(&Config::complete("[default]\nimage = \"/a.mp4\"")).unwrap();
     assert_eq!(
         (c.playback.clone(), c.transition.duration()),
         (Playback::default(), Duration::from_millis(600))
     );
-    let c: Config =
-        toml::from_str("[playback]\nvolume = 2.0\nmax_fps = 900\n[transition]\nkind = \"none\"").unwrap();
+    let c = Config::parse(&Config::complete(
+        "[playback]\nvolume = 2.0\nmax_fps = 900\n[transition]\nkind = \"none\"",
+    ))
+    .unwrap();
     assert_eq!((c.playback.sanitized().volume, c.playback.sanitized().max_fps), (1.0, 240));
-    let display = |text: &str| toml::from_str::<Config>(text).map(|c| c.playback.max_fps).ok();
+    let display = |text: &str| Config::parse(&Config::complete(text)).map(|c| c.playback.max_fps).ok();
     assert_eq!(display("[playback]\nmax_fps = \"display\""), Some(0));
     assert_eq!(display("[playback]\nmax_fps = 0"), Some(0));
     assert_eq!(display("[playback]\nmax_fps = \"fast\""), None);
     assert_eq!(c.transition.duration(), Duration::ZERO);
-    assert!(toml::from_str::<Config>("[transition]\nkind = \"spin\"").is_err());
+    assert!(Config::parse(&Config::complete("[transition]\nkind = \"spin\"")).is_err());
 }
 
 #[test]
@@ -87,19 +89,22 @@ fn options_are_listed_and_validated() {
     assert_eq!(typo, "invalid value for transition.duration_ms: invalid digit found in string");
     assert_eq!((c.playback.max_fps, c.layout.bezel_mm), (60, 8.5));
     c.set_option("layout.bezel_mm", "0").unwrap();
-    assert!(c.layout.is_default());
+    assert!(c.layout == Config::default().layout);
 }
 
 #[test]
 fn hand_edited_values_are_clamped_and_only_the_changed_key_is_validated() {
     let dir = tempfile::tempdir().unwrap();
     let path = dir.path().join("config.toml");
-    std::fs::write(&path, "[playback]\nvolume = 2.0\nmax_fps = 900\n[transition]\nduration_ms = 20000\n")
-        .unwrap();
+    std::fs::write(
+        &path,
+        Config::complete("[playback]\nvolume = 2.0\nmax_fps = 900\n[transition]\nduration_ms = 20000\n"),
+    )
+    .unwrap();
     let mut c = Config::load(&path).unwrap();
     assert_eq!((c.playback.volume, c.playback.max_fps, c.transition.duration_ms), (1.0, 240, 10_000));
     c.set_option("pause.on_battery", "never").unwrap();
-    let mut raw: Config = toml::from_str("[playback]\nvolume = 2.0").unwrap();
+    let mut raw = Config::parse(&Config::complete("[playback]\nvolume = 2.0")).unwrap();
     raw.set_option("playback.muted", "false").unwrap();
     let error = raw.set_option("transition.duration_ms", "20000").unwrap_err();
     assert!(error.contains("transition.duration_ms"), "{error}");

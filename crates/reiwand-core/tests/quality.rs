@@ -21,8 +21,8 @@ fn the_quality_setting_takes_auto_a_fixed_level_or_a_floor() {
     assert_eq!(c.playback.quality, QualityChoice::AtLeast(1), "a refused value changes nothing");
     let words = QualityChoice::WORDS.map(|w| QualityChoice::parse(w).unwrap().as_str());
     assert_eq!(words, QualityChoice::WORDS);
-    assert!(toml::from_str::<Config>("[playback]\nquality = 2").is_err());
-    assert!(toml::from_str::<Config>("[playback]\nquality = \"best\"").is_err());
+    assert!(Config::parse(&Config::complete("[playback]\nquality = 2")).is_err());
+    assert!(Config::parse(&Config::complete("[playback]\nquality = \"best\"")).is_err());
 }
 
 #[test]
@@ -36,8 +36,8 @@ fn a_screen_can_keep_its_own_quality_and_drop_it_again() {
     );
     assert_eq!(c.quality(""), QualityChoice::AtLeast(2), "every screen follows the general setting");
     let text = toml::to_string(&c).unwrap();
-    assert!(text.contains("[outputs.DP-1]\nquality = \"q0\""), "{text}");
-    let saved: Config = toml::from_str(&text).unwrap();
+    assert!(text.contains("quality = \"q0\""), "{text}");
+    let saved = Config::parse(&Config::complete(&text)).unwrap();
     assert_eq!(saved.quality("DP-1"), QualityChoice::Fixed(0));
     assert!(c.set_option("playback.quality.DP-1", "q9").is_err());
     assert!(c.set_option("playback.quality.", "q1").is_err());
@@ -57,7 +57,8 @@ fn a_screen_can_keep_its_own_quality_and_drop_it_again() {
 
 #[test]
 fn configurations_without_the_setting_stay_automatic() {
-    let old: Config = toml::from_str("[playback]\nmax_fps = 30\n[outputs.DP-1]\nfit = \"fit\"\n").unwrap();
+    let old = Config::parse(&Config::complete("[playback]\nmax_fps = 30\n[outputs.DP-1]\nfit = \"fit\"\n"))
+        .unwrap();
     assert_eq!((old.playback.quality, old.quality("DP-1")), (QualityChoice::Auto, QualityChoice::Auto));
     assert!(!toml::to_string(&old).unwrap().contains("[outputs.DP-1]\nquality"));
 }

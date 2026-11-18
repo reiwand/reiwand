@@ -11,6 +11,7 @@ pub mod scenes;
 pub mod server;
 #[cfg(feature = "server")]
 mod server_export;
+pub mod settings;
 #[cfg(feature = "client")]
 pub mod vault;
 

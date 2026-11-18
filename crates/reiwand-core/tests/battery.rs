@@ -35,8 +35,8 @@ fn each_value_pauses_only_on_battery_and_the_threshold_only_with_a_known_charge(
 
 #[test]
 fn the_two_old_keys_are_rejected_in_a_file() {
-    assert!(toml::from_str::<Config>("[pause]\non_battery = true\n").is_err());
-    assert!(toml::from_str::<Config>("[pause]\nbelow_percent = 20\n").is_err());
+    assert!(Config::parse(&Config::complete("[pause]\non_battery = true\n")).is_err());
+    assert!(Config::parse(&Config::complete("[pause]\nbelow_percent = 20\n")).is_err());
 }
 
 #[test]

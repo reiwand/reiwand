@@ -47,3 +47,23 @@ Lo usan los cargadores de todos los formatos; ningún formato escribe su propia 
   `explicit::null`; se detiene en `#[cfg(test)]`), `omission(&ejemplo, exento, carga)` (quita cada clave y exige
   el error con esa ruta) y `round_trip(texto, relee)` (mismos bytes).
 - Tipo de muestra y pruebas: `crates/reiwand-core/tests/explicit.rs`.
+
+## Ajustes (`config.toml`, formato 3)
+
+- El archivo lleva `format = 3` y todos los campos. En el primer arranque el demonio escribe el archivo
+  completo desde la plantilla (`Config::template()`, igual que `Config::default()`); nada se omite.
+- TOML no tiene `null`: cada opción se escribe como una palabra. `""` para imagen, lista, preajuste y perfil
+  sin elegir; `"general"` para ajuste, fondo, clics, filtro, calidad, HDR y transición de una pantalla que no
+  fija nada (en `[default]` significa que manda el paquete o el valor de fábrica); `"none"` en `blank`;
+  `"auto"` en `surfaces.layer_namespace`. Los módulos están en `reiwand_core::explicit::{empty, general, none}`.
+- Un `config.toml` sin `format` o con uno menor se rechaza al arrancar: el demonio dice
+  `reiwand-upgrade client` y que no se sobrescribió nada, y no arranca; uno mayor pide actualizar Reiwand.
+  `update_config` también se niega a escribir sobre un archivo de otro formato.
+- La conversión de única vez es `reiwand-upgrade client [--config DIR]` (paso A con los valores de hoy, más
+  `format`, las palabras y las tablas que faltaban); conserva los comentarios y deja el original en
+  `upgrade-copias/<segundos>/config.toml`. Lo que resuelve cada pantalla es idéntico antes y después
+  (`crates/reiwand-upgrade/tests/settings.rs`).
+- Tabla de prellenado: `crates/reiwand-core/prefill/config.tsv`. Cada `Option` está marcada `bloque` (su
+  ausencia significa «función sin usar»: `blank`, `filter`) o `valor` (su `null` tiene sentido): 2 y 14.
+- Pruebas: `crates/reiwand-core/tests/config_explicit.rs` (primer arranque, rechazo sin tocar el archivo,
+  esquema obligatorio, cada clave quitada, mismos bytes, fuentes sin valores ocultos).

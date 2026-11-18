@@ -27,7 +27,9 @@ mod tests {
         let (settings, data) = (dir.path().join("settings"), dir.path().join("data"));
         std::fs::create_dir_all(&settings).unwrap();
         let path = settings.join("config.toml");
-        let text = "[outputs.\"preview:1\"]\nimage = \"/a.png\"\n[outputs.DP-1]\nimage = \"/b.png\"\n";
+        let text = &reiwand_core::Config::complete(
+            "[outputs.\"preview:1\"]\nimage = \"/a.png\"\n[outputs.DP-1]\nimage = \"/b.png\"\n",
+        );
         std::fs::write(&path, text).unwrap();
         let store = crate::store::Store::at(data, dir.path().join("cache"));
         std::fs::set_permissions(&settings, std::fs::Permissions::from_mode(0o500)).unwrap();
@@ -42,7 +44,7 @@ mod tests {
         assert_eq!(config.outputs["DP-1"].image.as_deref(), Some(Path::new("/b.png")));
         assert_eq!(
             std::fs::read_to_string(&path).unwrap(),
-            text,
+            *text,
             "the file changed while it could not be written"
         );
     }

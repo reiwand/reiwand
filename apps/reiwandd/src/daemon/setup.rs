@@ -2,6 +2,21 @@ use crate::compositor::Settings;
 use reiwand_core::{Config, Playback, Transition, dbus};
 use zbus::fdo;
 
+pub(crate) fn first_load(
+    path: &std::path::Path,
+    store: &crate::store::Store,
+) -> anyhow::Result<Result<Config, reiwand_core::ConfigError>> {
+    use anyhow::Context;
+    if !path.exists() {
+        Config::first_start(path).context("cannot write the first configuration")?;
+    }
+    let loaded = crate::controls::load(path, store, true);
+    if let Err(e @ reiwand_core::ConfigError::Format { .. }) = &loaded {
+        anyhow::bail!("{e}");
+    }
+    Ok(loaded)
+}
+
 pub(crate) fn settings(config: &Config) -> Settings {
     let playback = config.playback.sanitized();
     let transition =

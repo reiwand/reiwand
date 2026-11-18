@@ -9,10 +9,10 @@ fn named(text: &str) -> LayerNamespace {
 }
 
 #[test]
-fn the_namespace_setting_is_checked_and_left_out_until_set() {
+fn the_namespace_setting_is_checked_and_written_as_auto_until_set() {
     let mut c = Config::default();
     assert_eq!(c.options()[KEY], toml::Value::String("auto".into()));
-    assert!(!toml::to_string(&c).unwrap().contains("surfaces"), "an untouched configuration stays as it was");
+    assert!(toml::to_string(&c).unwrap().contains("[surfaces]\nlayer_namespace = \"auto\""));
     c.set_option(KEY, " desktop-bg ").unwrap();
     assert_eq!(c.surfaces.layer_namespace, Some(named("desktop-bg")));
     assert!(toml::to_string(&c).unwrap().contains("[surfaces]\nlayer_namespace = \"desktop-bg\""));
@@ -28,15 +28,19 @@ fn the_namespace_setting_is_checked_and_left_out_until_set() {
     }
     assert_eq!(c.surfaces.layer_namespace, Some(named("desktop-bg")), "a refused value changes nothing");
     assert!(LayerNamespace::parse(&"x".repeat(LayerNamespace::MAX)).unwrap().is_some());
-    assert!(toml::from_str::<Config>("[surfaces]\nlayer_namespace = 3").is_err());
-    assert!(toml::from_str::<Config>("[surfaces]\nlayer_namespace = \"a b\"").is_err());
-    assert!(toml::from_str::<Config>("[surfaces]\nnamespace = \"a\"").is_err());
-    let auto: Config = toml::from_str("[surfaces]\nlayer_namespace = \"Auto\"").unwrap();
-    assert!(auto.surfaces.is_default());
+    assert!(Config::parse(&Config::complete("[surfaces]\nlayer_namespace = 3")).is_err());
+    assert!(Config::parse(&Config::complete("[surfaces]\nlayer_namespace = \"a b\"")).is_err());
+    assert!(Config::parse(&Config::complete("[surfaces]\nnamespace = \"a\"")).is_err());
+    let auto = Config::parse(&Config::complete("[surfaces]\nlayer_namespace = \"Auto\"")).unwrap();
+    assert!(auto.surfaces == Config::default().surfaces);
     for clear in ["auto", "", "  "] {
         c.set_option(KEY, "desktop-bg").unwrap();
         c.set_option(KEY, clear).unwrap();
-        assert!(c.surfaces.is_default() && !toml::to_string(&c).unwrap().contains("surfaces"), "{clear:?}");
+        assert!(
+            c.surfaces == Config::default().surfaces
+                && toml::to_string(&c).unwrap().contains("layer_namespace = \"auto\""),
+            "{clear:?}"
+        );
     }
 }
 

@@ -13,12 +13,12 @@ fn filters_are_checked_and_kept_per_output() {
     c.set_filter("", Filter::default());
     assert!(c.default.filter.is_none());
     let text = "[outputs.DP-1.filter]\nlook = \"sepia\"\nexposure = 9.0\nhue = -30.0\n";
-    let mut read: Config = toml::from_str(text).unwrap();
+    let mut read = Config::parse(&Config::complete(text)).unwrap();
     assert_eq!(read.normalize(), ["outputs.DP-1.filter"]);
     let kept = read.filter("DP-1");
     assert_eq!((kept.look, kept.exposure, kept.hue), (Look::Sepia, 3.0, -30.0));
-    assert!(toml::from_str::<Config>("[default.filter]\nlook = \"teal\"\n").is_err());
-    assert!(toml::from_str::<Config>("[default.filter]\nblur = 1.0\n").is_err());
+    assert!(Config::parse(&Config::complete("[default.filter]\nlook = \"teal\"\n")).is_err());
+    assert!(Config::parse(&Config::complete("[default.filter]\nblur = 1.0\n")).is_err());
 }
 
 #[test]
