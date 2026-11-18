@@ -15,13 +15,13 @@ fn removing_a_layer_drops_what_named_it_and_keeps_followers_in_place() {
     act(&mut p, json!({"remove_layer": {"id": "base"}})).unwrap();
     let kid = at(&p, "/scene/layers/0");
     assert_eq!(kid["id"], "kid");
-    assert!(kid.get("parent").is_none() && kid.get("mask").is_none(), "{kid}");
+    assert!(crate::whole::unset(&kid["parent"]) && crate::whole::unset(&kid["mask"]), "{kid}");
     let after = pivot(&p, "kid");
     assert!(
         (after[0] - before[0]).abs() < 0.05 && (after[1] - before[1]).abs() < 0.05,
         "{before:?} {after:?}"
     );
-    assert!(at(&p, "/scene/timelines/0").get("trigger").is_none());
+    assert!(crate::whole::unset(&at(&p, "/scene/timelines/0")["trigger"]));
     assert_eq!(reiwand_editor::actions::locked(&p.doc), Vec::<String>::new());
     assert!(reiwand_editor::check::check(&p.doc).is_empty(), "{:?}", reiwand_editor::check::check(&p.doc));
 }

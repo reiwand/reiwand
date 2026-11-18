@@ -113,5 +113,5 @@ fn a_scene_sets_its_frame_rate_sound_and_start_without_video_settings() {
         assert!(act(&mut p, json!({"manifest": {"playback": {"values": refused}}})).is_err());
     }
     act(&mut p, json!({"manifest": {"playback": {"clear": ["max_fps", "volume", "muted"]}}})).unwrap();
-    assert!(p.doc["manifest"].get("playback").is_none());
+    assert!(crate::whole::unset(&p.doc["manifest"]["playback"]));
 }

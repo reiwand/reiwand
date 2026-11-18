@@ -14,8 +14,8 @@ fn rendered(keys: &Value, t: f32) -> Vec2 {
 #[test]
 fn pair_keys_bend_the_same_in_the_editor_and_the_render() {
     for keys in [
-        json!([[0, [1, 1], {"out": [1, 0.9]}], [2, [3, 3]]]),
-        json!([[0, [1, 2], {"out": [1, 0.2]}], [2, [3, -1]]]),
+        json!([[0, [1, 1], {"in": null, "out": [1, 0.9]}], [2, [3, 3]]]),
+        json!([[0, [1, 2], {"in": null, "out": [1, 0.2]}], [2, [3, -1]]]),
     ] {
         for t in [0.25, 0.5, 1.0, 1.5, 1.9] {
             let edited = value_at(&json!({ "keys": keys }), f64::from(t));
@@ -33,10 +33,10 @@ fn pair_keys_bend_the_same_in_the_editor_and_the_render() {
 #[test]
 fn a_pair_key_is_written_back_as_a_pair_and_a_number_is_refused() {
     let keys: Vec<Key<Vec2>> =
-        serde_json::from_value(json!([[0, [1, 1], {"out": [1, 0.5]}], [2, [3, 3]]])).unwrap();
+        serde_json::from_value(json!([[0, [1, 1], {"in": null, "out": [1, 0.5]}], [2, [3, 3]]])).unwrap();
     assert_eq!(
         serde_json::to_value(&keys).unwrap(),
-        json!([[0.0, [1.0, 1.0], {"out": [1.0, 0.5]}], [2.0, [3.0, 3.0]]])
+        json!([[0.0, [1.0, 1.0], {"in": null, "out": [1.0, 0.5]}], [2.0, [3.0, 3.0]]])
     );
     assert!(serde_json::from_value::<Vec<Key<Vec3>>>(json!([[0, 0.5]])).is_err());
     assert!(serde_json::from_value::<Vec<Key<Color>>>(json!([[0, 0.5]])).is_err(), "a color is no number");
@@ -44,9 +44,9 @@ fn a_pair_key_is_written_back_as_a_pair_and_a_number_is_refused() {
 
 #[test]
 fn colors_lists_and_eased_keys_sample_as_the_render_draws_them() {
-    let colors = json!([[0, "#ff0000", {"out": [0.5, 0.8]}], [1, "#0000ff80"], [2, "#00ff00", "in_out_sine"], [3, "#ffffff"]]);
+    let colors = json!([[0, "#ff0000", {"in": null, "out": [0.5, 0.8]}], [1, "#0000ff80"], [2, "#00ff00", "in_out_sine"], [3, "#ffffff"]]);
     let shown: Vec<Key<Color>> = serde_json::from_value(colors.clone()).unwrap();
-    let triples = json!([[0, [0, 1, 2], {"out": [0.3, 0.1]}], [2, [4, -1, 2], {"in": [1, 0.6]}], [3, [1, 1, 1], "out_quad"], [4, [0, 0, 0]]]);
+    let triples = json!([[0, [0, 1, 2], {"in": null, "out": [0.3, 0.1]}], [2, [4, -1, 2], {"in": [1, 0.6], "out": null}], [3, [1, 1, 1], "out_quad"], [4, [0, 0, 0]]]);
     let drawn: Vec<Key<Vec3>> = serde_json::from_value(triples.clone()).unwrap();
     for t in [0.0, 0.2, 0.5, 0.9, 1.4, 2.3, 2.9, 3.5, 5.0] {
         let edited =
@@ -68,9 +68,9 @@ fn colors_lists_and_eased_keys_sample_as_the_render_draws_them() {
 
 #[test]
 fn handles_per_part_bend_the_same_in_the_editor_and_the_render() {
-    let triples = json!([[0, [0, 1, 2], {"out": [[0.5, 3], [1, -2], [0.2, 0]]}], [2, [4, 1, 2], {"in": [[0.5, 1], [0.5, 0.5], [1, 1]]}], [3, [0, 0, 0]]]);
+    let triples = json!([[0, [0, 1, 2], {"in": null, "out": [[0.5, 3], [1, -2], [0.2, 0]]}], [2, [4, 1, 2], {"in": [[0.5, 1], [0.5, 0.5], [1, 1]], "out": null}], [3, [0, 0, 0]]]);
     let drawn: Vec<Key<Vec3>> = serde_json::from_value(triples.clone()).unwrap();
-    let colors = json!([[0, "#000000", {"out": [[1, 0.9], [0.5, 0], [0.5, 0.2], [0.5, 0]]}], [2, "#ffffff"]]);
+    let colors = json!([[0, "#000000", {"in": null, "out": [[1, 0.9], [0.5, 0], [0.5, 0.2], [0.5, 0]]}], [2, "#ffffff"]]);
     let shown: Vec<Key<Color>> = serde_json::from_value(colors.clone()).unwrap();
     for t in [0.1, 0.5, 1.0, 1.6, 2.4] {
         let edited = value_at(&json!({ "keys": triples }), f64::from(t));

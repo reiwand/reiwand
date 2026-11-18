@@ -80,3 +80,13 @@ pub fn holds(actual: &Value, expected: Value) {
         assert_eq!(&actual[key], value, "{key} of {actual}");
     }
 }
+
+pub fn descriptor(text: &str) -> String {
+    let mut json: Value = serde_json::from_str(text).unwrap();
+    reiwand_upgrade::descriptors::complete(&mut json);
+    json.to_string()
+}
+
+pub fn unset(value: &Value) -> bool {
+    matches!(value, Value::Bool(false)) || empty(value)
+}

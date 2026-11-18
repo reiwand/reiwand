@@ -21,7 +21,7 @@ fn the_lighting_block_takes_pictures_and_numbers_in_range() {
     assert!(p.doc["scene"]["assets"]["pic"]["linear"] == false, "the picture of the layer keeps its colors");
     act(&mut p, json!({ "lighting": { "layer": "logo", "normal": "", "env": "pic" } })).unwrap();
     let l = &layer(&p, "logo")["lighting"];
-    assert!(l.get("normal").is_none() && l["env"] == "pic" && l["strength"] == 0.5);
+    assert!(crate::whole::unset(&l["normal"]) && l["env"] == "pic" && l["strength"] == 0.5);
     for bad in [
         json!({ "layer": "logo", "roughness": 2 }),
         json!({ "layer": "logo", "emissive": 17 }),
@@ -33,7 +33,7 @@ fn the_lighting_block_takes_pictures_and_numbers_in_range() {
     act(&mut p, json!({ "light": { "add": { "id": "l" } } })).unwrap();
     assert!(act(&mut p, json!({ "lighting": { "layer": "l", "roughness": 0.5 } })).is_err());
     act(&mut p, json!({ "lighting": { "layer": "logo", "off": true } })).unwrap();
-    assert!(layer(&p, "logo").get("lighting").is_none());
+    assert!(crate::whole::unset(&layer(&p, "logo")["lighting"]));
 }
 
 #[test]

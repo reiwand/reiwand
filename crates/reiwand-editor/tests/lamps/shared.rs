@@ -23,7 +23,7 @@ fn a_map_picked_only_for_light_is_read_as_linear_in_the_same_step() {
     crate::whole::holds(asset(&p, "bump"), json!({ "path": "bump.png", "linear": true }));
     assert_eq!(layer(&p, "logo")["lighting"]["emissive_map"], "bump");
     act(&mut p, json!({ "lighting": { "layer": "logo", "env": "pic" } })).unwrap();
-    assert!(asset(&p, "pic").get("linear").is_none(), "a reflected picture keeps its colors");
+    assert!(crate::whole::unset(&asset(&p, "pic")["linear"]), "a reflected picture keeps its colors");
     act(&mut p, json!({ "particles": { "lit": { "system": "flakes", "lit": true, "normal": "bump" } } }))
         .unwrap();
     assert_eq!(p.doc["scene"]["particles"]["flakes"]["render"]["normal"], "bump");
@@ -43,7 +43,7 @@ fn a_picture_shown_in_colors_gets_a_linear_twin_for_particles() {
     let render = &p.doc["scene"]["particles"]["flakes"]["render"];
     assert_eq!(render["refract"]["normal"], "pic_linear");
     assert_eq!(asset(&p, "pic_linear")["linear"], true);
-    assert!(asset(&p, "pic").get("linear").is_none());
+    assert!(crate::whole::unset(&asset(&p, "pic")["linear"]));
 }
 
 #[test]
@@ -114,5 +114,5 @@ fn a_particles_layer_takes_strength_and_glow() {
         assert!(act(&mut p, json!({ "lighting": args })).is_err(), "{bad}");
     }
     act(&mut p, json!({ "lighting": { "layer": "flakes", "off": true } })).unwrap();
-    assert!(layer(&p, "flakes").get("lighting").is_none());
+    assert!(crate::whole::unset(&layer(&p, "flakes")["lighting"]));
 }

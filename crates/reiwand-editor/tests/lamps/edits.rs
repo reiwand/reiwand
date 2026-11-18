@@ -50,7 +50,7 @@ fn setting_a_light_checks_its_values_and_fields() {
     }
     light(&mut p, json!({ "set": { "layer": "s", "light": "tube" } })).unwrap();
     let t = layer(&p, "s");
-    assert!(t.get("cone").is_none() && t["light"] == "tube");
+    assert!(crate::whole::unset(&t["cone"]) && t["light"] == "tube");
 }
 
 #[test]

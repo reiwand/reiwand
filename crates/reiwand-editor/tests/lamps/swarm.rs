@@ -23,7 +23,7 @@ fn particles_take_light_with_a_normal_map_and_undo() {
     undone(&mut p, &before);
     assert_eq!((render(&p)["lit"].clone(), render(&p)["normal"].clone()), (json!(true), json!("bump")));
     act(&mut p, json!({ "particles": { "lit": { "system": "flakes", "normal": "" } } })).unwrap();
-    assert!(render(&p).get("normal").is_none());
+    assert!(crate::whole::unset(&render(&p)["normal"]));
     assert!(
         act(&mut p, json!({ "particles": { "lit": { "system": "flakes", "normal": "song" } } })).is_err()
     );
@@ -32,7 +32,7 @@ fn particles_take_light_with_a_normal_map_and_undo() {
         .unwrap();
     assert_eq!(layer(&p, "flakes")["render"].get("lit"), None, "the layer keeps its own look");
     act(&mut p, json!({ "particles": { "lit": { "system": "flakes", "lit": false } } })).unwrap();
-    assert!(render(&p).get("lit").is_none());
+    assert!(crate::whole::unset(&render(&p)["lit"]));
 }
 
 #[test]
@@ -64,7 +64,7 @@ fn refraction_needs_a_normal_map_and_an_amount_in_range() {
             && cost["levels"][3]["refract_pixels"].as_f64() > Some(0.0)
     );
     act(&mut p, bend(json!({ "system": "flakes", "off": true }))).unwrap();
-    assert!(render(&p).get("refract").is_none());
+    assert!(crate::whole::unset(&render(&p)["refract"]));
 }
 
 #[test]
@@ -80,7 +80,7 @@ fn refraction_in_pixels_converts_between_units_and_checks_the_range() {
     let kept = render(&p)["refract"].clone();
     assert_eq!(kept["units"], "pixels");
     assert!((kept["shift"].as_f64().unwrap() - 0.5 * 0.5 * size).abs() < 1e-6, "{kept}");
-    assert!(kept.get("amount").is_none());
+    assert!(crate::whole::unset(&kept["amount"]));
     act(&mut p, bend(json!({ "system": "flakes", "shift": 40 }))).unwrap();
     assert_eq!(render(&p)["refract"], json!({ "normal": "bump", "units": "pixels", "shift": 40.0 }));
     let shown = reiwand_editor::lamps::swarm_light(&p.dir, &p.doc, "flakes", None);

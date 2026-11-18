@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use reiwand_editor::Project;
 use reiwand_editor::check::{Problem, review};
 use reiwand_editor::starters::starter;
@@ -16,7 +18,7 @@ fn dim(dir: &Path, wgsl: &str) -> Project {
     let mut project =
         Project::create(dir, starter("empty", "org.example.dim", "Dim", "en").unwrap()).unwrap();
     fs::create_dir_all(dir.join("effects")).unwrap();
-    fs::write(dir.join("effects/dim.json"), JSON).unwrap();
+    fs::write(dir.join("effects/dim.json"), whole::descriptor(JSON)).unwrap();
     fs::write(dir.join("effects/dim.wgsl"), wgsl).unwrap();
     project.doc["scene"]["effects"] =
         json!({ "dim": { "descriptor": "effects/dim.json", "wgsl": "effects/dim.wgsl" } });
@@ -29,7 +31,7 @@ fn an_effect_blocked_while_open_is_checked_again_once_forgiven() {
     let root = tempfile::tempdir().unwrap();
     let dir = root.path().join("dim");
     let project = dim(&dir, WGSL);
-    let checked = reiwand_scene::Descriptor::packaged("dim", JSON, WGSL).unwrap().key & !1;
+    let checked = reiwand_scene::Descriptor::packaged("dim", &whole::descriptor(JSON), WGSL).unwrap().key & !1;
     let book = root.path().join("stopped-effects");
     fs::write(&book, format!("{checked:016x} 2 1\n")).unwrap();
     reiwand_scene::keep_strikes(&book);

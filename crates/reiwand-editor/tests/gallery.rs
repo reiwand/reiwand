@@ -96,7 +96,7 @@ fn trimming_keeps_the_part_inside_the_video_and_reads_its_real_length() {
     act(&mut p, json!({"film": {"trim": {"layer": "film", "start": 0.0, "end": length / 2.0}}})).unwrap();
     assert_eq!(p.doc["scene"]["layers"][0]["playback"]["end"], json!(length / 2.0));
     act(&mut p, json!({"film": {"trim": {"layer": "film", "start": 0.0}}})).unwrap();
-    assert!(p.doc["scene"]["layers"][0]["playback"].get("end").is_none());
+    assert!(whole::unset(&p.doc["scene"]["layers"][0]["playback"]["end"]));
     let past = act(&mut p, json!({"film": {"trim": {"layer": "film", "start": 0.0, "end": length + 5.0}}}));
     assert!(past.is_err());
     let backwards = act(&mut p, json!({"film": {"trim": {"layer": "film", "start": 0.2, "end": 0.1}}}));
@@ -131,7 +131,7 @@ fn a_sprite_grid_cuts_in_the_chosen_order_and_free_frames_are_edited_one_by_one(
     let grid = json!({"sprites": {"grid": {"asset": "walk", "rows": 2, "columns": 4, "count": 6}}});
     act(&mut p, grid).unwrap();
     let asset = &p.doc["scene"]["assets"]["walk"];
-    assert!(asset.get("atlas").is_none());
+    assert!(whole::unset(&asset["atlas"]));
     assert_eq!(asset["rects"].as_array().unwrap().len(), 6);
     assert_eq!(asset["rects"][1], json!([10, 0, 10, 10]));
     assert_eq!(asset["rects"][4], json!([0, 10, 10, 10]));
@@ -165,7 +165,7 @@ fn a_sprite_grid_cuts_in_the_chosen_order_and_free_frames_are_edited_one_by_one(
         assert!(act(&mut p, bad.clone()).is_err(), "{bad}");
     }
     act(&mut p, json!({"sprites": {"clear": {"asset": "walk"}}})).unwrap();
-    assert!(p.doc["scene"]["assets"]["walk"].get("rects").is_none());
+    assert!(whole::unset(&p.doc["scene"]["assets"]["walk"]["rects"]));
 }
 
 #[test]

@@ -77,5 +77,5 @@ fn the_settings_of_a_module_are_a_typed_table_whose_names_follow_into_the_values
         act(&mut p, json!({ "script": { "param": { "path": "scripts/w.js", "id": id, "remove": true } } }))
             .unwrap();
     }
-    assert!(p.doc["scene"]["scripts"][0].get("params").is_none());
+    assert!(crate::whole::unset(&p.doc["scene"]["scripts"][0]["params"]));
 }

@@ -4392,6 +4392,7 @@ dependencies = [
  "reiwand-scene",
  "reiwand-script",
  "reiwand-type",
+ "reiwand-upgrade",
  "reiwand-video",
  "schemars",
  "semver",
