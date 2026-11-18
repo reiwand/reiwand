@@ -122,3 +122,17 @@ Lo usan los cargadores de todos los formatos; ningún formato escribe su propia 
 - Un archivo de otro formato o dañado hace que el demonio no arranque (`reiwand-upgrade client`) y nunca se
   sobrescribe. Conversión de única vez: `crates/reiwand-upgrade/src/stored.rs`; prueba en
   `crates/reiwand-upgrade/tests/stored.rs`.
+
+## Acciones del editor y comando `scene` sin valores inventados
+
+- La tabla `crates/reiwand-scene/src/prefill.json` lleva, además de las filas `Tipo.campo`, dos familias que no
+  anotan el esquema: `Action.<acción>.<ruta>` (valor sugerido de un argumento escalar de una acción) y
+  `Offer.<nombre>` (objeto parcial que el editor ofrece al crear algo: cámara, estela, perspectiva, lienzo,
+  capas de texto o forma, luces, propiedades). El código del editor las lee con `prefill::arg`, `prefill::offer`
+  y `prefill::canvas`; no quedan constantes en las acciones de crear.
+- `reiwand-ctl scene actions NOMBRE` muestra cada argumento opcional como `(optional, prefill X)`.
+- Toda acción de crear completa el archivo con `completing`; `apps/reiwand-ctl/tests/scene/examples.rs` carga
+  de forma estricta `manifest.json` y `scene.json` tras cada ejemplo de `scene act`.
+- Pruebas: `crates/reiwand-editor/tests/offers.rs` y `manual/tests.rs`.
+- Límite: el QML del editor aún lleva alternativas literales (`?? 16`, `?? [1920, 1080]` y similares) que
+  repiten filas de la tabla; se sustituyen cuando el editor entregue la tabla a la interfaz.
