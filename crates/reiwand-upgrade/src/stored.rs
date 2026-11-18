@@ -1,6 +1,6 @@
+use crate::sink::Sink;
 use anyhow::Context;
 use serde_json::{Value, json};
-use std::fs;
 use std::path::Path;
 
 pub const FORMAT: u64 = 3;
@@ -11,24 +11,6 @@ pub fn wrap(text: &str) -> anyhow::Result<String> {
         return Ok(text.to_owned());
     }
     Ok(serde_json::to_string_pretty(&json!({"format": FORMAT, "content": found}))? + "\n")
-}
-
-pub fn keep(
-    path: &Path,
-    copies: &Path,
-    convert: impl Fn(&str) -> anyhow::Result<String>,
-) -> anyhow::Result<bool> {
-    let Ok(original) = fs::read_to_string(path) else { return Ok(false) };
-    let converted = convert(&original).with_context(|| format!("cannot convert {}", path.display()))?;
-    if converted == original {
-        return Ok(false);
-    }
-    fs::create_dir_all(copies)?;
-    fs::write(copies.join(path.file_name().context("no file name")?), &original)?;
-    let staged = path.with_extension("upgrading");
-    fs::write(&staged, converted)?;
-    fs::rename(staged, path)?;
-    Ok(true)
 }
 
 pub fn installed(text: &str) -> anyhow::Result<String> {
@@ -46,11 +28,11 @@ pub fn installed(text: &str) -> anyhow::Result<String> {
     wrap(&found.to_string())
 }
 
-pub fn files(data: &Path, copies: &Path) -> anyhow::Result<usize> {
+pub fn files(data: &Path, sink: &mut Sink) -> anyhow::Result<usize> {
     let mut done = 0;
     for name in ["inputs.json", "inputs-declined.json", "accounts.json", "anchors.json", "repo-pins.json"] {
-        done += usize::from(keep(&data.join(name), copies, wrap)?);
+        done += usize::from(sink.text(&data.join(name), wrap)?);
     }
-    done += usize::from(keep(&data.join("installed.json"), copies, installed)?);
+    done += usize::from(sink.text(&data.join("installed.json"), installed)?);
     Ok(done)
 }

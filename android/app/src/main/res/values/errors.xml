@@ -88,7 +88,7 @@
     <string name="error_android_server_changed_encryption">The server changed the encryption of this account; nothing was synced</string>
     <string name="error_android_server_other_certificate">The server\'s certificate is not the one with the fingerprint given</string>
     <string name="error_android_server_own_certificate">This server uses its own certificate with the fingerprint %1$s; add it only if the server shows the same one</string>
-    <string name="error_android_carry_old">This file has the older format %1$s. On a computer run reiwand-upgrade export FILE (an encrypted file stays encrypted and asks for its password), then choose the converted file</string>
+    <string name="error_android_carry_old">This file has the older format %1$s. On a computer run reiwand-upgrade file FILE (an encrypted file stays encrypted and asks for its password), then choose the converted file</string>
     <string name="error_android_settings_refused">settings.toml cannot be read: %1$s. Reiwand does not fill in values: update the app over this one so it converts the file, or clear the app data to start with the default settings.</string>
     <string name="error_android_server_set_up">The server set up sync with another encryption than asked</string>
     <string name="error_android_setting_value">%1$s cannot be %2$s</string>

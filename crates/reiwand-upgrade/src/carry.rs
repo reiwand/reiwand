@@ -114,3 +114,8 @@ pub fn file(path: &Path, password: Option<&str>, check: bool) -> anyhow::Result<
     }
     Ok(Outcome::Upgraded { from: 1, to: i64::from(FORMAT) })
 }
+
+pub fn sealed(path: &Path) -> bool {
+    let mut magic = [0u8; 8];
+    File::open(path).is_ok_and(|mut f| f.read_exact(&mut magic).is_ok() && is_sealed(&magic))
+}

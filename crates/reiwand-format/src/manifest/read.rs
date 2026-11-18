@@ -33,7 +33,7 @@ impl Manifest {
         if schema != current {
             let reason = said(
                 "format.old_manifest",
-                "%1 is no longer read; run reiwand-upgrade on the package folder and sign it again",
+                "%1 is no longer read; run `reiwand-upgrade file FOLDER` on the package folder and sign it again",
                 &[&schema],
             );
             return Err(crate::refuse("schema", reason));

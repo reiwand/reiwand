@@ -1,6 +1,6 @@
 use crate::fill::{Format, complete_toml};
+use crate::sink::Sink;
 use anyhow::Context;
-use std::fs;
 use std::path::Path;
 use toml_edit::{DocumentMut, Item, Table, TableLike, value};
 
@@ -72,17 +72,6 @@ fn text_in(root: &mut Table, key: &str, apply: impl FnOnce(&mut dyn TableLike)) 
     }
 }
 
-pub fn run(config_dir: &Path, copies: &Path) -> anyhow::Result<bool> {
-    let path = config_dir.join("config.toml");
-    let Ok(original) = fs::read_to_string(&path) else { return Ok(false) };
-    let converted = config(&original).with_context(|| format!("cannot convert {}", path.display()))?;
-    if converted == original {
-        return Ok(false);
-    }
-    fs::create_dir_all(copies)?;
-    fs::write(copies.join("config.toml"), &original)?;
-    let staged = path.with_extension("toml.upgrading");
-    fs::write(&staged, converted)?;
-    fs::rename(staged, path)?;
-    Ok(true)
+pub fn run(config_dir: &Path, sink: &mut Sink) -> anyhow::Result<bool> {
+    sink.text(&config_dir.join("config.toml"), config)
 }

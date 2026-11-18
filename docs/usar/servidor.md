@@ -153,7 +153,7 @@ La lista completa de variables y la API HTTP están en
 El servidor 2.0.0 solo atiende `/api/v1/r/<nombre>/…`: ya no existen `/repo/`, las rutas sin nombre de
 repositorio ni el campo `repository` del descubrimiento, y los envíos exigen `repo`. La imagen
 ejecuta `reiwand-upgrade server --data /data` antes de arrancar: guarda una copia de la base
-(`db/reiwand.sqlite.before-v15-from-vN`), pasa el primer repositorio a `repos/main/` y su clave en línea a
+(`db/reiwand.sqlite.before-v16-from-vN`), pasa el primer repositorio a `repos/main/` y su clave en línea a
 `keys/main.online.key`, y no pierde ningún paquete, versión, voto ni cuenta. Quien lo ejecuta sin la
 imagen lo hace con el servidor parado; si el servidor encuentra datos de una versión anterior, se
 niega a arrancar y nombra ese comando.

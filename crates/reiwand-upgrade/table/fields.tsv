@@ -466,7 +466,7 @@ scene	Init.palette	object|null	optional	3	null	editor.md:85
 scene	Init.radial	array|null	optional	3	null	dbus.md:2439
 scene	Init.remap	array	optional	3	[]	editor.md:85
 scene	Init.rotation	Spread_for_float	optional	1	[0.0,0.0]	editor.md:73
-scene	Init.size	Spread_for_float	optional	1	[2.0,6.0]	dbus.md:1109
+scene	Init.size	Spread_for_float	optional	1	[2.0,6.0]	actualizacion.md:11
 scene	Init.speed	Spread_for_float	optional	1	[10.0,40.0]	editor.md:85
 scene	Init.spin	Spread_for_float	optional	1	[0.0,0.0]	editor.md:85
 scene	Init.tilt	Tilt	optional	1	{"angle":[[0.0,0.0],[0.0,0.0]],"spin":[[0.0,0.0],[0.0,0.0]]}	editor.md:85
@@ -478,7 +478,7 @@ scene	Instance.color	string|object|null	optional	3	null	dbus.md:579
 scene	Instance.count	number|object|null	optional	3	null	dbus.md:1227
 scene	Instance.life	number|object|null	optional	3	null	editor.md:85
 scene	Instance.points	array	optional	3	[]	dbus.md:2442
-scene	Instance.size	number|object|null	optional	3	null	dbus.md:1109
+scene	Instance.size	number|object|null	optional	3	null	actualizacion.md:11
 scene	Instance.speed	number|object|null	optional	3	null	editor.md:85
 scene	Instance.time_scale	number|object|null	optional	3	null	editor.md:113
 scene	Layer.aim3d	array|object|null	optional	3	null	editor.md:111
@@ -552,7 +552,7 @@ scene	Layer.shadow_bias	number|null	optional	3	null	scene.md:601
 scene	Layer.shadow_resolution	number|null	optional	3	null	scene.md:600
 scene	Layer.shadows	boolean	optional	1	false	editor.md:111
 scene	Layer.shapes	object	optional	3	{}	editor.md:76
-scene	Layer.size	array|null	optional	3	null	dbus.md:1109
+scene	Layer.size	array|null	optional	3	null	actualizacion.md:11
 scene	Layer.solid	Solid	optional	1	false	dbus.md:1917
 scene	Layer.sound	string	optional	1	""	dbus.md:2085
 scene	Layer.sounds	array	optional	3	[]	editor.md:194
@@ -633,7 +633,7 @@ scene	Playback.own_clock	boolean	optional	1	false	-
 scene	Playback.playing	Value_for_boolean	optional	1	true	dbus.md:1223
 scene	Playback.rate	Value_for_float	optional	1	1.0	dbus.md:2050
 scene	Playback.start	number	optional	1	0.0	editor.md:59
-scene	Pool.size	array|null	optional	3	null	dbus.md:1109
+scene	Pool.size	array|null	optional	3	null	actualizacion.md:11
 scene	Pool.texture	string|null	optional	3	null	editor.md:63
 scene	Remap.clamp_in	boolean	optional	1	false	scene.md:2029
 scene	Remap.clamp_out	boolean	optional	1	false	scene.md:2030
@@ -718,7 +718,7 @@ scene	System.render	Render	optional	1	{"aspect":1.0,"fps":12.0}	editor.md:85
 scene	System.seed	number	optional	1	0	dbus.md:1557
 scene	System.space	Placement	optional	1	"local"	editor.md:85
 scene	Taper.position	number	optional	1	0.5	dbus.md:1226
-scene	Taper.size	number	optional	1	0.5	dbus.md:1109
+scene	Taper.size	number	optional	1	0.5	actualizacion.md:11
 scene	Taper.speed	number	optional	1	0.0	editor.md:85
 scene	Timeline.autoplay	boolean	optional	1	true	editor.md:117
 scene	Timeline.delay	number	optional	1	0.0	editor.md:85
@@ -982,7 +982,7 @@ edit	Parallax.strength	number	optional	1	0.02	dbus.md:587
 edit	Source.bytes	number	optional	1	0	-
 edit	Source.name	string	optional	1	""	choose-pieces.md:32
 edit	Source.pixels	array	optional	1	[0,0]	editor.md:85
-edit	Source.sha256	string	optional	1	""	repo.md:110
+edit	Source.sha256	string	optional	1	""	actualizacion.md:11
 edit	Span.center	array	optional	1	[0.5,0.5]	dbus.md:509
 edit	Span.zoom	number	optional	1	1.0	dbus.md:2455
 edit	Stroke.erase	boolean	optional	1	false	dbus.md:2442

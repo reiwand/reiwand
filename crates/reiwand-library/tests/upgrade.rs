@@ -41,8 +41,10 @@ fn an_old_database_is_refused_then_converted_over_a_copy_and_opens() {
     old_database(&data.join("library.db"));
     let refused = Library::open(data.join("library.db")).err().unwrap();
     assert!(matches!(refused, Error::Foreign(8)) && refused.to_string().contains("reiwand-upgrade client"));
-    assert!(reiwand_upgrade::library::run(&data, &copies).unwrap());
-    let kept: u32 = Connection::open(copies.join("library.db"))
+    assert!(
+        reiwand_upgrade::library::run(&data, &mut reiwand_upgrade::sink::Sink::copying(&copies)).unwrap()
+    );
+    let kept: u32 = Connection::open(copies.join("1-library.db"))
         .unwrap()
         .pragma_query_value(None, "user_version", |r| r.get(0))
         .unwrap();
@@ -55,5 +57,7 @@ fn an_old_database_is_refused_then_converted_over_a_copy_and_opens() {
     assert!(profile.outputs["DP-1"]["filter"].is_null() && profile.auto["on_battery"] == true);
     assert_eq!(library.presets(None).unwrap()[0].value, json!({"fit": "fit", "background": null}));
     assert_eq!(library.rotations().unwrap()[0].state.position(), 0);
-    assert!(!reiwand_upgrade::library::run(&data, &copies).unwrap());
+    assert!(
+        !reiwand_upgrade::library::run(&data, &mut reiwand_upgrade::sink::Sink::copying(&copies)).unwrap()
+    );
 }

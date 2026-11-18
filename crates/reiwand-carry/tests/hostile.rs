@@ -74,7 +74,7 @@ fn the_old_format_is_refused_naming_the_command() {
     let bytes = zip_with(&[("carry.json", br#"{"format": 1}"#.to_vec(), false)]);
     match open_bytes(bytes, None, Limits::default()) {
         Err(e @ Error::Old { found: 1, known: 2 }) => {
-            assert!(e.to_string().contains("reiwand-upgrade export"), "{e}")
+            assert!(e.to_string().contains("reiwand-upgrade file"), "{e}")
         }
         other => panic!("{:?}", other.err()),
     }

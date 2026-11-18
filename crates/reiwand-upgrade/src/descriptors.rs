@@ -1,3 +1,4 @@
+use crate::sink::Sink;
 mod shape;
 mod write;
 
@@ -32,19 +33,17 @@ fn renamed(descriptor: &mut Value) -> bool {
     changed | shape::descriptor(descriptor)
 }
 
-pub fn file(path: &Path) -> anyhow::Result<bool> {
+pub fn file(path: &Path, sink: &mut Sink) -> anyhow::Result<bool> {
     let mut doc: Value = serde_json::from_slice(&fs::read(path)?)?;
     let listing = doc.get("effects").is_some() && doc.get("id").is_none();
     let changed = if listing { shape::catalog(&mut doc) } else { renamed(&mut doc) };
     if changed {
-        let staged = path.with_extension("json.upgrading");
-        fs::write(&staged, text(&doc, if listing { 3 } else { 2 }))?;
-        fs::rename(staged, path)?;
+        sink.save(path, text(&doc, if listing { 3 } else { 2 }).as_bytes())?;
     }
     Ok(changed)
 }
 
-pub fn rewrite(dir: &Path, doc: &Value) -> anyhow::Result<usize> {
+pub fn rewrite(dir: &Path, doc: &Value, sink: &mut Sink) -> anyhow::Result<usize> {
     let mut changed = 0;
     let files = doc.get("effects").and_then(Value::as_object);
     for entry in files.into_iter().flat_map(|f| f.values()) {
@@ -55,9 +54,7 @@ pub fn rewrite(dir: &Path, doc: &Value) -> anyhow::Result<usize> {
         if !renamed(&mut descriptor) {
             continue;
         }
-        let staged = path.with_extension("json.upgrading");
-        fs::write(&staged, text(&descriptor, 2))?;
-        fs::rename(staged, &path)?;
+        sink.save(&path, text(&descriptor, 2).as_bytes())?;
         changed += 1;
     }
     Ok(changed)

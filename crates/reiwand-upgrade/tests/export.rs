@@ -61,7 +61,7 @@ fn a_plain_old_file_is_refused_then_converted_and_reads_back() {
     std::fs::write(&path, old_file()).unwrap();
     let refused = open(&path, None, Limits::default()).err().unwrap();
     assert!(matches!(refused, Error::Old { found: 1, .. }));
-    assert!(refused.to_string().contains("reiwand-upgrade export"));
+    assert!(refused.to_string().contains("reiwand-upgrade file"));
     let before = std::fs::read(&path).unwrap();
     assert_eq!(
         reiwand_upgrade::carry::file(&path, None, true).unwrap(),

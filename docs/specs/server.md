@@ -307,7 +307,7 @@ them is refused naming the key and `reiwand-upgrade server`. Schema 15 to 16 is 
 
 The migration is the separate program `reiwand-upgrade` (crate `crates/reiwand-upgrade`), which runs once
 and is safe to run again. `reiwand-upgrade server --data DIR` keeps a copy of the database
-(`db/reiwand.sqlite.before-v15-from-vM`), applies the schema steps in one transaction that checks the
+(`db/reiwand.sqlite.before-v16-from-vM`), applies the schema steps in one transaction that checks the
 keys before it commits, moves the old first repository from `repo/` to `repos/main/` and its key from
 `keys/online.key` to `keys/main.online.key`, drops the sync tables of older servers after writing, for each account that had records, `sync-export/<handle>.json` (the records as stored, payload in hex; sealed payloads stay sealed, the server never held their key) and moving its private files to `sync-export/<handle>/`, and leaves everything else where it was. The admin hands those files to their owners and deletes the folder. The server image
 runs it in its entrypoint before `serve`; outside the image run it yourself while the server is stopped.

@@ -1,3 +1,4 @@
+use crate::sink::Sink;
 use anyhow::{Context, bail};
 use rusqlite::{Connection, params};
 use serde_json::{Map, Value, json};
@@ -105,7 +106,7 @@ pub fn convert(db: &mut Connection) -> anyhow::Result<()> {
     Ok(tx.commit()?)
 }
 
-pub fn run(data: &Path, copies: &Path) -> anyhow::Result<bool> {
+pub fn run(data: &Path, sink: &mut Sink) -> anyhow::Result<bool> {
     let path = data.join("library.db");
     if !path.is_file() {
         return Ok(false);
@@ -118,6 +119,10 @@ pub fn run(data: &Path, copies: &Path) -> anyhow::Result<bool> {
     if found != SCHEMA - 1 {
         bail!("{}: schema {found} cannot be converted; nothing was changed", path.display());
     }
+    if sink.is_check() {
+        sink.note(&path);
+        return Ok(true);
+    }
     let staged = data.join("library.db.upgrading");
     let _ = fs::remove_file(&staged);
     original.execute("VACUUM INTO ?1", [staged.to_string_lossy().as_ref()])?;
@@ -125,12 +130,8 @@ pub fn run(data: &Path, copies: &Path) -> anyhow::Result<bool> {
     convert(&mut copy).context("cannot convert the library database")?;
     copy.close().map_err(|(_, e)| e)?;
     original.close().map_err(|(_, e)| e)?;
-    fs::create_dir_all(copies)?;
     for suffix in ["", "-wal", "-shm"] {
-        let from = data.join(format!("library.db{suffix}"));
-        if from.exists() {
-            fs::rename(&from, copies.join(format!("library.db{suffix}")))?;
-        }
+        sink.move_away(&data.join(format!("library.db{suffix}")))?;
     }
     fs::rename(staged, path)?;
     Ok(true)

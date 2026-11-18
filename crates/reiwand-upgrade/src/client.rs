@@ -1,14 +1,27 @@
 use crate::Outcome;
 #[cfg(feature = "client")]
 use crate::download;
+use crate::sink::Sink;
 use anyhow::Context;
-use serde_json::Value;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
-pub const CURRENT: i64 = 2;
+pub const CURRENT: i64 = 3;
 
 const MARK: &str = "format-version";
+
+pub struct Options {
+    pub skip_download: bool,
+    pub check: bool,
+    pub also: Vec<PathBuf>,
+    pub copies: Option<PathBuf>,
+}
+
+pub struct Done {
+    pub outcome: Outcome,
+    pub changed: Vec<PathBuf>,
+    pub copies: PathBuf,
+}
 
 pub fn run(data: &Path) -> anyhow::Result<Outcome> {
     run_with(data, &mut crate::NoVault)
@@ -61,60 +74,85 @@ fn fetched(data: &Path, vault: &mut dyn crate::Vault, skip: bool) -> anyhow::Res
 }
 
 pub fn run_options(data: &Path, vault: &mut dyn crate::Vault, skip: bool) -> anyhow::Result<Outcome> {
-    if !data.is_dir() {
-        return Ok(Outcome::Nothing);
+    let options = Options { skip_download: skip, check: false, also: Vec::new(), copies: None };
+    Ok(convert(data, vault, &options)?.outcome)
+}
+
+pub fn copies_of(data: &Path) -> PathBuf {
+    data.join("upgrade-copias").join(std::time::UNIX_EPOCH.elapsed().map_or(0, |d| d.as_secs()).to_string())
+}
+
+#[cfg(any(feature = "client", feature = "server"))]
+fn folders(data: &Path, also: &[PathBuf]) -> Vec<PathBuf> {
+    let mut found: Vec<PathBuf> = also.to_vec();
+    let opened = rusqlite::Connection::open_with_flags(
+        data.join("library.db"),
+        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+    );
+    let listed = opened.ok().and_then(|db| {
+        let mut ask = db.prepare("SELECT uri FROM sources WHERE kind = 'folder'").ok()?;
+        let rows = ask.query_map([], |r| r.get::<_, String>(0)).ok()?;
+        Some(rows.flatten().collect::<Vec<_>>())
+    });
+    for uri in listed.into_iter().flatten() {
+        found.push(PathBuf::from(uri.strip_prefix("file://").unwrap_or(&uri)));
     }
-    crate::phone::settings(data)?;
+    found
+}
+
+pub fn convert(data: &Path, vault: &mut dyn crate::Vault, options: &Options) -> anyhow::Result<Done> {
+    let copies = options.copies.clone().unwrap_or_else(|| copies_of(data));
+    let mut sink = if options.check { Sink::checking() } else { Sink::copying(&copies) };
+    if !data.is_dir() {
+        return Ok(Done { outcome: Outcome::Nothing, changed: Vec::new(), copies });
+    }
     let found = match fs::read_to_string(data.join(MARK)) {
         Ok(text) => text.trim().parse::<i64>().context("the version mark is damaged")?,
         Err(_) => 1,
     };
-    if found >= CURRENT {
-        return Ok(Outcome::Nothing);
+    if !options.check && found < CURRENT {
+        fetched(data, vault, options.skip_download)?;
     }
-    fetched(data, vault, skip)?;
-    for item in fs::read_dir(data.join("repos")).into_iter().flatten().flatten() {
-        plain(&item.path().join("state.json"))?;
-    }
-    crate::apply(data, vault)?;
-    if data.join("sync.json").exists() {
-        vault.drop_item("server")?;
-        fs::remove_file(data.join("sync.json"))?;
-    }
-    let _ = fs::remove_file(data.join("sync-downloaded"));
-    fs::write(data.join(MARK), format!("{CURRENT}\n"))?;
-    Ok(Outcome::Upgraded { from: found, to: CURRENT })
-}
-
-fn plain(path: &Path) -> anyhow::Result<()> {
-    let Ok(bytes) = fs::read(path) else { return Ok(()) };
-    let mut state: Value = serde_json::from_slice(&bytes)?;
-    let old = state["url"].as_str().unwrap_or_default().to_string();
-    if !bare(&mut state["url"], true) {
-        return Ok(());
-    }
-    let (from, to) = (old.split('?').next().unwrap_or_default(), state["url"].as_str().unwrap_or_default());
-    let (from, to) = (from.to_string(), to.to_string());
-    for base in state["bases"].as_array_mut().into_iter().flatten() {
-        if let Some(rest) = base.as_str().and_then(|b| b.strip_prefix(&from)) {
-            *base = format!("{to}{rest}").into();
+    steps(data, &mut sink, &options.also)?;
+    if found < CURRENT && data.join("sync.json").exists() {
+        if options.check {
+            sink.note(&data.join("sync.json"));
+        } else {
+            crate::apply(data, vault)?;
+            vault.drop_item("server")?;
+            fs::remove_file(data.join("sync.json"))?;
         }
     }
-    replace(path, &state)
-}
-
-fn bare(url: &mut Value, server: bool) -> bool {
-    let Some(text) = url.as_str().filter(|u| u.contains('?')) else { return false };
-    let mut plain = text.split('?').next().unwrap_or(text).to_string();
-    if server && plain.starts_with("http") && plain.trim_end_matches('/').ends_with("/repo") {
-        plain = format!("{}/r/main/", plain.trim_end_matches('/').trim_end_matches("/repo"));
+    if !options.check {
+        let _ = fs::remove_file(data.join("sync-downloaded"));
+        if found < CURRENT {
+            fs::write(data.join(MARK), format!("{CURRENT}\n"))?;
+        }
     }
-    *url = plain.into();
-    true
+    let outcome = match found < CURRENT || !sink.changed().is_empty() {
+        true => Outcome::Upgraded { from: found, to: CURRENT },
+        false => Outcome::Nothing,
+    };
+    Ok(Done { outcome, changed: sink.changed().to_vec(), copies })
 }
 
-fn replace(path: &Path, state: &Value) -> anyhow::Result<()> {
-    let staged = path.with_extension("json.upgrading");
-    fs::write(&staged, serde_json::to_vec(state)?)?;
-    Ok(fs::rename(staged, path)?)
+#[cfg(not(any(feature = "client", feature = "server")))]
+fn folders(_: &Path, also: &[PathBuf]) -> Vec<PathBuf> {
+    also.to_vec()
+}
+
+fn steps(data: &Path, sink: &mut Sink, also: &[PathBuf]) -> anyhow::Result<()> {
+    crate::phone::settings(data, sink)?;
+    crate::edits::folder(&data.join("edits"), sink)?;
+    for item in fs::read_dir(data.join("repos")).into_iter().flatten().flatten() {
+        crate::registries::plain(&item.path().join("state.json"), sink)?;
+    }
+    crate::packages::installed(data, sink)?;
+    crate::stored::files(data, sink)?;
+    for folder in folders(data, also) {
+        crate::scenes::walk_in(&folder, sink)?;
+    }
+    #[cfg(any(feature = "client", feature = "server"))]
+    crate::library::run(data, sink)?;
+    Ok(())
 }

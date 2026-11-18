@@ -11,7 +11,7 @@ pub enum Error {
     )]
     Future { found: u32, known: u32 },
     #[error(
-        "the file has format {found}, and this program reads format {known}; convert it with `reiwand-upgrade export FILE` on a computer (an encrypted file stays encrypted and asks for its password), then use the converted file"
+        "the file has format {found}, and this program reads format {known}; convert it with `reiwand-upgrade file FILE` on a computer (an encrypted file stays encrypted and asks for its password), then use the converted file"
     )]
     Old { found: u32, known: u32 },
     #[error("{0}")]

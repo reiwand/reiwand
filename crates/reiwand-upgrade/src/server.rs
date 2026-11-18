@@ -5,16 +5,21 @@ use std::fs;
 use std::path::Path;
 
 pub const FIRST: i64 = 11;
-pub const CURRENT: i64 = 15;
+pub const CURRENT: i64 = 16;
 
-const STEPS: [&str; 4] = [
+const STEPS: [&str; 5] = [
     include_str!("../migrations/11-12.sql"),
     include_str!("../migrations/12-13.sql"),
     include_str!("../migrations/13-14.sql"),
     include_str!("../migrations/14-15.sql"),
+    include_str!("../migrations/15-16.sql"),
 ];
 
 pub fn run(data: &Path) -> anyhow::Result<Outcome> {
+    run_checked(data, false)
+}
+
+pub fn run_checked(data: &Path, check: bool) -> anyhow::Result<Outcome> {
     let path = data.join("db/reiwand.sqlite");
     if !path.is_file() {
         return Ok(Outcome::Nothing);
@@ -32,6 +37,9 @@ pub fn run(data: &Path) -> anyhow::Result<Outcome> {
     if !(FIRST..CURRENT).contains(&found) {
         bail!("the database is at schema {found}; this upgrade reads {FIRST} to {}", CURRENT - 1);
     }
+    if check {
+        return Ok(Outcome::Upgraded { from: found, to: CURRENT });
+    }
     let copy = path.with_extension(format!("sqlite.before-v{CURRENT}-from-v{found}"));
     if !copy.exists() {
         Connection::open(&path)?.execute("VACUUM INTO ?1", [copy.to_string_lossy().as_ref()])?;
@@ -48,6 +56,7 @@ pub fn run(data: &Path) -> anyhow::Result<Outcome> {
     for step in found..CURRENT {
         tx.execute_batch(STEPS[(step - FIRST) as usize])?;
     }
+    crate::server_settings::complete(&tx)?;
     let broken: i64 = tx.query_row("SELECT count(*) FROM pragma_foreign_key_check", [], |r| r.get(0))?;
     ensure!(broken == 0, "the upgrade left {broken} rows without their parent");
     tx.pragma_update(None, "user_version", CURRENT)?;

@@ -80,7 +80,7 @@ if [ ! -x "$BIN/reiwand-upgrade" ]; then
   echo "SKIP: no reiwand-upgrade in $BIN"
 else
   env "${env[@]}" "$BIN/reiwand-upgrade" client --skip-download --data "$data" >"$WORK/upgrade.out" 2>&1 || fail "upgrade: $(cat "$WORK/upgrade.out")"
-  grep -q "upgraded from version 1 to 2" "$WORK/upgrade.out" || fail "upgrade said: $(cat "$WORK/upgrade.out")"
+  grep -q "upgraded from version 1 to 3" "$WORK/upgrade.out" || fail "upgrade said: $(cat "$WORK/upgrade.out")"
   [ ! -e "$data/sync.json" ] || fail "the old account file was left"
   grep -q '"server/server"' "$data/secrets.json" && fail "the old access item was left"
   grep -q '"server/account ' "$data/secrets.json" || fail "the access did not move to the account: $(cat "$data/secrets.json")"
@@ -91,6 +91,7 @@ else
   [ "$(x old account ls --json | jq_ "r['accounts'][0]['repos'][0]['url']")" = "https://srv.example:8443/r/shelf/" ] ||
     fail "the account lost its repository: $(x old account ls)"
   env "${env[@]}" "$BIN/reiwand-upgrade" client --data "$data" | grep -q "nothing to upgrade" || fail "a second upgrade changed the data"
+  source "$(dirname "$0")"/integration-upgrade-library.sh
   x old export "$WORK/with.reiwand" --secrets --password-file <(printf 'pw\n') >/dev/null || fail "the export with accounts failed"
   acct_start dst
   x dst provider store file 2>/dev/null
