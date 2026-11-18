@@ -48,6 +48,7 @@ fn error_text_names_the_path_and_the_way_out() {
     v.as_object_mut().unwrap().remove("parent");
     let text = load(&v).unwrap_err().to_string();
     assert!(text.starts_with("scene.json: \"parent\" is missing."), "{text}");
+    assert!(text.contains("reiwand-upgrade"), "{text}");
 }
 
 #[test]

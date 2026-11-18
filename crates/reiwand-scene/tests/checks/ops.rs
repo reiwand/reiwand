@@ -57,11 +57,13 @@ fn stage_functions_are_held_to_the_operations_of_a_pixel() {
             "m = m * n;".repeat(30)
         );
         let wgsl = if stage == "material" { wgsl.replace("color", "albedo") } else { wgsl };
-        let fault =
-            Descriptor::packaged("p", &json, &wgsl).err().unwrap_or_else(|| panic!("{stage} accepted"));
+        let fault = Descriptor::packaged("p", &reiwand_upgrade::descriptors::completed(&json), &wgsl)
+            .err()
+            .unwrap_or_else(|| panic!("{stage} accepted"));
         assert!(fault.contains(&format!("{stage} runs more than {MAX_OPS} operations a pixel")), "{fault}");
         let light = wgsl.replace("1024u; j++", "2u; j++").replace("1024u; i++", "4u; i++");
-        let d = Descriptor::packaged("p", &json, &light).unwrap_or_else(|e| panic!("{stage}: {e}"));
+        let d = Descriptor::packaged("p", &reiwand_upgrade::descriptors::completed(&json), &light)
+            .unwrap_or_else(|e| panic!("{stage}: {e}"));
         assert!(d.ops > 4.0 * 2.0 * 30.0 * 64.0, "{stage}: {}", d.ops);
     }
 }

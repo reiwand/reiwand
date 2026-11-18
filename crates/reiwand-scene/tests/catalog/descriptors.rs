@@ -11,7 +11,7 @@ fn complete(params: &str) -> Json {
 }
 
 fn parse(d: &Json) -> Result<Descriptor, String> {
-    Descriptor::parse(&d.to_string(), "").map_err(|e| e.to_string())
+    Descriptor::parse(&reiwand_upgrade::descriptors::completed(&d.to_string()), "").map_err(|e| e.to_string())
 }
 
 #[test]

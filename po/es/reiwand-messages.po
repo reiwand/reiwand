@@ -6302,3 +6302,19 @@ msgstr "capa que recibe el puntero"
 #: crates/reiwand-scene/src/validate.rs
 msgid "trigger"
 msgstr "disparador"
+
+#: crates/reiwand-format/src/fetch.rs
+msgid "expected 64 hex digits"
+msgstr "se esperaban 64 cifras hexadecimales"
+
+#: crates/reiwand-format/src/said.rs
+msgid "the fingerprint does not match the repository at %1"
+msgstr "la huella no coincide con el repositorio de %1"
+
+#: crates/reiwand-core/src/explicit/error.rs
+msgid ""
+"%1: \"%2\" is missing. Reiwand does not fill in values: write it, or run "
+"reiwand-upgrade on the file."
+msgstr ""
+"%1: falta «%2». Reiwand no completa valores: escríbelo, o corre reiwand-"
+"upgrade sobre el archivo."

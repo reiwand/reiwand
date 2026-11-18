@@ -57,7 +57,7 @@ fn descriptor() -> Json {
 fn packaged(change: impl FnOnce(&mut Json), wgsl: &str) -> Result<Descriptor, String> {
     let mut d = descriptor();
     change(&mut d);
-    Descriptor::packaged("ripple", &d.to_string(), wgsl)
+    Descriptor::packaged("ripple", &reiwand_upgrade::descriptors::completed(&d.to_string()), wgsl)
 }
 
 fn full(mut uses: Json) -> Json {

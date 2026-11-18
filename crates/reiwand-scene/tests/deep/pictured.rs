@@ -13,24 +13,34 @@ fn picture(id: &str) -> Json {
 #[test]
 fn material_shaders_sample_up_to_four_images_and_count_their_reads() {
     let params = json!([{ "id": "tint", "type": "color", "default": "#ffffff" }, picture("base")]);
-    let d = Descriptor::packaged("coat", &coat(params), SAMPLED).unwrap();
+    let d = Descriptor::packaged("coat", &reiwand_upgrade::descriptors::completed(&coat(params)), SAMPLED)
+        .unwrap();
     assert!(d.reads >= 1.0, "{}", d.reads);
     assert_eq!(material_images(&d).collect::<Vec<_>>(), ["base"]);
     let five: Vec<Json> = (0..5).map(|i| picture(&format!("p{i}"))).collect();
-    let many = Descriptor::packaged("coat", &coat(json!(five)), SAMPLED).unwrap_err();
+    let many =
+        Descriptor::packaged("coat", &reiwand_upgrade::descriptors::completed(&coat(json!(five))), SAMPLED)
+            .unwrap_err();
     assert!(many.contains("at most 4 images"), "{many}");
     let lut = json!([{ "id": "grade", "type": "lut", "default": "" }]);
-    assert!(Descriptor::packaged("coat", &coat(lut), SAMPLED).unwrap_err().contains("no lut"));
+    assert!(
+        Descriptor::packaged("coat", &reiwand_upgrade::descriptors::completed(&coat(lut)), SAMPLED)
+            .unwrap_err()
+            .contains("no lut")
+    );
     let nine: Vec<Json> =
         (0..9).map(|i| json!({ "id": format!("n{i}"), "type": "float", "default": 0 })).collect();
-    let crowded = Descriptor::packaged("coat", &coat(json!(nine)), SAMPLED).unwrap_err();
+    let crowded =
+        Descriptor::packaged("coat", &reiwand_upgrade::descriptors::completed(&coat(json!(nine))), SAMPLED)
+            .unwrap_err();
     assert!(crowded.contains("at most 8 parameters"), "{crowded}");
 }
 
 #[test]
 fn material_shaders_that_read_what_only_layer_effects_have_are_refused_at_their_line() {
     let wgsl = "fn material(s: Surface) -> Surface {\n    var o = s;\n    o.albedo = sample(input_tex, s.uv);\n    return o;\n}";
-    let why = Descriptor::packaged("coat", &coat(json!([])), wgsl).unwrap_err();
+    let why = Descriptor::packaged("coat", &reiwand_upgrade::descriptors::completed(&coat(json!([]))), wgsl)
+        .unwrap_err();
     assert!(why.contains("does not build as a material shader"), "{why}");
     let at = why.split("wgsl:").nth(1).and_then(|r| r.split(':').next()).and_then(|l| l.parse().ok());
     assert_eq!(at.and_then(shader_line), Some(3), "{why}");
@@ -39,7 +49,10 @@ fn material_shaders_that_read_what_only_layer_effects_have_are_refused_at_their_
     let wgsl = format!(
         "{image}\n@fragment\nfn fs_flat(in: VertexOut) -> @location(0) vec4<f32> {{\n    return image0(in.uv);\n}}"
     );
-    assert!(Descriptor::packaged("flat", &layer, &wgsl).is_err(), "only materials have images");
+    assert!(
+        Descriptor::packaged("flat", &reiwand_upgrade::descriptors::completed(&layer), &wgsl).is_err(),
+        "only materials have images"
+    );
 }
 
 #[test]

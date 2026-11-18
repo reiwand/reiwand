@@ -62,7 +62,16 @@ impl<T: JsonSchema> JsonSchema for Spread<T> {
         format!("Spread_for_{}", T::schema_name()).into()
     }
     fn json_schema(generator: &mut SchemaGenerator) -> Schema {
-        SpreadRepr::<T>::json_schema(generator)
+        let mut schema = SpreadRepr::<T>::json_schema(generator);
+        let branches = schema.get_mut("anyOf").and_then(serde_json::Value::as_array_mut);
+        for branch in branches.into_iter().flatten() {
+            if let Some(exponent) =
+                branch.pointer_mut("/prefixItems/2").and_then(serde_json::Value::as_object_mut)
+            {
+                exponent.insert("default".into(), serde_json::json!(1.0));
+            }
+        }
+        schema
     }
 }
 

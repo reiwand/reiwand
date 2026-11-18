@@ -87,7 +87,8 @@ fn retrying_effects_undoes_a_block_found_while_checking_a_package() {
     let (mut probe, files) = scene();
     let (json, wgsl) = (files("fx/s.json", 0).unwrap(), files("fx/s.wgsl", 0).unwrap());
     let (json, wgsl) = (String::from_utf8(json).unwrap(), String::from_utf8(wgsl).unwrap());
-    let checked = Descriptor::packaged("s", &json, &wgsl).unwrap().key & !1;
+    let checked =
+        Descriptor::packaged("s", &reiwand_upgrade::descriptors::completed(&json), &wgsl).unwrap().key & !1;
     std::fs::write(&path, format!("{checked:016x} 2 1\n")).unwrap();
     keep_strikes(&path);
     let fault = probe.adopt(&BTreeMap::new(), files).unwrap_err().to_string();

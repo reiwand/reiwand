@@ -142,8 +142,8 @@ fn reads(json: &Json, key: &str) -> bool {
     let values = |v: &Json| v.as_object().is_some_and(|m| m.values().any(|v| reads(v, key)));
     match json {
         Json::Object(map) => {
-            let bound =
-                map.contains_key(key) && serde_json::from_value::<Binding<Json>>(json.clone()).is_ok();
+            let bound = map.get(key).is_some_and(|v| !v.is_null())
+                && serde_json::from_value::<Binding<Json>>(json.clone()).is_ok();
             bound
                 || map.iter().any(|(k, v)| match k.as_str() {
                     "effects" | "map" | "ext" | "expressions" | "limits" => false,
@@ -190,3 +190,7 @@ pub fn variants(scene: &Scene) -> Vec<(String, Vec<&str>)> {
     found.retain(|(_, ids)| ids.len() > 1);
     found
 }
+
+#[cfg(test)]
+#[path = "uses_tests.rs"]
+mod tests;

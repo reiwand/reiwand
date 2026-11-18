@@ -115,7 +115,7 @@ fn descriptors_check_their_new_fields() {
         ),
     ];
     for (json, problem) in cases {
-        let d = Descriptor::parse(&json.to_string(), "").unwrap();
+        let d = Descriptor::parse(&reiwand_upgrade::descriptors::completed(&json.to_string()), "").unwrap();
         assert!(d.problems().iter().any(|p| p.contains(problem)), "{problem}: {:?}", d.problems());
     }
 }
@@ -124,7 +124,9 @@ fn descriptors_check_their_new_fields() {
 fn the_contract_compiles_and_names_its_helpers() {
     let d = Descriptor::packaged(
         "solo",
-        &json!({ "id": "solo", "passes": [{ "entry": "fs_solo" }], "cost": {} }).to_string(),
+        &reiwand_upgrade::descriptors::completed(
+            &json!({ "id": "solo", "passes": [{ "entry": "fs_solo" }], "cost": {} }).to_string(),
+        ),
         "@fragment\nfn fs_solo(in: VertexOut) -> @location(0) vec4<f32> { return tap(in.uv); }",
     )
     .unwrap();

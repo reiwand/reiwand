@@ -31,6 +31,7 @@ pub(super) fn nullable(s: &Value) -> bool {
         .get("type")
         .is_some_and(|t| t == "null" || t.as_array().is_some_and(|a| a.iter().any(|x| x == "null")));
     typed
+        || s.get("x-null") == Some(&Value::Bool(true))
         || s.get("anyOf")
             .and_then(Value::as_array)
             .is_some_and(|a| a.iter().any(|b| b.get("type") == Some(&Value::from("null"))))
@@ -128,6 +129,7 @@ impl<'a> Walk<'a> {
         let (s, named) = self.resolve(s);
         let def = named.unwrap_or(def);
         super::particles::spread(def, v);
+        super::particles::sequence(def, v);
         if let Value::Object(map) = v
             && let Some((name, value)) = super::legacy::tag(ctx, map)
         {

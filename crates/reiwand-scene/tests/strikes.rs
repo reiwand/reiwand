@@ -23,7 +23,7 @@ fn crashes_hangs_and_losses_count_strikes_that_block_an_effect_until_it_is_forgi
     let path = dir.path().join("cache").join("stopped-effects");
     let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs();
     let (json, wgsl) = effect();
-    let key = Descriptor::packaged("s", &json, &wgsl).unwrap().key;
+    let key = Descriptor::packaged("s", &reiwand_upgrade::descriptors::completed(&json), &wgsl).unwrap().key;
     let checked = key & !1;
     keep_strikes(&path);
     assert!(!struck(key) && !path.exists(), "nothing is read or written before it is needed");
@@ -31,15 +31,16 @@ fn crashes_hangs_and_losses_count_strikes_that_block_an_effect_until_it_is_forgi
     std::fs::write(&path, format!("{checked:016x} trying {DEAD}\n{key:016x} 1 {now}\n")).unwrap();
     keep_strikes(&path);
     assert!(!struck(checked) && !struck(key), "one crash or loss is one strike");
-    Descriptor::packaged("s", &json, &wgsl).unwrap();
+    Descriptor::packaged("s", &reiwand_upgrade::descriptors::completed(&json), &wgsl).unwrap();
     assert_eq!(heads(&path), [format!("{key:016x} 1"), format!("{checked:016x} 1")]);
     std::fs::write(&path, format!("{checked:016x} 1 {now}\n{checked:016x} trying {DEAD}\n")).unwrap();
     keep_strikes(&path);
-    let fault = Descriptor::packaged("s", &json, &wgsl).unwrap_err();
+    let fault =
+        Descriptor::packaged("s", &reiwand_upgrade::descriptors::completed(&json), &wgsl).unwrap_err();
     assert!(fault.contains("not checked again") && fault.contains("effects again"), "{fault}");
     assert_eq!(forgive_strikes().unwrap(), 1);
     assert!(!struck(checked) && lines(&path).is_empty());
-    Descriptor::packaged("s", &json, &wgsl).unwrap();
+    Descriptor::packaged("s", &reiwand_upgrade::descriptors::completed(&json), &wgsl).unwrap();
     trying(key).unwrap();
     assert_eq!(heads(&path), [format!("{key:016x} trying")]);
     keep_strikes(&path);

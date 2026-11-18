@@ -14,5 +14,5 @@ fn effect(change: impl FnOnce(&mut Json), body: &str) -> Result<Descriptor, Stri
     let mut d = json!({ "id": "w", "cost": {}, "passes": [{ "entry": "fs_w" }],
         "options": [{ "id": "taps", "values": [4, 16], "prefill": 4 }] });
     change(&mut d);
-    Descriptor::packaged("w", &d.to_string(), &shader(body))
+    Descriptor::packaged("w", &reiwand_upgrade::descriptors::completed(&d.to_string()), &shader(body))
 }

@@ -27,7 +27,7 @@ impl ReadError {
         match &self.fault {
             Fault::Missing => said(
                 "explicit.missing",
-                "%1: \"%2\" is missing. Reiwand does not fill in values: write it, or open it in the editor, which fills it in.",
+                "%1: \"%2\" is missing. Reiwand does not fill in values: write it, or run reiwand-upgrade on the file.",
                 &[&self.file, &self.path],
             ),
             Fault::Invalid(why) => {

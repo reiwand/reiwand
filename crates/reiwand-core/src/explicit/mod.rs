@@ -1,5 +1,7 @@
 mod error;
+mod loose;
 mod omit;
+mod pad;
 mod read;
 mod scan;
 mod schema;

@@ -17,6 +17,8 @@ fn walk(dir: &Path, changed: &mut usize) -> anyhow::Result<()> {
             walk(&path, changed)?;
         } else if path.file_name().is_some_and(|n| n == "scene.json") {
             *changed += usize::from(scene(&path)?);
+        } else if path.file_name().is_some_and(|n| n == "manifest.json") {
+            *changed += usize::from(manifest(&path)?);
         }
     }
     Ok(())
@@ -68,6 +70,17 @@ pub fn scene(path: &Path) -> anyhow::Result<bool> {
     let versioned = version(&mut doc);
     if complete_with(Format::Scene, &mut doc, &customs).written == 0 && !dropped && !versioned {
         return Ok(renamed);
+    }
+    let staged = path.with_extension("json.upgrading");
+    fs::write(&staged, text(&doc)?)?;
+    fs::rename(staged, path)?;
+    Ok(true)
+}
+
+pub fn manifest(path: &Path) -> anyhow::Result<bool> {
+    let Ok(mut doc) = serde_json::from_slice::<Value>(&fs::read(path)?) else { return Ok(false) };
+    if complete_with(Format::Manifest, &mut doc, &Customs::new()).written == 0 {
+        return Ok(false);
     }
     let staged = path.with_extension("json.upgrading");
     fs::write(&staged, text(&doc)?)?;

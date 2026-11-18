@@ -7,6 +7,12 @@ use std::path::Path;
 
 pub use write::text;
 
+pub fn completed(text: &str) -> String {
+    let Ok(mut doc) = serde_json::from_str::<Value>(text) else { return text.to_owned() };
+    complete(&mut doc);
+    doc.to_string()
+}
+
 pub fn complete(descriptor: &mut Value) -> bool {
     renamed(descriptor)
 }

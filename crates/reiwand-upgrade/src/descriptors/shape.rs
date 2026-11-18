@@ -42,11 +42,13 @@ fn pass(pass: &mut Map<String, Value>) -> bool {
 
 fn param(param: &mut Map<String, Value>) -> bool {
     let none = Value::Null;
+    let ranged = matches!(param.get("type").and_then(Value::as_str), Some("float" | "int" | "vec2"));
+    let (low, high) = if ranged { (json!(f32::MIN), json!(f32::MAX)) } else { (none.clone(), none.clone()) };
     let mut changed = fill(
         param,
         &[
-            ("min", none.clone()),
-            ("max", none.clone()),
+            ("min", low.clone()),
+            ("max", high.clone()),
             ("uses", none.clone()),
             ("unit", none.clone()),
             ("tools", json!([])),
@@ -60,6 +62,12 @@ fn param(param: &mut Map<String, Value>) -> bool {
             ("tool", none),
         ],
     );
+    for (key, bound) in [("min", low), ("max", high)] {
+        if ranged && param.get(key).is_some_and(Value::is_null) {
+            param.insert(key.to_owned(), bound);
+            changed = true;
+        }
+    }
     changed |= each(param.get_mut("values"), |entry| fill(entry, &[("label", json!({}))]));
     changed
 }

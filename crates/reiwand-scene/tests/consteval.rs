@@ -7,7 +7,7 @@ const PROBE: &str = "REIWAND_CONSTEVAL_PROBE";
 
 fn pack(wgsl: &str) -> Result<Descriptor, String> {
     let json = json!({ "id": "p", "cost": {}, "passes": [{ "entry": "fs_p" }] }).to_string();
-    Descriptor::packaged("p", &json, wgsl)
+    Descriptor::packaged("p", &reiwand_upgrade::descriptors::completed(&json), wgsl)
 }
 
 fn entry(body: &str) -> String {

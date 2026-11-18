@@ -9,7 +9,7 @@ mod zeroed;
 
 pub(crate) fn pack(wgsl: &str) -> Result<Descriptor, String> {
     let json = json!({ "id": "p", "cost": {}, "passes": [{ "entry": "fs_p" }] }).to_string();
-    Descriptor::packaged("p", &json, wgsl)
+    Descriptor::packaged("p", &reiwand_upgrade::descriptors::completed(&json), wgsl)
 }
 
 pub(crate) fn small_stack(wgsl: String) -> Result<Descriptor, String> {
