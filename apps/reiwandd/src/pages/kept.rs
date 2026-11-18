@@ -1,8 +1,15 @@
 use std::path::Path;
 
 const MAX_ENTRIES: usize = 100_000;
-const KEPT: [&str; 7] =
-    ["Local Storage", "Session Storage", "IndexedDB", "Service Worker", "File System", "databases", "Cookies"];
+const KEPT: [&str; 7] = [
+    "Local Storage",
+    "Session Storage",
+    "IndexedDB",
+    "Service Worker",
+    "File System",
+    "databases",
+    "Cookies",
+];
 
 fn kept(name: &std::ffi::OsStr) -> bool {
     KEPT.iter().any(|kept| name.to_str().is_some_and(|name| name.starts_with(kept)))
