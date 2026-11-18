@@ -17,7 +17,7 @@ pub fn handle(message: ToWeb) {
         ToWeb::Close(id) => close(id),
         ToWeb::Resize { view: id, size, scale } => qt::resize(id, size, scale),
         ToWeb::Visible { view: id, visible } => view(id).into_iter().for_each(|v| show(&v, visible)),
-        ToWeb::Fps { view: id, fps } => qt::fps(id, fps.max(1)),
+        ToWeb::Fps { view: id, fps } => rate(id, fps.max(1)),
         ToWeb::Settings(settings) => {
             qt::muted(settings.volume <= 0.0);
             tell(&json!({"settings": settings}));
@@ -71,6 +71,13 @@ fn open(id: u32, size: (u32, u32), scale: f64, properties: serde_json::Map<Strin
     qt::fps(id, live(|l| l.settings.fps).max(1));
     load(id);
     crate::watch::beat(view);
+}
+
+fn rate(id: u32, fps: u32) {
+    qt::fps(id, fps);
+    if view(id).is_some_and(|v| v.loaded.get()) {
+        qt::eval(id, &format!("window.__rafCap && window.__rafCap({fps})"));
+    }
 }
 
 pub fn load(id: u32) {

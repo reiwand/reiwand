@@ -34,7 +34,6 @@ fn page_gets_its_api_and_nothing_else() {
     server.set_nonblocking(true).unwrap();
     let port = server.local_addr().unwrap().port();
     let granted = Start { network: vec!["https://api.example.org".into()], ..start(dir.path(), port) };
-    let hardware = granted.device.is_some();
     let mut page = Page::open(granted, Isolation { network: true, devices: false, limits: false });
     assert_eq!(page.wait("early", 20), "preloaded");
     assert_eq!(page.wait("language", 5), "es-AR");
@@ -68,7 +67,7 @@ fn page_gets_its_api_and_nothing_else() {
     page.said.remove("frames");
     page.wait("frames", 5);
     let rate = page.wait("frames", 5).as_u64().unwrap();
-    assert!(!hardware || (10..=26).contains(&rate), "{rate} frames a second at a cap of 20");
+    assert!((10..=26).contains(&rate), "{rate} frames a second at a cap of 20");
     page.link.send(&ToWeb::Visible { view: 1, visible: false }, &[]).unwrap();
     assert_eq!(page.wait("paused", 5), true);
     page.frames = 0;
@@ -92,6 +91,10 @@ fn page_without_a_render_node_draws_in_memory() {
     page.frames = 0;
     page.pump(Instant::now() + Duration::from_secs(1));
     assert!(page.frames >= 5, "{} frames in memory", page.frames);
+    page.said.remove("frames");
+    page.wait("frames", 5);
+    let rate = page.wait("frames", 5).as_u64().unwrap();
+    assert!((10..=26).contains(&rate), "{rate} animation frames a second at a cap of 20");
 }
 
 #[test]

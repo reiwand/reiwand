@@ -219,6 +219,11 @@ void Page::install(const QJsonArray &list) {
         script.setRunsOnSubFrames(entry["frames"].toBool());
         items.append(script);
     }
+    QWebEngineScript cap;
+    cap.setSourceCode(capScript(fps));
+    cap.setInjectionPoint(QWebEngineScript::DocumentCreation);
+    cap.setWorldId(QWebEngineScript::MainWorld);
+    items.append(cap);
     QMetaObject::invokeMethod(scripts, "clear");
     QMetaObject::invokeMethod(scripts, "insert", Q_ARG(QList<QWebEngineScript>, items));
 }

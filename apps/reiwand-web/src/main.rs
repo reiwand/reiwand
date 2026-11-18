@@ -35,13 +35,18 @@ fn sandbox_usable() -> bool {
     }
 }
 
+fn proxy(network: &[String]) -> String {
+    let bypass: Vec<&str> = std::iter::once("<-loopback>").chain(network.iter().map(String::as_str)).collect();
+    format!("--proxy-server=http://127.0.0.1:1 --proxy-bypass-list={}", bypass.join(";"))
+}
+
 fn environment(start: &Start) {
     let off = std::env::var_os("QTWEBENGINE_DISABLE_SANDBOX").is_some() || !sandbox_usable();
     unsafe {
         if off {
             std::env::set_var("QTWEBENGINE_DISABLE_SANDBOX", "1");
         }
-        std::env::set_var("QTWEBENGINE_CHROMIUM_FLAGS", FLAGS);
+        std::env::set_var("QTWEBENGINE_CHROMIUM_FLAGS", format!("{FLAGS} {}", proxy(&start.network)));
         if start.device.is_none() {
             std::env::set_var("LIBGL_ALWAYS_SOFTWARE", "1");
         }
