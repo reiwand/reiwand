@@ -30,16 +30,27 @@ never inferred from the folder).
 
 Every kind may also carry `locale/<language>.json` (see "Languages"). No kind admits programs or
 libraries (exe, dll, so, sh, bat, AppImage and the like are refused by their extension), and a
-`.wasm` file must start with the WebAssembly signature. `image`, `video` and `scene` exist since the
-first version; `web`, `preset` and `assets` need the second.
+`.wasm` file must start with the WebAssembly signature.
 
 ## Versions
 
-`schema` is `reiwand.wpak/2`. Every reader (daemon, library, repositories, server and
-the Android app) refuses a `reiwand.wpak/1` package with `invalid schema: reiwand.wpak/1
-is no longer read; the package needs reiwand.wpak/2`. Within `/2` only optional fields, enum
-values and feature names are added; the meaning of what exists never changes, and a new major
-version is made only to remove or change something.
+`schema` is `reiwand.wpak/3`. Every reader (daemon, library, repositories, server and the Android app)
+refuses an older manifest with `<schema> is no longer read; run `reiwand-upgrade file FOLDER` on the
+package folder and sign it again`. Within `/3` only new feature names and new enum values are added, and
+a field that is added to something that exists comes with a new major version of the format, together with
+the conversion that writes it (`reiwand-upgrade`, outside every application): the meaning of what exists
+never changes.
+
+Every value is written. A manifest that lacks a field is refused naming it (`manifest.json: "requires.engine"
+is missing. Reiwand does not fill in values: write it, or run `reiwand-upgrade file PATH` on it`); nothing is
+completed silently. The only fields that may be absent are the unused optional blocks (`content`, `display`,
+`links`, `origin`, `permissions`, `playback`, `previews`, `requires`, `web`, and inside a property `group`,
+`help`, `icon`, `label`, `unit`, `default_asset`): an absent block and `null` mean the same, but a block that
+is present carries all its fields. A value whose `null` has its own meaning (`playback.end`, `playback.max_fps`,
+`display.accent`) is always written. The editor writes whole documents with the prefilled values it shows;
+the table of every field, its class and its prefilled value is `crates/reiwand-format/src/prefill.tsv`.
+`reiwand-ctl pack build` and the server refuse an incomplete manifest naming the field, and a package
+without `content` and `origin`, which they require although the format lets them be absent.
 
 Readers work in two steps. They first read a tolerant header (`schema` and `requires`): a newer
 major version, a `requires.engine` that this version of Reiwand does not meet, or a name in
@@ -48,53 +59,87 @@ Reiwand: it uses …`) instead of an error about an unknown field. Only then is 
 read strictly, refusing unknown fields.
 
 In the desktop library a package that needs a newer version still shows its thumbnail
-(`previews.thumbnail` or `preview`, read without the strict manifest) next to the reason. The
+(`previews.thumbnail`, read without the strict manifest) next to the reason. The
 library remembers which version of Reiwand read each package and reads every package again once
 after an upgrade, so packages that needed a newer version start working and older ones get the
-facets of the newer rules. Versions of Reiwand released before the second version cannot open
-its packages; repositories keep them readable for those versions by listing only first-version
-releases where they look (`repo.md`).
+facets of the newer rules.
 
 ## Manifest
 
-| Field | Version | Rules |
-|-------|---------|-------|
-| `schema`, `id`, `version`, `kind`, `entry` | 1, 2 | `id` is a lowercase reverse-DNS name (`org.example.dusk`), `version` SemVer |
-| `title` | 1, 2 | 1 to 128 characters on one line; in *2* also `{language: text}` or `"@key"` |
-| `description` | 1, 2 | plain text in *1*; in *2* text, map or `"@key"` of at most 8000 characters, with the markup below |
-| `changes` | 2 | notes of this version, at most 2000 characters, with the markup below |
-| `default_locale`, `strings` | 2 | see "Languages" |
-| `authors`, `license`, `tags` | 1, 2 | at most 64 authors of 1 to 128 characters, an SPDX expression of at most 256 characters, at most 32 tags of 1 to 32 characters; in *2* authors and tags have no `<` or `>` |
-| `platforms` | 2 | `[desktop, android]`, each once: the devices the package is made for, see "Platforms" |
-| `content` | 2, required | `{rating: general \| mature, descriptors: [sexual, violence, gore, language]}`; `mature` names at least one reason, each once |
-| `photosensitive` | 2, required | `true` when the package flashes or shows fast patterns that can trigger seizures |
-| `origin` | 2, required | `{kind: original}` for a work made for Reiwand, `{kind: derived, derived_from: [{author, title?, url?, license?}]}` for one remade by hand from 1 to 64 other works, crediting their authors (authors and titles without `<` or `>`), `{kind: imported}` for a conversion kept for personal use, or `{kind: provider, provider: {name, item_url, credit, terms_url?}}` for a picture or video downloaded from an online source; any kind may add `source_url`, see "Origin" |
-| `credits` | 2 | at most 64 `{paths, license, attribution, url?, source?}`: who made which files (a path ending in `/` names a folder) under which SPDX license, and `source: {id, version}` when they were copied from an `assets` package; paths and attribution have no `<` or `>` |
-| `links` | 2 | `{homepage, source, support, donate}`, each optional, `https://` and at most 512 characters |
-| `preview` | 1 | an image of the package |
-| `previews` | 2 | `{thumbnail, animated}`: png, jpg or webp of at most 1024 px a side and 1 MiB; gif or webp of at most 640 px, 15 s and 8 MiB; the file must be what its extension says |
-| `requires` | 2 | `{engine: "<SemVer requirement>", features: [..], packages: [{id, version}], gpu: any \| compute}`, see "Features" and "Dependencies" |
-| `inputs` | 2 | `[audio, pointer, clicks, media, network]`, see "Inputs" |
-| `permissions` | 2, `web` and `scene` | `{network: {allow: [..]}, rgb}`: `network` for web pages only, see "Web pages"; `rgb` see "RGB lighting" |
-| `web` | 2, `web` only | `{preload, background, storage_kib}`, see "Web pages" |
-| `playback` | 2, `video`, `web` and `scene` | how the content plays by default, see "Display and playback" |
-| `display` | 2 | how a picture or video is placed and the accent it suggests, see "Display and playback" |
-| `properties`, `presets` | 1, 2 | user properties (`scene.md`): in *1* at most 64 with ids `[a-z][a-z0-9_-]{0,62}` of the types `color`, `slider` with `step`, `bool`, `combo` of texts, `text`, `file`, `group` and `label`; in *2* at most 256 with ids `[A-Za-z][A-Za-z0-9_]{0,63}` that differ in more than case, combos of at most 64 options, files and folders that accept `image`, `video` or both, and every newer type and field; at most 32 presets in *1*, 64 in *2*, for scenes and videos |
+| Field | Rules |
+|-------|-------|
+| `schema`, `id`, `version`, `kind`, `entry` | `id` is a lowercase reverse-DNS name (`org.example.dusk`), `version` SemVer |
+| `title` | 1 to 128 characters on one line; also `{language: text}` or `"@key"` |
+| `description` | text, map or `"@key"` of at most 8000 characters, with the markup below; `""` when there is none |
+| `changes` | notes of this version, at most 2000 characters, with the markup below; `null` when there are none |
+| `default_locale`, `strings` | see "Languages"; `strings` is `{}` when there are none |
+| `authors`, `license`, `tags` | at most 64 authors of 1 to 128 characters, an SPDX expression of at most 256 characters, at most 32 tags of 1 to 32 characters; authors and tags have no `<` or `>`; `[]` when there are none |
+| `platforms` | `[desktop, android]`, each once: the devices the package is made for, see "Platforms"; `[]` when it is made for all |
+| `content` | `{rating: general \| mature, descriptors: [sexual, violence, gore, language]}`; `mature` names at least one reason, each once; required by `pack build` |
+| `photosensitive` | `true` when the package flashes or shows fast patterns that can trigger seizures |
+| `origin` | `{kind: original}` for a work made for Reiwand, `{kind: derived, derived_from: [{author, title, url, license}]}` for one remade by hand from 1 to 64 other works, crediting their authors (authors and titles without `<` or `>`), `{kind: imported}` for a conversion kept for personal use, or `{kind: provider, provider: {name, item_url, credit, terms_url}}` for a picture or video downloaded from an online source; every `origin` also writes `source_url` (`null` when there is none) and `derived_from` and `provider` as `[]` and `null` when the kind does not use them, see "Origin"; required by `pack build` |
+| `credits` | at most 64 `{paths, license, attribution, url, source}`: who made which files (a path ending in `/` names a folder) under which SPDX license, and `source: {id, version}` when they were copied from an `assets` package (`null` otherwise); paths and attribution have no `<` or `>` |
+| `links` | `{homepage, source, support, donate}`, each `https://` and at most 512 characters, or `null` |
+| `previews` | `{thumbnail, animated}`: png, jpg or webp of at most 1024 px a side and 1 MiB; gif or webp of at most 640 px, 15 s and 8 MiB; the file must be what its extension says; each `null` when there is none |
+| `requires` | `{engine: "<SemVer requirement>", features: [..], packages: [{id, version}], gpu: any \| compute \| null}`, see "Features" and "Dependencies" |
+| `inputs` | `[audio, pointer, clicks, media, network]`, see "Inputs"; `[]` when there are none |
+| `permissions` | `{network: {allow: [..]}, rgb}`, `web` and `scene`: `network` for web pages only, see "Web pages"; `rgb` see "RGB lighting" |
+| `web` | `{preload, background, storage_kib}`, `web` only, see "Web pages" |
+| `playback` | `video`, `web` and `scene`: how the content plays when the user has not chosen, see "Display and playback" |
+| `display` | how a picture or video is placed and the accent it suggests, see "Display and playback" |
+| `properties`, `presets` | user properties (`scene.md`): at most 256 with ids `[A-Za-z][A-Za-z0-9_]{0,63}` that differ in more than case, combos of at most 64 options, files and folders that accept `image`, `video` or both; at most 64 presets for scenes and videos; `{}` and `[]` when there are none |
+
+The whole manifest of a small scene (`docs/crear/ejemplos/primera-escena`, written by `reiwand-ctl scene new` and the editor; every unused block is `null` here and may also be left out):
 
 ```json
 {
-  "schema": "reiwand.wpak/2", "id": "org.example.dusk", "version": "1.3.0", "kind": "scene",
-  "entry": "scene.json", "default_locale": "en", "title": { "en": "Dusk", "es": "Atardecer" },
-  "description": "@description", "changes": "@changes",
-  "strings": { "en": { "description": "Hills at **dusk**.", "changes": "- Warmer light", "speed": "Speed" },
-               "es": { "description": "Colinas al **atardecer**.", "changes": "- Luz más cálida", "speed": "Velocidad" } },
-  "authors": ["Example"], "license": "CC-BY-4.0",
-  "credits": [{ "paths": ["assets/hills.webp"], "license": "CC0-1.0", "attribution": "Example" }],
-  "origin": { "kind": "original" }, "content": { "rating": "general" }, "photosensitive": false,
-  "previews": { "thumbnail": "preview.webp", "animated": "preview.gif" },
-  "links": { "source": "https://example.org/dusk" },
-  "requires": { "features": ["inputs.pointer"] }, "inputs": ["pointer"],
-  "properties": { "speed": { "type": "slider", "label": "@speed", "min": 0, "max": 2, "step": 0.1, "default": 1 } }
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": "es",
+  "description": "",
+  "display": null,
+  "entry": "scene.json",
+  "id": "org.example.primera-escena",
+  "inputs": [],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
+  "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "previews": null,
+  "properties": {
+    "color_sol": {
+      "alpha": false,
+      "default": "#ffd23f",
+      "enabled_if": {},
+      "label": "Color del sol",
+      "order": 1,
+      "quality": {},
+      "type": "color",
+      "visible_if": {}
+    }
+  },
+  "requires": null,
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "Mi primera escena",
+  "version": "0.1.0",
+  "web": null
 }
 ```
 
@@ -151,14 +196,15 @@ screen like the properties of a scene (`GetSceneProperties`, `reiwand-ctl prop`)
 times, without changing the pitch of the sound), `start` and `end` (the part of the video that
 loops, in seconds; an `end` of 0 plays to the end), `volume` (0 to 100 % of the general volume),
 `zoom` (1 to 8) and `x` and `y` (-1 to 1, which part of the zoomed or cropped video shows). The
-author gives their defaults in the second version:
+author writes all of them (`speed`, `start`, `end`, `loop`, `max_fps`, `volume`, `muted`; `null` where the value means «none», as in `end` and `max_fps`) when the block is present (fragment: the other fields of the manifest are written as shown above):
 
 ```json
 { "kind": "video", "entry": "rain.webm",
-  "playback": { "speed": 0.75, "start": 2.5, "end": 18, "volume": 0.4 },
-  "display": { "fit": "fill", "zoom": 1.5, "position": [0, -0.5] },
+  "playback": { "speed": 0.75, "start": 2.5, "end": 18, "loop": true, "max_fps": null, "volume": 0.4, "muted": false },
+  "display": { "fit": "fill", "background": null, "span": "per-output", "flip": "none", "zoom": 1.5,
+               "position": [0, -0.5], "accent": null },
   "presets": [{ "id": "calm", "label": "Calm", "values": { "speed": 0.5, "volume": 20 } }],
-  "requires": { "features": ["video_properties"] } }
+  "requires": { "engine": null, "features": ["video_properties"], "packages": [], "gpu": null } }
 ```
 
 Presets of a video package set these ids. The phone shows the same settings and presets on the page
@@ -409,7 +455,7 @@ release.
 
 `requires.packages` lists at most 16 other packages, each `{id, version}` with a SemVer requirement
 such as `^1.2`, that a package needs installed; it cannot name the package itself or one id twice.
-`requires.gpu` is `any` (the default) or `compute` for packages that cannot draw without compute
+`requires.gpu` is `any` or `compute` (`null` and `any` mean the same: no compute shaders needed) for packages that cannot draw without compute
 shaders; they get the `compute` facet, and where the graphics card lacks compute shaders or draws in
 software (`compute` of `GetState`) the app, `reiwand-ctl lib apply` and the page of the package on the
 phone warn before it is applied, which it still is. Installing a package from a repository also
@@ -436,12 +482,11 @@ A `web` package shows its entry page in an isolated web view, without network un
   "web": { "preload": "compat.js", "background": "#000000", "storage_kib": 512 },
   "permissions": { "network": { "allow": ["https://api.example.org"] } },
   "playback": { "max_fps": "display", "volume": 0.5 },
-  "requires": { "features": ["inputs.audio", "inputs.network", "inputs.pointer", "playback2", "web"] } }
+  "requires": { "engine": null, "features": ["inputs.audio", "inputs.network", "inputs.pointer", "playback2", "web"], "packages": [], "gpu": null } }
 ```
 
 `web.preload` is a `.js` or `.mjs` file of the package run at the start of the page, before its own
-scripts; `web.background` (`#rrggbb`) shows while the page loads; `web.storage_kib` (0 to 5120,
-default 0) is the local storage the page may keep: none without it, and what it keeps stays on
+scripts; `web.background` (`#rrggbb`) shows while the page loads; `web.storage_kib` (0 to 5120; 0 prefilled) is the local storage the page may keep: none without it, and what it keeps stays on
 the device, is never synced and goes away with the package or a *Clear data*. `permissions.network.allow`
 lists at most 8 `https://` origins (`https://host` or `https://host:port`, lowercase, without a
 path), the only places the page may reach once the user allows the network; a page that lists any
@@ -477,7 +522,7 @@ values name; it is published, versioned and credited on its own:
 
 ```json
 { "kind": "preset", "entry": "preset.json",
-  "requires": { "features": ["packages", "preset"], "packages": [{ "id": "org.example.dusk", "version": "^1.2" }] } }
+  "requires": { "engine": null, "features": ["packages", "preset"], "packages": [{ "id": "org.example.dusk", "version": "^1.2" }], "gpu": null } }
 ```
 
 ```json
@@ -520,10 +565,10 @@ the package works without the shared one and the license of every file stays wri
 `path` of a script) or `effect` (a package effect), each once and present in the document; `title` has
 1 to 128 characters on one line without `<` or `>`; `thumbnail` is a png, jpg or webp of the package of
 at most 1024 pixels a side and 1 MiB. Without `ext.parts`, every top-level layer, particle system,
-script and effect is a part.
+script and effect is a part. Fragment of a scene (the other fields are written as in `scene.md`):
 
 ```json
-{ "schema": "reiwand.scene/1", "canvas": { "size": [1920, 1080] },
+{ "schema": "reiwand.scene/2", "canvas": { "size": [1920, 1080] },
   "assets": { "flake": { "path": "assets/flake.png" } },
   "layers": [{ "blend_space": "canvas", "id": "snow", "type": "particles", "system": "snow" }],
   "particles": { "snow": { "capacity": 2000, "emitters": [{ "shape": "edge", "rate": 120 }] } },
@@ -553,8 +598,7 @@ most 512 KiB, which the package lists with the feature `locale_files`; a languag
 `strings` or in its file, never both, and the limits above count both. Readers merge the files with
 `strings` and keep them apart when they write the manifest back. Packages and source folders read these files
 as texts only when they list `locale_files`; without it a `locale/*.json` file is an ordinary file
-of the package, as it was before, so released packages and their folders that keep data of their
-own there keep working and build as they did. The author chooses the feature: `pack build` never
+of the package, so folders that keep data of their own there are not read as texts. The author chooses the feature: `pack build` never
 adds it, and `pack build`, `pack check` and the editor note each `locale/<language>.json` that stays
 an ordinary file.
 
@@ -572,7 +616,7 @@ refused, and `\*` writes an asterisk. HTML, images and links other than `https:/
 Clients render it without loading anything remote and open a link only after a click and a
 confirmation (through the OpenURI portal in the Flatpak); `reiwand-ctl` prints it as plain text. Every
 other text is plain: clients show it as written,
-and in the second version plain texts (titles, labels, help, options, preset labels) have no `<`
+and plain texts (titles, labels, help, options, preset labels) have no `<`
 or `>`.
 
 ## Facets and tags

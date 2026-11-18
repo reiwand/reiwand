@@ -681,7 +681,7 @@ rate only lowers the ceiling of the scene: what the user or the battery sets sti
 | Annotation | Meaning |
 |------------|---------|
 | `x-markup` | a text with the markup of `package.md`, edited on several lines with a view under each one that renders what is typed as the app does everywhere else (paragraphs, lists, bold, italic and links; HTML, images and remote content are not part of the markup, and the links of the view are shown but never followed) |
-| `x-required` | required in `reiwand.wpak/2` (`content`, `photosensitive`, `origin`), so it has no way back to a default; a switch that is not set yet shows *No* and *Yes* |
+| `x-required` | required in `reiwand.wpak/3` (`content`, `photosensitive`, `origin`), so it has no way back to a default; a switch that is not set yet shows *No* and *Yes* |
 | `x-computed` | filled by the tools (`requires.features`), shown read-only with translated names but for the features the author chooses |
 | `x-ref` | `thumbnail` or `animated`: a file chooser that runs `thumbnail`; `language`: the languages of the texts and of the desktop, offered in a list by their names in the language of the desktop |
 
@@ -1710,7 +1710,7 @@ LANGUAGE]` and the *Scenes* page of the app create a folder from a starting poin
 `org.example.<folder name>` (accents dropped, so `Canción` becomes `cancion`) and the folder name as
 title unless given: an empty canvas, falling particles with a density property, layered hills that
 follow the pointer, or a clock with a color property. The manifest is a valid
-`reiwand.wpak/2` one: `default_locale` is the language of the title, the first language of the
+`reiwand.wpak/3` one: `default_locale` is the language of the title, the first language of the
 desktop unless given (`es` for `es_ES.UTF-8`), or `en` when the labels of the properties, in English
 and Spanish, lack it; `content` `general`, `photosensitive` `false`, `origin` `original`, license
 `CC0-1.0`, and the inputs and features the scene uses. The starting point `assets` makes an empty

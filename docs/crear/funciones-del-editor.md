@@ -38,7 +38,7 @@ otra página no cierra un editor con cambios sin guardar.
 - **Inspector**: se genera a partir del esquema JSON de las escenas (`reiwand-ctl scene schema`), así
   que los campos nuevos del formato aparecen solos: números con deslizador y unidad, colores,
   opciones, vectores, curvas (un clic añade un punto, se arrastra y un doble clic lo quita),
-  recursos, efectos con sus parámetros y la vuelta al valor por defecto de cada campo opcional. Los nombres de los campos y de sus valores (modos de fusión,
+  recursos, efectos con sus parámetros y la vuelta al valor prellenado de cada campo opcional. Los nombres de los campos y de sus valores (modos de fusión,
   formas, curvas de interpolación, efectos, tipos de capa y de recurso, idiomas, *Igual que la
   pantalla* de los fotogramas por segundo) salen en el idioma del escritorio, y una prueba recorre
   el inspector de cada punto de partida con todas sus variantes y falla si algo de lo que muestra
@@ -50,7 +50,7 @@ otra página no cierra un editor con cambios sin guardar.
   paralaje (cambian la escena en vivo al arrastrarlos y cada arrastre es un solo paso de
   deshacer, aunque se detenga a mitad; así con todos los deslizadores del editor, también los de
   rango, y con las asas del lienzo; deshacer a mitad de un arrastre deja el resto como un paso
-  propio), y una propiedad deslizante su mínimo, máximo, paso y valor por defecto; *Importar una
+  propio), y una propiedad deslizante su mínimo, máximo, paso y valor prellenado; *Importar una
   hoja de sprites o un mapa de datos…* del panel de recursos corta una imagen en filas y columnas
   o la lee como datos. En la terminal hacen lo mismo `reiwand-ctl scene act CARPETA
   effects`, `scene act CARPETA layer`, `scene act CARPETA manifest`, `scene act CARPETA property`,
@@ -71,18 +71,18 @@ otra página no cierra un editor con cambios sin guardar.
   con `add_events`, `drop_events` y `clear_events`).
 - **Paquete**: *Detalles del paquete* lleva el manifiesto al inspector, que también se genera a
   partir de su esquema (`reiwand-ctl scene schema --manifest`): título, descripción y notas de esta
-  versión en cada idioma (*Traducir* añade uno a partir del texto del idioma por defecto sin tocar
+  versión en cada idioma (*Traducir* añade uno a partir del texto del idioma principal sin tocar
   los que ya hay, y los textos `@clave` se escriben en `strings`), versión, id, autores (hasta
   64), licencia (una expresión SPDX de hasta 256 caracteres), clasificación (para todos o para
   adultos, con sus motivos), si destella, origen y obras de las que
   procede, créditos por archivo, miniatura y vista previa animada (*Elegir…* copia la imagen a
   `assets/` y reduce la miniatura si pasa de 1024 píxeles o de 1 MiB), enlaces, etiquetas, idioma
-  por defecto y las entradas que puede pedir. Las entradas que usa la escena se marcan solas y no se
+  prellenado y las entradas que puede pedir. Las entradas que usa la escena se marcan solas y no se
   pueden quitar, y `requires.features` se calcula en cada cambio como en `reiwand-ctl pack build`:
   nunca se escribe a mano; las entradas que añadió el editor se van cuando nada las usa. Como
   `reiwand-ctl pack check`, *Problemas* dice si el escritorio y el teléfono la rechazan o la reproducen
   sin alguna función. Una escena
-  nueva toma como idioma por defecto el del escritorio.
+  nueva toma como idioma principal el del escritorio.
 - **Propiedades y preajustes**: *Propiedades de usuario* las lista en el orden del formulario, cada
   grupo con sus miembros debajo, y sigue con los preajustes en la misma lista. Se añaden de
   cualquier tipo (deslizador, interruptor, color, selección, texto, archivo, carpeta, botón, grupo,
@@ -94,7 +94,7 @@ otra página no cierra un editor con cambios sin guardar.
   las nombra: entonces se dice dónde. El inspector edita cada campo de su tipo: paso, unidad,
   decimales, casilla para el número y escala logarítmica de un deslizador, valores, etiquetas e
   iconos de las opciones, color con transparencia, textos secretos, grupos plegados, archivos que
-  acepta y recurso por defecto, carpetas con su orden y su intervalo, icono y orden, y muestra los
+  acepta y recurso prellenado, carpetas con su orden y su intervalo, icono y orden, y muestra los
   textos `"@clave"` con los de `strings`. `visible_if` y `enabled_if` se escriben como una expresión
   del lenguaje de las condiciones o como un mapa JSON y se comprueban mientras escribes; solo se
   guarda una condición válida, y un problema de una condición o de un preajuste lleva a su campo.

@@ -24,7 +24,7 @@ Una malla es una capa que se puede deformar con huesos. Todas las herramientas d
 2. Elige **Malla desde una imagen…**. Se abre la ventana del mismo nombre.
 3. Escoge la imagen en la lista.
 4. Marca **Seguir el contorno de la imagen** si quieres que la malla siga el borde de lo dibujado y deje fuera lo transparente. Sin marcar, se corta en una cuadrícula.
-5. Fija **Celdas a lo largo del lado mayor** (de 2 a 64; por defecto 16) y acepta el diálogo.
+5. Fija **Celdas a lo largo del lado mayor** (de 2 a 64; prellenado 16) y acepta el diálogo.
 6. La capa aparece con la imagen como textura. Ahora coloca los huesos, como dice la ventana: **Luego coloca sus huesos en el inspector y arrástralos sobre la vista previa.**
 
 Si ya tienes un archivo de modelo (`.glb`) en los recursos, **Añadir una capa** > **Malla** crea una capa de malla con él y se edita igual. Una capa de **Modelo 3D** no tiene la colocación de huesos: sus huesos vienen de su archivo, se ven en el inspector y los posan sus clips (ver [editor-3d](editor-3d.md)).

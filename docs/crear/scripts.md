@@ -155,7 +155,7 @@ Un módulo exporta las funciones que quiera. La escena llama a cada una dentro d
 
 | Función | Cuándo se llama |
 |---------|-----------------|
-| `init(ctx)` | Una vez, en el primer cuadro. `ctx.params` son los valores por defecto de `params` y `ctx.engine` es `engine`. |
+| `init(ctx)` | Una vez, en el primer cuadro. `ctx.params` son los valores prellenados de `params` y `ctx.engine` es `engine`. |
 | `update(frame)` | En cada cuadro mientras se ve la pantalla. Lo que devuelve es el valor de las fuentes `{ "script": "<su ruta>" }` de `scene.json`. |
 | `destroy()` | Cuando la escena se detiene. |
 | `resize({ screen, canvas })` | Cuando cambia el tamaño o el giro de la pantalla. |

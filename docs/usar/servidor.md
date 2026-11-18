@@ -148,6 +148,27 @@ lista todas con su valor por defecto); `VARIABLE_FILE` lee el valor de un archiv
 La lista completa de variables y la API HTTP están en
 [`docs/specs/server.md`](../specs/server.md).
 
+## Actualizar desde 6.x a 7.0
+
+La 7.0.0 cambia los formatos de paquetes, repositorios, ajustes y base: el servidor ya no lee los de la
+6.x. Actualiza primero los equipos de escritorio y los teléfonos (`instalacion.md`, «Actualizar desde 6.x
+a 7.0») y después el servidor.
+
+- La imagen ejecuta `reiwand-upgrade server --data /data` antes de arrancar. Sin la imagen, córrela a mano con
+  el servidor parado; `--check` dice qué cambiaría sin escribir nada.
+- Convierte la base (esquema 16) y los ajustes guardados: la 7.0 escribe todas las claves de ajustes
+  (registro, publicación automática, TLS…) con los valores de tu entorno de hoy, y se niega a arrancar si falta
+  alguna: «the saved settings lack "CLAVE"; run `reiwand-upgrade server --data <data folder>` once». Si la
+  base es de otro esquema dice «the database has schema N but this program reads M; … run
+  `reiwand-upgrade server --data <data folder>` once».
+- Guarda una copia de cada archivo que cambia en `upgrade-copias/<tiempo>/` de la carpeta de datos, con su
+  `index.txt`, y repetirla no cambia nada.
+- Los paquetes ya publicados se guardan tal como los subieron sus autores y la conversión no los reescribe
+  (sus firmas son de cada autor). Un cliente 7.0 que descarga uno con manifiesto de la 6.x
+  (`reiwand.wpak/2`) lo rechaza diciendo que se convierta con `reiwand-upgrade file`: cada autor convierte su
+  carpeta, firma y sube una versión nueva. Quien ya lo tenía instalado lo conserva convertido en su equipo,
+  como «Local · Sin firma verificada».
+
 ## Actualizar desde 1.x
 
 El servidor 2.0.0 solo atiende `/api/v1/r/<nombre>/…`: ya no existen `/repo/`, las rutas sin nombre de

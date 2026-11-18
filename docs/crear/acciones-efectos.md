@@ -40,7 +40,7 @@ Cambia un efecto que ya está en la capa: sus parámetros, si está activo, su n
 |---|---|---|
 | `layer` | texto | (obligatorio) Id de la capa. |
 | `index` | entero | (obligatorio) Posición del efecto en la lista. |
-| `params` | objeto | Parámetros que cambian. Un valor `null` quita el parámetro y deja el valor por defecto del efecto. |
+| `params` | objeto | Parámetros que cambian. Un valor `null` quita el parámetro y deja el valor prellenado del efecto. |
 | `enabled` | sí/no | `false` apaga el efecto sin quitarlo. |
 | `name` | texto | Nombre nuevo; un texto vacío lo quita. |
 | `optional` | sí/no | Marca o desmarca el efecto como opcional. |
@@ -213,7 +213,7 @@ Hace un degradado a partir de paradas de color y lo pone en un parámetro del ef
 | `stops` | lista de objetos | (obligatorio) De 1 a 16 paradas `{"at": 0 a 1, "color": "#rrggbb"}`, en cualquier orden. |
 | `pointer` | texto | Ruta del parámetro que recibe el resultado, `/scene/layers/N/effects/M/params/NOMBRE`. Sin valor, solo se crea la imagen. |
 | `asset` | texto | Id de un degradado hecho antes con esta acción, para rehacerlo con otras paradas. Cualquier otro id se rechaza. |
-| `format` | texto | `png` (por defecto) o `cube`. |
+| `format` | texto | `png` (prellenado) o `cube`. |
 | `width` | entero | Ancho en píxeles, de 16 a 1024. Por defecto 256. |
 
 ```sh
@@ -250,7 +250,7 @@ Crea, cambia o quita la transición propia del fondo para cuando entra (`"way": 
 
 | Argumento | Tipo | Qué significa |
 |---|---|---|
-| `way` | texto | `in` (al entrar, por defecto) o `out` (al salir). |
+| `way` | texto | `in` (al entrar, prellenado) o `out` (al salir). |
 | `make` | sí/no | `true` la crea si falta: copia el efecto de la otra dirección o escribe el de partida `transitions/opening.json`. |
 | `effect` | texto | Descriptor del paquete con `"stage": "transition"`; su `.wgsl` va al lado. Borra los valores. |
 | `duration_ms` | entero | Duración, de 100 a 10000 ms. |
@@ -344,7 +344,7 @@ Muestra el mapa de rugosidad o el de luz propia de una capa como un mapa de calo
 | Argumento | Tipo | Qué significa |
 |---|---|---|
 | `layer` | texto | Id de la capa. También se puede dar con `--layer ID`. |
-| `map` | texto | `emissive` (luz propia) o `roughness` (rugosidad, por defecto). |
+| `map` | texto | `emissive` (luz propia) o `roughness` (rugosidad, prellenado). |
 
 La respuesta tiene `map` (el id de la imagen del mapa), `size` y `heat`, una imagen incrustada como texto `data:image/png;base64,...`. Si la capa no tiene ese mapa, la respuesta es `{"map": null}`.
 

@@ -20,7 +20,7 @@ mi-fondo/
 
 ```json
 {
-  "schema": "reiwand.wpak/2",
+  "schema": "reiwand.wpak/3",
   "id": "org.example.reloj",
   "version": "1.0.0",
   "title": { "en": "Clock", "es": "Reloj" },

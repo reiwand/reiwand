@@ -2421,8 +2421,8 @@ that cannot be used is ignored with a warning.
   `rotate` clockwise `0`, `90`, `180` or `270`, `straighten` from `-45` to `45` degrees
   counterclockwise keeping the largest centred rectangle, `flip` `[horizontal, vertical]`.
 - `ops` run in order, at most 24. Each has a unique `id` (1 to 64 letters, digits, `-` or `_`), a
-  `type`, `enabled` (`true` when absent), an optional `mask` naming one of `masks` and an
-  optional `opacity` from `0` to `1`. `reiwand-ctl edit curve`, `blur`, `vignette` and `overlay`
+  `type`, `enabled`, `mask` (one of `masks`, `""` for none) and `opacity` from `0` to `1`
+  (a block: `null` or absent for a full-strength operation). `reiwand-ctl edit curve`, `blur`, `vignette` and `overlay`
   refuse an `--id` that names an operation of another type instead of changing its type.
 
 | `type` | Fields |
@@ -2486,8 +2486,8 @@ that cannot be used is ignored with a warning.
   `fill` (`lama` or `simple`) how the layers are filled behind near objects (`lama` is the LaMa model
   when it and ONNX Runtime are installed, else `simple`, the push-pull extension of the nearest
   background) and `layers` (`4` to `6`) the number of depth layers. Both belong to the picture, are
-  optional and synced and undone with the rest of its edit; when absent the standard value applies
-  when it is read: `lama` on the computer, `simple` on the phone, and 5 layers. A picture that must
+  always written (`"auto"` for the standard value) and synced and undone with the rest of its edit; `"auto"` means,
+  when it is read, `lama` on the computer, `simple` on the phone, and 5 layers. A picture that must
   not move turns `enabled` off; there is no machine-wide setting for either. Each choice has its own
   layer set (the key of the set includes both), so two pictures never share or delete each other's.
 - `fit` (`fill`, `fit`, `stretch`, `center` or `tile`) shows this picture with its own fit instead
@@ -2830,8 +2830,8 @@ they do not know, and read enum values they do not know as unknown.
 The Rust types are in `crates/reiwand-core/src/model`: none has `serde(default)` or
 `skip_serializing_if`, and every `Option` is read through `explicit::null` (a key that is present
 holds a value or `null`; absent is an error). `crates/reiwand-core/prefill/model.tsv` lists each
-optional field (`Type.field`) with its class: `bloque` (an optional block, a nested object or `null`;
-the reading that lets an unused block be missing will start with this class) or `valor` (a single
+optional field (`Type.field`) with its class: `bloque` (an optional block, a nested object or `null`: in a stored file it may be absent, in a reply
+the daemon writes it) or `valor` (a single
 value that is always written, `null` for none). The test `tests/model_explicit.rs` fails when a field is
 missing from the table or a default comes back. The messages that clients send are not part of this
 model: they are the typed arguments of each method and the JSON of `SetSceneProperty`, `PreviewEdit`
@@ -3163,14 +3163,20 @@ cached thumbnail paths; an item's path appears only in `GetItem` and in `GetStat
 
 `~/.config/reiwand/config.toml` is written atomically with mode `0600`; the directory is
 created with mode `0700`. If the file is a symbolic link, the link is kept and its target is
-replaced. Values out of range are clamped when the file is read and invalid colors fall back to
-the default color, with a warning naming the key. Saving keeps the user's file: its comments,
+replaced. The file carries `format = 3` and every setting: at the first start the daemon writes it whole
+from the template (`Config::template()`), and a file without `format`, with an older one or that lacks a
+key is refused (see below). TOML has no `null`, so a setting that is not chosen is written as a word:
+`""` for an image, list, preset or profile, `"general"` for the fit, background, clicks, filter, quality, HDR and
+transition of a screen that fixes nothing (in `[default]` it means that the package or the factory value
+rules), `"none"` for `blank`, `"auto"` for `surfaces.layer_namespace`. Values out of range are clamped when the
+file is read and invalid colors fall back to the template value, with a warning naming the key. Saving keeps the user's file: its comments,
 blank lines, key order (also within `[providers.*]`) and value spelling stay, only changed
 values are rewritten (keeping their trailing comments), removed keys go with the comments above
 them and new tables are added at the end. A file that does not parse, or whose merged form would
 not read back as the same configuration, is written fresh.
 
-If the file cannot be parsed at startup, the daemon starts with the default configuration and
+A file without `format` or with a lower one is not read: the daemon names `reiwand-upgrade client` and does not start,
+and it overwrites nothing; one with a higher `format` asks to update Reiwand. If the file cannot be parsed at startup, the daemon starts with the template configuration and
 reports the error in `GetState().config_error` (`null` when the file is fine), as
 `invalid configuration at line L, column C: <message>`. Before the first save, the broken file
 is copied to `config.toml.broken` (mode `0600`).
@@ -3179,8 +3185,11 @@ On the phone a settings file that still cannot be read (damaged, or with a key o
 version) is left untouched: the settings that depend on it report an error and the network
 features stay off, so nothing is reset without the person seeing it.
 
+The first keys of the file, with an excerpt of the sections (the whole file has every key; the written file is the reference):
+
 ```toml
-profile = "01J…"          # active profile uid, absent when none
+format = 3
+profile = "01J…"          # active profile uid, "" when none
 
 [default]                 # and each [outputs.<name>]
 image = "/path"           # may be a .wpak written by Library1.Apply
@@ -3228,7 +3237,7 @@ field. `preset` is only a label: `Library1.Apply`, `Profiles1.Activate` and
 library is available at startup or `Reload`, `preset`, `playlist` and `profile` uids that name
 nothing are dropped with a warning naming the key, and the file is saved.
 
-Each `[providers.<id>]` table holds the provider's `kind` and the options given to it; missing
-options take the defaults of `GetSchema().providers`. Secrets are never written here. A table
+Each `[providers.<id>]` table holds the provider's `kind` and the options given to it; every
+option is written (the kinds and their options are in `GetSchema().providers`). Secrets are never written here. A table
 that cannot be read is skipped with a warning naming the provider and kept unchanged when the
 daemon saves the file.

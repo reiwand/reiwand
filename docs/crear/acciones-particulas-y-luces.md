@@ -21,7 +21,7 @@ Crea un sistema nuevo, vacío o copia de otro. No crea ninguna capa; para verlo,
 | `system` | texto | (obligatorio) Id del sistema nuevo; no puede estar en uso. |
 | `from` | texto | Sistema que se copia. Sin valor, empieza con un sistema básico. |
 | `parent` | texto | Sistema del que será hijo. |
-| `on` | texto | Con `parent`, cuándo nace el hijo: `static` (por defecto, por su cuenta), `spawn` (con cada partícula que nace), `death` (cuando muere) o `follow` (siguiéndola). |
+| `on` | texto | Con `parent`, cuándo nace el hijo: `static` (prellenado, por su cuenta), `spawn` (con cada partícula que nace), `death` (cuando muere) o `follow` (siguiéndola). |
 
 ```sh
 reiwand-ctl scene act mi-escena add_layer '{"kind":"particles","id":"chispas"}'
@@ -597,7 +597,7 @@ Añade una luz en el centro del lienzo con los valores de su tipo: punto (radio 
 
 | Argumento | Tipo | Qué significa |
 |---|---|---|
-| `light` | texto | `point` (punto, por defecto), `spot` (foco), `tube` (tubo) o `directional` (direccional). |
+| `light` | texto | `point` (punto, prellenado), `spot` (foco), `tube` (tubo) o `directional` (direccional). |
 | `id` | texto | Id de la capa de luz. Sin valor, usa el nombre del tipo. |
 | `into` | texto | Id de un grupo donde entra. |
 | `at` | lista de números | Lugar `[x, y]` de la luz dentro de su grupo, en píxeles, y se guarda como la `position` de su transformación. En la lista principal coincide con los píxeles del lienzo; dentro de un grupo que está movido, la luz queda en el lugar del lienzo que resulta de sumarle el del grupo. Sin valor, el centro del lienzo. Para dejar una luz en un punto del lienzo, usa `at` de la variante `set`. |
@@ -667,7 +667,7 @@ Deja una luz fuera de la vista previa, o la vuelve a poner. No cambia la escena 
 | Argumento | Tipo | Qué significa |
 |---|---|---|
 | `layer` | texto | (obligatorio) Id de la capa de luz. |
-| `muted` | sí/no | `true` la silencia; `false` (por defecto) la vuelve a poner. |
+| `muted` | sí/no | `true` la silencia; `false` (prellenado) la vuelve a poner. |
 
 ```sh
 reiwand-ctl scene act mi-escena light '{"add":{"light":"point","id":"punto"}}'
@@ -823,7 +823,7 @@ Dice cuánto cuesta un sistema de partículas: simula el sistema hasta un segund
 |---|---|---|
 | `layer` | texto | Capa de partículas cuyo dibujo propio se mira. Sin valor, la primera que dibuja el sistema. |
 | `time` | número | Segundo hasta el que se simula, de 0 a 10. Por defecto 0. |
-| `quality` | texto | Nivel de calidad: `q0` (el más bajo) a `q3` (el más alto, por defecto). |
+| `quality` | texto | Nivel de calidad: `q0` (el más bajo) a `q3` (el más alto, prellenado). |
 
 La respuesta tiene `capacity`, `alive` (partículas vivas en ese segundo), `slots` (plazas que reserva), `tiers` (por cada tipo de equipo, de `t0` a `t3`, las plazas en la tarjeta gráfica y en el procesador), `levels` (por cada calidad, la parte de partículas que nacen, vecinas de bandada, pasos de estela y subdivisiones de cuerda), `boids`, `particles` (hasta 300 partículas como `[x, y, número]` en píxeles del lienzo), `rope` y `trails`. Si el sistema no existe, la respuesta es `null`.
 
@@ -968,7 +968,7 @@ reiwand-ctl scene ask mi-escena spread '{"layout":"mine","monitors":[{"id":"izq"
 
 ### Sonido
 
-**Cómo es una capa de sonido.** Las capas de sonido se editan con `add_layer` de tipo `sound` y con `set` sobre sus campos; no tienen acciones propias. `add_layer` con `"kind":"sound"` y `"file":"sonido.ogg"` crea la capa, importa el archivo y le da el id `sound`. Sus campos son: `sound` (el id de un sonido del paquete) o `sounds` (una lista de 1 a 16 sonidos; una capa lleva uno de los dos), `loop` (si se repite sin cortes; sí por defecto), `play` (si suena; sí por defecto), `volume` (de 0 a 1), `pan` (de −1 izquierda a 1 derecha), `fade_in` y `fade_out` (segundos de subida y de bajada, de 0 a 60), `mode` (con `sounds`: `sequence` o `random`), `pause` (`[mín, máx]` segundos de silencio entre sonidos, de 0 a 600), `stream` (sí para sonidos largos) y `play_on` (un disparador, como `start`, `beat` o `event:nombre`, que arranca el sonido cada vez que se cumple). `volume`, `pan` y `play` pueden seguir una propiedad de usuario o teclas; no pueden seguir el sonido que se oye (`validate` lo rechaza). Ocultar la capa con `hide` la silencia.
+**Cómo es una capa de sonido.** Las capas de sonido se editan con `add_layer` de tipo `sound` y con `set` sobre sus campos; no tienen acciones propias. `add_layer` con `"kind":"sound"` y `"file":"sonido.ogg"` crea la capa, importa el archivo y le da el id `sound`. Sus campos son: `sound` (el id de un sonido del paquete) o `sounds` (una lista de 1 a 16 sonidos; una capa lleva uno de los dos), `loop` (si se repite sin cortes; sí prellenado), `play` (si suena; sí prellenado), `volume` (de 0 a 1), `pan` (de −1 izquierda a 1 derecha), `fade_in` y `fade_out` (segundos de subida y de bajada, de 0 a 60), `mode` (con `sounds`: `sequence` o `random`), `pause` (`[mín, máx]` segundos de silencio entre sonidos, de 0 a 600), `stream` (sí para sonidos largos) y `play_on` (un disparador, como `start`, `beat` o `event:nombre`, que arranca el sonido cada vez que se cumple). `volume`, `pan` y `play` pueden seguir una propiedad de usuario o teclas; no pueden seguir el sonido que se oye (`validate` lo rechaza). Ocultar la capa con `hide` la silencia.
 
 ```sh
 reiwand-ctl scene act mi-escena add_layer '{"kind":"sound","file":"sonido.ogg","id":"viento"}'
@@ -1012,8 +1012,8 @@ Dice a qué reacciona un enlace al sonido y qué valor da con un nivel de sonido
 
 | Argumento | Tipo | Qué significa |
 |---|---|---|
-| `source` | objeto | (obligatorio) El enlace: `audio` es `"bass"` (graves), `"mid"` (medios), `"treble"` (agudos), `"level"` (volumen de todo), `"beat"` (1 en cada pulso), el número de una banda (`3`) o un rango (`[0, 3]`). Admite `of` (cuántas bandas tiene la rejilla: 16, 32 o 64, por defecto 64), `reduce` (`mean`, el promedio, o `max`, el máximo, para un rango), `channel` (`left`, `right` o el promedio, por defecto), y la forma: `bounds`, `exponent`, `invert`, `scale`, `offset` y `clamp`. El campo `smooth` también es válido en un enlace, pero esta pregunta no lo aplica: para ver su efecto usa `response`. |
-| `reading` | objeto | Lo que se oyó: `listening` (sí/no; sin `true`, la respuesta solo trae las bandas marcadas), `raw` (los niveles de las bandas: una lista para el canal izquierdo y otra para el derecho, de hasta 64 números cada una), `loud` (lo mismo, medido en valor absoluto; se usa si la escena fija `audio.gain` en `fixed`), `loudness`, `beat` (sí/no), `silent` (sí/no) y `granted` (sí/no; por defecto `true`). |
+| `source` | objeto | (obligatorio) El enlace: `audio` es `"bass"` (graves), `"mid"` (medios), `"treble"` (agudos), `"level"` (volumen de todo), `"beat"` (1 en cada pulso), el número de una banda (`3`) o un rango (`[0, 3]`). Admite `of` (cuántas bandas tiene la rejilla: 16, 32 o 64, valor prellenado 64), `reduce` (`mean`, el promedio, o `max`, el máximo, para un rango), `channel` (`left`, `right` o el promedio, prellenado), y la forma: `bounds`, `exponent`, `invert`, `scale`, `offset` y `clamp`. El campo `smooth` también es válido en un enlace, pero esta pregunta no lo aplica: para ver su efecto usa `response`. |
+| `reading` | objeto | Lo que se oyó: `listening` (sí/no; sin `true`, la respuesta solo trae las bandas marcadas), `raw` (los niveles de las bandas: una lista para el canal izquierdo y otra para el derecho, de hasta 64 números cada una), `loud` (lo mismo, medido en valor absoluto; se usa si la escena fija `audio.gain` en `fixed`), `loudness`, `beat` (sí/no), `silent` (sí/no) y `granted` (sí/no; prellenado `true`). |
 | `of` | entero | Cuántas bandas tiene la rejilla de la respuesta: 16, 32 o 64. Por defecto 64. |
 
 La respuesta tiene `granted`, `listening`, `of` y `marked` (`[primera, última]` banda marcada en esa rejilla, o `null` si el enlace es el volumen o el pulso). Con `listening` en `true` añade `bands` (los niveles plegados a `of` bandas), `levels` (`bass`, `mid`, `treble`, `level` y `beat`), `silent`, `raw` (el valor antes de darle forma) y `value` (el valor ya con la forma: `bounds`, `exponent`, `invert`, `scale`, `offset` y `clamp`). Si el enlace está mal escrito o `of` no es 16, 32 ni 64, trae `error`.

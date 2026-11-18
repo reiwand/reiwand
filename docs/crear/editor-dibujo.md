@@ -102,14 +102,14 @@ reiwand-ctl scene act mi-escena layer '{"figure":{"stop":{"layer":"caja","stop":
 
 **Pasos:**
 
-1. Escribe el texto en el idioma por defecto del paquete.
-2. Debajo del campo, escribe el código de otro idioma (`es`, `pt-BR`) y pulsa **Traducir**. Aparece una fila por idioma, cada una con su caja de varias líneas, y la nueva parte del texto del idioma por defecto.
-3. Escribe el texto de cada fila. Quien mira ve el de su idioma y, si no está, el del idioma por defecto. **Quitar este idioma** borra una fila; el último texto de la capa no se puede quitar.
+1. Escribe el texto en el idioma principal del paquete.
+2. Debajo del campo, escribe el código de otro idioma (`es`, `pt-BR`) y pulsa **Traducir**. Aparece una fila por idioma, cada una con su caja de varias líneas, y la nueva parte del texto del idioma principal.
+3. Escribe el texto de cada fila. Quien mira ve el de su idioma y, si no está, el del idioma principal. **Quitar este idioma** borra una fila; el último texto de la capa no se puede quitar.
 4. Para ver la escena en otro idioma, elige el idioma en **Idioma de la vista previa** (panel de vista previa). También sirve al guardar una imagen o un clip.
 
-Si el texto sigue un valor (una hora, una fecha, una propiedad) no tiene idiomas. En la lista de problemas aparece un aviso si a la capa le falta el texto en el idioma por defecto. Un script que escribe el texto de la capa lo escribe en todos los idiomas.
+Si el texto sigue un valor (una hora, una fecha, una propiedad) no tiene idiomas. En la lista de problemas aparece un aviso si a la capa le falta el texto en el idioma principal. Un script que escribe el texto de la capa lo escribe en todos los idiomas.
 
-**En la terminal:** `translate` con `"pointer":"/scene/layers/0/text"`, el idioma y el texto, o con `"add":true` para partir del texto del idioma por defecto; `reiwand-ctl scene render DIR -o vista.png --language es` dibuja la escena en un idioma.
+**En la terminal:** `translate` con `"pointer":"/scene/layers/0/text"`, el idioma y el texto, o con `"add":true` para partir del texto del idioma principal; `reiwand-ctl scene render DIR -o vista.png --language es` dibuja la escena en un idioma.
 
 ## Cómo fijar el ancho del texto con el asa
 
@@ -137,9 +137,9 @@ reiwand-ctl scene act mi-escena layer '{"figure":{"text_width":{"layer":"titulo"
 
 **Pasos:**
 
-1. En el campo "Font", pulsa el botón con el nombre de la fuente (dice **Fuente por defecto** si no hay ninguna). Se abre una lista.
+1. En el campo "Font", pulsa el botón con el nombre de la fuente (dice **Fuente prellenado** si no hay ninguna). Se abre una lista.
 2. Escribe en **Buscar fuentes** para filtrar. Cada nombre se escribe con su propia fuente, y debajo dice de dónde viene: **En este paquete** (fuentes que importaste), **La que use el sistema para este estilo** (genéricas, como serif o monospace) o **Instalada en este equipo**.
-3. Pulsa una fuente para elegirla. El botón de borrar, **Usar la fuente por defecto**, la quita.
+3. Pulsa una fuente para elegirla. El botón de borrar, **Usar la fuente prellenado**, la quita.
 4. En el campo "Fallback" hay la lista de fuentes de respaldo, hasta 8. Una letra que la fuente no tiene se dibuja con la primera de esta lista que la tenga. **Añadir una fuente de respaldo** abre la misma lista de selección. Cada fila tiene **Subir**, **Bajar** y **Quitar**.
 5. Si una fuente de la lista ya no está en el paquete ni instalada, aparece el aviso **%1 no está en el paquete ni instalada aquí, así que se usa la fuente siguiente**, con su nombre.
 

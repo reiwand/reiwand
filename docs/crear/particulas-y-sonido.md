@@ -114,7 +114,7 @@ Cada emisor tiene una `shape`, un ritmo y, si quieres, ráfagas. En el panel de 
 |-------|----------|
 | `shape` | De dónde nace: ver abajo. |
 | `rate` | Partículas por segundo; puede seguir un valor (una propiedad, el sonido...). |
-| `bursts` | Hasta 8 ráfagas, cada una de `count` partículas: `on` cada golpe de música (`beat`) o clic (`click`); o una vez a los `at` segundos de empezar el emisor (0 por defecto) y, con `every`, otra vez cada tantos segundos. |
+| `bursts` | Hasta 8 ráfagas, cada una de `count` partículas: `on` cada golpe de música (`beat`) o clic (`click`); o una vez a los `at` segundos de empezar el emisor (0 prellenado) y, con `every`, otra vez cada tantos segundos. |
 | `follow` | `cursor`: la forma sigue al puntero. |
 | `inherit` | Fracción de la velocidad del puntero que heredan. |
 | `duration` | Segundos tras los que el emisor se apaga (0, nunca). |
@@ -133,7 +133,7 @@ Las formas son:
 | `sphere` | `{ "sphere": { "center": [x, y], "depth": z, "radius": [rx, ry, rz], "inner": 0, "sign": [0, 0, 0] } }` | Dentro de una esfera o elipsoide, repartidas por igual en su volumen (no en la superficie). `inner` (0 a 1, fracción de los radios) deja el núcleo vacío, y `sign` (-1, 0 o 1 por cada uno de x, y, z) las deja en un solo lado. Todos los campos son obligatorios; `at` es opcional. x e y dan la posición y z la profundidad: con `perspective` se suma a `init.depth` y a `depth` de la forma (las que nacen cerca del ojo se ven grandes y quedan cerca del centro de la imagen); sin `perspective` se descarta z y queda el reparto de una bola vista de frente, más densa hacia el centro que un disco. |
 | `line` | `{ "line": [[x0, y0], [x1, y1]] }` | Sobre una línea. |
 | `edge` | `"edge"` | En el borde del lienzo. |
-| `mask` | `{ "mask": { "texture", "threshold" } }` | Donde el alfa de una imagen estirada sobre el lienzo supera `threshold` (0,5 por defecto). |
+| `mask` | `{ "mask": { "texture", "threshold" } }` | Donde el alfa de una imagen estirada sobre el lienzo supera `threshold` (0,5 prellenado). |
 | `layer` | `{ "layer": { "id", "threshold", "color", "inherit", "jitter", "refresh" } }` | Donde una capa es opaca (hasta 4096 puntos), con el color y el movimiento de la capa. `refresh` es `static` o `on_change`. |
 | `around` | `{ "around": { "axis", "at", "count", "arc", "radius", "speed", "mode", "restart" } }` | Uno tras otro alrededor de un punto (en el círculo perpendicular a `axis`, que es obligatorio: tres números de largo 1, `[0, 0, 1]` es el giro plano en pantalla): `count` sitios (1 a 4096) en `arc` grados, girando `speed` grados por segundo. `mode`: `repeat` o `mirror`. |
 | `between` | `{ "between": { "from", "to", "count", "span", "mode", "arc", "taper" } }` | A lo largo de una línea o arco entre dos puntos. |
@@ -208,7 +208,7 @@ Hasta 8 colisionadores, cada uno `{ "bounds", "bounce", "friction", "kill", "sti
 | Campo | Qué hace |
 |-------|----------|
 | `texture` | Un recurso de imagen, que se parte en fotogramas con el `atlas` o los `rects` del recurso. Sin él, discos suaves. |
-| `frames` | `time` (a `fps`, 12 por defecto), `life` o `random`. |
+| `frames` | `time` (a `fps`, 12 prellenado), `life` o `random`. |
 | `mix` | Mezcla un fotograma con el siguiente. |
 | `cycles` | Cuántas veces se repiten los fotogramas en la vida (1 a 64, con `frames: life`). |
 | `size_over_life` | Lista de `[t, valor]` (hasta 64): multiplica el tamaño. | En el panel de partículas, «A lo largo de la vida de una partícula» da una curva para arrastrar los puntos y, para el color, una barra de degradado.
@@ -346,7 +346,7 @@ El sonido sigue el reloj de la escena: suena desde el punto en que la escena dic
 y si se desvía más de 60 ms se vuelve a poner en su sitio. Un sonido con `play_on` suena donde
 salta el disparador.
 
-Toda escena con sonido tiene una propiedad `volume` (un deslizador de 0 a 100 %, 100 por defecto)
+Toda escena con sonido tiene una propiedad `volume` (un deslizador de 0 a 100 %, 100 prellenado)
 que se añade sola; el manifiesto puede declararla para cambiar su etiqueta, su valor o su orden,
 siempre que siga siendo un deslizador de 0 a 100. Las escenas empiezan en silencio, como los
 vídeos, y siguen los ajustes `playback.muted` y `playback.volume` que fija el usuario. Si la escena se ve
@@ -395,7 +395,7 @@ Los valores de sonido van de 0 a 1. `bass`, `mid` y `treble` promedian las banda
 golpe. El análisis tiene 64 bandas por canal (de 40 Hz a 16 kHz), y cada una va en decibelios
 por encima de -70 dB, relativos a la banda más fuerte de los últimos segundos; así la música
 baja y la fuerte llenan el mismo rango. Eso es lo que lee una entrada de partículas, un guion o un
-sombreador. Un enlace de escena (`audio` en un valor) elige además cómo se mide, sin valor por defecto:
+sombreador. Un enlace de escena (`audio` en un valor) elige además cómo se mide, sin valor prellenado:
 
 - `kind`: `relative` (contra la banda más fuerte reciente), `absolute` (desde el máximo digital: cuánto
   suena de verdad, sin importar lo anterior) o `surge` (cuánto más fuerte que lo habitual suena ahora; 1 es

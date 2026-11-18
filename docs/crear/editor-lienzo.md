@@ -434,7 +434,7 @@ Cada campo muestra su nombre (con la unidad entre paréntesis si la tiene) y, al
 Pasos:
 
 1. Elige una capa. Cambia un campo escribiendo o moviendo el deslizador. Un arrastre largo cuenta como un solo paso del historial.
-2. Un campo opcional que ya tiene valor muestra **Valor por defecto**: lo quita y vuelve al valor de fábrica. Un grupo de campos opcional muestra **Añadir** para crearlo.
+2. Un campo opcional que ya tiene valor muestra **Valor prellenado**: lo quita y vuelve al valor de fábrica. Un grupo de campos opcional muestra **Añadir** para crearlo.
 3. El botón de la derecha de cada campo (◇, ◈, ◆ o ⛓) lo anima o lo enlaza. Mira [animación](editor-animacion.md) y [propiedades](editor-propiedades.md).
 4. Un campo enlazado muestra un botón **Sigue X**; púlsalo para pasar a editar el enlace.
 

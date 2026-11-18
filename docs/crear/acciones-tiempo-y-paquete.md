@@ -178,7 +178,7 @@ reiwand-ctl scene act mi-escena manifest '{"display":{"clear":["span"]}}'
 
 ##### variante `playback`
 
-Cambia cómo se reproduce por defecto el paquete. En una escena o página web, `max_fps` (cuadros por segundo máximos), `volume` (0 a 1) y `muted` (sí/no). En un video también `speed`, `start`, `end` y `loop`.
+Cambia cómo se reproduce el paquete. En una escena o página web, `max_fps` (cuadros por segundo máximos), `volume` (0 a 1) y `muted` (sí/no). En un video también `speed`, `start`, `end` y `loop`.
 
 | Argumento | Tipo | Qué significa |
 |-----------|------|---------------|
@@ -438,7 +438,7 @@ Graba un gif o un webp de hasta 640 píxeles y 8 MiB (se reduce hasta que cabe) 
 | `seconds` | número | Duración, de 0.1 a 15. Por defecto 4. |
 | `fps` | entero | Cuadros por segundo, de 1 a 30. Por defecto 10. |
 | `base` | texto | Solo en un preset: el archivo del paquete base. |
-| `format` | `gif` o `webp` | Tipo de archivo. `webp` guarda cada color sin perderlo; `gif` es el valor por defecto. |
+| `format` | `gif` o `webp` | Tipo de archivo. `webp` guarda cada color sin perderlo; `gif` es el valor prellenado. |
 
 ```sh
 reiwand-ctl scene act mi-escena add_layer '{"kind":"solid"}'
@@ -466,7 +466,7 @@ Las propiedades de usuario son los ajustes que la persona que usa el fondo puede
 
 #### `add_property`
 
-Añade una propiedad nueva, al final de su grupo. Empieza válida, con valores por defecto. Imprime su id.
+Añade una propiedad nueva, al final de su grupo. Empieza válida, con valores prellenados. Imprime su id.
 
 | Argumento | Tipo | Qué significa |
 |-----------|------|---------------|
@@ -535,7 +535,7 @@ reiwand-ctl scene act mi-escena remove_property '{"id":"brillo"}'
 
 #### `property`
 
-Ajusta una propiedad que ya existe: su rango, su paso, su valor por defecto y su lugar. Rechaza un valor por defecto fuera del rango o que no cae en un paso.
+Ajusta una propiedad que ya existe: su rango, su paso, su valor prellenado y su lugar. Rechaza un valor prellenado fuera del rango o que no cae en un paso.
 
 | Argumento | Tipo | Qué significa |
 |-----------|------|---------------|
@@ -543,7 +543,7 @@ Ajusta una propiedad que ya existe: su rango, su paso, su valor por defecto y su
 | `min` | número | Mínimo. Solo deslizadores. |
 | `max` | número | Máximo. Solo deslizadores. |
 | `step` | número | Paso. Solo deslizadores. |
-| `default` | cualquier valor JSON | Valor por defecto, del tipo de la propiedad. |
+| `default` | cualquier valor JSON | Valor prellenado, del tipo de la propiedad. |
 | `order` | entero | Lugar dentro de su grupo, como `to` de `move_property`. |
 
 ```sh
@@ -689,14 +689,14 @@ reiwand-ctl scene act mi-escena script '{"write":{"path":"scripts/empty.js","tex
 
 ##### variante `param`
 
-Crea, cambia, renombra o quita un ajuste (`params`) del módulo, que el usuario o la escena pueden dar al script. Hasta 32 por módulo. Un ajuste nuevo empieza con el valor por defecto de su tipo; si cambias el tipo, se pierden `min` y `max`; el valor por defecto debe caber en el rango.
+Crea, cambia, renombra o quita un ajuste (`params`) del módulo, que el usuario o la escena pueden dar al script. Hasta 32 por módulo. Un ajuste nuevo empieza con el valor prellenado de su tipo; si cambias el tipo, se pierden `min` y `max`; el valor prellenado debe caber en el rango.
 
 | Argumento | Tipo | Qué significa |
 |-----------|------|---------------|
 | `path` | texto (obligatorio) | Ruta del módulo. |
 | `id` | texto (obligatorio) | Nombre del ajuste. |
 | `type` | texto | `number`, `bool`, `text`, `color` o `vec2` (dos números). |
-| `default` | cualquier valor JSON | Valor por defecto. |
+| `default` | cualquier valor JSON | Valor prellenado. |
 | `min`, `max` | número | Rango, solo para números. |
 | `to` | texto | Nombre nuevo; los valores que seguían el ajuste lo siguen. |
 | `remove` | sí/no | `true` quita el ajuste. Por defecto `false`. |

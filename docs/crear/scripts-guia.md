@@ -18,9 +18,9 @@ interfaz completa; lo esencial:
 - **Un valor, una función**: `{"script": "scripts/olas.js", "fn": "vaiven", "params": {"velocidad":
   2}}` llama cada fotograma a `vaiven(valor, ctx)` con lo que devolvió la vez anterior y `ctx.path`,
   `ctx.layer` y `ctx.params`; un mismo módulo sirve así a muchas propiedades. Los `params` se declaran
-  solo en la entrada del script en `scene.json`, con tipo, valor por defecto y límites: el módulo no
+  solo en la entrada del script en `scene.json`, con tipo, valor prellenado y límites: el módulo no
   los exporta y `reiwand-ctl scene act CARPETA import_script` no los propone, pero los conserva al importar de nuevo
-  el módulo. En el editor se escriben en una tabla tipada por módulo (id, tipo, valor por defecto y,
+  el módulo. En el editor se escriben en una tabla tipada por módulo (id, tipo, valor prellenado y,
   en los números, mínimo y máximo) y cada propiedad los sigue con *Seguir un script*, que lista las
   funciones del módulo.
 - **Capas**: `scene.layer(id)` lee la posición, la escala, el giro, la opacidad, el color, el tamaño,
@@ -70,7 +70,7 @@ interfaz completa; lo esencial:
   punto. Con `uses: ["camera"]`, `scene.camera = {zoom: 2, shake: {amplitude: 6}}`,
   `scene.parallax`, `scene.bloom` y `scene.background` cambian la cámara, el paralaje, el resplandor
   y el color de fondo de la escena, y `null` los devuelve a lo que dice `scene.json`. El resplandor
-  también se enciende en escenas que no lo declaran (con los valores por defecto de `canvas.bloom`
+  también se enciende en escenas que no lo declaran (con los valores prellenados de `canvas.bloom`
   para lo que el script no nombra) y se apaga con `null`; sigue las mismas reglas de calidad y batería
   y no cuesta nada hasta que un script lo pide; el script lo declara con `bloom` en `uses` (el editor
   lo añade solo al ver `.bloom` en el código) y el costo de la escena, el de cada nivel en el editor

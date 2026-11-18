@@ -25,7 +25,7 @@ La imagen tiene que estar importada antes (`import`). El id de la capa es tambi�
 | Argumento | Tipo | Qué significa |
 |---|---|---|
 | `image` | texto (obligatorio) | Id de la imagen de la escena que se corta. |
-| `outline` | sí/no | `false` (por defecto) cubre con una cuadrícula las celdas que tienen algo opaco. `true` sigue el borde de la parte opaca más grande y pone puntos dentro. |
+| `outline` | sí/no | `false` (prellenado) cubre con una cuadrícula las celdas que tienen algo opaco. `true` sigue el borde de la parte opaca más grande y pone puntos dentro. |
 | `cells` | entero | Celdas a lo largo del lado más largo, de 2 a 64. Por defecto 16. Un valor fuera de ese rango se ajusta al más cercano. |
 | `id` | texto | Id de la capa nueva. Si falta, se forma con el de la imagen y `_mesh`. Un id en uso se rechaza. |
 
@@ -179,7 +179,7 @@ Crea, cambia o quita un clip de una capa de malla o de modelo. En la app, **Edit
 | `remove` | sí/no | `true` quita el clip y las capas de animación que lo tocan. |
 | `to` | texto | Id nuevo. Las capas de animación que lo tocan lo siguen. |
 | `length` | número | Duración en segundos, mayor que 0 y hasta 3600. |
-| `loop` | texto | `once` (una vez), `repeat` (repetir, el valor por defecto) o `pingpong` (ida y vuelta). |
+| `loop` | texto | `once` (una vez), `repeat` (repetir, el valor prellenado) o `pingpong` (ida y vuelta). |
 | `animation` | texto | Nombre de una animación del archivo `.glb` de la capa. El clip la reproduce entera y toma su duración. |
 | `from` | número | Segundo de la animación del archivo donde empieza el clip. Mantiene la duración del clip dentro de la animación. |
 | `play` | sí/no | Solo junto con `add`: añade además una capa de animación que reproduce el clip nuevo (hasta 16 por capa). |
@@ -235,7 +235,7 @@ Cada clave es de una sola cosa: un hueso, una forma de mezcla o el orden de una 
 | `weight` | número | Peso de la forma, de -1 a 1. Sin él se usa el valor que el clip da en ese segundo. |
 | `order` | texto | Pieza cuyo orden de dibujo se anima. |
 | `value` | número | Orden de la pieza (se redondea a un entero). Sin él se usa el valor que el clip da en ese segundo. |
-| `ease` | texto o lista de 4 números | Cómo se mueve el valor hasta la clave siguiente: `linear` (por defecto), `step`, `hold`, o `in_`, `out_` o `in_out_` seguido de `sine`, `quad`, `cubic`, `quart`, `quint`, `expo`, `circ`, `back`, `elastic` o `bounce` (por ejemplo `in_out_sine`). También cuatro números `[x1, y1, x2, y2]` de una curva de Bézier cúbica. Una clave con `ease` pierde sus asas. |
+| `ease` | texto o lista de 4 números | Cómo se mueve el valor hasta la clave siguiente: `linear` (prellenado), `step`, `hold`, o `in_`, `out_` o `in_out_` seguido de `sine`, `quad`, `cubic`, `quart`, `quint`, `expo`, `circ`, `back`, `elastic` o `bounce` (por ejemplo `in_out_sine`). También cuatro números `[x1, y1, x2, y2]` de una curva de Bézier cúbica. Una clave con `ease` pierde sus asas. |
 | `in_handle` | `[dt, dv]` | Asa de Bézier con la que la curva llega a la clave: segundos hasta la clave anterior y cuánto cambia el valor allí. Curva un solo canal. No se combina con `ease`. |
 | `out_handle` | `[dt, dv]` | Lo mismo para la curva que sale hacia la clave siguiente. |
 | `remove` | sí/no | `true` quita la clave de ese segundo. |
@@ -575,7 +575,7 @@ Añade, cambia o quita una cadena de cinemática inversa: huesos que se estiran 
 | `limits` | objeto | Límites de giro por hueso, `{"brazo": [-90, 90]}`: mínimo y máximo en grados desde el reposo, de -180 a 180. El hueso debe ser de la cadena. |
 | `unlimit` | lista de textos | Huesos cuyo límite se quita. |
 | `weight` | número | Cuánto manda la cadena, de 0 a 1. Por defecto 1. |
-| `bend` | texto | `clockwise` (sentido horario, por defecto) o `counterclockwise` hacia dónde se dobla. |
+| `bend` | texto | `clockwise` (sentido horario, prellenado) o `counterclockwise` hacia dónde se dobla. |
 | `remove` | sí/no | Con `index`: quita la cadena. |
 
 Una capa admite hasta 16 cadenas. Una cadena que sigue al puntero necesita el permiso del puntero, y la escena avisa al usuario de que lo sigue.
@@ -1016,7 +1016,7 @@ reiwand-ctl scene act mi-escena key '{"layer":"malla","clip":"saludo","time":1,"
 
 #### `rig`
 
-Lista los huesos, puntos, piezas, formas de mezcla y clips de una capa de malla o de modelo. Es la pregunta por defecto de la capa.
+Lista los huesos, puntos, piezas, formas de mezcla y clips de una capa de malla o de modelo. Es la pregunta usual de la capa.
 
 Sin argumentos (`'{}'`). La respuesta tiene:
 
@@ -1244,7 +1244,7 @@ reiwand-ctl scene ask mi-escena wind '{}'
 
 Da dónde está en un segundo el puntero inventado que recorre la vista previa cuando pulsas **Probar el puntero** en un enlace al puntero. Sirve para saber, sin vista previa, por dónde pasará.
 
-Argumento: `{"time": SEGUNDOS}` (por defecto 0). La respuesta tiene `x` e `y`, el lugar del puntero en fracciones del lienzo, y `buttons`, que siempre es 0.
+Argumento: `{"time": SEGUNDOS}` (valor prellenado 0). La respuesta tiene `x` e `y`, el lugar del puntero en fracciones del lienzo, y `buttons`, que siempre es 0.
 
 ```sh
 reiwand-ctl scene ask mi-escena wander '{"time":1.5}'

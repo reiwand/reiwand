@@ -118,7 +118,7 @@ Una máscara también puede ir en un efecto (ver [efectos.md](efectos.md)).
 
 `parent` hace que una capa siga el movimiento de otra capa dibujada, sin tener que meterla en un
 grupo. La posición de la capa pasa a medirse desde la posición del padre, en el sistema girado y
-escalado del padre. `inherit` dice qué sigue: `transform`, `visible` y `opacity` (por defecto, las
+escalado del padre. `inherit` dice qué sigue: `transform`, `visible` y `opacity` (prellenado, las
 dos primeras). Las cadenas pueden llegar a 8 padres y no pueden volver a sí mismas. El orden de
 dibujo no cambia.
 
@@ -252,7 +252,7 @@ y las escrituras que necesitan formas unidas (árabe, escrituras de la India) no
 fuente que no se puede leer se cambia por la del sistema.
 
 Un texto por idioma funciona como el título del paquete y las etiquetas de las propiedades: cada
-clave es un idioma (`es`, `pt-BR`), el texto del idioma por defecto del paquete (`default_locale`
+clave es un idioma (`es`, `pt-BR`), el texto del idioma principal del paquete (`default_locale`
 del manifiesto) es obligatorio y se usa cuando el idioma de quien mira no está. Se elige el idioma
 completo (`es-AR`) y después su base (`es`). Un texto que sigue un valor (reloj, fecha, propiedad)
 no tiene idiomas; un script que fija el texto de la capa lo fija en todos los idiomas, y un script que
@@ -296,11 +296,11 @@ Las formas:
 
 | Forma | Campos | Rango |
 |-------|--------|-------|
-| `rect` | `size` `[ancho, alto]`, `radius` (0 por defecto) | `radius` hasta la mitad del lado menor |
+| `rect` | `size` `[ancho, alto]`, `radius` (0 prellenado) | `radius` hasta la mitad del lado menor |
 | `ellipse` | `size` `[ancho, alto]` | |
 | `ring` | `size` `[ancho, alto]`, `width` | `width` de 0,001 hasta la mitad del lado menor |
 | `polygon` | `sides`, `size` | `sides` de 3 a 64 |
-| `star` | `points`, `size`, `inner` (0,5 por defecto) | `points` de 2 a 64, `inner` de 0,01 a 1 |
+| `star` | `points`, `size`, `inner` (0,5 prellenado) | `points` de 2 a 64, `inner` de 0,01 a 1 |
 | `line` | `to` `[x, y]`, `width` | `to` de -100000 a 100000 |
 
 Una `line` mide lo que dice `to` y queda centrada en la posición de la capa.

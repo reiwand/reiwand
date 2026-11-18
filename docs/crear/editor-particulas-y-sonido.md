@@ -237,7 +237,7 @@ Una **reasignación** convierte una entrada (por ejemplo, el azar o el sonido) e
    - **Girar alrededor de un punto**.
    - **Frenar cerca de un punto**.
 2. Elige el punto: un punto de control, el puntero o un punto fijo (**un punto fijo**, con sus coordenadas en píxeles del sistema).
-3. Ajusta la **Fuerza** (o **Velocidad conservada** en el frenado) y, donde aplique, **Se debilita con la distancia**: **Como lo hace la fuerza por defecto**, **No se debilita**, **En proporción** o **Con el cuadrado**.
+3. Ajusta la **Fuerza** (o **Velocidad conservada** en el frenado) y, donde aplique, **Se debilita con la distancia**: **Como lo hace la fuerza prellenado**, **No se debilita**, **En proporción** o **Con el cuadrado**.
 4. Cada alcance (radio, borde interior, borde exterior) tiene un control deslizante. En el lienzo se ve como un anillo discontinuo con un asa arriba; la fuerza tiene otra asa en su centro.
 5. En las fuerzas de distancia, el control **Distancia N px** fija la distancia; en el lienzo se ve un anillo con un asa en el objetivo y otra en el anillo.
 6. **Quitar esta fuerza** la elimina.
@@ -445,7 +445,7 @@ El formato no tiene recorte de inicio y fin de un sonido: las entradas y salidas
 - **Pausar**: segundos de silencio entre sonidos (rango).
 - **En flujo**: lee el archivo mientras suena, para sonidos largos.
 - **Sonar con**: el disparador.
-- **Bucle**: repite sin hueco (activado por defecto). Si lo apagas, suena una vez cada vez que se enciende.
+- **Bucle**: repite sin hueco (activado prellenado). Si lo apagas, suena una vez cada vez que se enciende.
 - **Reproducir**: enciende y apaga el sonido.
 - **Volumen** (de 0 a 1) y **Panorama** (de −1 izquierda a 1 derecha).
 - **Entrada gradual** y **Salida gradual**.
