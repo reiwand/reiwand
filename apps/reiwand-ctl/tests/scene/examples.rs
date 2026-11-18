@@ -86,10 +86,10 @@ fn incomplete(name: &str, dir: &Path) -> Option<String> {
     if let Err(e) = reiwand_format::Manifest::from_json(manifest.as_bytes()) {
         faults.push(format!("manifest: {e}"));
     }
-    if let Ok(text) = std::fs::read_to_string(dir.join("scene.json")) {
-        if let Err(e) = reiwand_scene::Scene::from_json(&text) {
-            faults.push(format!("scene: {e}"));
-        }
+    if let Ok(text) = std::fs::read_to_string(dir.join("scene.json"))
+        && let Err(e) = reiwand_scene::Scene::from_json(&text)
+    {
+        faults.push(format!("scene: {e}"));
     }
     (!faults.is_empty()).then(|| format!("act {name} leaves an incomplete result:\n{}", faults.join("\n")))
 }
