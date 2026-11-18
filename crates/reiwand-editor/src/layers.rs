@@ -154,7 +154,9 @@ pub fn template(
             &[&kind, &(KINDS.join(", "))]
         )),
     };
-    Ok(reiwand_scene::prefill::of("Layer", made))
+    let mut made = made;
+    made["blend_space"] = reiwand_scene::prefill::of("Layer", json!({}))["blend_space"].clone();
+    Ok(made)
 }
 
 pub fn system(doc: &Value) -> Value {
