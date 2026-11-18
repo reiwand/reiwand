@@ -82,3 +82,28 @@ fn save_map(
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use reiwand_depth::Map;
+
+    #[test]
+    fn saves_the_raw_and_the_coloured_map() {
+        let dir = tempfile::tempdir().unwrap();
+        let image = dir.path().join("pic.png");
+        let places = Places { data: dir.path().join("data"), cache: dir.path().join("cache") };
+        let raw = Map::from_fn(4, 4, |x, _| image::Luma([(x * 16000) as u16]));
+        write(&raw, &reiwand_depth::beside(&image)).unwrap();
+        let depth = Depth::default();
+        let plain = dir.path().join("plain.png");
+        save_map(&places, (&image, "none"), &depth, (&plain, false, false)).unwrap();
+        assert_eq!(read(&plain).unwrap().get_pixel(3, 0).0, [48000]);
+        let tinted = dir.path().join("tinted.png");
+        save_map(&places, (&image, "none"), &depth, (&tinted, true, true)).unwrap();
+        assert!(image::open(&tinted).unwrap().color().has_color());
+        let missing = dir.path().join("gone.png");
+        let error = save_map(&places, (&missing, "none"), &depth, (&plain, false, false)).unwrap_err();
+        assert!(error.to_string().contains("no depth map"));
+    }
+}
