@@ -125,6 +125,7 @@ msgstr ""
 #: apps/reiwand-app/qml/BrowseOwn.qml apps/reiwand-app/qml/CarryExport.qml
 #: apps/reiwand-app/qml/CarryImport.qml apps/reiwand-app/qml/DepthDialog.qml
 #: apps/reiwand-app/qml/EditDepth.qml apps/reiwand-app/qml/EditDepthCompare.qml
+#: apps/reiwand-app/qml/EditExport.qml
 #: apps/reiwand-app/qml/EditLayersProgress.qml
 #: apps/reiwand-app/qml/EditParallax.qml apps/reiwand-app/qml/Installer.qml
 #: apps/reiwand-app/qml/ItemPresets.qml apps/reiwand-app/qml/LibraryAdd.qml
@@ -1529,22 +1530,6 @@ msgstr "Exportar…"
 msgid "Reset all"
 msgstr "Restablecer todo"
 
-#: apps/reiwand-app/qml/EditActions.qml
-msgid "PNG pictures"
-msgstr "Imágenes PNG"
-
-#: apps/reiwand-app/qml/EditActions.qml
-msgid "JPEG pictures"
-msgstr "Imágenes JPEG"
-
-#: apps/reiwand-app/qml/EditActions.qml
-msgid "Lossless WebP pictures"
-msgstr "Imágenes WebP sin pérdida"
-
-#: apps/reiwand-app/qml/EditActions.qml
-msgid "AVIF pictures"
-msgstr "Imágenes AVIF"
-
 #: apps/reiwand-app/qml/EditCanvas.qml
 msgid ""
 "This computer has no graphics card the app can use. Show on the desktop "
@@ -1685,6 +1670,18 @@ msgid "Remove the map"
 msgstr "Quitar el mapa"
 
 #: apps/reiwand-app/qml/EditDepth.qml
+msgid "Export the adjusted map…"
+msgstr "Exportar el mapa ajustado…"
+
+#: apps/reiwand-app/qml/EditDepth.qml apps/reiwand-app/qml/EditPage.qml
+msgid "Saved as %1"
+msgstr "Guardado como %1"
+
+#: apps/reiwand-app/qml/EditDepth.qml
+msgid "Model input size (px, multiple of 14)"
+msgstr "Tamaño de entrada del modelo (px, múltiplo de 14)"
+
+#: apps/reiwand-app/qml/EditDepth.qml
 msgid "Near level"
 msgstr "Nivel cercano"
 
@@ -1704,6 +1701,10 @@ msgstr "Suavizado (px)"
 #: apps/reiwand-app/qml/EditDepth.qml
 msgid "Grow near edges (px)"
 msgstr "Ensanchar los bordes cercanos (px)"
+
+#: apps/reiwand-app/qml/EditDepth.qml apps/reiwand-app/qml/EditExport.qml
+msgid "PNG pictures"
+msgstr "Imágenes PNG"
 
 #: apps/reiwand-app/qml/EditDepth.qml apps/reiwand-app/qml/LibraryBar.qml
 #: apps/reiwand-app/qml/PackagePresetPublish.qml
@@ -2037,6 +2038,63 @@ msgstr ""
 "Limita un efecto a una parte de la imagen con una máscara en la lista de "
 "operaciones."
 
+#: apps/reiwand-app/qml/EditExport.qml
+msgid "Export the picture"
+msgstr "Exportar la imagen"
+
+#: apps/reiwand-app/qml/EditExport.qml
+msgid ""
+"The file type chosen next sets the format. The quality is used by JPEG and "
+"AVIF; PNG and lossless WebP ignore it."
+msgstr ""
+"El tipo de archivo que elijas a continuación fija el formato. La calidad la "
+"usan JPEG y AVIF; PNG y WebP sin pérdida la ignoran."
+
+#: apps/reiwand-app/qml/EditExport.qml
+msgid "Choose the file…"
+msgstr "Elegir el archivo…"
+
+#: apps/reiwand-app/qml/EditExport.qml apps/reiwand-app/qml/SceneKtx2.qml
+msgid "Quality"
+msgstr "Calidad"
+
+#: apps/reiwand-app/qml/EditExport.qml
+msgid "Resize to a size"
+msgstr "Cambiar el tamaño"
+
+#: apps/reiwand-app/qml/EditExport.qml apps/reiwand-app/qml/EditMasks.qml
+#: apps/reiwand-app/qml/SceneSwarmStrands.qml
+#: apps/reiwand-app/qml/facade/Labels.qml
+#: apps/reiwand-app/qml/facade/SceneLabels.qml
+msgid "Width"
+msgstr "Anchura"
+
+#: apps/reiwand-app/qml/EditExport.qml apps/reiwand-app/qml/EditMasks.qml
+#: apps/reiwand-app/qml/SceneLightTools.qml
+#: apps/reiwand-app/qml/facade/SceneTerms.qml
+msgid "Height"
+msgstr "Altura"
+
+#: apps/reiwand-app/qml/EditExport.qml
+msgid "px; the picture is cropped to this shape"
+msgstr "px; la imagen se recorta a esta forma"
+
+#: apps/reiwand-app/qml/EditExport.qml
+msgid "Without my edits, the original with its geometry"
+msgstr "Sin mis ediciones: el original con su encuadre"
+
+#: apps/reiwand-app/qml/EditExport.qml
+msgid "JPEG pictures"
+msgstr "Imágenes JPEG"
+
+#: apps/reiwand-app/qml/EditExport.qml
+msgid "Lossless WebP pictures"
+msgstr "Imágenes WebP sin pérdida"
+
+#: apps/reiwand-app/qml/EditExport.qml
+msgid "AVIF pictures"
+msgstr "Imágenes AVIF"
+
 #: apps/reiwand-app/qml/EditGeometry.qml apps/reiwand-app/qml/SceneRigIk.qml
 msgid "Free"
 msgstr "Libre"
@@ -2206,18 +2264,6 @@ msgid "Center Y"
 msgstr "Centro Y"
 
 #: apps/reiwand-app/qml/EditMasks.qml
-#: apps/reiwand-app/qml/SceneSwarmStrands.qml
-#: apps/reiwand-app/qml/facade/Labels.qml
-#: apps/reiwand-app/qml/facade/SceneLabels.qml
-msgid "Width"
-msgstr "Anchura"
-
-#: apps/reiwand-app/qml/EditMasks.qml apps/reiwand-app/qml/SceneLightTools.qml
-#: apps/reiwand-app/qml/facade/SceneTerms.qml
-msgid "Height"
-msgstr "Altura"
-
-#: apps/reiwand-app/qml/EditMasks.qml
 msgid "Darkest"
 msgstr "Más oscuro"
 
@@ -2339,7 +2385,9 @@ msgstr "Máscara %1"
 msgid "Crop and rotate"
 msgstr "Recortar y girar"
 
-#: apps/reiwand-app/qml/EditPage.qml apps/reiwand-app/qml/SettingsPage.qml
+#: apps/reiwand-app/qml/EditPage.qml
+#: apps/reiwand-app/qml/SettingsLayoutRules.qml
+#: apps/reiwand-app/qml/SettingsPage.qml
 msgid "Screens"
 msgstr "Pantallas"
 
@@ -2374,10 +2422,6 @@ msgstr "Paralaje"
 #: apps/reiwand-app/qml/EditPage.qml
 msgid "Edit %1"
 msgstr "Editar %1"
-
-#: apps/reiwand-app/qml/EditPage.qml
-msgid "Saved as %1"
-msgstr "Guardado como %1"
 
 #: apps/reiwand-app/qml/EditParallax.qml
 msgid "Move the picture in depth"
@@ -9794,10 +9838,6 @@ msgid "Smaller file (ETC1S)"
 msgstr "Archivo más pequeño (ETC1S)"
 
 #: apps/reiwand-app/qml/SceneKtx2.qml
-msgid "Quality"
-msgstr "Calidad"
-
-#: apps/reiwand-app/qml/SceneKtx2.qml
 msgid "File: %1 now, %2 as KTX2, with %3 levels of detail."
 msgstr "Archivo: %1 ahora, %2 como KTX2, con %3 niveles de detalle."
 
@@ -11611,6 +11651,7 @@ msgstr "Ver la escena como en un"
 
 #: apps/reiwand-app/qml/ScenePreviewPanel.qml
 #: apps/reiwand-app/qml/SceneStatesCheck.qml
+#: apps/reiwand-app/qml/SettingsLayoutRules.qml
 msgid "On battery"
 msgstr "Con batería"
 
@@ -15680,6 +15721,20 @@ msgstr ""
 "La disposición se usa sola cuando se cumple esto. Si no fijas nada, solo "
 "cuando tú la eliges."
 
+#: apps/reiwand-app/qml/SettingsLayoutRules.qml
+msgid "Power"
+msgstr "Alimentación"
+
+#: apps/reiwand-app/qml/SettingsLayoutRules.qml
+#: apps/reiwand-app/qml/SourceMore.qml apps/reiwand-app/qml/SourceMoreList.qml
+#: apps/reiwand-app/qml/SourceMoreMain.qml
+msgid "Any"
+msgstr "Cualquiera"
+
+#: apps/reiwand-app/qml/SettingsLayoutRules.qml
+msgid "Plugged in"
+msgstr "Enchufado"
+
 #: apps/reiwand-app/qml/SettingsLayoutSave.qml
 msgid "Save this layout"
 msgstr "Guardar esta disposición"
@@ -16886,11 +16941,6 @@ msgstr "Actualizar todo"
 #: apps/reiwand-app/qml/SourceList.qml
 msgid "Your own photos? Add a folder to your library"
 msgstr "¿Tus propias fotos? Añade una carpeta a tu biblioteca"
-
-#: apps/reiwand-app/qml/SourceMore.qml apps/reiwand-app/qml/SourceMoreList.qml
-#: apps/reiwand-app/qml/SourceMoreMain.qml
-msgid "Any"
-msgstr "Cualquiera"
 
 #: apps/reiwand-app/qml/SourceMoreList.qml
 msgid "private"

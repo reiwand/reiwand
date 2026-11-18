@@ -5054,16 +5054,22 @@ msgid "download size"
 msgstr "tamaño de la descarga"
 
 #: crates/reiwand-format/src/index.rs
+msgid ""
+"%1 is in format %2 but this version reads %3: whoever publishes the "
+"repository must run reiwand-upgrade server with this version and publish "
+"again"
+msgstr ""
+"%1 está en el formato %2 pero esta versión lee el %3: quien publica el "
+"repositorio debe ejecutar reiwand-upgrade server con esta versión y publicar "
+"de nuevo"
+
+#: crates/reiwand-format/src/index.rs
 msgid "does not match its place in the entry"
 msgstr "no coincide con su lugar en la entrada"
 
 #: crates/reiwand-format/src/index.rs
 msgid "%1 is invalid, misplaced or repeated"
 msgstr "%1 no es válido, está fuera de lugar o está repetido"
-
-#: crates/reiwand-format/src/index.rs
-msgid "%1 is in format %2 but this version reads %3: whoever publishes the repository must run reiwand-upgrade server with this version and publish again"
-msgstr "%1 está en el formato %2 pero esta versión lee el %3: quien publica el repositorio debe ejecutar reiwand-upgrade server con esta versión y publicar de nuevo"
 
 #: crates/reiwand-format/src/index.rs
 msgid "%1 needs unique ascending valid releases"
