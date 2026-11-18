@@ -68,10 +68,16 @@ empezar con su firma `\0asm`.
 
 ## Dónde se ve
 
-Las páginas las dibuja un programa auxiliar, `reiwand-web`, con WPE WebKit 2.54 o más nuevo. Donde ese
-motor no está, el demonio rechaza los fondos web con el motivo en lugar de dejar la pantalla en
+Las páginas las dibuja un programa auxiliar, `reiwand-web`, con Qt WebEngine (Chromium, Qt 6.5 o
+más nuevo). Donde ese motor no está (Ubuntu 24.04), el demonio rechaza los fondos web con el motivo en lugar de dejar la pantalla en
 blanco, y lo dice en `reiwand-ctl lib apply`, en la app y en el error de la pantalla. En el teléfono se
 usa el WebView del sistema.
+
+Códecs: para que el vídeo se vea en todos los sistemas, codifícalo en VP9, VP8 o AV1 (WebM o MP4 con
+AV1) y el sonido en Opus o Vorbis. H.264 y AAC solo se reproducen donde el sistema trae un `ffmpeg`
+completo (por ejemplo Arch) y se espera que no en Fedora (sin comprobar con un vídeo real) ni en el Flatpak; el teléfono sí los reproduce, pero un
+paquete se ve en todas partes solo con los formatos libres. Cada página se prueba con `reiwand-ctl`
+como se explica arriba, en un Fedora o un Arch con Qt WebEngine, no en el WebView del teléfono.
 
 Un fondo web que se queda sin responder se reinicia solo:
 

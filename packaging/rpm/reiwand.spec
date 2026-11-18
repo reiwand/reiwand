@@ -1,4 +1,5 @@
 %global debug_package %{nil}
+%global __requires_exclude ^libQt6WebEngine.*\.so
 
 Name:           reiwand
 Version:        %{reiwand_core}
@@ -18,7 +19,7 @@ Requires:       gstreamer1-plugins-base >= 1.24
 Requires:       gstreamer1-plugins-good >= 1.24
 Requires:       pipewire-gstreamer
 Requires:       kf6-kirigami
-Recommends:     wpewebkit >= 2.54
+Recommends:     qt6-qtwebengine >= 6.5
 Recommends:     %{name}-examples
 
 %description
