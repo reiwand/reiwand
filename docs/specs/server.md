@@ -68,7 +68,7 @@ at the first step not done:
    Serving HTTPS itself needs a `REIWAND_PUBLIC_URL` that starts with `https://`. The choice takes
    effect when the setup is finished and at every later start.
 2. **Account**: the administrator. «Change» on a later step edits the same account.
-3. **Repository**: its name, its address name (`main` by default) and «Online authors» (as `repo init --online-authors`). The root
+3. **Repository**: its name, its address name (`main` prefilled) and «Online authors» (as `repo init --online-authors`). The root
    secret key is not shown: the server keeps it sealed (see «Root key kept by the server»). A repository made before
    with `repo init` or `repo import` skips this step.
 4. **Who gets in**: «Closed», «By invitation» or «Open», stored as the registration and
@@ -145,6 +145,7 @@ tmp/ logs/ backups/
 ## Conventions
 
 - JSON in UTF-8. Times are Unix milliseconds unless they belong to repository files.
+- Replies and stored data are always complete: every field is present, with `null` or an empty list where there is no value. A `?` after a name in a request body (`{private?, publishing?}`) marks a field of a command that may be left out because the call changes only what it names; it is not a field of a stored format.
 - Errors are `application/problem+json`: `{type: "about:blank", title, status, code, detail}`.
   `code` is stable (`invalid`, `malformed`, `unauthorized`, `forbidden`, `not_found`,
   `rate_limited`, `handle_taken`, `version`, …).
@@ -457,6 +458,8 @@ For devices without a keyboard or accounts without a password (RFC 8628 style):
    `access_denied` or `invalid_grant`, or `200` with the device token.
 
 ## Uploads
+
+A package is accepted only when its manifest is a whole `reiwand.wpak/3` one: an incomplete or older manifest is refused naming the field (or, for an older schema, `reiwand-upgrade file FOLDER`); the server never completes it. See `package.md`.
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
