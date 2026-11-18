@@ -50,7 +50,7 @@ impl Check<'_> {
             self.shape(&format!("{path}/shape"), shape);
         }
         self.range(&format!("{path}/feather"), mask.feather, 0.0, 1e4);
-        self.uses(true, "mask_strength");
+        self.uses(mask.strength != Value::Fixed(1.0), "mask_strength");
         self.value(&format!("{path}/strength"), &mask.strength);
         if let Value::Fixed(v) = &mask.strength {
             self.range(&format!("{path}/strength"), *v, 0.0, 1.0);

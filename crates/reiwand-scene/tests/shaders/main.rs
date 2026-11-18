@@ -94,12 +94,6 @@ fn adopt(scene: &mut Scene, descriptor: &Json) -> Result<(), SceneError> {
     scene.adopt(&BTreeMap::new(), files)
 }
 
-fn used(mut v: Json) -> EffectUse {
-    let o = v.as_object_mut().unwrap();
-    o.entry("name").or_insert(Json::Null);
-    o.entry("enabled").or_insert(json!(true));
-    o.entry("mask").or_insert(Json::Null);
-    o.entry("optional").or_insert(json!(false));
-    o.entry("params").or_insert(json!({}));
-    serde_json::from_value(v).unwrap()
+fn used(v: Json) -> EffectUse {
+    serde_json::from_value(reiwand_scene::prefill::of("EffectUse", v)).unwrap()
 }

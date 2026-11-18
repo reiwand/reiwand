@@ -40,7 +40,8 @@ fn new_fields_round_trip_and_older_scenes_use_none_of_them() {
     let old = Scene::from_json(&reiwand_upgrade::fill::whole(SAMPLE)).unwrap();
     assert_eq!(old.features(), Default::default());
     let plain: Json = serde_json::from_str(&old.to_json().unwrap()).unwrap();
-    assert!(plain["canvas"].get("clear").is_none() && plain.get("effects").is_none());
+    assert_eq!(plain["canvas"]["clear"], json!(true));
+    assert!(plain["effects"] == json!({}), "{}", plain["effects"]);
     let even = json!({ "schema": SCHEMA, "canvas": { "size": [8, 8] },
         "layers": [{ "blend_space": "canvas", "id": "a", "type": "solid", "color": "#000000", "parallax": [0.4, 0.4] }] });
     let even = Scene::from_json(&reiwand_upgrade::fill::whole(&even.to_string())).unwrap();

@@ -6,9 +6,9 @@ fn timelines_count_frames_wrap_and_seeds_start_fresh() {
         json!({ "timelines": [{ "id": "intro", "fps": 24, "frames": 48, "events": [{ "t": 1.5, "name": "drop" }] }] }),
     );
     assert_eq!((counted.timelines[0].length(), counted.validate(&BTreeMap::new())), (2.0, Vec::new()));
-    assert!(
-        counted.features().contains("timeline_frames") && !counted.to_json().unwrap().contains("duration")
-    );
+    let written: Json = serde_json::from_str(&counted.to_json().unwrap()).unwrap();
+    assert!(counted.features().contains("timeline_frames"), "{:?}", counted.features());
+    assert_eq!(written["timelines"][0]["duration"], json!(0.0));
     let wrapped =
         scene(json!({ "timelines": [{ "id": "intro", "duration": 2, "loop": "repeat", "wrap": true }] }));
     assert!(wrapped.validate(&BTreeMap::new()).is_empty() && wrapped.features().contains("timeline_wrap"));

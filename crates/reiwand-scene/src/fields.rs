@@ -75,13 +75,13 @@ impl Check<'_> {
 
     pub(crate) fn tint(&mut self, p: &str, color: Option<&Value<Color>>) {
         if let Some(c) = color {
-            self.uses(true, "layer_color");
+            self.uses(*c != crate::content::white(), "layer_color");
             self.value(&format!("{p}/color"), c);
         }
     }
 
     pub(crate) fn playback(&mut self, p: &str, b: &Playback) {
-        self.uses(true, "layer_playback");
+        self.uses(*b != Playback::default(), "layer_playback");
         self.number(&format!("{p}/rate"), &b.rate, 0.0, 16.0);
         self.value(&format!("{p}/playing"), &b.playing);
         self.range(&format!("{p}/start"), b.start, 0.0, 86_400.0);

@@ -56,7 +56,7 @@ fn newer_effects_refuse_values_outside_their_types_and_ranges() {
     let quiet = scene(effect(json!({ "effect": "fluid", "params": { "push": 0 } })));
     assert!(needs(&busy).cursor && needs(&pushed).cursor && !needs(&quiet).cursor);
     let timed =
-        |e: Json| descriptor("fluid").unwrap().needs(Use::Time, &serde_json::from_value(e).unwrap(), None);
+        |e: Json| descriptor("fluid").unwrap().needs(Use::Time, &serde_json::from_value(reiwand_scene::prefill::of("EffectUse", e)).unwrap(), None);
     let spout = json!({ "effect": "fluid", "params": { "emitters": [{ "from": [0.5, 0.9], "to": null, "angle": 0, "strength": 4 }] } });
     assert!(timed(spout) && !timed(json!({ "effect": "fluid" })), "only emitters ask for time");
     let still = json!({ "effect": "fluid", "params": { "emitters": [{ "from": [0.5, 0.9], "to": null, "angle": 0, "strength": 4 }], "strength": 0 } });

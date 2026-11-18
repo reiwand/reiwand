@@ -147,7 +147,12 @@ fn a_package_effect_use_reads_a_generic_picture_by_name() {
             "layers": used["layers"] }));
         let files = |path: &str, _| {
             Ok::<_, String>(
-                if path.ends_with("json") { descriptor.to_string() } else { wgsl.into() }.into_bytes(),
+                if path.ends_with("json") {
+                    reiwand_upgrade::descriptors::completed(&descriptor.to_string())
+                } else {
+                    wgsl.into()
+                }
+                .into_bytes(),
             )
         };
         let adopted = doc.adopt(&BTreeMap::new(), files).err().map(|e| e.to_string());
@@ -171,7 +176,7 @@ fn every_parameter_must_be_written() {
         doc.as_object_mut().unwrap().extend(layer(json!({})).as_object().unwrap().clone());
         let mut doc: Json = serde_json::from_str(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
         doc["layers"][0]["effects"][0]["params"] = params;
-        Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap().validate(&BTreeMap::new())
+        Scene::from_json(&doc.to_string()).unwrap().validate(&BTreeMap::new())
     };
     let absent = |id: &str| Issue::Absent { path: "/layers/0/effects/0/params".into(), id: id.into() };
     let ids = ["key", "tolerance", "softness", "spill", "distance", "keep"];
