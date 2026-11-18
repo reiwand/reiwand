@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use reiwand_editor::Project;
 use reiwand_editor::actions::{Action, plan};
 use reiwand_editor::ops::apply;
@@ -5,8 +7,8 @@ use reiwand_editor::starters::starter;
 use serde_json::{Value, json};
 
 fn act(doc: &mut Value, action: Value) -> anyhow::Result<()> {
-    let action: Action = serde_json::from_value(action)?;
-    apply(doc, &plan(doc, &action)?).map(drop)
+    let action: Action = serde_json::from_value(whole::action_doc(doc, action))?;
+    apply(doc, &reiwand_editor::completing::complete_all(doc, plan(doc, &action)?)).map(drop)
 }
 
 fn run(p: &mut Project, action: Value) -> anyhow::Result<()> {

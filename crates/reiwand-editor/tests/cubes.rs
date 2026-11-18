@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use image::{Rgba, Rgba32FImage, RgbaImage};
 use reiwand_editor::actions::Action;
 use reiwand_editor::starters::starter;
@@ -18,7 +20,7 @@ fn project(root: &TempDir) -> Project {
 }
 
 fn act(p: &mut Project, action: Value) -> anyhow::Result<()> {
-    p.act(&serde_json::from_value::<Action>(action).unwrap()).map(drop)
+    p.act(&serde_json::from_value::<Action>(whole::action(p, action)).unwrap()).map(drop)
 }
 
 fn import(p: &mut Project, root: &TempDir, (id, name): (&str, &str), save: impl Fn(&std::path::Path)) {

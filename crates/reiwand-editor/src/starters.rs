@@ -90,9 +90,10 @@ pub fn starter(name: &str, id: &str, title: &str, locale: &str) -> Result<Value>
     let made =
         crate::pages::manifest(name, base.clone()).or_else(|| crate::bundles::document(name, base.clone()));
     if let Some(mut doc) = made {
+        crate::completing::scene_doc(&mut doc);
+        crate::completing::manifest_doc(&mut doc);
         let ops = sync(&doc, &Default::default(), None);
         apply(&mut doc, &ops)?;
-        crate::completing::scene_doc(&mut doc);
         return Ok(doc);
     }
     let (layers, particles, mut properties) = layers(name)?;
@@ -111,9 +112,10 @@ pub fn starter(name: &str, id: &str, title: &str, locale: &str) -> Result<Value>
         scene["particles"] = particles;
     }
     let mut doc = json!({"manifest": manifest, "scene": scene});
+    crate::completing::scene_doc(&mut doc);
+    crate::completing::manifest_doc(&mut doc);
     let ops = sync(&doc, &Default::default(), None);
     apply(&mut doc, &ops)?;
-    crate::completing::scene_doc(&mut doc);
     Ok(doc)
 }
 

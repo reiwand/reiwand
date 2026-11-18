@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use reiwand_editor::actions::Action;
 use reiwand_editor::starters::starter;
 use reiwand_editor::{Project, check};
@@ -5,7 +7,7 @@ use serde_json::{Value, json};
 use std::path::Path;
 
 fn act(project: &mut Project, action: Value) -> anyhow::Result<()> {
-    project.act(&serde_json::from_value::<Action>(action).unwrap()).map(drop)
+    project.act(&serde_json::from_value::<Action>(whole::action(project, action)).unwrap()).map(drop)
 }
 
 fn preset(root: &Path) -> Project {

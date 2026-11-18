@@ -30,7 +30,7 @@ pub fn action(value: Value) -> Action {
 
 pub fn run(doc: &mut Value, value: Value) {
     let ops = plan(doc, &action(value)).unwrap();
-    apply(doc, &ops).unwrap();
+    apply(doc, &reiwand_editor::completing::complete_all(doc, ops)).unwrap();
 }
 
 pub fn at(problems: &[Problem], pointer: &str) -> bool {

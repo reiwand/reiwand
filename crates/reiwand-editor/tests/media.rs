@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use reiwand_editor::Project;
 use reiwand_editor::actions::Action;
 use reiwand_editor::inspect::fields;
@@ -20,7 +22,7 @@ fn project(root: &TempDir) -> Project {
 }
 
 fn act(p: &mut Project, action: Value) -> anyhow::Result<()> {
-    p.act(&serde_json::from_value::<Action>(action).unwrap()).map(drop)
+    p.act(&serde_json::from_value::<Action>(whole::action(p, action)).unwrap()).map(drop)
 }
 
 #[test]

@@ -2,6 +2,8 @@ mod credits;
 mod flashes;
 mod shots;
 mod strings;
+#[path = "../support/whole.rs"]
+mod whole;
 
 use reiwand_editor::Project;
 use reiwand_editor::actions::Action;
@@ -25,7 +27,7 @@ pub fn project(root: &TempDir, name: &str) -> Project {
 }
 
 pub fn act(p: &mut Project, action: Value) -> anyhow::Result<()> {
-    p.act(&serde_json::from_value::<Action>(action).unwrap()).map(drop)
+    p.act(&serde_json::from_value::<Action>(whole::action(p, action)).unwrap()).map(drop)
 }
 
 pub fn ask(p: &Project, query: Value) -> Value {
