@@ -4444,6 +4444,7 @@ dependencies = [
  "reiwand-core",
  "reiwand-format",
  "reiwand-schedule",
+ "reiwand-upgrade",
  "rusqlite",
  "serde",
  "serde_json",

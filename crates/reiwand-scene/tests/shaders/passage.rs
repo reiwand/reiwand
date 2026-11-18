@@ -22,7 +22,7 @@ fn crossing(transition: Json, descriptor: Json, wgsl: &str) -> Scene {
     let mut scene = Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new())
         .unwrap_or_else(|e| panic!("{e}"));
     let files = |path: &str, _: usize| match path {
-        "t/iris.json" => Ok(descriptor.to_string().into_bytes()),
+        "t/iris.json" => Ok(reiwand_upgrade::descriptors::completed(&descriptor.to_string()).into_bytes()),
         "t/iris.wgsl" => Ok(wgsl.as_bytes().to_vec()),
         _ => Err("missing"),
     };

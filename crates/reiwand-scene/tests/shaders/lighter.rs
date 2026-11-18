@@ -90,7 +90,7 @@ fn a_scene_whose_effects_bring_a_lighter_variant_names_its_feature() {
             Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new()).unwrap();
         let json = soft_json(lighter).to_string();
         let files = |path: &str, _: usize| match path {
-            "fx/soft.json" => Ok(json.clone().into_bytes()),
+            "fx/soft.json" => Ok(reiwand_upgrade::descriptors::completed(&json).into_bytes()),
             "fx/soft.wgsl" => Ok(SOFT.as_bytes().to_vec()),
             _ => Err("missing"),
         };

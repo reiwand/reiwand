@@ -87,7 +87,7 @@ fn scene(uses: Json) -> Scene {
 
 fn adopt(scene: &mut Scene, descriptor: &Json) -> Result<(), SceneError> {
     let files = |path: &str, _: usize| match path {
-        "fx/ripple.json" => Ok(descriptor.to_string().into_bytes()),
+        "fx/ripple.json" => Ok(reiwand_upgrade::descriptors::completed(&descriptor.to_string()).into_bytes()),
         "fx/ripple.wgsl" => Ok(WGSL.as_bytes().to_vec()),
         _ => Err("missing"),
     };

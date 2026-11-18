@@ -53,7 +53,9 @@ fn colors_blend_in_oklab_along_the_shorter_hue() {
 #[test]
 fn handles_tracks_and_bases_shape_values() {
     let opacity = |v: Json| json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ffffff", "opacity": v }]);
-    let eased = opacity(json!({ "keys": [[0, 0, { "out": [1, 0] }], [2, 1, { "in": [1, 0] }]] }));
+    let eased = opacity(
+        json!({ "keys": [[0, 0, { "in": null, "out": [1, 0] }], [2, 1, { "in": [1, 0], "out": null }]] }),
+    );
     let mut rt = runtime(eased);
     assert!((at(&mut rt, 1.0).draws[0].opacity - 0.5).abs() < 1e-3);
     let early = at(&mut rt, 0.4).draws[0].opacity;
@@ -108,7 +110,8 @@ fn time_of_day_and_dates_follow_the_local_clock() {
 
 #[test]
 fn handles_time_positions_and_colors_by_their_share_of_the_way() {
-    let curve = json!([[0, [0, 0], { "out": [1, 0] }], [2, [40, 20], { "in": [1, 0] }]]);
+    let curve =
+        json!([[0, [0, 0], { "in": null, "out": [1, 0] }], [2, [40, 20], { "in": [1, 0], "out": null }]]);
     let moved = json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ffffff", "size": [10, 10],
         "transform": { "position": { "keys": curve } } }]);
     let mut rt = runtime(moved);
@@ -118,14 +121,14 @@ fn handles_time_positions_and_colors_by_their_share_of_the_way() {
     assert!(world[4] < 4.0 && world[5] < 2.0, "a flat handle starts slowly: {world:?}");
     let solid = |keys: Json| json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": { "keys": keys } }]);
     let mid = color(&at(&mut runtime(solid(json!([[0, "#000000"], [2, "#ffffff"]]))), 1.0))[0];
-    let mut rt = runtime(solid(json!([[0, "#000000", { "out": [1, 0.9] }], [2, "#ffffff"]])));
+    let mut rt = runtime(solid(json!([[0, "#000000", { "in": null, "out": [1, 0.9] }], [2, "#ffffff"]])));
     let [r, g, b, _] = color(&at(&mut rt, 1.0));
     assert!(
         (r - g).abs() < 1e-3 && (g - b).abs() < 1e-3 && r > mid + 0.1,
         "an early rise is not past {mid}: {r}"
     );
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [100, 50] }, "layers": [{ "blend_space": "canvas", "id": "t", "type": "text",
-        "text": { "keys": [[0, "a", { "out": [1, 0] }], [2, "b"]] } }] });
+        "text": { "keys": [[0, "a", { "in": null, "out": [1, 0] }], [2, "b"]] } }] });
     let refused =
         Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new()).unwrap_err();
     assert!(format!("{refused:?}").contains("/layers/0/text/keys/0/2"), "{refused:?}");
@@ -149,17 +152,18 @@ fn handles_per_part_shape_each_part_in_its_own_units() {
         json!([{ "blend_space": "canvas", "id": "s", "type": "solid", "color": "#ffffff", "size": [10, 10],
             "transform": { "position": { "keys": keys } } }])
     };
-    let split = json!([[0, [0, 0], { "out": [[1, 0], [0.5, 30]] }], [2, [40, 0]]]);
+    let split = json!([[0, [0, 0], { "in": null, "out": [[1, 0], [0.5, 30]] }], [2, [40, 0]]]);
     let world = at(&mut runtime(place(split)), 1.0).draws[0].world.0;
     assert!((world[4] - 20.0).abs() > 1.0 && world[5] > 5.0, "a flat part bends on its own: {world:?}");
-    let short = json!([[0, [0, 0], { "out": [1, 0] }], [2, [40, 20]]]);
-    let parts = json!([[0, [0, 0], { "out": [[1, 0], [1, 0]] }], [2, [40, 20]]]);
+    let short = json!([[0, [0, 0], { "in": null, "out": [1, 0] }], [2, [40, 20]]]);
+    let parts = json!([[0, [0, 0], { "in": null, "out": [[1, 0], [1, 0]] }], [2, [40, 20]]]);
     for t in [0.3, 1.0, 1.7] {
         let a = at(&mut runtime(place(short.clone())), t).draws[0].world.0;
         let b = at(&mut runtime(place(parts.clone())), t).draws[0].world.0;
         assert!((a[4] - b[4]).abs() < 1e-2 && (a[5] - b[5]).abs() < 1e-2, "{t}: {a:?} {b:?}");
     }
-    let wide = json!([[0, [0, 0], { "out": [[1, 0], [1, 0], [1, 0], [1, 0], [1, 0]] }], [2, [1, 1]]]);
+    let wide =
+        json!([[0, [0, 0], { "in": null, "out": [[1, 0], [1, 0], [1, 0], [1, 0], [1, 0]] }], [2, [1, 1]]]);
     assert!(
         Scene::load(
             &reiwand_upgrade::fill::whole(

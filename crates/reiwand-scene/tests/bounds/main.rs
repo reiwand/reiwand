@@ -20,7 +20,7 @@ fn faults(changes: &[(&str, Json)]) -> Vec<String> {
         }
     }
     doc["particles"] = prefill::all(doc["particles"].take());
-    match Scene::from_json(&doc.to_string()) {
+    match Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())) {
         Ok(scene) => scene.validate(&BTreeMap::new()).iter().map(ToString::to_string).collect(),
         Err(e) => vec![e.to_string()],
     }

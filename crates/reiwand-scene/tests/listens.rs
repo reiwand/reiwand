@@ -6,7 +6,7 @@ const STEP: f32 = 1.0 / 60.0;
 fn listen(extra: Json) -> Listen {
     let mut l = json!({ "kind": "surge", "unit": "amplitude", "window": 1, "reference": "band", "hold_silence": false });
     l.as_object_mut().unwrap().extend(extra.as_object().unwrap().clone());
-    serde_json::from_value(l).unwrap()
+    serde_json::from_value(reiwand_scene::prefill::of("Listen", l)).unwrap()
 }
 
 fn tone(on: bool) -> AudioFrame {
@@ -43,10 +43,15 @@ fn a_surge_listen_pops_after_silence_and_decays() {
 
 #[test]
 fn surge_fields_are_required_and_only_for_surge() {
-    let missing: Listen = serde_json::from_value(json!({ "kind": "surge", "unit": "db" })).unwrap();
+    let missing: Listen = serde_json::from_value(
+        json!({ "kind": "surge", "unit": "db", "window": null, "reference": null, "hold_silence": null }),
+    )
+    .unwrap();
     assert_eq!(missing.problems("/x").len(), 3);
-    let stray: Listen =
-        serde_json::from_value(json!({ "kind": "relative", "unit": "db", "window": 1 })).unwrap();
+    let stray: Listen = serde_json::from_value(
+        json!({ "kind": "relative", "unit": "db", "window": 1, "reference": null, "hold_silence": null }),
+    )
+    .unwrap();
     assert!(matches!(stray.problems("/x")[0], Issue::Type(_)));
     assert!(listen(json!({})).problems("/x").is_empty());
     assert!(!listen(json!({ "window": 90 })).problems("/x").is_empty());

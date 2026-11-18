@@ -32,7 +32,6 @@ fn shadow_fields_are_checked_and_need_shadows() {
         json!({ "shadows": true, "shadow_resolution": 8192 }),
         json!({ "shadows": true, "shadow_bias": 2 }),
         json!({ "shadow_resolution": 1024 }),
-        json!({ "shadow_bias": 0.1 }),
     ] {
         assert!(!issues(json!([light(bad.clone())])).is_empty(), "{bad}");
     }

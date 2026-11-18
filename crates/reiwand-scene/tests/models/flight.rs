@@ -1,7 +1,18 @@
 use super::*;
 
-fn path(keys: Value, closed: bool) -> CameraPath {
-    serde_json::from_value(json!({ "id": "p", "keys": keys, "loop": closed })).unwrap()
+fn path(mut keys: Value, closed: bool) -> CameraPath {
+    for key in keys.as_array_mut().unwrap() {
+        for field in ["up", "fov"] {
+            key.as_object_mut().unwrap().entry(field).or_insert(Value::Null);
+        }
+    }
+    serde_json::from_value(json!({ "id": "p", "keys": keys, "ease": null, "loop": closed })).unwrap()
+}
+
+fn fading(to: &str) -> Camera3d {
+    serde_json::from_value(json!({ "fov": 60, "near": 0.1, "far": 100, "eye": [0, 0, 5], "center": [0, 0, 0],
+        "up": [0, 1, 0], "paths": [], "order": "sequential", "fade": { "to": to, "duration": 1 } }))
+    .unwrap()
 }
 
 fn base() -> Eye {
@@ -62,11 +73,11 @@ fn random_order_plays_every_path_once_per_round_and_fades_between_them() {
         json!([{ "t": 0, "eye": [3, 0, 5], "center": [0, 0, 0] }, { "t": 2, "eye": [3, 0, 5], "center": [0, 0, 0] }]),
         false,
     );
-    let cam: Camera3d = serde_json::from_value(json!({ "fade": { "to": "black", "duration": 1 } })).unwrap();
+    let cam = fading("black");
     let paths = [a.clone(), b.clone()];
     let fade = |t: f32| play_paths(&paths, &cam, t, 60.0).unwrap().fade;
     assert!(fade(1.0) < 1e-4 && fade(2.0) > 0.99 && fade(1.75) > 0.4 && fade(2.25) > 0.4);
-    let cam: Camera3d = serde_json::from_value(json!({ "fade": { "to": "cross", "duration": 1 } })).unwrap();
+    let cam = fading("cross");
     let crossed = play_paths(&paths, &cam, 1.5, 60.0).unwrap();
     let (eye, k) = crossed.cross.unwrap();
     assert!((k - 0.5).abs() < 1e-4 && gap(eye.at, [3.0, 0.0, 5.0]) < 1e-4);

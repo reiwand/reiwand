@@ -104,6 +104,9 @@ pub fn sample(root: &Value, schema: &Value) -> Value {
     if let Some(d) = schema.get("default") {
         return d.clone();
     }
+    if schema["x-condition"] == true {
+        return json!({});
+    }
     let (schema, _) = deref(root, schema);
     if let Some(d) = schema.get("default").or_else(|| schema.get("const")) {
         return d.clone();

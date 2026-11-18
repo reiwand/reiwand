@@ -46,7 +46,8 @@ fn features_name_what_older_versions_cannot_read() {
         (used("speed"), used("photos"), used("photo")),
         (vec!["properties2"], vec!["properties2", "folder"], vec!["properties2", "user_videos"])
     );
-    let plain: BTreeMap<String, Property> = serde_json::from_str(include_str!("../props.json")).unwrap();
+    let plain =
+        reiwand_scene::prefill::properties(serde_json::from_str(include_str!("../props.json")).unwrap());
     assert!(plain.values().all(|p| p.features().is_empty()));
     let round = |p: &Property| serde_json::from_value::<Property>(serde_json::to_value(p).unwrap()).unwrap();
     assert!(props.values().all(|p| round(p) == *p));

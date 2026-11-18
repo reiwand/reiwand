@@ -3,7 +3,9 @@ use super::*;
 const SAMPLED: &str = "fn material(s: Surface) -> Surface {\n    var o = s;\n    o.albedo = image0(s.uv) * param(0u);\n    return o;\n}";
 
 fn coat(params: Json) -> String {
-    json!({ "id": "coat", "stage": "material", "cost": {}, "params": params }).to_string()
+    reiwand_upgrade::descriptors::completed(
+        &json!({ "id": "coat", "stage": "material", "cost": {}, "params": params }).to_string(),
+    )
 }
 
 fn picture(id: &str) -> Json {
@@ -61,11 +63,11 @@ fn material_images_name_pictures_of_the_package() {
         DEEP.replacen(r#""shader": "glass""#, r#""params": { "base": "nowhere" }, "shader": "glass""#, 1);
     let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc)).unwrap();
     let read = |path: &str, max: usize| match path {
-        "effects/glass.json" => {
-            Ok(json!({ "id": "glass", "stage": "material", "cost": {}, "params": [picture("base")] })
-                .to_string()
-                .into_bytes())
-        }
+        "effects/glass.json" => Ok(reiwand_upgrade::descriptors::completed(
+            &json!({ "id": "glass", "stage": "material", "cost": {}, "params": [picture("base")] })
+                .to_string(),
+        )
+        .into_bytes()),
         "effects/glass.wgsl" => Ok(SAMPLED.replace("* param(0u)", "").into_bytes()),
         p => files(&figure())(p, max),
     };
