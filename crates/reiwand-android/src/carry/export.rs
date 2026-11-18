@@ -39,7 +39,7 @@ pub(super) fn export(path: &str, own: bool, secrets: bool, password: &str) -> Re
         files.clear();
     }
     if secrets {
-        let provider_keys = carried::secrets().into_iter().collect();
+        let provider_keys = carried::secrets()?.into_iter().collect();
         content.secrets = Some(Secrets { sessions: Vec::new(), provider_keys });
     }
     let sections = content.sections();

@@ -111,7 +111,7 @@ fn bring(entry: &mut Entry, fetched: Fetched) -> Result<u32, Error> {
 }
 
 fn one(id: &str) -> Result<Value, Error> {
-    let entry = saved::load().into_iter().find(|e| e.id == id);
+    let entry = saved::load()?.into_iter().find(|e| e.id == id);
     let entry =
         entry.ok_or_else(|| said("android.provider_missing", "there is no picture source %1", &[&id]))?;
     if !entry.on {
@@ -140,7 +140,7 @@ fn one(id: &str) -> Result<Value, Error> {
     });
     drop(fs::remove_dir_all(&dir));
     let _held = saved::held();
-    let mut all = saved::load();
+    let mut all = saved::load()?;
     let slot = saved::find(&mut all, id)?;
     match outcome {
         Ok((fresh, report)) => {
@@ -173,7 +173,7 @@ pub(super) fn sync(id: &str, force: bool) -> Result<Value, Error> {
     CANCEL.store(false, Relaxed);
     let now = library::now();
     let ids: Vec<String> = match id {
-        "" => saved::load().into_iter().filter(|e| e.on && (force || due(e, now))).map(|e| e.id).collect(),
+        "" => saved::load()?.into_iter().filter(|e| e.on && (force || due(e, now))).map(|e| e.id).collect(),
         id => vec![id.to_owned()],
     };
     let mut reports = Vec::new();

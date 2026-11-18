@@ -2,6 +2,7 @@ use crate::model::{Content, Manifest};
 use crate::safe::{check_id, check_name, hex};
 use crate::seal::{is_sealed, open as unseal};
 use crate::{Error, FORMAT, Result};
+use reiwand_core::explicit;
 use sha2::{Digest, Sha256};
 use std::fs::File;
 use std::io::{Cursor, Read, Seek, Write};
@@ -104,11 +105,16 @@ fn from_source(source: Box<dyn Source>, limits: Limits) -> Result<Opened> {
     })?;
     vet(&mut archive, &limits)?;
     let head = read_capped(&mut archive, "carry.json", limits.max_json)?;
-    let found = serde_json::from_slice::<serde_json::Value>(&head)?["format"].as_u64().unwrap_or(0) as u32;
+    let head: serde_json::Value = serde_json::from_slice(&head)?;
+    let found =
+        head["format"].as_u64().ok_or_else(|| Error::Invalid("carry.json has no format".into()))? as u32;
     if found > FORMAT {
         return Err(Error::Future { found, known: FORMAT });
     }
-    let manifest: Manifest = serde_json::from_slice(&head)?;
+    if found < FORMAT {
+        return Err(Error::Old { found, known: FORMAT });
+    }
+    let manifest: Manifest = explicit::read("carry.json", &head)?;
     let json = read_capped(&mut archive, "files/content.json", limits.max_json)?;
     let want = manifest
         .sums
@@ -117,7 +123,7 @@ fn from_source(source: Box<dyn Source>, limits: Limits) -> Result<Opened> {
     if *want != hex(&Sha256::digest(&json)) {
         return Err(Error::Sum("files/content.json".into()));
     }
-    let content: Content = serde_json::from_slice(&json)?;
+    let content: Content = explicit::read_str("files/content.json", std::str::from_utf8(&json)?)?;
     if content.sections() != manifest.sections {
         return Err(Error::Invalid("the sections in the manifest do not match the content".into()));
     }

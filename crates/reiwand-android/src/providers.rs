@@ -60,7 +60,7 @@ pub(crate) fn request(request: Request) -> Result<Value, Error> {
         Request::ProviderSet { id, key, value } => set(&id, &key, &value),
         Request::ProviderSecret { id, secret } => {
             let _held = held();
-            find(&mut load(), &id)?;
+            find(&mut load()?, &id)?;
             saved::keep(&id, secret.trim()).map(|()| Value::Null)
         }
         Request::ProviderOn { id, on } => switch(&id, on),
@@ -90,7 +90,7 @@ fn shown(entry: &Entry, now: i64) -> Result<Value, Error> {
 
 fn listed() -> Result<Value, Error> {
     let now = library::now();
-    let entries: Result<Vec<Value>, Error> = load().iter().map(|e| shown(e, now)).collect();
+    let entries: Result<Vec<Value>, Error> = load()?.iter().map(|e| shown(e, now)).collect();
     Ok(json!({"kinds": schema(), "providers": entries?, "network": settings::chosen(NETWORK)}))
 }
 
@@ -107,9 +107,9 @@ fn add(name: &str, given: &Options, secret: &str, on: bool) -> Result<Value, Err
         return Err(said("android.provider_secret", "%1 needs its key or password first", &[&name]));
     }
     let _held = held();
-    let mut entries = load();
+    let mut entries = load()?;
     let id = fresh_id(&entries, name);
-    entries.push(Entry { id: id.clone(), kind: name.to_owned(), options, on, ..Entry::default() });
+    entries.push(Entry::new(id.clone(), name.to_owned(), options, on));
     save(&entries)?;
     saved::keep(&id, secret.trim())?;
     Ok(json!(id))
@@ -117,7 +117,7 @@ fn add(name: &str, given: &Options, secret: &str, on: bool) -> Result<Value, Err
 
 fn set(id: &str, key: &str, value: &str) -> Result<Value, Error> {
     let _held = held();
-    let mut entries = load();
+    let mut entries = load()?;
     let entry = find(&mut entries, id)?;
     let known = kind(&entry.kind)?;
     let before = hosts(known, &entry.options);
@@ -134,7 +134,7 @@ fn set(id: &str, key: &str, value: &str) -> Result<Value, Error> {
 
 fn switch(id: &str, on: bool) -> Result<Value, Error> {
     let _held = held();
-    let mut entries = load();
+    let mut entries = load()?;
     find(&mut entries, id)?.on = on;
     save(&entries)?;
     Ok(Value::Null)
@@ -142,7 +142,7 @@ fn switch(id: &str, on: bool) -> Result<Value, Error> {
 
 fn remove(id: &str, purge: bool) -> Result<Value, Error> {
     let _held = held();
-    let mut entries = load();
+    let mut entries = load()?;
     find(&mut entries, id)?;
     entries.retain(|e| e.id != id);
     save(&entries)?;

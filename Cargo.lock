@@ -4273,6 +4273,7 @@ dependencies = [
  "argon2",
  "chacha20poly1305",
  "getrandom 0.4.3",
+ "reiwand-core",
  "schemars",
  "serde",
  "serde_json",
@@ -4688,6 +4689,7 @@ dependencies = [
  "toml",
  "toml_edit",
  "zbus",
+ "zip",
 ]
 
 [[package]]

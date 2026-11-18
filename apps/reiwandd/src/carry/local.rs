@@ -47,7 +47,7 @@ mod tests {
             favourites: vec![item("a")],
             installed: vec![Installed { repo_id: "r".into(), id: "p".into(), version: "1.0.0".into() }],
             own: vec![OwnFile { id: "h".into(), name: "x.png".into() }],
-            ..Content::default()
+            ..Content::empty()
         };
         let local = local_of(&content, ["prov".to_owned()].into(), BTreeSet::new());
         assert!(

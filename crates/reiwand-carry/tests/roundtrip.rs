@@ -12,7 +12,7 @@ fn plain_round_trip_with_own_files() {
     let path = dir.path().join("a.reiwand");
     write(&path, &export(content(), own, None)).unwrap();
     let mut opened = open(&path, None, Limits::default()).unwrap();
-    assert_eq!(opened.manifest.format, 1);
+    assert_eq!(opened.manifest.format, 2);
     assert_eq!(opened.content.repositories, content().repositories);
     assert_eq!(opened.content.own.len(), 1);
     assert!(opened.manifest.sections.contains(&"own".to_string()));
@@ -45,7 +45,7 @@ fn encrypted_round_trip_with_secrets() {
 #[test]
 fn secrets_need_a_password() {
     let mut c = content();
-    c.secrets = Some(Secrets::default());
+    c.secrets = Some(Secrets { sessions: Vec::new(), provider_keys: Default::default() });
     assert!(write_bytes(&export(c, vec![], None)).is_err());
 }
 

@@ -1,9 +1,8 @@
 pub(crate) const NETWORK: &str = "sync_network";
 use crate::said;
-use crate::{Error, power, store};
+use crate::{Error, own, power, store};
 use reiwand_core::settings::fps::DISPLAY;
 use reiwand_core::{Config, Fit, TransitionKind};
-use std::fs;
 use std::path::Path;
 use std::sync::{Mutex, MutexGuard, PoisonError};
 use std::time::Duration;
@@ -13,16 +12,7 @@ pub(crate) const BACKEND: &str = "backend";
 const CHARGER: &str = "charger_fps";
 const FIT: &str = "fit";
 const BATTERY: &str = "playback.max_fps";
-const CHOICES: [(&str, &[&str]); 6] = [
-    (COLORS, &["chosen", "always", "never"]),
-    (CHARGER, &["60", "30"]),
-    (BACKEND, &["auto", "vulkan", "gl"]),
-    (NETWORK, &["unmetered", "any"]),
-    ("video_convert", &["auto", "keep", "off"]),
-    (crate::net::PRIVATE, &["off", "on"]),
-];
 const SHARED: &str = "config.toml";
-const OWN: &str = "settings.toml";
 
 static CONFIG: Mutex<Option<Config>> = Mutex::new(None);
 
@@ -37,6 +27,7 @@ pub(crate) struct Look {
 }
 
 pub(crate) fn prepare() -> Result<(), Error> {
+    own::read()?;
     caps();
     Ok(())
 }
@@ -101,28 +92,22 @@ pub(crate) fn relinked(old: &Path, new: &Path) -> Result<(), Error> {
     })
 }
 
-fn table() -> Result<toml::Table, Error> {
-    let text = fs::read_to_string(store::dir()?.join(OWN)).unwrap_or_default();
-    Ok(text.parse().unwrap_or_default())
-}
-
 pub(crate) fn setting(key: &str, value: Option<&str>) -> Result<String, Error> {
-    if let Some((_, allowed)) = CHOICES.iter().find(|(k, _)| *k == key) {
-        let mut own = table()?;
+    if let Some(allowed) = own::allowed(key) {
+        let mut table = own::read()?;
         if let Some(value) = value {
             let valid = allowed.contains(&value).then_some(value);
-            own.insert(
+            table.insert(
                 key.into(),
                 valid
                     .ok_or_else(|| said("android.setting_value", "%1 cannot be %2", &[&key, &value]))?
                     .into(),
             );
-            store::write(&store::dir()?.join(OWN), own.to_string().as_bytes())?;
+            own::write(&table)?;
             store::changed();
             caps();
         }
-        let saved = own.get(key).and_then(toml::Value::as_str).filter(|v| allowed.contains(v));
-        return Ok(saved.unwrap_or(allowed[0]).to_owned());
+        return own::value(key);
     }
     if let Some(value) = value {
         update(|config| match key {

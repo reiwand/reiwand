@@ -64,7 +64,18 @@ fn a_huge_manifest_is_refused() {
 fn newer_formats_give_a_clear_error() {
     let bytes = zip_with(&[("carry.json", br#"{"format": 9, "future": true}"#.to_vec(), false)]);
     match open_bytes(bytes, None, Limits::default()) {
-        Err(e @ Error::Future { found: 9, known: 1 }) => assert!(e.to_string().contains("newer")),
+        Err(e @ Error::Future { found: 9, known: 2 }) => assert!(e.to_string().contains("newer")),
+        other => panic!("{:?}", other.err()),
+    }
+}
+
+#[test]
+fn the_old_format_is_refused_naming_the_command() {
+    let bytes = zip_with(&[("carry.json", br#"{"format": 1}"#.to_vec(), false)]);
+    match open_bytes(bytes, None, Limits::default()) {
+        Err(e @ Error::Old { found: 1, known: 2 }) => {
+            assert!(e.to_string().contains("reiwand-upgrade export"), "{e}")
+        }
         other => panic!("{:?}", other.err()),
     }
 }

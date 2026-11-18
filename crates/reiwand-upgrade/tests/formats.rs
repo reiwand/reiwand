@@ -33,11 +33,10 @@ fn carry_reads_the_same() {
     let mut doc: Value = serde_json::from_str(&original).unwrap();
     assert!(complete(Format::Carry, &mut doc).written > 0);
     let done = serde_json::to_string_pretty(&doc).unwrap() + "\n";
-    let (a, b) = (
-        serde_json::from_str::<reiwand_carry::Content>(&original).unwrap(),
-        serde_json::from_str::<reiwand_carry::Content>(&done).unwrap(),
-    );
-    assert!(a == b);
+    let strict =
+        |text: &str| reiwand_core::explicit::read_str::<reiwand_carry::Content>("content.json", text);
+    assert!(strict(&original).is_err());
+    assert!(strict(&done).is_ok());
     expect("carry.completed.json", &done);
     assert_eq!(complete(Format::Carry, &mut doc).written, 0);
 }

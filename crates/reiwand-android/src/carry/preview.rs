@@ -9,7 +9,7 @@ use serde_json::{Value, json};
 pub(super) fn preview(path: &str, password: &str) -> Result<Value, Error> {
     let opened = open(path, password)?;
     let content = &opened.content;
-    let local = local_of(&gather()?.content, keys_held());
+    let local = local_of(&gather()?.content, keys_held()?);
     let rows: Vec<Value> = (rows_of(content, &local).rows.iter())
         .map(|r| json!({"section": r.section, "held": r.held, "new": r.new, "skipped": r.skipped, "conflicts": r.conflicts}))
         .collect();

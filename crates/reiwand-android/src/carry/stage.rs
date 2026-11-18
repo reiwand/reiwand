@@ -11,6 +11,11 @@ pub(super) fn open(path: &str, password: &str) -> Result<Opened, Error> {
         reiwand_carry::Error::WrongPassword => {
             said("android.carry_wrong_password", "Wrong password, or the file is damaged", &[])
         }
+        reiwand_carry::Error::Old { found, .. } => said(
+            "android.carry_old",
+            "This file has the older format %1. On a computer run reiwand-upgrade export FILE (an encrypted file stays encrypted and asks for its password), then choose the converted file",
+            &[&found],
+        ),
         other => said("android.carry_unreadable", "This file cannot be read: %1", &[&other.to_string()]),
     })
 }

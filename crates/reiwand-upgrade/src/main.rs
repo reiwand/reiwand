@@ -30,6 +30,11 @@ usage:
       writes into each effect descriptor (or descriptor catalog) every field it leaves out, with the value
       applied until now, so each parameter and pass reads exactly as before
 
+  reiwand-upgrade export FILE [--password-file FILE] [--check]
+      converts an export file (.reiwand) of format 1 into format 2, with every field written; an encrypted file
+      stays encrypted: give its password with --password-file, or type it when asked; --check only says what
+      would change
+
 It is safe to run again: a folder that is already current is left alone.";
 
 fn user_data() -> anyhow::Result<PathBuf> {
@@ -106,6 +111,9 @@ fn main() -> anyhow::Result<()> {
         println!("{changed} effect descriptors upgraded");
         return Ok(());
     }
+    if what == Some("export") {
+        return export(&args[1..]);
+    }
     let given = args.iter().position(|a| a == "--data").and_then(|at| args.get(at + 1));
     let data = match (what, given) {
         (Some("client"), None) => user_data()?,
@@ -134,5 +142,26 @@ fn main() -> anyhow::Result<()> {
         let failed = Command::new(program).args(&args[at + 2..]).exec();
         bail!("cannot run {program}: {failed}");
     }
+    Ok(())
+}
+
+fn export(args: &[String]) -> anyhow::Result<()> {
+    let path = PathBuf::from(args.first().context("export needs the file")?);
+    let flag = |name: &str| args.iter().position(|a| a == name);
+    let mut password = match flag("--password-file").and_then(|at| args.get(at + 1)) {
+        Some(file) => Some(std::fs::read_to_string(file)?.trim_end_matches(['\r', '\n']).to_owned()),
+        None => None,
+    };
+    let mut magic = [0u8; 8];
+    let sealed = std::io::Read::read_exact(&mut std::fs::File::open(&path)?, &mut magic).is_ok()
+        && reiwand_carry::is_sealed(&magic);
+    if sealed && password.is_none() {
+        eprint!("password of {}: ", path.display());
+        let mut line = String::new();
+        std::io::stdin().read_line(&mut line)?;
+        password = Some(line.trim_end_matches(['\r', '\n']).to_owned());
+    }
+    let done = reiwand_upgrade::carry::file(&path, password.as_deref(), flag("--check").is_some())?;
+    println!("{}: {done}", path.display());
     Ok(())
 }

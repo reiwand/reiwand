@@ -103,7 +103,7 @@ fn foreign(dir: &Path) {
     let content = Content {
         lists: vec![List { name: "Far".into(), items: vec![item], query: None, rules: None }],
         providers: vec![lonely],
-        ..Content::default()
+        ..Content::empty()
     };
     let export = Export {
         program: "reiwand".into(),

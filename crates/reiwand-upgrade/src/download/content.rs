@@ -38,7 +38,7 @@ pub fn build(
     who: &BTreeMap<String, Item>,
     installed: &[Installed],
 ) -> Content {
-    let mut content = Content::default();
+    let mut content = Content::empty();
     let mut favourites = BTreeSet::new();
     for (key, view) in views.iter().filter(|(key, _)| key.starts_with("library/")) {
         let Some(item) = who.get(key) else { continue };

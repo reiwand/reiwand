@@ -38,6 +38,7 @@ mod library;
 mod media;
 mod net;
 mod opened;
+mod own;
 mod own_sound;
 mod pack;
 mod page;
@@ -138,6 +139,8 @@ pub(crate) enum Error {
     Format(#[from] reiwand_format::Error),
     #[error("{0}")]
     Setting(String),
+    #[error(transparent)]
+    Stored(#[from] reiwand_core::explicit::ReadError),
     #[cfg(target_os = "android")]
     #[error("the surface has no native window")]
     Window,

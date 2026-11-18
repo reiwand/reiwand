@@ -8,6 +8,7 @@ rust-version.workspace = true
 
 [dependencies]
 argon2.workspace = true
+reiwand-core.workspace = true
 chacha20poly1305.workspace = true
 getrandom.workspace = true
 schemars = { workspace = true, optional = true }

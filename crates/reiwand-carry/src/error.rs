@@ -10,6 +10,12 @@ pub enum Error {
         "the file has format {found}, newer than the format {known} this program reads; update the program"
     )]
     Future { found: u32, known: u32 },
+    #[error(
+        "the file has format {found}, and this program reads format {known}; convert it with `reiwand-upgrade export FILE` on a computer (an encrypted file stays encrypted and asks for its password), then use the converted file"
+    )]
+    Old { found: u32, known: u32 },
+    #[error("{0}")]
+    Field(#[from] reiwand_core::explicit::ReadError),
     #[error("the file is encrypted and needs its password")]
     NeedsPassword,
     #[error("wrong password, or the file is damaged")]
@@ -32,6 +38,12 @@ impl From<zip::result::ZipError> for Error {
             zip::result::ZipError::Io(io) => Error::Io(io),
             other => Error::Invalid(other.to_string()),
         }
+    }
+}
+
+impl From<std::str::Utf8Error> for Error {
+    fn from(error: std::str::Utf8Error) -> Self {
+        Error::Invalid(error.to_string())
     }
 }
 

@@ -28,6 +28,7 @@ impl Error {
             Error::Config(e) => text("android.config", e.to_string()),
             Error::Image(e) => text("android.image", e.to_string()),
             Error::Json(e) => text("android.json", e.to_string()),
+            Error::Stored(e) => text("android.stored", e.to_string()),
             Error::Unprepared => ("android.unprepared", Vec::new()),
             #[cfg(target_os = "android")]
             e @ (Error::Jni(_) | Error::Render(_) | Error::Window) => text("android.internal", e.to_string()),

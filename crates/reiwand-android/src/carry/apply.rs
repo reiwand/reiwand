@@ -57,7 +57,7 @@ fn providers(changes: &[Change], report: &mut Report) {
 
 pub(super) fn import(path: &str, password: &str, pick: &Pick) -> Result<Value, Error> {
     let mut opened = open(path, password)?;
-    let local = local_of(&gather()?.content, carried::keys_held());
+    let local = local_of(&gather()?.content, carried::keys_held()?);
     let changes = plan(&opened.content, &local, pick).changes;
     let mut report = Report::default();
     for change in &changes {

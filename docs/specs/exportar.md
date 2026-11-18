@@ -6,7 +6,7 @@ The `reiwand-carry` crate defines the file that moves a device's configuration t
 
 A `.reiwand` file is a zip archive:
 
-- `carry.json`: the manifest. Fields: `format` (1), `program`, `version`, `created` (text given by the caller), `sections` (names of the sections held), `encrypted`, and `sums` (SHA-256 of every file under `files/`).
+- `carry.json`: the manifest. Fields: `format` (2), `program`, `version`, `created` (text given by the caller), `sections` (names of the sections held), `encrypted`, and `sums` (SHA-256 of every file under `files/`).
 - `files/content.json`: the data of every section.
 - `files/own/<id>`: one file per own wallpaper (stored, not recompressed). `<id>` only has letters, digits, `.`, `-` and `_`.
 
@@ -65,3 +65,13 @@ Ajustes > Equipo > «Mover mi configuración» ofrece «Exportar mi configuraci�
 ## En el teléfono
 
 `crates/reiwand-android` (`carry`) arma el mismo contenido que el daemon y aplica el mismo orden y el mismo informe. El archivo se elige con el selector de archivos del sistema: Kotlin copia el documento a la caché de la app (o desde ella) y Rust trabaja sobre esa ruta. Operaciones de `Native.account`: `carry_preview`, `carry_export` (`own`, `secrets`, `password`) y `carry_import` (`take`, `lists`, `suffix`). Un archivo exportado en el escritorio se importa en el teléfono y al revés; las claves de los proveedores y las sesiones siguen las mismas reglas. Las sesiones de cuenta de un archivo no se aplican en el teléfono: se anotan para que la persona inicie sesión de nuevo. El teléfono no tiene subcomando de terminal: la paridad es la de los dos programas sobre el mismo archivo.
+
+## Formato 2: valores explícitos
+
+- `carry.json` y `files/content.json` llevan todos los campos. Un valor opcional sin contenido se escribe como `null`; no se omite. El lector (`reiwand_carry::read`) rechaza el archivo y nombra la ruta del campo que falta.
+- Un archivo de formato 1, también cifrado, se rechaza con un mensaje que nombra la salida: `reiwand-upgrade export ARCHIVO` en un ordenador. Si el archivo está cifrado sigue cifrado y la herramienta pide la contraseña. El resultado se escribe junto al original (el original no se toca si la conversión falla) y es el que se importa, en el ordenador o en el teléfono.
+- Tabla de valores sugeridos: `reiwand_carry::PREFILL` (una por formato). Los campos `Option` se clasifican como `bloque` (bloque opcional que podría faltar más adelante: `List.rules`, `Content.secrets`) o `valor` (el `null` significa algo y siempre se escribe: `Item.repo_id`, `Repository.pin`, `List.query`).
+
+## Teléfono: ajustes propios
+
+El teléfono escribe `settings.toml` completo en el primer arranque, con `format = 2` y los valores de `own::PREFILL`. Un archivo antiguo o con un valor fuera de lo permitido no se lee: la aplicación lo dice y pide actualizar encima (el receptor de actualización ejecuta `reiwand-upgrade`, que completa el archivo una sola vez) o borrar los datos. Los archivos `providers.json` se leen también sin omisiones: un campo ausente se rechaza nombrando su ruta.

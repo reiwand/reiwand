@@ -35,7 +35,7 @@ pub fn content() -> Content {
         installed: vec![Installed { repo_id: "r1".into(), id: "a".into(), version: "1.2.0".into() }],
         settings: [("playback.fps".to_string(), json!(30)), ("playback.volume".to_string(), json!(0.5))]
             .into(),
-        ..Content::default()
+        ..Content::empty()
     }
 }
 

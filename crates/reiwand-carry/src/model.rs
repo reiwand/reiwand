@@ -1,9 +1,10 @@
+use reiwand_core::explicit;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::BTreeMap;
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Manifest {
     pub format: u32,
     pub program: String,
@@ -17,7 +18,8 @@ pub struct Manifest {
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct Item {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "explicit::null")]
+    #[cfg_attr(feature = "schema", schemars(required))]
     pub repo_id: Option<String>,
     pub id: String,
 }
@@ -28,9 +30,9 @@ pub struct Repository {
     pub address: String,
     pub repo_id: String,
     pub origin: String,
-    #[serde(default)]
     pub name: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "explicit::null")]
+    #[cfg_attr(feature = "schema", schemars(required))]
     pub pin: Option<String>,
 }
 
@@ -39,7 +41,7 @@ pub struct Repository {
 pub struct Provider {
     pub kind: String,
     pub name: String,
-    #[serde(default)]
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Map<String, Value>"))]
     pub config: Value,
 }
 
@@ -48,9 +50,11 @@ pub struct Provider {
 pub struct List {
     pub name: String,
     pub items: Vec<Item>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "explicit::null")]
+    #[cfg_attr(feature = "schema", schemars(required))]
     pub query: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "explicit::null")]
+    #[cfg_attr(feature = "schema", schemars(required, with = "Option<serde_json::Map<String, Value>>"))]
     pub rules: Option<serde_json::Value>,
 }
 
@@ -93,38 +97,45 @@ pub struct Session {
 }
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Secrets {
     pub sessions: Vec<Session>,
     pub provider_keys: BTreeMap<String, String>,
 }
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Content {
-    #[serde(default)]
     pub repositories: Vec<Repository>,
-    #[serde(default)]
     pub providers: Vec<Provider>,
-    #[serde(default)]
     pub lists: Vec<List>,
-    #[serde(default)]
     pub favourites: Vec<Item>,
-    #[serde(default)]
     pub ratings: Vec<Rating>,
-    #[serde(default)]
     pub tags: Vec<Tagging>,
-    #[serde(default)]
     pub installed: Vec<Installed>,
-    #[serde(default)]
     pub settings: BTreeMap<String, Value>,
-    #[serde(default)]
     pub own: Vec<OwnFile>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "explicit::null")]
+    #[cfg_attr(feature = "schema", schemars(required))]
     pub secrets: Option<Secrets>,
 }
 
 impl Content {
+    pub fn empty() -> Self {
+        Content {
+            repositories: Vec::new(),
+            providers: Vec::new(),
+            lists: Vec::new(),
+            favourites: Vec::new(),
+            ratings: Vec::new(),
+            tags: Vec::new(),
+            installed: Vec::new(),
+            settings: BTreeMap::new(),
+            own: Vec::new(),
+            secrets: None,
+        }
+    }
+
     pub fn sections(&self) -> Vec<String> {
         let held = [
             ("repositories", !self.repositories.is_empty()),

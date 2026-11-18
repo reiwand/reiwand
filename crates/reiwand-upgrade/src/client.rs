@@ -64,6 +64,7 @@ pub fn run_options(data: &Path, vault: &mut dyn crate::Vault, skip: bool) -> any
     if !data.is_dir() {
         return Ok(Outcome::Nothing);
     }
+    crate::phone::settings(data)?;
     let found = match fs::read_to_string(data.join(MARK)) {
         Ok(text) => text.trim().parse::<i64>().context("the version mark is damaged")?,
         Err(_) => 1,

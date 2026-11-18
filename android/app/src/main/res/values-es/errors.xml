@@ -88,6 +88,8 @@
     <string name="error_android_server_changed_encryption">El servidor cambió el cifrado de esta cuenta; no se sincronizó nada</string>
     <string name="error_android_server_other_certificate">El certificado del servidor no es el de la huella indicada</string>
     <string name="error_android_server_own_certificate">Este servidor usa un certificado propio con la huella %1$s; añádelo solo si el servidor muestra la misma</string>
+    <string name="error_android_carry_old">Este archivo tiene el formato anterior %1$s. En un computador ejecuta reiwand-upgrade export ARCHIVO (un archivo cifrado sigue cifrado y pide su contraseña) y elige después el archivo convertido</string>
+    <string name="error_android_settings_refused">No se puede leer settings.toml: %1$s. Reiwand no completa valores: actualiza la aplicación sobre esta para que convierta el archivo, o borra los datos de la aplicación para empezar con los ajustes de fábrica.</string>
     <string name="error_android_server_set_up">El servidor preparó la sincronización con otro cifrado del pedido</string>
     <string name="error_android_setting_value">%1$s no puede valer %2$s</string>
     <string name="error_android_sound_value">%1$s no es un valor de sonido</string>
@@ -167,4 +169,5 @@
     <string name="error_android_carry_secrets_password">Las contraseñas y claves solo se exportan con una contraseña</string>
     <string name="error_android_carry_sessions">Las sesiones de cuenta no se importan: vuelve a iniciar sesión en este teléfono</string>
     <string name="error_android_carry_choice">%1$s no es una opción de la importación</string>
+    <string name="error_android_stored">No se puede leer un archivo guardado: %1$s. Reiwand no completa valores: actualiza la aplicación sobre esta para que convierta el archivo, o borra los datos de la aplicación para empezar de nuevo.</string>
 </resources>

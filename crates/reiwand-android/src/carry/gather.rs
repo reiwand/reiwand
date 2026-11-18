@@ -30,11 +30,11 @@ fn repositories() -> Result<Vec<Repository>, Error> {
         .collect())
 }
 
-fn providers() -> Vec<Provider> {
+fn providers() -> Result<Vec<Provider>, Error> {
     let config = |options: BTreeMap<String, String>| json!(options);
-    (carried::all().into_iter())
+    Ok((carried::all()?.into_iter())
         .map(|p| Provider { kind: p.kind, name: p.id, config: config(p.options) })
-        .collect()
+        .collect())
 }
 
 fn settings_of() -> BTreeMap<String, Value> {
@@ -109,7 +109,7 @@ pub(super) fn gather() -> Result<Gathered, Error> {
     held.sort();
     let content = Content {
         repositories: repositories()?,
-        providers: providers(),
+        providers: providers()?,
         lists,
         favourites: favourites.into_iter().collect(),
         ratings,
