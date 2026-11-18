@@ -48,6 +48,14 @@ pub mod qobject {
         #[qinvokable]
         fn install(self: Pin<&mut DepthMaps>, file: &QString);
         #[qinvokable]
+        fn export_map(
+            self: Pin<&mut DepthMaps>,
+            file: &QString,
+            depth: &QString,
+            adjusted: bool,
+            colour: bool,
+        );
+        #[qinvokable]
         fn view(self: Pin<&mut DepthMaps>, depth: &QString, colour: bool);
     }
 

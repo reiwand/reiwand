@@ -129,6 +129,23 @@ ColumnLayout {
         onClicked: maps.forget()
     }
 
+    EditDepthExport {
+        maps: maps
+        depth: tool.depth
+        colour: colour.checked
+    }
+
+    EditSlider {
+        text: App.tr("Model input size (px, multiple of 14)")
+        from: 196
+        to: 1036
+        stepSize: 14
+        value: tool.depth.input ?? 518
+        onMoved: value => tool.page.run("depth", {
+                "input": Math.round(value)
+            })
+    }
+
     Repeater {
         model: [["near", App.tr("Near level"), 0, 1, 0.01], ["far", App.tr("Far level"), 0, 1, 0.01], ["gamma", App.tr("Curve"), 0.2, 5, 0.05], ["smooth", App.tr("Smoothing (px)"), 0, 16, 1], ["dilate", App.tr("Grow near edges (px)"), 0, 16, 1]]
 
