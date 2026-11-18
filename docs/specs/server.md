@@ -289,7 +289,7 @@ Administrators and moderators read every repository; only administrators publish
 
 ### Database versions and backups
 
-The database carries a version number (`user_version`, 15). The server knows only that version:
+The database carries a version number (`user_version`, 16). The server knows only that version:
 it refuses to open any other and names the migration (`reiwand-upgrade server --data DIR`). It contains
 no code for older databases or layouts. `reiwand-server restore` takes a backup of the current version
 only; to restore an older one, run `reiwand-upgrade server` on the restored folder first. After restoring,

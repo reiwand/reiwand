@@ -19,6 +19,7 @@ pub mod scenes;
 pub mod server;
 #[cfg(feature = "server")]
 mod server_export;
+#[cfg(feature = "server")]
 mod server_settings;
 pub mod settings;
 pub mod sink;
