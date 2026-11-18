@@ -308,10 +308,10 @@
       ],
       "parent": null,
       "playback": null,
-      "size": null,
+      "size": "source",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -349,10 +349,10 @@
       ],
       "parent": null,
       "playback": null,
-      "size": null,
+      "size": "source",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           960,
           900
@@ -398,7 +398,7 @@
       "solid": false,
       "system": "sparks",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -574,7 +574,7 @@
         "y": null
       },
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           -64,
           -64
@@ -680,7 +680,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -741,7 +741,7 @@
             "width": 2
           },
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -770,7 +770,7 @@
       "solid": false,
       "space": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           200,
           200
@@ -946,7 +946,7 @@
       "solid": false,
       "style": "bars",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           0,
           -40
@@ -1053,10 +1053,10 @@
       "parent": null,
       "redraw": false,
       "rgb": false,
-      "size": null,
+      "size": "canvas",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [

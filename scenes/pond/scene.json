@@ -80,7 +80,7 @@
       "sounds": [],
       "stream": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -155,7 +155,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -232,7 +232,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           700,
           380
@@ -298,7 +298,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": [
               360,
               760
@@ -350,7 +350,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": [
               560,
               880
@@ -402,7 +402,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": [
               1450,
               300
@@ -454,7 +454,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": [
               1650,
               470
@@ -506,7 +506,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": [
               1180,
               860
@@ -557,7 +557,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": [
               390,
               740
@@ -608,7 +608,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": [
               1470,
               280
@@ -640,7 +640,7 @@
       "solid": false,
       "space": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -794,10 +794,10 @@
       "parent": null,
       "redraw": false,
       "rgb": false,
-      "size": null,
+      "size": "canvas",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [

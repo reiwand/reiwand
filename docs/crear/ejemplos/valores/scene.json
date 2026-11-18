@@ -95,10 +95,10 @@
         0
       ],
       "parent": null,
-      "size": null,
+      "size": "canvas",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -188,7 +188,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           480,
           540
@@ -320,7 +320,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           960,
           540
@@ -370,7 +370,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           1440,
           540
@@ -481,7 +481,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": {
           "a": null,
           "audio": null,
@@ -644,7 +644,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": {
           "a": null,
           "audio": null,
@@ -799,7 +799,7 @@
         "y": null
       },
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           0,
           80

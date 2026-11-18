@@ -84,7 +84,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -167,7 +167,7 @@
       ],
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -231,7 +231,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -281,7 +281,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -331,7 +331,7 @@
           "solid": false,
           "stroke": null,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -360,7 +360,7 @@
       "solid": false,
       "space": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -437,7 +437,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -506,7 +506,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -555,7 +555,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           1153,
           574
@@ -607,7 +607,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           677,
           611
@@ -679,7 +679,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           816,
           352
@@ -731,7 +731,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           886,
           352
@@ -824,7 +824,7 @@
         "y": null
       },
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           -64,
           48

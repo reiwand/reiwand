@@ -56,7 +56,7 @@
       "solid": false,
       "system": "cohetes",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -98,7 +98,7 @@
       "solid": false,
       "system": "estrellas",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -150,7 +150,7 @@
       "solid": false,
       "system": "luciernagas",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [

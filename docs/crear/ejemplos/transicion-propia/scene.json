@@ -51,10 +51,10 @@
         0
       ],
       "parent": null,
-      "size": null,
+      "size": "canvas",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -103,7 +103,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           1320,
           420
@@ -156,7 +156,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           1320,
           420

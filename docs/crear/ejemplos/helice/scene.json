@@ -56,7 +56,7 @@
       "solid": false,
       "system": "helice",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [

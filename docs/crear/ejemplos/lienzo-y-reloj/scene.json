@@ -31,7 +31,7 @@
       "tint": "#ffffff"
     },
     "camera": {
-      "center": null,
+      "center": "canvas",
       "rotation": 0.0,
       "shake": {
         "amplitude": 6,
@@ -101,7 +101,7 @@
       ],
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -191,7 +191,7 @@
         "y": null
       },
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -283,7 +283,7 @@
         "y": null
       },
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           0,
           -120

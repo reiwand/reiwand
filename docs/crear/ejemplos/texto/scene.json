@@ -79,7 +79,7 @@
         "es": "Buenos días"
       },
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           960,
           300
@@ -143,7 +143,7 @@
       "solid": false,
       "text": "Un texto largo se parte en líneas del ancho que tú digas y termina con puntos suspensivos si no cabe.",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           510,
           520
@@ -242,7 +242,7 @@
         "y": null
       },
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           -80,
           -60
@@ -337,7 +337,7 @@
         "y": null
       },
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           80,
           -60

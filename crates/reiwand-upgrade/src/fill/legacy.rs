@@ -30,6 +30,19 @@ pub(super) fn corrected(def: &str, name: &str) -> Option<Value> {
     })
 }
 
+pub(super) fn follows(def: &str, name: &str, map: &Map<String, Value>) -> Option<Value> {
+    Some(match (def, name) {
+        ("Transform", "origin") => json!("anchor"),
+        ("Camera", "center") => json!("canvas"),
+        ("Playback", "end") => json!("end"),
+        ("Layer", "size") => match map.get("type").and_then(Value::as_str) {
+            Some("image" | "video") => json!("source"),
+            _ => json!("canvas"),
+        },
+        _ => return None,
+    })
+}
+
 pub(super) fn contextual(def: &str, name: &str) -> bool {
     matches!((def, name), ("Layer", "blend_space")) || heard_value(def, name).is_some()
 }

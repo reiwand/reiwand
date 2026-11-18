@@ -90,10 +90,10 @@
         0
       ],
       "parent": null,
-      "size": null,
+      "size": "canvas",
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -192,10 +192,10 @@
             5
           ],
           "shapes": {},
-          "size": null,
+          "size": "canvas",
           "solid": false,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -306,10 +306,10 @@
           "rules": [],
           "scale": null,
           "shapes": {},
-          "size": null,
+          "size": "canvas",
           "solid": false,
           "transform": {
-            "origin": null,
+            "origin": "anchor",
             "position": null,
             "rotation": 0.0,
             "scale": [
@@ -338,7 +338,7 @@
       "solid": false,
       "space": "3d",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -396,7 +396,7 @@
       "solid": false,
       "texture": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [

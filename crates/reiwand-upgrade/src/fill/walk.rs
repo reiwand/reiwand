@@ -177,6 +177,12 @@ impl<'a> Walk<'a> {
                 map.insert(name.clone(), value);
                 self.report.note(if def.is_empty() { ctx } else { def }, name);
             }
+            if map.get(name).is_none_or(Value::is_null)
+                && let Some(word) = super::legacy::follows(def, name, map)
+            {
+                map.insert(name.clone(), word);
+                self.report.note(def, name);
+            }
             if let Some(child) = map.get_mut(name) {
                 self.visit(ps, child, "", name);
             }

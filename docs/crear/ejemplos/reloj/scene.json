@@ -84,7 +84,7 @@
       "solid": false,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -136,7 +136,7 @@
       "solid": false,
       "text": "--:--",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -190,7 +190,7 @@
       "solid": false,
       "text": "",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           0,
           170

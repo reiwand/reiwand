@@ -89,7 +89,7 @@
       ],
       "parent": null,
       "playback": {
-        "end": null,
+        "end": "end",
         "frame": null,
         "loop": true,
         "own_clock": false,
@@ -103,7 +103,7 @@
       ],
       "solid": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           700,
           540
@@ -156,7 +156,7 @@
       "solid": true,
       "stroke": null,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": [
           1250,
           540
@@ -273,7 +273,7 @@
       "solid": false,
       "text": "Toca aquí",
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
@@ -324,7 +324,7 @@
       "sounds": [],
       "stream": false,
       "transform": {
-        "origin": null,
+        "origin": "anchor",
         "position": null,
         "rotation": 0.0,
         "scale": [
