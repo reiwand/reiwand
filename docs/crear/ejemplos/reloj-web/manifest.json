@@ -8,25 +8,20 @@
   "credits": [],
   "default_locale": "es",
   "description": "",
-  "display": null,
   "entry": "index.html",
   "id": "org.example.reloj_web",
   "inputs": [],
   "kind": "web",
   "license": "CC0-1.0",
-  "links": null,
   "origin": {
     "derived_from": [],
     "kind": "original",
     "provider": null,
     "source_url": null
   },
-  "permissions": null,
   "photosensitive": false,
   "platforms": [],
-  "playback": null,
   "presets": [],
-  "previews": null,
   "properties": {
     "color": {
       "alpha": false,

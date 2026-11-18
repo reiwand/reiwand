@@ -23,6 +23,8 @@ cleanup() {
   discard "$WORK"
 }
 trap cleanup EXIT
+set -E
+trap 'echo "FAIL: $(basename "${BASH_SOURCE[0]}") line $LINENO: $BASH_COMMAND"' ERR
 
 wait_for() {
   local seconds=$1; shift

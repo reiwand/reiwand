@@ -168,13 +168,14 @@ impl<'a> Walk<'a> {
         super::legacy::looks(def, map, &mut self.report);
         super::particles::before(ctx, map);
         let props = s.get("properties").and_then(Value::as_object);
+        let variant = props.and_then(|p| p.get("type")).and_then(|t| t.get("const")).and_then(Value::as_str);
         let required =
             |n: &str| s.get("required").and_then(Value::as_array).is_some_and(|r| r.iter().any(|x| x == n));
         for (name, ps) in props.into_iter().flatten() {
             if !map.contains_key(name)
                 && (!self.required_only || required(name))
                 && let Some(value) = self.hidden(ps, required(name), def, ctx, name)
-                && !(value.is_null() && super::blocks::is_block(def, name))
+                && !(value.is_null() && super::blocks::is_block(def, ctx, variant, name))
             {
                 map.insert(name.clone(), value);
                 self.report.note(if def.is_empty() { ctx } else { def }, name);

@@ -11,7 +11,29 @@ static BLOCKS: LazyLock<BTreeSet<String>> = LazyLock::new(|| {
         .collect()
 });
 
-pub(super) fn is_block(def: &str, name: &str) -> bool {
+const VARIANTS: [(&str, &str); 5] = [
+    ("text", "TextLayer"),
+    ("model", "ModelLayer"),
+    ("mesh", "MeshLayer"),
+    ("light", "Light"),
+    ("sound", "Sound"),
+];
+
+fn owners<'a>(def: &'a str, ctx: &str, variant: Option<&str>) -> Vec<&'a str> {
     let owner = def.split("_for_").next().unwrap_or(def);
-    BLOCKS.contains(&format!("{owner}.{name}"))
+    let mut owners = vec![owner];
+    match owner {
+        "Layer" => {
+            owners.push("Kind");
+            owners.extend(VARIANTS.iter().filter(|(kind, _)| Some(*kind) == variant).map(|(_, own)| *own));
+        }
+        "Operator" => owners.push("Force"),
+        "" if ctx == "vortex" => owners.push("Force"),
+        _ => {}
+    }
+    owners
+}
+
+pub(super) fn is_block(def: &str, ctx: &str, variant: Option<&str>, name: &str) -> bool {
+    owners(def, ctx, variant).into_iter().any(|owner| BLOCKS.contains(&format!("{owner}.{name}")))
 }

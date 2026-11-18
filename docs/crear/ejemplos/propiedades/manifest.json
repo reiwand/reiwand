@@ -8,23 +8,19 @@
   "credits": [],
   "default_locale": "es",
   "description": "",
-  "display": null,
   "entry": "scene.json",
   "id": "org.example.propiedades",
   "inputs": [],
   "kind": "scene",
   "license": "CC0-1.0",
-  "links": null,
   "origin": {
     "derived_from": [],
     "kind": "original",
     "provider": null,
     "source_url": null
   },
-  "permissions": null,
   "photosensitive": false,
   "platforms": [],
-  "playback": null,
   "presets": [
     {
       "id": "calido",
@@ -51,7 +47,6 @@
       }
     }
   ],
-  "previews": null,
   "properties": {
     "abrir": {
       "enabled_if": {},
@@ -264,6 +259,5 @@
   },
   "tags": [],
   "title": "Propiedades de usuario",
-  "version": "0.1.0",
-  "web": null
+  "version": "0.1.0"
 }

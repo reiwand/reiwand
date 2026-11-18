@@ -8,7 +8,6 @@
   "credits": [],
   "default_locale": "en",
   "description": "",
-  "display": null,
   "entry": "scene.json",
   "id": "org.example.reaccionsonido",
   "inputs": [
@@ -16,21 +15,16 @@
   ],
   "kind": "scene",
   "license": "CC0-1.0",
-  "links": null,
   "origin": {
     "derived_from": [],
     "kind": "original",
     "provider": null,
     "source_url": null
   },
-  "permissions": null,
   "photosensitive": false,
   "platforms": [],
-  "playback": null,
   "presets": [],
-  "previews": null,
   "properties": {},
-  "requires": null,
   "schema": "reiwand.wpak/3",
   "strings": {},
   "tags": [],
@@ -38,6 +32,5 @@
     "en": "Sound pulse",
     "es": "Pulso con el sonido"
   },
-  "version": "1.0.0",
-  "web": null
+  "version": "1.0.0"
 }
