@@ -135,7 +135,7 @@ private fun Explore(main: Main, run: Run, examples: Set<String>, close: () -> Un
                                         installed++
                                         main.changed()
                                     }
-                                }) { Text(stringResource(R.string.repo_install)) }
+                                }, modifier = Modifier.testTag("install")) { Text(stringResource(R.string.repo_install)) }
                             },
                         )
                     }
