@@ -35,6 +35,7 @@ fn bindings(value: &mut Value) {
         Value::Array(items) if items.len() == 3 && items[2] == json!(1.0) => {
             for item in items.iter_mut().filter(|i| i.get("keys").is_some()) {
                 *item = reiwand_scene::prefill::of("Binding_for_float", item.take());
+                item["loop"] = json!("repeat");
             }
         }
         Value::Array(items) => items.iter_mut().for_each(bindings),

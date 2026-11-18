@@ -2,56 +2,57 @@
 set -euo pipefail
 declare scene
 draft=$scene/draft
+looks_at() { local copy; copy=$(mktemp -d "$WORK/look.XXXXXX"); cp -r "$1/." "$copy"; complete "$copy"; shift; ctl scene preview "$copy" "$@"; }
 ctl scene new "$draft" >/dev/null
 ctl scene act "$draft" set '{"pointer": "/scene/canvas/background", "value": "#00ff00"}'
 read -r _ _ _ s15 < <(ctl stream preview:1 160 90)
 expect "list(s['outputs'])" "[]"
-ctl scene preview "$draft" -o preview:1 --time 0
+looks_at "$draft" -o preview:1 --time 0
 shown "$s15" 0 255 0
 ctl scene act "$draft" add_layer '{"kind": "solid"}' >/dev/null
 ctl scene act "$draft" set '{"pointer": "/scene/layers/0/color", "value": "#ff0000"}'
-ctl scene preview "$draft" -o preview:1 --time 0
+looks_at "$draft" -o preview:1 --time 0
 shown "$s15" 255 0 0
 ctl scene act "$draft" solo '{"id": "solid"}' && ctl scene act "$draft" hide '{"hidden": true, "id": "solid"}'
-ctl scene preview "$draft" -o preview:1 --time 2
+looks_at "$draft" -o preview:1 --time 2
 shown "$s15" 0 255 0
-if ctl scene act "$draft" set '{"pointer": "/scene/canvas/size/0", "value": 0}' && ctl scene preview "$draft" -o preview:1 2>/dev/null; then
+if ctl scene act "$draft" set '{"pointer": "/scene/canvas/size/0", "value": 0}' && looks_at "$draft" -o preview:1 2>/dev/null; then
   fail "an invalid scene was previewed"
 fi
 ctl scene act "$draft" undo
 ctl scene act "$draft" set '{"pointer": "/scene/layers/0/blend", "value": "linear_burn"}'
-ctl scene preview "$draft" -o preview:1 --time 2 || fail "a scene with a newer blend mode was not previewed"
+looks_at "$draft" -o preview:1 --time 2 || fail "a scene with a newer blend mode was not previewed"
 ctl scene act "$draft" undo
-ctl scene act "$draft" set '{"pointer": "/scene/camera3d", "value": {"paths": [{"id": "a", "keys": [{"center": [0, 0, 0], "eye": [0, 0, 5], "t": 0}, {"center": [0, 0, 0], "eye": [1, 0, 5], "t": 1}]}]}}'
-ctl scene preview "$draft" -o preview:1 --time 0 || fail "a scene with camera paths was not previewed"
+ctl scene act "$draft" set '{"pointer": "/scene/camera3d", "value": {"fov": 60, "near": 0.1, "far": 1000, "eye": [0, 0, 5], "center": [0, 0, 0], "up": [0, 1, 0], "order": "sequential", "fade": null, "paths": [{"id": "a", "ease": null, "loop": false, "keys": [{"center": [0, 0, 0], "eye": [0, 0, 5], "t": 0, "up": null, "fov": null}, {"center": [0, 0, 0], "eye": [1, 0, 5], "t": 1, "up": null, "fov": null}]}]}}'
+looks_at "$draft" -o preview:1 --time 0 || fail "a scene with camera paths was not previewed"
 ctl scene act "$draft" undo
 ctl scene act "$draft" set '{"pointer": "/scene/layers/0", "value": { "blend_space": "canvas", "id": "title", "text": {"media": "title"}, "type": "text"}}'
-ctl scene preview "$draft" -o preview:1 --time 0 || fail "a scene showing media titles was not previewed"
+looks_at "$draft" -o preview:1 --time 0 || fail "a scene showing media titles was not previewed"
 ctl scene act "$draft" undo
 ctl scene act "$draft" set '{"pointer": "/scene/layers/0/transform/tilt", "value": [10, 0]}'
 ctl scene act "$draft" set '{"pointer": "/scene/canvas/camera", "value": {"rotation": 10, "zoom": 1.5}}'
 ctl scene act "$draft" set '{"pointer": "/scene/canvas/bloom", "value": {"tint": "#ffd0a0"}}'
-ctl scene preview "$draft" -o preview:1 --time 2 || fail "a scene with a camera, bloom and tilted layers was not previewed"
+looks_at "$draft" -o preview:1 --time 2 || fail "a scene with a camera, bloom and tilted layers was not previewed"
 ctl scene act "$draft" undo && ctl scene act "$draft" undo && ctl scene act "$draft" undo
 ctl scene act "$draft" set '{"pointer": "/scene/layers/0/solid", "value": {"alpha": 0.5}}'
-ctl scene preview "$draft" -o preview:1 --time 2 || fail "a scene with solid layers was not previewed"
+looks_at "$draft" -o preview:1 --time 2 || fail "a scene with solid layers was not previewed"
 ctl scene act "$draft" undo
 ctl scene act "$draft" set '{"pointer": "/scene/layers/0/effects", "value": [{"effect": "glitter", "params": {"speed": 0}}, {"effect": "fluid", "params": {"emitters": [{"from": [0.3, 0.9], "strength": 8}, {"from": [0.2, 1], "strength": 4, "to": [0.8, 1]}]}}, {"effect": "god_rays", "params": {"mode": 2}}]}'
-ctl scene preview "$draft" -o preview:1 --time 2 || fail "a scene with glitter, fluid and a star of rays was not previewed"
+looks_at "$draft" -o preview:1 --time 2 || fail "a scene with glitter, fluid and a star of rays was not previewed"
 ctl scene act "$draft" keyframe '{"pointer": "/scene/layers/0/effects/1/params/emitters", "time": 0}' && ctl scene act "$draft" keyframe '{"pointer": "/scene/layers/0/effects/1/params/emitters", "time": 3, "value": [{"angle": 0, "from": [0.7, 0.5], "strength": 2}, {"from": [0.2, 0.9], "strength": 6, "to": [0.8, 0.9]}]}'
 grep -q '"keys"' "$draft/scene.json" || fail "fluid emitters were not keyframed"
-ctl scene preview "$draft" -o preview:1 --time 1.5 || fail "a scene with keyframed fluid emitters was not previewed"
+looks_at "$draft" -o preview:1 --time 1.5 || fail "a scene with keyframed fluid emitters was not previewed"
 ctl scene act "$draft" undo && ctl scene act "$draft" undo && ctl scene act "$draft" undo
 ctl scene act "$draft" set '{"pointer": "/scene/layers/0/effects", "value": [{"effect": "blend_gradient"}]}'
 ctl scene act "$draft" paint_mask '{"channel": 1, "pointer": "/scene/layers/0/effects/0/params/map", "points": [[0.4, 0.5], [0.6, 0.5]], "radius": 0.05}' || fail "a mask was not painted"
-ctl scene preview "$draft" -o preview:1 --time 2 || fail "a scene with a painted mask was not previewed"
+looks_at "$draft" -o preview:1 --time 2 || fail "a scene with a painted mask was not previewed"
 ctl scene act "$draft" undo
 ctl scene act "$draft" undo
 ctl scene act "$draft" set '{"pointer": "/scene/layers/0/effects", "value": [{"effect": "light_shafts", "params": {"speed": 0}}, {"effect": "tint", "mask": {"shape": {"ellipse": {"size": [40, 40]}}}}]}'
-ctl scene preview "$draft" -o preview:1 --time 2 || fail "a scene with the newer built-in effects was not previewed"
+looks_at "$draft" -o preview:1 --time 2 || fail "a scene with the newer built-in effects was not previewed"
 ctl scene act "$draft" undo
 ctl scene act "$draft" set '{"pointer": "/scene/clock", "value": {"seed": null}}'
-ctl scene preview "$draft" -o preview:1 --time 2 || fail "a scene with a fresh seed was not previewed"
+looks_at "$draft" -o preview:1 --time 2 || fail "a scene with a fresh seed was not previewed"
 ctl scene act "$draft" undo
 steps_done() {
   ctl scene ask "$draft" history | python3 -c 'import json, sys; print(len(json.load(sys.stdin)["done"]))'
@@ -65,14 +66,14 @@ ctl scene ask "$draft" rig --layer puppet | grep '"arm"' >/dev/null || fail "the
 ctl scene ask "$draft" outline --layer puppet | grep '\[' >/dev/null || fail "the outlines of the parts were not listed"
 ctl scene act "$draft" set '{"pointer": "/scene/layers/1/clips", "value": [{"bones": {"arm": {"rotation": [[0, 0], [1, 40]]}}, "id": "wave"}]}'
 ctl scene act "$draft" set '{"pointer": "/scene/layers/1/animations", "value": [{"clip": "wave"}]}'
-ctl scene preview "$draft" -o preview:1 --time 0.5 || fail "a scene with a bent mesh was not previewed"
+looks_at "$draft" -o preview:1 --time 0.5 || fail "a scene with a bent mesh was not previewed"
 ctl scene act "$draft" set '{"pointer": "/scene/layers/1/ik", "value": [{"chain": ["root", "arm"], "limits": {"arm": [-60, 60]}, "target": "cursor"}]}'
 ctl scene act "$draft" set '{"pointer": "/scene/layers/1/physics", "value": [{"bone": "arm", "gravity": 1, "mode": "rope", "wind": 0.5}]}'
 ctl scene act "$draft" set '{"pointer": "/scene/layers/1/depth", "value": {"cull": true, "scale": 1}}'
 ctl scene act "$draft" mesh_depth '{"by": 30, "layer": "puppet", "points": [[0.4, 0.5], [0.6, 0.5]], "radius": 0.2}' || fail "the depth of the mesh was not painted"
 ctl scene act "$draft" set '{"pointer": "/scene/layers/1/hit", "value": ["arm"]}'
 ctl scene act "$draft" set '{"pointer": "/scene/canvas/wind", "value": [40, 0]}'
-ctl scene preview "$draft" -o preview:1 --time 0.5 || fail "a scene with reaching and swinging bones was not previewed"
+looks_at "$draft" -o preview:1 --time 0.5 || fail "a scene with reaching and swinging bones was not previewed"
 ctl scene act "$draft" bone '{"at": [0.9, 0.5], "layer": "puppet", "name": "hand", "parent": "arm"}' || fail "the mesh took no hand"
 ctl scene act "$draft" weights '{"bone": "arm", "by": 0.5, "layer": "puppet", "lock": ["root"], "mode": "add", "points": [[0.5, 0.5], [0.6, 0.5]], "radius": 0.2}' || fail "no weights were painted"
 ctl scene ask "$draft" weights '"arm"' --layer puppet | grep '"arm"' >/dev/null || fail "the weights of the vertices were not listed"
@@ -90,7 +91,7 @@ ctl scene act "$draft" key '{"bone": "arm", "clip": "swing", "ease": [0.25, 0.1,
 if ctl scene act "$draft" key '{"bone": "arm", "clip": "swing", "ease": "linear", "in_handle": [0.1, 1], "layer": "puppet", "rotation": 0, "time": 0}' 2>/dev/null; then fail "a key took handles and an easing together"; fi
 ctl scene act "$draft" clip '{"id": "swing", "layer": "puppet", "to": "sway"}' || fail "the clip was not renamed"
 ctl scene act "$draft" set '{"pointer": "/scene/layers/1/animations", "value": [{"clip": "sway"}]}'
-ctl scene preview "$draft" -o preview:1 --time 0.5 || fail "a scene with a keyed and painted mesh was not previewed"
+looks_at "$draft" -o preview:1 --time 0.5 || fail "a scene with a keyed and painted mesh was not previewed"
 ctl scene act "$draft" ik '{"bend": "counterclockwise", "layer": "puppet", "limits": {"arm": [-45, 45]}, "root": "root", "tip": "arm"}' || fail "no chain was added"
 ctl scene act "$draft" ik '{"index": 1, "layer": "puppet", "target": [30, 20], "weight": 0.8}' || fail "the chain was not aimed"
 ctl scene act "$draft" ik '{"index": 0, "layer": "puppet", "remove": true}' || fail "the chain was not removed"
@@ -115,7 +116,7 @@ ctl scene act "$draft" parts '{"layer": "puppet", "show": ["body"]}' || fail "th
 ctl scene act "$draft" parts '{"depth": {"cull": true, "scale": 2, "sort": false}, "layer": "puppet"}' || fail "the depth of the mesh was not set"
 if ctl scene act "$draft" parts '{"depth": {"scale": 20}, "layer": "puppet"}' 2>/dev/null; then fail "a depth scale of 20 was kept"; fi
 ctl scene act "$draft" parts '{"depth": {"off": true}, "layer": "puppet"}' || fail "the depth of the mesh was not turned off"
-ctl scene preview "$draft" -o preview:1 --time 0.5 || fail "a scene with chains, a rope, wind and attachments was not previewed"
+looks_at "$draft" -o preview:1 --time 0.5 || fail "a scene with chains, a rope, wind and attachments was not previewed"
 ctl scene act "$draft" attach '{"detach": true, "layer": "badge"}' || fail "the layer was not let go"
 source "$(dirname "$0")"/integration-particles.sh
 source "$(dirname "$0")"/integration-lights.sh
@@ -144,7 +145,7 @@ ctl scene act "$draft" expression '{"layer": "body", "name": "happy", "to": "gla
 ctl scene act "$draft" clip '{"add": true, "id": "grin", "layer": "body"}' || fail "no clip was added to the mesh of several parts"
 ctl scene act "$draft" key '{"clip": "grin", "layer": "body", "shape": "smile", "time": 0.5, "weight": 0.5}' || fail "the blend shape was not keyed"
 ctl scene act "$draft" parts '{"clip": {"chest": "legs"}, "layer": "body", "order": {"legs": -1}}' || fail "the part was not cut to another"
-ctl scene preview "$draft" -o preview:1 --time 0.5 || fail "a scene with a mesh of several parts was not previewed"
+looks_at "$draft" -o preview:1 --time 0.5 || fail "a scene with a mesh of several parts was not previewed"
 ctl pack build "$draft" -o "$WORK/meshes.wpak" >/dev/null || fail "the scene with meshes was not built"
 packed=$(python3 -c "import sys, zipfile; print(sum(n.startswith('meshes/') for n in zipfile.ZipFile(sys.argv[1]).namelist()))" "$WORK/meshes.wpak")
 [ "$packed" = 2 ] || fail "the package carries $packed meshes instead of the two in use"
@@ -152,7 +153,7 @@ while [ "$(steps_done)" -gt "$steps" ]; do ctl scene act "$draft" undo; done
 "$BIN/probe" "$s15" 4 --hold >"$WORK/edit-frames.out" 2>&1 & counter=$!; pids+=("$counter")
 sleep 1
 ctl scene act "$draft" set '{"pointer": "/scene/canvas/background", "value": "#0000ff"}'
-ctl scene preview "$draft" -o preview:1 --time 2
+looks_at "$draft" -o preview:1 --time 2
 wait "$counter" || fail "no frames while editing: $(cat "$WORK/edit-frames.out")"
 frames=$(sed -n 's/^frames //p' "$WORK/edit-frames.out")
 [ "$frames" -lt 15 ] || fail "one edit of a held preview rendered $frames frames"
@@ -160,20 +161,20 @@ ctl scene act "$draft" solo && ctl scene act "$draft" hide '{"hidden": false, "i
 ctl scene act "$draft" keyframe '{"pointer": "/scene/layers/0/color", "time": 0, "value": "#ff0000"}'
 ctl scene act "$draft" keyframe '{"pointer": "/scene/layers/0/color", "time": 16, "value": "#0000ff"}'
 "$BIN/probe" "$s15" 10 --hold >"$WORK/play-frames.out" 2>&1 & player=$!; pids+=("$player")
-ctl scene preview "$draft" -o preview:1
+looks_at "$draft" -o preview:1
 sleep 6
 ctl scene act "$draft" set '{"pointer": "/scene/canvas/background", "value": "#00ff00"}'
-ctl scene preview "$draft" -o preview:1
+looks_at "$draft" -o preview:1
 read -r b g r _ < <("$BIN/probe" "$s15" 3 | sed 's/.*center bgra \[\(.*\)\]/\1/; s/,/ /g')
 [ "$b" -gt 85 ] || fail "an edit restarted the playing preview: bgra $b $g $r"
 wait "$player" || fail "the playing preview stopped: $(cat "$WORK/play-frames.out")"
 ctl scene act "$draft" translate '{"language": "es", "pointer": "/manifest/title", "text": "Borrador"}'
 ctl scene act "$draft" set '{"pointer": "/manifest/content", "value": {"descriptors": ["gore"], "rating": "mature"}}'
-ctl scene preview "$draft" -o preview:1 --time 0
+looks_at "$draft" -o preview:1 --time 0
 shown "$s15" 255 0 0
 ctl scene act "$draft" remove '{"pointer": "/manifest/content"}' && ctl scene act "$draft" remove '{"pointer": "/manifest/origin"}'
 ctl scene act "$draft" hide '{"hidden": true, "id": "solid"}'
-ctl scene preview "$draft" -o preview:1 --time 0 || fail "incomplete package details stopped the preview"
+looks_at "$draft" -o preview:1 --time 0 || fail "incomplete package details stopped the preview"
 shown "$s15" 0 255 0
 ctl scene act "$draft" hide '{"hidden": false, "id": "solid"}'
 [ "$(ctl scene act "$draft" add_property '{"id": "look", "kind": "combo"}')" = look ] || fail "add-property printed no id"
@@ -184,16 +185,16 @@ ctl scene act "$draft" add_property '{"id": "flash", "kind": "button"}' >/dev/nu
 if ctl scene act "$draft" condition '{"id": "flash", "text": "look > 2"}' 2>/dev/null; then fail "a condition that compares a text with a number was kept"; fi
 ctl scene act "$draft" condition '{"enabled": true, "id": "flash", "text": "look == '\''red'\''"}'
 ctl scene act "$draft" rename_property '{"id": "look", "to": "tone"}'
-ctl scene preview "$draft" -o preview:1 --time 0
+looks_at "$draft" -o preview:1 --time 0
 shown "$s15" 0 0 255
 ctl scene act "$draft" set '{"pointer": "/manifest/properties/tone/default", "value": "red"}'
-ctl scene preview "$draft" -o preview:1 --time 0
+looks_at "$draft" -o preview:1 --time 0
 shown "$s15" 255 0 0
 scene_doc "$draft" /manifest/requires/features | grep properties2 >/dev/null || fail "a button left properties2 out of the features"
 if ctl scene act "$draft" remove_property '{"id": "tone"}' 2>/dev/null; then fail "a property that a binding follows was removed"; fi
 ctl scene act "$draft" remove_property '{"id": "flash"}'
 if scene_doc "$draft" /manifest/properties | grep flash >/dev/null; then fail "remove-property kept the button"; fi
-ctl scene preview "$draft" -o preview:1 --stop
+looks_at "$draft" -o preview:1 --stop
 ctl release preview:1 && expect "list(s['outputs'])" "[]"
 echo "scene editor preview checks passed"
 source "$(dirname "$0")"/integration-grants.sh
