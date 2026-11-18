@@ -110,6 +110,8 @@ Lo usan los cargadores de todos los formatos; ningún formato escribe su propia 
   `reiwand-upgrade client`.
 - La conversión de única vez trabaja sobre una copia de la base, completa los bloques con los valores de hoy,
   fija la versión 9, deja la original en `upgrade-copias/<segundos>/` y pone la copia en su lugar.
+- Horarios: la caja de horarios no guarda archivos propios; lo guardado es el estado de rotación y las reglas de
+  cada lista, ya cubiertos arriba.
 
 ## Archivos internos de instalación (`installed.json`, `anchors.json`, `repo-pins.json`)
 
