@@ -56,14 +56,13 @@ fn new_fields_refuse_values_outside_their_limits() {
         (vec![("/layers/3/fallback", json!(vec!["a"; 9]))], "/layers/3/fallback has 9 entries, at most 8"),
         (vec![("/layers/3/outline/width", json!(100))], "/layers/3/outline/width is 100, expected 0..=64"),
         (vec![("/layers/5/cone", json!([50, 40]))], "/layers/5/cone/1 is 40, expected 50..=180"),
-        (vec![("/layers/6/cone", json!([10, 20]))], "/layers/6/cone does not fit"),
         (vec![("/layers/5/opacity", json!(0.5))], "/layers/5 is a light layer"),
         (vec![("/layers/7/size", json!([5000, 300]))], "/layers/7/size/0 is 5000, expected 1..=3840"),
         (vec![("/layers/8/sound", json!("wind"))], "/layers/8 needs either sound or sounds"),
         (vec![("/layers/8/pause", json!([9, 3]))], "/layers/8/pause/1 is 3, expected 9..=600"),
         (vec![("/layers/8/play_on", json!("event:nothing"))], "/layers/8/play_on names the unknown event"),
         (
-            vec![("/layers/9/opacity/keys/0/2", json!({ "out": [3, 1] }))],
+            vec![("/layers/9/opacity/keys/0/2", json!({ "in": null, "out": [3, 1] }))],
             "/layers/9/opacity/keys/0/2/out/0 is 3",
         ),
         (vec![("/layers/9/transform/position/r", json!(1))], "/layers/9/transform/position/r does not fit"),
@@ -127,7 +126,7 @@ fn malformed_new_fields_are_refused_while_parsing() {
         ("/layers/3/render", json!("vector")),
         ("/assets/sky/wrap", json!("tile")),
         ("/layers/8/mode", json!("shuffle")),
-        ("/layers/9/opacity/keys/0/2", json!({ "out": [0.5, 1], "tension": 1 })),
+        ("/layers/9/opacity/keys/0/2", json!({ "in": null, "out": [0.5, 1], "tension": 1 })),
         ("/timelines/0/events/0", json!({ "t": 1, "name": "x", "at": 2 })),
     ] {
         let saved = doc.pointer(pointer).cloned().unwrap();

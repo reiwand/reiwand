@@ -31,7 +31,12 @@ fn sound_layers_validate_their_sources_and_ranges() {
         .collect();
     assert_eq!(scene(json!(many)).validate(&props()), [Issue::Sounds(9)]);
     let mut odd = props();
-    odd.insert(VOLUME.into(), serde_json::from_value(json!({ "type": "bool", "default": true })).unwrap());
+    odd.insert(
+        VOLUME.into(),
+        reiwand_scene::prefill::properties(json!({ "v": { "type": "bool", "default": true } }))
+            .remove("v")
+            .unwrap(),
+    );
     assert_eq!(
         scene(json!([{ "blend_space": "canvas", "id": "s", "type": "sound", "sound": "wind" }]))
             .validate(&odd),

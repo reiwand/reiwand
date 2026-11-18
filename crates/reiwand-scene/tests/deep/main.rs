@@ -80,12 +80,14 @@ pub fn figure() -> Json {
 fn files(model: &Json) -> impl FnMut(&str, usize) -> Result<Vec<u8>, &'static str> + '_ {
     move |path: &str, max: usize| match path {
         p if p.ends_with(".glb") => Some(glb(model)).filter(|b| b.len() <= max).ok_or("too large"),
-        "effects/glass.json" => {
-            Ok(json!({ "id": "glass", "stage": "material", "cost": {} }).to_string().into_bytes())
-        }
-        "effects/sparkle.json" => {
-            Ok(json!({ "id": "sparkle", "stage": "particle", "cost": {} }).to_string().into_bytes())
-        }
+        "effects/glass.json" => Ok(reiwand_upgrade::descriptors::completed(
+            &json!({ "id": "glass", "stage": "material", "cost": {} }).to_string(),
+        )
+        .into_bytes()),
+        "effects/sparkle.json" => Ok(reiwand_upgrade::descriptors::completed(
+            &json!({ "id": "sparkle", "stage": "particle", "cost": {} }).to_string(),
+        )
+        .into_bytes()),
         "effects/glass.wgsl" => Ok(GLASS.as_bytes().to_vec()),
         "effects/sparkle.wgsl" => Ok(SPARKLE.as_bytes().to_vec()),
         _ => Err("missing"),

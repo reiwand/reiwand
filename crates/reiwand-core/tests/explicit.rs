@@ -118,3 +118,17 @@ fn source_scan_flags_what_the_rules_forbid() {
     let own = scan(&[&sample.join("sample.rs")], &rules);
     assert!(own.is_empty(), "{own:?}");
 }
+
+#[test]
+fn bindings_inside_tuples_are_completed() {
+    let schema = serde_json::json!({
+        "$defs": { "Bind": { "type": "object", "required": ["keys", "prop"],
+            "properties": { "keys": { "type": "array", "items": { "type": "number" } },
+                            "prop": { "type": ["string", "null"], "x-null": true } } } },
+        "type": "array", "minItems": 2, "maxItems": 2,
+        "prefixItems": [{ "type": "number" }, { "$ref": "#/$defs/Bind" }]
+    });
+    let mut value = serde_json::json!([1.0, { "keys": [] }]);
+    reiwand_core::explicit::walk::fill(&schema, &schema, &mut value);
+    assert_eq!(value, serde_json::json!([1.0, { "keys": [], "prop": null }]));
+}

@@ -11,7 +11,7 @@ fn complete(params: &str) -> Json {
 }
 
 fn parse(d: &Json) -> Result<Descriptor, String> {
-    Descriptor::parse(&reiwand_upgrade::descriptors::completed(&d.to_string()), "").map_err(|e| e.to_string())
+    Descriptor::parse(&d.to_string(), "").map_err(|e| e.to_string())
 }
 
 #[test]
@@ -54,7 +54,10 @@ fn a_parameter_carries_exactly_the_fields_of_its_kind() {
     color["min"] = json!(0);
     assert!(parse(&complete(&format!("[{color}]"))).unwrap_err().contains("has no \"min\""));
     let float = json!({"id": "f", "type": "float", "prefill": 0.5});
-    let found = parse(&complete(&format!("[{float}]"))).unwrap_err();
+    let mut bare = complete(&format!("[{float}]"));
+    bare["params"][0]["min"] = Json::Null;
+    bare["params"][0]["max"] = Json::Null;
+    let found = parse(&bare).unwrap_err();
     assert!(found.contains("needs \"min\""), "{found}");
     let list = json!({"id": "e", "type": "enum", "prefill": 0});
     assert!(parse(&complete(&format!("[{list}]"))).unwrap_err().contains("needs \"values\""));

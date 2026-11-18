@@ -28,7 +28,14 @@ fn scenes_adopt_their_package_effects_and_check_their_uses() {
         json!([{ "effect": "ripple", "params": { "taps": { "prop": "q" }, "tinted": { "prop": "t" } } }]),
     );
     let files = |path: &str, _: usize| {
-        Ok::<_, &str>(if path.ends_with("json") { wide.to_string() } else { WGSL.into() }.into_bytes())
+        Ok::<_, &str>(
+            if path.ends_with("json") {
+                reiwand_upgrade::descriptors::completed(&wide.to_string())
+            } else {
+                WGSL.into()
+            }
+            .into_bytes(),
+        )
     };
     let fault = bound.adopt(&props, files).unwrap_err().to_string();
     assert_eq!(
@@ -41,7 +48,14 @@ fn scenes_adopt_their_package_effects_and_check_their_uses() {
     let mut both = scene(json!([{ "effect": "ripple",
         "params": { "taps": { "prop": "q" }, "tinted": { "prop": "t" }, "paint": { "prop": "t", "map": { "false": "a", "true": "a" } } } }]));
     let files = |path: &str, _: usize| {
-        Ok::<_, &str>(if path.ends_with("json") { waiting.to_string() } else { WGSL.into() }.into_bytes())
+        Ok::<_, &str>(
+            if path.ends_with("json") {
+                reiwand_upgrade::descriptors::completed(&waiting.to_string())
+            } else {
+                WGSL.into()
+            }
+            .into_bytes(),
+        )
     };
     let fault = both.adopt(&props, files).unwrap_err().to_string();
     assert!(fault.ends_with("needs 10 variants of its shader, at most 8 are allowed"), "{fault}");
@@ -83,8 +97,11 @@ fn package_effects_compile_once_and_share_a_shader_budget() {
         let id = path.trim_start_matches("fx/").split('.').next().unwrap_or_default();
         let mut d = descriptor();
         d["id"] = json!(id);
-        let text =
-            if path.ends_with("json") { d.to_string() } else { format!("{WGSL}{}", " ".repeat(60 << 10)) };
+        let text = if path.ends_with("json") {
+            reiwand_upgrade::descriptors::completed(&d.to_string())
+        } else {
+            format!("{WGSL}{}", " ".repeat(60 << 10))
+        };
         Some(text.into_bytes()).filter(|b| b.len() <= max).ok_or("too large")
     };
     let fault = many.adopt(&BTreeMap::new(), files).unwrap_err().to_string();

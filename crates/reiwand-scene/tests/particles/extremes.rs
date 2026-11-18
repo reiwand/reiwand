@@ -93,6 +93,7 @@ fn ranges_of_births_and_emitter_shapes_may_be_bound() {
     let system = &parsed.particles["dots"];
     assert_eq!((system.init.size.ends, system.init.life.exponent), ([2.0, 0.0], 2.0));
     let written: Json = serde_json::to_value(&parsed).unwrap();
+    let loud = reiwand_scene::prefill::of("Binding_for_float", loud);
     assert_eq!(written["particles"]["dots"]["init"]["size"], json!([2.0, loud, 1.0]));
     assert_eq!(written["particles"]["dots"]["emitters"][0]["shape"]["circle"]["radius"], loud);
     let plain = Scene::from_json(&reiwand_upgrade::fill::whole(&scene(sparks(), true))).unwrap();

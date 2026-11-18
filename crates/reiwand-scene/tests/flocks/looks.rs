@@ -46,7 +46,7 @@ fn trails_remember_recent_positions_and_forget_the_dead() {
     let system = still(
         json!({ "capacity": 4, "emitters": [{ "shape": { "point": [10, 50] }, "bursts": [{ "count": 1 }] }],
         "init": { "life": [0.5, 0.5], "velocity": [[60, 0], [60, 0]], "size": [3, 3] },
-        "render": { "trail": { "length": 6, "width": 0.5 } } }),
+        "render": { "trail": { "length": 6, "width": 0.5, "segments": null, "subdivide": 0, "uv_scale": 1, "uv_scroll": 0, "textured": false } } }),
     );
     let mut fly = Fly::of(json!({ "a": system }));
     assert_eq!(fly.bake.trails, [6]);
@@ -118,10 +118,11 @@ fn bound_birth_ranges_and_shapes_follow_their_sources() {
 
 #[test]
 fn new_looks_are_validated_and_named() {
-    let (found, features) =
-        issues(json!({ "init": { "life": [1, 1], "gradient": [[0, "#ff0000"], [1, "#0000ff"]] },
-        "render": { "order": "newest", "trail": { "length": 8, "width": 0.5 } },
-        "collide": [{ "bounds": { "mask": { "texture": "floor" } } }] }));
+    let (found, features) = issues(
+        json!({ "init": { "life": [1, 1], "gradient": [[0, "#ff0000"], [1, "#0000ff"]] },
+        "render": { "order": "newest", "trail": { "length": 8, "width": 0.5, "segments": null, "subdivide": 0, "uv_scale": 1, "uv_scroll": 0, "textured": false } },
+        "collide": [{ "bounds": { "mask": { "texture": "floor" } } }] }),
+    );
     assert!(
         found.is_empty() && features.contains("particles2") && !features.contains("particle_ropes"),
         "{found:?}"
@@ -135,11 +136,13 @@ fn new_looks_are_validated_and_named() {
         json!({ "collide": [{ "bounds": { "mask": { "texture": "song" } } }] }),
         json!({ "collide": [{ "bounds": { "mask": { "texture": "floor", "threshold": 2 } } }] }),
         json!({ "emitters": [{ "shape": { "mask": { "texture": "floor", "threshold": { "audio": "bass", "kind": "relative", "unit": "db" } } }, "rate": 1 }] }),
-        json!({ "render": { "trail": { "length": 99, "width": 0.5 } } }),
+        json!({ "render": { "trail": { "length": 99, "width": 0.5, "segments": null, "subdivide": 0, "uv_scale": 1, "uv_scroll": 0, "textured": false } } }),
     ];
     for b in bad {
         assert!(!issues(b.clone()).0.is_empty(), "{b}");
     }
-    let (_, long) = issues(json!({ "render": { "trail": { "length": 32, "width": 0.5 } } }));
+    let (_, long) = issues(
+        json!({ "render": { "trail": { "length": 32, "width": 0.5, "segments": null, "subdivide": 0, "uv_scale": 1, "uv_scroll": 0, "textured": false } } }),
+    );
     assert!(long.contains("particle_ropes"), "long trails stay with ropes");
 }

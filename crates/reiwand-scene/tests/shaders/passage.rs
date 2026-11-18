@@ -22,7 +22,7 @@ fn crossing(transition: Json, descriptor: Json, wgsl: &str) -> Scene {
     let mut scene = Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new())
         .unwrap_or_else(|e| panic!("{e}"));
     let files = |path: &str, _: usize| match path {
-        "t/iris.json" => Ok(descriptor.to_string().into_bytes()),
+        "t/iris.json" => Ok(reiwand_upgrade::descriptors::completed(&descriptor.to_string()).into_bytes()),
         "t/iris.wgsl" => Ok(wgsl.as_bytes().to_vec()),
         _ => Err("missing"),
     };
@@ -68,7 +68,10 @@ fn scenes_without_a_transition_read_as_before() {
     let mut scene = Scene::load(&reiwand_upgrade::fill::whole(&text.to_string()), &BTreeMap::new()).unwrap();
     scene.adopt(&BTreeMap::new(), |_: &str, _: usize| Err::<Vec<u8>, _>("none")).unwrap();
     assert!(scene.transition.is_none() && scene.passages == Passages::default());
-    assert!(!scene.features().contains("transition") && !scene.to_json().unwrap().contains("transition"));
+    assert!(
+        !scene.features().contains("transition")
+            && serde_json::from_str::<Json>(&scene.to_json().unwrap()).unwrap()["transition"].is_null()
+    );
 }
 
 #[test]

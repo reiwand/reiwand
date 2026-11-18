@@ -12,7 +12,7 @@ fn ticks(seconds: f32) -> usize {
 fn binding(extra: Json) -> Binding<f32> {
     let mut b = json!({ "audio": 40, "kind": "surge", "unit": "amplitude", "window": 1, "reference": "band", "hold_silence": false });
     b.as_object_mut().unwrap().extend(extra.as_object().unwrap().clone());
-    serde_json::from_value(b).unwrap()
+    serde_json::from_value(reiwand_scene::prefill::of("Binding_for_float", b)).unwrap()
 }
 
 fn tone(bands: &[(usize, f32)]) -> AudioFrame {

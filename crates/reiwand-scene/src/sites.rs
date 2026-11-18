@@ -37,9 +37,8 @@ fn walk(json: &Json, at: &str, layer: Option<&str>, out: &mut Vec<Site>) {
         Json::Object(map) => {
             let own = map.get("type").and(map.get("id")).and_then(Json::as_str);
             let layer = own.or(layer);
-            let bound = (map.get("fn").is_some() || map.get("params").is_some())
-                .then(|| map.get("script")?.as_str())
-                .flatten();
+            let given = |k: &str| map.get(k).is_some_and(|v| !v.is_null());
+            let bound = (given("fn") || given("params")).then(|| map.get("script")?.as_str()).flatten();
             if let Some(script) = bound {
                 let call = map.get("fn").and_then(Json::as_str);
                 let params: Option<BTreeMap<String, Param>> =

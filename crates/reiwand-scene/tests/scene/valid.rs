@@ -29,8 +29,8 @@ fn unknown_fields_and_values_are_rejected() {
         ("\"loop\": \"repeat\"", "\"loop\": \"forever\""),
         ("\"out_cubic\"", "\"out_cubical\""),
         (
-            "\"scale\": 0.8,\n        \"smooth\"",
-            "\"scale\": 0.8,\n        \"jitter\": 1,\n        \"smooth\"",
+            "\"scale\": 0.8,\n        \"script\"",
+            "\"scale\": 0.8,\n        \"jitter\": 1,\n        \"script\"",
         ),
         ("\"fill\": \"#ff8800\"", "\"fill\": \"#ff88\""),
         ("\"capacity\": 4000", "\"capacity\": 4000, \"gravity\": 1"),
@@ -74,11 +74,14 @@ fn validation_names_the_broken_field() {
         [unknown("/layers/0/image/map/dawn", "asset", "sky_dawn")]
     );
     assert_eq!(issues(|s| s.particles.clear()), [unknown("/layers/2/system", "particle system", "sparks")]);
-    let renamed = SAMPLE.replace(
-        "\"prop\": \"depth\",\n              \"scale\": 10",
-        "\"prop\": \"deep\", \"audio\": \"bass\", \"kind\": \"relative\", \"unit\": \"db\"",
-    );
-    let found = Scene::from_json(&renamed).unwrap().validate(&props());
+    let mut renamed: serde_json::Value = serde_json::from_str(SAMPLE).unwrap();
+    let radius = &mut renamed["layers"][0]["effects"][1]["params"]["radius"];
+    assert_eq!(radius["prop"], "depth");
+    for (field, value) in [("prop", "deep"), ("audio", "bass"), ("kind", "relative"), ("unit", "db")] {
+        radius[field] = value.into();
+    }
+    radius["scale"] = serde_json::Value::Null;
+    let found = Scene::from_json(&renamed.to_string()).unwrap().validate(&props());
     let path = "/layers/0/effects/1/params/radius";
     assert_eq!(found, [Issue::Source(path.into()), unknown(path, "property", "deep")]);
     let found = issues(|s| {
@@ -126,7 +129,7 @@ fn validation_names_the_broken_field() {
     assert_eq!(found, [Issue::Unsorted("/layers/4/transform/rotation/keys".into())]);
     let clocked = SAMPLE.replace("\"opacity\": 0.6", "\"opacity\": { \"clock\": \"HH\" }");
     assert_eq!(
-        Scene::from_json(&clocked).unwrap().validate(&props()),
+        Scene::from_json(&reiwand_upgrade::fill::whole(&clocked)).unwrap().validate(&props()),
         [Issue::Type("/layers/1/opacity".into())]
     );
     let huge = edited(|doc| doc["layers"][5]["opacity"]["scale"] = json!(1e39));
@@ -148,17 +151,17 @@ fn validation_names_the_broken_field() {
         [Issue::TooMany { path: "/layers".into(), count: 2000, max: 256 }]
     );
     assert!(started.elapsed().as_secs() < 2);
-    let triggered = SAMPLE.replace("\"autoplay\": true", "\"trigger\": \"prop:nothing\"");
+    let triggered = triggered_by("prop:nothing");
     assert_eq!(
         Scene::from_json(&triggered).unwrap().validate(&props()),
         [unknown("/timelines/0/trigger", "property", "nothing")]
     );
-    let tapped = SAMPLE.replace("\"autoplay\": true", "\"trigger\": \"tap:sky\"");
+    let tapped = triggered_by("tap:sky");
     assert_eq!(
         Scene::from_json(&tapped).unwrap().validate(&props()),
         [unknown("/timelines/0/trigger", "trigger", "tap:sky")]
     );
-    let clicked = SAMPLE.replace("\"autoplay\": true", "\"trigger\": \"click:sky\"");
+    let clicked = triggered_by("click:sky");
     assert_eq!(
         Scene::from_json(&clicked).unwrap().validate(&props()),
         [unknown("/timelines/0/trigger", "layer that takes clicks", "sky")]
@@ -185,4 +188,11 @@ fn mask() -> Mask {
 
 fn white() -> Value<Color> {
     Value::Fixed(Color::parse("#ffffff").unwrap())
+}
+
+fn triggered_by(trigger: &str) -> String {
+    edited(|doc| {
+        doc["timelines"][0]["autoplay"] = json!(false);
+        doc["timelines"][0]["trigger"] = json!(trigger);
+    })
 }

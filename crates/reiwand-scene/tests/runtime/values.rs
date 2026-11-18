@@ -71,11 +71,14 @@ fn properties_check_and_clamp_values() {
     assert!(check("style", json!("noon")).is_err() && check("style", json!("dawn")).is_ok());
     assert!(check("soft", json!("yes")).is_err() && check("photo", json!("relative.png")).is_err());
     assert_eq!(check("photo", json!(null)), Ok(json!(null)));
-    let presets: Vec<Preset> =
-        serde_json::from_value(json!([{ "id": "calm", "values": { "density": 20, "depth": 0.2 } }])).unwrap();
+    let presets: Vec<Preset> = serde_json::from_value(
+        json!([{ "id": "calm", "label": null, "values": { "density": 20, "depth": 0.2 } }]),
+    )
+    .unwrap();
     assert_eq!(check_presets(&props, &presets), Ok(()));
     let bad: Vec<Preset> =
-        serde_json::from_value(json!([{ "id": "x", "values": { "photo": "/a.png" } }])).unwrap();
+        serde_json::from_value(json!([{ "id": "x", "label": null, "values": { "photo": "/a.png" } }]))
+            .unwrap();
     assert!(check_presets(&props, &bad).is_err());
     let output = BTreeMap::from([("depth".to_string(), json!(0.9))]);
     let global = BTreeMap::from([("depth".to_string(), json!(0.1)), ("soft".to_string(), json!(false))]);

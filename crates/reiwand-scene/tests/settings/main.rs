@@ -11,7 +11,11 @@ mod forms;
 mod leveling;
 
 fn props(value: Value) -> BTreeMap<String, Property> {
-    serde_json::from_value(value).unwrap()
+    reiwand_scene::prefill::properties(value)
+}
+
+fn one(value: Value) -> Property {
+    props(json!({ "one": value })).remove("one").unwrap()
 }
 
 fn values(value: Value) -> Values {
@@ -29,7 +33,7 @@ fn sample() -> BTreeMap<String, Property> {
         "again": { "type": "button", "enabled_if": "!glow && mood != 1", "order": 4 },
         "key": { "type": "text", "secret": true },
         "photo": { "type": "file", "accept": ["image", "video"], "default_asset": "sky" },
-        "photos": { "type": "folder", "accept": ["image"], "pick": "sequence", "every": 30 }
+        "photos": { "type": "folder", "accept": ["image"], "pick": "sequence", "every": 30, "max_files": 1000, "recursive": 0 }
     }))
 }
 

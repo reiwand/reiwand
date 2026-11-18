@@ -23,7 +23,6 @@ fn package_effects_compile_against_the_contract_and_report_what_they_read() {
     let broken = [
         (json!({ "id": "other" }), WGSL, "declares the id other, expected ripple"),
         (json!({ "id": "blur" }), WGSL, "blur is the name of a built-in effect"),
-        (json!({ "cost": null }), WGSL, "needs a cost"),
         (json!({}), "fn broken(", "expected"),
         (json!({}), &WGSL.replace("fn fs_ripple(", "fn fs_other("), "has no entry point fs_ripple"),
         (json!({}), &WGSL.replace("override taps", "const taps"), "declares no override taps"),
@@ -50,6 +49,11 @@ fn package_effects_compile_against_the_contract_and_report_what_they_read() {
             "no texture",
         ),
     ];
+    let mut bare: Json =
+        serde_json::from_str(&reiwand_upgrade::descriptors::completed(&descriptor().to_string())).unwrap();
+    bare.as_object_mut().unwrap().remove("cost");
+    let fault = Descriptor::packaged("ripple", &bare.to_string(), WGSL).err().unwrap();
+    assert!(fault.contains("missing field `cost`"), "{fault}");
     for (patch, wgsl, problem) in broken {
         let apply = |d: &mut Json| {
             for (k, v) in patch.as_object().unwrap() {
@@ -78,7 +82,12 @@ fn descriptors_check_their_new_fields() {
         (pass(json!({ "entry": "fs_a", "vertex": "vs_a", "grid": [65, 8] })), "a grid of 1 to 64"),
         (pass(json!({ "entry": "fs_a", "inputs": vec!["input"; 10] })), "more than 9 inputs"),
         (pass(json!({ "entry": "fs_a", "inputs": ["target:nowhere"] })), "unknown input target:nowhere"),
-        (params(json!({ "id": "k", "type": "enum", "prefill": 0 })), "needs 1 to 64 values"),
+        (
+            params(
+                json!({ "id": "k", "type": "enum", "prefill": 0, "values": vec![json!({ "value": 0, "label": { "en": "a" } }); 65] }),
+            ),
+            "needs 1 to 64 values",
+        ),
         (params(json!({ "id": "k", "type": "float", "prefill": 0, "channels": 3 })), "is no mask"),
         (
             params(json!({ "id": "k", "type": "mask", "prefill": "", "channels": 2 })),

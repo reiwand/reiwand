@@ -64,7 +64,7 @@ impl Probe for Param {
             Param::Number(n) => f32::probe(c, path, n),
             Param::Vec2(v) => Vec2::probe(c, path, &Vec2(*v)),
             Param::Color(color) => c.color(path, *color),
-            Param::Bool(_) | Param::Text(_) | Param::Emitters(_) => {}
+            Param::Bool(_) | Param::Text(_) | Param::Emitters(_) | Param::Auto => {}
         }
     }
 }

@@ -1,13 +1,7 @@
 use super::*;
 
-fn whole_use(mut v: serde_json::Value) -> serde_json::Value {
-    let o = v.as_object_mut().unwrap();
-    o.entry("name").or_insert(serde_json::Value::Null);
-    o.entry("enabled").or_insert(serde_json::json!(true));
-    o.entry("mask").or_insert(serde_json::Value::Null);
-    o.entry("optional").or_insert(serde_json::json!(false));
-    o.entry("params").or_insert(serde_json::json!({}));
-    v
+fn whole_use(v: serde_json::Value) -> serde_json::Value {
+    reiwand_scene::prefill::of("EffectUse", v)
 }
 
 fn uses(list: serde_json::Value) -> Vec<EffectUse> {

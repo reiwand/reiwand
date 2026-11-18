@@ -68,9 +68,10 @@ fn scene() -> (Scene, impl Fn(&str, usize) -> Result<Vec<u8>, String> + Copy) {
         "effects": { "s": { "descriptor": "fx/s.json", "wgsl": "fx/s.wgsl" } },
         "layers": [{ "blend_space": "canvas", "id": "l", "type": "image", "image": "a", "effects": [{ "effect": "s" }] }] });
     let files = |path: &str, _: usize| match path {
-        "fx/s.json" => {
-            Ok(json!({ "id": "s", "cost": {}, "passes": [{ "entry": "fs_s" }] }).to_string().into_bytes())
-        }
+        "fx/s.json" => Ok(reiwand_upgrade::descriptors::completed(
+            &json!({ "id": "s", "cost": {}, "passes": [{ "entry": "fs_s" }] }).to_string(),
+        )
+        .into_bytes()),
         "fx/s.wgsl" => {
             Ok(b"@fragment fn fs_s(in: VertexOut) -> @location(0) vec4<f32> { return tap(in.uv) * 0.5; }"
                 .to_vec())

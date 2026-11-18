@@ -42,7 +42,9 @@ fn conditions_that_depend_on_each_other_are_refused() {
 #[test]
 fn newer_controls_check_their_fields_and_values() {
     let props = sample();
-    assert!(props.values().all(|p| p.check().is_ok()));
+    for (k, p) in &props {
+        assert_eq!(p.check(), Ok(()), "{k}");
+    }
     assert_eq!(check_presets(&props, &[]), Ok(()));
     let value = |id: &str, v: Value| props[id].value(&v);
     assert_eq!(value("speed", json!(1.23456)), Ok(json!(1.23)));
@@ -54,7 +56,7 @@ fn newer_controls_check_their_fields_and_values() {
     assert!(props["key"].personal() && props["photos"].personal() && !props["mood"].personal());
     assert!(props["photo"].accepts("video") && !props["photos"].accepts("video"));
     assert_eq!(effective(&props, &[])["photo"], json!("sky"));
-    let broken = |p: Value| serde_json::from_value::<Property>(p).unwrap().check().is_err();
+    let broken = |p: Value| one(p).check().is_err();
     assert!(broken(json!({ "type": "slider", "min": 0, "max": 1, "default": 0.5, "log": true })));
     assert!(broken(json!({ "type": "slider", "min": 0, "max": 1, "default": 0.5, "decimals": 7 })));
     assert!(broken(json!({ "type": "combo", "default": 1, "options": [1, "two"] })));

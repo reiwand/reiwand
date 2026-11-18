@@ -42,7 +42,7 @@ fn problems_name_the_field_to_fix_and_groups_do_not_nest() {
     let refused = check_presets(&props, &[]).unwrap_err();
     assert_eq!(refused, ("properties.glow.visible_if".into(), "depends on the unknown property gone".into()));
     let mut props = sample();
-    let inner: Property = serde_json::from_value(json!({ "type": "group", "group": "more" })).unwrap();
+    let inner = one(json!({ "type": "group", "group": "more" }));
     props.insert("inner".into(), inner);
     assert_eq!(check_presets(&props, &[]).unwrap_err().0, "properties.inner.group");
     props.get_mut("inner").unwrap().group = None;
@@ -71,10 +71,9 @@ fn bindings_follow_values_and_triggers_follow_buttons() {
         [valueless("/layers/0/opacity", "again"), valueless("/timelines/0/trigger", "more")]
     );
     assert_eq!(scene("lines", "start"), [valueless("/layers/0/opacity", "lines")]);
-    let labeled: Property = serde_json::from_value(
+    let labeled = one(
         json!({ "type": "combo", "default": "a", "options": [{ "value": "a", "label": "" }, { "value": "b", "label": "Bee" }] }),
-    )
-    .unwrap();
+    );
     let only = BTreeMap::from([("pick".to_string(), labeled)]);
     let options = &form(&only, &[], &effective(&only, &[]), &[]).0[0].options;
     assert_eq!((options[0].label.as_str(), options[1].label.as_str()), ("a", "Bee"));
