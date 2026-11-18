@@ -356,13 +356,10 @@ jobs:
           shared-key: dev
           save-if: false
 
-      - name: Daemon, helper and test binaries
+      - name: Daemon and test binaries
         run: |
-          cargo build --locked -p reiwandd -p reiwand-ctl -p reiwand-web -p reiwand-upgrade
+          cargo build --locked -p reiwandd -p reiwand-ctl -p reiwand-upgrade
           cargo build --locked -p reiwand-pipewire --example probe
-          page=$(cargo test --locked -p reiwand-web --test page --no-run --message-format=json |
-            jq -r 'select(.executable != null and .target.name == "page") | .executable')
-          cp "$page" target/debug/web-page
           cp target/debug/examples/probe target/debug/probe
 
       - name: Virtual DRM devices
@@ -370,10 +367,10 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: scripts/ci-drm.sh
 
-      - name: User namespaces for the WebKit sandbox
+      - name: User namespaces for the Chromium sandbox
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
-      - name: Helper and daemon with WPE WebKit, and video sound through PipeWire 1.2 or newer
+      - name: Helper with Qt WebEngine, pages and daemon, and video sound through PipeWire 1.2 or newer
         run: |
           docker run --rm --device /dev/dri --security-opt seccomp=unconfined --security-opt apparmor=unconfined --security-opt systempaths=unconfined \
             -v "$PWD:$PWD" -w "$PWD" \
@@ -381,7 +378,8 @@ jobs:
             set -e
             install() {
               pacman -Sy --noconfirm --needed archlinux-keyring >/dev/null
-              pacman -Syu --noconfirm --needed wpewebkit pipewire pipewire-audio gst-plugin-pipewire wireplumber dbus python procps-ng \
+              pacman -Syu --noconfirm --needed qt6-webengine qt6-declarative qt6-base rust gcc clang pkgconf make jq \
+                pipewire pipewire-audio gst-plugin-pipewire wireplumber dbus python procps-ng xorg-server-xvfb \
                 gst-plugins-base gst-plugins-good mesa vulkan-swrast vulkan-icd-loader >/dev/null
             }
             for attempt in 1 2 3 4; do
@@ -389,9 +387,9 @@ jobs:
               [ "$attempt" -lt 4 ] || exit 1
               sleep $((attempt * 20))
             done
-            pacman -Q wpewebkit gst-plugin-pipewire
+            pacman -Q qt6-webengine gst-plugin-pipewire
             useradd -m -u "$(stat -c %u .)" tester
-            su tester -c "REIWAND_REQUIRE_WEB=1 target/debug/web-page --test-threads 1 && REIWAND_REQUIRE_WEB=1 scripts/web-test.sh target/debug && REIWAND_REQUIRE_PIPEWIRE_SOUND=1 scripts/video-test.sh target/debug"
+            su tester -c scripts/web-engine-test.sh
           '
 
   sway:
@@ -482,12 +480,11 @@ jobs:
             files: |
               target/release/reiwand-app
           - name: tools
-            bins: reiwand-ctl reiwand-web reiwand-upgrade
+            bins: reiwand-ctl reiwand-upgrade
             cache: daemon
             save: false
             files: |
               target/release/reiwand-ctl
-              target/release/reiwand-web
               target/release/reiwand-upgrade
     env:
       REIWAND_VERSION: ${{ needs.version.outputs.informational }}
@@ -574,9 +571,41 @@ jobs:
           compression-level: 1
           retention-days: 1
 
+  build-web:
+    name: Release helper with Qt WebEngine
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      REIWAND_VERSION: ${{ needs.version.outputs.informational }}
+      FEDORA: docker.io/library/fedora:44@sha256:43b29f65a41eb9c35e1cd5323e3bdf3b655c2357a9f4f1ff2f9c2798e5045d80
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Build in Fedora, whose Qt has the web engine that Ubuntu 24.04 lacks
+        run: |
+          docker run --rm -e REIWAND_VERSION -e QMAKE=/usr/bin/qmake6 -v "$PWD:/src" -w /src "$FEDORA" bash -c '
+            set -e
+            dnf -y -q install cargo rust gcc-c++ pkgconf-pkg-config qt6-qtbase-devel qt6-qtbase-private-devel \
+              qt6-qtdeclarative-devel qt6-qtwebengine-devel >/dev/null
+            scripts/build-release.sh reiwand-web
+            ldd target/release/reiwand-web | grep -E "Qt6WebEngine|Qt6Quick"
+          '
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: release-bin-web
+          path: target/release/reiwand-web
+          if-no-files-found: error
+          compression-level: 1
+          retention-days: 1
+
   package:
     name: Package
-    needs: [version, build]
+    needs: [version, build, build-web]
     if: needs.version.outputs.rust == 'true'
     runs-on: ubuntu-24.04
     env:
@@ -942,6 +971,11 @@ jobs:
       - name: Tracked sources, vendored Cargo sources and version
         run: packaging/flatpak/sources.sh
 
+      - name: Qt WebEngine base application
+        run: |
+          flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install -y --noninteractive flathub io.qt.qtwebengine.BaseApp//6.11
+
       - uses: flatpak/flatpak-github-actions/flatpak-builder@79327416609af08178ad73b352877e51450790b3
         with:
           manifest-path: packaging/flatpak/io.github.reiwand.Reiwand.yml
@@ -982,7 +1016,7 @@ jobs:
 
       - name: Install Flatpak and a sound server
         run: |
-          scripts/ci-apt.sh flatpak pipewire pipewire-bin wireplumber dbus-x11 dbus-bin
+          scripts/ci-apt.sh flatpak pipewire pipewire-bin wireplumber dbus-x11 dbus-bin sway
           xdg-dbus-proxy --version
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
           flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -998,6 +1032,10 @@ jobs:
       - name: The daemon answers inside the sandbox
         timeout-minutes: 10
         run: scripts/private-audio.sh packaging/flatpak/serve-check.sh
+
+      - name: The web helper starts inside the sandbox on a headless compositor
+        timeout-minutes: 10
+        run: packaging/flatpak/web-check.sh
 
   app-check:
     name: Interface check
@@ -1140,7 +1178,7 @@ jobs:
   release:
     name: Release
     if: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-    needs: [version, workflows, lint, clippy, test, render-gl, depth, e2e, sway, x11, build, package, android-native, android, android-lint, android-emulator, rpm, plasma, app-check, web, server]
+    needs: [version, workflows, lint, clippy, test, render-gl, depth, e2e, sway, x11, build, build-web, package, android-native, android, android-lint, android-emulator, rpm, plasma, app-check, web, server]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -1234,7 +1272,7 @@ jobs:
 
   cache-cleanup:
     name: Cache cleanup
-    needs: [version, workflows, lint, clippy, test, render-gl, depth, e2e, web, sway, x11, build, package, android-native, android, android-lint, android-emulator, rpm, flatpak, flatpak-daemon, app-check, plasma, server, release, image, flatpak-release]
+    needs: [version, workflows, lint, clippy, test, render-gl, depth, e2e, web, sway, x11, build, build-web, package, android-native, android, android-lint, android-emulator, rpm, flatpak, flatpak-daemon, app-check, plasma, server, release, image, flatpak-release]
     if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10

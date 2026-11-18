@@ -2,55 +2,55 @@
 
 A `web` package (`package.md`, "Web pages") is shown by `reiwand-web`, a helper process that the
 daemon starts for each web package shown and stops as soon as no screen shows it. The helper runs
-the page in WPE WebKit, hands every frame to the daemon, and the daemon draws it like any other
+the page in Qt WebEngine (Chromium), hands every frame to the daemon, and the daemon draws it like any other
 wallpaper: with the same transitions, fit, frame rate cap, pause rules and streams.
 
 ## Engine
 
-`reiwand-web` loads WPE WebKit 2.54 or newer (`libWPEWebKit-2.0.so.1`, with its headless platform)
-when it starts, so the same binary runs everywhere and nothing links against WebKit at build time.
-WPE is the only engine that renders a page without a window and hands over its frames: other
-WebKit ports only draw into toolkit widgets or take still snapshots, and engines that are not in
-distributions would have to be bundled and updated by Reiwand. Where it is missing the daemon
+`reiwand-web` is built against Qt Quick and Qt WebEngine 6.5 or newer (the version that lets a
+content security policy go with each URL scheme) and runs the page in an off-screen `WebEngineView`
+rendered with `QQuickRenderControl`, so no window ever shows. Qt WebEngine comes with the distribution
+(or, in the Flatpak, with `io.qt.qtwebengine.BaseApp`): Reiwand bundles no engine. A build whose
+computer has no Qt WebEngine 6.5 or newer (`no_engine`) still produces the helper, and the daemon
 refuses web wallpapers with a translated reason, in `Library1.Apply`, `reiwand-ctl lib apply` and the
 error of the screen, instead of drawing nothing:
 
 | Where | What it has | Web pages |
 |-------|-------------|-----------|
-| Arch Linux, Fedora | `wpewebkit` 2.54 | shown |
-| Ubuntu 24.04 (the CI runner) | WebKitGTK 2.52 only; no `wpewebkit` package at all (the last Ubuntu release that had one is 22.04, with WPE 2.36 and the 1.0 API) | refused: `they need WPE WebKit 2.54 or newer, which is not installed. Ubuntu 24.04 does not ship it` |
-| Flatpak (`org.kde.Platform`) | no WPE in the runtime, and no WPE runtime or extension on Flathub that we know of | refused: `this Flatpak runs on the KDE runtime, which has no WPE WebKit 2.54 or newer`; `reiwand-web` is in the bundle |
+| Arch Linux, Fedora | `qt6-webengine` / `qt6-qtwebengine` 6.5 or newer | shown |
+| Flatpak | `io.qt.qtwebengine.BaseApp` 6.11, which the manifest builds on, and `QtWebEngineProcess` in `/app/bin` | shown |
+| Ubuntu 24.04 (the CI runner) | Qt 6.4, which has no per-scheme content security policy | not shown: its tarball carries the helper built on Fedora (below), which needs Qt WebEngine on the computer; the reason names Qt WebEngine 6.5 or newer |
 | any, without the helper | — | refused: `the web helper reiwand-web is not installed` |
 | Android (the app) | the system WebView | shown with it, see "On the phone" |
 
-Putting WPE in the Flatpak would mean building WPE WebKit 2.54 from source inside the manifest
-(libwpe, wpebackend-fdo, libsoup 3, GStreamer GL, ICU and the rest of its dependencies; hours of
-compile time and several GiB of memory on every release build), because neither the KDE runtime nor
-Flathub carries it, and the same holds for a deb on Ubuntu 24.04. The web job of the CI therefore
-proves pages where WPE exists (an Arch Linux container on the Ubuntu runner), and the Ubuntu and
-Flatpak jobs prove the refusal with its reason (`scripts/integration-web.sh`, `packaging/flatpak/check.sh`).
+The CI proves each row. The `web` job runs the page tests, the daemon and the video sound in an Arch
+Linux container with `qt6-webengine` (`scripts/web-engine-test.sh`; it says whether the runner has a
+render node, and without one the pages run on the software path); `build-web` builds the helper of the
+release binaries in a Fedora container, because the Ubuntu 24.04 jobs compile it as `no_engine` (they
+still check, lint and test the Rust side and the refusal, `scripts/integration-web.sh`); the Flatpak
+job builds on the BaseApp and `packaging/flatpak/web-check.sh` runs `reiwand-web --check` inside the
+sandbox on a headless Wayland compositor.
 
 The daemon finds the helper in `REIWAND_WEB`, next to `reiwandd` or in `PATH`, and runs
-`reiwand-web --check` once to learn whether it can start (it prints the WebKit version, or why not).
+`reiwand-web --check` once to learn whether it can start (it prints the Qt version, or why not).
 
 ## Frames
 
-The helper takes over the `render_buffer` and `buffers_changed` steps of the headless view, so it
-decides when a frame is done: it reports a frame as presented only at the frame rate the daemon asks
-for (the output's cap, battery and power saving included), and WebKit paces animation frames, CSS
-animations and video by that, so the cap limits every frame the page draws, not only
-`requestAnimationFrame`. A page that does not change draws nothing. `GetState().outputs[x].page_frames`
+The helper grabs the frame of the off-screen view itself, so it decides when a frame is done: it
+reports a frame as presented only at the frame rate the daemon asks for (the output's cap, battery
+and power saving included), and Chromium paces animation frames, CSS animations and video by that, so the cap limits every frame the page draws, not only
+`requestAnimationFrame`. A page that does not change draws nothing. An idle helper (no view visible for 5 minutes) sends `Idle` and the daemon stops it; it starts again when a view is visible. `GetState().outputs[x].page_frames`
 counts the frames the page drew for an output. A fade to a page waits for its first frame (or for
 the page to fail), so the wallpaper before it never fades into an empty output; a fade from a page
 starts from its last frame.
 
-When the daemon's GPU can import them, the helper asks WebKit to render into the formats and
+When the daemon's GPU can import them, the helper exports the frame of its OpenGL ES texture as a DMA-BUF in the formats and
 modifiers that GPU samples in place (`XRGB8888`/`ARGB8888` with one plane, on the render node of the
-daemon) and sends each buffer once as a DMA-BUF (`decode` reads `zero-copy`); the daemon gives a
+daemon) and sends each buffer once (`decode` reads `zero-copy`); the daemon gives a
 buffer back once a newer frame replaced it. Otherwise frames travel through a sealed `memfd` with two
 slots (`decode` reads `copy`). A page gets a GPU only when the daemon renders on a hardware GPU
 whose render node can allocate a GBM buffer (`reiwand-web --gpu <node>`, checked once per node);
-otherwise (`vgem`, virtual GPUs without 3D, software rendering) it starts without the GPU devices
+otherwise (`vgem`, virtual GPUs without 3D, software rendering) it starts with `LIBGL_ALWAYS_SOFTWARE=1`
 and draws in memory, as it also does when it draws nothing on the GPU within 10 s. Pages are
 always opaque.
 
@@ -68,14 +68,16 @@ always opaque.
   error says why. A page that runs for a minute without crashing starts counting again. The daemon
   restarts a helper that stopped or failed after 1, 5 and 30 s; after the third failure in a row the
   screen shows its background color and its error says why.
-- The helper and WebKit's processes run at nice 10. When a systemd user manager runs, the helper
-  starts in its own transient scope with `CPUQuota=100%`, `CPUWeight=20`, `MemoryMax=1536M`,
-  `MemorySwapMax=0` and `TasksMax=512`, so a page takes at most one processor and 1.5 GB in all;
+- The helper and the processes of Qt WebEngine run at nice 10. When a systemd user manager runs, the helper
+  starts in its own transient scope with `CPUQuota=100%`, `CPUWeight=20`, `MemoryHigh=768M`, `MemoryMax=1536M`,
+  `MemorySwapMax=0` and `TasksMax=512`, so a page takes at most one processor, is slowed down past
+  768 MB and is killed past 1.5 GB in all (the scope is the only memory limit: Chromium has no
+  per-page cap of its own here);
   where the scope cannot be made the helper starts without it.
 - A page whose kept data (`data` below) grows past twice its `web.storage_kib` plus 1 MiB starts
   without keeping anything, and its error says so until its data is cleared. On the desktop the
-  limit is checked only when the page starts, because WPE WebKit has no quota per origin in its
-  current interface: a running page can keep more until its next start. On the phone the WebView
+  limit is checked only when the page starts, because the helper has no quota per origin to set in
+  its profile: a running page can keep more until its next start. On the phone the WebView
   has no quota per origin either, so each start of a page measures what its origin keeps (the
   WebView's own count for IndexedDB, Cache Storage and the like, plus `localStorage`, which a script
   that runs before the page counts) against the same limit. While it runs, a `localStorage` write
@@ -91,6 +93,17 @@ always opaque.
 - Changing a property sends only the changed values to the running page; changing what the page may
   see (below), clearing its data or granting the network starts it again.
 
+## Session and the page's view
+
+Qt needs an OpenGL ES context to render, so the helper connects to the Wayland or X session of the
+daemon (`WAYLAND_DISPLAY` or `DISPLAY`) only to create that context and a surface that is never
+mapped: it opens no window and takes no input from the session. The page sees none of it: the size
+of its screen, the pointer and the clicks come from the daemon as messages, and the engine runs
+with the platform of that session only for the GL context. `reiwand-web --check` creates the same
+context, so it needs a session with working GL (a headless compositor serves; the offscreen Qt
+platform does not). Without a session the helper fails to start and the daemon shows the error of
+the screen.
+
 ## Protocol
 
 The helper gets one end of a `SOCK_SEQPACKET` socket pair as descriptor 3. Each packet is one JSON
@@ -100,9 +113,9 @@ sealed `memfd` instead, up to 64 MiB. The daemon maps frames only from `memfd`s 
 shrinking and as large as the frames they hold. The helper dies with the daemon
 (`PR_SET_PDEATHSIG`).
 
-Each helper leads its own process group, which WebKit's processes join. To stop a page the daemon
+Each helper leads its own process group, which the processes of Qt WebEngine join. To stop a page the daemon
 sends `Quit` (closing the socket counts the same): the helper closes its views, lets go of its
-WebKit context and network session, waits up to one second for WebKit's processes to end, kills
+profile, waits up to one second for those processes to end, kills
 those left and exits. The daemon never waits for this on its render thread: a thread of its own
 gives the helper 1.5 s, then kills it, and kills whatever stays in its group 3 s later. A page that
 keeps data starts again only once its earlier helper and group are gone, and `ClearData` deletes
@@ -125,23 +138,26 @@ Every layer applies to every page:
    the package (never `manifest.json` or its signature), percent-decoded, without `..`. A file the
    user chose reaches it only through an opaque `wpak-user://<property>/<token>` (below). Nothing
    else resolves: `file:`, other packages, other schemes.
-2. A content security policy that the page cannot remove limits every load to `wpak:`,
-   `wpak-user:`, `data:` and `blob:`, plus the declared origins once the network is allowed; no
-   objects, forms or `<base>`.
-3. A content filter blocks every request but those schemes and origins, including `fetch` and
-   WebSockets.
+2. A content security policy that the page cannot remove (the scheme handler adds it to every
+   response of `wpak:` and `wpak-user:`, as a header) limits every load to `wpak:`, `wpak-user:`,
+   `data:` and `blob:`, plus the declared origins once the network is allowed; no objects, forms or
+   `<base>`.
+3. A request interceptor of the profile cuts every request but those schemes and origins, including
+   `fetch` and WebSockets (a request refused by the interceptor fails as a blocked request).
 4. Navigation outside the package, new windows, downloads, dialogs, the file chooser,
    notifications and full screen are refused; every permission request (camera, microphone,
-   location, clipboard and the rest) is denied; WebRTC and media capture are off; keys never reach
-   the page.
+   location, clipboard and the rest) is denied; WebRTC and media capture are removed by a script
+   injected before the page's own (`RTCPeerConnection` and its relatives are deleted, and
+   `getUserMedia`, `getDisplayMedia` and `enumerateDevices` reject); keys never reach the page.
 5. Unless the package declares origins and the user granted `network`, the helper starts in its own
-   user and network namespaces with no network at all, so not even the network process of WebKit
-   can reach anything.
-6. WebKit runs the page in its own process inside its bubblewrap and seccomp sandbox, limited to
-   768 MB of memory.
+   user and network namespaces with no network at all, so not even the network service of
+   Chromium can reach anything.
+6. Chromium runs the page in its renderer process inside its own user namespace and seccomp
+   sandbox; the memory of everything is limited by the scope of the helper (see Lifecycle).
 
-`OutputState.sandbox` is `"on"` when every layer is in place and `"reduced"` when WebKit could not
-start its sandbox or the namespaces could not be made (some containers forbid them); clients show
+`OutputState.sandbox` is `"on"` when every layer is in place and `"reduced"` when the helper
+could not make the namespaces and started Qt WebEngine with its sandbox off
+(`QTWEBENGINE_DISABLE_SANDBOX`; some containers forbid them); clients show
 it next to the privacy notice. `reiwand-ctl` prints the same notice, on standard error, after `lib apply`,
 `playlist start`, `next` and `prev` (for the screens they touch) and in `state` when run in a terminal.
 
@@ -150,12 +166,13 @@ it next to the privacy notice. `reiwand-ctl` prints the same notice, on standard
 ## Privacy
 
 A page sees, by default, the real time zone, the language of the user, what the graphics card can
-do through WebGL, and keeps its own storage when it declares `web.storage_kib`. On the desktop WPE
-WebKit already reports a generic renderer (`Apple GPU`), so WebGL tells the page the limits and
-extensions of the card, not its model; on the phone the WebView reports the model. Each of them is
+do through WebGL, and keeps its own storage when it declares `web.storage_kib`. On the desktop WebGL
+tells the page the model that the engine reports for the card (the debug renderer extension), as on
+the phone. Each of them is
 restricted per package with `Library1.Confirm` (`hide_zone`: UTC; `hide_language`: `en-US`, also in
-`reiwand.locale` and the labels of combos; `hide_gpu`: WebGL keeps working with a generic vendor and
-renderer and no debug extension, and `navigator.gpu` is absent; `hide_storage`: nothing is kept). `PackageInfo.exposes` lists what a page
+`reiwand.locale` and the labels of combos; `hide_gpu`: a script injected before the page's (`mask.js`) makes WebGL keep working with a
+generic vendor and renderer (`WebKit`, `WebKit WebGL`) and no debug extension, and `navigator.gpu`
+(WebGPU) is absent; `hide_storage`: nothing is kept). `PackageInfo.exposes` lists what a page
 sees now, and the app (details and *Apply to…*), the tray (each screen) and `reiwand-ctl` (`lib apply`
 and `lib show`) show the same notice from it: "This web wallpaper uses your time zone, your
 language, what your graphics card can do and data it keeps on this computer."
@@ -183,10 +200,12 @@ The helper injects `window.reiwand` before the page's own scripts (and before `w
 | `rgb.setImage(bytes, w, h)` | RGBA bytes shrunk on the page to at most 64 × 16 and checked again by the helper (at most 64 × 16, 30 times a second); the daemon tells each view whether it may light (`permissions.rgb`, the `rgb` grant of its output and RGB lighting on, or a preview) and the call returns `false` and posts nothing otherwise; the helper drops strips of a view that may not light, and the daemon sends them only under the same conditions (`package.md`) |
 | `onMedia(cb)` | what the media player plays, once the user allows `media` for a package that declares it (and `media_network` as well when it declares network origins): `{enabled, state, title, artist, album, cover, colors, position, duration, rate}`, with `state` `playing`, `paused` or `stopped`, `cover` a `blob:` address of a PNG of at most 256 pixels a side made on the page (or `null`), `colors` the `primary`, `secondary`, `tertiary`, `text` and `contrast` colors of the cover as `{hex, r, g, b, a}`, and `position` and `duration` in seconds at the moment of the call (the page runs the position on at `rate`); `{enabled: false}` otherwise. The first callback subscribes and gets the last state at once; then every callback gets each change of the track, the cover, the playback or a jump. Never a path, an address of the cover or the name of the player |
 
-Audio and video files of the package and of the user's folder play from a `blob:` copy that the
-helper's script makes when a media element (or `new Audio`) gets a `wpak:` or `wpak-user:` address,
-because GStreamer only reads the schemes it knows; the copy lives while the element uses it, and a
-file over 256 MiB does not play. `console` output and uncaught errors reach the daemon's log at
+Audio and video files of the package and of the user's folder play straight from their `wpak:` or
+`wpak-user:` address, which Chromium reads with range requests. The helper serves the files of the
+package from sealed `memfd`s and keeps at most 64 MiB of them in a cache of its own (the oldest leave
+first; a file larger than 64 MiB is not kept and is read from the package again on each request,
+so a large video costs one read per seek). Files the user chose are opened on each request and never
+cached. `console` output and uncaught errors reach the daemon's log at
 debug level, at most 200 lines a run. The folder of a `folder` property is listed by the daemon (`max_files`, `recursive`, hidden
 files and links left out, the same rules as scenes), checked again every 5 s while the page is
 shown and never while hidden; the helper serves only the listed files, opened without following

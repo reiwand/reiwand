@@ -27,7 +27,7 @@ if ! "$BIN/reiwand-web" --check >/dev/null 2>&1; then
   [ "$(ctl lib search "" --json | from "[i['package']['unshown'] is not None for i in r['items'] if (i['package'] or {}).get('kind') == 'web']")" = "[True, True]" ] ||
     fail "library items of web pages did not say they cannot be shown"
   if ctl lib apply "$tint" -o TEST-W 2>"$pages/refused"; then fail "a web wallpaper was applied without its helper"; fi
-  grep -q "Web wallpapers cannot be shown here: .*\(WPE WebKit\|reiwand-web\)" "$pages/refused" || fail "unclear refusal: $(cat "$pages/refused")"
+  grep -q "Web wallpapers cannot be shown here: .*\(Qt WebEngine\|reiwand-web\)" "$pages/refused" || fail "unclear refusal: $(cat "$pages/refused")"
   ctl release TEST-W
   echo "web wallpapers refused with a reason where the web engine is missing"
 else
