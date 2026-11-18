@@ -46,7 +46,7 @@ Mandos {
             width: Look.e8 + Look.e7
             from: 0
             to: 1
-            value: App.state.volume
+            value: App.state.volume ?? 0
             Accessible.name: App.tr("Overall volume")
             onMoved: debounce.restart()
         }

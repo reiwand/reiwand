@@ -83,7 +83,7 @@ QtObject {
         if (page.values.parallax.fill !== "simple" || page.values.parallax.layers !== 6)
             throw new Error("depth: the fill and the layers of the picture were not kept: " + JSON.stringify(page.values.parallax));
         page.editor.undo();
-        if (page.values.parallax.fill != null)
+        if (page.values.parallax?.fill === "simple")
             throw new Error("depth: undo did not put the fill back");
         page.paint = null;
         paint.destroy();

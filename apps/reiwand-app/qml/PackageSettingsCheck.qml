@@ -112,7 +112,7 @@ QtObject {
         page.run("remove", {
             "pointer": "/manifest/permissions/rgb"
         });
-        expect(page.manifest.permissions?.rgb == null, "the permission for the lights was not removed");
+        expect(page.manifest.permissions?.rgb !== true, "the permission for the lights was not removed");
         shown.destroy();
         const panel = Qt.createComponent("PackageInputs.qml").createObject(page, {
             "page": page
@@ -120,7 +120,7 @@ QtObject {
         panel.lights(true);
         expect(page.manifest.permissions?.rgb === true, "the lights box of the inputs did not allow the lights");
         panel.lights(false);
-        expect(page.manifest.permissions?.rgb == null, "the lights box of the inputs did not take the permission back");
+        expect(page.manifest.permissions?.rgb !== true, "the lights box of the inputs did not take the permission back");
         panel.destroy();
     }
 

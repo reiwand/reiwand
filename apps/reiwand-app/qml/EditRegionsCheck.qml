@@ -82,7 +82,7 @@ QtObject {
         tool.straightTool.cutStraight();
         expect(depth().splits?.length === 1 && page.regionLine === null && !tool.straightTool.straight, "the straight split was not made");
         tool.reset();
-        expect(!depth().joins && !depth().moves && !depth().splits, "the regions were not put back");
+        expect((depth().joins ?? []).length === 0 && (depth().moves ?? []).length === 0 && (depth().splits ?? []).length === 0, "the regions were not put back");
         page.regionPicks = [];
         tool.map = "check";
         tool.refresh();
