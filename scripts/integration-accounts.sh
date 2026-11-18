@@ -90,6 +90,7 @@ else
   [ "$(x old account ls --json | jq_ "r['accounts'][0]['repos'][0]['url']")" = "https://srv.example:8443/r/shelf/" ] ||
     fail "the account lost its repository: $(x old account ls)"
   env "${env[@]}" "$BIN/reiwand-upgrade" client --data "$data" | grep -q "nothing to upgrade" || fail "a second upgrade changed the data"
+  source "$(dirname "$0")"/integration-upgrade-library.sh
   x old export "$WORK/with.reiwand" --secrets --password-file <(printf 'pw\n') >/dev/null || fail "the export with accounts failed"
   acct_start dst
   x dst provider store file 2>/dev/null
