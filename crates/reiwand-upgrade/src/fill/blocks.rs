@@ -34,6 +34,12 @@ fn owners<'a>(def: &'a str, ctx: &str, variant: Option<&str>) -> Vec<&'a str> {
     owners
 }
 
-pub(super) fn is_block(def: &str, ctx: &str, variant: Option<&str>, name: &str) -> bool {
+pub(super) fn is_block(
+    def: &str,
+    ctx: &str,
+    props: Option<&serde_json::Map<String, serde_json::Value>>,
+    name: &str,
+) -> bool {
+    let variant = props.and_then(|p| p.get("type")).and_then(|t| t.get("const")).and_then(|c| c.as_str());
     owners(def, ctx, variant).into_iter().any(|owner| BLOCKS.contains(&format!("{owner}.{name}")))
 }
