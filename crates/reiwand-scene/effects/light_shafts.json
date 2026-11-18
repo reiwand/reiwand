@@ -1,29 +1,259 @@
 {
-  "id": "light_shafts",
-  "name": { "en": "Light shafts" },
+  "audio": [],
+  "bounded": [],
   "category": "light",
-  "description": { "en": "Draws soft colored light shafts across the picture.", "es": "Dibuja haces suaves de luz de color que cruzan la imagen." },
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1.0,
+    "taps": 1.0
+  },
+  "description": {
+    "en": "Draws soft colored light shafts across the picture.",
+    "es": "Dibuja haces suaves de luz de color que cruzan la imagen."
+  },
+  "fuse": null,
+  "id": "light_shafts",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Light shafts"
+  },
+  "options": [],
+  "pace": null,
   "params": [
     {
+      "channels": null,
+      "help": {},
       "id": "direction",
-      "type": "enum",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
       "prefill": 0,
+      "tool": null,
+      "tools": [],
+      "type": "enum",
+      "unit": null,
+      "uses": null,
       "values": [
-        { "value": 0, "label": { "en": "Linear", "es": "Lineal" } },
-        { "value": 1, "label": { "en": "Radial", "es": "Radial" } },
-        { "value": 2, "label": { "en": "Corner", "es": "Esquina" } }
-      ]
+        {
+          "label": {
+            "en": "Linear",
+            "es": "Lineal"
+          },
+          "value": 0
+        },
+        {
+          "label": {
+            "en": "Radial",
+            "es": "Radial"
+          },
+          "value": 1
+        },
+        {
+          "label": {
+            "en": "Corner",
+            "es": "Esquina"
+          },
+          "value": 2
+        }
+      ],
+      "waits_for": null,
+      "yields_to": null
     },
-    { "id": "angle", "type": "float", "unit": "degrees", "prefill": 30, "min": -360, "max": 360 },
-    { "id": "center", "type": "position", "prefill": [0.5, 0] },
-    { "id": "color", "type": "color", "prefill": "#fff2cc" },
-    { "id": "gradient", "type": "texture", "tools": ["ramp"], "prefill": "" },
-    { "id": "exponent", "type": "float", "prefill": 1, "min": 0.1, "max": 8 },
-    { "id": "intensity", "type": "float", "prefill": 1, "min": 0, "max": 4 },
-    { "id": "feather", "type": "float", "prefill": 0.3, "min": 0, "max": 1 },
-    { "id": "smoothness", "type": "float", "prefill": 0.5, "min": 0, "max": 1 },
-    { "id": "speed", "type": "float", "prefill": 0.2, "min": -8, "max": 8, "uses": "time" }
+    {
+      "channels": null,
+      "help": {},
+      "id": "angle",
+      "label": {},
+      "max": 360,
+      "min": -360,
+      "paint": null,
+      "prefill": 30,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": "degrees",
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "center",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": [
+        0.5,
+        0
+      ],
+      "tool": null,
+      "tools": [],
+      "type": "position",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "color",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": "#fff2cc",
+      "tool": null,
+      "tools": [],
+      "type": "color",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "gradient",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": "",
+      "tool": null,
+      "tools": [
+        "ramp"
+      ],
+      "type": "texture",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "exponent",
+      "label": {},
+      "max": 8,
+      "min": 0.1,
+      "paint": null,
+      "prefill": 1,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "intensity",
+      "label": {},
+      "max": 4,
+      "min": 0,
+      "paint": null,
+      "prefill": 1,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "feather",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0.3,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "smoothness",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0.5,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "speed",
+      "label": {},
+      "max": 8,
+      "min": -8,
+      "paint": null,
+      "prefill": 0.2,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": "time",
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    }
   ],
-  "passes": [{ "entry": "fs_light_shafts", "inputs": ["previous", "asset:gradient"] }]
+  "passes": [
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_light_shafts",
+      "grid": null,
+      "inputs": [
+        "previous",
+        "asset:gradient"
+      ],
+      "output": "next",
+      "scale": 1.0,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    }
+  ],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

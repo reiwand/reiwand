@@ -1,18 +1,158 @@
 {
-  "id": "blur",
-  "name": { "en": "Blur" },
+  "audio": [],
+  "bounded": [],
   "category": "blur",
-  "description": { "en": "Blurs the picture by a fixed radius.", "es": "Desenfoca la imagen con un radio fijo." },
-  "params": [
-    { "id": "radius", "type": "float", "prefill": 8, "min": 0, "max": 128 },
-    { "id": "blend", "type": "blend", "prefill": "normal" },
-    { "id": "amount", "type": "float", "prefill": 1, "min": 0, "max": 1 }
-  ],
-  "passes": [{ "entry": "fs_blur_h" }, { "entry": "fs_blur_v", "inputs": ["previous", "input"] }],
-  "cost": { "taps": 3, "passes": 2, "scale": 1 },
-  "lighter": {
-    "passes": [{ "entry": "fs_blur_lite", "scale": 0.5 }, { "entry": "fs_blur_lite_mix", "inputs": ["previous", "input"] }],
-    "cost": { "taps": 2, "passes": 2, "scale": 0.5 }
+  "compose": false,
+  "cost": {
+    "passes": 2,
+    "scale": 1,
+    "taps": 3
   },
-  "reach": "radius"
+  "description": {
+    "en": "Blurs the picture by a fixed radius.",
+    "es": "Desenfoca la imagen con un radio fijo."
+  },
+  "fuse": null,
+  "id": "blur",
+  "lighter": {
+    "cost": {
+      "passes": 2,
+      "scale": 0.5,
+      "taps": 2
+    },
+    "passes": [
+      {
+        "blend": null,
+        "copy": null,
+        "entry": "fs_blur_lite",
+        "grid": null,
+        "inputs": [
+          "previous"
+        ],
+        "output": "next",
+        "scale": 0.5,
+        "swap": null,
+        "target": null,
+        "vertex": null
+      },
+      {
+        "blend": null,
+        "copy": null,
+        "entry": "fs_blur_lite_mix",
+        "grid": null,
+        "inputs": [
+          "previous",
+          "input"
+        ],
+        "output": "next",
+        "scale": 1.0,
+        "swap": null,
+        "target": null,
+        "vertex": null
+      }
+    ],
+    "up_to": null
+  },
+  "mask_mode": "mix",
+  "min_fps": null,
+  "name": {
+    "en": "Blur"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {
+      "channels": null,
+      "help": {},
+      "id": "radius",
+      "label": {},
+      "max": 128,
+      "min": 0,
+      "paint": null,
+      "prefill": 8,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "blend",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": "normal",
+      "tool": null,
+      "tools": [],
+      "type": "blend",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "amount",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 1,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    }
+  ],
+  "passes": [
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_blur_h",
+      "grid": null,
+      "inputs": [
+        "previous"
+      ],
+      "output": "next",
+      "scale": 1.0,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_blur_v",
+      "grid": null,
+      "inputs": [
+        "previous",
+        "input"
+      ],
+      "output": "next",
+      "scale": 1.0,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    }
+  ],
+  "quality": {},
+  "reach": "radius",
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

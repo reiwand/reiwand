@@ -31,14 +31,26 @@ pub(super) fn corrected(def: &str, name: &str) -> Option<Value> {
 }
 
 pub(super) fn follows(def: &str, name: &str, map: &Map<String, Value>) -> Option<Value> {
+    let kind = map.get("type").and_then(Value::as_str).unwrap_or("");
     Some(match (def, name) {
         ("Transform", "origin") => json!("anchor"),
         ("Camera", "center") => json!("canvas"),
         ("Playback", "end") => json!("end"),
-        ("Layer", "size") => match map.get("type").and_then(Value::as_str) {
-            Some("image" | "video") => json!("source"),
-            _ => json!("canvas"),
-        },
+        ("Layer", "size") if matches!(kind, "image" | "video") => json!("source"),
+        ("Layer", "size") if matches!(kind, "solid" | "adjustment" | "mesh" | "model") => json!("canvas"),
+        ("Layer", "color") if matches!(kind, "group" | "image" | "video" | "particles" | "text" | "spectrum") => {
+            json!("#ffffff")
+        }
+        ("Layer", "space") if kind == "group" => json!("2d"),
+        ("Layer", "cone") if kind == "light" => json!([30, 60]),
+        ("Layer", "length") if kind == "light" => json!(256),
+        ("Layer", "shadow_bias") if kind == "light" => json!(0.2),
+        ("Layer", "padding") if kind == "text" => json!(0),
+        ("Layer", "valign") if kind == "text" => json!("center"),
+        ("Layer", "mode") if kind == "sound" => json!("sequence"),
+        ("Layer", "playback") if kind == "video" => json!({
+            "rate": 1, "playing": true, "loop": true, "start": 0, "end": "end", "frame": null, "own_clock": false
+        }),
         _ => return None,
     })
 }

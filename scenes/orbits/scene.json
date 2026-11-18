@@ -108,7 +108,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "backdrop",
@@ -192,7 +192,7 @@
       "brightness": null,
       "cache": false,
       "clip": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "paths",
@@ -358,7 +358,7 @@
       ],
       "parent": null,
       "solid": false,
-      "space": null,
+      "space": "2d",
       "transform": {
         "origin": "anchor",
         "position": null,
@@ -774,7 +774,7 @@
       "mask": null,
       "opacity": 1.0,
       "outline": null,
-      "padding": null,
+      "padding": 0,
       "parallax": [
         0,
         0
@@ -842,7 +842,7 @@
         "z": null
       },
       "type": "text",
-      "valign": null,
+      "valign": "center",
       "visible": {
         "a": null,
         "audio": null,

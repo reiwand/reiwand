@@ -55,7 +55,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "fondo",
@@ -101,7 +101,7 @@
       "brightness": null,
       "cache": false,
       "clip": true,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "ventana",
@@ -164,7 +164,7 @@
           "blend_space": "canvas",
           "brightness": null,
           "cache": false,
-          "color": null,
+          "color": "#ffffff",
           "depth_test": false,
           "effects": [
             {
@@ -279,7 +279,7 @@
       ],
       "parent": null,
       "solid": false,
-      "space": null,
+      "space": "2d",
       "transform": {
         "origin": "anchor",
         "position": null,

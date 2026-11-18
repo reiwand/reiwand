@@ -68,7 +68,7 @@
       "lighting": null,
       "loop": true,
       "mask": null,
-      "mode": null,
+      "mode": "sequence",
       "opacity": 1.0,
       "pan": -0.2,
       "parallax": [

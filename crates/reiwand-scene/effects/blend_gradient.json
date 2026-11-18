@@ -1,14 +1,127 @@
 {
-  "id": "blend_gradient",
-  "name": { "en": "Gradient blend" },
+  "audio": [],
+  "bounded": [],
   "category": "blend",
-  "description": { "en": "Blends in a texture using a gradient map to control where it shows.", "es": "Mezcla una textura usando un mapa de degradado que controla dónde se ve." },
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1.0,
+    "taps": 1.0
+  },
+  "description": {
+    "en": "Blends in a texture using a gradient map to control where it shows.",
+    "es": "Mezcla una textura usando un mapa de degradado que controla dónde se ve."
+  },
+  "fuse": null,
+  "id": "blend_gradient",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Gradient blend"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "texture", "type": "texture", "prefill": "" },
-    { "id": "map", "type": "texture", "tools": ["gray"], "prefill": "" },
-    { "id": "progress", "type": "float", "prefill": 0.5, "min": 0, "max": 1 },
-    { "id": "softness", "type": "float", "prefill": 0.1, "min": 0, "max": 1 }
+    {
+      "channels": null,
+      "help": {},
+      "id": "texture",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": "",
+      "tool": null,
+      "tools": [],
+      "type": "texture",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "map",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": "",
+      "tool": null,
+      "tools": [
+        "gray"
+      ],
+      "type": "texture",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "progress",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0.5,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "softness",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0.1,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    }
   ],
-  "passes": [{ "entry": "fs_blend_gradient", "inputs": ["previous", "asset:texture", "asset:map"] }]
+  "passes": [
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_blend_gradient",
+      "grid": null,
+      "inputs": [
+        "previous",
+        "asset:texture",
+        "asset:map"
+      ],
+      "output": "next",
+      "scale": 1.0,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    }
+  ],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

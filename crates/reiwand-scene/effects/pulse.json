@@ -1,30 +1,248 @@
 {
-  "id": "pulse",
-  "name": { "en": "Pulse" },
+  "audio": [],
+  "bounded": [],
   "category": "color",
-  "description": { "en": "Pulses brightness, color, opacity or a tinted light over time.", "es": "Hace pulsar el brillo, el color, la opacidad o una luz teñida con el tiempo." },
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1.0,
+    "taps": 1.0
+  },
+  "description": {
+    "en": "Pulses brightness, color, opacity or a tinted light over time.",
+    "es": "Hace pulsar el brillo, el color, la opacidad o una luz teñida con el tiempo."
+  },
+  "fuse": "color",
+  "id": "pulse",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Pulse"
+  },
+  "options": [],
+  "pace": null,
   "params": [
     {
+      "channels": null,
+      "help": {},
       "id": "what",
-      "type": "enum",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
       "prefill": 0,
+      "tool": null,
+      "tools": [],
+      "type": "enum",
+      "unit": null,
+      "uses": null,
       "values": [
-        { "value": 0, "label": { "en": "Brightness", "es": "Brillo" } },
-        { "value": 1, "label": { "en": "Color", "es": "Color" } },
-        { "value": 2, "label": { "en": "Opacity", "es": "Opacidad" } },
-        { "value": 3, "label": { "en": "Tinted light", "es": "Luz teñida" } }
-      ]
+        {
+          "label": {
+            "en": "Brightness",
+            "es": "Brillo"
+          },
+          "value": 0
+        },
+        {
+          "label": {
+            "en": "Color",
+            "es": "Color"
+          },
+          "value": 1
+        },
+        {
+          "label": {
+            "en": "Opacity",
+            "es": "Opacidad"
+          },
+          "value": 2
+        },
+        {
+          "label": {
+            "en": "Tinted light",
+            "es": "Luz teñida"
+          },
+          "value": 3
+        }
+      ],
+      "waits_for": null,
+      "yields_to": null
     },
-    { "id": "speed", "type": "float", "prefill": 1, "min": 0, "max": 16, "uses": "time", "yields_to": "audio_band" },
-    { "id": "bounds", "type": "vec2", "prefill": [0, 1], "min": 0, "max": 4 },
-    { "id": "tint_low", "type": "color", "prefill": "#000000" },
-    { "id": "tint_high", "type": "color", "prefill": "#ffffff" },
-    { "id": "noise", "type": "float", "prefill": 0, "min": 0, "max": 1, "uses": "time" },
-    { "id": "noise_speed", "type": "float", "prefill": 1, "min": 0, "max": 16 },
-    { "id": "phase", "type": "texture", "tools": ["gray"], "prefill": "" },
-    { "id": "audio_band", "type": "int", "prefill": 0, "min": 0, "max": 64, "uses": "audio" }
+    {
+      "channels": null,
+      "help": {},
+      "id": "speed",
+      "label": {},
+      "max": 16,
+      "min": 0,
+      "paint": null,
+      "prefill": 1,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": "time",
+      "values": [],
+      "waits_for": null,
+      "yields_to": "audio_band"
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "bounds",
+      "label": {},
+      "max": 4,
+      "min": 0,
+      "paint": null,
+      "prefill": [
+        0,
+        1
+      ],
+      "tool": null,
+      "tools": [],
+      "type": "vec2",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "tint_low",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": "#000000",
+      "tool": null,
+      "tools": [],
+      "type": "color",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "tint_high",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": "#ffffff",
+      "tool": null,
+      "tools": [],
+      "type": "color",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "noise",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": "time",
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "noise_speed",
+      "label": {},
+      "max": 16,
+      "min": 0,
+      "paint": null,
+      "prefill": 1,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "phase",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": "",
+      "tool": null,
+      "tools": [
+        "gray"
+      ],
+      "type": "texture",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "audio_band",
+      "label": {},
+      "max": 64,
+      "min": 0,
+      "paint": null,
+      "prefill": 0,
+      "tool": null,
+      "tools": [],
+      "type": "int",
+      "unit": null,
+      "uses": "audio",
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    }
   ],
-  "passes": [{ "entry": "fs_pulse", "inputs": ["previous", "asset:phase"] }],
-  "fuse": "color"
+  "passes": [
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_pulse",
+      "grid": null,
+      "inputs": [
+        "previous",
+        "asset:phase"
+      ],
+      "output": "next",
+      "scale": 1.0,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    }
+  ],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

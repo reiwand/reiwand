@@ -1,19 +1,134 @@
 {
-  "id": "local_contrast",
-  "name": { "en": "Local contrast" },
+  "audio": [],
+  "bounded": [],
   "category": "blur",
-  "description": { "en": "Sharpens local contrast without affecting overall exposure.", "es": "Aumenta el contraste local sin cambiar la exposición general." },
+  "compose": false,
+  "cost": {
+    "passes": 3,
+    "scale": 0.5,
+    "taps": 3
+  },
+  "description": {
+    "en": "Sharpens local contrast without affecting overall exposure.",
+    "es": "Aumenta el contraste local sin cambiar la exposición general."
+  },
+  "fuse": null,
+  "id": "local_contrast",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Local contrast"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "radius", "type": "float", "prefill": 8, "min": 1, "max": 64 },
-    { "id": "amount", "type": "float", "prefill": 0.5, "min": 0, "max": 4 },
-    { "id": "luma_only", "type": "bool", "prefill": true }
+    {
+      "channels": null,
+      "help": {},
+      "id": "radius",
+      "label": {},
+      "max": 64,
+      "min": 1,
+      "paint": null,
+      "prefill": 8,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "amount",
+      "label": {},
+      "max": 4,
+      "min": 0,
+      "paint": null,
+      "prefill": 0.5,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "luma_only",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": true,
+      "tool": null,
+      "tools": [],
+      "type": "bool",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    }
   ],
   "passes": [
-    { "entry": "fs_local_contrast_h", "scale": 0.5 },
-    { "entry": "fs_local_contrast_v", "scale": 0.5 },
-    { "entry": "fs_local_contrast", "inputs": ["input", "pass:1"] }
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_local_contrast_h",
+      "grid": null,
+      "inputs": [
+        "previous"
+      ],
+      "output": "next",
+      "scale": 0.5,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_local_contrast_v",
+      "grid": null,
+      "inputs": [
+        "previous"
+      ],
+      "output": "next",
+      "scale": 0.5,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_local_contrast",
+      "grid": null,
+      "inputs": [
+        "input",
+        "pass:1"
+      ],
+      "output": "next",
+      "scale": 1.0,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    }
   ],
-  "cost": { "taps": 3, "passes": 3, "scale": 0.5 },
-  "reach": "radius"
+  "quality": {},
+  "reach": "radius",
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

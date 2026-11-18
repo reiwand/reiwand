@@ -138,7 +138,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [
         {
@@ -335,7 +335,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "sea",
@@ -348,7 +348,15 @@
         0
       ],
       "parent": null,
-      "playback": null,
+      "playback": {
+        "end": "end",
+        "frame": null,
+        "loop": true,
+        "own_clock": false,
+        "playing": true,
+        "rate": 1,
+        "start": 0
+      },
       "size": "source",
       "solid": false,
       "transform": {
@@ -380,7 +388,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "sparks",
@@ -524,7 +532,7 @@
         "y": null
       },
       "outline": null,
-      "padding": null,
+      "padding": 0,
       "parallax": [
         0,
         0
@@ -592,7 +600,7 @@
         "z": null
       },
       "type": "text",
-      "valign": null,
+      "valign": "center",
       "visible": {
         "a": null,
         "audio": null,
@@ -642,7 +650,7 @@
       "brightness": null,
       "cache": false,
       "clip": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "badge",
@@ -768,7 +776,7 @@
       ],
       "parent": null,
       "solid": false,
-      "space": null,
+      "space": "2d",
       "transform": {
         "origin": "anchor",
         "position": [

@@ -1,12 +1,72 @@
 {
-  "id": "posterize",
-  "name": { "en": "Posterize" },
+  "audio": [],
+  "bounded": [],
   "category": "color",
-  "description": { "en": "Reduces the picture to a few color levels.", "es": "Reduce la imagen a unos pocos niveles de color." },
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1.0,
+    "taps": 1.0
+  },
+  "description": {
+    "en": "Reduces the picture to a few color levels.",
+    "es": "Reduce la imagen a unos pocos niveles de color."
+  },
+  "fuse": "color",
+  "id": "posterize",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Posterize"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "levels", "type": "float", "prefill": 6, "min": 2, "max": 64 },
-    { "id": "dither", "type": "float", "prefill": 0.5, "min": 0, "max": 1 }
+    {
+      "channels": null,
+      "help": {},
+      "id": "levels",
+      "label": {},
+      "max": 64,
+      "min": 2,
+      "paint": null,
+      "prefill": 6,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "dither",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0.5,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    }
   ],
-  "fuse": "color"
+  "passes": [],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

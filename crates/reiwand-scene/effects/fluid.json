@@ -1,49 +1,491 @@
 {
-  "id": "fluid",
-  "name": { "en": "Fluid" },
+  "audio": [],
+  "bounded": [],
   "category": "motion",
-  "description": { "en": "Simulates a fluid that reacts to the pointer.", "es": "Simula un fluido que reacciona al puntero." },
+  "compose": false,
+  "cost": {
+    "passes": 14,
+    "scale": 0.25,
+    "taps": 10
+  },
+  "description": {
+    "en": "Simulates a fluid that reacts to the pointer.",
+    "es": "Simula un fluido que reacciona al puntero."
+  },
+  "fuse": null,
+  "id": "fluid",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Fluid"
+  },
+  "options": [],
+  "pace": null,
   "params": [
     {
+      "channels": null,
+      "help": {},
       "id": "render",
-      "type": "enum",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
       "prefill": 0,
+      "tool": null,
+      "tools": [],
+      "type": "enum",
+      "unit": null,
+      "uses": null,
       "values": [
-        { "value": 0, "label": { "en": "Gradient", "es": "Degradado" } },
-        { "value": 1, "label": { "en": "Emitter color", "es": "Color del emisor" } },
-        { "value": 2, "label": { "en": "Background color", "es": "Color de fondo" } },
-        { "value": 3, "label": { "en": "Distortion", "es": "Distorsión" } }
-      ]
+        {
+          "label": {
+            "en": "Gradient",
+            "es": "Degradado"
+          },
+          "value": 0
+        },
+        {
+          "label": {
+            "en": "Emitter color",
+            "es": "Color del emisor"
+          },
+          "value": 1
+        },
+        {
+          "label": {
+            "en": "Background color",
+            "es": "Color de fondo"
+          },
+          "value": 2
+        },
+        {
+          "label": {
+            "en": "Distortion",
+            "es": "Distorsión"
+          },
+          "value": 3
+        }
+      ],
+      "waits_for": null,
+      "yields_to": null
     },
-    { "id": "gradient", "type": "texture", "tools": ["ramp"], "prefill": "" },
-    { "id": "color", "type": "color", "prefill": "#ffffff" },
-    { "id": "velocity_decay", "type": "float", "prefill": 0.98, "min": 0, "max": 1 },
-    { "id": "dye_decay", "type": "float", "prefill": 0.97, "min": 0, "max": 1 },
-    { "id": "push", "type": "float", "prefill": 1, "min": 0, "max": 8, "uses": "cursor" },
-    { "id": "emitters", "type": "emitters", "prefill": [], "uses": "time", "waits_for": "strength" },
-    { "id": "strength", "type": "float", "prefill": 1, "min": 0, "max": 8 },
-    { "id": "blend", "type": "blend", "prefill": "normal" },
-    { "id": "perspective", "type": "float", "prefill": 0, "min": 0, "max": 1 },
-    { "id": "opaque", "type": "bool", "prefill": false }
+    {
+      "channels": null,
+      "help": {},
+      "id": "gradient",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": "",
+      "tool": null,
+      "tools": [
+        "ramp"
+      ],
+      "type": "texture",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "color",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": "#ffffff",
+      "tool": null,
+      "tools": [],
+      "type": "color",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "velocity_decay",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0.98,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "dye_decay",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0.97,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "push",
+      "label": {},
+      "max": 8,
+      "min": 0,
+      "paint": null,
+      "prefill": 1,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": "cursor",
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "emitters",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": [],
+      "tool": null,
+      "tools": [],
+      "type": "emitters",
+      "unit": null,
+      "uses": "time",
+      "values": [],
+      "waits_for": "strength",
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "strength",
+      "label": {},
+      "max": 8,
+      "min": 0,
+      "paint": null,
+      "prefill": 1,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "blend",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": "normal",
+      "tool": null,
+      "tools": [],
+      "type": "blend",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "perspective",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "opaque",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": false,
+      "tool": null,
+      "tools": [],
+      "type": "bool",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    }
   ],
-  "state": { "scale": 0.25, "settle": 6 },
   "passes": [
-    { "entry": "fs_fluid_advect", "scale": 0.25, "inputs": ["state", "asset:emitters"], "output": "step" },
-    { "entry": "fs_fluid_divergence", "scale": 0.25, "inputs": ["pass:0"], "output": "step" },
-    { "entry": "fs_fluid_pressure", "scale": 0.25, "inputs": ["pass:0", "pass:1"], "output": "step" },
-    { "entry": "fs_fluid_pressure", "scale": 0.25, "inputs": ["pass:2", "pass:1"], "output": "step" },
-    { "entry": "fs_fluid_pressure", "scale": 0.25, "inputs": ["pass:3", "pass:1"], "output": "step" },
-    { "entry": "fs_fluid_pressure", "scale": 0.25, "inputs": ["pass:4", "pass:1"], "output": "step" },
-    { "entry": "fs_fluid_pressure", "scale": 0.25, "inputs": ["pass:5", "pass:1"], "output": "step" },
-    { "entry": "fs_fluid_pressure", "scale": 0.25, "inputs": ["pass:6", "pass:1"], "output": "step" },
-    { "entry": "fs_fluid_pressure", "scale": 0.25, "inputs": ["pass:7", "pass:1"], "output": "step" },
-    { "entry": "fs_fluid_pressure", "scale": 0.25, "inputs": ["pass:8", "pass:1"], "output": "step" },
-    { "entry": "fs_fluid_pressure", "scale": 0.25, "inputs": ["pass:9", "pass:1"], "output": "step" },
-    { "entry": "fs_fluid_pressure", "scale": 0.25, "inputs": ["pass:10", "pass:1"], "output": "step" },
-    { "entry": "fs_fluid_step", "scale": 0.25, "inputs": ["pass:0", "pass:11"], "output": "state" },
-    { "entry": "fs_fluid", "inputs": ["input", "state", "asset:gradient"] }
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_fluid_advect",
+      "grid": null,
+      "inputs": [
+        "state",
+        "asset:emitters"
+      ],
+      "output": "step",
+      "scale": 0.25,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_fluid_divergence",
+      "grid": null,
+      "inputs": [
+        "pass:0"
+      ],
+      "output": "step",
+      "scale": 0.25,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_fluid_pressure",
+      "grid": null,
+      "inputs": [
+        "pass:0",
+        "pass:1"
+      ],
+      "output": "step",
+      "scale": 0.25,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_fluid_pressure",
+      "grid": null,
+      "inputs": [
+        "pass:2",
+        "pass:1"
+      ],
+      "output": "step",
+      "scale": 0.25,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_fluid_pressure",
+      "grid": null,
+      "inputs": [
+        "pass:3",
+        "pass:1"
+      ],
+      "output": "step",
+      "scale": 0.25,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_fluid_pressure",
+      "grid": null,
+      "inputs": [
+        "pass:4",
+        "pass:1"
+      ],
+      "output": "step",
+      "scale": 0.25,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_fluid_pressure",
+      "grid": null,
+      "inputs": [
+        "pass:5",
+        "pass:1"
+      ],
+      "output": "step",
+      "scale": 0.25,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_fluid_pressure",
+      "grid": null,
+      "inputs": [
+        "pass:6",
+        "pass:1"
+      ],
+      "output": "step",
+      "scale": 0.25,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_fluid_pressure",
+      "grid": null,
+      "inputs": [
+        "pass:7",
+        "pass:1"
+      ],
+      "output": "step",
+      "scale": 0.25,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_fluid_pressure",
+      "grid": null,
+      "inputs": [
+        "pass:8",
+        "pass:1"
+      ],
+      "output": "step",
+      "scale": 0.25,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_fluid_pressure",
+      "grid": null,
+      "inputs": [
+        "pass:9",
+        "pass:1"
+      ],
+      "output": "step",
+      "scale": 0.25,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_fluid_pressure",
+      "grid": null,
+      "inputs": [
+        "pass:10",
+        "pass:1"
+      ],
+      "output": "step",
+      "scale": 0.25,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_fluid_step",
+      "grid": null,
+      "inputs": [
+        "pass:0",
+        "pass:11"
+      ],
+      "output": "state",
+      "scale": 0.25,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    },
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_fluid",
+      "grid": null,
+      "inputs": [
+        "input",
+        "state",
+        "asset:gradient"
+      ],
+      "output": "next",
+      "scale": 1.0,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    }
   ],
-  "cost": { "taps": 10, "passes": 14, "scale": 0.25 },
-  "quality": { "q1": { "scale": 0.5 }, "q0": { "freeze": true } }
+  "quality": {
+    "q0": {
+      "freeze": true,
+      "params": {},
+      "scale": null
+    },
+    "q1": {
+      "freeze": false,
+      "params": {},
+      "scale": 0.5
+    }
+  },
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": {
+    "fade": null,
+    "scale": 0.25,
+    "settle": 6
+  },
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

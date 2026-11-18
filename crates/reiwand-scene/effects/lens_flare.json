@@ -1,16 +1,162 @@
 {
-  "id": "lens_flare",
-  "name": { "en": "Lens flare" },
+  "audio": [],
+  "bounded": [],
   "category": "light",
-  "description": { "en": "Draws a lens flare from a light source.", "es": "Dibuja el destello de una lente desde una fuente de luz." },
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 4
+  },
+  "description": {
+    "en": "Draws a lens flare from a light source.",
+    "es": "Dibuja el destello de una lente desde una fuente de luz."
+  },
+  "fuse": null,
+  "id": "lens_flare",
+  "lighter": null,
+  "mask_mode": "mix",
+  "min_fps": null,
+  "name": {
+    "en": "Lens flare"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "source", "type": "position", "prefill": [0.3, 0.3] },
-    { "id": "follow", "type": "bool", "prefill": false, "uses": "cursor" },
-    { "id": "intensity", "type": "float", "prefill": 1, "min": 0, "max": 4 },
-    { "id": "ghosts", "type": "int", "prefill": 4, "min": 0, "max": 8 },
-    { "id": "halo", "type": "float", "prefill": 0.3, "min": 0, "max": 1 },
-    { "id": "color", "type": "color", "prefill": "#ffffff" }
+    {
+      "channels": null,
+      "help": {},
+      "id": "source",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": [
+        0.3,
+        0.3
+      ],
+      "tool": null,
+      "tools": [],
+      "type": "position",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "follow",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": false,
+      "tool": null,
+      "tools": [],
+      "type": "bool",
+      "unit": null,
+      "uses": "cursor",
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "intensity",
+      "label": {},
+      "max": 4,
+      "min": 0,
+      "paint": null,
+      "prefill": 1,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "ghosts",
+      "label": {},
+      "max": 8,
+      "min": 0,
+      "paint": null,
+      "prefill": 4,
+      "tool": null,
+      "tools": [],
+      "type": "int",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "halo",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0.3,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "color",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": "#ffffff",
+      "tool": null,
+      "tools": [],
+      "type": "color",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    }
   ],
-  "passes": [{ "entry": "fs_lens_flare" }],
-  "cost": { "taps": 4, "passes": 1, "scale": 1 }
+  "passes": [
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_lens_flare",
+      "grid": null,
+      "inputs": [
+        "previous"
+      ],
+      "output": "next",
+      "scale": 1.0,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    }
+  ],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

@@ -495,7 +495,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "badge",
@@ -538,7 +538,7 @@
       "brightness": null,
       "cache": false,
       "clip": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "stage",
@@ -767,13 +767,16 @@
           "brightness": null,
           "cache": false,
           "color": "#ffffff",
-          "cone": null,
+          "cone": [
+            30,
+            60
+          ],
           "depth_test": false,
           "effects": [],
           "id": "sun",
           "inherit": null,
           "intensity": 1.0,
-          "length": null,
+          "length": 256,
           "light": "directional",
           "lighting": null,
           "mask": null,
@@ -785,7 +788,7 @@
           "parent": null,
           "position3d": null,
           "radius": 512.0,
-          "shadow_bias": null,
+          "shadow_bias": 0.2,
           "shadow_resolution": null,
           "shadows": true,
           "solid": false,
@@ -871,7 +874,7 @@
           "mask": null,
           "opacity": 1.0,
           "outline": null,
-          "padding": null,
+          "padding": 0,
           "parallax": [
             0,
             0
@@ -936,7 +939,7 @@
             "z": null
           },
           "type": "text",
-          "valign": null,
+          "valign": "center",
           "visible": true,
           "wrap": null
         }
@@ -976,7 +979,7 @@
       "blend_space": "canvas",
       "brightness": null,
       "cache": false,
-      "color": null,
+      "color": "#ffffff",
       "depth_test": false,
       "effects": [],
       "id": "show",

@@ -1,25 +1,196 @@
 {
-  "id": "reveal",
-  "name": { "en": "Reveal" },
+  "audio": [],
+  "bounded": [],
   "category": "blend",
-  "description": { "en": "Reveals or hides the picture through a growing shape.", "es": "Muestra u oculta la imagen con una forma que crece." },
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1.0,
+    "taps": 1.0
+  },
+  "description": {
+    "en": "Reveals or hides the picture through a growing shape.",
+    "es": "Muestra u oculta la imagen con una forma que crece."
+  },
+  "fuse": null,
+  "id": "reveal",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Reveal"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "texture", "type": "texture", "prefill": "" },
     {
-      "id": "shape",
-      "type": "enum",
-      "prefill": 0,
-      "values": [
-        { "value": 0, "label": { "en": "Circle", "es": "Círculo" } },
-        { "value": 1, "label": { "en": "Ellipse", "es": "Elipse" } }
-      ]
+      "channels": null,
+      "help": {},
+      "id": "texture",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": "",
+      "tool": null,
+      "tools": [],
+      "type": "texture",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
     },
-    { "id": "radius", "type": "float", "prefill": 0.15, "min": 0, "max": 1 },
-    { "id": "softness", "type": "float", "prefill": 0.3, "min": 0, "max": 1 },
-    { "id": "follow", "type": "bool", "prefill": false, "uses": "cursor" },
-    { "id": "invert", "type": "bool", "prefill": false },
-    { "id": "center", "type": "position", "prefill": [0.5, 0.5] }
+    {
+      "channels": null,
+      "help": {},
+      "id": "shape",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": 0,
+      "tool": null,
+      "tools": [],
+      "type": "enum",
+      "unit": null,
+      "uses": null,
+      "values": [
+        {
+          "label": {
+            "en": "Circle",
+            "es": "Círculo"
+          },
+          "value": 0
+        },
+        {
+          "label": {
+            "en": "Ellipse",
+            "es": "Elipse"
+          },
+          "value": 1
+        }
+      ],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "radius",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0.15,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "softness",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0.3,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "follow",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": false,
+      "tool": null,
+      "tools": [],
+      "type": "bool",
+      "unit": null,
+      "uses": "cursor",
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "invert",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": false,
+      "tool": null,
+      "tools": [],
+      "type": "bool",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "center",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": [
+        0.5,
+        0.5
+      ],
+      "tool": null,
+      "tools": [],
+      "type": "position",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    }
   ],
-  "passes": [{ "entry": "fs_reveal", "inputs": ["previous", "asset:texture"] }]
+  "passes": [
+    {
+      "blend": null,
+      "copy": null,
+      "entry": "fs_reveal",
+      "grid": null,
+      "inputs": [
+        "previous",
+        "asset:texture"
+      ],
+      "output": "next",
+      "scale": 1.0,
+      "swap": null,
+      "target": null,
+      "vertex": null
+    }
+  ],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }

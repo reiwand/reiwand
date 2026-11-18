@@ -1,24 +1,159 @@
 {
-  "id": "chroma_key",
-  "name": { "en": "Chroma key" },
+  "audio": [],
+  "bounded": [],
   "category": "color",
-  "description": { "en": "Removes a chosen color, making it transparent.", "es": "Quita un color elegido y lo vuelve transparente." },
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1.0,
+    "taps": 1.0
+  },
+  "description": {
+    "en": "Removes a chosen color, making it transparent.",
+    "es": "Quita un color elegido y lo vuelve transparente."
+  },
+  "fuse": "color",
+  "id": "chroma_key",
+  "lighter": null,
   "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Chroma key"
+  },
+  "options": [],
+  "pace": null,
   "params": [
-    { "id": "key", "type": "color", "prefill": "#00ff00" },
-    { "id": "tolerance", "type": "float", "prefill": 0.1, "min": 0, "max": 1 },
-    { "id": "softness", "type": "float", "prefill": 0.08, "min": 0, "max": 1 },
-    { "id": "spill", "type": "float", "prefill": 0.5, "min": 0, "max": 1 },
     {
-      "id": "distance",
-      "type": "enum",
-      "prefill": 0,
-      "values": [
-        { "value": 0, "label": { "en": "Chroma only", "es": "Solo croma" } },
-        { "value": 1, "label": { "en": "Full color", "es": "Color completo" } }
-      ]
+      "channels": null,
+      "help": {},
+      "id": "key",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": "#00ff00",
+      "tool": null,
+      "tools": [],
+      "type": "color",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
     },
-    { "id": "keep", "type": "float", "prefill": 0, "min": 0, "max": 1 }
+    {
+      "channels": null,
+      "help": {},
+      "id": "tolerance",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0.1,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "softness",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0.08,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "spill",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0.5,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "distance",
+      "label": {},
+      "max": null,
+      "min": null,
+      "paint": null,
+      "prefill": 0,
+      "tool": null,
+      "tools": [],
+      "type": "enum",
+      "unit": null,
+      "uses": null,
+      "values": [
+        {
+          "label": {
+            "en": "Chroma only",
+            "es": "Solo croma"
+          },
+          "value": 0
+        },
+        {
+          "label": {
+            "en": "Full color",
+            "es": "Color completo"
+          },
+          "value": 1
+        }
+      ],
+      "waits_for": null,
+      "yields_to": null
+    },
+    {
+      "channels": null,
+      "help": {},
+      "id": "keep",
+      "label": {},
+      "max": 1,
+      "min": 0,
+      "paint": null,
+      "prefill": 0,
+      "tool": null,
+      "tools": [],
+      "type": "float",
+      "unit": null,
+      "uses": null,
+      "values": [],
+      "waits_for": null,
+      "yields_to": null
+    }
   ],
-  "fuse": "color"
+  "passes": [],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
 }
