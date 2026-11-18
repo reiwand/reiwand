@@ -29,6 +29,7 @@ pub fn scene(effects: &[(&str, String)]) -> Scene {
         let (id, ext) = path.trim_start_matches("fx/").split_once('.').unwrap_or_default();
         let (_, wgsl) = effects.iter().find(|(i, _)| *i == id).ok_or("missing")?;
         let json = json!({ "id": id, "cost": {}, "passes": [{ "entry": "fs_e" }] }).to_string();
+        let json = reiwand_upgrade::descriptors::completed(&json);
         Ok::<_, &str>(if ext == "json" { json } else { wgsl.clone() }.into_bytes())
     };
     scene.adopt(&BTreeMap::new(), read).unwrap();

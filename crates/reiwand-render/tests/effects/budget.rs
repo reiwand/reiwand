@@ -15,7 +15,7 @@ pub(super) fn packaged(json: &Value, wgsl: &str, layers: Vec<Value>) -> Option<R
     let canvas = json!({ "size": [3840, 2160] });
     let text = json!({ "schema": SCHEMA, "canvas": canvas, "layers": list, "effects": effects });
     let mut scene = Scene::from_json(&crate::gpu::whole(&text.to_string())).unwrap();
-    let descriptor = json.to_string();
+    let descriptor = reiwand_upgrade::descriptors::completed(&json.to_string());
     let files = |path: &str, _: usize| {
         Ok::<_, &str>(if path.ends_with(".json") { descriptor.clone() } else { wgsl.to_string() }.into_bytes())
     };
@@ -59,7 +59,7 @@ fn a_heavy_package_on_a_tiny_adjustment_layer_costs_the_whole_target_and_is_left
     };
     let targets = json!({ "a": { "scale": 2 }, "b": { "scale": 2 } });
     let json = json!({ "id": "mx", "cost": {}, "targets": targets, "passes": (0..16).map(pass).collect::<Vec<_>>() });
-    let statements = (1..=10).rev().find(|k| Descriptor::packaged("mx", &json.to_string(), &heavy(*k)).is_ok());
+    let statements = (1..=10).rev().find(|k| Descriptor::packaged("mx", &reiwand_upgrade::descriptors::completed(&json.to_string()), &heavy(*k)).is_ok());
     let wgsl = heavy(statements.expect("a heavy effect within the limits"));
     let Some(mut run) = packaged(&json, &wgsl, adjustments(1, 1, "mx")) else { return };
     drawn_fast(&mut run);

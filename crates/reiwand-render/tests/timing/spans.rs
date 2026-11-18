@@ -20,6 +20,7 @@ fn many(n: usize, side: f64, wgsl: String) -> Scene {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": size }, "layers": layers, "effects": files });
     let mut scene = Scene::from_json(&crate::gpu::whole(&text.to_string())).unwrap();
     let json = json!({ "id": "busy", "cost": {}, "passes": [{ "entry": "fs_e" }] }).to_string();
+    let json = reiwand_upgrade::descriptors::completed(&json);
     let read = |path: &str, _: usize| {
         Ok::<_, &str>(if path.ends_with(".json") { json.clone() } else { wgsl.clone() }.into_bytes())
     };

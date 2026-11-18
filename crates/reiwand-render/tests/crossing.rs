@@ -24,7 +24,7 @@ fn ready(cost: Json) -> Arc<Ready> {
     let mut scene = Scene::load(&crate::gpu::whole(&text.to_string()), &BTreeMap::new())
         .unwrap_or_else(|e| panic!("{e}"));
     let files = |path: &str, _: usize| match path {
-        "t/wipe.json" => Ok(descriptor.to_string().into_bytes()),
+        "t/wipe.json" => Ok(reiwand_upgrade::descriptors::completed(&descriptor.to_string()).into_bytes()),
         "t/wipe.wgsl" => Ok(WIPE.as_bytes().to_vec()),
         _ => Err("missing"),
     };

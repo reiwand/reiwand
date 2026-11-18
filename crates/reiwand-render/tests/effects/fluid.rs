@@ -30,7 +30,7 @@ fn fluid_smoke_follows_the_pointer_then_settles_and_freezes_at_the_lowest_qualit
     assert_eq!(run.shot().diff(&settled), 0.0);
     let Some((rest, mut low)) = stirred(json!({ "push": 4 }), Quality::Q0) else { return };
     assert!(low.shot().diff(&rest) < 0.05 && low.runtime.wake() != Wake::Frame);
-    let Some(mut fire) = Fx::new("fluid", json!({ "emitters": [{ "from": [0.5, 0.9], "strength": 40 }], "color": "#ffaa00" })).input(solid([20; 3])).run()
+    let Some(mut fire) = Fx::new("fluid", json!({ "emitters": full(json!([{ "from": [0.5, 0.9], "strength": 40 }])), "color": "#ffaa00" })).input(solid([20; 3])).run()
     else {
         return;
     };
@@ -40,7 +40,7 @@ fn fluid_smoke_follows_the_pointer_then_settles_and_freezes_at_the_lowest_qualit
     }
     let rising = fire.shot();
     assert!(rising.at(32, 26)[0] > 60 && fire.runtime.wake() == Wake::Frame, "{:?}", rising.at(32, 26));
-    let Some(mut bent) = Fx::new("fluid", json!({ "emitters": [{ "from": [0.5, 0.9], "strength": 40 }], "render": 3 })).input(squares()).run() else {
+    let Some(mut bent) = Fx::new("fluid", json!({ "emitters": full(json!([{ "from": [0.5, 0.9], "strength": 40 }])), "render": 3 })).input(squares()).run() else {
         return;
     };
     for _ in 0..20 {

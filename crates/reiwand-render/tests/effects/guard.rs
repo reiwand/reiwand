@@ -48,7 +48,7 @@ fn the_injected_guard_alone_ends_loops_that_never_break() {
     ];
     for (body, expected) in cases {
         let body = format!("{body}\n    c = select(vec4<f32>(0.0, 0.0, 1.0, 1.0), vec4<f32>(1.0, 0.0, 0.0, 1.0), {expected});");
-        let Some(found) = endless(json!({}), &body) else { return };
+        let Some(found) = endless(json!({ "taps": 4 }), &body) else { return };
         assert_eq!(found, RED, "{body}");
     }
 }
@@ -78,9 +78,9 @@ fn loops_the_checker_once_missed_finish_on_the_gpu() {
 #[test]
 fn variables_started_from_a_bitcast_override_draw_instead_of_crashing_the_driver() {
     let body = "var k: u32 = bitcast<u32>(neg);\n    var f = bitcast<f32>(taps | 1065353216u);\n    c = select(vec4<f32>(0.0, 0.0, 1.0, 1.0), vec4<f32>(1.0, 0.0, 0.0, 1.0), k == 4294967295u && f > 0.5);";
-    let Some(found) = drawn(json!({}), &shader(body), None) else { return };
+    let Some(found) = drawn(json!({ "taps": 4 }), &shader(body), None) else { return };
     assert_eq!(found, RED);
     let bounded = "for (var i: u32 = bitcast<u32>(neg); i > 4294967200u; i--) { c *= 0.9; }";
-    let Some(found) = endless(json!({}), bounded) else { return };
+    let Some(found) = endless(json!({ "taps": 4 }), bounded) else { return };
     assert_eq!(found, [0; 3]);
 }

@@ -33,7 +33,19 @@ pub(super) fn seen_among(
         "assets": assets, "effects": effects });
     let files: BTreeMap<&str, &str> = files.iter().copied().collect();
     let mut scene = Scene::from_json(&crate::gpu::whole(&text.to_string())).unwrap();
-    let read = |path: &str, _: usize| files.get(path).map(|t| t.as_bytes().to_vec()).ok_or("missing");
+    let read = |path: &str, _: usize| {
+        files
+            .get(path)
+            .map(|t| {
+                if path.ends_with(".json") {
+                    reiwand_upgrade::descriptors::completed(t)
+                } else {
+                    t.to_string()
+                }
+                .into_bytes()
+            })
+            .ok_or("missing")
+    };
     scene.adopt(&BTreeMap::new(), read).unwrap_or_else(|e| panic!("{e}"));
     let pair =
         RgbaImage::from_fn(2, 1, |x, _| Rgba(if x == 0 { [255, 0, 0, 255] } else { [0, 0, 255, 255] }));

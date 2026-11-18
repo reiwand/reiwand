@@ -54,8 +54,11 @@ fn ktx2_arrays_are_sprite_sheets_and_cubes_are_panoramas() {
     let seen = shot(r, json!({ "path": "p.ktx2" }), json!({}), cube);
     assert!(near(at(&seen, 50, 25), [160, 95, 100], 12), "{:?}", at(&seen, 50, 25));
     let mut assets = SceneAssets::default();
-    let asset: reiwand_scene::Asset =
-        serde_json::from_value(json!({ "path": "a.ktx2", "animated": true })).unwrap();
+    let asset: reiwand_scene::Asset = serde_json::from_value(reiwand_scene::prefill::of(
+        "Asset",
+        json!({ "path": "a.ktx2", "animated": true }),
+    ))
+    .unwrap();
     let mut pictures = reiwand_render::Pictures::default();
     let timed = reiwand_ktx2::timed(&bytes, 0.5);
     pictures

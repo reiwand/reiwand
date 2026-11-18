@@ -97,7 +97,7 @@ impl Fx {
         let files = |path: &str, _: usize| {
             let (id, ext) = path.trim_start_matches("fx/").split_once('.').unwrap_or_default();
             let (_, json, wgsl) = self.own.iter().find(|(i, ..)| i == id).ok_or("missing")?;
-            Ok::<_, &str>(if ext == "json" { json.to_string() } else { wgsl.clone() }.into_bytes())
+            Ok::<_, &str>(if ext == "json" { reiwand_upgrade::descriptors::completed(&json.to_string()) } else { wgsl.clone() }.into_bytes())
         };
         scene.adopt(&BTreeMap::new(), files).unwrap_or_else(|e| panic!("{e}"));
         for (id, wgsl) in &self.unchecked {

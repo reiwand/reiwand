@@ -25,7 +25,14 @@ fn scene(wgsl: &str) -> Scene {
     let mut scene = Scene::from_json(&crate::gpu::whole(&text.to_string())).unwrap();
     let read = |path: &str, _: usize| {
         let json = r#"{ "id": "own", "stage": "particle", "cost": {} }"#;
-        Ok::<_, &str>(if path.ends_with(".json") { json.to_owned() } else { wgsl.to_owned() }.into_bytes())
+        Ok::<_, &str>(
+            if path.ends_with(".json") {
+                reiwand_upgrade::descriptors::completed(json)
+            } else {
+                wgsl.to_owned()
+            }
+            .into_bytes(),
+        )
     };
     scene.adopt(&BTreeMap::new(), read).unwrap();
     scene
