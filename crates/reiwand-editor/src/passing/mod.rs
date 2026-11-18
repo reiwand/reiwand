@@ -72,7 +72,7 @@ fn wgsl_of(descriptor: &str) -> String {
 }
 
 fn fresh(dir: &Path, doc: &Value, e: &TransitionEdit) -> Result<Value> {
-    let twin = doc.pointer(&path(other(e.way)));
+    let twin = doc.pointer(&path(other(e.way))).filter(|v| !v.is_null());
     let descriptor = match (&e.effect, twin) {
         (Some(effect), _) => effect.clone(),
         (None, Some(t)) => t["descriptor"].as_str().unwrap_or_default().to_owned(),
