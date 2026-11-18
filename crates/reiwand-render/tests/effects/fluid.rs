@@ -51,8 +51,17 @@ fn fluid_smoke_follows_the_pointer_then_settles_and_freezes_at_the_lowest_qualit
     assert!(warped.diff(&Shot(squares())) > 0.3 && warped.diff(&smoke) > 0.3);
 }
 
+fn full(value: Value) -> Value {
+    match value {
+        Value::Array(items) => Value::Array(items.into_iter().map(full).collect()),
+        Value::Object(map) if map.contains_key("from") => reiwand_scene::prefill::of("EffectEmitter", Value::Object(map)),
+        Value::Object(map) => Value::Object(map.into_iter().map(|(k, v)| (k, full(v))).collect()),
+        other => other,
+    }
+}
+
 fn emitted(emitters: Value) -> Option<Shot> {
-    let mut run = Fx::new("fluid", json!({ "emitters": emitters, "color": "#ffaa00", "push": 0 })).input(solid([20; 3])).run()?;
+    let mut run = Fx::new("fluid", json!({ "emitters": full(emitters), "color": "#ffaa00", "push": 0 })).input(solid([20; 3])).run()?;
     for _ in 0..20 {
         run.runtime.advance(1.0 / 30.0);
         run.shot();
@@ -86,7 +95,7 @@ fn fluid_draws_keyframed_emitters_as_they_are_at_each_time() {
 #[test]
 fn moving_emitters_write_into_the_picture_they_already_have() {
     let keys = json!({ "keys": [[0, [{ "from": [0.1, 0.9], "strength": 40 }]], [3, [{ "from": [0.9, 0.9], "strength": 40 }]]] });
-    let params = json!({ "emitters": keys, "color": "#ffaa00" });
+    let params = json!({ "emitters": full(keys), "color": "#ffaa00" });
     let Some(mut run) = Fx::new("fluid", params).input(solid([20; 3])).run() else { return };
     for _ in 0..4 {
         run.runtime.advance(1.0 / 30.0);

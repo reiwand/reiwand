@@ -27,8 +27,25 @@ fn settle(value: &mut Value) {
             {
                 t.insert("origin".into(), json!("anchor"));
             }
+            if let Some(Value::Object(c)) = map.get_mut("camera") {
+                if c.get("center").is_some_and(Value::is_null) {
+                    c.insert("center".into(), json!("canvas"));
+                }
+                if let Some(Value::Object(sh)) = c.get_mut("shake") {
+                    for (key, value) in [("enabled", json!(true)), ("roughness", json!(0.5))] {
+                        if sh.get(key).is_some_and(Value::is_null) {
+                            sh.insert(key.into(), value);
+                        }
+                    }
+                }
+            }
             if map.get("playback").is_some_and(Value::is_null) {
                 map.insert("playback".into(), reiwand_scene::prefill::of("Playback", json!({})));
+            }
+            if let Some(Value::Object(p)) = map.get_mut("playback")
+                && p.get("end").is_some_and(Value::is_null)
+            {
+                p.insert("end".into(), json!("end"));
             }
             if let Some(Value::Object(m)) = map.get_mut("mask") {
                 let texture = m.get("texture").is_some_and(|t| !t.is_null());
