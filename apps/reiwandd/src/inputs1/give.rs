@@ -6,9 +6,11 @@ use crate::inputs::{declined_path, grants_path, load, load_bound};
 use std::sync::Arc;
 use zbus::message::Header;
 
-pub(crate) fn start(daemon: &Arc<Daemon>, connection: zbus::Connection) {
+pub(crate) fn start(daemon: &Arc<Daemon>, connection: zbus::Connection) -> anyhow::Result<()> {
     let path = grants_path(daemon);
-    crate::inputs::start(daemon, connection, (load_bound(&path), load(&declined_path(&path))));
+    let grants = (load_bound(&path)?, load(&declined_path(&path))?);
+    crate::inputs::start(daemon, connection, grants);
+    Ok(())
 }
 
 impl super::Inputs {

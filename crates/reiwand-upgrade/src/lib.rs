@@ -13,6 +13,7 @@ pub mod server;
 #[cfg(feature = "server")]
 mod server_export;
 pub mod settings;
+pub mod stored;
 #[cfg(feature = "client")]
 pub mod vault;
 

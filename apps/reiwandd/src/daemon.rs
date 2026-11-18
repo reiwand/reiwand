@@ -1,4 +1,5 @@
 mod setup;
+mod stored;
 
 use crate::changes::Changes;
 use crate::compositor::{Compositor, lock};
@@ -83,6 +84,7 @@ impl Daemon {
     pub fn new(config_path: PathBuf, display: Option<reiwand_render::Display>) -> anyhow::Result<Self> {
         let store = Store::open();
         reiwand_format::check_data(&store.data)?;
+        stored::check(&store.data)?;
         let closed = || Config { models: Models { allow_download: false }, ..Config::default() };
         let loaded = setup::first_load(&config_path, &store)?;
         let (config, config_error) =

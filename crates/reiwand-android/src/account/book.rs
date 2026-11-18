@@ -12,15 +12,14 @@ fn ring(id: &str) -> String {
 }
 
 pub(crate) fn file() -> File {
-    let bytes = store::dir().ok().and_then(|dir| std::fs::read(dir.join(FILE)).ok());
-    bytes.and_then(|bytes| serde_json::from_slice(&bytes).ok()).unwrap_or_default()
+    store::dir().ok().and_then(|dir| File::read(&dir.join(FILE)).ok()).unwrap_or_default()
 }
 
 pub(crate) fn edit<T>(change: impl FnOnce(&mut File) -> Result<T, Error>) -> Result<T, Error> {
     let _gate = GATE.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let mut file = file();
     let done = change(&mut file)?;
-    store::write(&store::dir()?.join(FILE), &serde_json::to_vec(&file)?)?;
+    store::write(&store::dir()?.join(FILE), &file.text()?)?;
     Ok(done)
 }
 

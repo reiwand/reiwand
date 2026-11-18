@@ -59,6 +59,13 @@ fn settings(args: &[String], data: &std::path::Path) -> anyhow::Result<()> {
     if changed > 0 {
         println!("{changed} image edits converted, the originals are in {}", copies.display());
     }
+    let changed = reiwand_upgrade::stored::files(data, &copies)?;
+    if changed > 0 {
+        println!(
+            "{changed} stored files converted (permissions, accounts), the originals are in {}",
+            copies.display()
+        );
+    }
     Ok(())
 }
 

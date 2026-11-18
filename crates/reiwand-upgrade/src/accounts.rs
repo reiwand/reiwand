@@ -43,7 +43,7 @@ pub fn apply(data: &Path, vault: &mut dyn Vault) -> anyhow::Result<()> {
     let pins = fs::read(data.join("repo-pins.json")).ok().and_then(|b| serde_json::from_slice(&b).ok());
     let done = accounts_step(&sync, pins.unwrap_or_default(), vault)?;
     if done.moved && !data.join("accounts.json").exists() {
-        write(&data.join("accounts.json"), serde_json::to_vec(&done.accounts)?)?;
+        write(&data.join("accounts.json"), done.accounts.text()?)?;
         write(&data.join("repo-pins.json"), serde_json::to_vec(&done.pins)?)?;
     }
     Ok(())
@@ -145,8 +145,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         fs::write(dir.path().join("sync.json"), serde_json::to_vec(&sync()).unwrap()).unwrap();
         apply(dir.path(), &mut NoVault).unwrap();
-        let file: File =
-            serde_json::from_slice(&fs::read(dir.path().join("accounts.json")).unwrap()).unwrap();
+        let file = File::read(&dir.path().join("accounts.json")).unwrap();
         assert!(file.accounts[0].pending);
         let pins: BTreeMap<String, String> =
             serde_json::from_slice(&fs::read(dir.path().join("repo-pins.json")).unwrap()).unwrap();

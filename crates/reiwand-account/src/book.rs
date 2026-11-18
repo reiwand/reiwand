@@ -1,14 +1,13 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
-#[serde(default)]
 pub struct Link {
     pub url: String,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
     pub repo_id: Option<String>,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
-#[serde(default)]
 pub struct Rec {
     pub id: String,
     pub origin: String,
@@ -20,9 +19,18 @@ pub struct Rec {
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
-#[serde(default)]
 pub struct File {
     pub accounts: Vec<Rec>,
+}
+
+impl File {
+    pub fn read(path: &std::path::Path) -> Result<File, reiwand_core::stored::StoredError> {
+        Ok(reiwand_core::stored::read(path)?.unwrap_or_default())
+    }
+
+    pub fn text(&self) -> serde_json::Result<Vec<u8>> {
+        reiwand_core::stored::text(self)
+    }
 }
 
 pub fn clean(url: &str) -> String {

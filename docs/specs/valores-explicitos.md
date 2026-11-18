@@ -83,3 +83,15 @@ Lo usan los cargadores de todos los formatos; ningún formato escribe su propia 
 - Tabla de prellenado: `crates/reiwand-core/prefill/edit.tsv`. Pruebas:
   `crates/reiwand-core/tests/edit_explicit.rs`.
 - Límite: la ruta del campo que falta dentro de un trazo de pincel no lleva el índice del trazo.
+
+## Permisos de entradas y cuentas (`inputs.json`, `inputs-declined.json`, `accounts.json`, formato 3)
+
+- Cada archivo guarda `{"format": 3, "content": ...}` (`reiwand_core::stored`). Ningún campo es opcional:
+  en `accounts.json` el `repo_id` de un enlace es explícito (`null` si aún no existe) y se quitó `serde(default)`
+  de `Rec`, `Link` y `File`. No hay tabla de prellenado: estos archivos no tienen campos con valor sugerido.
+- El demonio se niega a arrancar si un archivo es de otro formato o está dañado, nombra el archivo y manda
+  correr `reiwand-upgrade client`; ya no se descarta en silencio un archivo ilegible. Nunca se sobrescribe.
+- La conversión de única vez es el paso A de `reiwand-upgrade client`
+  (`crates/reiwand-upgrade/src/stored.rs`): envuelve el contenido, deja el original en
+  `upgrade-copias/<segundos>/` y es idempotente. Pruebas: `crates/reiwand-upgrade/tests/stored.rs`,
+  `apps/reiwandd/src/inputs/tests.rs`.

@@ -27,27 +27,23 @@ impl Daemon {
         self.store.data.join("accounts.json")
     }
 
-    pub(super) fn accounts_file(&self) -> File {
-        let Ok(bytes) = std::fs::read(self.accounts_path()) else { return File::default() };
-        serde_json::from_slice(&bytes).unwrap_or_else(|e| {
-            tracing::warn!("the accounts cannot be read; none is used until one is signed in again: {e}");
-            File::default()
-        })
+    pub(super) fn accounts_file(&self) -> Result<File> {
+        File::read(&self.accounts_path()).map_err(|e| failed(e.to_string()))
     }
 
     pub fn account_list(&self) -> Vec<Rec> {
-        self.accounts_file().accounts
+        self.accounts_file().map(|f| f.accounts).unwrap_or_default()
     }
 
     pub(super) fn edit_accounts<T>(&self, change: impl FnOnce(&mut File) -> Result<T>) -> Result<T> {
         let _gate = lock(&self.accounts.gate);
-        let mut file = self.accounts_file();
+        let mut file = self.accounts_file()?;
         let done = change(&mut file)?;
         let path = self.accounts_path();
         let dir = path.parent().unwrap_or(std::path::Path::new("."));
         private_dir(dir)?;
         let mut temporary = tempfile::Builder::new().prefix(".tmp-").tempfile_in(dir)?;
-        temporary.write_all(&serde_json::to_vec(&file).map_err(|e| failed(e.to_string()))?)?;
+        temporary.write_all(&file.text().map_err(|e| failed(e.to_string()))?)?;
         temporary.persist(&path).map_err(|e| Error::from(e.error))?;
         self.changes.changed("accounts", Vec::new());
         Ok(done)

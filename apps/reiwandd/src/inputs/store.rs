@@ -11,19 +11,17 @@ pub(crate) fn declined_path(grants: &Path) -> PathBuf {
     grants.with_file_name("inputs-declined.json")
 }
 
-fn read<T: serde::de::DeserializeOwned + Default>(path: &Path) -> T {
-    let Ok(bytes) = std::fs::read(path) else { return T::default() };
-    serde_json::from_slice(&bytes).unwrap_or_else(|e| {
-        tracing::warn!("ignoring unreadable input permissions: {e}");
-        T::default()
-    })
+fn read<T: serde::de::DeserializeOwned + Default>(
+    path: &Path,
+) -> Result<T, reiwand_core::stored::StoredError> {
+    Ok(reiwand_core::stored::read(path)?.unwrap_or_default())
 }
 
-pub(crate) fn load(path: &Path) -> Grants {
+pub(crate) fn load(path: &Path) -> Result<Grants, reiwand_core::stored::StoredError> {
     read(path)
 }
 
-pub(crate) fn load_bound(path: &Path) -> Bound {
+pub(crate) fn load_bound(path: &Path) -> Result<Bound, reiwand_core::stored::StoredError> {
     read(path)
 }
 
@@ -31,6 +29,6 @@ pub(crate) fn save(path: &Path, value: &impl serde::Serialize) -> std::io::Resul
     let dir = path.parent().unwrap_or(Path::new("."));
     crate::store::private_dir(dir)?;
     let mut file = tempfile::Builder::new().prefix(".tmp-").tempfile_in(dir)?;
-    file.write_all(&serde_json::to_vec_pretty(value)?)?;
+    file.write_all(&reiwand_core::stored::text(value)?)?;
     file.persist(path).map(drop).map_err(|e| e.error)
 }

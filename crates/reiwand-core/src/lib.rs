@@ -32,6 +32,7 @@ pub mod shortcuts;
 pub mod spread;
 pub mod stash;
 mod store;
+pub mod stored;
 mod template;
 mod transition;
 pub use edit::travel;

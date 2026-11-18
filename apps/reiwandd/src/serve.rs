@@ -46,7 +46,7 @@ pub(crate) async fn run(args: Args) -> anyhow::Result<()> {
     server.at(dbus::OBJECT_PATH, accounts1::Accounts(weak.clone())).await?;
     server.at(dbus::OBJECT_PATH, publish1::Publish(weak)).await?;
     tokio::spawn(changes::emit(connection.clone(), daemon.clone()));
-    inputs1::start(&daemon, connection.clone());
+    inputs1::start(&daemon, connection.clone())?;
     pool::start(&daemon);
     folders::start(&daemon);
     remote::start(&daemon, connection.clone());

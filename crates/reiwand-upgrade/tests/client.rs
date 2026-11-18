@@ -49,7 +49,7 @@ fn the_old_account_keeps_its_session_in_the_new_store() {
     client::run_with(data, &mut vault).unwrap();
     let file: serde_json::Value =
         serde_json::from_slice(&fs::read(data.join("accounts.json")).unwrap()).unwrap();
-    let rec = &file["accounts"][0];
+    let rec = &file["content"]["accounts"][0];
     assert_eq!((rec["user"].as_str(), rec["pending"].as_bool()), (Some("ana"), Some(false)));
     let id = rec["id"].as_str().unwrap();
     assert_eq!(vault.items.get(&format!("account {id}")).map(String::as_str), Some("tok"));
