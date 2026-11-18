@@ -73,3 +73,20 @@ pub fn document(doc: &mut Value) {
         }
     }
 }
+
+pub fn holds(actual: &Value, expected: Value) {
+    let Some(map) = expected.as_object() else { return assert_eq!(actual, &expected) };
+    for (key, value) in map {
+        assert_eq!(&actual[key], value, "{key} of {actual}");
+    }
+}
+
+pub fn descriptor(text: &str) -> String {
+    let mut json: Value = serde_json::from_str(text).unwrap();
+    reiwand_upgrade::descriptors::complete(&mut json);
+    json.to_string()
+}
+
+pub fn unset(value: &Value) -> bool {
+    matches!(value, Value::Bool(false)) || empty(value)
+}

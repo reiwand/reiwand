@@ -20,10 +20,10 @@ fn a_map_picked_only_for_light_is_read_as_linear_in_the_same_step() {
     act(&mut p, json!({ "lighting": { "layer": "logo", "normal": "bump", "emissive_map": "bump" } }))
         .unwrap();
     undone(&mut p, &before);
-    assert_eq!(asset(&p, "bump"), &json!({ "path": "bump.png", "linear": true }));
+    crate::whole::holds(asset(&p, "bump"), json!({ "path": "bump.png", "linear": true }));
     assert_eq!(layer(&p, "logo")["lighting"]["emissive_map"], "bump");
     act(&mut p, json!({ "lighting": { "layer": "logo", "env": "pic" } })).unwrap();
-    assert!(asset(&p, "pic").get("linear").is_none(), "a reflected picture keeps its colors");
+    assert!(crate::whole::unset(&asset(&p, "pic")["linear"]), "a reflected picture keeps its colors");
     act(&mut p, json!({ "particles": { "lit": { "system": "flakes", "lit": true, "normal": "bump" } } }))
         .unwrap();
     assert_eq!(p.doc["scene"]["particles"]["flakes"]["render"]["normal"], "bump");
@@ -43,7 +43,7 @@ fn a_picture_shown_in_colors_gets_a_linear_twin_for_particles() {
     let render = &p.doc["scene"]["particles"]["flakes"]["render"];
     assert_eq!(render["refract"]["normal"], "pic_linear");
     assert_eq!(asset(&p, "pic_linear")["linear"], true);
-    assert!(asset(&p, "pic").get("linear").is_none());
+    assert!(crate::whole::unset(&asset(&p, "pic")["linear"]));
 }
 
 #[test]
@@ -59,11 +59,7 @@ fn painting_a_picked_map_keeps_the_picture_and_paints_a_copy() {
     let before = p.doc.clone();
     act(&mut p, json!({ "paint_map": stroke.clone() })).unwrap();
     undone(&mut p, &before);
-    assert_eq!(
-        asset(&p, "pic"),
-        &json!({ "path": "pic.png", "mipmaps": true }),
-        "the layer image is untouched"
-    );
+    crate::whole::holds(asset(&p, "pic"), json!({ "path": "pic.png", "mipmaps": true }));
     assert_eq!(asset(&p, &picked), &twin, "the picked map is untouched");
     let painted = layer(&p, "logo")["lighting"]["roughness_map"].as_str().unwrap().to_string();
     assert_ne!(painted, picked);
@@ -98,7 +94,7 @@ fn normals_refuse_an_id_that_names_another_asset() {
     let mut p = project(&root);
     let made = |id: &str| json!({ "normals": { "layer": "logo", "strength": 2, "blur": 0, "id": id } });
     assert!(act(&mut p, made("pic")).is_err());
-    assert_eq!(asset(&p, "pic"), &json!({ "path": "pic.png" }));
+    crate::whole::holds(asset(&p, "pic"), json!({ "path": "pic.png" }));
     act(&mut p, made("logo_bumps")).unwrap();
     act(&mut p, made("logo_bumps")).unwrap();
     assert!(asset(&p, "logo_bumps")["path"].as_str().unwrap().starts_with("normals/"));
@@ -111,12 +107,12 @@ fn a_particles_layer_takes_strength_and_glow() {
     let before = p.doc.clone();
     act(&mut p, json!({ "lighting": { "layer": "flakes", "strength": 0.4, "emissive": 3 } })).unwrap();
     undone(&mut p, &before);
-    assert_eq!(layer(&p, "flakes")["lighting"], json!({ "strength": 0.4, "emissive": 3.0 }));
+    crate::whole::holds(&layer(&p, "flakes")["lighting"], json!({ "strength": 0.4, "emissive": 3.0 }));
     for bad in [json!({ "normal": "pic" }), json!({ "roughness": 0.3 }), json!({ "emissive": 20 })] {
         let mut args = bad.clone();
         args["layer"] = json!("flakes");
         assert!(act(&mut p, json!({ "lighting": args })).is_err(), "{bad}");
     }
     act(&mut p, json!({ "lighting": { "layer": "flakes", "off": true } })).unwrap();
-    assert!(layer(&p, "flakes").get("lighting").is_none());
+    assert!(crate::whole::unset(&layer(&p, "flakes")["lighting"]));
 }

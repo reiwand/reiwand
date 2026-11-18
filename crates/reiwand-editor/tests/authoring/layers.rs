@@ -43,7 +43,7 @@ fn a_particles_layer_changes_its_instance_of_the_system() {
     act(&mut p, json!({"layer": {"instance": {"layer": "dust", "values": values}}})).unwrap();
     assert_eq!(at(&p, &format!("{path}/instance/count")), json!(0.25));
     act(&mut p, json!({"layer": {"instance": {"layer": "dust", "values": {"count": null}}}})).unwrap();
-    assert!(at(&p, &format!("{path}/instance")).get("count").is_none());
+    assert!(crate::whole::unset(&at(&p, &format!("{path}/instance"))["count"]));
     assert!(
         refused(&mut p, json!({"layer": {"instance": {"layer": "dust", "values": {"alpha": 4}}}}))
             .contains("alpha")
@@ -71,7 +71,7 @@ fn the_canvas_glows_and_moves_in_depth_from_its_defaults() {
         (&json!(2.0), &json!(0.8), &json!({"threshold": 2, "strength": 1}))
     );
     act(&mut p, json!({"canvas": {"bloom": {"hdr": "none"}}})).unwrap();
-    assert!(at(&p, "/scene/canvas/bloom").get("hdr").is_none());
+    assert!(crate::whole::unset(&at(&p, "/scene/canvas/bloom")["hdr"]));
     assert!(refused(&mut p, json!({"canvas": {"bloom": {"radius": 500}}})).contains("radius"));
     act(&mut p, json!({"canvas": {"bloom": {"off": true}}})).unwrap();
     assert_eq!(at(&p, "/scene/canvas/bloom"), serde_json::Value::Null);

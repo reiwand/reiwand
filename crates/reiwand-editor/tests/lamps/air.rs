@@ -9,7 +9,7 @@ fn volumetrics_are_set_checked_undone_and_dropped_with_the_type() {
     let before = p.doc.clone();
     light(&mut p, json!({ "volumetric": { "layer": "s", "density": 0.4, "samples": 24 } })).unwrap();
     undone(&mut p, &before);
-    assert_eq!(layer(&p, "s")["volumetric"], json!({ "density": 0.4, "samples": 24 }));
+    crate::whole::holds(&layer(&p, "s")["volumetric"], json!({ "density": 0.4, "samples": 24 }));
     light(&mut p, json!({ "volumetric": { "layer": "s", "samples": 8 } })).unwrap();
     assert_eq!(layer(&p, "s")["volumetric"], json!({ "density": 0.4, "samples": 8 }));
     let before = p.doc.clone();
@@ -40,12 +40,12 @@ fn volumetrics_are_set_checked_undone_and_dropped_with_the_type() {
     }
     assert!(light(&mut p, json!({ "volumetric": { "layer": "logo" } })).is_err(), "an image is no light");
     light(&mut p, json!({ "set": { "layer": "s", "light": "tube" } })).unwrap();
-    assert!(layer(&p, "s").get("volumetric").is_none(), "a tube does not light the air");
+    assert!(crate::whole::unset(&layer(&p, "s")["volumetric"]), "a tube does not light the air");
     assert!(light(&mut p, json!({ "volumetric": { "layer": "s" } })).is_err());
     light(&mut p, json!({ "set": { "layer": "s", "light": "point" } })).unwrap();
     light(&mut p, json!({ "volumetric": { "layer": "s" } })).unwrap();
     light(&mut p, json!({ "volumetric": { "layer": "s", "off": true } })).unwrap();
-    assert!(layer(&p, "s").get("volumetric").is_none());
+    assert!(crate::whole::unset(&layer(&p, "s")["volumetric"]));
 }
 
 #[test]

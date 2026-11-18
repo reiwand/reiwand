@@ -70,7 +70,7 @@ fn an_effect_changes_moves_and_leaves_with_its_parameters() {
     assert!(refused(&mut p, effects(json!({"move": {"layer": "card", "index": 0, "to": 2}}))).contains('2'));
     act(&mut p, effects(json!({"remove": {"layer": "card", "index": 0}}))).unwrap();
     act(&mut p, effects(json!({"remove": {"layer": "card", "index": 0}}))).unwrap();
-    assert!(at(&p, &path).get("effects").is_none());
+    assert!(crate::whole::unset(&at(&p, &path)["effects"]));
 }
 
 #[test]

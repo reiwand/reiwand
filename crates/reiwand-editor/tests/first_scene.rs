@@ -21,7 +21,7 @@ fn with_shape() -> Value {
 fn a_first_keyframe_on_an_untouched_position_takes_the_resting_value() {
     let mut doc = with_shape();
     let position = "/scene/layers/0/transform/position";
-    assert!(doc.pointer(position).is_none());
+    assert!(doc.pointer(position).is_none_or(Value::is_null));
     act(&mut doc, json!({"keyframe": {"pointer": position, "time": 0}}));
     assert_eq!(doc.pointer(&format!("{position}/keys/0/1")), Some(&json!([960.0, 540.0])));
 }

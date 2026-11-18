@@ -90,9 +90,9 @@ fn the_undo_step_of_several_same_actions_says_how_many() {
     let ask = p.ask("", &json!({ "history": {} }));
     assert_eq!(
         ask["undo"]["text"],
-        format!("{} (3 times)", reiwand_editor::history::step("add_layer").local())
+        reiwand_editor::history::step("add_layer*3").local()
     );
     let remove = |id| json!({"remove_layer": {"id": id}});
     p.act_all(&actions(json!([remove("a"), remove("b")]))).unwrap();
-    assert_eq!(p.ask("", &json!({ "history": {} }))["undo"]["text"], "Remove 2 layers");
+    assert_eq!(p.ask("", &json!({ "history": {} }))["undo"]["text"], reiwand_editor::history::step("remove_layer*2").local());
 }

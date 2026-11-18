@@ -39,7 +39,7 @@ fn timelines_are_added_timed_renamed_and_removed_with_the_values_they_drive() {
     assert_eq!((&line["loop"], line.get("wrap")), (&json!("pingpong"), None), "leaving repeat drops wrap");
     act(&mut p, json!({"timeline": {"id": "opening", "remove": true}})).unwrap();
     assert_eq!(at(&p, "/scene/timelines"), json!([]));
-    assert!(at(&p, "/scene/layers/0/opacity").get("timeline").is_none());
+    assert!(crate::whole::unset(&at(&p, "/scene/layers/0/opacity")["timeline"]));
     let missing = refused(&mut p, key(json!({"time": 1, "value": 1, "timeline": "opening"})));
     assert!(missing.contains("timeline action"), "{missing}");
 }
@@ -62,7 +62,7 @@ fn keyframes_take_a_base_and_bezier_handles_that_the_editor_samples() {
     act(&mut p, key(json!({"time": 0, "ease": "in_out_sine"}))).unwrap();
     assert_eq!(at(&p, "/scene/layers/0/opacity/keys/0/2"), "in_out_sine");
     act(&mut p, key(json!({"time": 0, "absolute": true}))).unwrap();
-    assert!(at(&p, "/scene/layers/0/opacity").get("base").is_none());
+    assert!(crate::whole::unset(&at(&p, "/scene/layers/0/opacity")["base"]));
     for bad in [
         key(json!({"time": 0, "ease": "linear", "out_handle": [1, 0]})),
         key(json!({"time": 0, "out_handle": [-1, 0]})),
@@ -127,7 +127,7 @@ fn a_timeline_that_drives_a_tracked_binding_is_renamed_and_removed_with_it() {
     act(&mut p, json!({"timeline": {"id": "intro", "to": "main"}})).unwrap();
     assert_eq!(at(&p, &format!("{at_position}/timeline")), "main");
     act(&mut p, json!({"timeline": {"id": "main", "remove": true}})).unwrap();
-    assert!(at(&p, at_position).get("timeline").is_none());
+    assert!(crate::whole::unset(&at(&p, at_position)["timeline"]));
     let problems = reiwand_editor::check::review(&p.doc, Some(&p.dir));
     assert!(problems.iter().all(|p| p.warning), "{problems:?}");
 }

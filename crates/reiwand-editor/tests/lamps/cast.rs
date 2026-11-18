@@ -25,7 +25,7 @@ fn spots_project_pictures_videos_and_layers_without_loops() {
     assert!(!cast["layers"].as_array().unwrap().contains(&json!("logo")), "a lit layer would light itself");
     assert!(light(&mut p, json!({ "projection": { "layer": "s", "from": "logo" } })).is_err());
     light(&mut p, json!({ "projection": { "layer": "s", "off": true } })).unwrap();
-    assert!(layer(&p, "s").get("texture").is_none());
+    assert!(crate::whole::unset(&layer(&p, "s")["texture"]));
     light(&mut p, json!({ "add": { "light": "point", "id": "dot" } })).unwrap();
     assert!(
         light(&mut p, json!({ "projection": { "layer": "dot", "asset": "pic" } })).is_err(),

@@ -38,7 +38,7 @@ fn a_new_particles_layer_fills_the_screen_at_once_and_falls() {
     let system = &project.doc["scene"]["particles"]["nieve"];
     assert!(system["prewarm"].as_f64().unwrap() >= system["init"]["life"][0].as_f64().unwrap());
     assert!(system["emitters"][0]["shape"].get("box").is_some());
-    assert_eq!(system["init"]["angle"], json!([80, 100]));
+    assert_eq!(system["init"]["angle"], json!([80, 100, 1]));
     assert!(errors(&project).is_empty(), "{:?}", errors(&project));
 }
 

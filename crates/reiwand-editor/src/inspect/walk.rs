@@ -44,6 +44,11 @@ impl Walk<'_> {
         if optional {
             (schema, name) = deref(self.root, list.iter().find(|b| b["type"] != "null").unwrap_or(schema));
         }
+        let value_union = |schema: &Value| {
+            let list = branches(schema);
+            list.len() == 2 && deref(self.root, &list[1]).1.starts_with("Binding_for_")
+        };
+        let inline_value = !name.starts_with("Value_for_") && value_union(schema);
         if name == "Smooth" {
             f.widget = "smooth".into();
             f.range = json!([0, 60]);
@@ -52,7 +57,8 @@ impl Walk<'_> {
         }
         let probe = if current.is_null() { &f.default } else { &current };
         let scalar = probe.is_array() || probe.is_number() || probe.is_boolean();
-        let untyped = schema.get("type").is_none() && !name.starts_with("Value_for_") && scalar;
+        let untyped =
+            schema.get("type").is_none() && !name.starts_with("Value_for_") && !inline_value && scalar;
         if untyped && !branches(schema).is_empty() && !tagged(self.root, schema) {
             (schema, name) = deref(self.root, choose(self.root, schema, probe));
         }
@@ -67,7 +73,7 @@ impl Walk<'_> {
             }
             return self.out.push(f);
         }
-        if name.starts_with("Value_for_") {
+        if name.starts_with("Value_for_") || inline_value {
             f.bindable = true;
             f.source = SOURCES.iter().find(|s| current.get(**s).is_some()).map_or("", |s| *s).into();
             (schema, name) = deref(self.root, &branches(schema)[0]);

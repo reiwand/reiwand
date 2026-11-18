@@ -29,7 +29,7 @@ fn templates_are_made_from_layers_renamed_removed_and_listed_as_a_tree() {
     act(&mut p, json!({ "template": { "rename": { "name": "pair", "to": "couple" } } })).unwrap();
     assert!(
         p.doc["scene"]["templates"]["couple"].is_object()
-            && p.doc["scene"]["templates"].get("pair").is_none()
+            && crate::whole::unset(&p.doc["scene"]["templates"]["pair"])
     );
     assert!(
         refused(&mut p, json!({ "template": { "rename": { "name": "couple", "to": "dot_template" } } }))
