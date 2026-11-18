@@ -112,6 +112,8 @@ Lo usan los cargadores de todos los formatos; ningún formato escribe su propia 
   fija la versión 9, deja la original en `upgrade-copias/<segundos>/` y pone la copia en su lugar.
 - Horarios: la caja de horarios no guarda archivos propios; lo guardado es el estado de rotación y las reglas de
   cada lista, ya cubiertos arriba.
+- Límite: la base de Android usa el mismo esquema; su conversión la hace el receptor de actualización de esa
+  aplicación.
 
 ## Archivos internos de instalación (`installed.json`, `anchors.json`, `repo-pins.json`)
 
