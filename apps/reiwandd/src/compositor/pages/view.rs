@@ -41,6 +41,7 @@ pub(in crate::compositor) struct ViewSlot {
     pub(in crate::compositor) drawn: u64,
     pub(in crate::compositor) console: std::collections::VecDeque<String>,
     pub(in crate::compositor) snap: Option<Snap>,
+    pub(in crate::compositor) loaded: bool,
     imported: HashMap<u32, GpuImage>,
     ring: Option<Mapped>,
     copied: Option<GpuImage>,
@@ -117,7 +118,7 @@ impl ViewSlot {
         };
         let room = ring.len / 2;
         let data = unsafe { std::slice::from_raw_parts(ring.map.add(slot as usize * room), room) };
-        if matches!(self.snap, Some(Snap::Asked(_))) {
+        if self.loaded && matches!(self.snap, Some(Snap::Asked(_))) {
             self.snap = Some(Snap::Ready(size, tight(data, size, ring.stride)));
         }
         renderer.upload_page(&mut self.copied, data, size, ring.stride)?;
