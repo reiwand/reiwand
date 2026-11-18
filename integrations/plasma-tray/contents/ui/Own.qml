@@ -34,7 +34,7 @@ ColumnLayout {
     Option {
         Layout.fillWidth: true
         text: i18n("Fit")
-        hint: own.label(own.fits, own.info.fit ?? "fill")
+        hint: own.label(own.fits, own.info.fit)
         more: true
         open: own.open === "fit"
         onClicked: own.open = own.open === "fit" ? "" : "fit"
@@ -44,7 +44,7 @@ ColumnLayout {
         Layout.fillWidth: true
         visible: own.open === "fit"
         model: own.fits
-        current: own.info.fit ?? "fill"
+        current: own.info.fit
         onPicked: value => own.daemon.act("SetWallpaper", ["", own.name, value])
     }
 

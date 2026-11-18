@@ -48,7 +48,7 @@ QtObject {
         const part = open("advanced");
         same(JSON.stringify(page.route), JSON.stringify([App.tr("Device"), App.tr("Advanced")]), "the route of Advanced");
         row(part, App.tr("Graphics card"));
-        same(row(part, App.tr("HDR, extra bright colors")).off, !MachineWords.hdrSeen(App.state.outputs) && String((App.state.options ?? {})["playback.hdr"] ?? "auto") !== "off", "HDR without a screen that supports it");
+        same(row(part, App.tr("HDR, extra bright colors")).off, !MachineWords.hdrSeen(App.state.outputs) && String((App.state.options ?? {})["playback.hdr"]) !== "off", "HDR without a screen that supports it");
         same(MachineWords.hdrSeen({
             "DP-1": {
                 "hdr": {

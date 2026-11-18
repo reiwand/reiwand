@@ -14,7 +14,7 @@ PlasmaExtras.Representation {
     property string target: ""
     readonly property var own: rows.rowOf(single ? names[0] : target)
     readonly property bool shortcut: (current.options ?? {})["shortcuts.enabled"] === true
-    readonly property string keys: String((current.options ?? {})["shortcuts.next"] ?? "")
+    readonly property string keys: String((current.options ?? {})["shortcuts.next"])
     readonly property var screen: (current.outputs ?? {})[names.length > 0 ? names[0] : ""] ?? ({})
     property var fixed: ({})
 

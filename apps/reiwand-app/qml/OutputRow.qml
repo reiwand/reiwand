@@ -15,7 +15,7 @@ RowLayout {
     readonly property string item: info.item ?? ""
     readonly property var playing: info.playlist ?? null
     readonly property var credit: info.credit ?? null
-    readonly property var fits: daemon.schema.fits ?? ["fill", "fit", "stretch", "center", "tile"]
+    readonly property var fits: daemon.schema.fits ?? []
     readonly property bool scene: info.kind === "scene"
     readonly property bool tunable: scene || info.kind === "web" || (info.kind === "video" && pkg.kind === "video")
     readonly property string sound: info.sound ?? ""
@@ -177,8 +177,8 @@ RowLayout {
         }
 
         SmallNote {
-            visible: (row.info.shown_fit ?? row.info.fit) !== row.info.fit
-            text: row.daemon.tr("This picture has its own placement: %1", row.daemon.value(row.info.shown_fit ?? ""))
+            visible: row.info.shown_fit !== row.info.fit
+            text: row.daemon.tr("This picture has its own placement: %1", row.daemon.value(row.info.shown_fit))
         }
 
         OutputControls {

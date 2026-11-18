@@ -10,7 +10,7 @@ ColumnLayout {
     property string output: ""
     property var info: ({})
     readonly property var transition: info.transition ?? null
-    readonly property string general: String((daemon.state?.options ?? {})["transition.kind"] ?? "own")
+    readonly property string general: String((daemon.state?.options ?? {})["transition.kind"])
     readonly property var words: ({
             "own": daemon.tr("The transition each wallpaper brings, or a fade"),
             "fade": daemon.tr("Always a plain fade"),

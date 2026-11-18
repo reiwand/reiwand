@@ -9,7 +9,7 @@ ColumnLayout {
     required property var daemon
     property string output: ""
     property var info: ({})
-    readonly property string general: String((daemon.state?.options ?? {})["playback.quality"] ?? "auto")
+    readonly property string general: String((daemon.state?.options ?? {})["playback.quality"])
     readonly property string chosen: output ? (info.quality_choice ?? "none") : general
     readonly property var words: ({
             "auto": daemon.tr("Automatic: lower on battery, when hot or when the scene is heavy"),

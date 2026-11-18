@@ -139,7 +139,7 @@ FocusScope {
             note: App.tr("On every screen")
             kind: "elige"
             options: SettingsWords.passages.map(value => SettingsWords.passage(value))
-            current: Math.max(0, SettingsWords.passages.indexOf(String(tab.options["transition.kind"] ?? "own")))
+            current: Math.max(0, SettingsWords.passages.indexOf(String(tab.options["transition.kind"])))
             onChosen: index => App.act("SetOption", ["transition.kind", SettingsWords.passages[index]])
         }
 
@@ -150,7 +150,7 @@ FocusScope {
             note: App.tr("On every screen")
             kind: "elige"
             options: [App.tr("Like the system"), App.tr("Always"), App.tr("Never")]
-            current: Math.max(0, ["system", "always", "never"].indexOf(String(tab.options["transition.less_motion"] ?? "system")))
+            current: Math.max(0, ["system", "always", "never"].indexOf(String(tab.options["transition.less_motion"])))
             explain: App.tr("With less motion, every change of wallpaper is a plain fade. “Like the system” follows the setting of your desktop.")
             onChosen: index => App.act("SetOption", ["transition.less_motion", ["system", "always", "never"][index]])
         }

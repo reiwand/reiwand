@@ -7,10 +7,10 @@ FocusScope {
     required property var page
     readonly property string key: "surfaces.layer_namespace"
     readonly property var options: App.state.options ?? {}
-    readonly property string chosen: String(options[key] ?? "auto")
+    readonly property string chosen: String(options[key])
     readonly property string own: chosen === "auto" ? "" : chosen
     readonly property var shell: App.state.layer_shell ?? {}
-    readonly property bool software: String(options["render.gpu"] ?? "auto") === "software"
+    readonly property bool software: String(options["render.gpu"]) === "software"
     readonly property var sources: ({
             "option": App.tr("the option the daemon was started with"),
             "environment": App.tr("the REIWAND_LAYER_NAMESPACE variable"),

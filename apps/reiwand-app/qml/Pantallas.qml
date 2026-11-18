@@ -23,7 +23,7 @@ Row {
             readonly property var info: strip.screens[modelData] ?? {}
             readonly property string item: info.item ?? ""
             readonly property bool chosen: modelData === strip.current
-            readonly property real wide: (info.width ?? 16) / Math.max(1, info.height ?? 10)
+            readonly property real wide: info.width / Math.max(1, info.height)
             property string thumb
 
             function load() {

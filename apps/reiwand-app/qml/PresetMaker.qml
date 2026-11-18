@@ -7,7 +7,7 @@ PanelChico {
 
     property string name
     property string shade
-    readonly property var fits: [""].concat(App.schema.fits ?? ["fill", "fit", "stretch", "center", "tile"])
+    readonly property var fits: [""].concat(App.schema.fits ?? [])
     property int fit: 0
 
     function start(from) {

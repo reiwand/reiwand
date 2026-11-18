@@ -11,7 +11,7 @@ Mandos {
     property bool favorite: false
     readonly property bool paused: App.state.paused === true
     readonly property bool muted: App.state.muted === true
-    readonly property var fits: App.schema.fits ?? ["fill", "fit", "stretch", "center", "tile"]
+    readonly property var fits: App.schema.fits ?? []
     readonly property alias pause: pause
 
     label: App.tr("What is on your desktop")
@@ -46,7 +46,7 @@ Mandos {
             width: Look.e8 + Look.e7
             from: 0
             to: 1
-            value: App.state.volume ?? 0
+            value: App.state.volume
             Accessible.name: App.tr("Overall volume")
             onMoved: debounce.restart()
         }
@@ -95,7 +95,7 @@ Mandos {
         options: bar.fits.map(name => ({
                     "text": App.value(name)
                 }))
-        current: Math.max(0, bar.fits.indexOf(bar.info.fit ?? "fill"))
+        current: Math.max(0, bar.fits.indexOf(bar.info.fit))
         onChosen: index => {
             close();
             App.act("SetWallpaper", ["", bar.screen, bar.fits[index]]);

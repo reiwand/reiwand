@@ -7,7 +7,7 @@ FocusScope {
     required property var page
     readonly property var options: App.state.options ?? {}
     readonly property bool battery: App.state.on_battery === true || App.state.battery_percent !== null && App.state.battery_percent !== undefined
-    readonly property string chosen: String(options["pause.on_battery"] ?? "always")
+    readonly property string chosen: String(options["pause.on_battery"])
     readonly property var presets: ["below:10", "below:15", "below:20", "below:30"]
     readonly property var values: ["never", "always"].concat(presets.includes(chosen) || !chosen.startsWith("below:") ? presets : presets.concat([chosen]))
 
