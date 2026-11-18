@@ -36,6 +36,11 @@ ellas o está dentro; desde cualquier otra, `flatpak run` arranca en la carpeta 
 relativa apunta a otro sitio, así que conviene usar la ruta completa: `reiwand-ctl set
 ~/Imágenes/fondo.jpg` en lugar de `reiwand-ctl set fondo.jpg`.
 
+El Flatpak se construye sobre `io.qt.qtwebengine.BaseApp` (rama 6.11), que trae Qt WebEngine
+fuera del runtime de KDE, y por eso muestra los fondos web (unos 600 MB más al instalar). Lo único
+que pide es `--share=ipc`, que ya tiene: Chromium se aísla con la ayuda de sandbox de la base, no
+con `QTWEBENGINE_DISABLE_SANDBOX`.
+
 Permisos: la GPU, el socket de PipeWire, que publica los streams, lleva el sonido de los vídeos y de
 las escenas y permite capturar el sonido solo para las escenas con permiso (no hace falta el de
 PulseAudio), el socket de Wayland, para las ventanas de la app y, en el daemon, solo para leer la

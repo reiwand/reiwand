@@ -8,8 +8,9 @@ run() { cmd=$1 && shift && flatpak run --env=QT_QPA_PLATFORM=offscreen --env=REI
 test "$(run reiwand-ctl $app --version)" = "reiwand-ctl $version"
 test "$(run reiwandd $app --version)" = "reiwandd $version"
 run reiwand-app $app --check
-if said=$(run reiwand-web $app --check 2>&1); then echo "the runtime unexpectedly carries WPE WebKit"; exit 1; fi
-case $said in *libWPEWebKit*) echo "web wallpapers refused here, as expected" ;; *) echo "reiwand-web --check failed for another reason: $said"; exit 1 ;; esac
+run reiwand-web $app --check
+test -x "$(flatpak info -l $app)/files/bin/reiwand-web"
+flatpak run --command=test $app -x /app/bin/QtWebEngineProcess
 files=$(flatpak info -l $app)/files
 exports=${files%%/app/*}/exports/share
 run reiwand-plasma $app > plasma.sh

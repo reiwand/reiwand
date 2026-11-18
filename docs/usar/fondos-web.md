@@ -4,12 +4,31 @@ Un paquete `web` es una página (HTML, CSS, JavaScript, WebAssembly, WebGL, imá
 sonido y vídeo dentro del propio paquete) que se muestra como fondo con las mismas transiciones,
 ajuste, límite de FPS y pausas que los demás. La dibuja `reiwand-web`, un proceso aparte que el
 servicio arranca para cada página que se ve y para en cuanto ninguna pantalla la muestra. Necesita
-WPE WebKit 2.54 o posterior (`wpewebkit` en Arch y Fedora); donde no está (Ubuntu 24.04, que no trae
-ningún `wpewebkit`, y el Flatpak, cuyo runtime de KDE tampoco lo trae y para el que no conocemos
-ninguno en Flathub) el fondo se rechaza con el motivo en lugar de quedarse en blanco, en `reiwand-ctl` y en la app,
+Qt WebEngine (Qt 6.5 o posterior) y una sesión gráfica, que el servicio ya tiene: `qt6-qtwebengine` en Fedora
+(45 trae la 6.11), `qt6-webengine` en Arch y, en el Flatpak, la base `io.qt.qtwebengine.BaseApp`, que ya
+va incluida. Donde falta el motor (Ubuntu 24.04, que trae Qt 6.4, demasiado antigua) el fondo se rechaza con
+el motivo en lugar de quedarse en blanco, en `reiwand-ctl` y en la app,
 con el texto en español, y la biblioteca avisa antes de aplicarlo: la ficha de la página lo marca
-con el motivo, sus detalles lo muestran y `reiwand-ctl lib show` da la línea `not shown here`. Meter WPE en el Flatpak exigiría compilar WPE WebKit 2.54 y sus dependencias
-en cada versión (horas y varios GiB de memoria), así que por ahora no está. `docs/specs/web.md` explica el
+con el motivo, sus detalles lo muestran y `reiwand-ctl lib show` da la línea `not shown here`.
+
+Qué instalar en cada sistema:
+
+- **Fedora Workstation, KDE Spin:** el paquete RPM lo recomienda y `dnf` lo instala solo; a mano:
+  `sudo dnf install qt6-qtwebengine`.
+- **Fedora atómico (Silverblue, Kinoite y derivadas):** `rpm-ostree install qt6-qtwebengine` y reiniciar
+  para estrenar el nuevo despliegue (`systemctl reboot`). Con la instalación sin root (`install.sh`) hace
+  falta igualmente, porque el motor no viene con el sistema base. Con el Flatpak no hace falta nada.
+- **Arch y derivadas:** `sudo pacman -S qt6-webengine`.
+- **Flatpak:** nada; el motor llega con la base de Qt WebEngine (unos 600 MB más al instalar) y la
+  página corre además dentro del aislamiento de Chromium de Flatpak.
+- **Ubuntu 24.04 y Debian 12:** no se pueden mostrar; el fondo se rechaza con el motivo.
+
+El motor pesa más que el WebView del teléfono: una página a 1080p gasta del orden de 400 MiB y de 1,5 a
+2 veces el procesador de lo que gastaba el motor anterior, y mientras una página no cambia no dibuja
+nada. El Qt WebEngine de Fedora usa el `libavcodec-free` del sistema, una compilación de ffmpeg "limitada en
+el número de códecs" (así la describe su paquete): se espera que no reproduzca H.264 ni AAC, aunque
+no lo hemos probado con un vídeo real en Fedora 45; VP8, VP9, Opus y Vorbis se esperan bien (AV1 sin probar). En Arch el motor usa el
+`ffmpeg` completo del sistema. `docs/specs/web.md` explica el
 motor, el aislamiento y la interfaz de la página, y `docs/crear/fondos-web.md` es la guía para quien
 los hace. El fundido hacia una página empieza cuando la página dibuja su primer fotograma (o falla),
 así que el fondo anterior no se funde en una pantalla vacía, y al salir de una página se funde desde
@@ -30,7 +49,7 @@ paquete en la app (*Privacidad*) o con
 deshace). *Borrar datos* en la app o `reiwand-ctl lib clear-data ELEMENTO` borra lo que guardó, y se
 borra solo al quitar el paquete. Si lo que guarda pasa del doble de lo que declara más 1 MiB, la
 página arranca sin guardar nada y su error lo dice hasta que se borren sus datos; en el escritorio
-eso se comprueba solo al arrancar la página, porque WPE WebKit no deja fijar un límite por origen.
+eso se comprueba solo al arrancar la página, porque el motor web no deja fijar un límite por origen.
 Los permisos de sonido, puntero y clics son los mismos que los de
 las escenas: los clics solo llegan desde clics reales en las pantallas donde los activas. Una página
 oculta deja de dibujar al momento y, tras 5 minutos oculta, se detiene su proceso y queda su último

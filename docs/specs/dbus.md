@@ -1164,7 +1164,7 @@ default a page sees all four, and `PackageInfo.exposes` lists what the package's
 `zone`, `language`, `gpu`, `storage` (only for pages that declare `web.storage_kib`) and `network`
 (only for pages that declare origins and hold the `network` grant of `Inputs1`), so that every
 client shows the same notice. `PackageInfo.flash_disabled` is `true` for a photosensitive package while `playback.allow_flashing` is off (`RepoPackage.flash_disabled` likewise, and `RepoPackage.asks` lists what the release asks for); `PackageInfo.unshown` is `null`, or, for a web page that this build or
-computer cannot show (no `reiwand-web` helper or no WPE WebKit 2.54 or newer), the same reason that
+computer cannot show (no `reiwand-web` helper or no Qt WebEngine 6.5 or newer), the same reason that
 applying it would return, so clients warn before it is applied. Every screen that shows a web page is configured again, and its page
 starts again with the new settings.
 
