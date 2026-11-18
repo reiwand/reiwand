@@ -41,7 +41,7 @@ QtObject {
             "name": "blink",
             "remove": true
         });
-        if (read(pointer) !== null)
+        if (read(pointer)?.length !== 0)
             throw new Error("clip events: the event was not removed");
         lane.destroy();
         line.destroy();

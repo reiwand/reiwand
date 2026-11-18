@@ -36,7 +36,7 @@ QtObject {
             throw new Error("touch: the overlay does not list the area: " + JSON.stringify(overlay.areas));
         overlay.destroy();
         panel.put("off", null);
-        if (page.editor.value(pointer + "/solid") !== "" && page.editor.value(pointer + "/solid") !== "null")
+        if (page.editor.value(pointer + "/solid") !== "false")
             throw new Error("touch: letting the pointer through left a solid");
         panel.destroy();
         page.run("remove_layer", {

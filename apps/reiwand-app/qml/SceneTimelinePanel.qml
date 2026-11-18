@@ -10,7 +10,7 @@ Kirigami.Dialog {
     required property var page
     property string pointer: ""
     readonly property var line: pointer ? (page.view, JSON.parse(page.editor.value(pointer) || "null")) : null
-    readonly property bool counted: line?.frames !== undefined
+    readonly property bool counted: (line?.frames ?? null) !== null
     readonly property real length: !line ? 0 : counted ? line.frames / Math.max(1, line.fps ?? 1) : (line.duration ?? 0)
     readonly property var cause: pointer ? (page.view, JSON.parse(page.editor.inspect(pointer) || "[]").find(f => f.key === "trigger") ?? {}) : ({})
     readonly property var triggers: cause.options ?? []

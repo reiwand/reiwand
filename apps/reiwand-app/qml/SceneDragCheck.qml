@@ -83,7 +83,8 @@ TestEvent {
             page.run("set", {
                 "pointer": at,
                 "value": {
-                    "scale": 1
+                    "scale": 1,
+                    "sort": true
                 }
             });
         const panel = made("SceneRigDepth.qml", {

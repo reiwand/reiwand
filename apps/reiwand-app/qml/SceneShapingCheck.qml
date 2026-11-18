@@ -29,10 +29,11 @@ QtObject {
             "value": {}
         });
         const glowing = page.view.history.done.length;
-        look.slid("bloom", "radius", 16, 16);
+        const radius = read("/scene/canvas/bloom/radius");
+        look.slid("bloom", "radius", radius, radius);
         look.slid("parallax", "amount", 1, 1);
-        if (page.view.history.done.length !== glowing || read("/scene/canvas/bloom/radius") !== null)
-            throw new Error("shaping: a click on a canvas slider that did not move it took an undo step");
+        if (page.view.history.done.length !== glowing || radius !== 0)
+            throw new Error("shaping: a click on a canvas slider that did not move it took an undo step " + page.view.history.done.length + "/" + glowing + JSON.stringify(look.bloom));
         if (glowing !== before)
             page.run("undo");
         look.destroy();

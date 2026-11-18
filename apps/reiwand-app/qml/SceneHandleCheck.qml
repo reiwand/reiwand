@@ -34,16 +34,20 @@ QtObject {
                 "strength": 6
             }
         ];
-        page.run("set", {
-            "pointer": layer + "/effects",
-            "value": [
-                {
-                    "effect": "fluid",
-                    "params": {
-                        "emitters": list
-                    }
+        page.run("manifest", {
+            "inputs": {
+                "inputs": ["pointer"],
+                "add": true
+            }
+        });
+        page.run("effects", {
+            "add": {
+                "layer": "smoke",
+                "effect": "fluid",
+                "params": {
+                    "emitters": list
                 }
-            ]
+            }
         });
         const canvas = made("SceneEmitters.qml", {
             "page": page,

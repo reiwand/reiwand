@@ -63,7 +63,7 @@ QtObject {
         lite.destroy();
         page.run("undo");
         form.load();
-        if (form.parsed.lighter !== undefined)
+        if ((form.parsed.lighter ?? null) !== null)
             throw new Error("shaders: undo kept the lighter variant");
         form.close();
         form.destroy();

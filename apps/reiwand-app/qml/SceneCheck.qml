@@ -78,17 +78,14 @@ QtObject {
                 "pointer": "/scene/layers/0/opacity/timeline",
                 "value": "intro"
             });
-            page.run("set", {
-                "pointer": "/scene/layers/0/effects",
-                "value": [
-                    {
-                        "effect": "vignette"
-                    },
-                    {
-                        "effect": "film_grain"
+            const first = JSON.parse(page.editor.value("/scene/layers"))[0].id;
+            for (const effect of ["vignette", "film_grain"])
+                page.run("effects", {
+                    "add": {
+                        "layer": first,
+                        "effect": effect
                     }
-                ]
-            });
+                });
             page.run("move", {
                 "from": "/scene/layers/0/effects/1",
                 "to": "/scene/layers/0/effects/0"

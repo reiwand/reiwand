@@ -7,7 +7,7 @@ QQC2.ToolButton {
 
     required property var page
     readonly property var size: page.view.canvas?.size ?? [1920, 1080]
-    readonly property bool fresh: page.editor.value("/scene/clock/seed") === "null"
+    readonly property bool fresh: JSON.parse(page.editor.value("/scene/clock") || "{}")?.seed === null
 
     function canvas(args) {
         page.run("canvas", args);

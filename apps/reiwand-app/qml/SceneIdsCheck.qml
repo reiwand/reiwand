@@ -77,7 +77,7 @@ QtObject {
                 "fresh": true
             }
         });
-        if (JSON.stringify(page.view.canvas?.size) !== JSON.stringify(phone.size) || !clock.fresh)
+        if (JSON.stringify(page.view.canvas?.size) !== JSON.stringify(phone.size) || read("/scene/clock/seed") !== null)
             throw new Error("ids: the canvas did not take a phone size and a fresh seed: " + page.editor.error);
         clock.destroy();
         while (page.view.history.done.length > steps)

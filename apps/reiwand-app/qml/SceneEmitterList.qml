@@ -82,11 +82,11 @@ ColumnLayout {
             required property int index
 
             QQC2.Label {
-                text: row.modelData.to !== undefined ? App.tr("Line %1", row.index + 1) : App.tr("Point %1", row.index + 1)
+                text: row.modelData.to != null ? App.tr("Line %1", row.index + 1) : App.tr("Point %1", row.index + 1)
             }
 
             Repeater {
-                model: ["from", "to"].filter(end => row.modelData[end] !== undefined)
+                model: ["from", "to"].filter(end => row.modelData[end] != null)
 
                 delegate: QQC2.TextField {
                     required property string modelData

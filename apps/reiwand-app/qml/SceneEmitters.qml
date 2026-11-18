@@ -23,12 +23,12 @@ Item {
         const out = [];
         lists.forEach((list, k) => {
             (list ?? []).forEach((m, i) => {
-                ["from", "to"].filter(end => m[end] !== undefined).forEach(end => out.push({
+                ["from", "to"].filter(end => m[end] != null).forEach(end => out.push({
                             "effect": k,
                             "index": i,
                             "end": end,
                             "at": m[end],
-                            "line": m.to !== undefined,
+                            "line": m.to != null,
                             "emitter": m
                         }));
             });
@@ -51,7 +51,7 @@ Item {
     function drawn(spot) {
         const m = spot.emitter, l = live && live.effect === spot.effect && live.index === spot.index ? live : null;
         const at = end => l?.end === end ? [l.x, l.y] : [m[end][0] * width, m[end][1] * height];
-        const from = at("from"), to = m.to === undefined ? null : at("to");
+        const from = at("from"), to = m.to == null ? null : at("to");
         if (l?.end === "tip")
             return Object.assign({
                 "from": from,

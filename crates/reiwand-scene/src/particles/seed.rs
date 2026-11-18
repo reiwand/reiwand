@@ -15,7 +15,9 @@ pub struct Hsv {
     pub hue: [f32; 2],
     #[schemars(extend("x-range" = [1, 360]))]
     pub steps: u32,
+    #[schemars(extend("default" = [1.0, 1.0]))]
     pub sat: [f32; 2],
+    #[schemars(extend("default" = [1.0, 1.0]))]
     pub val: [f32; 2],
 }
 

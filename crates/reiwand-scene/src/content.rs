@@ -21,7 +21,7 @@ pub struct Mask {
     pub channel: MaskChannel,
     pub invert: bool,
     pub feather: f32,
-    #[schemars(extend("x-range" = [0, 1]))]
+    #[schemars(extend("x-range" = [0, 1], "default" = 1.0))]
     pub strength: Value<f32>,
 }
 

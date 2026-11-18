@@ -13,7 +13,7 @@ ColumnLayout {
     readonly property int index: found && found[2] !== undefined ? Number(found[2]) : -1
     readonly property var mask: owner ? (page.view, JSON.parse(page.editor.value(found[1] + (index >= 0 ? "/effects/" + index : "") + "/mask") || "null")) : null
     readonly property var gizmo: owner ? (page.gizmos ?? []).find(g => g.pointer === found[1]) ?? null : null
-    readonly property string source: mask === null ? "" : typeof mask === "string" ? "texture" : ["texture", "layer", "shape"].find(k => mask[k] !== undefined) ?? ""
+    readonly property string source: mask === null ? "" : typeof mask === "string" ? "texture" : ["texture", "layer", "shape"].find(k => mask[k] !== undefined && mask[k] !== null) ?? ""
     readonly property string kind: source === "shape" ? Object.keys(mask.shape)[0] : ""
     readonly property var images: (page.view.assets ?? []).filter(a => a.kind === "image" || a.kind === "video").map(a => a.id)
     readonly property var others: (page.view.layers ?? []).filter(l => l.pointer !== (found ? found[1] : "") && l.type !== "sound").map(l => l.id)

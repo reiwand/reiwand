@@ -38,7 +38,7 @@ fn new_fields_refuse_values_outside_their_limits() {
         (vec![("/assets/serif/path", json!("fonts/serif.ttf"))], "/assets/serif/face does not fit"),
         (vec![("/assets/normals/fps", json!(10))], "/assets/normals/fps does not fit"),
         (
-            vec![("/assets/sky/path", json!("sky.ogg")), ("/assets/sky/filter", json!(null))],
+            vec![("/assets/sky/path", json!("sky.ogg"))],
             "/assets/sky/wrap does not fit",
         ),
         (vec![("/layers/0/brightness", json!(20))], "/layers/0/brightness is 20, expected 0..=16"),
