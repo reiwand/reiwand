@@ -130,7 +130,7 @@ fn removing_a_layer_keeps_keyframed_followers_in_place_and_names_the_bound_ones(
     act(&mut q, json!({"set": {"pointer": "/scene/layers/1/transform/position", "value": bound}})).unwrap();
     assert_eq!(query(&q)["layers"], json!(["kid"]));
     act(&mut q, json!({"remove_layer": {"id": "base"}})).unwrap();
-    assert_eq!(at(&q, "/scene/layers/0/transform/position"), bound);
+    crate::whole::holds(&at(&q, "/scene/layers/0/transform/position"), bound);
 }
 
 #[test]
