@@ -90,7 +90,7 @@ fn scripts_are_imported_with_what_they_declare() {
         export function update() {}"#;
     std::fs::write(dir.join("bars.js"), module).unwrap();
     ok(dir, &["scene", "act", "snow", "import_script", &script(dir, "bars.js")]);
-    let entry = json!({ "path": "scripts/bars.js", "events": ["init", "update", "click"], "uses": ["audio", "timers", "layers", "sounds", "math"] });
+    let entry = json!({ "path": "scripts/bars.js", "events": ["init", "update", "click"], "uses": ["audio", "timers", "layers", "sounds", "math"], "params": {} });
     assert_eq!(show(dir, "/scene/scripts"), json!([entry]));
     assert!(dir.join("snow/scripts/bars.js").is_file());
     std::fs::write(dir.join("big.js"), " ".repeat((1 << 20) + 1)).unwrap();

@@ -113,6 +113,8 @@ Packages
   ct-codecs 1.1.8
   ctutils 0.4.3
   cursor-icon 1.2.0
+  curve25519-dalek 5.0.0
+  curve25519-dalek-derive 0.1.1
   cxx 1.0.205
   cxx-build 1.0.205
   cxx-gen 0.7.205
@@ -157,6 +159,7 @@ Packages
   fallible-streaming-iterator 0.1.9
   fastrand 2.5.0
   fdeflate 0.3.7
+  fiat-crypto 0.3.0
   filetime 0.2.29
   find-msvc-tools 0.1.15
   flate2 1.1.10
@@ -214,7 +217,10 @@ Packages
   heck 0.5.0
   hermit-abi 0.5.3
   hex 0.4.3
+  hkdf 0.13.0
   hmac 0.12.1
+  hmac 0.13.0
+  hpke 0.14.1
   http 1.5.0
   http-body 1.1.0
   http-body-util 0.1.5
@@ -618,6 +624,7 @@ Packages
   wyz 0.5.1
   x11rb 0.14.0
   x11rb-protocol 0.14.0
+  x25519-dalek 3.0.0
   x509-parser 0.18.1
   xcursor 0.3.11
   xkeysym 0.2.1
@@ -1496,6 +1503,7 @@ Used by:
       Copyright (c) 2025-2026 The RustCrypto Project Developers
   cursor-icon 1.2.0
       Copyright (c) 2023 Kirill Chibisov
+  curve25519-dalek-derive 0.1.1
   cxx 1.0.205
   cxx-build 1.0.205
   cxx-gen 0.7.205
@@ -1623,7 +1631,12 @@ Used by:
   hex 0.4.3
       Copyright (c) 2013-2014 The Rust Project Developers.
       Copyright (c) 2015-2020 The rust-hex Developers
+  hkdf 0.13.0
+      Copyright (c) 2015-2018 Vlad Filippov
+      Copyright (c) 2018-2021 RustCrypto Developers
   hmac 0.12.1
+      Copyright (c) 2017 Artyom Pavlov
+  hmac 0.13.0
       Copyright (c) 2017 Artyom Pavlov
   http 1.5.0
       Copyright (c) 2017 http-rs authors
@@ -2349,6 +2362,11 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright 2023 Kirill Chibisov
+  curve25519-dalek-derive 0.1.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
   cxx-qt 0.10.0
   cxx-qt-build 0.10.0
   cxx-qt-gen 0.10.0
@@ -2595,7 +2613,17 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  hkdf 0.13.0
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
   hmac 0.12.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
+  hmac 0.13.0
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
@@ -3698,6 +3726,8 @@ Used by:
   data-encoding 2.11.1
       Copyright (c) 2015-2020 Julien Cretin
       Copyright (c) 2017-2020 Google Inc.
+  fiat-crypto 0.3.0
+      Copyright (c) 2015-2020 the fiat-crypto authors (see the AUTHORS file).
   fontdb 0.24.0
       Copyright (c) 2020 Yevhenii Reizner
   g2gen 1.2.2
@@ -3710,6 +3740,8 @@ Used by:
       Copyright (c) 2015 Bartłomiej Kamiński
   gif 0.14.2
       Copyright (c) 2015 nwin
+  hpke 0.14.1
+      Copyright (c) 2020 Michael Rosenberg
   jiff 0.2.38
       Copyright (c) 2015 Andrew Gallant
   jiff-core 0.1.1
@@ -6025,6 +6057,53 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ========================================================================
 Used by:
+  curve25519-dalek 5.0.0
+      Copyright (c) 2016-2021 isis agora lovecruft. All rights reserved.
+      Copyright (c) 2016-2021 Henry de Valence. All rights reserved.
+  encoding_rs 0.8.42
+      Copyright © WHATWG (Apple, Google, Mozilla, Microsoft).
+  lebe 0.5.3
+      Copyright (c) 2022 Contributors to the lebe Project. All rights reserved.
+  moxcms 0.8.1
+      Copyright (c) Radzivon Bartoshyk. All rights reserved.
+  pxfm 0.1.30
+      Copyright (c) Radzivon Bartoshyk. All rights reserved.
+  subtle 2.6.1
+      Copyright (c) 2016-2017 Isis Agora Lovecruft, Henry de Valence. All rights reserved.
+      Copyright (c) 2016-2024 Isis Agora Lovecruft. All rights reserved.
+  x25519-dalek 3.0.0
+      Copyright (c) 2017-2021 isis agora lovecruft. All rights reserved.
+      Copyright (c) 2019-2021 DebugSteven. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+1. Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+========================================================================
+Used by:
   dirs 7.0.0
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -6230,45 +6309,6 @@ designated (see the individual files for PD/CC0-dedicated sections).
 
 ========================================================================
 Used by:
-  encoding_rs 0.8.42
-      Copyright © WHATWG (Apple, Google, Mozilla, Microsoft).
-  lebe 0.5.3
-      Copyright (c) 2022 Contributors to the lebe Project. All rights reserved.
-  moxcms 0.8.1
-      Copyright (c) Radzivon Bartoshyk. All rights reserved.
-  pxfm 0.1.30
-      Copyright (c) Radzivon Bartoshyk. All rights reserved.
-  subtle 2.6.1
-      Copyright (c) 2016-2017 Isis Agora Lovecruft, Henry de Valence. All rights reserved.
-      Copyright (c) 2016-2024 Isis Agora Lovecruft. All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-========================================================================
-Used by:
   exr 1.74.2
       Copyright (c) Contributors to the OpenEXR Project. All rights reserved.
       Copyright (c) Contributors to the exrs Project. All rights reserved.
@@ -6304,6 +6344,66 @@ Redistribution and use in source and binary forms, with or without modification,
 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+========================================================================
+Used by:
+  fiat-crypto 0.3.0
+
+SPDX-License-Identifier: MIT OR Apache-2.0 OR BSD-1-Clause
+
+Fiat Cryptography is licensed under the MIT License <LICENSE-MIT> or
+<http://opensource.org/licenses/MIT>, the Apache License, Version 2.0
+<LICENSE-APACHE> or <http://www.apache.org/licenses/LICENSE-2.0>, or
+the BSD 1-Clause License <LICENSE-BSD-1> or
+<https://spdx.org/licenses/BSD-1-Clause.html>, at your option.
+
+========================================================================
+Used by:
+  fiat-crypto 0.3.0
+      Copyright 2015-2020 the fiat-crypto authors (see the AUTHORS file)
+
+The Apache License, Version 2.0 (Apache-2.0)
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+========================================================================
+Used by:
+  fiat-crypto 0.3.0
+      Copyright (c) 2015-2020 the fiat-crypto authors (see the AUTHORS file)
+
+The BSD 1-Clause License (BSD-1-Clause)
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    1. Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+
+THIS SOFTWARE IS PROVIDED BY the fiat-crypto authors "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Berkeley Software Design,
+Inc. BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================
 Used by:
@@ -6850,6 +6950,21 @@ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
+
+========================================================================
+Used by:
+  hpke 0.14.1
+      Copyright 2020 Michael Rosenberg
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+compliance with the License. You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is
+distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied. See the License for the specific language governing permissions and limitations under the
+License.
 
 ========================================================================
 Used by:

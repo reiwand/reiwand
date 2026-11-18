@@ -4768,6 +4768,7 @@ dependencies = [
  "reiwand-schedule",
  "reiwand-script",
  "reiwand-type",
+ "reiwand-upgrade",
  "reiwand-video",
  "reiwand-wayland",
  "reiwand-web",
