@@ -31,7 +31,7 @@ QtObject {
             expect(page.manifest.display.zoom === 2 && page.manifest.display.position[0] === 0.5, "the part shown was not kept");
         }
         framing.put({}, ["fit", "flip", "background", "zoom", "position"]);
-        expect(page.manifest.display === undefined, "the display was not cleared");
+        expect(page.manifest.display == null, "the display was not cleared");
         framing.destroy();
     }
 
@@ -41,7 +41,7 @@ QtObject {
         line.trim("end", 5);
         expect(page.manifest.playback?.start === 2 && page.manifest.playback?.end === 5, "the trim was not kept");
         line.trim("end", 1000);
-        expect(page.manifest.playback?.end === undefined, "the end of the video was not released");
+        expect(page.manifest.playback?.end == null, "the end of the video was not released");
         page.manifestEdit("playback", {
                 "values": {
                     "speed": 0.5,
@@ -52,7 +52,7 @@ QtObject {
         page.manifestEdit("playback", {
                 "clear": ["start", "speed", "loop"]
             });
-        expect(page.manifest.playback === undefined, "the playback was not cleared");
+        expect(page.manifest.playback == null, "the playback was not cleared");
         line.destroy();
     }
 

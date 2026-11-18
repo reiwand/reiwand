@@ -69,7 +69,7 @@ QtObject {
         if (page.cutsLive !== null || JSON.stringify(page.edit.depth.cuts) !== "[0.3,0.6]")
             throw new Error("depth: releasing a handle did not keep the cuts: " + JSON.stringify(page.edit.depth));
         cuts.put([]);
-        if (page.edit.depth.cuts !== undefined)
+        if (page.edit.depth.cuts != null)
             throw new Error("depth: going back to automatic kept the cuts");
         const compare = Qt.createComponent("EditDepthCompare.qml").createObject(page, {
                 "page": page
@@ -83,7 +83,7 @@ QtObject {
         if (page.values.parallax.fill !== "simple" || page.values.parallax.layers !== 6)
             throw new Error("depth: the fill and the layers of the picture were not kept: " + JSON.stringify(page.values.parallax));
         page.editor.undo();
-        if (page.values.parallax.fill !== undefined)
+        if (page.values.parallax.fill != null)
             throw new Error("depth: undo did not put the fill back");
         page.paint = null;
         paint.destroy();

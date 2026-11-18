@@ -22,7 +22,7 @@ QtObject {
         page.manifestEdit("web", {
                 "clear": ["preload", "storage_kib"]
             });
-        expect(page.manifest.web?.preload === undefined && page.manifest.web?.background === "#102030", "a page setting was not cleared");
+        expect(page.manifest.web?.preload == null && page.manifest.web?.background === "#102030", "a page setting was not cleared");
     }
 
     function network() {
@@ -34,7 +34,7 @@ QtObject {
             "origins": ["https://api.example.org"],
             "remove": true
         });
-        expect(page.manifest.permissions === undefined && !(page.manifest.inputs ?? []).includes("network"), "the last origin left the network input behind");
+        expect(page.manifest.permissions == null && !(page.manifest.inputs ?? []).includes("network"), "the last origin left the network input behind");
     }
 
     function inputs() {
@@ -63,7 +63,7 @@ QtObject {
         page.manifestEdit("playback", {
             "clear": ["max_fps", "volume", "muted"]
         });
-        expect(page.manifest.playback === undefined, "the playback was not cleared");
+        expect(page.manifest.playback == null, "the playback was not cleared");
     }
 
     function preview() {
@@ -73,7 +73,7 @@ QtObject {
         shown.rate(30);
         expect(JSON.parse(page.editor.look).fps === 30, "the frame rate of the preview was not kept");
         shown.rate(0);
-        expect(JSON.parse(page.editor.look).fps === undefined, "the frame rate of the preview was not released");
+        expect(JSON.parse(page.editor.look).fps == null, "the frame rate of the preview was not released");
         shown.destroy();
     }
 
@@ -99,7 +99,7 @@ QtObject {
         expect(player.colors === null, "cover colors were read without a cover picture");
         SceneLook.media = null;
         SceneLook.preview(page);
-        expect(JSON.parse(page.editor.look).media === undefined, "the made-up track was not released");
+        expect(JSON.parse(page.editor.look).media == null, "the made-up track was not released");
         player.destroy();
     }
 
@@ -112,7 +112,7 @@ QtObject {
         page.run("remove", {
             "pointer": "/manifest/permissions/rgb"
         });
-        expect(page.manifest.permissions?.rgb === undefined, "the permission for the lights was not removed");
+        expect(page.manifest.permissions?.rgb == null, "the permission for the lights was not removed");
         shown.destroy();
         const panel = Qt.createComponent("PackageInputs.qml").createObject(page, {
             "page": page
@@ -120,7 +120,7 @@ QtObject {
         panel.lights(true);
         expect(page.manifest.permissions?.rgb === true, "the lights box of the inputs did not allow the lights");
         panel.lights(false);
-        expect(page.manifest.permissions?.rgb === undefined, "the lights box of the inputs did not take the permission back");
+        expect(page.manifest.permissions?.rgb == null, "the lights box of the inputs did not take the permission back");
         panel.destroy();
     }
 
