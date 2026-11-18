@@ -37,6 +37,7 @@ fn main() {
         return eprintln!("skipping the regression net: scripts/regression.sh runs it with its own build");
     }
     let Some(r) = renderer() else { return };
+    reiwand_render::set_step_budget(None);
     let mut net = Net::new(r.adapter());
     scenes::check(r, &mut net);
     kinds::check(r, &mut net);
