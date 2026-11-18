@@ -38,9 +38,17 @@ pub(super) fn follows(def: &str, name: &str, map: &Map<String, Value>) -> Option
         ("Playback", "end") => json!("end"),
         ("Layer", "size") if matches!(kind, "image" | "video") => json!("source"),
         ("Layer", "size") if matches!(kind, "solid" | "adjustment" | "mesh" | "model") => json!("canvas"),
-        ("Layer", "color") if matches!(kind, "group" | "image" | "video" | "particles" | "text" | "spectrum") => {
+        ("Layer", "color")
+            if matches!(kind, "group" | "image" | "video" | "particles" | "text" | "spectrum" | "mesh") =>
+        {
             json!("#ffffff")
         }
+        ("Mask", "channel") => {
+            json!(if map.get("texture").is_some_and(|t| !t.is_null()) { "luminance" } else { "a" })
+        }
+        ("Mask", "strength") => json!(1),
+        ("Shake", "enabled") => json!(true),
+        ("Shake", "roughness") => json!(0.5),
         ("Layer", "space") if kind == "group" => json!("2d"),
         ("Layer", "cone") if kind == "light" => json!([30, 60]),
         ("Layer", "length") if kind == "light" => json!(256),
