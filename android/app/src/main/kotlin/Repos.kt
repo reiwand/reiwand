@@ -27,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -118,7 +119,16 @@ private fun Explore(main: Main, run: Run, examples: Set<String>, close: () -> Un
                                 }
                             },
                             trailingContent = {
-                                if (item.optBoolean("installed")) Text(stringResource(R.string.repo_installed))
+                                if (item.optBoolean("installed")) Column(horizontalAlignment = Alignment.End) {
+                                    Text(stringResource(R.string.repo_installed))
+                                    WordAction({
+                                        run("") {
+                                            account("uninstall", "repo_id" to item.getString("repo_id"), "id" to item.getString("id"))
+                                            installed++
+                                            main.changed()
+                                        }
+                                    }, Modifier.testTag("uninstall")) { Text(stringResource(R.string.repo_uninstall)) }
+                                }
                                 else WordAction(enabled = !Net.cut.value || item.getString("repo_id") in examples, onClick = {
                                     run("") {
                                         main.complete(account("install", "repo_id" to item.getString("repo_id"), "id" to item.getString("id")))

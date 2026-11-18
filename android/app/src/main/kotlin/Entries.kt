@@ -106,6 +106,11 @@ fun Entries(main: Main, uid: String, open: (String) -> Unit, close: () -> Unit) 
                     save("interval", value)
                 }
             }
+            SheetOption(stringResource(R.string.every_custom), Modifier.testTag("every_custom"), chosen = INTERVALS.none { it.first == rules.optString("interval") }) { sheet = CUSTOM }
+        }
+        sheet == CUSTOM -> NameSheet(stringResource(R.string.every_custom), stringResource(R.string.every_minutes), customMinutes(rules.optString("interval")), stringResource(R.string.save), { sheet = null }) { text ->
+            sheet = null
+            customInterval(text)?.let { save("interval", it) } ?: main.toast(main.getString(R.string.every_invalid))
         }
         sheet == DELETE -> Question(
             stringResource(R.string.list_delete_ask, current.name), stringResource(R.string.list_delete_note),
@@ -122,6 +127,7 @@ fun Entries(main: Main, uid: String, open: (String) -> Unit, close: () -> Unit) 
 
 private const val NAME = "name"
 private const val EVERY = "every"
+private const val CUSTOM = "custom"
 private const val DELETE = "delete"
 
 private fun take(main: Main, playlist: String, item: String) = main.act { ask("take", "playlist" to playlist, "items" to listOf(item)) }
