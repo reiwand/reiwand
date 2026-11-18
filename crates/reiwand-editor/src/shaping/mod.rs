@@ -48,7 +48,7 @@ pub(crate) fn checked(dir: Option<&Path>, doc: &Value, ops: Vec<Op>) -> Result<V
 
 fn probed(dir: Option<&Path>, doc: &Value, ops: Vec<Op>) -> Result<Vec<Op>> {
     let mut probe = doc.clone();
-    let mut ops = ops;
+    let mut ops = crate::completing::complete_all(doc, ops);
     apply(&mut probe, &ops)?;
     let filled = crate::completing::ops(&probe);
     apply(&mut probe, &filled)?;

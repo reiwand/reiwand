@@ -165,7 +165,7 @@ pub(crate) fn reads(doc: &Value) -> bool {
 fn fits(doc: &Value, e: &KeyframeEdit, ops: &[Op]) -> Result<()> {
     let Some(value) = &e.value else { return Ok(()) };
     let mut staged = doc.clone();
-    crate::ops::apply(&mut staged, ops)?;
+    crate::ops::apply(&mut staged, &crate::completing::complete_all(doc, ops.to_vec()))?;
     if reads(&staged) || !reads(doc) {
         return Ok(());
     }

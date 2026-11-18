@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use image::{ImageFormat, RgbImage};
 use reiwand_editor::starters::starter;
 use reiwand_editor::{Project, package, stock};
@@ -15,7 +17,7 @@ fn state() {
 }
 
 fn act(project: &mut Project, action: Value) -> anyhow::Result<()> {
-    project.act(&serde_json::from_value(action)?).map(drop)
+    project.act(&serde_json::from_value(whole::action(project, action))?).map(drop)
 }
 
 #[test]

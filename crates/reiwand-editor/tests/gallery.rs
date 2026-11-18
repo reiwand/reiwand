@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use reiwand_editor::Project;
 use reiwand_editor::actions::Action;
 use reiwand_editor::inspect::fields;
@@ -11,7 +13,7 @@ use tempfile::TempDir;
 const FILM: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../../tests/fixtures/magenta-64x32.webm");
 
 fn act(p: &mut Project, action: Value) -> anyhow::Result<()> {
-    let action = serde_json::from_value::<Action>(action).unwrap();
+    let action = serde_json::from_value::<Action>(whole::action(p, action)).unwrap();
     assert!(reiwand_editor::ACTIONS.contains(&action.name().as_str()));
     p.act(&action).map(drop)
 }

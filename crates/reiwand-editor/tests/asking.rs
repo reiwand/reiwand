@@ -1,3 +1,5 @@
+#[path = "support/whole.rs"]
+mod whole;
 use reiwand_editor::actions::Action;
 use reiwand_editor::starters::starter;
 use reiwand_editor::{Project, manual};
@@ -32,7 +34,7 @@ const ANSWERED: [&str; 25] = [
 ];
 
 fn act(project: &mut Project, action: Value) {
-    project.act(&serde_json::from_value::<Action>(action).unwrap()).unwrap();
+    project.act(&serde_json::from_value::<Action>(whole::action(project, action)).unwrap()).unwrap();
 }
 
 #[test]

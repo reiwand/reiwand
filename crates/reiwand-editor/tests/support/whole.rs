@@ -5,22 +5,30 @@ use reiwand_editor::ops::Op;
 use serde_json::Value;
 
 pub fn at(project: &Project, pointer: &str, value: &Value) -> Value {
+    at_doc(&project.doc, pointer, value)
+}
+
+pub fn at_doc(doc: &Value, pointer: &str, value: &Value) -> Value {
     if !pointer.starts_with("/scene") {
         return value.clone();
     }
     let landing = match pointer.rsplit_once('/') {
         Some((parent, "-")) => {
-            format!("{parent}/{}", project.doc.pointer(parent).and_then(Value::as_array).map_or(0, Vec::len))
+            format!("{parent}/{}", doc.pointer(parent).and_then(Value::as_array).map_or(0, Vec::len))
         }
         _ => pointer.to_owned(),
     };
-    match complete(&project.doc, Op::Replace { path: landing, value: value.clone() }) {
+    match complete(doc, Op::Replace { path: landing, value: value.clone() }) {
         Op::Replace { value, .. } => value,
         _ => value.clone(),
     }
 }
 
 pub fn action(project: &Project, action: Value) -> Value {
+    action_doc(&project.doc, action)
+}
+
+pub fn action_doc(doc: &Value, action: Value) -> Value {
     let mut action = action;
     for verb in ["set", "add"] {
         let Some(body) = action.get_mut(verb) else { continue };
@@ -28,7 +36,7 @@ pub fn action(project: &Project, action: Value) -> Value {
         else {
             continue;
         };
-        let filled = at(project, pointer, value);
+        let filled = at_doc(doc, pointer, value);
         body["value"] = filled;
     }
     action

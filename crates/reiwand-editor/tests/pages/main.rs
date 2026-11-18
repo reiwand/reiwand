@@ -5,6 +5,8 @@ mod palette;
 mod settings;
 mod shots;
 mod web;
+#[path = "../support/whole.rs"]
+mod whole;
 
 use reiwand_editor::Project;
 use reiwand_editor::actions::Action;
@@ -29,7 +31,7 @@ pub fn page(root: &Path) -> Project {
 }
 
 pub fn act(project: &mut Project, action: Value) -> anyhow::Result<()> {
-    project.act(&serde_json::from_value::<Action>(action).unwrap()).map(drop)
+    project.act(&serde_json::from_value::<Action>(whole::action(project, action)).unwrap()).map(drop)
 }
 
 pub fn manifest(project: &mut Project, edit: Value) -> anyhow::Result<()> {

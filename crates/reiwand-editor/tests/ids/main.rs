@@ -1,3 +1,5 @@
+#[path = "../support/whole.rs"]
+mod whole;
 use reiwand_editor::Project;
 use reiwand_editor::actions::Action;
 use reiwand_editor::starters::starter;
@@ -19,7 +21,7 @@ fn state() {
 }
 
 pub fn act(project: &mut Project, action: Value) -> anyhow::Result<()> {
-    let action = serde_json::from_value::<Action>(action).unwrap();
+    let action = serde_json::from_value::<Action>(whole::action(project, action)).unwrap();
     assert!(reiwand_editor::ACTIONS.contains(&action.name().as_str()), "{}", action.name());
     project.act(&action).map(drop)
 }
