@@ -314,7 +314,7 @@ jobs:
 
       - name: End-to-end test (D-Bus + PipeWire + daemon)
         run: |
-          cargo build --locked -p reiwandd -p reiwand-ctl -p reiwand-web
+          cargo build --locked -p reiwandd -p reiwand-ctl -p reiwand-web -p reiwand-upgrade
           cargo build --locked -p reiwand-pipewire --example probe
           cargo build --locked -p reiwandd --examples
           cp target/debug/examples/probe target/debug/probe
@@ -358,7 +358,7 @@ jobs:
 
       - name: Daemon, helper and test binaries
         run: |
-          cargo build --locked -p reiwandd -p reiwand-ctl -p reiwand-web
+          cargo build --locked -p reiwandd -p reiwand-ctl -p reiwand-web -p reiwand-upgrade
           cargo build --locked -p reiwand-pipewire --example probe
           page=$(cargo test --locked -p reiwand-web --test page --no-run --message-format=json |
             jq -r 'select(.executable != null and .target.name == "page") | .executable')
@@ -424,7 +424,7 @@ jobs:
 
       - name: Layer-shell surfaces on a headless Sway
         run: |
-          cargo build --locked -p reiwandd -p reiwand-ctl --bins --example pointer
+          cargo build --locked -p reiwandd -p reiwand-ctl -p reiwand-upgrade --bins --example pointer
           scripts/sway-test.sh target/debug
 
   x11:
@@ -457,7 +457,7 @@ jobs:
 
       - name: Desktop windows on Xvfb
         run: |
-          cargo build --locked -p reiwandd -p reiwand-ctl
+          cargo build --locked -p reiwandd -p reiwand-ctl -p reiwand-upgrade
           scripts/x11-test.sh target/debug
 
   build:
