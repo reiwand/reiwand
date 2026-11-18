@@ -168,7 +168,8 @@ state.tick = () => {
     now.lines = lines;
     now.saved = saved;
     const changed = Object.fromEntries([...dirty].map((k) => [k, made[k]()]));
-    if (touched.size && !dirty.has("layers")) changed.layer_edits = Object.fromEntries([...touched].map((id) => [id, layerOf(id)]));
+    const edited = dirty.has("layers") ? [] : [...touched];
+    changed.layer_edits = Object.fromEntries(edited.map((id) => [id, layerOf(id)]));
     [dirty, touched].forEach((set) => set.clear());
     return changed;
 };
