@@ -25,7 +25,7 @@ fn layers_follow_bones_and_points_placed_on_the_mesh() {
         .unwrap();
     assert_eq!(
         pin(&p),
-        json!({ "layer": "net", "bone": "arm", "offset": [5.0, 0.0], "inherit": ["position"] })
+        json!({ "layer": "net", "bone": "arm", "point": null, "offset": [5.0, 0.0], "inherit": ["position"] })
     );
     act(&mut p, attach(json!({ "point": [0.3, 0.5] }))).unwrap();
     assert_eq!(

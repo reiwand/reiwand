@@ -24,10 +24,13 @@ fn parts_are_ordered_hidden_and_shown_only_over_others() {
     .unwrap();
     assert_eq!(
         shown(&p),
-        json!({ "chest": { "order": -2.0, "clip_to": "legs" }, "legs": { "order": 1.0, "visible": false } })
+        json!({ "chest": { "order": -2.0, "clip_to": "legs", "visible": null }, "legs": { "order": 1.0, "visible": false, "clip_to": null } })
     );
     act(&mut p, edit(json!({ "show": ["legs"], "unclip": ["chest"] }))).unwrap();
-    assert_eq!(shown(&p), json!({ "chest": { "order": -2.0 }, "legs": { "order": 1.0 } }));
+    assert_eq!(
+        shown(&p),
+        json!({ "chest": { "order": -2.0, "clip_to": null, "visible": null }, "legs": { "order": 1.0, "clip_to": null, "visible": null } })
+    );
     act(&mut p, json!({ "undo": {} })).unwrap();
     assert_eq!(shown(&p)["chest"]["clip_to"], json!("legs"));
     for bad in [
@@ -61,11 +64,11 @@ fn depth_is_turned_on_tuned_and_off_with_its_back_to_front_order() {
     let mut p = parts(&root);
     let depth = |p: &Project| p.doc["scene"]["layers"][0]["depth"].clone();
     act(&mut p, edit(json!({ "depth": { "scale": 2, "cull": true } }))).unwrap();
-    assert_eq!(depth(&p), json!({ "scale": 2.0, "cull": true }));
+    assert_eq!(depth(&p), json!({ "scale": 2.0, "cull": true, "sort": false }));
     act(&mut p, edit(json!({ "depth": { "sort": false }, "order": { "legs": 3 } }))).unwrap();
     assert_eq!((depth(&p)["sort"].clone(), shown(&p)["legs"]["order"].clone()), (json!(false), json!(3.0)));
     act(&mut p, edit(json!({ "depth": { "sort": true } }))).unwrap();
-    assert!(depth(&p).get("sort").is_none(), "on is the default: {}", depth(&p));
+    assert_eq!(depth(&p)["sort"], true);
     for bad in [
         json!({ "depth": { "scale": 11 } }),
         json!({ "depth": { "scale": -1 } }),

@@ -44,8 +44,8 @@ fn handles_bend_one_channel_and_travel_with_the_key() {
     let (_root, mut p) = keyed();
     act(&mut p, key(0.0, json!({ "rotation": 0, "out_handle": [0.5, 60] }))).unwrap();
     act(&mut p, key(2.0, json!({ "rotation": 40, "in_handle": [0.5, -20] }))).unwrap();
-    assert_eq!(rotation(&p)[0], json!([0.0, 0.0, { "out": [0.5, 60.0] }]));
-    assert_eq!(rotation(&p)[1], json!([2.0, 40.0, { "in": [0.5, -20.0] }]));
+    assert_eq!(rotation(&p)[0], json!([0.0, 0.0, { "in": null, "out": [0.5, 60.0] }]));
+    assert_eq!(rotation(&p)[1], json!([2.0, 40.0, { "in": [0.5, -20.0], "out": null }]));
     act(&mut p, key(3.0, json!({ "rotation": 10 }))).unwrap();
     act(&mut p, key(2.0, json!({ "rotation": 40, "out_handle": [1.0, 5] }))).unwrap();
     assert_eq!(rotation(&p)[1][2], json!({ "in": [0.5, -20.0], "out": [1.0, 5.0] }));
