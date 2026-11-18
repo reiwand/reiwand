@@ -3,6 +3,7 @@ mod loose;
 mod omit;
 mod pad;
 mod read;
+mod sample;
 mod scan;
 mod schema;
 pub mod walk;

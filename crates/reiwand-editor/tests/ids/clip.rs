@@ -23,7 +23,11 @@ fn layers_copied_from_one_scene_paste_into_another_with_their_files() {
     let layers = at(&to, "/scene/layers");
     let ids: Vec<&str> = layers.as_array().unwrap().iter().map(|l| l["id"].as_str().unwrap()).collect();
     assert_eq!(ids, ["lead", "kid", "box"]);
-    assert!(crate::whole::unset(&layers[1]["parent"]) && crate::whole::unset(&layers[1]["mask"]), "{}", layers[1]);
+    assert!(
+        crate::whole::unset(&layers[1]["parent"]) && crate::whole::unset(&layers[1]["mask"]),
+        "{}",
+        layers[1]
+    );
     let inside = &layers[2]["layers"];
     assert_eq!(inside[0]["id"], "lead_2");
     assert_eq!(inside[1]["parent"], "lead_2");

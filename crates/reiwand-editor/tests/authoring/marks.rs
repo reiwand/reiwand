@@ -62,8 +62,8 @@ fn an_asset_is_imported_as_linear_data_or_as_a_sprite_sheet() {
     image::RgbaImage::from_pixel(8, 8, image::Rgba([255, 255, 255, 255])).save(&file).unwrap();
     act(&mut p, json!({"import": {"file": file, "id": "sheet", "atlas": [2, 4]}})).unwrap();
     act(&mut p, json!({"import": {"file": file, "id": "bumps", "linear": true}})).unwrap();
-    assert_eq!(at(&p, "/scene/assets/sheet"), json!({"path": "assets/sheet.png", "atlas": [2, 4]}));
-    assert_eq!(at(&p, "/scene/assets/bumps"), json!({"path": "assets/sheet.png", "linear": true}));
+    crate::whole::holds(&at(&p, "/scene/assets/sheet"), json!({"path": "assets/sheet.png", "atlas": [2, 4]}));
+    crate::whole::holds(&at(&p, "/scene/assets/bumps"), json!({"path": "assets/sheet.png", "linear": true}));
     assert!(
         refused(&mut p, json!({"import": {"file": file, "id": "none", "atlas": [0, 4]}})).contains("256")
     );

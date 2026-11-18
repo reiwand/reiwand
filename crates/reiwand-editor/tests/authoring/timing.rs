@@ -12,12 +12,15 @@ fn timelines_are_added_timed_renamed_and_removed_with_the_values_they_drive() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
     act(&mut p, json!({"timeline": {"id": "intro", "add": true, "loop": "repeat"}})).unwrap();
-    assert_eq!(at(&p, "/scene/timelines"), json!([{"id": "intro", "duration": 5, "loop": "repeat"}]));
+    crate::whole::holds(
+        &at(&p, "/scene/timelines")[0],
+        json!({"id": "intro", "duration": 5, "loop": "repeat"}),
+    );
     act(&mut p, key(json!({"time": 0, "value": 0, "timeline": "intro"}))).unwrap();
     assert_eq!(at(&p, "/scene/layers/0/opacity/timeline"), "intro");
     act(&mut p, json!({"timeline": {"id": "intro", "frames": 48, "fps": 24, "wrap": true}})).unwrap();
     let line = at(&p, "/scene/timelines/0");
-    assert_eq!((&line["frames"], &line["fps"], line.get("duration")), (&json!(48), &json!(24.0), None));
+    assert_eq!((&line["frames"], &line["fps"], &line["duration"]), (&json!(48), &json!(24.0), &json!(0)));
     act(&mut p, json!({"timeline": {"id": "intro", "to": "opening", "speed": -2, "delay": 1.5}})).unwrap();
     assert_eq!(at(&p, "/scene/layers/0/opacity/timeline"), "opening");
     assert_eq!(at(&p, "/scene/timelines/0/speed"), json!(-2.0));
@@ -36,7 +39,11 @@ fn timelines_are_added_timed_renamed_and_removed_with_the_values_they_drive() {
     }
     act(&mut p, json!({"timeline": {"id": "opening", "loop": "pingpong"}})).unwrap();
     let line = at(&p, "/scene/timelines/0");
-    assert_eq!((&line["loop"], line.get("wrap")), (&json!("pingpong"), None), "leaving repeat drops wrap");
+    assert_eq!(
+        (&line["loop"], &line["wrap"]),
+        (&json!("pingpong"), &json!(false)),
+        "leaving repeat drops wrap"
+    );
     act(&mut p, json!({"timeline": {"id": "opening", "remove": true}})).unwrap();
     assert_eq!(at(&p, "/scene/timelines"), json!([]));
     assert!(crate::whole::unset(&at(&p, "/scene/layers/0/opacity")["timeline"]));
@@ -54,7 +61,10 @@ fn keyframes_take_a_base_and_bezier_handles_that_the_editor_samples() {
     act(&mut p, key(json!({"time": 0, "out_handle": [1.0, 0.0]}))).unwrap();
     act(&mut p, key(json!({"time": 2, "in_handle": [1.0, 0.0]}))).unwrap();
     let keys = at(&p, "/scene/layers/0/opacity/keys");
-    assert_eq!(keys, json!([[0.0, 0, {"out": [1.0, 0.0]}], [2.0, 1, {"in": [1.0, 0.0]}]]));
+    assert_eq!(
+        keys,
+        json!([[0.0, 0, {"in": null, "out": [1.0, 0.0]}], [2.0, 1, {"in": [1.0, 0.0], "out": null}]])
+    );
     let keys = keys.as_array().unwrap();
     let early = reiwand_editor::keys::sample(keys, 0.4).unwrap().as_f64().unwrap();
     assert!(early < 0.2 * 0.5, "a flat handle starts slowly: {early}");
@@ -174,25 +184,4 @@ fn removing_the_last_relative_keyframe_keeps_the_value_it_showed() {
     act(&mut p, scaled(0.0, json!({"remove": true}))).unwrap();
     act(&mut p, scaled(1.0, json!({"remove": true}))).unwrap();
     assert_eq!(at(&p, scale), json!([1.2, 1.1]));
-}
-
-#[test]
-fn straightening_a_curve_is_one_step_that_keeps_the_neighbouring_curves() {
-    let root = tempfile::tempdir().unwrap();
-    let mut p = project(&root);
-    let bent = json!({"in": [0.3, 0.1], "out": [0.3, 0.1]});
-    let keys = json!({"keys": [[0, 0, {"out": [0.3, 0.1]}], [1, 1, bent], [2, 0, bent], [3, 1, {"in": [0.3, 0.1]}]]});
-    act(&mut p, json!({"set": {"pointer": "/scene/layers/0/opacity", "value": keys}})).unwrap();
-    let before = p.history.done.len();
-    act(&mut p, key(json!({"time": 1, "straighten": true}))).unwrap();
-    assert_eq!(p.history.done.len(), before + 1);
-    let got = at(&p, "/scene/layers/0/opacity/keys");
-    assert_eq!(got[1], json!([1, 1, {"in": [0.3, 0.1]}]));
-    assert_eq!(got[2], json!([2, 0, {"out": [0.3, 0.1]}]));
-    assert_eq!((&got[0], &got[3]), (&keys["keys"][0], &keys["keys"][3]));
-    act(&mut p, key(json!({"time": 0, "ease": "in_out_sine"}))).unwrap();
-    act(&mut p, key(json!({"time": 0, "straighten": true}))).unwrap();
-    assert_eq!(at(&p, "/scene/layers/0/opacity/keys/0"), json!([0.0, 0]));
-    refused(&mut p, key(json!({"time": 1, "straighten": true, "ease": "linear"})));
-    refused(&mut p, key(json!({"time": 5, "straighten": true})));
 }

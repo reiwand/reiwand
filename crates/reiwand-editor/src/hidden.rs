@@ -56,7 +56,9 @@ fn plain_transform(layer: &Value) -> bool {
 fn covers(layer: &Value, canvas: [f64; 2]) -> bool {
     let kind = layer["type"].as_str();
     let size = match kind {
-        Some("solid") => given(layer, "size").map_or(Some(canvas), |s| if s == "canvas" { Some(canvas) } else { pair(s) }),
+        Some("solid") => {
+            given(layer, "size").map_or(Some(canvas), |s| if s == "canvas" { Some(canvas) } else { pair(s) })
+        }
         Some("shape") => {
             let rect = &layer["shape"]["rect"];
             let round = given(rect, "radius").and_then(number).unwrap_or(0.0) > 0.0;

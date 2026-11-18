@@ -1,5 +1,6 @@
 use super::loose::kind;
-use serde_json::{Map, Value, json};
+pub use super::sample::sample;
+use serde_json::{Map, Value};
 
 static NULL: Value = Value::Null;
 
@@ -54,6 +55,10 @@ pub fn fits(root: &Value, schema: &Value, value: &Value) -> bool {
         return required.clone().all(|k| object.contains_key(k))
             && (!closed || object.keys().all(|k| props.contains_key(k)));
     }
+    let extra = schema.get("additionalProperties").filter(|a| a.is_object());
+    if let (Some(extra), Some(object)) = (extra, value.as_object()) {
+        return object.values().all(|v| fits(root, extra, v));
+    }
     let list = branches(schema);
     list.is_empty() || list.iter().any(|b| fits(root, b, value))
 }
@@ -100,51 +105,6 @@ pub fn child<'a>(root: &'a Value, schema: &'a Value, token: &str, value: &Value)
     prefix.or_else(|| chosen.get("items").cloned())
 }
 
-pub fn sample(root: &Value, schema: &Value) -> Value {
-    if let Some(d) = schema.get("default") {
-        return d.clone();
-    }
-    if schema["x-condition"] == true {
-        return json!({});
-    }
-    let (schema, _) = deref(root, schema);
-    if let Some(d) = schema.get("default").or_else(|| schema.get("const")) {
-        return d.clone();
-    }
-    if let Some(first) = schema["enum"].get(0) {
-        return first.clone();
-    }
-    if schema["x-null"] == true || branches(schema).iter().any(|b| deref(root, b).0["type"] == "null") {
-        return Value::Null;
-    }
-    if let Some(first) = branches(schema).first() {
-        return sample(root, first);
-    }
-    let t = match &schema["type"] {
-        Value::Array(list) if list.iter().any(|t| t == "null") => "null",
-        Value::Array(list) => list.first().and_then(Value::as_str).unwrap_or("null"),
-        t => t.as_str().unwrap_or("object"),
-    };
-    match t {
-        "boolean" => json!(false),
-        "integer" | "number" => schema.get("minimum").cloned().unwrap_or(json!(0)),
-        "string" => json!(""),
-        "array" => {
-            let n = schema["minItems"].as_u64().unwrap_or(0) as usize;
-            let items = (0..n).map(|i| {
-                schema["prefixItems"].get(i).or(schema.get("items")).map_or(Value::Null, |s| sample(root, s))
-            });
-            Value::Array(items.collect())
-        }
-        "object" => {
-            let required = schema["required"].as_array().into_iter().flatten().filter_map(Value::as_str);
-            let props = &schema["properties"];
-            Value::Object(required.map(|k| (k.to_owned(), sample(root, &props[k]))).collect())
-        }
-        _ => Value::Null,
-    }
-}
-
 fn objects_of<'a>(root: &'a Value, schema: &'a Value) -> Vec<&'a Value> {
     let mut found = Vec::new();
     for branch in branches(schema) {
@@ -168,9 +128,15 @@ pub fn fill(root: &Value, schema: &Value, value: &mut Value) {
             } else {
                 let objects = objects_of(root, resolved);
                 let fitting = objects.iter().copied().find(|b| fits(root, b, &shown));
+                let picked = deref(root, choose(root, resolved, &shown)).0;
+                let covers = |b: &&Value| {
+                    b["properties"].as_object().is_some_and(|p| map.keys().all(|k| p.contains_key(k)))
+                };
                 fitting
+                    .or_else(|| objects.iter().copied().find(covers))
+                    .or_else(|| Some(picked).filter(|p| fits(root, p, &shown)))
                     .or_else(|| objects.first().copied())
-                    .unwrap_or_else(|| deref(root, choose(root, resolved, &shown)).0)
+                    .unwrap_or(picked)
             };
             let props = properties(root, chosen, &shown);
             let mut required: Vec<&str> =

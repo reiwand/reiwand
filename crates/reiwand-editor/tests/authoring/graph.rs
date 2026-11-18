@@ -103,7 +103,7 @@ fn aligned_handles_keep_one_slope_and_straighten_is_one_step() {
     let before = steps(&p);
     act(&mut p, json!({"edit_keys": {"picks": pick, "straighten": true}})).unwrap();
     assert_eq!(steps(&p), before + 1);
-    assert_eq!(keys(&p, opacity)[1][2], json!({"in": [0.25, -0.3]}));
+    assert_eq!(keys(&p, opacity)[1][2], json!({"in": [0.25, -0.3], "out": null}));
 }
 
 #[test]
@@ -113,7 +113,7 @@ fn copied_keys_paste_at_a_time_into_their_tracks_and_plain_values() {
     let opacity = "/scene/layers/0/opacity";
     keyed(&mut p, opacity, &[(0.0, json!(0)), (1.0, json!(1))]);
     act(&mut p, json!({"set": {"pointer": "/scene/layers/0/transform/rotation", "value": 0}})).unwrap();
-    let copied = json!([[0.0, 0.25, {"out": [0.5, 0.1]}], [1.0, 0.75]]);
+    let copied = json!([[0.0, 0.25, {"in": null, "out": [0.5, 0.1]}], [1.0, 0.75]]);
     let pick = json!([{"pointer": opacity, "keys": copied}, {"pointer": "/scene/layers/0/transform/rotation", "keys": [[0.5, 90]]}]);
     act(&mut p, json!({"edit_keys": {"picks": pick, "at": 1}})).unwrap();
     let pasted: Vec<f64> = keys(&p, opacity).iter().map(|k| k[0].as_f64().unwrap()).collect();

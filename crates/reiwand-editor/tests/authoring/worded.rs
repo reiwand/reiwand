@@ -1,4 +1,4 @@
-use super::{act, project, refused};
+use super::{act, at, project, refused};
 use serde_json::json;
 
 #[test]
@@ -27,4 +27,15 @@ fn unreadable_keyframe_fields_say_which_field_and_the_shape_it_needs() {
             .unwrap();
     let dry = reiwand_editor::actions::plan(&p.doc, &planned).unwrap_err().to_string();
     assert_eq!(dry, eased, "the plan checks like the project");
+}
+
+#[test]
+fn a_property_label_is_translated_from_its_explicit_null() {
+    let root = tempfile::tempdir().unwrap();
+    let mut p = project(&root);
+    act(&mut p, json!({"add_property": {"kind": "slider", "id": "speed"}})).unwrap();
+    let label = "/manifest/properties/speed/label";
+    act(&mut p, json!({"translate": {"pointer": label, "language": "en", "text": "Speed"}})).unwrap();
+    act(&mut p, json!({"translate": {"pointer": label, "language": "es", "text": "Velocidad"}})).unwrap();
+    assert_eq!(at(&p, label), json!({"en": "Speed", "es": "Velocidad"}));
 }

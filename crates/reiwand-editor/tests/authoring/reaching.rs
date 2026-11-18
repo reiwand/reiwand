@@ -36,7 +36,7 @@ fn bezier_handles_reach_only_up_to_the_neighbouring_keyframe_so_the_scene_stays_
     act(&mut p, key(json!({"time": 1.5, "value": 0.5}))).unwrap();
     act(&mut p, key(json!({"time": 5, "from": 3}))).unwrap();
     sound(&p);
-    assert_eq!(at(&p, "/scene/layers/0/opacity/keys/2/2"), json!({"in": [1.0, 0.0]}));
+    assert_eq!(at(&p, "/scene/layers/0/opacity/keys/2/2"), json!({"in": [1.0, 0.0], "out": null}));
 }
 
 #[test]
@@ -107,7 +107,7 @@ fn a_keyframe_on_a_field_left_at_its_default_is_refused_with_the_shape_it_needs(
         let pointer = format!("/scene/layers/0/transform/{field}");
         json!({"keyframe": {"pointer": pointer, "time": 0, "value": value}})
     };
-    assert_eq!(p.doc.pointer("/scene/layers/0/transform/skew"), None);
+    assert_eq!(p.doc.pointer("/scene/layers/0/transform/skew"), Some(&json!([0.0, 0.0])));
     let listed = refused(&mut p, at("skew", json!("1,1")));
     assert!(
         listed.contains("a list of 2 numbers such as [1, 1]") && !listed.contains("untagged"),

@@ -46,7 +46,7 @@ fn the_events_of_a_timeline_are_added_moved_and_removed_within_its_length() {
     act(&mut p, line("intro", json!({"drop_events": ["boom"]}))).unwrap();
     assert_eq!(at(&p, "/scene/timelines/0/events"), json!([{"t": 0.5, "name": "spark"}]));
     act(&mut p, line("intro", json!({"clear_events": true}))).unwrap();
-    assert_eq!(at(&p, "/scene/timelines/0/events"), Value::Null);
+    assert_eq!(at(&p, "/scene/timelines/0/events"), json!([]));
     let many: Vec<Value> =
         (0..65).map(|i| json!({"t": 0.01 * f64::from(i), "name": format!("e{i}")})).collect();
     let crowded = refused(&mut p, line("intro", json!({ "add_events": many })));

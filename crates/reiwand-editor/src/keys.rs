@@ -127,8 +127,11 @@ pub fn keyframe(doc: &Value, e: &KeyframeEdit) -> Result<Vec<Op>> {
                     &[&pointer]
                 ));
             }
-            let value =
-                e.value.clone().or_else(|| current.filter(|v| !v.is_null()).cloned()).or_else(|| crate::resting::of(doc, pointer));
+            let value = e
+                .value
+                .clone()
+                .or_else(|| current.filter(|v| !v.is_null()).cloned())
+                .or_else(|| crate::resting::of(doc, pointer));
             let value = value.ok_or_else(|| {
                 anyhow!(said("editor.no_value_yet", "%1 has no value yet; give one", &[&pointer]))
             })?;
@@ -169,7 +172,7 @@ fn fits(doc: &Value, e: &KeyframeEdit, ops: &[Op]) -> Result<()> {
     if reads(&staged) || !reads(doc) {
         return Ok(());
     }
-    let like = match doc.pointer(&e.pointer) {
+    let like = match doc.pointer(&e.pointer).filter(|v| !v.is_null()) {
         Some(like) => Some(like.pointer("/keys/0/1").unwrap_or(like).clone()),
         None => taken(doc, &e.pointer),
     };

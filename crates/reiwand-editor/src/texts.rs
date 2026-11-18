@@ -39,7 +39,10 @@ pub fn rows(doc: &Value, pointer: &str, value: &Value) -> Vec<Value> {
 fn textual(doc: &Value, pointer: &str) -> bool {
     let (Some((root, _)), Some(node)) = (root_of(pointer), at(doc, pointer)) else { return false };
     let (schema, name) = deref(root, &node);
-    name == "Text" || branches(schema).iter().any(|b| deref(root, b).1 == "Text")
+    let list = branches(schema);
+    let string = list.iter().any(|b| b["type"] == "string");
+    let map = list.iter().any(|b| b["additionalProperties"]["type"] == "string");
+    name == "Text" || list.iter().any(|b| deref(root, b).1 == "Text") || (string && map)
 }
 
 pub(crate) fn worded(text: &Value) -> bool {

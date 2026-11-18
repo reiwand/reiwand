@@ -19,7 +19,7 @@ pub(crate) fn scene(doc: &Value, action: &Action, ops: &[Op]) -> Result<()> {
     {
         return Ok(());
     }
-    let like = match doc.pointer(pointer) {
+    let like = match doc.pointer(pointer).filter(|v| !v.is_null()) {
         Some(like) => Some(like.clone()),
         None => crate::keys::taken(doc, pointer),
     };
