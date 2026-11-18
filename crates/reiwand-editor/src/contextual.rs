@@ -41,14 +41,27 @@ fn written(op: &Op) -> Option<(&str, &Value)> {
     }
 }
 
-pub(crate) fn camera(doc: &Value, ops: &[Op]) -> Option<Value> {
-    if doc.pointer("/scene").is_none() || doc.pointer("/scene/camera3d").is_some_and(Value::is_object) {
-        return None;
+fn space_3d(op: &Op) -> bool {
+    written(op).is_some_and(|(path, value)| path.ends_with("/space") && value == "3d")
+}
+
+fn clears(op: &Op) -> bool {
+    match op {
+        Op::Remove { path } => path == "/scene/camera3d",
+        other => written(other).is_some_and(|(path, value)| path == "/scene/camera3d" && !value.is_object()),
     }
-    let sets = ops.iter().filter_map(written).any(|(path, _)| path == "/scene/camera3d");
-    let places = ops
-        .iter()
-        .filter_map(written)
-        .any(|(path, value)| path.starts_with("/scene") && path != "/scene/camera3d" && solid(value));
-    (places && !sets).then(crate::stage3d::camera_suggested)
+}
+
+pub(crate) fn camera(doc: &Value, ops: &[Op]) -> Option<Value> {
+    let scene = doc.pointer("/scene")?;
+    let has = doc.pointer("/scene/camera3d").is_some_and(Value::is_object);
+    let sets =
+        ops.iter().filter_map(written).any(|(path, value)| path == "/scene/camera3d" && value.is_object());
+    let places = ops.iter().any(space_3d)
+        || ops
+            .iter()
+            .filter_map(written)
+            .any(|(path, value)| path.starts_with("/scene") && path != "/scene/camera3d" && solid(value));
+    let cleared = ops.iter().any(clears) && solid(scene);
+    ((places && !has || cleared) && !sets).then(crate::stage3d::camera_suggested)
 }
