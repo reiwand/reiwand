@@ -52,7 +52,7 @@ impl Shot {
     fn with(r: &Renderer, mut text: Value, images: &[(&str, Arc<Pixels>)]) -> Shot {
         text["schema"] = json!(SCHEMA);
         let props: BTreeMap<String, Property> =
-            serde_json::from_value(json!({ "tone": { "type": "color", "default": "#00ff00" } })).unwrap();
+            serde_json::from_value(json!({ "tone": json!({ "type": "color", "default": "#00ff00", "alpha": false, "label": null, "help": null, "group": null, "visible_if": {}, "enabled_if": {}, "order": 0, "icon": null, "quality": {} }) })).unwrap();
         let scene = Scene::load(&crate::gpu::whole(&text.to_string()), &props).unwrap();
         let assets = SceneAssets {
             images: images.iter().map(|(id, i)| (id.to_string(), i.clone())).collect(),
