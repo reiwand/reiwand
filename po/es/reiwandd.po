@@ -193,10 +193,10 @@ msgstr "Un script de la escena informó de un error: %1"
 
 #: apps/reiwandd/src/words.rs
 msgid ""
-"The web page stopped three times in a row and is off; the background color "
+"The web page stopped four times in a row and is off; the background color "
 "shows instead."
 msgstr ""
-"La página web se detuvo tres veces seguidas y está apagada; en su lugar se "
+"La página web se detuvo cuatro veces seguidas y está apagada; en su lugar se "
 "ve el color de fondo."
 
 #: apps/reiwandd/src/words.rs

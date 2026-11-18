@@ -114,7 +114,7 @@ pub fn scene_script_error(line: &str) -> String {
 }
 
 pub fn web_failed() -> String {
-    tr("The web page stopped three times in a row and is off; the background color shows instead.")
+    tr("The web page stopped four times in a row and is off; the background color shows instead.")
 }
 
 pub fn web_stalled() -> String {
