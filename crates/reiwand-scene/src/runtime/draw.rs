@@ -39,7 +39,7 @@ impl Runtime {
             calm: self.stirred.map(|s| (self.t - s) as f32),
             beat: self.since_beat(),
             wall: self.wall,
-            step: f64::from(self.scene.clock.step.unwrap_or(60.0)).max(1.0),
+            step: f64::from(self.scene.clock.step).max(1.0),
             lang: &self.lang,
             languages: &self.languages,
             audio: &self.audio,

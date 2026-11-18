@@ -5,7 +5,7 @@
       "atlas": null,
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
@@ -14,7 +14,7 @@
       "path": "assets/cielo.png",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     }
   },
   "audio": null,
@@ -43,7 +43,7 @@
     "max_fps": 60,
     "poster_time": 0.0,
     "seed": 0,
-    "step": null
+    "step": 60
   },
   "effects": {
     "duotono": {

@@ -66,8 +66,7 @@ impl Scene {
     pub fn inked_ids(&self) -> Vec<&str> {
         let uses = self.layers().flat_map(|l| &l.effects);
         let ids: BTreeSet<&str> = uses.flat_map(|e| textures(self, e)).collect();
-        let clamped =
-            |id: &&str| self.assets.get(*id).is_some_and(|a| a.wrap.unwrap_or_default() == Wrapping::Clamp);
+        let clamped = |id: &&str| self.assets.get(*id).is_some_and(|a| a.wrap == Wrapping::Clamp);
         ids.into_iter().filter(clamped).collect()
     }
 

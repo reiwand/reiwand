@@ -1,0 +1,327 @@
+adopt.rs	1	poisoned lock recovery
+adopt/models.rs	1	lookup or text computation over runtime values
+animate/param.rs	1	runtime type, not serialized as a format
+area/mod.rs	1	field of runtime type ?, not part of a saved format
+asset.rs	2	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+blend.rs	1	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+bones.rs	2	internal computation over runtime values (and 1 more kinds)
+bones/tracks.rs	1	field of runtime type ?, not part of a saved format
+book.rs	1	lookup or text computation over runtime values
+budget.rs	1	runtime type, not serialized as a format
+calendar.rs	2	lookup or text computation over runtime values
+camera.rs	12	lookup or text computation over runtime values (and 2 more kinds)
+canvas.rs	3	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+catalog.rs	4	internal computation over runtime values (and 1 more kinds)
+content.rs	2	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+cost.rs	3	lookup or text computation over runtime values (and 1 more kinds)
+cover.rs	1	internal computation over runtime values
+deep.rs	2	pending: Material.shader null means pbr (spec: shader is pbr by default)
+document.rs	1	runtime type, not serialized as a format
+drafted.rs	4	runtime type, not serialized as a format (and 3 more kinds)
+easing.rs	1	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+effects.rs	3	poisoned lock recovery (and 1 more kinds)
+effects/defs.rs	4	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+effects/handles.rs	2	field of runtime type Hold, not part of a saved format (and 1 more kinds)
+effects/parts.rs	3	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+eval.rs	5	lookup or text computation over runtime values (and 3 more kinds)
+eval/drawn.rs	26	field of runtime type Content, not part of a saved format (and 5 more kinds)
+eval/lamp3d.rs	1	internal computation over runtime values
+eval/lamps.rs	7	field of runtime type Lamp, not part of a saved format (and 1 more kinds)
+eval/shown.rs	5	size null means the canvas (and 2 more kinds)
+eval/staged.rs	14	field of runtime type Look, not part of a saved format (and 3 more kinds)
+eval/staged/group.rs	2	internal computation over runtime values (and 1 more kinds)
+eval/staged/key.rs	3	internal computation over runtime values
+eval/staged/looks.rs	14	pending: Scene.camera3d null takes the default 3D camera
+eval/staged/paths.rs	1	field of runtime type Flight, not part of a saved format
+eval/staged/paths/spline.rs	2	lookup or text computation over runtime values (and 1 more kinds)
+fence.rs	1	lookup or text computation over runtime values
+figure.rs	4	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+finish_maps.rs	1	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+flash.rs	1	runtime type, not serialized as a format
+footage.rs	5	field of runtime type Tape, not part of a saved format (and 1 more kinds)
+form.rs	5	internal computation over runtime values (and 1 more kinds)
+fx.rs	1	internal computation over runtime values
+fx/slots.rs	1	parameter min/max null means unbounded
+fx/tune.rs	2	field of runtime type ?, not part of a saved format (and 1 more kinds)
+glow.rs	3	lookup or text computation over runtime values
+gltf/json.rs	41	reader of the external glTF standard; absent fields take the standard
+gltf/mod.rs	3	reader of the external glTF standard; absent fields take the standard
+gltf/notes.rs	20	reader of the external glTF standard; absent fields take the standard
+guard/cell/build.rs	1	internal computation over runtime values
+guard/cell/mod.rs	1	field of runtime type Wrap, not part of a saved format
+helper.rs	2	runtime handle in Verdict (skipped by serde or not a file field) (and 1 more kinds)
+hitbox.rs	4	field of runtime type Hitbox, not part of a saved format (and 1 more kinds)
+hooks.rs	2	parameter min/max null means unbounded (script clamp)
+ink.rs	2	field of runtime type Ink, not part of a saved format
+input.rs	5	internal protocol state between the daemon, input sources and scripts; never a saved file
+input/kinds.rs	2	internal protocol state between the daemon, input sources and scripts; never a saved file
+input/media.rs	3	internal protocol state between the daemon, input sources and scripts; never a saved file
+input/mesh.rs	1	internal protocol state between the daemon, input sources and scripts; never a saved file
+input/outputs.rs	40	internal protocol state between the daemon, input sources and scripts; never a saved file
+input/read.rs	6	internal protocol state between the daemon, input sources and scripts; never a saved file
+input/rigs.rs	7	internal protocol state between the daemon, input sources and scripts; never a saved file
+input/stage.rs	39	internal protocol state between the daemon, input sources and scripts; never a saved file
+input/track.rs	6	internal protocol state between the daemon, input sources and scripts; never a saved file
+kept.rs	3	poisoned lock recovery (and 1 more kinds)
+kin.rs	16	lookup or text computation over runtime values (and 2 more kinds)
+lanes.rs	1	internal computation over runtime values
+layer/kind.rs	1	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+layer/transform.rs	2	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+ledger.rs	6	field of runtime type Book, not part of a saved format (and 2 more kinds)
+lens.rs	3	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+light.rs	3	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+links.rs	1	internal computation over runtime values
+look.rs	6	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+loops.rs	1	internal computation over runtime values
+measured.rs	7	engine calibration cache; a damaged or old file is measured again
+media.rs	1	lookup or text computation over runtime values
+model/build.rs	1	glTF model reader and mesh build; standard defaults, not a Reiwand format
+model/build/part.rs	4	glTF model reader and mesh build; standard defaults, not a Reiwand format
+model/forge.rs	2	glTF model reader and mesh build; standard defaults, not a Reiwand format
+model/mod.rs	5	glTF model reader and mesh build; standard defaults, not a Reiwand format
+model/morphs.rs	1	glTF model reader and mesh build; standard defaults, not a Reiwand format
+model/posed.rs	5	glTF model reader and mesh build; standard defaults, not a Reiwand format
+model/sculpt.rs	2	glTF model reader and mesh build; standard defaults, not a Reiwand format
+model/surface.rs	11	glTF model reader and mesh build; standard defaults, not a Reiwand format
+model/tiers.rs	3	glTF model reader and mesh build; standard defaults, not a Reiwand format
+model/uvs.rs	9	glTF model reader and mesh build; standard defaults, not a Reiwand format
+mpeg.rs	1	lookup or text computation over runtime values
+outside.rs	5	poisoned lock recovery (and 3 more kinds)
+outside/launch.rs	1	poisoned lock recovery
+package.rs	1	lookup or text computation over runtime values
+particles/bake.rs	2	runtime type, not serialized as a format (and 1 more kinds)
+particles/census.rs	1	runtime type, not serialized as a format
+particles/checks.rs	3	internal computation over runtime values (and 1 more kinds)
+particles/cloud.rs	4	runtime type, not serialized as a format (and 1 more kinds)
+particles/drive.rs	1	internal computation over runtime values
+particles/field.rs	1	lookup or text computation over runtime values
+particles/fit.rs	1	lookup or text computation over runtime values
+particles/flock.rs	4	field of runtime type Part, not part of a saved format (and 2 more kinds)
+particles/hatch.rs	2	runtime type, not serialized as a format (and 1 more kinds)
+particles/kept.rs	2	runtime type, not serialized as a format (and 1 more kinds)
+particles/lend.rs	1	internal computation over runtime values
+particles/pack.rs	2	runtime type, not serialized as a format (and 1 more kinds)
+particles/paths.rs	1	lookup or text computation over runtime values
+particles/place.rs	1	lookup or text computation over runtime values
+particles/plan.rs	2	internal computation over runtime values
+particles/points.rs	2	field of runtime type Room, not part of a saved format (and 1 more kinds)
+particles/pulls.rs	2	lookup or text computation over runtime values
+particles/school.rs	1	runtime type, not serialized as a format
+particles/seed.rs	1	runtime handle in Remap (skipped by serde or not a file field)
+particles/sow.rs	1	lookup or text computation over runtime values
+particles/spawn.rs	2	field of runtime type ?, not part of a saved format (and 1 more kinds)
+particles/spread.rs	1	field of runtime type Spread, not part of a saved format
+particles/swarm.rs	3	runtime type, not serialized as a format
+particles/tether.rs	1	internal computation over runtime values
+particles/tune.rs	3	lookup or text computation over runtime values (and 1 more kinds)
+particles/wall.rs	1	runtime type, not serialized as a format
+passage.rs	7	field of runtime type Passages, not part of a saved format (and 4 more kinds)
+patch.rs	5	partial-change message; absence means unchanged
+pilot.rs	11	field of runtime type Pilot, not part of a saved format (and 2 more kinds)
+pilot/step.rs	1	runtime type, not serialized as a format
+pilot/window.rs	1	runtime type, not serialized as a format
+pin.rs	1	Attach.offset null is no offset
+played.rs	3	field of runtime type Taken, not part of a saved format (and 2 more kinds)
+pointing.rs	7	field of runtime type Pointing, not part of a saved format (and 4 more kinds)
+poses.rs	3	lookup or text computation over runtime values (and 1 more kinds)
+prefill.rs	1	internal computation over runtime values
+probe/signal.rs	1	pending: Binding.of null means 64 bands (spec: default 64); the binding is one struct for every source, needs tagged variants
+props/check.rs	1	lookup or text computation over runtime values
+props/cond.rs	2	lookup or text computation over runtime values (and 1 more kinds)
+props/control.rs	2	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+props/expr.rs	1	lookup or text computation over runtime values
+props/leveling.rs	2	runtime type, not serialized as a format (and 1 more kinds)
+props/mod.rs	1	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+props/slider.rs	2	spec: slider without decimals/step derives them (scene.md, sliders) (and 1 more kinds)
+props/text.rs	3	lookup or text computation over runtime values (and 1 more kinds)
+props/values.rs	1	internal computation over runtime values
+puppet/arc.rs	1	runtime type, not serialized as a format
+puppet/collide.rs	1	runtime type, not serialized as a format
+puppet/course.rs	1	internal computation over runtime values
+puppet/fig.rs	1	field of runtime type Fig, not part of a saved format
+puppet/finish.rs	2	internal computation over runtime values
+puppet/heads.rs	4	internal computation over runtime values (and 2 more kinds)
+puppet/mount.rs	4	field of runtime type Seat, not part of a saved format (and 3 more kinds)
+puppet/pose.rs	2	lookup or text computation over runtime values
+puppet/reach.rs	2	field of runtime type Chain, not part of a saved format (and 1 more kinds)
+puppet/root.rs	1	lookup or text computation over runtime values
+puppet/swing.rs	1	lookup or text computation over runtime values
+quality.rs	1	runtime type, not serialized as a format
+reap.rs	1	lookup or text computation over runtime values
+render/adapter.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/allocations/traced.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/animation.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/bench.rs	7	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/bench/ceiling.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/bench/ceiling/set.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/bench/flight.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/bench/frames.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/bind.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/calibrate.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/choose.rs	4	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/choose/listing.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/choose/sysfs.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/coded.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/crossing/passing.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/damaged.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/deck.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/decode.rs	4	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/decode/read.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/decode/thumbs.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/develop.rs	4	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/device.rs	4	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/dmabuf.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/draw.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/encoding.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/exported.rs	8	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/lit.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/lost.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/luma.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/packed.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/save.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/build.rs	5	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/builders.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/chains.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/clock/judge.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/clock/slow.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/clock/stamps.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/crop.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/damage.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/draw.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/draw/gobo.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/draw/lit.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/draw/masks.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/effects.rs	6	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/encode.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/fed.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/field.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/flight/mod.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/flight/sent.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/fused.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/gather.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/hits.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/item.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/lamps.rs	6	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/limit.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/load.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/make.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/mips.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/molds.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/own.rs	4	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/packages.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/paint.rs	4	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/paint/air.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/paint/geometry.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/placed.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/pool.rs	4	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/pool/tex.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/poster.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/profile.rs	8	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/profile/tests.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/rehearse.rs	8	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/rehearse/reel.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/rehearse/wall.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/sampling.rs	5	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/scripted/real.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/skins/atlas.rs	4	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/skins/cast.rs	4	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/skins/make.rs	5	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/skins/mipped.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/skins/wave.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/solids/calls.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/solids/dress.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/solids/env.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/solids/gpu.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/solids/groups.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/solids/looks.rs	10	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/solids/maps.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/solids/material.rs	4	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/solids/mix.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/solids/paint.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/solids/pictures.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/solids/pipes.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/solids/shadows.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/solids/staged.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/solids/uniform.rs	6	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/sources.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/state.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/steady.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/stops.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/strip.rs	4	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/swarm/bent.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/swarm/census.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/swarm/chart.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/swarm/dispatch.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/swarm/flight.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/swarm/kit.rs	5	renderer: runtime state, GPU resources, caches and computation over data already validated (and 1 more kinds)
+render/scene/swarm/lamp.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/swarm/looks.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/swarm/maps.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/swarm/mod.rs	16	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/swarm/paint.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/swarm/stage.rs	1	text of an error message
+render/scene/swarm/staging.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/swarm/step.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/uploads.rs	10	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/view.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/scene/warm.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/shader.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/stack.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/surface.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/texture.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
+render/timeout.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
+resolve.rs	3	pending: Binding.loop null takes the default Loop; same untagged Binding struct
+resolve/binding.rs	9	internal computation over runtime values (and 2 more kinds)
+resolve/media.rs	6	internal computation over runtime values (and 1 more kinds)
+rig.rs	3	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+rig/colliders.rs	1	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+rig/tracks.rs	1	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+rigged/build.rs	4	reader of the external glTF standard (rig import); absent fields take the standard
+rigged/doc.rs	72	reader of the external glTF standard (rig import); absent fields take the standard
+rigged/geometry.rs	8	reader of the external glTF standard (rig import); absent fields take the standard
+rigged/maps.rs	15	reader of the external glTF standard (rig import); absent fields take the standard
+rigged/math.rs	1	reader of the external glTF standard (rig import); absent fields take the standard
+rigged/mod.rs	2	reader of the external glTF standard (rig import); absent fields take the standard
+rigged/motion.rs	5	reader of the external glTF standard (rig import); absent fields take the standard
+rigged/read.rs	5	reader of the external glTF standard (rig import); absent fields take the standard
+rigged/sheets.rs	1	reader of the external glTF standard (rig import); absent fields take the standard
+rigged/sketch.rs	2	reader of the external glTF standard (rig import); absent fields take the standard
+rigged/stack.rs	2	reader of the external glTF standard (rig import); absent fields take the standard
+rigged/write.rs	2	reader of the external glTF standard (rig import); absent fields take the standard
+roll.rs	3	lookup or text computation over runtime values (and 1 more kinds)
+rules/effects.rs	1	parameter min/max null means unbounded
+runtime.rs	2	field of runtime type Runtime, not part of a saved format (and 1 more kinds)
+runtime/draw.rs	2	internal computation over runtime values
+runtime/feed.rs	1	internal computation over runtime values
+scripted.rs	7	script control messages and outputs; absence means unchanged
+seat.rs	3	field of runtime type Seated, not part of a saved format (and 2 more kinds)
+shader.rs	1	lookup or text computation over runtime values
+shape.rs	3	lookup or text computation over runtime values (and 1 more kinds)
+sheet.rs	3	Asset.frames null means every cell of the sheet (and 2 more kinds)
+signal.rs	2	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+sites.rs	6	internal computation over runtime values (and 2 more kinds)
+sound.rs	2	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields (and 1 more kinds)
+spare.rs	1	runtime type, not serialized as a format
+spawn.rs	12	lookup or text computation over runtime values (and 1 more kinds)
+spend.rs	2	field of runtime type Spend, not part of a saved format (and 1 more kinds)
+spill/written.rs	1	runtime type, not serialized as a format
+spread/expr.rs	5	internal computation over runtime values (and 1 more kinds)
+spread/places.rs	6	lookup or text computation over runtime values (and 1 more kinds)
+spread/walk.rs	6	internal computation over runtime values (and 1 more kinds)
+stage/assets.rs	3	internal computation over runtime values (and 1 more kinds)
+tally.rs	1	runtime type, not serialized as a format
+tier.rs	1	runtime type, not serialized as a format
+timeline.rs	3	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields (and 1 more kinds)
+timeline/bend.rs	1	lookup or text computation over runtime values
+timeline/keys.rs	2	field of runtime type Key, not part of a saved format (and 1 more kinds)
+trials.rs	1	internal computation over runtime values
+typeset.rs	6	field of runtime type Layout, not part of a saved format (and 2 more kinds)
+unposed.rs	1	lookup or text computation over runtime values
+uses.rs	3	lookup or text computation over runtime values (and 1 more kinds)
+validate.rs	1	field of runtime type Check, not part of a saved format
+value.rs	2	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields (and 1 more kinds)
+value/emitters.rs	1	EffectEmitter.to null means the same as from (single point)
+value/kinds.rs	3	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
+variant.rs	5	internal computation over runtime values (and 1 more kinds)
+verdicts.rs	3	poisoned lock recovery
+voice.rs	4	runtime type, not serialized as a format (and 2 more kinds)

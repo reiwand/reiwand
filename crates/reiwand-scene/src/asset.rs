@@ -12,12 +12,8 @@ pub struct Asset {
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
     pub atlas: Option<[u32; 2]>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
-    pub filter: Option<Filter>,
-    #[serde(deserialize_with = "reiwand_core::explicit::null")]
-    #[schemars(required, extend("x-null" = true))]
-    pub wrap: Option<Wrapping>,
+    pub filter: Filter,
+    pub wrap: Wrapping,
     #[serde(deserialize_with = "reiwand_core::explicit::null")]
     #[schemars(required, extend("x-null" = true))]
     pub mipmaps: Option<bool>,
@@ -72,7 +68,7 @@ impl Asset {
     }
 
     pub fn sampled(&self) -> bool {
-        self.filter.is_some() || self.wrap.is_some() || self.mipmaps.is_some()
+        self.filter != Filter::default() || self.wrap != Wrapping::default() || self.mipmaps.is_some()
     }
 
     pub fn collection(&self) -> bool {

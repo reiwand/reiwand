@@ -17,14 +17,14 @@
       "path": "assets/bola.png",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     },
     "toque": {
       "animated": false,
       "atlas": null,
       "durations": [],
       "face": null,
-      "filter": null,
+      "filter": "linear",
       "fps": null,
       "frames": null,
       "linear": false,
@@ -33,7 +33,7 @@
       "path": "assets/zumbido.wav",
       "rects": [],
       "shapes": {},
-      "wrap": null
+      "wrap": "clamp"
     }
   },
   "audio": null,
@@ -62,7 +62,7 @@
     "max_fps": 60,
     "poster_time": 0.0,
     "seed": 0,
-    "step": null
+    "step": 60
   },
   "effects": {},
   "ext": {},
