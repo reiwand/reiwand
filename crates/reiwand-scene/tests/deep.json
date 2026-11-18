@@ -373,7 +373,7 @@
             ],
             "kind": null,
             "layer": null,
-            "loop": null,
+            "loop": "once",
             "map": null,
             "media": null,
             "of": null,
@@ -629,6 +629,10 @@
                 "orm": null
               },
               "params": {
+                "comb_x": 0,
+                "comb_y": 0,
+                "comb_z": 0,
+                "density": 0.5,
                 "layers": 12,
                 "length": 4
               },
@@ -711,7 +715,7 @@
             ],
             "kind": null,
             "layer": null,
-            "loop": null,
+            "loop": "once",
             "map": null,
             "media": null,
             "of": null,
@@ -2030,7 +2034,7 @@
             ],
             "kind": null,
             "layer": null,
-            "loop": null,
+            "loop": "once",
             "map": null,
             "media": null,
             "of": null,

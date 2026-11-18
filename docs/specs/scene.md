@@ -807,12 +807,15 @@ draws it unlit, `blend` or an `opacity` below 1 draws it after the opaque ones, 
 Primitives without a material take a white one. Textures may be PNG, JPEG or WebP pictures of at most
 4096 pixels; phones and the T0 and T1 tiers draw them at most 2048 pixels wide.
 
-`shader` is `pbr` (default, `params` `metallic`, `roughness`, `occlusion` 0 to 1 and `normal_scale`
+`shader` is always written: `pbr` (the editor suggests it; `params` `metallic`, `roughness`, `occlusion` 0 to 1 and `normal_scale`
 0 to 10), `unlit`, `fur` (`layers` 1 to 32, `length` 0 to 100, `density` 0 to 1), `foliage`
 (`strength` and `speed` 0 to 10, swaying with `canvas.wind`), `chroma` (`key` color, `threshold` and
 `softness` 0 to 1) or the id of a package effect with `stage: "material"` (`material_shaders` for all
 but `pbr` and `unlit`); `fur` also takes `comb_x`, `comb_y` and `comb_z` from −1 to 1, and all but `unlit`
-take the numbers of `pbr`. Shadows of lights and materials name `shadows`; both `cast_shadows` and
+take the numbers of `pbr`. Every parameter of `fur`, `foliage` and `chroma` listed here is written (the
+editor suggests `layers` 12, `length` 10, `density` 0.5, `comb_x`, `comb_y` and `comb_z` 0, `strength` and
+`speed` 1, `key` `#00ff00`, `threshold` 0.4 and `softness` 0.1); the numbers of `pbr` may stay out to keep
+those of the model file. Shadows of lights and materials name `shadows`; both `cast_shadows` and
 `receive_shadows` are `true` unless set, which changes nothing until a light casts shadows.
 `maps` replaces maps of the file with pictures of the scene: `{ "base", "orm", "normal",
 "occlusion", "emissive" }` (and gives fur its `comb` map), each the id of a picture asset; a replaced map keeps the texture
@@ -923,7 +926,9 @@ layers: `fov` (1 to 179 degrees, may be bound), `near` and `far` planes, `eye`, 
 bound) and `up`; `paths` (at most 16 `{ "id", "keys", "ease", "loop" }`, each with 2 to 256 keys `{
 "t", "eye", "center", "up", "fov" }`, where `t`, `eye` and `center` are required, in increasing time) play one after another or at random
 (`order`), joined by a `fade` `{ "to": "black" | "cross", "duration" (0 to 10 s) }`.
-Without `camera3d` the camera stands at `[0, 0, 5]`, looks at the origin with `up` `[0, 1, 0]`, a
+`camera3d` is written whole (`null` only when no layer is a model, a mesh or a 3D group: such a scene
+has no 3D camera and the loader refuses a scene with 3D content and `null`); the editor suggests the camera
+at `[0, 0, 5]`, looking at the origin with `up` `[0, 1, 0]`, a
 `fov` of 60 degrees, `near` 0.1 and `far` 1000; depth is reversed (1 near, 0 far) in 32-bit floats.
 Scripts that use `camera` read `scene.camera3d` and set `{ "fov", "eye", "center", "up" }` for the next
 frame (`fov` 1 to 179, points within a million units); what they set wins over the paths.
@@ -984,7 +989,7 @@ one source:
 | Source | Example |
 |--------|---------|
 | User property | `{ "prop": "style", "map": { "night": "sky" } }` |
-| Keyframes | `{ "keys": [[0, 0], [2, 1, "in_out_sine"]], "timeline": "intro", "loop": "repeat" }` |
+| Keyframes | `{ "keys": [[0, 0], [2, 1, "in_out_sine"]], "timeline": "intro", "loop": "repeat" }`; keys without a `timeline` write `loop` (`once`, `repeat` or `pingpong`), with a `timeline` it is ignored |
 | Audio | `{ "audio": "bass", "kind": "relative", "unit": "db" }`, `{ "audio": 3, "kind": "relative", "unit": "db", "channel": "left" }`, `{ "audio": "bass", "kind": "surge", "unit": "amplitude", "window": 1, "reference": "band", "hold_silence": false }` |
 | Pointer | `{ "cursor": "x" }` (`x`, `y`, `inside`, `speed`) |
 | Clock | `{ "clock": "HH:mm:ss a" }` (text only: `HH`, `H`, `hh`, `h`, `mm`, `m`, `ss`, `s`, `a`) |
@@ -1047,7 +1052,7 @@ Newer values add these forms, each with its feature:
 | Relative | `{ "keys": [[0, 0], [1, 30]], "base": 120 }` adds the animation to `base` (numbers, positions and colors, part by part; a lone number in an effect or script parameter is added to both parts of a pair and to the red, green and blue of a color, and the alpha of a sum stays within 0 to 1) | `relative_values` |
 | Time as a number | `{ "clock": "day" }` from 0 at midnight to almost 1 before the next; also `hour` (0 to 23), `minute` and `second` (0 to 59), `weekday` (1 for Monday to 7 for Sunday) and `month` (1 to 12), all in local time; a value that follows `day` changes at most once a minute, or every `clock.step` seconds (1 to 3600, always written; 60 is the usual value), and the others when they change | `clock_values` |
 | Dates | `{ "date": "EEEE d 'de' MMMM yyyy" }` (text only) with `yyyy`, `yy`, `MMMM`, `MMM`, `MM`, `M`, `dd`, `d`, `EEEE`, `EEE`, `D` (day of the year) and `w` (ISO week) besides the tokens of a clock, names in the language of the package (English or Spanish, English for the others); text between single quotes stays as written and `''` writes a quote; a text without hours, minutes or seconds changes at midnight. A `clock` text keeps only the tokens of the time, and every other letter stays as written | `clock_dates` |
-| Frequency ranges | `{ "audio": [0, 3], "kind": "relative", "unit": "db", "of": 16, "reduce": "max" }` follows bands 0 to 3 of 16 (`of` is 16, 32 or 64, default 64, also for a single band) and takes their `mean` (default) or `max` | `audio_ranges` |
+| Frequency ranges | `{ "audio": [0, 3], "kind": "relative", "unit": "db", "of": 16, "reduce": "max" }` follows bands 0 to 3 of 16 (`of` is 16, 32 or 64, always written with an indexed band or a range; 64 is the number the editor suggests) and takes their `mean` (default) or `max` | `audio_ranges` |
 | Shaping | `bounds: [a, b]` maps a value to (x − a) / (b − a) clamped to 0 to 1, `exponent` (0.1 to 10) raises it, both before `scale` and `offset`; `smooth: { "up", "down" }` rises and falls at different speeds | `shaping` |
 | Layer as texture | `{ "layer": "<id>" }` for a `texture` or `mask` parameter of an effect: the layer is drawn on its own (even with `visible: false`) and fed to the effect aligned with the screen, so that each point of the effect reads the point of that layer above it, at the size the effect's layer has on the screen; it is drawn again only when that layer changes, and each one costs as much as a layer drawn on its own; layers may not feed themselves through other layers, masks or groups | `layer_textures` |
 

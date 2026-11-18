@@ -128,7 +128,7 @@ impl Context<'_> {
             }
             return tl.position(head);
         }
-        let repeat = b.repeat.unwrap_or_default();
+        let Some(repeat) = b.repeat else { return 0.0 };
         if repeat != Loop::Once || self.t < end {
             self.note(Wake::Frame);
         }

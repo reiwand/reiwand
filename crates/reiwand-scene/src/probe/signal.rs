@@ -4,7 +4,6 @@ use crate::value::{AudioKind, Band, Binding};
 
 impl Check<'_> {
     pub(crate) fn signal<T>(&mut self, path: &str, b: &Binding<T>) {
-        let of = b.of.unwrap_or(64);
         if let Some(of) = b.of {
             self.uses(true, "audio_ranges");
             if ![16, 32, 64].contains(&of) {
@@ -16,15 +15,23 @@ impl Check<'_> {
                 });
             }
         }
-        let top = of.saturating_sub(1) as f32;
-        match b.audio {
-            Some(Band::Index(i)) => self.range(&format!("{path}/audio"), i as f32, 0.0, top),
-            Some(Band::Range([lo, hi])) => {
-                self.uses(true, "audio_ranges");
-                self.range(&format!("{path}/audio/0"), lo as f32, 0.0, top);
-                self.range(&format!("{path}/audio/1"), hi as f32, lo as f32, top);
+        let indexed = matches!(b.audio, Some(Band::Index(_) | Band::Range(_)));
+        if indexed && b.of.is_none() {
+            self.issues.push(Issue::Required(format!("{path}/of")));
+        }
+        if let Some(top) = b.of.map(|of| of.saturating_sub(1) as f32) {
+            match b.audio {
+                Some(Band::Index(i)) => self.range(&format!("{path}/audio"), i as f32, 0.0, top),
+                Some(Band::Range([lo, hi])) => {
+                    self.uses(true, "audio_ranges");
+                    self.range(&format!("{path}/audio/0"), lo as f32, 0.0, top);
+                    self.range(&format!("{path}/audio/1"), hi as f32, lo as f32, top);
+                }
+                _ => {}
             }
-            _ => {}
+        }
+        if b.keys.is_some() && b.timeline.is_none() && b.repeat.is_none() {
+            self.issues.push(Issue::Required(format!("{path}/loop")));
         }
         if b.audio.is_some() {
             for (name, given) in [("kind", b.kind.is_some()), ("unit", b.unit.is_some())] {

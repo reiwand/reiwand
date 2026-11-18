@@ -167,7 +167,7 @@
                 "roughness": 0.8
               },
               "receive_shadows": null,
-              "shader": null
+              "shader": "pbr"
             }
           },
           "model": "crate",

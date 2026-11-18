@@ -95,7 +95,11 @@ fn what_breaks_a_rule_is_refused_and_the_scene_stays_as_it_was() {
     let unknown = act(&mut p, TransitionEdit { params: Some(odd), ..edit(Way::In) }).unwrap_err();
     assert!(unknown.to_string().contains("nothing"), "{unknown}");
     assert!(act(&mut p, TransitionEdit { curve: Some(json!("wobbly")), ..edit(Way::In) }).is_err());
-    fs::write(p.dir.join("plain.json"), whole::descriptor(&json!({ "id": "plain", "cost": { "taps": 1 } }).to_string())).unwrap();
+    fs::write(
+        p.dir.join("plain.json"),
+        whole::descriptor(&json!({ "id": "plain", "cost": { "taps": 1 } }).to_string()),
+    )
+    .unwrap();
     fs::write(p.dir.join("plain.wgsl"), "fn transition(c: Crossing) -> Crossing { return c; }").unwrap();
     let stage =
         act(&mut p, TransitionEdit { effect: Some("plain.json".into()), ..edit(Way::In) }).unwrap_err();

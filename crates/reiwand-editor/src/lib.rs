@@ -22,6 +22,7 @@ mod clips;
 pub mod clocks;
 pub mod completing;
 mod contents;
+mod contextual;
 pub mod copying;
 pub mod covers;
 mod credit;

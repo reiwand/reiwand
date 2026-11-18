@@ -17,6 +17,7 @@ pub fn complete(doc: &Value, op: Op) -> Op {
     let schema = unwrapped(root, schema);
     let mut full = value.clone();
     fill(root, &schema, &mut full);
+    crate::contextual::fill(&mut full);
     if path.starts_with("/manifest") {
         no_conditions(&mut full);
     }
@@ -55,7 +56,11 @@ fn unwrapped(root: &Value, mut schema: Value) -> Value {
 }
 
 pub fn complete_all(doc: &Value, ops: Vec<Op>) -> Vec<Op> {
-    ops.into_iter().map(|op| complete(doc, op)).collect()
+    let mut done: Vec<Op> = ops.into_iter().map(|op| complete(doc, op)).collect();
+    if let Some(camera) = crate::contextual::camera(doc, &done) {
+        done.extend([Op::Add { path: "/scene/camera3d".into(), value: camera }]);
+    }
+    done
 }
 
 pub fn manifest_doc(doc: &mut Value) {

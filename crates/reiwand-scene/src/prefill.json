@@ -541,7 +541,7 @@
   "Material.emissive": null,
   "Material.lit": null,
   "Material.receive_shadows": null,
-  "Material.shader": null,
+  "Material.shader": "pbr",
   "MaterialMaps.base": null,
   "MaterialMaps.comb": null,
   "MaterialMaps.emissive": null,

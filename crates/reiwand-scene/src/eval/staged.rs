@@ -14,7 +14,6 @@ pub mod paths;
 pub use group::particle_plane;
 pub use key::{cross_key, seal};
 pub(crate) use looks::eye;
-pub use looks::{CHROMA_KEY, FUR_LAYERS, FUR_LENGTH};
 pub use paths::Flight;
 
 pub const MAX_PLANES: usize = 4;

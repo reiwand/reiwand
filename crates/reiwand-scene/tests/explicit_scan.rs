@@ -54,10 +54,3 @@ fn every_hit_of_the_scan_is_classified_as_runtime_or_internal() {
         wrong.join("\n")
     );
 }
-
-#[test]
-#[ignore = "lists the hidden values that are still pending"]
-fn no_hidden_value_of_a_saved_format_is_pending() {
-    let pending: Vec<_> = allowed().into_iter().filter(|(_, (_, why))| why.starts_with("pending")).collect();
-    assert!(pending.is_empty(), "{pending:#?}");
-}

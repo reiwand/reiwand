@@ -79,7 +79,9 @@ fn fresh(dir: &Path, doc: &Value, e: &TransitionEdit) -> Result<Value> {
         (None, None) => starter::write(dir)?,
     };
     let wgsl = wgsl_of(&descriptor);
-    Ok(json!({ "descriptor": descriptor, "wgsl": wgsl, "duration_ms": 1200, "curve": "out_cubic", "params": {} }))
+    Ok(
+        json!({ "descriptor": descriptor, "wgsl": wgsl, "duration_ms": 1200, "curve": "out_cubic", "params": {} }),
+    )
 }
 
 pub fn readied(dir: &Path, way: Way, value: &Value) -> Result<Readied> {

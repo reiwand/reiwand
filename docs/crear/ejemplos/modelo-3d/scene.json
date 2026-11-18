@@ -221,7 +221,7 @@
                 "roughness": 0.8
               },
               "receive_shadows": null,
-              "shader": null
+              "shader": "pbr"
             }
           },
           "model": "caja",
@@ -310,7 +310,7 @@
                 "roughness": 0.35
               },
               "receive_shadows": null,
-              "shader": null
+              "shader": "pbr"
             }
           },
           "model": "caja",
@@ -470,7 +470,7 @@
               },
               "params": {},
               "receive_shadows": null,
-              "shader": null
+              "shader": "pbr"
             }
           },
           "model": "figura",

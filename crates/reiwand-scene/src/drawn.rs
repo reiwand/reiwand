@@ -7,10 +7,11 @@ pub fn triangle_unit(tier: crate::Tier, phone: bool) -> f32 {
     if phone || tier < crate::Tier::T3 { TRIANGLE_UNIT } else { MEASURED_TRIANGLE_UNIT }
 }
 
-fn layers(m: &crate::Material) -> u32 {
+fn layers(m: &crate::Material) -> Option<u32> {
     match m.params.get("layers") {
-        Some(Value::Fixed(crate::Param::Number(n))) => n.clamp(1.0, 32.0) as u32,
-        _ => crate::FUR_LAYERS as u32,
+        Some(Value::Fixed(crate::Param::Number(n))) => Some(n.clamp(1.0, 32.0) as u32),
+        Some(_) => Some(32),
+        None => None,
     }
 }
 
@@ -23,9 +24,10 @@ impl Scene {
     pub fn drawn_triangles(&self, l: &Layer, q: Quality) -> u64 {
         let Kind::Model(m) = &l.kind else { return 0 };
         let Some(model) = self.solids.get(&m.model) else { return 0 };
-        let fur = m.materials.iter().filter(|(_, x)| x.shader.as_deref() == Some("fur"));
-        let more = fur.map(|(name, x)| {
-            u64::from(fur_shells(layers(x), q)) * model.material(name).map_or(0, |i| of(model, i))
+        let fur = m.materials.iter().filter(|(_, x)| x.shader == "fur");
+        let more = fur.filter_map(|(name, x)| {
+            let shells = u64::from(fur_shells(layers(x)?, q));
+            Some(shells * model.material(name).map_or(0, |i| of(model, i)))
         });
         model.triangles + more.sum::<u64>()
     }

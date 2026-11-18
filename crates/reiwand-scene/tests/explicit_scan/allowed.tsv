@@ -15,7 +15,7 @@ catalog.rs	4	internal computation over runtime values (and 1 more kinds)
 content.rs	2	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
 cost.rs	3	lookup or text computation over runtime values (and 1 more kinds)
 cover.rs	1	internal computation over runtime values
-deep.rs	2	pending: Material.shader null means pbr (spec: shader is pbr by default)
+deep.rs	1	parameter min/max null means unbounded
 document.rs	1	runtime type, not serialized as a format
 drafted.rs	4	runtime type, not serialized as a format (and 3 more kinds)
 easing.rs	1	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
@@ -31,7 +31,7 @@ eval/shown.rs	5	size null means the canvas (and 2 more kinds)
 eval/staged.rs	14	field of runtime type Look, not part of a saved format (and 3 more kinds)
 eval/staged/group.rs	2	internal computation over runtime values (and 1 more kinds)
 eval/staged/key.rs	3	internal computation over runtime values
-eval/staged/looks.rs	14	pending: Scene.camera3d null takes the default 3D camera
+eval/staged/looks.rs	6	computation over runtime values; a null scene camera exists only without 3D content, where it is not drawn
 eval/staged/paths.rs	1	field of runtime type Flight, not part of a saved format
 eval/staged/paths/spline.rs	2	lookup or text computation over runtime values (and 1 more kinds)
 fence.rs	1	lookup or text computation over runtime values
@@ -125,7 +125,6 @@ played.rs	3	field of runtime type Taken, not part of a saved format (and 2 more 
 pointing.rs	7	field of runtime type Pointing, not part of a saved format (and 4 more kinds)
 poses.rs	3	lookup or text computation over runtime values (and 1 more kinds)
 prefill.rs	1	internal computation over runtime values
-probe/signal.rs	1	pending: Binding.of null means 64 bands (spec: default 64); the binding is one struct for every source, needs tagged variants
 props/check.rs	1	lookup or text computation over runtime values
 props/cond.rs	2	lookup or text computation over runtime values (and 1 more kinds)
 props/control.rs	2	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields
@@ -270,7 +269,7 @@ render/stack.rs	3	renderer: runtime state, GPU resources, caches and computation
 render/surface.rs	3	renderer: runtime state, GPU resources, caches and computation over data already validated
 render/texture.rs	2	renderer: runtime state, GPU resources, caches and computation over data already validated
 render/timeout.rs	1	renderer: runtime state, GPU resources, caches and computation over data already validated
-resolve.rs	3	pending: Binding.loop null takes the default Loop; same untagged Binding struct
+resolve.rs	2	lookup or text computation over runtime values
 resolve/binding.rs	9	internal computation over runtime values (and 2 more kinds)
 resolve/media.rs	6	internal computation over runtime values (and 1 more kinds)
 rig.rs	3	Default builds the value in code (templates, editor prefill, tests); the loader refuses omitted fields

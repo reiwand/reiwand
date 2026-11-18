@@ -19,6 +19,7 @@ mod grab;
 mod held;
 mod hulls;
 mod info;
+mod looks;
 mod maps;
 mod material;
 mod newmat;
@@ -41,6 +42,7 @@ mod view;
 pub use cost::cost;
 pub use gizmo::stage;
 pub use info::info;
+pub(crate) use looks::camera as camera_suggested;
 pub use store::file;
 pub use view::{View, preview};
 

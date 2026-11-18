@@ -67,7 +67,7 @@ fn the_view_orbits_pans_zooms_frames_and_looks_through_the_camera() {
     edit(&mut p, json!({ "view": { "through": true } })).unwrap();
     let mut scene = p.doc["scene"].clone();
     reiwand_editor::stage3d::preview(&mut scene);
-    assert!(scene["camera3d"].is_null());
+    assert_eq!(scene["camera3d"], p.doc["scene"]["camera3d"]);
     edit(&mut p, json!({ "view": { "reset": true } })).unwrap();
     assert!(p.doc["scene"]["ext"]["editor"]["view3d"].is_null());
 }
