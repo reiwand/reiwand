@@ -37,9 +37,9 @@ fn scripts_send_only_the_outputs_that_changed_and_every_event() {
         ["layer_edits"],
         "only the layer that changed is sent"
     );
-    assert_eq!(sent(&mut script, encoder, 3.0).unwrap(), ["values"], "a value changed in place is noticed");
-    assert_eq!(sent(&mut script, encoder, 4.0).unwrap(), ["timelines"]);
-    assert_eq!(sent(&mut script, encoder, 5.0).unwrap(), ["timelines"], "the same event is sent again");
+    assert_eq!(sent(&mut script, encoder, 3.0).unwrap(), ["layer_edits", "values"], "a value changed in place is noticed");
+    assert_eq!(sent(&mut script, encoder, 4.0).unwrap(), ["layer_edits", "timelines"]);
+    assert_eq!(sent(&mut script, encoder, 5.0).unwrap(), ["layer_edits", "timelines"], "the same event is sent again");
     assert!(matches!(sent(&mut script, encoder, 6.0), Err(Error::Timeout(_))));
     let again = sent(&mut script, encoder, 7.0).unwrap();
     assert!(again.len() >= first.len(), "after a failure everything is sent again: {again:?}");
