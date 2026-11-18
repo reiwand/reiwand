@@ -128,7 +128,7 @@ pub fn keyframe(doc: &Value, e: &KeyframeEdit) -> Result<Vec<Op>> {
                 ));
             }
             let value =
-                e.value.clone().or_else(|| current.cloned()).or_else(|| crate::resting::of(doc, pointer));
+                e.value.clone().or_else(|| current.filter(|v| !v.is_null()).cloned()).or_else(|| crate::resting::of(doc, pointer));
             let value = value.ok_or_else(|| {
                 anyhow!(said("editor.no_value_yet", "%1 has no value yet; give one", &[&pointer]))
             })?;

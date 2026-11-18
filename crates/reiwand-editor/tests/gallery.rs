@@ -96,7 +96,7 @@ fn trimming_keeps_the_part_inside_the_video_and_reads_its_real_length() {
     act(&mut p, json!({"film": {"trim": {"layer": "film", "start": 0.0, "end": length / 2.0}}})).unwrap();
     assert_eq!(p.doc["scene"]["layers"][0]["playback"]["end"], json!(length / 2.0));
     act(&mut p, json!({"film": {"trim": {"layer": "film", "start": 0.0}}})).unwrap();
-    assert!(whole::unset(&p.doc["scene"]["layers"][0]["playback"]["end"]));
+    assert_eq!(p.doc["scene"]["layers"][0]["playback"]["end"], json!("end"));
     let past = act(&mut p, json!({"film": {"trim": {"layer": "film", "start": 0.0, "end": length + 5.0}}}));
     assert!(past.is_err());
     let backwards = act(&mut p, json!({"film": {"trim": {"layer": "film", "start": 0.2, "end": 0.1}}}));
