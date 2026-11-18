@@ -46,7 +46,7 @@ fn count(conn: &Connection, sql: &str) -> i64 {
 
 fn assert_kept(data: &Path) {
     let conn = Connection::open(data.join("db/reiwand.sqlite")).unwrap();
-    assert_eq!(count(&conn, "PRAGMA user_version"), 15);
+    assert_eq!(count(&conn, "PRAGMA user_version"), 16);
     assert_eq!(count(&conn, "SELECT count(*) FROM packages WHERE repo = 'main'"), 2);
     assert_eq!(count(&conn, "SELECT count(*) FROM versions WHERE repo = 'main'"), 2);
     assert_eq!(count(&conn, "SELECT id FROM versions WHERE package_id = 'org.example.dawn'"), 7);
@@ -85,9 +85,9 @@ fn a_version_11_server_is_upgraded_once_keeping_everything() {
     let dir = tempfile::tempdir().unwrap();
     let data = dir.path();
     old_data(data);
-    assert_eq!(server::run(data).unwrap(), Outcome::Upgraded { from: 11, to: 15 });
+    assert_eq!(server::run(data).unwrap(), Outcome::Upgraded { from: 11, to: 16 });
     assert_kept(data);
-    let copy = Connection::open(data.join("db/reiwand.sqlite.before-v15-from-v11")).unwrap();
+    let copy = Connection::open(data.join("db/reiwand.sqlite.before-v16-from-v11")).unwrap();
     assert_eq!(count(&copy, "PRAGMA user_version"), 11);
     assert_eq!(count(&copy, "SELECT count(*) FROM votes"), 2);
     assert_eq!(server::run(data).unwrap(), Outcome::Nothing);
@@ -107,7 +107,7 @@ fn a_version_12_server_is_upgraded_too() {
     )
     .unwrap();
     drop(conn);
-    assert_eq!(server::run(data).unwrap(), Outcome::Upgraded { from: 12, to: 15 });
+    assert_eq!(server::run(data).unwrap(), Outcome::Upgraded { from: 12, to: 16 });
     assert_kept(data);
 }
 
@@ -119,4 +119,32 @@ fn a_folder_without_a_database_or_with_a_foreign_one_is_refused_or_left_alone() 
     let conn = Connection::open(dir.path().join("db/reiwand.sqlite")).unwrap();
     conn.execute_batch("CREATE TABLE x (a); PRAGMA user_version = 5").unwrap();
     assert!(server::run(dir.path()).is_err());
+}
+
+#[test]
+fn a_finished_server_gets_every_setting_written_and_an_unfinished_one_gets_none() {
+    for (setup, expected) in [("done", 8), ("wizard", 1)] {
+        let dir = tempfile::tempdir().unwrap();
+        let data = dir.path();
+        old_data(data);
+        let conn = Connection::open(data.join("db/reiwand.sqlite")).unwrap();
+        conn.execute("INSERT INTO settings (key, value) VALUES ('setup', ?1)", [setup]).unwrap();
+        drop(conn);
+        server::run(data).unwrap();
+        let conn = Connection::open(data.join("db/reiwand.sqlite")).unwrap();
+        assert_eq!(count(&conn, "SELECT count(*) FROM settings"), expected);
+        if setup == "done" {
+            let get = |key: &str| -> String {
+                conn.query_row("SELECT value FROM settings WHERE key = ?1", [key], |r| r.get(0)).unwrap()
+            };
+            assert_eq!(
+                (get("registration"), get("auto_publish"), get("network")),
+                ("invite".into(), "trusted".into(), "own".into())
+            );
+            assert_eq!(
+                (get("cert_path"), get("key_path"), get("admin")),
+                (String::new(), String::new(), "2".into())
+            );
+        }
+    }
 }
