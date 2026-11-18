@@ -7,6 +7,7 @@ Item {
 
     required property var page
     readonly property var editor: page.editor
+    readonly property alias exporting: exporting
     readonly property list<Kirigami.Action> actions: [
         Kirigami.Action {
             text: App.tr("Back")
@@ -54,7 +55,7 @@ Item {
             text: App.tr("Export…")
             icon.name: "document-export"
             enabled: bar.editor.ready
-            onTriggered: files.open()
+            onTriggered: exporting.open()
         },
         Kirigami.Action {
             text: App.tr("Reset all")
@@ -64,12 +65,9 @@ Item {
         }
     ]
 
-    Chooser {
-        id: files
+    EditExport {
+        id: exporting
 
-        mode: Chooser.Save
-        defaultSuffix: "png"
-        nameFilters: [App.tr("PNG pictures") + " (*.png)", App.tr("JPEG pictures") + " (*.jpg *.jpeg)", App.tr("Lossless WebP pictures") + " (*.webp)", App.tr("AVIF pictures") + " (*.avif)"]
-        onAccepted: bar.editor.saveAs(selectedFile.toString(), 90)
+        editor: bar.editor
     }
 }

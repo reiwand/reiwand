@@ -101,15 +101,23 @@ impl Editor {
         self.draw();
     }
 
-    pub fn save_as(mut self: Pin<&mut Self>, file: &QString, quality: u32) {
+    pub fn save_as(
+        mut self: Pin<&mut Self>,
+        file: &QString,
+        quality: u32,
+        width: u32,
+        height: u32,
+        original: bool,
+    ) {
         let out = crate::app::path(&file.to_string()).map(PathBuf::from).unwrap_or_default();
         let (edit, image, qt) = (self.edit.clone(), self.file.clone(), self.qt_thread());
+        let size = Some((width, height)).filter(|(w, h)| *w > 0 && *h > 0);
+        let sent = crate::picture::Sent { quality, size, original };
         self.as_mut().set_exported(QString::default());
         bus::spawn(async move {
             let made = {
                 let out = out.clone();
-                tokio::task::spawn_blocking(move || crate::picture::export(&image, &edit, &out, quality))
-                    .await
+                tokio::task::spawn_blocking(move || crate::picture::export(&image, &edit, &out, sent)).await
             };
             let made = made.map_err(anyhow::Error::from).and_then(|m| m);
             qt.queue(move |mut editor| match made {
