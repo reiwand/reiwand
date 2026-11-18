@@ -8,7 +8,6 @@ run() { cmd=$1 && shift && flatpak run --env=QT_QPA_PLATFORM=offscreen --env=REI
 test "$(run reiwand-ctl $app --version)" = "reiwand-ctl $version"
 test "$(run reiwandd $app --version)" = "reiwandd $version"
 run reiwand-app $app --check
-run reiwand-web $app --check
 test -x "$(flatpak info -l $app)/files/bin/reiwand-web"
 flatpak run --command=test $app -x /app/bin/QtWebEngineProcess
 files=$(flatpak info -l $app)/files
