@@ -1,35 +1,69 @@
 {
+  "authors": [],
+  "changes": null,
   "content": {
+    "descriptors": [],
     "rating": "general"
   },
+  "credits": [],
   "default_locale": "es",
+  "description": "",
+  "display": null,
   "entry": "scene.json",
   "id": "org.example.particulas",
+  "inputs": [],
   "kind": "scene",
   "license": "CC0-1.0",
+  "links": null,
   "origin": {
-    "kind": "original"
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
   },
+  "permissions": null,
   "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "preview": null,
+  "previews": null,
   "properties": {
     "densidad": {
+      "decimals": null,
       "default": 120,
+      "editable": false,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
       "integer": true,
       "label": {
         "es": "Cantidad de chispas"
       },
+      "log": false,
       "max": 300,
       "min": 0,
+      "order": 0,
+      "quality": {},
       "step": 10,
-      "type": "slider"
+      "type": "slider",
+      "unit": null,
+      "visible_if": {}
     }
   },
   "requires": {
+    "engine": null,
     "features": [
       "particles2"
-    ]
+    ],
+    "gpu": null,
+    "packages": []
   },
   "schema": "reiwand.wpak/2",
+  "strings": {},
+  "tags": [],
   "title": "Partículas",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "web": null
 }

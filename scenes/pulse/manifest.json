@@ -1,115 +1,41 @@
 {
-  "schema": "reiwand.wpak/2",
-  "id": "io.github.reiwand.example.pulse",
-  "version": "1.3.0",
-  "title": {
-    "en": "Pulse",
-    "es": "Pulso"
-  },
-  "description": {
-    "en": "A ring and a spectrum that follow the sound playing on the computer, once you allow it, around the cover, title and artist of what the media player plays.\n\nIt **flashes with the beat**, and its glitches jump on strong beats.",
-    "es": "Un anillo y un espectro que siguen el sonido que se reproduce en el equipo, cuando lo permites, alrededor de la carátula, el título y el artista de lo que suena en el reproductor.\n\n**Destella con el ritmo** y sus interferencias saltan en los golpes fuertes."
-  },
+  "authors": [
+    "Reiwand contributors"
+  ],
   "changes": {
     "en": "Says that nothing is playing where the title and artist go until a track plays.",
     "es": "Dice que no suena nada donde van el título y el artista hasta que suena una pista."
   },
-  "default_locale": "en",
-  "authors": [
-    "Reiwand contributors"
-  ],
-  "license": "CC0-1.0",
-  "origin": {
-    "kind": "original"
-  },
   "content": {
+    "descriptors": [],
     "rating": "general"
   },
-  "photosensitive": true,
-  "kind": "scene",
+  "credits": [],
+  "default_locale": "en",
+  "description": {
+    "en": "A ring and a spectrum that follow the sound playing on the computer, once you allow it, around the cover, title and artist of what the media player plays.\n\nIt **flashes with the beat**, and its glitches jump on strong beats.",
+    "es": "Un anillo y un espectro que siguen el sonido que se reproduce en el equipo, cuando lo permites, alrededor de la carátula, el título y el artista de lo que suena en el reproductor.\n\n**Destella con el ritmo** y sus interferencias saltan en los golpes fuertes."
+  },
+  "display": null,
   "entry": "scene.json",
-  "previews": {
-    "thumbnail": "preview.jpg"
-  },
-  "tags": [
-    "example",
-    "audio",
-    "music",
-    "media"
-  ],
-  "requires": {
-    "features": [
-      "effect.chromatic_aberration.angle",
-      "effect.chromatic_aberration.mode",
-      "inputs.audio",
-      "inputs.media",
-      "media_info"
-    ]
-  },
+  "id": "io.github.reiwand.example.pulse",
   "inputs": [
     "audio",
     "media"
   ],
-  "properties": {
-    "color": {
-      "label": {
-        "en": "Color",
-        "es": "Color"
-      },
-      "order": 1,
-      "type": "color",
-      "default": "#5ee7ff",
-      "alpha": false
-    },
-    "glitch": {
-      "label": {
-        "en": "Glitch on beats",
-        "es": "Interferencias con el ritmo"
-      },
-      "order": 3,
-      "type": "bool",
-      "default": true
-    },
-    "note": {
-      "label": {
-        "en": "Allow audio for this scene to make it move with the sound, and the media player to show the cover and title of what plays.",
-        "es": "Permite el audio a esta escena para que se mueva con el sonido, y el reproductor multimedia para que muestre la carátula y el título de lo que suena."
-      },
-      "type": "label"
-    },
-    "show": {
-      "label": {
-        "en": "Spectrum",
-        "es": "Espectro"
-      },
-      "order": 2,
-      "type": "combo",
-      "options": [
-        {
-          "value": "circle",
-          "label": {
-            "en": "Circle",
-            "es": "Círculo"
-          }
-        },
-        {
-          "value": "bars",
-          "label": {
-            "en": "Bars",
-            "es": "Barras"
-          }
-        },
-        {
-          "value": "both",
-          "label": {
-            "en": "Both",
-            "es": "Ambos"
-          }
-        }
-      ],
-      "default": "both"
-    }
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
   },
+  "permissions": null,
+  "photosensitive": true,
+  "platforms": [],
+  "playback": null,
   "presets": [
     {
       "id": "calm",
@@ -123,5 +49,124 @@
         "show": "circle"
       }
     }
-  ]
+  ],
+  "preview": null,
+  "previews": {
+    "animated": null,
+    "thumbnail": "preview.jpg"
+  },
+  "properties": {
+    "color": {
+      "alpha": false,
+      "default": "#5ee7ff",
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": {
+        "en": "Color",
+        "es": "Color"
+      },
+      "order": 1,
+      "quality": {},
+      "type": "color",
+      "visible_if": {}
+    },
+    "glitch": {
+      "default": true,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": {
+        "en": "Glitch on beats",
+        "es": "Interferencias con el ritmo"
+      },
+      "order": 3,
+      "quality": {},
+      "type": "bool",
+      "visible_if": {}
+    },
+    "note": {
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": {
+        "en": "Allow audio for this scene to make it move with the sound, and the media player to show the cover and title of what plays.",
+        "es": "Permite el audio a esta escena para que se mueva con el sonido, y el reproductor multimedia para que muestre la carátula y el título de lo que suena."
+      },
+      "order": 0,
+      "quality": {},
+      "type": "label",
+      "visible_if": {}
+    },
+    "show": {
+      "default": "both",
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": {
+        "en": "Spectrum",
+        "es": "Espectro"
+      },
+      "options": [
+        {
+          "icon": null,
+          "label": {
+            "en": "Circle",
+            "es": "Círculo"
+          },
+          "value": "circle"
+        },
+        {
+          "icon": null,
+          "label": {
+            "en": "Bars",
+            "es": "Barras"
+          },
+          "value": "bars"
+        },
+        {
+          "icon": null,
+          "label": {
+            "en": "Both",
+            "es": "Ambos"
+          },
+          "value": "both"
+        }
+      ],
+      "order": 2,
+      "quality": {},
+      "type": "combo",
+      "visible_if": {}
+    }
+  },
+  "requires": {
+    "engine": null,
+    "features": [
+      "effect.chromatic_aberration.angle",
+      "effect.chromatic_aberration.mode",
+      "inputs.audio",
+      "inputs.media",
+      "media_info"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/2",
+  "strings": {},
+  "tags": [
+    "example",
+    "audio",
+    "music",
+    "media"
+  ],
+  "title": {
+    "en": "Pulse",
+    "es": "Pulso"
+  },
+  "version": "1.3.0",
+  "web": null
 }

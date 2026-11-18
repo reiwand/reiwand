@@ -1,30 +1,126 @@
 {
-  "schema": "reiwand.wpak/2",
-  "id": "io.github.reiwand.example.orbits",
-  "version": "1.2.0",
+  "authors": [
+    "Reiwand contributors"
+  ],
+  "changes": {
+    "en": "Shows a picture or a video you choose behind the planets.",
+    "es": "Muestra una imagen o un vídeo que elijas tras los planetas."
+  },
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
   "default_locale": "en",
-  "title": { "en": "Orbits", "es": "Órbitas" },
-  "description": { "en": "Planets moved by a *scene script* around a glowing sun, with a clock in the corner.",
-                   "es": "Planetas que un *script de escena* mueve alrededor de un sol brillante, con un reloj en la esquina." },
-  "changes": { "en": "Shows a picture or a video you choose behind the planets.",
-              "es": "Muestra una imagen o un vídeo que elijas tras los planetas." },
-  "authors": ["Reiwand contributors"],
-  "license": "CC0-1.0",
-  "origin": { "kind": "original" },
-  "content": { "rating": "general" },
-  "photosensitive": false,
-  "kind": "scene",
+  "description": {
+    "en": "Planets moved by a *scene script* around a glowing sun, with a clock in the corner.",
+    "es": "Planetas que un *script de escena* mueve alrededor de un sol brillante, con un reloj en la esquina."
+  },
+  "display": null,
   "entry": "scene.json",
-  "previews": { "thumbnail": "preview.jpg" },
-  "tags": ["example", "space", "script"],
-  "requires": { "features": ["scripts", "user_videos"] },
+  "id": "io.github.reiwand.example.orbits",
+  "inputs": [],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
+  "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "preview": null,
+  "previews": {
+    "animated": null,
+    "thumbnail": "preview.jpg"
+  },
   "properties": {
-    "speed": { "type": "slider", "min": 0, "max": 4, "step": 0.25, "default": 1, "unit": "×",
-               "label": { "en": "Speed", "es": "Velocidad" } },
-    "clock": { "type": "bool", "order": 1, "default": true, "label": { "en": "Clock", "es": "Reloj" } },
-    "backdrop": { "type": "file", "order": 2, "accept": ["image", "video"],
-                  "label": { "en": "Picture or video behind", "es": "Imagen o vídeo de fondo" },
-                  "help": { "en": "Shows a picture or a video you choose behind the planets.",
-                            "es": "Muestra una imagen o un vídeo que elijas tras los planetas." } }
-  }
+    "backdrop": {
+      "accept": [
+        "image",
+        "video"
+      ],
+      "default_asset": null,
+      "enabled_if": {},
+      "group": null,
+      "help": {
+        "en": "Shows a picture or a video you choose behind the planets.",
+        "es": "Muestra una imagen o un vídeo que elijas tras los planetas."
+      },
+      "icon": null,
+      "label": {
+        "en": "Picture or video behind",
+        "es": "Imagen o vídeo de fondo"
+      },
+      "order": 2,
+      "quality": {},
+      "type": "file",
+      "visible_if": {}
+    },
+    "clock": {
+      "default": true,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": {
+        "en": "Clock",
+        "es": "Reloj"
+      },
+      "order": 1,
+      "quality": {},
+      "type": "bool",
+      "visible_if": {}
+    },
+    "speed": {
+      "decimals": null,
+      "default": 1,
+      "editable": false,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "integer": false,
+      "label": {
+        "en": "Speed",
+        "es": "Velocidad"
+      },
+      "log": false,
+      "max": 4,
+      "min": 0,
+      "order": 0,
+      "quality": {},
+      "step": 0.25,
+      "type": "slider",
+      "unit": "×",
+      "visible_if": {}
+    }
+  },
+  "requires": {
+    "engine": null,
+    "features": [
+      "scripts",
+      "user_videos"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/2",
+  "strings": {},
+  "tags": [
+    "example",
+    "space",
+    "script"
+  ],
+  "title": {
+    "en": "Orbits",
+    "es": "Órbitas"
+  },
+  "version": "1.2.0",
+  "web": null
 }

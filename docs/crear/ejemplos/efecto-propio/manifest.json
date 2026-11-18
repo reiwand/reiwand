@@ -1,34 +1,69 @@
 {
+  "authors": [],
+  "changes": null,
   "content": {
+    "descriptors": [],
     "rating": "general"
   },
+  "credits": [],
   "default_locale": "es",
+  "description": "",
+  "display": null,
   "entry": "scene.json",
   "id": "org.example.efecto-propio",
+  "inputs": [],
   "kind": "scene",
   "license": "CC0-1.0",
+  "links": null,
   "origin": {
-    "kind": "original"
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
   },
+  "permissions": null,
   "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "preview": null,
+  "previews": null,
   "properties": {
     "intensidad": {
+      "decimals": null,
       "default": 1,
+      "editable": false,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "integer": false,
       "label": {
         "es": "Intensidad del duotono"
       },
+      "log": false,
       "max": 1,
       "min": 0,
+      "order": 0,
+      "quality": {},
       "step": 0.05,
-      "type": "slider"
+      "type": "slider",
+      "unit": null,
+      "visible_if": {}
     }
   },
   "requires": {
+    "engine": null,
     "features": [
       "custom_effects"
-    ]
+    ],
+    "gpu": null,
+    "packages": []
   },
   "schema": "reiwand.wpak/2",
+  "strings": {},
+  "tags": [],
   "title": "Efecto propio",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "web": null
 }

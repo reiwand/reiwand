@@ -1,8 +1,14 @@
 {
+  "authors": [],
+  "changes": null,
   "content": {
+    "descriptors": [],
     "rating": "general"
   },
+  "credits": [],
   "default_locale": "es",
+  "description": "",
+  "display": null,
   "entry": "scene.json",
   "id": "org.example.sonido",
   "inputs": [
@@ -10,35 +16,65 @@
   ],
   "kind": "scene",
   "license": "CC0-1.0",
+  "links": null,
   "origin": {
-    "kind": "original"
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
   },
+  "permissions": null,
   "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "preview": null,
+  "previews": null,
   "properties": {
     "sonido_activo": {
       "default": true,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
       "label": {
         "es": "Sonido ambiente"
       },
-      "type": "bool"
+      "order": 0,
+      "quality": {},
+      "type": "bool",
+      "visible_if": {}
     },
     "ver_anillo": {
       "default": true,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
       "label": {
         "es": "Anillo del espectro"
       },
-      "type": "bool"
+      "order": 0,
+      "quality": {},
+      "type": "bool",
+      "visible_if": {}
     }
   },
   "requires": {
+    "engine": null,
     "features": [
       "audio_response",
       "inputs.audio",
       "shaping",
       "sound"
-    ]
+    ],
+    "gpu": null,
+    "packages": []
   },
   "schema": "reiwand.wpak/2",
+  "strings": {},
+  "tags": [],
   "title": "Sonido",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "web": null
 }

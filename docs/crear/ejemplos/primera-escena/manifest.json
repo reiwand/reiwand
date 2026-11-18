@@ -1,25 +1,53 @@
 {
+  "authors": [],
+  "changes": null,
   "content": {
+    "descriptors": [],
     "rating": "general"
   },
+  "credits": [],
   "default_locale": "es",
+  "description": "",
+  "display": null,
   "entry": "scene.json",
   "id": "org.example.primera-escena",
+  "inputs": [],
   "kind": "scene",
   "license": "CC0-1.0",
+  "links": null,
   "origin": {
-    "kind": "original"
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
   },
+  "permissions": null,
   "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "preview": null,
+  "previews": null,
   "properties": {
     "color_sol": {
+      "alpha": false,
       "default": "#ffd23f",
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
       "label": "Color del sol",
       "order": 1,
-      "type": "color"
+      "quality": {},
+      "type": "color",
+      "visible_if": {}
     }
   },
+  "requires": null,
   "schema": "reiwand.wpak/2",
+  "strings": {},
+  "tags": [],
   "title": "Mi primera escena",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "web": null
 }
