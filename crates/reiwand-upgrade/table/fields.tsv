@@ -25,7 +25,7 @@ scene	Asset.atlas	array|null	optional	3	null	editor.md:60
 scene	Asset.durations	array	optional	3	[]	package.md:306
 scene	Asset.face	number|null	optional	3	null	package.md:310
 scene	Asset.filter	string|null	optional	1	"linear"	dbus.md:585
-scene	Asset.fps	number|null	optional	3	null	dbus.md:2843
+scene	Asset.fps	number|null	optional	3	null	dbus.md:2855
 scene	Asset.frames	number|null	optional	3	null	dbus.md:2168
 scene	Asset.linear	boolean	optional	1	false	dbus.md:2439
 scene	Asset.media	string|null	optional	3	null	dbus.md:1906
@@ -650,7 +650,7 @@ scene	Render.brightness	number|object|null	optional	3	null	editor.md:85
 scene	Render.color_over_life	array	optional	3	[]	scene.md:1811
 scene	Render.cutout	array|null	optional	3	null	editor.md:85
 scene	Render.cycles	number|null	optional	3	null	editor.md:85
-scene	Render.fps	number	optional	1	12.0	dbus.md:2843
+scene	Render.fps	number	optional	1	12.0	dbus.md:2855
 scene	Render.frames	string|null	optional	3	null	dbus.md:2168
 scene	Render.lit	boolean	optional	1	false	choose-pieces.md:34
 scene	Render.mix	boolean	optional	1	false	editor.md:85
@@ -677,7 +677,7 @@ scene	Scene.effects	object	optional	3	{}	editor.md:52
 scene	Scene.ext	object	optional	3	{}	-
 scene	Scene.layers	array	optional	3	[]	dbus.md:814
 scene	Scene.listens	array	optional	3	[]	scene.md:2543
-scene	Scene.particles	object	optional	3	{}	dbus.md:2857
+scene	Scene.particles	object	optional	3	{}	dbus.md:2869
 scene	Scene.pools	object	optional	3	{}	package.md:368
 scene	Scene.scripts	array	optional	3	[]	editor.md:85
 scene	Scene.templates	object	optional	3	{}	editor.md:53
@@ -724,7 +724,7 @@ scene	Timeline.autoplay	boolean	optional	1	true	editor.md:117
 scene	Timeline.delay	number	optional	1	0.0	editor.md:85
 scene	Timeline.duration	number	optional	1	0	dbus.md:2049
 scene	Timeline.events	array	optional	3	[]	editor.md:95
-scene	Timeline.fps	number|null	optional	3	null	dbus.md:2843
+scene	Timeline.fps	number|null	optional	3	null	dbus.md:2855
 scene	Timeline.frames	number|null	optional	3	null	dbus.md:2168
 scene	Timeline.loop	Loop	optional	1	"once"	editor.md:72
 scene	Timeline.speed	number	optional	1	1.0	editor.md:85
@@ -795,7 +795,7 @@ manifest	Manifest.platforms	array	optional	3	[]	dbus.md:1052
 manifest	Manifest.playback	object|null	optional	3	null	editor.md:657
 manifest	Manifest.presets	array	optional	3	[]	editor.md:541
 manifest	Manifest.preview	string|null	optional	3	null	editor.md:657
-manifest	Manifest.previews	object|null	optional	3	null	dbus.md:2908
+manifest	Manifest.previews	object|null	optional	3	null	dbus.md:2920
 manifest	Manifest.properties	object	optional	3	{}	package.md:82
 manifest	Manifest.requires	object|null	optional	3	null	editor.md:750
 manifest	Manifest.strings	object	optional	3	{}	editor.md:726
@@ -861,7 +861,7 @@ config	Config.network	Network	optional	1	{"private":false}	dbus.md:1164
 config	Config.outputs	object	optional	3	{}	dbus.md:1489
 config	Config.pause	Pause	optional	1	{"on_battery":"always","when_covered":true,"when_locked":true}	dbus.md:771
 config	Config.playback	Playback	optional	1	{"allow_flashing":false,"auto_pace":"detail","duck":false,"hdr":"auto","lowest_below_percent":0,"max_fps":"display","muted":true,"quality":"auto","scene_capture":true,"scene_sound":true,"software_parallax":false,"volume":0.5}	editor.md:657
-config	Config.profile	string|null	optional	3	null	dbus.md:3216
+config	Config.profile	string|null	optional	3	null	dbus.md:3228
 config	Config.render	Render	optional	3	{}	editor.md:85
 config	Config.repos	Repos	optional	1	{"auto_refresh":true,"auto_update":false,"vote_counts":true}	dbus.md:761
 config	Config.rgb	Rgb	optional	1	{"enabled":false,"server":"127.0.0.1:6742","when_covered":"pause"}	dbus.md:764
@@ -901,7 +901,7 @@ config	OutputConfig.transition	string|null	optional	3	null	dbus.md:754
 config	Pause.on_battery	object|array|string|boolean|number|null	optional	1	"always"	dbus.md:757
 config	Pause.when_covered	boolean	optional	1	true	dbus.md:2169
 config	Pause.when_locked	boolean	optional	1	true	-
-config	Placed.mm	array	optional	1	[0.0,0.0,0.0,0.0]	dbus.md:2830
+config	Placed.mm	array	optional	1	[0.0,0.0,0.0,0.0]	dbus.md:2842
 config	Playback.allow_flashing	boolean	optional	1	false	-
 config	Playback.auto_pace	AutoPace	optional	1	"detail"	-
 config	Playback.duck	boolean	optional	1	false	-

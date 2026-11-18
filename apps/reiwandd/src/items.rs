@@ -10,8 +10,8 @@ use serde::Serialize;
 use serde_json::{Value, json};
 use std::hash::{BuildHasher, RandomState};
 
-mod resolve;
 mod merge;
+mod resolve;
 mod shape;
 pub use merge::merged;
 use merge::whole_item;

@@ -7,9 +7,9 @@ mod download;
 pub mod edits;
 pub mod fill;
 pub mod gain;
-pub mod manifests;
 #[cfg(any(feature = "client", feature = "server"))]
 pub mod library;
+pub mod manifests;
 mod phone;
 pub mod scenes;
 #[cfg(feature = "server")]
