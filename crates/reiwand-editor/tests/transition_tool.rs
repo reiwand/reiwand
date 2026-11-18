@@ -1,3 +1,6 @@
+#[path = "support/whole.rs"]
+mod whole;
+
 use reiwand_editor::Project;
 use reiwand_editor::actions::Action;
 use reiwand_editor::passing::{TransitionEdit, Way};
@@ -75,7 +78,7 @@ fn a_curve_a_duration_and_a_value_change_and_undo_takes_them_back() {
     assert_eq!(p.doc["scene"]["transition"]["in"]["duration_ms"], 1200);
     let cleared = serde_json::from_value(json!({ "edge": null })).unwrap();
     act(&mut p, TransitionEdit { params: Some(cleared), ..edit(Way::In) }).unwrap();
-    assert!(p.doc["scene"]["transition"]["in"].get("params").is_none());
+    assert_eq!(p.doc["scene"]["transition"]["in"]["params"], json!({}));
 }
 
 #[test]
@@ -92,7 +95,7 @@ fn what_breaks_a_rule_is_refused_and_the_scene_stays_as_it_was() {
     let unknown = act(&mut p, TransitionEdit { params: Some(odd), ..edit(Way::In) }).unwrap_err();
     assert!(unknown.to_string().contains("nothing"), "{unknown}");
     assert!(act(&mut p, TransitionEdit { curve: Some(json!("wobbly")), ..edit(Way::In) }).is_err());
-    fs::write(p.dir.join("plain.json"), json!({ "id": "plain", "cost": { "taps": 1 } }).to_string()).unwrap();
+    fs::write(p.dir.join("plain.json"), whole::descriptor(&json!({ "id": "plain", "cost": { "taps": 1 } }).to_string())).unwrap();
     fs::write(p.dir.join("plain.wgsl"), "fn transition(c: Crossing) -> Crossing { return c; }").unwrap();
     let stage =
         act(&mut p, TransitionEdit { effect: Some("plain.json".into()), ..edit(Way::In) }).unwrap_err();
@@ -107,9 +110,9 @@ fn removing_one_way_keeps_the_other_and_removing_both_leaves_no_transition() {
     act(&mut p, TransitionEdit { make: true, ..edit(Way::In) }).unwrap();
     act(&mut p, TransitionEdit { make: true, ..edit(Way::Out) }).unwrap();
     act(&mut p, TransitionEdit { remove: true, ..edit(Way::In) }).unwrap();
-    assert!(p.doc["scene"]["transition"].get("in").is_none());
+    assert!(p.doc["scene"]["transition"]["in"].is_null());
     act(&mut p, TransitionEdit { remove: true, ..edit(Way::Out) }).unwrap();
-    assert!(p.doc["scene"].get("transition").is_none());
+    assert_eq!(p.doc["scene"]["transition"], json!({ "in": null, "out": null }));
     p.act(&Action::Undo {}).unwrap();
     assert!(p.doc["scene"]["transition"]["out"].is_object());
     assert!(act(&mut p, TransitionEdit { remove: true, ..edit(Way::In) }).is_err());

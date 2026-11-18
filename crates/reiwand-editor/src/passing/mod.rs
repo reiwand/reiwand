@@ -28,14 +28,12 @@ pub(crate) fn act(dir: &Path, doc: &Value, e: &TransitionEdit) -> Result<Vec<Op>
     let key = e.way.key();
     if e.remove {
         ensure!(
-            doc.pointer(&at).is_some(),
+            doc.pointer(&at).is_some_and(|v| !v.is_null()),
             said("editor.transition_none", "there is no transition %1 to remove", &[&key])
         );
-        let alone = doc.pointer(&path(other(e.way))).is_none();
-        let gone = if alone { "/scene/transition".to_owned() } else { at };
-        return Ok(vec![Op::Remove { path: gone }]);
+        return Ok(set(doc, &at, Value::Null));
     }
-    let mut way = match doc.pointer(&at) {
+    let mut way = match doc.pointer(&at).filter(|v| !v.is_null()) {
         Some(v) => v.clone(),
         None if e.make => fresh(dir, doc, e)?,
         None => {
@@ -45,9 +43,7 @@ pub(crate) fn act(dir: &Path, doc: &Value, e: &TransitionEdit) -> Result<Vec<Op>
     if let Some(effect) = &e.effect {
         way["descriptor"] = json!(effect);
         way["wgsl"] = json!(wgsl_of(effect));
-        if let Some(m) = way.as_object_mut() {
-            m.remove("params");
-        }
+        way["params"] = json!({});
     }
     if let Some(ms) = e.duration_ms {
         way["duration_ms"] = json!(ms);
@@ -63,8 +59,8 @@ pub(crate) fn act(dir: &Path, doc: &Value, e: &TransitionEdit) -> Result<Vec<Op>
             v => way["params"][id] = v.clone(),
         }
     }
-    if way.get("params").is_some_and(|p| p.as_object().is_none_or(|m| m.is_empty())) {
-        way.as_object_mut().map(|m| m.remove("params"));
+    if !way["params"].is_object() {
+        way["params"] = json!({});
     }
     check(dir, e.way, &way)?;
     Ok(set(doc, &at, way))
@@ -83,7 +79,7 @@ fn fresh(dir: &Path, doc: &Value, e: &TransitionEdit) -> Result<Value> {
         (None, None) => starter::write(dir)?,
     };
     let wgsl = wgsl_of(&descriptor);
-    Ok(json!({ "descriptor": descriptor, "wgsl": wgsl, "duration_ms": 1200, "curve": "out_cubic" }))
+    Ok(json!({ "descriptor": descriptor, "wgsl": wgsl, "duration_ms": 1200, "curve": "out_cubic", "params": {} }))
 }
 
 pub fn readied(dir: &Path, way: Way, value: &Value) -> Result<Readied> {
