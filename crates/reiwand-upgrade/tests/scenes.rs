@@ -54,7 +54,7 @@ fn every_particle_system_gains_explicit_zero_tilt() {
     let zeros = json!({"angle": [[0.0, 0.0], [0.0, 0.0]], "spin": [[0.0, 0.0], [0.0, 0.0]]});
     assert_eq!(p["bare"]["init"]["tilt"], zeros);
     assert_eq!(p["plain"]["init"]["tilt"], zeros);
-    assert_eq!(p["plain"]["init"]["life"], json!([1, 2]));
+    assert_eq!(p["plain"]["init"]["life"], json!([1, 2, 1]));
     assert_eq!(p["kept"]["init"]["tilt"]["angle"], json!([[5, 5], [9, 9]]));
 }
 

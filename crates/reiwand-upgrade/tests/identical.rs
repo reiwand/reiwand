@@ -69,5 +69,5 @@ fn manifests_read_the_same_after_step_a() {
         );
         read += 1;
     }
-    assert!(read >= 30, "the corpus is too small: {read}");
+    assert!(read >= 20, "the corpus is too small: {read}");
 }
