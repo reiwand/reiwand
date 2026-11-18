@@ -36,7 +36,8 @@ fn sandbox_usable() -> bool {
 }
 
 fn proxy(network: &[String]) -> String {
-    let bypass: Vec<&str> = std::iter::once("<-loopback>").chain(network.iter().map(String::as_str)).collect();
+    let bypass: Vec<&str> =
+        std::iter::once("<-loopback>").chain(network.iter().map(String::as_str)).collect();
     format!("--proxy-server=http://127.0.0.1:1 --proxy-bypass-list={}", bypass.join(";"))
 }
 

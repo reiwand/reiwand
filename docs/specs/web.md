@@ -140,6 +140,8 @@ Every layer applies to every page:
 6. WebKit runs the page in its own process inside its bubblewrap and seccomp sandbox, limited to
    768 MB of memory.
 
+Limit: a `fetch` of a file that is not in the package answers with a network error because the helper redirects it to a blocked address; Qt WebEngine never settles a `fetch` when the request job is failed with `fail`, so the failure cannot be reported with a proper error code.
+
 `OutputState.sandbox` is `"on"` when every layer is in place and `"reduced"` when WebKit could not
 start its sandbox or the namespaces could not be made (some containers forbid them); clients show
 it next to the privacy notice. `reiwand-ctl` prints the same notice, on standard error, after `lib apply`,
