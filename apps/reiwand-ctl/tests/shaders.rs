@@ -1,3 +1,6 @@
+#[path = "whole/mod.rs"]
+mod whole;
+
 use serde_json::{Value, json};
 use std::io::Write;
 use std::path::Path;
@@ -13,7 +16,7 @@ const ENDLESS: &str = "@fragment fn fs_dim(in: VertexOut) -> @location(0) vec4<f
 const REASON: &str = "a counter that a literal limits";
 
 fn descriptor() -> String {
-    json!({ "id": "dim", "cost": {}, "passes": [{ "entry": "fs_dim" }] }).to_string()
+    whole::descriptor(json!({ "id": "dim", "cost": {}, "passes": [{ "entry": "fs_dim" }] }))
 }
 
 fn run(dir: &Path, args: &[&str]) -> Output {

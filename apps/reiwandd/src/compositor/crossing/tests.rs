@@ -14,10 +14,11 @@ fn passages() -> (Arc<Ready>, Arc<Ready>) {
     let way = |ms: u32| json!({ "descriptor": "t/wipe.json", "wgsl": "t/wipe.wgsl", "duration_ms": ms });
     let transition = json!({ "out": way(1000), "in": way(3000) });
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [16, 9] }, "transition": transition });
-    let mut scene = Scene::load(&text.to_string(), &BTreeMap::new()).expect("scene");
-    let descriptor = json!({ "id": "wipe", "stage": "transition", "cost": { "taps": 1 } });
+    let mut scene = Scene::load(&crate::whole::scene(&text.to_string()), &BTreeMap::new()).expect("scene");
+    let descriptor =
+        crate::whole::descriptor(json!({ "id": "wipe", "stage": "transition", "cost": { "taps": 1 } }));
     let files = |path: &str, _: usize| match path {
-        "t/wipe.json" => Ok(descriptor.to_string().into_bytes()),
+        "t/wipe.json" => Ok(descriptor.clone().into_bytes()),
         "t/wipe.wgsl" => Ok(WIPE.as_bytes().to_vec()),
         _ => Err("missing"),
     };

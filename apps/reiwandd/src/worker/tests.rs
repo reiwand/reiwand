@@ -53,11 +53,12 @@ fn package(dir: &Path, kind: &str, entry: &str, preview: Option<&str>) -> PathBu
     RgbaImage::from_pixel(20, 20, image::Rgba([0, 0, 255, 255])).save(source.join("preview.png")).unwrap();
     if kind == "scene" {
         let scene = r##"{"schema": "reiwand.scene/1", "canvas": {"size": [64, 32]}, "layers": [{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ff0000"}]}"##;
-        std::fs::write(source.join("scene.json"), scene).unwrap();
+        std::fs::write(source.join("scene.json"), crate::whole::scene(scene)).unwrap();
     }
-    let manifest = serde_json::json!({"schema": reiwand_format::SCHEMA, "id": "org.example.calm", "version": "1.0.0",
+    let mut manifest = serde_json::json!({"schema": reiwand_format::SCHEMA, "id": "org.example.calm", "version": "1.0.0",
         "title": "Calm", "license": "CC0-1.0", "kind": kind, "entry": entry, "previews": {"thumbnail": preview},
         "content": {"rating": "general"}, "photosensitive": false, "origin": {"kind": "original"}});
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
     std::fs::write(source.join("manifest.json"), manifest.to_string()).unwrap();
     let wpak = dir.join(format!("{kind}.wpak"));
     reiwand_format::build(&source, &wpak, &reiwand_format::Limits::default()).unwrap();

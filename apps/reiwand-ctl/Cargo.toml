@@ -35,6 +35,7 @@ zeroize.workspace = true
 [dev-dependencies]
 tempfile.workspace = true
 reiwand-video.workspace = true
+reiwand-upgrade.workspace = true
 
 [[test]]
 name = "net"

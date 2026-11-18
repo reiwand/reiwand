@@ -10,7 +10,7 @@ fn slowed(lights: bool) -> (Quality, &'static str) {
     let text = json!({ "schema": SCHEMA, "canvas": { "size": [64, 36] }, "layers": [fade],
         "timelines": [{ "id": "fade", "duration": 1.0, "loop": "repeat" }] });
     let pack = Arc::new(ScenePack::bare(
-        Scene::from_json(&text.to_string()).unwrap(),
+        Scene::from_json(&crate::whole::scene(&text.to_string())).unwrap(),
         Default::default(),
         Vec::new(),
     ));

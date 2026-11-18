@@ -83,7 +83,11 @@
       "effect.blur_motion.shutter",
       "effect.depth_parallax.scale",
       "effect.depth_parallax.smooth",
-      "inputs.pointer"
+      "inputs.audio",
+      "inputs.media",
+      "inputs.pointer",
+      "layer_color",
+      "mask_strength"
     ]
   },
   "inputs": [
@@ -94,111 +98,183 @@
       "label": "@caption",
       "help": "@caption_help",
       "group": "words",
+      "visible_if": {},
+      "enabled_if": {},
       "order": 1,
+      "icon": null,
+      "quality": {},
       "type": "text",
       "default": "",
       "max_len": 40,
-      "multiline": false
+      "multiline": false,
+      "secret": false
     },
     "caption_color": {
       "label": "@caption_color",
+      "help": null,
       "group": "words",
+      "visible_if": {},
+      "enabled_if": {},
       "order": 2,
+      "icon": null,
+      "quality": {},
       "type": "color",
       "default": "#ffffffd0",
       "alpha": true
     },
     "depth": {
       "label": "@depth",
+      "help": null,
       "group": "look",
+      "visible_if": {},
+      "enabled_if": {},
       "order": 7,
+      "icon": null,
+      "quality": {},
       "type": "combo",
       "options": [
         {
           "value": "pointer",
-          "label": "@pointer"
+          "label": "@pointer",
+          "icon": null
         },
         {
           "value": "orbit",
-          "label": "@orbit"
+          "label": "@orbit",
+          "icon": null
         },
         {
           "value": "off",
-          "label": "@off"
+          "label": "@off",
+          "icon": null
         }
       ],
       "default": "pointer"
     },
     "light": {
       "label": "@light",
+      "help": null,
       "group": "look",
+      "visible_if": {},
+      "enabled_if": {},
       "order": 3,
+      "icon": null,
+      "quality": {},
       "type": "color",
       "default": "#ff9a5c",
       "alpha": false
     },
     "look": {
       "label": "@look",
-      "type": "group"
+      "help": null,
+      "group": null,
+      "visible_if": {},
+      "enabled_if": {},
+      "order": 0,
+      "icon": null,
+      "quality": {},
+      "type": "group",
+      "collapsed": false
     },
     "mood": {
       "label": "@mood",
+      "help": null,
       "group": "look",
+      "visible_if": {},
+      "enabled_if": {},
       "order": 1,
+      "icon": null,
+      "quality": {},
       "type": "combo",
       "options": [
         {
           "value": "dusk",
-          "label": "@dusk"
+          "label": "@dusk",
+          "icon": null
         },
         {
           "value": "night",
-          "label": "@night"
+          "label": "@night",
+          "icon": null
         }
       ],
       "default": "dusk"
     },
     "stars": {
       "label": "@stars",
+      "help": null,
       "group": "look",
+      "visible_if": {},
+      "enabled_if": {},
       "order": 2,
+      "icon": null,
+      "quality": {},
       "type": "bool",
       "default": true
     },
     "sun_size": {
       "label": "@sun_size",
+      "help": null,
       "group": "look",
+      "visible_if": {},
+      "enabled_if": {},
       "order": 5,
+      "icon": null,
+      "quality": {},
       "type": "slider",
       "min": 0.5,
       "max": 1.5,
       "step": 0.05,
       "default": 1.0,
       "integer": false,
-      "unit": "×"
+      "unit": "×",
+      "decimals": null,
+      "editable": false,
+      "log": false
     },
     "vignette": {
       "label": "@vignette",
+      "help": null,
       "group": "look",
+      "visible_if": {},
+      "enabled_if": {},
       "order": 6,
+      "icon": null,
+      "quality": {},
       "type": "bool",
       "default": true
     },
     "warmth": {
       "label": "@warmth",
+      "help": null,
       "group": "look",
+      "visible_if": {},
+      "enabled_if": {},
       "order": 4,
+      "icon": null,
+      "quality": {},
       "type": "slider",
       "min": 0.0,
       "max": 1.0,
       "step": 0.05,
       "default": 0.35,
-      "integer": false
+      "integer": false,
+      "unit": null,
+      "decimals": null,
+      "editable": false,
+      "log": false
     },
     "words": {
       "label": "@words",
+      "help": null,
+      "group": null,
+      "visible_if": {},
+      "enabled_if": {},
       "order": 1,
-      "type": "group"
+      "icon": null,
+      "quality": {},
+      "type": "group",
+      "collapsed": false
     }
   },
   "presets": [

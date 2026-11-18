@@ -27,6 +27,7 @@ minisign = { workspace = true, optional = true }
 [dev-dependencies]
 tempfile.workspace = true
 image.workspace = true
+reiwand-upgrade.workspace = true
 
 [[test]]
 name = "anchor_mismatch"

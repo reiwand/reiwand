@@ -41,8 +41,10 @@ fn display_and_playback_fields_belong_to_their_kinds() {
     let platforms = Platform::ALL.map(|p| features::lacks(p.name(), &read));
     assert!(platforms.iter().all(Vec::is_empty), "{platforms:?}");
     let tinted = Manifest {
-        properties: serde_json::from_value(json!({ "tint": { "type": "color", "default": "#ff8800" },
-            "on": { "type": "bool", "default": true } }))
+        properties: serde_json::from_value(common::properties(
+            json!({ "tint": { "type": "color", "default": "#ff8800" },
+            "on": { "type": "bool", "default": true } }),
+        ))
         .unwrap(),
         ..shown(Kind::Scene, json!({ "accent": { "prop": "tint" } }))
     };
@@ -88,7 +90,7 @@ fn display_and_playback_fields_belong_to_their_kinds() {
 #[test]
 fn shortcuts_lists_of_folders_and_quality_values_are_checked() {
     let props = |properties: Value| Manifest {
-        properties: serde_json::from_value(properties).unwrap(),
+        properties: serde_json::from_value(common::properties(properties)).unwrap(),
         ..v2(Kind::Scene)
     };
     let all = props(json!({
@@ -131,7 +133,7 @@ fn shortcuts_lists_of_folders_and_quality_values_are_checked() {
     let shortcut = json!({ "open": { "type": "shortcut" } });
     let preset = Manifest {
         presets: serde_json::from_value(
-            json!([{ "id": "p", "values": { "open": { "uri": "https://example.org" } } }]),
+            json!([{ "id": "p", "label": null, "values": { "open": { "uri": "https://example.org" } } }]),
         )
         .unwrap(),
         ..props(shortcut)
@@ -140,6 +142,8 @@ fn shortcuts_lists_of_folders_and_quality_values_are_checked() {
     let quiet = props(json!({ "photos": { "type": "folder" } }));
     assert_eq!(
         serde_json::to_value(&quiet).unwrap()["properties"]["photos"],
-        json!({ "type": "folder", "accept": [], "pick": "random", "every": 60 })
+        json!({ "type": "folder", "accept": [], "pick": "random", "every": 60, "mode": "one", "max_files": 1000,
+            "recursive": 0, "label": null, "help": null, "group": null, "icon": null, "order": 0,
+            "visible_if": {}, "enabled_if": {}, "quality": {} })
     );
 }

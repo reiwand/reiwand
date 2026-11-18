@@ -1,3 +1,6 @@
+#[path = "whole/mod.rs"]
+mod whole;
+
 use std::path::Path;
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
@@ -83,7 +86,7 @@ fn lamp_scene(home: &Path, source: &str) -> std::path::PathBuf {
     let script =
         serde_json::json!({ "path": "scripts/lamp.js", "events": ["update"], "uses": ["layers", "media"] });
     doc["scripts"] = serde_json::json!([script]);
-    std::fs::write(folder.join("scene.json"), doc.to_string()).unwrap();
+    std::fs::write(folder.join("scene.json"), whole::scene(&doc.to_string())).unwrap();
     std::fs::create_dir_all(folder.join("scripts")).unwrap();
     std::fs::write(folder.join("scripts/lamp.js"), source).unwrap();
     folder

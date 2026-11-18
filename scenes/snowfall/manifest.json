@@ -1,150 +1,48 @@
 {
-  "schema": "reiwand.wpak/2",
-  "id": "io.github.reiwand.example.snowfall",
-  "version": "1.2.0",
-  "title": {
-    "en": "Snowfall",
-    "es": "Nevada"
-  },
-  "description": {
-    "en": "Snow drifting over pines in moonlight, with particles, drifting clouds, light rays, a vignette, film grain and the sound of the wind.",
-    "es": "Nieve que cae sobre pinos a la luz de la luna, con partículas, nubes a la deriva, rayos de luz, viñeta, grano de película y el sonido del viento."
-  },
+  "authors": [
+    "Reiwand contributors"
+  ],
   "changes": {
     "en": "Shows the pictures of a folder you choose behind the snow.",
     "es": "Muestra las imágenes de una carpeta que elijas tras la nieve."
   },
-  "default_locale": "en",
-  "authors": [
-    "Reiwand contributors"
-  ],
-  "license": "CC0-1.0",
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
   "credits": [
     {
+      "attribution": "Reiwand contributors",
+      "license": "CC0-1.0",
       "paths": [
         "assets/wind.ogg"
       ],
-      "license": "CC0-1.0",
-      "attribution": "Reiwand contributors"
+      "source": null,
+      "url": null
     }
   ],
-  "origin": {
-    "kind": "original"
+  "default_locale": "en",
+  "description": {
+    "en": "Snow drifting over pines in moonlight, with particles, drifting clouds, light rays, a vignette, film grain and the sound of the wind.",
+    "es": "Nieve que cae sobre pinos a la luz de la luna, con partículas, nubes a la deriva, rayos de luz, viñeta, grano de película y el sonido del viento."
   },
-  "content": {
-    "rating": "general"
-  },
-  "photosensitive": false,
-  "kind": "scene",
+  "display": null,
   "entry": "scene.json",
-  "previews": {
-    "thumbnail": "preview.jpg"
+  "id": "io.github.reiwand.example.snowfall",
+  "inputs": [],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
   },
-  "tags": [
-    "example",
-    "winter",
-    "particles",
-    "sound"
-  ],
-  "requires": {
-    "features": [
-      "effect.film_grain.bias",
-      "effect.film_grain.blend",
-      "effect.film_grain.mono",
-      "effect.god_rays.angle",
-      "effect.god_rays.edges",
-      "effect.god_rays.mode",
-      "effect.god_rays.noise",
-      "folder",
-      "properties2",
-      "sound"
-    ]
-  },
-  "properties": {
-    "clouds": {
-      "label": {
-        "en": "Clouds",
-        "es": "Nubes"
-      },
-      "order": 2,
-      "type": "bool",
-      "default": true
-    },
-    "density": {
-      "label": {
-        "en": "Snowflakes per second",
-        "es": "Copos por segundo"
-      },
-      "type": "slider",
-      "min": 10.0,
-      "max": 120.0,
-      "step": 5.0,
-      "default": 80.0,
-      "integer": true
-    },
-    "photos": {
-      "label": {
-        "en": "Pictures behind the snow",
-        "es": "Imágenes tras la nieve"
-      },
-      "help": {
-        "en": "Shows the pictures of a folder you choose behind the falling snow, a new one every ten minutes.",
-        "es": "Muestra las imágenes de una carpeta que elijas tras la nieve que cae, una nueva cada diez minutos."
-      },
-      "order": 4,
-      "type": "folder",
-      "accept": [
-        "image"
-      ],
-      "pick": "sequence",
-      "every": 600
-    },
-    "volume": {
-      "label": {
-        "en": "Wind volume",
-        "es": "Volumen del viento"
-      },
-      "order": 3,
-      "type": "slider",
-      "min": 0.0,
-      "max": 100.0,
-      "step": 5.0,
-      "default": 100.0,
-      "integer": true
-    },
-    "wind": {
-      "label": {
-        "en": "Wind",
-        "es": "Viento"
-      },
-      "order": 1,
-      "type": "combo",
-      "options": [
-        {
-          "value": "calm",
-          "label": {
-            "en": "Calm",
-            "es": "En calma"
-          }
-        },
-        {
-          "value": "breeze",
-          "label": {
-            "en": "Breeze",
-            "es": "Brisa"
-          }
-        },
-        {
-          "value": "gale",
-          "label": {
-            "en": "Gale",
-            "es": "Ventisca"
-          }
-        }
-      ],
-      "default": "breeze"
-    }
-  },
+  "permissions": null,
+  "photosensitive": false,
+  "platforms": [],
+  "playback": null,
   "presets": [
     {
       "id": "blizzard",
@@ -169,5 +67,170 @@
         "wind": "calm"
       }
     }
-  ]
+  ],
+  "preview": null,
+  "previews": {
+    "animated": null,
+    "thumbnail": "preview.jpg"
+  },
+  "properties": {
+    "clouds": {
+      "default": true,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": {
+        "en": "Clouds",
+        "es": "Nubes"
+      },
+      "order": 2,
+      "quality": {},
+      "type": "bool",
+      "visible_if": {}
+    },
+    "density": {
+      "decimals": null,
+      "default": 80.0,
+      "editable": false,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "integer": true,
+      "label": {
+        "en": "Snowflakes per second",
+        "es": "Copos por segundo"
+      },
+      "log": false,
+      "max": 120.0,
+      "min": 10.0,
+      "order": 0,
+      "quality": {},
+      "step": 5.0,
+      "type": "slider",
+      "unit": null,
+      "visible_if": {}
+    },
+    "photos": {
+      "accept": [
+        "image"
+      ],
+      "enabled_if": {},
+      "every": 600,
+      "group": null,
+      "help": {
+        "en": "Shows the pictures of a folder you choose behind the falling snow, a new one every ten minutes.",
+        "es": "Muestra las imágenes de una carpeta que elijas tras la nieve que cae, una nueva cada diez minutos."
+      },
+      "icon": null,
+      "label": {
+        "en": "Pictures behind the snow",
+        "es": "Imágenes tras la nieve"
+      },
+      "max_files": 1000,
+      "mode": "one",
+      "order": 4,
+      "pick": "sequence",
+      "quality": {},
+      "recursive": 0,
+      "type": "folder",
+      "visible_if": {}
+    },
+    "volume": {
+      "decimals": null,
+      "default": 100.0,
+      "editable": false,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "integer": true,
+      "label": {
+        "en": "Wind volume",
+        "es": "Volumen del viento"
+      },
+      "log": false,
+      "max": 100.0,
+      "min": 0.0,
+      "order": 3,
+      "quality": {},
+      "step": 5.0,
+      "type": "slider",
+      "unit": null,
+      "visible_if": {}
+    },
+    "wind": {
+      "default": "breeze",
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": {
+        "en": "Wind",
+        "es": "Viento"
+      },
+      "options": [
+        {
+          "icon": null,
+          "label": {
+            "en": "Calm",
+            "es": "En calma"
+          },
+          "value": "calm"
+        },
+        {
+          "icon": null,
+          "label": {
+            "en": "Breeze",
+            "es": "Brisa"
+          },
+          "value": "breeze"
+        },
+        {
+          "icon": null,
+          "label": {
+            "en": "Gale",
+            "es": "Ventisca"
+          },
+          "value": "gale"
+        }
+      ],
+      "order": 1,
+      "quality": {},
+      "type": "combo",
+      "visible_if": {}
+    }
+  },
+  "requires": {
+    "engine": null,
+    "features": [
+      "effect.film_grain.bias",
+      "effect.film_grain.blend",
+      "effect.film_grain.mono",
+      "effect.god_rays.angle",
+      "effect.god_rays.edges",
+      "effect.god_rays.mode",
+      "effect.god_rays.noise",
+      "folder",
+      "properties2",
+      "sound"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/2",
+  "strings": {},
+  "tags": [
+    "example",
+    "winter",
+    "particles",
+    "sound"
+  ],
+  "title": {
+    "en": "Snowfall",
+    "es": "Nevada"
+  },
+  "version": "1.2.0",
+  "web": null
 }

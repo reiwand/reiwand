@@ -1,3 +1,6 @@
+#[path = "whole/mod.rs"]
+mod whole;
+
 use serde_json::{Value, json};
 use std::path::Path;
 use std::process::{Command, Output, Stdio};
@@ -22,7 +25,7 @@ fn scene(dir: &Path, scripts: &[(&str, Option<&str>)]) {
     let listed: Vec<Value> =
         scripts.iter().map(|(p, _)| json!({ "path": p, "events": ["update"] })).collect();
     doc["scripts"] = json!(listed);
-    std::fs::write(&file, doc.to_string()).unwrap();
+    std::fs::write(&file, whole::scene(&doc.to_string())).unwrap();
     std::fs::create_dir_all(dir.join("snow/scripts")).unwrap();
     for (path, text) in scripts {
         text.iter().for_each(|text| std::fs::write(dir.join("snow").join(path), text).unwrap());

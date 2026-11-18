@@ -58,9 +58,9 @@ impl Repo {
         fs::create_dir_all(&src).unwrap();
         let manifest = Manifest { kind: Kind::Scene, entry: "scene.json".into(), ..manifest(id, version) };
         fs::write(src.join("manifest.json"), manifest.to_json().unwrap()).unwrap();
-        let scene = r##"{"schema": "reiwand.scene/1", "canvas": {"size": [64, 32]},
+        let scene = r##"{"schema": "reiwand.scene/2", "canvas": {"size": [64, 32]},
             "layers": [{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#336699"}]}"##;
-        fs::write(src.join("scene.json"), scene).unwrap();
+        fs::write(src.join("scene.json"), reiwand_upgrade::fill::whole(scene)).unwrap();
         fs::write(src.join("preview.png"), PNG).unwrap();
         sign_source(&src, &signer(&self.author)).unwrap();
         let out = self.tmp.path().join(format!("{id}-{version}.wpak"));

@@ -1,6 +1,6 @@
 mod common;
 
-use common::manifest;
+use common::{manifest, manifest_text};
 use reiwand_format::{Control, Error, Kind, Manifest, Property, Result, Slider};
 
 fn with(edit: impl FnOnce(&mut Manifest)) -> Result<()> {
@@ -32,7 +32,7 @@ fn parses_minimal_json_with_typed_properties() {
         "license":"MIT","kind":"scene","entry":"scene.json","content":{"rating":"general"},
         "photosensitive":false,"origin":{"kind":"original"},"properties":{"speed":{"type":"slider",
         "min":0,"max":2,"step":0.25,"default":1},"dark":{"type":"bool","default":false}}}"#;
-    let manifest = Manifest::from_json(json).unwrap();
+    let manifest = Manifest::from_json(manifest_text(std::str::from_utf8(json).unwrap()).as_bytes()).unwrap();
     assert_eq!(manifest.kind, Kind::Scene);
     assert_eq!(
         manifest.properties["speed"],

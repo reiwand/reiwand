@@ -1,24 +1,84 @@
 {
-  "schema": "reiwand.wpak/2",
-  "id": "org.example.grupo_por_ajuste",
-  "version": "1.0.0",
-  "kind": "scene",
-  "entry": "scene.json",
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
   "default_locale": "en",
-  "title": { "en": "Day or night", "es": "Día o noche" },
+  "description": "",
+  "display": null,
+  "entry": "scene.json",
+  "id": "org.example.grupo_por_ajuste",
+  "inputs": [],
+  "kind": "scene",
   "license": "CC0-1.0",
-  "origin": { "kind": "original" },
-  "content": { "rating": "general" },
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
   "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "preview": null,
+  "previews": null,
   "properties": {
     "momento": {
-      "type": "combo", "default": "auto",
-      "label": { "en": "Moment", "es": "Momento" },
+      "default": "auto",
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": {
+        "en": "Moment",
+        "es": "Momento"
+      },
       "options": [
-        { "value": "auto", "label": { "en": "By the time of day", "es": "Según la hora" } },
-        { "value": "dia", "label": { "en": "Day", "es": "Día" } },
-        { "value": "noche", "label": { "en": "Night", "es": "Noche" } }
-      ]
+        {
+          "icon": null,
+          "label": {
+            "en": "By the time of day",
+            "es": "Según la hora"
+          },
+          "value": "auto"
+        },
+        {
+          "icon": null,
+          "label": {
+            "en": "Day",
+            "es": "Día"
+          },
+          "value": "dia"
+        },
+        {
+          "icon": null,
+          "label": {
+            "en": "Night",
+            "es": "Noche"
+          },
+          "value": "noche"
+        }
+      ],
+      "order": 0,
+      "quality": {},
+      "type": "combo",
+      "visible_if": {}
     }
-  }
+  },
+  "requires": null,
+  "schema": "reiwand.wpak/2",
+  "strings": {},
+  "tags": [],
+  "title": {
+    "en": "Day or night",
+    "es": "Día o noche"
+  },
+  "version": "1.0.0",
+  "web": null
 }

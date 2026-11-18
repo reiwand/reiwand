@@ -1,19 +1,75 @@
 {
-  "schema": "reiwand.wpak/2",
-  "id": "org.example.probe",
-  "version": "1.0.0",
-  "title": "Probe",
-  "license": "CC0-1.0",
-  "origin": {
-    "kind": "original"
-  },
+  "authors": [],
+  "changes": null,
   "content": {
+    "descriptors": [],
     "rating": "general"
   },
-  "photosensitive": false,
-  "kind": "web",
+  "credits": [],
+  "default_locale": null,
+  "description": "",
+  "display": null,
   "entry": "index.html",
+  "id": "org.example.probe",
+  "inputs": [
+    "audio",
+    "pointer",
+    "clicks",
+    "media"
+  ],
+  "kind": "web",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
+  "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "preview": null,
+  "previews": null,
+  "properties": {
+    "speed": {
+      "decimals": null,
+      "default": 1.0,
+      "editable": false,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "integer": false,
+      "label": "Speed",
+      "log": false,
+      "max": 2.0,
+      "min": 0.0,
+      "order": 0,
+      "quality": {},
+      "step": null,
+      "type": "slider",
+      "unit": null,
+      "visible_if": {}
+    },
+    "tint": {
+      "alpha": false,
+      "default": "#ff8000",
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": "Tint",
+      "order": 0,
+      "quality": {},
+      "type": "color",
+      "visible_if": {}
+    }
+  },
   "requires": {
+    "engine": null,
     "features": [
       "inputs.audio",
       "inputs.clicks",
@@ -21,33 +77,18 @@
       "inputs.pointer",
       "properties2",
       "web"
-    ]
+    ],
+    "gpu": null,
+    "packages": []
   },
-  "inputs": [
-    "audio",
-    "pointer",
-    "clicks",
-    "media"
-  ],
+  "schema": "reiwand.wpak/2",
+  "strings": {},
+  "tags": [],
+  "title": "Probe",
+  "version": "1.0.0",
   "web": {
-    "preload": "early.js",
     "background": "#102030",
+    "preload": "early.js",
     "storage_kib": 64
-  },
-  "properties": {
-    "speed": {
-      "label": "Speed",
-      "type": "slider",
-      "min": 0.0,
-      "max": 2.0,
-      "default": 1.0,
-      "integer": false
-    },
-    "tint": {
-      "label": "Tint",
-      "type": "color",
-      "default": "#ff8000",
-      "alpha": false
-    }
   }
 }

@@ -19,7 +19,8 @@ impl Manifest {
             );
             return Err(crate::refuse("schema", reason));
         }
-        features::supported(header.requires.engine.as_deref(), &header.requires.features)?;
+        let needs = header.requires.unwrap_or_default();
+        features::supported(needs.engine.as_deref(), &needs.features)?;
         Ok(serde_json::from_slice(bytes)?)
     }
 }

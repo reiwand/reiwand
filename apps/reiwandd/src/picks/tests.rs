@@ -5,7 +5,7 @@ use std::fs;
 fn folder(extra: serde_json::Value) -> Property {
     let mut prop = json!({ "type": "folder", "accept": ["image"] });
     prop.as_object_mut().unwrap().extend(extra.as_object().unwrap().clone());
-    serde_json::from_value(prop).unwrap()
+    serde_json::from_value(crate::whole::properties(json!({ "p": prop })).get("p").unwrap().clone()).unwrap()
 }
 
 #[test]

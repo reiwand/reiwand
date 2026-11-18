@@ -35,7 +35,7 @@ fn hostile_package_shaders_are_refused_without_crashing_the_reader() {
         effects,
     );
     let descriptor =
-        json!({ "id": "ripple", "passes": [{ "entry": "fs_ripple" }], "cost": { "taps": 1 } }).to_string();
+        descriptor(json!({ "id": "ripple", "passes": [{ "entry": "fs_ripple" }], "cost": { "taps": 1 } }));
     let chain = format!("let a = in.uv.x; let b = a{}; return vec4<f32>(b);", "+a".repeat(20000));
     let array =
         "var a: array<vec4<f32>, 262144>; let i = u32(in.position.x); a[i] = tap(in.uv); return a[i / 2u];";

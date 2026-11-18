@@ -8,8 +8,10 @@ use reiwand_format::{
 use serde_json::json;
 use std::fs;
 
+use common::properties as properties_of;
+
 fn with(mut manifest: Manifest, properties: serde_json::Value) -> Manifest {
-    manifest.properties = serde_json::from_value(properties).unwrap();
+    manifest.properties = serde_json::from_value(properties_of(properties)).unwrap();
     manifest
 }
 
@@ -131,7 +133,7 @@ fn image_variants_of_another_shape_are_reported() {
         v2(Kind::Scene),
         json!({ "sky": { "type": "combo", "default": "day", "options": ["day", "night"] } }),
     );
-    let scene = json!({ "schema": "reiwand.scene/1", "canvas": { "size": [64, 32] },
+    let scene = json!({ "schema": "reiwand.scene/2", "canvas": { "size": [64, 32] },
         "assets": { "day": { "path": "day.png" }, "night": { "path": "night.png" } },
         "layers": [{ "blend_space": "canvas", "id": "sky", "type": "image", "image": { "prop": "sky", "map": { "day": "day", "night": "night" } } },
                    { "blend_space": "canvas", "id": "veil", "type": "solid", "color": "#000000", "size": [64, 32],
@@ -140,7 +142,7 @@ fn image_variants_of_another_shape_are_reported() {
                                 "init": { "life": [1, 2] }, "render": { "texture": { "prop": "sky", "map": { "day": "day", "night": "night" } } } } } });
     let write = |night: Vec<u8>| {
         fs::write(tmp.path().join("manifest.json"), manifest.to_json().unwrap()).unwrap();
-        fs::write(tmp.path().join("scene.json"), scene.to_string()).unwrap();
+        fs::write(tmp.path().join("scene.json"), common::whole(&scene.to_string())).unwrap();
         [
             ("preview.png", image(32, 16, ImageFormat::Png)),
             ("day.png", image(64, 32, ImageFormat::Png)),

@@ -58,3 +58,4 @@ smithay-client-toolkit.workspace = true
 reiwand-format = { workspace = true, features = ["sign"] }
 wiremock.workspace = true
 reiwand-ktx2 = { workspace = true, features = ["encode"] }
+reiwand-upgrade.workspace = true

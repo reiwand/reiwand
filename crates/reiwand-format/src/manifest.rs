@@ -88,7 +88,7 @@ pub struct Manifest {
 struct Header {
     schema: String,
     #[serde(default)]
-    requires: Needs,
+    requires: Option<Needs>,
 }
 
 pub fn manifest_schema() -> serde_json::Value {
