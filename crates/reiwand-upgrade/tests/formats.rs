@@ -28,19 +28,6 @@ fn config_keeps_comments_and_completes_every_value() {
 }
 
 #[test]
-fn edit_reads_the_same() {
-    let original = text("edit.original.json");
-    let mut doc: Value = serde_json::from_str(&original).unwrap();
-    let report = complete(Format::Edit, &mut doc);
-    assert!(report.written > 0);
-    let done = serde_json::to_string_pretty(&doc).unwrap() + "\n";
-    let (a, b) = (reiwand_core::edit::Edit::parse(&original), reiwand_core::edit::Edit::parse(&done));
-    assert!(a.is_ok() && a == b, "{:?}", b.err());
-    expect("edit.completed.json", &done);
-    assert_eq!(complete(Format::Edit, &mut doc).written, 0);
-}
-
-#[test]
 fn carry_reads_the_same() {
     let original = text("carry.original.json");
     let mut doc: Value = serde_json::from_str(&original).unwrap();

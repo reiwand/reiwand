@@ -3,6 +3,7 @@ pub mod client;
 pub mod descriptors;
 #[cfg(feature = "client")]
 mod download;
+pub mod edits;
 pub mod fill;
 pub mod gain;
 pub mod manifests;

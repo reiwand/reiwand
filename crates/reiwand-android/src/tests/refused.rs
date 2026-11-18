@@ -122,7 +122,7 @@ fn format_errors_are_told_in_the_language_of_the_phone() {
 
 #[test]
 fn edit_refusals_are_told_in_the_language_of_the_phone() {
-    let refused = reiwand_core::Edit::parse(r#"{"version": 1, "span": {"zoom": 9}}"#).unwrap_err();
+    let refused = reiwand_core::Edit::parse_whole(r#"{"version": 1, "span": {"zoom": 9}}"#).unwrap_err();
     let error = crate::Error::Said(refused);
     assert_eq!(error.told_in(&["es".into()]), "span.zoom: 9 está fuera del rango de 1 a 8");
     assert_eq!(error.reply()["id"], "edit.range");

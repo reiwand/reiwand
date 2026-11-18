@@ -18,7 +18,7 @@ fn depth_masks_follow_the_depth_map() {
     let Some(r) = renderer() else { return };
     let gray = RgbaImage::from_pixel(W, H, Rgba([100, 100, 100, 255]));
     let depth = halves(|x| x >= W / 2);
-    let edit = Edit::from_value(json!({"version": 1,
+    let edit = Edit::from_whole(json!({"version": 1,
         "masks": {"near": {"type": "depth", "range": [0.5, 1.0], "soft": 0.01}},
         "ops": [{"id": "ev", "type": "exposure", "ev": 1, "mask": "near"}]}))
     .unwrap();
@@ -37,7 +37,7 @@ fn depth_masks_follow_the_depth_map() {
 fn depth_masks_follow_turned_and_tinted_photos() {
     let Some(r) = renderer() else { return };
     let gray = RgbaImage::from_pixel(W, H, Rgba([100, 100, 100, 255]));
-    let edit = Edit::from_value(json!({"version": 1, "geometry": {"rotate": 180},
+    let edit = Edit::from_whole(json!({"version": 1, "geometry": {"rotate": 180},
         "masks": {"near": {"type": "depth", "range": [0.5, 1.0], "soft": 0.01}},
         "ops": [{"id": "warm", "type": "saturation", "saturation": 20, "vibrance": 0},
             {"id": "ev", "type": "exposure", "ev": 1, "mask": "near"}]}))

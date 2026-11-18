@@ -1,4 +1,4 @@
-use super::{Edit, Kind, Op};
+use super::{Depth, Edit, Kind, Op, Parallax, Span};
 use crate::message::{Message, said};
 use serde_json::Value;
 
@@ -59,7 +59,16 @@ fn slot<'a>(doc: &'a mut Value, key: &str) -> Option<&'a mut Value> {
             Value::Object(map) => match (last, part) {
                 (true, _) => map.entry(part).or_insert(Value::Null),
                 (false, "span" | "depth" | "parallax") => {
-                    map.entry(part).or_insert_with(|| serde_json::json!({}))
+                    let block = map.entry(part).or_insert(Value::Null);
+                    if block.is_null() {
+                        *block = match part {
+                            "span" => serde_json::to_value(Span::default()),
+                            "depth" => serde_json::to_value(Depth::default()),
+                            _ => serde_json::to_value(Parallax::default()),
+                        }
+                        .unwrap_or_default();
+                    }
+                    block
                 }
                 _ => map.get_mut(part)?,
             },
@@ -86,7 +95,7 @@ impl Edit {
 
     pub fn get(&self, key: &str) -> Option<Value> {
         let (mut doc, path) = self.resolve(key.trim()).ok()?;
-        slot(&mut doc, &path).map(Value::take).filter(|v| !v.is_null())
+        slot(&mut doc, &path).map(Value::take).filter(|v| !v.is_null() && v != "")
     }
 
     pub fn set(&mut self, key: &str, value: &str) -> Result<(), Message> {
@@ -95,14 +104,21 @@ impl Edit {
         let field = slot(&mut doc, &path)
             .ok_or_else(|| said("edit.unknown_setting", "%1: unknown setting", &[&key]))?;
         *field = match path.rsplit('.').next() {
-            Some("mask") if value.trim().is_empty() => Value::Null,
+            Some("mask") if value.trim().is_empty() => Value::String(String::new()),
             Some("mask") => serde_json::from_str(value.trim())
                 .ok()
                 .filter(Value::is_string)
                 .unwrap_or_else(|| Value::String(value.trim().into())),
             _ => typed(field, value).map_err(|e| said("edit.setting", "%1: %2", &[&key, &e]).with(2, e))?,
         };
+        if path == "fit" && field_is_null(&doc) {
+            doc["fit"] = Value::String("general".into());
+        }
         *self = Edit::from_value(doc)?;
         Ok(())
     }
+}
+
+fn field_is_null(doc: &Value) -> bool {
+    doc.get("fit").is_some_and(Value::is_null)
 }

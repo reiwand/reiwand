@@ -1,23 +1,196 @@
 {
-  "version": 1,
-  "source": { "name": "hills.jpg", "bytes": 8421337, "sha256": "9f2c", "pixels": [6000, 4000] },
-  "geometry": { "crop": [0.0, 0.08, 1.0, 0.84], "rotate": 90, "straighten": -1.2, "flip": [false, true] },
+  "version": 3,
+  "source": {
+    "name": "hills.jpg",
+    "bytes": 8421337,
+    "sha256": "9f2c",
+    "pixels": [
+      6000,
+      4000
+    ]
+  },
+  "geometry": {
+    "crop": [
+      0.0,
+      0.08,
+      1.0,
+      0.84
+    ],
+    "rotate": 90,
+    "straighten": -1.2,
+    "flip": [
+      false,
+      true
+    ]
+  },
   "ops": [
-    { "id": "wb", "type": "white_balance", "temperature": 5600, "tint": 4 },
-    { "id": "ev", "type": "exposure", "ev": 0.35, "opacity": 0.5 },
-    { "id": "ct", "type": "contrast", "amount": 12 },
-    { "id": "sa", "type": "saturation", "saturation": -8, "vibrance": 15 },
-    { "id": "cu", "type": "curves", "rgb": [[0, 0], [0.25, 0.21], [0.75, 0.8], [1, 1]] },
-    { "id": "bl", "type": "blur", "radius": 18, "mask": "back" },
-    { "id": "ov", "type": "overlay", "color": "#1a2b6d", "blend": "soft_light", "mask": "sky" },
-    { "id": "vi", "type": "vignette", "amount": -0.35, "midpoint": 0.5, "roundness": 0.0, "feather": 0.6, "enabled": false }
+    {
+      "id": "wb",
+      "type": "white_balance",
+      "temperature": 5600,
+      "tint": 4,
+      "enabled": true,
+      "mask": "",
+      "opacity": null
+    },
+    {
+      "id": "ev",
+      "type": "exposure",
+      "ev": 0.35,
+      "opacity": 0.5,
+      "enabled": true,
+      "mask": ""
+    },
+    {
+      "id": "ct",
+      "type": "contrast",
+      "amount": 12,
+      "enabled": true,
+      "mask": "",
+      "opacity": null
+    },
+    {
+      "id": "sa",
+      "type": "saturation",
+      "saturation": -8,
+      "vibrance": 15,
+      "enabled": true,
+      "mask": "",
+      "opacity": null
+    },
+    {
+      "id": "cu",
+      "type": "curves",
+      "rgb": [
+        [
+          0,
+          0
+        ],
+        [
+          0.25,
+          0.21
+        ],
+        [
+          0.75,
+          0.8
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "enabled": true,
+      "mask": "",
+      "opacity": null,
+      "r": [],
+      "g": [],
+      "b": []
+    },
+    {
+      "id": "bl",
+      "type": "blur",
+      "radius": 18,
+      "mask": "back",
+      "enabled": true,
+      "opacity": null
+    },
+    {
+      "id": "ov",
+      "type": "overlay",
+      "color": "#1a2b6d",
+      "blend": "soft_light",
+      "mask": "sky",
+      "enabled": true,
+      "opacity": null
+    },
+    {
+      "id": "vi",
+      "type": "vignette",
+      "amount": -0.35,
+      "midpoint": 0.5,
+      "roundness": 0.0,
+      "feather": 0.6,
+      "enabled": false,
+      "mask": "",
+      "opacity": null
+    }
   ],
   "masks": {
-    "back": { "type": "luminance", "range": [0.0, 0.35], "soft": 0.05 },
-    "sky": { "type": "linear", "from": [0.5, 0.0], "to": [0.5, 0.45], "invert": true },
-    "face": { "type": "brush", "strokes": [{ "radius": 0.04, "hardness": 0.6, "points": [[0.41, 0.33], [0.43, 0.35]] }] },
-    "sun": { "type": "radial", "center": [0.7, 0.2], "radius": [0.1, 0.1], "feather": 0.5 }
+    "back": {
+      "type": "luminance",
+      "range": [
+        0.0,
+        0.35
+      ],
+      "soft": 0.05,
+      "invert": false
+    },
+    "sky": {
+      "type": "linear",
+      "from": [
+        0.5,
+        0.0
+      ],
+      "to": [
+        0.5,
+        0.45
+      ],
+      "invert": true
+    },
+    "face": {
+      "type": "brush",
+      "strokes": [
+        {
+          "radius": 0.04,
+          "hardness": 0.6,
+          "points": [
+            [
+              0.41,
+              0.33
+            ],
+            [
+              0.43,
+              0.35
+            ]
+          ],
+          "erase": false
+        }
+      ],
+      "invert": false
+    },
+    "sun": {
+      "type": "radial",
+      "center": [
+        0.7,
+        0.2
+      ],
+      "radius": [
+        0.1,
+        0.1
+      ],
+      "feather": 0.5,
+      "invert": false
+    }
   },
-  "outputs": { "Maker Model 1234": { "connector": "DP-1", "crop": [0.0, 0.1, 0.5, 0.5625] } },
-  "span": { "center": [0.5, 0.46], "zoom": 1.0 }
+  "outputs": {
+    "Maker Model 1234": {
+      "connector": "DP-1",
+      "crop": [
+        0.0,
+        0.1,
+        0.5,
+        0.5625
+      ]
+    }
+  },
+  "span": {
+    "center": [
+      0.5,
+      0.46
+    ],
+    "zoom": 1.0
+  },
+  "depth": null,
+  "parallax": null,
+  "fit": "general"
 }

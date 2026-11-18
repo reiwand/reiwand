@@ -48,7 +48,8 @@ fn invalid_files_name_the_field() {
     );
     assert_eq!(broken("ops/6/color", json!("blue")), "ops[6].color: use #rrggbb");
     assert_eq!(broken("span/zoom", json!(0.5)), "span.zoom: 0.5 is out of range 1 to 8");
-    assert_eq!(broken("version", json!(2)), "version 2 is newer than 1");
+    assert!(broken("version", json!(2)).contains("run `reiwand-upgrade client`"));
+    assert!(broken("version", json!(9)).contains("update Reiwand"));
     assert!(broken("masks/sky/type", json!("sketch")).contains("unknown variant"));
     assert!(broken("ops/1/ev", json!("bright")).starts_with("ops[1].ev: invalid type: string \"bright\""));
     assert!(broken("masks/sky/invert", json!(3)).starts_with("masks.sky.invert: invalid type: integer `3`"));
@@ -59,7 +60,7 @@ fn invalid_files_name_the_field() {
         broken("outputs/Maker Model 1234/crop", json!("all")).starts_with("outputs.Maker Model 1234.crop:")
     );
     let crowded = json!({"version": 1, "ops": (0..25).map(|i| json!({"id": format!("e{i}"), "type": "exposure", "ev": 0})).collect::<Vec<_>>()});
-    assert!(Edit::from_value(crowded).unwrap_err().to_string().contains("at most 24 ops"));
+    assert!(Edit::from_whole(crowded).unwrap_err().to_string().contains("at most 24 ops"));
 }
 
 #[test]
@@ -130,7 +131,8 @@ fn synced_edits_keep_the_local_source_and_removals_wait_for_known_items() {
     let dir = tempfile::tempdir().unwrap();
     let (image, edits) = (dir.path().join("hills.jpg"), dir.path().join("edits"));
     std::fs::write(&image, b"not really a picture").unwrap();
-    let synced = json!({"version": 1, "geometry": {"crop": [0.25, 0.0, 0.5, 1.0]}, "fit": "fit"});
+    let synced =
+        Edit::whole(json!({"version": 1, "geometry": {"crop": [0.25, 0.0, 0.5, 1.0]}, "fit": "fit"}));
     assert!(edit::adopt(Some(&synced), &image, &edits, false).unwrap());
     let (_, adopted) = edit::load(&image, &edits).unwrap().unwrap();
     assert_eq!((adopted.geometry.crop, adopted.source.bytes), (Some([0.25, 0.0, 0.5, 1.0]), 20));

@@ -12,7 +12,6 @@ pub const MAX_STRENGTH: f32 = 0.03;
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(default)]
 pub struct Depth {
     pub model: String,
     pub input: u32,
@@ -21,17 +20,13 @@ pub struct Depth {
     pub gamma: f32,
     pub smooth: u32,
     pub dilate: u32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(feature = "schema", schemars(required))]
+    #[serde(deserialize_with = "crate::explicit::null")]
     pub cuts: Option<Vec<f32>>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub strokes: Vec<Touch>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub fills: Vec<Touch>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub joins: Vec<Join>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub splits: Vec<Touch>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub moves: Vec<Shift>,
 }
 
@@ -70,7 +65,6 @@ pub enum Motion {
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(default)]
 pub struct Parallax {
     pub enabled: bool,
     pub source: Motion,
@@ -80,9 +74,10 @@ pub struct Parallax {
     pub smoothing_ms: u32,
     pub overscan: f32,
     #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(with = "crate::explicit::auto")]
     pub fill: Option<Fill>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::auto")]
     pub layers: Option<u8>,
 }
 

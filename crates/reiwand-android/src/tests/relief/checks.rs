@@ -38,7 +38,7 @@ fn the_runtime_is_taken_from_its_archive_by_checksum() {
 }
 
 pub(super) fn masked(uid: &str, image: &Path) {
-    let edit = |value: Value| reiwand_core::Edit::from_value(value).unwrap();
+    let edit = |value: Value| reiwand_core::Edit::from_whole(value).unwrap();
     let tinted = edit(json!({"version": 1, "geometry": {"rotate": 90},
         "masks": {"near": {"type": "depth", "range": [0.5, 1.0], "soft": 0.1}},
         "ops": [{"id": "ev", "type": "exposure", "ev": 1, "mask": "near"}]}));

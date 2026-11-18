@@ -47,12 +47,20 @@ msgid "%1"
 msgstr "%1"
 
 #: crates/reiwand-core/src/edit/check.rs
-msgid "version %1 is newer than %2"
-msgstr "la versión %1 es posterior a la %2"
+msgid "update Reiwand"
+msgstr "actualiza Reiwand"
 
 #: crates/reiwand-core/src/edit/check.rs
-msgid "version: use 1 to %1"
-msgstr "version: usa de 1 a %1"
+msgid "run `reiwand-upgrade client` once to convert it"
+msgstr "corre `reiwand-upgrade client` una vez para convertirlo"
+
+#: crates/reiwand-core/src/edit/check.rs
+msgid "format %1, this version reads format %2: %3"
+msgstr "formato %1, esta versión lee el formato %2: %3"
+
+#: crates/reiwand-core/src/edit/check.rs
+msgid "version: use %1"
+msgstr "versión: usa %1"
 
 #: crates/reiwand-core/src/edit/check.rs
 msgid "source: too long"

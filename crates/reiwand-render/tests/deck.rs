@@ -145,7 +145,7 @@ fn dimmed(c: u8) -> u8 {
 #[test]
 fn colour_operations_are_applied_to_every_layer_and_keep_their_cut_outs() {
     let Some(r) = renderer() else { return };
-    let edit = reiwand_core::Edit::from_value(serde_json::json!({
+    let edit = reiwand_core::Edit::from_whole(serde_json::json!({
         "version": 1,
         "ops": [{"id": "a", "type": "exposure", "ev": -1.0}]
     }))

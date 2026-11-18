@@ -74,7 +74,7 @@ fn every_editor_action_edits_the_file_beside_the_image() {
     assert_eq!(saved["fit"], json!("center"));
     assert!(fails(dir, &["edit", "fit", "hills.png", "span"], 2).contains("possible values"));
     edit(&["fit", "none"]);
-    assert_eq!(show().get("fit"), None);
+    assert_eq!(show()["fit"], json!("general"));
     let mode = std::fs::metadata(dir.join("hills.png.reiwand.json")).unwrap().permissions().mode();
     assert_eq!(mode & 0o777, 0o600);
     let refused = fails(dir, &["edit", "set", "hills.png", "ev=9"], 1);
@@ -85,7 +85,7 @@ fn every_editor_action_edits_the_file_beside_the_image() {
     assert!(fails(dir, &["edit", "show", "missing.png"], 1).contains("cannot find missing.png"));
     assert!(fails(dir, &["edit", "preview", "hills.png", "ev=1"], 1).contains("failed to connect"));
     edit(&["mask", "sky", "none"]);
-    assert_eq!((show()["ops"][0].get("mask"), show()["masks"].get("sky")), (None, None));
+    assert_eq!((show()["ops"][0]["mask"].clone(), show()["masks"].get("sky")), (json!(""), None));
     edit(&["reset", "ov", "bl"]);
     assert_eq!(show()["ops"].as_array().unwrap().len(), 5);
     edit(&["crop", "--aspect", "1:2", "--output", "HDMI-A-1"]);
@@ -101,15 +101,21 @@ fn every_editor_action_edits_the_file_beside_the_image() {
     assert_eq!((&cleared["outputs"], &cleared["geometry"]["crop"]), (&json!({}), &json!(null)));
     std::fs::write(
         dir.join("new.json"),
-        r#"{"version": 1, "ops": [{"id": "e", "type": "exposure", "ev": 2}]}"#,
+        r#"{"version": 3, "source": {"name": "hills.png", "bytes": 0, "sha256": "", "pixels": [0, 0]},
+          "geometry": {"crop": null, "rotate": 0, "straighten": 0.0, "flip": [false, false]},
+          "ops": [{"id": "e", "enabled": true, "mask": "", "opacity": null, "type": "exposure", "ev": 2}],
+          "masks": {}, "outputs": {}, "span": null, "depth": null, "parallax": null, "fit": "general"}"#,
     )
     .unwrap();
     edit(&["apply", "new.json"]);
-    assert_eq!(show()["ops"], json!([{"id": "e", "enabled": true, "type": "exposure", "ev": 2.0}]));
+    assert_eq!(
+        show()["ops"],
+        json!([{"id": "e", "enabled": true, "mask": "", "opacity": null, "type": "exposure", "ev": 2.0}])
+    );
     edit(&["reset"]);
     assert!(!dir.join("hills.png.reiwand.json").exists() && dir.join("hills.png").exists());
     std::fs::write(dir.join("hills.png.reiwand.json"), r#"{"version": 9}"#).unwrap();
-    assert!(fails(dir, &["edit", "set", "hills.png", "ev=1"], 1).contains("newer"));
+    assert!(fails(dir, &["edit", "set", "hills.png", "ev=1"], 1).contains("update Reiwand"));
     edit(&["reset"]);
     assert!(!dir.join("hills.png.reiwand.json").exists());
 }

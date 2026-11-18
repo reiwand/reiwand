@@ -73,8 +73,13 @@ impl Edit {
 
     pub fn from_value(value: Value) -> Result<Edit, Message> {
         let version = value.get("version").and_then(Value::as_u64).unwrap_or_default();
-        ensure(version <= u64::from(VERSION), || {
-            said("edit.newer", "version %1 is newer than %2", &[&version, &VERSION])
+        ensure(version == u64::from(VERSION), || {
+            let fix = if version > u64::from(VERSION) {
+                said("explicit.update", "update Reiwand", &[])
+            } else {
+                said("explicit.upgrade", "run `reiwand-upgrade client` once to convert it", &[])
+            };
+            said("edit.format", "format %1, this version reads format %2: %3", &[&version, &VERSION, &fix])
         })?;
         let edit: Edit = super::fields::typed(&value)?;
         let known = serde_json::to_value(&edit).map_err(|e| said("edit.json", "%1", &[&e]))?;
@@ -87,9 +92,7 @@ impl Edit {
     }
 
     pub fn validate(&self) -> Checked {
-        ensure((1..=VERSION).contains(&self.version), || {
-            said("edit.version", "version: use 1 to %1", &[&VERSION])
-        })?;
+        ensure(self.version == VERSION, || said("edit.version", "version: use %1", &[&VERSION]))?;
         ensure(self.source.name.len() <= 255 && self.source.sha256.len() <= 64, || {
             said("edit.source_long", "source: too long", &[])
         })?;

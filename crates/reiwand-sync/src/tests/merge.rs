@@ -103,20 +103,21 @@ fn empty_fields_are_no_edit() {
 
 #[test]
 fn edits_travel_in_parts_without_their_source_and_large_parts_keep_the_last_sent() {
-    let edit: reiwand_core::Edit = serde_json::from_value(json!({
-        "version": 1, "source": {"name": "IMG_1.jpg"}, "fit": "fit",
+    let edit = reiwand_core::Edit::from_whole(json!({
+        "version": 3, "source": {"name": "IMG_1.jpg"}, "fit": "fit",
         "outputs": {"Android": {"connector": "Android", "crop": [0.25, 0.0, 0.5, 1.0]}}
     }))
     .unwrap();
     let fields = edit_fields(Some(&edit), None);
     let android = json!({"connector": "Android", "crop": [0.25, 0.0, 0.5, 1.0]});
     assert_eq!(fields, view(&[("e:fit", json!("fit")), ("e:outputs/Android", android.clone())]));
-    let whole = json!({"version": 1, "fit": "fit", "outputs": {"Android": android}});
+    let whole =
+        reiwand_core::Edit::whole(json!({"version": 3, "fit": "fit", "outputs": {"Android": android}}));
     assert_eq!(edit_of(&fields), Some(whole));
     assert_eq!((edit_of(&title("IMG_1")), edit_fields(None, None)), (None, View::new()));
     let stroke = json!({"radius": 0.1, "hardness": 0.5, "points": vec![[0.5, 0.5]; 9000]});
-    let masks = json!({"version": 1, "masks": {"b": {"type": "brush", "strokes": [stroke]}}});
-    let huge: reiwand_core::Edit = serde_json::from_value(masks).unwrap();
+    let masks = json!({"version": 3, "masks": {"b": {"type": "brush", "strokes": [stroke]}}});
+    let huge = reiwand_core::Edit::from_whole(masks).unwrap();
     let base = view(&[("e:masks", json!({}))]);
     assert_eq!(edit_fields(Some(&huge), Some(&base)).get("e:masks"), Some(&json!({})));
     assert_eq!(edit_fields(Some(&huge), None).get("e:masks"), None);

@@ -17,6 +17,10 @@ usage:
       --config DIR is the folder with config.toml (default: the reiwand folder of the user config directory): it is
       rewritten with every setting written out and the first-start words, and the original is kept in upgrade-copias
 
+  reiwand-upgrade edits DIR...
+      converts the image edits that sit beside the pictures (name.ext.reiwand.json) under each DIR; the ones kept in
+      the data folder are converted by `client`
+
   reiwand-upgrade scenes DIR
       writes into every scene.json under DIR each value the scene format leaves out, with the value the
       engine used for it until now, so the scene reads exactly as before; packed .wpak files are unpacked,
@@ -47,13 +51,19 @@ fn user_config() -> anyhow::Result<PathBuf> {
 fn settings(args: &[String], data: &std::path::Path) -> anyhow::Result<()> {
     let given = args.iter().position(|a| a == "--config").and_then(|at| args.get(at + 1));
     let dir = given.map_or_else(user_config, |dir| Ok(PathBuf::from(dir)))?;
-    let copies = data
-        .join("upgrade-copias")
-        .join(std::time::UNIX_EPOCH.elapsed().map_or(0, |d| d.as_secs()).to_string());
+    let copies = copies_of(data);
     if reiwand_upgrade::settings::run(&dir, &copies)? {
         println!("{}: config.toml converted, the original is in {}", dir.display(), copies.display());
     }
+    let changed = reiwand_upgrade::edits::folder(&data.join("edits"), &copies)?;
+    if changed > 0 {
+        println!("{changed} image edits converted, the originals are in {}", copies.display());
+    }
     Ok(())
+}
+
+fn copies_of(data: &std::path::Path) -> PathBuf {
+    data.join("upgrade-copias").join(std::time::UNIX_EPOCH.elapsed().map_or(0, |d| d.as_secs()).to_string())
 }
 
 fn main() -> anyhow::Result<()> {
@@ -62,6 +72,16 @@ fn main() -> anyhow::Result<()> {
     if what == Some("scenes") {
         let dir = args.get(1).context("scenes needs a folder")?;
         println!("{dir}: {} scenes upgraded", reiwand_upgrade::scenes::run(std::path::Path::new(dir))?);
+        return Ok(());
+    }
+    if what == Some("edits") {
+        let data = user_data()?;
+        let copies = copies_of(&data);
+        let mut changed = 0;
+        for dir in &args[1..] {
+            changed += reiwand_upgrade::edits::sidecars(std::path::Path::new(dir), &copies)?;
+        }
+        println!("{changed} image edits upgraded, the originals are in {}", copies.display());
         return Ok(());
     }
     if what == Some("effects") {

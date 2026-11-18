@@ -67,3 +67,19 @@ Lo usan los cargadores de todos los formatos; ningún formato escribe su propia 
   ausencia significa «función sin usar»: `blank`, `filter`) o `valor` (su `null` tiene sentido): 2 y 14.
 - Pruebas: `crates/reiwand-core/tests/config_explicit.rs` (primer arranque, rechazo sin tocar el archivo,
   esquema obligatorio, cada clave quitada, mismos bytes, fuentes sin valores ocultos).
+
+## Ediciones de imagen (`edit.json`, formato 3)
+
+- Cada edición lleva `version = 3` y todos los campos: operaciones, máscaras, recorte, ajuste, relieve y
+  paralaje. Lo que no se usa se escribe `null` (clase `bloque`: `span`, `depth`, `parallax`, `crop`,
+  `opacity`, `cuts`) o una palabra (clase `valor`: `fit` `"general"`, `mask` `""`, `fill` y `layers` `"auto"`).
+  Se añadió el módulo `reiwand_core::explicit::auto`.
+- `Edit::parse` rechaza un archivo de otra versión con el mensaje `edit.format` y nombra el campo que falta;
+  un archivo viejo no se sobrescribe. La caché de deshacer y rehacer (`history`) se lee con tolerancia: si es
+  vieja se descarta.
+- La conversión de única vez es el paso A de `reiwand-upgrade client` sobre cada `edit.json`
+  (`crates/reiwand-upgrade/src/edits.rs`); deja el original en `upgrade-copias/<segundos>/`. Es idempotente y
+  la edición resuelve lo mismo antes y después (`crates/reiwand-upgrade/tests/edits.rs`).
+- Tabla de prellenado: `crates/reiwand-core/prefill/edit.tsv`. Pruebas:
+  `crates/reiwand-core/tests/edit_explicit.rs`.
+- Límite: la ruta del campo que falta dentro de un trazo de pincel no lleva el índice del trazo.

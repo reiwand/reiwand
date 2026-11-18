@@ -14,7 +14,7 @@ fn depth_and_parallax_sections_round_trip_and_are_checked() {
       "ops": [{"id": "bl", "type": "blur", "radius": 18, "mask": "back"}],
       "depth": {"model": "depth-anything-v2-small", "input": 518, "near": 0.98, "far": 0.02, "gamma": 1.0, "smooth": 2, "dilate": 3},
       "parallax": {"source": "pointer", "strength": 0.025, "focus": 0.3, "steps": 16, "smoothing_ms": 150, "overscan": 1.04}}"#;
-    let edit = Edit::parse(text).unwrap();
+    let edit = Edit::parse_whole(text).unwrap();
     assert_eq!(edit.masks["back"], Mask::Depth { range: [0.0, 0.35], soft: 0.05, invert: false });
     assert_eq!(edit.parallax.as_ref().map(|p| (p.source, p.enabled)), Some((Motion::Pointer, true)));
     assert_eq!(Edit::parse(&edit.to_json()).unwrap(), edit);
@@ -27,7 +27,7 @@ fn depth_and_parallax_sections_round_trip_and_are_checked() {
     assert_eq!(broken("parallax.steps", "12"), "parallax.steps: use 1, 8, 16 or 32");
     assert_eq!(broken("depth.input", "500"), "depth.input: use a multiple of 14 from 196 to 1036");
     assert_eq!(broken("depth.model", "depth-anything-v2-large"), "depth.model: use depth-anything-v2-small");
-    assert!(Edit::parse(r#"{"version": 1, "parallax": {"source": "gyro"}}"#).is_err());
+    assert!(Edit::parse_whole(r#"{"version": 1, "parallax": {"source": "gyro"}}"#).is_err());
 }
 
 #[test]
@@ -45,7 +45,7 @@ fn actions_adjust_depth_and_parallax() {
     );
     assert!(act(&mut e, json!({"parallax": {"steps": 3}})).is_err());
     assert_eq!((p.fill(), p.layers(), p.fill, p.layers), (Fill::standard(), 5, None, None));
-    assert!(!serde_json::to_string(&p).unwrap().contains("fill"));
+    assert!(serde_json::to_value(&p).unwrap()["fill"] == "auto");
     act(&mut e, json!({"parallax": {"fill": "simple", "layers": 6}})).unwrap();
     let p = e.parallax.clone().unwrap();
     assert_eq!((p.fill(), p.layers(), p.enabled), (Fill::Simple, 6, true));
@@ -167,7 +167,7 @@ fn strokes_cuts_and_fill_marks_are_edit_actions_that_round_trip() {
     act(&mut e, json!({"depth_cuts": {"auto": true}})).unwrap();
     assert_eq!(e.depth, Some(Depth::default()));
     let plain = serde_json::to_value(Depth::default()).unwrap();
-    assert!(["cuts", "strokes", "fills"].iter().all(|k| plain.get(k).is_none()));
+    assert!(plain["cuts"].is_null() && plain["strokes"] == json!([]) && plain["fills"] == json!([]));
     let many = vec!["0.1,0.1"; 1000].join(";");
     for _ in 0..3 {
         act(&mut e, json!({"depth_brush": {"points": many}})).unwrap();

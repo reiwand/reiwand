@@ -30,14 +30,15 @@ pub fn edit_fields(edit: Option<&Edit>, base: Option<&View>) -> View {
 }
 
 pub fn edit_of(view: &View) -> Option<Value> {
-    let mut edit = serde_json::Map::new();
-    for (field, value) in view.iter().filter(|(field, _)| edit_part(field)) {
+    let Ok(Value::Object(mut edit)) = serde_json::to_value(Edit::default()) else { return None };
+    let blank = edit.clone();
+    for (field, value) in view.iter().filter(|(field, value)| edit_part(field) && !value.is_null()) {
         match field.strip_prefix(SCREENS) {
             Some(screen) => edit.entry("outputs").or_insert_with(|| json!({}))[screen] = value.clone(),
             None => drop(edit.insert(field[EDIT.len()..].to_owned(), value.clone())),
         }
     }
-    (!edit.is_empty()).then(|| {
+    (edit != blank).then(|| {
         edit.insert("version".into(), json!(VERSION));
         Value::Object(edit)
     })

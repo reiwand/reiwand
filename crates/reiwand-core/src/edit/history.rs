@@ -8,7 +8,6 @@ const MAX_BYTES: usize = 8 << 20;
 
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(default)]
 pub struct History {
     pub undo: Vec<Edit>,
     pub redo: Vec<Edit>,

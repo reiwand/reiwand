@@ -64,11 +64,10 @@ fn still_reasons_have_words_and_messages() {
 fn joins_and_splits_round_trip_and_are_checked() {
     let text = r#"{"version": 1, "depth": {"joins": [{"a": [0.1, 0.2], "b": [0.8, 0.5]}],
       "splits": [{"points": [[0.0, 0.5], [1.0, 0.5]], "radius": 0.01, "falloff": 0.0, "by": 1.0}]}}"#;
-    let edit = Edit::parse(text).unwrap();
+    let edit = Edit::parse_whole(text).unwrap();
     let depth = edit.depth.clone().unwrap();
     assert_eq!((depth.joins.len(), depth.splits.len()), (1, 1));
     assert_eq!(Edit::parse(&edit.to_json()).unwrap(), edit);
-    assert!(!Edit::default().to_json().contains("joins"));
     let outside = text.replace("0.8, 0.5", "1.8, 0.5");
-    assert!(Edit::parse(&outside).is_err());
+    assert!(Edit::parse_whole(&outside).is_err());
 }

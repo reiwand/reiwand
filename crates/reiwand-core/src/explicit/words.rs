@@ -43,3 +43,4 @@ macro_rules! word {
 word!(general, "general");
 word!(empty, "");
 word!(none, "none");
+word!(auto, "auto");

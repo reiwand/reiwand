@@ -68,7 +68,7 @@ fn mistakes_are_refused_without_changing_anything() {
     assert_eq!(usage.to_string(), "ev is not KEY=VALUE");
     let es = reiwand_core::message::tr_in(&["es".into()]);
     assert_eq!(usage.message().told(&es), "ev no es CLAVE=VALOR");
-    let range = Edit::parse(r#"{"version": 1, "span": {"zoom": 9}}"#).unwrap_err();
+    let range = Edit::parse_whole(r#"{"version": 1, "span": {"zoom": 9}}"#).unwrap_err();
     assert_eq!(
         (range.id, range.told(&es).as_str()),
         ("edit.range", "span.zoom: 9 está fuera del rango de 1 a 8")
@@ -116,7 +116,7 @@ fn a_picture_keeps_its_own_fit() {
     assert!(matches!(act(&mut e, json!({"fit": {"mode": "zoom"}})), Err(Error::Usage(_))));
     act(&mut e, json!({"fit": {"mode": "none"}})).unwrap();
     assert!(e.fit.is_none() && e.is_empty());
-    assert!(Edit::parse(r#"{"version": 1, "fit": "span"}"#).is_err());
+    assert!(Edit::parse_whole(r#"{"version": 1, "fit": "span"}"#).is_err());
 }
 
 #[test]
