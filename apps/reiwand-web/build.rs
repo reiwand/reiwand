@@ -19,6 +19,9 @@ const MODULES: [&str; 12] = [
 const LIBS: [&str; 6] = ["Core", "Gui", "Qml", "Quick", "WebEngineCore", "WebEngineQuick"];
 
 fn qmake() -> Option<PathBuf> {
+    if let Some(qmake) = env::var_os("REIWAND_WEB_QMAKE") {
+        return Some(PathBuf::from(qmake));
+    }
     if let Some(qmake) = env::var_os("QMAKE") {
         return Some(PathBuf::from(qmake));
     }
@@ -92,6 +95,9 @@ fn compile(qt: &Qt) {
     files.sort();
     build.files(files).compile("reiwand_web_engine");
     println!("cargo::rustc-link-search=native={}", qt.libs.display());
+    if env::var_os("REIWAND_WEB_QMAKE").is_some() {
+        println!("cargo::rustc-link-arg=-Wl,-rpath,{}", qt.libs.display());
+    }
     LIBS.iter().for_each(|l| println!("cargo::rustc-link-lib=Qt6{l}"));
     println!("cargo::rustc-link-lib=EGL");
     println!("cargo::rustc-link-lib=GLESv2");
@@ -100,6 +106,7 @@ fn compile(qt: &Qt) {
 fn main() {
     println!("cargo::rustc-check-cfg=cfg(no_engine)");
     println!("cargo::rerun-if-env-changed=QMAKE");
+    println!("cargo::rerun-if-env-changed=REIWAND_WEB_QMAKE");
     println!("cargo::rerun-if-changed=cpp");
     println!("cargo::rerun-if-changed=qml");
     match find() {

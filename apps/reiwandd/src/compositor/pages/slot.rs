@@ -42,6 +42,7 @@ pub(in crate::compositor) struct PageSlot {
     pub(in crate::compositor) full: bool,
     pub(in crate::compositor) media: Option<(bool, Option<u64>)>,
     pub(in crate::compositor) cover: u64,
+    pub(in crate::compositor) asleep: bool,
 }
 
 impl PageSlot {
@@ -75,6 +76,7 @@ impl PageSlot {
             full: false,
             media: None,
             cover: 0,
+            asleep: false,
         }
     }
 
@@ -140,7 +142,15 @@ impl PageSlot {
         (self.media, self.cover) = (None, 0);
     }
 
+    pub(super) fn sleep(&mut self) {
+        self.stop();
+        (self.asleep, self.due, self.waiting, self.ready) = (true, None, None, false);
+    }
+
     pub(super) fn starts(&mut self, now: Instant) -> bool {
+        if self.asleep && self.views.values().any(|v| v.live) {
+            (self.asleep, self.due) = (false, Some(now));
+        }
         if self.link.is_some() || self.due.is_none_or(|due| due > now) {
             return false;
         }

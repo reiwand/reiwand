@@ -158,7 +158,10 @@ fn take(
             drawn(slot, view);
         }
         FromWeb::Wants { audio } => slot.audio = audio,
-        FromWeb::Idle => tracing::debug!("the web helper has no visible page"),
+        FromWeb::Idle => {
+            tracing::debug!("the web helper has no visible page and is closed");
+            slot.sleep();
+        }
         FromWeb::Loaded { .. } => tracing::debug!("the web page loaded"),
         FromWeb::Crashed { .. } => tracing::warn!("the web page crashed and is loading again"),
         FromWeb::Broken { .. } => {
