@@ -79,13 +79,13 @@ mod tests {
         crate::db::create(&mut c).unwrap();
         c.pragma_update(None, "foreign_keys", "OFF").unwrap();
         c.execute(
-            "INSERT INTO users (id, handle, role, quota_bytes, created_at) VALUES (1, 'ana', 'user', 1, 0)",
+            "INSERT INTO users (id, handle, role, status, quota_bytes, created_at) VALUES (1, 'ana', 'user', 'active', 1, 0)",
             [],
         )
         .unwrap();
         let sql = "INSERT INTO versions (repo, package_id, version, sha256, size, kind, title, description, license, \
-                   tags, authors, state, uploaded_by, created_at) VALUES (?1, 'org.example.a', ?2, 'x', 1, 'image', 't', 'd', \
-                   'CC0-1.0', '[]', '[]', ?3, 1, 1)";
+                   tags, authors, state, uploaded_by, created_at, facets, listed, asks) VALUES (?1, 'org.example.a', ?2, 'x', 1, \
+                   'image', 't', 'd', 'CC0-1.0', '[]', '[]', ?3, 1, 1, '[]', 1, '[]')";
         for (repo, version, state) in [("main", "1.0.0", "published"), ("other", "1.0.0", "rejected")] {
             c.execute(sql, rusqlite::params![repo, version, state]).unwrap();
         }

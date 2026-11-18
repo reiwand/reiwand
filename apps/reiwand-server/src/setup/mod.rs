@@ -137,9 +137,13 @@ impl App {
             && admins.map_err(|e| anyhow::anyhow!(e.detail))? > 0
             && !self.repos.ready().is_empty()
         {
-            self.change(|c| crate::settings::put(c, &[("setup", "done")]))
-                .await
-                .map_err(|e| anyhow::anyhow!(e.detail))?;
+            let (current, name) = (self.settings(), crate::lang::t("Your wallpaper server"));
+            self.change(move |c| {
+                crate::settings::put_whole(c, &crate::settings::whole(&current, name))?;
+                crate::settings::put(c, &[("setup", "done")])
+            })
+            .await
+            .map_err(|e| anyhow::anyhow!(e.detail))?;
         }
         if !self.settings().done {
             let token = self.setup_token().await?;

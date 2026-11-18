@@ -4,6 +4,7 @@ use crate::creds::digest;
 use crate::db::one;
 use crate::error::{Problem, Res};
 use crate::invite::new_invite;
+use crate::lang::t;
 use crate::settings::{self, Access, put};
 use crate::{App, St};
 use axum::extract::{Form, State};
@@ -71,8 +72,10 @@ pub async fn access(State(app): St, headers: HeaderMap, Form(f): Form<Entry>) ->
     let invite =
         app.held.lock().unwrap_or_else(PoisonError::into_inner).invite.take().filter(|(v, _)| *v == visit);
     let unused = invite.filter(|_| chosen == Access::Closed).map(|(_, code)| digest(&code));
+    let current = app.settings();
     let fresh = app.change(move |c| {
         let tx = c.unchecked_transaction()?;
+        settings::put_whole(&tx, &settings::whole(&current, t("Your wallpaper server")))?;
         put(&tx, &settings::access_pairs(chosen))?;
         put(&tx, &[("setup", "done")])?;
         tx.execute("DELETE FROM setup_visits", [])?;

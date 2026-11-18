@@ -130,12 +130,12 @@ fn backups_hold_exactly_the_files_their_database_names() {
     let app = app(&dir.path().join("data"), &[]);
     let (cfg, sha) = (app.cfg.clone(), "ab".repeat(32));
     let conn = rusqlite::Connection::open(cfg.data.join("db/reiwand.sqlite")).unwrap();
-    let sql = "INSERT INTO users (handle, role, quota_bytes, created_at) VALUES ('ana', 'user', 1, 0);
+    let sql = "INSERT INTO users (handle, role, status, quota_bytes, created_at) VALUES ('ana', 'user', 'active', 1, 0);
                INSERT INTO packages (repo, id, owner_id, created_at) VALUES ('main', 'org.example.dawn', 1, 0);";
     conn.execute_batch(sql).unwrap();
     let sql = "INSERT INTO versions (repo, package_id, version, sha256, size, kind, title, description, license, tags, \
-               authors, state, uploaded_by, created_at) VALUES ('main', 'org.example.dawn', '1.0.0', ?1, 1, 'image', 't', \
-               'd', 'CC0-1.0', '[]', '[]', 'pending', 1, 0)";
+               authors, state, uploaded_by, created_at, facets, listed, asks) VALUES ('main', 'org.example.dawn', '1.0.0', ?1, 1, \
+               'image', 't', 'd', 'CC0-1.0', '[]', '[]', 'pending', 1, 0, '[]', 1, '[]')";
     conn.execute(sql, [&sha]).unwrap();
     for name in
         [format!("blobs/{sha}.wpak"), format!("thumbs/{sha}.jpg"), format!("blobs/{}.wpak", "cd".repeat(32))]
@@ -182,7 +182,7 @@ fn a_database_of_another_version_is_refused_and_left_untouched() {
 }
 
 #[test]
-fn the_schema_is_the_one_earlier_builds_wrote() {
+fn the_schema_is_the_one_this_build_writes() {
     use sha2::Digest;
     let mut conn = rusqlite::Connection::open_in_memory().unwrap();
     crate::db::create(&mut conn).unwrap();
@@ -193,5 +193,5 @@ fn the_schema_is_the_one_earlier_builds_wrote() {
         .query_map([], |r| Ok(format!("-- {}\n{};\n", r.get::<_, String>(0)?, r.get::<_, String>(1)?)));
     let text = rows.unwrap().collect::<Result<Vec<_>, _>>().unwrap().join("\n");
     let hash: String = sha2::Sha256::digest(text.as_bytes()).iter().map(|b| format!("{b:02x}")).collect();
-    assert_eq!(hash, "195f2501817a6670878338c5b34c8a28bad0f4486d07690c93fd1b1681bbbdea");
+    assert_eq!(hash, "51baf10dc6eacd3c8a35ef0aed348cfbec53daacc3a94ee77f55a47f648a71a7");
 }

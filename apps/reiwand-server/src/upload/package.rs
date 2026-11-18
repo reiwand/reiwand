@@ -15,8 +15,8 @@ async fn reserve(app: &App, user: i64) -> Res<(String, u64)> {
         .run(move |c| {
             let room = allowed(c, user, per_day)?.min(max);
             let (id, t) = (hex(&random::<16>()), now());
-            let sql = "INSERT INTO uploads (id, user_id, size, sha256, state, created_at, expires_at) \
-                       VALUES (?1, ?2, ?3, '', 'open', ?4, ?5)";
+            let sql = "INSERT INTO uploads (id, user_id, size, sha256, state, listed, repo, created_at, expires_at) \
+                       VALUES (?1, ?2, ?3, '', 'open', 1, '', ?4, ?5)";
             c.execute(sql, params![id, user, room, t, t + DAY])?;
             Ok((id, room as u64))
         })

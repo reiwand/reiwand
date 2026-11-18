@@ -289,11 +289,19 @@ Administrators and moderators read every repository; only administrators publish
 
 ### Database versions and backups
 
-The database carries a version number (`user_version`, 15). The server knows only that version:
+The database carries a version number (`user_version`, 16). The server knows only that version:
 it refuses to open any other and names the migration (`reiwand-upgrade server --data DIR`). It contains
 no code for older databases or layouts. `reiwand-server restore` takes a backup of the current version
 only; to restore an older one, run `reiwand-upgrade server` on the restored folder first. After restoring,
 every repository is marked to sign again. Backups include the `repos/` trees and their keys.
+
+### Explicit values in the database
+
+No table has a `DEFAULT`: every insert in the server writes every column, and the schema (`apps/reiwand-server/schema.sql`) lists
+none. Saved settings are complete too: the setup assistant writes `registration`, `auto_publish`, `network`, `cert_path`,
+`key_path`, `repo_name` and `admin` before it marks `setup` as done, and a database that says it is set up but lacks one of
+them is refused naming the key and `reiwand-upgrade server`. Schema 15 to 16 is the step
+`crates/reiwand-upgrade/migrations/15-16.sql` (rebuilds the nine tables that had defaults, same rows).
 
 ### Upgrading the data
 
