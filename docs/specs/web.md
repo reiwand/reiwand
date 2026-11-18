@@ -74,7 +74,7 @@ always opaque.
   768 MB and is killed past 1.5 GB in all (the scope is the only memory limit: Chromium has no
   per-page cap of its own here);
   where the scope cannot be made the helper starts without it.
-- A page whose kept data (`data` below) grows past twice its `web.storage_kib` plus 1 MiB starts
+- A page whose kept data (what its origin stores in `data` below: local and session storage, IndexedDB, service workers, file system, databases and cookies; the engine's own caches do not count) grows past twice its `web.storage_kib` plus 1 MiB starts
   without keeping anything, and its error says so until its data is cleared. On the desktop the
   limit is checked only when the page starts, because the helper has no quota per origin to set in
   its profile: a running page can keep more until its next start. On the phone the WebView
