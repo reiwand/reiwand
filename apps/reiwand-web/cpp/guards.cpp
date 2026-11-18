@@ -1,5 +1,6 @@
 #include <QTimer>
 #include "guards.h"
+#include <unistd.h>
 #include <QFile>
 #include <QMultiMap>
 #include <QWebEngineUrlRequestInfo>
@@ -40,6 +41,7 @@ void Scheme::requestStarted(QWebEngineUrlRequestJob *job) {
     auto *file = new QFile(job);
     if (!file->open(fd, QIODevice::ReadOnly, QFile::AutoCloseHandle)) {
         delete file;
+        ::close(fd);
         return job->fail(QWebEngineUrlRequestJob::RequestFailed);
     }
     QMultiMap<QByteArray, QByteArray> headers;

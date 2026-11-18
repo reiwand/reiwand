@@ -57,6 +57,14 @@ bool openContext(World &w, QString &why) {
     return true;
 }
 
+bool hasDisplay(QString &why) {
+    if (qEnvironmentVariableIsSet("QT_QPA_PLATFORM") || qEnvironmentVariableIsSet("WAYLAND_DISPLAY") ||
+        qEnvironmentVariableIsSet("DISPLAY"))
+        return true;
+    why = "there is no graphical session to draw the page in (no Wayland or X display)";
+    return false;
+}
+
 void prepare() {
     registerSchemes();
     qputenv("QSG_RHI_BACKEND", "opengl");
@@ -89,6 +97,11 @@ static QQuickWebEngineProfile *makeProfile(const QJsonObject &c, QObject *parent
 
 int rw_run(const char *config, const RwHost *host, int socket) {
     const QJsonObject c = QJsonDocument::fromJson(config).object();
+    QString why;
+    if (!hasDisplay(why)) {
+        host->said(why.toUtf8().constData());
+        return 2;
+    }
     prepare();
     int argc = 1;
     char name[] = "reiwand-web";
@@ -96,7 +109,6 @@ int rw_run(const char *config, const RwHost *host, int socket) {
     QGuiApplication app(argc, argv);
     World &w = global;
     w.host = host;
-    QString why;
     if (!openContext(w, why)) {
         host->said(why.toUtf8().constData());
         return 2;
@@ -123,6 +135,7 @@ int rw_run(const char *config, const RwHost *host, int socket) {
     host->ready(qVersion());
     const int code = app.exec();
     pages.clear();
+    QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
     delete w.component;
     delete w.engine;
     delete profile;

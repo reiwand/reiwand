@@ -3,6 +3,7 @@
 #include "world.h"
 #include <QElapsedTimer>
 #include <QJsonArray>
+#include <QPointer>
 #include <QQuickItem>
 #include <QQuickRenderControl>
 #include <QQuickWindow>
@@ -33,6 +34,7 @@ public:
 
 private:
     void changed();
+    void polish();
     void schedule();
     void render();
     void build();
@@ -54,6 +56,8 @@ private:
     QElapsedTimer since;
     bool dirty = true;
     bool pending = false;
+    bool inFrame = false;
+    bool polishQueued = false;
     bool first = true;
     GLuint textures[kTextures] = {};
     bool known[kTextures] = {};
@@ -61,7 +65,7 @@ private:
     GLuint fbo = 0;
     GLuint scratch = 0;
     GLuint source = 0;
-    QQuickItem *input = nullptr;
+    QPointer<QQuickItem> input;
     QPointF last;
     int latest = 0;
     QSize pixels;

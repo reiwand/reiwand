@@ -30,13 +30,13 @@ bool dmabufExport(QOpenGLContext *context, GLuint texture, Exported &out) {
                                     reinterpret_cast<EGLClientBuffer>(static_cast<uintptr_t>(texture)), nullptr);
     if (!image) return false;
     int fourcc = 0, planes = 0;
-    EGLuint64KHR modifier = 0;
+    EGLuint64KHR modifiers[8] = {};
     bool done = false;
-    if (query(display, image, &fourcc, &planes, &modifier) && planes == 1) {
+    if (query(display, image, &fourcc, &planes, modifiers) && planes == 1) {
         int fd = -1;
         EGLint stride = 0, offset = 0;
         if (exportImage(display, image, &fd, &stride, &offset) && fd >= 0) {
-            out = {fd, static_cast<uint32_t>(fourcc), modifier, static_cast<uint32_t>(stride),
+            out = {fd, static_cast<uint32_t>(fourcc), modifiers[0], static_cast<uint32_t>(stride),
                    static_cast<uint32_t>(offset), planes};
             done = true;
         }

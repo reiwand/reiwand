@@ -53,6 +53,17 @@ void Page::call(const char *method, const QVariant &argument) {
 }
 
 void Page::changed() {
+    if (polishQueued) return;
+    polishQueued = true;
+    QTimer::singleShot(0, this, &Page::polish);
+}
+
+void Page::polish() {
+    polishQueued = false;
+    if (inFrame) {
+        changed();
+        return;
+    }
     control->polishItems();
     dirty = true;
     schedule();
@@ -158,6 +169,7 @@ void Page::render() {
     build();
     dirty = false;
     since.start();
+    inFrame = true;
     control->polishItems();
     QQuickRenderTarget target = QQuickRenderTarget::fromOpenGLTexture(scratch, GL_RGBA8, pixels);
     target.setDevicePixelRatio(scale);
@@ -167,6 +179,7 @@ void Page::render() {
     control->sync();
     control->render();
     control->endFrame();
+    inFrame = false;
     convert(index);
     glFinish();
     latest = index;

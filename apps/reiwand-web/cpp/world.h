@@ -24,6 +24,7 @@ struct World {
 World &world();
 bool openContext(World &w, QString &why);
 
+bool hasDisplay(QString &why);
 void prepare();
 void openPage(uint32_t id, QSize size, double scale);
 void closePage(uint32_t id);
