@@ -220,7 +220,7 @@ void Page::install(const QJsonArray &list) {
         items.append(script);
     }
     QWebEngineScript cap;
-    cap.setSourceCode(capScript(fps));
+    cap.setSourceCode(capScript(fps, world().bridge->key()));
     cap.setInjectionPoint(QWebEngineScript::DocumentCreation);
     cap.setWorldId(QWebEngineScript::MainWorld);
     items.append(cap);

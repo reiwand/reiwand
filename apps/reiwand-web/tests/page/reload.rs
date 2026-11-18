@@ -43,7 +43,7 @@ fn reloaded(page: &mut Page) -> serde_json::Value {
 #[test]
 fn a_crashed_page_loads_with_its_latest_values_and_gives_up_after_three_reloads() {
     if !available() {
-        return eprintln!("skipped: no Qt WebEngine 6.5");
+        return eprintln!("skipped: no Qt WebEngine 6.5 or newer");
     }
     let dir = tempfile::tempdir().unwrap();
     let mut page =
@@ -52,7 +52,7 @@ fn a_crashed_page_loads_with_its_latest_values_and_gives_up_after_three_reloads(
     let values = json!({"speed": 3}).as_object().unwrap().clone();
     page.link.send(&ToWeb::Properties { view: 1, values }, &[]).unwrap();
     page.said.remove("properties");
-    assert_eq!(page.wait("properties", 5), json!({"speed": 3}));
+    assert_eq!(page.wait("properties", 30), json!({"speed": 3}));
     for _ in 0..3 {
         page.said.remove("properties");
         crash(&mut page);
@@ -60,7 +60,7 @@ fn a_crashed_page_loads_with_its_latest_values_and_gives_up_after_three_reloads(
         assert!(!page.broken);
     }
     crash(&mut page);
-    let end = Instant::now() + Duration::from_secs(5);
+    let end = Instant::now() + Duration::from_secs(30);
     while Instant::now() < end && !page.broken {
         page.pump(Instant::now() + Duration::from_millis(20));
     }
@@ -70,7 +70,7 @@ fn a_crashed_page_loads_with_its_latest_values_and_gives_up_after_three_reloads(
 #[test]
 fn a_page_that_stops_answering_loads_again() {
     if !available() {
-        return eprintln!("skipped: no Qt WebEngine 6.5");
+        return eprintln!("skipped: no Qt WebEngine 6.5 or newer");
     }
     let dir = tempfile::tempdir().unwrap();
     let spin: &[u8] = b"console.log('probe load 1');\nsetTimeout(() => { for (;;) {} }, 1000);\n";

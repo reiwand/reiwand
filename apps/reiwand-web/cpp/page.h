@@ -67,6 +67,6 @@ private:
     QSize pixels;
 };
 
-QString capScript(uint32_t fps);
+QString capScript(uint32_t fps, const QString &key);
 Page *pageOf(uint32_t id);
 std::vector<Page *> allPages();

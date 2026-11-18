@@ -13,7 +13,7 @@ fn png() -> String {
 #[test]
 fn the_page_hears_the_media_player_with_its_cover_as_a_blob() {
     if !available() {
-        return eprintln!("skipped: no Qt WebEngine 6.5");
+        return eprintln!("skipped: no Qt WebEngine 6.5 or newer");
     }
     let dir = tempfile::tempdir().unwrap();
     let mut page =
@@ -47,7 +47,7 @@ while (Date.now() < end) {}
 #[test]
 fn a_cover_heard_before_the_page_has_loaded_reaches_it_once_it_has() {
     if !available() {
-        return eprintln!("skipped: no Qt WebEngine 6.5");
+        return eprintln!("skipped: no Qt WebEngine 6.5 or newer");
     }
     let dir = tempfile::tempdir().unwrap();
     let html = b"<!doctype html><html><body><script src=\"slow.js\"></script></body></html>";

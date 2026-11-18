@@ -18,7 +18,7 @@ fn accepted(server: &TcpListener) -> usize {
 #[test]
 fn connection_hints_reach_only_the_granted_origins() {
     if !available() {
-        return eprintln!("skipped: no Qt WebEngine 6.5");
+        return eprintln!("skipped: no Qt WebEngine 6.5 or newer");
     }
     let dir = tempfile::tempdir().unwrap();
     let (granted, a) = listener();

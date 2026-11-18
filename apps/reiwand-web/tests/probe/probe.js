@@ -69,3 +69,6 @@ const asked = (name, ask) => {
 asked("camera", () => navigator.mediaDevices.getUserMedia({ audio: true, video: true }));
 asked("clipboard", () => navigator.clipboard.readText());
 asked("place", () => new Promise((given, refused) => navigator.geolocation.getCurrentPosition(given, refused)));
+for (const given of [undefined, "reiwand:", 0, null]) {
+  try { window.__rafCap && window.__rafCap(given, 240); } catch (e) {}
+}

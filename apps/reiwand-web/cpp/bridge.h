@@ -16,6 +16,7 @@ public:
     Bridge(const RwHost *host, QObject *profile, QString own, QByteArray prefix, QColor background)
         : host(host), profile(profile), own(std::move(own)), prefix(std::move(prefix)), background(background) {}
     void mute(bool on);
+    QString key() const { return QString::fromUtf8(prefix); }
 
     Q_INVOKABLE void loaded(int view);
     Q_INVOKABLE void terminated(int view, int status);

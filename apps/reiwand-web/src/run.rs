@@ -76,7 +76,8 @@ fn open(id: u32, size: (u32, u32), scale: f64, properties: serde_json::Map<Strin
 fn rate(id: u32, fps: u32) {
     qt::fps(id, fps);
     if view(id).is_some_and(|v| v.loaded.get()) {
-        qt::eval(id, &format!("window.__rafCap && window.__rafCap({fps})"));
+        let key = engine().map(|e| serde_json::json!(crate::script::prefix(&e.nonce))).unwrap_or_default();
+        qt::eval(id, &format!("window.__rafCap && window.__rafCap({key}, {fps})"));
     }
 }
 
