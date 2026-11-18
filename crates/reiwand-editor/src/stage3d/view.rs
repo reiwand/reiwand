@@ -83,7 +83,5 @@ pub fn preview(scene: &mut Value) {
     }
     (c["eye"], c["center"], c["up"], c["far"]) =
         (json!(r(eye.at)), json!(r(eye.center)), json!([0, 1, 0]), json!(eye.far));
-    if let Some(m) = c.as_object_mut() {
-        m.remove("paths");
-    }
+    c["paths"] = json!([]);
 }

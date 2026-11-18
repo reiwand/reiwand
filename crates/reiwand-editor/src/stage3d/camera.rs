@@ -23,12 +23,22 @@ fn point(name: &str, v: [f64; 3]) -> Result<Value> {
     ]))
 }
 
+pub(super) fn full(eye: &reiwand_scene::Eye) -> Value {
+    let r = |v: f32| (f64::from(v) * 1000.0).round() / 1000.0;
+    let p = |v: [f32; 3]| json!(v.map(r));
+    json!({
+        "fov": r(eye.fov), "near": r(eye.near), "far": r(eye.far), "eye": p(eye.at), "center": p(eye.center),
+        "up": p(eye.up), "paths": [], "order": "sequential", "fade": null
+    })
+}
+
 pub(crate) fn camera_edit(doc: &Value, e: &CameraEdit) -> Result<Vec<Op>> {
     let at = "/scene/camera3d";
     if e.clear {
         return Ok(doc.pointer(at).map(|_| Op::Remove { path: at.into() }).into_iter().collect());
     }
-    let mut c = doc.pointer(at).cloned().filter(Value::is_object).unwrap_or_else(|| json!({}));
+    let mut c =
+        doc.pointer(at).cloned().filter(Value::is_object).unwrap_or_else(|| full(&camera(&doc["scene"])));
     let scene = &doc["scene"];
     if e.from_view {
         let eye = View::read(scene).unwrap_or_else(|| View::from(&camera(scene))).eye(&camera(scene));

@@ -48,7 +48,11 @@ pub fn query(doc: &Value, q: &Value) -> Value {
     if !DISPLAYS.contains(&of) {
         return json!({ "error": said("editor.meter_of", "bands are counted out of 16, 32 or 64", &[]).to_string() });
     }
-    let source: Binding<f32> = match serde_json::from_value(q["source"].clone()) {
+    let mut given = q["source"].clone();
+    if let Some((root, _)) = crate::schema::root_of("/scene") {
+        crate::schema::fill(root, &json!({ "$ref": "#/$defs/Binding_for_float" }), &mut given);
+    }
+    let source: Binding<f32> = match serde_json::from_value(given) {
         Ok(source) => source,
         Err(e) => return json!({ "error": e.to_string() }),
     };

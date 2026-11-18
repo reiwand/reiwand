@@ -25,7 +25,10 @@ fn written(doc: &Value, h: Held, at: Option<f64>, replace: bool) -> Result<Vec<O
     }
     let mut work = doc.clone();
     if !work.pointer(CAMERA).is_some_and(Value::is_object) {
-        work["scene"]["canvas"]["camera"] = json!({});
+        let size = |i: usize| doc.pointer(&format!("/scene/canvas/size/{i}")).and_then(Value::as_f64);
+        let middle = json!([size(0).unwrap_or(0.0) / 2.0, size(1).unwrap_or(0.0) / 2.0]);
+        work["scene"]["canvas"]["camera"] =
+            json!({ "center": middle, "zoom": 1.0, "rotation": 0.0, "shake": null });
     }
     let fields = [
         ("center", h.center.map(|c| json!(c))),

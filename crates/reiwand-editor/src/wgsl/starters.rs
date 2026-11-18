@@ -18,12 +18,39 @@ fn param(id: &str, kind: &str, prefill: Value, range: [Value; 2], unit: Value) -
         "yields_to": null, "waits_for": null, "tool": null })
 }
 
-fn plain(id: &str, kind: &str, prefill: Value) -> Value {
+pub(super) fn pass(entry: &str, scale: f64, inputs: &[&str]) -> Value {
+    json!({ "entry": entry, "scale": scale, "inputs": inputs, "output": "next", "target": null, "copy": null,
+        "blend": null, "vertex": null, "grid": null, "swap": null })
+}
+
+pub(super) fn plain(id: &str, kind: &str, prefill: Value) -> Value {
     param(id, kind, prefill, [Value::Null, Value::Null], Value::Null)
 }
 
 fn float(id: &str, default: f64, range: [f64; 2]) -> Value {
     param(id, "float", json!(default), [json!(range[0]), json!(range[1])], Value::Null)
+}
+
+pub(super) fn completed(mut descriptor: Value) -> Value {
+    let blank = plain("", "float", Value::Null);
+    if let Some(d) = descriptor.as_object_mut() {
+        for (key, value) in whole() {
+            d.entry(key).or_insert(value);
+        }
+    }
+    let params = descriptor["params"].as_array_mut().into_iter().flatten();
+    for param in params.filter_map(Value::as_object_mut) {
+        for (key, value) in blank.as_object().into_iter().flatten() {
+            param.entry(key.clone()).or_insert(value.clone());
+        }
+    }
+    let passes = descriptor["passes"].as_array_mut().into_iter().flatten();
+    for item in passes.filter_map(Value::as_object_mut) {
+        for (key, value) in pass("", 1.0, &["previous"]).as_object().into_iter().flatten() {
+            item.entry(key.clone()).or_insert(value.clone());
+        }
+    }
+    descriptor
 }
 
 pub fn starter(name: &str, template: &str) -> Option<(Value, String)> {
@@ -43,8 +70,7 @@ pub fn starter(name: &str, template: &str) -> Option<(Value, String)> {
             json!({ "category": "blur", "cost": { "taps": 9, "passes": 2, "scale": 1 },
                 "params": [float("length", 8.0, [0.0, 64.0]),
                     param("angle", "float", json!(0), [json!(-180), json!(180)], json!("degrees"))],
-                "passes": [{ "entry": "fs_NAME_soft", "scale": 0.5 },
-                    { "entry": "fs_NAME", "inputs": ["pass:0", "input"] }] }),
+                "passes": [pass("fs_NAME_soft", 0.5, &["input"]), pass("fs_NAME", 1.0, &["pass:0", "input"])] }),
             PASSES,
         ),
         "material" => (

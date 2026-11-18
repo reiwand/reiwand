@@ -87,7 +87,11 @@ fn keyed(doc: &Value, keys: &mut Vec<Value>, k: &PathKey) -> Result<()> {
 }
 
 pub(crate) fn edit(_dir: &Path, doc: &Value, e: &PathEdit) -> Result<Vec<Op>> {
-    let mut cam = doc.pointer(ROOT).cloned().unwrap_or_else(|| json!({}));
+    let mut cam = doc
+        .pointer(ROOT)
+        .filter(|c| !c.is_null())
+        .cloned()
+        .unwrap_or_else(|| super::camera::full(&camera(&doc["scene"])));
     let mut paths = cam["paths"].as_array().cloned().unwrap_or_default();
     match e {
         PathEdit::Add { id } => {
@@ -140,7 +144,7 @@ pub(crate) fn edit(_dir: &Path, doc: &Value, e: &PathEdit) -> Result<Vec<Op>> {
             cam["order"] = json!(order);
         }
         PathEdit::Fade { to, duration, clear } => match clear {
-            true => drop(cam.as_object_mut().and_then(|m| m.remove("fade"))),
+            true => cam["fade"] = Value::Null,
             false => {
                 let mut fade = cam["fade"].as_object().cloned().unwrap_or_default();
                 if let Some(t) = to {
@@ -161,9 +165,6 @@ pub(crate) fn edit(_dir: &Path, doc: &Value, e: &PathEdit) -> Result<Vec<Op>> {
             }
         },
     }
-    match paths.is_empty() {
-        true => drop(cam.as_object_mut().and_then(|m| m.remove("paths"))),
-        false => cam["paths"] = json!(paths),
-    }
+    cam["paths"] = json!(paths);
     Ok(set(doc, ROOT, cam))
 }

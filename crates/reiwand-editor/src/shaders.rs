@@ -104,7 +104,7 @@ pub fn rule(dir: &Path, doc: &Value, r: &crate::actions::RuleEdit) -> Result<Vec
     for (key, wanted) in [("uses", &r.uses), ("waits_for", &r.waits_for), ("yields_to", &r.yields_to)] {
         match wanted.as_deref() {
             None => {}
-            Some("") => drop(param.as_object_mut().and_then(|m| m.remove(key))),
+            Some("") => param[key] = Value::Null,
             Some(v) => param[key] = json!(v),
         }
     }

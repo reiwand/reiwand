@@ -63,10 +63,9 @@ fn a_scene_is_made_edited_and_built_from_the_command_line() {
     act(dir, "snow", "keyframe", json!({"pointer": OPACITY, "time": 4, "value": 1, "ease": "out_cubic"}));
     act(dir, "snow", "keyframe", json!({"pointer": OPACITY, "time": 3, "from": 4}));
     act(dir, "snow", "keyframe", json!({"pointer": OPACITY, "time": 4, "from": 3}));
-    assert_eq!(
-        show(dir, "/scene/layers/1/opacity"),
-        json!({"keys": [[0.0, 0], [4.0, 1, "out_cubic"]], "timeline": "rise"})
-    );
+    let opacity = show(dir, "/scene/layers/1/opacity");
+    assert_eq!(opacity["keys"], json!([[0.0, 0], [4.0, 1, "out_cubic"]]));
+    assert_eq!(opacity["timeline"], "rise");
     assert_eq!(act(dir, "snow", "duplicate_layer", json!({"id": "image"})), "image_copy\n");
     act(dir, "snow", "group", json!({"ids": ["image", "image_copy"], "id": "moons"}));
     act(dir, "snow", "move_layer", json!({"id": "moons", "to": 0}));

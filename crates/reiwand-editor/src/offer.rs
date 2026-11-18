@@ -75,6 +75,9 @@ pub fn make(dir: &Path, doc: &Value, picks: &[Pick], out: &Path, offer: &Offer) 
     parts["schema"] = scene["schema"].clone();
     parts["canvas"] = scene["canvas"].clone();
     parts["ext"] = json!({ "parts": listed });
+    let mut whole = json!({ "scene": parts });
+    crate::completing::scene_doc(&mut whole);
+    parts = whole["scene"].take();
     let mut manifest = json!({
         "schema": SCHEMA, "id": offer.id, "version": "1.0.0", "kind": "assets", "entry": "assets.json",
         "title": offer.title, "authors": [offer.attribution], "license": offer.license,
