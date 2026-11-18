@@ -57,7 +57,7 @@ fn a_layer_takes_the_pointer_everywhere_by_its_opacity_or_not_at_all() {
     assert_eq!(kinds, [("button", "alpha"), ("backdrop", "alpha")]);
     assert_eq!(seen[0]["alpha"], json!(0.25));
     touch(&mut p, "button", "off", None).unwrap();
-    assert!(solid(&p, "button").is_null(), "a layer that lets the pointer through keeps no solid");
+    assert_eq!(solid(&p, "button"), json!(false), "a layer that lets the pointer through is not solid");
     assert_eq!(areas(&p).len(), 1);
     touch(&mut p, "button", "off", None).unwrap();
     assert!(touch(&mut p, "button", "alpha", Some(1.5)).is_err());
@@ -70,7 +70,7 @@ fn the_change_of_a_pointer_area_is_one_undo_step() {
     let mut p = project(&root);
     touch(&mut p, "button", "alpha", Some(0.8)).unwrap();
     act(&mut p, json!({ "undo": {} })).unwrap();
-    assert!(solid(&p, "button").is_null());
+    assert_eq!(solid(&p, "button"), json!(false));
     act(&mut p, json!({ "redo": {} })).unwrap();
     assert_eq!(solid(&p, "button"), json!({ "alpha": 0.8 }));
 }

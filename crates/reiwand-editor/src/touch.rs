@@ -23,7 +23,7 @@ pub fn edit(doc: &Value, path: &str, layer: &Value, takes: Takes, alpha: Option<
         said("editor.touch_alpha", "the opacity that takes the pointer goes from 0 to 1", &[])
     );
     Ok(match takes {
-        Takes::Off => doc.pointer(&at).map(|_| Op::Remove { path: at }).into_iter().collect(),
+        Takes::Off => set(doc, &at, json!(false)),
         Takes::All => set(doc, &at, json!(true)),
         Takes::Alpha => set(doc, &at, json!({ "alpha": threshold })),
     })

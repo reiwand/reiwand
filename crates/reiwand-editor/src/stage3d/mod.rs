@@ -7,6 +7,7 @@ use std::path::Path;
 mod bones;
 mod camera;
 mod carve;
+mod held;
 mod carved;
 mod carving;
 mod combed;

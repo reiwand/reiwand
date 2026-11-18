@@ -84,11 +84,7 @@ pub(crate) fn place(dir: &Path, doc: &Value, e: &LightPlace) -> Result<Vec<Op>> 
 pub(crate) fn listed(doc: &Value, seen: &super::Seen, frame: &reiwand_scene::Frame) -> Vec<Value> {
     let Some(stage) = frame.stages.first() else { return Vec::new() };
     let px = |p: V3| seen.at(p).map(super::super::gizmo::px);
-    let held = |v: &Value| match v {
-        Value::Object(_) if v["keys"].is_array() && v["prop"].is_null() => "keyed",
-        Value::Object(_) => "bound",
-        _ => "fixed",
-    };
+    let held = |v: &Value| super::super::held::held(v);
     frame
         .lamps
         .iter()
