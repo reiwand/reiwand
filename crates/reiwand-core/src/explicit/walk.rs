@@ -121,7 +121,7 @@ pub fn sample(root: &Value, schema: &Value) -> Value {
     if let Some(first) = schema["enum"].get(0) {
         return first.clone();
     }
-    if branches(schema).iter().any(|b| deref(root, b).0["type"] == "null") {
+    if schema["x-null"] == true || branches(schema).iter().any(|b| deref(root, b).0["type"] == "null") {
         return Value::Null;
     }
     if let Some(first) = branches(schema).first() {

@@ -31,6 +31,7 @@ pub(super) fn nullable(s: &Value) -> bool {
         .get("type")
         .is_some_and(|t| t == "null" || t.as_array().is_some_and(|a| a.iter().any(|x| x == "null")));
     typed
+        || s.get("x-null") == Some(&Value::Bool(true))
         || s.get("anyOf")
             .and_then(Value::as_array)
             .is_some_and(|a| a.iter().any(|b| b.get("type") == Some(&Value::from("null"))))
