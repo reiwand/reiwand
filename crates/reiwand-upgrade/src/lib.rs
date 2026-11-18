@@ -5,6 +5,7 @@ pub mod descriptors;
 #[cfg(feature = "client")]
 mod download;
 pub mod edits;
+mod examples;
 pub mod file;
 pub mod fill;
 pub mod gain;

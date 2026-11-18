@@ -10,7 +10,11 @@ viejos se niegan a arrancar y nombran la orden exacta que corre la conversión.
   permisos de entradas, cuentas, base de la biblioteca, registros de repositorios, paquetes instalados
   (se reescribe el `.wpak` y se actualizan `sha256` y `size` en `installed.json`; la firma del repositorio ya no
   corresponde al archivo reescrito, la confianza queda en el registro local) y las escenas y paquetes de las carpetas
-  de la biblioteca (`--also` suma carpetas de proyectos del editor). Al terminar escribe la marca `format-version`.
+  de la biblioteca (`--also` suma carpetas de proyectos del editor). El repositorio «Example wallpapers»
+  (`examples-repo`) cuya raíz ya no carga en el formato actual se rehace vacío con claves
+  nuevas (el daemon vuelve a sumar los ejemplos), el nuevo `repo_id` se escribe en `examples-repo.json` (conservando `declined`) y en `installed.json`, la copia
+  vieja del cliente en `repos/<id>` se aparta con las copias y el servicio vuelve a añadirlo sano al arrancar
+  (en el teléfono el registro recibe `stamp` 0 para que la app lo ofrezca de nuevo). Al terminar escribe la marca `format-version`.
 - `reiwand-upgrade file RUTA... [--password-file ARCHIVO] [--copies DIR] [--check]`: una carpeta de escena o de
   paquete (todo lo que hay debajo), un `.wpak`, un `.reiwand` (si está cifrado sigue cifrado), una edición
   (`nombre.ext.reiwand.json`) o un descriptor de efecto. Es la orden de quien crea, antes de volver a firmar.

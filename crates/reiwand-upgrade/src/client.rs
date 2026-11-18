@@ -150,6 +150,7 @@ fn steps(data: &Path, sink: &mut Sink, also: &[PathBuf]) -> anyhow::Result<()> {
     }
     crate::packages::installed(data, sink)?;
     crate::stored::files(data, sink)?;
+    crate::examples::repaired(data, sink)?;
     for folder in folders(data, also) {
         crate::scenes::walk_in(&folder, sink)?;
     }

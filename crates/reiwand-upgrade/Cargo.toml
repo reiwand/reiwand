@@ -24,7 +24,7 @@ anyhow.workspace = true
 reiwand-account.workspace = true
 reiwand-carry.workspace = true
 reiwand-core.workspace = true
-reiwand-format.workspace = true
+reiwand-format = { workspace = true, features = ["sign"] }
 reiwand-sync.workspace = true
 rusqlite = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
