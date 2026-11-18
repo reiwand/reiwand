@@ -48,7 +48,8 @@ fn packages_this_device_cannot_show_keep_their_details_and_say_why() {
         let mut manifest: serde_json::Value =
             serde_json::from_slice(&fs::read(source.join("manifest.json")).unwrap()).unwrap();
         change(&mut manifest);
-        fs::write(source.join("manifest.json"), manifest.to_string()).unwrap();
+        fs::write(source.join("manifest.json"), reiwand_upgrade::manifests::whole(&manifest.to_string()))
+            .unwrap();
         reiwand_format::build(&source, root.join(format!("{name}.wpak")), &Limits::default()).unwrap();
     };
     edit("phone", |m| {

@@ -76,13 +76,13 @@ fn the_package_details_are_edited_from_the_command_line() {
     assert_eq!(copied("/manifest/title"), json!({"en": "Dusk", "es": "Atardecer"}));
     assert_eq!(
         (copied("/manifest/id"), copied("/manifest/previews")),
-        (json!("org.example.dusk.copy"), json!({"thumbnail": "assets/preview.jpg"}))
+        (json!("org.example.dusk.copy"), json!({"animated": null, "thumbnail": "assets/preview.jpg"}))
     );
     act(dir, "dusk", "translate", json!({"pointer": "/manifest/title", "language": "es"}));
     assert_eq!(show_in(dir, "dusk", "/manifest/title"), json!({"en": "Dusk"}));
     let schema: Value = serde_json::from_str(&ok(dir, &["scene", "schema", "--manifest"])).unwrap();
     assert!(
-        schema["$defs"]["Content"].is_object()
-            && schema["properties"]["photosensitive"]["x-required"] == true
+        schema["properties"]["content"]["required"] == json!(["rating", "descriptors"])
+            && schema["required"].as_array().unwrap().contains(&json!("photosensitive"))
     );
 }

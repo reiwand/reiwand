@@ -10,3 +10,7 @@ pub fn descriptor(mut descriptor: Value) -> String {
     reiwand_upgrade::descriptors::complete(&mut descriptor);
     descriptor.to_string()
 }
+
+pub fn manifest(text: &str) -> String {
+    reiwand_upgrade::manifests::whole(text)
+}

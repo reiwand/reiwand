@@ -131,12 +131,12 @@ fn an_edited_copy_of_a_signed_scene_carries_no_signature_of_the_original() {
     ok(dir, &["scene", "open", "copy", "--from", "orig.wpak"]);
     assert!(!dir.join("copy/manifest.json.minisig").exists());
     assert_eq!(ok(dir, &["scene", "show", "copy", "/manifest/id"]).trim(), "\"org.example.orig.copy\"");
-    let ancestor = json!({"author": "Ana", "title": "orig", "license": "CC0-1.0"});
+    let ancestor = json!({"author": "Ana", "title": "orig", "license": "CC0-1.0", "url": null});
     assert_eq!(
         show_in(dir, "copy", "/manifest/origin"),
-        json!({"kind": "derived", "derived_from": [ancestor]})
+        json!({"kind": "derived", "derived_from": [ancestor], "provider": null, "source_url": null})
     );
-    assert_eq!(run(dir, &["scene", "show", "copy", "/manifest/authors"]).status.code(), Some(1));
+    assert_eq!(show_in(dir, "copy", "/manifest/authors"), json!([]));
     act(dir, "copy", "set", json!({"pointer": "/scene/canvas/background", "value": "#ff0000"}));
     let built: Value = serde_json::from_str(&ok(dir, &["pack", "build", "copy", "--json"])).unwrap();
     assert_eq!(built["path"], json!("org.example.orig.copy-0.1.0.wpak"));

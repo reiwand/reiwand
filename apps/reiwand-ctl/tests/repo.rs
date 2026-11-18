@@ -1,3 +1,5 @@
+#[path = "whole/mod.rs"]
+mod whole;
 use std::fs;
 use std::path::Path;
 use std::process::{Command, Output};
@@ -35,9 +37,11 @@ fn site(work: &Path) {
     fs::copy(&fixtures, src.join("image.png")).unwrap();
     fs::write(
         src.join("manifest.json"),
-        r#"{"schema": "reiwand.wpak/2", "id": "org.example.dawn", "version": "1.0.0", "title": "Dawn",
+        whole::manifest(
+            r#"{"schema": "reiwand.wpak/2", "id": "org.example.dawn", "version": "1.0.0", "title": "Dawn",
         "license": "CC0-1.0", "kind": "image", "entry": "image.png", "origin": {"kind": "original"},
         "content": {"rating": "general"}, "photosensitive": false}"#,
+        ),
     )
     .unwrap();
     ok(work, &["repo", "keygen", "root", "--no-password"]);

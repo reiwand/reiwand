@@ -1,3 +1,5 @@
+#[path = "whole/mod.rs"]
+mod whole;
 use serde_json::Value;
 use std::path::Path;
 use std::process::{Command, Output};
@@ -38,9 +40,7 @@ fn check_explains_what_a_package_needs() {
         "requires": {"features": ["inputs.audio", "inputs.media", "media_info"]},
         "properties": {"color": {"type": "color", "default": "#ffffff"}, "show": {"type": "combo",
         "default": "both", "options": ["circle", "bars", "both"]}, "glitch": {"type": "bool", "default": true}}}"##;
-    let mut whole: Value = serde_json::from_str(manifest).unwrap();
-    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut whole);
-    std::fs::write(src.join("manifest.json"), whole.to_string()).unwrap();
+    std::fs::write(src.join("manifest.json"), whole::manifest(manifest)).unwrap();
     let path = src.to_str().unwrap();
     let new: Value = serde_json::from_str(&ok(&["pack", "check", path, "--json"])).unwrap();
     assert_eq!(
