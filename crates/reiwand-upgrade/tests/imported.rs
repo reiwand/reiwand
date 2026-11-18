@@ -66,6 +66,24 @@ fn an_imported_package_is_converted_and_its_row_is_read_again() {
 }
 
 #[test]
+fn an_imported_package_the_library_has_not_read_yet_is_converted_on_the_first_start() {
+    let dir = tempfile::tempdir().unwrap();
+    let data = dir.path();
+    fs::create_dir_all(data.join("files")).unwrap();
+    fs::write(data.join("format-version"), "2\n").unwrap();
+    let wpak = data.join("files/old.wpak");
+    package(&wpak);
+    let db = library(data);
+    item(&db, "package", &wpak, None, None);
+    drop(db);
+    client::run(data).unwrap();
+    assert_eq!(reiwand_format::peek(&wpak).unwrap().id, "org.example.old");
+    let text = fs::read(&wpak).unwrap();
+    assert_eq!(client::run(data).unwrap(), Outcome::Nothing);
+    assert_eq!(fs::read(&wpak).unwrap(), text);
+}
+
+#[test]
 fn edits_next_to_provider_images_are_converted_once() {
     let dir = tempfile::tempdir().unwrap();
     let data = dir.path();

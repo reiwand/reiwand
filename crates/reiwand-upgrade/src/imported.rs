@@ -36,11 +36,17 @@ pub(crate) fn edits(data: &Path, sink: &mut Sink) -> anyhow::Result<()> {
 
 pub(crate) fn packages(data: &Path, sink: &mut Sink) -> anyhow::Result<()> {
     let Some(db) = open(data, OpenFlags::SQLITE_OPEN_READ_ONLY) else { return Ok(()) };
-    let refused =
-        paths(&db, "SELECT path FROM items WHERE kind = 'package' AND missing = 0 AND error IS NOT NULL");
+    // A package the library already refused, or one whose manifest does not load in the current format: the
+    // second covers the first start of a new version, before the daemon has read the package once.
+    let listed = paths(&db, "SELECT path FROM items WHERE kind = 'package' AND missing = 0");
+    let refused: BTreeSet<PathBuf> =
+        paths(&db, "SELECT path FROM items WHERE kind = 'package' AND missing = 0 AND error IS NOT NULL")
+            .into_iter()
+            .collect();
     drop(db);
     let mut converted = Vec::new();
-    for path in refused.into_iter().filter(|p| p.is_file()) {
+    let stale = |p: &PathBuf| p.is_file() && (refused.contains(p) || reiwand_format::peek(p).is_err());
+    for path in listed.into_iter().filter(stale) {
         if crate::packages::wpak(&path, sink).unwrap_or(false) {
             converted.push(path);
         }
