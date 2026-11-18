@@ -16,12 +16,12 @@ Unencrypted files carry no signature: integrity comes from the sums in the manif
 
 - `repositories`: address, `repo_id` anchor and server origin of each added repository.
 - `providers`: photo providers (kind, name, configuration) without secrets.
-- `lists`: name and items (`repo_id` optional, `id`).
+- `lists`: name and items (`repo_id`, `null` for an item with no repository, and `id`).
 - `favourites`, `ratings`, `tags`: per item.
 - `installed`: repository wallpapers as references `(repo_id, id, version)`. They are downloaded again on import and never carried.
 - `settings`: portable settings only.
-- Optional `own`: the files of the user's own wallpapers.
-- Optional `secrets`: account sessions per repository and provider keys.
+- `own`, only when the user ticks it: the files of the user's own wallpapers.
+- `secrets`, only when the user ticks it: account sessions per repository and provider keys.
 
 ## Settings of this device
 
@@ -29,7 +29,7 @@ These keys are never exported and are dropped on import even if a file holds the
 
 ## Encryption
 
-When the user ticks secrets, the whole zip is encrypted with a password chosen at export. Key: Argon2id (default 64 MiB, 3 passes; the cost is stored in the header and bounded on read) over a random 16-byte salt. Cipher: XChaCha20-Poly1305 in 64 KiB segments. The nonce is a 19-byte random prefix, the segment number and a flag on the last segment, so reordering and truncation are detected; the header is authenticated with every segment. A file starts with `REIWANDE` and a header version byte. Errors are distinct: needs a password, wrong password or damaged, truncated.
+When the user ticks secrets, the whole zip is encrypted with a password chosen at export. Key: Argon2id (64 MiB, 3 passes; the cost is stored in the header and bounded on read) over a random 16-byte salt. Cipher: XChaCha20-Poly1305 in 64 KiB segments. The nonce is a 19-byte random prefix, the segment number and a flag on the last segment, so reordering and truncation are detected; the header is authenticated with every segment. A file starts with `REIWANDE` and a header version byte. Errors are distinct: needs a password, wrong password or damaged, truncated.
 
 ## Hostile input
 
@@ -68,9 +68,9 @@ Ajustes > Equipo > «Mover mi configuración» ofrece «Exportar mi configuraci�
 
 ## Formato 2: valores explícitos
 
-- `carry.json` y `files/content.json` llevan todos los campos. Un valor opcional sin contenido se escribe como `null`; no se omite. El lector (`reiwand_carry::read`) rechaza el archivo y nombra la ruta del campo que falta.
+- `carry.json` y `files/content.json` llevan todos los campos. Un valor sin contenido se escribe como `null`; solo los bloques de funciones sin usar (`List.rules`, `Content.secrets`) pueden faltar, y un bloque presente lleva todos sus campos. El lector (`reiwand_carry::read`) rechaza el archivo y nombra la ruta del campo que falta.
 - Un archivo de formato 1, también cifrado, se rechaza con un mensaje que nombra la salida: `reiwand-upgrade file ARCHIVO` en un ordenador. Si el archivo está cifrado sigue cifrado y la herramienta pide la contraseña. El resultado se escribe junto al original (el original no se toca si la conversión falla) y es el que se importa, en el ordenador o en el teléfono.
-- Tabla de valores sugeridos: `reiwand_carry::PREFILL` (una por formato). Los campos `Option` se clasifican como `bloque` (bloque opcional que podría faltar más adelante: `List.rules`, `Content.secrets`) o `valor` (el `null` significa algo y siempre se escribe: `Item.repo_id`, `Repository.pin`, `List.query`).
+- Tabla de valores prellenados: `reiwand_carry::PREFILL` (una por formato). Los campos `Option` se clasifican como `bloque` (bloque de una función sin usar: puede faltar o ser `null`; si está, lleva todos sus campos: `List.rules`, `Content.secrets`) o `valor` (el `null` significa algo y siempre se escribe: `Item.repo_id`, `Repository.pin`, `List.query`).
 
 ## Teléfono: ajustes propios
 
