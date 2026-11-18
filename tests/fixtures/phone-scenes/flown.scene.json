@@ -1,0 +1,102 @@
+{
+  "assets": {},
+  "audio": null,
+  "camera3d": {
+    "center": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "eye": [
+      0.0,
+      0.0,
+      5.0
+    ],
+    "fade": null,
+    "far": 1000.0,
+    "fov": 60.0,
+    "near": 0.1,
+    "order": "sequential",
+    "paths": [
+      {
+        "ease": null,
+        "id": "around",
+        "keys": [
+          {
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "eye": [
+              0,
+              0,
+              5
+            ],
+            "fov": null,
+            "t": 0,
+            "up": null
+          },
+          {
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "eye": [
+              1,
+              0,
+              5
+            ],
+            "fov": null,
+            "t": 1,
+            "up": null
+          }
+        ],
+        "loop": false
+      }
+    ],
+    "up": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  "canvas": {
+    "ambient": null,
+    "background": "#000000",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
+    "size": [
+      64,
+      32
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": [],
+  "transition": null
+}

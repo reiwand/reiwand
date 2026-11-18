@@ -1,0 +1,107 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": null,
+  "description": "",
+  "display": null,
+  "entry": "scene.json",
+  "id": "org.example.knobs",
+  "inputs": [],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
+  "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "preview": null,
+  "previews": null,
+  "properties": {
+    "again": {
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": null,
+      "order": 0,
+      "quality": {},
+      "type": "button",
+      "visible_if": {}
+    },
+    "mood": {
+      "default": 1,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": null,
+      "options": [
+        1,
+        2
+      ],
+      "order": 0,
+      "quality": {},
+      "type": "combo",
+      "visible_if": {}
+    },
+    "photos": {
+      "accept": [],
+      "enabled_if": {},
+      "every": 60,
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": null,
+      "max_files": 1000,
+      "mode": "one",
+      "order": 0,
+      "pick": "random",
+      "quality": {},
+      "recursive": 0,
+      "type": "folder",
+      "visible_if": {}
+    },
+    "token": {
+      "default": "",
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": null,
+      "max_len": null,
+      "multiline": false,
+      "order": 0,
+      "quality": {},
+      "secret": true,
+      "type": "text",
+      "visible_if": {}
+    }
+  },
+  "requires": {
+    "engine": null,
+    "features": [
+      "folder",
+      "properties2"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/2",
+  "strings": {},
+  "tags": [],
+  "title": "Knobs",
+  "version": "1.0.0",
+  "web": null
+}

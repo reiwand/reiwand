@@ -148,9 +148,7 @@ setTimeout(() => {
 }, Number(query.get("wait")));
 </script></body></html>"""
         const val SIDE = 64
-        const val MANIFEST = """{ "schema": "reiwand.wpak/2", "id": "org.example.kept", "version": "1.0.0",
-            "title": "Kept", "license": "CC0-1.0", "kind": "web", "entry": "index.html", "origin": { "kind": "original" },
-            "content": { "rating": "general" }, "photosensitive": false, "web": { "storage_kib": 4 } }"""
+        val MANIFEST: String get() = sample("kept", "manifest")
         const val PAGE = """<!doctype html><html><body><script>
 const probe = (window.probe = { origin: location.origin });
 const keep = (name, value) => { try { localStorage.setItem(name, value); probe[name] = "kept"; } catch (e) { probe[name] = e.name; } };

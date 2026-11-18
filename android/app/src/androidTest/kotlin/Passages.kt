@@ -32,17 +32,14 @@ object Passages {
         dir.mkdirs()
         File(dir, "scene.json").writeText(scene)
         File(dir, "manifest.json").writeText(
-            """{ "schema": "reiwand.wpak/2", "id": "org.example.passage.${name.lowercase()}", "version": "1.0.0",
-                "title": "$name", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json",
-                "origin": { "kind": "original" }, "content": { "rating": "general" }, "photosensitive": false,
-                "requires": { "features": ["transition"] } }""",
+            sample("passage", "manifest").replace("org.example.passage", "org.example.passage.${name.lowercase()}").replace("TITLE", name),
         )
         File(dir, "t").mkdirs()
         File(dir, "t/mark.json").writeText(MARK)
         File(dir, "t/mark.wgsl").writeText(if (name == "Broken") BROKEN else WGSL)
     }
 
-    private const val MARK = """{ "id": "mark", "stage": "transition", "cost": { "taps": 1, "passes": 1, "scale": 1 } }"""
+    private val MARK: String get() = sample("passage", "descriptor")
     private const val WGSL = """fn transition(c: Crossing) -> Crossing {
     var o = c;
     o.color = select(after(c.uv), vec4<f32>(1.0, 1.0, 0.0, 1.0), c.progress < 0.999);
@@ -53,9 +50,9 @@ object Passages {
     return 1.0;
 }
 """
-    private fun scene(color: String, ms: Int?) = """{ "schema": "reiwand.scene/1", "canvas": { "size": [64, 64], "fit": "stretch" },
-        ${ms?.let { """"transition": { "in": { "descriptor": "t/mark.json", "wgsl": "t/mark.wgsl", "duration_ms": $it } },""" } ?: ""}
-        "layers": [{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "$color" }] }"""
+    private fun scene(color: String, ms: Int?) =
+        if (ms == null) sample("passplain", "scene").replace("#ff0000", color)
+        else sample("passmark", "scene").replace("#0000ff", color).replace("\"duration_ms\": 1500", "\"duration_ms\": $ms")
     private val SCENES = mapOf(
         "Red" to scene("#ff0000", null),
         "Mark" to scene("#0000ff", 1500),

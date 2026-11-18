@@ -102,17 +102,10 @@ class ShortcutTest : SceneBase() {
 
     private companion object {
         const val APART_MS = 1_100L
-        const val SHORTCUT_SCENE = """{ "schema": "reiwand.scene/1", "canvas": { "size": [64, 64] },
-            "scripts": [{ "path": "open.js", "events": ["init", "click"], "uses": ["layers", "clicks", "shortcuts"] }],
-            "layers": [{ "blend_space": "canvas", "id": "button", "type": "solid", "color": "#2040c0", "size": [32, 64], "solid": true,
-                        "transform": { "position": [16, 32] } }] }"""
+        val SHORTCUT_SCENE: String get() = sample("shortcut", "scene")
         const val SHORTCUT_SCRIPT = """import { scene, openShortcut } from "reiwand";
 export function init() { scene.layer("button").on("click", () => { openShortcut("open"); }); }
 """
-        const val SHORTCUT_MANIFEST = """{ "schema": "reiwand.wpak/2", "id": "org.example.shortcuts", "version": "1.0.0",
-            "title": "Shortcuts", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "origin": { "kind": "original" },
-            "content": { "rating": "general" }, "photosensitive": false, "inputs": ["pointer", "clicks"],
-            "requires": { "features": ["properties2", "script_shortcuts"] },
-            "properties": { "open": { "type": "shortcut", "label": "Open" } } }"""
+        val SHORTCUT_MANIFEST: String get() = sample("shortcut", "manifest")
     }
 }
