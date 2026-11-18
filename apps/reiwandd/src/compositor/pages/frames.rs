@@ -166,7 +166,10 @@ fn take(
             view_of(slot, view).into_iter().for_each(|v| v.loaded = true);
             tracing::debug!("the web page loaded");
         }
-        FromWeb::Crashed { .. } => tracing::warn!("the web page crashed and is loading again"),
+        FromWeb::Crashed { .. } => {
+            slot.views.values_mut().for_each(|v| v.loaded = false);
+            tracing::warn!("the web page crashed and is loading again");
+        }
         FromWeb::Broken { .. } => {
             slot.failures = RETRIES;
             slot.fail(crate::words::web_crashed(), now);

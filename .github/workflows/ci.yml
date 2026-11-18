@@ -356,6 +356,12 @@ jobs:
           shared-key: dev
           save-if: false
 
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: web-arch
+          workspaces: ". -> target-web"
+          save-if: ${{ github.ref == 'refs/heads/master' }}
+
       - name: Daemon and test binaries
         run: |
           cargo build --locked -p reiwandd -p reiwand-ctl -p reiwand-upgrade
@@ -584,6 +590,12 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: web-fedora
+          save-if: ${{ github.ref == 'refs/heads/master' }}
+          workspaces: .
 
       - name: Build in Fedora, whose Qt has the web engine that Ubuntu 24.04 lacks
         run: |
@@ -1240,7 +1252,7 @@ jobs:
 
   flatpak-release:
     name: Attach the Flatpak bundles
-    needs: [version, release, flatpak]
+    needs: [version, release, flatpak, flatpak-daemon]
     if: ${{ !cancelled() && needs.release.outputs.tag != '' }}
     runs-on: ubuntu-24.04
     permissions:

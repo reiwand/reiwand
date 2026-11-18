@@ -177,3 +177,11 @@ fn an_idle_helper_is_closed_and_comes_back_only_when_a_view_is_shown() {
     assert!(slot.starts(now), "a visible view wakes the page");
     assert!(!slot.asleep);
 }
+
+#[test]
+fn a_view_that_is_reset_waits_for_its_page_to_load_again() {
+    let mut view = super::view::ViewSlot::new(1, (1, 1));
+    view.loaded = true;
+    view.reset();
+    assert!(!view.loaded);
+}

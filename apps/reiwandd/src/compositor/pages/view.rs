@@ -66,6 +66,7 @@ impl ViewSlot {
     pub(super) fn reset(&mut self) {
         (self.opened, self.visible, self.fps, self.shown, self.pointer) = (false, None, 0, None, None);
         self.lights = None;
+        self.loaded = false;
         self.imported.clear();
         self.ring = None;
     }

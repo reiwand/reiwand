@@ -42,7 +42,13 @@ struct Qt {
     version: String,
     headers: PathBuf,
     libs: PathBuf,
+    more_headers: Option<PathBuf>,
+    more_libs: Option<PathBuf>,
     moc: PathBuf,
+}
+
+fn extra(name: &str) -> Option<PathBuf> {
+    env::var_os(name).filter(|v| !v.is_empty()).map(PathBuf::from)
 }
 
 fn find() -> Result<Qt, String> {
@@ -50,12 +56,15 @@ fn find() -> Result<Qt, String> {
     let version = query(&qmake, "QT_VERSION").ok_or("qmake does not answer")?;
     let headers = PathBuf::from(query(&qmake, "QT_INSTALL_HEADERS").ok_or("no Qt headers")?);
     let libs = PathBuf::from(query(&qmake, "QT_INSTALL_LIBS").ok_or("no Qt libraries")?);
+    let (more_headers, more_libs) = (extra("REIWAND_WEB_INCLUDE"), extra("REIWAND_WEB_LIB"));
     let mut parts = version.split('.').filter_map(|p| p.parse::<u32>().ok());
     let (major, minor) = (parts.next().unwrap_or(0), parts.next().unwrap_or(0));
     if (major, minor) < (6, 5) {
         return Err(format!("Qt {version} is older than 6.5"));
     }
-    if !headers.join("QtWebEngineQuick/qtwebenginequickglobal.h").is_file() {
+    let engine = "QtWebEngineQuick/qtwebenginequickglobal.h";
+    let has = |dir: &PathBuf| dir.join(engine).is_file();
+    if !has(&headers) && !more_headers.as_ref().is_some_and(has) {
         return Err(format!("Qt {version} has no Qt WebEngine headers"));
     }
     let moc = ["QT_HOST_LIBEXECS", "QT_INSTALL_LIBEXECS", "QT_HOST_BINS"]
@@ -64,14 +73,16 @@ fn find() -> Result<Qt, String> {
         .map(|d| PathBuf::from(d).join("moc"))
         .find(|p| p.is_file())
         .ok_or("moc was not found")?;
-    Ok(Qt { version, headers, libs, moc })
+    Ok(Qt { version, headers, libs, more_headers, more_libs, moc })
 }
 
 fn compile(qt: &Qt) {
     let out = PathBuf::from(env::var_os("OUT_DIR").unwrap());
     let moc = out.join("moc_bridge.cpp");
     let mut includes = vec![qt.headers.clone()];
-    includes.extend(MODULES.iter().map(|m| qt.headers.join(format!("Qt{m}"))));
+    includes.extend(qt.more_headers.clone());
+    let roots: Vec<_> = includes.clone();
+    includes.extend(roots.iter().flat_map(|r| MODULES.iter().map(move |m| r.join(format!("Qt{m}")))));
     let mut command = Command::new(&qt.moc);
     for include in &includes {
         command.arg(format!("-I{}", include.display()));
@@ -95,6 +106,9 @@ fn compile(qt: &Qt) {
     files.sort();
     build.files(files).compile("reiwand_web_engine");
     println!("cargo::rustc-link-search=native={}", qt.libs.display());
+    if let Some(more) = &qt.more_libs {
+        println!("cargo::rustc-link-search=native={}", more.display());
+    }
     if env::var_os("REIWAND_WEB_QMAKE").is_some() {
         println!("cargo::rustc-link-arg=-Wl,-rpath,{}", qt.libs.display());
     }
@@ -107,6 +121,9 @@ fn main() {
     println!("cargo::rustc-check-cfg=cfg(no_engine)");
     println!("cargo::rerun-if-env-changed=QMAKE");
     println!("cargo::rerun-if-env-changed=REIWAND_WEB_QMAKE");
+    println!("cargo::rerun-if-env-changed=REIWAND_WEB_INCLUDE");
+    println!("cargo::rerun-if-env-changed=REIWAND_WEB_LIB");
+    println!("cargo::rerun-if-env-changed=REIWAND_WEB_REQUIRE_ENGINE");
     println!("cargo::rerun-if-changed=cpp");
     println!("cargo::rerun-if-changed=qml");
     match find() {
@@ -115,6 +132,9 @@ fn main() {
             compile(&qt);
         }
         Err(reason) => {
+            if env::var_os("REIWAND_WEB_REQUIRE_ENGINE").is_some_and(|v| v == "1") {
+                panic!("reiwand-web must have Qt WebEngine and cannot be built without it: {reason}");
+            }
             println!("cargo::warning=reiwand-web is built without Qt WebEngine: {reason}");
             println!("cargo::rustc-cfg=no_engine");
             println!("cargo::rustc-env=REIWAND_WEB_QT={reason}");

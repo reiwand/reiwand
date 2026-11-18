@@ -80,7 +80,7 @@ pub fn web_missing() -> String {
 pub fn web_engine(flatpak: bool) -> String {
     match flatpak {
         true => tr(
-            "Web wallpapers cannot be shown here: this Flatpak does not include Qt WebEngine 6.5 or newer, the engine that draws them. Install the Qt WebEngine base app of the Flatpak runtime, or install Reiwand from a package of your distribution.",
+            "Web wallpapers cannot be shown here: Qt WebEngine 6.5 or newer cannot be loaded from this Flatpak. The Flatpak is broken or out of date: update or reinstall it, or install Reiwand from a package of your distribution.",
         ),
         false => tr(
             "Web wallpapers cannot be shown here: they need Qt WebEngine 6.5 or newer, which is not installed. Ubuntu 24.04 ships Qt 6.4, which is too old; install qt6-qtwebengine on Fedora or qt6-webengine on Arch Linux.",
@@ -94,6 +94,11 @@ pub fn unshown(why: &str) -> String {
 
 pub fn web_old(why: &str) -> String {
     tr("Web wallpapers cannot be shown here: they need Qt WebEngine 6.5 or newer (%1).").replace("%1", why)
+}
+
+pub fn web_unbuilt(why: &str) -> String {
+    tr("Web wallpapers cannot be shown here: the web helper of this installation was built without Qt WebEngine, so the package is broken or out of date; reinstall or update Reiwand (%1).")
+        .replace("%1", why)
 }
 
 pub fn web_broken(why: &str) -> String {

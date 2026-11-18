@@ -23,4 +23,8 @@ if [ -z "$socket" ] || [ "$socket" = . ]; then
   exit 1
 fi
 export WAYLAND_DISPLAY="$socket"
-flatpak run --device=dri --socket=wayland --command=reiwand-web "$app" --check
+if ! command -v dbus-run-session >/dev/null; then
+  echo "dbus-run-session is needed" >&2
+  exit 1
+fi
+dbus-run-session -- flatpak run --device=dri --socket=wayland --command=reiwand-web "$app" --check | grep -q "^Qt [0-9]"
