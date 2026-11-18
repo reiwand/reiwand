@@ -66,12 +66,16 @@ pub(crate) fn act(doc: &Value, e: &RgbEdit) -> Result<Vec<Op>> {
         );
         target.insert("size".into(), json!([w, h]));
         let transform = target.entry("transform").or_insert_with(|| json!({}));
-        if let Some(t) = transform.as_object_mut().filter(|t| !t.contains_key("position")) {
+        if let Some(t) = transform.as_object_mut().filter(|t| t.get("position").is_none_or(Value::is_null)) {
             t.insert("position".into(), json!([most(0) / 4.0, most(1) / 4.0]));
         }
     }
     if e.whole {
-        target.remove("size");
+        let whole = match target.get("type").and_then(Value::as_str) {
+            Some("image" | "video") => "source",
+            _ => "canvas",
+        };
+        target.insert("size".into(), json!(whole));
     }
     let wanted = lit(&new["scene"]["layers"]);
     if let Some(m) = new["manifest"].as_object_mut().filter(|_| wanted || permitted(doc)) {

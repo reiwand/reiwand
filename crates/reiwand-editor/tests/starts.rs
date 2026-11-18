@@ -35,12 +35,12 @@ fn a_clock_layer_is_one_step_and_shows_the_time_or_the_date() {
     let root = tempfile::tempdir().unwrap();
     let mut project = open(root.path());
     act(&mut project, json!({"layer": {"start": {"clock": {}}}})).unwrap();
-    assert_eq!(layer(&project, "clock")["text"], json!({"clock": "HH:mm"}));
+    assert_eq!(layer(&project, "clock")["text"]["clock"], json!("HH:mm"));
     act(&mut project, json!({"layer": {"start": {"clock": {"date": true, "id": "fecha"}}}})).unwrap();
-    assert_eq!(layer(&project, "fecha")["text"], json!({"date": "EEEE d MMMM yyyy"}));
+    assert_eq!(layer(&project, "fecha")["text"]["date"], json!("EEEE d MMMM yyyy"));
     act(&mut project, json!({"layer": {"start": {"clock": {"format": "hh:mm a", "size": 90.0}}}})).unwrap();
     let second = layer(&project, "clock_2");
-    assert_eq!((&second["text"], &second["size"]), (&json!({"clock": "hh:mm a"}), &json!(90.0)));
+    assert_eq!((&second["text"]["clock"], &second["size"]), (&json!("hh:mm a"), &json!(90.0)));
     assert!(errors(&project).is_empty(), "{:?}", errors(&project));
     let taken = act(&mut project, json!({"layer": {"start": {"clock": {"id": "fecha"}}}}));
     assert!(taken.unwrap_err().to_string().contains("fecha"));
@@ -57,7 +57,8 @@ fn a_spin_turns_forever_in_the_chosen_direction_and_keeps_where_it_was() {
     act(&mut project, json!({"add_layer": {"kind": "shape", "id": "gear"}})).unwrap();
     act(&mut project, json!({"layer": {"start": {"forever": {"layer": "gear", "motion": "spin"}}}})).unwrap();
     let rotation = layer(&project, "gear")["transform"]["rotation"].clone();
-    assert_eq!(rotation, json!({"keys": [[0, 0.0, "linear"], [20.0, 360.0, "linear"]], "loop": "repeat"}));
+    assert_eq!(rotation["keys"], json!([[0, 0.0, "linear"], [20.0, 360.0, "linear"]]));
+    assert_eq!(rotation["loop"], "repeat");
     act(&mut project, json!({"layer": {"transform": {"layer": "gear", "rotation": 30.0, "replace": true}}}))
         .unwrap();
     let spin = json!({"layer": {"start": {"forever": {"layer": "gear", "motion": "spin", "seconds": 8.0, "reverse": true}}}});
@@ -94,10 +95,8 @@ fn a_drift_goes_and_comes_back_forever_from_where_the_layer_is() {
         "back": false, "reverse": true, "seconds": 5.0}}}});
     act(&mut project, away).unwrap();
     let position = layer(&project, "cloud")["transform"]["position"].clone();
-    assert_eq!(
-        position,
-        json!({"keys": [[0, [100.0, 100.0], "linear"], [5.0, [100.0, 50.0], "linear"]], "loop": "repeat"})
-    );
+    assert_eq!(position["keys"], json!([[0, [100.0, 100.0], "linear"], [5.0, [100.0, 50.0], "linear"]]));
+    assert_eq!(position["loop"], "repeat");
     assert!(errors(&project).is_empty(), "{:?}", errors(&project));
 }
 

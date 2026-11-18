@@ -38,7 +38,7 @@ fn package_effects_are_removed_unless_a_layer_still_uses_them() {
         Project::create(&dir, starter("empty", "org.example.glow", "Glow", "en").unwrap()).unwrap();
     let source = root.path().join("source");
     fs::create_dir_all(&source).unwrap();
-    fs::write(source.join("glow.json"), descriptor("glow").to_string()).unwrap();
+    fs::write(source.join("glow.json"), whole::descriptor(&descriptor("glow").to_string())).unwrap();
     fs::write(source.join("glow.wgsl"), WGSL).unwrap();
     project.act(&Action::ImportEffect { descriptor: source.join("glow.json"), wgsl: None }).unwrap();
     let listed = outline(&project, 0.0, &[]);
@@ -71,7 +71,7 @@ fn the_cost_of_an_effect_is_shown_at_every_quality_level_and_drops_for_heavy_and
     fs::create_dir_all(&source).unwrap();
     let heavy =
         json!({ "id": "heavy", "cost": { "taps": 50, "passes": 2 }, "passes": [{ "entry": "fs_glow" }] });
-    fs::write(source.join("heavy.json"), heavy.to_string()).unwrap();
+    fs::write(source.join("heavy.json"), whole::descriptor(&heavy.to_string())).unwrap();
     fs::write(source.join("heavy.wgsl"), WGSL).unwrap();
     project.act(&Action::ImportEffect { descriptor: source.join("heavy.json"), wgsl: None }).unwrap();
     let ask = |optional: bool| {

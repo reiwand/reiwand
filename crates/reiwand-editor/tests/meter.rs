@@ -1,7 +1,11 @@
 use reiwand_editor::rigs::query;
 use serde_json::{Value, json};
 
-fn ask(doc: &Value, q: Value) -> Value {
+fn ask(doc: &Value, mut q: Value) -> Value {
+    if q["meter"]["source"].is_object() {
+        let source = q["meter"]["source"].take();
+        q["meter"]["source"] = reiwand_scene::prefill::of("Binding_for_float", source);
+    }
     query(std::path::Path::new("."), doc, "", &q)
 }
 

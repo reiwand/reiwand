@@ -22,7 +22,7 @@ fn conditions_are_checked_while_they_are_typed() {
     assert_eq!(doc["manifest"]["properties"]["photo"]["visible_if"], "speed >= 2");
     assert_eq!(doc["manifest"]["properties"]["photo"]["enabled_if"], json!({"mood": "storm"}));
     run(&mut doc, json!({"condition": {"id": "photo", "text": ""}}));
-    assert!(doc["manifest"]["properties"]["photo"].get("visible_if").is_none());
+    assert_eq!(doc["manifest"]["properties"]["photo"]["visible_if"], json!({}));
     assert_eq!(field(&doc, "/manifest/properties/photo", "enabled_if").widget, "condition");
 }
 

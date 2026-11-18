@@ -106,13 +106,13 @@ fn language_files_and_package_effects_belong_to_the_package() {
     fs::write(dir.join("locale/en.json"), json!({"title": "Tide"}).to_string()).unwrap();
     let descriptor = json!({"id": "ripple", "passes": [{"entry": "fs_ripple"}], "cost": {},
         "options": [{"id": "taps", "values": [1, 2], "prefill": 1}]});
-    fs::write(dir.join("assets/ripple.json"), descriptor.to_string()).unwrap();
+    fs::write(dir.join("assets/ripple.json"), whole::descriptor(&descriptor.to_string())).unwrap();
     let wgsl = "override taps: i32 = 1;\n@fragment\nfn fs_ripple(in: VertexOut) -> @location(0) vec4<f32> {\n    return tap(in.uv) * f32(taps);\n}\n";
     fs::write(dir.join("assets/ripple.wgsl"), wgsl).unwrap();
     act(&mut project, json!({"set": {"pointer": "/manifest/title", "value": "@title"}}));
     let effects = json!({"ripple": {"descriptor": "assets/ripple.json", "wgsl": "assets/ripple.wgsl"}});
     act(&mut project, json!({"set": {"pointer": "/scene/effects", "value": effects}}));
-    let layers = json!([{ "blend_space": "canvas", "id": "sea", "type": "solid", "color": "#103050", "effects": [{"effect": "ripple"}]}]);
+    let layers = json!([{ "blend_space": "canvas", "id": "sea", "type": "solid", "color": "#103050", "effects": [{"effect": "ripple", "params": {"taps": 1}}]}]);
     act(&mut project, json!({"set": {"pointer": "/scene/layers", "value": layers}}));
     let listed = |p: &Project| p.doc["manifest"]["requires"]["features"].clone();
     assert_eq!(listed(&project), json!(["custom_effects", "effect_options"]));

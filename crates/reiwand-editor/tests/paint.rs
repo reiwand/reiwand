@@ -27,7 +27,7 @@ fn masks_are_painted_per_channel_into_new_pictures_that_undo_restores() {
     let dir = root.path().join("veil");
     let mut project =
         Project::create(&dir, starter("empty", "org.example.veil", "Veil", "en").unwrap()).unwrap();
-    let layer = json!([{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ffffff", "effects": [{ "effect": "blend_gradient" }] }]);
+    let layer = json!([{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ffffff", "effects": [{ "effect": "blend_gradient", "params": { "texture": "", "map": "", "progress": 0.5, "softness": 0.1 } }] }]);
     act(&mut project, json!({ "set": { "pointer": "/scene/layers", "value": layer } })).unwrap();
     let pointer = "/scene/layers/0/effects/0/params/map";
     let stroke = |channel: Value, value: f32| {
@@ -54,7 +54,8 @@ fn masks_are_painted_per_channel_into_new_pictures_that_undo_restores() {
     let far =
         json!({ "paint_mask": { "pointer": pointer, "channel": 5, "radius": 0.1, "points": [[0.5, 0.5]] } });
     assert!(act(&mut project, far).is_err());
-    assert!(reiwand_editor::package::problems(&project.dir, &project.doc).iter().all(|p| p.warning));
+    let left = reiwand_editor::package::problems(&project.dir, &project.doc);
+    assert!(left.iter().all(|p| p.warning), "{left:?}");
 }
 
 #[test]
@@ -70,11 +71,11 @@ fn a_new_mask_starts_from_the_paint_of_its_parameter() {
     let wgsl = "@fragment fn fs_veil(in: VertexOut) -> @location(0) vec4<f32> {
     return tap(in.uv) * sample(aux0, in.uv).g;
 }";
-    std::fs::write(root.path().join("veil.json"), descriptor.to_string()).unwrap();
+    std::fs::write(root.path().join("veil.json"), whole::descriptor(&descriptor.to_string())).unwrap();
     std::fs::write(root.path().join("veil.wgsl"), wgsl).unwrap();
     let import = Action::ImportEffect { descriptor: root.path().join("veil.json"), wgsl: None };
     project.act(&import).unwrap();
-    let layer = json!([{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ffffff", "effects": [{ "effect": "veil" }] }]);
+    let layer = json!([{ "blend_space": "canvas", "id": "fill", "type": "solid", "color": "#ffffff", "effects": [{ "effect": "veil", "params": { "cover": "" } }] }]);
     act(&mut project, json!({ "set": { "pointer": "/scene/layers", "value": layer } })).unwrap();
     let pointer = "/scene/layers/0/effects/0/params/cover";
     let stroke = json!({ "paint_mask": { "pointer": pointer, "channel": 1, "radius": 0.1, "value": 0,
@@ -109,7 +110,7 @@ fn a_first_mask_on_a_ktx2_picture_is_written_as_ktx2() {
         json!({ "set": { "pointer": "/scene/assets/wall", "value": { "path": "assets/wall.ktx2" } } }),
     )
     .unwrap();
-    let layer = json!([{ "blend_space": "canvas", "id": "w", "type": "image", "image": "wall", "effects": [{ "effect": "blend_gradient" }] }]);
+    let layer = json!([{ "blend_space": "canvas", "id": "w", "type": "image", "image": "wall", "effects": [{ "effect": "blend_gradient", "params": { "texture": "", "map": "", "progress": 0.5, "softness": 0.1 } }] }]);
     act(&mut project, json!({ "set": { "pointer": "/scene/layers", "value": layer } })).unwrap();
     let pointer = "/scene/layers/0/effects/0/params/map";
     let stroke = json!({ "paint_mask": { "pointer": pointer, "channel": 1, "radius": 0.1, "value": 1.0,

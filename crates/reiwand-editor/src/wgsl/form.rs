@@ -27,7 +27,7 @@ pub const FIELDS: [&str; 19] = [
     "compose",
     "lighter",
 ];
-const PARAM_KEYS: [&str; 14] = [
+pub(super) const PARAM_KEYS_ALL: [&str; 14] = [
     "type",
     "prefill",
     "min",
@@ -43,7 +43,7 @@ const PARAM_KEYS: [&str; 14] = [
     "waits_for",
     "tools",
 ];
-const PASS_KEYS: [&str; 10] =
+pub(super) const PASS_KEYS: [&str; 10] =
     ["entry", "scale", "inputs", "output", "target", "copy", "blend", "vertex", "grid", "swap"];
 
 fn default_of(kind: &str) -> Value {
@@ -94,22 +94,22 @@ pub(crate) fn param(json: &mut Value, c: &ParamChange) -> Result<()> {
         None => {
             crate::clips::valid(c.id)?;
             let kind = c.set.get("type").and_then(Value::as_str).unwrap_or("float");
-            params.push(json!({ "id": c.id, "type": kind, "prefill": default_of(kind) }));
+            params.push(super::whole::param(c.id, kind, default_of(kind)));
             params.len() - 1
         }
     };
     let p = &mut params[at];
     let kind_before = p["type"].clone();
     for (k, v) in c.set {
-        keyed(k, &PARAM_KEYS)?;
+        keyed(k, &PARAM_KEYS_ALL)?;
         p[k] = v.clone();
     }
     if p["type"] != kind_before && !c.set.contains_key("prefill") {
         p["prefill"] = default_of(p["type"].as_str().unwrap_or("float"));
     }
     for k in c.clear {
-        keyed(k, &PARAM_KEYS[2..])?;
-        drop(p.as_object_mut().and_then(|o| o.remove(k)));
+        keyed(k, &PARAM_KEYS_ALL[2..])?;
+        p[k] = super::whole::cleared_param(k);
     }
     if let Some(to) = c.to {
         crate::clips::valid(to)?;
@@ -135,12 +135,13 @@ pub(crate) fn lighter(json: &mut Value, set: &Map<String, Value>, remove: bool) 
     let made = !json["lighter"].is_object();
     if made {
         let cost = json!({ "taps": 1, "passes": 1, "scale": 1 });
-        json["lighter"] = json!({ "passes": [{ "entry": format!("fs_{id}_lite") }], "cost": cost });
+        json["lighter"] =
+            json!({ "passes": [super::whole::pass(format!("fs_{id}_lite"))], "cost": cost, "up_to": null });
     }
     for (k, v) in set {
         keyed(k, &["cost", "up_to"])?;
         match v {
-            Value::Null => drop(json["lighter"].as_object_mut().and_then(|o| o.remove(k))),
+            Value::Null => json["lighter"][k] = Value::Null,
             v => json["lighter"][k] = v.clone(),
         }
     }
@@ -171,7 +172,7 @@ pub(crate) fn pass(json: &mut Value, c: &PassChange) -> Result<()> {
         Some(_) => return Err(missing()),
         None if remove => return Err(missing()),
         None => {
-            passes.push(json!({ "entry": format!("{entry}{}", passes.len()) }));
+            passes.push(super::whole::pass(format!("{entry}{}", passes.len())));
             passes.len() - 1
         }
     };
@@ -185,7 +186,7 @@ pub(crate) fn pass(json: &mut Value, c: &PassChange) -> Result<()> {
     }
     for k in clear {
         keyed(k, &PASS_KEYS[1..])?;
-        drop(passes[at].as_object_mut().and_then(|o| o.remove(k)));
+        passes[at][k] = super::whole::cleared_pass(k);
     }
     Ok(())
 }
@@ -193,7 +194,7 @@ pub(crate) fn pass(json: &mut Value, c: &PassChange) -> Result<()> {
 pub(crate) fn field(json: &mut Value, name: &str, value: &Value) -> Result<()> {
     keyed(name, &FIELDS)?;
     match value {
-        Value::Null => drop(json.as_object_mut().and_then(|o| o.remove(name))),
+        Value::Null => json[name] = super::whole::cleared_field(name),
         v => json[name] = v.clone(),
     }
     Ok(())

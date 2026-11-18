@@ -7,7 +7,11 @@ use serde_json::{Value, json};
 const PICTURED: [(&str, &str); 2] = [("shine", "style"), ("depth_parallax", "reach")];
 
 fn source(current: Option<&Value>) -> String {
-    SOURCES.iter().find(|s| current.is_some_and(|c| c.get(**s).is_some())).map_or("", |s| *s).into()
+    SOURCES
+        .iter()
+        .find(|s| current.is_some_and(|c| c.get(**s).is_some_and(|v| !v.is_null())))
+        .map_or("", |s| *s)
+        .into()
 }
 
 fn local(texts: &std::collections::BTreeMap<String, String>) -> String {

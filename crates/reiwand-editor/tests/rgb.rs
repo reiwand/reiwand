@@ -41,7 +41,7 @@ fn an_adjustment_layer_sends_to_rgb_lighting_with_its_permission_in_one_step() {
     assert_eq!(p.doc["manifest"]["permissions"]["rgb"], json!(true));
     assert_eq!(layer(&p)["transform"]["position"], json!([960.0, 540.0]));
     act(&mut p, json!({ "rgb": { "layer": "glow", "whole": true } })).unwrap();
-    assert!(layer(&p).get("size").is_none());
+    assert_eq!(layer(&p)["size"], json!("canvas"));
     act(&mut p, json!({ "undo": {} })).unwrap();
     assert_eq!(layer(&p)["size"], json!([640.0, 80.0]));
     act(&mut p, json!({ "redo": {} })).unwrap();

@@ -22,7 +22,9 @@ fn template(kind: &str) -> Option<Value> {
             "default": "option_1"})
         }
         "text" => json!({"type": kind, "default": ""}),
-        "file" | "folder" => json!({"type": kind, "accept": ["image"]}),
+        "file" => json!({"type": kind, "accept": ["image"], "default_asset": null}),
+        "folder" => json!({"type": kind, "accept": ["image"], "pick": "random", "every": 60, "mode": "one",
+            "max_files": 1000, "recursive": 0}),
         "shortcut" | "button" | "group" | "label" | "divider" => json!({"type": kind}),
         _ => return None,
     })
@@ -112,7 +114,7 @@ pub fn move_property(doc: &Value, id: &str, to: usize, group: Option<&str>) -> R
     let at = format!("{}/group", path(id));
     match (group, prop.get("group")) {
         (Some(g), now) if now != Some(&json!(g)) => ops.extend(set(doc, &at, json!(g))),
-        (None, Some(_)) => ops.push(Op::Remove { path: at }),
+        (None, Some(now)) if !now.is_null() => ops.extend(set(doc, &at, Value::Null)),
         _ => {}
     }
     Ok(ops)

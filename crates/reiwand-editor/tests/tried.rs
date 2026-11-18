@@ -28,11 +28,12 @@ fn the_values_join_the_preview_part_of_the_document() {
 
 #[test]
 fn the_form_shows_defaults_under_the_tried_values_without_secrets_or_buttons() {
-    let doc = json!({"manifest": {"properties": {
+    let mut doc = json!({"manifest": {"properties": {
         "speed": {"type": "slider", "min": 0, "max": 10, "default": 1},
         "key": {"type": "text", "secret": true},
         "go": {"type": "button"}
     }, "presets": [{"id": "fast", "label": "Fast", "values": {"speed": 8}}]}});
+    reiwand_editor::completing::manifest_doc(&mut doc);
     let plain = reiwand_editor::tried::query(&doc, &json!({}));
     assert_eq!(plain["values"]["speed"].as_f64(), Some(1.0));
     let ids: Vec<_> =
@@ -45,9 +46,10 @@ fn the_form_shows_defaults_under_the_tried_values_without_secrets_or_buttons() {
 
 #[test]
 fn a_capture_with_a_preset_chosen_renders_the_preset_values() {
-    let doc = json!({"manifest": {"properties": {
+    let mut doc = json!({"manifest": {"properties": {
         "speed": {"type": "slider", "min": 0, "max": 10, "default": 1}
     }, "presets": [{"id": "fast", "label": "Fast", "values": {"speed": 8}}]}});
+    reiwand_editor::completing::manifest_doc(&mut doc);
     let spec = json!({"time": 0, "values": {}, "preset": "fast"});
     let shown = reiwand_editor::reach::tried(&doc, &reiwand_editor::tried::rendered(&doc, &spec));
     assert_eq!(shown["speed"].as_f64(), Some(8.0));

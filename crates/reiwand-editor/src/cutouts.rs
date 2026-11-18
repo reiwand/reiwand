@@ -36,10 +36,8 @@ fn depth(doc: &Value, path: &str, layer: &Value, d: &DepthSet) -> Result<Vec<Op>
     if let Some(c) = d.cull {
         v.insert("cull".into(), json!(c));
     }
-    match d.sort {
-        Some(false) => drop(v.insert("sort".into(), json!(false))),
-        Some(true) => drop(v.remove("sort")),
-        None => {}
+    if let Some(sort) = d.sort {
+        v.insert("sort".into(), json!(sort));
     }
     Ok(set(doc, &at, Value::Object(v)))
 }

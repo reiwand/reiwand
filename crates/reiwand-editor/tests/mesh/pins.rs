@@ -30,7 +30,7 @@ fn layers_follow_bones_and_points_placed_on_the_mesh() {
     act(&mut p, attach(json!({ "point": [0.3, 0.5] }))).unwrap();
     assert_eq!(
         pin(&p),
-        json!({ "layer": "net", "point": "hat_point", "offset": [5.0, 0.0], "inherit": ["position"] })
+        json!({ "layer": "net", "point": "hat_point", "offset": [5.0, 0.0], "inherit": ["position"], "bone": null })
     );
     let shown = info(&p, "net");
     assert_eq!(shown["bones"].as_array().unwrap().len(), 2);
@@ -45,7 +45,10 @@ fn layers_follow_bones_and_points_placed_on_the_mesh() {
     assert!(rig.joints[node].parent.is_some() && rig.palette.iter().all(|(j, _)| *j as usize != node));
     act(&mut p, attach(json!({ "point": "hat_point", "inherit": ["position", "rotation", "scale"] })))
         .unwrap();
-    assert_eq!(pin(&p), json!({ "layer": "net", "point": "hat_point", "offset": [5.0, 0.0] }));
+    assert_eq!(
+        pin(&p),
+        json!({ "layer": "net", "point": "hat_point", "offset": [5.0, 0.0], "bone": null, "inherit": null })
+    );
     act(&mut p, json!({ "undo": {} })).unwrap();
     act(&mut p, json!({ "undo": {} })).unwrap();
     assert_eq!(pin(&p)["bone"], json!("arm"));

@@ -83,16 +83,7 @@ fn model(doc: &Value, seen: &Seen, p: &reiwand_scene::Placed, stage: &str) -> Op
     let hi = shown.iter().fold([f32::MIN; 2], |m, q| [m[0].max(q[0]), m[1].max(q[1])]);
     let pointer = crate::actions::layer(doc, &p.layer.id).map(|(p, _)| p).unwrap_or_default();
     let layer = doc.pointer(&pointer).cloned().unwrap_or_default();
-    let held = |k: &str| match &layer[k] {
-        Value::Object(o)
-            if o.contains_key("keys")
-                && o.keys().all(|k| ["keys", "timeline", "loop"].contains(&k.as_str())) =>
-        {
-            "keyed"
-        }
-        Value::Object(_) => "bound",
-        _ => "fixed",
-    };
+    let held = |k: &str| super::held::held(&layer[k]);
     Some(json!({ "id": p.layer.id, "pointer": pointer, "stage": stage, "at": px(at), "arms": arms,
         "length": round(length), "depth": round(depth), "box": [round(lo[0]), round(lo[1]), round(hi[0]), round(hi[1])],
         "position": layer["position"], "rotation": layer["rotation"], "scale": layer["scale"], "now": super::turns::now(p),

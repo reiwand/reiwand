@@ -31,7 +31,8 @@ fn an_effect_blocked_while_open_is_checked_again_once_forgiven() {
     let root = tempfile::tempdir().unwrap();
     let dir = root.path().join("dim");
     let project = dim(&dir, WGSL);
-    let checked = reiwand_scene::Descriptor::packaged("dim", &whole::descriptor(JSON), WGSL).unwrap().key & !1;
+    let checked =
+        reiwand_scene::Descriptor::packaged("dim", &whole::descriptor(JSON), WGSL).unwrap().key & !1;
     let book = root.path().join("stopped-effects");
     fs::write(&book, format!("{checked:016x} 2 1\n")).unwrap();
     reiwand_scene::keep_strikes(&book);

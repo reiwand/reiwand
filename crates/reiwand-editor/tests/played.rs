@@ -16,14 +16,12 @@ fn a_made_up_track_brings_its_cover_to_the_pictures_that_follow_the_player() {
     assert!(made.state.colors.is_some());
     let cover = made.cover.unwrap();
     assert_eq!(cover.dimensions(), (256, 128));
-    let scene = reiwand_scene::Scene::load(
-        &json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [8, 8] },
-            "assets": { "art": { "path": "assets/cover.png", "media": "current" } },
-            "layers": [{ "blend_space": "canvas", "id": "art", "type": "image", "image": "art" }] })
-        .to_string(),
-        &Default::default(),
-    )
-    .unwrap();
+    let mut doc = json!({ "scene": { "schema": reiwand_scene::SCHEMA, "canvas": { "size": [8, 8], "fit": "fill", "background": "#000000" },
+        "clock": { "max_fps": "display" },
+        "assets": { "art": { "path": "assets/cover.png", "media": "current" } },
+        "layers": [{ "blend_space": "canvas", "id": "art", "type": "image", "image": "art" }] } });
+    reiwand_editor::completing::scene_doc(&mut doc);
+    let scene = reiwand_scene::Scene::load(&doc["scene"].to_string(), &Default::default()).unwrap();
     let mut assets = SceneAssets::default();
     dress(&mut assets, &scene, &cover);
     assert_eq!(assets.images["art"].size(), (256, 128));
