@@ -15,6 +15,7 @@ cat >"$WORK/clicks/manifest.json" <<'MANIFEST'
  "kind": "scene", "entry": "scene.json", "content": {"rating": "general"}, "photosensitive": false,
  "origin": {"kind": "original"}, "inputs": ["pointer", "clicks"]}
 MANIFEST
+complete "$WORK/clicks"
 ctl pack build "$WORK/clicks" -o "$WORK/clicks.wpak" >/dev/null
 ctl lib import "$WORK/clicks.wpak" --wait >/dev/null
 scene=$(ctl lib search kind:scene --json | python3 -c "import json, sys; print(json.load(sys.stdin)['items'][0]['uid'])")
@@ -62,6 +63,7 @@ echo '{"schema": "reiwand.wpak/2", "id": "org.example.hear", "version": "1.0.0",
  "origin": {"kind": "original"}, "inputs": ["audio"]}' >"$WORK/hear/manifest.json"
 echo '{"schema": "reiwand.scene/1", "canvas": {"size": [64, 36]}, "layers": [{ "blend_space": "canvas", "id": "bars", "type": "spectrum", "size": [64, 36]}]}' \
   >"$WORK/hear/scene.json"
+complete "$WORK/hear"
 ctl pack build "$WORK/hear" -o "$WORK/hear.wpak" >/dev/null && ctl lib import "$WORK/hear.wpak" --wait >/dev/null
 speaker() {
   pw-cli create-node adapter '{ factory.name=support.null-audio-sink node.name=reiwand-sway-sink media.class=Audio/Sink

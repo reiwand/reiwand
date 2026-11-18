@@ -14,6 +14,7 @@ cat >"$WORK/clicks/manifest.json" <<'MANIFEST'
  "kind": "scene", "entry": "scene.json", "content": {"rating": "general"}, "photosensitive": false,
  "origin": {"kind": "original"}, "inputs": ["pointer", "clicks"]}
 MANIFEST
+complete "$WORK/clicks"
 ctl pack build "$WORK/clicks" -o "$WORK/clicks.wpak" >/dev/null
 ctl lib import "$WORK/clicks.wpak" --wait >/dev/null
 scene=$(ctl lib search kind:scene --json | python3 -c "import json, sys; print(json.load(sys.stdin)['items'][0]['uid'])")

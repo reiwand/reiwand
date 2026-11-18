@@ -11,6 +11,7 @@ tuned() {
   printf '{"schema": "reiwand.wpak/2", "id": "%s", "version": "%s", "title": "Tune", "license": "CC0-1.0",
     "kind": "scene", "entry": "scene.json", "previews": {"thumbnail": "preview.png"}, "origin": {"kind": "original"},
     "content": {"rating": "general"}, "photosensitive": false, "inputs": ["media"]}' "$tune" "$2" >"$WORK/tune/manifest.json"
+  complete "$WORK/tune"
   ctl pack build "$WORK/tune" -o "$WORK/import/tune-$2.wpak" >/dev/null
   local job
   job=$(bus Library1 Import asb 1 "$WORK/import/tune-$2.wpak" false | out "d[0]")

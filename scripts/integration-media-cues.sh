@@ -12,6 +12,7 @@ printf '%s' '{"schema": "reiwand.scene/1", "canvas": {"size": [64, 32], "backgro
 printf '{"schema": "reiwand.wpak/2", "id": "%s", "version": "1.0.0", "title": "Cue", "license": "CC0-1.0",
   "kind": "scene", "entry": "scene.json", "previews": {"thumbnail": "preview.png"}, "origin": {"kind": "original"},
   "content": {"rating": "general"}, "photosensitive": false, "inputs": ["media"]}' "$cue" >"$WORK/cue/manifest.json"
+complete "$WORK/cue"
 ctl pack build "$WORK/cue" -o "$WORK/import/cue.wpak" >/dev/null
 job=$(bus Library1 Import asb 1 "$WORK/import/cue.wpak" false | out "d[0]")
 wait_for 20 finished "$job" || fail "media cue scene import: $(bus Daemon1 GetJob t "$job")"
@@ -47,6 +48,7 @@ printf '%s' '{"schema": "reiwand.scene/1", "canvas": {"size": [64, 32], "backgro
   "scripts": [{"path": "scripts/heard.js", "events": ["mediaPlayback"], "uses": ["media"]}],
   "layers": [{ "blend_space": "canvas", "id": "box", "type": "solid", "size": [64, 32], "color": "#ff0000", "transform": {"position": [32, 16]}}]}' >"$WORK/heard/scene.json"
 sed "s/$cue/$heard/; s/\"Cue\"/\"Heard\"/" "$WORK/cue/manifest.json" >"$WORK/heard/manifest.json"
+complete "$WORK/heard"
 ctl pack build "$WORK/heard" -o "$WORK/import/heard.wpak" >/dev/null
 job=$(bus Library1 Import asb 1 "$WORK/import/heard.wpak" false | out "d[0]")
 wait_for 20 finished "$job" || fail "media script scene import: $(bus Daemon1 GetJob t "$job")"

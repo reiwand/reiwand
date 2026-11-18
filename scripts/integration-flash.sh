@@ -7,6 +7,7 @@ flash() {
   printf '{"schema": "reiwand.wpak/2", "id": "%s", "version": "1.0.0", "title": "Flash", "license": "CC0-1.0",
     "kind": "scene", "entry": "scene.json", "previews": {"thumbnail": "preview.png"}, "origin": {"kind": "original"},
     "content": {"rating": "general"}, "photosensitive": true}' "$1" >"$WORK/flash/manifest.json"
+  complete "$WORK/flash"
   ctl pack build "$WORK/flash" -o "$WORK/import/flash.wpak" >/dev/null
   job=$(bus Library1 Import asb 1 "$WORK/import/flash.wpak" false | out "d[0]")
   wait_for 20 finished "$job" || fail "flashing scene import: $(bus Daemon1 GetJob t "$job")"
@@ -38,6 +39,7 @@ cat >"$WORK/blink/scene.json" <<'BLINK'
    "opacity": {"timeline": "blink", "keys": [[0, 0], [0.05, 1], [0.1, 0]]}}]}
 BLINK
 sed 's/"org.example.flash2"/"org.example.blink"/; s/"photosensitive": true/"photosensitive": false/' "$WORK/flash/manifest.json" >"$WORK/blink/manifest.json"
+complete "$WORK/blink"
 ctl pack build "$WORK/blink" -o "$WORK/import/blink.wpak" >/dev/null
 job=$(bus Library1 Import asb 1 "$WORK/import/blink.wpak" false | out "d[0]")
 wait_for 20 finished "$job" || fail "blinking scene import: $(bus Daemon1 GetJob t "$job")"

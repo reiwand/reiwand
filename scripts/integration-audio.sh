@@ -21,6 +21,7 @@ tint = "import { scene } from 'reiwand';\nexport function update() { scene.layer
 package("spin", {"layers": [{ "blend_space": "canvas", "id": "tint", "type": "solid", "color": "#0000ff"}],
                  "scripts": [{"path": "scripts/tint.js"}]}, {"scripts/tint.js": tint}, (), ["scripts"])
 PACKAGE
+complete "$scene"/*.wpak
 imported() {
   local job
   job=$(bus Library1 Import asb 1 "$1" false | out "d[0]")

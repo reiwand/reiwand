@@ -12,6 +12,7 @@ cat >"$WORK/spread/manifest.json" <<'MANIFEST'
  "kind": "scene", "entry": "scene.json", "content": {"rating": "general"}, "photosensitive": false,
  "origin": {"kind": "original"}, "display": {"span": "all-outputs"}, "requires": {"features": ["spanned_scenes"]}}
 MANIFEST
+complete "$WORK/spread"
 ctl pack build "$WORK/spread" -o "$WORK/spread.wpak" >/dev/null
 ctl lib import "$WORK/spread.wpak" --wait >/dev/null
 pick='import json, sys; print(next(i["uid"] for i in json.load(sys.stdin)["items"] if i["title"] == "Spread"))'

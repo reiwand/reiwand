@@ -15,6 +15,7 @@ with zipfile.ZipFile(sys.argv[1], "w") as package:
     package.writestr("manifest.json", json.dumps(manifest))
     package.writestr("scene.json", json.dumps(scene))
 PACKAGE
+complete "$WORK/scene/heavy.wpak"
 ctl lib import "$WORK/scene/heavy.wpak" --wait >/dev/null
 heavy=$(ctl lib search "" --json | python3 -c "import json, sys
 print([i['uid'] for i in json.load(sys.stdin)['items'] if (i['package'] or {}).get('id') == 'org.example.heavy'][0])")

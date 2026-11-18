@@ -42,6 +42,7 @@ with zipfile.ZipFile(sys.argv[1], "w") as package:
     package.write(sys.argv[2], "preview.png")
     package.write(sys.argv[2], "assets/backdrop.png")
 PACKAGE
+complete "$scene"/*.wpak
 [ "$(ctl scene bench "$scene/glow.wpak" --frames 20 --size 160x90 --json | js "r['needed'], r['created_after_warmup']")" = "(1, 0)" ] ||
   fail "scene bench: $(ctl scene bench "$scene/glow.wpak" --frames 20 --size 160x90)"
 [ "$(ctl scene bench "$scene/glow.wpak" --frames 30 --size 160x90 --quality auto --pace smooth --json | js "r['auto']['pace'], r['auto']['pace_fps']")" = "(1, 60)" ] ||
@@ -96,9 +97,8 @@ with zipfile.ZipFile(sys.argv[1], "w") as package:
     package.write(sys.argv[2], "assets/clip.webm", zipfile.ZIP_STORED)
     package.write(sys.argv[3], "preview.png")
 PACKAGE
-job=$(bus Library1 Import asb 1 "$scene/clip.wpak" false | out "d[0]")
-wait_for 20 finished "$job" || fail "video scene import: $(bus Daemon1 GetJob t "$job")"
-clip=$(reply "r['job']['output']['imported'][0]['uid']" Daemon1 GetJob t "$job")
+complete "$scene/clip.wpak"; job=$(bus Library1 Import asb 1 "$scene/clip.wpak" false | out "d[0]")
+wait_for 20 finished "$job" || fail "video scene import: $(bus Daemon1 GetJob t "$job")"; clip=$(reply "r['job']['output']['imported'][0]['uid']" Daemon1 GetJob t "$job")
 ctl lib apply "$clip" -o TEST-11
 shown "$s11" 208 32 96
 python3 - "$scene" "$ROOT/tests/fixtures/green-64x32.png" "$ROOT/tests/fixtures/quadrants-64x32.webm" <<'PACKAGE'
@@ -135,7 +135,7 @@ for name, manifest, files in [("knobs", knobs, {"scene.json": json.dumps(scene)}
         package.write(sys.argv[3], "loop.webm", zipfile.ZIP_STORED)
 PACKAGE
 imported() {
-  local job; job=$(bus Library1 Import asb 1 "$1" false | out "d[0]")
+  complete "$1"; local job; job=$(bus Library1 Import asb 1 "$1" false | out "d[0]")
   wait_for 20 finished "$job" || fail "import of $1: $(bus Daemon1 GetJob t "$job")"
   reply "r['job']['output']['imported'][0]['uid']" Daemon1 GetJob t "$job"
 }

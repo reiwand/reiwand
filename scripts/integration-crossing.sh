@@ -27,6 +27,7 @@ with zipfile.ZipFile(path, "w") as package:
     package.writestr("t/mark.wgsl", wgsl)
     package.write(preview, "preview.png")
 PACKAGE
+  complete "$1"
 }
 imported() {
   local job

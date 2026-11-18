@@ -27,6 +27,7 @@ for name, manifest, files in [("base", base, {"scene.json": scene}), ("green", p
         if manifest["kind"] == "image":
             package.write(sys.argv[2], "image.png")
 PACKAGE
+complete "$content"
 added() {
   local job; job=$(bus Library1 Import asb 1 "$1" false | out "d[0]")
   wait_for 20 finished "$job" || fail "import of $1: $(bus Daemon1 GetJob t "$job")"

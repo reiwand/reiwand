@@ -29,6 +29,7 @@ wait_for() {
 }
 
 ctl() { "$BIN/reiwand-ctl" "$@"; }
+source "$(dirname "$0")"/integration-complete.sh
 field() { ctl state | python3 -c "import json, sys; s = json.load(sys.stdin); print(eval(sys.argv[1]))" "$1"; }
 expect() {
   local ends=$((SECONDS + 30))

@@ -38,6 +38,8 @@ expect() {
   echo "FAIL: $1 is $(field "$1"), expected $2" && exit 1
 }
 fail() { echo "FAIL: $*"; exit 1; }
+source "$(dirname "${BASH_SOURCE[0]}")"/integration-complete.sh
+
 scene_doc() {
   python3 -c 'import json, sys
 read = lambda name: json.load(open(sys.argv[1] + "/" + name))
