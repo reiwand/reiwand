@@ -755,7 +755,7 @@
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 72,
       "solid": false,

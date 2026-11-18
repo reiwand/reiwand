@@ -130,7 +130,7 @@
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 220,
       "solid": false,
@@ -184,7 +184,7 @@
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 56,
       "solid": false,

@@ -1216,12 +1216,12 @@
       "inherit": null,
       "lighting": null,
       "mask": {
-        "channel": null,
+        "channel": "a",
         "feather": 0.0,
         "invert": false,
         "layer": "lake",
         "shape": null,
-        "strength": null,
+        "strength": 1,
         "texture": null
       },
       "opacity": 0.55,
@@ -1738,7 +1738,7 @@
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 56,
       "solid": false,

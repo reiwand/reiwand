@@ -9,7 +9,7 @@ fn scene(layers: Json) -> Scene {
     let assets = json!({ "wall": { "path": "wall.png" }, "song": { "path": "song.ogg" }, "clip": { "path": "clip.mp4" } });
     let doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "assets": assets, "layers": layers,
         "particles": prefill::all(json!({ "rain": { "capacity": 10, "emitters": [{ "shape": "edge" }] } })) });
-    Scene::from_json(&doc.to_string()).unwrap()
+    Scene::from_json(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap()
 }
 
 fn issues(layers: Json) -> Vec<String> {

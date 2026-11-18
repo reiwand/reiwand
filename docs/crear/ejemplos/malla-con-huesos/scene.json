@@ -131,7 +131,7 @@
         }
       ],
       "colliders": [],
-      "color": null,
+      "color": "#ffffff",
       "depth": null,
       "depth_test": false,
       "effects": [],

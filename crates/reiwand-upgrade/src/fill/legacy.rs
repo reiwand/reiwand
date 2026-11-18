@@ -46,7 +46,6 @@ pub(super) fn follows(def: &str, name: &str, map: &Map<String, Value>) -> Option
         ("Emitter", "delay") | ("Burst", "at") | ("Child", "angle") => json!(0),
         ("Trail", "subdivide") | ("Trail", "uv_scroll") | ("Hsv", "steps") => json!(0),
         ("Trail", "uv_scale") => json!(1),
-        ("Transform", "position") => json!([0, 0]),
         ("Mask", "channel") => {
             json!(if map.get("texture").is_some_and(|t| !t.is_null()) { "luminance" } else { "a" })
         }
@@ -60,6 +59,7 @@ pub(super) fn follows(def: &str, name: &str, map: &Map<String, Value>) -> Option
         ("Layer", "padding") if kind == "text" => json!(0),
         ("Layer", "valign") if kind == "text" => json!("center"),
         ("Layer", "mode") if kind == "sound" => json!("sequence"),
+        ("Layer", "render") if kind == "text" => json!("auto"),
         ("Layer", "playback") if kind == "video" => json!({
             "rate": 1, "playing": true, "loop": true, "start": 0, "end": "end", "frame": null, "own_clock": false
         }),

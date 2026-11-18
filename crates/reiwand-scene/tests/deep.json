@@ -880,7 +880,7 @@
             0
           ],
           "parent": null,
-          "render": null,
+          "render": "auto",
           "shadow": null,
           "size": 48.0,
           "solid": false,

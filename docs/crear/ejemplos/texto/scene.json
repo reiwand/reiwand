@@ -63,7 +63,7 @@
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": {
         "blur": 12,
         "color": "#00000099",
@@ -137,7 +137,7 @@
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 44,
       "solid": false,
@@ -198,7 +198,7 @@
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 90,
       "solid": false,
@@ -293,7 +293,7 @@
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 40,
       "solid": false,

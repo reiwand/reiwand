@@ -467,7 +467,7 @@
         "invert": false,
         "layer": "disc",
         "shape": null,
-        "strength": null,
+        "strength": 1,
         "texture": null
       },
       "opacity": 1.0,
@@ -564,7 +564,7 @@
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 34,
       "solid": false,
@@ -700,7 +700,7 @@
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 24,
       "solid": false,

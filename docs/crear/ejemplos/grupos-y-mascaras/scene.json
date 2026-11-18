@@ -366,7 +366,7 @@
         "invert": false,
         "layer": "foco",
         "shape": null,
-        "strength": null,
+        "strength": 1,
         "texture": null
       },
       "opacity": 0.35,

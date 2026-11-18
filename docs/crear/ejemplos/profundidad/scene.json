@@ -226,7 +226,7 @@
         0.04
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 110,
       "solid": false,

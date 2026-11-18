@@ -46,7 +46,7 @@ fn material_shaders_that_read_what_only_layer_effects_have_are_refused_at_their_
 fn material_images_name_pictures_of_the_package() {
     let doc =
         DEEP.replacen(r#""shader": "glass""#, r#""params": { "base": "nowhere" }, "shader": "glass""#, 1);
-    let mut scene = Scene::from_json(&doc).unwrap();
+    let mut scene = Scene::from_json(&reiwand_upgrade::fill::whole(&doc)).unwrap();
     let read = |path: &str, max: usize| match path {
         "effects/glass.json" => {
             Ok(json!({ "id": "glass", "stage": "material", "cost": {}, "params": [picture("base")] })

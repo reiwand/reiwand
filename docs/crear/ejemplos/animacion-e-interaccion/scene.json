@@ -267,7 +267,7 @@
         0
       ],
       "parent": "boton",
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 54,
       "solid": false,

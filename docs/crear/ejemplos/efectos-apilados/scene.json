@@ -134,7 +134,7 @@
             "invert": false,
             "layer": null,
             "shape": null,
-            "strength": null,
+            "strength": 1,
             "texture": "mancha"
           },
           "name": null,
@@ -154,7 +154,7 @@
           "effect": "blur",
           "enabled": true,
           "mask": {
-            "channel": null,
+            "channel": "a",
             "feather": 0.0,
             "invert": true,
             "layer": null,

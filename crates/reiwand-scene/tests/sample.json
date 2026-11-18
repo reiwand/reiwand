@@ -145,12 +145,12 @@
           "effect": "waves",
           "enabled": true,
           "mask": {
-            "channel": null,
+            "channel": "luminance",
             "feather": 0.0,
             "invert": false,
             "layer": null,
             "shape": null,
-            "strength": null,
+            "strength": 1,
             "texture": "lake"
           },
           "name": null,
@@ -538,7 +538,7 @@
         0
       ],
       "parent": null,
-      "render": null,
+      "render": "auto",
       "shadow": null,
       "size": 96,
       "solid": false,
@@ -725,7 +725,7 @@
             "invert": true,
             "layer": "disc",
             "shape": null,
-            "strength": null,
+            "strength": 1,
             "texture": null
           },
           "opacity": 1.0,
