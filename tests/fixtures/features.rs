@@ -61,10 +61,7 @@ pub fn source(name: &str, case: &Value, dir: &Path) -> PathBuf {
         "license": "CC0-1.0", "kind": kind, "entry": entry, "content": { "rating": "general" },
         "photosensitive": false, "origin": { "kind": "original" }, "previews": { "thumbnail": "preview.png" } });
     merge(&mut manifest, &case["manifest"]);
-    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
-    if let Some(playback) = case["manifest"].get("playback") {
-        manifest["playback"] = playback.clone();
-    }
+    reiwand_upgrade::manifests::complete(&mut manifest);
     let mut scene = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] },
         "assets": { "sky": { "path": "sky.png" } } });
     merge(&mut scene, &case["scene"]);

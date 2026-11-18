@@ -9,6 +9,7 @@ fn manifest(extra: serde_json::Value) -> Manifest {
         "origin": {"kind": "original"}, "content": {"rating": "general"}, "photosensitive": false,
         "web": {"storage_kib": 0}, "playback": {}});
     base.as_object_mut().unwrap().extend(extra.as_object().unwrap().clone());
+    reiwand_upgrade::manifests::complete(&mut base);
     Manifest::from_json(base.to_string().as_bytes()).unwrap()
 }
 

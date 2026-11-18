@@ -9,7 +9,7 @@ use crate::gpu::renderer;
 
 fn edit(value: serde_json::Value) -> Edit {
     let mut value = value;
-    value["version"] = json!(1);
+    value["version"] = json!(reiwand_core::edit::VERSION);
     Edit::from_value(value).unwrap()
 }
 

@@ -25,10 +25,11 @@ fn repository(dir: &Path) -> String {
     for version in ["1.0.0", "1.1.0"] {
         let src = dir.join(version);
         fs::create_dir_all(&src).unwrap();
-        let manifest = json!({"schema": reiwand_format::SCHEMA, "id": "org.example.dawn", "version": version,
+        let mut manifest = json!({"schema": reiwand_format::SCHEMA, "id": "org.example.dawn", "version": version,
             "title": "Dawn", "license": "CC0-1.0", "kind": "image", "entry": "image.png",
             "previews": {"thumbnail": "preview.png"}, "content": {"rating": "general"}, "photosensitive": false,
             "origin": {"kind": "original"}});
+        reiwand_upgrade::manifests::complete(&mut manifest);
         fs::write(src.join("manifest.json"), manifest.to_string()).unwrap();
         let green = image::RgbaImage::from_pixel(8, 4, image::Rgba([0, 255, 0, 255]));
         green.save(src.join("image.png")).unwrap();

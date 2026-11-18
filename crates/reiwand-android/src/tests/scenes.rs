@@ -138,7 +138,7 @@ pub(super) fn scenes() {
     fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
     let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.clip", "version": "1.0.0", "title": "Clip", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" }, "photosensitive": false, "origin": { "kind": "original" },
         "properties": serde_json::to_value(reiwand_scene::prefill::properties(json!({ "pick": { "type": "file", "accept": ["video"], "default_asset": "clip" } }))).unwrap() });
-    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
+    reiwand_upgrade::manifests::complete(&mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let built = source.path().join("clip.wpak");
     reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();

@@ -23,11 +23,13 @@ fn fits(k: &Kept) -> bool {
 }
 
 pub(super) fn load(path: &Path) -> Vec<Device> {
-    let Ok(bytes) = std::fs::read(path) else { return Vec::new() };
-    let kept: Vec<Kept> = serde_json::from_slice(&bytes).unwrap_or_else(|e| {
-        tracing::warn!("ignoring unreadable RGB modes: {e}");
-        Vec::new()
-    });
+    let kept: Vec<Kept> = match reiwand_core::stored::read(path) {
+        Ok(found) => found.unwrap_or_default(),
+        Err(e) => {
+            tracing::warn!("ignoring unreadable RGB modes: {e}");
+            Vec::new()
+        }
+    };
     let device = |k: Kept| Device {
         index: k.index,
         key: k.key,

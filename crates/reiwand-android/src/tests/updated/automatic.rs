@@ -12,9 +12,10 @@ fn wpak(dir: &Path, version: &str, inputs: &[&str]) -> PathBuf {
     let src = dir.join(format!("src-{version}"));
     fs::create_dir_all(&src).unwrap();
     fs::copy(Path::new(FIXTURES).join("green-64x32.png"), src.join("image.png")).unwrap();
-    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": ID, "version": version, "title": ID,
+    let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": ID, "version": version, "title": ID,
         "license": "CC0-1.0", "kind": "image", "entry": "image.png", "content": { "rating": "general" },
         "photosensitive": false, "origin": { "kind": "original" }, "inputs": inputs });
+    reiwand_upgrade::manifests::complete(&mut manifest);
     fs::write(src.join("manifest.json"), manifest.to_string()).unwrap();
     let out = dir.join(format!("{version}.wpak"));
     build(&src, &out, &Limits::default()).unwrap();

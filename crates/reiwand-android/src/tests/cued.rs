@@ -20,7 +20,7 @@ pub(super) fn cued() {
         "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" },
         "photosensitive": false, "origin": { "kind": "original" },
         "requires": { "features": ["timeline_events", "timeline_wrap"] } });
-    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
+    reiwand_upgrade::manifests::complete(&mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let built = source.path().join("cued.wpak");
     reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();

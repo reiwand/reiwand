@@ -12,7 +12,7 @@ fn stored() -> std::sync::Arc<pack::Pack> {
     let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.keeps", "version": "1.0.0",
         "title": "Keeps", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json",
         "content": { "rating": "general" }, "photosensitive": false, "origin": { "kind": "original" } });
-    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
+    reiwand_upgrade::manifests::complete(&mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let wpak = source.path().join("keeps.wpak");
     reiwand_format::build(source.path(), &wpak, &reiwand_format::Limits::default()).unwrap();

@@ -40,3 +40,9 @@ pub fn whole(text: &str) -> String {
     convert(&mut doc);
     doc.to_string()
 }
+
+pub fn complete(doc: &mut Value) {
+    if let Ok(done) = serde_json::from_str(&whole(&doc.to_string())) {
+        *doc = done;
+    }
+}

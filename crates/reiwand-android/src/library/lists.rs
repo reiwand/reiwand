@@ -44,7 +44,9 @@ pub(super) fn add(lib: &mut Library, playlist: &str, items: &[String]) -> Result
 }
 
 pub(super) fn rotate(lib: &mut Library, name: &str, items: &[String], every: &str) -> Result<Value, Error> {
-    let rules: Rules = serde_json::from_value(json!({ "interval": every }))?;
+    let mut whole = serde_json::to_value(Rules::default())?;
+    whole["interval"] = json!(every);
+    let rules: Rules = serde_json::from_value(whole)?;
     if rules.interval.is_zero() {
         return Err(said("android.rotation_interval", "give a time longer than zero", &[]));
     }

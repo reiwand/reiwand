@@ -25,7 +25,7 @@ fn installed() -> (String, std::path::PathBuf) {
     let source = store::dir().unwrap().join("phone-pages/phone");
     fs::create_dir_all(&source).unwrap();
     let mut manifest: Value = serde_json::from_str(MANIFEST).unwrap();
-    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
+    reiwand_upgrade::manifests::complete(&mut manifest);
     fs::write(source.join("manifest.json"), manifest.to_string()).unwrap();
     fs::write(
         source.join("index.html"),

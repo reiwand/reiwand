@@ -16,7 +16,7 @@ pub(super) fn flown() {
     let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.fuse", "version": "1.0.0", "title": "Fuse",
         "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" },
         "photosensitive": false, "origin": { "kind": "original" } });
-    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
+    reiwand_upgrade::manifests::complete(&mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let built = source.path().join("fuse.wpak");
     reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();

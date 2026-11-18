@@ -12,7 +12,7 @@ fn blink(id: &str, photosensitive: bool) -> (String, std::path::PathBuf) {
     let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": id, "version": "1.0.0", "title": "Blink",
         "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" },
         "photosensitive": photosensitive, "origin": { "kind": "original" } });
-    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
+    reiwand_upgrade::manifests::complete(&mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let built = source.path().join("blink.wpak");
     reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();

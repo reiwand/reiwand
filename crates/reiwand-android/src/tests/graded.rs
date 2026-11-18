@@ -1,6 +1,15 @@
 use super::*;
 
 fn set(lock: bool, filter: Value) -> Value {
+    let filter = match filter {
+        Value::Object(part) => {
+            let mut whole = json!({ "look": "none", "strength": 1.0, "exposure": 0.0, "contrast": 0.0,
+                "saturation": 0.0, "warmth": 0.0, "hue": 0.0 });
+            whole.as_object_mut().unwrap().extend(part);
+            whole
+        }
+        other => other,
+    };
     ask(json!({ "op": "set_filter", "lock": lock, "filter": filter }))
 }
 

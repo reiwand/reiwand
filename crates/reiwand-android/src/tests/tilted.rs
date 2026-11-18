@@ -15,7 +15,7 @@ pub(super) fn scenes_follow_the_phone() {
     let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.hills", "version": "1.0.0",
         "title": "Hills", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json",
         "content": { "rating": "general" }, "photosensitive": false, "origin": { "kind": "original" }, "inputs": ["pointer"] });
-    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
+    reiwand_upgrade::manifests::complete(&mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let built = source.path().join("hills.wpak");
     reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();

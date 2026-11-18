@@ -74,7 +74,7 @@ fn broken_or_oversized_kept_modes_are_ignored() {
         row(2, "huge", 1 << 20),
         row(3, "bad\u{7}", 4)
     ]);
-    std::fs::write(&disk, rows.to_string()).unwrap();
+    std::fs::write(&disk, reiwand_core::stored::text(&rows).unwrap()).unwrap();
     let kept = disk::load(&disk);
     assert_eq!(kept.iter().map(|d| d.key.as_str()).collect::<Vec<_>>(), ["fine"]);
     assert!(disk::load(&dir.path().join("missing.json")).is_empty());

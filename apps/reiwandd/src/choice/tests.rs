@@ -33,7 +33,7 @@ fn a_failed_hold_reports_no_path() {
 fn an_automatic_choice_waits_for_a_choice_by_hand_and_keeps_it() {
     let dir = tempfile::tempdir().unwrap();
     let docked = (BTreeSet::from(["DP-1".to_owned()]), false);
-    let auto = serde_json::json!({"outputs": ["DP-1"]});
+    let auto = serde_json::json!({"outputs": ["DP-1"], "on_battery": null});
     let profile = |uid: &str, auto| reiwand_library::Profile {
         uid: uid.into(),
         name: uid.into(),
@@ -42,7 +42,10 @@ fn an_automatic_choice_waits_for_a_choice_by_hand_and_keeps_it() {
         auto,
         priority: 0,
     };
-    let profiles = vec![profile("DOCK", auto), profile("HAND", serde_json::json!({}))];
+    let profiles = vec![
+        profile("DOCK", auto),
+        profile("HAND", serde_json::json!({"outputs": null, "on_battery": null})),
+    ];
     assert_eq!(automatic(dir.path(), Some("HAND"), &docked, &profiles).as_deref(), Some("DOCK"));
     let (path, hold, (started, applying)) =
         (dir.path().to_owned(), docked.clone(), std::sync::mpsc::channel());

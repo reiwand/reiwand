@@ -57,10 +57,11 @@ mod tests {
         std::fs::create_dir(&source).unwrap();
         let png = image::RgbaImage::from_pixel(8, 8, image::Rgba([0, 0, 255, 255]));
         ["image.png", "preview.png"].iter().for_each(|name| png.save(source.join(name)).unwrap());
-        let manifest = serde_json::json!({"schema": reiwand_format::SCHEMA, "id": "org.example.look", "version": "1.0.0",
+        let mut manifest = serde_json::json!({"schema": reiwand_format::SCHEMA, "id": "org.example.look", "version": "1.0.0",
             "title": "Look", "license": "CC0-1.0", "kind": "image", "entry": "image.png", "content": {"rating": "general"},
             "photosensitive": false, "origin": {"kind": "original"}, "previews": {"thumbnail": "preview.png"},
             "requires": {"features": ["flip"]}, "display": {"flip": "horizontal", "background": "#ff0000"}});
+        reiwand_upgrade::manifests::complete(&mut manifest);
         std::fs::write(source.join("manifest.json"), manifest.to_string()).unwrap();
         let wpak = dir.path().join("look.wpak");
         reiwand_format::build(&source, &wpak, &reiwand_format::Limits::default()).unwrap();

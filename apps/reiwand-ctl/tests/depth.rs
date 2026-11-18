@@ -150,7 +150,8 @@ fn depth_strokes_cuts_and_marks_are_commands_and_a_layer_shows_its_band() {
     assert!(fails(dir, &["edit", "depth", "fill-mask", "hills.png", "0.2,0.2"], 2).contains("--refill"));
     ok(dir, &["edit", "depth", "fill-mask", "hills.png", "--clear"]);
     ok(dir, &["edit", "depth", "cuts", "hills.png", "--auto"]);
-    assert!(shown(dir)["depth"]["fills"].is_null() && shown(dir)["depth"]["cuts"].is_null());
+    let after = shown(dir);
+    assert!(after["depth"]["fills"] == json!([]) && after["depth"]["cuts"].is_null(), "{after}");
     ok(dir, &["edit", "depth", "cuts", "hills.png", "0.5"]);
     ok(dir, &["edit", "depth", "layers", "hills.png", "--fill", "simple", "--layers", "4"]);
     ok(

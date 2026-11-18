@@ -46,14 +46,18 @@ fn wpak(dir: &Path, id: &str, version: &str, kind: &str, needs: &[(&str, &str)])
         needs.iter().map(|(id, range)| json!({ "id": id, "version": range })).collect();
     let (entry, bytes) = if kind == "preset" {
         let base = json!({ "id": needs[0].0, "version": needs[0].1 });
-        ("preset.json", json!({ "base": base, "values": { "fit": "fill" } }).to_string().into_bytes())
+        (
+            "preset.json",
+            json!({ "base": base, "values": { "fit": "fill" }, "files": {} }).to_string().into_bytes(),
+        )
     } else {
         ("image.png", fs::read(Path::new(FIXTURES).join("green-64x32.png")).unwrap())
     };
     fs::write(src.join(entry), bytes).unwrap();
-    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": id, "version": version, "title": id,
+    let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": id, "version": version, "title": id,
         "license": "CC0-1.0", "kind": kind, "entry": entry, "content": { "rating": "general" },
         "photosensitive": false, "origin": { "kind": "original" }, "requires": { "packages": packages } });
+    reiwand_upgrade::manifests::complete(&mut manifest);
     fs::write(src.join("manifest.json"), manifest.to_string()).unwrap();
     let out = dir.join(format!("{id}-{version}.wpak"));
     build(&src, &out, &Limits::default()).unwrap();

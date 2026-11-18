@@ -24,7 +24,7 @@ fn packed(layers: Value, properties: Value) -> (String, std::sync::Arc<pack::Pac
         "title": "Album", "license": "CC0-1.0", "kind": "scene", "entry": "scene.json",
         "content": { "rating": "general" }, "photosensitive": false, "origin": { "kind": "original" },
         "properties": properties });
-    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
+    reiwand_upgrade::manifests::complete(&mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let wpak = source.path().join("album.wpak");
     reiwand_format::build(source.path(), &wpak, &reiwand_format::Limits::default()).unwrap();

@@ -77,7 +77,10 @@ fn the_editor_describes_what_its_controls_show() {
         (&moving["parallax"]["enabled"], &moving["parallax"]["source"]),
         (&json!(true), &json!("pointer"))
     );
-    assert!(moving["parallax"].get("fill").is_none() && moving["parallax"].get("layers").is_none());
+    assert_eq!(
+        (&moving["parallax"]["fill"], &moving["parallax"]["layers"]),
+        (&json!("auto"), &json!("auto"))
+    );
     edit.act(serde_json::from_value(json!({"parallax": {"fill": "simple", "layers": 6}})).unwrap()).unwrap();
     let own = values(&edit);
     assert_eq!((&own["parallax"]["fill"], &own["parallax"]["layers"]), (&json!("simple"), &json!(6)));

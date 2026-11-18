@@ -30,7 +30,7 @@ fn made(name: &str, script: &str, uses: Value, properties: Value) -> String {
         "title": name, "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" },
         "photosensitive": false, "origin": { "kind": "original" }, "inputs": ["pointer", "clicks"],
         "properties": properties });
-    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
+    reiwand_upgrade::manifests::complete(&mut manifest);
     fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
     let wpak = source.path().join(format!("{name}.wpak"));
     reiwand_format::build(source.path(), &wpak, &reiwand_format::Limits::default()).unwrap();

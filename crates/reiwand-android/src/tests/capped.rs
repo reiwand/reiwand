@@ -72,7 +72,7 @@ fn installed() -> (String, PathBuf) {
     let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.capped", "version": "1.0.0",
         "title": "Capped", "license": "CC0-1.0", "kind": "web", "entry": "index.html", "content": { "rating": "general" },
         "photosensitive": false, "origin": { "kind": "original" }, "web": { "storage_kib": 4 } });
-    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
+    reiwand_upgrade::manifests::complete(&mut manifest);
     fs::write(source.join("manifest.json"), manifest.to_string()).unwrap();
     fs::write(source.join("index.html"), "<!DOCTYPE html>\n<html><body></body></html>").unwrap();
     let uids = ask(json!({ "op": "examples", "dir": source.parent().unwrap() }));

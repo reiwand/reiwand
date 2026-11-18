@@ -59,7 +59,8 @@ fn removing_the_wallpaper_keeps_the_previous_one() {
 pub(super) fn ruled_lists() {
     let morning = ask(json!({ "op": "create", "name": "Morning" })).as_str().unwrap().to_owned();
     let info = json!({ "uid": morning, "name": "Mañana", "query": "kind:image",
-        "rules": { "interval": "1h", "at": ["07:30", "18:00"], "days": ["Mon", "Sat"] } });
+        "rules": { "interval": "1h", "at": ["07:30", "18:00"], "days": ["Mon", "Sat"], "order": "sequential",
+            "synced": false, "resume": true, "advance_while_paused": false, "skip_videos_on_battery": false, "transition_ms": null } });
     assert_eq!(ask(json!({ "op": "save", "playlist": info })), Value::Null);
     let listed = ask(json!({ "op": "playlists" }));
     let row = listed.as_array().unwrap().iter().find(|p| p["playlist"]["uid"] == json!(morning)).unwrap();
@@ -81,7 +82,8 @@ pub(super) fn synced_lists_fade_their_own_way() {
     let bands = store::store(&mut open("bands-640x180.png"), "bands.png").unwrap().0;
     let list = ask(json!({ "op": "create", "name": "Twins" })).as_str().unwrap().to_owned();
     ask(json!({ "op": "add", "playlist": list, "items": [green, bands] }));
-    let rules = json!({ "interval": "1h", "synced": true, "resume": false, "transition_ms": 250 });
+    let rules = json!({ "interval": "1h", "synced": true, "resume": false, "transition_ms": 250, "order": "sequential",
+        "at": [], "days": [], "advance_while_paused": false, "skip_videos_on_battery": false });
     let info = json!({ "uid": list, "name": "Twins", "query": null, "rules": rules });
     assert_eq!(ask(json!({ "op": "save", "playlist": info })), Value::Null);
     set(json!({ "playlist": list }), Target::Both);

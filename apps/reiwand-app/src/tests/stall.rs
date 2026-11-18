@@ -126,10 +126,10 @@ fn a_static_repository_is_made_signed_rotated_and_revoked_from_the_app() {
     let (root_pub, online_pub) = (file("root.pub", &root.public), file("online.pub", &online.public));
     let charter = serde_json::json!({"name": "Example", "root_keys": [root_pub], "online_keys": [online_pub],
         "authors": {"ana": [file("ana.pub", &author.public)]}, "threshold": 1});
-    let state = chartered(&dir, &charter.to_string(), true).unwrap();
+    let state = chartered(&dir, &whole_charter(charter.clone()), true).unwrap();
     assert_eq!((&state["done"], &state["root"]["complete"]), (&"created".into(), &false.into()));
     assert_eq!(state["authors"]["ana"][0], fingerprint(&author.public).unwrap());
-    assert!(chartered(&dir, &charter.to_string(), true).is_err());
+    assert!(chartered(&dir, &whole_charter(charter), true).is_err());
     assert!(chartered(&dir, r#"{"colour": 1}"#, false).is_err());
     let state = rooted(&dir, Path::new(&file("root.key", &root.secret)), None).unwrap();
     assert_eq!((&state["done"], &state["root"]["complete"]), (&"signed".into(), &true.into()));
@@ -148,13 +148,26 @@ fn a_static_repository_is_made_signed_rotated_and_revoked_from_the_app() {
     let print = fingerprint(&author.public).unwrap();
     assert_eq!(key_revoked(&dir, &print, "malware").unwrap()["revoked_keys"][0], print.as_str());
     let next = keygen(None).unwrap();
-    let swap = serde_json::json!({"authors": {"ana": [file("next.pub", &next.public)]}, "root_days": 45});
-    let state = chartered(&dir, &swap.to_string(), false).unwrap();
+    let swap = whole_charter(
+        serde_json::json!({"authors": {"ana": [file("next.pub", &next.public)]}, "root_days": 45}),
+    );
+    let state = chartered(&dir, &swap, false).unwrap();
     assert_eq!(state["authors"]["ana"], serde_json::json!([fingerprint(&next.public).unwrap()]));
     assert_eq!(state["policy"]["root_days"], 45);
     rooted(&dir, Path::new(&file("root.key", &root.secret)), None).unwrap();
-    let state = chartered(&dir, r#"{"removed": ["ana"], "root_days": 30}"#, false).unwrap();
+    let state =
+        chartered(&dir, &whole_charter(serde_json::json!({"removed": ["ana"], "root_days": 30})), false)
+            .unwrap();
     assert_eq!((&state["done"], &state["root"]["version"]), (&"rotated".into(), &3.into()));
     assert_eq!((&state["authors"], &state["root"]["complete"]), (&serde_json::json!({}), &false.into()));
-    assert!(chartered(&dir, r#"{"removed": ["ana"]}"#, false).is_err());
+    assert!(chartered(&dir, &whole_charter(serde_json::json!({"removed": ["ana"]})), false).is_err());
+}
+
+fn whole_charter(part: serde_json::Value) -> String {
+    let mut whole = serde_json::json!({"name": null, "root_keys": [], "online_keys": [], "authors": {},
+        "removed": [], "threshold": null, "require_author_signature": null, "online_authors": null,
+        "root_days": null, "entry_max_days": null, "max_package_size": null, "mirrors": null,
+        "shard_bits": null});
+    whole.as_object_mut().unwrap().extend(part.as_object().unwrap().clone());
+    whole.to_string()
 }

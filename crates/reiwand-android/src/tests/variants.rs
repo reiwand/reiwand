@@ -16,6 +16,7 @@ fn packed(name: &str, manifest: Value, files: &[(&str, &[u8])]) -> (tempfile::Te
     let mut full = json!({ "schema": reiwand_format::SCHEMA, "version": "1.0.0", "title": name, "license": "CC0-1.0",
         "content": { "rating": "general" }, "photosensitive": false, "origin": { "kind": "original" } });
     full.as_object_mut().unwrap().extend(manifest.as_object().unwrap().clone());
+    reiwand_upgrade::manifests::complete(&mut full);
     fs::write(source.path().join("manifest.json"), full.to_string()).unwrap();
     let wpak = source.path().join(format!("{name}.wpak"));
     reiwand_format::build(source.path(), &wpak, &reiwand_format::Limits::default()).unwrap();
@@ -26,7 +27,7 @@ pub(super) fn presets_set_the_values_of_their_base() {
     let support = |name| reiwand_format::features::support(reiwand_format::Platform::Android, name);
     assert_eq!([support("preset"), support("packages")], [reiwand_format::features::Support::Runs; 2]);
     let needs = json!([{ "id": "org.example.based", "version": "^1" }]);
-    let values = json!({ "base": { "id": "org.example.based", "version": "^1" }, "values": { "speed": 0.5, "volume": 30, "nope": 1 } });
+    let values = json!({ "base": { "id": "org.example.based", "version": "^1" }, "values": { "speed": 0.5, "volume": 30, "nope": 1 }, "files": {} });
     let calm = json!({ "id": "org.example.calm", "kind": "preset", "entry": "preset.json",
         "requires": { "packages": needs } });
     let preset = built("calm", calm.clone(), &[("preset.json", values.to_string().as_bytes())]);
@@ -95,8 +96,7 @@ pub(super) fn presets_set_the_values_of_their_base() {
     assert!(Arc::ptr_eq(&first, &again), "a preset shown again is not loaded again");
     let kept = library::with(|lib| Ok(lib.item(&preset)?.path)).unwrap();
     let before = fs::read(&kept).unwrap();
-    let slower =
-        json!({ "base": { "id": "org.example.based", "version": "^1" }, "values": { "speed": 0.25 } });
+    let slower = json!({ "base": { "id": "org.example.based", "version": "^1" }, "values": { "speed": 0.25 }, "files": {} });
     let (_source, newer) = packed("calm", calm, &[("preset.json", slower.to_string().as_bytes())]);
     fs::copy(&newer, &kept).unwrap();
     let updated = variant::loaded(&path, Some(&preset)).unwrap();
