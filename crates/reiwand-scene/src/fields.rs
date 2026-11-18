@@ -9,7 +9,7 @@ impl Check<'_> {
         self.uses(layer.parallax.apart(), "parallax2");
         self.uses(layer.parallax.bound(), "parallax_values");
         if let Some(b) = &layer.brightness {
-            self.uses(true, "layer_color");
+            self.uses(*b != Value::Fixed(1.0), "layer_color");
             self.number(&format!("{p}/brightness"), b, 0.0, 16.0);
         }
         let t = &layer.transform;

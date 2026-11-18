@@ -75,6 +75,7 @@ pub enum Param {
     Color(Color),
     Text(String),
     Emitters(Vec<super::EffectEmitter>),
+    Auto,
 }
 
 impl Serialize for Color {

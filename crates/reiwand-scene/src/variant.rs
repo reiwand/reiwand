@@ -21,6 +21,7 @@ impl Variant {
 
     fn built(&self, e: &EffectUse, pick: usize) -> usize {
         match e.params.get(&self.id) {
+            Some(Value::Fixed(Param::Auto)) => pick,
             Some(Value::Fixed(v)) => self.at(v).unwrap_or(self.base()),
             Some(Value::Bound(b)) => {
                 let mapped = || b.map.iter().flat_map(|m| m.values()).filter_map(|v| self.at(v));
@@ -71,7 +72,7 @@ impl Descriptor {
     }
 
     pub fn choices(&self, e: &EffectUse) -> Vec<Vec<usize>> {
-        let picks = self.options.iter().map(|o| match e.params.get(&o.id) {
+        let picks = self.options.iter().map(|o| match e.params.get(&o.id).filter(|v| !matches!(v, Value::Fixed(Param::Auto))) {
             Some(Value::Fixed(v)) => vec![o.at(v).unwrap_or(o.base())],
             Some(Value::Bound(b)) => match &b.map {
                 Some(map) => map.values().filter_map(|v| o.at(v)).collect(),

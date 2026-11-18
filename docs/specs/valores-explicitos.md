@@ -36,6 +36,7 @@ Lo usan los cargadores de todos los formatos; ningún formato escribe su propia 
   prellena.»
 - Una `Option` se escribe siempre: `#[serde(deserialize_with = "explicit::null")]` más
   `#[schemars(required)]`. Sin el atributo serde acepta la omisión; con él, falta = error. La ausencia es `null`.
+- Excepción declarada: una opción de un efecto de paquete que declara `when_bound` (la variante depende de que una textura esté ligada) acepta `null` en `params` de su uso, y `null` significa «la elige la ligadura, como se declaró»: con la textura ligada toma el valor `when_bound` y sin ligar toma su `prefill`. Cualquier otra opción rechaza `null` (`Issue::Type` en `/params/<opción>`). El editor escribe `null` en esas opciones.
 - Enumeración sin etiqueta: se implementa `Deserialize` con `untagged(d, &[(&["clave"], variante), …])`; la
   clave de pista elige de qué variante se informa el error con su ruta exacta.
 - Esquema: `annotate(&mut esquema, &Prefill(&[("Tipo.campo", "valor JSON")]))` marca todo campo como

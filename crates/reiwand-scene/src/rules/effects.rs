@@ -28,7 +28,11 @@ impl Check<'_> {
             }
             for (id, value) in &effect.params {
                 let path = format!("{e}/params/{id}");
-                if d.options.iter().any(|o| &o.id == id) {
+                if let Some(o) = d.options.iter().find(|o| &o.id == id) {
+                    let auto = matches!(value, Value::Fixed(Param::Auto));
+                    if auto && o.when_bound.is_none() {
+                        self.issues.push(Issue::Type(path));
+                    }
                     continue;
                 }
                 let Some(def) = d.params.iter().find(|p| &p.id == id) else {
