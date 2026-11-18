@@ -14,16 +14,11 @@ pub fn note(o: &OutputState) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::note;
-    use reiwand_core::model::{OutputState, StillReason};
+    use reiwand_core::model::StillReason;
 
     #[test]
     fn each_reason_has_its_words_and_a_playing_screen_has_none() {
-        let mut o: OutputState = serde_json::from_value(serde_json::json!({
-            "width": 1, "height": 1, "image": null, "fit": "fill", "kind": "image", "playing": true,
-            "active": true, "covered": false, "clients": 0, "error": null, "item": null, "preset": null,
-            "playlist": null, "credit": null
-        }))
-        .unwrap();
+        let mut o = crate::fixture::output(serde_json::json!({}));
         assert_eq!(note(&o), None);
         let words: Vec<_> =
             [StillReason::Covered, StillReason::Battery, StillReason::Locked, StillReason::Paused]

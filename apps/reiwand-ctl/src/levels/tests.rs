@@ -1,14 +1,13 @@
 use super::hdr;
 use super::notes::{measured, note, off, page_notes, sandbox_lines, sandbox_note};
-use reiwand_core::model::{OutputState, SceneInputs};
+use crate::fixture;
+use reiwand_core::model::OutputState;
 use serde_json::json;
 
 fn shown(reason: &str, cost: f64, auto: &str) -> OutputState {
-    let state = json!({ "width": 64, "height": 32, "image": null, "fit": "fill", "kind": "scene",
-        "playing": true, "active": true, "covered": false, "clients": 0, "error": null, "item": null,
-        "preset": null, "playlist": null, "credit": null, "quality": "q0", "quality_reason": reason,
-        "quality_cost": cost, "quality_budget": if cost > 0.0 { 4.0 } else { 0.0 }, "quality_auto": auto });
-    serde_json::from_value(state).unwrap()
+    fixture::output(json!({ "width": 64, "height": 32, "kind": "scene", "quality": "q0",
+        "quality_reason": reason, "quality_cost": cost,
+        "quality_budget": if cost > 0.0 { 4.0 } else { 0.0 }, "quality_auto": auto }))
 }
 
 #[test]
@@ -55,13 +54,11 @@ fn a_level_measured_too_slow_tells_its_frame_time_and_rate_instead_of_the_estima
 
 #[test]
 fn an_input_a_scene_uses_but_is_not_granted_shows_as_off() {
-    let used: SceneInputs = serde_json::from_value(json!({ "scene": "org.example.sea", "audio": true,
-        "pointer": true, "network": true, "granted": ["pointer"] }))
-    .unwrap();
+    let used = fixture::inputs(json!({ "scene": "org.example.sea", "audio": true,
+        "pointer": true, "network": true, "granted": ["pointer"] }));
     assert_eq!(off(&used), ["audio", "network", "audio_network"]);
-    let none: SceneInputs = serde_json::from_value(json!({ "scene": "org.example.sea", "audio": false,
-        "pointer": true, "granted": ["pointer"] }))
-    .unwrap();
+    let none = fixture::inputs(json!({ "scene": "org.example.sea", "audio": false,
+        "pointer": true, "granted": ["pointer"] }));
     assert!(off(&none).is_empty());
 }
 
@@ -91,9 +88,9 @@ fn the_reduced_sandbox_line_names_only_the_screens_asked_about() {
 #[test]
 fn the_hdr_line_says_how_the_colors_reach_the_desktop() {
     let mut o = shown("user", 0.0, "");
-    o.hdr = serde_json::from_value(json!({ "choice": "on", "own": null, "active": true, "offered": true,
+    o.hdr = serde_json::from_value(fixture::hdr(json!({ "choice": "on", "active": true, "offered": true,
         "display": true, "peak_nits": 800.0, "reference_nits": 203.0, "reason": "on", "encoding": "pq-own",
-        "max_cll": 800, "max_fall": 203 }))
+        "max_cll": 800, "max_fall": 203 })))
     .unwrap();
     assert_eq!(hdr(&o), "on on (on, 800 nits, PQ with its own description, MaxCLL 800)");
     o.hdr.encoding = "scrgb".into();

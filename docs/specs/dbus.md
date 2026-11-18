@@ -2822,8 +2822,20 @@ was removed or its file changed.
 ## JSON model
 
 Every reply below carries `model` (currently `1`) and `serial` first. Every field is always
-written (`null` for none); clients ignore fields they do not know, and read enum values they do
-not know as unknown. Adding a field, an enum value or a method keeps the model version;
+written, with no omission (`null` for none, `[]` and `{}` for empty): the daemon never skips a field,
+whatever its value. A client reads a reply strictly: a missing field is an error that names it
+(`item`, `entries[2].item.title`), and no client fills in a value of its own. Clients ignore fields
+they do not know, and read enum values they do not know as unknown.
+
+The Rust types are in `crates/reiwand-core/src/model`: none has `serde(default)` or
+`skip_serializing_if`, and every `Option` is read through `explicit::null` (a key that is present
+holds a value or `null`; absent is an error). `crates/reiwand-core/prefill/model.tsv` lists each
+optional field (`Type.field`) with its class: `bloque` (an optional block, a nested object or `null`;
+the reading that lets an unused block be missing will start with this class) or `valor` (a single
+value that is always written, `null` for none). The test `tests/model_explicit.rs` fails when a field is
+missing from the table or a default comes back. The messages that clients send are not part of this
+model: they are the typed arguments of each method and the JSON of `SetSceneProperty`, `PreviewEdit`
+and `scene act`, which change only what they name ("change only this"), by design. Adding a field, an enum value or a method keeps the model version;
 removing, renaming or retyping something increases it. Times are Unix seconds; `Fit` is
 `"fill"`, `"fit"`, `"stretch"`, `"center"`, `"tile"` or `"span"`; enums are written in snake case.
 `edited` tells whether an edit applies to the shown image and `screen` repeats `SetOutputInfo`;

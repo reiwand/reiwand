@@ -16,7 +16,8 @@ fn reply(fields: Value) -> String {
 fn summary(uid: &str, title: &str) -> Value {
     json!({"uid": uid, "kind": "image", "title": title, "width": 3840, "height": 2160, "duration_ms": null,
         "color": 3368703, "tags": ["sea", "blue"], "rating": 4, "favorite": true, "missing": false, "error": null,
-        "revoked": null, "removable": false, "imported": false, "thumb": null})
+        "revoked": null, "removable": false, "imported": false, "sound_muted": null, "sound_volume": null,
+        "thumb": null, "package": null, "provider": null})
 }
 
 fn rules() -> Value {
@@ -28,7 +29,8 @@ fn item() -> Value {
     json!({"uid": "01J9Z0X9Z6Q7X4F3K5E1V0R1AB", "source": null, "kind": "package", "path": "/srv/example/dawn.wpak",
         "title": "Dawn", "size": 1572864, "mtime": 1, "width": 1920, "height": 1080, "duration_ms": null, "audio": null,
         "color": 3368703, "error": null, "package": {"id": "org.example.dawn", "version": "1.0.0", "kind": "image",
-        "license": "CC0-1.0"}, "tags": ["sky"], "rating": 0, "favorite": false, "added_at": 1, "used_at": null,
+        "license": "CC0-1.0", "content": null, "photosensitive": null, "facets": [], "confirmed": [], "exposes": [], "flash_disabled": false, "unshown": null, "base": null},
+        "sound_muted": null, "sound_volume": null, "tags": ["sky"], "rating": 0, "favorite": false, "added_at": 1, "used_at": null,
         "use_count": 0, "missing": false})
 }
 
@@ -38,12 +40,13 @@ fn repo() -> Value {
     json!({"repo_id": REPO, "url": "https://example.org/repo/", "name": "Example wallpapers",
         "hosts": ["example.org"], "fingerprints": [], "root_version": 1, "root_expires": 0, "entry_version": 3,
         "entry_expires": 0, "checked": 0, "stale": true, "packages": 2, "warnings": ["stale", "root_expiring"],
-        "last_error": null, "job": null})
+        "last_error": null, "last_error_name": null, "job": null, "broken": null, "bundled": false})
 }
 
 fn installed() -> Value {
     json!({"repo_id": REPO, "id": "org.example.dawn", "version": "1.0.0", "sha256": "ab", "size": 1572864,
-        "signer": null, "revoked": "license", "item": "01J9Z0X9Z6Q7X4F3K5E1V0R1AB", "update": "1.1.0"})
+        "signer": null, "revoked": "license", "item": "01J9Z0X9Z6Q7X4F3K5E1V0R1AB", "update": "1.1.0",
+        "changes": "", "missing": [], "asks": []})
 }
 
 fn job(kind: &str, output: Value) -> Job {

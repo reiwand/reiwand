@@ -1,5 +1,6 @@
 model! {
     pub struct PreviewState {
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub error: Option<String>,
         pub console: Vec<String>,
     }
@@ -9,9 +10,7 @@ model! {
         pub kind: String,
         pub backend: String,
         pub used: bool,
-        #[serde(default)]
         pub bus: String,
-        #[serde(default)]
         pub compositor: bool,
     }
 }

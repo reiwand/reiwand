@@ -16,12 +16,14 @@ model! {
         pub resume: bool,
         pub advance_while_paused: bool,
         pub skip_videos_on_battery: bool,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub transition_ms: Option<u32>,
     }
 
     pub struct Playlist {
         pub uid: Uid,
         pub name: String,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub query: Option<String>,
         pub rules: Rules,
         pub count: u32,
@@ -39,21 +41,37 @@ model! {
         pub items: Vec<ItemSummary>,
     }
 
-    pub struct HistoryEntry { pub at: Time, pub item: Option<ItemSummary> }
+    pub struct HistoryEntry {
+        pub at: Time,
+        #[serde(deserialize_with = "crate::explicit::null")]
+        pub item: Option<ItemSummary>,
+    }
 
     pub struct HistoryReply { pub model: u32, pub serial: u64, pub output: String, pub entries: Vec<HistoryEntry> }
 
     pub struct ProfileOutput {
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub item: Option<Uid>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub path: Option<PathBuf>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub playlist: Option<Uid>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub fit: Option<Fit>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub background: Option<String>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub preset: Option<Uid>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub filter: Option<crate::Filter>,
     }
 
-    pub struct ProfileAuto { pub outputs: Option<Vec<String>>, pub on_battery: Option<bool> }
+    pub struct ProfileAuto {
+        #[serde(deserialize_with = "crate::explicit::null")]
+        pub outputs: Option<Vec<String>>,
+        #[serde(deserialize_with = "crate::explicit::null")]
+        pub on_battery: Option<bool>,
+    }
 
     pub struct Profile {
         pub uid: Uid,
@@ -65,15 +83,38 @@ model! {
         pub active: bool,
     }
 
-    pub struct ProfilesReply { pub model: u32, pub serial: u64, pub active: Option<Uid>, pub profiles: Vec<Profile> }
+    pub struct ProfilesReply {
+        pub model: u32,
+        pub serial: u64,
+        #[serde(deserialize_with = "crate::explicit::null")]
+        pub active: Option<Uid>,
+        pub profiles: Vec<Profile>,
+    }
 
     pub struct ProfileReply { pub model: u32, pub serial: u64, pub profile: Profile }
 
-    pub struct PresetValue { pub fit: Option<Fit>, pub background: Option<String> }
+    pub struct PresetValue {
+        #[serde(deserialize_with = "crate::explicit::null")]
+        pub fit: Option<Fit>,
+        #[serde(deserialize_with = "crate::explicit::null")]
+        pub background: Option<String>,
+    }
 
-    pub struct Preset { pub uid: Uid, pub item: Option<Uid>, pub name: String, pub value: PresetValue }
+    pub struct Preset {
+        pub uid: Uid,
+        #[serde(deserialize_with = "crate::explicit::null")]
+        pub item: Option<Uid>,
+        pub name: String,
+        pub value: PresetValue,
+    }
 
-    pub struct PresetsReply { pub model: u32, pub serial: u64, pub item: Option<Uid>, pub presets: Vec<Preset> }
+    pub struct PresetsReply {
+        pub model: u32,
+        pub serial: u64,
+        #[serde(deserialize_with = "crate::explicit::null")]
+        pub item: Option<Uid>,
+        pub presets: Vec<Preset>,
+    }
 
     #[derive(Copy, Eq, Hash)]
     pub enum BrowseSource { Playlist, Library, #[serde(other)] Unknown }
@@ -92,23 +133,26 @@ model! {
         pub serial: u64,
         pub output: String,
         pub active: bool,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub ended: Option<BrowseEnd>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub source: Option<BrowseSource>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub playlist: Option<Uid>,
         pub playlist_name: String,
         pub steps: i32,
         pub position: u32,
         pub count: u32,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub shown: Option<Uid>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub candidate: Option<ItemSummary>,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub now: Option<ItemSummary>,
-        #[serde(default)]
         pub ahead: Vec<ItemSummary>,
-        #[serde(default)]
         pub behind: Vec<ItemSummary>,
-        #[serde(default)]
         pub plays: BrowsePlays,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub path: Option<PathBuf>,
         pub transition: String,
         pub idle_ms: u32,

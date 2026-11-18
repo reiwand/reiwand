@@ -6,6 +6,7 @@ macro_rules! model {
     )*};
 }
 
+mod about;
 mod account;
 mod accounts;
 mod field;
@@ -23,6 +24,7 @@ mod schema;
 mod sources;
 mod state;
 
+pub use about::*;
 pub use account::*;
 pub use accounts::*;
 pub use field::*;

@@ -1,6 +1,7 @@
 model! {
     pub struct ServerAccountRepo {
         pub url: String,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub repo_id: Option<String>,
     }
 

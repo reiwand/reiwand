@@ -97,7 +97,7 @@ impl Library {
             json!({"uid": uid, "kind": "image", "title": format!("Sea {}", &uid[20..]),
             "width": 64, "height": 32, "duration_ms": null, "color": null, "tags": ["sea"], "rating": 0,
             "favorite": false, "missing": false, "error": null, "revoked": null, "removable": true,
-            "imported": false, "thumb": null})
+            "imported": false, "sound_muted": null, "sound_volume": null, "thumb": null, "package": null, "provider": null})
         };
         let items: Vec<_> = UIDS.iter().skip(offset as usize).take(limit as usize).map(item).collect();
         let seeded = query.split(' ').map(|word| if word == "sort:random" { "sort:random:7" } else { word });

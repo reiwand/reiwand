@@ -39,9 +39,9 @@ fn playlists_show_their_rules_and_numbered_entries() {
 fn profiles_and_presets_show_their_sections() {
     let profile = json!({"uid": "01J9Z0X9Z6Q7X4F3K5E1V0F001", "name": "Desk", "priority": 5, "active": true,
         "outputs": {"": {"item": null, "path": null, "playlist": "01J9Z0X9Z6Q7X4F3K5E1V0L001", "fit": "fill",
-            "background": "#000000", "preset": null},
+            "background": "#000000", "preset": null, "filter": null},
             "DP-1": {"item": "01J9Z0X9Z6Q7X4F3K5E1V0R1AB", "path": null, "playlist": null, "fit": null,
-            "background": null, "preset": "01J9Z0X9Z6Q7X4F3K5E1V0P001"}},
+            "background": null, "preset": "01J9Z0X9Z6Q7X4F3K5E1V0P001", "filter": null}},
         "options": {"pause.on_battery": "always"}, "auto": {"outputs": ["DP-1", "HDMI-A-1"], "on_battery": null}});
     let list = reply(json!({"active": "01J9Z0X9Z6Q7X4F3K5E1V0F001", "profiles": [profile]}));
     assert_eq!(
@@ -66,9 +66,15 @@ fn profiles_and_presets_show_their_sections() {
 fn providers_and_repositories_show_their_state() {
     let provider = json!({"id": "photos", "kind": "immich", "options": {"server": "https://photos.example.org"},
         "source": null, "state": "needs_secret", "has_secret": false, "hosts": ["photos.example.org"], "items": 0,
-        "cache_bytes": 0, "last_sync": null, "next_sync": null, "last_error": "the key was rejected", "job": null});
+        "cache_bytes": 0, "last_sync": null, "next_sync": null, "last_error": "the key was rejected", "job": null, "orphan_secret": false, "plain_http": false,
+        "offline": false});
     assert_eq!(
-        providers::list_providers(parse(&reply(json!({"providers": [provider.clone()]}))).unwrap()),
+        providers::list_providers(
+            parse(&reply(
+                json!({"providers": [provider.clone()], "store": "keyring", "keyring_found": true})
+            ))
+            .unwrap()
+        ),
         "PROVIDER  KIND    STATE         ITEMS  CACHE  SYNCED  NEXT  ERROR\n\
          photos    immich  needs_secret  0      0 B    -       -     the key was rejected\n"
     );
@@ -86,8 +92,9 @@ fn providers_and_repositories_show_their_state() {
         "author": null, "version": "1.1.0", "kind": "image", "title": "Sky at dawn", "description": "", "tags": [],
         "license": "CC0-1.0", "authors": [], "size": 1024, "published": 0, "preview": true,
         "versions": ["1.0.0", "1.1.0"], "installed": ["1.0.0"], "update": true, "content": "general",
-        "photosensitive": true, "flash_disabled": true, "asks": ["audio", "network"]});
-    let page = reply(json!({"query": "dawn", "total": 1, "offset": 0, "packages": [package]}));
+        "photosensitive": true, "flash_disabled": true, "asks": ["audio", "network"], "animated": false,
+        "facets": [], "changes": "", "revealed": false, "featured": false});
+    let page = reply(json!({"query": "dawn", "total": 1, "offset": 0, "hidden": 0, "packages": [package]}));
     assert_eq!(
         pkg::browse(parse(&page).unwrap()),
         "query = dawn\npackages = 1 of 1\n\

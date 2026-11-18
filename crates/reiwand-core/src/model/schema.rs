@@ -19,8 +19,11 @@ model! {
         pub key: String,
         pub kind: FieldKind,
         pub default: Value,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub min: Option<f64>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub max: Option<f64>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub step: Option<f64>,
         pub values: Vec<String>,
         pub required: bool,
@@ -37,6 +40,7 @@ model! {
         pub kind: String,
         pub hosts: Vec<String>,
         pub options: Vec<Field>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub secret: Option<SecretField>,
     }
 

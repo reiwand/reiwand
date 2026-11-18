@@ -32,6 +32,8 @@ pub mod edit;
 mod editing;
 mod facts;
 mod filtering;
+#[cfg(test)]
+mod fixture;
 mod folder;
 mod foreign;
 mod gpus;

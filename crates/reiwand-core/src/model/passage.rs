@@ -2,6 +2,7 @@ model! {
     #[derive(Default)]
     pub struct TransitionState {
         pub choice: String,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub own: Option<String>,
         pub plays: String,
         pub why: String,

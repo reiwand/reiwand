@@ -12,17 +12,11 @@ model! {
         pub properties: BTreeMap<String, Value>,
         pub values: BTreeMap<String, Value>,
         pub presets: Vec<Value>,
-        #[serde(default)]
         pub fields: Vec<SceneField>,
-        #[serde(default)]
         pub preset_labels: Vec<SceneOption>,
-        #[serde(default)]
         pub warnings: Vec<String>,
-        #[serde(default)]
         pub user_presets: Vec<SceneOption>,
-        #[serde(default)]
         pub shared: bool,
-        #[serde(default)]
         pub kind: String,
     }
 
@@ -31,6 +25,7 @@ model! {
         pub name: String,
         pub position: u32,
         pub count: u32,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub next_at: Option<Time>,
     }
 }

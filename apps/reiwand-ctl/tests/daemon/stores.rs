@@ -13,7 +13,7 @@ impl Playlists {
         let item = |i: u32| {
             json!({"uid": UIDS[i as usize % 5], "kind": "image", "title": "Sea", "width": null, "height": null,
             "duration_ms": null, "color": null, "tags": [], "rating": 0, "favorite": false, "missing": false,
-            "error": null, "revoked": null, "removable": true, "imported": false, "thumb": null})
+            "error": null, "revoked": null, "removable": true, "imported": false, "sound_muted": null, "sound_volume": null, "thumb": null, "package": null, "provider": null})
         };
         let items: Vec<_> = (offset..600.min(offset.saturating_add(limit))).map(item).collect();
         json!({"model": 1, "serial": 9, "playlist": info, "total": 600, "offset": offset, "items": items})
@@ -47,13 +47,15 @@ pub(super) struct Inputs(pub(super) Log);
 impl Inputs {
     fn get_inputs(&self) -> String {
         let shown = |key: &str, granted: &[&str]| {
-            json!({"scene": "org.example.sea", "audio": true, "pointer": false, "clicks": true, "title": "Sea", "key": key,
-                "granted": granted})
+            json!({"scene": "org.example.sea", "audio": true, "pointer": false, "clicks": true, "network": false, "rgb": false, "media": false,
+                "title": "Sea", "key": key, "granted": granted, "without": [], "undecided": []})
         };
         let shown = json!({"DP-1": shown("key:signer", &["audio"]), "DP-2": shown("sha256:other", &[])});
         json!({"model": 1, "serial": 9, "capturing": true, "tracking": false,
             "grants": {"org.example.sea": ["audio"]}, "shown": shown, "parallax": [], "declined": {},
-            "clicks": ["DP-1"], "clicking": []})
+            "asking": {}, "quiet": {}, "clicks": ["DP-1"], "clicking": [], "unreached": [], "gates": {},
+            "media": {"listening": false, "players": 0, "playing": false, "track": false, "cover": false,
+            "remote_covers": false, "using": []}})
         .to_string()
     }
 
@@ -110,7 +112,7 @@ impl Providers {
         let nas = json!({"id": "nas", "kind": "webdav", "options": {"url": "http://nas.example.org/dav"},
             "source": null, "state": "idle", "has_secret": true, "hosts": ["nas.example.org"], "items": 0,
             "cache_bytes": 0, "last_sync": null, "next_sync": null, "last_error": null, "job": null,
-            "plain_http": true});
+            "orphan_secret": false, "plain_http": true, "offline": false});
         json!({"model": 1, "serial": 9, "providers": [nas], "store": "file", "keyring_found": false})
             .to_string()
     }
@@ -131,7 +133,7 @@ impl Repos {
     fn list_installed(&self) -> String {
         let package = |repo: &str, id: &str| {
             json!({"repo_id": repo, "id": id, "version": "1.0.0", "sha256": "ab", "size": 1, "signer": null,
-            "revoked": null, "item": null, "update": "1.1.0"})
+            "revoked": null, "item": null, "update": "1.1.0", "changes": "", "missing": [], "asks": []})
         };
         let packages = [
             package("0123456789abcdef", "org.example.dawn"),
@@ -145,8 +147,10 @@ impl Repos {
         let package = json!({"repo_id": "0123456789abcdef", "repo_name": "Example wallpapers", "id": query,
             "author": null, "version": "1.0.0", "kind": "image", "title": "Dawn", "description": "", "tags": [],
             "license": "CC0-1.0", "authors": [], "size": 1, "published": 0, "preview": false,
-            "versions": ["1.0.0"], "installed": [], "update": false});
-        json!({"model": 1, "serial": 9, "query": query, "total": 1, "offset": 0, "packages": [package]})
+            "versions": ["1.0.0"], "installed": [], "update": false, "animated": false, "content": null,
+            "photosensitive": null, "facets": [], "asks": [], "flash_disabled": false, "changes": "",
+            "revealed": false, "featured": false});
+        json!({"model": 1, "serial": 9, "query": query, "total": 1, "offset": 0, "hidden": 0, "packages": [package]})
             .to_string()
     }
 }

@@ -91,10 +91,15 @@ fn the_option_wins_over_the_environment_the_file_and_the_desktop() {
 }
 
 #[test]
-fn the_state_reads_a_daemon_that_does_not_report_ignored_values() {
-    let old: LayerShellState =
-        serde_json::from_str(r#"{"namespace": "wallpaper", "from": "default", "restart": false}"#).unwrap();
-    assert_eq!((&old.ignored, &old.ignored_from, old.ignored_empty), (&None, &None, false));
+fn the_state_refuses_a_daemon_that_does_not_report_ignored_values() {
+    let error = serde_json::from_str::<LayerShellState>(
+        r#"{"namespace": "wallpaper", "from": "default", "restart": false}"#,
+    )
+    .unwrap_err()
+    .to_string();
+    assert!(error.contains("missing field `ignored`"), "{error}");
+    let old =
+        LayerShellState { namespace: Some("wallpaper".into()), from: "default".into(), ..Default::default() };
     let new = LayerShellState {
         ignored: Some("the environment value is ignored".into()),
         ignored_from: Some("environment".into()),

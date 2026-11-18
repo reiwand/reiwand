@@ -6,9 +6,12 @@ model! {
         pub uid: Uid,
         pub path: PathBuf,
         pub recursive: bool,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub scanned_at: Option<Time>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub error: Option<String>,
         pub items: u32,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub provider: Option<String>,
     }
 
@@ -18,7 +21,14 @@ model! {
 
     pub struct TagsReply { pub model: u32, pub serial: u64, pub tags: Vec<Tag> }
 
-    pub struct SourceScan { pub source: Option<Uid>, pub added: u32, pub updated: u32, pub moved: u32, pub missing: u32 }
+    pub struct SourceScan {
+        #[serde(deserialize_with = "crate::explicit::null")]
+        pub source: Option<Uid>,
+        pub added: u32,
+        pub updated: u32,
+        pub moved: u32,
+        pub missing: u32,
+    }
 
     pub struct ScanOutput { pub reports: Vec<SourceScan> }
 

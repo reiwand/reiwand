@@ -11,23 +11,14 @@ model! {
         pub scene: String,
         pub audio: bool,
         pub pointer: bool,
-        #[serde(default)]
         pub clicks: bool,
-        #[serde(default)]
         pub network: bool,
-        #[serde(default)]
         pub rgb: bool,
-        #[serde(default)]
         pub media: bool,
-        #[serde(default)]
         pub title: String,
-        #[serde(default)]
         pub key: String,
-        #[serde(default)]
         pub granted: BTreeSet<Input>,
-        #[serde(default)]
         pub without: BTreeSet<Input>,
-        #[serde(default)]
         pub undecided: BTreeSet<Input>,
     }
 
@@ -38,28 +29,18 @@ model! {
         pub tracking: bool,
         pub grants: BTreeMap<String, BTreeSet<Input>>,
         pub shown: BTreeMap<String, SceneInputs>,
-        #[serde(default)]
         pub parallax: BTreeSet<String>,
-        #[serde(default)]
         pub declined: BTreeMap<String, BTreeSet<Input>>,
-        #[serde(default)]
         pub asking: BTreeMap<String, BTreeSet<Input>>,
-        #[serde(default)]
         pub quiet: BTreeMap<String, BTreeSet<Input>>,
-        #[serde(default)]
         pub clicks: BTreeSet<String>,
-        #[serde(default)]
         pub clicking: BTreeSet<String>,
-        #[serde(default)]
         pub unreached: BTreeSet<String>,
-        #[serde(default)]
         pub media: MediaStatus,
-        #[serde(default)]
         pub gates: BTreeMap<String, InputsGate>,
     }
 
     #[derive(Default)]
-    #[serde(default)]
     pub struct MediaStatus {
         pub listening: bool,
         pub players: u32,

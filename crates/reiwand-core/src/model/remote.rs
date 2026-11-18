@@ -9,21 +9,23 @@ model! {
         pub id: String,
         pub kind: String,
         pub options: BTreeMap<String, String>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub source: Option<Uid>,
         pub state: ProviderState,
         pub has_secret: bool,
         pub hosts: Vec<String>,
         pub items: u32,
         pub cache_bytes: u64,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub last_sync: Option<Time>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub next_sync: Option<Time>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub last_error: Option<String>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub job: Option<u64>,
-        #[serde(default)]
         pub orphan_secret: bool,
-        #[serde(default)]
         pub plain_http: bool,
-        #[serde(default)]
         pub offline: bool,
     }
 
@@ -31,9 +33,7 @@ model! {
         pub model: u32,
         pub serial: u64,
         pub providers: Vec<Provider>,
-        #[serde(default)]
         pub store: String,
-        #[serde(default)]
         pub keyring_found: bool,
     }
 
@@ -74,13 +74,14 @@ model! {
         pub stale: bool,
         pub packages: u32,
         pub warnings: Vec<RepoWarning>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub last_error: Option<String>,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub last_error_name: Option<String>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub job: Option<u64>,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub broken: Option<String>,
-        #[serde(default)]
         pub bundled: bool,
     }
 
@@ -93,6 +94,7 @@ model! {
         pub repo_id: String,
         pub repo_name: String,
         pub id: String,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub author: Option<String>,
         pub version: String,
         pub kind: String,
@@ -104,26 +106,19 @@ model! {
         pub size: u64,
         pub published: Time,
         pub preview: bool,
-        #[serde(default)]
         pub animated: bool,
         pub versions: Vec<String>,
         pub installed: Vec<String>,
         pub update: bool,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub content: Option<String>,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub photosensitive: Option<bool>,
-        #[serde(default)]
         pub facets: Vec<String>,
-        #[serde(default)]
         pub asks: Vec<String>,
-        #[serde(default)]
         pub flash_disabled: bool,
-        #[serde(default)]
         pub changes: String,
-        #[serde(default)]
         pub revealed: bool,
-        #[serde(default)]
         pub featured: bool,
     }
 
@@ -132,7 +127,6 @@ model! {
         pub serial: u64,
         pub query: String,
         pub total: u32,
-        #[serde(default)]
         pub hidden: u32,
         pub offset: u32,
         pub packages: Vec<RepoPackage>,
@@ -144,15 +138,16 @@ model! {
         pub version: String,
         pub sha256: String,
         pub size: u64,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub signer: Option<String>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub revoked: Option<Reason>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub item: Option<Uid>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub update: Option<String>,
-        #[serde(default)]
         pub changes: String,
-        #[serde(default, skip_serializing_if = "Vec::is_empty")]
         pub missing: Vec<String>,
-        #[serde(default, skip_serializing_if = "Vec::is_empty")]
         pub asks: Vec<String>,
     }
 
@@ -163,7 +158,6 @@ model! {
         pub id: String,
         pub installed: String,
         pub available: String,
-        #[serde(default)]
         pub changes: String,
     }
 

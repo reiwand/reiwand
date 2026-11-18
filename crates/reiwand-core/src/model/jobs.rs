@@ -10,8 +10,11 @@ model! {
         pub done: u64,
         pub total: u64,
         pub started_at: Time,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub finished_at: Option<Time>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub error: Option<JobError>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub output: Option<Value>,
     }
 

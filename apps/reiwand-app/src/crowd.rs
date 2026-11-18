@@ -23,7 +23,10 @@ fn item(at: usize) -> Value {
         "revoked": null,
         "removable": false,
         "imported": false,
+        "sound_muted": null,
+        "sound_volume": null,
         "thumb": null,
+        "package": null,
         "provider": if sourced { Some("example") } else { None },
     })
 }

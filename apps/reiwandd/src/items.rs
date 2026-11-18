@@ -7,24 +7,18 @@ use reiwand_core::model::{
 use reiwand_format::Installed;
 use reiwand_library::{Error as LibraryError, Item, Kind, Library};
 use serde::Serialize;
-use serde::de::DeserializeOwned;
 use serde_json::{Value, json};
 use std::hash::{BuildHasher, RandomState};
 
 mod resolve;
+mod merge;
 mod shape;
+pub use merge::merged;
+use merge::whole_item;
 use shape::shape;
 
 pub const MAX_UIDS: usize = 10_000;
 const MAX_PAGE: u32 = 500;
-
-pub fn merged<T: DeserializeOwned>(base: impl Serialize, extra: Value) -> Result<T> {
-    let mut value = serde_json::to_value(base).map_err(|e| failed(e.to_string()))?;
-    if let (Some(object), Value::Object(extra)) = (value.as_object_mut(), extra) {
-        object.extend(extra);
-    }
-    serde_json::from_value(value).map_err(|e| failed(e.to_string()))
-}
 
 fn rescanned(item: &Item) -> bool {
     item.source.is_some() && item.path.exists() && Kind::detect(&item.path).is_some()
@@ -55,8 +49,8 @@ impl Daemon {
         let (imported, thumb) = (item.path.starts_with(self.store.files()), self.thumbs.cached(&item, 256));
         let revoked = installed.and_then(|i| i.revoked);
         let (exposes, provider) = (self.exposes(&item), self.untitled_photo(&item));
-        let extra = json!({"revoked": revoked, "removable": removable, "imported": imported, "thumb": thumb});
-        let mut summary = ItemSummary { provider, ..merged(item, extra)? };
+        let extra = json!({"revoked": revoked, "removable": removable, "imported": imported, "thumb": thumb, "provider": null});
+        let mut summary = ItemSummary { provider, ..whole_item(item, extra)? };
         let off = !self.state().config.playback.allow_flashing;
         summary.package.iter_mut().for_each(|p| shape(p, &exposes, off));
         summary.error = summary.error.or_else(|| self.page_problem(&path));
@@ -112,7 +106,7 @@ impl Daemon {
         let about = peeked
             .map(|m| reiwand_core::model::About { animated, ..m.about(&reiwand_core::locale::languages()) });
         let (exposes, (variants, base)) = (self.exposes(&item), self.kin(&item));
-        let mut item: reiwand_core::model::Item = merged(item, Value::Null)?;
+        let mut item: reiwand_core::model::Item = whole_item(item, Value::Null)?;
         let off = !self.state().config.playback.allow_flashing;
         item.package.iter_mut().for_each(|p| shape(p, &exposes, off));
         item.error = item.error.or_else(|| self.page_problem(&item.path));

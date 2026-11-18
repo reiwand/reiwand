@@ -5,7 +5,7 @@ fn search_pages_show_the_normalized_query_and_aligned_items() {
     let waves = json!({"uid": "01J9Z0X9Z6Q7X4F3K5E1V0R9ZZ", "kind": "video", "title": "Waves", "width": 1920,
         "height": 1080, "duration_ms": 95000, "color": null, "tags": [], "rating": 0, "favorite": false,
         "missing": true, "error": "cannot decode", "revoked": "malware", "removable": true, "imported": true,
-        "thumb": null});
+        "sound_muted": null, "sound_volume": null, "thumb": null, "package": null, "provider": null});
     let items = [summary("01J9Z0X9Z6Q7X4F3K5E1V0R1AB", "Harbour"), waves];
     let page = reply(json!({"query": "tag:sea sort:random:7", "total": 42, "offset": 2, "items": items}));
     assert_eq!(
@@ -23,10 +23,12 @@ fn item_details_list_only_what_is_set() {
     let preset = json!({"uid": "01J9Z0X9Z6Q7X4F3K5E1V0P001", "item": "01J9Z0X9Z6Q7X4F3K5E1V0R1AB", "name": "dark",
         "value": {"fit": "fit", "background": "#000000"}});
     let installed = json!({"repo_id": REPO, "id": "org.example.dawn", "version": "1.0.0", "sha256": "ab",
-        "size": 1572864, "signer": null, "revoked": null, "item": "01J9Z0X9Z6Q7X4F3K5E1V0R1AB", "update": null});
+        "size": 1572864, "signer": null, "revoked": null, "item": "01J9Z0X9Z6Q7X4F3K5E1V0R1AB", "update": null,
+        "changes": "", "missing": [], "asks": []});
     let details =
         reply(json!({"item": item(), "thumb": null, "presets": [preset], "credit": null, "revoked": null,
-        "playlists": [{"uid": "01J9Z0X9Z6Q7X4F3K5E1V0L001", "name": "Mornings"}], "installed": installed}));
+        "playlists": [{"uid": "01J9Z0X9Z6Q7X4F3K5E1V0L001", "name": "Mornings"}], "installed": installed,
+        "about": null, "variants": [], "base": null}));
     let expected = format!(
         "item = 01J9Z0X9Z6Q7X4F3K5E1V0R1AB\ntitle = Dawn\nkind = package\npath = /srv/example/dawn.wpak\n\
          size = 1.5 MiB\ndimensions = 1920x1080\ncolor = #3366ff\ntags = sky\nrating = 0\nfavorite = false\n\
@@ -47,12 +49,13 @@ fn package_details_add_their_metadata() {
         "changes": "", "authors": ["Jo"], "license": "CC0-1.0", "content": "mature", "descriptors": ["violence"],
         "photosensitive": true, "origin": "derived",
         "derived_from": [{"author": "Ana", "title": "Harbor", "url": null, "license": null}],
-        "credits": [{"paths": ["a.png"], "license": "CC0-1.0", "attribution": "Bo", "url": null}],
+        "credits": [{"paths": ["a.png"], "license": "CC0-1.0", "attribution": "Bo", "url": null, "source": null}],
         "links": [{"kind": "homepage", "url": "https://example.org"}], "inputs": ["pointer"],
         "features": [{"name": "inputs.pointer", "why": "follows the pointer"}], "languages": ["en", "es"],
-        "source_url": "https://example.org/harbor"});
+        "provider": null, "source_url": "https://example.org/harbor", "platforms": [], "packages": [], "refused": [],
+        "animated": null, "spread": false});
     let details = reply(json!({"item": item, "thumb": null, "presets": [], "credit": null, "revoked": null,
-        "playlists": [], "installed": null, "about": about}));
+        "playlists": [], "installed": null, "about": about, "variants": [], "base": null}));
     let shown = items::details(parse(&details).unwrap());
     let tail = "package = org.example.dawn 1.0.0 (image, CC0-1.0)\ncontent = mature (violence)\n\
         mature shown = false\nphotosensitive = yes, allowed\norigin = derived from Harbor by Ana\n\

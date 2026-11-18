@@ -11,141 +11,111 @@ model! {
         pub model: u32,
         pub version: String,
         pub adapter: String,
-        #[serde(default)]
         pub tier: String,
-        #[serde(default)]
         pub tier_measured: bool,
         pub config: PathBuf,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub config_error: Option<String>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub library_error: Option<String>,
         pub serial: u64,
         pub paused: bool,
         pub on_battery: bool,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub battery_percent: Option<u8>,
         pub locked: bool,
         pub volume: f64,
         pub muted: bool,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub profile: Option<Uid>,
         pub jobs: u32,
         pub options: BTreeMap<String, Value>,
         pub outputs: BTreeMap<String, OutputState>,
-        #[serde(default)]
         pub previews: BTreeMap<String, PreviewState>,
-        #[serde(default)]
         pub calibrating: bool,
-        #[serde(default)]
         pub compute: bool,
-        #[serde(default)]
         pub adapters: Vec<GpuAdapter>,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub gpu_warning: Option<String>,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub gpu_note: Option<String>,
-        #[serde(default)]
         pub gpu_restart: bool,
-        #[serde(default)]
         pub qualities: BTreeMap<String, String>,
-        #[serde(default)]
         pub hdrs: BTreeMap<String, String>,
-        #[serde(default)]
         pub transitions: BTreeMap<String, String>,
-        #[serde(default)]
         pub layer_shell: LayerShellState,
-        #[serde(default)]
         pub plasma: bool,
     }
 
     pub struct OutputState {
         pub width: u32,
         pub height: u32,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub image: Option<PathBuf>,
         pub fit: Fit,
-        #[serde(default)]
         pub background: String,
         pub kind: Shown,
         pub playing: bool,
         pub active: bool,
         pub covered: bool,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub still_reason: Option<StillReason>,
         pub clients: u32,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub error: Option<String>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub item: Option<Uid>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub preset: Option<Uid>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub playlist: Option<OutputPlaylist>,
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub credit: Option<Credit>,
-        #[serde(default)]
         pub edited: bool,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub screen: Option<Screen>,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub mm: Option<[f64; 4]>,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub follows: Option<String>,
-        #[serde(default)]
         pub parallax: bool,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub still: Option<crate::travel::Still>,
-        #[serde(default)]
         pub frames: u64,
-        #[serde(default)]
         pub page_frames: u64,
-        #[serde(default)]
         pub refresh: u32,
-        #[serde(default)]
         pub fps: u32,
-        #[serde(default)]
         pub buffers: String,
-        #[serde(default)]
         pub sound: String,
-        #[serde(default)]
         pub shown_fit: Fit,
-        #[serde(default)]
         pub flashes: String,
-        #[serde(default)]
         pub left_out: Vec<String>,
-        #[serde(default)]
         pub page_errors: Vec<String>,
-        #[serde(default)]
         pub blank: bool,
-        #[serde(default)]
         pub previous: bool,
-        #[serde(default)]
         pub released: bool,
-        #[serde(default)]
         pub particles: String,
-        #[serde(default)]
         pub quality: String,
-        #[serde(default)]
         pub quality_reason: String,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub quality_choice: Option<String>,
-        #[serde(default)]
         pub quality_cost: f64,
-        #[serde(default)]
         pub quality_budget: f64,
-        #[serde(default)]
         pub quality_auto: String,
         #[serde(flatten)]
         pub quality_timing: QualityTiming,
-        #[serde(default)]
         pub decode: String,
-        #[serde(default)]
         pub drafted: bool,
-        #[serde(default)]
         pub sandbox: String,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub helper: Option<u32>,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub accent: Option<String>,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub tones: Option<super::Tones>,
-        #[serde(default)]
+        #[serde(deserialize_with = "crate::explicit::null")]
         pub filter: Option<Filter>,
-        #[serde(default)]
         pub hdr: HdrState,
-        #[serde(default)]
         pub transition: TransitionState,
     }
 
@@ -158,12 +128,10 @@ model! {
 
 #[derive(Debug, Clone, Default, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct QualityTiming {
-    #[serde(default)]
+    #[serde(deserialize_with = "crate::explicit::null")]
     pub quality_frame_ms: Option<f64>,
-    #[serde(default)]
+    #[serde(deserialize_with = "crate::explicit::null")]
     pub quality_period_ms: Option<f64>,
-    #[serde(default)]
     pub quality_step: String,
-    #[serde(default)]
     pub quality_pace: u32,
 }

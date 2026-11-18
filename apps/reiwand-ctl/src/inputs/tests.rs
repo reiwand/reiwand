@@ -17,12 +17,18 @@ fn a_position_without_a_comma_or_with_a_number_that_does_not_parse_is_refused() 
 
 #[test]
 fn applying_a_scene_asks_only_for_that_scene_even_when_another_screen_waits_for_its_own() {
-    let reply: reiwand_core::model::InputsReply = serde_json::from_value(serde_json::json!({
+    use crate::fixture::inputs;
+    use serde_json::{json, to_value};
+    let pulse =
+        to_value(inputs(json!({"scene": "org.example.pulse", "audio": true, "title": "Pulse"}))).unwrap();
+    let lights =
+        to_value(inputs(json!({"scene": "org.example.lights", "pointer": true, "title": "Lights"}))).unwrap();
+    let reply: reiwand_core::model::InputsReply = serde_json::from_value(json!({
         "model": 1, "serial": 1, "capturing": false, "tracking": false, "grants": {},
-        "shown": {
-            "DP-1": {"scene": "org.example.pulse", "audio": true, "pointer": false, "title": "Pulse"},
-            "DP-2": {"scene": "org.example.lights", "audio": false, "pointer": true, "title": "Lights"}
-        }
+        "shown": {"DP-1": pulse, "DP-2": lights}, "parallax": [], "declined": {}, "asking": {}, "quiet": {},
+        "clicks": [], "clicking": [], "unreached": [], "gates": {},
+        "media": {"listening": false, "players": 0, "playing": false, "track": false, "cover": false,
+            "remote_covers": false, "using": []}
     }))
     .unwrap();
     let every = |_: &String| true;
