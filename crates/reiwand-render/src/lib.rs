@@ -44,15 +44,15 @@ mod platform;
 mod pq;
 mod readback;
 mod save;
-#[cfg(test)]
-#[path = "../tests/whole.rs"]
-mod whole;
 mod scene;
 mod shader;
 mod stack;
 mod surface;
 mod texture;
 mod timeout;
+#[cfg(test)]
+#[path = "../tests/whole.rs"]
+mod whole;
 mod yuv;
 
 pub use animation::{MAX_ANIMATION, Pictures, animation};

@@ -20,7 +20,7 @@ fn option_values_outside_the_built_variants_never_build_on_the_render_thread() {
         "effects": { "vv": { "descriptor": "fx/vv.json", "wgsl": "fx/vv.wgsl" } } });
     let mut scene = Scene::from_json(&crate::gpu::whole(&text.to_string())).unwrap();
     let props: BTreeMap<String, Property> = serde_json::from_value(json!({
-        "p": { "type": "slider", "min": 0, "max": 1, "step": 1, "integer": true, "default": 0 } }))
+        "p": { "type": "slider", "min": 0, "max": 1, "step": 1, "integer": true, "default": 0, "unit": null, "decimals": null, "editable": true, "log": false, "label": null, "help": null, "group": null, "visible_if": {}, "enabled_if": {}, "order": 0, "icon": null, "quality": {} } }))
     .unwrap();
     let files = |path: &str, _: usize| {
         Ok::<_, &str>(if path.ends_with(".json") { json.to_string() } else { wgsl.to_string() }.into_bytes())

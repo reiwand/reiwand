@@ -7,7 +7,7 @@ use image::{Rgba, RgbaImage};
 use reiwand_scene::{Budget, Quality, Runtime, Scene, Spare, Tier, Values};
 use std::sync::Arc;
 
-pub(crate) const SCENE: &str = r##"{ "schema": "reiwand.scene/1",
+pub(crate) const SCENE: &str = r##"{ "schema": "reiwand.scene/2",
   "canvas": { "size": [320, 180], "background": "#102030" },
   "assets": { "photo": { "path": "p.png", "mipmaps": true, "wrap": "repeat" },
               "sheet": { "path": "s.png", "atlas": [1, 4], "fps": 8 } },
@@ -29,7 +29,7 @@ pub(crate) const SCENE: &str = r##"{ "schema": "reiwand.scene/1",
     { "blend_space": "canvas", "id": "post", "type": "adjustment", "effects": [{ "effect": "vignette", "params": { "intensity": 0.4 } }] }
   ] }"##;
 
-const OWN: &str = r##"{ "schema": "reiwand.scene/1",
+const OWN: &str = r##"{ "schema": "reiwand.scene/2",
   "canvas": { "size": [320, 180], "background": "#102030" },
   "effects": { "smear": { "descriptor": "fx/smear.json", "wgsl": "fx/smear.wgsl" } },
   "layers": [

@@ -105,7 +105,8 @@ fn ktx2_pictures_are_read_like_other_pictures() {
     let reader = image::ImageReader::new(std::io::Cursor::new(bytes.clone()));
     assert!(reiwand_render::decode_limited(reader, tight).is_err());
     let mut assets = SceneAssets::default();
-    let asset: reiwand_scene::Asset = serde_json::from_value(reiwand_scene::prefill::of("Asset", json!({ "path": "p.ktx2" }))).unwrap();
+    let asset: reiwand_scene::Asset =
+        serde_json::from_value(reiwand_scene::prefill::of("Asset", json!({ "path": "p.ktx2" }))).unwrap();
     let mut pictures = reiwand_render::Pictures::default();
     let total = pictures
         .add::<image::ImageError>((&mut assets, "p", &asset), || Ok(bytes), |_, _| unreachable!())
@@ -113,7 +114,8 @@ fn ktx2_pictures_are_read_like_other_pictures() {
     assert_eq!(total, 64 * 32 * 4);
     assert!(assets.images["p"].packed().is_some() && !assets.images["p"].resident());
     assert_eq!(assets.images["p"].image().unwrap().dimensions(), (64, 32));
-    let other: reiwand_scene::Asset = serde_json::from_value(reiwand_scene::prefill::of("Asset", json!({ "path": "q.ktx2" }))).unwrap();
+    let other: reiwand_scene::Asset =
+        serde_json::from_value(reiwand_scene::prefill::of("Asset", json!({ "path": "q.ktx2" }))).unwrap();
     let read = || Ok(reiwand_ktx2::MAGIC.to_vec());
     let broken = pictures.add::<image::ImageError>((&mut assets, "q", &other), read, |_, _| unreachable!());
     assert!(broken.is_err());

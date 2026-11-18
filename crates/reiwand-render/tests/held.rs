@@ -11,7 +11,8 @@ use crate::gpu::renderer;
 fn open(r: &Renderer, systems: Value, layers: Value, gpu: bool) -> Option<(Runtime, SceneView)> {
     let canvas = json!({ "size": [SIZE.0, SIZE.1], "background": "#000000" });
     let text = json!({ "schema": SCHEMA, "canvas": canvas, "layers": layers, "particles": systems });
-    let scene = Scene::load(&crate::gpu::whole(&text.to_string()), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"));
+    let scene = Scene::load(&crate::gpu::whole(&text.to_string()), &BTreeMap::new())
+        .unwrap_or_else(|e| panic!("{e}"));
     let mut view = r.scene_view(&scene, &SceneAssets::default(), &Values::new()).unwrap();
     view.set_gpu_particles(r, gpu).then(|| (Runtime::new(Arc::new(scene), Values::new()), view))
 }

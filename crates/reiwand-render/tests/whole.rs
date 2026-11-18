@@ -13,10 +13,14 @@ fn settle(value: &mut Value) {
         Value::Array(items) => items.iter_mut().for_each(settle),
         Value::Object(map) => {
             if let (Some(Value::String(kind)), true) = (map.get("type").cloned(), map.contains_key("id")) {
-                let table: Value = serde_json::from_str(include_str!("../../reiwand-scene/src/prefill.json")).unwrap();
-                let nulls: Vec<String> = map.iter().filter(|(_, v)| v.is_null()).map(|(k, _)| k.clone()).collect();
+                let table: Value =
+                    serde_json::from_str(include_str!("../../reiwand-scene/src/prefill.json")).unwrap();
+                let nulls: Vec<String> =
+                    map.iter().filter(|(_, v)| v.is_null()).map(|(k, _)| k.clone()).collect();
                 for key in nulls {
-                    let row = table.get(format!("Layer[{kind}].{key}")).or_else(|| table.get(format!("Layer.{key}")));
+                    let row = table
+                        .get(format!("Layer[{kind}].{key}"))
+                        .or_else(|| table.get(format!("Layer.{key}")));
                     if let Some(value) = row.filter(|v| !v.is_null()) {
                         map.insert(key, value.clone());
                     }

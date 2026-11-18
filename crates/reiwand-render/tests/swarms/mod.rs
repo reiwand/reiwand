@@ -47,7 +47,8 @@ impl Run {
     ) -> Option<Run> {
         let canvas = json!({ "size": [SIZE.0, SIZE.1], "background": "#000000" });
         let text = json!({ "schema": SCHEMA, "canvas": canvas, "layers": layers, "particles": systems, "assets": assets });
-        let scene = Scene::load(&crate::gpu::whole(&text.to_string()), &BTreeMap::new()).unwrap_or_else(|e| panic!("{e}"));
+        let scene = Scene::load(&crate::gpu::whole(&text.to_string()), &BTreeMap::new())
+            .unwrap_or_else(|e| panic!("{e}"));
         let images = images.into_iter().map(|(id, p)| (id.to_string(), p)).collect();
         let mut view =
             r.scene_view(&scene, &SceneAssets { images, ..Default::default() }, &Values::new()).unwrap();
