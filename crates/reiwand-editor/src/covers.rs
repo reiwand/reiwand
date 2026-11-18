@@ -78,12 +78,16 @@ fn edited(doc: &Value, wanted: &AssetEdit) -> Result<Vec<Op>> {
             return Err(anyhow!(said("editor.cover_kind", "%1 is not current, previous or none", &[&other])));
         }
     }
-    if !asset["media"].is_null() {
+    if asset.get("media").is_some_and(|m| !m.is_null()) {
         let a = asset.as_object_mut().into_iter().flatten();
         let moving = ["frames", "fps", "durations", "rects", "atlas", "animated"];
+        let active = |v: &Value| match v {
+            Value::Null | Value::Bool(false) => false,
+            Value::Array(list) => !list.is_empty(),
+            _ => true,
+        };
         ensure!(
-            !a.into_iter().any(|(k, v)| moving.contains(&k.as_str())
-                && !(v.is_null() || v == false || v.as_array().is_some_and(Vec::is_empty))),
+            !a.into_iter().any(|(k, v)| moving.contains(&k.as_str()) && active(v)),
             said("editor.cover_still", "%1 is animated, and a cover is a still picture", &[id])
         );
     }

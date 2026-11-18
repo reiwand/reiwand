@@ -27,7 +27,7 @@ pub fn staged(look: &Value) -> Option<Value> {
 
 pub fn preview(scene: &mut Value, look: &Value) {
     if look["bloom"] == false {
-        scene["canvas"].as_object_mut().into_iter().for_each(|c| drop(c.remove("bloom")));
+        scene["canvas"].as_object_mut().into_iter().for_each(|c| drop(c.insert("bloom".into(), Value::Null)));
     }
     crate::lamps::preview(scene);
     crate::stage3d::preview(scene);

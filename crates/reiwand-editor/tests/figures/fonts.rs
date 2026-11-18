@@ -35,7 +35,7 @@ fn the_font_and_its_fallback_list_are_set_and_cleared() {
     assert!(act(&mut p, json!({"layer": {"figure": {"fonts": {"layer": "t", "fallback": many}}}})).is_err());
     act(&mut p, json!({"layer": {"figure": {"fonts": {"layer": "t", "font": "", "fallback": []}}}})).unwrap();
     assert_eq!(at(&p, "/scene/layers/0/font"), Value::Null);
-    assert_eq!(at(&p, "/scene/layers/0/fallback"), Value::Null);
+    assert_eq!(at(&p, "/scene/layers/0/fallback"), json!([]));
     let shape =
         json!({ "blend_space": "canvas", "id": "s", "type": "shape", "shape": {"rect": {"size": [10, 10]}}});
     let mut q = scene(&root, json!([shape]));

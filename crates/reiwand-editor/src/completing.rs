@@ -93,7 +93,10 @@ fn blank(doc: &Value, path: &str) -> Option<Op> {
         resolved["oneOf"].as_array().into_iter().flatten().find(|v| crate::schema::fits(root, v, shown));
     let listed_in = |s: &Value| s["required"].as_array().is_some_and(|r| r.iter().any(|r| r == key));
     let required = listed_in(resolved) || variant.is_some_and(listed_in);
-    required.then(|| Op::Replace { path: path.to_owned(), value: sample(root, &prop) })
+    let nullable =
+        prop["x-null"] == true || branches(&prop).iter().any(|b| deref(root, b).0["type"] == "null");
+    let value = if nullable { Value::Null } else { sample(root, &prop) };
+    required.then(|| Op::Replace { path: path.to_owned(), value })
 }
 
 pub fn ops(doc: &Value) -> Vec<Op> {

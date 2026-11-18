@@ -10,7 +10,7 @@ fn an_effect_starts_the_stack_of_a_layer_that_has_none() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
     let path = reiwand_editor::layers::find(&p.doc, "card").unwrap();
-    assert_eq!(at(&p, &format!("{path}/effects")), serde_json::Value::Null);
+    assert_eq!(at(&p, &format!("{path}/effects")), json!([]));
     let add =
         json!({"add": {"layer": "card", "effect": "vignette", "params": {"intensity": 0.4}, "name": "edge"}});
     act(&mut p, effects(add)).unwrap();
@@ -23,7 +23,7 @@ fn an_effect_starts_the_stack_of_a_layer_that_has_none() {
     assert_eq!(stack[1]["params"].as_object().unwrap().len(), 6, "every parameter is written");
     act(&mut p, json!({"undo": {}})).unwrap();
     act(&mut p, json!({"undo": {}})).unwrap();
-    assert_eq!(at(&p, &format!("{path}/effects")), serde_json::Value::Null);
+    assert_eq!(at(&p, &format!("{path}/effects")), json!([]));
 }
 
 #[test]
@@ -84,15 +84,15 @@ fn a_mask_limits_an_effect_to_a_shape_a_layer_or_a_picture() {
     let mask = json!({"mask": {"layer": "card", "index": 0, "shape": shape, "feather": 12, "invert": true}});
     act(&mut p, effects(mask)).unwrap();
     let pointer = format!("{path}/effects/0/mask");
-    assert_eq!(at(&p, &pointer), json!({"shape": shape, "feather": 12.0, "invert": true}));
+    crate::whole::holds(&at(&p, &pointer), json!({"shape": shape, "feather": 12.0, "invert": true}));
     act(
         &mut p,
         effects(json!({"mask": {"layer": "card", "index": 0, "from": "hole", "channel": "luminance"}})),
     )
     .unwrap();
-    assert_eq!(
-        at(&p, &pointer),
-        json!({"layer": "hole", "feather": 12.0, "invert": true, "channel": "luminance"})
+    crate::whole::holds(
+        &at(&p, &pointer),
+        json!({"layer": "hole", "feather": 12.0, "invert": true, "channel": "luminance"}),
     );
     let selfish = json!({"mask": {"layer": "card", "index": 0, "from": "card"}});
     refused(&mut p, effects(selfish));

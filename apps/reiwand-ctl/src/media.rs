@@ -137,6 +137,6 @@ mod tests {
         assert!(with["scene"]["canvas"]["bloom"].is_object());
         let without =
             preview_document(dir, &doc, None, false, None, [false, false, true], (None, None)).unwrap();
-        assert!(without["scene"]["canvas"].get("bloom").is_none());
+        assert!(without["scene"]["canvas"]["bloom"].is_null());
     }
 }

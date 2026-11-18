@@ -30,7 +30,8 @@ fn particles_take_light_with_a_normal_map_and_undo() {
     assert!(act(&mut p, json!({ "particles": { "lit": { "system": "nothing", "lit": true } } })).is_err());
     act(&mut p, json!({ "particles": { "lit": { "system": "flakes", "layer": "flakes", "lit": false } } }))
         .unwrap();
-    assert_eq!(layer(&p, "flakes")["render"].get("lit"), None, "the layer keeps its own look");
+    assert_eq!(layer(&p, "flakes")["render"]["lit"], false, "the layer takes its own look");
+    assert_eq!(render(&p)["lit"], true, "the system keeps its look");
     act(&mut p, json!({ "particles": { "lit": { "system": "flakes", "lit": false } } })).unwrap();
     assert!(crate::whole::unset(&render(&p)["lit"]));
 }

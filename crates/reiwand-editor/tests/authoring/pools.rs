@@ -29,9 +29,9 @@ fn pools_are_added_changed_listed_drawn_and_removed() {
         refused(&mut p, bad);
     }
     act(&mut p, json!({"add_layer": {"kind": "shapes", "id": "drawn"}})).unwrap();
-    assert_eq!(
-        at(&p, "/scene/layers/1"),
-        json!({ "blend_space": "canvas", "id": "drawn", "type": "video", "video": "bars"})
+    crate::whole::holds(
+        &at(&p, "/scene/layers/1"),
+        json!({ "blend_space": "canvas", "id": "drawn", "type": "video", "video": "bars"}),
     );
     let rows = query(&root.path().join("glow"), &p.doc, "", &json!({"pools": {}}));
     assert_eq!(rows["pools"][0]["layers"], json!(["drawn"]));
@@ -39,7 +39,7 @@ fn pools_are_added_changed_listed_drawn_and_removed() {
     assert!(refused(&mut p, json!({"pool": {"id": "bars", "remove": true}})).contains("drawn by drawn"));
     act(&mut p, json!({"remove_layer": {"id": "drawn"}})).unwrap();
     act(&mut p, json!({"pool": {"id": "bars", "remove": true}})).unwrap();
-    assert_eq!(at(&p, "/scene/pools"), serde_json::Value::Null);
+    assert_eq!(at(&p, "/scene/pools"), json!({}));
 }
 
 #[test]

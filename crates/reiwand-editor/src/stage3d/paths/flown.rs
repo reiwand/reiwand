@@ -13,7 +13,7 @@ pub fn paths(dir: &Path, doc: &Value, t: f64) -> Value {
     let cam: Camera3d = scene.camera3d.clone().unwrap_or_default();
     let mut raw = doc.clone();
     if let Some(c) = raw.pointer_mut("/scene/camera3d").and_then(Value::as_object_mut) {
-        c.insert("paths".into(), serde_json::json!([]));
+        c.insert("paths".into(), json!([]));
     }
     let Some(still) = super::super::store::scene(dir, &raw) else { return Value::Null };
     let rt = Runtime::new(Arc::new(still), Values::new());

@@ -62,7 +62,7 @@ fn the_box_counts_the_outline_the_padding_and_the_wrap() {
         return;
     }
     let root = tempfile::tempdir().unwrap();
-    let extra = json!({"wrap": {"width": 300, "lines": 2}, "padding": 8, "outline": {"width": 3},
+    let extra = json!({"wrap": {"width": 300, "lines": 2}, "padding": 8, "outline": {"color": "#000000", "width": 3},
         "line_height": 1.5, "letter_spacing": 2});
     let p = scene(&root, json!([label("one two three four five six seven", extra)]));
     let layout = Layout {

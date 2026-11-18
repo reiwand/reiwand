@@ -841,7 +841,7 @@ Guarda el código WGSL, el descriptor, o los dos. Cada archivo debe ser válido:
 ```sh
 reiwand-ctl scene act mi-escena shader '{"new":{"name":"tinte"}}'
 reiwand-ctl scene act mi-escena shader '{"write":{"effect":"tinte","wgsl":"fn color_tinte(color: vec4<f32>, uv: vec2<f32>) -> vec4<f32> {\n    return color;\n}\n"}}'
-reiwand-ctl scene act mi-escena shader '{"write":{"effect":"tinte","descriptor":{"id":"tinte","category":"color","fuse":"color","cost":{"taps":1,"passes":1,"scale":1},"params":[{"id":"amount","type":"float","default":1,"min":0,"max":1}]}}}'
+reiwand-ctl scene act mi-escena shader '{"write":{"effect":"tinte","descriptor":{"id":"tinte","category":"color","fuse":"color","cost":{"taps":1,"passes":1,"scale":1},"params":[{"id":"amount","type":"float","prefill":1,"min":0,"max":1}]}}}'
 ```
 
 ##### variante `param`
@@ -860,7 +860,7 @@ Crea, cambia, renombra, mueve o quita un ajuste del efecto. Si no existe, lo cre
 
 ```sh
 reiwand-ctl scene act mi-escena shader '{"new":{"name":"tinte"}}'
-reiwand-ctl scene act mi-escena shader '{"param":{"effect":"tinte","id":"fuerza","set":{"type":"float","default":0.5,"min":0,"max":2,"label":{"en":"Strength"}}}}'
+reiwand-ctl scene act mi-escena shader '{"param":{"effect":"tinte","id":"fuerza","set":{"type":"float","prefill":0.5,"min":0,"max":2,"label":{"en":"Strength"}}}}'
 reiwand-ctl scene act mi-escena shader '{"param":{"effect":"tinte","id":"fuerza","to":"energia","at":0}}'
 reiwand-ctl scene act mi-escena shader '{"param":{"effect":"tinte","id":"energia","clear":["label"]}}'
 reiwand-ctl scene act mi-escena shader '{"param":{"effect":"tinte","id":"energia","remove":true}}'

@@ -1,4 +1,5 @@
 mod form;
+mod pass_form;
 mod starters;
 mod trial;
 mod whole;
@@ -128,7 +129,12 @@ pub(crate) fn act(dir: &Path, doc: &Value, e: &E) -> Result<Vec<Op>> {
             ops.extend(crate::scripts::save(dir, doc, &wgsl, code)?);
         }
         if let Some(given) = given {
-            ops.extend(crate::scripts::save(dir, doc, &descriptor, &valid(effect, given)?)?);
+            ops.extend(crate::scripts::save(
+                dir,
+                doc,
+                &descriptor,
+                &valid(effect, &starters::completed(given.clone()))?,
+            )?);
         }
         return Ok(ops);
     }
@@ -145,13 +151,13 @@ pub(crate) fn act(dir: &Path, doc: &Value, e: &E) -> Result<Vec<Op>> {
         }
         E::Pass { index, set, clear, remove, lighter, .. } => {
             let (index, remove, lighter) = (*index, *remove, *lighter);
-            form::pass(&mut json, &form::PassChange { index, set, clear, remove, lighter })?;
+            pass_form::pass(&mut json, &pass_form::PassChange { index, set, clear, remove, lighter })?;
         }
-        E::Lighter { set, remove, .. } if form::lighter(&mut json, set, *remove)? => {
+        E::Lighter { set, remove, .. } if pass_form::lighter(&mut json, set, *remove)? => {
             more = starters::lighter(dir, doc, effect, &wgsl)?;
         }
         E::Lighter { .. } => {}
-        E::Field { field, value, .. } => form::field(&mut json, field, value)?,
+        E::Field { field, value, .. } => pass_form::field(&mut json, field, value)?,
         _ => {}
     }
     let mut ops = crate::scripts::save(dir, doc, &descriptor, &valid(effect, &json)?)?;

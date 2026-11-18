@@ -112,7 +112,7 @@ pub fn move_property(doc: &Value, id: &str, to: usize, group: Option<&str>) -> R
     let moved = list.iter().enumerate().filter(|(i, s)| doc.pointer(&order(s)) != Some(&json!(i + 1)));
     let mut ops: Vec<Op> = moved.flat_map(|(i, s)| set(doc, &order(s), json!(i + 1))).collect();
     let at = format!("{}/group", path(id));
-    match (group, prop.get("group")) {
+    match (group, prop.get("group").filter(|g| !g.is_null())) {
         (Some(g), now) if now != Some(&json!(g)) => ops.extend(set(doc, &at, json!(g))),
         (None, Some(now)) if !now.is_null() => ops.extend(set(doc, &at, Value::Null)),
         _ => {}

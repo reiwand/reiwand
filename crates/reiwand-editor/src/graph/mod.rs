@@ -152,7 +152,7 @@ fn moved(doc: &Value, pick: &KeyPick, e: &KeysEdit, mids: &[f64]) -> Result<Vec<
 
 fn fits(doc: &Value, picks: &[KeyPick], ops: &[Op]) -> Result<()> {
     let mut staged = doc.clone();
-    crate::ops::apply(&mut staged, ops)?;
+    crate::ops::apply(&mut staged, &crate::completing::complete_all(doc, ops.to_vec()))?;
     if crate::keys::reads(&staged) || !crate::keys::reads(doc) {
         return Ok(());
     }

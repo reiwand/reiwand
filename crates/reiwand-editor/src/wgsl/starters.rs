@@ -33,6 +33,28 @@ fn float(id: &str, default: f64, range: [f64; 2]) -> Value {
     param(id, "float", json!(default), [json!(range[0]), json!(range[1])], Value::Null)
 }
 
+pub(super) fn completed(mut descriptor: Value) -> Value {
+    let blank = plain("", "float", Value::Null);
+    if let Some(d) = descriptor.as_object_mut() {
+        for (key, value) in whole() {
+            d.entry(key).or_insert(value);
+        }
+    }
+    let params = descriptor["params"].as_array_mut().into_iter().flatten();
+    for param in params.filter_map(Value::as_object_mut) {
+        for (key, value) in blank.as_object().into_iter().flatten() {
+            param.entry(key.clone()).or_insert(value.clone());
+        }
+    }
+    let passes = descriptor["passes"].as_array_mut().into_iter().flatten();
+    for item in passes.filter_map(Value::as_object_mut) {
+        for (key, value) in pass("", 1.0, json!(["previous"])).as_object().into_iter().flatten() {
+            item.entry(key.clone()).or_insert(value.clone());
+        }
+    }
+    descriptor
+}
+
 pub fn starter(name: &str, template: &str) -> Option<(Value, String)> {
     let (descriptor, wgsl) = match template {
         "color" => (

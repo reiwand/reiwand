@@ -19,7 +19,7 @@ fn swarms(doc: &Value) -> (Systems, Systems) {
             &systems.get(id).unwrap_or(&Value::Null)["render"]
         };
         let n = systems.get(id).and_then(|s| s["capacity"].as_f64()).unwrap_or(0.0);
-        if r["lit"] == true || l.get("lighting").is_some() {
+        if r["lit"] == true || l["lighting"].is_object() {
             lit.push((id.to_owned(), n));
         }
         if r["refract"].is_object() {
@@ -34,7 +34,7 @@ pub fn cost(dir: &Path, doc: &Value, t: f64, quality: Quality) -> Value {
     let lights = all.len().min(MAX_LIGHTS);
     let lit: Vec<_> = crate::canvas::gizmos(dir, doc, t)
         .into_iter()
-        .filter(|g| doc.pointer(&g.pointer).is_some_and(|l| l.get("lighting").is_some()))
+        .filter(|g| doc.pointer(&g.pointer).is_some_and(|l| l["lighting"].is_object()))
         .collect();
     let pixels: f64 = lit.iter().map(|g| (g.size[0] * g.scale[0] * g.size[1] * g.scale[1]).abs()).sum();
     let layers = crate::layers::walk(doc);

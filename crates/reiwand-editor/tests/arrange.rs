@@ -73,7 +73,7 @@ fn problems_of_nested_layers_point_at_them() {
     let mut doc = clock();
     act(&mut doc, json!({"group": {"ids": ["time", "seconds"], "id": "g1"}})).unwrap();
     act(&mut doc, json!({"set": {"pointer": "/scene/layers/1/layers/1/id", "value": "Bad Id"}})).unwrap();
-    let found = check(&doc);
+    let found: Vec<_> = check(&doc).into_iter().filter(|p| !p.warning).collect();
     assert_eq!(found.len(), 1);
     assert_eq!(found[0].pointer, "/scene/layers/1/layers/1/id");
     assert!(doc.pointer(&found[0].pointer).is_some());

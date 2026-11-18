@@ -79,12 +79,15 @@ fn fresh(dir: &Path, doc: &Value, e: &TransitionEdit) -> Result<Value> {
         (None, None) => starter::write(dir)?,
     };
     let wgsl = wgsl_of(&descriptor);
-    Ok(json!({ "descriptor": descriptor, "wgsl": wgsl, "duration_ms": 1200, "curve": "out_cubic", "params": {} }))
+    Ok(
+        json!({ "descriptor": descriptor, "wgsl": wgsl, "duration_ms": 1200, "curve": "out_cubic", "params": {} }),
+    )
 }
 
 pub fn readied(dir: &Path, way: Way, value: &Value) -> Result<Readied> {
-    let mut doc = json!({ "scene": {
-        "schema": SCHEMA, "canvas": { "size": [16, 16] }, "transition": { way.key(): value } } });
+    let mut doc = json!({
+        "scene": { "schema": SCHEMA, "canvas": { "size": [16, 16] }, "transition": { way.key(): value } }
+    });
     crate::completing::scene_doc(&mut doc);
     let mut scene = Scene::load(&doc["scene"].to_string(), &Default::default())
         .map_err(|e| anyhow!(said("editor.transition_rule", "the transition breaks a rule: %1", &[&e])))?;

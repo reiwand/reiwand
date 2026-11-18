@@ -32,6 +32,12 @@ fn point(h: &Held, p: V3, other: V3, up: V3) -> Result<V3> {
 }
 
 pub(super) fn camera(doc: &Value, h: &Held) -> Result<Vec<Op>> {
+    if !doc["scene"]["camera3d"].is_object() {
+        let base = crate::ops::set(doc, "/scene/camera3d", super::super::camera::full(&h.cam));
+        let mut staged = doc.clone();
+        crate::ops::apply(&mut staged, &base)?;
+        return Ok(base.into_iter().chain(camera(&staged, h)?).collect());
+    }
     let raw = &doc["scene"]["camera3d"];
     let cam = h.cam;
     let (eye, center) = (three(&raw["eye"]).unwrap_or(cam.at), three(&raw["center"]).unwrap_or(cam.center));

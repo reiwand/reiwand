@@ -134,7 +134,7 @@ fn plan(doc: &Value, gone: &[String], inside: &str) -> Result<(Vec<Op>, Vec<Stri
     let mut ops: Vec<Op> = Vec::new();
     let mut staged = doc.clone();
     for r in &found {
-        let more = cleared(&staged, r);
+        let more = crate::completing::complete_all(&staged, cleared(&staged, r));
         apply(&mut staged, &more)?;
         ops.extend(more);
     }
@@ -147,6 +147,7 @@ fn plan(doc: &Value, gone: &[String], inside: &str) -> Result<(Vec<Op>, Vec<Stri
             None => lost.push(id.to_owned()),
         }
     }
+    let keep = crate::completing::complete_all(&staged, keep);
     apply(&mut staged, &keep)?;
     ops.extend(keep);
     Ok((ops, lost))
