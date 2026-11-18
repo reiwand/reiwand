@@ -2,7 +2,7 @@ use crate::{Error, said, store};
 use image::RgbaImage;
 use reiwand_format::{Kind, Package};
 use reiwand_render::{Pictures, SceneAssets};
-use reiwand_scene::{Preset, Property, SCHEMA, Scene};
+use reiwand_scene::{Preset, Property, Scene};
 use std::collections::BTreeMap;
 use std::fs;
 use std::io::BufReader;
