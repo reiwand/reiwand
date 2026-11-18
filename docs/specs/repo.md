@@ -8,10 +8,10 @@ generation and signing behind the `sign` feature).
 
 ## Keys and roles
 
-| Role | Signs | Threshold | Default lifetime |
+| Role | Signs | Threshold | Prefilled lifetime |
 |------|-------|-----------|------------------|
 | `root` | `root/<N>.json` | t of n, 1 to 8 keys | 365 days (30 to 1096) |
-| `online` | `entry/<N>.json` | 1 | 7 days, at most `policy.entry_max_days` (1 to 90, default 14) |
+| `online` | `entry/<N>.json` | 1 | 7 days, at most `policy.entry_max_days` (1 to 90, prefilled 14) |
 | author | `manifest.json` inside a package | 1 | no expiry; revoked through `revoked` |
 | online author | the same, listed in `authors/<sha256>.json` instead of the root | 1 | the same |
 
@@ -74,7 +74,10 @@ Mirrors copy immutable files first and `entry/latest` last.
 
 ## Formats
 
-All metadata is compact JSON with fixed field order; unknown fields are rejected, except in
+All metadata is compact JSON with fixed field order; every field is written and a file that lacks one is
+refused naming it (the unused optional blocks `mirrors` of a root, `authors` and `featured` of an entry and the
+release blocks `preview`, `animated`, `content` and `requires` may be absent, or `null`, and a block that
+is present carries all its fields); unknown fields are rejected, except in
 the releases of the shards, whose readers ignore fields and
 values they do not know (also inside `content` and `requires`; an unknown rating counts as
 `mature`). Times are RFC 3339 UTC (`2027-01-15T08:00:00Z`).
@@ -90,8 +93,8 @@ values they do not know (also inside `content` and `requires`; an unknown rating
 | `keys` | map of fingerprint to `{"minisign": "<base64 public key>"}`; fingerprints must match |
 | `roles` | `{"root": {keys, threshold}, "online": {keys, threshold}}` |
 | `authors` | `[{"id": "[a-z][a-z0-9_-]{0,31}", "keys": [fingerprint…]}]`, unique ids |
-| `policy` | `{require_author_signature, max_package_size, entry_max_days}` and, only when it is not the default `root`, `authors: "online"`; roots without it keep their bytes, and versions of Reiwand before online authors refuse roots that set it |
-| `mirrors` | at most 16 `https://` or `file://` base URLs; `file://` mirrors are used only by clients that added the repository itself from a `file://` URL or a folder, and skipped for repositories fetched over the network |
+| `policy` | `{require_author_signature, max_package_size, entry_max_days}` and `authors` (`null` when the root signs the authors, `"online"` when the online key does) |
+| `mirrors` | a block, absent or `null` without mirrors: at most 16 `https://` or `file://` base URLs; `file://` mirrors are used only by clients that added the repository itself from a `file://` URL or a folder, and skipped for repositories fetched over the network |
 
 `entry/<N>.json` (at most 128 KiB): `format` (`wpak-repo-entry/2.0`), `repo_id`, `version`
 (= `N`), `timestamp`, `expires` (`0 < expires - timestamp ≤ entry_max_days`), `root`
@@ -134,7 +137,7 @@ revoked), adds `.wpak` files with *Add unlisted* as `repo add --unlisted` does, 
 again a package or one version and features (with an optional note) or unfeatures a package, each
 after a confirmation that says what the CLI says, through the same `reiwand_format` functions. *Publish…*
 takes a secret key file of an online key, its password when it has one, and the days until the index
-expires (7 by default), and calls `publish` as `reiwand-ctl repo publish` does. The same tab revokes a
+expires (prefilled 7), and calls `publish` as `reiwand-ctl repo publish` does. The same tab revokes a
 package or one version with a reason and a message (`stall::revoked`, as `repo revoke`), withdraws a
 revocation (`stall::unrevoked`, as `repo unrevoke DIR ID [--version V]`, which `unrevoke` the whole
 package without a version) and, from *Author keys…*, revokes an author key by its fingerprint
@@ -155,7 +158,7 @@ previews, installs them checked against that index (see *Package installation*) 
 updates.
 
 `featured/<sha256>.json` (optional): `format` (`wpak-repo-featured/2.0`), `repo_id` and `items`: at
-most 64 `{id, note?}`, ids of packages of the repository, each once, with a note of at most 200
+most 64 `{id, note}` (`note` is `null` without one), ids of packages of the repository, each once, with a note of at most 200
 characters on one line without `<` or `>`. The entry cites it as `featured` (`{sha256, size}`), so the
 online signature covers it.
 Clients mark these packages as featured when browsing and list them first. Nothing in a manifest can
@@ -305,12 +308,12 @@ be rolled back either. When no address is left, `add_repo` with its URL repairs 
 <data>/installed.json                         origin, hash, signer and revocation of each package
 <data>/anchors.json                           first signing key of each package of an online author
 <data>/.repos.lock                            flock serializing writers
-<data>/format-version                         number of the stored format (2)
+<data>/format-version                         number of the stored format (3)
 ```
 
 The client knows only the current format. A data folder without `format-version` that already holds
 repositories, or with another number, is refused with a message that names `reiwand-upgrade client
---data <data>`; an empty folder is marked as current. See *Upgrading from 1.x* below.
+--data <data>`; an empty folder is marked as current. See *Upgrading the data* below. Data of 6.x is converted by the same command; stored repository files of the older format are refused naming it.
 
 Files are written to a temporary file in the same directory, synced and renamed. Files are
 `0600` and directories `0700`. Nothing is stored before it is verified. Committing a snapshot,
