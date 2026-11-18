@@ -18,6 +18,13 @@ fn param(id: &str, kind: &str, prefill: Value, range: [Value; 2], unit: Value) -
         "yields_to": null, "waits_for": null, "tool": null })
 }
 
+fn pass(entry: &str, scale: f64, inputs: Value) -> Value {
+    let mut made = super::whole::pass(entry.to_owned());
+    made["scale"] = json!(scale);
+    made["inputs"] = inputs;
+    made
+}
+
 fn plain(id: &str, kind: &str, prefill: Value) -> Value {
     param(id, kind, prefill, [Value::Null, Value::Null], Value::Null)
 }
@@ -43,8 +50,8 @@ pub fn starter(name: &str, template: &str) -> Option<(Value, String)> {
             json!({ "category": "blur", "cost": { "taps": 9, "passes": 2, "scale": 1 },
                 "params": [float("length", 8.0, [0.0, 64.0]),
                     param("angle", "float", json!(0), [json!(-180), json!(180)], json!("degrees"))],
-                "passes": [{ "entry": "fs_NAME_soft", "scale": 0.5 },
-                    { "entry": "fs_NAME", "inputs": ["pass:0", "input"] }] }),
+                "passes": [pass("fs_NAME_soft", 0.5, json!(["previous"])),
+                    pass("fs_NAME", 1.0, json!(["pass:0", "input"]))] }),
             PASSES,
         ),
         "material" => (

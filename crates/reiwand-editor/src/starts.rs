@@ -52,7 +52,7 @@ fn clock(
     };
     let mut ops = plan(doc, &add)?;
     if let Some(Op::Add { value, .. }) = ops.last_mut() {
-        value["text"] = json!({ kind: pattern });
+        value["text"] = reiwand_scene::prefill::of("Binding_for_string", json!({ kind: pattern }));
         value["size"] = json!(size);
     }
     Ok(ops)

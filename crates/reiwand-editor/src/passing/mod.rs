@@ -87,9 +87,10 @@ fn fresh(dir: &Path, doc: &Value, e: &TransitionEdit) -> Result<Value> {
 }
 
 pub fn readied(dir: &Path, way: Way, value: &Value) -> Result<Readied> {
-    let text =
-        json!({ "schema": SCHEMA, "canvas": { "size": [16, 16] }, "transition": { way.key(): value } });
-    let mut scene = Scene::load(&text.to_string(), &Default::default())
+    let mut doc = json!({ "scene": {
+        "schema": SCHEMA, "canvas": { "size": [16, 16] }, "transition": { way.key(): value } } });
+    crate::completing::scene_doc(&mut doc);
+    let mut scene = Scene::load(&doc["scene"].to_string(), &Default::default())
         .map_err(|e| anyhow!(said("editor.transition_rule", "the transition breaks a rule: %1", &[&e])))?;
     let read = crate::reach::reader(dir);
     scene.read_passages(&mut |p: &str, max: usize| {

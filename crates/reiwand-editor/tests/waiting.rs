@@ -29,7 +29,10 @@ fn project(root: &TempDir) -> Project {
 fn the_text_while_nothing_plays_is_a_text_in_every_language() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
-    let value = json!({ "media": "title", "placeholder": "Nothing plays" });
+    let value = reiwand_scene::prefill::of(
+        "Binding_for_string",
+        json!({ "media": "title", "placeholder": "Nothing plays" }),
+    );
     act(&mut p, json!({ "set": { "pointer": "/scene/layers/0/text", "value": value } })).unwrap();
     let shown = fields(&p.doc, "/scene/layers/0/text");
     let field = shown.iter().find(|f| f.key == "placeholder").unwrap();

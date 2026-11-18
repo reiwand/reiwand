@@ -1,6 +1,7 @@
 mod form;
 mod starters;
 mod trial;
+mod whole;
 
 use crate::action::ShaderEdit as E;
 use crate::ops::{Op, escape};
