@@ -11602,7 +11602,7 @@ msgstr "Idioma de la vista previa"
 #: apps/reiwand-app/qml/ScenePreviewLanguage.qml
 #: apps/reiwand-app/qml/facade/ManifestWords.qml
 msgid "Default language"
-msgstr "Idioma por defecto"
+msgstr "Idioma principal"
 
 #: apps/reiwand-app/qml/ScenePreviewPanel.qml
 #: apps/reiwand-app/qml/SceneStatesCheck.qml
