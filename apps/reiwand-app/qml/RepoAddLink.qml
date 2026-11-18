@@ -60,11 +60,12 @@ PanelChico {
         if (id !== job)
             return;
         job = -1;
-        if (state === "done") {
+        if (state === "done")
             kind === "add" ? added() : begin("");
-        } else {
+        else if (String(name).endsWith("NotARepository"))
+            App.query("GetJob", [id], "Daemon1", reply => adder && adder.told(name, message, reply.job.output?.repositories ?? []), () => adder && adder.told(name, message));
+        else
             told(name, message);
-        }
     }
 
     function added() {
@@ -73,7 +74,7 @@ PanelChico {
         applicationWindow().showPassiveNotification(App.tr("Repository added."), "long");
     }
 
-    function told(name, message) {
+    function told(name, message, found = []) {
         const reason = String(name).split(".").pop();
         reply.detail = message;
         if (reason === "CertificateUnknown" && /fingerprint is ([0-9a-f]+)/.test(message)) {
@@ -83,7 +84,7 @@ PanelChico {
         } else if (reason === "AccountNeeded") {
             App.query("List", [], "Accounts1", list => adder && adder.listed(list.accounts), () => adder && adder.listed([]));
         } else if (reason === "NotARepository") {
-            reply.found = reply.listing(message);
+            reply.found = found;
             stage = "server";
         } else if (reason === "CertificateChanged" || reason === "SignatureChanged") {
             stage = "warning";

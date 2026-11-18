@@ -13,8 +13,8 @@ QtObject {
             throw new Error("repository dialog: " + what);
     }
 
-    function fail(name, message) {
-        adder.told(error + name, message);
+    function fail(name, message, found = []) {
+        adder.told(error + name, message, found);
     }
 
     function exercise() {
@@ -28,8 +28,14 @@ QtObject {
         expect(adder.stage === "certificate" && adder.reply.digest === "abcd12ef" && adder.reply.trust.visible, "an unknown certificate must offer to trust it");
         adder.reply.trusted();
         expect(adder.stage === "working", "trusting must add again");
-        fail("NotARepository", "this is a server, not a repository: paste the address of one of its repositories: Home (https://casa.example/fondos), Art (https://casa.example/arte)");
-        expect(adder.stage === "server" && adder.reply.found.length === 2 && adder.reply.servers.visible, "a server address must list its repositories");
+        fail("NotARepository", "this is a server, not a repository: paste the address of one of its repositories: Home (https://casa.example/fondos), Art (https://casa.example/arte)", [{
+                "name": "Home",
+                "url": "https://casa.example/fondos"
+            }, {
+                "name": "Art: 2024, new",
+                "url": "https://casa.example/arte"
+            }]);
+        expect(adder.stage === "server" && adder.reply.found.length === 2 && adder.reply.found[1].name === "Art: 2024, new" && adder.reply.servers.visible, "a server address must list its repositories");
         adder.reply.servers.incrementCurrentIndex();
         adder.reply.servers.pick();
         expect(adder.address.text === "https://casa.example/arte" && adder.stage === "working", "choosing a listed repository must add it");

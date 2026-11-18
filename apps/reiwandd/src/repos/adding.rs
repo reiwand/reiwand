@@ -3,9 +3,9 @@ use crate::error::{Error, Result, failed, invalid};
 use crate::jobs::Ctl;
 use crate::kinds::{local, parse_url};
 use crate::repos::pins::origin;
-use reiwand_core::dbus::error::{CERTIFICATE_CHANGED, CERTIFICATE_UNKNOWN, NOT_A_REPOSITORY};
+use reiwand_core::dbus::error::{CERTIFICATE_CHANGED, CERTIFICATE_UNKNOWN};
 use reiwand_format::Fetch;
-use serde_json::Value;
+use serde_json::{Value, json};
 
 pub(super) fn checked(url: &str, trust: &str) -> Result<()> {
     let parsed = parse_url(url, true)?;
@@ -71,31 +71,37 @@ impl Daemon {
             };
         }
         if matches!(e, reiwand_format::Error::Missing(ref what) if what == "root/1.json")
-            && let Some(found) = self.server_page(&site, ctl)
+            && let Some((text, listed)) = self.server_page(&site, ctl)
         {
-            return Error::Named(NOT_A_REPOSITORY, found);
+            return Error::Listing(text, json!({ "repositories": listed }));
         }
         e.into()
     }
 
-    fn server_page(&self, site: &str, ctl: &Ctl) -> Option<String> {
+    fn server_page(&self, site: &str, ctl: &Ctl) -> Option<(String, Vec<Value>)> {
         let fetch = crate::repos::fetcher(self, ctl, &[format!("{site}/")]).ok()?;
         let body = fetch.get(&format!("{site}/"), ".well-known/reiwand-server", 256 << 10).ok()??;
         let found: Value = serde_json::from_slice(&body).ok()?;
-        let listed: Vec<String> = found["repositories"]
+        let listed: Vec<Value> = found["repositories"]
             .as_array()
             .into_iter()
             .flatten()
-            .filter_map(|r| Some(format!("{} ({})", r["name"].as_str()?, r["url"].as_str()?)))
+            .filter_map(|r| Some(json!({ "name": r["name"].as_str()?, "url": r["url"].as_str()? })))
             .take(5)
             .collect();
         let named = found["name"].as_str().unwrap_or(site);
-        Some(match listed.is_empty() {
-            false => format!(
-                "this is a server, not a repository: paste the address of one of its repositories: {}",
-                listed.join(", ")
-            ),
+        let text = match listed.is_empty() {
+            false => {
+                let text = |r: &Value, key: &str| r[key].as_str().unwrap_or_default().to_owned();
+                let names: Vec<String> =
+                    listed.iter().map(|r| format!("{} ({})", text(r, "name"), text(r, "url"))).collect();
+                format!(
+                    "this is a server, not a repository: paste the address of one of its repositories: {}",
+                    names.join(", ")
+                )
+            }
             true => format!("this is a server, not a repository: {named} has no public repository"),
-        })
+        };
+        Some((text, listed))
     }
 }

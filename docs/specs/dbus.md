@@ -1721,7 +1721,7 @@ The job fails with `CertificateUnknown` when the server's certificate is not fro
 authority (the message carries its SHA-256 fingerprint; nothing is pinned), with
 `CertificateChanged` when the origin is already pinned (or was just confirmed) and the server
 presents another one, and with `NotARepository` when the address is a server (it answers
-`/.well-known/reiwand-server` and has no `root/1.json`; the message names its repositories page). `Exists` when the job finds it already added; a `broken` one is
+`/.well-known/reiwand-server` and has no `root/1.json`; the message names its repositories and the job's `output` is `{"repositories": [{"name", "url"}]}`, at most five, so a client lists them without reading the text). `Exists` when the job finds it already added; a `broken` one is
 replaced. The job verifies the repository fully and stores its signed state.
 
 ### `AddTrusting(s url, s certificate) → (t job)`
@@ -2627,7 +2627,7 @@ are the thumbnails of the library.
 after cropping the edited image to that shape. The extension of the file chooses PNG, JPEG
 (`--quality`), lossless WebP or AVIF (`--quality`, encoded without native libraries at speed 6),
 and `--before` renders the picture with its geometry but without its operations and masks, as
-*Compare with the original* shows it in the app, whose *Export…* writes the same files.
+*Compare with the original* shows it in the app, whose *Export…* writes the same files: its panel asks for the quality (1 to 100, 90 filled in), an optional size (width and height) and *Without my edits*, as `--quality`, `--size` and `--before` do.
 
 Every `reiwand-ctl edit` command that changes an edit, and *Save* in the image editor of the app,
 keep the edits that came before in
