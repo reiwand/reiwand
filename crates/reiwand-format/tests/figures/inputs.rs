@@ -5,19 +5,27 @@ fn meshes_are_read_from_the_package_and_their_chains_play_everywhere() {
     let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "mesh", "mesh": "fox", "ik": [{ "chain": ["arm", "hand"], "target": [10, 10] }] }]);
     let assets = json!({ "assets": { "sky": { "path": "sky.png" }, "fox": { "path": "fox.glb" } } });
     let text = scene(layers, assets.clone());
-    let package = load(&manifest(&["ik", "mesh"], json!({})), &text, &[("fox.glb", &fox())]).unwrap();
-    assert_eq!(package.facts.features.iter().collect::<Vec<_>>(), ["ik", "mesh"]);
+    let package =
+        load(&manifest(&["camera3d", "ik", "mesh"], json!({})), &text, &[("fox.glb", &fox())]).unwrap();
+    assert_eq!(package.facts.features.iter().collect::<Vec<_>>(), ["camera3d", "ik", "mesh"]);
     for platform in [Platform::Desktop, Platform::Android] {
         assert!(features::playable(&package.manifest, &package.facts, platform).is_ok());
     }
     let loose = json!([{ "blend_space": "canvas", "id": "p", "type": "mesh", "mesh": "fox", "ik": [{ "chain": ["hand", "arm"], "target": [1, 1] }] }]);
-    let fault =
-        load(&manifest(&["ik", "mesh"], json!({})), &scene(loose, assets.clone()), &[("fox.glb", &fox())]);
+    let fault = load(
+        &manifest(&["camera3d", "ik", "mesh"], json!({})),
+        &scene(loose, assets.clone()),
+        &[("fox.glb", &fox())],
+    );
     assert!(fault.map(drop).unwrap_err().to_string().contains("each hang from the one before"));
     let wrong = json!([{ "blend_space": "canvas", "id": "p", "type": "mesh", "mesh": "fox", "ik": [{ "chain": ["arm", "tail"], "target": [1, 1] }] }]);
-    let fault = load(&manifest(&["ik", "mesh"], json!({})), &scene(wrong, assets), &[("fox.glb", &fox())]);
+    let fault = load(
+        &manifest(&["camera3d", "ik", "mesh"], json!({})),
+        &scene(wrong, assets),
+        &[("fox.glb", &fox())],
+    );
     assert!(fault.map(drop).unwrap_err().to_string().contains("/layers/0/ik/0/chain/1 names \"tail\""));
-    let broken = load(&manifest(&["ik", "mesh"], json!({})), &text, &[("fox.glb", b"glTF junk")]);
+    let broken = load(&manifest(&["camera3d", "ik", "mesh"], json!({})), &text, &[("fox.glb", b"glTF junk")]);
     assert!(
         broken
             .map(drop)
