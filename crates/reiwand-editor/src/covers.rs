@@ -82,7 +82,8 @@ fn edited(doc: &Value, wanted: &AssetEdit) -> Result<Vec<Op>> {
         let a = asset.as_object_mut().into_iter().flatten();
         let moving = ["frames", "fps", "durations", "rects", "atlas", "animated"];
         ensure!(
-            !a.into_iter().any(|(k, v)| moving.contains(&k.as_str()) && !(v.is_null() || v == false || v.as_array().is_some_and(Vec::is_empty))),
+            !a.into_iter().any(|(k, v)| moving.contains(&k.as_str())
+                && !(v.is_null() || v == false || v.as_array().is_some_and(Vec::is_empty))),
             said("editor.cover_still", "%1 is animated, and a cover is a still picture", &[id])
         );
     }

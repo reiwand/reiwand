@@ -64,7 +64,11 @@ impl Walk<'_> {
         }
         if name == "Words" {
             f.bindable = true;
-            f.source = SOURCES.iter().find(|s| current.get(**s).is_some_and(|v| !v.is_null())).map_or("", |s| *s).into();
+            f.source = SOURCES
+                .iter()
+                .find(|s| current.get(**s).is_some_and(|v| !v.is_null()))
+                .map_or("", |s| *s)
+                .into();
             let free = f.source.is_empty() && crate::texts::worded(&current);
             f.translatable = free && self.doc["manifest"]["schema"] == reiwand_format::SCHEMA;
             f.widget = if free && current.is_object() { "texts" } else { "multiline" }.into();
@@ -75,7 +79,11 @@ impl Walk<'_> {
         }
         if name.starts_with("Value_for_") || inline_value {
             f.bindable = true;
-            f.source = SOURCES.iter().find(|s| current.get(**s).is_some_and(|v| !v.is_null())).map_or("", |s| *s).into();
+            f.source = SOURCES
+                .iter()
+                .find(|s| current.get(**s).is_some_and(|v| !v.is_null()))
+                .map_or("", |s| *s)
+                .into();
             (schema, name) = deref(self.root, &branches(schema)[0]);
         }
         let types = match &schema["type"] {

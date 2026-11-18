@@ -17,7 +17,10 @@ fn layers_inside_a_template_get_bones_chains_and_attachments_of_their_own() {
     let net = template["layers"].as_array().unwrap().iter().find(|l| l["id"] == "net").unwrap();
     let badge = template["layers"].as_array().unwrap().iter().find(|l| l["id"] == "badge").unwrap();
     assert_eq!(net["ik"][0]["chain"], json!(["root", "arm", "hand"]), "{template}");
-    assert_eq!(badge["attach"], json!({ "layer": "net", "bone": "arm", "inherit": null, "offset": null, "point": null }));
+    assert_eq!(
+        badge["attach"],
+        json!({ "layer": "net", "bone": "arm", "inherit": null, "offset": null, "point": null })
+    );
     let scene = &p.doc["scene"]["layers"][0]["layers"];
     assert!(scene.as_array().unwrap().iter().all(|l| super::whole::empty(&l["ik"]) && l["attach"].is_null()));
     let seen = p.seen();

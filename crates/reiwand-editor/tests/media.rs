@@ -60,7 +60,10 @@ fn a_picture_becomes_the_cover_with_its_placeholder_and_back() {
     act(&mut p, json!({ "import": { "file": file, "id": "dark" } })).unwrap();
     let path = p.doc["scene"]["assets"]["dark"]["path"].clone();
     act(&mut p, json!({ "asset": { "asset": "cover", "cover": "current", "placeholder": "dark" } })).unwrap();
-    assert_eq!(p.doc["scene"]["assets"]["cover"], whole::at_doc(&p.doc, "/scene/assets/cover", &json!({ "path": path, "media": "current" })));
+    assert_eq!(
+        p.doc["scene"]["assets"]["cover"],
+        whole::at_doc(&p.doc, "/scene/assets/cover", &json!({ "path": path, "media": "current" }))
+    );
     act(&mut p, json!({ "asset": { "asset": "before", "cover": "previous", "placeholder": path } })).unwrap();
     assert_eq!(p.doc["scene"]["assets"]["before"]["media"], "previous");
     let refused = |p: &mut Project, v: Value| act(p, json!({ "asset": v })).unwrap_err().to_string();
@@ -126,7 +129,10 @@ fn choosing_the_cover_for_a_field_never_turns_a_plain_picture_into_one_and_undoe
     assert_eq!(p.doc["scene"]["assets"]["cover"], plain, "the plain picture called cover stays plain");
     let made = p.doc.pointer(field).and_then(Value::as_str).unwrap().to_owned();
     assert_ne!(made, "cover");
-    assert_eq!(p.doc["scene"]["assets"][&made], whole::at_doc(&p.doc, "/scene/assets/x", &json!({ "path": plain["path"], "media": "current" })));
+    assert_eq!(
+        p.doc["scene"]["assets"][&made],
+        whole::at_doc(&p.doc, "/scene/assets/x", &json!({ "path": plain["path"], "media": "current" }))
+    );
     act(&mut p, json!({ "undo": {} })).unwrap();
     assert_eq!(p.doc.pointer(field), Some(&json!("cover")), "one undo takes the field back");
     assert!(p.doc["scene"]["assets"].get(&made).is_none(), "and the cover asset it made");

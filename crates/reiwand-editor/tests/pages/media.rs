@@ -143,7 +143,10 @@ fn the_preview_of_a_picture_or_video_package_is_a_scene_that_shows_the_file_as_t
     assert_eq!((layer["type"].as_str(), layer["video"].as_str()), (Some("video"), Some("media")));
     assert_eq!(layer["size"], json!([2160, 1080]));
     assert_eq!(layer["transform"]["scale"], json!([-2.0, 2.0]));
-    assert_eq!(layer["playback"], json!({"rate": 2, "start": 0.1, "loop": false, "end": "end", "frame": null, "own_clock": false, "playing": true}));
+    assert_eq!(
+        layer["playback"],
+        json!({"rate": 2, "start": 0.1, "loop": false, "end": "end", "frame": null, "own_clock": false, "playing": true})
+    );
     assert_eq!(scene["assets"]["media"]["path"], "quadrants-64x32.webm");
     assert_eq!(document["preview"]["quality"], "q1");
     let parsed = reiwand_scene::Scene::load(&scene.to_string(), &Default::default());

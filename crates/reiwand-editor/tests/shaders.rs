@@ -99,10 +99,12 @@ fn package_effects_are_imported_listed_and_inspected() {
         project.act(&serde_json::from_value::<Action>(whole::action(&project, set)).unwrap()).unwrap();
     }
     let fields = fields_from(None, &project.doc, &at, 0.0, &project.effects());
-    let found = |key: &str| {
-        fields.iter().find(|f| f.key == key && f.pointer.contains("/params/")).unwrap().clone()
-    };
-    assert_eq!((found("shape").value["layer"].clone(), found("soft").source), (json!("light"), "prop".into()));
+    let found =
+        |key: &str| fields.iter().find(|f| f.key == key && f.pointer.contains("/params/")).unwrap().clone();
+    assert_eq!(
+        (found("shape").value["layer"].clone(), found("soft").source),
+        (json!("light"), "prop".into())
+    );
     assert!(
         reiwand_editor::check::review(&project.doc, Some(&dir)).iter().all(|p| p.warning),
         "{:?}",

@@ -135,7 +135,8 @@ pub(crate) fn lighter(json: &mut Value, set: &Map<String, Value>, remove: bool) 
     let made = !json["lighter"].is_object();
     if made {
         let cost = json!({ "taps": 1, "passes": 1, "scale": 1 });
-        json["lighter"] = json!({ "passes": [super::whole::pass(format!("fs_{id}_lite"))], "cost": cost, "up_to": null });
+        json["lighter"] =
+            json!({ "passes": [super::whole::pass(format!("fs_{id}_lite"))], "cost": cost, "up_to": null });
     }
     for (k, v) in set {
         keyed(k, &["cost", "up_to"])?;
