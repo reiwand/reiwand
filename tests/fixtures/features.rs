@@ -18,6 +18,30 @@ fn merge(base: &mut Value, more: &Value) {
     }
 }
 
+fn bare(value: &mut Value) {
+    match value {
+        Value::Object(map) => {
+            map.retain(|_, v| !v.is_null());
+            map.values_mut().for_each(bare);
+        }
+        Value::Array(items) => items.iter_mut().for_each(bare),
+        _ => {}
+    }
+}
+
+fn bindings(value: &mut Value) {
+    match value {
+        Value::Object(map) => map.values_mut().for_each(bindings),
+        Value::Array(items) if items.len() == 3 && items[2] == json!(1.0) => {
+            for item in items.iter_mut().filter(|i| i.get("keys").is_some()) {
+                *item = reiwand_scene::prefill::of("Binding_for_float", item.take());
+            }
+        }
+        Value::Array(items) => items.iter_mut().for_each(bindings),
+        _ => {}
+    }
+}
+
 fn bytes(text: &str) -> Vec<u8> {
     let fixtures = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures");
     match (text.strip_prefix("fixture:"), text.strip_prefix("base64:")) {
@@ -36,9 +60,18 @@ pub fn source(name: &str, case: &Value, dir: &Path) -> PathBuf {
         "license": "CC0-1.0", "kind": kind, "entry": entry, "content": { "rating": "general" },
         "photosensitive": false, "origin": { "kind": "original" }, "previews": { "thumbnail": "preview.png" } });
     merge(&mut manifest, &case["manifest"]);
+    reiwand_upgrade::fill::complete(reiwand_upgrade::fill::Format::Manifest, &mut manifest);
+    if let Some(playback) = case["manifest"].get("playback") {
+        manifest["playback"] = playback.clone();
+    }
     let mut scene = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32] },
         "assets": { "sky": { "path": "sky.png" } } });
     merge(&mut scene, &case["scene"]);
+    scene["assets"].as_object_mut().unwrap().entry("sky").or_insert(json!({ "path": "sky.png" }));
+    if let Some(particles) = scene.get_mut("particles") {
+        bare(particles);
+        bindings(particles);
+    }
     let scene = serde_json::from_str::<Value>(&reiwand_upgrade::fill::whole(&scene.to_string())).unwrap();
     let mut files = vec![("preview.png".to_owned(), bytes("fixture:green-64x32.png"))];
     files.push(("sky.png".to_owned(), bytes("fixture:green-64x32.png")));
@@ -47,7 +80,15 @@ pub fn source(name: &str, case: &Value, dir: &Path) -> PathBuf {
         files.push((entry.to_owned(), scene.to_string().into_bytes()));
     }
     let given = case["files"].as_object().into_iter().flatten();
-    files.extend(given.map(|(path, text)| (path.clone(), bytes(text.as_str().unwrap_or_default()))));
+    files.extend(given.map(|(path, text)| {
+        let data = bytes(text.as_str().unwrap_or_default());
+        let descriptor =
+            path.ends_with(".json") && (path.starts_with("effects/") || path.starts_with("transitions/"));
+        match (descriptor, String::from_utf8(data.clone())) {
+            (true, Ok(text)) => (path.clone(), reiwand_upgrade::descriptors::completed(&text).into_bytes()),
+            _ => (path.clone(), data),
+        }
+    }));
     for (path, data) in files {
         fs::create_dir_all(source.join(&path).parent().unwrap()).unwrap();
         fs::write(source.join(path), data).unwrap();
