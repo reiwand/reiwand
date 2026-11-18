@@ -60,10 +60,10 @@ RowLayout {
     QQC2.TextField {
         Layout.preferredWidth: Kirigami.Units.gridUnit * 5
         placeholderText: App.tr("Default")
-        text: JSON.stringify(row.param.default ?? null)
+        text: JSON.stringify(row.param.prefill ?? null)
         onEditingFinished: row.form.param(row.param.id, {
                 "set": {
-                    "default": row.given(text)
+                    "prefill": row.given(text)
                 }
             })
     }
