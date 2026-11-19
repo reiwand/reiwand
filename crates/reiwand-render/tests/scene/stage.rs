@@ -4,6 +4,7 @@ use reiwand_scene::Wake;
 mod bloom;
 mod capture;
 mod films;
+mod glow;
 mod tilt;
 
 const RED: [u8; 3] = [255, 0, 0];

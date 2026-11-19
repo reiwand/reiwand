@@ -339,8 +339,12 @@ scene	Binding_for_string.unit	string|null	optional	2	"db"	editor.md:67
 scene	Binding_for_string.window	number|null	optional	3	null	editor.md:85
 scene	Binding_for_string.x	number|object|null	optional	3	null	dbus.md:434
 scene	Binding_for_string.y	number|object|null	optional	3	null	dbus.md:434
-scene	Bloom.hdr	object|null	optional	3	null	dbus.md:743
+scene	Bloom.hdr	object|null	optional	3	null	actualizacion.md:29
+scene	Bloom.knee	Value_for_float	optional	1	0.5	actualizacion.md:28
+scene	Bloom.limit	number|object|null	optional	3	null	actualizacion.md:29
 scene	Bloom.radius	Value_for_float	optional	1	16.0	dbus.md:2435
+scene	Bloom.radius_unit	string	optional	1	"canvas"	actualizacion.md:28
+scene	Bloom.saturation	Value_for_float	optional	1	1.0	actualizacion.md:28
 scene	Bloom.strength	Value_for_float	optional	1	1.0	dbus.md:587
 scene	Bloom.threshold	Value_for_float	optional	1	0.8	editor.md:85
 scene	Bloom.tint	Value_for_Color	optional	1	"#ffffff"	dbus.md:2431
@@ -388,7 +392,7 @@ scene	Canvas.camera	object|null	optional	3	null	editor.md:95
 scene	Canvas.clear	boolean	optional	1	true	editor.md:67
 scene	Canvas.fit	string	optional	1	"fill"	dbus.md:508
 scene	Canvas.gusts	number|null	optional	3	null	editor.md:80
-scene	Canvas.hdr	boolean	optional	1	false	dbus.md:743
+scene	Canvas.hdr	boolean	optional	1	false	actualizacion.md:29
 scene	Canvas.parallax	object|null	optional	3	null	dbus.md:2020
 scene	Canvas.perspective	number|null	optional	3	null	editor.md:85
 scene	Canvas.sky	string|null	optional	3	null	editor.md:94
@@ -432,6 +436,9 @@ scene	Emitter.max_per_step	number|null	optional	3	null	editor.md:85
 scene	Emitter.periodic	object|null	optional	3	null	editor.md:85
 scene	Emitter.rate	Value_for_float	optional	1	0.0	dbus.md:2050
 scene	Fade.to	FadeTo	optional	1	"black"	dbus.md:1103
+scene	Glare.knee	number	optional	1	0.5	actualizacion.md:28
+scene	Glare.levels	number	optional	1	1	actualizacion.md:29
+scene	Glare.scatter	number	optional	1	0.5	actualizacion.md:29
 scene	Glide.amount	Value_for_float	optional	1	1.0	dbus.md:2432
 scene	Glide.delay	number	optional	1	0.15	editor.md:85
 scene	Glide.gyro	boolean	optional	1	false	editor.md:116
@@ -872,7 +879,7 @@ config	Filter.contrast	number	optional	1	0.0	dbus.md:588
 config	Filter.exposure	number	optional	1	0.0	dbus.md:588
 config	Filter.hue	number	optional	1	0.0	dbus.md:589
 config	Filter.look	object|array|string|boolean|number|null	optional	1	"none"	dbus.md:586
-config	Filter.saturation	number	optional	1	0.0	dbus.md:588
+config	Filter.saturation	number	optional	1	0.0	actualizacion.md:28
 config	Filter.strength	number	optional	1	1.0	dbus.md:587
 config	Filter.warmth	number	optional	1	0.0	dbus.md:588
 config	Kept.image	string|null	optional	3	null	dbus.md:1316
@@ -893,7 +900,7 @@ config	OutputConfig.blank	object|null	optional	3	null	dbus.md:529
 config	OutputConfig.clicks	boolean|null	optional	3	null	dbus.md:1879
 config	OutputConfig.filter	object|null	optional	3	null	dbus.md:585
 config	OutputConfig.fit	string|null	optional	3	null	dbus.md:508
-config	OutputConfig.hdr	string|null	optional	3	null	dbus.md:743
+config	OutputConfig.hdr	string|null	optional	3	null	actualizacion.md:29
 config	OutputConfig.image	string|null	optional	3	null	dbus.md:1316
 config	OutputConfig.playlist	string|null	optional	3	null	dbus.md:517
 config	OutputConfig.preset	string|null	optional	3	null	dbus.md:517
@@ -905,7 +912,7 @@ config	Placed.mm	array	optional	1	[0.0,0.0,0.0,0.0]	dbus.md:2842
 config	Playback.allow_flashing	boolean	optional	1	false	-
 config	Playback.auto_pace	AutoPace	optional	1	"detail"	-
 config	Playback.duck	boolean	optional	1	false	-
-config	Playback.hdr	HdrChoice	optional	1	"auto"	dbus.md:743
+config	Playback.hdr	HdrChoice	optional	1	"auto"	actualizacion.md:29
 config	Playback.lowest_below_percent	number	optional	1	0	-
 config	Playback.max_fps	object|array|string|boolean|number|null	optional	1	"display"	package.md:173
 config	Playback.muted	boolean	optional	1	true	dbus.md:586
@@ -967,7 +974,7 @@ edit	Op.mask	string|null	optional	3	null	dbus.md:2424
 edit	Op.opacity	number|null	optional	3	null	dbus.md:2424
 edit	Op.r	array	optional	3	[]	dbus.md:2434
 edit	Op.rgb	array	optional	3	[]	dbus.md:764
-edit	Op.saturation	number	optional	1	0.0	dbus.md:588
+edit	Op.saturation	number	optional	1	0.0	actualizacion.md:28
 edit	Op.tint	number	optional	1	0.0	dbus.md:2431
 edit	Op.vibrance	number	optional	1	0.0	dbus.md:2433
 edit	OutputCrop.connector	string	optional	1	""	dbus.md:2452

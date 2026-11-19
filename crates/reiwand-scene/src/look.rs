@@ -61,10 +61,25 @@ pub struct Bloom {
     pub strength: Value<f32>,
     #[schemars(extend("x-unit" = "px", "x-range" = [0, 128]))]
     pub radius: Value<f32>,
+    pub radius_unit: RadiusUnit,
+    #[schemars(extend("x-range" = [0, 1]))]
+    pub knee: Value<f32>,
+    #[schemars(extend("x-range" = [0, 4]))]
+    pub saturation: Value<f32>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true, "x-range" = [0, 16]))]
+    pub limit: Option<Value<f32>>,
     pub tint: Value<Color>,
     #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     #[schemars(extend("x-null" = true, "x-block" = true))]
     pub hdr: Option<Glare>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum RadiusUnit {
+    Canvas,
+    Screen,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -74,6 +89,12 @@ pub struct Glare {
     pub threshold: f32,
     #[schemars(extend("x-range" = [0, 8]))]
     pub strength: f32,
+    #[schemars(extend("x-range" = [0, 1]))]
+    pub knee: f32,
+    #[schemars(extend("x-range" = [1, 8]))]
+    pub levels: u32,
+    #[schemars(extend("x-range" = [0, 2]))]
+    pub scatter: f32,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
@@ -126,8 +147,9 @@ impl Default for Shake {
 
 impl Default for Bloom {
     fn default() -> Self {
-        let [threshold, strength, radius] = [0.8, 1.0, 16.0].map(Value::Fixed);
-        Bloom { threshold, strength, radius, tint: white(), hdr: None }
+        let [threshold, strength, radius, knee, saturation] = [0.8, 1.0, 16.0, 0.5, 1.0].map(Value::Fixed);
+        let (radius_unit, limit) = (RadiusUnit::Canvas, None);
+        Bloom { threshold, strength, radius, radius_unit, knee, saturation, limit, tint: white(), hdr: None }
     }
 }
 

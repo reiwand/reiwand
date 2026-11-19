@@ -52,12 +52,12 @@ pub fn query(dir: &Path, doc: &Value, q: &Value) -> Value {
     }
     let swarms: Vec<_> = scene.particles.iter().filter(|(_, s)| s.listens().1).map(|(id, _)| id).collect();
     let bloom = &doc["scene"]["canvas"]["bloom"];
-    let glare = bloom["hdr"].is_array() && (level == Quality::Q3 || (level == Quality::Q2 && !battery));
+    let glare = bloom["hdr"].is_object() && (level == Quality::Q3 || (level == Quality::Q2 && !battery));
     let left = effects.iter().filter(|e| e["kept"] == false).count();
     let spent: f64 = effects.iter().filter_map(|e| e["units"].as_f64()).sum();
     json!({ "asked": asked, "quality": level, "battery": battery, "calm": calm,
         "render_scale": level.render_scale(), "density": level.density(), "particles": level.particles(),
-        "bloom": { "on": bloom.is_object(), "hdr": bloom["hdr"].is_array(), "glare": glare },
+        "bloom": { "on": bloom.is_object(), "hdr": bloom["hdr"].is_object(), "glare": glare },
         "pointer": { "emitters": swarms },
         "effects": effects, "left_out": left, "units": spent })
 }

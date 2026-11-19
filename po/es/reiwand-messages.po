@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Reiwand\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 00:00+0000\n"
+"POT-Creation-Date: 2026-11-19 00:00+0000\n"
 "PO-Revision-Date: 2026-10-30 00:00+0000\n"
 "Last-Translator: Reiwand contributors\n"
 "Language-Team: Reiwand contributors\n"
@@ -3386,8 +3386,12 @@ msgid "give a seed or ask for a new one each start, not both"
 msgstr "da una semilla o pide una nueva en cada inicio, no ambas cosas"
 
 #: crates/reiwand-editor/src/shaping/canvas.rs
-msgid "the glare of a glow is none or a threshold and a strength"
-msgstr "el destello de un resplandor es none o un umbral y una intensidad"
+msgid ""
+"the glare of a glow is none or an object with threshold and strength, and "
+"optionally knee, levels and scatter"
+msgstr ""
+"el brillo sobre el blanco de un resplandor es none o un objeto con umbral e "
+"intensidad, y opcionalmente borde suave, niveles y dispersión"
 
 #: crates/reiwand-editor/src/shaping/effects.rs
 msgid "there is no effect \"%1\""

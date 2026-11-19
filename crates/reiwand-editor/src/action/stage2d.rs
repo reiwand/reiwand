@@ -17,6 +17,14 @@ pub enum CanvasEdit {
         #[serde(default)]
         radius: Option<f64>,
         #[serde(default)]
+        radius_unit: Option<String>,
+        #[serde(default)]
+        knee: Option<f64>,
+        #[serde(default)]
+        saturation: Option<f64>,
+        #[serde(default)]
+        limit: Option<Value>,
+        #[serde(default)]
         tint: Option<String>,
         #[serde(default)]
         hdr: Option<Value>,

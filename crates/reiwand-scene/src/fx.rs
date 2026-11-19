@@ -1,9 +1,6 @@
-use crate::effects::{Descriptor, Fuse, Output, Pace, ParamDef, ParamKind, PassDef, SLOTS, Solve, Tool, Use};
-use crate::value::Param;
+use crate::effects::{Descriptor, Fuse, Output, Pace, ParamDef, ParamKind, PassDef, SLOTS, Tool, Use};
 use crate::{Class, MAX_PARAMS};
-use homography::homography;
 use slots::live;
-use std::borrow::Cow;
 
 mod homography;
 pub(crate) mod slots;
@@ -21,7 +18,7 @@ impl Descriptor {
         if d.passes.is_empty() && d.fuse.is_some() {
             let inputs = vec!["previous".into()];
             let entry = format!("fs_{}", d.id);
-            let (target, copy, blend, vertex, grid, swap) = Default::default();
+            let (target, copy, blend, vertex, grid, swap, when) = Default::default();
             d.passes.push(PassDef {
                 entry,
                 scale: 1.0,
@@ -33,24 +30,11 @@ impl Descriptor {
                 vertex,
                 grid,
                 swap,
+                when,
             });
         }
         d.lighten();
         Ok(d)
-    }
-
-    pub fn pack<'a>(&'a self, value: impl Fn(&'a str) -> Option<Cow<'a, Param>>) -> [[f32; 4]; MAX_PARAMS] {
-        let mut slots = [[0.0; 4]; MAX_PARAMS];
-        let pictures =
-            |def: &&ParamDef| matches!(def.kind, ParamKind::Texture | ParamKind::Lut | ParamKind::Mask);
-        for (slot, def) in slots.iter_mut().zip(&self.params).filter(|(_, def)| !pictures(def)) {
-            *slot = def.slot(value(&def.id).as_deref().unwrap_or(&def.prefill));
-        }
-        if self.solve == Some(Solve::Homography) && self.params.len() + 3 <= SLOTS {
-            let rows = homography(std::array::from_fn(|i| [slots[i][0], slots[i][1]]));
-            slots[self.params.len()..][..3].copy_from_slice(&rows);
-        }
-        slots
     }
 
     pub fn param(&self, id: &str) -> Option<usize> {
@@ -122,6 +106,11 @@ impl Descriptor {
         for (n, pass) in self.passes.iter().enumerate() {
             fail(unit(pass.scale), format!("pass {n} has a scale outside (0, 1]"));
             fail(pass.output == Output::Next || stateful, format!("pass {n} writes a missing state"));
+            let gate = pass
+                .when
+                .as_ref()
+                .is_none_or(|w| kind(&w.param, ParamKind::Float) || kind(&w.param, ParamKind::Int));
+            fail(gate, format!("pass {n} waits for a parameter that is no number"));
             for input in pass.inputs.iter().chain(&pass.copy) {
                 fail(self.input(n, input), format!("pass {n} reads the unknown input {input}"));
             }

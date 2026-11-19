@@ -61,7 +61,7 @@ como si el lienzo midiera `size` píxeles; el programa lo ajusta a cada pantalla
   "canvas": {
     "size": [1920, 1080], "fit": "fill", "background": "#0b1020", "blend_space": "linear",
     "parallax": { "amount": 1, "delay": 0.15, "pointer": 1 },
-    "bloom": { "threshold": 0.8, "strength": 0.6, "radius": 24 },
+    "bloom": { "threshold": 0.8, "strength": 0.6, "radius": 24, "radius_unit": "canvas", "knee": 0.5, "saturation": 1, "limit": null, "tint": "#ffffff" },
     "camera": { "zoom": 1.05, "shake": { "enabled": false, "amplitude": 6, "roughness": 0.5, "speed": 1 } }
   }
 ```
@@ -125,13 +125,32 @@ movimiento y en el nivel de calidad más bajo. Todos los campos de la cámara pu
 `canvas.bloom` hace brillar lo claro de toda la escena, como una capa de ajuste arriba del todo
 con el efecto `bloom` (ver [efectos.md](efectos.md)).
 
-| Campo | Por defecto | Rango | Qué hace |
-|-------|-------------|-------|----------|
+Todos los campos se guardan siempre; la columna «Prellenado» es lo que propone el editor.
+
+| Campo | Prellenado | Rango | Qué hace |
+|-------|------------|-------|----------|
 | `threshold` | 0,8 | 0 a 4 | Desde qué brillo empieza a brillar. |
 | `strength` | 1 | 0 a 8 | Cuánto brilla. Con 0 no cuesta nada. |
-| `radius` | 16 | 0 a 128 px | Hasta dónde se extiende. |
+| `radius` | 16 | 0 a 128 | Hasta dónde se extiende, en la unidad de `radius_unit`. |
+| `radius_unit` | `canvas` | `canvas` o `screen` | Con `screen`, `radius` son píxeles de la pantalla: un lienzo del doble de la pantalla conserva el mismo halo en ella. |
+| `knee` | 0,5 | 0 a 1 | La parte del umbral en que el corte se suaviza; con 0 el corte es seco y lo que queda bajo el umbral no se toca. |
+| `saturation` | 1 | 0 a 4 | Mezcla lo brillante con su gris antes del desenfoque: 0 da un resplandor gris, 4 uno vivo. |
+| `limit` | `null` | 0 a 16, o `null` | Tope de cada canal de lo brillante por la fuerza, para que un punto muy brillante no tape a uno más débil; `null` no pone tope. |
 | `tint` | blanco | | Color del resplandor. |
-| `hdr` | | `threshold` 0 a 16, `strength` 0 a 8 | Valores que reemplazan a los anteriores en el nivel `q3` y en `q2` con corriente. |
+| `hdr` | | ver abajo | Valores que reemplazan a los anteriores en el nivel `q3` y en `q2` con corriente. |
+
+`hdr` es un objeto con `threshold` (0 a 16), `strength` (0 a 8), `knee` (0 a 1, prellenado 0,5),
+`levels` (1 a 8, prellenado 1) y `scatter` (0 a 2, prellenado 0,5). Cada nivel suma un desenfoque
+del doble de ancho que el anterior, con el peso `scatter` elevado al nivel: con `scatter` 0 o con
+un solo nivel es el resplandor simple. La calidad limita los niveles (1 en `q0`, 2 en `q1`, 4 en
+`q2` y hasta 8 en `q3`) y cada nivel cuesta cerca de un tercio del anterior.
+
+En el editor, el panel del lienzo trae un control por campo: deslizadores para el umbral, la fuerza,
+el radio, el borde suave y la saturación; un interruptor para leer el radio en píxeles de la
+pantalla; un interruptor para poner un tope a lo más brillante, con su deslizador de 0 a 16; y un
+interruptor para el brillo sobre el blanco, con deslizadores de su umbral, fuerza, borde suave,
+niveles y dispersión. Desde la terminal:
+`reiwand-ctl scene act CARPETA canvas '{"bloom":{"saturation":1.6}}'`.
 
 ## El reloj
 

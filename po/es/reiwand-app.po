@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Reiwand\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 00:00+0000\n"
+"POT-Creation-Date: 2026-11-19 00:00+0000\n"
 "PO-Revision-Date: 2026-10-22 00:00+0000\n"
 "Last-Translator: Reiwand contributors\n"
 "Language-Team: Reiwand contributors\n"
@@ -1670,14 +1670,6 @@ msgid "Remove the map"
 msgstr "Quitar el mapa"
 
 #: apps/reiwand-app/qml/EditDepth.qml
-msgid "Export the adjusted map…"
-msgstr "Exportar el mapa ajustado…"
-
-#: apps/reiwand-app/qml/EditDepth.qml apps/reiwand-app/qml/EditPage.qml
-msgid "Saved as %1"
-msgstr "Guardado como %1"
-
-#: apps/reiwand-app/qml/EditDepth.qml
 msgid "Model input size (px, multiple of 14)"
 msgstr "Tamaño de entrada del modelo (px, múltiplo de 14)"
 
@@ -1701,10 +1693,6 @@ msgstr "Suavizado (px)"
 #: apps/reiwand-app/qml/EditDepth.qml
 msgid "Grow near edges (px)"
 msgstr "Ensanchar los bordes cercanos (px)"
-
-#: apps/reiwand-app/qml/EditDepth.qml apps/reiwand-app/qml/EditExport.qml
-msgid "PNG pictures"
-msgstr "Imágenes PNG"
 
 #: apps/reiwand-app/qml/EditDepth.qml apps/reiwand-app/qml/LibraryBar.qml
 #: apps/reiwand-app/qml/PackagePresetPublish.qml
@@ -1773,6 +1761,7 @@ msgid "Strength"
 msgstr "Fuerza"
 
 #: apps/reiwand-app/qml/EditDepthBrush.qml
+#: apps/reiwand-app/qml/SceneCanvasLook.qml
 #: apps/reiwand-app/qml/SceneEffectMaskTune.qml
 #: apps/reiwand-app/qml/SceneRigWeights.qml
 #: apps/reiwand-app/qml/SceneShapeSculpt.qml
@@ -1904,6 +1893,18 @@ msgstr ""
 "Los cortes reparten las regiones de la imagen en capas según su profundidad. "
 "Arrastra un asa para mover un corte, haz doble clic para quitarlo y clic en "
 "la franja para añadir otro."
+
+#: apps/reiwand-app/qml/EditDepthExport.qml
+msgid "Export the adjusted map…"
+msgstr "Exportar el mapa ajustado…"
+
+#: apps/reiwand-app/qml/EditDepthExport.qml apps/reiwand-app/qml/EditPage.qml
+msgid "Saved as %1"
+msgstr "Guardado como %1"
+
+#: apps/reiwand-app/qml/EditDepthExport.qml apps/reiwand-app/qml/EditExport.qml
+msgid "PNG pictures"
+msgstr "Imágenes PNG"
 
 #: apps/reiwand-app/qml/EditDepthLayers.qml
 msgid "Smart fill (LaMa)"
@@ -8191,6 +8192,10 @@ msgid "Threshold"
 msgstr "Umbral"
 
 #: apps/reiwand-app/qml/SceneCanvasLook.qml
+msgid "Glow saturation"
+msgstr "Saturación del resplandor"
+
+#: apps/reiwand-app/qml/SceneCanvasLook.qml
 #: apps/reiwand-app/qml/facade/SceneWords.qml
 msgid "Delay"
 msgstr "Retraso"
@@ -9455,6 +9460,42 @@ msgstr "Sin el brillo"
 #: apps/reiwand-app/qml/SceneGlowGrip.qml
 msgid "Drag to move the split between the glow and no glow"
 msgstr "Arrastra para mover el corte entre con brillo y sin brillo"
+
+#: apps/reiwand-app/qml/SceneGlowMore.qml
+msgid "Glare threshold"
+msgstr "Umbral del brillo sobre el blanco"
+
+#: apps/reiwand-app/qml/SceneGlowMore.qml
+msgid "Glare strength"
+msgstr "Fuerza del brillo sobre el blanco"
+
+#: apps/reiwand-app/qml/SceneGlowMore.qml
+msgid "Glare soft edge"
+msgstr "Borde suave del brillo sobre el blanco"
+
+#: apps/reiwand-app/qml/SceneGlowMore.qml
+msgid "Glare levels"
+msgstr "Niveles del brillo sobre el blanco"
+
+#: apps/reiwand-app/qml/SceneGlowMore.qml
+msgid "Glare scatter"
+msgstr "Dispersión del brillo sobre el blanco"
+
+#: apps/reiwand-app/qml/SceneGlowMore.qml
+msgid "Radius in screen pixels"
+msgstr "Radio en píxeles de la pantalla"
+
+#: apps/reiwand-app/qml/SceneGlowMore.qml
+msgid "Cap the brightest parts"
+msgstr "Poner tope a lo más brillante"
+
+#: apps/reiwand-app/qml/SceneGlowMore.qml
+msgid "Brightness cap"
+msgstr "Tope de brillo"
+
+#: apps/reiwand-app/qml/SceneGlowMore.qml
+msgid "Glare above white"
+msgstr "Brillo por encima del blanco"
 
 #: apps/reiwand-app/qml/SceneGradientBar.qml
 msgid "Remove the stop"
@@ -21498,3 +21539,11 @@ msgstr "Retirado por su repositorio"
 #: apps/reiwand-app/src/covers.rs
 msgid "Has flashes, turned off"
 msgstr "Tiene destellos, deshabilitado"
+
+#: apps/reiwand-app/qml/facade/SceneNames.qml
+msgid "Capped"
+msgstr "Con tope"
+
+#: apps/reiwand-app/qml/facade/SceneNames.qml
+msgid "Radius unit"
+msgstr "Unidad del radio"

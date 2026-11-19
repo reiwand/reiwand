@@ -4,6 +4,7 @@ import QtQuick
 QtObject {
     readonly property var words: ({
             "absolute": App.tr("Absolute"),
+            "capped": App.tr("Capped"),
             "db": App.tr("Decibels"),
             "hold_silence": App.tr("Keep the usual during silence"),
             "kind": App.tr("Measured as"),
@@ -59,6 +60,7 @@ QtObject {
             "r": App.tr("Red"),
             "radial": App.tr("Radial"),
             "radius": App.tr("Radius"),
+            "radius_unit": App.tr("Radius unit"),
             "range": App.tr("Range"),
             "rate": App.tr("Rate"),
             "ratio": App.tr("Ratio"),
@@ -95,6 +97,7 @@ QtObject {
             "scale": App.tr("Scale"),
             "reach": App.tr("Pointer reach"),
             "scan": App.tr("Scan lines"),
+            "scatter": App.tr("Scatter"),
             "scene": App.tr("Scene"),
             "schema": App.tr("Format"),
             "script": App.tr("Script"),

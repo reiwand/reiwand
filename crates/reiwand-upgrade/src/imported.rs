@@ -34,7 +34,7 @@ pub(crate) fn edits(data: &Path, sink: &mut Sink) -> anyhow::Result<()> {
     Ok(())
 }
 
-pub(crate) fn packages(data: &Path, sink: &mut Sink) -> anyhow::Result<()> {
+pub(crate) fn packages(data: &Path, sink: &mut Sink, all: bool) -> anyhow::Result<()> {
     let Some(db) = open(data, OpenFlags::SQLITE_OPEN_READ_ONLY) else { return Ok(()) };
     // A package the library already refused, or one whose manifest does not load in the current format: the
     // second covers the first start of a new version, before the daemon has read the package once.
@@ -45,7 +45,7 @@ pub(crate) fn packages(data: &Path, sink: &mut Sink) -> anyhow::Result<()> {
             .collect();
     drop(db);
     let mut converted = Vec::new();
-    let stale = |p: &PathBuf| p.is_file() && (refused.contains(p) || reiwand_format::peek(p).is_err());
+    let stale = |p: &PathBuf| p.is_file() && (all || refused.contains(p) || reiwand_format::peek(p).is_err());
     for path in listed.into_iter().filter(stale) {
         if sink.attempt(&path, |sink| crate::packages::wpak(&path, sink)).unwrap_or(false) {
             converted.push(path);

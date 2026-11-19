@@ -186,6 +186,7 @@ PassDef.grid	block
 PassDef.swap	block
 PassDef.target	block
 PassDef.vertex	block
+PassDef.when	block
 Playback.frame	block
 Pool.size	value
 Pool.texture	block

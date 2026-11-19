@@ -89,7 +89,7 @@ fn damaged_files_are_listed_and_the_rest_is_converted() {
     let done = client::convert(data, &mut NoVault, &options()).unwrap();
     assert_eq!(done.skipped.iter().map(|(p, _)| p.clone()).collect::<Vec<_>>(), vec![empty]);
     assert!(!fs::read_to_string(fine).unwrap().contains('?'));
-    assert_eq!(fs::read_to_string(data.join("format-version")).unwrap(), "4\n");
+    assert_eq!(fs::read_to_string(data.join("format-version")).unwrap(), "5\n");
     let listed = fs::read_to_string(done.copies.join("not-converted.txt")).unwrap();
     assert!(listed.contains("empty"));
 }
@@ -125,15 +125,15 @@ fn a_second_run_does_nothing_and_does_not_read_the_packages() {
 }
 
 #[test]
-fn from_3_to_4_only_the_newer_steps_run() {
+fn from_3_to_5_only_the_newer_steps_run() {
     let dir = tempfile::tempdir().unwrap();
     let data = dir.path();
     fs::write(data.join("format-version"), "3\n").unwrap();
     let fine = state(data, "fine", OLD_STATE);
     let done = client::convert(data, &mut NoVault, &options()).unwrap();
-    assert_eq!(done.outcome, reiwand_upgrade::Outcome::Upgraded { from: 3, to: 4 });
+    assert_eq!(done.outcome, reiwand_upgrade::Outcome::Upgraded { from: 3, to: 5 });
     assert_eq!(fs::read_to_string(fine).unwrap(), OLD_STATE);
-    assert_eq!(fs::read_to_string(data.join("format-version")).unwrap(), "4\n");
+    assert_eq!(fs::read_to_string(data.join("format-version")).unwrap(), "5\n");
 }
 
 #[test]
@@ -142,7 +142,7 @@ fn an_empty_mark_does_not_block_and_the_mark_is_replaced_whole() {
     let data = dir.path();
     fs::write(data.join("format-version"), "").unwrap();
     client::convert(data, &mut NoVault, &options()).unwrap();
-    assert_eq!(fs::read_to_string(data.join("format-version")).unwrap(), "4\n");
+    assert_eq!(fs::read_to_string(data.join("format-version")).unwrap(), "5\n");
 }
 
 #[test]

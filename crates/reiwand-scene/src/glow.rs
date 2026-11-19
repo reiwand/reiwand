@@ -1,18 +1,47 @@
-use crate::look::Bloom;
+use crate::look::{Bloom, RadiusUnit};
 use crate::value::{Param, Value};
 use crate::{Canvas, EffectUse, Kind, Layer, Quality};
 use serde_json::{Value as Json, json};
 
 pub(crate) type Glows = [Option<Box<Layer>>; 2];
 
+fn json(v: &Value<f32>) -> Json {
+    serde_json::to_value(v).unwrap_or(Json::Null)
+}
+
 fn param(v: Json) -> Option<Value<Param>> {
     serde_json::from_value(v).ok()
 }
 
-fn layer(b: &Bloom, threshold: Json, strength: Json) -> Box<Layer> {
+struct Scales {
+    threshold: Json,
+    strength: Json,
+    knee: Json,
+    levels: u32,
+    scatter: f32,
+}
+
+fn layer(b: &Bloom, scales: Scales) -> Box<Layer> {
     let radius = serde_json::to_value(&b.radius).unwrap_or(json!(16));
     let tint = serde_json::to_value(&b.tint).unwrap_or(json!("#ffffff"));
-    let params = [("threshold", threshold), ("intensity", strength), ("radius", radius), ("tint", tint)];
+    let screen = b.radius_unit == RadiusUnit::Screen;
+    let (capped, limit) = match &b.limit {
+        Some(v) => (true, json(v)),
+        None => (false, json!(0.0)),
+    };
+    let params = [
+        ("threshold", scales.threshold),
+        ("intensity", scales.strength),
+        ("radius", radius),
+        ("knee", scales.knee),
+        ("tint", tint),
+        ("saturation", json(&b.saturation)),
+        ("capped", json!(capped)),
+        ("limit", limit),
+        ("levels", json!(scales.levels)),
+        ("scatter", json!(scales.scatter)),
+        ("unit", json!(u8::from(screen))),
+    ];
     let params = params.into_iter().filter_map(|(k, v)| Some((k.to_owned(), param(v)?))).collect();
     let (effect, name, enabled, mask, optional) = ("bloom".into(), None, Value::Fixed(true), None, false);
     let mut layer = Layer::new("", Kind::Adjustment { size: crate::Ctx::word(), redraw: false, rgb: false });
@@ -22,9 +51,24 @@ fn layer(b: &Bloom, threshold: Json, strength: Json) -> Box<Layer> {
 
 pub(crate) fn glows(canvas: &Canvas) -> Glows {
     let Some(b) = &canvas.bloom else { return [None, None] };
-    let json = |v: &Value<f32>| serde_json::to_value(v).unwrap_or(Json::Null);
-    let hdr = b.hdr.map(|h| layer(b, json!(h.threshold), json!(h.strength)));
-    [Some(layer(b, json(&b.threshold), json(&b.strength))), hdr]
+    let hdr = b.hdr.map(|h| {
+        let scales = Scales {
+            threshold: json!(h.threshold),
+            strength: json!(h.strength),
+            knee: json!(h.knee),
+            levels: h.levels,
+            scatter: h.scatter,
+        };
+        layer(b, scales)
+    });
+    let base = Scales {
+        threshold: json(&b.threshold),
+        strength: json(&b.strength),
+        knee: json(&b.knee),
+        levels: 1,
+        scatter: 0.0,
+    };
+    [Some(layer(b, base)), hdr]
 }
 
 pub(crate) fn pick(glows: &Glows, quality: Quality, battery: bool) -> Option<&Layer> {

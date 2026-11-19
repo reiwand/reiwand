@@ -55,7 +55,7 @@ fn battery_lowers_the_level_the_daemon_reaches_and_reduced_motion_is_reported() 
 fn the_glare_of_the_bloom_is_kept_only_where_the_daemon_draws_it() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
-    let set = json!({ "set": { "pointer": "/scene/canvas/bloom", "value": { "hdr": [1.0, 0.5] } } });
+    let set = json!({ "set": { "pointer": "/scene/canvas/bloom", "value": { "hdr": {"threshold": 1.0, "strength": 0.5, "knee": 0.5, "levels": 1, "scatter": 0.5} } } });
     p.act(&serde_json::from_value::<Action>(whole::action(&p, set)).unwrap()).unwrap();
     let glare = |q: &str, battery| level(&p, q, battery, false)["bloom"].clone();
     assert_eq!(glare("q3", false), json!({ "on": true, "hdr": true, "glare": true }));

@@ -85,6 +85,7 @@ QtObject {
             "life": App.tr("Life"),
             "light": App.tr("Light"),
             "lighting": App.tr("Lighting"),
+            "limit": App.tr("Brightness cap"),
             "limits": App.tr("Limits"),
             "line": App.tr("Line"),
             "listens": App.tr("Audio inputs"),

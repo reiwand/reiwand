@@ -879,20 +879,25 @@ reiwand-ctl scene act mi-escena canvas '{"clock":{"fresh":true}}'
 
 ##### variante `bloom`
 
-Hace que lo brillante «brille» (resplandor). Lo que no se nombra empieza con los valores prellenados la primera vez.
+Hace que lo brillante «brille» (resplandor). Lo que no se nombra empieza con los valores prellenados la primera vez; lo que se guarda lleva todos los campos.
 
 | Argumento | Tipo | Qué significa |
 |-----------|------|---------------|
 | `threshold` | número | Desde qué brillo empieza el resplandor, de 0 a 4. Por defecto 0.8. |
 | `strength` | número | Fuerza, de 0 a 8. Por defecto 1. |
 | `radius` | número | Alcance en píxeles, de 0 a 128. Por defecto 16. |
+| `radius_unit` | texto | `canvas` (píxeles del lienzo) o `screen` (píxeles de la pantalla: un lienzo del doble de la pantalla conserva el mismo halo). Por defecto `canvas`. |
+| `knee` | número | La parte del umbral en que el corte se suaviza, de 0 a 1; con 0 el corte es seco. Por defecto 0.5. |
+| `saturation` | número | De 0 a 4; 0 da un resplandor gris, 1 deja los colores y 4 los aviva. Por defecto 1. |
+| `limit` | número o `"none"` | Tope de cada canal de lo brillante, de 0 a 16, para que un punto muy brillante no tape a uno más débil; `"none"` quita el tope. Por defecto `"none"`. |
 | `tint` | texto | Color del resplandor, como `#ffddaa`. |
-| `hdr` | lista de 2 números o `"none"` | `[umbral, fuerza]` del resplandor de colores más brillantes que el blanco (umbral de 0 a 16, fuerza de 0 a 8); `"none"` lo quita. |
+| `hdr` | objeto o `"none"` | El resplandor de colores más brillantes que el blanco: `threshold` (de 0 a 16) y `strength` (de 0 a 8), y opcionalmente `knee` (de 0 a 1, por defecto 0.5), `levels` (de 1 a 8, por defecto 1: cuántos desenfoques cada vez el doble de anchos se suman; la calidad los limita) y `scatter` (de 0 a 2, por defecto 0.5: el peso de cada nivel más ancho; con 0 o con un solo nivel es el resplandor simple). Lo que no se nombra se queda como estaba; `"none"` lo quita. |
 | `off` | sí/no | `true` quita el resplandor. Por defecto `false`. |
 
 ```sh
 reiwand-ctl scene act mi-escena canvas '{"bloom":{"threshold":0.8,"strength":0.6,"radius":8,"tint":"#ffddaa"}}'
-reiwand-ctl scene act mi-escena canvas '{"bloom":{"hdr":[1.5,0.5]}}'
+reiwand-ctl scene act mi-escena canvas '{"bloom":{"saturation":1.6,"limit":4,"radius_unit":"screen"}}'
+reiwand-ctl scene act mi-escena canvas '{"bloom":{"hdr":{"threshold":1.5,"strength":0.5,"levels":4,"scatter":0.6}}}'
 reiwand-ctl scene act mi-escena canvas '{"bloom":{"hdr":"none"}}'
 reiwand-ctl scene act mi-escena canvas '{"bloom":{"off":true}}'
 ```

@@ -213,7 +213,7 @@ Parámetros: `amplitude` (número, valor prellenado 8; de 0 a 256); `frequency` 
 
 **`bloom`** (Resplandor, medio). Hace brillar hacia fuera las partes claras. Con `tint` tiñe el resplandor.
 
-Parámetros: `threshold` (número, valor prellenado 0,8; de 0 a 4); `intensity` (número, valor prellenado 1; de 0 a 8); `radius` (número, valor prellenado 16; de 0 a 128); `knee` (número, valor prellenado 0,5; de 0 a 1); `tint` (color, valor prellenado `#ffffff`).
+Parámetros: `threshold` (número, valor prellenado 0,8; de 0 a 4); `intensity` (número, valor prellenado 1; de 0 a 8); `radius` (número, valor prellenado 16; de 0 a 128); `knee` (número, valor prellenado 0,5; de 0 a 1: la parte del umbral en que el corte se suaviza); `tint` (color, valor prellenado `#ffffff`); `saturation` (número, valor prellenado 1; de 0 a 4: 0 da un resplandor gris y 4 uno vivo); `capped` (sí/no, valor prellenado no: pone un tope a lo más brillante); `limit` (número, valor prellenado 1; de 0 a 16, solo con `capped`: el tope de cada canal antes del desenfoque); `levels` (entero, valor prellenado 1; de 1 a 8: cuántos desenfoques cada vez el doble de anchos se suman); `scatter` (número, valor prellenado 0,5; de 0 a 2, solo con `levels`: el peso de cada nivel más ancho); `unit` (lista, valor prellenado píxeles del lienzo; o píxeles de la pantalla: en cuál se lee `radius`).
 
 **`god_rays`** (Rayos de luz, medio). Rayos de luz que salen de una fuente brillante.
 
@@ -434,7 +434,7 @@ programa, y escribirlos es un error.
 Cada pasada puede tener `entry`, `scale` (fracción del tamaño de la capa), `inputs` (prellenado
 `["previous"]`: `previous`, `input`, `source`, `mask`, `pass:N`, `state`, `backdrop`,
 `asset:<parámetro>` o `target:<nombre>`), `output`, `target`, `blend` (`replace`, `normal`, `add`,
-`multiply`), `copy` y `swap`. Un efecto tiene hasta 16 pasadas.
+`multiply`), `copy` y `swap`. Un efecto tiene hasta 24 pasadas.
 
 ### El sombreador
 

@@ -19,7 +19,11 @@
     "background": "#0b1020",
     "blend_space": "linear",
     "bloom": {
+      "knee": 0.5,
+      "limit": null,
       "radius": 24,
+      "radius_unit": "canvas",
+      "saturation": 1.0,
       "strength": 0.6,
       "threshold": 0.8,
       "tint": "#ffffff"

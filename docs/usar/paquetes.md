@@ -149,7 +149,7 @@ El escritorio y el teléfono ya dibujan también los efectos propios del paquete
 uso de efecto muestra sus reglas para despertar la escena (qué entrada pide cada parámetro, a cuál
 espera y a cuál cede el paso) y en los efectos del paquete las cambia con selectores, igual que
 `reiwand-ctl scene act CARPETA effect_rule`. Cada uno es un
-descriptor JSON y un shader WGSL con hasta 16 pasadas que escriben en la siguiente textura o en
+descriptor JSON y un shader WGSL con hasta 24 pasadas que escriben en la siguiente textura o en
 objetivos con nombre a su escala (en 8 o 16 bits por canal), los copian, los intercambian para
 alternar entre dos (ping-pong), acumulan con fusión por pasada (reemplazar, normal, sumar o
 multiplicar), deforman la capa con un shader de vértice sobre una rejilla de hasta 64 × 64 celdas y

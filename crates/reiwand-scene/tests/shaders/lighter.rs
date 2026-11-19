@@ -71,8 +71,8 @@ fn the_loader_refuses_lighter_variants_that_are_not_lighter_or_not_whole() {
     refused(json!({ "passes": [], "cost": { "taps": 1 } }), "the lighter variant needs passes");
     let always = json!({ "passes": [{ "entry": "fs_soft_lite" }], "cost": { "taps": 1 }, "up_to": "q3" });
     refused(always, "replaces the effect only up to q0, q1 or q2");
-    let many: Vec<Json> = (0..17).map(|_| json!({ "entry": "fs_soft_lite", "scale": 0.1 })).collect();
-    refused(json!({ "passes": many, "cost": { "taps": 1 } }), "the lighter variant: more than 16 passes");
+    let many: Vec<Json> = (0..25).map(|_| json!({ "entry": "fs_soft_lite", "scale": 0.1 })).collect();
+    refused(json!({ "passes": many, "cost": { "taps": 1 } }), "the lighter variant: more than 24 passes");
     let unknown =
         json!({ "passes": [{ "entry": "fs_soft_lite", "inputs": ["pass:3"] }], "cost": { "taps": 1 } });
     refused(unknown, "the lighter variant: pass 0 reads the unknown input pass:3");

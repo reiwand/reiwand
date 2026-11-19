@@ -64,11 +64,16 @@ fn a_particles_layer_changes_its_instance_of_the_system() {
 fn the_canvas_glows_and_moves_in_depth_from_its_defaults() {
     let root = tempfile::tempdir().unwrap();
     let mut p = project(&root);
-    act(&mut p, json!({"canvas": {"bloom": {"strength": 2, "hdr": [2, 1]}}})).unwrap();
+    act(&mut p, json!({"canvas": {"bloom": {"strength": 2, "hdr": {"threshold": 2, "strength": 1}}}}))
+        .unwrap();
     let bloom = at(&p, "/scene/canvas/bloom");
     assert_eq!(
         (&bloom["strength"], &bloom["threshold"], &bloom["hdr"]),
-        (&json!(2.0), &json!(0.8), &json!({"threshold": 2, "strength": 1}))
+        (
+            &json!(2.0),
+            &json!(0.8),
+            &json!({"threshold": 2, "strength": 1, "knee": 0.5, "levels": 1, "scatter": 0.5})
+        )
     );
     act(&mut p, json!({"canvas": {"bloom": {"hdr": "none"}}})).unwrap();
     assert!(crate::whole::unset(&at(&p, "/scene/canvas/bloom")["hdr"]));
@@ -155,4 +160,29 @@ fn a_transform_at_a_second_keys_what_has_keyframes_and_each_part_keyed_alone() {
     assert!(words.contains("0 or more"), "{words}");
     act(&mut p, json!({"layer": {"transform": {"layer": "card", "rotation": 20, "at": 3}}})).unwrap();
     assert_eq!(at(&p, "/scene/layers/0/transform/rotation"), json!(20.0));
+}
+
+#[test]
+fn the_glow_takes_saturation_limit_knee_unit_and_wide_levels() {
+    let root = tempfile::tempdir().unwrap();
+    let mut p = project(&root);
+    act(
+        &mut p,
+        json!({"canvas": {"bloom": {"saturation": 2, "limit": 3, "knee": 0, "radius_unit": "screen",
+        "hdr": {"threshold": 2, "strength": 1, "levels": 4, "scatter": 0.7}}}}),
+    )
+    .unwrap();
+    let bloom = at(&p, "/scene/canvas/bloom");
+    assert_eq!(
+        (&bloom["saturation"], &bloom["limit"], &bloom["knee"]),
+        (&json!(2.0), &json!(3), &json!(0.0))
+    );
+    assert_eq!(
+        (&bloom["radius_unit"], &bloom["hdr"]["levels"], &bloom["hdr"]["scatter"]),
+        (&json!("screen"), &json!(4), &json!(0.7))
+    );
+    act(&mut p, json!({"canvas": {"bloom": {"limit": "none"}}})).unwrap();
+    assert!(at(&p, "/scene/canvas/bloom")["limit"].is_null());
+    assert!(refused(&mut p, json!({"canvas": {"bloom": {"hdr": {"levels": 9}}}})).contains("levels"));
+    assert!(refused(&mut p, json!({"canvas": {"bloom": {"saturation": 5}}})).contains("saturation"));
 }

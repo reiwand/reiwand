@@ -2,7 +2,13 @@
   "effects": [],
   "params": {
     "bloom": [
-      {"id": "tint", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#ffffff", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+      {"id": "tint", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#ffffff", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "saturation", "type": "float", "channels": null, "help": {}, "label": {}, "max": 4, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "capped", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "limit", "type": "float", "channels": null, "help": {}, "label": {}, "max": 16, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": "capped", "yields_to": null},
+      {"id": "levels", "type": "int", "channels": null, "help": {}, "label": {}, "max": 8, "min": 1, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "scatter", "type": "float", "channels": null, "help": {}, "label": {}, "max": 2, "min": 0, "paint": null, "prefill": 0.5, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": "levels", "yields_to": null},
+      {"id": "unit", "type": "enum", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [{"label": {"en": "Canvas pixels", "es": "Píxeles del lienzo"}, "value": 0}, {"label": {"en": "Screen pixels", "es": "Píxeles de la pantalla"}, "value": 1}], "waits_for": null, "yields_to": null}
     ],
     "blur": [
       {"id": "blend", "type": "blend", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "normal", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},

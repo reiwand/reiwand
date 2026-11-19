@@ -178,3 +178,21 @@ fn a_manifest_next_to_the_scene_is_completed() {
     assert!(after["properties"]["speed"].get("help").is_none());
     assert_eq!(reiwand_upgrade::scenes::run(&dir).unwrap(), 0);
 }
+
+#[test]
+fn the_canvas_glow_gains_its_five_capabilities_at_today_values() {
+    let glow = json!({"canvas": {"size": [8, 8], "bloom": {"threshold": 0.8, "strength": 1, "radius": 16,
+        "tint": "#ffffff", "hdr": {"threshold": 2, "strength": 1}}},
+        "layers": [{"effects": [{"effect": "bloom", "params": {"threshold": 0.5, "intensity": 1, "radius": 8, "knee": 0.5, "tint": "#ffffff"}}]}]});
+    let after = upgraded("scenes-glow", glow);
+    let bloom = &after["canvas"]["bloom"];
+    assert_eq!((&bloom["saturation"], &bloom["knee"]), (&json!(1.0), &json!(0.5)));
+    assert_eq!(bloom["radius_unit"], "canvas");
+    assert_eq!(bloom["hdr"]["levels"], 1);
+    let params = &after["layers"][0]["effects"][0]["params"];
+    assert_eq!(
+        (&params["saturation"], &params["capped"], &params["levels"]),
+        (&json!(1.0), &json!(false), &json!(1))
+    );
+    assert_eq!(params["unit"], 0);
+}

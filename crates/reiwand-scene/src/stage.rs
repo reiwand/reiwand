@@ -37,10 +37,18 @@ impl Check<'_> {
             self.number("/canvas/bloom/threshold", &b.threshold, 0.0, 4.0);
             self.number("/canvas/bloom/strength", &b.strength, 0.0, 8.0);
             self.number("/canvas/bloom/radius", &b.radius, 0.0, 128.0);
+            self.number("/canvas/bloom/knee", &b.knee, 0.0, 1.0);
+            self.number("/canvas/bloom/saturation", &b.saturation, 0.0, 4.0);
+            if let Some(limit) = &b.limit {
+                self.number("/canvas/bloom/limit", limit, 0.0, 16.0);
+            }
             self.value("/canvas/bloom/tint", &b.tint);
             if let Some(h) = b.hdr {
                 self.range("/canvas/bloom/hdr/threshold", h.threshold, 0.0, 16.0);
                 self.range("/canvas/bloom/hdr/strength", h.strength, 0.0, 8.0);
+                self.range("/canvas/bloom/hdr/knee", h.knee, 0.0, 1.0);
+                self.range("/canvas/bloom/hdr/levels", h.levels as f32, 1.0, 8.0);
+                self.range("/canvas/bloom/hdr/scatter", h.scatter, 0.0, 2.0);
             }
         }
         self.uses(c.hdr || c.tonemap.is_some(), "hdr");

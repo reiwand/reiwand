@@ -157,11 +157,17 @@
           "enabled": true,
           "optional": false,
           "params": {
+            "capped": false,
             "intensity": 0.8,
             "knee": 0.5,
+            "levels": 1,
+            "limit": 1.0,
             "radius": 24,
+            "saturation": 1.0,
+            "scatter": 0.5,
             "threshold": 0.7,
-            "tint": "#ffffff"
+            "tint": "#ffffff",
+            "unit": 0
           }
         },
         {

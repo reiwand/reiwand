@@ -4,7 +4,7 @@ use std::io::ErrorKind;
 use std::os::unix::fs::DirBuilderExt;
 use std::path::Path;
 
-pub const DATA_VERSION: u32 = 4;
+pub const DATA_VERSION: u32 = 5;
 
 const MARK: &str = "format-version";
 

@@ -40,7 +40,7 @@ finish_maps.rs	1	Default builds the value in code (templates, editor prefill, te
 flash.rs	1	runtime type, not serialized as a format
 footage.rs	5	field of runtime type Tape, not part of a saved format (and 1 more kinds)
 form.rs	5	internal computation over runtime values (and 1 more kinds)
-fx.rs	1	internal computation over runtime values
+fx/homography.rs	1	internal computation over runtime values
 fx/slots.rs	1	parameter min/max null means unbounded
 fx/tune.rs	2	field of runtime type ?, not part of a saved format (and 1 more kinds)
 glow.rs	3	lookup or text computation over runtime values

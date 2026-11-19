@@ -11,7 +11,7 @@ mod listening;
 mod parts;
 mod tools;
 
-pub use defs::{Cost, Output, ParamDef, PassDef, State, Tune};
+pub use defs::{Cost, Output, ParamDef, PassDef, State, Tune, When};
 pub use handles::{Grab, Hold};
 pub use lighter::{Form, Lighter, drawn_builtin};
 pub use parts::{

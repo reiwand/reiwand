@@ -70,6 +70,15 @@ pub struct PassDef {
     pub grid: Option<[u32; 2]>,
     #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
     pub swap: Option<[String; 2]>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    pub when: Option<When>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct When {
+    pub param: String,
+    pub at_least: f32,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]

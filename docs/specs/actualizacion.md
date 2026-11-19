@@ -21,9 +21,13 @@ viejos se niegan a arrancar y nombran la orden exacta que corre la conversión.
 
 ## Una vez y marcada
 
-`client` corre solo si la marca es menor que la versión de datos actual (4); con la marca al día no lee ningún paquete ni
+`client` corre solo si la marca es menor que la versión de datos actual (5); con la marca al día no lee ningún paquete ni
 carpeta. De una marca menor que 3 hace todo; de 3 a 4 hace solo lo agregado después: el repositorio de ejemplos, los
-paquetes importados y las ediciones sueltas. La marca se escribe en un temporal, con `fsync`, y se renombra; una marca
+paquetes importados y las ediciones sueltas. De 4 a 5 repasa los paquetes
+instalados, las carpetas de escenas y los paquetes importados, y escribe en cada resplandor del lienzo (`canvas.bloom`)
+los campos nuevos con el valor que ya se aplicaba en silencio: `radius_unit` `canvas`, `knee` 0.5, `saturation` 1 y
+`limit` `null` (sin tope); y en cada brillo sobre el blanco (`hdr`) `knee` 0.5, `levels` 1 y `scatter` 0.5. Las escenas
+que ya los traen no se tocan. La marca se escribe en un temporal, con `fsync`, y se renombra; una marca
 vacía cuenta como ausente. Los programas que usan los datos se niegan a arrancar con una marca vieja y nombran la orden.
 Una conversión nueva de los datos guardados sube esa versión en uno y corre desde la marca anterior: con la marca al
 día no corre nunca, así que una conversión agregada sin subirla no llegaría a quien ya tiene la marca. Una versión

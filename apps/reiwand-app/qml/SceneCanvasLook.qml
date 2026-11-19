@@ -9,7 +9,7 @@ ColumnLayout {
     required property var page
     readonly property var bloom: page.view.canvas?.bloom ?? null
     readonly property var glide: page.view.canvas?.parallax ?? null
-    readonly property var glows: [["threshold", App.tr("Threshold"), 0, 4, 0.8], ["strength", App.tr("Strength"), 0, 8, 1], ["radius", App.tr("Radius"), 0, 128, 16]]
+    readonly property var glows: [["threshold", App.tr("Threshold"), 0, 4, 0.8], ["strength", App.tr("Strength"), 0, 8, 1], ["radius", App.tr("Radius"), 0, 128, 16], ["knee", App.tr("Soft edge"), 0, 1, 0.5], ["saturation", App.tr("Glow saturation"), 0, 4, 1]]
     readonly property var moves: [["amount", App.tr("Depth"), 0, 4, 1], ["delay", App.tr("Delay"), 0, 2, 0.15], ["pointer", App.tr("Pointer"), 0, 1, 1], ["offset", App.tr("Offset"), -1, 1, 0]]
 
     function field(key, fallback) {
@@ -85,6 +85,12 @@ ColumnLayout {
                 onMoved: look.slid("bloom", glow.modelData[0], value, glow.modelData[4])
             }
         }
+    }
+
+    SceneGlowMore {
+        page: look.page
+        bloom: look.bloom
+        visible: look.bloom !== null
     }
 
     SceneValueRow {

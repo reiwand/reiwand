@@ -27,6 +27,7 @@ mod server_export;
 mod server_settings;
 pub mod settings;
 pub mod sink;
+mod steps;
 pub mod stored;
 #[cfg(feature = "client")]
 pub mod vault;

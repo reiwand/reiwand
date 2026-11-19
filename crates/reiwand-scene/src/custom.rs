@@ -23,7 +23,7 @@ pub const MAX_TARGETS: usize = 8;
 pub const MAX_OPTIONS: usize = 8;
 pub const MAX_VARIANTS: usize = 8;
 pub const MAX_GRID: u32 = 64;
-pub const MAX_PASSES: usize = 16;
+pub const MAX_PASSES: usize = 24;
 pub const MAX_WGSL: usize = 64 << 10;
 pub const MAX_WGSL_TOTAL: usize = 256 << 10;
 

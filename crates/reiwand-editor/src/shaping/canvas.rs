@@ -67,24 +67,30 @@ pub(crate) fn canvas(dir: &Path, doc: &Value, e: &C) -> Result<Vec<Op>> {
             ops
         }
         C::Bloom { off: true, .. } => put(doc, "/scene/canvas/bloom", None),
-        C::Bloom { threshold, strength, radius, tint, hdr, .. } => {
+        C::Bloom { threshold, strength, radius, radius_unit, knee, saturation, limit, tint, hdr, .. } => {
             let mut next = merged::<reiwand_scene::Bloom>(doc, "/scene/canvas/bloom");
-            let numbers = [("threshold", threshold), ("strength", strength), ("radius", radius)];
+            let numbers = [
+                ("threshold", threshold),
+                ("strength", strength),
+                ("radius", radius),
+                ("knee", knee),
+                ("saturation", saturation),
+            ];
             numbers.iter().for_each(|(k, v)| v.iter().for_each(|v| drop(next.insert((*k).into(), json!(v)))));
             tint.iter().for_each(|t| drop(next.insert("tint".into(), json!(t))));
-            match hdr.as_ref().map(|h| h.as_array().map(|a| (a.first().cloned(), a.get(1).cloned()))) {
-                Some(Some((Some(t), Some(s)))) => {
-                    drop(next.insert("hdr".into(), json!({ "threshold": t, "strength": s })))
+            radius_unit.iter().for_each(|u| drop(next.insert("radius_unit".into(), json!(u))));
+            limit.iter().for_each(|l| drop(next.insert("limit".into(), none_or_number(l))));
+            if let Some(h) = hdr {
+                let current = next.get("hdr").cloned();
+                match glare(h, current) {
+                    Some(glare) => drop(next.insert("hdr".into(), glare)),
+                    None if h.is_null() || h == "none" => drop(next.remove("hdr")),
+                    None => bail!(said(
+                        "editor.hdr_object",
+                        "the glare of a glow is none or an object with threshold and strength, and optionally knee, levels and scatter",
+                        &[]
+                    )),
                 }
-                Some(None) if hdr.as_ref().is_some_and(|h| h.is_null() || h == "none") => {
-                    drop(next.remove("hdr"))
-                }
-                Some(_) => bail!(said(
-                    "editor.hdr_pair",
-                    "the glare of a glow is none or a threshold and a strength",
-                    &[]
-                )),
-                None => {}
             }
             put(doc, "/scene/canvas/bloom", Some(Value::Object(next)))
         }
@@ -101,4 +107,22 @@ pub(crate) fn canvas(dir: &Path, doc: &Value, e: &C) -> Result<Vec<Op>> {
         }
     };
     refused(dir, doc, ops)
+}
+
+fn none_or_number(v: &Value) -> Value {
+    if v == "none" { Value::Null } else { v.clone() }
+}
+
+fn glare(given: &Value, current: Option<Value>) -> Option<Value> {
+    let given = given.as_object()?;
+    let mut out = match current {
+        Some(Value::Object(old)) => old,
+        _ => serde_json::Map::from_iter([
+            ("knee".into(), json!(0.5)),
+            ("levels".into(), json!(1)),
+            ("scatter".into(), json!(0.5)),
+        ]),
+    };
+    given.iter().for_each(|(k, v)| drop(out.insert(k.clone(), v.clone())));
+    (out.contains_key("threshold") && out.contains_key("strength")).then_some(Value::Object(out))
 }

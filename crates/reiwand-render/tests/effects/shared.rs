@@ -165,7 +165,8 @@ fn every_built_in_effect_renders_with_its_defaults() {
         let Some(mut run) = Fx::new(&d.id, set.into()).run() else { return };
         let out = run.shot();
         assert_eq!(run.stats().compiled, 0, "{} compiled a shader while drawing", d.id);
-        assert!(run.stats().passes >= d.passes.len() as u32, "{} ran {} passes", d.id, run.stats().passes);
+        let always = d.passes.iter().filter(|p| p.when.is_none()).count() as u32;
+        assert!(run.stats().passes >= always, "{} ran {} passes", d.id, run.stats().passes);
         assert!(out.mean().iter().any(|m| *m > 8.0), "{} drew nothing", d.id);
     }
 }

@@ -132,6 +132,12 @@ impl Painter<'_, '_, '_> {
     }
 
     fn step_pass(&mut self, at: &At<'_, '_>, n: usize, pass: &'static PassDef, k: u32, previous: Src) -> Src {
+        let held = |w: &reiwand_scene::When| {
+            at.e.descriptor.param(&w.param).is_none_or(|i| at.e.slots[i][0] >= w.at_least)
+        };
+        if !pass.when.as_ref().is_none_or(held) {
+            return Src::Clear;
+        }
         let front = at.sim.map(|id| (id, self.front(id)));
         let mut tex = [Src::Clear, at.mask, Src::Clear, Src::Clear, Src::Clear, Src::Clear, at.lut];
         for (slot, name) in [0, 2, 3, 4, 5].into_iter().zip(&pass.inputs) {

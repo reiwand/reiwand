@@ -530,6 +530,7 @@
           "enabled": true,
           "optional": false,
           "params": {
+            "capped": false,
             "intensity": {
               "audio": "bass",
               "invert": false,
@@ -539,9 +540,14 @@
               "unit": "db"
             },
             "knee": 0.5,
+            "levels": 1,
+            "limit": 1.0,
             "radius": 16.0,
+            "saturation": 1.0,
+            "scatter": 0.5,
             "threshold": 0.8,
-            "tint": "#ffffff"
+            "tint": "#ffffff",
+            "unit": 0
           }
         },
         {
