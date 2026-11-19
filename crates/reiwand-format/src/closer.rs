@@ -69,4 +69,9 @@ impl<R: Read + Seek> Package<R> {
         file.read_to_end(&mut tail)?;
         Ok((head, Some(tail)))
     }
+
+    pub(crate) fn sound_ends(&mut self, path: &str, edge: u64) -> Result<Option<crate::contents::Ends>> {
+        let Ok(mut file) = self.archive.by_name_seek(path) else { return Ok(None) };
+        Ok(Some(reiwand_scene::sound_edges(&mut file, edge)?))
+    }
 }

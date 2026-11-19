@@ -340,7 +340,7 @@ puede oír su propio sonido.
 
 Los recursos de sonido son OGG (Vorbis u Opus), OPUS, FLAC, WAV o MP3 (solo si se llaman `.mp3`),
 mono o estéreo, de 8 a 192 kHz. Cada uno pesa hasta 8 MiB y dura hasta 60 s; todos juntos, hasta
-180 s. Con `stream`, hasta 32 MiB y 10 minutos cada uno y 64 MiB en total, fuera de los 180 s.
+180 s. Con `stream`, hasta 192 MiB y 3 horas cada uno y 384 MiB en total, fuera de los 180 s.
 
 El sonido sigue el reloj de la escena: suena desde el punto en que la escena dice que debe ir,
 y si se desvía más de 60 ms se vuelve a poner en su sitio. Un sonido con `play_on` suena donde

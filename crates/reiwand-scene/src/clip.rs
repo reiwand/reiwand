@@ -1,9 +1,9 @@
 pub const MAX_SOUND_BYTES: u64 = 8 << 20;
 pub const MAX_SOUND_SECONDS: f32 = 60.0;
 pub const MAX_SOUND_TOTAL: f32 = 180.0;
-pub const MAX_STREAM_BYTES: u64 = 32 << 20;
-pub const MAX_STREAM_SECONDS: f32 = 600.0;
-pub const MAX_STREAM_TOTAL: u64 = 64 << 20;
+pub const MAX_STREAM_BYTES: u64 = 192 << 20;
+pub const MAX_STREAM_SECONDS: f32 = 10_800.0;
+pub const MAX_STREAM_TOTAL: u64 = 384 << 20;
 pub const MAX_CLIPS: usize = 16;
 const FORMATS: [&str; 5] = ["ogg", "opus", "flac", "wav", "mp3"];
 
@@ -28,19 +28,11 @@ impl Clip {
     }
 
     pub fn file(path: &std::path::Path) -> Result<Clip, String> {
-        use std::io::{Read, Seek, SeekFrom};
-        const EDGE: u64 = 1 << 20;
         let failed = |e: std::io::Error| e.to_string();
         let mut file = std::fs::File::open(path).map_err(failed)?;
         let size = file.metadata().map_err(failed)?.len();
-        let mut edge = |from: u64| {
-            let mut bytes = Vec::new();
-            file.seek(SeekFrom::Start(from)).map_err(failed)?;
-            (&mut file).take(EDGE).read_to_end(&mut bytes).map_err(failed)?;
-            Ok::<_, String>(bytes)
-        };
-        let (head, tail) = (edge(0)?, edge(size.saturating_sub(EDGE))?);
-        Clip::sample(&path.to_string_lossy(), &head, &tail, size)
+        let (head, tail, skip) = sound_edges(&mut file, 1 << 20).map_err(failed)?;
+        Clip::sample(&path.to_string_lossy(), &head, &tail, size - skip)
     }
 
     pub fn read(name: &str, bytes: &[u8]) -> Result<Clip, String> {
@@ -66,6 +58,31 @@ impl Clip {
         }
         Ok(Clip { rate, channels, seconds })
     }
+}
+
+/// Bytes in front of the sound: an ID3v2 tag, which an MP3 may carry before its first frame.
+pub(crate) fn tag_size(head: &[u8]) -> u64 {
+    let Some(size) = head.get(6..10).filter(|_| head.starts_with(b"ID3")) else { return 0 };
+    let size = size.iter().fold(0u64, |v, &x| v << 7 | u64::from(x & 0x7f));
+    10 + size + if head.get(5).is_some_and(|flags| flags & 0x10 != 0) { 10 } else { 0 }
+}
+
+/// The first and last `edge` bytes of a sound file, past any tag in front of it, and the size of that tag.
+pub fn sound_edges<R: std::io::Read + std::io::Seek>(
+    file: &mut R,
+    edge: u64,
+) -> std::io::Result<(Vec<u8>, Vec<u8>, u64)> {
+    use std::io::{Read, SeekFrom};
+    let size = file.seek(SeekFrom::End(0))?;
+    let (mut tag, mut head, mut tail) = (Vec::new(), Vec::new(), Vec::new());
+    file.seek(SeekFrom::Start(0))?;
+    file.by_ref().take(10).read_to_end(&mut tag)?;
+    let skip = tag_size(&tag).min(size);
+    file.seek(SeekFrom::Start(skip))?;
+    file.by_ref().take(edge).read_to_end(&mut head)?;
+    file.seek(SeekFrom::Start(size.saturating_sub(edge).max(skip)))?;
+    file.read_to_end(&mut tail)?;
+    Ok((head, tail, skip))
 }
 
 fn le(bytes: &[u8], at: usize, len: usize) -> Option<u64> {

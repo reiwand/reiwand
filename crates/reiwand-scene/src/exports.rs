@@ -13,7 +13,7 @@ pub use crate::catalog::{described, drawn, newer_params, reserved, undrawn};
 pub use crate::chain::{CHAIN_ENTRY, cut_at, effect_source, fused_at, fusion};
 pub use crate::clip::{
     Clip, MAX_CLIPS, MAX_SOUND_BYTES, MAX_SOUND_SECONDS, MAX_SOUND_TOTAL, MAX_STREAM_BYTES,
-    MAX_STREAM_SECONDS, MAX_STREAM_TOTAL, playable,
+    MAX_STREAM_SECONDS, MAX_STREAM_TOTAL, playable, sound_edges,
 };
 pub use crate::content::{
     Align, EffectUse, Gradient, Mask, MaskChannel, Shape, Spectrum, SpectrumStyle, Stroke,

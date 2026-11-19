@@ -102,11 +102,11 @@ impl<R: Read + Seek> Package<R> {
         let entries = self.entries.clone();
         scripts(&scene, &entries)?;
         sounds(&scene, &entries, |path, edge| match edge {
-            Some(edge) => self.ends(path, edge).and_then(|(head, tail)| match tail {
-                Some(tail) => Ok((head, tail)),
-                None => Ok((self.read_file(path)?, Vec::new())),
-            }),
-            None => Ok((self.read_file(path)?, Vec::new())),
+            Some(edge) => match self.sound_ends(path, edge)? {
+                Some(ends) => Ok(ends),
+                None => Ok((self.read_file(path)?, Vec::new(), 0)),
+            },
+            None => Ok((self.read_file(path)?, Vec::new(), 0)),
         })?;
         let props = self.manifest.properties.clone();
         scene.adopt(&props, crate::archive::Entries(self)).map_err(|e| invalid(e.to_string()))?;

@@ -84,7 +84,8 @@ fn mp3_clips_report_their_length_and_long_ones_need_streaming() {
     let long = Clip::read("a.mp3", &tagged(4000)).unwrap();
     assert_eq!((long.seconds * 10.0).round() / 10.0, 104.5);
     assert!(Clip::probe("a.mp3", &tagged(4000)).unwrap_err().contains("at most 60 s"));
-    assert!(Clip::read("a.mp3", &tagged(40_000)).unwrap_err().contains("at most 600 s"));
+    assert!(Clip::read("a.mp3", &tagged(40_000)).is_ok());
+    assert!(Clip::read("a.mp3", &tagged(420_000)).unwrap_err().contains("at most 10800 s"));
     assert!(Clip::read("a.mp3", &frame([0xff, 0xfb, 0xf0, 0x00], 417)).unwrap_err().contains("MP3"));
 }
 
@@ -116,4 +117,19 @@ fn streamed_clips_are_measured_from_their_edges() {
     let cbr = stereo.repeat(4000);
     let sampled = Clip::sample("a.mp3", &cbr[..4096], &[], cbr.len() as u64).unwrap();
     assert_eq!(sampled, Clip::read("a.mp3", &cbr).unwrap());
+}
+
+#[test]
+fn a_tag_in_front_of_an_mp3_is_skipped_by_the_size_it_declares() {
+    let frame = [&[0xff, 0xfb, 0x90, 0x00][..], &[0; 413]].concat();
+    let tag: u32 = 1_200_000;
+    let syncsafe = [21, 14, 7, 0].map(|shift| (tag >> shift & 0x7f) as u8);
+    let song = [&b"ID3\x04\0\0"[..], &syncsafe, &vec![0; tag as usize], &frame.repeat(4000)].concat();
+    let (head, tail, skip) = reiwand_scene::sound_edges(&mut std::io::Cursor::new(&song), 1 << 20).unwrap();
+    assert_eq!(skip, 10 + u64::from(tag));
+    let sampled = Clip::sample("a.mp3", &head, &tail, song.len() as u64 - skip).unwrap();
+    assert_eq!(sampled, Clip::read("a.mp3", &song).unwrap());
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::write(dir.path().join("a.mp3"), &song).unwrap();
+    assert_eq!(Clip::file(&dir.path().join("a.mp3")).unwrap(), sampled);
 }

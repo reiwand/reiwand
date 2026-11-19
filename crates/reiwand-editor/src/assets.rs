@@ -27,9 +27,7 @@ fn seconds(file: &Path) -> Result<f32> {
         size <= MAX_STREAM_BYTES,
         said("editor.sound_may_most", "a sound may have at most %1 MiB", &[&(MAX_STREAM_BYTES >> 20)])
     );
-    Ok(Clip::read(&file.to_string_lossy(), &fs::read(file)?)
-        .map_err(|e| anyhow!(said("editor.sound", "the sound %1", &[&e])))?
-        .seconds)
+    Ok(Clip::file(file).map_err(|e| anyhow!(said("editor.sound", "the sound %1", &[&e])))?.seconds)
 }
 
 fn pixels(file: &Path) -> Result<u64> {

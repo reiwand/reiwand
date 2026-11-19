@@ -8,11 +8,7 @@ fn be(b: &[u8], at: usize) -> Option<u32> {
 }
 
 pub(crate) fn mp3(b: &[u8], size: u64) -> Option<(u32, u32, u64)> {
-    let mut start = 0usize;
-    if b.starts_with(b"ID3") {
-        let size = b.get(6..10)?.iter().fold(0usize, |v, &x| v << 7 | usize::from(x & 0x7f));
-        start = 10 + size + if b.get(5)? & 0x10 != 0 { 10 } else { 0 };
-    }
+    let start = usize::try_from(crate::clip::tag_size(b)).ok()?;
     let sync = |i: usize| b.get(i) == Some(&0xff) && b.get(i + 1).is_some_and(|x| x & 0xe6 == 0xe2);
     let at = (start..start.saturating_add(GAP)).find(|&i| sync(i))?;
     let head = be(b, at)?;

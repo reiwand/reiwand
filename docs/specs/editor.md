@@ -261,8 +261,8 @@ playhead; `reiwand-ctl scene ask CARPETA clocks` prints the same lanes as JSON, 
 files of N frames (at most 16) of each with `--strip`.
 
 `import` copies pictures, videos, sounds, fonts and `.cube` tables. It refuses a file over the
-limits of the format (256 assets, 1 GiB per file, 512 MiB of pictures once decoded, sounds of 32
-MiB and 10 minutes at most, the ones up to 60 s 180 s together and the longer ones to be streamed,
+limits of the format (256 assets, 1 GiB per file, 512 MiB of pictures once decoded, sounds of 192
+MiB and 3 hours at most, the ones up to 60 s 180 s together and the longer ones to be streamed,
 tables of 16 MiB); MP3 sounds and `.ttc`, `.otc` and `.woff2` fonts are imported too or an asset id in use before it
 copies anything. The file is copied in blocks to a hidden file in `assets/` that is renamed when
 complete. A file with the same name and other content is stored as `name-2.ext`; one with the same

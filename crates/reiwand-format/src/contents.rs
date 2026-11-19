@@ -29,7 +29,8 @@ pub(crate) fn binaries(entries: &[FileEntry], mut head: impl FnMut(&str) -> Resu
 
 pub(crate) const SOUND_EDGE: u64 = 1 << 20;
 
-pub(crate) type Ends = (Vec<u8>, Vec<u8>);
+/// The head and tail of a sound file and the size of the tag in front of its sound.
+pub(crate) type Ends = (Vec<u8>, Vec<u8>, u64);
 
 pub(crate) fn scripts(scene: &Scene, entries: &[FileEntry]) -> Result<()> {
     let total = scene.scripts.iter().map(|s| size(entries, &s.path)).sum();
@@ -55,9 +56,9 @@ pub(crate) fn sounds(
             (MAX_SOUND_BYTES, MAX_SOUND_SECONDS)
         };
         within("sound size", size, bytes)?;
-        let (head, tail) = read(path, stream.then_some(SOUND_EDGE))?;
+        let (head, tail, skip) = read(path, stream.then_some(SOUND_EDGE))?;
         let tail = if tail.is_empty() { &head } else { &tail };
-        let clip = Clip::sample(path, &head, tail, size)
+        let clip = Clip::sample(path, &head, tail, size.saturating_sub(skip))
             .map_err(|reason| Error::Invalid { field: path.into(), reason: reason.into() })?;
         let lasts = format!("{:.1}", clip.seconds);
         let reason = || said("format.lasts", "lasts %1 s, at most %2 s are allowed", &[&lasts, &seconds]);

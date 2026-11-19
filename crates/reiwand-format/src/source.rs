@@ -83,8 +83,8 @@ fn facts_of(source: &Path, manifest: &Manifest) -> Result<Facts> {
         }
         scripts(scene, &files)?;
         sounds(scene, &files, |path, edge| match edge {
-            Some(edge) => Ok(media::ends(&source.join(path), edge)?),
-            None => Ok((fs::read(source.join(path))?, Vec::new())),
+            Some(edge) => Ok(reiwand_scene::sound_edges(&mut fs::File::open(source.join(path))?, edge)?),
+            None => Ok((fs::read(source.join(path))?, Vec::new(), 0)),
         })?;
         scene.adopt(&manifest.properties, Folder(source)).map_err(invalid)?;
         scene.read_inked(&mut Folder(source));

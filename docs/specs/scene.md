@@ -1767,7 +1767,7 @@ Newer sound layers may also use (`sound2`):
 | `sounds` | instead of `sound`, a list of 1 to 16 sound assets |
 | `mode` | with `sounds`: `sequence` (prefilled, in order) or `random` (picked with the scene seed) |
 | `pause` | `[min, max]` seconds (0 to 600) of silence between clips, picked with the scene seed |
-| `stream` | `true` plays the files as they are read instead of from memory, for long sounds: at most 32 MiB and 10 minutes each and 64 MiB for all the streamed sounds of a scene, outside the 180 s of the others |
+| `stream` | `true` plays the files as they are read instead of from memory, for long sounds: at most 192 MiB and 3 hours each and 384 MiB for all the streamed sounds of a scene, outside the 180 s of the others |
 | `play_on` | a trigger (`start`, `beat`, `prop:<id>`, `event:<name>`, `click:<layer>`, `enter:<layer>`, `leave:<layer>` or `media:<what>`, as for timelines) that starts the sound, always under the user's volume and mute |
 
 A layer has either `sound` or `sounds`. With `loop: false`, `sequence` plays the list once and
