@@ -1,3 +1,7 @@
+mod opening;
+mod speaker;
+
+use self::opening::Later;
 use super::Settings;
 use super::output::Output;
 use super::scene::SceneState;
@@ -14,12 +18,13 @@ use std::time::{Duration, Instant};
 type Chosen = BTreeMap<PathBuf, (String, bool, f64)>;
 
 const LINGER: Duration = Duration::from_secs(5);
+const OPENING: Duration = Duration::from_millis(50);
 const RESYNC: Duration = Duration::from_secs(1);
 
 pub(super) struct Speaker {
     pack: Arc<ScenePack>,
     output: String,
-    track: Option<Soundtrack>,
+    track: Later<Soundtrack>,
     playing: bool,
     volume: f64,
     voices: Vec<Voice>,
@@ -93,8 +98,7 @@ impl State {
             if self.speakers.get(&path).is_some_and(|s| !Arc::ptr_eq(&s.pack, &scene.spec.pack)) {
                 self.speakers.remove(&path);
             }
-            let ended =
-                self.speakers.get(&path).and_then(|s| s.track.as_ref()).is_some_and(Soundtrack::quiet);
+            let ended = self.speakers.get(&path).and_then(|s| s.track.get()).is_some_and(Soundtrack::quiet);
             let silent = ended || scene.voices.iter().all(|v| !v.play || v.volume <= 0.0);
             let speaker = match self.speakers.entry(path) {
                 Entry::Occupied(entry) => entry.into_mut(),
@@ -109,7 +113,10 @@ impl State {
             if heard || speaker.voices != scene.voices {
                 speaker.follow(&scene.voices, now);
             }
-            let track = speaker.track.as_ref();
+            if speaker.track.arrived() {
+                speaker.settle(volume, playing);
+            }
+            let track = speaker.track.get();
             if speaker.volume != volume {
                 track.iter().for_each(|t| t.set_volume(volume));
                 speaker.volume = volume;
@@ -134,55 +141,6 @@ impl State {
             Some(_) => "paused",
             None => "off",
         }
-    }
-}
-
-impl Speaker {
-    fn open(pack: &Arc<ScenePack>, voices: &[Voice], tracks: &[Track], volume: f64) -> Speaker {
-        let sounds: Vec<_> = pack.scene.sounds().collect();
-        let file = |id: &str| pack.sounds.iter().position(|(sound, _)| sound == id);
-        let lanes: Vec<(Vec<Option<usize>>, Track)> = (sounds.iter().zip(tracks))
-            .map(|(s, track)| {
-                let silent = s.play == Value::Fixed(false);
-                (s.clips().map(|id| file(id).filter(|_| !silent)).collect(), track.clone())
-            })
-            .collect();
-        let failed = |event| {
-            if let Event::Error(e) = event {
-                tracing::warn!("the scene sound stopped: {e}");
-            }
-        };
-        let track = Soundtrack::open(&pack.clips, &lanes, voices, volume, failed);
-        let track = track.inspect_err(|e| tracing::warn!("cannot play the scene sound: {e}")).ok();
-        tracing::info!(scene = pack.props.id, "scene sound on");
-        let fade = sounds.iter().map(|s| Duration::from_secs_f32(s.fade_out)).max().unwrap_or_default();
-        let (pack, output, voices) = (pack.clone(), String::new(), voices.to_vec());
-        let synced = Instant::now();
-        Speaker { pack, output, track, playing: false, volume, voices, fade, quiet: None, synced }
-    }
-
-    fn follow(&mut self, voices: &[Voice], now: Instant) {
-        if self.voices != voices {
-            self.track.iter().for_each(|t| t.set(voices));
-            self.voices = voices.to_vec();
-        }
-        self.synced = now;
-    }
-
-    fn faded(&self, now: Instant) -> bool {
-        self.quiet.is_some_and(|at| at + self.fade <= now)
-    }
-
-    fn due(&self) -> Option<Instant> {
-        let faded =
-            self.quiet.map(|quiet| quiet + self.fade + if self.playing { Duration::ZERO } else { LINGER });
-        faded.into_iter().chain(self.playing.then_some(self.synced + RESYNC)).min()
-    }
-}
-
-impl Drop for Speaker {
-    fn drop(&mut self) {
-        tracing::info!(scene = self.pack.props.id, "scene sound off");
     }
 }
 
