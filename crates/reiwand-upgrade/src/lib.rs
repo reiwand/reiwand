@@ -1,4 +1,5 @@
 mod accounts;
+mod atomic;
 pub mod carry;
 pub mod client;
 pub mod descriptors;

@@ -111,7 +111,7 @@ pub fn run(data: &Path, sink: &mut Sink) -> anyhow::Result<bool> {
     if !path.is_file() {
         return Ok(false);
     }
-    let original = Connection::open(&path)?;
+    let original = Connection::open_with_flags(&path, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)?;
     let found: u32 = original.pragma_query_value(None, "user_version", |r| r.get(0))?;
     if found == SCHEMA || found == 0 {
         return Ok(false);
@@ -131,7 +131,10 @@ pub fn run(data: &Path, sink: &mut Sink) -> anyhow::Result<bool> {
     copy.close().map_err(|(_, e)| e)?;
     original.close().map_err(|(_, e)| e)?;
     for suffix in ["", "-wal", "-shm"] {
-        sink.move_away(&data.join(format!("library.db{suffix}")))?;
+        sink.keep(&data.join(format!("library.db{suffix}")))?;
+    }
+    for suffix in ["-wal", "-shm"] {
+        let _ = fs::remove_file(data.join(format!("library.db{suffix}")));
     }
     fs::rename(staged, path)?;
     Ok(true)

@@ -308,7 +308,7 @@ be rolled back either. When no address is left, `add_repo` with its URL repairs 
 <data>/installed.json                         origin, hash, signer and revocation of each package
 <data>/anchors.json                           first signing key of each package of an online author
 <data>/.repos.lock                            flock serializing writers
-<data>/format-version                         number of the stored format (3)
+<data>/format-version                         number of the stored format (4)
 ```
 
 The client knows only the current format. A data folder without `format-version` that already holds

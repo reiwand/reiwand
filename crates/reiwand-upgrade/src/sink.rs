@@ -1,4 +1,5 @@
 use anyhow::Context;
+use std::collections::BTreeSet;
 use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -8,41 +9,53 @@ pub struct Sink {
     plain: bool,
     copies: PathBuf,
     kept: usize,
+    kept_paths: BTreeSet<PathBuf>,
+    skipped: Vec<(PathBuf, String)>,
     changed: Vec<PathBuf>,
     unsigned: Vec<String>,
 }
 
 impl Sink {
-    pub fn copying(copies: &Path) -> Self {
+    fn make(check: bool, plain: bool, copies: PathBuf) -> Self {
         Sink {
-            check: false,
-            plain: false,
-            copies: copies.to_path_buf(),
+            check,
+            plain,
+            copies,
             kept: 0,
+            kept_paths: BTreeSet::new(),
             changed: Vec::new(),
             unsigned: Vec::new(),
+            skipped: Vec::new(),
         }
+    }
+
+    pub fn copying(copies: &Path) -> Self {
+        Self::make(false, false, copies.to_path_buf())
     }
 
     pub fn plain() -> Self {
-        Sink {
-            check: false,
-            plain: true,
-            copies: PathBuf::new(),
-            kept: 0,
-            changed: Vec::new(),
-            unsigned: Vec::new(),
-        }
+        Self::make(false, true, PathBuf::new())
     }
 
     pub fn checking() -> Self {
-        Sink {
-            check: true,
-            plain: false,
-            copies: PathBuf::new(),
-            kept: 0,
-            changed: Vec::new(),
-            unsigned: Vec::new(),
+        Self::make(true, false, PathBuf::new())
+    }
+
+    pub fn skipped(&self) -> &[(PathBuf, String)] {
+        &self.skipped
+    }
+
+    pub fn skip(&mut self, path: &Path, reason: String) {
+        self.skipped.push((path.to_path_buf(), reason));
+    }
+
+    pub fn attempt<T>(&mut self, path: &Path, run: impl FnOnce(&mut Sink) -> anyhow::Result<T>) -> Option<T> {
+        match run(self) {
+            Ok(done) => Some(done),
+            Err(e) => {
+                self.skip(path, format!("{e:#}"));
+                None
+            }
         }
     }
 
@@ -73,6 +86,10 @@ impl Sink {
     fn slot(&mut self, path: &Path) -> anyhow::Result<PathBuf> {
         anyhow::ensure!(!self.plain, "this run keeps no copies");
         fs::create_dir_all(&self.copies)?;
+        if self.kept == 0 {
+            // the settings and the data of one run keep their copies in one folder: number after the ones there
+            self.kept = fs::read_to_string(self.copies.join("index.txt")).map_or(0, |t| t.lines().count());
+        }
         self.kept += 1;
         let name = path.file_name().context("no file name")?.to_string_lossy().into_owned();
         let mut index =
@@ -82,17 +99,9 @@ impl Sink {
     }
 
     pub fn keep(&mut self, path: &Path) -> anyhow::Result<()> {
-        if path.is_file() && !self.plain {
+        if path.is_file() && !self.plain && self.kept_paths.insert(path.to_path_buf()) {
             let slot = self.slot(path)?;
             fs::copy(path, slot).with_context(|| format!("cannot keep a copy of {}", path.display()))?;
-        }
-        Ok(())
-    }
-
-    pub fn move_away(&mut self, path: &Path) -> anyhow::Result<()> {
-        if path.is_file() {
-            let slot = self.slot(path)?;
-            fs::rename(path, slot)?;
         }
         Ok(())
     }
@@ -103,10 +112,7 @@ impl Sink {
             return Ok(());
         }
         self.keep(path)?;
-        let name = path.file_name().context("no file name")?.to_string_lossy().into_owned();
-        let staged = path.with_file_name(format!("{name}.upgrading"));
-        fs::write(&staged, converted)?;
-        Ok(fs::rename(staged, path)?)
+        crate::atomic::write(path, converted)
     }
 
     pub fn text(

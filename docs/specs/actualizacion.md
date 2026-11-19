@@ -18,6 +18,24 @@ viejos se niegan a arrancar y nombran la orden exacta que corre la conversión.
   También convierte `examples-repo.json` si no lleva el envoltorio de formato, los `.wpak` de la biblioteca que la base
   marca con error (los importados a `files/`: se reescriben y la fila recibe tamaño, fecha y hash nuevos y se vuelve a
   leer) y los `*.reiwand.json` junto a imágenes importadas o de proveedores. Al terminar escribe la marca `format-version`.
+
+## Una vez y marcada
+
+`client` corre solo si la marca es menor que la versión de datos actual (4); con la marca al día no lee ningún paquete ni
+carpeta. De una marca menor que 3 hace todo; de 3 a 4 hace solo lo agregado después: el repositorio de ejemplos, los
+paquetes importados y las ediciones sueltas. La marca se escribe en un temporal, con `fsync`, y se renombra; una marca
+vacía cuenta como ausente. Los programas que usan los datos se niegan a arrancar con una marca vieja y nombran la orden.
+Una conversión nueva de los datos guardados sube esa versión en uno y corre desde la marca anterior: con la marca al
+día no corre nunca, así que una conversión agregada sin subirla no llegaría a quien ya tiene la marca. Una versión
+anterior del programa se niega a arrancar con datos de una versión de datos mayor.
+
+Un archivo dañado (un `.wpak` roto, un `scene.json` ilegible, un `state.json` vacío) no frena la conversión: se
+informa «not converted RUTA: motivo» y se guarda la lista en `upgrade-copias/<tiempo>/not-converted.txt`; la marca se
+escribe igual, porque la versión nueva tampoco leería ese archivo. `installed.json` se guarda después de cada paquete
+reescrito, y si la corrida falla las firmas ya perdidas se nombran en el error. El recorrido no sigue enlaces simbólicos
+a carpetas. El repositorio de ejemplos se rehace en `examples-repo.upgrading` y se intercambia al final; si se corta
+entre medias, la corrida siguiente termina el intercambio. `save` conserva los permisos y escribe a través de enlaces.
+La base de la biblioteca se reemplaza con un solo renombrado, sin ventana sin `library.db`.
 - `reiwand-upgrade file RUTA... [--password-file ARCHIVO] [--copies DIR] [--check]`: una carpeta de escena o de
   paquete (todo lo que hay debajo), un `.wpak`, un `.reiwand` (si está cifrado sigue cifrado), una edición
   (`nombre.ext.reiwand.json`) o un descriptor de efecto. Es la orden de quien crea, antes de volver a firmar.
@@ -25,7 +43,8 @@ viejos se niegan a arrancar y nombran la orden exacta que corre la conversión.
 
 ## Garantías
 
-- `--check` dice qué cambiaría y no escribe nada.
+- `--check` dice qué cambiaría y no escribe en los datos ni abre el llavero ni la base en escritura (para ver si un
+  paquete cambia lo desempaqueta en una carpeta temporal del sistema).
 - Cada archivo que cambia se copia antes en `upgrade-copias/<tiempo>/` con un `index.txt` (`número`, ruta original).
 - Cada formato lleva su marca de versión (`format`, `schema`, esquema de la base): lo que ya está en la versión
   nueva se deja, así que repetir la orden no cambia nada.

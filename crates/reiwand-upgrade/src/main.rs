@@ -67,6 +67,9 @@ fn report(sink: &Sink, check: bool) {
     for path in sink.changed().iter().filter(|p| seen.insert(p.as_path())) {
         println!("{} {}", if check { "would change" } else { "changed" }, path.display());
     }
+    for (path, reason) in sink.skipped() {
+        eprintln!("not converted {}: {reason}", path.display());
+    }
     say_unsigned(sink.unsigned(), check);
     if !check && !seen.is_empty() {
         println!("the originals are in {}", sink.copies().display());
@@ -88,8 +91,14 @@ fn clients(args: &[String]) -> anyhow::Result<()> {
         also: also.map(PathBuf::from).collect(),
         copies: Some(copies),
     };
-    let mut vault = reiwand_upgrade::vault::KeyringVault::open(&data)?;
-    let done = client::convert(&data, &mut vault, &options)?;
+    let mut vault: Box<dyn reiwand_upgrade::Vault> = match check {
+        true => Box::new(reiwand_upgrade::NoVault),
+        false => Box::new(reiwand_upgrade::vault::KeyringVault::open(&data)?),
+    };
+    let done = client::convert(&data, vault.as_mut(), &options)?;
+    for (path, reason) in &done.skipped {
+        eprintln!("not converted {}: {reason}", path.display());
+    }
     for path in &done.changed {
         println!("{} {}", if check { "would change" } else { "changed" }, path.display());
     }

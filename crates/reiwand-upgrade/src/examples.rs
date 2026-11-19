@@ -67,6 +67,10 @@ fn repoint(data: &Path, old: &str, new: &str, sink: &mut Sink) -> anyhow::Result
 pub(crate) fn repaired(data: &Path, sink: &mut Sink) -> anyhow::Result<()> {
     record(data, sink)?;
     let (repo, keys) = (data.join("examples-repo"), data.join("examples-keys"));
+    let staged = data.join("examples-repo.upgrading");
+    if !repo.exists() && staged.is_dir() && !sink.is_check() {
+        fs::rename(&staged, &repo)?;
+    }
     let root = repo.join("root/1.json");
     let Ok(bytes) = fs::read(&root) else { return Ok(()) };
     if reiwand_format::status(&repo).is_ok() {
@@ -85,10 +89,14 @@ pub(crate) fn repaired(data: &Path, sink: &mut Sink) -> anyhow::Result<()> {
     for key in fs::read_dir(&keys).into_iter().flatten().flatten() {
         sink.keep(&key.path())?;
     }
-    fs::rename(&repo, sink.copies().join("examples-repo"))?;
+    if staged.exists() {
+        fs::rename(&staged, sink.copies().join("examples-repo-unfinished"))?;
+    }
     let now = std::time::UNIX_EPOCH.elapsed().map_or(0, |d| d.as_secs() as i64);
-    let made = reiwand_format::bundled(&repo, &keys, &name, &[], now)?;
+    let made = reiwand_format::bundled(&staged, &keys, &name, &[], now)?;
     repoint(data, &old, &made.repo_id, sink)?;
+    fs::rename(&repo, sink.copies().join("examples-repo"))?;
+    fs::rename(&staged, &repo)?;
     let client = data.join("repos").join(&old);
     if client.is_dir() {
         fs::rename(&client, sink.copies().join(format!("repo-{old}")))?;

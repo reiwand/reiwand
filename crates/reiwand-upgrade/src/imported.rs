@@ -27,7 +27,7 @@ pub(crate) fn edits(data: &Path, sink: &mut Sink) -> anyhow::Result<()> {
         for entry in fs::read_dir(&folder).into_iter().flatten().flatten() {
             let path = entry.path();
             if path.file_name().is_some_and(|n| n.to_string_lossy().ends_with(".reiwand.json")) {
-                crate::edits::file(&path, sink)?;
+                sink.attempt(&path, |sink| crate::edits::file(&path, sink));
             }
         }
     }
@@ -47,7 +47,7 @@ pub(crate) fn packages(data: &Path, sink: &mut Sink) -> anyhow::Result<()> {
     let mut converted = Vec::new();
     let stale = |p: &PathBuf| p.is_file() && (refused.contains(p) || reiwand_format::peek(p).is_err());
     for path in listed.into_iter().filter(stale) {
-        if crate::packages::wpak(&path, sink).unwrap_or(false) {
+        if sink.attempt(&path, |sink| crate::packages::wpak(&path, sink)).unwrap_or(false) {
             converted.push(path);
         }
     }

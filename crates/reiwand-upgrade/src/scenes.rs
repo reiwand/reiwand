@@ -18,19 +18,31 @@ fn walk(dir: &Path, changed: &mut usize, sink: &mut Sink) -> anyhow::Result<()> 
     let Ok(items) = fs::read_dir(dir) else { return Ok(()) };
     for item in items.flatten() {
         let path = item.path();
-        if path.is_dir() {
+        let Ok(kind) = item.file_type() else { continue };
+        if kind.is_dir() {
             walk(&path, changed, sink)?;
-        } else if path.file_name().is_some_and(|n| n == "scene.json") {
-            *changed += usize::from(scene(&path, sink)?);
-        } else if path.file_name().is_some_and(|n| n == "manifest.json") {
-            *changed += usize::from(manifest(&path, sink)?);
-        } else if path.extension().is_some_and(|e| e == "wpak") {
-            *changed += usize::from(crate::packages::wpak(&path, sink)?);
-        } else if path.file_name().is_some_and(|n| n.to_string_lossy().ends_with(".reiwand.json")) {
-            *changed += usize::from(crate::edits::file(&path, sink)?);
+        } else if kind.is_symlink() && path.is_dir() {
+            continue;
+        } else if let Some(done) = sink.attempt(&path, |sink| entry(&path, sink)) {
+            *changed += usize::from(done);
         }
     }
     Ok(())
+}
+
+fn entry(path: &Path, sink: &mut Sink) -> anyhow::Result<bool> {
+    let name = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+    if name == "scene.json" {
+        scene(path, sink)
+    } else if name == "manifest.json" {
+        manifest(path, sink)
+    } else if path.extension().is_some_and(|e| e == "wpak") {
+        crate::packages::wpak(path, sink)
+    } else if name.ends_with(".reiwand.json") {
+        crate::edits::file(path, sink)
+    } else {
+        Ok(false)
+    }
 }
 
 pub fn customs(dir: &Path, doc: &Value) -> Customs {

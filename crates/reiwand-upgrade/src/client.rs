@@ -6,7 +6,8 @@ use anyhow::Context;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-pub const CURRENT: i64 = 3;
+pub const CURRENT: i64 = reiwand_format::DATA_VERSION as i64;
+const SETTLED: i64 = 3;
 
 const MARK: &str = "format-version";
 
@@ -21,6 +22,7 @@ pub struct Done {
     pub outcome: Outcome,
     pub changed: Vec<PathBuf>,
     pub unsigned: Vec<String>,
+    pub skipped: Vec<(PathBuf, String)>,
     pub copies: PathBuf,
 }
 
@@ -105,17 +107,27 @@ pub fn convert(data: &Path, vault: &mut dyn crate::Vault, options: &Options) -> 
     let copies = options.copies.clone().unwrap_or_else(|| copies_of(data));
     let mut sink = if options.check { Sink::checking() } else { Sink::copying(&copies) };
     if !data.is_dir() {
-        return Ok(Done { outcome: Outcome::Nothing, changed: Vec::new(), unsigned: Vec::new(), copies });
+        return Ok(nothing(copies));
     }
     let found = match fs::read_to_string(data.join(MARK)) {
+        Ok(text) if text.trim().is_empty() => 1,
         Ok(text) => text.trim().parse::<i64>().context("the version mark is damaged")?,
         Err(_) => 1,
     };
-    if !options.check && found < CURRENT {
+    if found == CURRENT {
+        return Ok(nothing(copies));
+    }
+    if !options.check && found < SETTLED {
         fetched(data, vault, options.skip_download)?;
     }
-    steps(data, &mut sink, &options.also)?;
-    if found < CURRENT && data.join("sync.json").exists() {
+    if let Err(e) = steps(data, &mut sink, &options.also, found) {
+        let lost = sink.unsigned().join(", ");
+        return Err(match lost.is_empty() {
+            true => e,
+            false => e.context(format!("packages already rewritten lost their signature: {lost}")),
+        });
+    }
+    if found < SETTLED && data.join("sync.json").exists() {
         if options.check {
             sink.note(&data.join("sync.json"));
         } else {
@@ -126,15 +138,22 @@ pub fn convert(data: &Path, vault: &mut dyn crate::Vault, options: &Options) -> 
     }
     if !options.check {
         let _ = fs::remove_file(data.join("sync-downloaded"));
-        if found < CURRENT {
-            fs::write(data.join(MARK), format!("{CURRENT}\n"))?;
+        if !sink.skipped().is_empty() {
+            let list: String =
+                sink.skipped().iter().map(|(p, why)| format!("{}\t{why}\n", p.display())).collect();
+            fs::create_dir_all(&copies)?;
+            fs::write(copies.join("not-converted.txt"), list)?;
         }
+        crate::atomic::write(&data.join(MARK), format!("{CURRENT}\n").as_bytes())?;
     }
-    let outcome = match found < CURRENT || !sink.changed().is_empty() {
-        true => Outcome::Upgraded { from: found, to: CURRENT },
-        false => Outcome::Nothing,
-    };
-    Ok(Done { outcome, changed: sink.changed().to_vec(), unsigned: sink.unsigned().to_vec(), copies })
+    let outcome = Outcome::Upgraded { from: found, to: CURRENT };
+    Ok(Done {
+        outcome,
+        changed: sink.changed().to_vec(),
+        unsigned: sink.unsigned().to_vec(),
+        skipped: sink.skipped().to_vec(),
+        copies,
+    })
 }
 
 #[cfg(not(any(feature = "client", feature = "server")))]
@@ -142,20 +161,30 @@ fn folders(_: &Path, also: &[PathBuf]) -> Vec<PathBuf> {
     also.to_vec()
 }
 
-fn steps(data: &Path, sink: &mut Sink, also: &[PathBuf]) -> anyhow::Result<()> {
-    crate::phone::settings(data, sink)?;
-    crate::edits::folder(&data.join("edits"), sink)?;
-    for item in fs::read_dir(data.join("repos")).into_iter().flatten().flatten() {
-        crate::registries::plain(&item.path().join("state.json"), sink)?;
+fn nothing(copies: PathBuf) -> Done {
+    Done { outcome: Outcome::Nothing, changed: Vec::new(), unsigned: Vec::new(), skipped: Vec::new(), copies }
+}
+
+fn steps(data: &Path, sink: &mut Sink, also: &[PathBuf], found: i64) -> anyhow::Result<()> {
+    if found < SETTLED {
+        crate::phone::settings(data, sink)?;
+        crate::edits::folder(&data.join("edits"), sink)?;
+        for item in fs::read_dir(data.join("repos")).into_iter().flatten().flatten() {
+            let state = item.path().join("state.json");
+            sink.attempt(&state, |sink| crate::registries::plain(&state, sink));
+        }
+        let installed = data.join("installed.json");
+        if let Err(e) = crate::packages::installed(data, sink) {
+            sink.skip(&installed, format!("{e:#}"));
+        }
+        crate::stored::files(data, sink)?;
+        for folder in folders(data, also) {
+            crate::scenes::walk_in(&folder, sink)?;
+        }
+        #[cfg(any(feature = "client", feature = "server"))]
+        crate::library::run(data, sink)?;
     }
-    crate::packages::installed(data, sink)?;
-    crate::stored::files(data, sink)?;
     crate::examples::repaired(data, sink)?;
-    for folder in folders(data, also) {
-        crate::scenes::walk_in(&folder, sink)?;
-    }
-    #[cfg(any(feature = "client", feature = "server"))]
-    crate::library::run(data, sink)?;
     #[cfg(any(feature = "client", feature = "server"))]
     {
         crate::imported::packages(data, sink)?;
