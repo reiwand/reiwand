@@ -28,6 +28,7 @@ pub fn wanted(spec: &Value, doc: &Value) -> (Rehearsal, Option<Versus>) {
         battery: spec["battery"] == true,
         calm: spec["calm"] == true,
         edge: number("size", 1280.0, 16.0, 4096.0) as u32,
+        screen: None,
         time: number("time", 0.0, 0.0, 86_400.0),
         wall: spec["wall"]
             .as_f64()

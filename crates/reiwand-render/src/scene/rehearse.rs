@@ -26,6 +26,7 @@ pub struct Rehearsal {
     pub battery: bool,
     pub calm: bool,
     pub edge: u32,
+    pub screen: Option<(u32, u32)>,
     pub time: f64,
     pub wall: f64,
     pub lang: String,
@@ -43,6 +44,7 @@ impl Default for Rehearsal {
             battery: false,
             calm: false,
             edge: 1280,
+            screen: None,
             time: 0.0,
             wall: local_wall(),
             lang: "en".into(),
@@ -117,7 +119,8 @@ impl Renderer {
         let quality = wanted.level();
         let [w, h] = scene.canvas.size.map(|v| v.max(1) as f32);
         let scale = (wanted.edge.max(16) as f32 / w.max(h)).min(1.0);
-        let size = ((w * scale).round().max(1.0) as u32, (h * scale).round().max(1.0) as u32);
+        let canvas = ((w * scale).round().max(1.0) as u32, (h * scale).round().max(1.0) as u32);
+        let size = wanted.screen.unwrap_or(canvas);
         let mut runtime = Runtime::new(Arc::new(scene.clone()), props.clone());
         assets.sheets.iter().for_each(|(id, d)| runtime.set_sheet(id, d.clone()));
         runtime.set_battery(wanted.battery);

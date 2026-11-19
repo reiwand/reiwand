@@ -37,6 +37,8 @@ pub enum Rendering {
         fps: u32,
         #[arg(long, default_value_t = 1280, value_parser = clap::value_parser!(u32).range(16..=4096), help = "Longest side of the picture in pixels")]
         size: u32,
+        #[arg(long, value_name = "WIDTHxHEIGHT", value_parser = screen_size, conflicts_with = "size", help = "Draw as the daemon would on a screen of this size in pixels, with the fit of the canvas; the picture has exactly this size and --size does not apply")]
+        screen: Option<(u32, u32)>,
         #[arg(long, value_name = "X,Y[:X,Y]", value_parser = pointer, help = "Make-believe pointer at these fractions of the canvas, moving to the second pair over the clip")]
         pointer: Option<([f32; 2], [f32; 2])>,
         #[arg(long, requires = "pointer", help = "Press the pointer over the middle of the clip")]
@@ -59,6 +61,14 @@ pub enum Rendering {
 fn fraction(text: &str) -> Result<f32, String> {
     let v: f32 = text.parse().map_err(|_| fill(told("%1 is not a number"), &[&text]))?;
     (0.0..=1.0).contains(&v).then_some(v).ok_or_else(|| tr(told("from 0 to 1")).to_owned())
+}
+
+fn screen_size(text: &str) -> Result<(u32, u32), String> {
+    let side = |v: &str| v.trim().parse::<u32>().ok().filter(|v| (16..=8192).contains(v));
+    let (w, h) = text
+        .split_once(['x', 'X'])
+        .ok_or_else(|| tr(told("use WIDTHxHEIGHT, such as 1920x1080")).to_owned())?;
+    side(w).zip(side(h)).ok_or_else(|| tr(told("each side from 16 to 8192")).to_owned())
 }
 
 fn point(text: &str) -> Result<[f32; 2], String> {
@@ -89,6 +99,7 @@ pub fn run(command: Rendering) -> Result<()> {
         frames,
         fps,
         size,
+        screen,
         pointer,
         click,
         language,
@@ -105,6 +116,7 @@ pub fn run(command: Rendering) -> Result<()> {
         battery,
         calm,
         edge: size,
+        screen,
         time,
         wall: time_of_day.unwrap_or_else(reiwand_render::local_wall),
         script_host: None,

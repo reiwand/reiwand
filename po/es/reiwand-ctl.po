@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Reiwand\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 00:00+0000\n"
+"POT-Creation-Date: 2026-11-19 00:00+0000\n"
 "PO-Revision-Date: 2026-11-06 00:00+0000\n"
 "Last-Translator: Reiwand contributors\n"
 "Language-Team: Reiwand contributors\n"
@@ -4660,6 +4660,14 @@ msgstr "Lado mayor de la imagen en píxeles"
 
 #: apps/reiwand-ctl/src/rendering.rs
 msgid ""
+"Draw as the daemon would on a screen of this size in pixels, with the fit of "
+"the canvas; the picture has exactly this size and --size does not apply"
+msgstr ""
+"Dibuja como lo haría el demonio en una pantalla de este tamaño en píxeles, "
+"con el ajuste del lienzo; la imagen mide exactamente eso y --size no aplica"
+
+#: apps/reiwand-ctl/src/rendering.rs
+msgid ""
 "Make-believe pointer at these fractions of the canvas, moving to the second "
 "pair over the clip"
 msgstr ""
@@ -4695,6 +4703,14 @@ msgstr ""
 #: apps/reiwand-ctl/src/rendering.rs
 msgid "from 0 to 1"
 msgstr "de 0 a 1"
+
+#: apps/reiwand-ctl/src/rendering.rs
+msgid "use WIDTHxHEIGHT, such as 1920x1080"
+msgstr "usa ANCHOxALTO, como 1920x1080"
+
+#: apps/reiwand-ctl/src/rendering.rs
+msgid "each side from 16 to 8192"
+msgstr "cada lado de 16 a 8192"
 
 #: apps/reiwand-ctl/src/rendering.rs
 msgid "script: %1"

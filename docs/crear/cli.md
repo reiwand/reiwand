@@ -236,7 +236,8 @@ Imprime los archivos que escribió. Dibuja lo mismo que la vista previa del edit
 | `--time-of-day HORA` | La hora de pared que ven la escena y sus scripts: `HH:MM[:SS]` de hoy o `AAAA-MM-DD HH:MM[:SS]`. Sin ella, la hora de este equipo; ponla para que la imagen salga igual siempre. |
 | `--media ARCHIVO` | Una pista inventada del reproductor (JSON: `title`, `artist`, `album`, `playing`, `position`, `duration`, `rate`, `cover`…; la carátula es una imagen de la carpeta) que ven los scripts y las imágenes que siguen a la carátula. Sin ella, no hay reproductor. |
 | `--quality q0`…`q3` | El nivel de calidad más alto (`q3` prellenado). |
-| `--size PX` | El lado mayor de la imagen (1280 prellenado). |
+| `--size PX` | El lado mayor de la imagen (1280 prellenado). Nunca dibuja más grande que el lienzo. |
+| `--screen ANCHOxALTO` | Dibuja lo que el demonio mostraría en una pantalla de ese tamaño (de 16 a 8192 por lado), por ejemplo `--screen 1920x1080`: la imagen mide exactamente eso, con el `fit` del lienzo (`fill` recorta, `fit` deja franjas del color de fondo) y cada capa dibujada a la resolución de la pantalla, también cuando es mayor que el lienzo. No se combina con `--size`. |
 | `--frames N`, `--fps F` | Con más de un cuadro, un clip: `.gif`, o una secuencia `NOMBRE-0001.EXT` (hasta 600 cuadros). |
 | `--pointer X,Y[:X,Y]`, `--click` | Un puntero inventado en esas fracciones del lienzo, que se mueve al segundo par y pulsa hacia la mitad del clip. |
 | `--against q0`, `--without-bloom`, `--split F` | La parte derecha se ve a otro nivel o sin brillo, para comparar. |
