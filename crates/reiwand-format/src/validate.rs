@@ -36,7 +36,7 @@ pub struct Limits {
 
 impl Default for Limits {
     fn default() -> Self {
-        Limits { max_entries: 4096, max_file_size: 1 << 30, max_total_size: 2 << 30, max_ratio: 100 }
+        Limits { max_entries: 4096, max_file_size: 1536 << 20, max_total_size: 2 << 30, max_ratio: 100 }
     }
 }
 

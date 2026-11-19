@@ -3,7 +3,7 @@
 A `.wpak` package is a ZIP file with `manifest.json` at its root, the entry it names, and the
 files that entry uses. `reiwand-format` reads it strictly: stored or deflated entries only, no
 encryption, no symbolic links, safe relative paths (no `..`, `\`, `:` or control characters,
-at most 255 bytes), names unique without regard to case, at most 4096 files, 1 GiB per file and
+at most 255 bytes), names unique without regard to case, at most 4096 files, 1.5 GiB per file and
 2 GiB in total, a compression ratio of at most 100 for files above 1 MiB, and a manifest of at
 most 1 MiB. Repositories (`repo.md`) and the server (`server.md`) distribute packages; scenes are
 described in `scene.md`. An author signs the exact bytes of `manifest.json` into

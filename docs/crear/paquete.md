@@ -25,7 +25,7 @@ tipo (`kind`) y el archivo de entrada (`entry`).
 
 Un paquete nunca lleva programas ni bibliotecas (`.exe`, `.dll`, `.so`, `.sh`, `.bat`, `AppImage`…):
 se rechazan por la extensión. Tampoco enlaces simbólicos ni nombres de archivo con `..`, `\` o `:`.
-Como mucho tiene 4096 archivos, 1 GiB por archivo y 2 GiB en total.
+Como mucho tiene 4096 archivos, 1,5 GiB por archivo y 2 GiB en total.
 
 ## El manifiesto
 

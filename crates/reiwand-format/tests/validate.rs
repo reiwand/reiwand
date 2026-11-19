@@ -109,3 +109,12 @@ fn compression_ratio_is_bounded() {
     with_file(Kind::Image, FileEntry { compressed_size: 1, ..entry("assets/small.png", 1 << 20) }).unwrap();
     with_file(Kind::Image, FileEntry { compressed_size: 0, ..entry("assets/empty.png", 0) }).unwrap();
 }
+
+#[test]
+fn a_file_may_take_up_to_one_and_a_half_gib() {
+    let big = |size: u64| FileEntry { compressed_size: size, ..entry("assets/long.mp4", size) };
+    with_file(Kind::Video, big(1_102_314_103)).unwrap();
+    with_file(Kind::Video, big(1536 << 20)).unwrap();
+    let over = with_file(Kind::Video, big((1536 << 20) + 1));
+    assert!(matches!(over, Err(Error::Limit { what: "file size", .. })), "{over:?}");
+}
