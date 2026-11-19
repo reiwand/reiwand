@@ -676,7 +676,7 @@ scene	Scene.clock	Clock	optional	1	{"max_fps":60,"poster_time":0.0,"seed":0}	edi
 scene	Scene.effects	object	optional	3	{}	editor.md:52
 scene	Scene.ext	object	optional	3	{}	-
 scene	Scene.layers	array	optional	3	[]	dbus.md:814
-scene	Scene.listens	array	optional	3	[]	scene.md:2564
+scene	Scene.listens	array	optional	3	[]	scene.md:2581
 scene	Scene.particles	object	optional	3	{}	dbus.md:2869
 scene	Scene.pools	object	optional	3	{}	package.md:414
 scene	Scene.scripts	array	optional	3	[]	editor.md:85
@@ -759,7 +759,7 @@ scene	Turbulent.window	number|null	optional	3	null	editor.md:85
 scene	Volumetric.density	number	optional	1	0.2	editor.md:86
 scene	Volumetric.samples	number	optional	1	16	editor.md:86
 scene	Volumetric.shafts	number	optional	1	0	editor.md:86
-scene	Wrap.ellipsis	boolean	optional	1	false	scene.md:2617
+scene	Wrap.ellipsis	boolean	optional	1	false	scene.md:2634
 scene	Wrap.lines	number|null	optional	3	null	editor.md:579
 manifest	Ancestor.license	string|null	optional	3	null	editor.md:114
 manifest	Ancestor.title	string|null	optional	3	null	choose-pieces.md:51
@@ -835,7 +835,7 @@ manifest	Property.log	boolean	optional	1	false	dbus.md:608
 manifest	Property.max_files	number	optional	1	1000	package.md:290
 manifest	Property.max_len	number|null	optional	3	null	editor.md:791
 manifest	Property.mode	Mode	optional	1	"one"	editor.md:70
-manifest	Property.multiline	boolean	optional	1	false	scene.md:2145
+manifest	Property.multiline	boolean	optional	1	false	scene.md:2162
 manifest	Property.order	number	optional	1	0	dbus.md:602
 manifest	Property.pick	Pick	optional	1	"random"	editor.md:1521
 manifest	Property.quality	object	optional	3	{}	dbus.md:715

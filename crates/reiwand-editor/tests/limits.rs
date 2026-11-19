@@ -66,8 +66,10 @@ fn imports_stop_at_the_limits_of_the_format_and_leave_nothing_behind() {
     let error = import(&mut project, &wav(root.path(), "s3.wav", 20)).unwrap_err().to_string();
     assert!(error.contains("180 s"), "{error}");
     import(&mut project, &wav(root.path(), "song.wav", 240)).unwrap();
-    let error = import(&mut project, &wav(root.path(), "opera.wav", 700)).unwrap_err().to_string();
-    assert!(error.contains("600 s"), "{error}");
+    let opera = wav(root.path(), "opera.wav", 1);
+    fs::OpenOptions::new().write(true).open(&opera).unwrap().set_len(193 << 20).unwrap();
+    let error = import(&mut project, &opera).unwrap_err().to_string();
+    assert!(error.contains("192 MiB"), "{error}");
     import(&mut project, &bmp(root.path(), "a.bmp", 9000)).unwrap();
     let error = import(&mut project, &bmp(root.path(), "b.bmp", 9000)).unwrap_err().to_string();
     assert!(error.contains("512 MiB"), "{error}");

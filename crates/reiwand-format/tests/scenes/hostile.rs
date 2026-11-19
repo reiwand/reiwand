@@ -21,7 +21,7 @@ fn streamed_sounds_are_measured_before_they_are_read() {
     ];
     files.iter().for_each(|(name, data)| std::fs::write(dir.path().join(name), data).unwrap());
     for n in names {
-        std::fs::File::create(dir.path().join(format!("{n}.ogg"))).unwrap().set_len(30 << 20).unwrap();
+        std::fs::File::create(dir.path().join(format!("{n}.ogg"))).unwrap().set_len(150 << 20).unwrap();
     }
     let fault = reiwand_format::inspect(dir.path()).map(drop).unwrap_err().to_string();
     assert!(fault.contains("size of the streamed sounds"), "{fault}");
