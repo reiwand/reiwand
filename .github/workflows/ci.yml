@@ -766,7 +766,7 @@ jobs:
           else
             echo "::warning::ANDROID_KEYSTORE is not set, so this APK is signed with a temporary debug key"
           fi
-          android/gradlew -p android assembleRelease -x :app:cargo -PversionCode="$VERSION_CODE" -PversionName="$VERSION_NAME"
+          android/gradlew -p android --refresh-dependencies assembleRelease -x :app:cargo -PversionCode="$VERSION_CODE" -PversionName="$VERSION_NAME"
 
       - name: Native libraries, 16 KB page alignment and no build paths
         run: |
@@ -827,7 +827,7 @@ jobs:
           VERSION_NAME: ${{ needs.version.outputs.semver }}
         run: |
           export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME" ANDROID_NDK_ROOT="$ANDROID_NDK_LATEST_HOME"
-          android/gradlew -p android lintRelease testDebugUnitTest compileDebugAndroidTestKotlin -x :app:cargo -PversionCode="$VERSION_CODE" -PversionName="$VERSION_NAME"
+          android/gradlew -p android --refresh-dependencies lintRelease testDebugUnitTest compileDebugAndroidTestKotlin -x :app:cargo -PversionCode="$VERSION_CODE" -PversionName="$VERSION_NAME"
 
   android-emulator:
     name: Android emulator tests
@@ -859,7 +859,7 @@ jobs:
         run: |
           printf 'ANDROID_NDK_HOME=%s\nANDROID_NDK_ROOT=%s\n' "$ANDROID_NDK_LATEST_HOME" "$ANDROID_NDK_LATEST_HOME" >> "$GITHUB_ENV"
           export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME" ANDROID_NDK_ROOT="$ANDROID_NDK_LATEST_HOME"
-          android/gradlew -p android compileDebugKotlin compileDebugAndroidTestKotlin -Pabis=x86_64 -x :app:cargo
+          android/gradlew -p android --refresh-dependencies compileDebugKotlin compileDebugAndroidTestKotlin -Pabis=x86_64 -x :app:cargo
 
       - name: Wait for the native library
         env:
