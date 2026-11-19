@@ -8,10 +8,7 @@ impl Check<'_> {
             || r.order.is_some()
             || r.cycles.is_some()
             || r.stretch.is_some_and(|s| {
-                s.mode == StretchMode::Relative
-                    || s.depth == StretchDepth::Projected
-                    || s.min > 0.0
-                    || s.max < 1e4
+                s.mode == StretchMode::Relative || s.depth != StretchDepth::Flat || s.min > 0.0 || s.max < 1e4
             });
         self.uses(wide, "particles2");
         self.uses(r.aspect != 1.0, "particles2");

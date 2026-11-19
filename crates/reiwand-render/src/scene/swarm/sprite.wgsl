@@ -93,15 +93,17 @@ fn vs_particle(
     let center = look.deep.yz + (a.xy - look.deep.yz) * k;
     let size = b.z * curve(t) * look.tint.z * e.w * k;
     let corner = select(vec2<f32>(f32(v & 1u), f32(v >> 1u)), hull_corner(v), look.hull[1].x > 0.0);
-    let speed = length(a.zw);
+    let motion = look.trail.z > 1.5 && look.deep.w > 0.5;
+    let seen = select(a.zw, k * a.zw - (center - look.deep.yz) * d.y / far, motion);
+    let speed = length(seen);
     let relative = look.trail.y > 0.5;
     let turned = !relative && look.shade.z > 0.0 && look.shade.z == look.shade.w;
-    let near = select(1.0, k, look.trail.z > 0.5 && !relative);
+    let near = select(1.0, k, look.trail.z > 0.5 && look.trail.z < 1.5 && !relative);
     let reach = clamp(look.trail.x * speed * near, look.shade.z * near, look.shade.w * near);
     var tail = select(reach, 0.0, turned || speed <= 0.0);
     var axis = vec2<f32>(cos(radians(b.w)), sin(radians(b.w)));
     let driven = (tail > 0.0 || turned || relative || look.turn.x == 1.0) && speed > 0.0;
-    axis = select(axis, a.zw / max(speed, 1e-9), driven);
+    axis = select(axis, seen / max(speed, 1e-9), driven);
     let sides = select(vec2<f32>(1.0), look.tilt[2].yz, look.tilt[2].y > 0.0);
     let upright = driven && sides.y > sides.x;
     if look.turn.x == 2.0 {

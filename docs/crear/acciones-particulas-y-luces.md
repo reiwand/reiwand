@@ -428,7 +428,7 @@ Ajusta cómo se dibujan las partículas. Solo cambia lo que nombras.
 |---|---|---|
 | `system` | texto | (obligatorio) Id del sistema. |
 | `layer` | texto | Capa de partículas a la que vale. |
-| `stretch` | cualquier valor JSON | Cuánto se estira cada partícula en la dirección en que se mueve: `{"mode": "add", "depth": "flat", "time": s, "min": px, "max": px}`: segundos de movimiento y el mínimo y el máximo; con `add` se suman píxeles al lado, con `relative` el largo es el lado por `clamp(time·velocidad, min, max)` (mínimo y máximo en veces el lado, puede ser menor que el lado). `depth` es `flat` (estela por la velocidad sin perspectiva) o `projected` (la estela sigue el movimiento en pantalla). Los cinco campos son obligatorios; `"none"` lo quita. |
+| `stretch` | cualquier valor JSON | Cuánto se estira cada partícula en la dirección en que se mueve: `{"mode": "add", "depth": "flat", "time": s, "min": px, "max": px}`: segundos de movimiento y el mínimo y el máximo; con `add` se suman píxeles al lado, con `relative` el largo es el lado por `clamp(time·velocidad, min, max)` (mínimo y máximo en veces el lado, puede ser menor que el lado). `depth` es `flat` (estela por la velocidad sin perspectiva), `projected` (la estela sigue el movimiento en pantalla) o `motion` (el largo y la dirección salen de la velocidad en pantalla, contando la velocidad en profundidad; sin `perspective` equivale a `flat`). Los cinco campos son obligatorios; `"none"` lo quita. |
 | `frames` | texto | Cómo avanzan los cuadros de una hoja de imágenes: `time` (con el tiempo), `life` (con la vida) o `random`; `none` lo quita. |
 | `fps` | número | Cuadros por segundo con `frames` en `time`. |
 | `mix` | sí/no | Si es `true`, funde cada cuadro con el siguiente. |

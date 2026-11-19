@@ -14,6 +14,7 @@ mod families;
 mod fields;
 mod looks;
 mod pixels;
+mod seen_strokes;
 mod shone;
 mod sources;
 mod steered;

@@ -11,6 +11,7 @@ QtObject {
             "target": App.tr("Target"),
             "flat": App.tr("Flat"),
             "projected": App.tr("Projected"),
+            "motion": App.tr("Motion"),
             "templates": App.tr("Templates"),
             "text": App.tr("Text"),
             "texture": App.tr("Texture"),

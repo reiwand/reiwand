@@ -29,6 +29,7 @@ pub enum StretchMode {
 pub enum StretchDepth {
     Flat,
     Projected,
+    Motion,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]

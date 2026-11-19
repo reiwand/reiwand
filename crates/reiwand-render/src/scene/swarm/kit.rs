@@ -91,7 +91,11 @@ pub(super) fn kit(
         trail: [
             stretch.time,
             flag(stretch.mode == StretchMode::Relative),
-            flag(stretch.depth == StretchDepth::Projected),
+            match stretch.depth {
+                StretchDepth::Flat => 0.0,
+                StretchDepth::Projected => 1.0,
+                StretchDepth::Motion => 2.0,
+            },
             flag(render.mix),
         ],
         shade: [1.0, render.cycles.unwrap_or(1) as f32, stretch.min, stretch.max],
