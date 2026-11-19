@@ -8,13 +8,13 @@ pub(super) enum Later<T> {
 impl<T: Send + 'static> Later<T> {
     pub(super) fn spawn(work: impl FnOnce() -> Option<T> + Send + 'static) -> Self {
         let (sender, receiver) = mpsc::channel();
-        let started = std::thread::Builder::new().name("reiwand-sound-open".into()).spawn(move || {
+        let started = std::thread::Builder::new().name("reiwand-open".into()).spawn(move || {
             let _ = sender.send(work());
         });
         match started {
             Ok(_) => Later::Waiting(receiver),
             Err(e) => {
-                tracing::warn!("cannot open the scene sound: {e}");
+                tracing::warn!("cannot start the opener: {e}");
                 Later::Ready(None)
             }
         }
@@ -33,6 +33,13 @@ impl<T: Send + 'static> Later<T> {
     pub(super) fn get(&self) -> Option<&T> {
         match self {
             Later::Ready(value) => value.as_ref(),
+            Later::Waiting(_) => None,
+        }
+    }
+
+    pub(super) fn take(self) -> Option<T> {
+        match self {
+            Later::Ready(value) => value,
             Later::Waiting(_) => None,
         }
     }

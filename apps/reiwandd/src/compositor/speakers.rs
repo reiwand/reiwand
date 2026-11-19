@@ -1,8 +1,7 @@
-mod opening;
 mod speaker;
 
-use self::opening::Later;
 use super::Settings;
+use super::later::Later;
 use super::output::Output;
 use super::scene::SceneState;
 use super::state::State;

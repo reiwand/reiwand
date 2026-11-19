@@ -1,6 +1,7 @@
+use super::later::Later;
 use super::{Command, Reel, Settings, lock};
 use reiwand_render::{GpuImage, Imported, Renderer};
-use reiwand_video::{Event, Frame, Options, Player};
+use reiwand_video::{Frame, Player};
 use std::path::Path;
 use std::sync::{Arc, Mutex, mpsc};
 use std::time::{Duration, Instant};
@@ -32,6 +33,7 @@ pub(super) struct PlayerSlot {
     pub(super) volume: u32,
     pub(super) decode: &'static str,
     failures: u32,
+    opening: Option<Later<Player>>,
     inbox: Arc<Inbox>,
     shares: bool,
     imported: Option<Imported>,
@@ -61,6 +63,7 @@ impl PlayerSlot {
             volume,
             decode,
             failures: 0,
+            opening: None,
             inbox,
             shares,
             imported,
@@ -95,6 +98,9 @@ impl PlayerSlot {
         tx: &mpsc::Sender<Command>,
         now: Instant,
     ) {
+        if self.opening.is_some() {
+            return self.arrive(reel, heard, now);
+        }
         let Some(_) = self.due.take_if(|at| *at <= now) else { return };
         match self.player {
             Some(_) => {
@@ -105,40 +111,8 @@ impl PlayerSlot {
     }
 
     pub(super) fn revive(&mut self, now: Instant) {
-        if self.player.is_none() && self.due.is_none() {
+        if self.player.is_none() && self.opening.is_none() && self.due.is_none() {
             (self.failures, self.due) = (0, Some(now));
-        }
-    }
-
-    fn open(
-        &mut self,
-        reel: &Reel,
-        (settings, locked): (Settings, bool),
-        tx: &mpsc::Sender<Command>,
-        now: Instant,
-    ) {
-        let (max_size, max_fps, cut, path) = (self.max_size, self.fps, reel.cut, &reel.path);
-        let (volume, muted) = (loudness(settings.volume, self.volume), settings.muted || self.volume == 0);
-        let (inbox, tx) = (self.inbox.clone(), tx.clone());
-        let options = Options { max_size, max_fps, volume, muted, cut, zero_copy: self.shares };
-        let opened = Player::open(path, options, move |event| {
-            let first = match event {
-                Event::Frame(frame) => lock(&inbox.frame).replace(frame).is_none(),
-                Event::Error(e) => lock(&inbox.error).replace(e).is_none(),
-            };
-            if first {
-                let _ = tx.send(Command::Wake);
-            }
-        });
-        match opened {
-            Ok(player) => {
-                tracing::debug!(path = %path.display(), "video opened");
-                player.set_volume(volume * settings.duck, muted || locked);
-                player.play_once(reel.once);
-                player.set_playing(self.playing);
-                (self.player, self.due, self.steered) = (Some(player), Some(now + FIRST_FRAME), None);
-            }
-            Err(e) => drop(lock(&self.inbox.error).replace(e.to_string())),
         }
     }
 
@@ -156,10 +130,11 @@ impl PlayerSlot {
     fn copy_instead(&mut self, now: Instant) {
         tracing::info!("the GPU cannot read the decoded video frames in place, copying them instead");
         (self.shares, self.player, self.imported, self.held, self.due) = (false, None, None, None, Some(now));
+        self.opening = None;
     }
 
     fn fail(&mut self, path: &Path, error: String, now: Instant) {
-        self.player = None;
+        (self.player, self.opening) = (None, None);
         self.failures += 1;
         let retry = self.failures <= RETRIES;
         self.due = retry.then(|| now + FIRST_RETRY * 2u32.pow(self.failures - 1));
@@ -171,6 +146,7 @@ impl PlayerSlot {
     }
 }
 
+mod opening;
 #[cfg(test)]
 mod tests;
 mod upload;
