@@ -93,6 +93,19 @@ impl Page {
             .cloned()
             .unwrap_or_else(|| panic!("no {name}: {:?}", self.said))
     }
+
+    /// Waits until the page says exactly `value` under `name`: an earlier message of the same name (the full values
+    /// the page reports when it loads) may still arrive first.
+    pub fn wait_for(&mut self, name: &str, value: &Value, seconds: u64) -> bool {
+        let end = Instant::now() + Duration::from_secs(seconds);
+        while Instant::now() < end {
+            if self.said.get(name).is_some_and(|said| said.contains(value)) {
+                return true;
+            }
+            self.pump(Instant::now() + Duration::from_millis(50));
+        }
+        false
+    }
 }
 
 impl Drop for Page {

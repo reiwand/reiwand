@@ -52,7 +52,7 @@ fn a_crashed_page_loads_with_its_latest_values_and_gives_up_after_three_reloads(
     let values = json!({"speed": 3}).as_object().unwrap().clone();
     page.link.send(&ToWeb::Properties { view: 1, values }, &[]).unwrap();
     page.said.remove("properties");
-    assert_eq!(page.wait("properties", 30), json!({"speed": 3}));
+    assert!(page.wait_for("properties", &json!({"speed": 3}), 30), "{:?}", page.said.get("properties"));
     for _ in 0..3 {
         page.said.remove("properties");
         crash(&mut page);
