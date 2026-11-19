@@ -68,7 +68,7 @@ empezar con su firma `\0asm`.
 
 ## Dónde se ve
 
-Las páginas las dibuja un programa auxiliar, `reiwand-web`, con Qt WebEngine (Chromium, Qt 6.5 o
+Las páginas las dibuja un programa auxiliar, `reiwand-web`, con Qt WebEngine (Chromium, Qt 6.8 o
 más nuevo). Donde ese motor no está (Ubuntu 24.04), el demonio rechaza los fondos web con el motivo en lugar de dejar la pantalla en
 blanco, y lo dice en `reiwand-ctl lib apply`, en la app y en el error de la pantalla. En el teléfono se
 usa el WebView del sistema.

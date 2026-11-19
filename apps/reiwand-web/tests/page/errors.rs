@@ -7,7 +7,7 @@ const ISOLATION: Isolation = Isolation { network: false, devices: false, limits:
 #[test]
 fn a_page_that_throws_at_start_reports_the_error_to_the_daemon() {
     if !available() {
-        return eprintln!("skipped: no Qt WebEngine 6.5 or newer");
+        return eprintln!("skipped: no Qt WebEngine 6.8 or newer");
     }
     let dir = tempfile::tempdir().unwrap();
     let script: &[u8] = b"throw new Error('boom at start');";
@@ -22,7 +22,7 @@ fn a_page_that_throws_at_start_reports_the_error_to_the_daemon() {
 #[test]
 fn the_locale_a_page_gets_is_a_language_tag_the_engine_accepts() {
     if !available() {
-        return eprintln!("skipped: no Qt WebEngine 6.5 or newer");
+        return eprintln!("skipped: no Qt WebEngine 6.8 or newer");
     }
     let dir = tempfile::tempdir().unwrap();
     let script: &[u8] = b"const report = (n, v) => console.log(`probe ${n} ${JSON.stringify(v)}`);\n\

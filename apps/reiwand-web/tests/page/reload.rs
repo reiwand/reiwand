@@ -43,7 +43,7 @@ fn reloaded(page: &mut Page) -> serde_json::Value {
 #[test]
 fn a_crashed_page_loads_with_its_latest_values_and_gives_up_after_three_reloads() {
     if !available() {
-        return eprintln!("skipped: no Qt WebEngine 6.5 or newer");
+        return eprintln!("skipped: no Qt WebEngine 6.8 or newer");
     }
     let dir = tempfile::tempdir().unwrap();
     let mut page =
@@ -70,7 +70,7 @@ fn a_crashed_page_loads_with_its_latest_values_and_gives_up_after_three_reloads(
 #[test]
 fn a_page_that_stops_answering_loads_again() {
     if !available() {
-        return eprintln!("skipped: no Qt WebEngine 6.5 or newer");
+        return eprintln!("skipped: no Qt WebEngine 6.8 or newer");
     }
     let dir = tempfile::tempdir().unwrap();
     let spin: &[u8] = b"console.log('probe load 1');\nsetTimeout(() => { for (;;) {} }, 1000);\n";

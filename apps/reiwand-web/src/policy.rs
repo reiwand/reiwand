@@ -2,8 +2,13 @@ use serde_json::{Value, json};
 
 const OWN: &str = "wpak: wpak-user: data: blob:";
 
-pub fn csp(network: &[String]) -> String {
-    reiwand_format::page::csp(OWN, "wpak:", network)
+pub fn csp(network: &[String], mask_gpu: bool) -> String {
+    let base = reiwand_format::page::csp(OWN, "wpak:", network);
+    let base = match mask_gpu {
+        true => base.replace("worker-src wpak: wpak-user: data: blob:", "worker-src 'none'"),
+        false => base,
+    };
+    format!("{base}; webrtc 'block'")
 }
 
 fn escaped(origin: &str) -> String {

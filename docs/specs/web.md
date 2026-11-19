@@ -7,19 +7,19 @@ wallpaper: with the same transitions, fit, frame rate cap, pause rules and strea
 
 ## Engine
 
-`reiwand-web` is built against Qt Quick and Qt WebEngine 6.5 or newer (the version that lets a
+`reiwand-web` is built against Qt Quick and Qt WebEngine 6.8 or newer (the version that lets a
 content security policy go with each URL scheme) and runs the page in an off-screen `WebEngineView`
 rendered with `QQuickRenderControl`, so no window ever shows. Qt WebEngine comes with the distribution
 (or, in the Flatpak, with `io.qt.qtwebengine.BaseApp`): Reiwand bundles no engine. A build whose
-computer has no Qt WebEngine 6.5 or newer (`no_engine`) still produces the helper, and the daemon
+computer has no Qt WebEngine 6.8 or newer (`no_engine`) still produces the helper, and the daemon
 refuses web wallpapers with a translated reason, in `Library1.Apply`, `reiwand-ctl lib apply` and the
 error of the screen, instead of drawing nothing:
 
 | Where | What it has | Web pages |
 |-------|-------------|-----------|
-| Arch Linux, Fedora | `qt6-webengine` / `qt6-qtwebengine` 6.5 or newer | shown |
+| Arch Linux, Fedora | `qt6-webengine` / `qt6-qtwebengine` 6.8 or newer | shown |
 | Flatpak | `io.qt.qtwebengine.BaseApp` 6.11, which the manifest builds on, and `QtWebEngineProcess` in `/app/bin` | shown |
-| Ubuntu 24.04 (the CI runner) | Qt 6.4, which has no per-scheme content security policy | not shown: its tarball carries the helper built on Fedora (below), which needs Qt WebEngine on the computer; the reason names Qt WebEngine 6.5 or newer |
+| Ubuntu 24.04 (the CI runner) | Qt 6.4, which is older than 6.8 and has no per-scheme content security policy | not shown: its tarball carries the helper built on Fedora (below), which needs Qt WebEngine on the computer; the reason names Qt WebEngine 6.8 or newer |
 | any, without the helper | — | refused: `the web helper reiwand-web is not installed` |
 | Android (the app) | the system WebView | shown with it, see "On the phone" |
 
@@ -148,7 +148,7 @@ Every layer applies to every page:
    notifications and full screen are refused; every permission request (camera, microphone,
    location, clipboard and the rest) is denied; WebRTC and media capture are removed by a script
    injected before the page's own (`RTCPeerConnection` and its relatives are deleted, and
-   `getUserMedia`, `getDisplayMedia` and `enumerateDevices` reject); keys never reach the page.
+   `getUserMedia`, `getDisplayMedia` and `enumerateDevices` reject), in every frame including `about:blank` and `srcdoc` ones; besides, every response carries `webrtc 'block'` and the engine runs with the peer-connection policy `disable_non_proxied_udp`, so no UDP or STUN leaves the helper even if a script got round the removal, with or without `network`; keys never reach the page.
 5. Unless the package declares origins and the user granted `network`, the helper starts in its own
    user and network namespaces with no network at all, so not even the network service of
    Chromium can reach anything.
@@ -172,9 +172,9 @@ do through WebGL, and keeps its own storage when it declares `web.storage_kib`. 
 tells the page the model that the engine reports for the card (the debug renderer extension), as on
 the phone. Each of them is
 restricted per package with `Library1.Confirm` (`hide_zone`: UTC; `hide_language`: `en-US`, also in
-`reiwand.locale` and the labels of combos; `hide_gpu`: a script injected before the page's (`mask.js`) makes WebGL keep working with a
+`reiwand.locale` and the labels of combos, and the helper itself starts with that language (`--lang`, `LC_ALL`, `LANG`, `LANGUAGE`), so `Intl`, `toLocaleString` and `navigator.language` answer it in every frame and worker; `hide_gpu`: a script injected before the page's (`mask.js`) makes WebGL keep working with a
 generic vendor and renderer (`WebKit`, `WebKit WebGL`) and no debug extension, and `navigator.gpu`
-(WebGPU) is absent; `hide_storage`: nothing is kept). `PackageInfo.exposes` lists what a page
+(WebGPU) is absent, in every frame (an empty `about:blank` or `srcdoc` frame, which no injected script reaches in time, is masked when the page first asks the frame element for its `contentWindow` or `contentDocument`; reaching it through `window.frames` or `window[0]` first is a limit), and workers are refused (`worker-src 'none'`) while it applies, because a worker cannot be given the mask; `hide_storage`: nothing is kept). `PackageInfo.exposes` lists what a page
 sees now, and the app (details and *Apply to…*), the tray (each screen) and `reiwand-ctl` (`lib apply`
 and `lib show`) show the same notice from it: "This web wallpaper uses your time zone, your
 language, what your graphics card can do and data it keeps on this computer."
@@ -229,7 +229,7 @@ these are the differences:
   its doctype) and the files the user chose as `https://<host>/:user/<property>/<token>` instead of
   `wpak-user://`. Both are opaque to the page. The content security policy is the one above with
   `'self'` in place of the schemes of the desktop.
-- **Frame rate.** `requestAnimationFrame` is paced at the cap by the injected script; CSS animations
+- **Frame rate.** `requestAnimationFrame` is paced at the cap by the injected script, installed before the page's own scripts and in every frame (an inner frame hands its frames to its parent's capped function; workers keep their own, unpaced, `requestAnimationFrame` of an `OffscreenCanvas` only when `hide_gpu` is off); CSS animations
   and videos run at the rate of the display.
 - **Lifecycle.** A page is visible while its screen is shown and the phone neither saves power, nor
   runs low on battery, nor is very hot; otherwise the WebView is paused (`visibilityState` is

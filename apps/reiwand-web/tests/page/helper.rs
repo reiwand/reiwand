@@ -9,7 +9,7 @@ pub const HELPER: &str = env!("CARGO_BIN_EXE_reiwand-web");
 pub fn available() -> bool {
     let ok = std::process::Command::new(HELPER).arg("--check").status().is_ok_and(|s| s.success());
     if !ok && std::env::var_os("REIWAND_REQUIRE_WEB").is_some_and(|v| v == "1") {
-        panic!("REIWAND_REQUIRE_WEB=1 but Qt WebEngine 6.5 or newer is not available");
+        panic!("REIWAND_REQUIRE_WEB=1 but Qt WebEngine 6.8 or newer is not available");
     }
     ok
 }

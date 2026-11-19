@@ -68,8 +68,8 @@ mod tests {
         let (flatpak, other) = (refusal(missing, true), refusal(missing, false));
         assert!(flatpak.contains("Flatpak") && flatpak.contains("Qt WebEngine"), "{flatpak}");
         assert!(other.contains("Ubuntu 24.04") && other.contains("Qt WebEngine"), "{other}");
-        assert!(refusal("Qt 6.4.2 is older than 6.5", false).contains("6.4.2"));
-        assert!(refusal("Qt WebEngine is missing: qmake was not found", false).contains("Qt WebEngine 6.5"));
+        assert!(refusal("Qt 6.4.2 is older than 6.8", false).contains("6.4.2"));
+        assert!(refusal("Qt WebEngine is missing: qmake was not found", false).contains("Qt WebEngine 6.8"));
         assert!(refusal("boom", true).contains("boom"));
     }
 }

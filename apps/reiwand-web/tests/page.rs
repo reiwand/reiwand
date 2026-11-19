@@ -10,6 +10,8 @@ mod helper;
 mod hints;
 #[path = "page/input.rs"]
 mod input;
+#[path = "page/isolation.rs"]
+mod isolation;
 #[path = "page/media.rs"]
 mod media;
 #[path = "page/reload.rs"]
@@ -27,7 +29,7 @@ use std::time::{Duration, Instant};
 #[test]
 fn page_gets_its_api_and_nothing_else() {
     if !available() {
-        return eprintln!("skipped: no Qt WebEngine 6.5 or newer");
+        return eprintln!("skipped: no Qt WebEngine 6.8 or newer");
     }
     let dir = tempfile::tempdir().unwrap();
     let server = TcpListener::bind("127.0.0.1:0").unwrap();
@@ -80,7 +82,7 @@ fn page_gets_its_api_and_nothing_else() {
 #[test]
 fn page_without_a_render_node_draws_in_memory() {
     if !available() {
-        return eprintln!("skipped: no Qt WebEngine 6.5 or newer");
+        return eprintln!("skipped: no Qt WebEngine 6.8 or newer");
     }
     let dir = tempfile::tempdir().unwrap();
     let start = Start { device: None, storage: None, mask_gpu: true, ..start(dir.path(), 9) };

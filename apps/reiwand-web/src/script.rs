@@ -27,7 +27,7 @@ fn sources(view: u32) -> Vec<(String, bool)> {
     });
     let mut scripts = vec![(reiwand_format::page::api(&init, &post(&engine.nonce)), false)];
     if engine.start.mask_gpu {
-        scripts.push((format!("({})(globalThis);", reiwand_format::page::MASK.trim_end()), false));
+        scripts.push((format!("({})(globalThis);", reiwand_format::page::MASK.trim_end()), true));
     }
     scripts.push((format!("({})(globalThis);", reiwand_format::page::WEBRTC.trim_end()), true));
     scripts.push((reiwand_format::page::VOLUME.into(), true));

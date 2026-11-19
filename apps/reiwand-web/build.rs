@@ -52,8 +52,8 @@ fn find() -> Result<Qt, String> {
     let libs = PathBuf::from(query(&qmake, "QT_INSTALL_LIBS").ok_or("no Qt libraries")?);
     let mut parts = version.split('.').filter_map(|p| p.parse::<u32>().ok());
     let (major, minor) = (parts.next().unwrap_or(0), parts.next().unwrap_or(0));
-    if (major, minor) < (6, 5) {
-        return Err(format!("Qt {version} is older than 6.5"));
+    if (major, minor) < (6, 8) {
+        return Err(format!("Qt {version} is older than 6.8"));
     }
     if !headers.join("QtWebEngineQuick/qtwebenginequickglobal.h").is_file() {
         return Err(format!("Qt {version} has no Qt WebEngine headers"));

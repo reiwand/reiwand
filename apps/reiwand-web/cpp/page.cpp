@@ -225,6 +225,12 @@ void Page::install(const QJsonArray &list) {
     QObject *scripts = web() ? web()->property("userScripts").value<QObject *>() : nullptr;
     if (!scripts) return;
     QList<QWebEngineScript> items;
+    QWebEngineScript cap;
+    cap.setSourceCode(capScript(fps, world().bridge->key()));
+    cap.setInjectionPoint(QWebEngineScript::DocumentCreation);
+    cap.setWorldId(QWebEngineScript::MainWorld);
+    cap.setRunsOnSubFrames(true);
+    items.append(cap);
     for (const QJsonValue &entry : list) {
         QWebEngineScript script;
         script.setSourceCode(entry["source"].toString());
@@ -233,11 +239,6 @@ void Page::install(const QJsonArray &list) {
         script.setRunsOnSubFrames(entry["frames"].toBool());
         items.append(script);
     }
-    QWebEngineScript cap;
-    cap.setSourceCode(capScript(fps, world().bridge->key()));
-    cap.setInjectionPoint(QWebEngineScript::DocumentCreation);
-    cap.setWorldId(QWebEngineScript::MainWorld);
-    items.append(cap);
     QMetaObject::invokeMethod(scripts, "clear");
     QMetaObject::invokeMethod(scripts, "insert", Q_ARG(QList<QWebEngineScript>, items));
 }

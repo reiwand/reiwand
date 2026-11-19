@@ -4,7 +4,7 @@ Un paquete `web` es una página (HTML, CSS, JavaScript, WebAssembly, WebGL, imá
 sonido y vídeo dentro del propio paquete) que se muestra como fondo con las mismas transiciones,
 ajuste, límite de FPS y pausas que los demás. La dibuja `reiwand-web`, un proceso aparte que el
 servicio arranca para cada página que se ve y para en cuanto ninguna pantalla la muestra. Necesita
-Qt WebEngine (Qt 6.5 o posterior) y una sesión gráfica, que el servicio ya tiene: `qt6-qtwebengine` en Fedora
+Qt WebEngine (Qt 6.8 o posterior) y una sesión gráfica, que el servicio ya tiene: `qt6-qtwebengine` en Fedora
 (45 trae la 6.11), `qt6-webengine` en Arch y, en el Flatpak, la base `io.qt.qtwebengine.BaseApp`, que ya
 va incluida. Donde falta el motor (Ubuntu 24.04, que trae Qt 6.4, demasiado antigua) el fondo se rechaza con
 el motivo en lugar de quedarse en blanco, en `reiwand-ctl` y en la app,

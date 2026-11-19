@@ -4,6 +4,12 @@
 
 QString capScript(uint32_t fps, const QString &key) {
     static const char *const source = R"JS((() => {
+  if (window.parent !== window) {
+    const outer = window.parent;
+    window.requestAnimationFrame = (callback) => outer.requestAnimationFrame(callback);
+    window.cancelAnimationFrame = (key) => outer.cancelAnimationFrame(key);
+    return;
+  }
   const raw = window.requestAnimationFrame.bind(window);
   const stop = window.cancelAnimationFrame.bind(window);
   const pending = new Map();

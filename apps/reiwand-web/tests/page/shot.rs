@@ -7,7 +7,7 @@ use std::time::{Duration, Instant};
 #[test]
 fn a_frame_is_copied_on_request_from_the_page_as_it_is_shown() {
     if !available() {
-        return eprintln!("skipped: no Qt WebEngine 6.5 or newer");
+        return eprintln!("skipped: no Qt WebEngine 6.8 or newer");
     }
     let dir = tempfile::tempdir().unwrap();
     let start = Start { device: None, storage: None, mask_gpu: true, ..start(dir.path(), 9) };

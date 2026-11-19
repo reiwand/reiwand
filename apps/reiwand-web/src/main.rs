@@ -18,7 +18,8 @@ use std::os::fd::{FromRawFd, OwnedFd};
 
 const SOCKET: i32 = 3;
 const FLAGS: &str = "--autoplay-policy=no-user-gesture-required --disable-breakpad --disable-sync \
-    --disable-background-networking --no-pings --disable-features=Translate,MediaRouter";
+    --disable-background-networking --no-pings --disable-features=Translate,MediaRouter \
+    --force-webrtc-ip-handling-policy=disable_non_proxied_udp --webrtc-ip-handling-policy=disable_non_proxied_udp";
 
 fn sandbox_usable() -> bool {
     match unsafe { libc::fork() } {
@@ -47,25 +48,38 @@ fn environment(start: &Start) {
         if off {
             std::env::set_var("QTWEBENGINE_DISABLE_SANDBOX", "1");
         }
-        std::env::set_var("QTWEBENGINE_CHROMIUM_FLAGS", format!("{FLAGS} {}", proxy(&start.network)));
+        std::env::set_var(
+            "QTWEBENGINE_CHROMIUM_FLAGS",
+            format!(
+                "{FLAGS} --lang={} {}",
+                start.languages.first().map_or("en-US", String::as_str),
+                proxy(&start.network)
+            ),
+        );
+        if let Some(tag) = start.languages.first() {
+            let name = format!("{}.UTF-8", tag.replace('-', "_"));
+            std::env::set_var("LC_ALL", &name);
+            std::env::set_var("LANG", &name);
+            std::env::set_var("LANGUAGE", tag.replace('-', "_"));
+        }
         if start.device.is_none() {
             std::env::set_var("LIBGL_ALWAYS_SOFTWARE", "1");
         }
     }
 }
 
-fn nonce() -> String {
+fn nonce() -> std::io::Result<String> {
     use std::io::Read;
     let mut bytes = [0u8; 16];
-    let _ = std::fs::File::open("/dev/urandom").and_then(|mut f| f.read_exact(&mut bytes));
-    bytes.iter().map(|b| format!("{b:02x}")).collect()
+    std::fs::File::open("/dev/urandom").and_then(|mut f| f.read_exact(&mut bytes))?;
+    Ok(bytes.iter().map(|b| format!("{b:02x}")).collect())
 }
 
 fn config(start: &Start, nonce: &str) -> String {
     json!({
         "own": format!("wpak://{}/", start.id.to_ascii_lowercase()),
         "prefix": script::prefix(nonce),
-        "policy": reiwand_web::csp(&start.network),
+        "policy": reiwand_web::csp(&start.network, start.mask_gpu),
         "background": start.background,
         "network": start.network,
         "storage": start.storage,
@@ -110,8 +124,12 @@ fn main() {
             l.folders.insert(folder.prop.clone(), folder.clone());
         }
     });
+    let Ok(nonce) = nonce() else {
+        state::say(&link, &FromWeb::Failed("the system has no source of random numbers".into()), &[]);
+        std::process::exit(1);
+    };
     environment(&start);
-    let (raw, nonce) = (link.raw(), nonce());
+    let raw = link.raw();
     let config = config(&start, &nonce);
     state::set_engine(state::Engine { link, start, entries, preload, nonce });
     let code = qt::run(&config, &host::HOST, raw);

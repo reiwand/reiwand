@@ -47,7 +47,7 @@ mod tests {
     #[test]
     fn kept_data_stays_near_what_the_page_declared() {
         let dir = tempfile::tempdir().unwrap();
-        let data = dir.path().join("data/origin");
+        let data = dir.path().join("data/Local Storage/origin");
         std::fs::create_dir_all(&data).unwrap();
         std::fs::write(data.join("small"), vec![0; 100 << 10]).unwrap();
         assert!(super::within(dir.path(), 64));
