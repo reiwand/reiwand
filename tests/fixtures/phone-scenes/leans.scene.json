@@ -8,7 +8,11 @@
     "blend_space": "linear",
     "bloom": {
       "hdr": null,
+      "knee": 0.5,
+      "limit": null,
       "radius": 4,
+      "radius_unit": "canvas",
+      "saturation": 1.0,
       "strength": 1.0,
       "threshold": 0.5,
       "tint": "#ffd0a0"
