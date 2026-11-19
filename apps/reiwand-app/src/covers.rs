@@ -34,6 +34,7 @@ impl Shown {
 pub fn caption(item: &ItemSummary) -> String {
     let kind = match grid::kind(item).as_str() {
         "scene" => tr("Scene"),
+        "web" => tr("Web page"),
         "image" => tr("Image"),
         "video" => tr("Video"),
         "package" => tr("Package"),

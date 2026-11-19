@@ -8,6 +8,8 @@ Tapa {
     readonly property string caption: String(from.role(model, from.captionRole) ?? "")
     readonly property bool wants: hovered || lit && from.activeFocus
     readonly property bool scene: from.role(model, "kind") === "scene"
+    // scenes and web pages play on the cover while the pointer rests on it
+    readonly property bool plays: scene || from.role(model, "kind") === "web"
     readonly property bool hidden: from.role(model, "flashing") === true || from.role(model, "mature") === true
     readonly property bool broken: from.role(model, "missing") === true || String(from.role(model, "broken") ?? "") !== ""
     readonly property var layering: Capas.of(String(from.role(model, "uid") ?? ""))
@@ -16,7 +18,7 @@ Tapa {
     picture: from.role(model, from.pictureRole) ?? ""
     pictures: from.role(model, from.picturesRole) ?? []
     moving: wants && from.movingOf ? from.movingOf(index) : ""
-    liveUid: scene && !hidden && !broken ? String(from.role(model, "uid") ?? "") : ""
+    liveUid: plays && !hidden && !broken ? String(from.role(model, "uid") ?? "") : ""
     live: !from.view.moving && from.turning !== true
     name: String(from.role(model, "provider") ?? "") !== "" ? Names.of(model) : from.role(model, from.nameRole) ?? ""
     icon: from.iconRole === "" ? "" : from.role(model, from.iconRole) ?? ""

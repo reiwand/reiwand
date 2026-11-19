@@ -147,3 +147,18 @@ fn everything_selects_and_clears_every_row() {
     assert_eq!(grid.all(false), vec![0, 1, 2]);
     assert_eq!(grid.all(false), Vec::<usize>::new());
 }
+
+#[test]
+fn scenes_and_web_pages_say_what_they_are_so_their_covers_can_play() {
+    let item: serde_json::Value = serde_json::from_str(&fixture("Library1", "GetItem")).unwrap();
+    let package = |kind: &str| {
+        let mut info = item["item"]["package"].clone();
+        info["kind"] = kind.into();
+        let info: PackageInfo = serde_json::from_value(info).unwrap();
+        ItemSummary { kind: ItemKind::Package, package: Some(info), ..summary("P") }
+    };
+    assert_eq!(kind(&package("scene")), "scene");
+    assert_eq!(kind(&package("web")), "web");
+    assert_eq!(kind(&package("preset")), "package");
+    assert!(crate::covers::caption(&package("web")).starts_with("Web page"));
+}

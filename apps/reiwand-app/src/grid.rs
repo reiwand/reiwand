@@ -134,7 +134,7 @@ pub fn info(item: &ItemSummary) -> String {
 
 pub fn kind(item: &ItemSummary) -> String {
     match &item.package {
-        Some(p) if p.kind == "scene" => p.kind.clone(),
+        Some(p) if p.kind == "scene" || p.kind == "web" => p.kind.clone(),
         _ => name(item.kind),
     }
 }
