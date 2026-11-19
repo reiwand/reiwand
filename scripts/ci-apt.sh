@@ -6,12 +6,14 @@ sudo chown _apt:root "$cache/partial"
 sudo rm -f /var/lib/man-db/auto-update
 printf 'Acquire::Retries "5";\nAcquire::http::Timeout "30";\nAcquire::https::Timeout "30";\n' |
   sudo tee /etc/apt/apt.conf.d/80ci >/dev/null
-# a mirror that trickles never trips the timeouts above: give each call a few minutes and try it again
+# a mirror that trickles never trips the timeouts above: give each call fifteen minutes and try it again; a call cut
+# while dpkg was configuring leaves it half done, so dpkg finishes that before the next try
 try() {
   local n
   for n in 1 2 3; do
-    timeout 480 "$@" && return 0
+    timeout 900 "$@" && return 0
     echo "::warning::$1 $2 $3 did not finish (try $n of 3)"
+    sudo dpkg --configure -a || true
     sleep 10
   done
   return 1

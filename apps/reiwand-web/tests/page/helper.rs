@@ -94,12 +94,13 @@ impl Page {
             .unwrap_or_else(|| panic!("no {name}: {:?}", self.said))
     }
 
-    /// Waits until the page says exactly `value` under `name`: an earlier message of the same name (the full values
-    /// the page reports when it loads) may still arrive first.
-    pub fn wait_for(&mut self, name: &str, value: &Value, seconds: u64) -> bool {
+    /// Waits until a message `name` from the page carries every field of `fields` with its value: the page may report
+    /// only what changed or all its values at once, as it loaded or not yet.
+    pub fn wait_for(&mut self, name: &str, fields: &Value, seconds: u64) -> bool {
+        let carries = |said: &Value| fields.as_object().is_some_and(|f| f.iter().all(|(k, v)| said.get(k) == Some(v)));
         let end = Instant::now() + Duration::from_secs(seconds);
         while Instant::now() < end {
-            if self.said.get(name).is_some_and(|said| said.contains(value)) {
+            if self.said.get(name).is_some_and(|said| said.iter().any(carries)) {
                 return true;
             }
             self.pump(Instant::now() + Duration::from_millis(50));
