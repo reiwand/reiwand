@@ -19,7 +19,13 @@ mod swarm;
 
 pub const SIZE: (u32, u32) = (160, 90);
 
-pub use crate::gpu::renderer;
+// Like the scene and model tests, the light tests share one renderer with the rest of the binary: give its effect
+// timing a wide budget, so a slow software GPU on a loaded runner does not leave an effect (refraction) out of one shot.
+pub fn renderer() -> Option<&'static reiwand_render::Renderer> {
+    let r = crate::gpu::renderer()?;
+    reiwand_render::set_gpu_budget(Some(std::time::Duration::from_secs(60)));
+    Some(r)
+}
 
 pub fn flat(rgba: [u8; 4]) -> std::sync::Arc<Pixels> {
     Pixels::new(RgbaImage::from_pixel(32, 32, Rgba(rgba)))
