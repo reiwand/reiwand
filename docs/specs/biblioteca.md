@@ -200,7 +200,8 @@ con una línea por cosa (puntero, sonido del equipo, clics y toques, lo que suen
 sonido con red), su explicación y «Permitir» o «Sin esto» en cada una. «Permitir» al pie aplica lo
 elegido y «Sin esto» deja todo afuera, con `Inputs1.Decide`; la escena ya funciona mientras tanto sin
 esos permisos, y si algo quedó afuera un aviso dice dónde cambiarlo. La red y las luces no se
-preguntan acá. Se pregunta una vez por escena en cada sesión de la app; lo respondido se recuerda en
+preguntan acá. Una vista previa (la tapa en marcha, la ventana de vista previa o el editor, salidas
+`preview:`) no pregunta: la escena se ve sin esos permisos hasta que se pone de fondo en una pantalla. Se pregunta una vez por escena en cada sesión de la app; lo respondido se recuerda en
 el servicio. La pieza es `PreguntaPermisos` y otras pantallas la usan con `ask(escena, clave,
 nombre, cosas)`.
 

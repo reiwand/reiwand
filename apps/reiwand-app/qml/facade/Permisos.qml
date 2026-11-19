@@ -56,7 +56,8 @@ QtObject {
 
     function open(inputs) {
         const shown = inputs.shown ?? {};
-        for (const output of Object.keys(shown)) {
+        // only a screen asks: a preview (a library cover, the preview window, the editor) plays without them
+        for (const output of Object.keys(shown).filter(name => !name.startsWith("preview:"))) {
             const s = shown[output];
             const list = (s.undecided ?? []).filter(input => asked.includes(input));
             if (list.length > 0)

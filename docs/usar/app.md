@@ -188,7 +188,8 @@ Pausar o Reanudar, Siguiente, «Volumen general», «Silenciar todo» y, por pan
 ## Preguntas de permisos
 
 Una escena puede pedir el puntero, el sonido del equipo, clics y toques, lo que suena o la red.
-Antes de usar algo, te pregunta una vez por escena: «“nombre” pide permiso para usar», con una
+Cuando la pones de fondo, antes de usar algo te pregunta una vez por escena (una vista previa no
+pregunta: se ve sin esos permisos): «“nombre” pide permiso para usar», con una
 línea por cosa y «Permitir» o «Sin esto». La escena ya funciona sin los permisos; si algo queda
 afuera, un aviso dice dónde cambiarlo. En Plasma la pregunta también puede llegar como notificación
 del escritorio. Lo respondido se recuerda y se retira en Ajustes › Equipo › «Permisos de las escenas».

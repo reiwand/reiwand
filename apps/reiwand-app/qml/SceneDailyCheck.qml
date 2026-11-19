@@ -51,6 +51,18 @@ QtObject {
                 }
             }
         }) === null, "the grouped question opens for lights alone");
+        must(Permisos.open({
+            "shown": {
+                "preview:card-1": {
+                    "scene": "pond",
+                    "undecided": ["pointer", "audio"]
+                },
+                "preview:7-1": {
+                    "scene": "pond",
+                    "undecided": ["clicks"]
+                }
+            }
+        }) === null, "a preview asks for permissions as a screen would");
         const question = make("PreguntaPermisos.qml", {
             "scene": open.scene,
             "key": open.key,
