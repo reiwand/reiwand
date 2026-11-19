@@ -8,8 +8,8 @@ Tapa {
     readonly property string caption: String(from.role(model, from.captionRole) ?? "")
     readonly property bool wants: hovered || lit && from.activeFocus
     readonly property bool scene: from.role(model, "kind") === "scene"
-    // scenes and web pages play on the cover while the pointer rests on it
-    readonly property bool plays: scene || from.role(model, "kind") === "web"
+    // scenes, web pages and videos play on the cover while the pointer rests on it
+    readonly property bool plays: scene || ["web", "video"].includes(from.role(model, "kind"))
     readonly property bool hidden: from.role(model, "flashing") === true || from.role(model, "mature") === true
     readonly property bool broken: from.role(model, "missing") === true || String(from.role(model, "broken") ?? "") !== ""
     readonly property var layering: Capas.of(String(from.role(model, "uid") ?? ""))

@@ -18,7 +18,7 @@ La Biblioteca muestra los fondos guardados sobre la imagen del fondo en uso.
   puede dibujar, el registro del servicio lo dice con el id del elemento y el motivo. Una tapa mucho
   más chica que la tarjeta se muestra a su tamaño, centrada sobre el fondo quieto de la tarjeta, sin
   estirarse. Las páginas web y los ajustes empaquetados usan siempre su tapa.
-- Con el puntero quieto unos 300 ms sobre la tapa de una escena o de una página web (en el estante, en la tapa
+- Con el puntero quieto unos 300 ms sobre la tapa de una escena, una página web o un video (en el estante, en la tapa
   encendida y en «Ver todos»), la tapa muestra el fondo en marcha, dibujada por el servicio en una transmisión
   `preview:` del tamaño de la tapa (`RequestStream`, `Library1.Apply` sobre esa salida y
   `ReleaseStream`, lo mismo que `reiwand-ctl stream`, `reiwand-ctl lib apply --output` y `reiwand-ctl
@@ -28,7 +28,7 @@ La Biblioteca muestra los fondos guardados sobre la imagen del fondo en uso.
   pantallas ni se anota en los ajustes ni en el historial, usa la calidad que el usuario fijó, y no
   arranca para una escena con destellos que el usuario no permitió, una oculta por contenido maduro,
   una dañada o una que pide una versión más nueva: esas quedan en su tapa, sin aviso. Con el teclado
-  la tapa encendida sigue mostrando su tapa. Las imágenes y los videos no cambian.
+  la tapa encendida sigue mostrando su tapa. Las imágenes no cambian.
   La tapa en marcha siempre va sin sonido: el servicio no abre ninguna salida de audio para la
   transmisión de una tapa (`preview:card-…`) y la página web de una tapa suena a volumen 0, aunque la
   escena tenga capas de sonido o videos con audio o la página reproduzca sonido, y el sonido del fondo de las pantallas sigue igual.

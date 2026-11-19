@@ -159,6 +159,7 @@ fn scenes_and_web_pages_say_what_they_are_so_their_covers_can_play() {
     };
     assert_eq!(kind(&package("scene")), "scene");
     assert_eq!(kind(&package("web")), "web");
+    assert_eq!(kind(&package("video")), "video");
     assert_eq!(kind(&package("preset")), "package");
     assert!(crate::covers::caption(&package("web")).starts_with("Web page"));
 }
