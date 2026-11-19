@@ -18,6 +18,8 @@ daemon=${pids[-1]}
 x old lib add "$six" --wait >/dev/null || fail "the folder was not added"
 kill "$daemon"
 wait_for 20 daemon_exited "$daemon" || fail "the daemon did not stop"
+# the conversion runs once per data version: an install from before imported packages were converted has mark 3
+echo 3 >"$data/format-version"
 env "${env[@]}" "$BIN/reiwand-upgrade" client --check --skip-download --data "$data" >"$WORK/check.out" 2>&1 || fail "check: $(cat "$WORK/check.out")"
 grep -q "six.wpak" "$WORK/check.out" || fail "the check did not name the package: $(cat "$WORK/check.out")"
 unzip -p "$six/six.wpak" manifest.json | grep -q 'wpak/2' || fail "the check wrote"
