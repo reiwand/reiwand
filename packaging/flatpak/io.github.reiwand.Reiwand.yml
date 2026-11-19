@@ -47,6 +47,9 @@ modules:
       cxxflags: -ffile-prefix-map=/run/build/reiwand=/src
       env:
         CARGO_HOME: /run/build/reiwand/cargo
+        REIWAND_WEB_REQUIRE_ENGINE: "1"
+        REIWAND_WEB_INCLUDE: /app/include
+        REIWAND_WEB_LIB: /app/lib
         RUSTFLAGS: --remap-path-prefix=/run/build/reiwand=/src --remap-path-prefix=/run/build/reiwand/cargo=/cargo
     build-commands:
       - pkg-config --atleast-version=1.24 gstreamer-1.0

@@ -9,6 +9,7 @@ test "$(run reiwand-ctl $app --version)" = "reiwand-ctl $version"
 test "$(run reiwandd $app --version)" = "reiwandd $version"
 run reiwand-app $app --check
 test -x "$(flatpak info -l $app)/files/bin/reiwand-web"
+grep -aq libQt6WebEngineQuick.so "$(flatpak info -l $app)/files/bin/reiwand-web"
 flatpak run --command=test $app -x /app/bin/QtWebEngineProcess
 files=$(flatpak info -l $app)/files
 exports=${files%%/app/*}/exports/share

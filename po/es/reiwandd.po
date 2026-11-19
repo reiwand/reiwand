@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Reiwand\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 00:00+0000\n"
+"POT-Creation-Date: 2026-11-18 00:00+0000\n"
 "PO-Revision-Date: 2026-10-22 00:00+0000\n"
 "Last-Translator: Reiwand contributors\n"
 "Language-Team: Reiwand contributors\n"
@@ -135,14 +135,13 @@ msgstr ""
 
 #: apps/reiwandd/src/words.rs
 msgid ""
-"Web wallpapers cannot be shown here: this Flatpak does not include Qt "
-"WebEngine 6.8 or newer, the engine that draws them. Install the Qt WebEngine "
-"base app of the Flatpak runtime, or install Reiwand from a package of your "
-"distribution."
+"Web wallpapers cannot be shown here: Qt WebEngine 6.8 or newer cannot be "
+"loaded from this Flatpak. The Flatpak is broken or out of date: update or "
+"reinstall it, or install Reiwand from a package of your distribution."
 msgstr ""
-"Aquí no se pueden mostrar fondos web: este Flatpak no incluye Qt WebEngine "
-"6.8 o posterior, el motor que los dibuja. Instala la aplicación base de Qt "
-"WebEngine del runtime de Flatpak, o instala Reiwand desde un paquete de tu "
+"Aquí no se pueden mostrar fondos web: no se puede cargar Qt WebEngine 6.8 o "
+"posterior desde este Flatpak. El Flatpak está roto o desactualizado: "
+"actualízalo o reinstálalo, o instala Reiwand desde un paquete de tu "
 "distribución."
 
 #: apps/reiwandd/src/words.rs
@@ -171,6 +170,16 @@ msgstr ""
 
 #: apps/reiwandd/src/words.rs
 msgid ""
+"Web wallpapers cannot be shown here: the web helper of this installation was "
+"built without Qt WebEngine, so the package is broken or out of date; "
+"reinstall or update Reiwand (%1)."
+msgstr ""
+"Aquí no se pueden mostrar fondos web: el auxiliar web de esta instalación se "
+"compiló sin Qt WebEngine, así que el paquete está roto o desactualizado; "
+"reinstala o actualiza Reiwand (%1)."
+
+#: apps/reiwandd/src/words.rs
+msgid ""
 "Web wallpapers cannot be shown here: the web helper does not start (%1)."
 msgstr "Aquí no se pueden mostrar fondos web: el auxiliar web no arranca (%1)."
 
@@ -184,10 +193,10 @@ msgstr "Un script de la escena informó de un error: %1"
 
 #: apps/reiwandd/src/words.rs
 msgid ""
-"The web page stopped three times in a row and is off; the background color "
+"The web page stopped four times in a row and is off; the background color "
 "shows instead."
 msgstr ""
-"La página web se detuvo tres veces seguidas y está apagada; en su lugar se "
+"La página web se detuvo cuatro veces seguidas y está apagada; en su lugar se "
 "ve el color de fondo."
 
 #: apps/reiwandd/src/words.rs

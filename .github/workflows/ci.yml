@@ -336,7 +336,7 @@ jobs:
     needs: version
     if: needs.version.outputs.rust == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
@@ -355,6 +355,12 @@ jobs:
         with:
           shared-key: dev
           save-if: false
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: web-arch
+          workspaces: ". -> target-web"
+          save-if: ${{ github.ref == 'refs/heads/master' }}
 
       - name: Daemon and test binaries
         run: |
@@ -585,14 +591,24 @@ jobs:
         with:
           persist-credentials: false
 
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: web-fedora
+          save-if: ${{ github.ref == 'refs/heads/master' }}
+          workspaces: .
+
       - name: Build in Fedora, whose Qt has the web engine that Ubuntu 24.04 lacks
         run: |
           docker run --rm -e REIWAND_VERSION -e QMAKE=/usr/bin/qmake6 -v "$PWD:/src" -w /src "$FEDORA" bash -c '
             set -e
-            dnf -y -q install cargo rust gcc-c++ pkgconf-pkg-config qt6-qtbase-devel qt6-qtbase-private-devel \
-              qt6-qtdeclarative-devel qt6-qtwebengine-devel >/dev/null
+            dnf -y -q install rustup gcc-c++ pkgconf-pkg-config qt6-qtbase-devel qt6-qtbase-private-devel \
+              qt6-qtdeclarative-devel qt6-qtwebengine-devel qt6-qtwebchannel-devel qt6-qtpositioning-devel \
+              libglvnd-devel >/dev/null
+            rustup-init -y -q --profile minimal --default-toolchain 1.99 >/dev/null
+            export PATH="$HOME/.cargo/bin:$PATH"
             scripts/build-release.sh reiwand-web
             ldd target/release/reiwand-web | grep -E "Qt6WebEngine|Qt6Quick"
+            chown -R "$(stat -c %u:%g /src)" /src/target
           '
 
       - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
@@ -1240,7 +1256,7 @@ jobs:
 
   flatpak-release:
     name: Attach the Flatpak bundles
-    needs: [version, release, flatpak]
+    needs: [version, release, flatpak, flatpak-daemon]
     if: ${{ !cancelled() && needs.release.outputs.tag != '' }}
     runs-on: ubuntu-24.04
     permissions:

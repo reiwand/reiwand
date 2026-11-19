@@ -23,4 +23,14 @@ if [ -z "$socket" ] || [ "$socket" = . ]; then
   exit 1
 fi
 export WAYLAND_DISPLAY="$socket"
-flatpak run --device=dri --socket=wayland --command=reiwand-web "$app" --check
+if ! command -v dbus-run-session >/dev/null; then
+  echo "dbus-run-session is needed" >&2
+  exit 1
+fi
+dbus-run-session -- flatpak run --device=dri --socket=wayland --env=QT_QUICK_BACKEND=software --env=LIBGL_ALWAYS_SOFTWARE=1 --command=reiwand-web "$app" --check | grep -q "^Qt [0-9]"
+if dbus-run-session -- flatpak run --command=unshare "$app" --user --pid --net --fork true 2>"$dir/unshare.log"; then
+  echo "web sandbox inside the Flatpak: full (user, pid and network namespaces can be created)"
+else
+  echo "web sandbox inside the Flatpak: reduced (the namespaces cannot be created; the web helper turns the Chromium sandbox off)"
+  head -n 3 "$dir/unshare.log"
+fi

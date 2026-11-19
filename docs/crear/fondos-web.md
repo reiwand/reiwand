@@ -14,28 +14,65 @@ mi-fondo/
   manifest.json
   index.html
   app.js
-  assets/
-    preview.png
 ```
+
+El manifiesto es el de `docs/crear/ejemplos/reloj-web`: lleva todos los campos, porque ninguno se omite (los vacíos se escriben vacíos o `null`) y pasa `pack check`.
 
 ```json
 {
-  "schema": "reiwand.wpak/3",
-  "id": "org.example.reloj",
-  "version": "1.0.0",
-  "title": { "en": "Clock", "es": "Reloj" },
-  "default_locale": "en",
-  "license": "CC0-1.0",
-  "origin": { "kind": "original" },
-  "content": { "rating": "general" },
-  "photosensitive": false,
-  "kind": "web",
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": "es",
+  "description": "",
   "entry": "index.html",
-  "previews": { "thumbnail": "assets/preview.png" },
+  "id": "org.example.reloj_web",
   "inputs": [],
-  "web": { "background": "#000000" },
+  "kind": "web",
+  "license": "CC0-1.0",
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "photosensitive": false,
+  "platforms": [],
+  "presets": [],
   "properties": {
-    "color": { "type": "color", "default": "#ffffff", "label": { "en": "Color", "es": "Color" } }
+    "color": {
+      "alpha": false,
+      "default": "#f2f5ff",
+      "enabled_if": {},
+      "label": "@reiwand.color",
+      "order": 0,
+      "quality": {},
+      "type": "color",
+      "visible_if": {}
+    }
+  },
+  "requires": {
+    "engine": null,
+    "features": [
+      "engine_strings",
+      "web"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "Reloj web",
+  "version": "0.1.0",
+  "web": {
+    "background": "#101828",
+    "preload": null,
+    "storage_kib": 0
   }
 }
 ```
@@ -85,7 +122,7 @@ Un fondo web que se queda sin responder se reinicia solo:
   un bucle), la detiene y la carga de nuevo;
 - una página que se cae o se queda sin memoria se carga otra vez a 1, 4 y 9 s; a la cuarta seguida
   se apaga, la pantalla muestra el color de `web.background` y su error dice por qué;
-- toma como mucho un procesador y 1,5 GB entre todos sus procesos, y 768 MB cada proceso de página.
+- toma como mucho un procesador; entre todos sus procesos pasa a ir lento al superar 768 MB entre todos y se mata al superar 1,5 GB; no hay límite por proceso.
 
 ## La interfaz `window.reiwand`
 
@@ -124,7 +161,7 @@ reiwand.onSettings(({ fps, locale, volume }) => ajustar(fps, locale, volume));
 - `reiwand.volume` es el volumen del fondo para el sonido de tu página: puede sonar sin que nadie
   toque nada, `<audio>`, `<video>` y `AudioContext` suenan a ese volumen (por el que les pongas) y
   a 0 está silenciada. Los audios y vídeos del paquete o de la carpeta elegida se reproducen desde
-  una copia en memoria, de hasta 256 MiB cada uno.
+  la memoria del motor, que guarda hasta 64 MiB en total; un archivo mayor no se guarda y se vuelve a leer del paquete en cada petición, así que un vídeo grande cuesta una lectura por salto.
 - `web.preload` es un `.js` o `.mjs` del paquete que corre antes de los scripts de la página, y
   `web.background` (`#rrggbb`) es el color que se ve mientras carga.
 
@@ -136,8 +173,7 @@ reiwand.onSettings(({ fps, locale, volume }) => ajustar(fps, locale, volume));
   está encendida (guarda las últimas 50 líneas);
 - en la terminal: `reiwand-ctl scene preview mi-fondo -o DP-1 --console` las imprime a medida que salen,
   en tus pantallas o en las de prueba, mientras algo mira esa salida y hasta que lo interrumpas;
-- en el registro del servicio, a nivel `debug` (`RUST_LOG=reiwandd=debug`), hasta 200 líneas por
-  ejecución.
+- en el registro del servicio, a nivel `debug` (`RUST_LOG=reiwandd=debug`), con un cubo de 50 líneas que se rellena a 10 por segundo.
 
 `reiwand-ctl scene preview mi-fondo --values ajustes.json` prueba valores de propiedades sin guardarlos
 y `--media pista.json` inventa una pista del reproductor. La salida de `reiwand-ctl state` dice si la
@@ -168,9 +204,8 @@ archivos ocultos ni enlaces) y la vuelve a mirar cada 5 s mientras la página se
 ## Lo que ve tu página
 
 Por defecto ve la zona horaria (`new Date()` da la hora local), el idioma (`navigator.language`),
-lo que puede hacer la tarjeta gráfica a través de WebGL (en el escritorio, sus límites y extensiones,
-no su modelo; en el teléfono, también su modelo) y su propio almacenamiento. El usuario puede
-ocultar cada cosa: entonces la página ve UTC, `en-US`, un nombre de tarjeta genérico (WebGL sigue
+lo que puede hacer la tarjeta gráfica a través de WebGL (en el escritorio y en el teléfono, también el modelo de la tarjeta) y su propio almacenamiento. El usuario puede
+ocultar cada cosa: entonces la página ve UTC, `en-US`, un nombre de tarjeta genérico (`WebKit`, `WebKit WebGL`; WebGL sigue
 funcionando; `navigator.gpu` desaparece) y nada guardado. Haz que funcione en todos esos casos.
 Nunca ve rutas, nombres de dispositivos, la batería ni la lista de fuentes.
 

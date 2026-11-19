@@ -51,7 +51,7 @@ buffer back once a newer frame replaced it. Otherwise frames travel through a se
 slots (`decode` reads `copy`). A page gets a GPU only when the daemon renders on a hardware GPU
 whose render node can allocate a GBM buffer (`reiwand-web --gpu <node>`, checked once per node);
 otherwise (`vgem`, virtual GPUs without 3D, software rendering) it starts with `LIBGL_ALWAYS_SOFTWARE=1`
-and draws in memory, as it also does when it draws nothing on the GPU within 10 s. Pages are
+and draws in memory, as it also does when it draws nothing on the GPU within 10 s; when it goes back to software the helper starts in its own mount namespace with an empty tmpfs over `/dev/dri`, so the engine cannot find a GPU. Pages are
 always opaque.
 
 ## Lifecycle
@@ -66,8 +66,10 @@ always opaque.
   helper reloads a page whose web process crashed, ran out of memory or stopped answering after 1, 4
   and 9 s; a fourth time in a row turns the page off, the screen shows its background color and its
   error says why. A page that runs for a minute without crashing starts counting again. The daemon
-  restarts a helper that stopped or failed after 1, 5 and 30 s; after the third failure in a row the
-  screen shows its background color and its error says why.
+  restarts a helper that stopped or failed after 1, 5 and 30 s; after the fourth failure in a row (three restarts) the
+  screen shows its background color and its error says why. A page that draws nothing within 10 s,
+  also in memory, stops and restarts the same way, and its error is "drew nothing for 10 seconds and is off".
+  A helper whose systemd scope fails before it is ready restarts once without the scope.
 - The helper and the processes of Qt WebEngine run at nice 10. When a systemd user manager runs, the helper
   starts in its own transient scope with `CPUQuota=100%`, `CPUWeight=20`, `MemoryHigh=768M`, `MemoryMax=1536M`,
   `MemorySwapMax=0` and `TasksMax=512`, so a page takes at most one processor, is slowed down past
@@ -126,7 +128,7 @@ helper to end.
 
 A page shown for the editor on a `preview:` output (`PreviewScene`, `dbus.md`) keeps its last 50
 console lines and errors per screen, which the helper sends as `Console` with the view that wrote
-them, and `GetState` shows them in `console` of that output; other screens keep nothing, so a page
+them, and `GetState` shows them in `console` of that output; every screen keeps its last 50 lines, but `GetState` shows them only for previews; the other screens expose just their errors (`page_errors`), so a page
 that writes often never wakes the bus. The helper limits what it forwards with a bucket of 50 lines that refills at 10 a second, so a
 flood is cut but a preview that runs for hours keeps showing its latest lines.
 
@@ -159,7 +161,7 @@ Limit: a `fetch` of a file that is not in the package answers with a network err
 
 `OutputState.sandbox` is `"on"` when every layer is in place and `"reduced"` when the helper
 could not make the namespaces and started Qt WebEngine with its sandbox off
-(`QTWEBENGINE_DISABLE_SANDBOX`; some containers forbid them); clients show
+(`QTWEBENGINE_DISABLE_SANDBOX`; some containers and the Flatpak forbid them), or when the daemon could not make the empty network namespace; with the network allowed that namespace does not exist by design and `sandbox` stays `on`. Clients show
 it next to the privacy notice. `reiwand-ctl` prints the same notice, on standard error, after `lib apply`,
 `playlist start`, `next` and `prev` (for the screens they touch) and in `state` when run in a terminal.
 
@@ -208,7 +210,7 @@ package from sealed `memfd`s and keeps at most 64 MiB of them in a cache of its 
 first; a file larger than 64 MiB is not kept and is read from the package again on each request,
 so a large video costs one read per seek). Files the user chose are opened on each request and never
 cached. `console` output and uncaught errors reach the daemon's log at
-debug level, at most 200 lines a run. The folder of a `folder` property is listed by the daemon (`max_files`, `recursive`, hidden
+debug level, through the same bucket of 50 lines refilled at 10 a second (200 lines a load is the phone). The folder of a `folder` property is listed by the daemon (`max_files`, `recursive`, hidden
 files and links left out, the same rules as scenes), checked again every 5 s while the page is
 shown and never while hidden; the helper serves only the listed files, opened without following
 links.
