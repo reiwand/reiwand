@@ -597,6 +597,9 @@ its background and its position never lay it out again. Each character comes fro
 another with the kerning of their font, without joining or reordering them, so scripts that need
 shaping (Arabic, Indic scripts) or right-to-left text do not show correctly yet. A font file is at most
 32 MiB, also once a `.woff2` is unpacked; a font that cannot be read is replaced by the system one.
+The text is drawn in the line box its font declares (its ascent and descent, times `line_height`)
+plus `padding`: a letter that reaches beyond that box, such as a tall accent or the letters of a font
+that declares its descent above the baseline, is cut at its edge unless `padding` leaves room for it.
 
 ### Lights
 

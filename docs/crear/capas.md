@@ -237,13 +237,17 @@ decodificador no va más rápido que `clock.max_fps`. Con una propiedad de archi
 | `line_height` | | 0,5 a 4 veces el tamaño | La altura de línea. |
 | `letter_spacing` | 0 | -100 a 1000 px | Espacio entre letras. |
 | `background` | sin caja | `color`, `padding` `[x, y]`, `radius` | Una caja detrás del texto. |
-| `padding` | 0 | 0 a 1024 px | Margen alrededor para los efectos. |
+| `padding` | 0 | 0 a 1024 px | Margen alrededor para los efectos y para las letras que salen de la línea. |
 | `outline` | sin contorno | `color`, `width` 0 a 64 px | Un contorno. |
 | `shadow` | sin sombra | `color`, `offset` `[x, y]`, `blur` 0 a 64 px | Una sombra. |
 | `blur` | 0 | 0 a 64 px | Desenfoca el texto. |
 | `render` | `auto` | `auto`, `raster`, `sdf` | Cómo se dibuja: `sdf` usa un campo de distancias para que el tamaño cambie sin volver a dibujar las letras; `raster` dibuja de nuevo al tamaño que tiene en pantalla. |
 
 `letter_spacing`, `outline`, `shadow` y `blur` pueden seguir valores.
+El texto se dibuja en la caja de línea que declara su fuente (lo que sube y lo que baja de la
+línea base, por `line_height`) más `padding`. Una letra que sale de esa caja, como un acento alto o
+las letras de una fuente que declara mal lo que baja, queda cortada en el borde si `padding` no le
+deja lugar.
 Un texto se vuelve a componer solo cuando cambian el texto, el tamaño en pantalla o la
 composición; su color y su posición no lo hacen. Cada carácter sale de la primera fuente de
 `font` y `fallback` que lo tiene, y si ninguna, de `sans-serif`. Las letras se colocan una detrás
