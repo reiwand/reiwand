@@ -13,4 +13,7 @@ page=$(cargo test --locked -p reiwand-web --test page --no-run --message-format=
 cp target-web/debug/reiwand-web target/debug/reiwand-web
 cp "$page" target/debug/web-page
 export REIWAND_REQUIRE_WEB=1
-xvfb-run -a sh -c 'target/debug/web-page --test-threads 1 && scripts/web-test.sh target/debug && REIWAND_REQUIRE_PIPEWIRE_SOUND=1 scripts/video-test.sh target/debug'
+# The pages need a display for their GL context; the video test must not see one, or the daemon opens its own X11
+# surface ("screen") next to the test outputs.
+xvfb-run -a sh -c 'target/debug/web-page --test-threads 1 && scripts/web-test.sh target/debug'
+env -u DISPLAY REIWAND_REQUIRE_PIPEWIRE_SOUND=1 scripts/video-test.sh target/debug
