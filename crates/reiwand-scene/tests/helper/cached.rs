@@ -57,3 +57,19 @@ pub(super) fn again(book: &str) {
     );
     println!("runs {}", helper_runs());
 }
+
+const TWO: &str = "@fragment fn fs_h(in: VertexOut) -> @location(0) vec4<f32> {
+    return (tap(in.uv) + tap(in.uv + vec2<f32>(0.01, 0.0)) + tap(in.uv - vec2<f32>(0.01, 0.0))) / 3.0;
+}
+@fragment fn fs_l(in: VertexOut) -> @location(0) vec4<f32> { return tap(in.uv); }";
+
+pub(super) fn a_lighter_variant_is_checked_with_its_effect() {
+    let described = serde_json::json!({ "id": "l", "cost": { "taps": 3, "passes": 1, "scale": 1 },
+        "passes": [{ "entry": "fs_h" }],
+        "lighter": { "passes": [{ "entry": "fs_l" }], "cost": { "taps": 1 }, "up_to": "q1" } });
+    let d = Descriptor::packaged("l", &reiwand_upgrade::descriptors::completed(&described.to_string()), TWO)
+        .unwrap();
+    guarded(&d).unwrap();
+    let lite = d.lite.as_deref().expect("a lighter variant");
+    guarded(lite).expect("the lighter variant of a checked package effect is drawn, not left out");
+}

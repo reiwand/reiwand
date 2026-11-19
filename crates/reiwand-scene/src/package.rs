@@ -148,7 +148,11 @@ impl Descriptor {
         crate::trying(trial).map_err(again)?;
         let checked = crate::shader::roomy(|| crate::package::checked(id, json, wgsl));
         crate::tried(trial);
-        checked.inspect(|d| crate::verdicts::pass(d.key))
+        // the lighter variant comes from the same shader, checked whole above: it passes with the effect
+        checked.inspect(|d| {
+            crate::verdicts::pass(d.key);
+            d.lite.iter().for_each(|lite| crate::verdicts::pass(lite.key));
+        })
     }
 }
 

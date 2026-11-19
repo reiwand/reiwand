@@ -70,6 +70,7 @@ fn main() {
     the_disk_cache_survives_a_new_process(&book);
     lower_hard_limits_of_the_parent_still_let_the_helper_check(&book);
     a_process_killed_while_the_helper_runs_gets_no_strike(&book);
+    a_lighter_variant_is_checked_with_its_effect();
     set_checker(None);
-    println!("test result: ok. 6 passed");
+    println!("test result: ok. 7 passed");
 }
