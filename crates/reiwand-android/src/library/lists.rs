@@ -10,6 +10,7 @@ pub(crate) fn remove(lib: &mut Library, uids: &[String]) -> Result<Value, Error>
     crate::keeping::forget(lib, &items)?;
     items.iter().try_for_each(store::forget)?;
     items.iter().for_each(crate::converted::forget);
+    crate::repos::forget(&items.iter().map(|item| item.uid.clone()).collect::<Vec<_>>())?;
     let gone = |o: &reiwand_core::config::OutputConfig| {
         items.iter().any(|item| o.image.as_ref() == Some(&item.path))
     };

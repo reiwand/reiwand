@@ -42,11 +42,19 @@ pub mod qobject {
         #[qinvokable]
         fn adopt(self: Pin<&mut DepthMaps>, file: &QString);
         #[qinvokable]
-        fn keep(self: Pin<&mut DepthMaps>);
+        fn keep(self: Pin<&mut DepthMaps>, input: u32);
         #[qinvokable]
-        fn forget(self: Pin<&mut DepthMaps>);
+        fn forget(self: Pin<&mut DepthMaps>, input: u32);
         #[qinvokable]
         fn install(self: Pin<&mut DepthMaps>, file: &QString);
+        #[qinvokable]
+        fn export_map(
+            self: Pin<&mut DepthMaps>,
+            file: &QString,
+            depth: &QString,
+            adjusted: bool,
+            colour: bool,
+        );
         #[qinvokable]
         fn view(self: Pin<&mut DepthMaps>, depth: &QString, colour: bool);
     }
@@ -128,11 +136,13 @@ impl DepthMaps {
         self.start(Work::Adopt(given));
     }
 
-    pub fn keep(self: Pin<&mut Self>) {
+    pub fn keep(mut self: Pin<&mut Self>, input: u32) {
+        self.as_mut().rust_mut().input = input;
         self.start(Work::Keep);
     }
 
-    pub fn forget(self: Pin<&mut Self>) {
+    pub fn forget(mut self: Pin<&mut Self>, input: u32) {
+        self.as_mut().rust_mut().input = input;
         self.start(Work::Remove);
     }
 

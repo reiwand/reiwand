@@ -51,6 +51,10 @@
     <string name="every_6h">Cada 6 horas</string>
     <string name="every_1d">Cada día</string>
     <string name="never">Nunca</string>
+    <string name="every_custom">Otro…</string>
+    <string name="every_minutes">Minutos</string>
+    <string name="every_invalid">Escribe minutos enteros, de 1 a 43200</string>
+    <string name="every_custom_value">Cada %1$s</string>
     <string name="shuffle">Orden aleatorio</string>
     <string name="skip_videos">Saltar los vídeos con batería</string>
     <string name="resume_list">Seguir donde se quedó</string>

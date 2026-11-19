@@ -56,6 +56,7 @@ Kirigami.Page {
         editor.run("fill_mask", '{"points": "0.5,0.5", "protect": true}');
         depthCheck.exercise();
         regionsCheck.exercise();
+        bar.exporting.exercise();
         editor.undo();
         editor.redo();
         editor.compare(true);

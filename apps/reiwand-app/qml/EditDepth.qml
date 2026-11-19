@@ -119,14 +119,31 @@ ColumnLayout {
         text: App.tr("Save next to the picture")
         icon.name: "document-save"
         enabled: maps.map !== "" && !maps.busy
-        onClicked: maps.keep()
+        onClicked: maps.keep(tool.depth.input ?? 518)
     }
 
     QQC2.Button {
         text: App.tr("Remove the map")
         icon.name: "edit-delete"
         enabled: maps.map !== "" && !maps.busy
-        onClicked: maps.forget()
+        onClicked: maps.forget(tool.depth.input ?? 518)
+    }
+
+    EditDepthExport {
+        maps: maps
+        depth: tool.depth
+        colour: colour.checked
+    }
+
+    EditSlider {
+        text: App.tr("Model input size (px, multiple of 14)")
+        from: 196
+        to: 1036
+        stepSize: 14
+        value: tool.depth.input ?? 518
+        onMoved: value => tool.page.run("depth", {
+                "input": Math.round(value)
+            })
     }
 
     Repeater {

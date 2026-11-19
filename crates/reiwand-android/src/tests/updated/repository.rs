@@ -159,6 +159,18 @@ pub(super) fn dependencies_and_updates_follow_a_repository() {
         "a preset still finds its base after the update"
     );
 
+    let shown = |id: &str| {
+        let found = repos::browse(id).unwrap();
+        found.as_array().unwrap().iter().find(|i| i["id"] == id).map(|i| i["installed"].clone())
+    };
+    assert_eq!(shown("org.example.dep"), Some(json!(true)));
+    let gone = json!({ "op": "uninstall", "repo_id": repo_id, "id": "org.example.dep" });
+    assert_eq!(account(gone.clone()), Value::Null);
+    assert!(uid_of("org.example.dep").is_none(), "the item left the library");
+    assert_eq!(shown("org.example.dep"), Some(json!(false)), "the repository offers it again");
+    assert!(account(gone)["error"].is_string(), "a package that is not installed cannot be uninstalled");
+    assert!(uid_of("org.example.base").is_some(), "what it needed stays");
+
     let all: Vec<String> = ["org.example.base", "org.example.dep", "org.example.orphan", "org.example.calm"]
         .iter()
         .filter_map(|id| uid_of(id))

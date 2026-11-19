@@ -45,7 +45,14 @@ pub mod qobject {
         #[qinvokable]
         fn compare(self: Pin<&mut Editor>, on: bool);
         #[qinvokable]
-        fn save_as(self: Pin<&mut Editor>, file: &QString, quality: u32);
+        fn save_as(
+            self: Pin<&mut Editor>,
+            file: &QString,
+            quality: u32,
+            width: u32,
+            height: u32,
+            original: bool,
+        );
     }
 
     impl cxx_qt::Threading for Editor {}

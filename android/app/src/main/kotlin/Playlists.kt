@@ -115,9 +115,18 @@ private fun Mini(main: Main, uid: String) {
     Cover(first)
 }
 
+const val MAX_MINUTES = 43_200
+
+fun customInterval(text: String): String? = text.trim().toIntOrNull()?.takeIf { it in 1..MAX_MINUTES }?.let { "${it}m" }
+
+fun customMinutes(interval: String): String = Regex("(\\d+)m").matchEntire(interval)?.groupValues?.get(1).orEmpty()
+
 @Composable
-fun every(rules: org.json.JSONObject): String =
-    stringResource(INTERVALS.find { it.first == rules.optString("interval") }?.second ?: R.string.every_30m)
+fun every(rules: org.json.JSONObject): String {
+    val interval = rules.optString("interval")
+    val known = INTERVALS.find { it.first == interval }?.second
+    return known?.let { stringResource(it) } ?: stringResource(R.string.every_custom_value, interval)
+}
 
 @Composable
 private fun summary(list: Playlist): String = every(list.rules) + " · " + pluralStringResource(R.plurals.wallpapers, list.count, list.count)

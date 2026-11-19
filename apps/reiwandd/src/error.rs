@@ -7,6 +7,7 @@ use zbus::names::ErrorName;
 pub enum Error {
     Fdo(fdo::Error),
     Named(&'static str, String),
+    Listing(String, serde_json::Value),
     Cancelled,
 }
 
@@ -33,6 +34,7 @@ impl Error {
         let (name, message) = match self {
             Error::Fdo(e) => (zbus::DBusError::name(e).to_string(), zbus::DBusError::description(e)),
             Error::Named(name, message) => ((*name).into(), Some(message.as_str())),
+            Error::Listing(message, _) => (error::NOT_A_REPOSITORY.into(), Some(message.as_str())),
             Error::Cancelled => return (String::new(), "cancelled".into()),
         };
         let message = error::reason(&name, message.unwrap_or_default());
@@ -51,6 +53,7 @@ impl zbus::DBusError for Error {
         match self {
             Error::Fdo(e) => zbus::DBusError::name(e),
             Error::Named(name, _) => ErrorName::from_static_str_unchecked(name),
+            Error::Listing(..) => ErrorName::from_static_str_unchecked(error::NOT_A_REPOSITORY),
             Error::Cancelled => ErrorName::from_static_str_unchecked("org.freedesktop.DBus.Error.Failed"),
         }
     }
@@ -58,7 +61,7 @@ impl zbus::DBusError for Error {
     fn description(&self) -> Option<&str> {
         match self {
             Error::Fdo(e) => e.description(),
-            Error::Named(_, message) => Some(message),
+            Error::Named(_, message) | Error::Listing(message, _) => Some(message),
             Error::Cancelled => Some("cancelled"),
         }
     }

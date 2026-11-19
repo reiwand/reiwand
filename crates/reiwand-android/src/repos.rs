@@ -6,10 +6,12 @@ use std::path::PathBuf;
 
 mod adding;
 pub(crate) mod bundled;
+mod gone;
 mod install;
 pub(crate) mod preview;
 pub(crate) mod server;
 
+pub(crate) use gone::{forget, uninstall};
 pub(crate) use install::{fetch, fetched, install};
 
 const DIR: &str = "repos";

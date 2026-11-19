@@ -10,6 +10,7 @@
     <string name="repo_search">Buscar paquetes</string>
     <string name="repo_install">Instalar</string>
     <string name="repo_installed">Instalado</string>
+    <string name="repo_uninstall">Desinstalar</string>
     <string name="repo_updates">Actualizaciones</string>
     <string name="repo_update_from">%1$s → %2$s</string>
     <string name="repo_update">Actualizar</string>

@@ -30,17 +30,6 @@ Column {
     visible: asking
     spacing: Look.e3
 
-    function listing(message) {
-        const pattern = /(?:: |, )([^,(:]*?) ?\(((?:https?|file):\/\/[^)\s]+)\)/g;
-        const found = [];
-        for (let m = pattern.exec(message); m !== null; m = pattern.exec(message))
-            found.push({
-                "name": m[1],
-                "url": m[2]
-            });
-        return found;
-    }
-
     function head() {
         return {
             "account": publishing ? App.tr("Publishing here needs an account") : App.tr("This repository is private"),

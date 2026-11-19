@@ -85,7 +85,9 @@ Piezas compartidas con las otras pantallas: `Seek` (campo de búsqueda), `Cover`
 - **Lista vacía** (una lista manual sin fondos): «Esta lista está vacía», «Añade fondos desde su
   página en la biblioteca.» e «Ir a la biblioteca».
 - Las reglas, en filas: «Cambiar de fondo» dice su intervalo y abre una hoja con las siete
-  opciones (cada 10, 15 o 30 minutos, cada hora, cada 6 horas, cada día o nunca); «Orden
+  opciones (cada 10, 15 o 30 minutos, cada hora, cada 6 horas, cada día o nunca) y «Otro…», que pide
+  minutos enteros de 1 a 43200 y los guarda como `45m`; una lista con otro intervalo lo dice tal cual
+  («Cada 45m»); «Orden
   aleatorio»; «Saltar los vídeos con batería»; «El mismo fondo en la pantalla de inicio y en la de
   bloqueo»; los días de la semana y las horas fijas («Añadir una hora», cada hora con su «Quitar
   esta hora»).
@@ -171,3 +173,7 @@ Sigue funcionando todo lo local: la biblioteca, los fondos instalados, las lista
 Las pantallas que usan la red (Explorar y repositorios, el formulario de repositorio, la cuenta y las actualizaciones) muestran arriba una línea tranquila, «Modo privado: la red está cortada.», con el botón «Desactivar», y sus botones de red quedan apagados. No es el aviso de «Sin conexión»: no hay error, solo el corte elegido.
 
 Cada lenguaje tiene una sola puerta (`net.rs` en la biblioteca nativa, `Net.kt` en la app) que se niega antes de resolver ningún nombre, y una prueba recorre el código para que ninguna conexión se abra fuera de ella. `PrivateModeTest` y `PrivatePageTest` en el emulador, y la prueba nativa del oyente local, comprueban que con el modo encendido un oyente en 127.0.0.1 no recibe ninguna conexión y que con el modo apagado sí la recibe.
+
+En Explorar, cada paquete instalado desde un repositorio lleva «Desinstalar», que lo quita de la
+biblioteca y borra su registro de instalación: el repositorio vuelve a ofrecerlo con «Instalar».
+Quitar un fondo instalado desde la biblioteca hace lo mismo con su registro.

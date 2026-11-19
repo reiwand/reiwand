@@ -416,8 +416,8 @@ mismo; Esc cierra). La respuesta del demonio decide lo que sigue:
   el código y la dirección de aprobación y agrega solo cuando el trabajo de inicio de sesión termina.
 - `CertificateUnknown`: «Este servidor usa su propio certificado», con la huella y «Confiar y
   agregar» (`Repos1.AddTrusting`).
-- `NotARepository`: «Es la dirección de un servidor»; lista las direcciones que trae el error, cada
-  una se elige con clic o Intro y se agrega.
+- `NotARepository`: «Es la dirección de un servidor»; lista los repositorios que trae la `output` de la tarea fallida (nombre y dirección, sin leer el
+  texto del error), cada una se elige con clic o Intro y se agrega.
 - `CertificateChanged` y `SignatureChanged`: aviso, no se agrega nada.
 
 La página Repositorios marca con «Requiere atención» los repositorios con `signature_changed` o

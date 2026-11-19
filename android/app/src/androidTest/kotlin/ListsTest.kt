@@ -3,6 +3,7 @@ package io.github.reiwand
 import androidx.activity.compose.setContent
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -12,6 +13,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
 import java.util.concurrent.atomic.AtomicInteger
@@ -113,8 +115,30 @@ class ListsTest {
         assertTrue(waitFor { closed && runBlocking { playlists().none { it.uid == uid } } })
     }
 
+    @Test
+    fun aListTakesAnIntervalOfItsOwnInMinutes() {
+        val uid = runBlocking { ask("create", "name" to NAMES[2]) as String }.also { made += it }
+        show { Entries(it, uid, {}) {} }
+        shown(words(R.string.list_empty))
+        val list = compose.onNodeWithTag("list-page")
+        list.performScrollToNode(hasText(words(R.string.list_more)))
+        list.performScrollToNode(hasText(words(R.string.change)))
+        compose.onNodeWithText(words(R.string.change)).performClick()
+        compose.onNodeWithTag("every_custom").performClick()
+        compose.onAllNodes(hasSetTextAction()).onLast().performTextReplacement("90000")
+        compose.onNodeWithText(words(R.string.save)).performClick()
+        assertTrue(runBlocking { playlists().first { it.uid == uid }.rules.optString("interval") }, waitFor { runBlocking { playlists().first { it.uid == uid }.rules.optString("interval") == "30m" } })
+        list.performScrollToNode(hasText(words(R.string.change)))
+        compose.onNodeWithText(words(R.string.change)).performClick()
+        compose.onNodeWithTag("every_custom").performClick()
+        compose.onAllNodes(hasSetTextAction()).onLast().performTextReplacement("45")
+        compose.onNodeWithText(words(R.string.save)).performClick()
+        assertTrue(runBlocking { playlists().first { it.uid == uid }.rules.optString("interval") }, waitFor { runBlocking { playlists().first { it.uid == uid }.rules.optString("interval") == "45m" } })
+        shown(words(R.string.every_custom_value, "45m"))
+    }
+
     private companion object {
         const val TIMEOUT_MS = 5_000L
-        val NAMES = listOf("Made in a sheet", "Folded rules")
+        val NAMES = listOf("Made in a sheet", "Folded rules", "Own pace")
     }
 }
