@@ -1,4 +1,4 @@
-use crate::scene::item::{Item, ndc};
+use crate::scene::item::{Item, Rect, ndc};
 use crate::scene::paint::{Painter, Target};
 use crate::scene::pipes::Mode;
 use crate::scene::{Op, Src};
@@ -28,7 +28,7 @@ impl Painter<'_, '_, '_> {
         let (system, mode) = (flock, Mode::Normal);
         let cast = [Src::White; 4];
         self.ops.push(Op::Particles { target: shift, system, slot, mode, timed: 0, bend: true, cast });
-        self.ops.push(Op::Copy { from: target.src, to: back, origin: [0, 0], size: (w, h), at: [0, 0] });
+        self.redraw(target.src, back, (w, h));
         let full = [0.0, 0.0, 1.0, 1.0];
         let mut item = Item { quad: full, uv: full, color: [1.0; 4], ..Item::default() };
         (item.m0, item.m1) = ndc(target.rect, target.rect.affine());
@@ -40,5 +40,16 @@ impl Painter<'_, '_, '_> {
         self.ops.push(Op::Draw { target: target.src, entry, mode: Mode::Replace, slot, tex });
         self.release(back);
         self.release(shift);
+    }
+
+    fn redraw(&mut self, from: Src, to: Src, (w, h): (u32, u32)) {
+        let (tw, th) = self.size_of(from);
+        let uv = [0.0, 0.0, w as f32 / tw as f32, h as f32 / th as f32];
+        let whole = Rect { x: 0.0, y: 0.0, w: w as f32, h: h as f32 };
+        let mut item = Item { quad: [0.0, 0.0, 1.0, 1.0], uv, color: [1.0; 4], ..Item::default() };
+        (item.m0, item.m1) = ndc(whole, whole.affine());
+        let slot = self.pool.push(&item);
+        let tex = [from, Src::White, Src::Clear];
+        self.ops.push(Op::Draw { target: to, entry: "fs_texture", mode: Mode::Replace, slot, tex });
     }
 }

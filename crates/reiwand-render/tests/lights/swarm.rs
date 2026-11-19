@@ -180,3 +180,15 @@ fn the_shift_view_paints_the_bend_of_refracting_particles_over_a_dimmed_scene() 
         );
     }
 }
+
+#[test]
+fn a_refracted_picture_repeats_exactly() {
+    let back = json!({ "blend_space": "canvas", "id": "back", "type": "image", "image": "mask", "size": [160, 90],
+        "transform": { "position": [80, 45] } });
+    let bend = json!({ "refract": { "normal": "bump", "units": "size", "amount": 1 } });
+    let Some(first) = shot(bend.clone(), vec![back.clone()], false, Quality::Q3) else { return };
+    for round in 1..24 {
+        let Some(again) = shot(bend.clone(), vec![back.clone()], false, Quality::Q3) else { return };
+        assert!(first == again, "round {round}: the same scene drew a different picture");
+    }
+}
