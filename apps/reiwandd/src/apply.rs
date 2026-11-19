@@ -161,6 +161,10 @@ impl Daemon {
             .filter(|o| output.is_empty() || **o == output)
             .cloned()
             .collect();
+        // a preview (a library card) keeps no record of use: the library did not change, so it announces nothing
+        if shown.is_empty() {
+            return Ok(());
+        }
         match self.store.write(|lib| shown.iter().try_for_each(|o| lib.mark_used(uid, o, now()))) {
             Ok(()) => self.changes.changed("library", vec![uid.to_owned()]),
             Err(e) => tracing::warn!("the wallpaper is shown, but its use was not recorded: {e}"),

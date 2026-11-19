@@ -154,6 +154,17 @@ mark=$(wc -l <"$WORK/library-signals.log")
 ctl lib confirm mature "$storm"
 told() { tail -n "+$mark" "$WORK/library-signals.log" | grep -A5 "member=Changed" | grep "$newer" >/dev/null; }
 wait_for 5 told || fail "Confirm did not announce the other version: $(tail -n "+$mark" "$WORK/library-signals.log")"
+# a library card shows a wallpaper without recording its use, so the library announces no change (the open
+# library would load again and lose its place); the notices of the confirmation above go out first
+sleep 1
+mark=$(wc -l <"$WORK/library-signals.log")
+ctl stream preview:card-check 160 90 >/dev/null
+bus Library1 Apply ssss "$harbour" preview:card-check "" "" >/dev/null
+sleep 1
+if tail -n "+$mark" "$WORK/library-signals.log" | grep -A1 "member=Changed" | grep -q 'string "library"'; then
+  fail "showing a wallpaper on a library card announced a library change"
+fi
+ctl release preview:card-check
 [ "$(reply "r['item']['package']['confirmed']" Library1 GetItem s "$newer")" = "['mature']" ] ||
   fail "the other version does not keep the decisions: $(ctl lib show "$newer" --json)"
 ctl release TEST-7 && expect "list(s['outputs'])" "[]"

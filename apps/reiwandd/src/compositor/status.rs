@@ -66,8 +66,10 @@ pub(super) fn problems_changed(
     old: &std::collections::BTreeMap<String, OutputStatus>,
     names: &[String],
 ) -> bool {
+    // an output that appears or goes away without problems changes none: a library card that starts its preview
+    // must not make the library load again
     let problems = |all: &std::collections::BTreeMap<String, OutputStatus>, n: &String| {
-        all.get(n).map(|s| s.problems.clone())
+        all.get(n).map(|s| s.problems.clone()).unwrap_or_default()
     };
     names.iter().any(|n| problems(now, n) != problems(old, n))
 }
@@ -86,5 +88,24 @@ impl Passage {
 impl Default for Passage {
     fn default() -> Self {
         Passage::CUT
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::BTreeMap;
+
+    #[test]
+    fn only_problems_that_come_or_go_count_as_a_change() {
+        let name = String::from("preview:card-1");
+        let (none, mut quiet) = (BTreeMap::new(), BTreeMap::new());
+        quiet.insert(name.clone(), OutputStatus::default());
+        assert!(!problems_changed(&quiet, &none, std::slice::from_ref(&name)));
+        assert!(!problems_changed(&none, &quiet, std::slice::from_ref(&name)));
+        let mut broken = quiet.clone();
+        broken.get_mut(&name).unwrap().problems = vec!["the page failed".into()];
+        assert!(problems_changed(&broken, &none, std::slice::from_ref(&name)));
+        assert!(problems_changed(&broken, &quiet, std::slice::from_ref(&name)));
     }
 }
