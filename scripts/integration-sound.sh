@@ -100,8 +100,7 @@ grep -q "reiwand-ctl input grant $lilies pointer" "$WORK/hint.err" ||
   fail "no grant command for a scene that follows the pointer: $(cat "$WORK/hint.err")"
 wait_for 10 reads "r['shown']['TEST-15']['title'], r['declined'].get('$lilies')" "('Pond', None)" ||
   fail "the scene asking for the pointer was not declared: $(ctl input status --json)"
-ctl input revoke "$lilies" pointer
-ctl input revoke "$lilies" clicks
+ctl input revoke "$lilies" pointer && ctl input revoke "$lilies" clicks
 [ "$(inputs "r['declined'].get('$lilies')")" = "['pointer', 'clicks']" ] || fail "not now was forgotten"
 ctl lib apply "$pond" -o TEST-15 2>"$WORK/hint.err"
 [ ! -s "$WORK/hint.err" ] || fail "a declined scene asked again: $(cat "$WORK/hint.err")"
@@ -109,6 +108,7 @@ ctl input grant "$lilies" pointer
 [ "$(inputs "r['declined'].get('$lilies')")" = "['clicks']" ] || fail "a grant kept the decline"
 ctl input revoke "$lilies" pointer && ctl mute
 leave && ctl release TEST-15 && ctl release TEST-16 && expect "list(s['outputs'])" "[]"
+source "$(dirname "$0")"/integration-previews.sh
 kill "$pulse" && { wait "$pulse" 2>/dev/null || true; }
 echo "scene sound and consent checks passed"
 bus Library1 Remove asb 1 "$flashing" false >/dev/null && rescanned
