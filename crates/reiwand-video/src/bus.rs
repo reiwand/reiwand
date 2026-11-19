@@ -17,7 +17,7 @@ pub(crate) struct Pipe {
     pub(crate) playbin: gst::Element,
     wish: Arc<Wish>,
     stop: Arc<AtomicBool>,
-    stopped: Option<Receiver<()>>,
+    stopped: Receiver<()>,
 }
 
 impl Pipe {
@@ -38,7 +38,7 @@ impl Pipe {
                 watch_bus(&bus, (&weak, uri, shared), &flags.0, &flags.1, &*sink);
             })
             .map_err(Error::state)?;
-        let pipe = Pipe { playbin, wish, stop, stopped: Some(stopped) };
+        let pipe = Pipe { playbin, wish, stop, stopped };
         match pipe.playbin.set_state(gst::State::Paused) {
             Err(_) if audible => {}
             started => drop(started.map_err(Error::state)?),
@@ -75,15 +75,8 @@ impl Drop for Pipe {
     fn drop(&mut self) {
         self.stop.store(true, Ordering::Relaxed);
         self.wake();
-        let (stopped, playbin) = (self.stopped.take(), self.playbin.clone());
-        let reaper = std::thread::Builder::new().name("reiwand-video-reap".into()).spawn(move || {
-            if let Some(Err(RecvTimeoutError::Timeout)) = stopped.map(|s| s.recv_timeout(STOP_WAIT)) {
-                tracing::warn!("playback did not stop within {STOP_WAIT:?}, leaving it behind");
-            }
-            drop(playbin);
-        });
-        if let Err(e) = reaper {
-            tracing::warn!("cannot wait for the playback to stop: {e}");
+        if let Err(RecvTimeoutError::Timeout) = self.stopped.recv_timeout(STOP_WAIT) {
+            tracing::warn!("playback did not stop within {STOP_WAIT:?}, leaving it behind");
         }
     }
 }

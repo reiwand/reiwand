@@ -61,12 +61,6 @@ fn a_steered_part_and_speed_reach_a_video_with_sound_opened_plain() {
     let mut slot = PlayerSlot::new(((64, 32), true, 60, 100), now);
     slot.shares = false;
     slot.tick(&reel, heard(), &tx, now);
-    assert!(slot.player.is_none() && slot.opening.is_some(), "the open blocked the caller");
-    let limit = Instant::now() + Duration::from_secs(30);
-    while slot.player.is_none() && Instant::now() < limit {
-        std::thread::sleep(Duration::from_millis(10));
-        slot.tick(&reel, heard(), &tx, Instant::now());
-    }
     assert!(slot.player.as_ref().is_some_and(Player::audio_enabled), "the video opened without sound");
     playing(&slot, |_| true);
     let cut = Cut { speed: 200, start: 300, end: 700 };

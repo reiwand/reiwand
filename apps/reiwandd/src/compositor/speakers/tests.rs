@@ -98,7 +98,7 @@ fn a_playing_speaker_whose_scene_clock_stands_still_wakes_once_a_second() {
     let mut speaker = Speaker {
         pack,
         output: "A".into(),
-        track: Later::Ready(None),
+        track: None,
         playing: true,
         volume: 1.0,
         voices: voices.clone(),
