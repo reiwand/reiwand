@@ -156,7 +156,7 @@ pub use crate::sites::{Site, script_inputs, script_key, sites};
 pub use crate::sound::{MAX_SOUNDS, Order, Sound, VOLUME, Voice, volume_property};
 pub use crate::spare::Spare;
 pub use crate::spend::{MAX_STATEFUL, Over, Spend, over};
-pub use crate::sprites::{STAGES_WGSL, material_shader, particle_shader};
+pub use crate::sprites::{STAGES_WGSL, defines_pixel, material_shader, particle_shader};
 pub use crate::stage::{IMAGES, VIDEOS};
 pub use crate::strikes::{STOPPED, end_trials, forgive_strikes, keep_strikes, strike, struck, tried, trying};
 pub use crate::surfaces::{MAX_MATERIAL_IMAGES, MAX_MATERIAL_PARAMS, material_images};

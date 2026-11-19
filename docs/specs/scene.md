@@ -1334,7 +1334,7 @@ WGSL defines `fn material(s: Surface) -> Surface`, or `particle` for a particle 
 (`render.shader`), whose WGSL defines `fn particle(p: Sprite) -> Sprite` for each corner of each
 particle; such descriptors have no passes, and the scene may only use them where their stage fits.
 `Surface` has `position`, `normal`, `uv`, `albedo`, `emissive`, `roughness`, `metallic` and
-`occlusion`; `Sprite` has `position`, `velocity`, `corner`, `uv`, `color`, `size`, `rotation`, `age`
+`occlusion`; `Pixel` has `sample`, `color`, `brightness`, `alpha`, `uv`, `age` and `life`; `Sprite` has `position`, `velocity`, `corner`, `uv`, `color`, `size`, `rotation`, `age`
 and `life`. A material shader has at most 8 parameters (`param(0u)` to `param(7u)`), none of them a
 `lut`, `mask` or `emitters`, and samples up to 4 images: its `texture` parameters, in the order the
 descriptor lists them, are read with `image0(uv)` to `image3(uv)` (a repeating, filtered read of
@@ -1893,7 +1893,7 @@ sets it, and every other name must be one of `points`. Targets and centers of fo
 | render `rope`, `trail` | `{ "subdivide" (0 to 7), "width", "uv_scale", "uv_scroll", "smooth" }` joins particles in birth order; trails of up to 64 steps with `segments`, `subdivide`, `uv_scale`, `uv_scroll` and `textured` | `particle_ropes` |
 | render `cutout`, `orient`, `angle` | `[start, end, opacity]` remaps the alpha of the texture; `screen`, `velocity` or `fixed` with `angle` | `particle_looks` |
 | render `lit`, `normal`, `refract` | `lit` lights the sprites with the scene lights (the `z` of a light lifts it toward the viewer, and a light behind a sprite lights its back); a spot with a `texture` casts its picture (image, video or layer) on them as it does on a lit layer, at the cost of one more texture read per lit pixel and spot with a picture, the same at every level; `normal` is a `linear` normal map laid over each sprite and turned with it; the `lighting` block of the layer, when set, lights them too and gives `strength` and `emissive`. `refract` draws the sprites only as a bend of what is behind them, by the normal map, and always states its `units`: `{ "normal", "units": "size", "amount" }` (0 to 1) bends up to `amount` times half the size of a sprite, and `{ "normal", "units": "pixels", "shift" }` (0 to 256) bends up to `shift` canvas pixels times the normal and the opacity, the same for any sprite size and along the whole length of a trail, a rope or a stretched or non-square sprite (a thin long drop can bend the background 40 pixels); `amount` is refused with `pixels` and `shift` with `size`, and `reiwand-upgrade scenes` writes `"units": "size"` into every refraction that lacks it; it works at full size at Q3, at half size at Q2 and leaves the sprites out at Q1 and Q0; a device without a blendable half-float target leaves it out too and names the layer in the notes of what was left out. Trails, long trails and ropes are lit and refract too, as a flat surface facing the viewer for the light and as a round tube across their width for the bend (their normal map is not read); sprites drawn with a particle shader take the light and the bend after their own `particle` function, with one more pipeline per shader and blend for each, built only when the layer is lit or refracts. A lit trail or rope costs the same light loop per pixel as a lit sprite, and a refracting one draws once more into the bend target at the size of the level, like the sprites | `particle_lighting` |
-| render `shader` | a package effect with `stage: "particle"` | `particle_shaders` |
+| render `shader` | a package effect with `stage: "particle"`; besides `fn particle`, its WGSL may define `fn pixel(p: Pixel) -> vec4<f32>` (see «Particle shaders») | `particle_shaders` |
 
 The newer fields behave as follows.
 
@@ -2064,6 +2064,23 @@ positions as its own `trail` asks for, or none.
   the build time of package shaders, its time on the GPU counts like the time of a package effect,
   and one that takes too long to build, stopped the graphics card or is too slow is left out for the
   run the same way. Ropes and trails are drawn as usual.
+  The WGSL may also define `fn pixel(p: Pixel) -> vec4<f32>`, which runs for each pixel of a sprite
+  before the alpha. `Pixel` is `sample: vec4<f32>` (the texture, or the soft disc, after `cutout`),
+  `color: vec4<f32>` (the color and alpha of the particle after `color_over_life`, the layer tint and
+  the opacity, without the brightness and not multiplied by its alpha), `brightness: f32` (the layer
+  brightness times `render.brightness`), `alpha: f32` (`sample.a * color.a`), `uv: vec2<f32>`,
+  `age: f32` and `life: f32`. It returns the straight color and alpha; the engine multiplies the color by
+  that alpha and blends as always. Without `fn pixel` the result is `sample * color`, with the
+  brightness already in the color, and every pixel is as before. With it, the brightness is not
+  multiplied into the color of the sprite (a `fn particle` sees `color` without it), so the shader
+  chooses where to apply it, and it clips before the alpha:
+  `fn pixel(p: Pixel) -> vec4<f32> { let lit = min(p.sample.rgb * p.color.rgb * p.brightness, vec3<f32>(1.0)); return vec4<f32>(lit, p.sample.a * p.color.a); }`.
+  A white sprite at alpha 0.5 and brightness 2.5 then stays at 127 over black, and an additive
+  halo reaches the same level in all three channels. The function is checked and limited with the
+  package shader (its signature, its work and its build time), may use the same helpers and `frame`, and
+  reads no textures. If it does not compile the whole effect is left out. Every system that names the
+  effect uses it; `lit` lights the result of `fn pixel`, `refract` only reads its alpha, and trails,
+  long trails and ropes do not call it: they take the brightness as before, unclipped.
 - **Keeping distance.** `keep_distance` pulls each particle toward its target or pushes it away, as
   a spring that rests `distance` pixels from it: the acceleration is `strength · (d − distance)` along
   the line to the target, in pixels a second squared for each pixel. `keep_between` pulls each particle

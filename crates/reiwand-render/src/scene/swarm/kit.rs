@@ -44,6 +44,7 @@ pub(super) struct Kit {
     pub(super) tex: wgpu::BindGroup,
     pub(super) stage: Option<(u64, wgpu::ShaderModule, std::sync::Arc<wgpu::naga::Module>)>,
     pub(super) shader: Option<String>,
+    pub(super) pixeled: bool,
     pub(super) refused: Option<(String, String)>,
     pub(super) lit: Option<[wgpu::TextureView; 2]>,
     pub(super) bend: Option<f32>,
@@ -130,9 +131,24 @@ pub(super) fn kit(
     let long = render.trail.as_ref().is_some_and(|t| t.long());
     let rope = render.rope;
     let shader = render.shader.clone();
-    let (stage, refused, lit, bend) = (None, None, None, None);
-    let mut kit =
-        Kit { id, system, layer, look, order, trail, long, rope, tex, stage, shader, refused, lit, bend };
+    let (stage, refused, lit, bend, pixeled) = (None, None, None, None, false);
+    let mut kit = Kit {
+        id,
+        system,
+        layer,
+        look,
+        order,
+        trail,
+        long,
+        rope,
+        tex,
+        stage,
+        shader,
+        pixeled,
+        refused,
+        lit,
+        bend,
+    };
     super::stage::stage(r, scene, &mut kit, render.shader.as_deref());
     if kit.stage.is_some() {
         kit.look.hull = Default::default();

@@ -8,7 +8,8 @@ use reiwand_scene::{
 };
 use std::collections::HashMap;
 
-const PLAIN: &str = "fn particle(p: Sprite) -> Sprite {\n    return p;\n}\n";
+pub(super) const PIXEL: &str = "fn pixel(p: Pixel) -> vec4<f32> {\n    let c = p.sample * p.color;\n    return vec4<f32>(c.rgb, c.a);\n}\n";
+const PLAIN: &str = "const PIXELED: bool = false;\nfn particle(p: Sprite) -> Sprite {\n    return p;\n}\n";
 
 pub(crate) fn renders(scene: &Scene) -> Vec<(usize, Option<String>, &Render)> {
     let own = scene.layers().filter_map(|l| match &l.kind {
@@ -113,6 +114,7 @@ impl Swarms {
                 &[
                     reiwand_scene::STAGES_WGSL,
                     PLAIN,
+                    PIXEL,
                     include_str!("sprite.wgsl"),
                     include_str!("tilt.wgsl"),
                     include_str!("ribbon.wgsl"),

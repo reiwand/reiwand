@@ -18,8 +18,17 @@ pub(super) fn seen_among(
     files: &[(&str, &str)],
     gpu: bool,
 ) -> Option<(Vec<u8>, Vec<String>)> {
-    let canvas = json!({ "size": [SIZE.0, SIZE.1], "background": "#000000" });
     layers.push(json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s" }));
+    seen_all(r, (json!({ "s": system }), layers), (files, "linear"), gpu)
+}
+
+pub(super) fn seen_all(
+    r: &Renderer,
+    (systems, layers): (Value, Vec<Value>),
+    (files, space): (&[(&str, &str)], &str),
+    gpu: bool,
+) -> Option<(Vec<u8>, Vec<String>)> {
+    let canvas = json!({ "size": [SIZE.0, SIZE.1], "background": "#000000", "blend_space": space });
     let effects: serde_json::Map<String, Value> = files
         .iter()
         .filter(|(p, _)| p.ends_with(".json"))
@@ -29,7 +38,7 @@ pub(super) fn seen_among(
         })
         .collect();
     let assets = json!({ "pair": { "path": "pair.png", "atlas": [1, 1] } });
-    let text = json!({ "schema": SCHEMA, "canvas": canvas, "layers": layers, "particles": { "s": system },
+    let text = json!({ "schema": SCHEMA, "canvas": canvas, "layers": layers, "particles": systems,
         "assets": assets, "effects": effects });
     let files: BTreeMap<&str, &str> = files.iter().copied().collect();
     let mut scene = Scene::from_json(&crate::gpu::whole(&text.to_string())).unwrap();

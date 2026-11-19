@@ -10,8 +10,9 @@ use std::sync::Arc;
 
 const ENTRIES: [&str; 3] = ["reiwand_fs_particle", "reiwand_fs_lit_particle", "reiwand_fs_bend_particle"];
 
-const OWN: [&str; 31] = [
+const OWN: [&str; 32] = [
     "Look",
+    "PIXELED",
     "look",
     "Corner",
     "samp",
@@ -44,10 +45,12 @@ const OWN: [&str; 31] = [
     "fs_bend_particle",
 ];
 
-fn source() -> String {
+fn source(pixeled: bool) -> String {
     let lit = include_str!("lit.wgsl").replace("@group(2)", "@group(3)");
+    let head =
+        format!("const PIXELED: bool = {pixeled};\n{}", if pixeled { "" } else { super::setup::PIXEL });
     prefixed(
-        &[include_str!("sprite.wgsl"), include_str!("tilt.wgsl"), include_str!("../lamps.wgsl"), &lit]
+        &[&head, include_str!("sprite.wgsl"), include_str!("tilt.wgsl"), include_str!("../lamps.wgsl"), &lit]
             .join("\n"),
     )
 }
@@ -77,7 +80,9 @@ pub(super) fn stage(r: &Renderer, scene: &Scene, kit: &mut Kit, id: Option<&str>
         return;
     };
     let made = left(d.key).map_or(Ok(()), Err).and_then(|()| {
-        let naga = Arc::new(reiwand_scene::particle_shader(d, &source())?);
+        let pixeled = reiwand_scene::defines_pixel(&d.wgsl);
+        kit.pixeled = pixeled;
+        let naga = Arc::new(reiwand_scene::particle_shader(d, &source(pixeled))?);
         within((d.key, r), None, move |device| (shader(device, &naga), naga))
     });
     match made {

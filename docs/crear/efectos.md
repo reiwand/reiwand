@@ -523,6 +523,22 @@ material de un modelo (ver [3d.md](3d.md)); con `"stage": "particle"`, define
 `fn particle(p: Sprite) -> Sprite` y cambia cómo se dibuja cada partícula (ver
 [particulas-y-sonido.md](particulas-y-sonido.md)).
 
+Un sombreador de partícula puede definir además `fn pixel(p: Pixel) -> vec4<f32>`, que corre por cada
+píxel del sprite antes del alfa. `p.sample` es la muestra de la textura, `p.color` el color y el alfa
+de la partícula (sin el brillo y sin multiplicar por el alfa), `p.brightness` el brillo del sistema,
+`p.alpha` el alfa (`sample.a * color.a`), `p.uv`, `p.age` y `p.life`. Devuelve color y alfa rectos y el
+motor multiplica después. Para que el núcleo llegue a blanco sin aclarar el borde translúcido:
+
+```wgsl
+fn pixel(p: Pixel) -> vec4<f32> {
+    let lit = min(p.sample.rgb * p.color.rgb * p.brightness, vec3<f32>(1.0));
+    return vec4<f32>(lit, p.sample.a * p.color.a);
+}
+```
+
+Con `pixel`, el brillo ya no se multiplica en el color del sprite (lo aplica la función). Sin ella todo
+se ve como siempre. Las estelas y las cuerdas no la llaman; `refract` solo lee su alfa.
+
 ### Una transición propia
 
 Un fondo puede traer su propia transición para cuando entra y, si quiere, otra para cuando sale.

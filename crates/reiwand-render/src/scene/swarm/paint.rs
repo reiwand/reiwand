@@ -38,6 +38,8 @@ impl Painter<'_, '_, '_> {
         let toned =
             crate::scene::item::toned(reiwand_scene::Color([cr, cg, cb, 1.0]), d.brightness, srgb, 1.0);
         let tint = [toned[0], toned[1], toned[2], d.tint.0[3]];
+        let even = crate::scene::item::toned(reiwand_scene::Color([cr, cg, cb, 1.0]), 1.0, srgb, 1.0);
+        let even = [even[0], even[1], even[2], d.tint.0[3]];
         let slot = (swarms.looks.len() as u64 * super::LOOK) as u32;
         let (mut timed, mut bent) = (0, false);
         let (strength, glow) = d.lit.map_or((1.0, 0.0), |l| (l.strength, l.emissive));
@@ -61,8 +63,13 @@ impl Painter<'_, '_, '_> {
                 self.refused.entry(id.clone()).or_insert_with(|| why.clone());
             }
             let mut look = kit.look;
+            let pixeled = kit.pixeled && kit.stage.is_some();
             if tinted {
+                let tint = if pixeled { even } else { tint };
                 look.colors.iter_mut().for_each(|c| (0..4).for_each(|j| c[j] *= tint[j]));
+            }
+            if pixeled {
+                look.shade[0] = d.brightness;
             }
             (look.m0, look.m1) = ndc(target.rect, m);
             look.turn[2] = m.0[1].atan2(m.0[0]);

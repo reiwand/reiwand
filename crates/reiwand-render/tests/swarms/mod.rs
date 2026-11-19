@@ -13,6 +13,7 @@ mod drawn;
 mod families;
 mod fields;
 mod looks;
+mod pixels;
 mod shone;
 mod sources;
 mod steered;

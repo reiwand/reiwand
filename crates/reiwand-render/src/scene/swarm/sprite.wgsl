@@ -32,6 +32,7 @@ struct Corner {
     @location(3) @interpolate(flat) turn: vec4<f32>,
     @location(4) @interpolate(flat) scale: f32,
     @location(5) @interpolate(flat) tilt: vec4<f32>,
+    @location(6) @interpolate(flat) span: vec2<f32>,
 };
 
 @group(0) @binding(0) var<uniform> look: Look;
@@ -110,7 +111,7 @@ fn vs_particle(
     let i = min(u32(x), 62u);
     let tone = mix(look.colors[i], look.colors[i + 1u], x - f32(i));
     let base = select(vec4<f32>(decode(color.rgb), color.a), color, look.tint.y > 0.5);
-    let shade = base * tone * vec4<f32>(vec3<f32>(look.shade.x), look.tint.x * e.z);
+    let shade = base * tone * vec4<f32>(vec3<f32>(select(look.shade.x, 1.0, PIXELED)), look.tint.x * e.z);
     let s = particle(Sprite(center, a.zw, corner, corner, shade, size, degrees(atan2(axis.y, axis.x)), b.x, b.y));
     let turn = vec2<f32>(cos(radians(s.rotation)), sin(radians(s.rotation)));
     tail = select(tail, s.size * (reach - 1.0), relative);
@@ -129,6 +130,7 @@ fn vs_particle(
     out.uv = s.uv;
     out.color = s.color;
     out.scale = k;
+    out.span = vec2<f32>(s.age, s.life);
     let spun = radians(s.rotation) + look.turn.z + select(0.0, 1.5707964, upright);
     out.turn = vec4<f32>(cos(spun), sin(spun), s.size * look.light.w, 0.0);
     let n = max(look.atlas.x * look.atlas.y, 1.0);
@@ -181,16 +183,13 @@ fn painted(in: Corner) -> vec4<f32> {
         discard;
     }
     var s = mix(cell(in.frames.x, in.uv), cell(in.frames.y, in.uv), in.frames.z);
-    if look.tint.y > 0.5 {
-        s = vec4<f32>(encode(s.rgb), s.a);
-    }
-    let disc = vec4<f32>(1.0, 1.0, 1.0, 1.0 - smoothstep(0.5, 1.0, length(in.uv * 2.0 - 1.0)));
-    var c = select(disc, s, look.tint.w > 0.5);
+    s = select(s, vec4<f32>(encode(s.rgb), s.a), look.tint.y > 0.5);
+    var c = select(vec4<f32>(1.0, 1.0, 1.0, 1.0 - smoothstep(0.5, 1.0, length(in.uv * 2.0 - 1.0))), s, look.tint.w > 0.5);
     if look.cut.w > 0.5 {
         c.a = clamp((c.a - look.cut.x) / (look.cut.y - look.cut.x), 0.0, 1.0) * look.cut.z;
     }
-    c *= in.color;
-    return vec4<f32>(c.rgb * c.a, c.a);
+    let q = pixel(Pixel(c, in.color, look.shade.x, c.a * in.color.a, in.uv, in.span.x, in.span.y));
+    return vec4<f32>(q.rgb * q.a, q.a);
 }
 
 @fragment

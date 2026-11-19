@@ -51,6 +51,24 @@ pub(crate) fn checked(id: &str, json: &str, wgsl: &str) -> Result<Descriptor, St
             return Err(format!("its shader needs fn {name}(value: {kind}) -> {kind}"));
         }
         entries.push(name);
+        if d.stage == crate::Stage::Particle {
+            let pixel = module.functions.iter().filter(|(_, f)| f.name.as_deref() == Some("pixel")).count();
+            let right = |f: &naga::Function| {
+                let float4 = |h: naga::Handle<naga::Type>| {
+                    matches!(module.types[h].inner, naga::TypeInner::Vector { size: naga::VectorSize::Quad, scalar }
+                        if scalar == naga::Scalar::F32)
+                };
+                matches!(f.arguments.as_slice(), [a] if module.types[a.ty].name.as_deref() == Some("Pixel"))
+                    && f.result.as_ref().is_some_and(|r| float4(r.ty))
+            };
+            let fits = module.functions.iter().any(|(_, f)| f.name.as_deref() == Some("pixel") && right(f));
+            if pixel > 0 {
+                if !fits {
+                    return Err("its shader needs fn pixel(value: Pixel) -> vec4<f32>".into());
+                }
+                entries.push("pixel");
+            }
+        }
     }
     crate::surfaces::check(&d)?;
     crate::passage::shader::check(&d)?;

@@ -45,3 +45,31 @@ fn staged(d: &Descriptor, source: &str) -> Result<naga::Module, String> {
         Ok(module)
     })
 }
+
+pub fn defines_pixel(wgsl: &str) -> bool {
+    let mut plain = String::with_capacity(wgsl.len());
+    let mut rest = wgsl;
+    while !rest.is_empty() {
+        let line = rest.find("//");
+        let block = rest.find("/*");
+        match (line, block) {
+            (Some(l), b) if b.is_none_or(|b| l < b) => {
+                plain.push_str(&rest[..l]);
+                rest = rest[l..].find('\n').map_or("", |n| &rest[l + n..]);
+            }
+            (_, Some(b)) => {
+                plain.push_str(&rest[..b]);
+                rest = rest[b + 2..].find("*/").map_or("", |e| &rest[b + 2 + e + 2..]);
+            }
+            _ => {
+                plain.push_str(rest);
+                rest = "";
+            }
+        }
+    }
+    plain.split("fn").skip(1).any(|after| {
+        let name = after.trim_start();
+        after.starts_with(char::is_whitespace)
+            && name.strip_prefix("pixel").is_some_and(|t| t.trim_start().starts_with('('))
+    })
+}

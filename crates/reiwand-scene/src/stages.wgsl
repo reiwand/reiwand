@@ -9,6 +9,16 @@ struct Surface {
     occlusion: f32,
 };
 
+struct Pixel {
+    sample: vec4<f32>,
+    color: vec4<f32>,
+    brightness: f32,
+    alpha: f32,
+    uv: vec2<f32>,
+    age: f32,
+    life: f32,
+};
+
 struct Sprite {
     position: vec2<f32>,
     velocity: vec2<f32>,

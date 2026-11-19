@@ -28,6 +28,7 @@ pub(crate) fn measure(
     let drawn = d.passes.iter().filter(|p| !p.entry.is_empty());
     let area = |p: &PassDef, w: u64| w as f32 * side(p).powi(2) * spread(p);
     let stage = d.stage.function().map_or(Work::default(), |(name, _)| of(name));
+    let stage = if d.stage == crate::Stage::Particle { stage.then(of("pixel")) } else { stage };
     let reads = drawn.clone().map(|p| area(p, of(&p.entry).reads)).sum::<f32>() + stage.reads as f32;
     let ops = drawn.clone().map(|p| area(p, of(&p.entry).ops)).sum::<f32>() + stage.ops as f32;
     let built = |p: &PassDef| of(&p.entry).size.saturating_add(p.vertex.as_deref().map_or(0, |v| of(v).size));
