@@ -5,6 +5,5 @@ fn particle(p: Sprite) -> Sprite {
 }
 
 fn pixel(p: Pixel) -> vec4<f32> {
-    let lit = min(p.sample.rgb * p.color.rgb * p.brightness, vec3<f32>(1.0));
-    return vec4<f32>(lit, p.sample.a * p.color.a);
+    return vec4<f32>(p.sample.rgb * p.color.rgb * p.brightness, p.sample.a * p.color.a);
 }
