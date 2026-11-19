@@ -79,7 +79,8 @@ impl Soundtrack {
     pub fn delay(&self) -> Duration {
         let bin = self.pipe.playbin.downcast_ref::<gst::Bin>();
         let mut elements = bin.into_iter().flat_map(|b| b.iterate_recurse().into_iter().flatten());
-        let piped = elements.any(|e| e.factory().is_some_and(|f| f.name() == "pipewiresink"));
+        let piped =
+            elements.any(|e| e.factory().is_some_and(|f| pipewire::SINKS.contains(&f.name().as_str())));
         if piped { QUANTUM } else { Duration::ZERO }
     }
 

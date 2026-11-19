@@ -849,7 +849,10 @@ Pauses or resumes every animated wallpaper.
 ### `SetVolume(d volume)`
 
 Sets the volume of video wallpapers and scenes with sound, `0.0` to `1.0`. Their sound goes to
-PipeWire directly (`pipewiresink`, stream `reiwand` with `media.role = Movie`) when the
+PipeWire through its PulseAudio interface (`pulsesink`, stream `reiwand` with `media.role = Movie`,
+`latency-time` from the 20 ms cycle) when a PulseAudio server is reachable (`PULSE_SERVER` or
+`$XDG_RUNTIME_DIR/pulse/native`; the PipeWire plugin can deadlock its own stop against its loop
+thread), otherwise directly (`pipewiresink`, same stream) when the
 GStreamer PipeWire plugin 1.2 or newer is installed; without it, with an older one (whose buffer
 pool can deadlock), or when PipeWire cannot be reached outside the Flatpak, it goes to the default
 audio output of GStreamer. While PipeWire has no audio output (and in the Flatpak while PipeWire
@@ -2716,7 +2719,7 @@ package up to 180.5 s; a sound that goes on longer is not played.
   timeline when it plays again. The daemon re-aligns every playing layer with the scene clock once a
   second, and a layer more than 60 ms away ducks for 5 ms and jumps. Positions count from the
   playing position of the audio output, whose clock leaves out what its sink still holds, plus one
-  20 ms PipeWire cycle (the period the soundtrack asks for) when the sound goes to `pipewiresink`.
+  20 ms PipeWire cycle (the period the soundtrack asks for) when the sound goes to `pulsesink` or `pipewiresink`.
 - When the audio output fails (no device, a sound server that went away, also with a PipeWire
   GStreamer plugin older than 1.2), the scene and the videos go on silent, and the output is tried
   again once a PipeWire or PulseAudio device provider lists an audio sink, after 1 s and then twice
