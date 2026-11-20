@@ -68,3 +68,12 @@ pub fn dress(
         }
     }
 }
+
+pub fn sounded(path: &Path, (start, end): (f64, f64)) -> Result<std::sync::Arc<reiwand_render::Track>> {
+    ensure!(path.is_file(), "{} is not a sound file", path.display());
+    let span = reiwand_render::Track::span(start, end);
+    let (first, clip) = reiwand_video::listen(path, span)
+        .map_err(|e| anyhow::anyhow!("cannot read the sound {}: {e}", path.display()))?;
+    let track = reiwand_render::Track::new(reiwand_video::RATE, first, clip.channels, &clip.samples);
+    Ok(std::sync::Arc::new(track))
+}

@@ -4522,6 +4522,7 @@ dependencies = [
  "jpeg-decoder",
  "libc",
  "pollster",
+ "reiwand-audio",
  "reiwand-core",
  "reiwand-ktx2",
  "reiwand-palette",

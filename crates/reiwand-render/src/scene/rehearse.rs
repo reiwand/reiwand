@@ -1,5 +1,8 @@
 mod reel;
+mod versus;
 mod wall;
+
+pub use versus::split;
 
 pub use wall::{local_wall, on_today};
 
@@ -7,6 +10,7 @@ use super::SceneAssets;
 use super::scripted::Scripted;
 use crate::{RenderError, Renderer};
 use image::RgbaImage;
+use reiwand_audio::{Played, Track};
 use reiwand_scene::{MediaState, PointerState, Quality, Runtime, Scene, Values};
 use std::sync::Arc;
 
@@ -32,6 +36,7 @@ pub struct Rehearsal {
     pub lang: String,
     pub script_host: Option<super::scripted::ScriptHost>,
     pub media: Option<MediaState>,
+    pub audio: Option<Arc<Track>>,
     pub frames: usize,
     pub fps: u32,
     pub pointer: Option<Trace>,
@@ -50,6 +55,7 @@ impl Default for Rehearsal {
             lang: "en".into(),
             script_host: None,
             media: None,
+            audio: None,
             frames: 1,
             fps: 30,
             pointer: None,
@@ -99,15 +105,6 @@ impl Rehearsal {
     }
 }
 
-pub fn split(left: &RgbaImage, right: &RgbaImage, at: f32) -> RgbaImage {
-    let (w, h) = left.dimensions();
-    let cut = (w as f32 * at.clamp(0.0, 1.0)).round() as u32;
-    RgbaImage::from_fn(w, h, |x, y| match (x < cut, right.get_pixel_checked(x, y)) {
-        (false, Some(p)) => *p,
-        _ => *left.get_pixel(x, y),
-    })
-}
-
 impl Renderer {
     pub fn rehearse(
         &self,
@@ -139,12 +136,19 @@ impl Renderer {
         let shown = |view: [f32; 4]| (view, [size.0, size.1], wanted.rate(), quality as u8);
         let (step, mut pointer) = (1.0 / f64::from(wanted.rate()), PointerState::default());
         let (mut frames, mut inner) = (Vec::new(), size);
+        let start = wanted.time.clamp(0.0, f64::from(reiwand_scene::MAX_POSTER_TIME));
+        let mut heard = wanted.audio.clone().map(|track| Played::new(track, start, step));
         for i in 0..wanted.frames.max(1) {
             if i > 0 {
                 runtime.advance(step);
                 if let Some(media) = &wanted.media {
                     let _ = runtime.set_media(media.at(i as f64 * step));
                 }
+            }
+            if let Some(heard) = heard.as_mut().map(|h| h.at(start + i as f64 * step))
+                && runtime.uses().audio
+            {
+                runtime.set_audio(heard.clone());
             }
             let (pos, buttons) = wanted.pointer_at(i);
             pointer = pointer.follow(pos, buttons, step as f32);
@@ -171,27 +175,5 @@ impl Renderer {
             console,
             stopped,
         })
-    }
-}
-
-impl Renderer {
-    pub fn rehearse_versus<E: From<RenderError>>(
-        &self,
-        open: impl Fn(bool) -> Result<Opened, E>,
-        wanted: &Rehearsal,
-        versus: Option<&Versus>,
-    ) -> Result<Reel, E> {
-        let draw = |wanted: &Rehearsal, bloom: bool| -> Result<Reel, E> {
-            let (scene, assets, props) = open(bloom)?;
-            Ok(self.rehearse(&scene, &assets, &props, wanted)?)
-        };
-        let mut reel = draw(wanted, true)?;
-        if let Some(v) = versus {
-            let other = Rehearsal { quality: v.quality.unwrap_or(wanted.quality), ..wanted.clone() };
-            let rival = draw(&other, !v.without_bloom)?;
-            let joined = reel.frames.iter().zip(&rival.frames).map(|(a, b)| split(a, b, v.split));
-            reel.frames = joined.collect();
-        }
-        Ok(reel)
     }
 }

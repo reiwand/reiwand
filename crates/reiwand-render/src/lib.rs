@@ -82,6 +82,7 @@ pub use parallax::{DepthMap, Relief};
 pub use platform::{Platform, heif, set_platform_decoder};
 pub use pq::pq_code;
 pub use readback::TargetLimits;
+pub use reiwand_audio::Track;
 use reiwand_core::{Fit, UvRect};
 pub use save::{FORMATS, save};
 pub use scene::{

@@ -13,6 +13,7 @@ avif = ["image/avif"]
 [dependencies]
 reiwand-core.workspace = true
 reiwand-scene.workspace = true
+reiwand-audio.workspace = true
 reiwand-palette.workspace = true
 reiwand-script.workspace = true
 reiwand-ktx2.workspace = true

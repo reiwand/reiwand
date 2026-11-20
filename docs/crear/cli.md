@@ -235,6 +235,7 @@ Imprime los archivos que escribió. Dibuja lo mismo que la vista previa del edit
 | `--time S` | El segundo de la escena del primer cuadro. Las partículas llevan simulados `prewarm` más S segundos (con tope de 30 s en total). |
 | `--time-of-day HORA` | La hora de pared que ven la escena y sus scripts: `HH:MM[:SS]` de hoy o `AAAA-MM-DD HH:MM[:SS]`. Sin ella, la hora de este equipo; ponla para que la imagen salga igual siempre. |
 | `--media ARCHIVO` | Una pista inventada del reproductor (JSON: `title`, `artist`, `album`, `playing`, `position`, `duration`, `rate`, `cover`…; la carátula es una imagen de la carpeta) que ven los scripts y las imágenes que siguen a la carátula. Sin ella, no hay reproductor. |
+| `--audio PISTA` | Un archivo de sonido (WAV, FLAC, Ogg, MP3 o el sonido de un video: lo que lea GStreamer) que la escena oye como si sonara a volumen completo desde el segundo 0 de su reloj. La entrada `audio` (capas, efectos, partículas y scripts que la leen) recibe en cada cuadro el mismo análisis que hace el demonio con el sonido del equipo (las 64 bandas por canal, `bass`, `mid`, `treble`, `level`, `beat`, con el mismo suavizado y el mismo código), calculado con el tiempo del cuadro (`--time`, `--fps`, `--frames`) y no con el reloj: la misma escena con la misma pista da los mismos bytes. Con `--time S` el análisis ya oyó el minuto de pista anterior al primer cuadro, pero lo que la escena hizo con el sonido antes de ese cuadro (partículas lanzadas por un golpe anterior) no está: para ver la respuesta entera, dibuja desde `--time 0`. Después del final de la pista, silencio. **Sin `--audio`, la escena oye silencio** (la entrada `audio` queda en cero, como sin sonido en el equipo). En una escena que no usa `audio`, no cambia nada. |
 | `--quality q0`…`q3` | El nivel de calidad más alto (`q3` prellenado). |
 | `--size PX` | El lado mayor de la imagen (1280 prellenado). Nunca dibuja más grande que el lienzo. |
 | `--screen ANCHOxALTO` | Dibuja lo que el demonio mostraría en una pantalla de ese tamaño (de 16 a 8192 por lado), por ejemplo `--screen 1920x1080`: la imagen mide exactamente eso, con el `fit` del lienzo (`fill` recorta, `fit` deja franjas del color de fondo) y cada capa dibujada a la resolución de la pantalla, también cuando es mayor que el lienzo. No se combina con `--size`. |
@@ -248,7 +249,7 @@ Imprime los archivos que escribió. Dibuja lo mismo que la vista previa del edit
 pared de `--time-of-day` (o la de este equipo) y escribe en la salida de error lo que imprimen con
 `console` (`script: log scripts/reloj.js: ...`) y sus errores, con archivo y línea
 (`script: error scripts/reloj.js: TypeError: ... (scripts/reloj.js line 4)`). Antes del primer cuadro
-da unos pasos a los scripts para que arranquen, así que las líneas de `console` salen repetidas (una por paso y por cuadro). No simula el sonido; el reproductor solo si pasas `--media`. Los scripts
+da unos pasos a los scripts para que arranquen, así que las líneas de `console` salen repetidas (una por paso y por cuadro). Oye silencio salvo que pases `--audio PISTA`, y el reproductor solo si pasas `--media`. Los scripts
 nunca corren en el proceso de `reiwand-ctl` (ni en el de la app): van a un proceso aparte con sandbox,
 el mismo que usa el demonio y con los mismos límites de tiempo y memoria. Si ese proceso no puede
 arrancar, dibuja sin scripts y lo dice en una línea en la salida de error.
@@ -272,7 +273,7 @@ tarjeta gráfica (con demonio). Con `--animated`, un `.gif` o `.webp` de hasta 6
 guarda, `--from` donde empieza la grabación, `--seconds` (0,1 a 15; 4 prellenado) cuánto dura y
 `--fps` (1 a 30; 10 prellenado) a cuántos cuadros por segundo. Con `--capture` los scripts de la
 escena sí corren, en el proceso aislado de siempre y con la hora de este equipo, así que un texto
-que llenan sale con su valor y no con el inicial. No simula el reproductor. El cuadro sale sin sonido ni puntero: una escena que reacciona a ellos se ve en reposo.
+que llenan sale con su valor y no con el inicial. No simula el reproductor. El cuadro sale sin sonido ni puntero: una escena que reacciona a ellos se ve en reposo (para ver cómo responde a una pista, `scene render --audio PISTA`).
 
 ## Revisar
 

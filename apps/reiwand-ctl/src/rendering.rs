@@ -7,6 +7,7 @@ use reiwand_render::{Rehearsal, Renderer, SceneAssets, Trace, Versus};
 use reiwand_scene::Quality;
 use std::path::PathBuf;
 
+const AUDIO: &str = "Sound file (WAV, FLAC, Ogg, MP3 or the sound of a video) that the scene hears as if it played from second 0 of the scene clock, with the analysis of the daemon; without it the scene hears silence";
 const OUT: &str = "Picture file (.png, .jpg, .webp or .avif), an animated .gif, or with --frames the first of an image sequence named NAME-0001.EXT";
 
 #[derive(Subcommand, Debug)]
@@ -25,6 +26,8 @@ pub enum Rendering {
         time_of_day: Option<f64>,
         #[arg(long, value_name = "FILE", help = crate::media::MEDIA)]
         media: Option<PathBuf>,
+        #[arg(long, value_name = "FILE", help = AUDIO)]
+        audio: Option<PathBuf>,
         #[arg(long, default_value = "q3", value_parser = ["q0", "q1", "q2", "q3"], help = "Highest quality level")]
         quality: String,
         #[arg(long, help = "Render as on battery: a lower level and at most 60 frames a second")]
@@ -93,6 +96,7 @@ pub fn run(command: Rendering) -> Result<()> {
         time,
         time_of_day,
         media,
+        audio,
         quality,
         battery,
         calm,
@@ -111,7 +115,7 @@ pub fn run(command: Rendering) -> Result<()> {
     reiwand_render::set_step_budget(None);
     let renderer = Renderer::new()?;
     let played = media.map(|file| reiwand_editor::media::played(&file, &project.dir)).transpose()?;
-    let wanted = Rehearsal {
+    let mut wanted = Rehearsal {
         quality: level(&quality)?,
         battery,
         calm,
@@ -121,11 +125,17 @@ pub fn run(command: Rendering) -> Result<()> {
         wall: time_of_day.unwrap_or_else(reiwand_render::local_wall),
         script_host: None,
         media: played.as_ref().map(|p| p.state.clone()),
+        audio: None,
         lang: reiwand_editor::texts::preview_locale(&project.doc, language.as_deref().unwrap_or_default()),
         frames: frames as usize,
         fps,
         pointer: pointer.map(|(from, to)| Trace { from, to, click }),
     };
+    if let Some(file) = audio {
+        let start = time.clamp(0.0, f64::from(reiwand_scene::MAX_POSTER_TIME));
+        let end = start + wanted.frames.saturating_sub(1) as f64 / f64::from(wanted.rate());
+        wanted.audio = Some(reiwand_editor::media::sounded(&file, (start, end))?);
+    }
     let open = |bloom: bool| -> Result<reiwand_render::Opened> {
         let (scene, props) = reiwand_editor::reach::open(&project.doc, &project.dir, bloom)?;
         let mut assets = SceneAssets::read(&scene, reiwand_editor::reach::reader(&project.dir))

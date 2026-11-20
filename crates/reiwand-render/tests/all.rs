@@ -18,6 +18,7 @@ mod particles;
 mod platform;
 mod pointed;
 mod rehearse;
+mod rehearse_heard;
 mod render;
 mod scene;
 mod scripted;

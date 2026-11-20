@@ -10,7 +10,10 @@ rust-version.workspace = true
 reiwand-scene.workspace = true
 realfft.workspace = true
 
+[features]
+capture = ["dep:pipewire", "dep:rtrb", "dep:tracing"]
+
 [target.'cfg(not(target_os = "android"))'.dependencies]
-pipewire.workspace = true
-rtrb.workspace = true
-tracing.workspace = true
+pipewire = { workspace = true, optional = true }
+rtrb = { workspace = true, optional = true }
+tracing = { workspace = true, optional = true }

@@ -4604,6 +4604,16 @@ msgstr "dañado; actualízalo o quítalo: %1"
 
 #: apps/reiwand-ctl/src/rendering.rs
 msgid ""
+"Sound file (WAV, FLAC, Ogg, MP3 or the sound of a video) that the scene "
+"hears as if it played from second 0 of the scene clock, with the analysis of "
+"the daemon; without it the scene hears silence"
+msgstr ""
+"Archivo de sonido (WAV, FLAC, Ogg, MP3 o el sonido de un video) que la "
+"escena oye como si sonara desde el segundo 0 de su reloj, con el análisis "
+"del demonio; sin él, la escena oye silencio"
+
+#: apps/reiwand-ctl/src/rendering.rs
+msgid ""
 "Picture file (.png, .jpg, .webp or .avif), an animated .gif, or with --"
 "frames the first of an image sequence named NAME-0001.EXT"
 msgstr ""
