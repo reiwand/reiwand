@@ -946,7 +946,7 @@ edit	Depth.fills	array	optional	3	[]	dbus.md:2474
 edit	Depth.gamma	number	optional	1	1.0	dbus.md:2467
 edit	Depth.input	number	optional	1	518	dbus.md:1937
 edit	Depth.joins	array	optional	3	[]	dbus.md:2477
-edit	Depth.model	string	optional	1	"depth-anything-v2-small"	choose-pieces.md:80
+edit	Depth.model	string	optional	1	"depth-anything-v2-small"	choose-pieces.md:81
 edit	Depth.moves	array	optional	3	[]	dbus.md:2480
 edit	Depth.near	number	optional	1	1.0	dbus.md:2466
 edit	Depth.smooth	number	optional	1	2	dbus.md:740
