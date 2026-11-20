@@ -173,6 +173,7 @@ PanelChico {
     LibraryAddReport {
         id: report
 
+        parent: add.parent
         onOlder: paths => add.older(paths)
         onSee: uids => uids.length === 1 ? add.owner.page.open(uids[0]) : add.owner.page.covers.newest()
     }
