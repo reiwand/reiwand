@@ -49,3 +49,27 @@ fn segment(a: vec4<f32>, d: vec4<f32>, size: f32, k: f32, angle: f32, relative: 
     let axis = select(own, span / max(l, 1e-9), l > 1e-6);
     return Segment(0.5 * (back + front), axis, select(l, l / max(size, 1e-6), relative), speed);
 }
+
+fn cover(size: f32, sides: vec2<f32>, tail: f32, upright: bool, squash: vec2<f32>) -> vec3<f32> {
+    let long = select(vec2<f32>(size * sides.x + tail, size * sides.y), vec2<f32>(size * sides.x, size + tail), upright);
+    let px = clamp(abs(long * squash) * look.light.w, vec2<f32>(0.0), vec2<f32>(1.0));
+    return vec3<f32>(1.0 / max(px, vec2<f32>(1e-4)), px.x * px.y);
+}
+
+fn frame_mix(b: vec4<f32>, c: vec4<f32>, t: f32) -> vec3<f32> {
+    let n = max(look.atlas.x * look.atlas.y, 1.0);
+    var f = c.y;
+    switch u32(look.atlas.z) {
+        case 1u: {
+            f = c.y + b.x * look.atlas.w;
+        }
+        case 2u: {
+            f = select(min(c.y + t * n, n - 0.001), c.y + fract(t * look.shade.y) * n, look.shade.y > 1.0);
+        }
+        case 3u: {
+            f = floor(c.z * n);
+        }
+        default: {}
+    }
+    return vec3<f32>(floor(f) % n, (floor(f) + 1.0) % n, fract(f) * look.trail.w);
+}

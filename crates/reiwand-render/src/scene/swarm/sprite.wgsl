@@ -113,38 +113,32 @@ fn vs_particle(
     tail = select(tail, s.size * (reach - 1.0), relative);
     let wide = vec2<f32>(mix(-0.5 * s.size * sides.x - tail, 0.5 * s.size * sides.x, s.corner.x), (s.corner.y - 0.5) * s.size * sides.y);
     var q = select(wide, vec2<f32>((s.corner.x - 0.5) * s.size * sides.x, mix(-0.5 * s.size, 0.5 * s.size + tail, s.corner.y)), upright);
+    var squash = vec2<f32>(1.0);
     if look.tilt[2].x > 0.5 {
         let a = tilt_of(bitcast<u32>(c.z), b.x);
         let reach_z = -q.x * a.w + q.y * a.y;
         let f = select(1.0, 1.0 / max(1.0 + reach_z / look.deep.x, 0.1), look.deep.w > 0.5);
         q = vec2<f32>(q.x * a.z, q.y * a.x) * f;
+        squash = vec2<f32>(a.z, a.x);
         out.tilt = a;
     }
+    let grow = cover(s.size, sides, tail, upright, squash);
+    if grow.z < 0.001 {
+        return out;
+    }
+    let mid = select(vec2<f32>(-0.5 * tail, 0.0), vec2<f32>(0.0, 0.5 * tail), upright) * squash;
+    q = mid + (q - mid) * grow.xy;
     let off = select(q, vec2<f32>(-q.y, q.x), upright);
     let lead = select(0.0, 0.5 * tail, spanned);
     let p = vec3<f32>(s.position + turn * (off.x + lead) + vec2<f32>(-turn.y, turn.x) * off.y, 1.0);
     out.position = vec4<f32>(dot(look.m0.xyz, p), dot(look.m1.xyz, p), 0.0, 1.0);
-    out.uv = s.uv;
-    out.color = s.color;
+    out.uv = select(s.uv, vec2<f32>(0.5), grow.xy > vec2<f32>(1.0));
+    out.color = vec4<f32>(s.color.rgb, s.color.a * grow.z);
     out.scale = k;
     out.span = vec2<f32>(s.age, s.life);
     let spun = radians(s.rotation) + look.turn.z + select(0.0, 1.5707964, upright);
     out.turn = vec4<f32>(cos(spun), sin(spun), s.size * look.light.w, 0.0);
-    let n = max(look.atlas.x * look.atlas.y, 1.0);
-    var f = c.y;
-    switch u32(look.atlas.z) {
-        case 1u: {
-            f = c.y + b.x * look.atlas.w;
-        }
-        case 2u: {
-            f = select(min(c.y + t * n, n - 0.001), c.y + fract(t * look.shade.y) * n, look.shade.y > 1.0);
-        }
-        case 3u: {
-            f = floor(c.z * n);
-        }
-        default: {}
-    }
-    out.frames = vec3<f32>(floor(f) % n, (floor(f) + 1.0) % n, fract(f) * look.trail.w);
+    out.frames = frame_mix(b, c, t);
     return out;
 }
 

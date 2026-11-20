@@ -2012,7 +2012,7 @@ positions as its own `trail` asks for, or none.
   (in 256 steps of depth, on the GPU and on the CPU); `add` needs no order.
 - **Cutouts.** `render.cutout: [start, end, opacity]` turns the alpha `a` of the texture (or of the
   soft disc) into `clamp((a - start) / (end - start), 0, 1) · opacity` before the alpha of the
-  particle multiplies it, so a soft texture becomes a hard edge at `start`..`end`.
+  particle multiplies it, so a soft texture becomes a hard edge at `start`..`end`. A sprite whose drawn width or length (stroke and tilt included) is under one pixel of the picture it is drawn into, at every quality level, is drawn one pixel wide on that side with its alpha times the fraction of the pixel it covers, and samples the middle of its texture there, so a far or tiny particle fades by its area instead of lighting a whole pixel or flickering between pixels as it moves; one under a thousandth of a pixel is not drawn.
 - **Orientation.** `render.orient` draws a sprite turned by its `rotation` (`screen`, prefilled),
   along its motion (`velocity`) or at `angle` degrees on the screen whatever the rotation of the
   particle and of the layer (`fixed`). World systems never turn with their layer.

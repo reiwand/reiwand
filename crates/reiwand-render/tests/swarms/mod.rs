@@ -22,6 +22,7 @@ mod sources;
 mod steered;
 mod strokes;
 mod strung;
+mod subpixel;
 mod tilts;
 mod timed;
 mod volume;

@@ -10,7 +10,7 @@ use std::sync::Arc;
 
 const ENTRIES: [&str; 3] = ["reiwand_fs_particle", "reiwand_fs_lit_particle", "reiwand_fs_bend_particle"];
 
-const OWN: [&str; 35] = [
+const OWN: [&str; 37] = [
     "Look",
     "PIXELED",
     "look",
@@ -46,6 +46,8 @@ const OWN: [&str; 35] = [
     "Segment",
     "segment",
     "segment_end",
+    "cover",
+    "frame_mix",
 ];
 
 fn source(pixeled: bool) -> String {
