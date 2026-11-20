@@ -1,6 +1,7 @@
 use super::item::{Item, gradient, premultiplied, scale_of, shape, toned};
 use super::map::Map;
 use super::paint::{Painter, Target};
+use super::skins::size::margins;
 use super::{Op, Src};
 use reiwand_scene::{Affine, Blend, BlendSpace, Content, Layout, Mask, SpectrumStyle, Wrapping};
 
@@ -71,10 +72,16 @@ impl Painter<'_, '_, '_> {
                 Some(("fs_picture", item, self.ext(image)))
             }
             Content::Mesh { layer, .. } => {
-                let skin = &self.skins.get(*layer)?.image;
+                let skin = self.skins.get(*layer)?;
+                let room = margins(size, skin.extent);
                 item.size[2] = 0.0;
                 (item.color, item.shape) = (toned(d.tint, d.brightness, srgb, opacity), [1.0, 0.0, 1.0, 1.0]);
-                Some(("fs_picture", item, self.ext(skin)))
+                if room == [0.0; 2] {
+                    return Some(("fs_picture", item, self.ext(&skin.image)));
+                }
+                let [sx, sy] = room.map(|r| 1.0 / (1.0 + 2.0 * r));
+                item.uv = [room[0] * sx, room[1] * sy, sx, sy];
+                Some(("fs_texture", item, self.ext(&skin.image)))
             }
             Content::Shape { shape: s, fill, gradient: g, stroke } => {
                 let (size, params, place) = shape(s);

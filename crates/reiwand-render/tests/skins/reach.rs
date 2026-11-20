@@ -22,3 +22,15 @@ fn parts_beyond_the_box_of_a_mesh_are_not_cut_at_its_edge() {
     let fitted = shot(64);
     assert!(near(rgb(&fitted, 10, 32), [255, 0, 0]));
 }
+
+#[test]
+fn parts_beyond_the_box_of_a_mesh_keep_their_size() {
+    if renderer().is_none() {
+        return;
+    }
+    for (box_side, x) in [(32, 25), (32, 26), (48, 25), (48, 26)] {
+        let px = shot(box_side);
+        assert!(near(rgb(&px, x, 32), [0, 255, 0]), "{box_side} {x}: {:?}", rgb(&px, x, 32));
+        assert!(near(rgb(&px, 22, 32), [255, 0, 0]), "{box_side}: {:?}", rgb(&px, 22, 32));
+    }
+}
