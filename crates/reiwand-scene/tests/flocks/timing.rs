@@ -107,3 +107,24 @@ fn a_system_revealed_live_starts_from_its_prewarm_only() {
     fly.rt.frame(VIEW, Quality::Q3);
     assert_eq!(fly.rt.swarm(0).unwrap().count(), 1, "no warm-up for the time already elapsed");
 }
+
+fn seeked_with_time_scale(scale: f64, seek: f64) -> (usize, u32, usize) {
+    let slow = still(
+        json!({ "emitters": [{ "shape": { "point": [100, 50] }, "rate": 3 }], "init": { "life": [20, 20], "speed": [0, 0], "size": [2, 2] } }),
+    );
+    let tuned = prefill::instance(json!({ "time_scale": scale }));
+    let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "a", "instance": tuned }]);
+    let mut fly = Fly::new(runtime(json!({ "a": slow }), layers));
+    fly.rt.seek(seek);
+    fly.frame(0.0);
+    (fly.rt.swarm(0).unwrap().count(), fly.births, fly.alive(0).len())
+}
+
+#[test]
+fn a_seek_runs_a_slowed_layer_on_its_own_clock() {
+    let half = seeked_with_time_scale(0.5, 10.0);
+    assert_eq!(half, seeked_with_time_scale(1.0, 5.0), "half the time scale, half the simulated time");
+    assert!((13..=17).contains(&half.2), "{half:?}");
+    let full = seeked_with_time_scale(1.0, 10.0);
+    assert!((28..=32).contains(&full.2), "{full:?}");
+}
