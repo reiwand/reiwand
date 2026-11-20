@@ -142,7 +142,7 @@ ctl lib apply "$storm" -o TEST-7
 source "$(dirname "$0")"/integration-flash.sh
 [ "$(reply "r['item']['package']['confirmed'], r['about']['content'], r['about']['descriptors']" Library1 GetItem s "$storm")" = \
   "([], 'mature', ['violence'])" ] || fail "rated details: $(ctl lib show "$storm" --json)"
-sed -i 's/"1.0.0"/"1.1.0"/' "$WORK/storm/manifest.json"
+sed -i 's/"version": "1.0.1"/"version": "1.1.0"/' "$WORK/storm/manifest.json"
 ctl pack build "$WORK/storm" -o "$WORK/import/storm-1.1.wpak" >/dev/null
 job=$(bus Library1 Import asb 1 "$WORK/import/storm-1.1.wpak" false | out "d[0]")
 wait_for 20 finished "$job" || fail "newer version import: $(bus Daemon1 GetJob t "$job")"
