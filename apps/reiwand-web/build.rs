@@ -87,7 +87,8 @@ fn compile(qt: &Qt) {
     for include in &includes {
         command.arg(format!("-I{}", include.display()));
     }
-    let status = command.arg("cpp/bridge.h").arg("-o").arg(&moc).status().expect("moc cannot run");
+    let status =
+        command.arg("-fbridge.h").arg("cpp/bridge.h").arg("-o").arg(&moc).status().expect("moc cannot run");
     assert!(status.success(), "moc failed");
     let mut build = cc::Build::new();
     build.cpp(true).std("c++17").warnings(true).flag_if_supported("-fPIC");
