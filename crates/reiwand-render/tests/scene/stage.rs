@@ -5,6 +5,7 @@ mod bloom;
 mod capture;
 mod films;
 mod glow;
+mod halo;
 mod tilt;
 
 const RED: [u8; 3] = [255, 0, 0];
