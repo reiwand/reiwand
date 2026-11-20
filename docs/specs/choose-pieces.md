@@ -33,7 +33,7 @@ ancho de la tapa; el filete de foco es el anillo común (`Anillo`).
   `"coral"` o `"brote"`).
 - Estados: en reposo está atenuada; `lit` la agranda (salvo con `even`) y le pone el filete de foco;
   el puntero encima aclara el velo; `off` la apaga (debe ir con su motivo en `note`); `inUse` pone
-  «En uso»; `choosing` muestra la marca de elegir y `chosen` la llena.
+  la marca de en uso; `choosing` muestra la marca de elegir y `chosen` la llena.
 - `even`: tamaño fijo dado por quien la contiene (rejilla); encendida no crece y muestra el nombre
   en negrita.
 - Lo que se le pone como hijo aparece debajo de la tapa encendida y agrandada (la ficha).
@@ -54,7 +54,9 @@ en una línea fija al pie de «Ver todos», con las acciones a la derecha y una 
 
 ## Uso
 
-La marca «En uso» de una tapa. Sin propiedades. Solo la pone la tapa.
+La marca de una tapa en uso o de la lista en marcha. Solo la pone la tapa. En uso es un ícono chico
+redondo, sin texto: `screen` da el nombre accesible y la pista («En uso» o «En …»), que aparece con
+`pointed` (el puntero sobre la marca). Con `list` muestra el ícono de lista y el nombre de la lista.
 
 ## Elegir y Seleccion
 

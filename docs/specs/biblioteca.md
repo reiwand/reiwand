@@ -43,8 +43,10 @@ La Biblioteca muestra los fondos guardados sobre la imagen del fondo en uso.
   «Poner de fondo» (o «Mostrar en la carpeta»), «Opciones» y «Editar una copia…». En Explorar el menú
   ofrece la acción principal de la tarjeta, «Detalles» y «Editar una copia…» (escena instalada);
   este último también es un botón de la tarjeta encendida.
-- La tapa del fondo en uso lleva «En uso»; con dos o más pantallas lleva «En …» con el nombre de cada
-  pantalla donde está.
+- La tapa del fondo en uso lleva solo un ícono chico, sin texto ni marco alrededor; su nombre para
+  lectores de pantalla y la pista al pasar el puntero dicen «En uso» o, con dos o más pantallas,
+  «En …» con el nombre de cada pantalla donde está. El filete de foco es aparte: marca la tapa con el
+  foco del teclado.
 - Una nota en la tapa avisa de un archivo que falta o está dañado, de un fondo retirado por su repositorio
   o de uno con destellos (apagado hasta que el usuario lo permita).
 - Mientras el escritorio crea las capas de profundidad de una imagen en pantalla, su tapa lo dice en
@@ -96,8 +98,8 @@ La Biblioteca muestra los fondos guardados sobre la imagen del fondo en uso.
 
 La misma colección en una rejilla con un velo parejo sobre la imagen; la ficha del fondo con foco queda
 fija abajo. Primero va lo que está puesto ahora: el fondo o los fondos en uso en cada pantalla
-(«En uso» o «En …»), después, si hay una lista en marcha, sus fondos en el orden de la lista (cada
-uno con el nombre de la lista), una línea fina y luego el resto en el orden de siempre. Un filtro o
+(con su ícono), después, si hay una lista en marcha, sus fondos en el orden de la lista (cada uno con
+el nombre de la lista) y luego el resto en el orden de siempre, sin líneas ni marcos entre los grupos. Un filtro o
 una búsqueda mantienen esa regla dentro de sus resultados. La rejilla llega con el foco en el fondo
 en uso. El estante conserva su orden. En la terminal, `reiwand-ctl lib search 'first:<uid>,<uid>'` da
 el mismo orden. Esc o «Ver el estante» vuelve al estante.

@@ -137,7 +137,6 @@ FocusScope {
         height: Math.max(Look.tapaRejilla, covers.page.height * (Look.escalon === "bajo" ? 0.5 : 0.62))
         focus: covers.all
         label: App.tr("All your wallpapers")
-        lead: covers.page.order.count
         listedOf: uid => covers.page.order.mark(uid)
         model: covers.page.library
         pictureRole: "thumb"

@@ -12,7 +12,6 @@ QtObject {
     property var listed: []
     readonly property var lead: unique(using.concat(listed.map(entry => entry.uid))).slice(0, 500)
     readonly property string term: lead.length > 0 ? "first:" + lead.join(",") : ""
-    property int count: 0
     property string landing
     readonly property Connections watch: Connections {
         target: App.backend
@@ -56,7 +55,6 @@ QtObject {
         if (page.library.total > 0 && (landing !== "" || view.currentIndex < 0))
             view.currentIndex = Math.max(0, at);
         landing = "";
-        measure();
         Qt.callLater(page.covers.keep);
         Qt.callLater(page.covers.look);
     }
@@ -73,14 +71,6 @@ QtObject {
         if (!page.all || using.includes(uid))
             return "";
         return listed.find(entry => entry.uid === uid)?.list ?? "";
-    }
-
-    function measure() {
-        const library = page.library;
-        let at = 0;
-        while (page.all && at < library.total && lead.includes(String(library.uid(at))))
-            at++;
-        count = at < library.total ? at : 0;
     }
 
     onKeyChanged: load()

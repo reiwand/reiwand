@@ -93,8 +93,11 @@ QtObject {
         }));
         const entry = page.entry;
         const found = [entry.inUse, entry.usedOn];
+        const mark = Array.from(covers.shelf.view.currentItem.children).find(child => !!child.mark).mark;
+        const marked = [mark.visible, mark.named, mark.width === mark.height, mark.Accessible.name !== "", mark.words === mark.Accessible.name];
         page.shown();
         must(found.join() === "true,DP-1", "a wallpaper in use does not name its screen when there are two: " + found.join());
+        must(marked.join() === "true,false,true,true,true", "the mark of a wallpaper in use is not a small named icon: " + marked.join());
     }
 
     function several() {

@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls as QQC2
 import QtQuick.Controls.impl
 import io.github.reiwand.app
 
@@ -7,18 +8,23 @@ Rectangle {
 
     property string screen
     property string list
+    property bool pointed
+    readonly property bool named: list !== ""
+    readonly property string words: named ? list : screen !== "" ? App.tr("On %1", App.screens(screen.split(", "))) : App.tr("In use")
 
-    implicitWidth: row.implicitWidth + Look.e2 + Look.marcaTapa
+    implicitWidth: named ? row.implicitWidth + Look.e2 + Look.marcaTapa : implicitHeight
     implicitHeight: Look.usoAlto
-    radius: Look.radioChico
+    radius: named ? Look.radioChico : height / 2
     color: Look.noche
     Accessible.role: Accessible.StaticText
-    Accessible.name: words.text
+    Accessible.name: words
+    QQC2.ToolTip.visible: pointed && !named
+    QQC2.ToolTip.text: words
 
     Row {
         id: row
 
-        x: Look.e2
+        x: uso.named ? Look.e2 : Math.round((uso.width - width) / 2)
         anchors.verticalCenter: parent.verticalCenter
         spacing: Look.usoHueco
 
@@ -28,15 +34,14 @@ Rectangle {
             height: Look.icono
             sourceSize.width: width
             sourceSize.height: height
-            name: uso.list !== "" ? "playlist" : "check-circle-fill"
+            name: uso.named ? "playlist" : "check-circle-fill"
             color: Look.luna
         }
 
         Text {
-            id: words
-
+            visible: uso.named
             anchors.verticalCenter: parent.verticalCenter
-            text: uso.list !== "" ? uso.list : uso.screen !== "" ? App.tr("On %1", App.screens(uso.screen.split(", "))) : App.tr("In use")
+            text: uso.list
             font.family: Look.letraTexto
             font.pixelSize: Look.tTecla
             font.weight: Font.DemiBold
