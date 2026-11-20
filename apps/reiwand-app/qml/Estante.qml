@@ -70,6 +70,7 @@ Coleccion {
                 readonly property alias caption: cover.caption
                 readonly property real room: cover.room
                 readonly property Item ficha: deck.item
+                readonly property alias picture: cover.picture
 
                 activeFocusOnTab: ListView.isCurrentItem || activeFocus
                 width: cover.width + (cover.lit ? Look.filete + Look.anillo : 0)

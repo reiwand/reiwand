@@ -44,6 +44,11 @@ pub async fn dispatch(daemon: &Daemon, iface: &str, member: &str, args: Vec<Valu
     {
         return Ok(reply);
     }
+    if let (Daemon::Fixtures, "Library1", "RequestThumbnails") = (daemon, iface, member)
+        && let Some(reply) = crate::crowdthumbs::thumbs(&args)
+    {
+        return Ok(reply);
+    }
     let method = METHODS.get(&format!("{iface}.{member}"));
     let method = method.ok_or_else(|| invalid(format!("unknown method {iface}.{member}")))?;
     let limit = |((_, name), arg): (&(String, String), &Value)| {

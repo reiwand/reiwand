@@ -5,10 +5,12 @@ const SIZE: usize = 356;
 const SOURCED: usize = 341;
 const FAVORITES: [usize; 2] = [3, 350];
 
+pub const UID: &str = "01J9Z0X9Z6Q7X4F3K5E1V";
+
 fn item(at: usize) -> Value {
     let sourced = at < SOURCED;
     json!({
-        "uid": format!("01J9Z0X9Z6Q7X4F3K5E1V{at:05}"),
+        "uid": format!("{UID}{at:05}"),
         "kind": if at % 9 == 4 { "scene" } else { "image" },
         "title": format!("Crowd {at}"),
         "width": 1920,
@@ -38,10 +40,11 @@ fn keeps(at: usize, word: &str) -> bool {
         MARK => true,
         "fav:yes" => FAVORITES.contains(&at),
         "provider:yes" => sourced,
-        "provider:no" => !sourced,
+        "provider:no" | "local:yes" => !sourced,
         "kind:scene" => scene,
         "kind:image" => !scene,
         w if w.starts_with("kind:") => false,
+        w if w.starts_with("uid:") => w[4..].split(',').any(|uid| uid == format!("{UID}{at:05}")),
         w => format!("crowd {at}").contains(&w.to_lowercase()),
     }
 }

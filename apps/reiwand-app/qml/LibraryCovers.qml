@@ -26,7 +26,7 @@ FocusScope {
             covers.page.library.visible(top * columns, Math.min(count, bottom * columns) - 1);
         } else {
             const at = shelf.view.indexAt(shelf.view.contentX + Look.tapa / 2, shelf.view.height - Look.e5);
-            const first = Math.max(0, (at >= 0 ? at : shelf.currentIndex) - 2);
+            const first = Math.max(0, Math.min(count - 1, at >= 0 ? at : shelf.currentIndex) - 2);
             covers.page.library.visible(first, Math.min(count - 1, first + Math.ceil(shelf.width / Look.tapa) + 4));
         }
     }

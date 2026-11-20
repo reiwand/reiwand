@@ -19,6 +19,7 @@ Timer {
     property int wait: 0
     property int still: 0
     property int rounds: 0
+    property int tries: 0
     property var broken: []
     property bool finished: !App.backend.claim("library.flip")
 
@@ -44,6 +45,46 @@ Timer {
                 }));
     }
 
+    function far(chip, word) {
+        const steps = [{
+                "text": "crowd:yes ",
+                "gap": 3
+            }, {
+                "settle": true
+            }, {
+                "far": true,
+                "gap": 3
+            }, {
+                "word": chip,
+                "gap": 3
+            }, {
+                "settle": true
+            }];
+        for (let n = 1; n <= word.length; n++)
+            steps.push({
+                "text": "crowd:yes " + word.slice(0, n),
+                "gap": 1
+            });
+        return steps.concat([{
+                "settle": true
+            }, {
+                "audit": true,
+                "covers": true
+            }]);
+    }
+
+    function covered(record) {
+        const list = page.covers.shelf.view;
+        const seen = slots(list).filter(item => item.visible && item.index >= 0 && item.index < list.count && item.x + item.width > list.contentX && item.x < list.contentX + list.width);
+        const bare = seen.filter(item => String(item.picture) === "");
+        const ok = seen.length > 0 && bare.length === 0;
+        if (!record)
+            return ok;
+        if (!ok)
+            broken.push("typing a word far from the start left " + bare.length + " of " + seen.length + " shelf covers without a picture, current " + list.currentIndex + " of " + list.count);
+        rounds++;
+    }
+
     function begin() {
         if (finished)
             return;
@@ -65,7 +106,7 @@ Timer {
                     "audit": true
                 }
             ]);
-        plan = all;
+        plan = all.concat(far(0, "crowd 35")).concat(far(7, "crowd 35"));
         start();
     }
 
@@ -100,6 +141,11 @@ Timer {
 
     function act(step) {
         const bar = page.bar;
+        if (step.far) {
+            const far = Math.max(0, page.library.total - 40);
+            page.covers.shelf.currentIndex = far;
+            return page.covers.shelf.view.positionViewAtIndex(far, ListView.Center);
+        }
         if (step.text !== undefined) {
             bar.find.text = step.text;
             if (step.gap === 0)
@@ -134,8 +180,11 @@ Timer {
             if (still < 6)
                 return;
             still = 0;
+            if (step.covers && !covered(false) && ++tries < 150)
+                return;
+            tries = 0;
             plan = plan.slice(1);
-            return step.audit ? audit() : undefined;
+            return step.covers ? covered(true) : step.audit ? audit() : undefined;
         }
         plan = plan.slice(1);
         act(step);

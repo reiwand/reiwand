@@ -52,7 +52,7 @@ QtObject {
         const view = page.covers.view;
         const at = landing !== "" ? page.library.row(landing) : -1;
         page.sync();
-        if (page.library.total > 0 && (landing !== "" || view.currentIndex < 0))
+        if (page.library.total > 0 && (landing !== "" || view.currentIndex < 0 || view.currentIndex >= view.view.count))
             view.currentIndex = Math.max(0, at);
         landing = "";
         Qt.callLater(page.covers.keep);

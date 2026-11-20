@@ -12,6 +12,7 @@ mod connectcode;
 mod covers;
 mod crashtrace;
 mod crowd;
+mod crowdthumbs;
 mod depth;
 mod depthfollow;
 mod depthproc;
