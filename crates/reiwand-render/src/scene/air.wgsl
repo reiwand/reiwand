@@ -36,6 +36,13 @@ fn fs_refract(in: Out) -> @location(0) vec4<f32> {
 }
 
 @fragment
+fn fs_refract_light(in: Out) -> @location(0) vec4<f32> {
+    let d = textureSampleLevel(mask_tex, samp, in.uv, 0.0);
+    let bent = textureSampleLevel(src_tex, samp, in.uv + d.xy * item.lit_env.zw, 0.0);
+    return bent * textureSampleLevel(back_tex, samp, in.uv, 0.0);
+}
+
+@fragment
 fn fs_shift_view(in: Out) -> @location(0) vec4<f32> {
     let d = textureSampleLevel(mask_tex, samp, in.uv, 0.0);
     let back = textureSampleLevel(src_tex, samp, in.uv, 0.0);

@@ -44,7 +44,7 @@ impl Painter<'_, '_, '_> {
         let even = crate::scene::item::toned(reiwand_scene::Color([cr, cg, cb, 1.0]), 1.0, srgb, 1.0);
         let even = [even[0], even[1], even[2], d.tint.0[3]];
         let slot = (swarms.looks.len() as u64 * super::LOOK) as u32;
-        let (mut timed, mut bent, mut tints) = (0, false, [false; 2]);
+        let (mut timed, mut bent, mut tints) = (0, [false; 2], [false; 2]);
         let (strength, glow) = d.lit.map_or((1.0, 0.0), |l| (l.strength, l.emissive));
         let lit = f32::from(u8::from(d.lit.is_some()));
         for (p, system) in herd.bake.systems.iter().enumerate() {
@@ -78,7 +78,7 @@ impl Painter<'_, '_, '_> {
             look.turn[2] = m.0[1].atan2(m.0[0]);
             (look.light[0], look.light[3]) = (look.light[0].max(lit), crate::scene::item::scale_of(m));
             look.place = [target.rect.x, target.rect.y, strength, glow];
-            bent |= kit.bend.is_some();
+            bent = [bent[0] || (kit.bend.is_some() && !kit.light), bent[1] || kit.light];
             (tints[0], tints[1]) =
                 (tints[0] || kit.tint == Some(Mode::Multiply), tints[1] || kit.tint == Some(Mode::Add));
             let middle = m.inverse().apply(screen.apply([w / 2.0, h / 2.0]));
@@ -101,8 +101,9 @@ impl Painter<'_, '_, '_> {
             swarms.looks.push(look);
             swarms.kitted.push(k);
         }
-        TINTS.iter().zip(tints).filter(|(_, on)| *on).for_each(|(m, _)| swarms.pipeline(r, *m));
-        let tinted = match (tints.contains(&true), seen.is_some()) {
+        let lights = [tints[0], tints[1] || bent[1]];
+        TINTS.iter().zip(lights).filter(|(_, on)| *on).for_each(|(m, _)| swarms.pipeline(r, *m));
+        let tinted = match (lights.contains(&true), seen.is_some()) {
             (true, true) => swarms.unshrunk(slot),
             _ => slot,
         };
@@ -110,8 +111,8 @@ impl Painter<'_, '_, '_> {
         let cast = if lit { self.gobos() } else { [crate::scene::Src::White; 4] };
         let (to, system, pass) = (target.src, flock, Pass::Plain);
         self.ops.push(Op::Particles { target: to, system, slot, mode, timed, pass, cast });
-        if bent {
-            self.bend(target, flock, (slot, tinted), tints, cast);
+        for light in [false, true].into_iter().filter(|l| bent[usize::from(*l)]) {
+            self.bend(target, flock, (slot, tinted), (tints, light), cast);
         }
     }
 }

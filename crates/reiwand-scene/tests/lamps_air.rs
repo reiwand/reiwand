@@ -152,6 +152,7 @@ fn particle_refraction_names_its_units_and_range() {
     assert!(!parses(json!({ "amount": 0.4 })));
     assert!(parses(json!({ "units": "size", "amount": 0.4, "color": "multiply" })));
     assert!(parses(json!({ "units": "size", "amount": 0.4, "color": "add" })));
+    assert!(parses(json!({ "units": "pixels", "shift": 40, "color": "light" })));
     assert!(!parses(json!({ "units": "size", "amount": 0.4, "color": "screen" })));
 }
 

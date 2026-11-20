@@ -99,8 +99,11 @@ fn tinted(color: Option<&str>, was: &Value) -> anyhow::Result<Value> {
     let prefill = || reiwand_scene::prefill::arg::<String>("particles.refract.color");
     let color =
         color.map_or_else(|| was["color"].as_str().map_or_else(prefill, str::to_owned), str::to_owned);
-    let known = ["none", "multiply", "add"].contains(&color.as_str());
-    ensure!(known, said("editor.refract_color", "the color of refraction is none, multiply or add", &[]));
+    let known = ["none", "multiply", "add", "light"].contains(&color.as_str());
+    ensure!(
+        known,
+        said("editor.refract_color", "the color of refraction is none, multiply, add or light", &[])
+    );
     Ok(json!(color))
 }
 

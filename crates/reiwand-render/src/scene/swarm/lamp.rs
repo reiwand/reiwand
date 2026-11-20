@@ -48,10 +48,11 @@ pub(super) fn light(r: &Renderer, kit: &mut Kit, (render, sprite): (&Render, [f3
     kit.look.light = [flag(render.lit), flag(normal), 0.0, 1.0];
     kit.bend = bend.map(|b| b.strength());
     kit.tint = bend.and_then(|b| match b.color() {
-        RefractColor::None => None,
+        RefractColor::None | RefractColor::Light => None,
         RefractColor::Multiply => Some(Mode::Multiply),
         RefractColor::Add => Some(Mode::Add),
     });
+    kit.light = bend.is_some_and(|b| b.color() == RefractColor::Light);
     kit.look.bend = [kit.bend.unwrap_or(0.0), bend.map_or(0.0, |b| flag(b.by_pixels())), 0.0, 0.0];
 }
 

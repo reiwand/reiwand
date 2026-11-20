@@ -121,6 +121,8 @@ fn refraction_takes_a_color_that_survives_other_edits() {
     );
     act(&mut p, bend(json!({ "system": "flakes", "color": "add" }))).unwrap();
     assert_eq!(render(&p)["refract"]["color"], "add");
+    act(&mut p, bend(json!({ "system": "flakes", "color": "light" }))).unwrap();
+    assert_eq!(render(&p)["refract"]["color"], "light");
     assert!(act(&mut p, bend(json!({ "system": "flakes", "color": "screen" }))).is_err());
 }
 

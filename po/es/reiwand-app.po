@@ -13220,6 +13220,13 @@ msgid "Add their color over what is behind"
 msgstr "Sumar su color sobre lo que hay detrás"
 
 #: apps/reiwand-app/qml/SceneSwarmBend.qml
+msgid ""
+"Add the bent picture, tinted by their color, as light over what is behind"
+msgstr ""
+"Sumar como luz, sobre lo que hay detrás, la imagen desviada teñida por su "
+"color"
+
+#: apps/reiwand-app/qml/SceneSwarmBend.qml
 msgid "Show the displacement over the preview"
 msgstr "Mostrar el desplazamiento sobre la vista previa"
 

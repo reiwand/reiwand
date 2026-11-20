@@ -129,3 +129,24 @@ fn particle_shaders_refract_what_is_behind_them() {
         assert!(!moved(60..76), "gpu {gpu}: not where the sprite was");
     }
 }
+
+#[test]
+fn ropes_that_refract_as_light_never_darken_what_is_behind_them() {
+    let Some(r) = renderer() else { return };
+    let back = json!({ "blend_space": "canvas", "id": "back", "type": "image", "image": "stripes", "size": [160, 80],
+        "transform": { "position": [80, 40] } });
+    let bend = json!({ "rope": { "width": 12, "subdivide": 2 },
+        "refract": { "normal": "bump", "units": "size", "amount": 1, "color": "light" } });
+    let Some(light) = strung(r, bend, vec![back.clone()], false) else { return };
+    let Some(plain) = strung(r, json!({ "rope": { "width": 0.01 } }), vec![back], false) else { return };
+    let under = || (36..44).flat_map(|y| (40..80).map(move |x| (x, y)));
+    assert!(
+        under().all(|(x, y)| at(&light, x, y)[1].saturating_add(4) >= at(&plain, x, y)[1]),
+        "the unbent stripes stay"
+    );
+    assert!(
+        under().any(|(x, y)| at(&light, x, y)[1] > at(&plain, x, y)[1].saturating_add(100)),
+        "the bent ones add"
+    );
+    assert!((40..80).all(|x| at(&light, x, 10) == at(&plain, x, 10)), "nothing is painted off the rope");
+}

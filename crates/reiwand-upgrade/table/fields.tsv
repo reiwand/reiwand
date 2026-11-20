@@ -525,7 +525,7 @@ scene	Layer.instance	object|null	optional	3	null	editor.md:113
 scene	Layer.intensity	Value_for_float	optional	1	1.0	editor.md:86
 scene	Layer.length	number|null	optional	3	null	editor.md:72
 scene	Layer.letter_spacing	number|object|null	optional	3	null	editor.md:577
-scene	Layer.light	Beam	optional	1	"point"	editor.md:86
+scene	Layer.light	Beam	optional	1	"point"	editor.md:85
 scene	Layer.lighting	object|null	optional	3	null	editor.md:87
 scene	Layer.line_height	number|null	optional	3	null	editor.md:577
 scene	Layer.loop	boolean	optional	1	true	editor.md:72

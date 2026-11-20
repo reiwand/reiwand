@@ -1591,8 +1591,8 @@ msgid "the shift of refraction goes from 0 to 4096 pixels"
 msgstr "el corrimiento de la refracción va de 0 a 4096 píxeles"
 
 #: crates/reiwand-editor/src/lamps/swarm.rs
-msgid "the color of refraction is none, multiply or add"
-msgstr "el color de la refracción es none, multiply o add"
+msgid "the color of refraction is none, multiply, add or light"
+msgstr "el color de la refracción es none, multiply, add o light"
 
 #: crates/reiwand-editor/src/lamps/template.rs
 msgid "%1 is not a light type; use point, spot, tube or directional"

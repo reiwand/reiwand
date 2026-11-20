@@ -40,13 +40,14 @@ impl Swarms {
             let Some(kit) = self.kits.get(n) else { continue };
             let drawn = match kind {
                 super::Pass::Plain => kit.bend.is_none(),
-                super::Pass::Bend => kit.bend.is_some(),
+                super::Pass::Bend(light) => kit.bend.is_some() && kit.light == light,
                 super::Pass::Tint => kit.tint == Some(mode),
+                super::Pass::Light => kit.light,
             };
             if !drawn {
                 continue;
             }
-            let bend = kind == super::Pass::Bend;
+            let bend = matches!(kind, super::Pass::Bend(_));
             let look = self.looks.get(first + p).map_or(0.0, |l| l.extra[1]);
             let Some(group) = self.look_group(first + p) else { continue };
             pass.set_bind_group(0, group, &[slot + (p as u64 * LOOK) as u32]);

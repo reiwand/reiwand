@@ -99,6 +99,7 @@ pub enum RefractColor {
     None,
     Multiply,
     Add,
+    Light,
 }
 
 pub const MAX_SHIFT: f32 = 4096.0;

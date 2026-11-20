@@ -50,6 +50,7 @@ pub(super) struct Kit {
     pub(super) lit: Option<[wgpu::TextureView; 2]>,
     pub(super) bend: Option<f32>,
     pub(super) tint: Option<Mode>,
+    pub(super) light: bool,
 }
 
 type Sprite<'a> = (Option<(&'a str, Option<&'a Image>)>, &'a [[f32; 4]], Option<[[f32; 4]; 2]>);
@@ -158,6 +159,7 @@ pub(super) fn kit(
         lit,
         bend,
         tint,
+        light: false,
     };
     super::stage::stage(r, scene, &mut kit, render.shader.as_deref());
     if kit.stage.is_some() {

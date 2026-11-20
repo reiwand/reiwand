@@ -10,6 +10,14 @@ fn take(color: &str, tint: &str, back: &str, quality: Quality) -> Option<image::
     shot(system, back, [160, 90], quality)
 }
 
+fn glass(color: &str, tint: &str, amount: u32, quality: Quality) -> Option<image::RgbaImage> {
+    let refract = json!({ "normal": "bump", "units": "size", "amount": amount, "color": tint });
+    let system = json!({ "capacity": 4, "seed": 2, "emitters": [{ "shape": { "point": [80, 45] }, "bursts": [{ "count": 1 }] }],
+        "init": { "life": [30, 30], "speed": [0, 0], "size": [40, 40], "color": [color, color] },
+        "render": { "refract": refract } });
+    shot(system, "mask", [160, 90], quality)
+}
+
 fn simulated(gpu: bool, color: &str, tint: &str) -> Option<image::RgbaImage> {
     let refract = json!({ "normal": "bump", "units": "size", "amount": 1, "color": tint });
     let system = json!({ "capacity": 4, "seed": 2, "emitters": [{ "shape": { "point": [80, 45] }, "bursts": [{ "count": 1 }] }],
@@ -122,4 +130,26 @@ fn a_shift_in_pixels_reaches_past_256() {
         at(&short, 120, 45)
     );
     assert!(at(&long, 120, 45)[0] > 200, "320 px from 120 reaches the light half: {:?}", at(&long, 120, 45));
+}
+
+#[test]
+fn a_light_refraction_adds_the_bent_background_over_the_unbent_one() {
+    let Some(unbent) = glass("#ff0000", "none", 0, Quality::Q3) else { return };
+    let tints = ["none", "add", "light"].map(|tint| glass("#ff0000", tint, 1, Quality::Q3));
+    let ([Some(none), Some(add), Some(light)], Some(dark)) =
+        (tints, glass("#000000", "light", 1, Quality::Q3))
+    else {
+        return;
+    };
+    assert!(close(&dark, &unbent), "a black light leaves the unbent background as it is");
+    assert!(rgb(&unbent, 75, 45)[0] < 30, "the dark half lies under the sprite: {:?}", rgb(&unbent, 75, 45));
+    let [r, g, b] = rgb(&light, 75, 45);
+    assert!(r > 200 && g < 30 && b < 30, "the bent white adds red light over the dark half: {:?}", [r, g, b]);
+    assert!(rgb(&none, 75, 45)[1] > 200 && rgb(&add, 75, 45)[1] > 200, "none and add replace the dark half");
+    assert!(at(&light, 10, 10) == at(&unbent, 10, 10) && at(&light, 150, 10) == at(&unbent, 150, 10));
+    let Some(half) = glass("#ff0000", "light", 1, Quality::Q2) else { return };
+    let [r, g, _] = rgb(&half, 75, 45);
+    assert!(r > 200 && g < 30, "Q2 bends at half size and adds the light: {:?}", [r, g]);
+    let Some(low) = glass("#ff0000", "light", 1, Quality::Q1) else { return };
+    assert!(close(&low, &unbent), "Q1 leaves the sprites out");
 }

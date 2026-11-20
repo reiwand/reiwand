@@ -68,11 +68,11 @@ ColumnLayout {
     }
 
     QQC2.ComboBox {
-        readonly property var colors: ["none", "multiply", "add"]
+        readonly property var colors: ["none", "multiply", "add", "light"]
 
         visible: bend.bent !== null
         Layout.fillWidth: true
-        model: [App.tr("Only bend what is behind"), App.tr("Multiply what is behind by their color"), App.tr("Add their color over what is behind")]
+        model: [App.tr("Only bend what is behind"), App.tr("Multiply what is behind by their color"), App.tr("Add their color over what is behind"), App.tr("Add the bent picture, tinted by their color, as light over what is behind")]
         currentIndex: Math.max(0, colors.indexOf(bend.bent?.color ?? App.fill("Action.particles.refract.color")))
         onActivated: index => bend.put({
                 "color": colors[index]

@@ -34,7 +34,7 @@ impl Painter<'_, '_, '_> {
         target: Target,
         flock: usize,
         (slot, tinted): (u32, u32),
-        tints: [bool; 2],
+        (tints, light): ([bool; 2], bool),
         cast: [Src; 4],
     ) {
         let Some(scale) = self.frame.quality.bend() else { return };
@@ -45,24 +45,37 @@ impl Painter<'_, '_, '_> {
         let small = (((w as f32) * scale).ceil() as u32, ((h as f32) * scale).ceil() as u32);
         let Some(shift) = self.borrow(small, TextureFormat::Rgba16Float).map(Src::Pool) else { return };
         let Some(back) = self.acquire((w, h)) else { return self.release(shift) };
+        let shown = self.swarms.as_ref().is_some_and(|s| s.shown);
+        let glow = if light && !shown { self.acquire((w, h)) } else { None };
+        if light && !shown && glow.is_none() {
+            self.release(back);
+            return self.release(shift);
+        }
         self.ops.push(Op::Clear(shift, [0.0; 4]));
         let (system, mode) = (flock, Mode::Normal);
         let white = [Src::White; 4];
-        let pass = Pass::Bend;
+        let pass = Pass::Bend(light);
         self.ops.push(Op::Particles { target: shift, system, slot, mode, timed: 0, pass, cast: white });
         self.redraw(target.src, back, (w, h));
+        if let Some(glow) = glow {
+            self.ops.push(Op::Clear(glow, [0.0; 4]));
+            let (mode, pass) = (Mode::Add, Pass::Light);
+            self.ops.push(Op::Particles { target: glow, system, slot: tinted, mode, timed: 0, pass, cast });
+        }
         let full = [0.0, 0.0, 1.0, 1.0];
         let mut item = Item { quad: full, uv: full, color: [1.0; 4], ..Item::default() };
         (item.m0, item.m1) = ndc(target.rect, target.rect.affine());
         item.lit_env = [0.0, 0.0, 1.0 / w as f32, 1.0 / h as f32];
-        let tex = [back, shift, Src::Clear];
         let slot = self.pool.push(&item);
-        let shown = self.swarms.as_ref().is_some_and(|s| s.shown);
-        let entry = if shown { "fs_shift_view" } else { "fs_refract" };
-        self.ops.push(Op::Draw { target: target.src, entry, mode: Mode::Replace, slot, tex });
-        self.release(back);
-        self.release(shift);
-        let modes = [Mode::Multiply, Mode::Add].into_iter().zip(tints).filter(|(_, on)| *on && !shown);
+        let (entry, mode, tex) = match glow {
+            _ if shown => ("fs_shift_view", Mode::Replace, [back, shift, Src::Clear]),
+            Some(glow) => ("fs_refract_light", Mode::Add, [back, shift, glow]),
+            None => ("fs_refract", Mode::Replace, [back, shift, Src::Clear]),
+        };
+        self.ops.push(Op::Draw { target: target.src, entry, mode, slot, tex });
+        [Some(back), Some(shift), glow].into_iter().flatten().for_each(|t| self.release(t));
+        let modes =
+            [Mode::Multiply, Mode::Add].into_iter().zip(tints).filter(|(_, on)| *on && !shown && !light);
         for (mode, _) in modes {
             let (to, slot, pass) = (target.src, tinted, Pass::Tint);
             self.ops.push(Op::Particles { target: to, system: flock, slot, mode, timed: 0, pass, cast });
