@@ -93,10 +93,13 @@ with wave.open(sys.argv[1], "wb") as out:
     out.setframerate(48000)
     out.writeframes(b"".join(struct.pack("<hh", *[int(12000 * math.sin(i * 0.0917))] * 2) for i in range(48000 * 2)))
 TONE
-pw-cli create-node adapter '{ factory.name=support.null-audio-sink node.name=reiwand-audio-sink
-  media.class=Audio/Sink object.linger=true audio.position=[FL FR] }' >/dev/null
-sleep 2
-tone() { pw-cat --playback --target reiwand-audio-sink "$WORK/tone.wav" >/dev/null 2>&1; }
+outputs() { pw-dump 2>/dev/null | python3 -c "import json, sys; print(sum(o['info']['props'].get('media.class') == 'Audio/Sink' for o in json.load(sys.stdin) if o['type'].endswith('Node')))"; }
+if [ "$(outputs)" = 0 ]; then
+  pw-cli create-node adapter '{ factory.name=support.null-audio-sink node.name=reiwand-audio-sink
+    media.class=Audio/Sink object.linger=true audio.position=[FL FR] }' >/dev/null
+  sleep 2
+fi
+tone() { pw-cat --playback "$WORK/tone.wav" >/dev/null 2>&1; }
 heard() { [ "$(bands TEST-12 "r['sound'] is True and max(r['raw'][0]) > 0")" = True ]; }
 tone & pids+=($!)
 wait_for 15 heard || fail "the spectrum did not read the first sound: $(ctl input bands TEST-12)"

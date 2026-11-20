@@ -38,13 +38,13 @@ first=$(digest)
 [ -n "$first" ] || fail "no frame from the still example: $("$BIN/probe" "$s13" 3 2>&1)"
 [ "$first" = "$(digest)" ] || fail "the still example changed while nothing moved"
 ctl release TEST-13 && expect "list(s['outputs'])" "[]"
-printf '%s\n' 'context.spa-libs = { audio.convert.* = audioconvert/libspa-audioconvert support.* = support/libspa-support }' \
-  'context.modules = [ { name = libpipewire-module-protocol-native } { name = libpipewire-module-client-node }' \
+printf '%s\n' 'context.spa-libs = { audio.convert.* = audioconvert/libspa-audioconvert support.* = support/libspa-support }' 'context.modules = [ { name = libpipewire-module-protocol-native } { name = libpipewire-module-client-node }' \
   '{ name = libpipewire-module-adapter } { name = libpipewire-module-metadata }' \
   '{ name = libpipewire-module-protocol-pulse args = { server.address = [ "unix:native" ] } } ]' >"$WORK/pulse.conf"
 pw-cli create-node adapter '{ factory.name=support.null-audio-sink node.name=reiwand-scene-sink
   media.class=Audio/Sink object.linger=true audio.position=[FL FR] }' >/dev/null
-pipewire -c "$WORK/pulse.conf" >"$WORK/pulse.log" 2>&1 & pulse=$!; pids+=("$pulse")
+pulsed() { if [ -n "$bridge" ]; then pipewire-pulse; else pipewire -c "$WORK/pulse.conf"; fi; }
+if [ -n "$bridge" ]; then pulse=$bridge; else pulsed >"$WORK/pulse.log" 2>&1 & pulse=$!; pids+=("$pulse"); fi
 wait_for 10 test -S "$XDG_RUNTIME_DIR/pulse/native" || fail "no PulseAudio server for the default audio output"
 streams() {
   pw-dump 2>/dev/null | python3 -c "import json, sys; nodes = [o['info']['props'] for o in json.load(sys.stdin) if o['type'].endswith('Node')]
@@ -91,7 +91,7 @@ wait_for 10 heard 1 || fail "unmuting did not bring the sound back"
 kill "$pulse" && { wait "$pulse" 2>/dev/null || true; }
 wait_for 10 heard 0 || fail "the sound stream outlived its audio output"
 expect "s['outputs']['TEST-15']['error'], s['outputs']['TEST-15']['playing']" "(None, True)"
-pipewire -c "$WORK/pulse.conf" >"$WORK/pulse-again.log" 2>&1 & pulse=$!; pids+=("$pulse")
+pulsed >"$WORK/pulse-again.log" 2>&1 & pulse=$!; pids+=("$pulse")
 wait_for 30 heard 1 || fail "the scene sound did not come back when an audio output appeared"
 ctl lib apply "$dusk" -o TEST-15 && ctl lib apply "$dusk" -o TEST-16 && speakers "('', '')"
 wait_for 10 heard 0 || fail "the audio stream outlived its scene"

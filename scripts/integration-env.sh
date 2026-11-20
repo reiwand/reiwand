@@ -67,8 +67,9 @@ export REIWAND_PRIVATE_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS
 pipewire >"$WORK/pipewire.log" 2>&1 & pids+=($!)
 wait_for 10 test -S "$XDG_RUNTIME_DIR/pipewire-0"
 wireplumber >"$WORK/wireplumber.log" 2>&1 & pids+=($!)
+bridge=
 if command -v pipewire-pulse >/dev/null; then
-  pipewire-pulse >"$WORK/pipewire-pulse.log" 2>&1 & pids+=($!)
+  pipewire-pulse >"$WORK/pipewire-pulse.log" 2>&1 & bridge=$!; pids+=("$bridge")
   wait_for 10 test -S "$XDG_RUNTIME_DIR/pulse/native"
 fi
 export REIWAND_PREVIEW_APP=$WORK/preview-window REIWAND_BROWSE_IDLE_MS=8000
