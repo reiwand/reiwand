@@ -2006,7 +2006,7 @@ the tray explain what is captured and that nothing is stored or sent, and offer 
 asks (`asking`), they say so instead of showing an error, and while the question rests (`quiet`)
 they say that the notification was closed and keep *Allow* off until it can be asked again. The
 scene settings show the same hint with these actions until the user decides, and their switch for
-each input says the same while the notification asks or the question rests. `reiwand-ctl lib apply`, `playlist start`, `next` and `prev` follow
+each input says the same while the notification asks or the question rests. Only screens ask: a `preview:` output (a library card, the preview window, the editor) plays without what was not granted, and neither the app nor the tray asks for it, marks itself as needing attention or opens for it. `reiwand-ctl lib apply`, `playlist start`, `next` and `prev` follow
 the same rule: once the daemon lists the inputs of the scene they showed in `shown`, they print the
 `reiwand-ctl input grant` command for each input that is neither granted nor declined, with `-o` and
 the output when another output shows another package with the same id.

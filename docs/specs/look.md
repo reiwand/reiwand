@@ -152,4 +152,5 @@ letras, deriva `contents/look/Look.qml` de `apps/reiwand-app/qml/facade/Look.qml
 - El perfil ya no se elige en la bandeja: se hace en la app. La miniatura de un paquete para adultos
   ya no se difumina por fila.
 - El panel no se puede ver sin una sesión de Plasma con el plugin; `scripts/plasma-features.sh` corre
-  `tests/tray-row.qml` y `tests/tray-left-out.qml` allí.
+  `tests/tray-row.qml`, `tests/tray-left-out.qml` y `tests/tray-consent.qml` (las vistas previas de la
+  biblioteca nunca piden permisos, ni marcan la bandeja como que necesita atención, ni la abren) allí.

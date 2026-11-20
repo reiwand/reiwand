@@ -26,7 +26,7 @@ Kirigami.InlineMessage {
         const decided = (map, scene, input) => ((map ?? {})[scene] ?? []).includes(input);
         const wants = (s, input) => input.endsWith("_network") ? s[input.split("_")[0]] === true && s.network === true && (s.granted ?? []).includes(input.split("_")[0]) : s[input] === true;
         const open = (s, input) => wants(s, input) && !(s.granted ?? []).includes(input) && !decided(inputs.declined, s.scene, input);
-        for (const name of Object.keys(shown).filter(name => consent.output === "" || name === consent.output)) {
+        for (const name of Object.keys(shown).filter(name => consent.output === "" ? !name.startsWith("preview:") : name === consent.output)) {
             const list = ["audio", "pointer", "clicks", "media", "media_network", "audio_network", "rgb"].filter(input => open(shown[name], input));
             if (list.length > 0)
                 return {
