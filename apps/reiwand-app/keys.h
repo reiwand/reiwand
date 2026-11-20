@@ -6,6 +6,7 @@
 #include <QtCore/QPoint>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QKeyEvent>
+#include <QtGui/QMouseEvent>
 #include <QtGui/QPointingDevice>
 #include <QtGui/QWheelEvent>
 #include <QtQml/QQmlEngine>
@@ -149,6 +150,18 @@ inline void sendWheel(double x, double y, int delta)
         static QPointingDevice mouse(QStringLiteral("probe"), 1, QInputDevice::DeviceType::TouchPad, QPointingDevice::PointerType::Finger, QInputDevice::Capability::Scroll | QInputDevice::Capability::Position, 1, 3);
         const QPointF at(x, y);
         QWheelEvent event(at, window->mapToGlobal(at), QPoint(), QPoint(0, delta), Qt::NoButton, Qt::NoModifier, Qt::NoScrollPhase, false, Qt::MouseEventNotSynthesized, &mouse);
+        QCoreApplication::sendEvent(window, &event);
+    }
+}
+
+inline void sendMouse(int kind, double x, double y)
+{
+    if (auto window = keyWindow()) {
+        const QPointF at(x, y);
+        const auto type = kind == 0 ? QEvent::MouseButtonPress : kind == 1 ? QEvent::MouseMove : QEvent::MouseButtonRelease;
+        const auto button = kind == 1 ? Qt::NoButton : Qt::LeftButton;
+        const auto buttons = kind == 2 ? Qt::NoButton : Qt::LeftButton;
+        QMouseEvent event(type, at, at, window->mapToGlobal(at), button, buttons, Qt::NoModifier);
         QCoreApplication::sendEvent(window, &event);
     }
 }

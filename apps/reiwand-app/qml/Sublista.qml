@@ -14,6 +14,8 @@ Column {
     property string otherIcon
     property bool movable: false
     property int keep: -1
+    readonly property alias rows: repeater
+    readonly property alias drag: drag
 
     signal removed(int index)
     signal added
@@ -37,6 +39,14 @@ Column {
     bottomPadding: Look.e2
     Accessible.role: Accessible.List
 
+    SublistaArrastre {
+        id: drag
+
+        list: sublista
+        visible: false
+        onDropped: (from, to) => sublista.move(from, Math.max(0, Math.min(repeater.count - 1, to)))
+    }
+
     Repeater {
         id: repeater
 
@@ -48,20 +58,21 @@ Column {
             required property var modelData
             required property int index
             readonly property bool lit: activeFocus
+            readonly property alias handle: handle
 
             x: Look.filaLado
             width: sublista.width - Look.filaLado
             implicitHeight: Look.altoSublista
             activeFocusOnTab: true
             Accessible.role: Accessible.ListItem
-            z: grip.active ? 1 : 0
+            z: drag.held === index ? 1 : 0
             Accessible.name: [modelData.name, modelData.where ?? "", modelData.problem ?? ""].filter(part => part !== "").join(", ")
             Accessible.description: sublista.movable ? App.tr("Ctrl+Up and Ctrl+Down change its place") : ""
             Keys.onUpPressed: event => sublista.movable && event.modifiers & Qt.ControlModifier ? sublista.move(index, index - 1) : nextItemInFocusChain(false).forceActiveFocus(Qt.TabFocusReason)
             Keys.onDownPressed: event => sublista.movable && event.modifiers & Qt.ControlModifier ? sublista.move(index, index + 1) : nextItemInFocusChain(true).forceActiveFocus(Qt.TabFocusReason)
             Keys.onDeletePressed: sublista.removeText !== "" && sublista.removed(index)
             transform: Translate {
-                y: grip.active ? grip.translation.y : 0
+                y: drag.held === item.index ? drag.lift : 0
             }
 
             Rectangle {
@@ -84,6 +95,8 @@ Column {
                 spacing: Look.listaHueco
 
                 IconImage {
+                    id: handle
+
                     visible: sublista.movable
                     sourceSize.width: Look.icono
                     sourceSize.height: Look.icono
@@ -91,12 +104,11 @@ Column {
                     color: item.lit ? Look.noche : Look.bruma
 
                     DragHandler {
-                        id: grip
-
                         target: null
                         xAxis.enabled: false
                         cursorShape: Qt.SizeVerCursor
-                        onActiveChanged: active || sublista.move(item.index, Math.max(0, Math.min(repeater.count - 1, item.index + Math.round(translation.y / item.height))))
+                        onActiveChanged: active ? drag.begin(item.index, centroid.scenePressPosition, item.height) : drag.end()
+                        onCentroidChanged: active && drag.follow(centroid.scenePosition)
                     }
                 }
 
@@ -163,38 +175,7 @@ Column {
         }
     }
 
-    Item {
-        x: Look.filaLado
-        visible: sublista.addText !== ""
-        width: sublista.width - Look.filaLado
-        implicitHeight: Look.altoSublista
-
-        Rectangle {
-            width: Look.linea
-            height: parent.height
-            color: Look.nocheLinea
-        }
-
-        QQC2.Button {
-            x: Look.e4
-            anchors.verticalCenter: parent.verticalCenter
-            flat: true
-            text: sublista.addText
-            icon.name: "plus"
-            Keys.onUpPressed: nextItemInFocusChain(false)?.forceActiveFocus(Qt.TabFocusReason)
-            Keys.onDownPressed: nextItemInFocusChain(true)?.forceActiveFocus(Qt.TabFocusReason)
-            onClicked: sublista.added()
-        }
-
-        QQC2.Button {
-            visible: sublista.otherText !== ""
-            anchors.right: parent.right
-            anchors.rightMargin: Look.filaFin
-            anchors.verticalCenter: parent.verticalCenter
-            flat: true
-            text: sublista.otherText
-            icon.name: sublista.otherIcon
-            onClicked: sublista.otherAdded()
-        }
+    SublistaPie {
+        sublista: sublista
     }
 }

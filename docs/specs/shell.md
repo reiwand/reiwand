@@ -271,8 +271,9 @@ quitar la lista). Arriba están «Cambia en», «Pausar la lista» y «Detener»
 Deshacer en el aviso, que la vuelve a crear con sus fondos y sus reglas.
 
 «Fondos» se despliega en el mismo nivel: cada fondo trae su miniatura, «en pantalla ahora» si se
-está mostrando y Quitar. En una lista manual el orden se cambia arrastrando el asa de la fila o con
-Ctrl+Arriba y Ctrl+Abajo sobre el fondo elegido; la fila elegida conserva el foco al moverse. Si la
+está mostrando y Quitar. En una lista manual el orden se cambia arrastrando el asa de la fila (se suelta
+donde se quiere dejar; al acercarla al borde de arriba o de abajo la vista se desplaza sola, así
+que llega lejos en una lista larga) o con Ctrl+Arriba y Ctrl+Abajo sobre el fondo elegido; la fila elegida conserva el foco al moverse. Si la
 lista cambió mientras tanto, el aviso lo dice y la vuelve a cargar. Una lista con búsqueda muestra
 sus fondos sin asas ni Quitar. «Añadir una carpeta…» copia los fondos de la carpeta una vez; seguirla
 para que los archivos nuevos entren solos está en Más, «Seguir una carpeta…». Se muestran hasta 500

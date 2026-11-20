@@ -84,6 +84,8 @@ pub mod qobject {
         #[qinvokable]
         fn wheel(self: &Backend, x: f64, y: f64, delta: i32);
         #[qinvokable]
+        fn pointer(self: &Backend, kind: i32, x: f64, y: f64);
+        #[qinvokable]
         fn path(self: &Backend, url: &QString) -> QString;
         #[qinvokable]
         fn markup(self: &Backend, text: &QString) -> QString;
