@@ -129,13 +129,13 @@ ctl volume 100 && ctl set "$sound" -o TEST-13 && consume "$s13"
 expect "s['outputs']['TEST-13']['playing']" True
 plugin=$(gst-inspect-1.0 pipewiresink 2>/dev/null | sed -n 's/^ *Version *//p')
 # the sound goes straight to PipeWire through a plugin from 1.2, or through the PulseAudio interface when it runs
-if printf '1.2\n%s\n' "$plugin" | sort -VC || { [ -S "$XDG_RUNTIME_DIR/pulse/native" ] && gst-inspect-1.0 pulsesink >/dev/null 2>&1; }; then
-  direct=true
-else direct=false; fi
+if [ -S "$XDG_RUNTIME_DIR/pulse/native" ] && gst-inspect-1.0 pulsesink >/dev/null 2>&1; then pulse=true; else pulse=false; fi
+if $pulse || printf '1.2\n%s\n' "$plugin" | sort -VC; then direct=true; else direct=false; fi
 [ "${REIWAND_REQUIRE_PIPEWIRE_SOUND:-0}" != 1 ] || $direct || fail "REIWAND_REQUIRE_PIPEWIRE_SOUND=1 but the PipeWire GStreamer plugin is '$plugin', older than 1.2"
 sounds() { ! $direct || until_between 10 5000 20000; }
 if $direct; then
-  wait_for 10 grep -q "no audio output" "$WORK/reiwandd.log" || fail "a video without an audio output was not reported"
+  # through the PulseAudio interface the server always takes the stream, so only the plugin path reports it
+  $pulse || wait_for 10 grep -q "no audio output" "$WORK/reiwandd.log" || fail "a video without an audio output was not reported"
   pw-cli create-node adapter '{ factory.name=support.null-audio-sink node.name=reiwand-test-sink
     media.class=Audio/Sink object.linger=true audio.position=[FL FR] }' >/dev/null
 fi
