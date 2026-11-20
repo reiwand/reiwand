@@ -517,17 +517,19 @@ reiwand-ctl scene act mi-escena particles '{"orient":{"system":"chispas","orient
 
 ##### variante `perspective`
 
-Da profundidad al sistema, con una distancia focal en píxeles, para usar `depth` y `depth_speed` en `start`.
+Da profundidad al sistema, con una distancia focal y un plano cercano en píxeles, para usar `depth` y `depth_speed` en `start`. Lo que no se da queda como estaba, o con el valor sugerido si el sistema no tenía perspectiva.
 
 | Argumento | Tipo | Qué significa |
 |---|---|---|
 | `system` | texto | (obligatorio) Id del sistema. |
 | `focal` | número | Distancia focal en píxeles, de 1 a 100000. Sin valor, usa 800 si no había. |
+| `near` | número | Plano cercano: distancia al ojo en píxeles, de 1 a 100000, por debajo de la cual no se dibuja ninguna partícula. Sin valor, usa 1 si no había. |
 | `off` | sí/no | Si es `true`, quita la perspectiva y los rangos `depth` y `depth_speed`. Por defecto `false`. |
 
 ```sh
 reiwand-ctl scene act mi-escena add_layer '{"kind":"particles","id":"chispas"}'
 reiwand-ctl scene act mi-escena particles '{"perspective":{"system":"chispas","focal":600}}'
+reiwand-ctl scene act mi-escena particles '{"perspective":{"system":"chispas","near":50}}'
 reiwand-ctl scene act mi-escena particles '{"perspective":{"system":"chispas","off":true}}'
 ```
 

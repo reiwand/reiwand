@@ -585,7 +585,7 @@
   "Offer.shader.foliage": {"strength": 1.0, "speed": 1.0},
   "Offer.shader.fur": {"layers": 12.0, "length": 10.0, "density": 0.5, "comb_x": 0.0, "comb_y": 0.0, "comb_z": 0.0},
   "Offer.wgsl.param": {"type": "float"},
-  "Offer.perspective": {"focal": 800.0},
+  "Offer.perspective": {"focal": 800.0, "near": 1.0},
   "Offer.property.bool": {"default": false},
   "Offer.property.button": {},
   "Offer.property.color": {"default": "#ffffff"},

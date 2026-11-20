@@ -97,7 +97,7 @@ fn turbulent_starts_fractal_offsets_remaps_and_depth_agree_on_both_paths() {
         (
             "depth",
             json!({ "depth": [-50, 150], "depth_speed": [-20, 20], "speed": [10, 20] }),
-            json!({ "perspective": { "focal": 200 } }),
+            json!({ "perspective": { "focal": 200, "near": 1 } }),
         ),
     ];
     for (name, init, more) in cases {

@@ -38,7 +38,13 @@ pub(super) fn remap(
     }
 }
 
-pub(super) fn perspective(doc: &Value, sys: &str, focal: Option<f64>, off: bool) -> Vec<Op> {
+pub(super) fn perspective(
+    doc: &Value,
+    sys: &str,
+    focal: Option<f64>,
+    near: Option<f64>,
+    off: bool,
+) -> Vec<Op> {
     let at = |k: &str| format!("{sys}/{k}");
     if off {
         return ["perspective", "init/depth", "init/depth_speed"]
@@ -46,12 +52,12 @@ pub(super) fn perspective(doc: &Value, sys: &str, focal: Option<f64>, off: bool)
             .flat_map(|k| put(doc, &at(k), None))
             .collect();
     }
-    let mut ops = Vec::new();
-    focal.iter().for_each(|f| ops.extend(set(doc, &at("perspective"), json!({ "focal": f }))));
-    if focal.is_none() && doc.pointer(&at("perspective")).is_none() {
-        ops.extend(set(doc, &at("perspective"), reiwand_scene::prefill::offer("perspective", "", json!({}))));
-    }
-    ops
+    let now = doc.pointer(&at("perspective")).filter(|v| v.is_object());
+    let mut next =
+        now.cloned().unwrap_or_else(|| reiwand_scene::prefill::offer("perspective", "", json!({})));
+    focal.iter().for_each(|f| next["focal"] = json!(f));
+    near.iter().for_each(|n| next["near"] = json!(n));
+    if now == Some(&next) { Vec::new() } else { set(doc, &at("perspective"), next) }
 }
 
 fn holds(layer: &Value, system: &str) -> bool {

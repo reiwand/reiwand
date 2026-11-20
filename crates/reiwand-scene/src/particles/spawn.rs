@@ -18,7 +18,7 @@ pub(super) fn drawn(s: &Sim, at: [f32; 2], z: f32) -> ([f32; 2], f32) {
         return (at, 1.0);
     }
     let f = focal + z;
-    let near = if f > 1.0 { focal / f } else { 0.0 };
+    let near = if f > s.hatch[1][3] { focal / f } else { 0.0 };
     let c = [s.depth[2][1], s.depth[2][2]];
     ([c[0] + (at[0] - c[0]) * near, c[1] + (at[1] - c[1]) * near], near)
 }

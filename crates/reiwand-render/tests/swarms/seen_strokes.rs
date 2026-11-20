@@ -1,7 +1,7 @@
 use super::*;
 
 fn coming(at: [f32; 2], depth: &str) -> Value {
-    json!({ "capacity": 8, "seed": 5, "perspective": { "focal": 100 },
+    json!({ "capacity": 8, "seed": 5, "perspective": { "focal": 100, "near": 1 },
         "emitters": [{ "shape": { "point": at }, "bursts": [{ "count": 1 }] }],
         "init": { "life": [30, 30], "speed": [0, 0], "size": [10, 10], "depth": [0, 0], "depth_speed": [-100, -100],
             "color": ["#ffffff", "#ffffff"] },

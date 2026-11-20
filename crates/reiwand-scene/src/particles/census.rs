@@ -42,7 +42,7 @@ pub fn seen(p: &Particle, deep: [f32; 4]) -> ([f32; 2], f32) {
         return (p.pos, 1.0);
     }
     let f = deep[0] + p.depth[0];
-    let k = if f > 1.0 { deep[0] / f } else { 0.0 };
+    let k = if f > deep[3] { deep[0] / f } else { 0.0 };
     ([deep[1] + (p.pos[0] - deep[1]) * k, deep[2] + (p.pos[1] - deep[2]) * k], k)
 }
 

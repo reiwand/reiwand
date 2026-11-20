@@ -8,7 +8,7 @@ fn nearness(z: f32) -> f32 {
         return 1.0;
     }
     let f = focal + z;
-    return select(0.0, focal / f, f > 1.0);
+    return select(0.0, focal / f, f > sim.hatch[1].w);
 }
 
 fn spawn(e: u32, id: u32, ev: Event, hatched: bool, order: u32) -> Particle {

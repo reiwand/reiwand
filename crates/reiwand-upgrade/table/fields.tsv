@@ -633,6 +633,7 @@ scene	Palette.noise	array	optional	1	[0.0,0.0,0.0]	editor.md:111
 scene	Passage.curve	Ease	optional	1	"linear"	editor.md:1970
 scene	Passage.duration_ms	number	optional	1	1000	dbus.md:1378
 scene	Passage.params	object	optional	3	{}	editor.md:95
+scene	Perspective.near	number	optional	1	1	dbus.md:2466
 scene	Playback.end	number|null	optional	3	null	editor.md:112
 scene	Playback.frame	number|object|null	optional	3	null	editor.md:85
 scene	Playback.loop	boolean	optional	1	true	editor.md:72

@@ -116,8 +116,11 @@ fn particles_in_a_3d_group_say_whether_they_hide_one_by_one() {
     );
     assert_eq!((&first["way"], &first["reason"]), (&json!("plane"), &json!("perspective")), "{first}");
     let at = format!("/scene/particles/{system}");
-    act(&mut p, json!({ "set": { "pointer": format!("{at}/perspective"), "value": { "focal": 100 } } }))
-        .unwrap();
+    act(
+        &mut p,
+        json!({ "set": { "pointer": format!("{at}/perspective"), "value": { "focal": 100, "near": 1 } } }),
+    )
+    .unwrap();
     assert_eq!(way(&p)["way"], "one_by_one", "{}", way(&p));
     act(&mut p, json!({ "set": { "pointer": format!("{at}/render/lit"), "value": true } })).unwrap();
     assert_eq!(way(&p)["way"], "one_by_one", "lit particles hide one by one");

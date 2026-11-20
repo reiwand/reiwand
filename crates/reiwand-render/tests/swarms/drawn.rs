@@ -121,7 +121,7 @@ fn perspective_draws_far_particles_smaller_and_nearer_the_middle() {
     for gpu in [false, true] {
         let s = dot(
             [20.0, 40.0],
-            json!({ "perspective": { "focal": 200 }, "init": { "life": [30, 30], "speed": [0, 0],
+            json!({ "perspective": { "focal": 200, "near": 1 }, "init": { "life": [30, 30], "speed": [0, 0],
             "size": [24, 24], "depth": [200, 200], "color": ["#ffffff", "#ffffff"] } }),
         );
         let Some(p) = shot(r, s, &[], gpu) else { return };

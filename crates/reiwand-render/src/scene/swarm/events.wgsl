@@ -29,7 +29,7 @@ fn mark(i: u32, p: Particle, before: f32) {
     var near = 1.0;
     if deep.w > 0.5 {
         let f = deep.x + p.depth.x;
-        near = select(0.0, deep.x / f, f > 1.0);
+        near = select(0.0, deep.x / f, f > deep.w);
         pos = deep.yz + (p.pos - deep.yz) * near;
     }
     state.data[o] = bitcast<u32>(pos.x);

@@ -55,6 +55,23 @@ GridLayout {
         }, true)
     }
 
+    QQC2.Label {
+        visible: !!deep.focal
+        text: App.tr("Near plane")
+    }
+
+    SceneSlider {
+        objectName: "near_plane"
+        Layout.fillWidth: true
+        visible: !!deep.focal
+        from: 1
+        to: 1000
+        value: deep.focal?.near ?? App.fill("Offer.perspective").near
+        onMoved: deep.tools.edit("perspective", {
+            "near": Math.round(value)
+        }, true)
+    }
+
     Repeater {
         model: deep.focal ? deep.rows : []
 

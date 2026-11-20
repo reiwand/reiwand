@@ -9,8 +9,7 @@ fn layers() -> Value {
 fn a_ball_with_a_hole_and_one_side_agrees_on_both_paths() {
     let Some(r) = renderer() else { return };
     let shape = json!({ "sphere": { "center": [80, 40], "depth": 20, "radius": [30, 20, 60], "inner": 0.3, "sign": [0, 1, -1] } });
-    let systems =
-        json!({ "s": system(shape, json!({ "depth": [5, 5] }), json!({ "perspective": { "focal": 200 } })) });
+    let systems = json!({ "s": system(shape, json!({ "depth": [5, 5] }), json!({ "perspective": { "focal": 200, "near": 1 } })) });
     let Some(found) = both(r, &systems, &layers(), 6) else { return };
     agree("sphere", &found, 0.05);
     assert!(found[0].iter().all(|p| p.pos[1] >= 40.0 - 1e-3));
@@ -33,8 +32,7 @@ fn a_ball_around_the_eye_draws_big_near_and_small_far_ones() {
     let Some(r) = renderer() else { return };
     let shape = json!({ "sphere": { "center": [80, 40], "depth": 0, "radius": [60, 30, 120], "inner": 0, "sign": [0, 0, 0] } });
     let init = json!({ "size": [6, 6], "life": [60, 60] });
-    let systems =
-        json!({ "s": system(shape, init, json!({ "perspective": { "focal": 120 }, "capacity": 128 })) });
+    let systems = json!({ "s": system(shape, init, json!({ "perspective": { "focal": 120, "near": 1 }, "capacity": 128 })) });
     let layer =
         json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "s", "blend": "add" }]);
     for gpu in [false, true] {

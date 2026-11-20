@@ -94,6 +94,7 @@ fn remaps_looks_depth_children_and_shaders_are_set_undone_and_checked() {
     edit(&mut p, "cutout", json!({ "range": [0.2, 0.6, 0.8] })).unwrap();
     edit(&mut p, "orient", json!({ "orient": "fixed", "angle": 30 })).unwrap();
     edit(&mut p, "perspective", json!({ "focal": 600 })).unwrap();
+    edit(&mut p, "perspective", json!({ "near": 40 })).unwrap();
     edit(&mut p, "start", json!({ "ranges": { "depth": [-100, 300], "depth_speed": [0, 20] } })).unwrap();
     let s = system(&p);
     assert_eq!(
@@ -101,8 +102,8 @@ fn remaps_looks_depth_children_and_shaders_are_set_undone_and_checked() {
         (json!([0.2, 0.6, 0.8]), json!("fixed"))
     );
     assert_eq!(
-        (s["perspective"]["focal"].clone(), s["init"]["depth"].clone()),
-        (json!(600.0), json!([-100, 300, 1.0]))
+        (s["perspective"].clone(), s["init"]["depth"].clone()),
+        (json!({ "focal": 600.0, "near": 40.0 }), json!([-100, 300, 1.0]))
     );
     edit(&mut p, "orient", json!({ "layer": "flakes", "orient": "velocity" })).unwrap();
     let own = &p.doc["scene"]["layers"][1]["render"];
@@ -129,6 +130,7 @@ fn remaps_looks_depth_children_and_shaders_are_set_undone_and_checked() {
         ("remap", json!({})),
         ("cutout", json!({ "range": [0.8, 0.2, 1] })),
         ("perspective", json!({ "focal": 0 })),
+        ("perspective", json!({ "near": 0.5 })),
         ("inherit", json!({ "child": 3, "inherit": ["color"] })),
         ("inherit", json!({ "child": 0, "inherit": ["color", "color"] })),
         ("shader", json!({ "shader": "nothing" })),

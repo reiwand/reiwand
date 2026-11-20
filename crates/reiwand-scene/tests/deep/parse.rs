@@ -40,6 +40,10 @@ fn advanced_fields_round_trip_and_older_forms_still_read() {
     assert_eq!(written["particles"]["fireworks"]["init"]["life"], json!([1.0, 3.0, 2.0]));
     assert_eq!(written["particles"]["fireworks"]["forces"][0]["window"], json!([0.0, 0.1, 0.8, 1.0]));
     assert_eq!(written["layers"][2]["space"], json!("3d"));
+    let mut lacking = written.clone();
+    lacking["particles"]["fireworks"]["perspective"].as_object_mut().unwrap().remove("near");
+    let refused = Scene::from_json(&lacking.to_string()).unwrap_err().to_string();
+    assert!(refused.contains("near"), "{refused}");
     let old = prefill::completed(
         json!({ "capacity": 10, "emitters": [{ "shape": { "box": { "from": [0.0, 0.0], "to": [10.0, 10.0] } }, "rate": 1 }],
         "init": { "life": [1, 2] }, "render": { "stretch": { "mode": "relative", "depth": "flat", "time": 0.5, "min": 0, "max": 9 } }, "forces": [{ "drag": 0.1 }] }),

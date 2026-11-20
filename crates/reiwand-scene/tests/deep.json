@@ -1549,7 +1549,8 @@
         "count"
       ],
       "perspective": {
-        "focal": 800
+        "focal": 800,
+        "near": 1
       },
       "points": [
         {

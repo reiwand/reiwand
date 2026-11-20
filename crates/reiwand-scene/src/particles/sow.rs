@@ -90,7 +90,7 @@ impl Sim {
         self.depth[0] = span(&i.depth);
         self.depth[1] = span(&i.depth_speed);
         if let Some(p) = s.perspective {
-            self.depth[2] = [p.focal.max(1.0), self.clock[2] / 2.0, self.clock[3] / 2.0, 1.0];
+            self.depth[2] = [p.focal.max(1.0), self.clock[2] / 2.0, self.clock[3] / 2.0, p.near.max(1.0)];
         }
         let n = i.remap.len().min(super::MAX_REMAPS);
         self.remap[0] = n as u32;

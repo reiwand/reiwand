@@ -69,7 +69,7 @@ fn vs_particle(
     var out: Corner;
     out.position = vec4<f32>(2.0, 2.0, 2.0, 1.0);
     let far = look.deep.x + d.x;
-    if b.x >= b.y || (look.deep.w > 0.5 && far <= 1.0) {
+    if b.x >= b.y || (look.deep.w > 0.5 && far <= look.deep.w) {
         return out;
     }
     let t = clamp(b.x / b.y, 0.0, 1.0);

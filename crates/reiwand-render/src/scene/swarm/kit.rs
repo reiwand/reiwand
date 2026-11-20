@@ -105,7 +105,9 @@ pub(super) fn kit(
         extra: [flag(!cells.is_empty()), 0.0, 0.0, render.trail.as_ref().map_or(1.0, |t| t.width)],
         cut: render.cutout.map_or([0.0, 1.0, 1.0, 0.0], |[a, b, o]| [a, b, o, 1.0]),
         turn: turn(render),
-        deep: own.map_or([0.0; 4], |s| s.perspective.map_or([0.0; 4], |p| [p.focal.max(1.0), 0.0, 0.0, 1.0])),
+        deep: own.map_or([0.0; 4], |s| {
+            s.perspective.map_or([0.0; 4], |p| [p.focal.max(1.0), 0.0, 0.0, p.near.max(1.0)])
+        }),
         strand: super::looks::strand(render),
         cord: super::looks::cord(render),
         sizes: std::array::from_fn(|i| std::array::from_fn(|j| sizes[i * 4 + j])),

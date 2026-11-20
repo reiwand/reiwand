@@ -35,7 +35,7 @@ fn knot(slot: u32) -> Knot {
     var k = 1.0;
     if deep.w > 0.5 {
         let f = deep.x + p.depth.x;
-        k = select(0.0, deep.x / f, f > 1.0);
+        k = select(0.0, deep.x / f, f > deep.w);
         pos = deep.yz + (p.pos - deep.yz) * k;
     }
     return Knot(pos, p.look.y * k, min(p.age / p.life, 1.0), k, vec4<f32>(p.color.rgb, p.color.a * p.look.x));

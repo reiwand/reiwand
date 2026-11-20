@@ -23,9 +23,9 @@ fn children_of_parents_in_depth_agree_on_both_paths() {
     let parent = system(
         json!({ "box": { "from": [40, 20], "to": [120, 60] } }),
         init,
-        json!({ "capacity": 64, "perspective": { "focal": 200 }, "children": children }),
+        json!({ "capacity": 64, "perspective": { "focal": 200, "near": 1 }, "children": children }),
     );
-    let deep = json!({ "perspective": { "focal": 200 } });
+    let deep = json!({ "perspective": { "focal": 200, "near": 1 } });
     let mut near = kid(deep.clone());
     near["init"]["depth"] = json!([5, 10]);
     let systems = json!({ "s": parent, "flat": kid(json!({})), "deep": kid(deep), "near": near });

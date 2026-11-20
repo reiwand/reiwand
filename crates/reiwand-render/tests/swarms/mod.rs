@@ -13,6 +13,7 @@ mod drawn;
 mod families;
 mod fields;
 mod looks;
+mod nearplane;
 mod pixels;
 mod seen_strokes;
 mod segments;

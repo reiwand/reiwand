@@ -70,4 +70,6 @@ pub struct Periodic {
 pub struct Perspective {
     #[schemars(extend("x-unit" = "px", "x-range" = [1, 100000]))]
     pub focal: f32,
+    #[schemars(extend("x-unit" = "px", "x-range" = [1, 100000]))]
+    pub near: f32,
 }

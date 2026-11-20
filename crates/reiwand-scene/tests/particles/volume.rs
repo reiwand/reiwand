@@ -8,7 +8,7 @@ fn ball(shape: Json, perspective: bool, init: Json) -> Vec<Particle> {
     );
     init.as_object().into_iter().flatten().for_each(|(k, v)| s["init"][k] = v.clone());
     if perspective {
-        s["perspective"] = json!({ "focal": 800 });
+        s["perspective"] = json!({ "focal": 800, "near": 1 });
     }
     run(&scene(s, true), 2, Quality::Q3).particles.into_iter().filter(|p| p.age < p.life).collect()
 }
@@ -95,6 +95,6 @@ fn radii_and_the_inner_fraction_are_checked() {
 
 fn helix_free() -> Json {
     let mut s = sparks();
-    s["perspective"] = json!({ "focal": 800 });
+    s["perspective"] = json!({ "focal": 800, "near": 1 });
     s
 }

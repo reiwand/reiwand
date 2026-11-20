@@ -8,7 +8,7 @@ fn the_offered_objects_come_whole_from_the_table() {
         boids,
         json!({ "radius": 40.0, "separation": 1.0, "alignment": 1.0, "cohesion": 0.5, "max_speed": 200.0 })
     );
-    assert_eq!(offer("perspective", "", json!({}))["focal"], 800.0);
+    assert_eq!(offer("perspective", "", json!({})), json!({ "focal": 800.0, "near": 1.0 }));
     assert_eq!(offer("trail", "", json!({}))["length"], 32);
     let camera = offer("camera", "Camera", json!({ "center": [1.0, 2.0] }));
     assert_eq!((&camera["zoom"], &camera["rotation"]), (&json!(1.0), &json!(0.0)));

@@ -80,7 +80,7 @@ fn the_turn_follows_the_direction_of_a_velocity_oriented_sprite() {
 fn a_perspective_turn_makes_the_near_edge_larger() {
     let Some(r) = renderer() else { return };
     let mut deep = flake([40.0, 40.0], tilt([0.0, 60.0], [0.0, 0.0]), json!({}));
-    deep["perspective"] = json!({ "focal": 30 });
+    deep["perspective"] = json!({ "focal": 30, "near": 1 });
     deep["init"]["depth"] = json!([0, 0]);
     let layers =
         json!([{ "blend_space": "canvas", "id": "s", "type": "particles", "system": "s", "blend": "add" }]);

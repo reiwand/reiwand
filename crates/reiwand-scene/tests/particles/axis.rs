@@ -12,7 +12,7 @@ fn helix(axis: Json, perspective: bool) -> Json {
             "forces": [], "collide": [] }),
     );
     if perspective {
-        s["perspective"] = json!({ "focal": 800 });
+        s["perspective"] = json!({ "focal": 800, "near": 1 });
     }
     s
 }

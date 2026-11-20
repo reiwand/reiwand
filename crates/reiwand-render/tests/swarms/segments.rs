@@ -2,7 +2,7 @@ use super::seen_strokes::{Stroke, measure};
 use super::*;
 
 fn star(at: [f32; 2], z: f32, depth: &str) -> Value {
-    json!({ "capacity": 8, "seed": 5, "perspective": { "focal": 100 },
+    json!({ "capacity": 8, "seed": 5, "perspective": { "focal": 100, "near": 1 },
         "emitters": [{ "shape": { "point": at }, "bursts": [{ "count": 1 }] }],
         "init": { "life": [30, 30], "speed": [0, 0], "size": [6, 6], "depth": [z, z], "depth_speed": [-20, -20],
             "color": ["#ffffff", "#ffffff"] },

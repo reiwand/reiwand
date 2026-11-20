@@ -57,7 +57,7 @@ fn oscillating_from_the_floor_agrees_on_both_paths() {
 }
 
 fn dropped(y: f32, z: f32, depth: &str) -> Value {
-    json!({ "capacity": 8, "seed": 5, "perspective": { "focal": 100 },
+    json!({ "capacity": 8, "seed": 5, "perspective": { "focal": 100, "near": 1 },
         "emitters": [{ "shape": { "point": [75, y] }, "bursts": [{ "count": 1 }] }],
         "init": { "life": [30, 30], "velocity": [[60, 0], [60, 0]], "size": [6, 6], "depth": [z, z],
             "color": ["#ffffff", "#ffffff"] },

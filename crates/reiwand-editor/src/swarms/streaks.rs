@@ -12,7 +12,8 @@ fn mean(range: &Value) -> f64 {
 
 fn drop(system: &Value, s: &Value, speed: f64, z: f64) -> Value {
     let focal = system["perspective"]["focal"].as_f64().unwrap_or(0.0);
-    let k = if focal > 0.0 && focal + z > 1.0 { focal / (focal + z) } else { 1.0 };
+    let plane = system["perspective"]["near"].as_f64().unwrap_or(1.0);
+    let k = if focal > 0.0 && focal + z > plane { focal / (focal + z) } else { 1.0 };
     let num = |key: &str| s[key].as_f64().unwrap_or(0.0);
     let side = mean(&system["init"]["size"]) * k;
     let spanned = s["depth"] == "segment";

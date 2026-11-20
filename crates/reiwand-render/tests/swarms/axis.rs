@@ -13,7 +13,7 @@ fn rings_and_swirls_around_a_tilted_axis_agree_on_both_paths() {
     let swirl =
         json!({ "vortex": { "axis": [1, 0, 0], "center": [80, 40], "strength": 60, "falloff": "constant" } });
     let systems = json!({ "s": system(shape, json!({ "depth": [0, 0] }), json!({
-        "perspective": { "focal": 200 }, "forces": [swirl, { "drag": 0.5 }] })) });
+        "perspective": { "focal": 200, "near": 1 }, "forces": [swirl, { "drag": 0.5 }] })) });
     let Some(found) = both(r, &systems, &layers(), 12) else { return };
     agree("tilted axis", &found, 0.1);
     let spread =

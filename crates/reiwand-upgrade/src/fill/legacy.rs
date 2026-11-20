@@ -30,6 +30,7 @@ pub(super) fn corrected(def: &str, name: &str) -> Option<Value> {
         ("Layer", "solid") => json!(false),
         ("Property", "mode") => json!("one"),
         ("Property", "max_files") => json!(1000),
+        ("Perspective", "near") => json!(1),
         _ => return None,
     })
 }

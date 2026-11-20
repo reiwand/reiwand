@@ -67,6 +67,8 @@ pub enum ParticleEdit {
         #[serde(default)]
         focal: Option<f64>,
         #[serde(default)]
+        near: Option<f64>,
+        #[serde(default)]
         off: bool,
     },
     Layer {

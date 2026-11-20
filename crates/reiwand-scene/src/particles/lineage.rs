@@ -17,6 +17,7 @@ impl Check<'_> {
         if let Some(d) = s.perspective {
             self.uses(true, "particle_depth");
             self.range(&format!("{p}/perspective/focal"), d.focal, 1.0, 1e5);
+            self.range(&format!("{p}/perspective/near"), d.near, 1.0, 1e5);
         }
         if s.lock.iter().enumerate().any(|(i, f)| s.lock[..i].contains(f)) {
             self.issues.push(Issue::Type(format!("{p}/lock")));

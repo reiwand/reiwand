@@ -1,7 +1,7 @@
 use super::*;
 
 fn deep(children: Json) -> Json {
-    still(json!({ "capacity": 4, "perspective": { "focal": 100 },
+    still(json!({ "capacity": 4, "perspective": { "focal": 100, "near": 1 },
         "init": { "life": [0.1, 0.1], "speed": [0, 0], "size": [4, 4], "depth": [100, 100] },
         "emitters": [{ "shape": { "point": [160, 50] }, "bursts": [{ "count": 1 }] }], "children": children }))
 }
@@ -20,7 +20,7 @@ fn kid(more: Json) -> Json {
 #[test]
 fn children_of_a_deep_parent_are_born_where_it_is_drawn_or_at_its_depth() {
     let systems = json!({ "a": deep(json!([{ "system": "b", "on": "death" }, { "system": "c", "on": "death" }])),
-        "b": kid(json!({})), "c": kid(json!({ "perspective": { "focal": 100 }, "init": { "life": [5, 5], "speed": [0, 0], "size": [4, 4], "depth": [20, 20] } })) });
+        "b": kid(json!({})), "c": kid(json!({ "perspective": { "focal": 100, "near": 1 }, "init": { "life": [5, 5], "speed": [0, 0], "size": [4, 4], "depth": [20, 20] } })) });
     let mut fly = Fly::of(systems);
     fly.run(0.4);
     let (flat, far) = (fly.alive(1), fly.alive(2));
@@ -85,7 +85,7 @@ fn children_of_a_deep_parent_take_its_speed_in_depth_with_its_velocity() {
         parent["init"]["depth_speed"] = json!([50, 50]);
         parent["init"]["life"] = json!([2, 2]);
         let child = kid(
-            json!({ "perspective": { "focal": 100 }, "emitters": [{ "shape": { "point": [0, 0] }, "rate": 20 }],
+            json!({ "perspective": { "focal": 100, "near": 1 }, "emitters": [{ "shape": { "point": [0, 0] }, "rate": 20 }],
             "init": { "life": [5, 5], "speed": [0, 0], "size": [4, 4], "depth": [0, 0], "depth_speed": [10, 10] } }),
         );
         let mut fly = Fly::of(json!({ "a": parent, "b": child }));
