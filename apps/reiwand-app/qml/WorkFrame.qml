@@ -12,7 +12,7 @@ Item {
     readonly property alias seat: seat
     readonly property alias backButton: back
     readonly property bool own: !!(page && page.topBar)
-    readonly property point noticeAt: Qt.point(Look.lateralIzq + Look.e4, Look.arribaAlto + Look.barraLienzoAlto + Look.e4)
+    readonly property point noticeAt: Qt.point(width - (page?.rightWide ?? 0) - Look.e4, Look.arribaAlto + Look.barraLienzoAlto + Look.e4)
 
     signal leave
 

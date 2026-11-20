@@ -12,6 +12,7 @@ Kirigami.Page {
     property string heading
     property string source
     property bool exercised: App.checking
+    readonly property real rightWide: area.layout.rightWide
     property bool exercising: false
     property alias editor: editor
     property alias layout: area.layout

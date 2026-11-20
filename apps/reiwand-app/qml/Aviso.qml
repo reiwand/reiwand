@@ -12,6 +12,8 @@ FocusScope {
     property string icon: Tono.icon(tone)
     property string action
     readonly property bool held: hover.hovered || activeFocus
+    readonly property real room: Look.avisoAncho - Look.e4 - 10 - Look.iconoAviso - Look.altoCerrar - 3 * Look.e3 - Look.e2
+    readonly property bool stacked: action !== "" && metrics.advanceWidth > room - inline.implicitWidth - Look.e3
 
     signal acted
     signal closed
@@ -37,65 +39,89 @@ FocusScope {
         }
     }
 
-    RowLayout {
+    TextMetrics {
+        id: metrics
+
+        font: words.font
+        text: aviso.text
+    }
+
+    ColumnLayout {
         id: line
 
         anchors.fill: parent
         anchors.leftMargin: Look.e4
         anchors.rightMargin: 10
-        spacing: Look.e3
+        spacing: Look.e2
 
-        IconImage {
-            name: aviso.icon
-            sourceSize: Qt.size(Look.iconoAviso, Look.iconoAviso)
-            color: Tono.of(aviso.tone, false, Look.bruma)
-        }
-
-        Text {
+        RowLayout {
             Layout.fillWidth: true
-            Layout.rightMargin: Look.e2
-            text: aviso.text
-            wrapMode: Text.WordWrap
-            lineHeight: 1.35
-            font.family: Look.letraTexto
-            font.pixelSize: Look.tCuerpo
-            color: Look.escarcha
+            spacing: Look.e3
+
+            IconImage {
+                name: aviso.icon
+                sourceSize: Qt.size(Look.iconoAviso, Look.iconoAviso)
+                color: Tono.of(aviso.tone, false, Look.bruma)
+            }
+
+            Text {
+                id: words
+
+                Layout.fillWidth: true
+                Layout.rightMargin: Look.e2
+                text: aviso.text
+                wrapMode: Text.WordWrap
+                lineHeight: 1.35
+                font.family: Look.letraTexto
+                font.pixelSize: Look.tCuerpo
+                color: Look.escarcha
+            }
+
+            QQC2.Button {
+                id: inline
+
+                visible: aviso.action !== "" && !aviso.stacked
+                flat: true
+                text: aviso.action
+                onClicked: aviso.acted()
+            }
+
+            QQC2.AbstractButton {
+                id: close
+
+                objectName: "notice-close"
+                implicitWidth: Look.altoCerrar
+                implicitHeight: Look.altoCerrar
+                Accessible.role: Accessible.Button
+                Accessible.name: App.tr("Close")
+                onClicked: aviso.closed()
+
+                Rectangle {
+                    anchors.fill: parent
+                    radius: Look.radioChico
+                    color: close.hovered ? Look.nocheLinea : "transparent"
+
+                    Anillo {
+                        corner: Look.radioChico
+                        visible: close.visualFocus
+                    }
+                }
+
+                IconImage {
+                    anchors.centerIn: parent
+                    name: "x"
+                    sourceSize: Qt.size(Look.icono, Look.icono)
+                    color: close.hovered ? Look.escarcha : Look.bruma
+                }
+            }
         }
 
         QQC2.Button {
-            visible: aviso.action !== ""
+            Layout.alignment: Qt.AlignRight
+            visible: aviso.action !== "" && aviso.stacked
             flat: true
             text: aviso.action
             onClicked: aviso.acted()
-        }
-
-        QQC2.AbstractButton {
-            id: close
-
-            objectName: "notice-close"
-            implicitWidth: Look.altoCerrar
-            implicitHeight: Look.altoCerrar
-            Accessible.role: Accessible.Button
-            Accessible.name: App.tr("Close")
-            onClicked: aviso.closed()
-
-            Rectangle {
-                anchors.fill: parent
-                radius: Look.radioChico
-                color: close.hovered ? Look.nocheLinea : "transparent"
-
-                Anillo {
-                    corner: Look.radioChico
-                    visible: close.visualFocus
-                }
-            }
-
-            IconImage {
-                anchors.centerIn: parent
-                name: "x"
-                sourceSize: Qt.size(Look.icono, Look.icono)
-                color: close.hovered ? Look.escarcha : Look.bruma
-            }
         }
     }
 }

@@ -29,8 +29,8 @@ dentro de Ajustes, en la pestaña Pantallas. El menú es un solo bloque para el 
 | Esqueleto | Páginas | Partes |
 |---|---|---|
 | título | Biblioteca, Explorar, Listas, Fuentes, Crear | columna izquierda con logo y menú bajo su velo; lugar «ahora» arriba a la derecha (ver «Bloque ahora»); velo de banda abajo; la página a la derecha del menú o, si la pide, en la banda baja; un lugar de avisos; línea de atajos abajo a la derecha |
-| opciones | Ajustes, Cuenta | la imagen como franja con su velo; el menú; un panel opaco en Noche con el título de la página, sus acciones, palabras de sección y la ruta con «Esc volver»; la página; avisos sobre los atajos; atajos siempre al pie |
-| trabajo | editor de un fondo, editor de escenas, empaquetador | barra superior en Noche con la vuelta («‹ Biblioteca», «‹ Crear»…), el título y las acciones; la página ocupa el resto; avisos arriba a la izquierda del lienzo |
+| opciones | Ajustes, Cuenta | la imagen como franja con su velo; el menú; un panel opaco en Noche con el título de la página, sus acciones, palabras de sección y la ruta con «Esc volver»; la página; avisos arriba a la derecha, bajo las acciones; atajos siempre al pie |
+| trabajo | editor de un fondo, editor de escenas, empaquetador | barra superior en Noche con la vuelta («‹ Biblioteca», «‹ Crear»…), el título y las acciones; la página ocupa el resto; avisos arriba a la derecha del lienzo |
 
 Los escalones de tamaño de `look.md` (compacto hasta 800 px de alto, amplio desde 1800 × 1000) se
 aplican solos.
@@ -65,8 +65,11 @@ de la cuenta y por último el aviso pasajero (`showPassiveNotification`), que se
 con su botón de cerrar. Los tres se dibujan con la misma pieza `Aviso` (ver `piezas-ajuste.md`): el
 error del servicio en Coral y con cruz (se oculta hasta que cambie), el pasajero con su acción
 («Deshacer», por ejemplo) y su tono. Mientras el puntero o el foco están sobre el aviso no se va.
-En una página con banda baja el aviso va arriba de la banda, a la izquierda, sin tapar la fila de
-filtros ni la ficha; en las demás, al pie de la columna.
+Los avisos van en la esquina de arriba a la derecha, la misma del progreso de las tareas, alineados
+al borde derecho y apilados uno bajo otro: en los esqueletos de título, debajo del bloque «ahora» (y
+de la barra de acciones de la página, si la tiene); en los de opciones, debajo del título y las
+acciones del panel; en los de trabajo, a la derecha del lienzo, debajo de su barra. Si el texto y el
+botón no caben en una fila, el botón baja a una segunda fila para que el texto use todo el ancho.
 
 ## Tamaño
 

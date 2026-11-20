@@ -29,7 +29,7 @@ Item {
     readonly property real stacked: upperLow > 0 ? upperLow + Look.e4 : 0
     readonly property rect band: banded ? Qt.rect(Look.margen, bandTop, width - 2 * Look.margen, bandBottom - bandTop) : Qt.rect(column.x, column.y + stacked, column.width, Math.max(0, column.height - stacked))
     readonly property rect upper: banded ? Qt.rect(column.x, bandTop - Look.e3 - upperLow, column.width, upperLow) : Qt.rect(column.x, column.y, column.width, upperLow)
-    readonly property point noticeAt: banded ? Qt.point(column.x + Look.e4, upper.y - Look.e3) : Qt.point(column.x + Look.e4, column.y + column.height - Look.e3)
+    readonly property point noticeAt: Qt.point(width - Look.margen, (tools.actions.length > 0 ? tools.y + tools.height : now.visible ? now.y + now.height : Look.margenArriba) + Look.e3)
     readonly property point hintsAt: Qt.point(width - Look.margen, height - Look.margenAbajo)
 
     signal escaped

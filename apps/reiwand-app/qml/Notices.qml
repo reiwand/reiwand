@@ -17,6 +17,7 @@ Column {
     property string waved: ""
     readonly property bool refusing: refusal !== "" && refusal !== banner && refusal !== waved && !told
     readonly property bool busy: failing
+    readonly property alias passive: passive
 
     function show(message, timeout, actionText, onAction) {
         const notice = message !== null && typeof message === "object" ? message : {
@@ -50,6 +51,7 @@ Column {
 
     Aviso {
         visible: notices.failing
+        anchors.right: parent.right
         width: Math.min(notices.width, implicitWidth)
         text: notices.banner
         tone: "coral"
@@ -58,6 +60,7 @@ Column {
 
     Aviso {
         visible: notices.refusing
+        anchors.right: parent.right
         width: Math.min(notices.width, implicitWidth)
         text: notices.refusal
         tone: "coral"
@@ -68,6 +71,7 @@ Column {
         id: passive
 
         visible: notices.text !== "" && !notices.busy
+        anchors.right: parent.right
         width: Math.min(notices.width, implicitWidth)
         text: notices.text
         tone: notices.tone

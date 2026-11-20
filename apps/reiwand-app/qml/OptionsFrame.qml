@@ -11,7 +11,7 @@ Item {
     property var sections: []
     readonly property var route: page?.route ?? []
     readonly property alias seat: seat
-    readonly property point noticeAt: Qt.point(panel.x + Look.e8, height - Look.e6 - Look.atajosAlto - Look.e4)
+    readonly property point noticeAt: Qt.point(width - Look.e8, head.y + head.height + Look.e3)
     readonly property point hintsAt: Qt.point(panel.x + Look.e8, height - Look.e6)
 
     signal chosen(int page)

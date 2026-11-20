@@ -52,12 +52,8 @@ Timer {
     function notice() {
         const notices = host.shell.notices;
         must(notices.text === "check" && notices.height > 0, "a notice does not show");
-        if (frame.banded) {
-            must(notices.y + notices.height <= frame.band.y, "a notice covers the low band");
-            must(notices.x >= frame.band.x, "a notice starts left of the band");
-        } else {
-            must(Math.abs(notices.x - frame.noticeAt.x) < 1, "a notice left its place in the column");
-        }
+        must(Math.abs(notices.x + notices.width - frame.noticeAt.x) < 1, "a notice left the top right corner");
+        must(frame.ahora.mapToItem(notices.parent, 0, frame.ahora.height).y <= notices.y + 1, "a notice covers the job line");
         const importer = host.pageStack.currentItem?.tools?.dialogs?.importer;
         must(!!importer, "the library has no importer");
         importer.tell({
@@ -69,6 +65,7 @@ Timer {
                 "failed": []
             }, "Dawn");
         must(notices.text === App.tr("“%1” was added.", "Dawn") && notices.action === App.tr("See"), "one added wallpaper is not named: " + notices.text);
+        must(!notices.passive.stacked, "a short notice moves its action to a second row");
         importer.tell({
                 "imported": [],
                 "kept": [{
@@ -88,13 +85,14 @@ Timer {
                     }]
             }, "");
         must(notices.action === App.tr("Details"), "an import with failures does not offer its details: " + notices.text);
+        must(notices.passive.stacked, "a long notice keeps its action in the text row");
         notices.callback();
         must(importer.report.visible && importer.report.rows.length === 2, "the details do not list the failed and older files");
         importer.report.close();
         host.hidePassiveNotification();
         const before = App.backend.lastError;
         App.backend.lastError = "refused probe";
-        must(notices.refusing && notices.x >= frame.noticeAt.x - 1, "a refused action does not show as a notice in the notices' place");
+        must(notices.refusing && Math.abs(notices.x + notices.width - frame.noticeAt.x) < 1, "a refused action does not show as a notice in the notices' place");
         notices.waved = "refused probe";
         must(!notices.refusing, "a refused action's notice does not close");
         App.backend.lastError = before;

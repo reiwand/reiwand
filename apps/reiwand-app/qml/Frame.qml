@@ -160,9 +160,9 @@ FocusScope {
         z: 4
         host: shell.host
         told: shell.active?.page?.tellsService === true
-        x: (shell.active?.noticeAt.x ?? 0)
-        y: shell.kind === "work" ? (shell.active?.noticeAt.y ?? 0) : (shell.active?.noticeAt.y ?? 0) - height
-        width: Math.min(Look.avisoAncho, shell.width - x - Look.e4)
+        x: (shell.active?.noticeAt.x ?? 0) - width
+        y: shell.active?.noticeAt.y ?? 0
+        width: Math.min(Look.avisoAncho, (shell.active?.noticeAt.x ?? 0) - Look.e4)
     }
 
     Binding {
