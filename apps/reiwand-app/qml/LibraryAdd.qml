@@ -14,6 +14,7 @@ PanelChico {
     readonly property var typed: area.text.split("\n").map(line => line.trim()).filter(line => line !== "").map(line => line.startsWith("file://") ? App.path(line) : line)
     readonly property var paths: typing ? typed : files
     readonly property int inner: Look.panelChico - 2 * Look.e4
+    readonly property alias report: report
 
     function start(from) {
         opener = from;
@@ -37,17 +38,6 @@ PanelChico {
             App.act("Import", [rest, copy], "Library1", reply => add && add.follow(Number(Array.isArray(reply) ? reply[0] : reply)));
     }
 
-    function older(failed) {
-        const paths = failed.filter(one => one.older).map(one => one.path);
-        if (paths.length === 0)
-            return false;
-        applicationWindow().showPassiveNotification(App.tr("A newer version of this wallpaper is already in your library."), "long", App.tr("Use the older one"), () => {
-            if (add)
-                App.act("ImportPackages", [paths, true], "Library1", reply => add && add.follow(Number(Array.isArray(reply) ? reply[0] : reply)));
-        });
-        return true;
-    }
-
     function follow(job) {
         if (ended.includes(job))
             return done(job);
@@ -56,26 +46,58 @@ PanelChico {
 
     function done(job) {
         App.query("GetJob", [job], "Daemon1", reply => {
-            if (!add)
-                return;
-            const output = reply.job.output ?? {};
-            const imported = (output.imported ?? []).length;
-            const failed = output.failed ?? [];
-            if (imported + failed.length === 0)
-                return;
-            if (imported === 0 && older(failed))
-                return;
-            if (imported === 0)
-                return applicationWindow().showPassiveNotification(App.tr("The files could not be added: %1", failed[0].error), "long");
-            const said = imported === 1 ? App.tr("1 wallpaper was added.") : App.tr("%1 wallpapers were added.", imported);
-            const more = failed.length > 0 ? " " + App.tr("%1 could not be added.", failed.length) : "";
-            applicationWindow().showPassiveNotification(said + more, "long", App.tr("See"), () => {
                 if (!add)
                     return;
-                App.navigate(0, "");
-                add.owner.page.covers.newest();
+                const output = reply.job.output ?? {};
+                const one = (output.imported ?? []).length === 1 ? output.imported[0] : (output.imported ?? []).length === 0 && (output.kept ?? []).length === 1 ? output.kept[0] : null;
+                if (!one)
+                    return add.tell(output, "");
+                App.query("GetItem", [one.uid], "Library1", item => add && add.tell(output, item.item ? Names.of(item.item) : ""));
             });
-        });
+    }
+
+    function tell(output, name) {
+        const imported = output.imported ?? [];
+        const kept = output.kept ?? [];
+        const failed = output.failed ?? [];
+        const newer = kept.filter(one => one.newer);
+        if (imported.length + kept.length + failed.length === 0)
+            return;
+        const window = applicationWindow();
+        const library = page => !!page?.covers && !!page?.tools?.dialogs?.importer;
+        const reach = act => {
+            if (!library(window.pageStack.currentItem))
+                App.navigate(0, "");
+            const page = window.pageStack.currentItem;
+            if (library(page))
+                act(page);
+        };
+        const uids = imported.length > 0 ? imported.map(one => one.uid) : kept.map(one => one.uid);
+        const see = () => reach(page => uids.length === 1 ? page.open(uids[0]) : page.covers.newest());
+        if (failed.length === 0 && imported.length === 0 && newer.length === 1 && kept.length === 1)
+            return window.showPassiveNotification(App.tr("A newer version of this wallpaper is already in your library."), "long", App.tr("Use the older one"), () => reach(page => page.tools.dialogs.importer.older([newer[0].path])));
+        const said = [];
+        if (imported.length === 1 && name !== "")
+            said.push(App.tr("“%1” was added.", name));
+        else if (imported.length > 0)
+            said.push(imported.length === 1 ? App.tr("1 wallpaper was added.") : App.tr("%1 wallpapers were added.", imported.length));
+        if (imported.length === 0 && kept.length === 1 && name !== "")
+            said.push(App.tr("“%1” was already in your library.", name));
+        else if (kept.length > 0)
+            said.push(kept.length === 1 ? App.tr("1 was already in your library.") : App.tr("%1 were already in your library.", kept.length));
+        if (failed.length > 0)
+            said.push(App.tr("%1 could not be added.", failed.length));
+        if (failed.length > 0 || newer.length > 0)
+            return window.showPassiveNotification(said.join(" "), "long", App.tr("Details"), () => reach(page => page.tools.dialogs.importer.details(output)));
+        window.showPassiveNotification(said.join(" "), "long", App.tr("See"), see);
+    }
+
+    function older(paths) {
+        App.act("ImportPackages", [paths, true], "Library1", reply => add && add.follow(Number(Array.isArray(reply) ? reply[0] : reply)));
+    }
+
+    function details(output) {
+        report.tell(output);
     }
 
     title: paths.length > 1 ? App.tr("Add %1 wallpapers", paths.length) : paths.length === 1 ? App.tr("Add 1 wallpaper") : App.tr("Add wallpapers")
@@ -146,6 +168,13 @@ PanelChico {
             add.typing = false;
             add.opened || add.open();
         }
+    }
+
+    LibraryAddReport {
+        id: report
+
+        onOlder: paths => add.older(paths)
+        onSee: uids => uids.length === 1 ? add.owner.page.open(uids[0]) : add.owner.page.covers.newest()
     }
 
     Connections {

@@ -58,6 +58,39 @@ Timer {
         } else {
             must(Math.abs(notices.x - frame.noticeAt.x) < 1, "a notice left its place in the column");
         }
+        const importer = host.pageStack.currentItem?.tools?.dialogs?.importer;
+        must(!!importer, "the library has no importer");
+        importer.tell({
+                "imported": [{
+                        "path": "/x/dawn.wpak",
+                        "uid": "U1"
+                    }],
+                "kept": [],
+                "failed": []
+            }, "Dawn");
+        must(notices.text === App.tr("“%1” was added.", "Dawn") && notices.action === App.tr("See"), "one added wallpaper is not named: " + notices.text);
+        importer.tell({
+                "imported": [],
+                "kept": [{
+                        "path": "/x/old.wpak",
+                        "uid": "U2",
+                        "version": "2.0.0",
+                        "newer": true
+                    }, {
+                        "path": "/x/same.wpak",
+                        "uid": "U3",
+                        "version": "1.0.0",
+                        "newer": false
+                    }],
+                "failed": [{
+                        "path": "/x/broken.wpak",
+                        "error": "the package is damaged"
+                    }]
+            }, "");
+        must(notices.action === App.tr("Details"), "an import with failures does not offer its details: " + notices.text);
+        notices.callback();
+        must(importer.report.visible && importer.report.rows.length === 2, "the details do not list the failed and older files");
+        importer.report.close();
         host.hidePassiveNotification();
         const before = App.backend.lastError;
         App.backend.lastError = "refused probe";

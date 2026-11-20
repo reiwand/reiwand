@@ -355,7 +355,7 @@ msgstr "Vídeo"
 #: apps/reiwand-app/qml/Ahora.qml apps/reiwand-app/qml/CreateStarters.qml
 #: apps/reiwand-app/qml/facade/LabelWords.qml
 #: apps/reiwand-app/qml/facade/ManifestWords.qml
-#: apps/reiwand-app/qml/facade/SceneValues.qml
+#: apps/reiwand-app/qml/facade/SceneValues.qml apps/reiwand-app/src/covers.rs
 msgid "Web page"
 msgstr "Página web"
 
@@ -382,6 +382,22 @@ msgstr "Puesto hace un momento"
 #: apps/reiwand-app/qml/AhoraCapas.qml
 msgid "Still at its poster"
 msgstr "Quieta en su póster"
+
+#: apps/reiwand-app/qml/AhoraCheck.qml apps/reiwand-app/qml/LibraryAdd.qml
+msgid "“%1” was added."
+msgstr "Se añadió «%1»."
+
+#: apps/reiwand-app/qml/AhoraCheck.qml apps/reiwand-app/qml/LibraryAdd.qml
+msgid "See"
+msgstr "Ver"
+
+#: apps/reiwand-app/qml/AhoraCheck.qml apps/reiwand-app/qml/BrowseMenu.qml
+#: apps/reiwand-app/qml/BrowseRow.qml apps/reiwand-app/qml/Detalles.qml
+#: apps/reiwand-app/qml/LibraryAdd.qml apps/reiwand-app/qml/LibraryMore.qml
+#: apps/reiwand-app/qml/SettingsAdvanced.qml
+#: apps/reiwand-app/qml/SourceCard.qml
+msgid "Details"
+msgstr "Detalles"
 
 #: apps/reiwand-app/qml/AhoraLista.qml
 msgid "List “%1”"
@@ -482,11 +498,11 @@ msgstr "%1: %2 de %3"
 #: apps/reiwand-app/qml/AhoraTarea.qml apps/reiwand-app/qml/Aviso.qml
 #: apps/reiwand-app/qml/BrowseOwn.qml apps/reiwand-app/qml/CarryImport.qml
 #: apps/reiwand-app/qml/CreateCopy.qml apps/reiwand-app/qml/Frame.qml
-#: apps/reiwand-app/qml/ItemCopy.qml apps/reiwand-app/qml/PageLights.qml
-#: apps/reiwand-app/qml/PreviewHints.qml apps/reiwand-app/qml/Publish.qml
-#: apps/reiwand-app/qml/PublishDone.qml apps/reiwand-app/qml/RepoAddLink.qml
-#: apps/reiwand-app/qml/RepoKeys.qml apps/reiwand-app/qml/RepoRoot.qml
-#: apps/reiwand-app/qml/SelectionDialogs.qml
+#: apps/reiwand-app/qml/ItemCopy.qml apps/reiwand-app/qml/LibraryAddReport.qml
+#: apps/reiwand-app/qml/PageLights.qml apps/reiwand-app/qml/PreviewHints.qml
+#: apps/reiwand-app/qml/Publish.qml apps/reiwand-app/qml/PublishDone.qml
+#: apps/reiwand-app/qml/RepoAddLink.qml apps/reiwand-app/qml/RepoKeys.qml
+#: apps/reiwand-app/qml/RepoRoot.qml apps/reiwand-app/qml/SelectionDialogs.qml
 #: apps/reiwand-app/qml/SettingsLayoutRules.qml
 msgid "Close"
 msgstr "Cerrar"
@@ -571,13 +587,6 @@ msgstr ""
 #: apps/reiwand-app/qml/BrowseDetails.qml
 msgid "It %1; it asks you before it starts."
 msgstr "Este fondo %1; te lo pregunta antes de empezar."
-
-#: apps/reiwand-app/qml/BrowseMenu.qml apps/reiwand-app/qml/BrowseRow.qml
-#: apps/reiwand-app/qml/Detalles.qml apps/reiwand-app/qml/LibraryMore.qml
-#: apps/reiwand-app/qml/SettingsAdvanced.qml
-#: apps/reiwand-app/qml/SourceCard.qml
-msgid "Details"
-msgstr "Detalles"
 
 #: apps/reiwand-app/qml/BrowseMenu.qml apps/reiwand-app/qml/CreateFooter.qml
 #: apps/reiwand-app/qml/ItemCopyButton.qml apps/reiwand-app/qml/LibraryCard.qml
@@ -3628,12 +3637,9 @@ msgid "A newer version of this wallpaper is already in your library."
 msgstr "Ya tienes una versión más nueva de este fondo en tu biblioteca."
 
 #: apps/reiwand-app/qml/LibraryAdd.qml
+#: apps/reiwand-app/qml/LibraryAddReport.qml
 msgid "Use the older one"
 msgstr "Usar la más antigua"
-
-#: apps/reiwand-app/qml/LibraryAdd.qml
-msgid "The files could not be added: %1"
-msgstr "No se pudieron añadir los archivos: %1"
 
 #: apps/reiwand-app/qml/LibraryAdd.qml
 msgid "1 wallpaper was added."
@@ -3644,12 +3650,20 @@ msgid "%1 wallpapers were added."
 msgstr "Se añadieron %1 fondos."
 
 #: apps/reiwand-app/qml/LibraryAdd.qml
-msgid "%1 could not be added."
-msgstr "%1 no se pudieron añadir."
+msgid "“%1” was already in your library."
+msgstr "«%1» ya estaba en tu biblioteca."
 
 #: apps/reiwand-app/qml/LibraryAdd.qml
-msgid "See"
-msgstr "Ver"
+msgid "1 was already in your library."
+msgstr "1 ya estaba en tu biblioteca."
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "%1 were already in your library."
+msgstr "%1 ya estaban en tu biblioteca."
+
+#: apps/reiwand-app/qml/LibraryAdd.qml
+msgid "%1 could not be added."
+msgstr "%1 no se pudieron añadir."
 
 #: apps/reiwand-app/qml/LibraryAdd.qml
 msgid "Add %1 wallpapers"
@@ -3717,6 +3731,42 @@ msgstr "Importar fondo"
 #: apps/reiwand-app/qml/LibraryAdd.qml
 msgid "Wallpaper packages (*.wpak)"
 msgstr "Paquetes de fondo (*.wpak)"
+
+#: apps/reiwand-app/qml/LibraryAddReport.qml
+msgid "Your library has the newer version %1."
+msgstr "Tu biblioteca tiene la versión más nueva, %1."
+
+#: apps/reiwand-app/qml/LibraryAddReport.qml
+msgid "Already in your library"
+msgstr "Ya estaban en tu biblioteca"
+
+#: apps/reiwand-app/qml/LibraryAddReport.qml
+msgid "1 file was not added"
+msgstr "1 archivo no se añadió"
+
+#: apps/reiwand-app/qml/LibraryAddReport.qml
+msgid "%1 files were not added"
+msgstr "%1 archivos no se añadieron"
+
+#: apps/reiwand-app/qml/LibraryAddReport.qml
+msgid "1 file is an older version of a wallpaper you have."
+msgstr "1 archivo es una versión más antigua de un fondo que ya tienes."
+
+#: apps/reiwand-app/qml/LibraryAddReport.qml
+msgid "%1 files are older versions of wallpapers you have."
+msgstr "%1 archivos son versiones más antiguas de fondos que ya tienes."
+
+#: apps/reiwand-app/qml/LibraryAddReport.qml
+msgid "Use the older ones"
+msgstr "Usar las más antiguas"
+
+#: apps/reiwand-app/qml/LibraryAddReport.qml
+msgid "See the added one"
+msgstr "Ver el añadido"
+
+#: apps/reiwand-app/qml/LibraryAddReport.qml
+msgid "See the %1 added"
+msgstr "Ver los %1 añadidos"
 
 #: apps/reiwand-app/qml/LibraryBar.qml
 msgid "Scenes"
@@ -9490,6 +9540,7 @@ msgid "Cap the brightest parts"
 msgstr "Poner tope a lo más brillante"
 
 #: apps/reiwand-app/qml/SceneGlowMore.qml
+#: apps/reiwand-app/qml/facade/SceneTerms.qml
 msgid "Brightness cap"
 msgstr "Tope de brillo"
 
@@ -13602,6 +13653,7 @@ msgid "Detail"
 msgstr "Detalle"
 
 #: apps/reiwand-app/qml/SceneSwarmFields.qml
+#: apps/reiwand-app/qml/facade/SceneNames.qml
 msgid "Scatter"
 msgstr "Dispersión"
 
@@ -19323,6 +19375,11 @@ msgid "Projected"
 msgstr "Proyectada"
 
 #: apps/reiwand-app/qml/facade/SceneLabels.qml
+#: apps/reiwand-app/qml/facade/SceneWords.qml
+msgid "Motion"
+msgstr "Movimiento"
+
+#: apps/reiwand-app/qml/facade/SceneLabels.qml
 msgid "Textured"
 msgstr "Con textura"
 
@@ -19643,6 +19700,10 @@ msgid "no"
 msgstr "no"
 
 #: apps/reiwand-app/qml/facade/SceneNames.qml
+msgid "Capped"
+msgstr "Con tope"
+
+#: apps/reiwand-app/qml/facade/SceneNames.qml
 msgid "Padding"
 msgstr "Margen"
 
@@ -19749,6 +19810,10 @@ msgstr "Fuerza del puntero"
 #: apps/reiwand-app/qml/facade/SceneNames.qml
 msgid "Radial"
 msgstr "Radial"
+
+#: apps/reiwand-app/qml/facade/SceneNames.qml
+msgid "Radius unit"
+msgstr "Unidad del radio"
 
 #: apps/reiwand-app/qml/facade/SceneNames.qml
 msgid "Range"
@@ -21234,10 +21299,6 @@ msgid "Distort"
 msgstr "Distorsión"
 
 #: apps/reiwand-app/qml/facade/SceneWords.qml
-msgid "Motion"
-msgstr "Movimiento"
-
-#: apps/reiwand-app/qml/facade/SceneWords.qml
 msgid "Stylize"
 msgstr "Estilo"
 
@@ -21543,11 +21604,3 @@ msgstr "Retirado por su repositorio"
 #: apps/reiwand-app/src/covers.rs
 msgid "Has flashes, turned off"
 msgstr "Tiene destellos, deshabilitado"
-
-#: apps/reiwand-app/qml/facade/SceneNames.qml
-msgid "Capped"
-msgstr "Con tope"
-
-#: apps/reiwand-app/qml/facade/SceneNames.qml
-msgid "Radius unit"
-msgstr "Unidad del radio"

@@ -83,9 +83,14 @@ La Biblioteca muestra los fondos guardados sobre la imagen del fondo en uso.
   viva que la biblioteca; la de uno sin instalar muestra la vista previa del repositorio.
 - «Añadir fondos…» abre el selector de archivos del escritorio y después el panel «Añadir N fondos», que pregunta si
   copiarlos a la biblioteca o dejarlos donde están. «Escribir las rutas…» cambia la lista por un campo
-  con una ruta por línea. Al terminar, el aviso «Se añadieron N fondos.» con «Ver» vuelve al estante en
-  Todos, donde los nuevos quedan primero. Soltar archivos sobre la biblioteca los añade sin copiarlos,
-  con el mismo aviso.
+  con una ruta por línea. Al terminar, el aviso nombra lo que pasó: con uno solo, «Se añadió
+  «Nombre».» y «Ver» abre su ficha; con varios, «Se añadieron N fondos.» y «Ver» vuelve al estante en
+  Todos, sin filtros, donde los nuevos quedan primero (uno que ya estaba y se actualizó conserva su
+  lugar). Los que ya estaban se cuentan aparte («N ya estaban en tu biblioteca.»), no como fallos.
+  Si alguno falló o es una versión más antigua de uno que ya tienes, el aviso trae «Detalles», que
+  abre la lista de esos archivos con el motivo de cada uno (las flechas la recorren), «Usar las más
+  antiguas» para reemplazar las versiones nuevas y «Ver los N añadidos». Soltar archivos sobre la
+  biblioteca los añade sin copiarlos, con el mismo aviso.
 - El velo de abajo sube hasta detrás de la barra, para que las palabras se lean también sobre un fondo
   claro; su opacidad sigue los tonos que la app saca de la imagen.
 - Teclas: ← → para moverse, ↑ lleva a los filtros de la barra (← → entre palabras, Intro elige, ↓
