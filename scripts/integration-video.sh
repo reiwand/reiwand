@@ -128,7 +128,10 @@ read -r _ _ _ s13 < <(ctl stream TEST-13 160 90)
 ctl volume 100 && ctl set "$sound" -o TEST-13 && consume "$s13"
 expect "s['outputs']['TEST-13']['playing']" True
 plugin=$(gst-inspect-1.0 pipewiresink 2>/dev/null | sed -n 's/^ *Version *//p')
-if printf '1.2\n%s\n' "$plugin" | sort -VC; then direct=true; else direct=false; fi
+# the sound goes straight to PipeWire through a plugin from 1.2, or through the PulseAudio interface when it runs
+if printf '1.2\n%s\n' "$plugin" | sort -VC || { [ -S "$XDG_RUNTIME_DIR/pulse/native" ] && gst-inspect-1.0 pulsesink >/dev/null 2>&1; }; then
+  direct=true
+else direct=false; fi
 [ "${REIWAND_REQUIRE_PIPEWIRE_SOUND:-0}" != 1 ] || $direct || fail "REIWAND_REQUIRE_PIPEWIRE_SOUND=1 but the PipeWire GStreamer plugin is '$plugin', older than 1.2"
 sounds() { ! $direct || until_between 10 5000 20000; }
 if $direct; then
