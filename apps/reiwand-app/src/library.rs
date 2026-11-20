@@ -29,7 +29,6 @@ pub struct ItemModelRust {
     pub generation: u64,
     pub fresh: Option<bool>,
     pub dirty: bool,
-    pub sent: Vec<String>,
     pub pending: Option<(i32, i32)>,
     pub range: Option<(i32, i32)>,
     pub busy: bool,
@@ -53,7 +52,7 @@ impl ItemModel {
             Event::Changed(topic, ids, _) if topic == "library" || watched == Some(topic.as_str()) => {
                 if topic == "library" {
                     self.as_mut().rust_mut().grid.stale(&ids);
-                    self.as_mut().rust_mut().sent.clear();
+                    self.as_mut().rust_mut().grid.sent.clear();
                 }
                 let searched = self.source.as_ref().is_some_and(|s| s.1 == "Search" && diff::steady(&s.2));
                 match topic == "library" && searched && (1..=MAX_TOUCHED).contains(&ids.len()) {
@@ -62,7 +61,7 @@ impl ItemModel {
                 }
             }
             Event::Link(Ok(())) => {
-                self.as_mut().rust_mut().sent.clear();
+                self.as_mut().rust_mut().grid.sent.clear();
                 self.refresh();
             }
             Event::Link(Err(_)) => self.refresh(),

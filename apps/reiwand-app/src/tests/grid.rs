@@ -163,3 +163,25 @@ fn scenes_and_web_pages_say_what_they_are_so_their_covers_can_play() {
     assert_eq!(kind(&package("preset")), "package");
     assert!(crate::covers::caption(&package("web")).starts_with("Web page"));
 }
+
+#[test]
+fn typing_a_search_and_taking_a_letter_back_keeps_the_covers() {
+    let mut grid = Grid { size: 512, ..Grid::default() };
+    let rows = |uids: &[&str]| uids.iter().map(|uid| summary(uid)).collect::<Vec<_>>();
+    let covers = |grid: &Grid| grid.rows.iter().map(|r| r.thumb.clone()).collect::<Vec<_>>();
+    let arrive = |grid: &mut Grid| {
+        let asked = grid.ask(0, 9).unwrap_or_default();
+        asked.iter().for_each(|uid| _ = grid.thumb(uid, &format!("/covers/{uid}.png")));
+    };
+    grid.reset(rows(&["A", "B", "C", "D"]), true);
+    arrive(&mut grid);
+    grid.reset(rows(&["A", "B"]), true);
+    arrive(&mut grid);
+    grid.reset(rows(&["A", "B"]), true);
+    arrive(&mut grid);
+    let found = covers(&grid);
+    assert_eq!(found, ["A", "B"].map(|uid| Some(format!("/covers/{uid}.png"))), "a cover is lost");
+    grid.reset(rows(&["A", "E", "B"]), true);
+    assert_eq!(covers(&grid)[1], None);
+    assert_eq!((grid.ask(0, 9), grid.ask(0, 9)), (Some(vec!["E".to_owned()]), None));
+}

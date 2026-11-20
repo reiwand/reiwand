@@ -1,7 +1,7 @@
 use reiwand_core::model::{ItemKind, ItemSummary};
 use serde::Serialize;
 use serde_json::Value;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 pub const PAGE: u32 = 200;
 pub const ROLES: [&str; 23] = [
@@ -23,6 +23,7 @@ pub struct Grid {
     pub total: u32,
     pub size: u32,
     pub anchor: usize,
+    pub sent: Vec<String>,
 }
 
 pub fn compose(text: &str, kind: &str, favorite: bool, tag: &str) -> String {
@@ -49,6 +50,15 @@ impl Grid {
         let rows = self.rows.iter().skip(first).take(last.saturating_sub(first) + 1);
         let wanted = rows.filter(|r| (r.thumb.is_none() || r.stale) && !r.item.missing);
         wanted.map(|r| r.item.uid.clone()).collect()
+    }
+
+    pub fn ask(&mut self, first: usize, last: usize) -> Option<Vec<String>> {
+        let wanted = self.wanted(first, last);
+        if wanted.is_empty() || wanted == self.sent {
+            return None;
+        }
+        self.sent.clone_from(&wanted);
+        Some(wanted)
     }
 
     pub fn thumb(&mut self, uid: &str, path: &str) -> Vec<usize> {
@@ -115,9 +125,15 @@ impl Grid {
 
     pub fn reset(&mut self, items: Vec<ItemSummary>, keep: bool) {
         let picked: HashSet<String> = self.selected().filter(|_| keep).map(|i| i.uid.clone()).collect();
-        self.rows.clear();
+        let known: HashMap<String, (String, bool)> =
+            self.rows.drain(..).filter_map(|r| Some((r.item.uid, (r.thumb?, r.stale)))).collect();
         self.apply(&crate::diff::Edit::Insert(0, items));
-        self.rows.iter_mut().for_each(|r| r.selected = picked.contains(&r.item.uid));
+        for row in &mut self.rows {
+            row.selected = picked.contains(&row.item.uid);
+            if let (None, Some((thumb, stale))) = (&row.thumb, known.get(&row.item.uid)) {
+                (row.thumb, row.stale) = (Some(thumb.clone()), *stale);
+            }
+        }
     }
 
     pub fn selected(&self) -> impl Iterator<Item = &ItemSummary> {

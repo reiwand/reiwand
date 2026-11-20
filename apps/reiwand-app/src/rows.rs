@@ -17,17 +17,16 @@ impl ItemModel {
         if last + 40 >= rows && !self.loading && rows < self.total {
             self.as_mut().fetch(rows as u32);
         }
-        let wanted = self.grid.wanted(first.max(0) as usize, last.max(0) as usize);
-        if wanted.is_empty() || wanted == self.sent {
-            return;
-        }
         if self.busy {
             self.as_mut().rust_mut().pending = Some((first, last));
             return;
         }
+        let Some(wanted) = self.as_mut().rust_mut().grid.ask(first.max(0) as usize, last.max(0) as usize)
+        else {
+            return;
+        };
         let (qt, size) = (self.qt_thread(), self.size);
-        let mut this = self.as_mut().rust_mut();
-        (this.busy, this.sent) = (true, wanted.clone());
+        self.as_mut().rust_mut().busy = true;
         bus::spawn(async move {
             let reply = bus::call("Library1", "RequestThumbnails", vec![json!(wanted), json!(size)]).await;
             let found =

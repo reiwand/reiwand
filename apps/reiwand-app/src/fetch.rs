@@ -113,7 +113,8 @@ impl ItemModel {
     }
 
     fn thumbs(self: Pin<&mut Self>) {
-        if let Some((first, last)) = self.range.filter(|(first, last)| last >= first && self.sent.is_empty())
+        if let Some((first, last)) =
+            self.range.filter(|(first, last)| last >= first && self.grid.sent.is_empty())
         {
             self.visible(first, last);
         }
