@@ -47,7 +47,10 @@ fn refraction_needs_a_normal_map_and_an_amount_in_range() {
     act(&mut p, bend(json!({ "system": "flakes", "normal": "bump", "units": "size", "amount": 0.5 })))
         .unwrap();
     undone(&mut p, &before);
-    assert_eq!(render(&p)["refract"], json!({ "normal": "bump", "units": "size", "amount": 0.5 }));
+    assert_eq!(
+        render(&p)["refract"],
+        json!({ "normal": "bump", "units": "size", "amount": 0.5, "color": "none" })
+    );
     act(&mut p, bend(json!({ "system": "flakes", "amount": 0.2 }))).unwrap();
     assert_eq!(render(&p)["refract"]["amount"], 0.2);
     assert!(act(&mut p, bend(json!({ "system": "flakes", "amount": 1.5 }))).is_err());
@@ -83,14 +86,42 @@ fn refraction_in_pixels_converts_between_units_and_checks_the_range() {
     assert!((kept["shift"].as_f64().unwrap() - 0.5 * 0.5 * size).abs() < 1e-6, "{kept}");
     assert!(crate::whole::unset(&kept["amount"]));
     act(&mut p, bend(json!({ "system": "flakes", "shift": 40 }))).unwrap();
-    assert_eq!(render(&p)["refract"], json!({ "normal": "bump", "units": "pixels", "shift": 40.0 }));
+    assert_eq!(
+        render(&p)["refract"],
+        json!({ "normal": "bump", "units": "pixels", "shift": 40.0, "color": "none" })
+    );
     let shown = reiwand_editor::lamps::swarm_light(&p.dir, &p.doc, "flakes", None);
     assert_eq!(shown["shift"], 40.0);
-    assert!(act(&mut p, bend(json!({ "system": "flakes", "shift": 300 }))).is_err());
+    act(&mut p, bend(json!({ "system": "flakes", "shift": 1200 }))).unwrap();
+    assert_eq!(render(&p)["refract"]["shift"], 1200.0);
+    assert!(act(&mut p, bend(json!({ "system": "flakes", "shift": 5000 }))).is_err());
     assert!(act(&mut p, bend(json!({ "system": "flakes", "units": "meters" }))).is_err());
     act(&mut p, bend(json!({ "system": "flakes", "units": "size" }))).unwrap();
     assert_eq!(render(&p)["refract"]["units"], "size");
     assert!(render(&p)["refract"]["amount"].as_f64().is_some());
+}
+
+#[test]
+fn refraction_takes_a_color_that_survives_other_edits() {
+    let root = tempfile::tempdir().unwrap();
+    let mut p = project(&root);
+    with_bump(&mut p);
+    let bend = |args: Value| json!({ "particles": { "refract": args } });
+    act(&mut p, bend(json!({ "system": "flakes", "normal": "bump", "units": "size", "amount": 0.5 })))
+        .unwrap();
+    assert_eq!(render(&p)["refract"]["color"], "none");
+    let before = p.doc.clone();
+    act(&mut p, bend(json!({ "system": "flakes", "color": "multiply" }))).unwrap();
+    undone(&mut p, &before);
+    assert_eq!(render(&p)["refract"]["color"], "multiply");
+    act(&mut p, bend(json!({ "system": "flakes", "units": "pixels", "shift": 600 }))).unwrap();
+    assert_eq!(
+        (render(&p)["refract"]["color"].clone(), render(&p)["refract"]["shift"].clone()),
+        (json!("multiply"), json!(600.0))
+    );
+    act(&mut p, bend(json!({ "system": "flakes", "color": "add" }))).unwrap();
+    assert_eq!(render(&p)["refract"]["color"], "add");
+    assert!(act(&mut p, bend(json!({ "system": "flakes", "color": "screen" }))).is_err());
 }
 
 #[test]

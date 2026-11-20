@@ -24,7 +24,7 @@ impl Swarms {
         pass: &mut wgpu::RenderPass<'_>,
         flock: usize,
         slot: u32,
-        (mode, bend): (Mode, bool),
+        (mode, kind): (Mode, super::Pass),
         lamps: &mut super::Lamps<'_>,
     ) {
         let flight = self.flights.get(flock).and_then(Option::as_ref);
@@ -38,9 +38,15 @@ impl Swarms {
         for (p, store) in flight.stores.iter().enumerate() {
             let Some(&n) = self.kitted.get(first + p) else { continue };
             let Some(kit) = self.kits.get(n) else { continue };
-            if bend != kit.bend.is_some() {
+            let drawn = match kind {
+                super::Pass::Plain => kit.bend.is_none(),
+                super::Pass::Bend => kit.bend.is_some(),
+                super::Pass::Tint => kit.tint == Some(mode),
+            };
+            if !drawn {
                 continue;
             }
+            let bend = kind == super::Pass::Bend;
             let look = self.looks.get(first + p).map_or(0.0, |l| l.extra[1]);
             let Some(group) = self.look_group(first + p) else { continue };
             pass.set_bind_group(0, group, &[slot + (p as u64 * LOOK) as u32]);

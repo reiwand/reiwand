@@ -81,15 +81,27 @@ pub enum Refract {
         normal: String,
         #[schemars(extend("x-range" = [0, 1]))]
         amount: f32,
+        color: RefractColor,
     },
     Pixels {
         #[schemars(extend("x-ref" = "image"))]
         normal: String,
-        #[schemars(extend("x-range" = [0, 256]))]
+        #[schemars(extend("x-range" = [0, 4096]))]
         #[schemars(extend("x-unit" = "px"))]
         shift: f32,
+        color: RefractColor,
     },
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "lowercase")]
+pub enum RefractColor {
+    None,
+    Multiply,
+    Add,
+}
+
+pub const MAX_SHIFT: f32 = 4096.0;
 
 impl Refract {
     pub fn normal(&self) -> &str {
@@ -105,7 +117,13 @@ impl Refract {
     pub fn strength(&self) -> f32 {
         match self {
             Self::Size { amount, .. } => amount.clamp(0.0, 1.0),
-            Self::Pixels { shift, .. } => shift.clamp(0.0, 256.0),
+            Self::Pixels { shift, .. } => shift.clamp(0.0, MAX_SHIFT),
+        }
+    }
+
+    pub fn color(&self) -> RefractColor {
+        match self {
+            Self::Size { color, .. } | Self::Pixels { color, .. } => *color,
         }
     }
 }

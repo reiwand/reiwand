@@ -38,6 +38,13 @@ use std::collections::HashMap;
 use wgpu::{BindGroup, BindGroupLayout, Buffer, BufferUsages as B};
 
 const CHUNK: usize = 16;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Pass {
+    Plain,
+    Bend,
+    Tint,
+}
 const SIM: u64 = 3840;
 const LOOK: u64 = 1792;
 const PARTICLE: u64 = 96;

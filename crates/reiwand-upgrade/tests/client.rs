@@ -19,7 +19,7 @@ fn stored_repositories_lose_the_share_parameters_once() {
         r#"{"url":"https://s.example","repo_url":"https://s.example/repo/?fingerprint=ab","offers":[{"url":"https://c.example/?repo_id=cd"}]}"#,
     )
     .unwrap();
-    assert_eq!(client::run(data).unwrap(), Outcome::Upgraded { from: 1, to: 5 });
+    assert_eq!(client::run(data).unwrap(), Outcome::Upgraded { from: 1, to: 6 });
     let read = |name: &str| {
         let text = fs::read(data.join("repos").join(name).join("state.json")).unwrap();
         serde_json::from_slice::<serde_json::Value>(&text).unwrap()
@@ -28,7 +28,7 @@ fn stored_repositories_lose_the_share_parameters_once() {
     assert_eq!(read("one")["bases"][0], "https://a.example/r/main/");
     assert_eq!(read("two")["url"], "https://b.example/r/x/");
     assert!(!data.join("sync.json").exists());
-    assert_eq!(fs::read_to_string(data.join("format-version")).unwrap(), "5\n");
+    assert_eq!(fs::read_to_string(data.join("format-version")).unwrap(), "6\n");
     assert_eq!(client::run(data).unwrap(), Outcome::Nothing);
 }
 
@@ -68,5 +68,5 @@ fn a_locked_keyring_leaves_everything_for_the_next_run() {
     assert!(client::run_with(data, &mut vault).is_err());
     assert!(data.join("sync.json").exists() && !data.join("format-version").exists());
     vault.unreachable = false;
-    assert_eq!(client::run_with(data, &mut vault).unwrap(), Outcome::Upgraded { from: 1, to: 5 });
+    assert_eq!(client::run_with(data, &mut vault).unwrap(), Outcome::Upgraded { from: 1, to: 6 });
 }

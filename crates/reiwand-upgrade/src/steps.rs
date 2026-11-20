@@ -3,7 +3,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 pub(crate) const SETTLED: i64 = 3;
-pub(crate) const GLOWING: i64 = 4;
+pub(crate) const REFRACTING: i64 = 5;
 
 #[cfg(any(feature = "client", feature = "server"))]
 fn folders(data: &Path, also: &[PathBuf]) -> Vec<PathBuf> {
@@ -46,7 +46,7 @@ pub(crate) fn steps(data: &Path, sink: &mut Sink, also: &[PathBuf], found: i64) 
         }
         #[cfg(any(feature = "client", feature = "server"))]
         crate::library::run(data, sink)?;
-    } else if found <= GLOWING {
+    } else if found <= REFRACTING {
         let installed = data.join("installed.json");
         if let Err(e) = crate::packages::installed(data, sink) {
             sink.skip(&installed, format!("{e:#}"));
@@ -58,7 +58,7 @@ pub(crate) fn steps(data: &Path, sink: &mut Sink, also: &[PathBuf], found: i64) 
     crate::examples::repaired(data, sink)?;
     #[cfg(any(feature = "client", feature = "server"))]
     {
-        crate::imported::packages(data, sink, found <= GLOWING)?;
+        crate::imported::packages(data, sink, found <= REFRACTING)?;
         crate::imported::edits(data, sink)?;
     }
     Ok(())

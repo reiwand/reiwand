@@ -82,8 +82,8 @@ fn a_six_client_folder_converts_loads_strictly_and_converts_again_to_nothing() {
     let mut sink = reiwand_upgrade::sink::Sink::copying(&dir.path().join("config-copies"));
     reiwand_upgrade::settings::run(&config, &mut sink).unwrap();
     let done = client::convert(&data, &mut NoVault, &options(false)).unwrap();
-    assert_eq!(done.outcome, Outcome::Upgraded { from: 2, to: 5 });
-    assert_eq!(fs::read_to_string(data.join("format-version")).unwrap(), "5\n");
+    assert_eq!(done.outcome, Outcome::Upgraded { from: 2, to: 6 });
+    assert_eq!(fs::read_to_string(data.join("format-version")).unwrap(), "6\n");
     let index = fs::read_to_string(done.copies.join("index.txt")).unwrap();
     assert!(index.contains("old.wpak") && index.contains("installed.json") && index.contains("inputs.json"));
 

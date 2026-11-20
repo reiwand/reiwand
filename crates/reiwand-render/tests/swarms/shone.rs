@@ -90,6 +90,22 @@ fn ropes_refract_what_is_behind_them() {
 }
 
 #[test]
+fn ropes_that_refract_with_color_paint_over_their_bend() {
+    let Some(r) = renderer() else { return };
+    let back = json!({ "blend_space": "canvas", "id": "back", "type": "image", "image": "stripes", "size": [160, 80],
+        "transform": { "position": [80, 40] } });
+    let bend = |color: &str| {
+        json!({ "rope": { "width": 12, "subdivide": 2 },
+        "refract": { "normal": "bump", "units": "size", "amount": 1, "color": color } })
+    };
+    let Some(none) = strung(r, bend("none"), vec![back.clone()], false) else { return };
+    let Some(added) = strung(r, bend("add"), vec![back], false) else { return };
+    let lit = (36..44).any(|y| (40..80).any(|x| at(&added, x, y)[1] > at(&none, x, y)[1].saturating_add(40)));
+    assert!(lit, "the rope adds its color over the bend");
+    assert!((40..80).all(|x| at(&added, x, 10) == at(&none, x, 10)), "nothing is painted off the rope");
+}
+
+#[test]
 fn particle_shaders_refract_what_is_behind_them() {
     let Some(r) = renderer() else { return };
     let files = [

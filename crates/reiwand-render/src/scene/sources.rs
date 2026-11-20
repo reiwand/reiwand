@@ -75,7 +75,7 @@ impl Sources<'_> {
         pool: &mut Pool,
         pass: &mut wgpu::RenderPass<'_>,
         (system, slot): (usize, u32),
-        how: (super::pipes::Mode, bool),
+        how: (super::pipes::Mode, super::swarm::Pass),
         cast: &[Src; 4],
     ) {
         let Some(swarms) = self.swarms else { return };

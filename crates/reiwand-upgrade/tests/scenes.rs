@@ -160,6 +160,8 @@ fn every_refraction_gains_its_size_units() {
     assert_eq!(p["rain"]["render"]["refract"]["units"], "size");
     assert_eq!(p["rain"]["render"]["refract"]["amount"], 0.4);
     assert_eq!(p["far"]["render"]["refract"]["units"], "pixels");
+    assert_eq!(p["rain"]["render"]["refract"]["color"], "none");
+    assert_eq!(p["far"]["render"]["refract"]["color"], "none");
 }
 
 #[test]

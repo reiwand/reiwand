@@ -5,6 +5,7 @@ pub(super) fn value(def: &str, name: &str) -> Option<Value> {
         ("Layer", "blend_space") => json!("canvas"),
         ("Oscillate", "from") => json!("top"),
         ("Stretch", "mode") => json!("add"),
+        ("Refract", "color") => json!("none"),
         ("Stretch", "depth") => json!("flat"),
         ("Stretch", "time") => json!(0),
         ("Stretch", "min") => json!(0),

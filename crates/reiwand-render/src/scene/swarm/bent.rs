@@ -1,3 +1,4 @@
+use super::{LOOK, Pass};
 use crate::scene::item::{Item, Rect, ndc};
 use crate::scene::paint::{Painter, Target};
 use crate::scene::pipes::Mode;
@@ -8,6 +9,19 @@ impl super::Swarms {
     pub(crate) fn bent(&self) -> impl Iterator<Item = &str> {
         self.kits.iter().filter(|k| k.bend.is_some()).map(|k| k.layer.as_deref().unwrap_or("particles"))
     }
+
+    pub(super) fn unshrunk(&mut self, slot: u32) -> u32 {
+        let (first, last) = ((u64::from(slot) / LOOK) as usize, self.looks.len());
+        for at in first..last {
+            let mut look = self.looks[at];
+            look.window[3] = 1.0;
+            let (kit, seen) = (self.kitted[at], self.seen[at].clone());
+            self.looks.push(look);
+            self.kitted.push(kit);
+            self.seen.push(seen);
+        }
+        (last as u64 * LOOK) as u32
+    }
 }
 
 impl Painter<'_, '_, '_> {
@@ -15,7 +29,14 @@ impl Painter<'_, '_, '_> {
         self.swarms.as_ref().is_some_and(|s| s.kits.iter().any(|k| k.look.light[0] > 0.5))
     }
 
-    pub(super) fn bend(&mut self, target: Target, flock: usize, slot: u32) {
+    pub(super) fn bend(
+        &mut self,
+        target: Target,
+        flock: usize,
+        (slot, tinted): (u32, u32),
+        tints: [bool; 2],
+        cast: [Src; 4],
+    ) {
         let Some(scale) = self.frame.quality.bend() else { return };
         if self.state_format != TextureFormat::Rgba16Float {
             return;
@@ -26,8 +47,9 @@ impl Painter<'_, '_, '_> {
         let Some(back) = self.acquire((w, h)) else { return self.release(shift) };
         self.ops.push(Op::Clear(shift, [0.0; 4]));
         let (system, mode) = (flock, Mode::Normal);
-        let cast = [Src::White; 4];
-        self.ops.push(Op::Particles { target: shift, system, slot, mode, timed: 0, bend: true, cast });
+        let white = [Src::White; 4];
+        let pass = Pass::Bend;
+        self.ops.push(Op::Particles { target: shift, system, slot, mode, timed: 0, pass, cast: white });
         self.redraw(target.src, back, (w, h));
         let full = [0.0, 0.0, 1.0, 1.0];
         let mut item = Item { quad: full, uv: full, color: [1.0; 4], ..Item::default() };
@@ -40,6 +62,11 @@ impl Painter<'_, '_, '_> {
         self.ops.push(Op::Draw { target: target.src, entry, mode: Mode::Replace, slot, tex });
         self.release(back);
         self.release(shift);
+        let modes = [Mode::Multiply, Mode::Add].into_iter().zip(tints).filter(|(_, on)| *on && !shown);
+        for (mode, _) in modes {
+            let (to, slot, pass) = (target.src, tinted, Pass::Tint);
+            self.ops.push(Op::Particles { target: to, system: flock, slot, mode, timed: 0, pass, cast });
+        }
     }
 
     fn redraw(&mut self, from: Src, to: Src, (w, h): (u32, u32)) {

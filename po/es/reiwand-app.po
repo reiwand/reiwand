@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Reiwand\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-19 00:00+0000\n"
+"POT-Creation-Date: 2026-11-20 00:00+0000\n"
 "PO-Revision-Date: 2026-10-22 00:00+0000\n"
 "Last-Translator: Reiwand contributors\n"
 "Language-Team: Reiwand contributors\n"
@@ -13208,6 +13208,18 @@ msgid "In pixels"
 msgstr "En píxeles"
 
 #: apps/reiwand-app/qml/SceneSwarmBend.qml
+msgid "Only bend what is behind"
+msgstr "Solo doblar lo que hay detrás"
+
+#: apps/reiwand-app/qml/SceneSwarmBend.qml
+msgid "Multiply what is behind by their color"
+msgstr "Multiplicar lo que hay detrás por su color"
+
+#: apps/reiwand-app/qml/SceneSwarmBend.qml
+msgid "Add their color over what is behind"
+msgstr "Sumar su color sobre lo que hay detrás"
+
+#: apps/reiwand-app/qml/SceneSwarmBend.qml
 msgid "Show the displacement over the preview"
 msgstr "Mostrar el desplazamiento sobre la vista previa"
 
@@ -13225,13 +13237,22 @@ msgstr "%1: desplaza hasta %2 px a la mitad del tamaño"
 
 #: apps/reiwand-app/qml/SceneSwarmBend.qml
 msgid ""
-"Refracting particles are drawn only as the bend of what is behind them; Q1 "
-"and Q0, where phones often run, leave them out. Draw the system with a "
-"second layer to paint them too."
+"These particles are drawn only as the bend of what is behind them; Q1 and "
+"Q0, where phones often run, leave them out. Pick a color mode or draw the "
+"system with a second layer to paint them too."
 msgstr ""
-"Las partículas que refractan solo se dibujan como la curvatura de lo que hay "
-"detrás; Q1 y Q0, donde suelen funcionar los teléfonos, las omiten. Dibuja el "
-"sistema con una segunda capa para pintarlas también."
+"Estas partículas solo se dibujan como el doblez de lo que hay detrás; Q1 y "
+"Q0, donde suelen funcionar los teléfonos, las omiten. Elige un modo de color "
+"o dibuja el sistema con una segunda capa para pintarlas también."
+
+#: apps/reiwand-app/qml/SceneSwarmBend.qml
+msgid ""
+"The bent background is tinted by the color of each particle, its texture and "
+"its opacity; Q1 and Q0, where phones often run, leave these particles out."
+msgstr ""
+"El fondo doblado se tiñe con el color de cada partícula, su textura y su "
+"opacidad; Q1 y Q0, donde suelen funcionar los teléfonos, omiten estas "
+"partículas."
 
 #: apps/reiwand-app/qml/SceneSwarmBudget.qml
 msgid "the graphics card runs compute shaders"

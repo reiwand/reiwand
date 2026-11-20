@@ -1853,7 +1853,7 @@ package, no preview, or a failed download or check).
 
 **Upgrading from 1.x.**
 
-The daemon knows only the current format of `~/.local/share/reiwand` (`format-version`, 2). When the
+The daemon knows only the current format of `~/.local/share/reiwand` (`format-version`, 6). When the
 folder holds repositories of 1.x it refuses to start and logs "the stored repositories were made by an
 older version: run reiwand-upgrade client --data DIR once". `reiwand-upgrade client --data DIR` rewrites
 the stored addresses (no `?fingerprint=` or `?repo_id=`; the first repository of a server moves from

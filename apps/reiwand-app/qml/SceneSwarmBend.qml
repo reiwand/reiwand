@@ -23,7 +23,8 @@ ColumnLayout {
         onToggled: bend.put(checked ? {
             "normal": bend.info.normal ?? bend.info.pictures[0],
             "units": "size",
-            "amount": 0.3
+            "amount": 0.3,
+            "color": "none"
         } : {
             "off": true
         })
@@ -56,7 +57,7 @@ ColumnLayout {
 
             Layout.fillWidth: true
             from: 0
-            to: pixels ? 256 : 1
+            to: pixels ? 4096 : 1
             value: pixels ? (bend.bent?.shift ?? App.fill("Action.particles.refract.shift")) : (bend.bent?.amount ?? App.fill("Action.particles.refract.amount"))
             onMoved: bend.put(pixels ? {
                 "shift": Math.round(value)
@@ -64,6 +65,18 @@ ColumnLayout {
                 "amount": Math.round(value * 100) / 100
             }, true)
         }
+    }
+
+    QQC2.ComboBox {
+        readonly property var colors: ["none", "multiply", "add"]
+
+        visible: bend.bent !== null
+        Layout.fillWidth: true
+        model: [App.tr("Only bend what is behind"), App.tr("Multiply what is behind by their color"), App.tr("Add their color over what is behind")]
+        currentIndex: Math.max(0, colors.indexOf(bend.bent?.color ?? App.fill("Action.particles.refract.color")))
+        onActivated: index => bend.put({
+                "color": colors[index]
+            })
     }
 
     Image {
@@ -100,6 +113,6 @@ ColumnLayout {
         visible: bend.bent !== null
         wrapMode: Text.Wrap
         font: Kirigami.Theme.smallFont
-        text: App.tr("Refracting particles are drawn only as the bend of what is behind them; Q1 and Q0, where phones often run, leave them out. Draw the system with a second layer to paint them too.")
+        text: bend.bent?.color === "none" ? App.tr("These particles are drawn only as the bend of what is behind them; Q1 and Q0, where phones often run, leave them out. Pick a color mode or draw the system with a second layer to paint them too.") : App.tr("The bent background is tinted by the color of each particle, its texture and its opacity; Q1 and Q0, where phones often run, leave these particles out.")
     }
 }

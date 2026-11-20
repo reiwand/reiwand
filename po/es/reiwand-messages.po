@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Reiwand\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-19 00:00+0000\n"
+"POT-Creation-Date: 2026-11-20 00:00+0000\n"
 "PO-Revision-Date: 2026-10-30 00:00+0000\n"
 "Last-Translator: Reiwand contributors\n"
 "Language-Team: Reiwand contributors\n"
@@ -1587,8 +1587,12 @@ msgid "the amount of refraction goes from 0 to 1"
 msgstr "la cantidad de refracción va de 0 a 1"
 
 #: crates/reiwand-editor/src/lamps/swarm.rs
-msgid "the shift of refraction goes from 0 to 256 pixels"
-msgstr "el corrimiento de la refracción va de 0 a 256 píxeles"
+msgid "the shift of refraction goes from 0 to 4096 pixels"
+msgstr "el corrimiento de la refracción va de 0 a 4096 píxeles"
+
+#: crates/reiwand-editor/src/lamps/swarm.rs
+msgid "the color of refraction is none, multiply or add"
+msgstr "el color de la refracción es none, multiply o add"
 
 #: crates/reiwand-editor/src/lamps/template.rs
 msgid "%1 is not a light type; use point, spot, tube or directional"

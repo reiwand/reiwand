@@ -16,6 +16,7 @@ mod ordered;
 mod shafts;
 mod surfaces;
 mod swarm;
+mod tinted;
 
 pub const SIZE: (u32, u32) = (160, 90);
 

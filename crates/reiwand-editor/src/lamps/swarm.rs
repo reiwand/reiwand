@@ -34,7 +34,7 @@ pub(crate) fn edit(dir: &Path, doc: &Value, e: &SwarmLight) -> Result<Vec<Op>> {
                 ops
             })?
         }
-        SwarmLight::Refract { system: id, layer, normal, units, amount, shift, off } => {
+        SwarmLight::Refract { system: id, layer, normal, units, amount, shift, color, off } => {
             let sys = system(doc, id)?;
             if *off {
                 let ops =
@@ -49,7 +49,8 @@ pub(crate) fn edit(dir: &Path, doc: &Value, e: &SwarmLight) -> Result<Vec<Op>> {
             let Some(normal) = normal else {
                 anyhow::bail!(said("editor.refract_normal", "refraction needs a normal map", &[]));
             };
-            let next = refraction(doc, id, (&was, normal), (units.as_deref(), *amount, *shift))?;
+            let mut next = refraction(doc, id, (&was, normal), (units.as_deref(), *amount, *shift))?;
+            next["color"] = tinted(color.as_deref(), &was)?;
             render(doc, &sys, layer.as_deref(), |doc, at| {
                 put(doc, &format!("{at}/refract"), Some(next.clone()))
             })?
@@ -85,12 +86,22 @@ fn refraction(
         ensure!(fits, said("editor.refract_amount", "the amount of refraction goes from 0 to 1", &[]));
         return Ok(json!({ "normal": normal, "units": "size", "amount": amount }));
     }
-    let from_size = was["amount"].as_f64().map(|a| (a * half).clamp(0.0, 256.0));
+    let from_size =
+        was["amount"].as_f64().map(|a| (a * half).clamp(0.0, f64::from(reiwand_scene::MAX_SHIFT)));
     let shift = shift.or(if before == Some("size") { from_size } else { was["shift"].as_f64() });
     let shift = shift.unwrap_or_else(|| reiwand_scene::prefill::arg("particles.refract.shift"));
-    let fits = shift.is_finite() && (0.0..=256.0).contains(&shift);
-    ensure!(fits, said("editor.refract_shift", "the shift of refraction goes from 0 to 256 pixels", &[]));
+    let fits = shift.is_finite() && (0.0..=f64::from(reiwand_scene::MAX_SHIFT)).contains(&shift);
+    ensure!(fits, said("editor.refract_shift", "the shift of refraction goes from 0 to 4096 pixels", &[]));
     Ok(json!({ "normal": normal, "units": "pixels", "shift": shift }))
+}
+
+fn tinted(color: Option<&str>, was: &Value) -> anyhow::Result<Value> {
+    let prefill = || reiwand_scene::prefill::arg::<String>("particles.refract.color");
+    let color =
+        color.map_or_else(|| was["color"].as_str().map_or_else(prefill, str::to_owned), str::to_owned);
+    let known = ["none", "multiply", "add"].contains(&color.as_str());
+    ensure!(known, said("editor.refract_color", "the color of refraction is none, multiply or add", &[]));
+    Ok(json!(color))
 }
 
 fn rendered<'a>(doc: &'a Value, id: &str, layer: Option<&str>) -> &'a Value {

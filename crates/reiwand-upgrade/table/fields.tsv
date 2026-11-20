@@ -642,6 +642,7 @@ scene	Playback.rate	Value_for_float	optional	1	1.0	dbus.md:2060
 scene	Playback.start	number	optional	1	0.0	editor.md:59
 scene	Pool.size	array|null	optional	3	null	actualizacion.md:11
 scene	Pool.texture	string|null	optional	3	null	editor.md:63
+scene	Refract.color	RefractColor	required	1	"none"	dbus.md:579
 scene	Remap.clamp_in	boolean	optional	1	false	scene.md:2053
 scene	Remap.clamp_out	boolean	optional	1	false	scene.md:2054
 scene	Remap.hold_silence	boolean|null	optional	3	null	scene.md:1038

@@ -2,6 +2,7 @@ use super::looks::{far, turn};
 use crate::Renderer;
 use crate::scene::Image;
 use crate::scene::item::linear;
+use crate::scene::pipes::Mode;
 use bytemuck::{Pod, Zeroable};
 use reiwand_scene::{Frames, Render, Scene, Stack, Stretch, StretchDepth, StretchMode};
 
@@ -48,6 +49,7 @@ pub(super) struct Kit {
     pub(super) refused: Option<(String, String)>,
     pub(super) lit: Option<[wgpu::TextureView; 2]>,
     pub(super) bend: Option<f32>,
+    pub(super) tint: Option<Mode>,
 }
 
 type Sprite<'a> = (Option<(&'a str, Option<&'a Image>)>, &'a [[f32; 4]], Option<[[f32; 4]; 2]>);
@@ -135,7 +137,7 @@ pub(super) fn kit(
     let long = render.trail.as_ref().is_some_and(|t| t.long());
     let rope = render.rope;
     let shader = render.shader.clone();
-    let (stage, refused, lit, bend, pixeled) = (None, None, None, None, false);
+    let (stage, refused, lit, bend, tint, pixeled) = (None, None, None, None, None, false);
     let mut kit = Kit {
         id,
         system,
@@ -152,6 +154,7 @@ pub(super) fn kit(
         refused,
         lit,
         bend,
+        tint,
     };
     super::stage::stage(r, scene, &mut kit, render.shader.as_deref());
     if kit.stage.is_some() {

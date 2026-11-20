@@ -17,7 +17,7 @@ fn glow_folder(data: &Path) -> PathBuf {
 }
 
 #[test]
-fn from_4_the_glow_fields_are_written_once_and_from_5_nothing_is_read() {
+fn from_4_the_glow_fields_are_written_once_and_from_6_nothing_is_read() {
     let dir = tempfile::tempdir().unwrap();
     let data = dir.path();
     fs::write(data.join("format-version"), "4\n").unwrap();
@@ -25,7 +25,7 @@ fn from_4_the_glow_fields_are_written_once_and_from_5_nothing_is_read() {
     let mut opts = options();
     opts.also = vec![data.join("scenes")];
     let done = client::convert(data, &mut NoVault, &opts).unwrap();
-    assert_eq!(done.outcome, reiwand_upgrade::Outcome::Upgraded { from: 4, to: 5 });
+    assert_eq!(done.outcome, reiwand_upgrade::Outcome::Upgraded { from: 4, to: 6 });
     let scene: serde_json::Value =
         serde_json::from_slice(&fs::read(folder.join("scene.json")).unwrap()).unwrap();
     let bloom = &scene["canvas"]["bloom"];

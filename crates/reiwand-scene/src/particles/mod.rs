@@ -76,7 +76,7 @@ pub use flock::{Flock, MAX_DEPTH, MAX_PARTS, Part, flocks};
 pub use forces::{Falloff, Force, Target};
 pub use instance::{Instance, Tunable};
 pub use kept::Kept;
-pub use look::{Frames, Refract, Render};
+pub use look::{Frames, MAX_SHIFT, Refract, RefractColor, Render};
 pub use ops::{FULL_WINDOW, Operator};
 pub use pack::{EVENT, MAX_HATCH, PARTICLE_EVENTS, Sim};
 pub use paths::{taper, turn};

@@ -2,8 +2,9 @@ use super::Swarms;
 use super::kit::Kit;
 use crate::Renderer;
 use crate::scene::Image;
+use crate::scene::pipes::Mode;
 use crate::scene::pool::Pool;
-use reiwand_scene::Render;
+use reiwand_scene::{RefractColor, Render};
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicU64, Ordering};
 
@@ -46,6 +47,11 @@ pub(super) fn light(r: &Renderer, kit: &mut Kit, (render, sprite): (&Render, [f3
     let normal = render.normal.as_ref().is_some_and(|id| lamp.images.contains_key(id));
     kit.look.light = [flag(render.lit), flag(normal), 0.0, 1.0];
     kit.bend = bend.map(|b| b.strength());
+    kit.tint = bend.and_then(|b| match b.color() {
+        RefractColor::None => None,
+        RefractColor::Multiply => Some(Mode::Multiply),
+        RefractColor::Add => Some(Mode::Add),
+    });
     kit.look.bend = [kit.bend.unwrap_or(0.0), bend.map_or(0.0, |b| flag(b.by_pixels())), 0.0, 0.0];
 }
 

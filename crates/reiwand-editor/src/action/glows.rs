@@ -25,6 +25,8 @@ pub enum SwarmLight {
         #[serde(default)]
         shift: Option<f64>,
         #[serde(default)]
+        color: Option<String>,
+        #[serde(default)]
         off: bool,
     },
 }

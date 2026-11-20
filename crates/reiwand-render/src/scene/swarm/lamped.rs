@@ -42,7 +42,7 @@ fn kinds(k: &Kit) -> [bool; 4] {
 }
 
 pub(super) fn lit(k: &Kit) -> bool {
-    k.lit.is_some() && k.bend.is_none()
+    k.lit.is_some() && (k.bend.is_none() || k.tint.is_some())
 }
 
 impl Swarms {

@@ -1,4 +1,4 @@
-use super::{MAX_CURVE, Refract, Render, StretchDepth, StretchMode};
+use super::{MAX_CURVE, MAX_SHIFT, Refract, Render, StretchDepth, StretchMode};
 use crate::effects::Stage;
 use crate::validate::{Check, Issue};
 
@@ -57,7 +57,7 @@ impl Check<'_> {
             match f {
                 Refract::Size { amount, .. } => self.range(&format!("{p}/refract/amount"), *amount, 0.0, 1.0),
                 Refract::Pixels { shift, .. } => {
-                    self.range(&format!("{p}/refract/shift"), *shift, 0.0, 256.0)
+                    self.range(&format!("{p}/refract/shift"), *shift, 0.0, MAX_SHIFT)
                 }
             }
         }

@@ -565,7 +565,7 @@ reiwand-ctl scene act mi-escena particles '{"lit":{"system":"chispas","lit":true
 
 ##### variante `refract`
 
-Hace que las partículas no se vean a sí mismas, sino que doblen lo que hay detrás, como gotas de agua, según un mapa de normales.
+Hace que las partículas doblen lo que hay detrás, como gotas de agua, según un mapa de normales; con `color` pueden además teñir o iluminar con su color lo que doblan.
 
 | Argumento | Tipo | Qué significa |
 |---|---|---|
@@ -574,7 +574,8 @@ Hace que las partículas no se vean a sí mismas, sino que doblen lo que hay det
 | `normal` | texto | Id de una imagen del paquete que sirve de mapa de normales. Obligatorio mientras el sistema no tenga uno. |
 | `units` | texto | `size` (el corrimiento es `amount` por la mitad del tamaño del sprite) o `pixels` (es `shift` píxeles del lienzo, igual para cualquier tamaño de sprite y a lo largo de toda la estela). Por defecto, las que ya tiene; si no tiene, `size`. Al cambiar de unidades se convierte el valor actual para que el doblez no cambie. |
 | `amount` | número | Con `size`: cuánto doblan, de 0 a 1. Por defecto 0,3. |
-| `shift` | número | Con `pixels`: corrimiento máximo en píxeles del lienzo, de 0 a 256. Por defecto 8. Una gota fina de 7 px con `shift` 40 dobla el fondo hasta 40 px por su opacidad en toda su longitud. |
+| `shift` | número | Con `pixels`: corrimiento máximo en píxeles del lienzo, de 0 a 4096. Por defecto 8. Una gota fina de 7 px con `shift` 40 dobla el fondo hasta 40 px por su opacidad en toda su longitud. |
+| `color` | texto | `none` (solo el doblez), `multiply` (el fondo doblado se multiplica por el color de la partícula, su textura y su opacidad: una blanca no cambia nada, una roja lo tiñe de rojo) o `add` (suma el color de la partícula por su opacidad: una negra no suma nada). Por defecto, el que ya tiene; si no tiene, `none`. |
 | `off` | sí/no | Si es `true`, quita la refracción. Por defecto `false`. |
 
 ```sh
@@ -582,6 +583,7 @@ reiwand-ctl scene act mi-escena add_layer '{"kind":"image","file":"foto.png"}'
 reiwand-ctl scene act mi-escena add_layer '{"kind":"particles","id":"chispas"}'
 reiwand-ctl scene act mi-escena particles '{"refract":{"system":"chispas","normal":"foto","units":"size","amount":0.4}}'
 reiwand-ctl scene act mi-escena particles '{"refract":{"system":"chispas","units":"pixels","shift":40}}'
+reiwand-ctl scene act mi-escena particles '{"refract":{"system":"chispas","color":"multiply"}}'
 reiwand-ctl scene act mi-escena particles '{"refract":{"system":"chispas","off":true}}'
 ```
 

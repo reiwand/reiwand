@@ -307,7 +307,7 @@ Una **reasignación** convierte una entrada (por ejemplo, el azar o el sonido) e
 2. Elige hacia dónde miran los sprites: **Hacia la pantalla**, **Según el movimiento** o **Con un ángulo fijo** (con **Giro de N°**).
 3. **Perspectiva**: activa la profundidad. La **Distancia focal** controla cuánto encoge la profundidad; en el lienzo hay un anillo con un asa. **Profundidad** y **Velocidad en profundidad** son rangos de dos asas.
 4. En **Luz**, marca **Recibir las luces de la escena** y elige un **Mapa de normales**. Una miniatura muestra un sprite iluminado por delante y por detrás (cada sprite recibe hasta 8 luces en ambas caras).
-5. En **Doblar lo que hay detrás de las partículas**, elige un mapa de normales y la cantidad. Marca **Mostrar el desplazamiento sobre la vista previa** para ver cuánto desplaza cada partícula. Una nota dice qué calidades lo omiten.
+5. En **Doblar lo que hay detrás de las partículas**, elige un mapa de normales, las unidades (proporcional al tamaño o en píxeles, hasta 4096) y la cantidad, y cómo pinta su color: **Solo doblar lo que hay detrás**, **Multiplicar lo que hay detrás por su color** (lo tiñe) o **Sumar su color sobre lo que hay detrás** (lo ilumina). Marca **Mostrar el desplazamiento sobre la vista previa** para ver cuánto desplaza cada partícula. Una nota dice qué calidades lo omiten.
 
 **En la terminal.** Acción `particles`, claves `cutout`, `orient`, `perspective`, `light` y `shader`. También `reiwand-ctl scene act CARPETA particles`. Mira [acciones](acciones.md).
 

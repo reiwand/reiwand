@@ -3,6 +3,7 @@
   "Action.canvas.probe.tilt": [0.0, 0.0],
   "Action.clip.length": 2.0,
   "Action.particles.refract.amount": 0.3,
+  "Action.particles.refract.color": "none",
   "Action.particles.refract.shift": 8.0,
   "Action.particles.settings.rate": 10,
   "Action.pool.max": 16,

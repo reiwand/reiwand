@@ -122,8 +122,8 @@ impl Renderer {
                             break;
                         }
                         let (shader, slot, mode, tex) = match op {
-                            Op::Particles { system, slot, mode, bend, cast, .. } => {
-                                src.particles(self, pool, &mut pass, (*system, *slot), (*mode, *bend), cast);
+                            Op::Particles { system, slot, mode, pass: kind, cast, .. } => {
+                                src.particles(self, pool, &mut pass, (*system, *slot), (*mode, *kind), cast);
                                 (stats.draws, k) = (stats.draws + 1, k + 1);
                                 continue;
                             }

@@ -73,10 +73,10 @@ use reiwand_scene::Lut;
 pub use reiwand_type::{MAX_FONT, font};
 pub(crate) use sampling::layout;
 pub use scripted::{ScriptHost, serve_script_host};
-use std::collections::HashMap;
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 pub use stops::{retry_effects, stop_effects};
 pub use strip::{MOST as RGB_MOST, lit};
+use swarm::Pass;
 pub use uploads::Pixels;
 pub(crate) use uploads::Uploads;
 pub use view::SceneView;
@@ -103,7 +103,7 @@ pub(crate) enum Op {
     Draw { target: Src, entry: &'static str, mode: Mode, slot: u32, tex: [Src; 3] },
     Lit { target: Src, entry: &'static str, mode: Mode, slot: u32, tex: [Src; 3], maps: [Src; 8] },
     Effect(Fill),
-    Particles { target: Src, system: usize, slot: u32, mode: Mode, timed: u64, bend: bool, cast: [Src; 4] },
+    Particles { target: Src, system: usize, slot: u32, mode: Mode, timed: u64, pass: Pass, cast: [Src; 4] },
     Read { from: Src, map: usize, size: (u32, u32) },
     Strip { from: Src },
 }

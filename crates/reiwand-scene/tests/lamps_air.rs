@@ -86,12 +86,16 @@ fn particles_take_light_and_refract_with_pictures_in_range() {
     assert!(issues(json!([layer(json!({ "lit": true, "normal": "wall" }))])).is_empty());
     assert!(!issues(json!([layer(json!({ "normal": "song" }))])).is_empty());
     assert!(
-        !issues(json!([layer(json!({ "refract": { "normal": "wall", "units": "size", "amount": 2 } }))]))
-            .is_empty()
+        !issues(json!([layer(
+            json!({ "refract": { "normal": "wall", "units": "size", "amount": 2, "color": "none" } })
+        )]))
+        .is_empty()
     );
     assert!(
-        issues(json!([layer(json!({ "refract": { "normal": "wall", "units": "size", "amount": 0.4 } }))]))
-            .is_empty()
+        issues(json!([layer(
+            json!({ "refract": { "normal": "wall", "units": "size", "amount": 0.4, "color": "none" } })
+        )]))
+        .is_empty()
     );
     let s = scene(json!([layer(json!({ "lit": true }))]));
     assert!(s.features().contains("particle_lighting"));
@@ -128,7 +132,7 @@ fn lamps_carry_their_air_and_picture_and_drop_the_air_at_the_lowest_level() {
 fn particle_refraction_names_its_units_and_range() {
     let layer = |render: Json| json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "rain", "render": prefill::render(render) });
     let wall = |r: Json| {
-        json!({ "normal": "wall" })
+        json!({ "normal": "wall", "color": "none" })
             .as_object()
             .cloned()
             .unwrap()
@@ -138,10 +142,33 @@ fn particle_refraction_names_its_units_and_range() {
     };
     let ok = |r: Json| issues(json!([layer(json!({ "refract": wall(r) }))])).is_empty();
     assert!(ok(json!({ "units": "pixels", "shift": 40 })));
-    assert!(!ok(json!({ "units": "pixels", "shift": 300 })));
+    assert!(ok(json!({ "units": "pixels", "shift": 300 })));
+    assert!(ok(json!({ "units": "pixels", "shift": 4096 })));
+    assert!(!ok(json!({ "units": "pixels", "shift": 5000 })));
     let parses = |r: Json| serde_json::from_value::<reiwand_scene::Refract>(wall(r)).is_ok();
-    assert!(parses(json!({ "units": "size", "amount": 0.4 })));
+    assert!(parses(json!({ "units": "size", "amount": 0.4, "color": "none" })));
     assert!(!parses(json!({ "units": "pixels", "amount": 0.4 })));
     assert!(!parses(json!({ "units": "size", "shift": 4 })));
     assert!(!parses(json!({ "amount": 0.4 })));
+    assert!(parses(json!({ "units": "size", "amount": 0.4, "color": "multiply" })));
+    assert!(parses(json!({ "units": "size", "amount": 0.4, "color": "add" })));
+    assert!(!parses(json!({ "units": "size", "amount": 0.4, "color": "screen" })));
+}
+
+#[test]
+fn a_refraction_without_its_color_is_refused_by_name() {
+    let bare = json!({ "normal": "wall", "units": "pixels", "shift": 40 });
+    let why = serde_json::from_value::<reiwand_scene::Refract>(bare).unwrap_err().to_string();
+    assert!(why.contains("color"), "{why}");
+    let render = json!({ "refract": { "normal": "wall", "units": "size", "amount": 0.4, "color": "add" } });
+    let layer = json!({ "blend_space": "canvas", "id": "p", "type": "particles", "system": "rain",
+        "render": prefill::render(render) });
+    let doc = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "assets": { "wall": { "path": "wall.png" } },
+        "layers": [layer], "particles": prefill::all(json!({ "rain": { "capacity": 10, "emitters": [{ "shape": "edge" }] } })) });
+    let mut whole: Json = serde_json::from_str(&reiwand_upgrade::fill::whole(&doc.to_string())).unwrap();
+    assert!(Scene::from_json(&whole.to_string()).is_ok());
+    let bent = whole.pointer_mut("/layers/0/render/refract").and_then(Json::as_object_mut).unwrap();
+    assert_eq!(bent.remove("color"), Some(json!("add")));
+    let loaded = Scene::from_json(&whole.to_string());
+    assert!(loaded.is_err_and(|e| e.to_string().contains("color")));
 }

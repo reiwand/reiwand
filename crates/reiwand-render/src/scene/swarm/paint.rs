@@ -1,8 +1,11 @@
-use super::mode;
+use super::{Pass, mode};
 use crate::scene::Op;
 use crate::scene::item::ndc;
 use crate::scene::paint::{Painter, Target};
+use crate::scene::pipes::Mode;
 use reiwand_scene::{Affine, Blend, BlendSpace, Content, Mask};
+
+const TINTS: [Mode; 2] = [Mode::Multiply, Mode::Add];
 
 impl Painter<'_, '_, '_> {
     pub(crate) fn particles(
@@ -41,7 +44,7 @@ impl Painter<'_, '_, '_> {
         let even = crate::scene::item::toned(reiwand_scene::Color([cr, cg, cb, 1.0]), 1.0, srgb, 1.0);
         let even = [even[0], even[1], even[2], d.tint.0[3]];
         let slot = (swarms.looks.len() as u64 * super::LOOK) as u32;
-        let (mut timed, mut bent) = (0, false);
+        let (mut timed, mut bent, mut tints) = (0, false, [false; 2]);
         let (strength, glow) = d.lit.map_or((1.0, 0.0), |l| (l.strength, l.emissive));
         let lit = f32::from(u8::from(d.lit.is_some()));
         for (p, system) in herd.bake.systems.iter().enumerate() {
@@ -76,6 +79,8 @@ impl Painter<'_, '_, '_> {
             (look.light[0], look.light[3]) = (look.light[0].max(lit), crate::scene::item::scale_of(m));
             look.place = [target.rect.x, target.rect.y, strength, glow];
             bent |= kit.bend.is_some();
+            (tints[0], tints[1]) =
+                (tints[0] || kit.tint == Some(Mode::Multiply), tints[1] || kit.tint == Some(Mode::Add));
             let middle = m.inverse().apply(screen.apply([w / 2.0, h / 2.0]));
             (look.deep[1], look.deep[2]) = (middle[0], middle[1]);
             look.tint[0] = opacity;
@@ -96,12 +101,17 @@ impl Painter<'_, '_, '_> {
             swarms.looks.push(look);
             swarms.kitted.push(k);
         }
+        TINTS.iter().zip(tints).filter(|(_, on)| *on).for_each(|(m, _)| swarms.pipeline(r, *m));
+        let tinted = match (tints.contains(&true), seen.is_some()) {
+            (true, true) => swarms.unshrunk(slot),
+            _ => slot,
+        };
         let lit = self.lit_swarms() && self.pool.glow.pictures() > 0;
         let cast = if lit { self.gobos() } else { [crate::scene::Src::White; 4] };
-        let (to, system, bend) = (target.src, flock, false);
-        self.ops.push(Op::Particles { target: to, system, slot, mode, timed, bend, cast });
+        let (to, system, pass) = (target.src, flock, Pass::Plain);
+        self.ops.push(Op::Particles { target: to, system, slot, mode, timed, pass, cast });
         if bent {
-            self.bend(target, flock, slot);
+            self.bend(target, flock, (slot, tinted), tints, cast);
         }
     }
 }

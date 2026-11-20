@@ -221,7 +221,7 @@ Hasta 8 colisionadores, cada uno `{ "bounds", "bounce", "friction", "kill", "sti
 | `cutout` | `[inicio, fin, opacidad]`: convierte el alfa de una textura suave en un borde duro. |
 | `orient` | `screen`, `velocity` o `fixed` (con `angle`). |
 | `lit`, `normal` | `lit`: las ilumina con las luces de la escena; `normal` es un mapa de normales `linear`. |
-| `refract` | `{ "normal", "units": "size", "amount" }` (0 a 1, proporcional a la mitad del tamaño) o `{ "normal", "units": "pixels", "shift" }` (0 a 256 píxeles del lienzo, igual para cualquier tamaño y a lo largo de toda la estela): refractan lo que hay detrás. |
+| `refract` | `{ "normal", "units": "size", "amount", "color" }` (0 a 1, proporcional a la mitad del tamaño) o `{ "normal", "units": "pixels", "shift", "color" }` (0 a 4096 píxeles del lienzo, igual para cualquier tamaño y a lo largo de toda la estela): refractan lo que hay detrás. `color` es obligatorio: `none` dibuja solo el desvío, `multiply` tiñe el fondo desviado con el color de cada partícula (con su textura, su `color_over_life` y su opacidad; una partícula blanca no cambia nada) y `add` le suma su color encima (una negra no suma nada). Las estelas y las cuerdas pintan su color igual. En Q2 el desvío va a media resolución y el color a resolución completa; en Q1 y Q0 las partículas que refractan no se dibujan. |
 | `shader` | Un efecto propio con `stage: "particle"` (ver [efectos.md](efectos.md)). |
 
 Los niveles de calidad `q2`, `q1` y `q0` dejan nacer solo el 75 %, el 50 % y el 25 % de las
