@@ -3,7 +3,7 @@ use super::size::{expanded, extent, sized};
 use super::{PIECES, Skin};
 use crate::texture::GpuImage;
 use crate::{RenderError, Renderer};
-use reiwand_scene::{Content, Frame, Posed, Relief, Rigged, Runtime};
+use reiwand_scene::{Content, Frame, Posed, Relief, Rigged, Runtime, Wrapping};
 
 const DEEP: f32 = 1.0 / 131_072.0;
 
@@ -45,6 +45,7 @@ impl Renderer {
             let white = &view.pool.white;
             let picture = found.map_or((white.id, white.view.clone()), |p| (p.id, p.view.clone()));
             let padded = found.filter(|p| p.crop != [1.0; 2]).cloned();
+            let wrap = named.and_then(|t| view.samplings.get(t)).map_or(Wrapping::Clamp, |s| s.wrap);
             if skin.image.size() != fits {
                 (skin.image, skin.depth) = self.skin_targets(fits);
                 skin.generation = u64::MAX;
@@ -56,10 +57,11 @@ impl Renderer {
             {
                 continue;
             }
-            self.bind_skin(skin, (picture.0, &picture.1, padded.as_ref()));
+            self.bind_skin(skin, (picture.0, &picture.1, padded.as_ref()), wrap);
             (skin.generation, skin.relief) = (*pose, *relief);
             let clips = p.posed().draws.iter().any(|d| d.clip.is_some());
-            let plain = relief.is_none() && video.is_none() && padded.is_none() && !clips;
+            let plain =
+                relief.is_none() && video.is_none() && padded.is_none() && !clips && wrap == Wrapping::Clamp;
             if plain && wave.joins(p, *size, fits) {
                 wave.add(layer, picture);
                 continue;

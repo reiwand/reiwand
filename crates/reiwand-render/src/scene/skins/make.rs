@@ -1,7 +1,7 @@
 use super::{BONES, DEPTH, FORMAT, PIECES, Skinner};
 use crate::texture::{GpuImage, create_texture, gpu_image};
 use crate::{RenderError, Renderer};
-use reiwand_scene::{MORPH_WIDTH, Rigged};
+use reiwand_scene::{MORPH_WIDTH, Rigged, Wrapping};
 use wgpu::{BufferUsages as B, TextureUsages as U};
 
 pub(crate) struct Skin {
@@ -113,6 +113,7 @@ impl Renderer {
         &self,
         skin: &mut Skin,
         (id, picture, padded): (u64, &wgpu::TextureView, Option<&crate::GpuImage>),
+        wrap: Wrapping,
     ) {
         if skin.group.as_ref().is_some_and(|(found, _)| *found == id) {
             return;
@@ -126,7 +127,7 @@ impl Renderer {
             wgpu::BindGroupEntry { binding: 3, resource: wgpu::BindingResource::TextureView(picture) },
             wgpu::BindGroupEntry {
                 binding: 4,
-                resource: wgpu::BindingResource::Sampler(&self.pipes().sampler),
+                resource: wgpu::BindingResource::Sampler(self.wrapping(wrap)),
             },
         ];
         let group = self.device.create_bind_group(&wgpu::BindGroupDescriptor {
@@ -135,5 +136,14 @@ impl Renderer {
             entries: &entries,
         });
         skin.group = Some((id, group));
+    }
+
+    pub(crate) fn wrapping(&self, wrap: Wrapping) -> &wgpu::Sampler {
+        let pipes = self.pipes();
+        match wrap {
+            Wrapping::Clamp => &pipes.sampler,
+            Wrapping::Repeat => &pipes.wrap,
+            Wrapping::Mirror => &pipes.mirror,
+        }
     }
 }

@@ -1,7 +1,8 @@
-use super::kit::{mesh, near, render, renderer, rgb, scene};
+use super::kit::{ORANGE, RED, SIDE, mesh, near, render, renderer, rgb, scene};
 use image::{Rgba, RgbaImage};
-use reiwand_scene::Quality;
+use reiwand_scene::{Quality, SCHEMA, Scene};
 use serde_json::json;
+use std::collections::BTreeMap;
 
 fn model(wrap: u32) -> Vec<u8> {
     let picture =
@@ -64,4 +65,26 @@ fn the_wrap_mode_of_the_texture_sampler_decides_what_lies_beyond_the_picture() {
     check(10497, [red, blue, red, blue]);
     check(33648, [red, blue, blue, red]);
     check(33071, [red, blue, blue, blue]);
+}
+
+fn replaced(wrap: &str) -> [[u8; 3]; 4] {
+    let glb = model(33071);
+    let doc = json!({ "schema": SCHEMA, "canvas": { "size": [SIDE, SIDE], "background": "#000000" },
+        "assets": { "pic": { "path": "pic.png", "wrap": wrap }, "mesh": { "path": "mesh.glb" } }, "layers": [mesh(json!({}))] });
+    let mut scene = Scene::from_json(&crate::gpu::whole(&doc.to_string())).unwrap();
+    scene.adopt(&BTreeMap::new(), move |_: &str, _: usize| Ok::<_, String>(glb.clone())).unwrap();
+    let px = render(renderer().unwrap(), scene, 0.0, Quality::Q3);
+    [8, 24, 36, 56].map(|x| rgb(&px, x, 32))
+}
+
+#[test]
+fn the_wrap_of_a_picture_that_replaces_the_textures_of_a_mesh_decides_what_lies_beyond_it() {
+    if renderer().is_none() {
+        return;
+    }
+    let (o, r) = (ORANGE, RED);
+    for (wrap, want) in [("repeat", [o, r, o, r]), ("mirror", [o, r, r, o]), ("clamp", [o, r, r, r])] {
+        let got = replaced(wrap);
+        assert!(got.iter().zip(want).all(|(a, b)| near(*a, b)), "{wrap}: {got:?}");
+    }
 }
