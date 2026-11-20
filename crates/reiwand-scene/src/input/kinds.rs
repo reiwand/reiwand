@@ -74,7 +74,7 @@ pub fn usual_key(b: &crate::Binding<impl Sized>) -> UsualKey {
 }
 
 pub fn surge(current: f32, usual: f32, unit: AudioUnit) -> f32 {
-    let ratio = current.max(SURGE_FLOOR) / usual.max(SURGE_FLOOR);
+    let ratio = current.max(0.0) / usual.max(SURGE_FLOOR);
     match unit {
         AudioUnit::Amplitude => ratio.sqrt(),
         AudioUnit::Db => (1.0 + 10.0 * ratio.log10() / SURGE_DB_STEP).max(0.0),

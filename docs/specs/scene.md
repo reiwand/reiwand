@@ -1028,7 +1028,11 @@ pitch) against the loudest band of the last seconds, so that quiet and loud musi
 `"absolute"` is the level from full scale (what a quiet passage really is, whatever the music did
 before); `"surge"` is how much louder than usual the band is now, `1` meaning as usual, with no
 ceiling (it is the only kind that leaves 0 to 1: whatever consumes it should bound it with
-`bounds` or `clamp`). `unit: "db"` shows relative and absolute in decibels above −70 dB (0 to 1), so that a
+`bounds` or `clamp`); the usual is never taken below −60 dB of full scale, the level at which the
+analysis calls the sound quiet, so a band without sound (a silence, or a band the music never
+reaches) is `0`, a band that stays quieter than that is below `1`, and the first sound after a
+silence is far above `1` and decays back to within 5 % of `1` as the average catches up (in about 2.4 times
+`window`). `unit: "db"` shows relative and absolute in decibels above −70 dB (0 to 1), so that a
 45 % dip in amplitude is only about 0.07; `"amplitude"` shows them linearly (0 to 1), so dips after hits are
 visible. For `surge` `amplitude` is the ratio of amplitudes (`sqrt` of the power ratio) and `db` is
 `1 + dB / 20` (each 20 dB above usual adds 1; never below 0). `surge` also requires `window` (0.05 to 60 s):

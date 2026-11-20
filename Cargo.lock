@@ -4263,6 +4263,7 @@ dependencies = [
  "realfft",
  "reiwand-scene",
  "rtrb",
+ "serde_json",
  "tracing",
 ]
 

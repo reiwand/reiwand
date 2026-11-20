@@ -399,7 +399,11 @@ sombreador. Un enlace de escena (`audio` en un valor) elige además cómo se mid
 
 - `kind`: `relative` (contra la banda más fuerte reciente), `absolute` (desde el máximo digital: cuánto
   suena de verdad, sin importar lo anterior) o `surge` (cuánto más fuerte que lo habitual suena ahora; 1 es
-  lo habitual y no tiene techo, así que quien lo consuma debe acotarlo con `bounds` o `clamp`).
+  lo habitual y no tiene techo, así que quien lo consuma debe acotarlo con `bounds` o `clamp`). Una banda
+  sin sonido (un silencio, o una banda a la que la música no llega) vale 0, y el primer sonido después de
+  un silencio sale muy por encima de 1 y baja hasta lo habitual en unas 2,4 veces `window`. Así, con
+  `bounds: [0.5, 1.5]`, un emisor arranca lleno tras un silencio, baja a la mitad mientras la banda suena
+  pareja y no emite nada en silencio.
 - `unit`: `db` (decibelios, 0 a 1) o `amplitude` (lineal, 0 a 1: las caídas tras un golpe se ven).
 - Solo con `surge`: `window` (0,05 a 60 s, el tiempo con el que se promedia lo habitual), `reference`
   (`band`: cada banda contra su propio promedio; `all`: contra el promedio de todas juntas, así una banda

@@ -17,3 +17,6 @@ capture = ["dep:pipewire", "dep:rtrb", "dep:tracing"]
 pipewire = { workspace = true, optional = true }
 rtrb = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
+
+[dev-dependencies]
+serde_json.workspace = true
