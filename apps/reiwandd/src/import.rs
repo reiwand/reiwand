@@ -1,17 +1,16 @@
 use crate::daemon::Daemon;
-use crate::error::{Error, Result, invalid};
+use crate::error::{Result, invalid};
+use crate::imports::Brought;
 use crate::jobs::{Ctl, now};
 use crate::scan::local;
 use crate::store::private_dir;
-use reiwand_core::model::{ImportReport, Imported, JobKind, PathError};
+use reiwand_core::model::{ImportReport, Imported, JobKind, Kept, PathError};
 use reiwand_library::Kind;
 use serde_json::Value;
 use std::fs::{self, File, OpenOptions};
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-
-pub(crate) const OLDER: &str = "older";
 
 impl Daemon {
     pub fn import(self: &Arc<Self>, paths: Vec<String>, copy: bool) -> Result<u64> {
@@ -32,20 +31,25 @@ impl Daemon {
         how: (bool, Option<bool>),
         ctl: &Ctl,
     ) -> Result<Value> {
-        let mut report = ImportReport { imported: Vec::new(), failed: Vec::new() };
+        let mut report = ImportReport { imported: Vec::new(), kept: Vec::new(), failed: Vec::new() };
         for (done, path) in (1..).zip(paths) {
             if ctl.check().is_err() {
                 break;
             }
             match self.import_one(Path::new(path), how) {
-                Ok(uid) => report.imported.push(Imported { path: path.into(), uid }),
+                Ok(Brought::Added(uid)) => report.imported.push(Imported { path: path.into(), uid }),
+                Ok(Brought::Kept { uid, version, newer }) => {
+                    report.kept.push(Kept { path: path.into(), uid, version, newer })
+                }
                 Err(e) => {
-                    let older = matches!(e, Error::Named(OLDER, _));
-                    report.failed.push(PathError { path: path.into(), error: e.to_string(), older })
+                    tracing::warn!("not imported: {path}: {e}");
+                    report.failed.push(PathError { path: path.into(), error: e.to_string() })
                 }
             }
             ctl.progress(done, paths.len() as u64);
         }
+        let (added, kept, failed) = (report.imported.len(), report.kept.len(), report.failed.len());
+        tracing::info!("import finished: {added} imported, {kept} already in the library, {failed} failed");
         if !report.imported.is_empty() {
             self.library_changed(report.imported.iter().map(|i| i.uid.clone()).collect());
             self.analyze_job();
@@ -53,7 +57,7 @@ impl Daemon {
         Ok(serde_json::to_value(report).unwrap_or_default())
     }
 
-    pub(crate) fn import_one(&self, path: &Path, (copy, older): (bool, Option<bool>)) -> Result<String> {
+    pub(crate) fn import_one(&self, path: &Path, (copy, older): (bool, Option<bool>)) -> Result<Brought> {
         if !fs::metadata(path)?.is_file() || Kind::detect(path).is_none() {
             return Err(invalid("not an image, video or package file"));
         }
@@ -61,7 +65,7 @@ impl Daemon {
             return self.import_package(path, older);
         }
         if !copy {
-            return self.store.write(|lib| lib.import_file(path, now()));
+            return self.store.write(|lib| lib.import_file(path, now())).map(Brought::Added);
         }
         let copied = self.copy_in(path)?;
         let titled = |lib: &mut reiwand_library::Library| {
@@ -72,7 +76,7 @@ impl Daemon {
             }
             Ok::<_, reiwand_library::Error>(uid)
         };
-        self.store.write(titled).inspect_err(|_| drop(fs::remove_file(&copied)))
+        self.store.write(titled).map(Brought::Added).inspect_err(|_| drop(fs::remove_file(&copied)))
     }
 
     pub(crate) fn copy_in(&self, path: &Path) -> Result<PathBuf> {

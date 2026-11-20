@@ -3667,8 +3667,8 @@ msgstr ""
 "%3\n"
 
 #: apps/reiwand-ctl/src/pkg_import.rs
-msgid "%1 packages were not imported"
-msgstr "No se importaron %1 paquetes"
+msgid "some files were not imported (%1)"
+msgstr "algunos archivos no se importaron (%1)"
 
 #: apps/reiwand-ctl/src/pkg_preview.rs
 msgid "the connection to the session bus was closed"
@@ -5326,14 +5326,6 @@ msgstr "su servidor"
 msgid "provider %1 (secret: %2; contacts: %3)"
 msgstr "proveedor %1 (secreto: %2; contacta con: %3)"
 
-#: apps/reiwand-ctl/src/show.rs
-msgid "%1 (%2 packages)"
-msgstr "%1 (%2 paquetes)"
-
-#: apps/reiwand-ctl/src/show.rs
-msgid " (incomplete: could not install %1)"
-msgstr " (incompleto: no se pudo instalar %1)"
-
 #: apps/reiwand-ctl/src/sourcing.rs
 msgid "%1 matches more than one library folder; use more characters"
 msgstr ""
@@ -5600,6 +5592,39 @@ msgid ""
 msgstr ""
 "%1 usa http sin cifrar: su contraseña o clave viaja sin cifrar. Usa https si "
 "el servidor lo permite."
+
+#: apps/reiwand-ctl/src/summary.rs
+msgid "%1 (%2 packages)"
+msgstr "%1 (%2 paquetes)"
+
+#: apps/reiwand-ctl/src/summary.rs
+msgid " (incomplete: could not install %1)"
+msgstr " (incompleto: no se pudo instalar %1)"
+
+#: apps/reiwand-ctl/src/summary.rs
+msgid "%1 imported, %2 already in the library, %3 failed"
+msgstr "%1 importados, %2 ya estaban en la biblioteca, %3 fallaron"
+
+#: apps/reiwand-ctl/src/summary.rs
+msgid "already in the library: %1 (the library has the newer version %2)"
+msgstr ""
+"ya estaba en la biblioteca: %1 (la biblioteca tiene la versión más nueva %2)"
+
+#: apps/reiwand-ctl/src/summary.rs
+msgid "already in the library: %1 (the same version %2)"
+msgstr "ya estaba en la biblioteca: %1 (la misma versión %2)"
+
+#: apps/reiwand-ctl/src/summary.rs
+msgid "not imported: %1: %2"
+msgstr "no se importó %1: %2"
+
+#: apps/reiwand-ctl/src/summary.rs
+msgid ""
+"reiwand-ctl pkg import --allow-older replaces a newer version with the older "
+"one"
+msgstr ""
+"reiwand-ctl pkg import --allow-older reemplaza una versión más nueva por la "
+"más antigua"
 
 #: apps/reiwand-ctl/src/texturing.rs
 msgid ""

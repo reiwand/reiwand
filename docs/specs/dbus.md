@@ -986,9 +986,9 @@ through `AddSource`. With `copy = false` the file is cataloged where it is. With
 it is first copied to `~/.local/share/reiwand/files/` (on a name collision as
 `<stem> (2).<ext>`, `(3)`, …; the copy keeps the modification time of the original) and takes
 the original file name without extension as title. A `.wpak` file always goes through the rules
-of `ImportPackages` (verification, version rules, always copied; `copy` is ignored), refusing an
-older version. A
-file that fails is listed in `ImportReport.failed`; the job fails only on a global error.
+of `ImportPackages` (verification, version rules, always copied; `copy` is ignored) with `allow_older = false`. A
+file that fails is listed in `ImportReport.failed` with its reason; the job fails only on a global
+error.
 
 ### `ImportPackages(as paths, b allow_older) → (t job)`
 
@@ -997,11 +997,18 @@ files are always copied to `~/.local/share/reiwand/files/`. Each package is open
 hashes are verified; a damaged or modified one is listed in `ImportReport.failed` with the reason.
 There is no signature requirement: a package whose author is not known imports and the app shows
 «Sin firma verificada». A package whose id is installed from a repository is refused. Importing the
-same version again returns the existing item, or, when the file changed, updates it in place; a newer version updates the item in place (same uid,
-its decisions and favorite stay); an older version is listed in `failed` with `older = true` unless
-`allow_older` is true. The search key `local:yes` matches the items imported this way (files cataloged
-by path and packages installed from a repository are excluded), and `source:none` matches every item
-without a source. `ImportReport.failed[]` entries carry `path`, `error` and `older`.
+same version again changes nothing and lists the file in `ImportReport.kept` with `newer = false`,
+or, when the file changed, updates the item in place (listed in `imported`); a newer version
+updates the item in place (same uid, its decisions and favorite stay); an older version is not a
+failure: unless `allow_older` is true the library keeps its newer version and the file is listed
+in `kept` with `newer = true` and `version` set to the version the library holds. The search key
+`local:yes` matches the items imported this way (files cataloged by path and packages installed
+from a repository are excluded), and `source:none` matches every item without a source.
+`ImportReport` carries `imported[]` (`path`, `uid`), `kept[]` (`path`, `uid`, `version`, `newer`)
+and `failed[]` (`path`, `error`, a readable reason). The daemon logs one `WARN` line per failed
+file, `not imported: PATH: REASON`, and one line with the three counts when the job ends.
+`reiwand-ctl lib import` and `pkg import` with `--wait` print those counts, one line per kept or
+failed file with its reason, and exit with an error when any file failed.
 
 ### `Resolve(as refs) → (as uids)`
 
@@ -3055,8 +3062,9 @@ struct TagsReply { model: u32, serial: u64, tags: Vec<Tag> }
 struct SourceScan { source: Option<Uid>, added: u32, updated: u32, moved: u32, missing: u32 }
 struct ScanOutput { reports: Vec<SourceScan> }
 struct Imported { path: PathBuf, uid: Uid }
+struct Kept { path: PathBuf, uid: Uid, version: String, newer: bool }
 struct PathError { path: PathBuf, error: String }
-struct ImportReport { imported: Vec<Imported>, failed: Vec<PathError> }
+struct ImportReport { imported: Vec<Imported>, kept: Vec<Kept>, failed: Vec<PathError> }
 struct AnalyzeReport { analyzed: u32, failed: u32 }
 struct Credit { provider: String, title: String, attribution: Option<String>, license: Option<String>, link: Option<String> }
 

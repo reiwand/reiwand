@@ -165,7 +165,7 @@ pub async fn run(client: &Client, command: Lib) -> Result<()> {
         Lib::Unsource { source } => crate::sourcing::unsource(client, &source).await?,
         Lib::Import { files, copy, wait } => {
             let paths = files.iter().map(|file| path_arg(file)).collect::<Result<Vec<_>>>()?;
-            job(client, lib.import(&strs(&paths), copy).map_ok(|id| ((), id)), &wait).await?
+            crate::pkg_import::waited(client, lib.import(&strs(&paths), copy), &wait).await?
         }
         Lib::Rm { items, delete_files } => {
             lib.remove(&strs(&resolve(client, &items).await?), delete_files).await?

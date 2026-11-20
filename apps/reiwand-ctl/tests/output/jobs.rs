@@ -10,8 +10,8 @@ fn finished_jobs_are_summarized_by_kind() {
         ("scan", scan, "3 added, 3 missing, 1 moved, 1 updated"),
         (
             "import",
-            json!({"imported": [{"path": "/srv/example/a.png", "uid": "X"}], "failed": []}),
-            "0 failed, 1 imported",
+            json!({"imported": [{"path": "/srv/example/a.png", "uid": "X"}], "kept": [], "failed": []}),
+            "1 imported, 0 already in the library, 0 failed",
         ),
         ("analyze", json!({"analyzed": 5, "failed": 1}), "5 analyzed, 1 failed"),
         ("provider_sync", sync, "2 downloaded, 0 failed, 8 listed, 6 reused, 0 skipped"),
@@ -26,6 +26,18 @@ fn finished_jobs_are_summarized_by_kind() {
     for (kind, output, detail) in cases {
         assert_eq!(show::summary(&job(kind, output)), format!("job 4 {kind} done: {detail}"));
     }
+    let report = json!({"imported": [{"path": "/srv/example/a.wpak", "uid": "X"}],
+        "kept": [{"path": "/srv/example/b.wpak", "uid": "Y", "version": "1.3.0", "newer": true},
+            {"path": "/srv/example/c.wpak", "uid": "Z", "version": "2.0.0", "newer": false}],
+        "failed": [{"path": "/srv/example/d.wpak", "error": "the package is damaged or was changed: bad\nzip"}]});
+    assert_eq!(
+        show::summary(&job("import", report)),
+        "job 4 import done: 1 imported, 2 already in the library, 1 failed\n\
+         already in the library: /srv/example/b.wpak (the library has the newer version 1.3.0)\n\
+         already in the library: /srv/example/c.wpak (the same version 2.0.0)\n\
+         not imported: /srv/example/d.wpak: the package is damaged or was changed: bad\u{fffd}zip\n\
+         reiwand-ctl pkg import --allow-older replaces a newer version with the older one"
+    );
     let mut incomplete = installed();
     incomplete["missing"] = json!(["org.example.base", "org.example.sky"]);
     assert_eq!(

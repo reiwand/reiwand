@@ -84,6 +84,7 @@ mod stacking;
 mod steps;
 mod stillness;
 pub mod storing;
+mod summary;
 mod texturing;
 pub mod told;
 mod touching;

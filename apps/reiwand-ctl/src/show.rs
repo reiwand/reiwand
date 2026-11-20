@@ -2,14 +2,12 @@ use crate::told::{fill, told, tr};
 use anyhow::{Result, bail};
 use chrono::{Local, TimeZone};
 use reiwand_client::parse;
-use reiwand_core::model::{
-    Field, Header, InstalledPackage, Job, JobKind, JobReply, JobsReply, Repo, Schema, UploadOutput,
-};
+use reiwand_core::model::{Field, Header, JobReply, JobsReply, Schema};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
-use serde_json::{Value, from_value};
-use std::collections::BTreeMap;
 use std::fmt::Display;
+
+pub use crate::summary::summary;
 
 pub fn reply<T: DeserializeOwned>(json: String, raw: bool, human: impl FnOnce(T) -> String) -> Result<()> {
     print!("{}", if raw { self::raw(&json)? } else { human(parse(&json)?) });
@@ -158,43 +156,4 @@ pub fn job(reply: JobReply) -> String {
         ("error", j.error.map_or("-".into(), |e| format!("{} ({})", e.message, e.name))),
         ("output", j.output.map_or("-".into(), |o| o.to_string())),
     ])
-}
-
-pub fn summary(job: &Job) -> String {
-    let head = format!("job {} {} {}", job.id, text(&job.kind), text(&job.state));
-    let output = job.output.clone().unwrap_or_default();
-    let detail = match job.kind {
-        JobKind::RepoAdd => {
-            from_value(output).ok().map(|r: Repo| fill(told("%1 (%2 packages)"), &[&r.name, &r.packages]))
-        }
-        JobKind::Install => from_value(output).ok().map(|p: InstalledPackage| {
-            let needs = p.missing.join(", ");
-            let note = if needs.is_empty() {
-                String::new()
-            } else {
-                fill(told(" (incomplete: could not install %1)"), &[&needs])
-            };
-            format!("{} {}{note}", p.id, p.version)
-        }),
-        JobKind::Upload => from_value(output).ok().map(|u: UploadOutput| {
-            format!("{} {} {}", u.package.unwrap_or_default(), u.version.unwrap_or_default(), u.state)
-        }),
-        JobKind::Unknown => None,
-        _ => Some(counts(&output)).filter(|counts| !counts.is_empty()),
-    };
-    clean(&detail.map_or(head.clone(), |detail| format!("{head}: {detail}")))
-}
-
-fn counts(output: &Value) -> String {
-    let parts = match output.get("reports").and_then(Value::as_array) {
-        Some(reports) => reports.iter().filter_map(Value::as_object).collect(),
-        None => output.as_object().into_iter().collect::<Vec<_>>(),
-    };
-    let mut sums = BTreeMap::<&str, u64>::new();
-    for (key, value) in parts.into_iter().flatten() {
-        if let Some(n) = value.as_u64().or(value.as_array().map(|a| a.len() as u64)) {
-            *sums.entry(key).or_default() += n;
-        }
-    }
-    list(sums.into_iter().map(|(key, n)| format!("{n} {key}")))
 }

@@ -1,12 +1,24 @@
 use crate::daemon::Daemon;
-use crate::error::{Error, Result, invalid};
-use crate::import::OLDER;
+use crate::error::{Result, invalid};
 use crate::jobs::now;
 use reiwand_format::{Limits, installed, open};
 use reiwand_library::qhash;
 use semver::Version;
 use std::fs;
 use std::path::Path;
+
+pub(crate) enum Brought {
+    Added(String),
+    Kept { uid: String, version: String, newer: bool },
+}
+
+impl Brought {
+    pub(crate) fn uid(self) -> String {
+        match self {
+            Brought::Added(uid) | Brought::Kept { uid, .. } => uid,
+        }
+    }
+}
 
 impl Daemon {
     pub(crate) fn local_query(&self, query: &str) -> String {
@@ -15,7 +27,7 @@ impl Daemon {
         query.replace("local:yes", &kept)
     }
 
-    pub(crate) fn import_package(&self, path: &Path, older: bool) -> Result<String> {
+    pub(crate) fn import_package(&self, path: &Path, older: bool) -> Result<Brought> {
         let package = open(path, &Limits::default())
             .and_then(|mut p| p.look_closer().map(|()| p))
             .map_err(|e| invalid(format!("the package is damaged or was changed: {e}")))?;
@@ -26,26 +38,29 @@ impl Daemon {
             return Err(invalid(format!("{id} is already installed from a repository; uninstall it first")));
         }
         let found = self.store.read(|lib| lib.loose_packages(&id))?;
-        let newest = found.iter().filter_map(|f| Version::parse(&f.2).ok()).max();
+        let newest = found
+            .iter()
+            .filter_map(|f| Version::parse(&f.2).ok().map(|v| (v, f)))
+            .max_by(|a, b| a.0.cmp(&b.0));
         match newest {
-            Some(n) if n == wanted => {
+            Some((n, _)) if n == wanted => {
                 let same = found
                     .iter()
                     .find(|f| f.2 == version)
                     .filter(|f| matches!((qhash(&f.1), qhash(path)), (Ok(kept), Ok(given)) if kept == given));
                 if let Some(f) = same {
-                    return Ok(f.0.clone());
+                    return Ok(Brought::Kept { uid: f.0.clone(), version, newer: false });
                 }
             }
-            Some(n) if n > wanted && !older => {
-                return Err(Error::Named(OLDER, format!("{id} {version} is older than the {n} you have")));
+            Some((n, f)) if n > wanted && !older => {
+                return Ok(Brought::Kept { uid: f.0.clone(), version: f.2.clone(), newer: true });
             }
             _ => {}
         }
         let copied = self.copy_in(path)?;
         let Some((uid, old, _)) = found.into_iter().max_by_key(|f| Version::parse(&f.2).ok()) else {
             let added = self.store.write(|lib| lib.import_file(&copied, now()));
-            return added.inspect_err(|_| drop(fs::remove_file(&copied)));
+            return added.map(Brought::Added).inspect_err(|_| drop(fs::remove_file(&copied)));
         };
         let before = self.store.read(|lib| lib.item(&uid))?;
         let relinked = self.store.write(|lib| lib.relink_item(&uid, &copied, now()));
@@ -55,6 +70,6 @@ impl Daemon {
         if old.starts_with(self.store.files()) {
             fs::remove_file(&old).ok();
         }
-        Ok(uid)
+        Ok(Brought::Added(uid))
     }
 }

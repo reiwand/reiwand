@@ -1,5 +1,6 @@
 use crate::daemon::Daemon;
 use crate::error::{Error, Result, denied, failed, invalid};
+use crate::imports::Brought;
 use crate::store::private_dir;
 use reiwand_carry::{Limits, Opened, OwnFile};
 use std::fs::{self, File};
@@ -27,7 +28,7 @@ impl Daemon {
         let written = File::create(&staged)
             .map_err(Error::from)
             .and_then(|mut out| opened.extract_own(&own.id, &mut out).map_err(|e| failed(e.to_string())));
-        let imported = written.and_then(|()| self.import_one(&staged, (true, None)));
+        let imported = written.and_then(|()| self.import_one(&staged, (true, None)).map(Brought::uid));
         drop(fs::remove_file(&staged));
         imported
     }
