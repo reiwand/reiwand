@@ -97,6 +97,7 @@ pub(super) fn kit(
                 StretchDepth::Flat => 0.0,
                 StretchDepth::Projected => 1.0,
                 StretchDepth::Motion => 2.0,
+                StretchDepth::Segment => 3.0,
             },
             flag(render.mix),
         ],

@@ -30,6 +30,7 @@ pub enum StretchDepth {
     Flat,
     Projected,
     Motion,
+    Segment,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]

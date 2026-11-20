@@ -75,10 +75,10 @@ GridLayout {
         Layout.columnSpan: 2
         Layout.fillWidth: true
         visible: stretch.info !== null
-        model: [App.tr("Trail from the speed without perspective"), App.tr("Trail follows the motion on screen"), App.tr("Trail follows the motion on screen, depth included")]
-        currentIndex: ["flat", "projected", "motion"].indexOf(stretch.info?.depth ?? "flat")
+        model: [App.tr("Trail from the speed without perspective"), App.tr("Trail follows the motion on screen"), App.tr("Trail follows the motion on screen, depth included"), App.tr("Trail is the path in depth, centred on the particle")]
+        currentIndex: ["flat", "projected", "motion", "segment"].indexOf(stretch.info?.depth ?? "flat")
         onActivated: index => stretch.put({
-                "depth": ["flat", "projected", "motion"][index]
+                "depth": ["flat", "projected", "motion", "segment"][index]
             })
     }
 

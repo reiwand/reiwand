@@ -15,7 +15,9 @@ fn drop(system: &Value, s: &Value, speed: f64, z: f64) -> Value {
     let k = if focal > 0.0 && focal + z > 1.0 { focal / (focal + z) } else { 1.0 };
     let num = |key: &str| s[key].as_f64().unwrap_or(0.0);
     let side = mean(&system["init"]["size"]) * k;
-    let near = if s["depth"] == "projected" { k } else { 1.0 };
+    let spanned = s["depth"] == "segment";
+    let speed = if spanned { speed.hypot(mean(&system["init"]["depth_speed"])) } else { speed };
+    let near = if s["depth"] == "projected" || spanned { k } else { 1.0 };
     let reach = (num("time") * speed * near).clamp(num("min") * near, num("max").max(num("min")) * near);
     let long = if s["mode"] == "relative" {
         side * (num("time") * speed).clamp(num("min"), num("max").max(num("min")))

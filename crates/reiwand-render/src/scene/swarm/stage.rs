@@ -10,7 +10,7 @@ use std::sync::Arc;
 
 const ENTRIES: [&str; 3] = ["reiwand_fs_particle", "reiwand_fs_lit_particle", "reiwand_fs_bend_particle"];
 
-const OWN: [&str; 32] = [
+const OWN: [&str; 35] = [
     "Look",
     "PIXELED",
     "look",
@@ -43,6 +43,9 @@ const OWN: [&str; 32] = [
     "lamp_lit",
     "fs_lit_particle",
     "fs_bend_particle",
+    "Segment",
+    "segment",
+    "segment_end",
 ];
 
 fn source(pixeled: bool) -> String {
@@ -50,8 +53,15 @@ fn source(pixeled: bool) -> String {
     let head =
         format!("const PIXELED: bool = {pixeled};\n{}", if pixeled { "" } else { super::setup::PIXEL });
     prefixed(
-        &[&head, include_str!("sprite.wgsl"), include_str!("tilt.wgsl"), include_str!("../lamps.wgsl"), &lit]
-            .join("\n"),
+        &[
+            &head,
+            include_str!("sprite.wgsl"),
+            include_str!("reach.wgsl"),
+            include_str!("tilt.wgsl"),
+            include_str!("../lamps.wgsl"),
+            &lit,
+        ]
+        .join("\n"),
     )
 }
 

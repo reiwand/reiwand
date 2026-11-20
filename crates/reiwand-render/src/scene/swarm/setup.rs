@@ -116,6 +116,7 @@ impl Swarms {
                     PLAIN,
                     PIXEL,
                     include_str!("sprite.wgsl"),
+                    include_str!("reach.wgsl"),
                     include_str!("tilt.wgsl"),
                     include_str!("ribbon.wgsl"),
                     include_str!("cord.wgsl"),

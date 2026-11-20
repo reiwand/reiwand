@@ -39,7 +39,9 @@ fn handles_draw_a_near_and_a_far_drop_with_the_chosen_depth() {
         json!({ "ranges": { "speed": [100, 100], "size": [10, 10], "depth": [-50, 100] } }),
     )
     .unwrap();
-    for (depth, near, far) in [("flat", 20.0 + 10.0, 5.0 + 10.0), ("projected", 20.0 + 20.0, 5.0 + 5.0)] {
+    let depths =
+        [("flat", 20.0 + 10.0, 5.0 + 10.0), ("projected", 20.0 + 20.0, 5.0 + 5.0), ("segment", 40.0, 10.0)];
+    for (depth, near, far) in depths {
         let stretch = json!({ "mode": "add", "depth": depth, "time": 0.1, "min": 0, "max": 100 });
         edit(&mut p, "render", json!({ "stretch": stretch })).unwrap();
         let drops = handles(&p)["stretch"]["drops"].clone();

@@ -56,22 +56,6 @@ fn encode(c: vec3<f32>) -> vec3<f32> {
     return select(1.055 * pow(c, vec3<f32>(1.0 / 2.4)) - 0.055, c * 12.92, c <= vec3<f32>(0.0031308));
 }
 
-fn hull_corner(v: u32) -> vec2<f32> {
-    let lo = look.hull[0];
-    let hi = look.hull[1];
-    var at = array<vec2<f32>, 8>(
-        vec2<f32>(lo.y + hi.w, lo.y),
-        vec2<f32>(hi.x, hi.x - hi.w),
-        vec2<f32>(lo.z - lo.y, lo.y),
-        vec2<f32>(hi.x, hi.z - hi.x),
-        vec2<f32>(lo.x, lo.z - lo.x),
-        vec2<f32>(hi.z - hi.y, hi.y),
-        vec2<f32>(lo.x, lo.x - lo.w),
-        vec2<f32>(hi.y + lo.w, hi.y),
-    );
-    return at[min(v, 7u)];
-}
-
 @vertex
 fn vs_particle(
     @builtin(vertex_index) v: u32,
@@ -93,17 +77,27 @@ fn vs_particle(
     let center = look.deep.yz + (a.xy - look.deep.yz) * k;
     let size = b.z * curve(t) * look.tint.z * e.w * k;
     let corner = select(vec2<f32>(f32(v & 1u), f32(v >> 1u)), hull_corner(v), look.hull[1].x > 0.0);
-    let motion = look.trail.z > 1.5 && look.deep.w > 0.5;
+    let motion = abs(look.trail.z - 2.0) < 0.5 && look.deep.w > 0.5;
     let seen = select(a.zw, k * a.zw - (center - look.deep.yz) * d.y / far, motion);
-    let speed = length(seen);
+    var speed = length(seen);
+    var heading = seen / max(speed, 1e-9);
     let relative = look.trail.y > 0.5;
     let turned = !relative && look.shade.z > 0.0 && look.shade.z == look.shade.w;
     let near = select(1.0, k, look.trail.z > 0.5 && look.trail.z < 1.5 && !relative);
-    let reach = clamp(look.trail.x * speed * near, look.shade.z * near, look.shade.w * near);
+    var reach = clamp(look.trail.x * speed * near, look.shade.z * near, look.shade.w * near);
+    let spanned = look.trail.z > 2.5;
+    var middle = center;
+    if spanned {
+        let g = segment(a, d, size, k, b.w, relative);
+        speed = g.speed;
+        heading = g.axis;
+        reach = g.long;
+        middle = g.mid;
+    }
     var tail = select(reach, 0.0, turned || speed <= 0.0);
     var axis = vec2<f32>(cos(radians(b.w)), sin(radians(b.w)));
     let driven = (tail > 0.0 || turned || relative || look.turn.x == 1.0) && speed > 0.0;
-    axis = select(axis, seen / max(speed, 1e-9), driven);
+    axis = select(axis, heading, driven);
     let sides = select(vec2<f32>(1.0), look.tilt[2].yz, look.tilt[2].y > 0.0);
     let upright = driven && sides.y > sides.x;
     if look.turn.x == 2.0 {
@@ -114,7 +108,7 @@ fn vs_particle(
     let tone = mix(look.colors[i], look.colors[i + 1u], x - f32(i));
     let base = select(vec4<f32>(decode(color.rgb), color.a), color, look.tint.y > 0.5);
     let shade = base * tone * vec4<f32>(vec3<f32>(select(look.shade.x, 1.0, PIXELED)), look.tint.x * e.z);
-    let s = particle(Sprite(center, a.zw, corner, corner, shade, size, degrees(atan2(axis.y, axis.x)), b.x, b.y));
+    let s = particle(Sprite(middle, a.zw, corner, corner, shade, size, degrees(atan2(axis.y, axis.x)), b.x, b.y));
     let turn = vec2<f32>(cos(radians(s.rotation)), sin(radians(s.rotation)));
     tail = select(tail, s.size * (reach - 1.0), relative);
     let wide = vec2<f32>(mix(-0.5 * s.size * sides.x - tail, 0.5 * s.size * sides.x, s.corner.x), (s.corner.y - 0.5) * s.size * sides.y);
@@ -127,7 +121,8 @@ fn vs_particle(
         out.tilt = a;
     }
     let off = select(q, vec2<f32>(-q.y, q.x), upright);
-    let p = vec3<f32>(s.position + turn * off.x + vec2<f32>(-turn.y, turn.x) * off.y, 1.0);
+    let lead = select(0.0, 0.5 * tail, spanned);
+    let p = vec3<f32>(s.position + turn * (off.x + lead) + vec2<f32>(-turn.y, turn.x) * off.y, 1.0);
     out.position = vec4<f32>(dot(look.m0.xyz, p), dot(look.m1.xyz, p), 0.0, 1.0);
     out.uv = s.uv;
     out.color = s.color;

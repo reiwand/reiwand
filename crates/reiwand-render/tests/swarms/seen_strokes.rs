@@ -8,14 +8,14 @@ fn coming(at: [f32; 2], depth: &str) -> Value {
         "render": { "stretch": { "mode": "relative", "depth": depth, "time": 0.05, "min": 0, "max": 1000 } } })
 }
 
-struct Stroke {
-    count: usize,
-    wide: u32,
-    high: u32,
-    angle: f64,
+pub(super) struct Stroke {
+    pub(super) count: usize,
+    pub(super) wide: u32,
+    pub(super) high: u32,
+    pub(super) angle: f64,
 }
 
-fn measure(pixels: &[u8]) -> Stroke {
+pub(super) fn measure(pixels: &[u8]) -> Stroke {
     let lit: Vec<(f64, f64)> = (0..SIZE.1)
         .flat_map(|y| (0..SIZE.0).map(move |x| (x, y)))
         .filter(|(x, y)| at(pixels, *x, *y)[0] > 100)

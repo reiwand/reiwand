@@ -15,6 +15,7 @@ mod fields;
 mod looks;
 mod pixels;
 mod seen_strokes;
+mod segments;
 mod shone;
 mod sources;
 mod steered;

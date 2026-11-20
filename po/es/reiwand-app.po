@@ -14439,6 +14439,10 @@ msgid "Trail follows the motion on screen, depth included"
 msgstr "La estela sigue el movimiento en pantalla, con la profundidad"
 
 #: apps/reiwand-app/qml/SceneSwarmStretch.qml
+msgid "Trail is the path in depth, centred on the particle"
+msgstr "La estela es el tramo recorrido en profundidad, centrado en la partícula"
+
+#: apps/reiwand-app/qml/SceneSwarmStretch.qml
 msgid "Seconds of motion"
 msgstr "Segundos de movimiento"
 
