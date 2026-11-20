@@ -13,6 +13,7 @@ PanelChico {
     property var kept: ({})
     readonly property var allowed: inputs.filter(input => question.kept[input] !== false)
     readonly property var left: inputs.filter(input => question.kept[input] === false)
+    readonly property alias rows: rows
 
     signal answered(var allow, var deny)
 
@@ -38,12 +39,15 @@ PanelChico {
     onRejected: answer([], inputs)
 
     Repeater {
+        id: rows
+
         model: question.inputs
 
         delegate: RowLayout {
             id: row
 
             required property string modelData
+            readonly property alias pick: pick
             readonly property bool on: question.kept[modelData] !== false
 
             width: parent.width - 2 * Look.e4
@@ -56,13 +60,12 @@ PanelChico {
                 reason: Permisos.reason(row.modelData)
             }
 
-            QQC2.Button {
+            QQC2.Switch {
+                id: pick
+
                 Layout.alignment: Qt.AlignTop
-                flat: !row.on
-                checkable: true
                 checked: row.on
-                text: row.on ? App.tr("Allow") : App.tr("Without this")
-                Accessible.name: Permisos.title(row.modelData) + ": " + text
+                Accessible.name: Permisos.title(row.modelData)
                 onToggled: {
                     const next = Object.assign({}, question.kept);
                     next[row.modelData] = checked;

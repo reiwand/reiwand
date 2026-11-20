@@ -60,9 +60,12 @@ QtObject {
             "inputs": open.inputs
         });
         const all = question.allowed.join();
-        question.kept = {
-            "audio": false
-        };
+        const pick = question.rows.itemAt(1).pick;
+        const words = [question.principal, question.quiet];
+        must(pick.checked && !words.includes(pick.text), "a row of the grouped question reads like one of its buttons or starts off: " + pick.text);
+        pick.toggle();
+        pick.toggled();
+        must(!pick.checked && !words.includes(pick.text), "a row of the grouped question turned off reads like one of its buttons: " + pick.text);
         const found = [all, question.allowed.join(), question.left.join(), question.title, question.quiet, question.principal];
         question.destroy();
         must(found.join("|") === ["pointer,audio,clicks", "pointer,clicks", "audio", App.tr("“%1” asks for permission to use", "Pond"), App.tr("Without this"), App.tr("Allow")].join("|"), "the grouped question does not split what is allowed from what is left out: " + found.join("|"));

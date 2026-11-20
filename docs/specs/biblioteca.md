@@ -201,8 +201,9 @@ relleno»; Tab pasa al campo siguiente, Esc cancela y «Guardar» crea un preaju
 Cuando una pantalla muestra una escena que pide cosas que la persona todavía no respondió (el campo
 `undecided` de `GetInputs().shown`), la app hace una sola pregunta, «“nombre” pide permiso para usar»,
 con una línea por cosa (puntero, sonido del equipo, clics y toques, lo que suena, y lo que suena o el
-sonido con red), su explicación y «Permitir» o «Sin esto» en cada una. «Permitir» al pie aplica lo
-elegido y «Sin esto» deja todo afuera, con `Inputs1.Decide`; la escena ya funciona mientras tanto sin
+sonido con red), su explicación y un interruptor en cada una, encendido de entrada: encendido es
+permitir y apagado es dejarlo afuera, sin palabras que se confundan con los botones del pie.
+«Permitir» al pie aplica lo elegido y «Sin esto» deja todo afuera, con `Inputs1.Decide`; la escena ya funciona mientras tanto sin
 esos permisos, y si algo quedó afuera un aviso dice dónde cambiarlo. La red y las luces no se
 preguntan acá. Una vista previa (la tapa en marcha, la ventana de vista previa o el editor, salidas
 `preview:`) no pregunta: la escena se ve sin esos permisos hasta que se pone de fondo en una pantalla. Se pregunta una vez por escena en cada sesión de la app; lo respondido se recuerda en
