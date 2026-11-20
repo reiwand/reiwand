@@ -108,3 +108,20 @@ fn children_without_room_cost_nothing() {
     let sim = fly.bake.apply(1, fly.rt.swarm(0).unwrap().sim(0, 1));
     assert_eq!(sim.mode[2], 10, "a child never hatches more than its room");
 }
+
+#[test]
+fn children_count_what_their_hosts_can_give() {
+    let host = |on: &str| {
+        still(json!({ "init": { "life": [3, 3], "speed": [0, 0], "size": [2, 2] },
+            "emitters": [{ "shape": { "point": [100, 50] }, "rate": 2 }],
+            "children": [{ "system": "b", "on": on, "probability": 0.5 }] }))
+    };
+    let kid = sparks(json!({ "capacity": 1000, "init": { "life": [1, 1], "speed": [0, 0] } }));
+    let counted = |on: &str| {
+        let fly = Fly::of(json!({ "a": host(on), "b": kid.clone() }));
+        lives(&fly.rt.scene, &fly.rt.flocks()[0])
+    };
+    assert_eq!(counted("spawn"), [6.0, 10.0]);
+    assert_eq!(counted("death"), [6.0, 40.0]);
+    assert_eq!(counted("follow"), [6.0, 1000.0]);
+}

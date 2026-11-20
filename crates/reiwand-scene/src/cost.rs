@@ -142,12 +142,14 @@ impl Scene {
         let glows = crate::glow::glows(lit.as_ref().unwrap_or(&self.canvas));
         let glow = glows[0].as_deref().map_or(0.0, |g| self.units(g, quality, (magnify, unit)));
         let particles = self.layers().filter_map(|l| match &l.kind {
-            Kind::Particles { system, .. } => self.particles.get(system),
+            Kind::Particles { system, .. } => self.particles.get(system).map(|s| (l, s)),
             _ => None,
         });
         let canvas = self.canvas.size;
-        let particles =
-            particles.map(|s| (s.capacity as f32 / 100_000.0 + s.overdraw(canvas)) * quality.particles());
+        let particles = particles.map(|(l, s)| {
+            let cover = crate::particles::alive(self, Some(l), s) * s.cover(canvas);
+            (s.capacity as f32 / 100_000.0 + cover) * quality.particles()
+        });
         let read: std::collections::HashSet<&str> = self.layers().flat_map(crate::links::reads).collect();
         let apart = read.into_iter().filter_map(|id| self.layer(id)).map(|l| APART * area(l));
         let scale = quality.render_scale_for(magnify);

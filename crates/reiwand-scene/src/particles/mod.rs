@@ -25,6 +25,7 @@ mod instance;
 mod kept;
 mod lend;
 mod lineage;
+mod live;
 mod look;
 mod motion;
 mod ops;
@@ -76,6 +77,7 @@ pub use flock::{Flock, MAX_DEPTH, MAX_PARTS, Part, flocks};
 pub use forces::{Falloff, Force, Target};
 pub use instance::{Instance, Tunable};
 pub use kept::Kept;
+pub use live::{alive, lives};
 pub use look::{Frames, MAX_SHIFT, Refract, RefractColor, Render};
 pub use ops::{FULL_WINDOW, Operator};
 pub use pack::{EVENT, MAX_HATCH, PARTICLE_EVENTS, Sim};
@@ -170,11 +172,10 @@ impl System {
         forces.chain(shapes).chain(self.init.inherit.iter().map(|c| &c.from))
     }
 
-    pub fn overdraw(&self, canvas: [u32; 2]) -> f32 {
+    pub fn cover(&self, canvas: [u32; 2]) -> f32 {
         let peak = self.render.size_over_life.iter().map(|k| k[1]).fold(0.0, f32::max);
         let peak = if self.render.size_over_life.is_empty() { 1.0 } else { peak };
         let side = (self.init.size[0] + self.init.size[1]) / 2.0 * peak;
-        self.capacity as f32 * side * side * self.render.fill()
-            / (canvas[0] as f32 * canvas[1] as f32).max(1.0)
+        side * side * self.render.fill() / (canvas[0] as f32 * canvas[1] as f32).max(1.0)
     }
 }

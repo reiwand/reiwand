@@ -79,12 +79,12 @@ impl Bake {
         let mut bake = Bake { tier: Some(tier), ..Bake::default() };
         let [w, h] = scene.canvas.size.map(|v| v as f32);
         let on = |s: &System, m| s.children.iter().any(|c| c.on == m);
-        for part in &f.parts {
+        let lives = super::lives(scene, f);
+        for (part, live) in f.parts.iter().zip(lives) {
             let s = systems[part.system];
             let alloc = (room(f, s) * cap / total.max(cap)).clamp(1, room(f, s).max(1)) as u32;
             let alloc = if cpu && boids(s) { alloc.min(CPU_BOIDS) } else { alloc };
-            let spread =
-                s.overdraw(scene.canvas.size) * alloc as f32 / s.capacity.max(1) as f32 * draws(f) as f32;
+            let spread = s.cover(scene.canvas.size) * (alloc as f32).min(live) * draws(f) as f32;
             bake.allocs.push(alloc);
             bake.sizes.push((tier.overdraw() / spread.max(1e-9)).sqrt().min(1.0));
             bake.hosts.push(part.host);

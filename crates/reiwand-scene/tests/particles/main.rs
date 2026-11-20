@@ -12,6 +12,7 @@ mod capped;
 mod drifts;
 mod extremes;
 mod fields;
+mod filled;
 mod listened;
 mod longseek;
 mod scheduled;

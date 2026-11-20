@@ -23,7 +23,7 @@ fn the_budget_counts_the_rectangle_and_not_the_square() {
             true,
         )))
         .unwrap();
-        s.particles.values().next().unwrap().overdraw([200, 100])
+        s.particles.values().next().unwrap().cover([200, 100])
     };
     assert!((sys(0.25) * 4.0 - sys(1.0)).abs() < 1e-4 && (sys(5.0) * 5.0 - sys(1.0)).abs() < 1e-4);
 }

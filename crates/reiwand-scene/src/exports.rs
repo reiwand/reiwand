@@ -102,9 +102,9 @@ pub use crate::particles::{
     Particle, Periodic, Perspective, Placement, Play, REMAP_INPUTS, ROPE_POINTS, Refract, RefractColor,
     Refresh, Remap, RemapOp, RemapOutput, Render, Ring, Rope, STEP, SUBSTEPS, Sim, SlowNear, Source, Spread,
     Stack, Strand, Stretch, StretchDepth, StretchMode, Surface, Swarm, Sweep, System, Taper, Target, Tilt,
-    Trail, Tunable, Turbulent, WARM, WARM_WORK, Wall, Wave, Wobble, bin, cells, distance_field, fbm, flocks,
-    fractal, gradient, hash, largest, mark, noise1, particle_salt, remap_input, remap_table, remapped,
-    ring_point, seen, stacked, strung, swirl, taper, toward_axis, turbulent_ray, turn,
+    Trail, Tunable, Turbulent, WARM, WARM_WORK, Wall, Wave, Wobble, alive, bin, cells, distance_field, fbm,
+    flocks, fractal, gradient, hash, largest, lives, mark, noise1, particle_salt, remap_input, remap_table,
+    remapped, ring_point, seen, stacked, strung, swirl, taper, toward_axis, turbulent_ray, turn,
 };
 pub use crate::passage::shader::{MAX_TRANSITION_UNITS, transition_shader};
 pub use crate::passage::{

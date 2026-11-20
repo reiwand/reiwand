@@ -90,7 +90,8 @@ fn the_scheduler_knows_when_particles_live() {
 
 #[test]
 fn budgets_follow_the_device_tier_and_masks_place_particles() {
-    let big = with(sparks(), json!({ "capacity": 8000, "init": { "size": [40, 60] } }));
+    let pour = json!([{ "shape": { "box": { "from": [0, 80], "to": [200, 100] } }, "rate": 100_000 }]);
+    let big = with(sparks(), json!({ "capacity": 8000, "init": { "size": [40, 60] }, "emitters": pour }));
     let s = Scene::from_json(&reiwand_upgrade::fill::whole(&scene(big, true))).unwrap();
     let bake = |tier, cpu| Bake::new(&s, 0, tier, cpu, |_| None).unwrap();
     assert_eq!(

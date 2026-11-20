@@ -1846,7 +1846,7 @@ only move while their layer is shown and the scene runs, and a scene keeps rende
 particles live, are emitted or wait for their next timed burst. A scene holds at most 2 000
 particles with software rendering, 5 000 on other devices without compute shaders and 10 000,
 50 000 or 200 000 on the GPU depending on the device; the budget is shared by capacity, particles
-are drawn smaller where they would cover the screen more than 1, 1.5, 3 or 6 times over, and trails
+are drawn smaller where the particles that can live at once would cover the screen more than 1, 1.5, 3 or 6 times over (and the cost of the scene counts those same particles): that is the slots of the system, or fewer when its emitters cannot fill them, namely the largest `rate` times the longest `life`, plus what each burst can add in that time (once, every `every` seconds, or again at each window of `periodic`) and at most `max_per_step` per step; a burst on a cue, a script that drives particles, a `follow` child or a `life` bound without a `clamp` counts every slot, a `rate` bound without one counts as 100 000 per second, a `spawn` or `death` child counts what its host can give it times the chance that each host event makes it, and the instance `count` and `life` of the layer are counted at their peak; and trails
 are limited to 0, 4, 8 or 16 steps. Lower quality levels let only 75 %, 50 % or 25 % of the
 particles be born and halve or drop trails. `reiwand-ctl scene bench` reports where particles run,
 their slots, how many are alive at the end, the steps per frame and the simulation time after the
