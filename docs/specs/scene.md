@@ -2730,7 +2730,13 @@ and its fragment and vertex programs entry points of one `.wgsl` file. The rules
 
 - Write one `@fragment` function per pass, `fn fs_<name>(in: VertexOut) -> @location(0)
   vec4<f32>`, and return the color instead of writing `gl_FragColor` or an `out` variable. Colors
-  are premultiplied by alpha; `straight(c)` undoes it.
+  are premultiplied by alpha; `straight(c)` undoes it. Where alpha is 0 no color is kept:
+  `straight` gives black there, also after an effect that only lowered the alpha. An original that
+  keeps the color under a pixel it made transparent, and later gives that pixel alpha again (rays,
+  glow or blur spreading over it), takes the color from the `source` input, `straight` of the
+  layer before its effects, and the alpha from its own input. When the layers below show the same
+  picture, setting the layer's `mask` to the same picture also works: it applies after the
+  effects and hides what spread past it.
 - Coordinates go from (0, 0) at the top left to (1, 1) at the bottom right, in `in.uv`. Flip `y`
   where the original counts from the bottom (`1.0 - uv.y`).
 - Move what the original computes per vertex but is affine (offsets, scales, rotations of the
