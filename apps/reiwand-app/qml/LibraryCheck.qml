@@ -108,6 +108,16 @@ QtObject {
         page.shown();
         must(found.join() === "true,DP-1", "a wallpaper in use does not name its screen when there are two: " + found.join());
         must(marked.join() === "true,false,true,true,true", "the mark of a wallpaper in use is not a small named icon: " + marked.join());
+        const other = Array.from(covers.shelf.view.itemAtIndex(1).children).find(child => !!child.mark).mark;
+        const hover = item => {
+            const at = item.mapToItem(null, item.width / 2, item.height / 2);
+            App.backend.pointer(3, at.x, at.y);
+            return [item.hinted, item.hint.visible].join();
+        };
+        const hinted = [hover(other), hover(mark)];
+        App.backend.pointer(3, 1, 1);
+        hinted.push([mark.hinted, mark.hint.visible].join());
+        must(hinted.join(";") === "false,false;true,true;false,false", "the in-use hint shows away from the in-use icon: " + hinted.join(";"));
     }
 
     function several() {

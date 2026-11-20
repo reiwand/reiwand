@@ -137,7 +137,7 @@ Item {
             visible: tapa.inUse || tapa.listed !== ""
             screen: tapa.usedOn
             list: tapa.inUse ? "" : tapa.listed
-            pointed: tapa.hovered && contains(Qt.point(area.mouseX - x, area.mouseY - y))
+            pointed: tapa.hovered && contains(mapFromItem(area, area.mouseX, area.mouseY))
             x: Look.marcaTapa
             y: parent.height - height - Look.marcaTapa
         }

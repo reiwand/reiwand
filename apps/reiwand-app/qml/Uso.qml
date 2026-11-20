@@ -10,6 +10,8 @@ Rectangle {
     property string list
     property bool pointed
     readonly property bool named: list !== ""
+    readonly property bool hinted: pointed && visible && !named
+    readonly property alias hint: hint
     readonly property string words: named ? list : screen !== "" ? App.tr("On %1", App.screens(screen.split(", "))) : App.tr("In use")
 
     implicitWidth: named ? row.implicitWidth + Look.e2 + Look.marcaTapa : implicitHeight
@@ -18,8 +20,14 @@ Rectangle {
     color: Look.noche
     Accessible.role: Accessible.StaticText
     Accessible.name: words
-    QQC2.ToolTip.visible: pointed && !named
-    QQC2.ToolTip.text: words
+
+    QQC2.ToolTip {
+        id: hint
+
+        parent: uso
+        visible: uso.hinted
+        text: uso.words
+    }
 
     Row {
         id: row

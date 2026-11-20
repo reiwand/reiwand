@@ -57,7 +57,8 @@ en una línea fija al pie de «Ver todos», con las acciones a la derecha y una 
 
 La marca de una tapa en uso o de la lista en marcha. Solo la pone la tapa. En uso es un ícono chico
 redondo, sin texto: `screen` da el nombre accesible y la pista («En uso» o «En …»), que aparece con
-`pointed` (el puntero sobre la marca). Con `list` muestra el ícono de lista y el nombre de la lista.
+`pointed` (el puntero sobre la marca) solo mientras la marca se ve y no lleva lista; va pegada al
+ícono y se apaga al salir el puntero. Con `list` muestra el ícono de lista y el nombre de la lista.
 
 ## Elegir y Seleccion
 

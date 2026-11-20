@@ -44,7 +44,8 @@ La Biblioteca muestra los fondos guardados sobre la imagen del fondo en uso.
   ofrece la acción principal de la tarjeta, «Detalles» y «Editar una copia…» (escena instalada);
   este último también es un botón de la tarjeta encendida.
 - La tapa del fondo en uso lleva solo un ícono chico, sin texto ni marco alrededor; su nombre para
-  lectores de pantalla y la pista al pasar el puntero dicen «En uso» o, con dos o más pantallas,
+  lectores de pantalla y la pista al pasar el puntero sobre ese ícono (solo ahí: el resto de las
+  tapas no tiene pista) dicen «En uso» o, con dos o más pantallas,
   «En …» con el nombre de cada pantalla donde está. El filete de foco es aparte: marca la tapa con el
   foco del teclado y solo se ve después de usar el teclado (flechas, Tab u otra tecla); un clic o un
   toque lo esconden. La tapa con el foco sigue elegida, así que las teclas de la barra responden sin

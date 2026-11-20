@@ -158,9 +158,9 @@ inline void sendMouse(int kind, double x, double y)
 {
     if (auto window = keyWindow()) {
         const QPointF at(x, y);
-        const auto type = kind == 0 ? QEvent::MouseButtonPress : kind == 1 ? QEvent::MouseMove : QEvent::MouseButtonRelease;
-        const auto button = kind == 1 ? Qt::NoButton : Qt::LeftButton;
-        const auto buttons = kind == 2 ? Qt::NoButton : Qt::LeftButton;
+        const auto type = kind == 0 ? QEvent::MouseButtonPress : kind == 2 ? QEvent::MouseButtonRelease : QEvent::MouseMove;
+        const auto button = kind == 0 || kind == 2 ? Qt::LeftButton : Qt::NoButton;
+        const auto buttons = kind == 0 || kind == 1 ? Qt::LeftButton : Qt::NoButton;
         QMouseEvent event(type, at, at, window->mapToGlobal(at), button, buttons, Qt::NoModifier);
         QCoreApplication::sendEvent(window, &event);
     }
