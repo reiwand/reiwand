@@ -43,7 +43,7 @@ printf '%s\n' 'context.spa-libs = { audio.convert.* = audioconvert/libspa-audioc
   '{ name = libpipewire-module-protocol-pulse args = { server.address = [ "unix:native" ] } } ]' >"$WORK/pulse.conf"
 pw-cli create-node adapter '{ factory.name=support.null-audio-sink node.name=reiwand-scene-sink
   media.class=Audio/Sink object.linger=true audio.position=[FL FR] }' >/dev/null
-pulsed() { if [ -n "$bridge" ]; then pipewire-pulse; else pipewire -c "$WORK/pulse.conf"; fi; }
+pulsed() { if [ -n "$bridge" ]; then exec pipewire-pulse; else exec pipewire -c "$WORK/pulse.conf"; fi; }
 if [ -n "$bridge" ]; then pulse=$bridge; else pulsed >"$WORK/pulse.log" 2>&1 & pulse=$!; pids+=("$pulse"); fi
 wait_for 10 test -S "$XDG_RUNTIME_DIR/pulse/native" || fail "no PulseAudio server for the default audio output"
 streams() {
