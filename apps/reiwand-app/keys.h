@@ -8,6 +8,7 @@
 #include <QtGui/QKeyEvent>
 #include <QtGui/QPointingDevice>
 #include <QtGui/QWheelEvent>
+#include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickWindow>
 
@@ -85,6 +86,15 @@ inline bool pressed(QQuickWindow* window, QKeyEvent* event)
     return true;
 }
 
+inline void used(QQuickWindow* window, bool keys)
+{
+    auto engine = qmlEngine(window);
+    static const int type = qmlTypeId("io.github.reiwand.app", 1, 0, "Teclado");
+    auto marker = engine && type >= 0 ? engine->singletonInstance<QObject*>(type) : nullptr;
+    if (marker && marker->property("used").toBool() != keys)
+        marker->setProperty("used", keys);
+}
+
 class Filter : public QObject {
 public:
     bool eventFilter(QObject* object, QEvent* event) override
@@ -94,8 +104,12 @@ public:
             return false;
         if (event->type() == QEvent::Wheel)
             guard(window, static_cast<QWheelEvent*>(event)->position());
-        else if (event->type() == QEvent::KeyPress)
+        else if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::TouchBegin)
+            used(window, false);
+        else if (event->type() == QEvent::KeyPress) {
+            used(window, true);
             return pressed(window, static_cast<QKeyEvent*>(event));
+        }
         return false;
     }
 };

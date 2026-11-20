@@ -31,7 +31,8 @@ ancho de la tapa; el filete de foco es el anillo común (`Anillo`).
 
 - `picture` (URL), `name`, `note`, `noteIcon` (nombre de ícono), `noteTone` (`""`, `"ambar"`,
   `"coral"` o `"brote"`).
-- Estados: en reposo está atenuada; `lit` la agranda (salvo con `even`) y le pone el filete de foco;
+- Estados: en reposo está atenuada; `lit` la agranda (salvo con `even`) y le pone el filete de foco, que se ve
+  solo mientras `Teclado.used` (la última entrada fue una tecla, no un clic ni un toque);
   el puntero encima aclara el velo; `off` la apaga (debe ir con su motivo en `note`); `inUse` pone
   la marca de en uso; `choosing` muestra la marca de elegir y `chosen` la llena.
 - `even`: tamaño fijo dado por quien la contiene (rejilla); encendida no crece y muestra el nombre

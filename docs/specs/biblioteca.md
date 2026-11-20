@@ -46,7 +46,9 @@ La Biblioteca muestra los fondos guardados sobre la imagen del fondo en uso.
 - La tapa del fondo en uso lleva solo un ícono chico, sin texto ni marco alrededor; su nombre para
   lectores de pantalla y la pista al pasar el puntero dicen «En uso» o, con dos o más pantallas,
   «En …» con el nombre de cada pantalla donde está. El filete de foco es aparte: marca la tapa con el
-  foco del teclado.
+  foco del teclado y solo se ve después de usar el teclado (flechas, Tab u otra tecla); un clic o un
+  toque lo esconden. La tapa con el foco sigue elegida, así que las teclas de la barra responden sin
+  clic previo.
 - Una nota en la tapa avisa de un archivo que falta o está dañado, de un fondo retirado por su repositorio
   o de uno con destellos (apagado hasta que el usuario lo permita).
 - Mientras el escritorio crea las capas de profundidad de una imagen en pantalla, su tapa lo dice en

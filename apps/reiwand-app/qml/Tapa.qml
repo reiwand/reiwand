@@ -25,6 +25,7 @@ Item {
     readonly property alias hovered: area.containsMouse
     readonly property alias bar: bar
     readonly property alias mark: mark
+    readonly property alias ring: ring
     default property alias below: under.data
 
     signal tapped(int modifiers)
@@ -124,7 +125,9 @@ Item {
         }
 
         Anillo {
-            visible: tapa.lit
+            id: ring
+
+            visible: tapa.lit && Teclado.used
             gap: Look.filete
         }
 

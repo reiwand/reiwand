@@ -74,6 +74,7 @@ QtObject {
 
     function exercise() {
         screens();
+        ring();
         several();
         options();
         empty();
@@ -82,6 +83,15 @@ QtObject {
         menus.exercise();
         daily.exercise();
         page.tools.shown();
+    }
+
+    function ring() {
+        covers.shelf.currentIndex = 0;
+        const shown = () => Array.from(covers.shelf.view.currentItem.children).find(child => !!child.ring).ring.visible;
+        Teclado.used = false;
+        const quiet = shown();
+        App.backend.press(Qt.Key_Shift, 0);
+        must(!quiet && shown(), "the focus ring shows before any key is pressed, or a key does not show it: " + [quiet, shown()].join());
     }
 
     function screens() {
