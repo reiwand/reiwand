@@ -6,8 +6,10 @@ import org.kde.taskmanager as TaskManager
 Item {
     id: coverage
 
+    // The lock screen is drawn above every window, so the windows under it never cover its wallpaper.
+    readonly property bool lockScreen: Qt.application.name === "kscreenlocker_greet"
     property bool windows: false
-    readonly property bool covered: windows && !KWindowSystem.showingDesktop
+    readonly property bool covered: !lockScreen && windows && !KWindowSystem.showingDesktop
 
     function covering(row) {
         const value = role => tasks.data(tasks.index(row, 0), role);

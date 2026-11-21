@@ -34,7 +34,10 @@ En Debian y Ubuntu, el selector de archivos del escritorio necesita además el p
 `qt6-xdgdesktopportal-platformtheme`; sin él la app dibuja su propio selector, e `install.sh` lo avisa.
 
 Después, en Plasma: clic derecho en el escritorio → *Configurar escritorio y fondo de
-pantalla* → tipo de fondo **reiwand**. Con escala fraccional y Qt anterior a 6.11, el plugin
+pantalla* → tipo de fondo **reiwand**. Para la pantalla de bloqueo: *Configuración del sistema* →
+*Bloqueo de pantalla* → *Apariencia: Configurar…* → tipo de fondo **reiwand**; muestra el fondo de cada
+pantalla y sigue en marcha mientras «Pausar» no incluya la pantalla bloqueada (las ventanas que quedan
+debajo no lo tapan). Con escala fraccional y Qt anterior a 6.11, el plugin
 pide más píxeles de los que tiene la pantalla; el daemon reduce el stream a los píxeles reales de la
 pantalla, los del modo que anuncia el compositor Wayland, para no gastar GPU ni memoria de más (el
 tamaño y la escala que le pasa el plugin no bastan, porque llevan la misma escala que la petición).
