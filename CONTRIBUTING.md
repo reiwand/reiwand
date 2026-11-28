@@ -96,6 +96,18 @@ What each part does today is described in `docs/specs/*.md` (`scene.md`, `editor
   `reiwand-video heard.rs`, `reiwand-core stash.rs screens_of_one_package`, the inotify `listing`
   tests, `integration-streams.sh`, `integration-recovery.sh` and `reiwand-render --test timing`.
 
+## Pull requests
+
+- Every change reaches `master` through a pull request; nothing is pushed to `master` directly.
+  Open an issue first (bug or proposal) and close it from the pull request (`Closes #N`).
+- One pull request per finished item, from a branch named `change/<name>`. Its title follows the
+  commit rules below, because a pull request becomes one commit on `master`.
+- The *Checks* workflow must pass: static checks, Clippy, the unit and render tests and, when the
+  phone code changed, an Android build. Each job stops at 20 minutes, so a pull request never
+  waits longer than that.
+- The *Release* workflow runs only on `master`: it builds every package and publishes the version
+  that the commit type decides.
+
 ## Commits and versions
 
 - [Conventional Commits](https://www.conventionalcommits.org/), in English, with one of these types:

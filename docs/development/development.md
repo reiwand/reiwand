@@ -29,7 +29,11 @@ target/debug/reiwand-app --check --list     # names the check units, runs none
 scripts/screenshots.sh [OUT]               # captures the app pages as a new user sees them, into docs/images
 ```
 
-The CI that runs on each push only builds and publishes; the tests are in the *Tests* workflow
+Changes reach `master` through pull requests. Each pull request runs the *Checks* workflow
+(`.github/workflows/checks.yml`): static checks, Clippy, the unit and render tests and, when the
+phone code changed, an Android build; every job stops at 20 minutes. The *Release* workflow
+(`.github/workflows/ci.yml`) runs only on `master`: it builds and publishes. The full test set,
+with the end-to-end, compositor and Flatpak tests, is the *Tests* workflow
 (`.github/workflows/tests.yml`), which is launched by hand.
 
 `reiwand-app --check` goes through each page with test data, opens the details of an item, the

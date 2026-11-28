@@ -1,0 +1,234 @@
+name: Checks
+
+# Pull requests: tests and a compile check, kept under 20 minutes. Master runs the same jobs only to
+# keep their caches warm for the next pull request; the release itself is in ci.yml.
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: "1"
+  CARGO_PROFILE_DEV_DEBUG: "0"
+
+jobs:
+  version:
+    name: Version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      semver: ${{ steps.gitversion.outputs.semVer }}
+      informational: ${{ steps.gitversion.outputs.informationalVersion }}
+      rust: ${{ steps.changes.outputs.rust }}
+      android: ${{ steps.changes.outputs.android }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Conventional Commits and commit dates
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          kept() { grep -vFf <(sed -n 's/^ *- \([0-9a-f]\{40\}\)$/\1/p' GitVersion.yml); }
+          git cat-file -e "$BASE^{commit}" 2>/dev/null || BASE=$(git merge-base origin/master HEAD)
+          BASE=$(git describe --tags --abbrev=0 --match 'v[0-9]*' 2>/dev/null || echo "$BASE")
+          bad=$(git log --no-merges --format='%H %s' "$BASE..HEAD" | kept |
+            grep -Ev '^\S+ (build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([^()]+\))?!?: \S' || true)
+          [ -z "$bad" ] || { echo "$bad"; echo "::error::These subjects do not follow Conventional Commits"; exit 1; }
+          newest=$(git log --format='%ct %H' HEAD^@ | kept | sort -n | tail -1)
+          [ -z "$newest" ] || [ "$(git log -1 --format=%ct)" -gt "${newest%% *}" ] || { echo "::error::HEAD needs a later commit date than ${newest#* }"; exit 1; }
+
+      - uses: gittools/actions/gitversion/setup@7417b1089e2c7de93510f1901d656ddf60bb024f
+        with:
+          versionSpec: 6.8.2
+
+      - id: gitversion
+        uses: gittools/actions/gitversion/execute@7417b1089e2c7de93510f1901d656ddf60bb024f
+
+      - id: changes
+        name: Jobs that a change can affect
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          ALWAYS: ${{ github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
+        run: scripts/changes.sh "$BASE" "$ALWAYS" | tee -a "$GITHUB_OUTPUT"
+
+      - name: GitVersion versioned HEAD
+        env:
+          SHA: ${{ steps.gitversion.outputs.sha }}
+        run: test "$SHA" = "$(git rev-parse HEAD)"
+
+  workflows:
+    name: Workflow lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: actionlint with shellcheck
+        run: |
+          shellcheck --version | grep '^version'
+          "$(scripts/tools.sh actionlint "$RUNNER_TEMP/tools")" -color
+
+  lint:
+    name: Static checks
+    needs: version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: scripts/ci-apt.sh shellcheck qt6-declarative-dev-tools gettext
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          components: rustfmt
+
+      - name: Format
+        run: cargo fmt --all --check
+
+      - name: File lengths
+        run: scripts/file-lengths.sh
+
+      - name: Third-party notices are current
+        run: python3 scripts/notices.py check
+
+      - name: Every workspace package is in a test shard
+        run: scripts/test-shards.sh check
+
+      - name: Shell scripts
+        run: shellcheck apps/reiwand-server/skeleton.sh packaging/*.sh packaging/flatpak/*.sh scripts/*.sh
+
+      - name: Cache cleanup selection
+        run: scripts/ci-cache-clean-test.sh
+
+      - name: QML syntax
+        run: |
+          for f in integrations/*/metadata.json; do python3 -c "import json, sys; json.load(open(sys.argv[1]))" "$f"; done
+          for f in integrations/*/contents/ui/*.qml apps/reiwand-app/qml/*.qml apps/reiwand-app/qml/*/*.qml; do
+            /usr/lib/qt6/bin/qmlformat "$f" > /dev/null
+          done
+
+      - name: Translations
+        run: scripts/translations.sh check
+
+  clippy:
+    name: Clippy
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            pkg-config libclang-dev libpipewire-0.3-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            qt6-base-dev qt6-declarative-dev qt6-declarative-dev-tools gettext
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          components: clippy
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          save-if: ${{ github.ref == 'refs/heads/master' }}
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+
+  test:
+    name: Unit and render tests (shard ${{ matrix.shard }})
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            pkg-config libclang-dev libpipewire-0.3-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-pipewire gstreamer1.0-tools \
+            mesa-vulkan-drivers libvulkan1 \
+            pipewire pipewire-bin wireplumber dbus-x11 gnome-keyring \
+            qt6-base-dev qt6-declarative-dev qt6-declarative-dev-tools gettext
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          key: test-${{ matrix.shard }}
+          save-if: ${{ github.ref == 'refs/heads/master' }}
+
+      - name: Unit and render tests
+        env:
+          REIWAND_REQUIRE_GPU: "1"
+          REIWAND_REQUIRE_VIDEO: "1"
+          SHARD: ${{ matrix.shard }}
+        run: |
+          mapfile -t packages < <(scripts/test-shards.sh "$SHARD")
+          cargo test "${packages[@]}" --all-features --locked
+
+
+  android:
+    name: Android build
+    needs: version
+    if: needs.version.outputs.android == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          targets: x86_64-linux-android
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          key: android-x86_64
+          save-if: ${{ github.ref == 'refs/heads/master' }}
+
+      - name: Install cargo-ndk
+        run: cargo install --locked cargo-ndk --version 4.1.2
+
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6
+        with:
+          cache-provider: basic
+          cache-read-only: ${{ github.ref != 'refs/heads/master' }}
+          add-job-summary: on-failure
+
+      - name: Native library and APK (x86_64, unsigned)
+        run: |
+          export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME" ANDROID_NDK_ROOT="$ANDROID_NDK_LATEST_HOME"
+          android/gradlew -p android :app:cargo -Pabis=x86_64
+          android/gradlew -p android assembleRelease -x :app:cargo -Pabis=x86_64
