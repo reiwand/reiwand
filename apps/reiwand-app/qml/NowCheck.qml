@@ -40,7 +40,15 @@ Timer {
                 "state": "failed"
             });
         const shown = tasks.pick([failed(10, "daily"), failed(11, "space"), failed(12, "daily"), failed(13, "space"), failed(14, "daily")]).map(job => job.id);
+        const running = [1, 2, 3, 4, 5, 6, 7].map(id => ({
+                    "id": id,
+                    "kind": "install",
+                    "target": "p" + id,
+                    "state": "running"
+                }));
+        const capped = tasks.rows(tasks.pick(running)).length;
         tasks.destroy();
+        must(capped === 4, "a burst of jobs shows a few lines and counts the rest, not " + capped);
         must(shown.join(",") === "13,14", "a task that keeps failing shows one line per attempt: " + shown.join(","));
         const layers = Qt.createComponent("LayersCheck.qml").createObject(frame, {
             "frame": frame

@@ -23005,3 +23005,7 @@ msgstr "Capas que usan el sistema (%1)"
 #: apps/reiwand-app/qml/SceneSwarmTree.qml
 msgid "No layer draws %1 yet."
 msgstr "Ninguna capa dibuja %1 todavía."
+
+#: apps/reiwand-app/qml/NowTask.qml
+msgid "%1 more"
+msgstr "%1 más"

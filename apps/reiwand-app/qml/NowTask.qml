@@ -6,7 +6,14 @@ Column {
     id: tasks
 
     property var dismissed: []
-    readonly property var shown: pick(App.jobs)
+    readonly property var all: pick(App.jobs)
+    readonly property var shown: rows(all)
+    readonly property int more: all.length - shown.length
+
+    // A few rows at most, so a burst of jobs never runs off the window; the rest are counted.
+    function rows(jobs) {
+        return jobs.slice(0, 4);
+    }
 
     function pick(jobs) {
         return jobs.filter(job => job.kind !== "layers").filter(job => job.state === "queued" || job.state === "running" || (job.state === "failed" && dismissed.indexOf(job.id) < 0 && !jobs.some(later => later.id > job.id && later.kind === job.kind && later.target === job.target)));
@@ -44,5 +51,12 @@ Column {
                 onClicked: task.failed ? tasks.dismissed = tasks.dismissed.concat([task.modelData.id]) : App.act("CancelJob", [task.modelData.id])
             }
         }
+    }
+
+    StatusLine {
+        anchors.right: parent ? parent.right : undefined
+        visible: tasks.more > 0
+        icon: "images"
+        text: App.tr("%1 more", tasks.more)
     }
 }
