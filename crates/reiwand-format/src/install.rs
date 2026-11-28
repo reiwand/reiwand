@@ -86,7 +86,7 @@ pub fn current(data: &Path, repo_id: &str, id: &str, version: &str) -> Result<In
     locked(data, false, || {
         let found =
             records(data)?.into_iter().find(|i| i.repo_id == repo_id && i.id == id && i.version == version);
-        let found = found.ok_or_else(|| Error::NotFound(format!("{id} {version} was uninstalled")))?;
+        let found = found.ok_or_else(|| Error::NotFound(format!("{id} {version}")))?;
         if let Some(reason) = found.revoked {
             return Err(Error::Revoked(format!("{id} {version} ({reason:?})")));
         }
@@ -149,7 +149,7 @@ fn signed_by(snap: &Snapshot, online: Option<&OnlineAuthor>, fp: &str) -> Option
 }
 
 fn still(data: &Path, item: &Installed) -> Result<()> {
-    let removed = |_| Error::NotFound(format!("repository {} was removed or broken", item.repo_id));
+    let removed = |_| Error::NotFound(format!("repository {}", item.repo_id));
     let snap = load(data, &item.repo_id).map_err(removed)?;
     let key = item.signer.as_deref().and_then(|fp| snap.revoked.key(fp));
     match snap.revoked.version(&item.id, &item.version).or(key) {
