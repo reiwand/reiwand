@@ -31,6 +31,15 @@ pub(super) async fn apply(path: &str, output: &str, fit: &str, doc: &Value) -> R
     waiting.abort();
     let report = imported?.1.output.unwrap_or_default();
     let uid = report["imported"][0]["uid"].as_str().map(String::from);
+    if let (None, Some(kept)) = (&uid, report["kept"][0]["uid"].as_str()) {
+        let version = report["kept"][0]["version"].as_str().unwrap_or_default();
+        bail!(fill(
+            told(
+                "version %1 of this package is already in the library, maybe with other files: raise the version in manifest.json, or remove the old one with reiwand-ctl lib rm %2"
+            ),
+            &[&version, &kept]
+        ));
+    }
     let failed = report["failed"][0]["error"]
         .as_str()
         .unwrap_or(&tr(told("the library refused the package")))

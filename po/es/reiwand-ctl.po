@@ -2134,6 +2134,16 @@ msgid "the library refused the package"
 msgstr "la biblioteca rechazó el paquete"
 
 #: apps/reiwand-ctl/src/folder/parts.rs
+msgid ""
+"version %1 of this package is already in the library, maybe with other "
+"files: raise the version in manifest.json, or remove the old one with "
+"reiwand-ctl lib rm %2"
+msgstr ""
+"la versión %1 de este paquete ya está en la biblioteca, quizá con otros "
+"archivos: sube la versión en manifest.json o quita la vieja con reiwand-ctl "
+"lib rm %2"
+
+#: apps/reiwand-ctl/src/folder/parts.rs
 msgid "Showing it on the screen…"
 msgstr "Mostrándolo en la pantalla…"
 
