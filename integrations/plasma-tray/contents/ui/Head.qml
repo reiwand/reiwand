@@ -101,9 +101,16 @@ ColumnLayout {
                 Layout.rightMargin: Look.e3
                 from: 0
                 to: 1
-                value: head.current.volume
                 Accessible.name: i18n("Master volume")
                 onMoved: debounce.restart()
+
+                // While it is held, or what it sent is still on its way back, a state that comes in does
+                // not move it under the pointer.
+                Binding on value {
+                    value: head.current.volume
+                    when: !volume.pressed && !debounce.running && !settle.running
+                    restoreMode: Binding.RestoreNone
+                }
             }
         }
     }
@@ -116,6 +123,13 @@ ColumnLayout {
             head.daemon.act("SetVolume", [volume.value]);
             if (head.muted)
                 head.daemon.act("SetMuted", [false]);
+            settle.restart();
         }
+    }
+
+    Timer {
+        id: settle
+
+        interval: 600
     }
 }

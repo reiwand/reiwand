@@ -52,9 +52,16 @@ RowLayout {
         from: 0
         to: 100
         stepSize: 5
-        value: picker.own.sound_volume ?? 100
         Accessible.name: picker.daemon.tr("Volume of this wallpaper")
         onMoved: debounce.restart()
+
+        // While it is held, or what it sent is still on its way back, a reload of the item does not
+        // move it under the pointer.
+        Binding on value {
+            value: picker.own.sound_volume ?? 100
+            when: !level.pressed && !debounce.running && !settle.running
+            restoreMode: Binding.RestoreNone
+        }
     }
 
     QQC2.Label {
@@ -65,6 +72,15 @@ RowLayout {
         id: debounce
 
         interval: 200
-        onTriggered: picker.save("", String(Math.round(level.value)))
+        onTriggered: {
+            picker.save("", String(Math.round(level.value)));
+            settle.restart();
+        }
+    }
+
+    Timer {
+        id: settle
+
+        interval: 600
     }
 }

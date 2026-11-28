@@ -118,8 +118,15 @@ ColumnLayout {
             visible: host.sound !== ""
             from: 0
             to: 1
-            value: host.daemon.state?.volume
             onMoved: debounce.restart()
+
+            // While it is held, or what it sent is still on its way back, a state that comes in does not
+            // move it under the pointer.
+            Binding on value {
+                value: host.daemon.state?.volume
+                when: !loudness.pressed && !debounce.running && !settle.running
+                restoreMode: Binding.RestoreNone
+            }
         }
 
         QQC2.ToolButton {
@@ -180,12 +187,19 @@ ColumnLayout {
     }
 
     Timer {
+        id: settle
+
+        interval: 600
+    }
+
+    Timer {
         id: debounce
 
         interval: 200
         onTriggered: {
             host.daemon.act("SetVolume", [loudness.value]);
             host.daemon.act("SetMuted", [false]);
+            settle.restart();
         }
     }
 

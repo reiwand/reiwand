@@ -46,9 +46,16 @@ ControlButtons {
             width: Look.e8 + Look.e7
             from: 0
             to: 1
-            value: App.state.volume ?? 0
             Accessible.name: App.tr("Overall volume")
             onMoved: debounce.restart()
+
+            // While it is held, or what it sent is still on its way back, a state that comes in does not
+            // move it under the pointer.
+            Binding on value {
+                value: App.state.volume ?? 0
+                when: !volume.pressed && !debounce.running && !settle.running
+                restoreMode: Binding.RestoreNone
+            }
         }
     }
 
@@ -78,12 +85,19 @@ ControlButtons {
     }
 
     Timer {
+        id: settle
+
+        interval: 600
+    }
+
+    Timer {
         id: debounce
 
         interval: 200
         onTriggered: {
             App.act("SetVolume", [volume.value]);
             App.act("SetMuted", [false]);
+            settle.restart();
         }
     }
 
