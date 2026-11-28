@@ -42,9 +42,35 @@ pub struct Track {
 
 type Item = (Option<usize>, f64, f64);
 
+/// Frames a change of the master volume takes from silence to full: 20 ms, short enough to follow a
+/// slider and long enough not to click.
+const GLIDE: f32 = 960.0;
+
+/// The master volume: where it is now and where it is going, a frame at a time.
+#[derive(Clone, Copy)]
+struct Gain {
+    now: f32,
+    aim: f32,
+}
+
+impl Default for Gain {
+    fn default() -> Gain {
+        Gain { now: 1.0, aim: 1.0 }
+    }
+}
+
+impl Gain {
+    fn step(&mut self) -> f32 {
+        let gap = self.aim - self.now;
+        self.now += gap.clamp(-1.0 / GLIDE, 1.0 / GLIDE);
+        self.now
+    }
+}
+
 #[derive(Default)]
 pub struct Mix {
     lanes: Vec<Lane>,
+    gain: Gain,
     pub frames: u64,
 }
 
@@ -62,7 +88,7 @@ impl Mix {
             duck: 1.0,
             ..Lane::default()
         };
-        Mix { lanes: tracks.iter().map(lane).collect(), frames: 0 }
+        Mix { lanes: tracks.iter().map(lane).collect(), gain: Gain::default(), frames: 0 }
     }
 
     pub fn load(&mut self, lane: usize, clip: usize, source: Source) {
@@ -80,6 +106,15 @@ impl Mix {
         }
     }
 
+    /// Sets the master volume, 0 to 1: it glides there over a few milliseconds, or jumps there at once
+    /// when `now`, as for the first volume of a sound that has not started.
+    pub fn set_gain(&mut self, gain: f32, now: bool) {
+        self.gain.aim = gain.clamp(0.0, 1.0);
+        if now {
+            self.gain.now = self.gain.aim;
+        }
+    }
+
     pub fn playheads(&self) -> Vec<f64> {
         self.lanes.iter().map(|lane| lane.at).collect()
     }
@@ -94,6 +129,8 @@ impl Mix {
         for frame in out.as_chunks_mut::<4>().0 {
             let mut sum = [0.0f32; 2];
             self.lanes.iter_mut().for_each(|lane| lane.add(&mut sum));
+            let gain = self.gain.step();
+            let sum = sum.map(|s| s * gain);
             let [left, right] =
                 sum.map(|s| ((s.clamp(-1.0, 1.0) * f32::from(i16::MAX)) as i16).to_le_bytes());
             *frame = [left[0], left[1], right[0], right[1]];

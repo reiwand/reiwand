@@ -103,3 +103,17 @@ fn lists_play_in_order_with_pauses_and_end() {
     let signs: Vec<i16> = (0..10).map(|i| out[i * 480 + 240][0].signum()).collect();
     assert!(signs.windows(2).all(|w| w[0] != w[1]), "{signs:?}");
 }
+
+#[test]
+fn the_master_volume_glides_instead_of_jumping() {
+    let mut sound = mix(track(&[1.0], true), vec![flat(16_384, 48_000)]);
+    sound.set(&[ON], 0.0);
+    run(&mut sound, 2000);
+    sound.set_gain(0.25, false);
+    let heard = run(&mut sound, 2000);
+    let step = heard.windows(2).map(|w| (w[1][0] - w[0][0]).abs()).max().unwrap_or(0);
+    assert!(step <= 20, "no click when the volume drops: a step of {step}");
+    assert!((heard[1999][0] - 4096).abs() <= 2, "and it gets there within 20 ms: {:?}", heard[1999]);
+    sound.set_gain(1.0, true);
+    assert!((run(&mut sound, 1)[0][0] - 16_383).abs() <= 2, "a first volume is there at once");
+}

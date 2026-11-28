@@ -34,6 +34,7 @@ impl Soundtrack {
         crate::init()?;
         let mut mix = Mix::new(&lanes.iter().map(|(_, track)| track.clone()).collect::<Vec<_>>());
         mix.set(voices, 0.0);
+        mix.set_gain(volume as f32, true);
         let mix = Arc::new(Mutex::new(mix));
         let playing = |lane: &usize| voices.get(*lane).is_some_and(|v| v.play);
         let (now, later): (Vec<usize>, Vec<usize>) = (0..lanes.len()).partition(playing);
@@ -45,7 +46,8 @@ impl Soundtrack {
         let playbin = make("playbin")?;
         playbin.set_property("uri", SOURCE);
         playbin.set_property_from_str("flags", "audio+soft-volume");
-        playbin.set_property("volume", volume.clamp(0.0, 1.0));
+        // The volume is the mix's own, which glides; a jump of the player's volume clicks.
+        playbin.set_property("volume", 1.0f64);
         playbin.set_property("mute", false);
         let piped = pipewire::sink(Some(LATENCY));
         piped.iter().for_each(|sink| playbin.set_property("audio-sink", sink));
@@ -93,7 +95,7 @@ impl Soundtrack {
     }
 
     pub fn set_volume(&self, volume: f64) {
-        self.pipe.playbin.set_property("volume", volume.clamp(0.0, 1.0));
+        lock(&self.mix).set_gain(volume as f32, false);
     }
 
     pub fn position(&self) -> Option<Duration> {
