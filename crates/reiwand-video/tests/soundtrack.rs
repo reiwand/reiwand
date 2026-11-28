@@ -140,6 +140,8 @@ fn soundtracks_stay_near_the_speaker_and_pause_and_resume_promptly() {
     let (paused, frames) = last;
     let crept = position().saturating_sub(paused);
     assert!(crept < Duration::from_millis(20) && sound.playheads().0 == frames, "it kept playing: {crept:?}");
+    // A pause as long as a window covering the screen: the sound comes back at once, not that much later.
+    std::thread::sleep(Duration::from_secs(2));
     let resumed = Instant::now();
     sound.set_playing(true);
     let played = within(Duration::from_secs(2), || position() > paused + Duration::from_millis(300));
