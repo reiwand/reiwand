@@ -1,0 +1,1002 @@
+{
+  "assets": {
+    "wind": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/wind.ogg",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    }
+  },
+  "canvas": {
+    "background": "#0d1b33",
+    "blend_space": "linear",
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": "display",
+    "poster_time": 0.0,
+    "seed": 11,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fade_in": 3,
+      "fade_out": 3,
+      "id": "gusts",
+      "loop": true,
+      "mode": "sequence",
+      "opacity": 1.0,
+      "pan": 0.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "play": {
+        "invert": false,
+        "map": {
+          "breeze": true,
+          "calm": false,
+          "gale": true
+        },
+        "prop": "wind"
+      },
+      "solid": false,
+      "sound": "wind",
+      "sounds": [],
+      "stream": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "sound",
+      "visible": true,
+      "volume": {
+        "invert": false,
+        "map": {
+          "breeze": 0.6,
+          "calm": 0,
+          "gale": 1
+        },
+        "prop": "wind"
+      }
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "clouds",
+          "enabled": {
+            "invert": false,
+            "prop": "clouds"
+          },
+          "optional": false,
+          "params": {
+            "color": "#c9d6e8",
+            "coverage": 0.5,
+            "height": 0.7,
+            "octaves": 5.0,
+            "opacity": 0.55,
+            "shade": "#4f6380",
+            "size": 460,
+            "softness": 0.3,
+            "speed": [
+              18,
+              0
+            ],
+            "warp": 0.8
+          }
+        }
+      ],
+      "gradient": {
+        "from": [
+          0.0,
+          0.0
+        ],
+        "radial": false,
+        "stops": [
+          [
+            0,
+            "#0b1830"
+          ],
+          [
+            0.6,
+            "#24456b"
+          ],
+          [
+            1,
+            "#6b8aa8"
+          ]
+        ],
+        "to": [
+          0.0,
+          1.0
+        ]
+      },
+      "id": "sky",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "rect": {
+          "radius": 0.0,
+          "size": [
+            1920,
+            1080
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "photo",
+      "image": {
+        "invert": false,
+        "prop": "photos"
+      },
+      "opacity": 0.8,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        1920,
+        1080
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#f4f1e6",
+      "id": "moon",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "ellipse": {
+          "size": [
+            130,
+            130
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          1480,
+          220
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "add",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "gradient": {
+        "from": [
+          0.5,
+          0.5
+        ],
+        "radial": true,
+        "stops": [
+          [
+            0,
+            "#cfe0ff50"
+          ],
+          [
+            0.3,
+            "#cfe0ff1b"
+          ],
+          [
+            0.65,
+            "#cfe0ff03"
+          ],
+          [
+            1,
+            "#cfe0ff00"
+          ]
+        ],
+        "to": [
+          1,
+          0.5
+        ]
+      },
+      "id": "halo",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "ellipse": {
+          "size": [
+            760,
+            760
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          1480,
+          220
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "god_rays",
+          "enabled": true,
+          "optional": true,
+          "params": {
+            "angle": 90.0,
+            "color": "#dfe9ff",
+            "decay": 0.96,
+            "density": 0.8,
+            "edges": 6.0,
+            "exposure": 0.35,
+            "follow": false,
+            "mode": 0.0,
+            "noise": 0.0,
+            "samples": 12.0,
+            "source": [
+              0.77,
+              0.2
+            ],
+            "threshold": 0.85
+          }
+        }
+      ],
+      "id": "rays",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "redraw": false,
+      "rgb": false,
+      "size": "canvas",
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "adjustment",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#b9c7d8",
+      "id": "far",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "ellipse": {
+          "size": [
+            2500,
+            620
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          560,
+          1040
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "clip": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "pines",
+      "layers": [
+        {
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#1b3047",
+          "id": "p1",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "shape": {
+            "polygon": {
+              "sides": 3,
+              "size": 110
+            }
+          },
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "position": [
+              300,
+              780
+            ],
+            "rotation": 0.0,
+            "scale": [
+              0.55,
+              1.5
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "shape",
+          "visible": true
+        },
+        {
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#1b3047",
+          "id": "p2",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "shape": {
+            "polygon": {
+              "sides": 3,
+              "size": 80
+            }
+          },
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "position": [
+              420,
+              820
+            ],
+            "rotation": 0.0,
+            "scale": [
+              0.55,
+              1.5
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "shape",
+          "visible": true
+        },
+        {
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#16283c",
+          "id": "p3",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "shape": {
+            "polygon": {
+              "sides": 3,
+              "size": 130
+            }
+          },
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "position": [
+              1320,
+              800
+            ],
+            "rotation": 0.0,
+            "scale": [
+              0.55,
+              1.5
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "shape",
+          "visible": true
+        },
+        {
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#16283c",
+          "id": "p4",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "shape": {
+            "polygon": {
+              "sides": 3,
+              "size": 90
+            }
+          },
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "position": [
+              1450,
+              840
+            ],
+            "rotation": 0.0,
+            "scale": [
+              0.55,
+              1.5
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "shape",
+          "visible": true
+        }
+      ],
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "solid": false,
+      "space": "2d",
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "group",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#e8eef6",
+      "id": "near",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "ellipse": {
+          "size": [
+            2700,
+            560
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          1400,
+          1130
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "snow",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "solid": false,
+      "system": "snow",
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "particles",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "vignette",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "center": [
+              0.5,
+              0.5
+            ],
+            "color": "#000000",
+            "intensity": 0.45,
+            "radius": 1.0,
+            "roundness": 1.0,
+            "softness": 0.65
+          }
+        },
+        {
+          "effect": "film_grain",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "amount": 0.035,
+            "bias": 0.0,
+            "blend": "overlay",
+            "fps": 0.0,
+            "mono": false,
+            "size": 1.5
+          }
+        }
+      ],
+      "id": "post",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "redraw": false,
+      "rgb": false,
+      "size": "canvas",
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "adjustment",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {
+    "snow": {
+      "capacity": 2000,
+      "children": [],
+      "collide": [
+        {
+          "bounce": 0.0,
+          "bounds": {
+            "plane": {
+              "normal": [
+                -1,
+                0
+              ],
+              "point": [
+                1940,
+                0
+              ]
+            }
+          },
+          "friction": 0,
+          "kill": true,
+          "stick": false
+        },
+        {
+          "bounce": 0.0,
+          "bounds": {
+            "plane": {
+              "normal": [
+                0,
+                -1
+              ],
+              "point": [
+                0,
+                1100
+              ]
+            }
+          },
+          "friction": 0,
+          "kill": true,
+          "stick": false
+        }
+      ],
+      "emitters": [
+        {
+          "audio_gate": false,
+          "bursts": [],
+          "delay": 0,
+          "duration": null,
+          "inherit": 0,
+          "rate": {
+            "invert": false,
+            "prop": "density"
+          },
+          "shape": {
+            "box": {
+              "from": [
+                -200,
+                -40
+              ],
+              "inner": [
+                0,
+                0
+              ],
+              "to": [
+                2120,
+                -10
+              ]
+            }
+          }
+        },
+        {
+          "audio_gate": false,
+          "bursts": [],
+          "delay": 0,
+          "duration": null,
+          "inherit": 0,
+          "rate": {
+            "invert": false,
+            "map": {
+              "breeze": 50,
+              "calm": 0,
+              "gale": 110
+            },
+            "prop": "wind"
+          },
+          "shape": {
+            "line": [
+              [
+                -30,
+                -40
+              ],
+              [
+                -30,
+                1060
+              ]
+            ]
+          }
+        }
+      ],
+      "forces": [
+        {
+          "gravity": {
+            "invert": false,
+            "map": {
+              "breeze": [
+                22,
+                16
+              ],
+              "calm": [
+                0,
+                14
+              ],
+              "gale": [
+                60,
+                20
+              ]
+            },
+            "prop": "wind"
+          },
+          "window": [
+            0,
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "turbulence": {
+            "mask": [
+              1,
+              1
+            ],
+            "scale": 0.004,
+            "speed": 0,
+            "strength": 14,
+            "time_scale": 1
+          },
+          "window": [
+            0,
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "drag": 0.25,
+          "window": [
+            0,
+            0,
+            1,
+            1
+          ]
+        }
+      ],
+      "init": {
+        "angle": [
+          80,
+          100,
+          1
+        ],
+        "color": [
+          "#ffffff",
+          "#dce6f4",
+          1
+        ],
+        "frame": [
+          0.0,
+          0.0,
+          1
+        ],
+        "gradient": [],
+        "life": [
+          12,
+          18,
+          1
+        ],
+        "remap": [],
+        "rotation": [
+          0.0,
+          0.0,
+          1
+        ],
+        "size": [
+          3,
+          8,
+          1
+        ],
+        "speed": [
+          30,
+          70,
+          1
+        ],
+        "spin": [
+          0.0,
+          0.0,
+          1
+        ],
+        "tilt": {
+          "angle": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ],
+          "spin": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "lock": [],
+      "points": [],
+      "prewarm": 8,
+      "render": {
+        "angle": null,
+        "aspect": 1,
+        "color_over_life": [
+          [
+            0,
+            "#ffffff00"
+          ],
+          [
+            0.08,
+            "#ffffffff"
+          ],
+          [
+            0.9,
+            "#ffffffff"
+          ],
+          [
+            1,
+            "#ffffff00"
+          ]
+        ],
+        "cycles": null,
+        "fps": 12.0,
+        "lit": false,
+        "mix": false,
+        "size_over_life": []
+      },
+      "seed": 3,
+      "space": "local"
+    }
+  },
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": []
+}

@@ -1,0 +1,94 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": null,
+  "description": "",
+  "display": null,
+  "entry": "index.html",
+  "id": "org.example.probe",
+  "inputs": [
+    "pointer",
+    "clicks"
+  ],
+  "kind": "web",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
+  "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "previews": null,
+  "properties": {
+    "photo": {
+      "accept": [
+        "image"
+      ],
+      "default_asset": null,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": "Photo",
+      "order": 0,
+      "quality": {},
+      "type": "file",
+      "visible_if": {}
+    },
+    "port": {
+      "decimals": null,
+      "default": 9,
+      "editable": false,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "integer": false,
+      "label": "Port",
+      "log": false,
+      "max": 65535,
+      "min": 1,
+      "order": 0,
+      "quality": {},
+      "step": 1,
+      "type": "slider",
+      "unit": null,
+      "visible_if": {}
+    },
+    "tint": {
+      "alpha": false,
+      "default": "#ff8000",
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": "Tint",
+      "order": 0,
+      "quality": {},
+      "type": "color",
+      "visible_if": {}
+    }
+  },
+  "requires": null,
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "Probe",
+  "version": "1.0.0",
+  "web": {
+    "background": "#102030",
+    "preload": "early.js",
+    "storage_kib": 64
+  }
+}

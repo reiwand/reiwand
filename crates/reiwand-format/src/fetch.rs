@@ -1,0 +1,86 @@
+use crate::store::State;
+use crate::validate::within;
+use crate::{Error, Result, Root, require};
+use std::fs::File;
+use std::io::{self, Read, Write};
+use std::path::Path;
+
+pub trait Fetch {
+    fn get(&self, base: &str, path: &str, max: u64) -> io::Result<Option<Vec<u8>>>;
+
+    fn copy(&self, base: &str, path: &str, max: u64, out: &mut dyn Write) -> io::Result<bool> {
+        let Some(bytes) = self.get(base, path, max)? else { return Ok(false) };
+        out.write_all(&bytes).map(|()| true)
+    }
+}
+
+pub struct FileFetch;
+
+impl Fetch for FileFetch {
+    fn get(&self, base: &str, path: &str, max: u64) -> io::Result<Option<Vec<u8>>> {
+        let root = base.strip_prefix("file://").unwrap_or(base);
+        match File::open(Path::new(root).join(path)) {
+            Ok(file) => {
+                let mut bytes = Vec::new();
+                file.take(max.saturating_add(1)).read_to_end(&mut bytes)?;
+                Ok(Some(bytes))
+            }
+            Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(None),
+            Err(e) => Err(e),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Anchor {
+    pub base: String,
+    pub repo_id: Option<String>,
+}
+
+impl Anchor {
+    pub fn parse(url: &str) -> Result<Self> {
+        let (base, query) = url.split_once('?').unwrap_or((url, ""));
+        require(
+            query.is_empty(),
+            "address",
+            "a repository address has no parameters: use the plain address, without ?fingerprint= or ?repo_id=",
+        )?;
+        Ok(Anchor { base: format!("{}/", base.trim_end_matches('/')), repo_id: None })
+    }
+}
+
+pub(crate) fn local(base: &str) -> bool {
+    base.starts_with("file://") || !base.contains("://")
+}
+
+pub(crate) fn bases(state: &State, root: &Root) -> Vec<String> {
+    let (mut bases, here) = (state.bases.clone(), state.bases.first().is_some_and(|b| local(b)));
+    for mirror in root.mirrors.iter().map(|m| format!("{}/", m.trim_end_matches('/'))) {
+        if (here || !local(&mirror)) && !bases.contains(&mirror) {
+            bases.push(mirror);
+        }
+    }
+    bases
+}
+
+pub(crate) fn first<T>(
+    bases: &[String],
+    mut attempt: impl FnMut(&str) -> Result<Option<T>>,
+) -> Result<Option<T>> {
+    let (mut missing, mut error) = (false, None);
+    for base in bases {
+        match attempt(base) {
+            Ok(Some(value)) => return Ok(Some(value)),
+            Ok(None) => missing = true,
+            Err(Error::Io(e)) if e.kind() == io::ErrorKind::Interrupted => return Err(e.into()),
+            Err(e) => error = Some(e),
+        }
+    }
+    error.filter(|_| !missing).map_or(Ok(None), Err)
+}
+
+pub(crate) fn get(fetch: &dyn Fetch, base: &str, path: &str, max: u64) -> Result<Option<Vec<u8>>> {
+    let bytes = fetch.get(base, path, max)?;
+    bytes.as_ref().map_or(Ok(()), |b| within("download size", b.len() as u64, max))?;
+    Ok(bytes)
+}

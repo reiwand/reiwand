@@ -1,0 +1,143 @@
+{
+  "authors": [
+    "Reiwand contributors"
+  ],
+  "changes": {
+    "en": "Describes itself in English and Spanish and declares its rating and the inputs it uses.",
+    "es": "Se describe en inglés y en español y declara su clasificación y las entradas que usa."
+  },
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [
+    {
+      "attribution": "Reiwand contributors",
+      "license": "CC0-1.0",
+      "paths": [
+        "assets/water.ogg"
+      ],
+      "source": null,
+      "url": null
+    }
+  ],
+  "default_locale": "en",
+  "description": {
+    "en": "Lily pads that drift aside and water that ripples where you touch or move the pointer, once you allow it, with the soft sound of water.",
+    "es": "Nenúfares que se apartan y agua que se ondula donde tocas o mueves el puntero, cuando lo permites, con el suave sonido del agua."
+  },
+  "display": null,
+  "entry": "scene.json",
+  "id": "io.github.reiwand.example.pond",
+  "inputs": [
+    "pointer",
+    "clicks"
+  ],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
+  "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "previews": {
+    "animated": null,
+    "thumbnail": "preview.jpg"
+  },
+  "properties": {
+    "note": {
+      "enabled_if": {},
+      "label": {
+        "en": "Allow touch for this scene, then touch the water or move the pointer over it.",
+        "es": "Permite el tacto a esta escena y toca el agua o mueve el puntero sobre ella."
+      },
+      "order": 0,
+      "quality": {},
+      "type": "label",
+      "visible_if": {}
+    },
+    "pads": {
+      "default": true,
+      "enabled_if": {},
+      "label": {
+        "en": "Lily pads",
+        "es": "Nenúfares"
+      },
+      "order": 2,
+      "quality": {},
+      "type": "bool",
+      "visible_if": {}
+    },
+    "ripples": {
+      "decimals": null,
+      "default": 40.0,
+      "editable": false,
+      "enabled_if": {},
+      "integer": false,
+      "label": {
+        "en": "Ripple strength",
+        "es": "Fuerza de las ondas"
+      },
+      "log": false,
+      "max": 96.0,
+      "min": 0.0,
+      "order": 1,
+      "quality": {},
+      "step": 4.0,
+      "type": "slider",
+      "unit": null,
+      "visible_if": {}
+    },
+    "volume": {
+      "decimals": null,
+      "default": 100.0,
+      "editable": false,
+      "enabled_if": {},
+      "integer": true,
+      "label": {
+        "en": "Water volume",
+        "es": "Volumen del agua"
+      },
+      "log": false,
+      "max": 100.0,
+      "min": 0.0,
+      "order": 3,
+      "quality": {},
+      "step": 5.0,
+      "type": "slider",
+      "unit": null,
+      "visible_if": {}
+    }
+  },
+  "requires": {
+    "engine": null,
+    "features": [
+      "inputs.clicks",
+      "inputs.pointer",
+      "sound"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [
+    "example",
+    "water",
+    "pointer",
+    "sound"
+  ],
+  "title": {
+    "en": "Pond",
+    "es": "Estanque"
+  },
+  "version": "1.1.0",
+  "web": null
+}

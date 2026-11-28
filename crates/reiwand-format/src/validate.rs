@@ -1,0 +1,146 @@
+use crate::locale::locale_file;
+use crate::{Error, Kind, Manifest, Result, ensure};
+use reiwand_core::message::said;
+use std::collections::HashSet;
+use std::path::Path;
+
+pub const MANIFEST: &str = "manifest.json";
+pub const SIGNATURE: &str = "manifest.json.minisig";
+
+const MAX_PATH: usize = 255;
+const RATIO_FLOOR: u64 = 1 << 20;
+const IMAGES: &[&str] = &["png", "jpg", "jpeg", "webp", "avif", "gif", "bmp", "ktx2"];
+const VIDEOS: &[&str] = &["webm", "mp4", "mkv"];
+const SCENES: &[&str] = &[
+    "json", "wgsl", "js", "gltf", "glb", "bin", "ogg", "opus", "flac", "mp3", "wav", "ttf", "otf", "ttc",
+    "otc", "woff2", "cube", "hdr", "exr",
+];
+const PAGES: &[&str] = &[
+    "html", "htm", "js", "mjs", "css", "json", "wasm", "svg", "hdr", "exr", "ogg", "opus", "flac", "mp3",
+    "wav", "ttf", "otf", "woff", "woff2", "glb", "gltf", "bin", "obj", "mtl", "fbx", "basis", "glsl", "vert",
+    "frag", "wgsl", "csv", "xml",
+];
+const COMMON: &[&str] = &["txt"];
+const DATA: &[&str] = &["json"];
+const THUMBNAILS: &[&str] = &["png", "jpg", "jpeg", "webp"];
+const ANIMATED: &[&str] = &["gif", "webp"];
+pub(crate) const MAX_ANIMATED: u64 = 8 << 20;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Limits {
+    pub max_entries: usize,
+    pub max_file_size: u64,
+    pub max_total_size: u64,
+    pub max_ratio: u64,
+}
+
+impl Default for Limits {
+    fn default() -> Self {
+        Limits { max_entries: 4096, max_file_size: 1536 << 20, max_total_size: 2 << 30, max_ratio: 100 }
+    }
+}
+
+impl Limits {
+    pub fn phone() -> Self {
+        Limits { max_total_size: crate::PHONE_BYTES, ..Limits::default() }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FileEntry {
+    pub path: String,
+    pub size: u64,
+    pub compressed_size: u64,
+    pub symlink: bool,
+}
+
+pub fn check_path(path: &str) -> Result<()> {
+    let safe = path.len() <= MAX_PATH
+        && !path.chars().any(|c| c.is_control() || c == '\\' || c == ':')
+        && path.split('/').all(|segment| !matches!(segment, "" | "." | ".."));
+    ensure(safe, || Error::UnsafePath(path.into()))
+}
+
+pub fn validate(manifest: &Manifest, files: &[FileEntry], limits: &Limits) -> Result<()> {
+    manifest.check()?;
+    within("entry count", files.len() as u64, limits.max_entries as u64)?;
+    let mut seen = HashSet::new();
+    let mut total = 0u64;
+    for file in files {
+        check_path(&file.path)?;
+        ensure(!file.symlink, || Error::Symlink(file.path.clone()))?;
+        ensure(seen.insert(file.path.to_lowercase()), || Error::Duplicate(file.path.clone()))?;
+        let allowed = [MANIFEST, SIGNATURE].contains(&file.path.as_str())
+            || locale_file(&file.path)
+            || extension(&file.path).is_some_and(|e| allows(manifest.kind, &e));
+        ensure(allowed, || Error::Extension { path: file.path.clone(), kind: manifest.kind })?;
+        within("file size", file.size, limits.max_file_size)?;
+        total = total.saturating_add(file.size);
+        within("total size", total, limits.max_total_size)?;
+        if file.size > RATIO_FLOOR {
+            within("compression ratio", file.size / file.compressed_size.max(1), limits.max_ratio)?;
+        }
+    }
+    ensure(files.iter().any(|f| f.path == MANIFEST), || Error::Missing(MANIFEST.into()))?;
+    let entry_types = match manifest.kind {
+        Kind::Image => IMAGES,
+        Kind::Video => VIDEOS,
+        Kind::Scene | Kind::Preset | Kind::Assets => DATA,
+        Kind::Web => &["html", "htm"],
+    };
+    let web = manifest.web.clone().unwrap_or_default();
+    let previews = manifest.previews.clone().unwrap_or_default();
+    let referenced = [
+        ("entry", Some(&manifest.entry), entry_types, u64::MAX),
+        ("previews.thumbnail", previews.thumbnail.as_ref(), THUMBNAILS, 1 << 20),
+        ("previews.animated", previews.animated.as_ref(), ANIMATED, MAX_ANIMATED),
+        ("web.preload", web.preload.as_ref(), &["js", "mjs"], u64::MAX),
+    ];
+    referenced.into_iter().try_for_each(|(field, path, types, max)| {
+        let Some(path) = path else { return Ok(()) };
+        check_path(path)?;
+        let file = files.iter().find(|f| &f.path == path).ok_or_else(|| Error::Missing(path.clone()))?;
+        let usable = path != MANIFEST && extension(path).is_some_and(|e| types.contains(&e.as_str()));
+        let quoted = format!("{path:?}");
+        let unusable = || {
+            said(
+                "format.unusable",
+                "%1 is not a usable %2 for %3 packages",
+                &[&quoted, &field, &manifest.kind],
+            )
+        };
+        crate::ensure(usable, || crate::refuse(field, unusable()))?;
+        let large = || {
+            said("format.large", "%1 has %2 bytes, more than the %3 allowed", &[&quoted, &file.size, &max])
+        };
+        crate::ensure(file.size <= max, || crate::refuse(field, large()))
+    })?;
+    manifest.credits.iter().flat_map(|c| &c.paths).try_for_each(|path| {
+        check_path(path.trim_end_matches('/'))?;
+        let dir = path.ends_with('/');
+        let found =
+            files.iter().any(|f| if dir { f.path.starts_with(path.as_str()) } else { f.path == *path });
+        let quoted = format!("{path:?}");
+        let gone = || said("format.uncredited", "%1 is not a file or folder of the package", &[&quoted]);
+        crate::ensure(found, || crate::refuse("credits", gone()))
+    })
+}
+
+pub(crate) fn within(what: &'static str, actual: u64, limit: u64) -> Result<()> {
+    ensure(actual <= limit, || Error::Limit { what, actual, limit })
+}
+
+pub(crate) fn extension(path: &str) -> Option<String> {
+    Path::new(path).extension().and_then(|e| e.to_str()).map(str::to_ascii_lowercase)
+}
+
+fn allows(kind: Kind, extension: &str) -> bool {
+    let groups: &[&[&str]] = match kind {
+        Kind::Image => &[IMAGES, COMMON],
+        Kind::Video => &[IMAGES, VIDEOS, COMMON],
+        Kind::Scene | Kind::Assets => &[IMAGES, VIDEOS, SCENES, COMMON],
+        Kind::Web => &[IMAGES, VIDEOS, PAGES, COMMON],
+        Kind::Preset => &[IMAGES, VIDEOS, DATA, COMMON],
+    };
+    groups.iter().any(|group| group.contains(&extension))
+}

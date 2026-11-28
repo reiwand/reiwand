@@ -1,0 +1,199 @@
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC2
+import org.kde.kirigami as Kirigami
+import io.github.reiwand.app
+
+Kirigami.Page {
+    id: page
+
+    required property var item
+    property alias editor: editor
+    property string aspect
+    property string mask
+    property var brush: null
+    property var paint: null
+    property var cutsLive: null
+    property bool overlayOn
+    property real overlayOpacity: 0.6
+    property bool overlayColour: true
+    property bool outlineOn
+    property bool bandOn
+    property var regionPicks: []
+    property bool regionsOn: true
+    property bool regionSplit
+    property string regionLast
+    property var regionLine: null
+    property bool regionPreview
+    property var pointer: [0, 0]
+    property bool splitOn
+    property real splitAt: 0.5
+    property int layerPick: -1
+    property alias relief: relief
+    readonly property var edit: JSON.parse(editor.json || "{}")
+    readonly property var values: JSON.parse(editor.values || "{}")
+    readonly property var ops: edit.ops ?? []
+    readonly property var tools: [[App.tr("Crop and rotate"), "transform-crop"], [App.tr("Screens"), "video-display"], [App.tr("Light and color"), "adjustlevels"], [App.tr("Curves"), "adjustcurves"], [App.tr("Effects"), "draw-brush"], [App.tr("Masks"), "edit-select"], [App.tr("Depth"), "object-order-back"], [App.tr("Parallax"), "transform-move"]]
+
+    function run(action, args) {
+        editor.run(action, JSON.stringify(args ?? {}));
+    }
+
+    function exercise() {
+        editor.preview(false);
+        editor.run("set", '{"changes": ["ev=0.3", "vibrance=12"]}');
+        editor.run("crop", '{"aspect": "16:9", "rotate": 90}');
+        editor.run("crop", JSON.stringify({
+            "output": App.outputs[0] ?? "DP-1"
+        }));
+        editor.run("curve", '{"points": ["0,0", "0.5,0.6", "1,1"]}');
+        editor.run("overlay", '{"mask": "radial:0.5,0.5,0.3,0.3", "opacity": 0.5}');
+        editor.run("mask", '{"name": "sky", "spec": "luminance:0,0.4"}');
+        editor.run("depth", '{"near": 0.9, "dilate": 4}');
+        editor.run("parallax", '{"source": "pointer", "steps": 8}');
+        editor.run("depth_brush", '{"points": "0.2,0.2;0.4,0.3", "by": 0.2, "radius": 0.05, "lower": true}');
+        editor.run("depth_cuts", '{"cuts": "0.3,0.6"}');
+        editor.run("fill_mask", '{"points": "0.5,0.5", "protect": true}');
+        depthCheck.exercise();
+        regionsCheck.exercise();
+        bar.exporting.exercise();
+        editor.undo();
+        editor.redo();
+        editor.compare(true);
+        editor.compare(false);
+        if (!editor.canUndo || editor.canRedo)
+            throw new Error("the image editor did not record its steps");
+        for (let i = page.tools.length - 1; i >= 0; i--)
+            side.currentIndex = i;
+        editor.preview(true);
+    }
+
+    title: App.tr("Edit %1", item.title || String(item.path ?? "").split("/").pop())
+    padding: 0
+    Component.onCompleted: editor.open(item.path ?? "", item.width ?? 0, item.height ?? 0)
+    actions: bar.actions
+
+    Editor {
+        id: editor
+    }
+
+    Relief {
+        id: relief
+
+        Component.onCompleted: open(page.item.path ?? "")
+    }
+
+    EditDepthCheck {
+        id: depthCheck
+
+        page: page
+    }
+
+    EditRegionsCheck {
+        id: regionsCheck
+
+        page: page
+    }
+
+    EditActions {
+        id: bar
+
+        page: page
+    }
+
+    header: Kirigami.InlineMessage {
+        type: editor.error !== "" ? Kirigami.MessageType.Error : Kirigami.MessageType.Positive
+        text: editor.error || (editor.exported ? App.tr("Saved as %1", editor.exported) : "")
+        visible: text !== ""
+    }
+
+    RowLayout {
+        anchors.fill: parent
+        enabled: editor.ready
+        spacing: 0
+
+        EditSide {
+            id: side
+
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 13
+            Layout.maximumWidth: Layout.preferredWidth
+            Layout.fillWidth: false
+            Layout.fillHeight: true
+            page: page
+        }
+
+        Kirigami.Separator {
+            Layout.fillHeight: true
+        }
+
+        ColumnLayout {
+            Layout.preferredWidth: Math.max(Kirigami.Units.gridUnit * 17, stack.need + 2 * Kirigami.Units.smallSpacing + panel.leftPadding + panel.rightPadding)
+            Layout.maximumWidth: Layout.preferredWidth
+            Layout.fillWidth: false
+            Layout.fillHeight: true
+
+            Kirigami.Heading {
+                Layout.margins: Kirigami.Units.smallSpacing
+                level: 3
+                text: (page.tools[side.currentIndex] ?? [""])[0]
+            }
+
+            QQC2.ScrollView {
+                id: panel
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                contentWidth: availableWidth
+
+                StackLayout {
+                    id: stack
+
+                    readonly property real need: children[currentIndex]?.width ?? 0
+
+                    x: Kirigami.Units.smallSpacing
+                    width: panel.availableWidth - 2 * Kirigami.Units.smallSpacing
+                    currentIndex: side.currentIndex
+
+                    EditGeometry {
+                        page: page
+                    }
+
+                    EditScreens {
+                        page: page
+                    }
+
+                    EditLight {
+                        page: page
+                    }
+
+                    EditCurves {
+                        page: page
+                    }
+
+                    EditEffects {
+                        page: page
+                    }
+
+                    EditMasks {
+                        page: page
+                    }
+
+                    EditDepth {
+                        page: page
+                    }
+
+                    EditParallax {
+                        page: page
+                    }
+                }
+            }
+        }
+
+        EditCanvas {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            page: page
+            section: side.currentIndex
+        }
+    }
+}

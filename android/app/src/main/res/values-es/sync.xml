@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sync_now">Sincronizar ahora</string>
+    <string name="mobile_data">Usar también datos móviles en segundo plano</string>
+    <string name="device_code">Código del dispositivo nuevo</string>
+    <string name="asked">Un dispositivo con %1$s y %2$s pidió este código el %3$s.</string>
+    <string name="approved">Dispositivo aprobado</string>
+</resources>

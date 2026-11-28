@@ -1,0 +1,198 @@
+use crate::apply::Media;
+use crate::compositor::{Content, Movie, Picture, SceneSpec, Spec, lock};
+use crate::daemon::Daemon;
+use anyhow::Context;
+use image::RgbaImage;
+use reiwand_core::{Edit, Fit, Place};
+use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex};
+use std::time::{Duration, SystemTime};
+use zbus::fdo::Error::InvalidArgs;
+
+pub(crate) type Upload = ((u32, u32), Fit, PathBuf, Option<SystemTime>, Option<Arc<Edit>>, Place);
+
+static ORDER: Mutex<()> = Mutex::new(());
+
+pub(crate) fn modified(path: &Path) -> anyhow::Result<Option<SystemTime>> {
+    let metadata = std::fs::metadata(path).with_context(|| format!("cannot read {}", path.display()))?;
+    Ok(metadata.modified().ok())
+}
+
+impl Daemon {
+    pub fn configure_output(&self, output: &str) -> Option<Arc<RgbaImage>> {
+        let _order = lock(&ORDER);
+        let (size, mut resolved, chosen, uploaded, refresh, filter) = {
+            let st = self.state();
+            let info = st.outputs.get(output)?;
+            let (resolved, chosen) = (st.config.resolve(output), st.config.chosen(output));
+            (info.size, resolved, chosen, info.uploaded.clone(), st.refresh(output), st.config.filter(output))
+        };
+        if self.surface_rests(output) || self.show_pattern(output, size, refresh) {
+            return None;
+        }
+        let (image, mut transition) = self.media_of(output, resolved.playlist.take(), resolved.image.take());
+        let display = image.as_deref().map(crate::look::display).unwrap_or_default();
+        let shown = image.as_deref().map(|_| crate::look::look(chosen, || crate::look::author(&display)));
+        (resolved.fit, resolved.background) = shown.unwrap_or((resolved.fit, resolved.background));
+        let draft = self.state().drafts.get(output).map(|d| (d.pack.clone(), d.hold, d.values.clone()));
+        transition = draft.as_ref().map_or(transition, |_| Some(Duration::ZERO));
+        let tried = draft.as_ref().and_then(|d| d.2.clone());
+        let (hold, page_quality) =
+            (draft.as_ref().and_then(|d| d.1), draft.as_ref().and_then(|d| d.0.quality()));
+        let media = match &draft {
+            Some((d, _, _)) => Some(Ok(d.media())),
+            None => image.clone().map(|image| self.media(image)),
+        };
+        let heard = self.heard(output, image.as_deref());
+        let (mut shown_scene, mut shown_video, mut turn, mut fit) = (None, None, None, resolved.fit);
+        let mut failed = None;
+        let (content, upload) = match media {
+            None => (Content::Color, None),
+            Some(Err(e)) => (unshown(output, &e, &mut failed), None),
+            Some(Ok(Media::Video(path, props))) => {
+                let movie = match &props {
+                    Some(p) => p.movie(path, &p.values(&self.state().scene_values(output, &p.id))),
+                    None => Movie::plain(path),
+                };
+                shown_video = props;
+                (Content::Video(movie.heard(heard)), None)
+            }
+            Some(Ok(Media::Scene(pack))) => {
+                let (values, stale) = {
+                    let st = self.state();
+                    let stored = crate::drafts::layers(&st, tried.as_ref(), output, &pack.props.id);
+                    (pack.props.values(&stored), pack.props.stale(&stored))
+                };
+                stale.iter().for_each(|w| tracing::warn!(output, scene = pack.props.id, "{w}"));
+                let (extra, clips) = self.scene_extra(&pack, &values);
+                turn = crate::picks::next_turn(&pack.props.properties, &values);
+                shown_scene = Some(pack.clone());
+                let moving = self.store.read(|lib| lib.moves(&pack.props.id)).unwrap_or(false);
+                let quality = self.state().config.own_quality(output);
+                let span = self.scene_span(output, resolved.fit, pack.scene.canvas.size);
+                (
+                    Content::Scene(SceneSpec {
+                        pack,
+                        values,
+                        extra,
+                        clips,
+                        hold,
+                        moving,
+                        quality,
+                        span,
+                        drafted: draft.is_some(),
+                        heard,
+                    }),
+                    None,
+                )
+            }
+            Some(Ok(Media::Web(pack))) => (
+                Content::Web(self.page_on(output, pack, &mut shown_video, (page_quality, tried), heard)),
+                None,
+            ),
+            Some(Ok(Media::Picture(file))) => {
+                match self.picture(output, file, (size, resolved.fit), uploaded) {
+                    Ok((picture, upload)) => {
+                        fit = upload.1;
+                        (Content::Image(picture), Some(upload))
+                    }
+                    Err(e) => (unshown(output, &e, &mut failed), None),
+                }
+            }
+        };
+        let accent = self.accent(output, (image.as_deref(), &display), &content, shown_video.as_deref());
+        let pixels = content.pixels();
+        let tone = crate::look::tone(&display, &content, (filter, self.state().config.hdr(output)));
+        let kind = self.state().config.transition(output);
+        let spec = Spec { content, fit, background: resolved.background, transition, kind, refresh, tone };
+        self.compositor.configure(output, size, spec);
+        self.retone(output, image.as_deref());
+        let mut st = self.state();
+        if let Some(info) = st.outputs.get_mut(output) {
+            (info.uploaded, info.scene, info.video, info.accent) = (upload, shown_scene, shown_video, accent);
+            info.unshown = failed;
+            info.spread = fit == Fit::Span && !crate::drafts::virtual_output(output);
+        }
+        st.turns.remove(output);
+        st.missed.remove(output);
+        st.turns.extend(turn.map(|at| (output.to_owned(), at)));
+        drop(st);
+        self.turned.notify_one();
+        self.apply_activity();
+        pixels
+    }
+
+    pub fn configure_all(&self) {
+        let outputs: Vec<String> = self.state().outputs.keys().cloned().collect();
+        let spread = self.spreading();
+        let _decoded: Vec<_> = outputs.iter().filter_map(|o| self.configure_output(o)).collect();
+        if self.spreading() != spread {
+            let _decoded: Vec<_> = outputs.iter().filter_map(|o| self.configure_output(o)).collect();
+        }
+    }
+
+    fn picture(
+        &self,
+        output: &str,
+        file: PathBuf,
+        (size, fit): ((u32, u32), Fit),
+        uploaded: Option<Upload>,
+    ) -> anyhow::Result<(Picture, Upload)> {
+        let modified = modified(&file)?;
+        let edit = self.edit_for(&file);
+        let fit = edit.as_ref().and_then(|e| e.fit).filter(|_| fit != Fit::Span).unwrap_or(fit);
+        let place = self.place(output, fit, edit.as_deref());
+        let max = self.compositor.max_edge();
+        let edge = || reiwand_render::needed_edge(&file, edit.as_deref(), &place, (fit, size), max);
+        let depth =
+            edit.as_deref().filter(|e| e.needs_depth()).and_then(|e| self.depth_for(&file, e, edge()));
+        let upload = (size, fit, file.clone(), modified, edit.clone(), place.clone());
+        let pixels = (uploaded.as_ref() != Some(&upload))
+            .then(|| self.load_image(&file, modified, Some(edge())))
+            .transpose()?;
+        pixels.iter().for_each(|image| self.keep_decoded(&file, image));
+        Ok((Picture { file, modified, pixels, edit, place, depth }, upload))
+    }
+
+    pub(crate) fn load_image(
+        &self,
+        path: &Path,
+        modified: Option<SystemTime>,
+        edge: Option<u32>,
+    ) -> anyhow::Result<Arc<RgbaImage>> {
+        let cached =
+            self.state().images.get(path).filter(|(m, _)| *m == modified).and_then(|(_, w)| w.upgrade());
+        if let Some(image) = cached.filter(|i| edge.is_none_or(|e| i.width().max(i.height()) + 2 >= e)) {
+            return Ok(image);
+        }
+        let max_edge = self.compositor.max_edge();
+        let image = reiwand_render::decode_image(path, edge.map_or(max_edge, |e| e.min(max_edge)))
+            .with_context(|| format!("cannot decode {}", path.display()))?;
+        tracing::debug!("decoded a picture");
+        let image = Arc::new(image);
+        let mut st = self.state();
+        st.images.retain(|_, (_, weak)| weak.strong_count() > 0);
+        st.images.insert(path.to_owned(), (modified, Arc::downgrade(&image)));
+        Ok(image)
+    }
+
+    pub fn set_wallpaper(&self, path: &Path, output: &str, fit: Option<Fit>) -> anyhow::Result<()> {
+        let path = std::fs::canonicalize(path).with_context(|| crate::flatpak::not_found(path))?;
+        if reiwand_library::Kind::detect(&path) == Some(reiwand_library::Kind::Package) {
+            return Err(InvalidArgs("import the package and use Library1.Apply".into()).into());
+        }
+        let _decoded = self.check_media(&path)?;
+        self.state().decks.again(&path);
+        self.change_output(output, |c| {
+            c.set_image(output, path, fit);
+            Ok(())
+        })
+    }
+}
+
+fn unshown(output: &str, error: &anyhow::Error, failed: &mut Option<String>) -> Content {
+    tracing::warn!(output, "cannot show the wallpaper ({}); showing the color instead", error.root_cause());
+    tracing::debug!("{error:#}");
+    *failed = Some(crate::words::unshown(&error.root_cause().to_string()));
+    Content::Color
+}

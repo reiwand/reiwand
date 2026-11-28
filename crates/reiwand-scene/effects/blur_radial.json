@@ -1,0 +1,45 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": "blur",
+  "compose": false,
+  "cost": {
+    "passes": 2,
+    "scale": 1,
+    "taps": 2
+  },
+  "description": {
+    "en": "Blurs outward from a center point, as if zooming.",
+    "es": "Desenfoca hacia fuera desde un punto central, como un zoom."
+  },
+  "fuse": null,
+  "id": "blur_radial",
+  "lighter": null,
+  "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Radial blur"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "center", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 2, "min": -1, "paint": null, "prefill": [0.5, 0.5], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "strength", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "samples", "type": "float", "channels": null, "help": {}, "label": {}, "max": 16, "min": 2, "paint": null, "prefill": 8, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "follow", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": "cursor", "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_blur_radial", "grid": null, "inputs": ["previous"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null},
+    {"blend": null, "copy": null, "entry": "fs_blur_radial", "grid": null, "inputs": ["previous"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {
+    "q1": {"freeze": false, "params": {"samples": 6}, "scale": null}
+  },
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
+}

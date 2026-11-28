@@ -1,0 +1,197 @@
+fn ggx(n_h: f32, a: f32) -> f32 {
+    let a2 = a * a;
+    let d = n_h * n_h * (a2 - 1.0) + 1.0;
+    return a2 / max(PI * d * d, 1e-6);
+}
+
+fn smith(n_v: f32, n_l: f32, a: f32) -> f32 {
+    let k = (a + 1.0) * (a + 1.0) / 8.0;
+    return n_v / (n_v * (1.0 - k) + k) * n_l / (n_l * (1.0 - k) + k);
+}
+
+fn equirect(d: vec3<f32>) -> vec2<f32> {
+    return vec2<f32>(atan2(d.x, -d.z) / (2.0 * PI) + 0.5, acos(clamp(d.y, -1.0, 1.0)) / PI);
+}
+
+fn falloff(l: Light, p: vec3<f32>) -> vec4<f32> {
+    let kind = l.color.w;
+    if kind > 2.5 {
+        return vec4<f32>(-l.dir.xyz, 1.0);
+    }
+    var at = l.at.xyz;
+    if kind > 1.5 {
+        let half = l.more.y * 0.5;
+        at = at + clamp(dot(p - at, l.dir.xyz), -half, half) * l.dir.xyz;
+    }
+    let to = at - p;
+    let d = length(to);
+    let k = clamp(1.0 - pow(d / max(l.at.w, 1e-3), 2.0), 0.0, 1.0);
+    var power = k * k;
+    let dir = to / max(d, 1e-6);
+    if kind > 0.5 && kind < 1.5 {
+        power = power * smoothstep(l.dir.w, l.more.x, dot(-dir, l.dir.xyz));
+    }
+    return vec4<f32>(dir, power);
+}
+
+fn tap(s: u32, uv: vec2<f32>, layer: u32, depth: f32) -> f32 {
+    if s == 0u {
+        return textureSampleCompareLevel(shadow_a, shadow_cmp, uv, layer, depth);
+    }
+    return textureSampleCompareLevel(shadow_b, shadow_cmp, uv, layer, depth);
+}
+
+fn round_tap(s: u32, d: vec3<f32>, depth: f32) -> f32 {
+    if s == 0u {
+        return textureSampleCompareLevel(shadow_c, shadow_cmp, d, depth);
+    }
+    return textureSampleCompareLevel(shadow_d, shadow_cmp, d, depth);
+}
+
+fn shadowed(l: Light, p: vec3<f32>, n: vec3<f32>) -> f32 {
+    let s = i32(l.more.z) - 1;
+    if s < 0 || finish.flags.z < 0.5 {
+        return 1.0;
+    }
+    let info = shade.info[s];
+    let lift = n * info.w * shade.at[s].w;
+    let d = p + lift - shade.at[s].xyz;
+    let a = abs(d);
+    var face = 0u;
+    if info.x > 1.5 {
+        if a.x >= a.y && a.x >= a.z {
+            face = select(1u, 0u, d.x > 0.0);
+        } else if a.y >= a.z {
+            face = select(3u, 2u, d.y > 0.0);
+        } else {
+            face = select(5u, 4u, d.z > 0.0);
+        }
+    }
+    let q = shade.mats[u32(info.y) + face] * vec4<f32>(p + lift, 1.0);
+    let c = q.xyz / q.w;
+    let uv = c.xy * vec2<f32>(0.5, -0.5) + 0.5;
+    let outside = info.x < 1.5 && (any(uv < vec2<f32>(0.0)) || any(uv > vec2<f32>(1.0)));
+    if q.w <= 0.0 || outside || c.z > 1.0 {
+        return 1.0;
+    }
+    let step = info.z * 0.5;
+    let depth = c.z - info.w * 0.002;
+    let side = select(vec3<f32>(0.0, 1.0, 0.0), vec3<f32>(1.0, 0.0, 0.0), a.y > a.x && a.y > a.z);
+    let t = normalize(cross(d, side)) * step * 2.0 * max(a.x, max(a.y, a.z));
+    let b = normalize(cross(d, t)) * length(t);
+    var sum = 0.0;
+    for (var k = 0u; k < 4u; k++) {
+        let o = vec2<f32>(select(-1.0, 1.0, (k & 1u) == 1u), select(-1.0, 1.0, k > 1u));
+        if info.x > 1.5 {
+            sum += round_tap(u32(s), d + t * o.x + b * o.y, depth);
+        } else {
+            sum += tap(u32(s), uv + o * step, 0u, depth);
+        }
+    }
+    return sum * 0.25;
+}
+
+fn hashed(c: vec2<f32>) -> f32 {
+    return fract(sin(dot(c, vec2<f32>(127.1, 311.7))) * 43758.5453);
+}
+
+fn moved(k: u32, uv0: vec2<f32>, uv1: vec2<f32>) -> vec2<f32> {
+    let a = uvs.rows[k * 2u];
+    let b = uvs.rows[k * 2u + 1u];
+    let uv = vec3<f32>(select(uv0, uv1, a.w > 0.5), 1.0);
+    return vec2<f32>(dot(a.xyz, uv), dot(b.xyz, uv));
+}
+
+fn map_uv(k: u32, in: Out) -> vec2<f32> {
+    return moved(k, in.uv, in.uv1);
+}
+
+@fragment
+fn fs_shadow_cut(c: Cut) {
+    if c.shell > 0.5 && hashed(floor(c.uv * (40.0 + finish.shade.w * 360.0))) >= finish.shade.w {
+        discard;
+    }
+    if finish.color.a * textureSample(base_map, base_smp, moved(0u, c.uv, c.uv1)).a < finish.flags.x {
+        discard;
+    }
+}
+
+@fragment
+fn fs_solid(in: Out, @builtin(front_facing) front: bool) -> @location(0) vec4<f32> {
+    let along = dot(in.world - scene.eye.xyz, scene.forward.xyz);
+    if along < scene.slice.x || along >= scene.slice.y {
+        discard;
+    }
+    let kind = finish.shade.x;
+    var s: Surface;
+    s.albedo = finish.color * textureSample(base_map, base_smp, map_uv(0u, in));
+    let orm = textureSample(orm_map, orm_smp, map_uv(1u, in));
+    s.occlusion = mix(1.0, textureSample(occlusion_map, occlusion_smp, map_uv(3u, in)).r, finish.pbr.w);
+    s.metallic = clamp(finish.pbr.x * orm.b, 0.0, 1.0);
+    s.roughness = clamp(finish.pbr.y * orm.g, 0.04, 1.0);
+    s.emissive = finish.emissive.rgb * textureSample(emissive_map, emissive_smp, map_uv(4u, in)).rgb;
+    s.position = in.world;
+    s.uv = in.uv;
+    var n = normalize(in.normal);
+    if !front {
+        n = -n;
+    }
+    if finish.maps.x > 0.5 {
+        let t = normalize(in.tangent.xyz - n * dot(n, in.tangent.xyz));
+        let b = cross(n, t) * select(1.0, -1.0, in.tangent.w < 0.0);
+        let m = textureSample(normal_map, normal_smp, map_uv(2u, in)).xyz * 2.0 - 1.0;
+        n = normalize(t * m.x * finish.pbr.z + b * m.y * finish.pbr.z + n * m.z);
+    }
+    s.normal = n;
+    if kind > 1.5 && kind < 2.5 && in.shell > 0.5 {
+        let k = in.shell / (max(finish.shade.y, 1.0) + 1.0);
+        let cells = floor(in.uv * (40.0 + finish.shade.w * 360.0));
+        if hashed(cells) < k + (1.0 - finish.shade.w) * 0.5 {
+            discard;
+        }
+        s.occlusion = s.occlusion * mix(0.4, 1.0, k);
+    }
+    if kind > 3.5 && kind < 4.5 {
+        let away = distance(s.albedo.rgb, finish.key.rgb);
+        s.albedo.a = s.albedo.a * smoothstep(finish.key.w, finish.key.w + max(finish.more.y, 1e-4), away);
+    }
+    s = material(s);
+    if finish.flags.x > 0.0 && s.albedo.a < finish.flags.x {
+        discard;
+    }
+    if finish.flags.w > 0.5 {
+        s.albedo.a = finish.flags.w - 1.0;
+    } else if s.albedo.a < 0.004 {
+        discard;
+    }
+    return lit(s, in, front);
+}
+
+@vertex
+fn vs_shadow(v: In) -> @builtin(position) vec4<f32> {
+    return scene.clip * vec4<f32>(place(v.pos, v.normal, v.tangent.xyz, v.paint, 0u, v.uv).p, 1.0);
+}
+
+@vertex
+fn vs_shadow_skinned(v: In, b: Bound, @builtin(vertex_index) index: u32) -> @builtin(position) vec4<f32> {
+    let q = posed(v, b, index);
+    return scene.clip * vec4<f32>(place(q[0], q[1], q[2], v.paint, 0u, v.uv).p, 1.0);
+}
+
+fn cast_shell(shell: u32) -> u32 {
+    return select(0u, u32(ceil(max(finish.shade.y, 1.0) * 0.6)), shell > 0u);
+}
+
+@vertex
+fn vs_shadow_cut(v: In, @builtin(instance_index) shell: u32) -> Cut {
+    let s = cast_shell(shell);
+    let p = place(v.pos, v.normal, v.tangent.xyz, v.paint, s, v.uv).p;
+    return Cut(scene.clip * vec4<f32>(p, 1.0), v.uv, v.uv1, f32(s));
+}
+
+@vertex
+fn vs_shadow_cut_skinned(v: In, b: Bound, @builtin(vertex_index) index: u32, @builtin(instance_index) shell: u32) -> Cut {
+    let q = posed(v, b, index);
+    let s = cast_shell(shell);
+    return Cut(scene.clip * vec4<f32>(place(q[0], q[1], q[2], v.paint, s, v.uv).p, 1.0), v.uv, v.uv1, f32(s));
+}

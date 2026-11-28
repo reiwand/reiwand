@@ -1,0 +1,196 @@
+use super::branches::{array, tagged};
+use super::rigrefs::{RIG, options};
+use super::{Field, Own, SOURCES, candidates};
+use crate::schema::{branches, choose, deref, sample};
+use crate::texts::rows;
+use reiwand_scene::easings;
+use serde_json::{Value, json};
+use std::path::Path;
+
+pub(super) struct Walk<'a> {
+    pub(super) dir: Option<&'a Path>,
+    pub(super) doc: &'a Value,
+    pub(super) own: &'a Own,
+    pub(super) root: &'a Value,
+    pub(super) hidden: &'a [&'a str],
+    pub(super) order: &'a str,
+    pub(super) out: Vec<Field>,
+}
+
+impl Walk<'_> {
+    pub(super) fn field(
+        &mut self,
+        meta: &Value,
+        value: Option<&Value>,
+        pointer: String,
+        key: &str,
+        depth: usize,
+    ) {
+        let (mut schema, mut name) = deref(self.root, meta);
+        let current = value.cloned().unwrap_or(Value::Null);
+        let mut f = Field {
+            pointer: pointer.clone(),
+            key: key.into(),
+            value: current.clone(),
+            set: value.is_some_and(|v| !v.is_null()),
+            depth,
+            ..Field::default()
+        };
+        f.default = meta.get("default").or(schema.get("default")).cloned().unwrap_or_default();
+        f.range = meta.get("x-range").cloned().unwrap_or_default();
+        f.unit = meta["x-unit"].as_str().unwrap_or_default().into();
+        let list = branches(schema);
+        let optional = list.len() == 2 && list.iter().any(|b| b["type"] == "null");
+        if optional {
+            (schema, name) = deref(self.root, list.iter().find(|b| b["type"] != "null").unwrap_or(schema));
+        }
+        let value_union = |schema: &Value| {
+            let list = branches(schema);
+            list.len() == 2 && deref(self.root, &list[1]).1.starts_with("Binding_for_")
+        };
+        let inline_value = !name.starts_with("Value_for_") && value_union(schema);
+        if name.is_empty() {
+            name = inlined(schema);
+        }
+        if name == "Smooth" {
+            f.widget = "smooth".into();
+            f.range = json!([0, 60]);
+            self.out.push(f);
+            return;
+        }
+        let probe = if current.is_null() { &f.default } else { &current };
+        let scalar = probe.is_array() || probe.is_number() || probe.is_boolean();
+        let untyped =
+            schema.get("type").is_none() && !name.starts_with("Value_for_") && !inline_value && scalar;
+        if untyped && !branches(schema).is_empty() && !tagged(self.root, schema) {
+            (schema, name) = deref(self.root, choose(self.root, schema, probe));
+        }
+        if name == "Words" {
+            f.bindable = true;
+            f.source = SOURCES
+                .iter()
+                .find(|s| current.get(**s).is_some_and(|v| !v.is_null()))
+                .map_or("", |s| *s)
+                .into();
+            let free = f.source.is_empty() && crate::texts::worded(&current);
+            f.translatable = free && self.doc["manifest"]["schema"] == reiwand_format::SCHEMA;
+            f.widget = if free && current.is_object() { "texts" } else { "multiline" }.into();
+            if f.widget == "texts" {
+                f.options = rows(self.doc, &pointer, &current);
+            }
+            return self.out.push(f);
+        }
+        if name.starts_with("Value_for_") || inline_value {
+            f.bindable = true;
+            f.source = SOURCES
+                .iter()
+                .find(|s| current.get(**s).is_some_and(|v| !v.is_null()))
+                .map_or("", |s| *s)
+                .into();
+            (schema, name) = deref(self.root, &branches(schema)[0]);
+        }
+        let types = match &schema["type"] {
+            Value::Array(list) => list.iter().find(|t| *t != "null").cloned().unwrap_or_default(),
+            t => t.clone(),
+        };
+        let reference = meta["x-ref"].as_str().or(schema["x-ref"].as_str());
+        if let Some(r) = reference.filter(|r| RIG.contains(r))
+            && let Some(found) = self.dir.and_then(|d| options(d, self.doc, r, &pointer, &current))
+        {
+            f.options = found;
+            return self.rigged(f, r, schema, &current);
+        }
+        let reference = reference.filter(|r| !RIG.contains(r));
+        let all: Vec<&Value> = branches(schema).iter().map(|b| deref(self.root, b).0).collect();
+        let banded =
+            all.iter().all(|b| b.get("enum").is_some() || b["type"] == "integer" || b["type"] == "array");
+        let listed = all.iter().find_map(|b| b["enum"].as_array().cloned()).filter(|_| banded);
+        let follows = schema.get("x-follows").is_some();
+        let named: Vec<Value> = all
+            .iter()
+            .filter_map(|b| {
+                b.get("const").cloned().or_else(|| b["enum"].as_array()?.first().cloned().filter(|_| follows))
+            })
+            .collect();
+        let counted =
+            all.iter().filter_map(|b| b["type"].as_str()).find(|t| ["integer", "number"].contains(t));
+        let counted = counted.filter(|_| !named.is_empty() && named.len() + 1 == all.len());
+        f.widget = match (name, types.as_str().unwrap_or_default()) {
+            _ if meta["x-computed"] == true => "computed".into(),
+            _ if meta["x-condition"] == true => "condition".into(),
+            _ if meta["x-scalar"] == true => "scalar".into(),
+            _ if meta["x-format"] == true => "format".into(),
+            _ if meta["x-multiline"] == true => "multiline".into(),
+            _ if meta["x-color"] == true => "color".into(),
+            ("Color", _) => "color".into(),
+            ("Vec2", _) => "vec2".into(),
+            ("Ease", _) => {
+                f.options = easings().into_iter().map(Value::from).collect();
+                "enum".into()
+            }
+            ("Param", _) => "json".into(),
+            ("Text", _) => {
+                f.options = rows(self.doc, &pointer, &current);
+                if meta["x-markup"] == true { "markup" } else { "texts" }.into()
+            }
+            _ if schema.get("const").is_some() => return,
+            _ if let Some(reference) = reference => {
+                f.options = candidates(self.doc, reference, &pointer);
+                f.names = crate::settings::names(self.doc, reference, &f.options);
+                format!("ref:{reference}")
+            }
+            _ if schema.get("enum").is_some() || listed.is_some() => {
+                f.options = schema["enum"].as_array().cloned().or(listed).unwrap_or_default();
+                "enum".into()
+            }
+            (_, "boolean") => "bool".into(),
+            (_, "integer") => "integer".into(),
+            (_, "number") => "number".into(),
+            _ if counted.is_some() => {
+                f.options = named;
+                counted.unwrap_or_default().into()
+            }
+            (_, "string") => "text".into(),
+            (_, "array") => array(self.root, meta, schema),
+            (_, "object") if optional && value.is_none() => {
+                return self.out.push(Field {
+                    widget: "group".into(),
+                    sample: sample(self.root, schema),
+                    ..f
+                });
+            }
+            (_, "object") if schema["properties"].is_object() && depth < 3 => {
+                self.out.push(Field { widget: "group".into(), ..f });
+                return self.object(schema, &current, &pointer, depth + 1);
+            }
+            _ if tagged(self.root, schema) && depth < 3 => return self.variant(f, schema, &current),
+            _ => "json".into(),
+        };
+        let items = schema.get("items").unwrap_or(&Value::Null);
+        match f.widget.as_str() {
+            "list" => f.sample = sample(self.root, items),
+            // A fixed row of numbers: what to start from while it is not set (its length tells how many).
+            "numbers" if f.default.is_array() => f.sample = f.default.clone(),
+            "numbers" => f.sample = json!(vec![0; schema["minItems"].as_u64().unwrap_or(0) as usize]),
+            "flags" => f.options = deref(self.root, items).0["enum"].as_array().cloned().unwrap_or_default(),
+            _ => {}
+        }
+        self.out.push(f);
+    }
+}
+
+fn inlined(schema: &Value) -> &'static str {
+    let list = branches(schema);
+    let shaped = |i: usize, key: &str| list.get(i).is_some_and(|b| b.get(key).is_some());
+    match (list.len(), list.first().map(|b| &b["type"]), list.get(1).map(|b| &b["type"])) {
+        (2, Some(a), Some(b)) if a == "string" && b == "object" && shaped(1, "additionalProperties") => {
+            "Text"
+        }
+        (2, Some(a), Some(b))
+            if a == "number" && b == "object" && list[1]["properties"]["up"].is_object() =>
+        {
+            "Smooth"
+        }
+        _ => "",
+    }
+}

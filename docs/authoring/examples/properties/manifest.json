@@ -1,0 +1,215 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": "en",
+  "description": "",
+  "entry": "scene.json",
+  "id": "org.example.properties",
+  "inputs": [],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "photosensitive": false,
+  "platforms": [],
+  "presets": [
+    {
+      "id": "warm",
+      "label": "Warm",
+      "values": {
+        "color_disc": "#ff8a3d",
+        "style": "day",
+        "opacity": 90
+      }
+    },
+    {
+      "id": "cool",
+      "label": "Cool",
+      "values": {
+        "color_disc": "#7dd3fc",
+        "style": "night",
+        "message": "Good night"
+      }
+    }
+  ],
+  "properties": {
+    "open": {
+      "enabled_if": {},
+      "label": "Open on click",
+      "order": 7,
+      "quality": {},
+      "type": "shortcut",
+      "visible_if": "style == 'night' || show_gallery"
+    },
+    "look": {
+      "collapsed": false,
+      "enabled_if": {},
+      "label": "Look",
+      "order": 1,
+      "quality": {},
+      "type": "group",
+      "visible_if": {}
+    },
+    "folder": {
+      "accept": [
+        "image"
+      ],
+      "enabled_if": "show_gallery",
+      "every": 30,
+      "label": "Photo folder",
+      "max_files": 200,
+      "mode": "one",
+      "order": 4,
+      "pick": "sequence",
+      "quality": {},
+      "recursive": 1,
+      "type": "folder",
+      "visible_if": {}
+    },
+    "color_disc": {
+      "alpha": false,
+      "default": "#ffb347",
+      "enabled_if": {},
+      "group": "look",
+      "label": "Disc color",
+      "order": 1,
+      "quality": {},
+      "type": "color",
+      "visible_if": {}
+    },
+    "flash": {
+      "enabled_if": {},
+      "label": "Flash",
+      "order": 8,
+      "quality": {},
+      "type": "button",
+      "visible_if": {}
+    },
+    "style": {
+      "default": "day",
+      "enabled_if": {},
+      "label": "Style",
+      "options": [
+        {
+          "icon": "weather-clear",
+          "label": "Day",
+          "value": "day"
+        },
+        {
+          "icon": "weather-clear-night",
+          "label": "Night",
+          "value": "night"
+        }
+      ],
+      "order": 6,
+      "quality": {},
+      "type": "combo",
+      "visible_if": {}
+    },
+    "picture": {
+      "accept": [
+        "image"
+      ],
+      "default_asset": "sky",
+      "enabled_if": {},
+      "label": "Background picture",
+      "order": 3,
+      "quality": {},
+      "type": "file",
+      "visible_if": {}
+    },
+    "message": {
+      "default": "Hello",
+      "enabled_if": {},
+      "group": "look",
+      "label": "Message",
+      "max_len": 60,
+      "multiline": false,
+      "order": 3,
+      "quality": {},
+      "secret": false,
+      "type": "text",
+      "visible_if": {}
+    },
+    "note": {
+      "enabled_if": {},
+      "label": "@note",
+      "order": 0,
+      "quality": {},
+      "type": "label",
+      "visible_if": {}
+    },
+    "opacity": {
+      "decimals": null,
+      "default": 100,
+      "editable": true,
+      "enabled_if": {},
+      "group": "look",
+      "help": "How solid the disc looks.",
+      "integer": true,
+      "label": "Disc opacity",
+      "log": false,
+      "max": 100,
+      "min": 10,
+      "order": 2,
+      "quality": {
+        "q0": 50,
+        "q1": 70
+      },
+      "step": 5,
+      "type": "slider",
+      "unit": "%",
+      "visible_if": {}
+    },
+    "divider": {
+      "enabled_if": {},
+      "label": "Pictures",
+      "order": 2,
+      "quality": {},
+      "type": "divider",
+      "visible_if": {}
+    },
+    "show_gallery": {
+      "default": false,
+      "enabled_if": {},
+      "label": "Show the gallery",
+      "order": 5,
+      "quality": {},
+      "type": "bool",
+      "visible_if": {}
+    }
+  },
+  "requires": {
+    "engine": null,
+    "features": [
+      "folder",
+      "folder2",
+      "properties2",
+      "quality_settings",
+      "shortcut"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {
+    "en": {
+      "note": "Change anything you like: the scene updates at once."
+    },
+    "de": {
+      "note": "Ändere, was du willst: Die Szene aktualisiert sich sofort."
+    }
+  },
+  "tags": [],
+  "title": "User properties",
+  "version": "0.1.0"
+}

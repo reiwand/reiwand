@@ -1,0 +1,42 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": "distort",
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Splits color channels apart near the edges, like a cheap lens.",
+    "es": "Separa los canales de color cerca de los bordes, como una lente barata."
+  },
+  "fuse": null,
+  "id": "chromatic_aberration",
+  "lighter": null,
+  "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Chromatic aberration"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "amount", "type": "float", "channels": null, "help": {}, "label": {}, "max": 64, "min": -64, "paint": null, "prefill": 3, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "center", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 2, "min": -1, "paint": null, "prefill": [0.5, 0.5], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "mode", "type": "enum", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [{"label": {"en": "Expansion", "es": "Expansión"}, "value": 0}, {"label": {"en": "Directional", "es": "Direccional"}, "value": 1}, {"label": {"en": "Radial", "es": "Radial"}, "value": 2}, {"label": {"en": "Barrel", "es": "Barril"}, "value": 3}], "waits_for": null, "yields_to": null},
+    {"id": "angle", "type": "float", "channels": null, "help": {}, "label": {}, "max": 360, "min": -360, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": "degrees", "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_chromatic_aberration", "grid": null, "inputs": ["previous"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {},
+  "reach": "amount",
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
+}

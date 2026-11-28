@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+declare scene ROOT
+maker=$scene/maker
+ctl scene new "$maker" --id org.example.maker >/dev/null
+ctl scene import "$maker" "$ROOT/tests/fixtures/green-64x32.png" --id leaf >/dev/null
+ctl scene act "$maker" add_layer '{"id": "sprout", "kind": "image"}' >/dev/null
+ctl scene act "$maker" add_layer '{"id": "dust", "kind": "particles"}' >/dev/null
+if ctl pack new-assets "$maker" "$scene/bad-parts" --part sound:x --id org.example.parts --title Parts \
+  --license CC0-1.0 --attribution Example 2>/dev/null; then fail "an unknown kind of part was offered"; fi
+ctl pack new-assets "$maker" "$scene/parts" --part layer:sprout --part particles:dust --id org.example.parts \
+  --title Parts --license CC-BY-4.0 --attribution "Example Maker" --part-title "layer:sprout=Sprout" \
+  --part-thumbnail "layer:sprout=$ROOT/tests/fixtures/green-64x32.png" >/dev/null || fail "no assets package was made"
+ctl pack build "$scene/parts" -o "$scene/parts.wpak" >/dev/null || fail "the assets package did not build"
+ctl pack parts "$scene/parts.wpak" | grep 'layer:sprout "Sprout"' >/dev/null || fail "the parts were not listed"
+ctl pack parts "$scene/parts.wpak" | grep 'CC-BY-4.0 Example Maker' >/dev/null || fail "the license of a file was not listed"
+user=$scene/user
+ctl scene new "$user" --id org.example.user >/dev/null
+if ctl scene act "$user" import_assets '{"package": "'"$scene"'/parts.wpak", "parts": ["layer:gone"]}' 2>/dev/null; then
+  fail "a part the package does not offer was imported"
+fi
+ctl scene act "$user" import_assets '{"package": "'"$scene"'/parts.wpak", "parts": ["layer:sprout"]}' >/dev/null || fail "no part was imported"
+scene_doc "$user" /manifest/credits | grep '"id": "org.example.parts"' >/dev/null || fail "the import was not credited"
+scene_doc "$user" /manifest/origin | grep '"derived"' >/dev/null || fail "the origin does not name the parts"
+ctl pack check "$user" >/dev/null || fail "the imported part left the scene invalid"
+ctl scene act "$user" undo >/dev/null
+if scene_doc "$user" /manifest/credits 2>/dev/null | grep '"id": "org.example.parts"' >/dev/null; then fail "undo kept the credits of the import"; fi

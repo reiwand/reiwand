@@ -1,0 +1,32 @@
+use super::Init;
+use crate::validate::Check;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct Tilt {
+    #[schemars(extend("x-unit" = "deg"))]
+    pub angle: [[f32; 2]; 2],
+    #[schemars(extend("x-unit" = "deg/s"))]
+    pub spin: [[f32; 2]; 2],
+}
+
+impl Tilt {
+    pub fn turned(&self) -> bool {
+        self.angle.iter().chain(&self.spin).flatten().any(|v| *v != 0.0)
+    }
+}
+
+impl Check<'_> {
+    pub(super) fn tilted(&mut self, p: &str, i: &Init) {
+        let t = &i.tilt;
+        self.uses(t.turned(), "particles2");
+        for (name, ends, max) in [("angle", t.angle, 3600.0), ("spin", t.spin, 36000.0)] {
+            for (k, lo) in ends[0].iter().enumerate() {
+                self.range(&format!("{p}/tilt/{name}/0/{k}"), *lo, -max, max);
+                self.range(&format!("{p}/tilt/{name}/1/{k}"), ends[1][k], *lo, max);
+            }
+        }
+    }
+}

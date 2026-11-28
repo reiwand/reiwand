@@ -1,0 +1,198 @@
+use super::summary;
+use crate::args::fixture;
+use crate::diff::Edit;
+use crate::grid::{Grid, compose, info, kind, name};
+use reiwand_core::model::*;
+
+#[test]
+fn filters_compose_one_query() {
+    assert_eq!(
+        compose(" harbour ", "image", true, "night sky"),
+        "kind:image fav:yes tag:\"night sky\" harbour"
+    );
+    assert_eq!(compose("", "", false, "sea"), "tag:sea");
+    assert_eq!(compose("", "", false, ""), "");
+}
+
+fn reload(grid: &mut Grid, uids: &[&str]) -> Vec<Edit> {
+    let edits = grid.plan(uids.iter().map(|uid| summary(uid)).collect());
+    edits.iter().for_each(|edit| grid.apply(edit));
+    edits
+}
+
+#[test]
+fn reloads_update_rows_in_place() {
+    let mut grid = Grid { size: 256, ..Grid::default() };
+    grid.apply(&Edit::Insert(0, vec![summary("A"), summary("B"), summary("C")]));
+    assert_eq!(grid.wanted(0, 9), ["A", "B", "C"]);
+    assert_eq!((grid.thumb("B", "/tmp/b.jpg"), grid.toggle(1, true)), (vec![1], vec![1]));
+    let renamed = ItemSummary { title: "Renamed".into(), ..summary("A") };
+    let edits = grid.plan(vec![summary("N"), summary("M"), summary("B"), renamed.clone()]);
+    let expected = [
+        Edit::Remove(2, 3),
+        Edit::Insert(0, vec![summary("N"), summary("M")]),
+        Edit::Move(3, 2),
+        Edit::Set(3, Box::new(renamed)),
+    ];
+    assert_eq!(edits, expected);
+    edits.iter().for_each(|edit| grid.apply(edit));
+    let uids: Vec<_> = grid.rows.iter().map(|r| r.item.uid.as_str()).collect();
+    assert_eq!((uids, grid.rows[3].item.title.as_str()), (vec!["N", "M", "B", "A"], "Renamed"));
+    assert_eq!((grid.rows[2].thumb.as_deref(), grid.rows[2].selected), (Some("/tmp/b.jpg"), true));
+    assert_eq!(reload(&mut grid, &["N", "M", "B", "A"]), [Edit::Set(3, Box::new(summary("A")))]);
+    assert!(reload(&mut grid, &["N", "M", "B", "A"]).is_empty());
+    let twice =
+        [Edit::Remove(3, 4), Edit::Remove(1, 2), Edit::Move(1, 0), Edit::Insert(1, vec![summary("B")])];
+    assert_eq!(reload(&mut grid, &["B", "B", "N"]), twice);
+    assert_eq!(reload(&mut grid, &["B"]), [Edit::Remove(2, 3), Edit::Remove(1, 2)]);
+    assert_eq!((grid.rows.len(), grid.rows[0].selected), (1, true));
+}
+
+#[test]
+fn changed_items_refresh_their_thumbnails() {
+    let mut grid = Grid { size: 256, ..Grid::default() };
+    grid.apply(&Edit::Insert(0, vec![summary("A"), summary("B")]));
+    grid.thumb("A", "/tmp/a.jpg");
+    grid.thumb("B", "/tmp/b.jpg");
+    assert!(grid.wanted(0, 9).is_empty());
+    grid.stale(&["B".into()]);
+    assert_eq!(grid.wanted(0, 9), ["B"]);
+    assert_eq!(grid.thumb("B", "/tmp/b.jpg"), Vec::<usize>::new());
+    grid.stale(&[]);
+    assert_eq!(grid.wanted(0, 9), ["A", "B"]);
+    assert_eq!(grid.thumb("A", "/tmp/a2.jpg"), [0]);
+    let cached = ItemSummary { thumb: Some("/tmp/b3.jpg".into()), ..summary("B") };
+    grid.apply(&Edit::Set(1, Box::new(cached)));
+    assert_eq!(grid.rows[1].thumb.as_deref(), Some("/tmp/b3.jpg"));
+    assert!(grid.wanted(0, 9).is_empty());
+    assert_eq!(grid.toggle(usize::MAX, true), Vec::<usize>::new());
+}
+
+#[test]
+fn rows_describe_items() {
+    let video = ItemSummary { kind: ItemKind::Video, duration_ms: Some(65000), ..summary("A") };
+    assert_eq!(info(&video), "3840×2160 · 1:05");
+    assert_eq!((name(ItemKind::Package), name(Reason::Takedown)), ("package".into(), "takedown".into()));
+    let page: SearchPage = reiwand_client::parse(&fixture("Library1", "Search")).unwrap();
+    assert_eq!(
+        page.items.iter().map(kind).collect::<Vec<_>>(),
+        ["image", "video", "package", "image", "scene"]
+    );
+}
+
+#[test]
+fn a_change_asks_again_only_for_its_rows() {
+    let mut grid = Grid { size: 256, ..Grid::default() };
+    let uids = ["A", "B", "C", "D"];
+    grid.apply(&Edit::Insert(0, uids.iter().map(|uid| summary(uid)).collect()));
+    grid.toggle(2, true);
+    let rated = ItemSummary { rating: 1, ..summary("C") };
+    let changed = ["B".to_owned(), "C".to_owned(), "Z".to_owned()];
+    let edits = grid.patch(&changed, vec![rated.clone()]).unwrap();
+    assert_eq!(edits, [Edit::Set(2, Box::new(rated)), Edit::Remove(1, 2)]);
+    edits.iter().for_each(|edit| grid.apply(edit));
+    let left: Vec<_> = grid.rows.iter().map(|r| (r.item.uid.as_str(), r.selected)).collect();
+    assert_eq!(left, [("A", false), ("C", true), ("D", false)]);
+    assert_eq!(grid.patch(&["A".to_owned()], vec![summary("A")]).unwrap(), []);
+    assert_eq!(grid.patch(&["N".to_owned()], vec![summary("N")]), None, "a new row needs its place");
+    assert!(crate::diff::steady("tag:sea sort:added- sort:random:7") && crate::diff::steady("harbour"));
+    assert!(!crate::diff::steady("sort:title") && !crate::diff::steady("fav:yes SORT:rating-"));
+}
+
+#[test]
+fn a_new_search_over_many_rows_keeps_its_rows_and_selection() {
+    let uids: Vec<String> = (0..600).map(|i| format!("U{i:04}")).collect();
+    let mut grid = Grid { size: 256, ..Grid::default() };
+    grid.apply(&Edit::Insert(0, uids.iter().map(|uid| summary(uid)).collect()));
+    grid.toggle(5, true);
+    grid.toggle(450, false);
+    let sorted: Vec<ItemSummary> = uids.iter().rev().map(|uid| summary(uid)).collect();
+    assert!(grid.plan(sorted.clone()).len() >= 599, "a diff moves every row of a new order");
+    assert_eq!((grid.count(0, Some(true)), grid.count(0, Some(false))), (600, 200));
+    assert_eq!((grid.count(0, None), grid.count(600, None)), (600, 800));
+    let kept = sorted.into_iter().filter(|i| i.uid != "U0005").take(grid.count(0, Some(true)) as usize);
+    grid.reset(kept.collect(), true);
+    let picked: Vec<_> = grid.selected().map(|i| i.uid.as_str()).collect();
+    let at = grid.rows.iter().position(|r| r.item.uid == "U0450");
+    assert_eq!((grid.rows.len(), picked, at), (599, vec!["U0450"], Some(149)));
+    let page: Vec<_> = grid.rows.iter().take(200).map(|r| r.item.clone()).collect();
+    grid.reset(page, true);
+    grid.reset(vec![summary("U0450")], false);
+    assert_eq!(grid.selected().count(), 0);
+}
+
+#[test]
+fn shift_selects_the_rows_between_the_last_choice_and_the_one_reached() {
+    let mut grid = Grid { size: 256, ..Grid::default() };
+    grid.apply(&Edit::Insert(0, ["A", "B", "C", "D", "E", "F"].iter().map(|uid| summary(uid)).collect()));
+    let picked = |grid: &Grid| grid.selected().map(|i| i.uid.clone()).collect::<Vec<_>>();
+    grid.toggle(1, true);
+    assert_eq!(grid.range(3, false), vec![2, 3]);
+    assert_eq!(picked(&grid), ["B", "C", "D"]);
+    assert_eq!(grid.range(0, false), vec![0, 2, 3]);
+    assert_eq!(picked(&grid), ["A", "B"]);
+    grid.toggle(4, false);
+    assert_eq!(grid.range(5, true), vec![5]);
+    assert_eq!(picked(&grid), ["A", "B", "E", "F"]);
+    assert_eq!(grid.range(99, false), Vec::<usize>::new());
+    assert_eq!(picked(&grid), ["A", "B", "E", "F"]);
+}
+
+#[test]
+fn everything_selects_and_clears_every_row() {
+    let mut grid = Grid { size: 256, ..Grid::default() };
+    grid.apply(&Edit::Insert(0, ["A", "B", "C"].iter().map(|uid| summary(uid)).collect()));
+    grid.toggle(1, true);
+    assert_eq!(grid.all(true), vec![0, 2]);
+    assert_eq!(grid.all(false), vec![0, 1, 2]);
+    assert_eq!(grid.all(false), Vec::<usize>::new());
+}
+
+#[test]
+fn scenes_and_web_pages_say_what_they_are_so_their_covers_can_play() {
+    let item: serde_json::Value = serde_json::from_str(&fixture("Library1", "GetItem")).unwrap();
+    let package = |kind: &str| {
+        let mut info = item["item"]["package"].clone();
+        info["kind"] = kind.into();
+        let info: PackageInfo = serde_json::from_value(info).unwrap();
+        ItemSummary { kind: ItemKind::Package, package: Some(info), ..summary("P") }
+    };
+    assert_eq!(kind(&package("scene")), "scene");
+    assert_eq!(kind(&package("web")), "web");
+    assert_eq!(kind(&package("video")), "video");
+    assert_eq!(kind(&package("preset")), "package");
+    assert!(crate::covers::caption(&package("web")).starts_with("Web page"));
+}
+
+#[test]
+fn typing_a_search_and_taking_a_letter_back_keeps_the_covers() {
+    let mut grid = Grid { size: 512, ..Grid::default() };
+    let rows = |uids: &[&str]| uids.iter().map(|uid| summary(uid)).collect::<Vec<_>>();
+    let covers = |grid: &Grid| grid.rows.iter().map(|r| r.thumb.clone()).collect::<Vec<_>>();
+    let arrive = |grid: &mut Grid| {
+        let asked = grid.ask(0, 9).unwrap_or_default();
+        asked.iter().for_each(|uid| _ = grid.thumb(uid, &format!("/covers/{uid}.png")));
+    };
+    grid.reset(rows(&["A", "B", "C", "D"]), true);
+    arrive(&mut grid);
+    grid.reset(rows(&["A", "B"]), true);
+    arrive(&mut grid);
+    grid.reset(rows(&["A", "B"]), true);
+    arrive(&mut grid);
+    let found = covers(&grid);
+    assert_eq!(found, ["A", "B"].map(|uid| Some(format!("/covers/{uid}.png"))), "a cover is lost");
+    grid.reset(rows(&["A", "E", "B"]), true);
+    assert_eq!(covers(&grid)[1], None);
+    assert_eq!((grid.ask(0, 9), grid.ask(0, 9)), (Some(vec!["E".to_owned()]), None));
+}
+
+#[test]
+fn covers_asked_for_rows_that_a_search_dropped_are_asked_again() {
+    let mut grid = Grid { size: 256, ..Grid::default() };
+    grid.reset(vec![summary("A"), summary("B")], true);
+    assert_eq!(grid.ask(0, 9), Some(vec!["A".to_owned(), "B".to_owned()]));
+    grid.reset(Vec::new(), true);
+    assert!(grid.thumb("A", "/covers/A.png").is_empty());
+    grid.reset(vec![summary("A"), summary("B")], true);
+    assert_eq!(grid.ask(0, 9), Some(vec!["A".to_owned(), "B".to_owned()]), "the covers are never asked");
+}

@@ -1,0 +1,55 @@
+use crate::{Manifest, features};
+use reiwand_core::model::{About, Feature, Link, PackageCredit, Work};
+use serde::Serialize;
+
+fn name(value: impl Serialize) -> String {
+    serde_json::to_value(value).ok().and_then(|v| v.as_str().map(String::from)).unwrap_or_default()
+}
+
+impl Manifest {
+    pub fn about(&self, languages: &[String]) -> About {
+        let pick = |t| self.pick(t, languages);
+        let origin = self.origin.as_ref();
+        let work = |a: &crate::Ancestor| Work {
+            author: a.author.clone(),
+            title: a.title.clone(),
+            url: a.url.clone(),
+            license: a.license.clone(),
+        };
+        let credit = |c: &crate::Credit| PackageCredit {
+            paths: c.paths.clone(),
+            license: c.license.clone(),
+            attribution: c.attribution.clone(),
+            url: c.url.clone(),
+            source: c.source.as_ref().map(|s| format!("{} {}", s.id, s.version)),
+        };
+        let links = self.links.iter().flat_map(|l| l.all());
+        let links = links.filter_map(|(kind, url)| Some(Link { kind: kind.into(), url: url?.clone() }));
+        let feature = |f: &String| Feature { name: f.clone(), why: features::explain(f) };
+        About {
+            schema: self.schema.clone(),
+            title: pick(&self.title),
+            description: pick(&self.description),
+            changes: self.changes.as_ref().map(pick).unwrap_or_default(),
+            authors: self.authors.clone(),
+            license: self.license.clone(),
+            content: self.content.as_ref().map(|c| name(c.rating)),
+            descriptors: self.content.iter().flat_map(|c| &c.descriptors).map(name).collect(),
+            photosensitive: self.photosensitive,
+            origin: origin.map(|o| name(o.kind)),
+            derived_from: origin.iter().flat_map(|o| &o.derived_from).map(work).collect(),
+            credits: self.credits.iter().map(credit).collect(),
+            links: links.collect(),
+            inputs: self.inputs.iter().map(|i| i.name().into()).collect(),
+            features: self.features().iter().map(feature).collect(),
+            languages: self.locales().into_iter().collect(),
+            provider: origin.and_then(|o| o.provider.as_ref()).map(|p| p.credit.clone()),
+            source_url: origin.and_then(|o| o.source_url.clone()),
+            platforms: self.platforms.iter().map(|p| p.name().into()).collect(),
+            packages: self.dependencies().iter().map(|d| format!("{} {}", d.id, d.version)).collect(),
+            refused: features::refused(crate::Platform::here().name(), self.features()),
+            animated: None,
+            spread: self.display.as_ref().is_some_and(|d| d.span == Some(crate::Span::AllOutputs)),
+        }
+    }
+}

@@ -1,0 +1,112 @@
+{
+  "assets": {
+    "sky": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/sky.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    }
+  },
+  "canvas": {
+    "background": "#000000",
+    "blend_space": "linear",
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {
+    "duotone": {
+      "descriptor": "effects/duotone.json",
+      "wgsl": "effects/duotone.wgsl"
+    },
+    "haze": {
+      "descriptor": "effects/haze.json",
+      "wgsl": "effects/haze.wgsl"
+    }
+  },
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "duotone",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "amount": {
+              "invert": false,
+              "prop": "intensity"
+            },
+            "light": "#ffcf8a",
+            "shadow": "#12122e"
+          }
+        },
+        {
+          "effect": "haze",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "amount": 0.5,
+            "color": "#dfe6ff"
+          }
+        }
+      ],
+      "id": "background",
+      "image": "sky",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        1920,
+        1080
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": []
+}

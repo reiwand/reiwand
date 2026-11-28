@@ -1,0 +1,26 @@
+use super::Stage;
+use reiwand_scene::{Course, Pilot, ScriptOutputs};
+use std::path::PathBuf;
+
+impl Stage {
+    pub(crate) fn shown(&mut self, shown: Vec<(String, PathBuf)>, frames: Vec<ScriptOutputs>) -> Vec<Course> {
+        self.acting.keeping.shown = shown;
+        self.gather();
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(10);
+        while !self.extras.lengths.is_empty() && std::time::Instant::now() < deadline {
+            self.extras.timed(&mut self.runtime);
+            std::thread::sleep(std::time::Duration::from_millis(5));
+        }
+        for outputs in frames {
+            self.runtime.set_script(outputs);
+            self.runtime.advance(0.1);
+        }
+        let mut courses = Vec::new();
+        self.runtime.fill_videos(&mut courses);
+        courses
+    }
+
+    pub(crate) fn pilot(&mut self) -> &mut Pilot {
+        &mut self.pilot
+    }
+}

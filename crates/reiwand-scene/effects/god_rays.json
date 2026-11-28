@@ -1,0 +1,55 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": "light",
+  "compose": false,
+  "cost": {
+    "passes": 4,
+    "scale": 0.5,
+    "taps": 3
+  },
+  "description": {
+    "en": "Draws light rays spreading from a bright source.",
+    "es": "Dibuja rayos de luz que salen de una fuente brillante."
+  },
+  "fuse": null,
+  "id": "god_rays",
+  "lighter": null,
+  "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Light rays"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "source", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 2, "min": -1, "paint": null, "prefill": [0.5, 0.15], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "threshold", "type": "float", "channels": null, "help": {}, "label": {}, "max": 4, "min": 0, "paint": null, "prefill": 0.7, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "density", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.8, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "decay", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0.5, "paint": null, "prefill": 0.96, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "exposure", "type": "float", "channels": null, "help": {}, "label": {}, "max": 4, "min": 0, "paint": null, "prefill": 0.6, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "color", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#fff4e0", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "samples", "type": "float", "channels": null, "help": {}, "label": {}, "max": 16, "min": 4, "paint": null, "prefill": 12, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "follow", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": "cursor", "values": [], "waits_for": null, "yields_to": null},
+    {"id": "mode", "type": "enum", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [{"label": {"en": "Radial", "es": "Radial"}, "value": 0}, {"label": {"en": "Directional", "es": "Direccional"}, "value": 1}, {"label": {"en": "Star", "es": "Estrella"}, "value": 2}], "waits_for": null, "yields_to": null},
+    {"id": "angle", "type": "float", "channels": null, "help": {}, "label": {}, "max": 360, "min": -360, "paint": null, "prefill": 90, "tool": null, "tools": [], "unit": "degrees", "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "noise", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": "time", "values": [], "waits_for": null, "yields_to": null},
+    {"id": "edges", "type": "int", "channels": null, "help": {}, "label": {}, "max": 16, "min": 2, "paint": null, "prefill": 6, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_god_rays_bright", "grid": null, "inputs": ["previous"], "output": "next", "scale": 0.5, "swap": null, "target": null, "vertex": null},
+    {"blend": null, "copy": null, "entry": "fs_god_rays_march", "grid": null, "inputs": ["previous"], "output": "next", "scale": 0.5, "swap": null, "target": null, "vertex": null},
+    {"blend": null, "copy": null, "entry": "fs_god_rays_march", "grid": null, "inputs": ["previous"], "output": "next", "scale": 0.5, "swap": null, "target": null, "vertex": null},
+    {"blend": null, "copy": null, "entry": "fs_god_rays_mix", "grid": null, "inputs": ["input", "pass:2"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {
+    "q1": {"freeze": false, "params": {"edges": 8, "samples": 8}, "scale": null}
+  },
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
+}

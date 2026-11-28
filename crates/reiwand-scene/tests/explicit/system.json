@@ -1,0 +1,41 @@
+{
+  "capacity": 400,
+  "seed": 3,
+  "emitters": [
+    {
+      "shape": { "box": { "from": [0, 80], "to": [200, 100] } },
+      "rate": 200,
+      "bursts": [{ "count": 5, "every": 1.0 }]
+    },
+    { "shape": { "circle": { "center": [100, 50], "radius": 20 } }, "rate": 10 }
+  ],
+  "init": {
+    "life": [0.5, 1.5, 1],
+    "speed": [20, 60, 1],
+    "angle": [250, 290, 1],
+    "size": [2, 4, 1],
+    "hsv": { "hue": [0, 30] },
+    "velocity": [[0, 0], [10, 10], 1]
+  },
+  "forces": [
+    { "gravity": [0, 30] },
+    { "turbulence": { "strength": 20, "scale": 0.05 } },
+    { "attractor": { "target": [130, 50], "strength": 100 } },
+    { "vortex": { "center": [100, 50], "strength": 200, "ring": { "radius": 10, "width": 5, "pull": 1 } } },
+    { "orbit": { "center": [100, 50], "strength": 20 } },
+    { "oscillate": { "what": "position", "from": "top", "freq": [0.5, 2], "scale": [0.2, 1] } },
+    { "slow_near": { "target": [100, 50], "inner": 5, "outer": 10, "factor": 0 } },
+    { "keep_between": { "from": [0, 0], "to": [5, 5], "strength": 2000 } },
+    { "remap": { "input": "age", "in": [0, 1], "output": "size", "out": [1, 4] } },
+    { "noise_field": { "strength": { "min": 10, "max": 40 }, "phase": { "min": 0, "max": 100 }, "scale": 0.01, "drift": 5, "mask": [1, 1, 0] } },
+    { "drag": 0.2 }
+  ],
+  "collide": [{ "bounds": "canvas", "bounce": 0.5 }],
+  "render": {
+    "texture": "dot",
+    "trail": { "length": 8, "width": 0.5 },
+    "rope": {},
+    "stretch": { "mode": "add", "depth": "flat", "time": 0, "min": 0, "max": 10 }
+  },
+  "children": [{ "system": "puff", "on": "death" }]
+}

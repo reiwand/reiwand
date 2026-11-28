@@ -1,0 +1,75 @@
+use crate::effects::{Descriptor, FRAME_WGSL};
+use naga::valid::{Capabilities, ValidationFlags, Validator};
+
+pub const STAGES_WGSL: &str = include_str!("stages.wgsl");
+
+const PARTICLE: &str = concat!(
+    "@group(2) @binding(0) var<uniform> frame: Frame;\n",
+    "const TAU: f32 = 6.2831853;\n",
+    "const LUMA: vec3<f32> = vec3<f32>(0.2126, 0.7152, 0.0722);\n",
+    include_str!("oklab.wgsl"),
+    include_str!("noise.wgsl"),
+    include_str!("dither.wgsl"),
+    include_str!("stages.wgsl")
+);
+
+pub(crate) const MATERIAL: &str = concat!(
+    "const TAU: f32 = 6.2831853;\n",
+    "const LUMA: vec3<f32> = vec3<f32>(0.2126, 0.7152, 0.0722);\n",
+    include_str!("oklab.wgsl"),
+    include_str!("noise.wgsl"),
+    include_str!("dither.wgsl"),
+    include_str!("stages.wgsl"),
+    include_str!("images.wgsl")
+);
+
+pub fn particle_shader(d: &Descriptor, sprite: &str) -> Result<naga::Module, String> {
+    staged(d, &format!("{FRAME_WGSL}{PARTICLE}\n{}\n{sprite}", d.wgsl))
+}
+
+pub fn material_shader(d: &Descriptor, solid: &str) -> Result<naga::Module, String> {
+    staged(d, &format!("{FRAME_WGSL}{MATERIAL}\n{}\n{solid}", d.wgsl))
+}
+
+fn staged(d: &Descriptor, source: &str) -> Result<naga::Module, String> {
+    if !crate::verdicts::passed(d.key) {
+        return Err("its shader was not checked".into());
+    }
+    crate::shader::roomy(|| {
+        let mut module = crate::shader::compile(source)?.0;
+        crate::fence::guard(&mut module);
+        let mut validator = Validator::new(ValidationFlags::all(), Capabilities::default());
+        validator
+            .validate(&module)
+            .map_err(|e| format!("its guarded shader: {}", e.emit_to_string(source)))?;
+        Ok(module)
+    })
+}
+
+pub fn defines_pixel(wgsl: &str) -> bool {
+    let mut plain = String::with_capacity(wgsl.len());
+    let mut rest = wgsl;
+    while !rest.is_empty() {
+        let line = rest.find("//");
+        let block = rest.find("/*");
+        match (line, block) {
+            (Some(l), b) if b.is_none_or(|b| l < b) => {
+                plain.push_str(&rest[..l]);
+                rest = rest[l..].find('\n').map_or("", |n| &rest[l + n..]);
+            }
+            (_, Some(b)) => {
+                plain.push_str(&rest[..b]);
+                rest = rest[b + 2..].find("*/").map_or("", |e| &rest[b + 2 + e + 2..]);
+            }
+            _ => {
+                plain.push_str(rest);
+                rest = "";
+            }
+        }
+    }
+    plain.split("fn").skip(1).any(|after| {
+        let name = after.trim_start();
+        after.starts_with(char::is_whitespace)
+            && name.strip_prefix("pixel").is_some_and(|t| t.trim_start().starts_with('('))
+    })
+}

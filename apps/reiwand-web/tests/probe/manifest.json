@@ -1,0 +1,87 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": null,
+  "description": "",
+  "display": null,
+  "entry": "index.html",
+  "id": "org.example.probe",
+  "inputs": [
+    "audio",
+    "pointer",
+    "clicks",
+    "media"
+  ],
+  "kind": "web",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
+  "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "previews": null,
+  "properties": {
+    "speed": {
+      "decimals": null,
+      "default": 1.0,
+      "editable": false,
+      "enabled_if": {},
+      "integer": false,
+      "label": "Speed",
+      "log": false,
+      "max": 2.0,
+      "min": 0.0,
+      "order": 0,
+      "quality": {},
+      "step": null,
+      "type": "slider",
+      "unit": null,
+      "visible_if": {}
+    },
+    "tint": {
+      "alpha": false,
+      "default": "#ff8000",
+      "enabled_if": {},
+      "label": "Tint",
+      "order": 0,
+      "quality": {},
+      "type": "color",
+      "visible_if": {}
+    }
+  },
+  "requires": {
+    "engine": null,
+    "features": [
+      "inputs.audio",
+      "inputs.clicks",
+      "inputs.media",
+      "inputs.pointer",
+      "properties2",
+      "web"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "Probe",
+  "version": "1.0.0",
+  "web": {
+    "background": "#102030",
+    "preload": "early.js",
+    "storage_kib": 64
+  }
+}

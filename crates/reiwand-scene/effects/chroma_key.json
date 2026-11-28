@@ -1,0 +1,42 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": "color",
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Removes a chosen color, making it transparent.",
+    "es": "Quita un color elegido y lo vuelve transparente."
+  },
+  "fuse": "color",
+  "id": "chroma_key",
+  "lighter": null,
+  "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Chroma key"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "key", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#00ff00", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "tolerance", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "softness", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.08, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "spill", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.5, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "distance", "type": "enum", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [{"label": {"en": "Chroma only", "es": "Solo croma"}, "value": 0}, {"label": {"en": "Full color", "es": "Color completo"}, "value": 1}], "waits_for": null, "yields_to": null},
+    {"id": "keep", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
+}

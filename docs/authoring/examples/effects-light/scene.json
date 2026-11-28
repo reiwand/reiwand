@@ -1,0 +1,484 @@
+{
+  "assets": {
+    "comets": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/comets.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    },
+    "medallion": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/medallion.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    },
+    "orb": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/orb.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    },
+    "runes": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/runes.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    },
+    "velvet": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/velvet.jpg",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    }
+  },
+  "canvas": {
+    "background": "#05030a",
+    "blend_space": "linear",
+    "bloom": {
+      "hdr": {
+        "knee": 0.5,
+        "levels": 1,
+        "scatter": 0.5,
+        "strength": 1.0,
+        "threshold": 1.0
+      },
+      "knee": 0.5,
+      "limit": null,
+      "radius": 14,
+      "radius_unit": "screen",
+      "saturation": 1.2,
+      "strength": 0.9,
+      "threshold": 0.7,
+      "tint": "#ffffff"
+    },
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "velvet",
+      "image": "velvet",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        1920,
+        1080
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          960,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "pulse",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "audio_band": 0,
+            "bounds": [
+              0.35,
+              1.6
+            ],
+            "noise": 0.3,
+            "noise_speed": 1,
+            "phase": "",
+            "speed": 0.6,
+            "tint_high": "#ffe2a0",
+            "tint_low": "#5a2a10",
+            "what": 3
+          }
+        }
+      ],
+      "id": "runes",
+      "image": "runes",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        1000,
+        1000
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          960,
+          540
+        ],
+        "rotation": {
+          "invert": false,
+          "keys": [
+            [
+              0,
+              0
+            ],
+            [
+              60,
+              360
+            ]
+          ],
+          "timeline": "turn"
+        },
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "electric",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "blend": "add",
+            "bounds": [
+              0.3,
+              0.62
+            ],
+            "color_a": "#4fb8ff",
+            "color_b": "#ffffff",
+            "multiply": 2.5,
+            "scale": 1.2,
+            "smoothness": 0.3,
+            "speed": 0.7
+          }
+        }
+      ],
+      "id": "orb_left",
+      "image": "orb",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        300,
+        300
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          330,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffb0f0",
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "electric",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "blend": "add",
+            "bounds": [
+              0.3,
+              0.62
+            ],
+            "color_a": "#ff5fd2",
+            "color_b": "#fff0ff",
+            "multiply": 2.5,
+            "scale": 1.0,
+            "smoothness": 0.3,
+            "speed": 0.6
+          }
+        }
+      ],
+      "id": "orb_right",
+      "image": "orb",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        300,
+        300
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          1590,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "blend": "add",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "spin",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "angle": 0,
+            "center": [
+              0.5,
+              0.5
+            ],
+            "radius": 0.7,
+            "speed": 75
+          }
+        },
+        {
+          "effect": "trail",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "persistence": 0.85
+          }
+        }
+      ],
+      "id": "comets",
+      "image": "comets",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        900,
+        900
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          960,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "shine",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "angle": 35,
+            "blend": "add",
+            "color": "#fff6d8",
+            "gap": 1,
+            "gradient": "",
+            "intensity": 0.9,
+            "phase": 0,
+            "softness": 0.6,
+            "speed": 0.3,
+            "style": 0,
+            "width": 0.1
+          }
+        },
+        {
+          "effect": "glitter",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "color": "#fff4c8",
+            "density": 0.35,
+            "size": 3,
+            "speed": 0.8
+          }
+        }
+      ],
+      "id": "medallion",
+      "image": "medallion",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          960,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": [
+    {
+      "autoplay": true,
+      "delay": 0.0,
+      "duration": 60,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "turn",
+      "loop": "repeat",
+      "speed": 1.0,
+      "wrap": false
+    }
+  ]
+}

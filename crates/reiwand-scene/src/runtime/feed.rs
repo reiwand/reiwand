@@ -1,0 +1,180 @@
+use super::{MAX_STEP, Runtime};
+use crate::Values;
+use crate::input::{AudioFrame, MediaState, PointerState, ScriptOutputs, TimelineCommand};
+use crate::{Hearing, uses};
+use std::collections::BTreeSet;
+
+impl Runtime {
+    pub fn set_language(&mut self, lang: &str) {
+        self.lang = lang.to_owned();
+        self.languages = vec![lang.to_owned()];
+    }
+
+    pub fn set_languages(&mut self, languages: &[String]) {
+        self.languages = languages.to_vec();
+    }
+
+    pub fn set_props(&mut self, raw: Values) -> bool {
+        let props = self.leveling.tuned(&raw, self.level);
+        self.raw = raw;
+        self.retune(props)
+    }
+
+    pub fn set_leveling(&mut self, leveling: crate::Leveling) -> bool {
+        self.leveling = leveling;
+        self.retune(self.leveling.tuned(&self.raw, self.level))
+    }
+
+    pub fn set_quality(&mut self, level: crate::Quality) -> bool {
+        let moved = std::mem::replace(&mut self.level, level) != level;
+        moved && !self.leveling.is_empty() && self.retune(self.leveling.tuned(&self.raw, level))
+    }
+
+    fn retune(&mut self, props: Values) -> bool {
+        let changed: Vec<String> =
+            props.iter().filter(|(k, v)| self.props.get(*k) != Some(*v)).map(|(k, _)| k.clone()).collect();
+        self.props = props;
+        if !changed.is_empty() {
+            self.uses = uses::of(&self.scene, &self.props);
+        }
+        self.trigger(|t| changed.iter().any(|id| t.strip_prefix("prop:") == Some(id)));
+        !changed.is_empty()
+    }
+
+    pub fn set_audio(&mut self, audio: AudioFrame) -> bool {
+        let dt = (self.t - std::mem::replace(&mut self.heard, self.t)).clamp(0.0, 1.0) as f32;
+        let audio = match self.scene.audio {
+            Some(h) => h.hear(&self.audio, audio, dt, &mut self.peak),
+            None => {
+                let mut audio = audio;
+                Hearing::default().kinds(&self.audio, &mut audio, dt);
+                audio
+            }
+        };
+        for (key, usual) in self.usual.get_mut() {
+            usual.advance(&audio, dt, *key);
+        }
+        self.listen_slots(&audio);
+        let beat = audio.beat && !self.audio.beat;
+        let changed = self.uses().audio && audio != self.audio && !(audio.silent && self.audio.silent);
+        if !audio.silent {
+            self.stirred[1] = self.t;
+        }
+        self.audio = audio;
+        if beat {
+            self.beat = self.t;
+            self.trigger(|t| t == "beat");
+        }
+        changed
+    }
+
+    pub fn set_media(&mut self, media: MediaState) -> bool {
+        let heard = self.uses().media;
+        let changed = heard && media != self.media.0;
+        let cues = if heard { media.cues(&self.media.0) } else { Vec::new() };
+        self.media = (media, self.t);
+        for cue in cues {
+            self.trigger(|t| t.strip_prefix("media:") == Some(cue));
+        }
+        changed
+    }
+
+    pub fn media(&self) -> (&MediaState, f64) {
+        (&self.media.0, self.media.1)
+    }
+
+    pub fn set_pointer(&mut self, pointer: PointerState) -> bool {
+        let changed = self.uses().cursor && pointer != self.pointer;
+        if pointer.moving() || pointer.buttons & !self.pointer.buttons != 0 {
+            self.stirred[0] = self.t;
+        }
+        let delay = self.scene.canvas.parallax.as_ref().map_or(crate::input::SETTLE, |g| g.delay);
+        let delay = self.script.stage.and_then(|s| s.parallax?.delay).unwrap_or(delay);
+        let dt = (self.t - self.glided).clamp(0.0, MAX_STEP) as f32;
+        self.glide = match delay == crate::input::SETTLE {
+            true => pointer,
+            false => self.glide.follow_in(pointer.pos, pointer.buttons, dt, delay),
+        };
+        (self.pointer, self.glided) = (pointer, self.t);
+        changed
+    }
+
+    pub fn hold_pointer(&mut self, at: [f32; 2]) {
+        let held = PointerState {
+            pos: Some(at),
+            smooth: at,
+            inside: true,
+            presence: 1.0,
+            ..PointerState::default()
+        };
+        (self.pointer, self.glide, self.glided) = (held, held, self.t);
+    }
+
+    pub fn set_tilt(&mut self, tilt: [f32; 2]) -> bool {
+        let tilt = tilt.map(|v| v.clamp(-1.0, 1.0));
+        let changed =
+            !self.still && self.scene.tilts() && (0..2).any(|i| (tilt[i] - self.tilt[i]).abs() > 1e-4);
+        self.tilt = tilt;
+        changed
+    }
+
+    pub fn set_reduced_motion(&mut self, still: bool) -> bool {
+        let shakes = self.scene.canvas.camera.as_ref().is_some_and(|c| c.shake.is_some())
+            || self.script.stage.is_some_and(|s| s.camera.is_some_and(|c| c.shake.is_some()));
+        let moves = shakes || self.scene.layers().any(|l| !l.parallax.is_zero());
+        moves && std::mem::replace(&mut self.still, still) != still
+    }
+
+    pub fn set_battery(&mut self, battery: bool) -> bool {
+        std::mem::replace(&mut self.battery, battery) != battery && self.glow[1].is_some()
+    }
+
+    pub fn set_sheet(&mut self, asset: &str, durations: Vec<f32>) {
+        self.sheets.insert(asset.to_owned(), durations);
+    }
+
+    pub fn set_script(&mut self, outputs: ScriptOutputs) -> bool {
+        let outputs = outputs.bounded(&self.scene);
+        self.film_files(&outputs.layers);
+        self.play_sounds(&outputs.sounds);
+        self.steer(&outputs.videos);
+        self.steer_puppets(&outputs.videos);
+        self.steer_rigs(&outputs.rigs);
+        for (id, command) in &outputs.timelines {
+            let Some((tl, head)) = self.timelines.iter_mut().find(|(tl, _)| &tl.id == id) else { continue };
+            match *command {
+                TimelineCommand::Play => (head.playing, head.reversed) = (true, false),
+                TimelineCommand::Pause => head.playing = false,
+                TimelineCommand::Seek(t) => head.t = t.clamp(0.0, tl.length()),
+                TimelineCommand::Reverse => (head.playing, head.reversed) = (true, !head.reversed),
+                TimelineCommand::Stop => (head.t, head.playing, head.reversed) = (0.0, false, false),
+                TimelineCommand::Speed(rate) => head.rate = rate.clamp(-100.0, 100.0),
+            }
+        }
+        for (layer, control) in &outputs.particles {
+            let system = self.scene.layer(layer).and_then(|l| match &l.kind {
+                crate::Kind::Particles { system, .. } => {
+                    self.scene.particles.keys().position(|k| k == system)
+                }
+                _ => None,
+            });
+            let at = system.map(|s| crate::particles::flock_of(&self.flocks, s, layer));
+            if let Some(swarm) = at.and_then(|i| self.swarms.get_mut().get_mut(i)) {
+                control.commands.iter().for_each(|c| swarm.command(*c));
+            }
+        }
+        self.adopt(outputs)
+    }
+
+    pub fn set_playing(&mut self, assets: BTreeSet<String>) {
+        self.playing = assets;
+    }
+
+    pub fn press(&mut self, id: &str) {
+        self.trigger(|t| t.strip_prefix("prop:") == Some(id));
+    }
+
+    pub fn fire(&mut self, trigger: &str) {
+        self.trigger(|t| t == trigger);
+    }
+}

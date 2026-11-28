@@ -1,0 +1,184 @@
+use crate::*;
+use reiwand_core::explicit::block;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+use serde_json::Value as Json;
+use std::collections::{BTreeMap, BTreeSet};
+use std::sync::Arc;
+
+#[derive(Debug, thiserror::Error)]
+#[error("{}", self.message())]
+pub enum SceneError {
+    Json(#[from] serde_json::Error),
+    Read(#[from] reiwand_core::explicit::ReadError),
+    Invalid(Issue),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Color(pub [f32; 4]);
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct Scene {
+    pub schema: String,
+    pub canvas: Canvas,
+    pub clock: Clock,
+    pub assets: BTreeMap<String, Asset>,
+    pub layers: Vec<Layer>,
+    pub particles: BTreeMap<String, System>,
+    pub timelines: Vec<Timeline>,
+    pub scripts: Vec<Script>,
+    pub effects: BTreeMap<String, EffectFiles>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub audio: Option<Hearing>,
+    pub listens: Vec<crate::value::Listen>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub camera3d: Option<Camera3d>,
+    pub templates: BTreeMap<String, Layer>,
+    pub pools: BTreeMap<String, Pool>,
+    pub ext: BTreeMap<String, Json>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub transition: Option<crate::Transition>,
+    #[serde(skip)]
+    #[schemars(skip)]
+    pub passages: crate::Passages,
+    #[serde(skip)]
+    #[schemars(skip)]
+    pub loaded: BTreeMap<String, Arc<Descriptor>>,
+    #[serde(skip)]
+    #[schemars(skip)]
+    pub models: BTreeMap<String, Arc<ModelFile>>,
+    #[serde(skip)]
+    #[schemars(skip)]
+    pub rigs: BTreeMap<String, Arc<crate::Rigged>>,
+    #[serde(skip)]
+    #[schemars(skip)]
+    pub solids: BTreeMap<String, Arc<crate::Model>>,
+    #[serde(skip)]
+    #[schemars(skip)]
+    pub draft: crate::Drafted,
+    #[serde(skip)]
+    #[schemars(skip)]
+    pub sheets: BTreeMap<String, String>,
+    #[serde(skip)]
+    #[schemars(skip)]
+    pub rooted: BTreeMap<String, Vec<Layer>>,
+    #[serde(skip)]
+    #[schemars(skip)]
+    pub inked: std::sync::OnceLock<BTreeMap<String, crate::Inked>>,
+}
+
+impl Default for Color {
+    fn default() -> Self {
+        Color([0.0, 0.0, 0.0, 1.0])
+    }
+}
+
+impl Scene {
+    pub fn new(size: [u32; 2]) -> Scene {
+        let (assets, layers, particles, timelines, scripts, effects, audio, ext, loaded) = Default::default();
+        let (camera3d, templates, pools, models, rigs, solids, draft, sheets, rooted) = Default::default();
+        let (transition, passages, listens, inked) = Default::default();
+        Scene {
+            schema: SCHEMA.into(),
+            canvas: Canvas::new(size),
+            listens,
+            clock: Clock::default(),
+            assets,
+            layers,
+            particles,
+            timelines,
+            scripts,
+            effects,
+            audio,
+            camera3d,
+            templates,
+            pools,
+            ext,
+            transition,
+            passages,
+            loaded,
+            models,
+            rigs,
+            solids,
+            draft,
+            sheets,
+            rooted,
+            inked,
+        }
+    }
+
+    pub fn effect(&self, id: &str) -> Option<&Descriptor> {
+        self.loaded.get(id).map(|d| &**d).or_else(|| described(id).filter(|_| !self.effects.contains_key(id)))
+    }
+
+    pub fn shader(&self, id: &str) -> Option<&Descriptor> {
+        self.loaded
+            .get(id)
+            .map(|d| &**d)
+            .or_else(|| descriptor(id).filter(|_| !self.effects.contains_key(id)))
+    }
+
+    pub fn from_json(text: &str) -> Result<Scene, SceneError> {
+        // A text editor may write a byte order mark first, which JSON does not have.
+        let value: Json = serde_json::from_str(text.trim_start_matches('\u{feff}'))?;
+        match value.get("schema").and_then(Json::as_str) {
+            Some(SCHEMA) | None => {}
+            Some(other) => return Err(SceneError::Invalid(Issue::Schema(other.to_owned()))),
+        }
+        Ok(reiwand_core::explicit::read("scene.json", &value)?)
+    }
+
+    pub fn load(text: &str, props: &BTreeMap<String, Property>) -> Result<Scene, SceneError> {
+        let mut scene = Scene::from_json(text)?;
+        match scene.validate(props).into_iter().next() {
+            Some(issue) => Err(SceneError::Invalid(issue)),
+            None => {
+                scene.pose_sheet_masks();
+                Ok(scene)
+            }
+        }
+    }
+
+    pub fn to_json(&self) -> Result<String, SceneError> {
+        Ok(serde_json::to_string_pretty(self)?)
+    }
+
+    pub fn layers(&self) -> impl Iterator<Item = &Layer> {
+        let mut stack: Vec<&Layer> = self.layers.iter().rev().collect();
+        std::iter::from_fn(move || {
+            let layer = stack.pop()?;
+            if let Kind::Group { layers, .. } = &layer.kind {
+                stack.extend(layers.iter().rev());
+            }
+            Some(layer)
+        })
+    }
+
+    pub fn any_layer(&self, wanted: impl Fn(&Layer) -> bool) -> bool {
+        fn any(layers: &[Layer], wanted: &dyn Fn(&Layer) -> bool) -> bool {
+            let inner = |l: &Layer| matches!(&l.kind, Kind::Group { layers, .. } if any(layers, wanted));
+            layers.iter().any(|l| wanted(l) || inner(l))
+        }
+        any(&self.layers, &wanted)
+    }
+
+    pub fn layer(&self, id: &str) -> Option<&Layer> {
+        fn find<'a>(layers: &'a [Layer], id: &str) -> Option<&'a Layer> {
+            layers.iter().find_map(|l| if l.id == id { Some(l) } else { find(l.children(), id) })
+        }
+        find(&self.layers, id)
+    }
+
+    pub fn paths(&self) -> BTreeSet<&str> {
+        let shapes = self.assets.values().flat_map(|a| a.shapes.values().map(String::as_str));
+        let assets = self.assets.values().map(|a| a.path.as_str()).chain(shapes);
+        let effects = self.effects.values().flat_map(|f| [f.descriptor.as_str(), f.wgsl.as_str()]);
+        let ways = self.transition.iter().flat_map(|t| t.coming.iter().chain(&t.out));
+        let effects = effects.chain(ways.flat_map(|p| [p.descriptor.as_str(), p.wgsl.as_str()]));
+        assets.chain(self.scripts.iter().map(|s| s.path.as_str())).chain(effects).collect()
+    }
+}

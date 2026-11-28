@@ -1,0 +1,167 @@
+use crate::keys::{key_text, signer};
+use crate::told::{fill, told, tr};
+use anyhow::{Result, bail, ensure};
+use clap::Subcommand;
+use reiwand_format::{
+    Limits, MANIFEST, Manifest, build_with, features, fill as filled, fingerprint, open, public_key,
+    sha256_file, sign_source, verify_package,
+};
+use serde_json::json;
+use std::fs;
+use std::path::{Path, PathBuf};
+
+#[derive(Subcommand, Debug)]
+pub enum Pack {
+    #[command(about = "Build a .wpak package from a folder that holds manifest.json")]
+    Build {
+        #[arg(help = "Package folder")]
+        dir: PathBuf,
+        #[arg(short, long, help = "Package file; <id>-<version>.wpak in the current folder when omitted")]
+        out: Option<PathBuf>,
+        #[arg(
+            long = "key",
+            value_name = "PUB",
+            help = "Public key file or text that checks a signature made without a manifest hash"
+        )]
+        keys: Vec<String>,
+        #[arg(long, help = "Print the result as JSON")]
+        json: bool,
+    },
+    #[command(about = "Sign the manifest of a package folder; run it before pack build")]
+    Sign {
+        #[arg(help = "Package folder")]
+        dir: PathBuf,
+        #[arg(
+            long,
+            help = "Secret key file of the author, the NAME.key made by repo keygen; its password is asked on the terminal or read from REIWAND_KEY_PASSWORD"
+        )]
+        key: PathBuf,
+    },
+    #[command(
+        about = "Sign the hand-over of an online author to a new key with the old key; prints the signature"
+    )]
+    RotateKey {
+        #[arg(help = "Secret key file that signed the earlier versions")]
+        old: PathBuf,
+        #[arg(help = "Public key file or line of the new key")]
+        new: String,
+        #[arg(long, help = "Author id that the repository shows for the account")]
+        author: String,
+    },
+    #[command(about = "Explain what a package folder or file needs, uses and declares, and whether the \
+        desktop and the phone play it, play it without some features or refuse it")]
+    Check {
+        #[arg(help = "Package file or folder")]
+        path: PathBuf,
+        #[arg(long, help = "Print the result as JSON")]
+        json: bool,
+    },
+    #[command(about = "Check packages and, with --key, their author signature")]
+    Validate {
+        #[arg(required = true, value_name = "FILE", help = "Package file or folder to validate")]
+        files: Vec<PathBuf>,
+        #[arg(long = "key", value_name = "PUB", help = "Public key file or text of an accepted author")]
+        keys: Vec<String>,
+        #[arg(long, help = "Print one JSON object per file")]
+        json: bool,
+    },
+    #[command(flatten)]
+    Shelving(crate::shelving::Shelving),
+}
+
+pub fn run(command: Pack) -> Result<()> {
+    match command {
+        Pack::Shelving(command) => crate::shelving::run(command)?,
+        Pack::Build { dir, out, keys, json } => {
+            let manifest = Manifest::from_json(&fs::read(dir.join(MANIFEST))?)?;
+            if let Some(first) = crate::facts::reviewed(&dir).0.first() {
+                bail!("{first}");
+            }
+            let out = out.unwrap_or_else(|| format!("{}-{}.wpak", manifest.id, manifest.version).into());
+            for note in manifest.unread_texts(reiwand_format::locale_names(&dir)) {
+                eprintln!("{}", fill(told("note: %1"), &[&note]));
+            }
+            for added in filled(&dir)? {
+                eprintln!(
+                    "{}",
+                    fill(told("requires.features += %1 (%2)"), &[&added, &features::explain(&added)])
+                );
+            }
+            let keys = keys.iter().map(|k| key_text(k)).collect::<Result<Vec<_>>>()?;
+            let keys =
+                keys.iter().map(|k| Ok((fingerprint(k)?, public_key(k)?))).collect::<Result<Vec<_>>>()?;
+            let pairs: Vec<(&str, &str)> = keys.iter().map(|(fp, key)| (fp.as_str(), key.as_str())).collect();
+            let sha256 = build_with(&dir, &out, &Limits::default(), &pairs)?;
+            let size = fs::metadata(&out)?.len();
+            match json {
+                true => println!("{}", json!({"path": out, "sha256": sha256, "size": size})),
+                false => println!("{sha256} {size} {}", out.display()),
+            }
+        }
+        Pack::Sign { dir, key } => println!("{}", sign_source(&dir, &signer(&key)?)?),
+        Pack::RotateKey { old, new, author } => {
+            print!("{}", reiwand_format::sign_rotation(&signer(&old)?, &author, &key_text(&new)?)?)
+        }
+        Pack::Check { path, json } => crate::facts::check(&path, json)?,
+        Pack::Validate { files, keys, json } => {
+            let keys = keys.iter().map(|k| key_text(k)).collect::<Result<Vec<_>>>()?;
+            let keys =
+                keys.iter().map(|k| Ok((fingerprint(k)?, public_key(k)?))).collect::<Result<Vec<_>>>()?;
+            let pairs: Vec<(&str, &str)> = keys.iter().map(|(fp, key)| (fp.as_str(), key.as_str())).collect();
+            let reports: Vec<(bool, String)> = files.iter().map(|file| report(file, &pairs, json)).collect();
+            reports.iter().for_each(|(_, line)| println!("{line}"));
+            let invalid = reports.iter().filter(|(valid, _)| !valid).count();
+            ensure!(
+                invalid == 0,
+                "{}",
+                fill(told("%1 of %2 packages are invalid"), &[&invalid, &files.len()])
+            );
+        }
+    }
+    Ok(())
+}
+
+fn report(file: &Path, keys: &[(&str, &str)], json: bool) -> (bool, String) {
+    let (checked, sha256) = (check(file, keys), sha256_file(file).ok());
+    let line = match (&checked, json) {
+        (Ok((m, signer)), false) => {
+            let (sha256, signer) = (sha256.unwrap_or_default(), signer.as_deref().unwrap_or("-"));
+            fill(told("ok %1 %2 %3 sha256=%4 signer=%5"), &[&m.kind, &m.id, &m.version, &sha256, &signer])
+        }
+        (Err(e), false) => format!("{}: {e}", file.display()),
+        (_, true) => {
+            let (size, valid) = (fs::metadata(file).ok().map(|m| m.len()), checked.is_ok());
+            let (manifest, signer, error) = match &checked {
+                Ok((m, signer)) => {
+                    (json!({"id": m.id, "version": m.version, "kind": m.kind}), json!(signer), json!(null))
+                }
+                Err(e) => (json!(null), json!(null), json!(e.to_string())),
+            };
+            json!({"file": file, "valid": valid, "sha256": sha256, "size": size, "manifest": manifest,
+                "signer": signer, "error": error})
+            .to_string()
+        }
+    };
+    (checked.is_ok(), line)
+}
+
+fn folder(dir: &Path, keys: &[(&str, &str)]) -> Result<(Manifest, Option<String>)> {
+    let manifest = reiwand_format::inspect(dir)?.0;
+    let texts: Vec<String> = keys.iter().map(|(_, key)| (*key).to_owned()).collect();
+    let signed = (!keys.is_empty()).then(|| reiwand_editor::review::signature(dir, &texts));
+    let Some(signed) = signed else { return Ok((manifest, None)) };
+    match signed["state"].as_str() {
+        Some("valid") => Ok((manifest, signed["signers"][0].as_str().map(str::to_owned))),
+        Some("unsigned") => bail!("{}", tr(told("the folder is not signed"))),
+        _ => bail!("{}", signed["error"].as_str().unwrap_or(&tr(told("the signature is not valid")))),
+    }
+}
+
+fn check(file: &Path, keys: &[(&str, &str)]) -> Result<(Manifest, Option<String>)> {
+    if file.is_dir() {
+        return folder(file, keys);
+    }
+    let mut package = open(file, &Limits::default())?;
+    let signer = (!keys.is_empty()).then(|| verify_package(&mut package, keys)).transpose()?;
+    Ok((package.manifest, signer))
+}

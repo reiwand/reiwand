@@ -1,0 +1,308 @@
+{
+  "authors": [
+    "Reiwand contributors"
+  ],
+  "changes": "@changes",
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": "en",
+  "description": "@description",
+  "display": null,
+  "entry": "scene.json",
+  "id": "io.github.reiwand.example.dusk",
+  "inputs": [
+    "pointer"
+  ],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
+  "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [
+    {
+      "id": "golden",
+      "label": "@golden",
+      "values": {
+        "light": "#ffb347",
+        "mood": "dusk",
+        "warmth": 0.55
+      }
+    },
+    {
+      "id": "moonlight",
+      "label": "@moonlight",
+      "values": {
+        "light": "#7f9cff",
+        "mood": "night",
+        "stars": true,
+        "warmth": 0.2
+      }
+    }
+  ],
+  "previews": {
+    "animated": null,
+    "thumbnail": "preview.jpg"
+  },
+  "properties": {
+    "caption": {
+      "default": "",
+      "enabled_if": {},
+      "group": "words",
+      "help": "@caption_help",
+      "icon": null,
+      "label": "@caption",
+      "max_len": 40,
+      "multiline": false,
+      "order": 1,
+      "quality": {},
+      "secret": false,
+      "type": "text",
+      "visible_if": {}
+    },
+    "caption_color": {
+      "alpha": true,
+      "default": "#ffffffd0",
+      "enabled_if": {},
+      "group": "words",
+      "help": null,
+      "icon": null,
+      "label": "@caption_color",
+      "order": 2,
+      "quality": {},
+      "type": "color",
+      "visible_if": {}
+    },
+    "depth": {
+      "default": "pointer",
+      "enabled_if": {},
+      "group": "look",
+      "help": null,
+      "icon": null,
+      "label": "@depth",
+      "options": [
+        {
+          "icon": null,
+          "label": "@pointer",
+          "value": "pointer"
+        },
+        {
+          "icon": null,
+          "label": "@orbit",
+          "value": "orbit"
+        },
+        {
+          "icon": null,
+          "label": "@off",
+          "value": "off"
+        }
+      ],
+      "order": 7,
+      "quality": {},
+      "type": "combo",
+      "visible_if": {}
+    },
+    "light": {
+      "alpha": false,
+      "default": "#ff9a5c",
+      "enabled_if": {},
+      "group": "look",
+      "help": null,
+      "icon": null,
+      "label": "@light",
+      "order": 3,
+      "quality": {},
+      "type": "color",
+      "visible_if": {}
+    },
+    "look": {
+      "collapsed": false,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": "@look",
+      "order": 0,
+      "quality": {},
+      "type": "group",
+      "visible_if": {}
+    },
+    "mood": {
+      "default": "dusk",
+      "enabled_if": {},
+      "group": "look",
+      "help": null,
+      "icon": null,
+      "label": "@mood",
+      "options": [
+        {
+          "icon": null,
+          "label": "@dusk",
+          "value": "dusk"
+        },
+        {
+          "icon": null,
+          "label": "@night",
+          "value": "night"
+        }
+      ],
+      "order": 1,
+      "quality": {},
+      "type": "combo",
+      "visible_if": {}
+    },
+    "stars": {
+      "default": true,
+      "enabled_if": {},
+      "group": "look",
+      "help": null,
+      "icon": null,
+      "label": "@stars",
+      "order": 2,
+      "quality": {},
+      "type": "bool",
+      "visible_if": {}
+    },
+    "sun_size": {
+      "decimals": null,
+      "default": 1.0,
+      "editable": false,
+      "enabled_if": {},
+      "group": "look",
+      "help": null,
+      "icon": null,
+      "integer": false,
+      "label": "@sun_size",
+      "log": false,
+      "max": 1.5,
+      "min": 0.5,
+      "order": 5,
+      "quality": {},
+      "step": 0.05,
+      "type": "slider",
+      "unit": "×",
+      "visible_if": {}
+    },
+    "vignette": {
+      "default": true,
+      "enabled_if": {},
+      "group": "look",
+      "help": null,
+      "icon": null,
+      "label": "@vignette",
+      "order": 6,
+      "quality": {},
+      "type": "bool",
+      "visible_if": {}
+    },
+    "warmth": {
+      "decimals": null,
+      "default": 0.35,
+      "editable": false,
+      "enabled_if": {},
+      "group": "look",
+      "help": null,
+      "icon": null,
+      "integer": false,
+      "label": "@warmth",
+      "log": false,
+      "max": 1.0,
+      "min": 0.0,
+      "order": 4,
+      "quality": {},
+      "step": 0.05,
+      "type": "slider",
+      "unit": null,
+      "visible_if": {}
+    },
+    "words": {
+      "collapsed": false,
+      "enabled_if": {},
+      "group": null,
+      "help": null,
+      "icon": null,
+      "label": "@words",
+      "order": 1,
+      "quality": {},
+      "type": "group",
+      "visible_if": {}
+    }
+  },
+  "requires": {
+    "engine": null,
+    "features": [
+      "inputs.pointer"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {
+    "en": {
+      "caption": "Text",
+      "caption_color": "Text color",
+      "caption_help": "Shown in the lower left corner.",
+      "changes": "Describes itself in English and Spanish and declares its rating and the inputs it uses.",
+      "depth": "Depth",
+      "description": "Layered hills under a low sun.\n\n- **Blend modes** and a masked reflection\n- A timeline that brings the light in\n- Depth that follows your finger or the pointer once you allow it\n- Settings for the time of day, the light and a caption",
+      "dusk": "Dusk",
+      "golden": "Golden hour",
+      "light": "Light color",
+      "look": "Look",
+      "mood": "Time of day",
+      "moonlight": "Moonlight",
+      "night": "Night",
+      "off": "Off",
+      "orbit": "Slow orbit",
+      "pointer": "Follow the pointer",
+      "stars": "Stars",
+      "sun_size": "Sun size",
+      "title": "Dusk hills",
+      "vignette": "Dark corners",
+      "warmth": "Light strength",
+      "words": "Caption"
+    },
+    "es": {
+      "caption": "Texto",
+      "caption_color": "Color del texto",
+      "caption_help": "Se muestra en la esquina inferior izquierda.",
+      "changes": "Se describe en inglés y en español y declara su clasificación y las entradas que usa.",
+      "depth": "Profundidad",
+      "description": "Colinas en capas bajo el sol del atardecer.\n\n- **Modos de fusión** y un reflejo con máscara\n- Una línea de tiempo que hace entrar la luz\n- Profundidad que sigue a tu dedo o al puntero cuando lo permites\n- Ajustes para el momento del día, la luz y un rótulo",
+      "dusk": "Atardecer",
+      "golden": "Hora dorada",
+      "light": "Color de la luz",
+      "look": "Aspecto",
+      "mood": "Momento del día",
+      "moonlight": "Luz de luna",
+      "night": "Noche",
+      "off": "Apagada",
+      "orbit": "Órbita lenta",
+      "pointer": "Seguir al puntero",
+      "stars": "Estrellas",
+      "sun_size": "Tamaño del sol",
+      "title": "Colinas al atardecer",
+      "vignette": "Esquinas oscuras",
+      "warmth": "Intensidad de la luz",
+      "words": "Rótulo"
+    }
+  },
+  "tags": [
+    "example",
+    "landscape",
+    "depth"
+  ],
+  "title": "@title",
+  "version": "1.1.0",
+  "web": null
+}

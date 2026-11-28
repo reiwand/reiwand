@@ -1,0 +1,199 @@
+pub(super) mod clock;
+#[cfg(test)]
+mod covered;
+mod heard;
+mod level;
+mod listing;
+mod lit;
+mod media;
+mod polling;
+#[cfg(test)]
+mod spreads;
+#[cfg(test)]
+mod stops;
+#[cfg(test)]
+mod tests;
+
+use super::SceneSpec;
+use super::power::Power;
+use super::scripts::Link;
+use reiwand_core::Region;
+use reiwand_render::SceneView;
+use reiwand_scene::{
+    Course, Fired, LayerRead, Pilot, PointerState, Press, Quality, Runtime, Spare, Touch, Uses, Values,
+    Voice, Why,
+};
+use std::time::{Duration, Instant};
+
+mod control;
+mod feed;
+mod frame;
+
+const CALM: u32 = 30;
+const SETTLE: u32 = 3;
+const POLL: f64 = 0.5;
+
+pub(super) struct SceneState {
+    pub(super) spec: SceneSpec,
+    runtime: Runtime,
+    still: bool,
+    reads: (bool, bool),
+    quality: Quality,
+    uses: Uses,
+    view: Option<SceneView>,
+    tick: Option<Instant>,
+    pointer: PointerState,
+    presses: Vec<Press>,
+    allowed: [bool; 2],
+    touches: Vec<Touch>,
+    clicked: [Option<Instant>; 2],
+    host: Option<Link>,
+    calm: u32,
+    answered: bool,
+    awaiting: u64,
+    timer: f64,
+    sent: (Values, [f32; 4], [u32; 2], u32),
+    read_back: Vec<(String, LayerRead)>,
+    sounding: Vec<String>,
+    pub(super) console: std::collections::VecDeque<String>,
+    pub(super) error: Option<String>,
+    pub(super) left: Vec<String>,
+    left_key: u64,
+    pub(super) due: Option<Instant>,
+    pub(super) moving: bool,
+    pub(super) voices: Vec<Voice>,
+    pub(super) heard: Option<Instant>,
+    exposed: Values,
+    pressed: Vec<String>,
+    fired: Vec<Fired>,
+    courses: Vec<Course>,
+    filmed: Vec<Course>,
+    ended: Vec<String>,
+    zone: (i64, String),
+    restock: bool,
+    pub(super) hushed: bool,
+    pub(super) quiet: bool,
+    guard: Option<Box<super::guard::Guard>>,
+    pub(super) damage: Option<Region>,
+    spare: Spare,
+    pilot: Pilot,
+    why: Why,
+    over: Option<(f32, f32)>,
+    automatic: &'static str,
+    samples: u64,
+    listed: listing::Listed,
+    keeper: Option<reiwand_core::stash::Keeper>,
+    shared: Option<clock::Clock>,
+    pub(super) lit: f32,
+    pub(super) lights: bool,
+    media: media::Shown,
+}
+
+fn after(seconds: f64) -> Duration {
+    Duration::try_from_secs_f64(seconds.clamp(0.0, 86_400.0)).unwrap_or_default()
+}
+
+impl SceneState {
+    pub(super) fn new(spec: SceneSpec, power: Power) -> SceneState {
+        let power = level::owned(&spec, power);
+        let mut runtime = Runtime::new(spec.pack.scene.clone(), spec.values.clone());
+        spec.pack.inputs.into_iter().for_each(|allowed| runtime.declare(allowed));
+        runtime.set_language(&spec.pack.locale);
+        spec.pack.assets.sheets.iter().for_each(|(id, d)| runtime.set_sheet(id, d.clone()));
+        runtime.set_lengths(spec.pack.lengths.clone());
+        runtime.set_playing(spec.clips.iter().map(|(asset, _)| asset.clone()).collect());
+        let still = spec.hold.is_some() || power.still(&runtime);
+        match spec.hold {
+            Some(time) => runtime.seek(time),
+            None if still => {
+                tracing::debug!("the scene is too heavy for this device and stays at its poster time");
+                runtime.seek(f64::from(runtime.scene.clock.poster_time));
+            }
+            None => {}
+        }
+        let (quality, why) = power.level(&runtime);
+        let (over, automatic) = (power.over(&runtime, quality), power.automatic(&runtime, quality));
+        runtime.set_leveling(reiwand_scene::Leveling::of(&spec.pack.props.properties));
+        runtime.set_quality(quality);
+        let exposed = reiwand_scene::exposed(&spec.pack.props.properties, runtime.props());
+        let [audio, cursor] = reiwand_scene::script_inputs(&spec.pack.scene, &spec.pack.scripts);
+        let reads = spec.pack.inputs.map_or((audio, cursor), |u| (audio && u.audio, cursor && u.cursor));
+        let (view, tick, pointer, calm, error, due, uses) = Default::default();
+        let (moving, voices, heard) = (!still, Vec::new(), None);
+        let mut scene = SceneState {
+            spec,
+            runtime,
+            still,
+            reads,
+            quality,
+            uses,
+            view,
+            tick,
+            pointer,
+            presses: Vec::new(),
+            allowed: [false; 2],
+            touches: Vec::new(),
+            clicked: [None; 2],
+            host: None,
+            calm,
+            answered: false,
+            awaiting: 0,
+            timer: f64::INFINITY,
+            sent: (Values::new(), [0.0; 4], [1, 1], 60),
+            read_back: Vec::new(),
+            sounding: Vec::new(),
+            console: Default::default(),
+            error,
+            left: Vec::new(),
+            left_key: 0,
+            due,
+            moving,
+            voices,
+            heard,
+            exposed,
+            pressed: Vec::new(),
+            fired: Vec::new(),
+            courses: Vec::new(),
+            filmed: Vec::new(),
+            ended: Vec::new(),
+            zone: (i64::MIN, String::new()),
+            restock: false,
+            hushed: false,
+            quiet: false,
+            guard: None,
+            damage: None,
+            spare: Spare::default(),
+            pilot: Pilot::default(),
+            why,
+            over,
+            automatic,
+            samples: 0,
+            listed: Default::default(),
+            keeper: None,
+            shared: None,
+            lit: 1.0,
+            lights: false,
+            media: Default::default(),
+        };
+        scene.uses = scene.needs(quality);
+        scene
+    }
+
+    fn needs(&self, quality: Quality) -> Uses {
+        let uses = self.runtime.uses_at(quality);
+        if self.still {
+            return Uses { media: uses.media, ..Uses::default() };
+        }
+        Uses { audio: uses.audio || self.reads.0, cursor: uses.cursor || self.reads.1, ..uses }
+    }
+}
+
+fn assets(
+    spec: &SceneSpec,
+    covers: &[(String, std::sync::Arc<reiwand_render::Pixels>)],
+) -> reiwand_render::SceneAssets {
+    let mut assets = spec.pack.assets.clone();
+    assets.images.extend(spec.extra.iter().cloned());
+    assets.images.extend(covers.iter().cloned());
+    assets
+}

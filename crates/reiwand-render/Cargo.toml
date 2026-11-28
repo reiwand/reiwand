@@ -1,0 +1,52 @@
+[package]
+name = "reiwand-render"
+description = "Headless wgpu renderer for Reiwand"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+autotests = false
+
+[features]
+avif = ["image/avif"]
+
+[dependencies]
+reiwand-core.workspace = true
+reiwand-scene.workspace = true
+reiwand-audio.workspace = true
+reiwand-palette.workspace = true
+reiwand-script.workspace = true
+reiwand-ktx2.workspace = true
+reiwand-type.workspace = true
+wgpu = { workspace = true, features = ["naga-ir"] }
+pollster.workspace = true
+bytemuck.workspace = true
+half.workspace = true
+image.workspace = true
+jpeg-decoder.workspace = true
+tempfile.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+libc.workspace = true
+serde_json.workspace = true
+
+[target.'cfg(target_os = "linux")'.dependencies]
+ash.workspace = true
+rustix.workspace = true
+
+[[test]]
+name = "all"
+path = "tests/all.rs"
+
+[[test]]
+name = "timing"
+path = "tests/timing/main.rs"
+
+[dev-dependencies]
+reiwand-video.workspace = true
+reiwand-fill.workspace = true
+ab_glyph.workspace = true
+fontdb.workspace = true
+reiwand-ktx2 = { workspace = true, features = ["encode"] }
+brotli.workspace = true
+tempfile.workspace = true

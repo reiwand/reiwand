@@ -1,0 +1,606 @@
+{
+  "assets": {
+    "water": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/water.ogg",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    }
+  },
+  "canvas": {
+    "background": "#06222c",
+    "blend_space": "linear",
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": "display",
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fade_in": 2,
+      "fade_out": 2,
+      "id": "lapping",
+      "loop": true,
+      "mode": "sequence",
+      "opacity": 1.0,
+      "pan": 0.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "play": true,
+      "solid": false,
+      "sound": "water",
+      "sounds": [],
+      "stream": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "sound",
+      "visible": true,
+      "volume": 0.8
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "gradient": {
+        "from": [
+          0.0,
+          0.0
+        ],
+        "radial": false,
+        "stops": [
+          [
+            0,
+            "#15506a"
+          ],
+          [
+            0.55,
+            "#0d3746"
+          ],
+          [
+            1,
+            "#05202a"
+          ]
+        ],
+        "to": [
+          0.0,
+          1.0
+        ]
+      },
+      "id": "water",
+      "opacity": 1.0,
+      "parallax": [
+        0.01,
+        0.01
+      ],
+      "shape": {
+        "rect": {
+          "radius": 0.0,
+          "size": [
+            2000,
+            1160
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "add",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "gradient": {
+        "from": [
+          0.5,
+          0.5
+        ],
+        "radial": true,
+        "stops": [
+          [
+            0,
+            "#5fd0d040"
+          ],
+          [
+            0.3,
+            "#5fd0d016"
+          ],
+          [
+            0.65,
+            "#5fd0d003"
+          ],
+          [
+            1,
+            "#5fd0d000"
+          ]
+        ],
+        "to": [
+          1,
+          0.5
+        ]
+      },
+      "id": "light",
+      "opacity": 1.0,
+      "parallax": [
+        0.02,
+        0.02
+      ],
+      "shape": {
+        "ellipse": {
+          "size": [
+            1500,
+            900
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          700,
+          380
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "clip": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "pads",
+      "layers": [
+        {
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#2f7d4d",
+          "id": "a",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "shape": {
+            "ellipse": {
+              "size": [
+                240,
+                190
+              ]
+            }
+          },
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "position": [
+              360,
+              760
+            ],
+            "rotation": 12,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "shape",
+          "visible": true
+        },
+        {
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#3a8f58",
+          "id": "b",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "shape": {
+            "ellipse": {
+              "size": [
+                170,
+                140
+              ]
+            }
+          },
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "position": [
+              560,
+              880
+            ],
+            "rotation": -20,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "shape",
+          "visible": true
+        },
+        {
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#2a6f45",
+          "id": "c",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "shape": {
+            "ellipse": {
+              "size": [
+                280,
+                220
+              ]
+            }
+          },
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "position": [
+              1450,
+              300
+            ],
+            "rotation": 30,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "shape",
+          "visible": true
+        },
+        {
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#3a8f58",
+          "id": "d",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "shape": {
+            "ellipse": {
+              "size": [
+                190,
+                150
+              ]
+            }
+          },
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "position": [
+              1650,
+              470
+            ],
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "shape",
+          "visible": true
+        },
+        {
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#2f7d4d",
+          "id": "e",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "shape": {
+            "ellipse": {
+              "size": [
+                210,
+                170
+              ]
+            }
+          },
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "position": [
+              1180,
+              860
+            ],
+            "rotation": -8,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "shape",
+          "visible": true
+        },
+        {
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#f6c8db",
+          "id": "f1",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "shape": {
+            "star": {
+              "inner": 0.45,
+              "points": 8,
+              "size": 34
+            }
+          },
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "position": [
+              390,
+              740
+            ],
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "shape",
+          "visible": true
+        },
+        {
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#fbe3ec",
+          "id": "f2",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "shape": {
+            "star": {
+              "inner": 0.45,
+              "points": 8,
+              "size": 28
+            }
+          },
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "position": [
+              1470,
+              280
+            ],
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "shape",
+          "visible": true
+        }
+      ],
+      "opacity": 1.0,
+      "parallax": [
+        0.04,
+        0.04
+      ],
+      "solid": false,
+      "space": "2d",
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "group",
+      "visible": {
+        "invert": false,
+        "prop": "pads"
+      }
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "water_ripple",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "beat": 0,
+            "click": 1.0,
+            "cursor": 1.0,
+            "damping": 0.96,
+            "perspective": 0.0,
+            "radius": 30,
+            "reflection": "",
+            "specular": 0.3,
+            "speed": 1.0,
+            "strength": {
+              "invert": false,
+              "prop": "ripples"
+            },
+            "tint": "#ffffff",
+            "walls": ""
+          }
+        },
+        {
+          "effect": "vignette",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "center": [
+              0.5,
+              0.5
+            ],
+            "color": "#021016",
+            "intensity": 0.4,
+            "radius": 1.0,
+            "roundness": 1.0,
+            "softness": 0.65
+          }
+        }
+      ],
+      "id": "ripples",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "redraw": false,
+      "rgb": false,
+      "size": "canvas",
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "adjustment",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": []
+}

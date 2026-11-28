@@ -1,0 +1,171 @@
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::collections::BTreeMap;
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
+pub enum Edit3d {
+    Model(ModelEdit),
+    Group {
+        #[serde(default)]
+        id: Option<String>,
+        #[serde(default)]
+        into: Option<String>,
+        #[serde(default)]
+        layers: Vec<String>,
+    },
+    Space {
+        layer: String,
+        deep: bool,
+    },
+    DepthTest {
+        layer: String,
+        on: bool,
+    },
+    Material(MaterialEdit),
+    Paint(MaterialStroke),
+    Sculpt(super::SculptStroke),
+    Camera(CameraEdit),
+    View(ViewEdit),
+    Tones(TonesEdit),
+    Shadows(super::ShadowEdit),
+    Path(super::PathEdit),
+    Grab(super::Grab),
+    Light(super::LightPlace),
+    NewMaterial {
+        name: String,
+    },
+    Key(ChromaPick),
+    Comb(CombStroke),
+    Debug {
+        #[serde(default)]
+        show: Option<String>,
+        #[serde(default)]
+        layer: Option<String>,
+        #[serde(default)]
+        material: Option<String>,
+    },
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
+pub enum ModelEdit {
+    Add {
+        asset: String,
+        #[serde(default)]
+        id: Option<String>,
+        #[serde(default)]
+        into: Option<String>,
+        #[serde(default)]
+        at: Option<[f64; 3]>,
+    },
+    Set(ModelSet),
+    Remove {
+        layer: String,
+    },
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(default, deny_unknown_fields)]
+pub struct ModelSet {
+    pub layer: String,
+    pub position: Option<[f64; 3]>,
+    pub rotation: Option<[f64; 3]>,
+    pub scale: Option<[f64; 3]>,
+    pub size: Option<[f64; 2]>,
+    pub env: Option<String>,
+    pub asset: Option<String>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(default, deny_unknown_fields)]
+pub struct MaterialEdit {
+    pub layer: String,
+    pub name: String,
+    pub shader: Option<String>,
+    pub lit: Option<bool>,
+    pub double_sided: Option<bool>,
+    pub cast_shadows: Option<bool>,
+    pub receive_shadows: Option<bool>,
+    pub color: Option<Value>,
+    pub emissive: Option<Value>,
+    pub params: BTreeMap<String, f64>,
+    pub values: BTreeMap<String, Value>,
+    pub key: Option<Value>,
+    pub maps: BTreeMap<String, Option<String>>,
+    pub files: BTreeMap<String, std::path::PathBuf>,
+    pub clear: bool,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(default, deny_unknown_fields)]
+pub struct CameraEdit {
+    pub fov: Option<f64>,
+    pub near: Option<f64>,
+    pub far: Option<f64>,
+    pub eye: Option<[f64; 3]>,
+    pub center: Option<[f64; 3]>,
+    pub up: Option<[f64; 3]>,
+    pub roll: Option<f64>,
+    pub from_view: bool,
+    pub clear: bool,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(default, deny_unknown_fields)]
+pub struct ViewEdit {
+    pub orbit: Option<[f64; 2]>,
+    pub pan: Option<[f64; 2]>,
+    pub zoom: Option<f64>,
+    pub through: Option<bool>,
+    pub frame: Option<String>,
+    pub reset: bool,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(default, deny_unknown_fields)]
+pub struct TonesEdit {
+    pub hdr: Option<bool>,
+    pub tonemap: Option<String>,
+    pub split: Option<f64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct MaterialStroke {
+    pub layer: String,
+    pub name: String,
+    pub slot: String,
+    pub color: [f32; 3],
+    pub radius: f32,
+    #[serde(default = "super::names::half")]
+    pub hardness: f32,
+    pub points: Vec<[f32; 2]>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ChromaPick {
+    pub layer: String,
+    pub name: String,
+    pub at: [f32; 2],
+    #[serde(default)]
+    pub time: f64,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct CombStroke {
+    pub layer: String,
+    pub name: String,
+    pub points: Vec<[f32; 2]>,
+    pub radius: f32,
+    #[serde(default = "super::names::whole")]
+    pub strength: f32,
+    #[serde(default = "super::names::half")]
+    pub hardness: f32,
+    #[serde(default)]
+    pub erase: bool,
+    #[serde(default)]
+    pub time: f64,
+}

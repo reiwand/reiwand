@@ -1,0 +1,57 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": "en",
+  "description": "",
+  "entry": "scene.json",
+  "id": "org.example.own-effect",
+  "inputs": [],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "photosensitive": false,
+  "platforms": [],
+  "presets": [],
+  "properties": {
+    "intensity": {
+      "decimals": null,
+      "default": 1,
+      "editable": false,
+      "enabled_if": {},
+      "integer": false,
+      "label": "Duotone strength",
+      "log": false,
+      "max": 1,
+      "min": 0,
+      "order": 0,
+      "quality": {},
+      "step": 0.05,
+      "type": "slider",
+      "unit": null,
+      "visible_if": {}
+    }
+  },
+  "requires": {
+    "engine": null,
+    "features": [
+      "custom_effects"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "Custom effect",
+  "version": "0.1.0"
+}

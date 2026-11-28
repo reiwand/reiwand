@@ -1,0 +1,110 @@
+use super::*;
+use crate::reel;
+
+fn built() -> (String, std::path::PathBuf) {
+    let source = tempfile::tempdir().unwrap();
+    fs::copy(Path::new(FIXTURES).join("magenta-64x32.webm"), source.path().join("clip.webm")).unwrap();
+    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.reel", "version": "1.0.0",
+        "title": "Reel", "license": "CC0-1.0", "kind": "video", "entry": "clip.webm", "content": { "rating": "general" },
+        "photosensitive": false, "origin": { "kind": "original" },
+        "playback": { "speed": 0.75, "start": 0.5, "end": 1.25, "volume": 0.4, "loop": false, "max_fps": 24 },
+        "display": { "zoom": 1.5, "position": [0, -0.5] },
+        "presets": [{ "id": "calm", "label": "Calm", "values": { "speed": 0.5, "volume": 20 } }] });
+    fs::write(source.path().join("manifest.json"), reiwand_fill::manifests::whole(&manifest.to_string()))
+        .unwrap();
+    let wpak = source.path().join("reel.wpak");
+    reiwand_format::build(source.path(), &wpak, &reiwand_format::Limits::default()).unwrap();
+    let uid = store::store(&mut File::open(&wpak).unwrap(), "reel.wpak").unwrap().0;
+    let path = library::with(|lib| Ok(lib.item(&uid)?.path)).unwrap();
+    (uid, path)
+}
+
+pub(super) fn video_settings_play_on_the_phone() {
+    let android = reiwand_format::Platform::Android;
+    assert_eq!(
+        reiwand_format::features::support(android, "video_properties"),
+        reiwand_format::features::Support::Runs
+    );
+    let (uid, path) = built();
+    let form = ask(json!({ "op": "scene", "uid": uid, "languages": [] }));
+    let keys: Vec<&str> =
+        form["fields"].as_array().unwrap().iter().filter_map(|f| f["key"].as_str()).collect();
+    assert_eq!(
+        (form["video"].clone(), keys),
+        (json!(true), vec!["speed", "start", "end", "volume", "zoom", "x", "y"])
+    );
+    assert_eq!(form["presets"][0]["value"], json!("calm"), "{form}");
+    assert!(
+        form["length"].is_null() && form["probe"].as_str().is_some_and(|p| p.ends_with(".webm")),
+        "{form}"
+    );
+    assert_eq!(form["fields"][2]["max"], json!(3600.0));
+    store::poster(&uid, &[0xff00_00ff_u32 as i32; 8], 4, (64, 32), (90_000, false)).unwrap();
+    let measured = ask(json!({ "op": "scene", "uid": uid, "languages": [] }));
+    assert_eq!((measured["length"].clone(), measured["probe"].clone()), (json!(90.0), Value::Null));
+    assert_eq!(
+        (measured["fields"][1]["max"].clone(), measured["fields"][2]["max"].clone()),
+        (json!(89.5), json!(90.0))
+    );
+    let shown = reel::of(Some(&path));
+    let authored = reel::Reel {
+        rate: 0.75,
+        start: 500,
+        end: Some(1250),
+        volume: 0.4,
+        once: true,
+        fps: 24,
+        zoom: 1.5,
+        pan: [0.0, -0.5],
+    };
+    assert_eq!(shown, authored);
+    assert!(shown.framed() && !shown.direct());
+    for (word, value, heard) in [("volume", "50", 0.2), ("muted", "true", 0.0), ("muted", "none", 0.2)] {
+        ask(json!({ "op": "sound", "uids": [uid], word: value }));
+        assert_eq!(
+            reel::of(Some(&path)).volume,
+            heard,
+            "the wallpaper's own sound ({word}) must reach the reel"
+        );
+    }
+    ask(json!({ "op": "sound", "uids": [uid], "volume": "none", "muted": "none" }));
+    assert_eq!(
+        shown.told(),
+        json!({ "rate": 0.75, "start": 500, "end": 1250, "loop": false, "volume": 0.4, "fps": 24 })
+    );
+    let set =
+        |key: &str, value: Value| ask(json!({ "op": "property", "uid": uid, "key": key, "value": value }));
+    assert_eq!(set("speed", json!(2)), Value::Null);
+    assert_eq!(set("end", json!(0)), Value::Null);
+    assert_eq!((reel::of(Some(&path)).rate, reel::of(Some(&path)).end), (2.0, None));
+    for (key, bad) in
+        [("speed", json!(true)), ("zoom", json!("far")), ("x", json!("left")), ("volume", json!([1]))]
+    {
+        assert!(set(key, bad.clone())["error"].is_string(), "{key} took {bad}");
+    }
+    for (key, high) in [("speed", 9), ("zoom", 0), ("volume", 101), ("x", -3)] {
+        assert_eq!(set(key, json!(high)), Value::Null);
+    }
+    let held = reel::of(Some(&path));
+    assert_eq!(
+        (held.rate, held.zoom, held.volume, held.pan[0]),
+        (4.0, 1.0, 1.0, -1.0),
+        "values outside are held in range"
+    );
+    set("x", json!(0));
+    assert!(set("color", json!(1))["error"].is_string());
+    set("zoom", json!(1));
+    set("y", json!(0));
+    let plain = reel::of(Some(&path));
+    assert!(plain.direct(), "a frame cap plays straight on the screen, which is asked for that rate");
+    assert_eq!(plain.cap(), 24);
+    assert_eq!(ask(json!({ "op": "preset", "uid": uid, "preset": "calm" })), Value::Null);
+    let calm = reel::of(Some(&path));
+    assert_eq!((calm.rate, calm.volume), (0.5, 0.2));
+    assert_eq!(ask(json!({ "op": "reset", "uid": uid })), Value::Null);
+    assert_eq!(reel::of(Some(&path)), authored);
+    assert_eq!(reel::of(None), reel::Reel::default());
+    assert!(reel::Reel::default().direct() && reel::Reel::default().cap() == 0);
+    assert_eq!(reel::Reel::default().told()["fps"], json!(0));
+    assert_eq!(ask(json!({ "op": "remove", "uids": [uid] })), Value::Null);
+}

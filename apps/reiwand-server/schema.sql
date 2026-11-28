@@ -1,0 +1,282 @@
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY,
+  handle TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  password_hash TEXT,
+  role TEXT NOT NULL CHECK (role IN ('user', 'trusted', 'moderator', 'admin')),
+  status TEXT NOT NULL CHECK (status IN ('active', 'suspended')),
+  quota_bytes INTEGER NOT NULL,
+  created_at INTEGER NOT NULL
+) STRICT;
+
+CREATE TABLE identities (
+  issuer TEXT NOT NULL,
+  subject TEXT NOT NULL,
+  user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+  PRIMARY KEY (issuer, subject)
+) STRICT, WITHOUT ROWID;
+
+CREATE TABLE invites (
+  id INTEGER PRIMARY KEY,
+  code_hash BLOB NOT NULL UNIQUE,
+  role TEXT NOT NULL CHECK (role IN ('user', 'trusted', 'moderator', 'admin')),
+  uses_left INTEGER NOT NULL,
+  expires_at INTEGER NOT NULL,
+  created_by INTEGER REFERENCES users ON DELETE SET NULL
+) STRICT;
+
+CREATE TABLE setup_tokens (hash BLOB PRIMARY KEY, expires_at INTEGER NOT NULL) STRICT, WITHOUT ROWID;
+
+CREATE TABLE sessions (
+  id_hash BLOB PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+  created_at INTEGER NOT NULL,
+  seen_at INTEGER NOT NULL
+) STRICT, WITHOUT ROWID;
+
+CREATE INDEX sessions_user ON sessions(user_id);
+
+CREATE TABLE devices (
+  id TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+  number INTEGER NOT NULL,
+  platform TEXT NOT NULL CHECK (platform IN ('linux', 'android', 'other')),
+  created_at INTEGER NOT NULL,
+  seen_at INTEGER,
+  UNIQUE (user_id, number)
+) STRICT;
+
+CREATE TABLE tokens (
+  id INTEGER PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+  device_id TEXT REFERENCES devices ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  hash BLOB NOT NULL UNIQUE,
+  scopes TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  used_at INTEGER,
+  expires_at INTEGER
+) STRICT;
+
+CREATE INDEX tokens_user ON tokens(user_id);
+
+CREATE TABLE device_codes (
+  code_hash BLOB PRIMARY KEY,
+  user_code TEXT NOT NULL UNIQUE,
+  platform TEXT NOT NULL,
+  user_id INTEGER REFERENCES users ON DELETE CASCADE,
+  state TEXT NOT NULL CHECK (state IN ('pending', 'approved', 'denied')),
+  interval_s INTEGER NOT NULL,
+  polled_at INTEGER NOT NULL,
+  expires_at INTEGER NOT NULL
+, client TEXT NOT NULL, created_at INTEGER NOT NULL) STRICT, WITHOUT ROWID;
+
+CREATE TABLE author_keys (
+  fingerprint TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+  public_key TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+) STRICT, WITHOUT ROWID;
+
+CREATE TABLE repos (
+  n INTEGER PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  folder TEXT NOT NULL UNIQUE,
+  online_key TEXT NOT NULL,
+  repo_id TEXT,
+  dirty INTEGER NOT NULL,
+  signed_at INTEGER NOT NULL,
+  failed_at INTEGER,
+  failed_raw TEXT,
+  created_at INTEGER NOT NULL,
+  private INTEGER NOT NULL,
+  publishing TEXT NOT NULL CHECK (publishing IN ('open', 'members'))
+) STRICT;
+
+CREATE TABLE repo_members (
+  repo TEXT NOT NULL REFERENCES repos(name) ON DELETE CASCADE ON UPDATE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+  may_read INTEGER NOT NULL,
+  may_publish INTEGER NOT NULL,
+  PRIMARY KEY (repo, user_id)
+) STRICT, WITHOUT ROWID;
+
+CREATE INDEX repo_members_user ON repo_members(user_id);
+
+CREATE TABLE packages (
+  repo TEXT NOT NULL,
+  id TEXT NOT NULL,
+  owner_id INTEGER REFERENCES users ON DELETE SET NULL,
+  created_at INTEGER NOT NULL,
+  hidden TEXT,
+  hidden_at INTEGER,
+  PRIMARY KEY (repo, id)
+) STRICT, WITHOUT ROWID;
+
+CREATE TABLE versions (
+  id INTEGER PRIMARY KEY,
+  repo TEXT NOT NULL,
+  package_id TEXT NOT NULL,
+  version TEXT NOT NULL,
+  sha256 TEXT NOT NULL,
+  size INTEGER NOT NULL,
+  kind TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  license TEXT NOT NULL,
+  tags TEXT NOT NULL,
+  authors TEXT NOT NULL,
+  state TEXT NOT NULL CHECK (state IN ('pending', 'published', 'rejected', 'removed', 'revoked')),
+  uploaded_by INTEGER REFERENCES users ON DELETE SET NULL,
+  created_at INTEGER NOT NULL,
+  published_at INTEGER,
+  content TEXT,
+  photosensitive INTEGER,
+  facets TEXT NOT NULL,
+  listed INTEGER NOT NULL,
+  signer TEXT,
+  asks TEXT NOT NULL,
+  band_sheet TEXT,
+  UNIQUE (repo, package_id, version),
+  FOREIGN KEY (repo, package_id) REFERENCES packages
+) STRICT;
+
+CREATE INDEX versions_feed ON versions(state, published_at DESC, id DESC);
+
+CREATE INDEX versions_uploader ON versions(uploaded_by);
+
+CREATE TABLE uploads (
+  id TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+  size INTEGER NOT NULL,
+  sha256 TEXT NOT NULL,
+  state TEXT NOT NULL CHECK (state IN ('open', 'received', 'failed', 'done')),
+  errors TEXT,
+  version_id INTEGER REFERENCES versions ON DELETE SET NULL,
+  created_at INTEGER NOT NULL,
+  expires_at INTEGER NOT NULL
+, listed INTEGER NOT NULL, repo TEXT NOT NULL) STRICT, WITHOUT ROWID;
+
+CREATE INDEX uploads_user ON uploads(user_id, created_at);
+
+CREATE TABLE cases (
+  id INTEGER PRIMARY KEY,
+  version_id INTEGER NOT NULL REFERENCES versions ON DELETE CASCADE,
+  reason TEXT NOT NULL CHECK (reason IN ('upload', 'report', 'notice', 'counter')),
+  detail TEXT NOT NULL,
+  priority INTEGER NOT NULL,
+  state TEXT NOT NULL CHECK (state IN ('open', 'actioned', 'dismissed')),
+  decision TEXT,
+  statement TEXT,
+  decided_by INTEGER REFERENCES users ON DELETE SET NULL,
+  created_at INTEGER NOT NULL,
+  decided_at INTEGER
+) STRICT;
+
+CREATE INDEX cases_queue ON cases(state, priority DESC, created_at);
+
+CREATE TABLE notices (
+  id TEXT PRIMARY KEY,
+  case_id INTEGER REFERENCES cases ON DELETE SET NULL,
+  kind TEXT NOT NULL CHECK (kind IN ('copyright', 'illegal', 'counter')),
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  location TEXT NOT NULL,
+  work TEXT NOT NULL,
+  explanation TEXT NOT NULL,
+  signature TEXT NOT NULL,
+  received_at INTEGER NOT NULL
+) STRICT, WITHOUT ROWID;
+
+CREATE TABLE strikes (
+  id INTEGER PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+  case_id INTEGER REFERENCES cases ON DELETE SET NULL,
+  expires_at INTEGER NOT NULL
+) STRICT;
+
+CREATE INDEX strikes_user ON strikes(user_id, expires_at);
+
+CREATE TABLE blocklist (
+  sha256 TEXT PRIMARY KEY,
+  reason TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+) STRICT, WITHOUT ROWID;
+
+CREATE TABLE audit (
+  id INTEGER PRIMARY KEY,
+  at INTEGER NOT NULL,
+  actor_id INTEGER,
+  action TEXT NOT NULL,
+  subject TEXT NOT NULL,
+  detail TEXT NOT NULL
+) STRICT;
+
+CREATE INDEX audit_at ON audit(at);
+
+CREATE VIRTUAL TABLE search USING fts5(package, title, description, tags, tokenize = 'trigram remove_diacritics 1');
+
+CREATE TRIGGER search_added AFTER INSERT ON versions WHEN new.state = 'published' BEGIN
+  INSERT INTO search (rowid, package, title, description, tags)
+    VALUES (new.id, new.package_id, new.title, new.description, new.tags);
+END;
+
+CREATE TRIGGER search_changed AFTER UPDATE ON versions BEGIN
+  DELETE FROM search WHERE rowid = old.id;
+  INSERT INTO search (rowid, package, title, description, tags)
+    SELECT new.id, new.package_id, new.title, new.description, new.tags WHERE new.state = 'published';
+END;
+
+CREATE TRIGGER search_removed AFTER DELETE ON versions BEGIN
+  DELETE FROM search WHERE rowid = old.id;
+END;
+
+CREATE TABLE votes (
+  repo TEXT NOT NULL,
+  package_id TEXT NOT NULL,
+  user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+  value INTEGER NOT NULL CHECK (value IN (-1, 1)),
+  at INTEGER NOT NULL,
+  PRIMARY KEY (repo, package_id, user_id),
+  FOREIGN KEY (repo, package_id) REFERENCES packages ON DELETE CASCADE
+) STRICT, WITHOUT ROWID;
+
+CREATE INDEX votes_user ON votes(user_id, at);
+
+CREATE TABLE vote_changes (
+  user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+  at INTEGER NOT NULL
+) STRICT;
+
+CREATE INDEX vote_changes_user ON vote_changes(user_id, at);
+
+CREATE TABLE featured (
+  repo TEXT NOT NULL,
+  package_id TEXT NOT NULL,
+  note TEXT,
+  at INTEGER NOT NULL,
+  PRIMARY KEY (repo, package_id),
+  FOREIGN KEY (repo, package_id) REFERENCES packages ON DELETE CASCADE
+) STRICT, WITHOUT ROWID;
+
+CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL) STRICT, WITHOUT ROWID;
+
+CREATE TABLE setup_visits (hash BLOB PRIMARY KEY, expires_at INTEGER NOT NULL) STRICT, WITHOUT ROWID;
+
+CREATE TABLE mail_queue (
+  id INTEGER PRIMARY KEY,
+  topic TEXT NOT NULL CHECK (topic IN ('case', 'health', 'test')),
+  case_id INTEGER REFERENCES cases(id) ON DELETE SET NULL,
+  subject TEXT NOT NULL,
+  body TEXT NOT NULL,
+  state TEXT NOT NULL CHECK (state IN ('queued', 'sent', 'failed')),
+  tries INTEGER NOT NULL,
+  next_at INTEGER NOT NULL,
+  created_at INTEGER NOT NULL,
+  sent_at INTEGER
+) STRICT;
+
+CREATE INDEX mail_queue_due ON mail_queue (state, next_at);
+
+CREATE INDEX mail_queue_case ON mail_queue (case_id);
+
+CREATE TABLE health_seen (row TEXT PRIMARY KEY, tone TEXT NOT NULL) STRICT, WITHOUT ROWID;

@@ -1,0 +1,64 @@
+[package]
+name = "reiwandd"
+description = "Reiwand daemon"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+reiwand-core.workspace = true
+reiwand-client.workspace = true
+reiwand-render.workspace = true
+reiwand-depth = { workspace = true, features = ["infer"] }
+reiwand-scene.workspace = true
+reiwand-pipewire.workspace = true
+reiwand-video.workspace = true
+reiwand-wayland.workspace = true
+reiwand-schedule.workspace = true
+reiwand-audio = { workspace = true, features = ["capture"] }
+reiwand-script.workspace = true
+chrono = { workspace = true, features = ["clock"] }
+jiff.workspace = true
+futures-util.workspace = true
+anyhow.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+tokio.workspace = true
+zbus.workspace = true
+image.workspace = true
+jpeg-decoder.workspace = true
+serde = { workspace = true }
+clap.workspace = true
+reiwand-library.workspace = true
+reiwand-palette.workspace = true
+reiwand-format = { workspace = true, features = ["sign"] }
+blake3.workspace = true
+dirs.workspace = true
+libc.workspace = true
+rustix = { workspace = true, features = ["time", "system"] }
+tempfile.workspace = true
+reiwand-providers.workspace = true
+reiwand-plugin.workspace = true
+async-trait.workspace = true
+reqwest.workspace = true
+semver.workspace = true
+zeroize.workspace = true
+toml.workspace = true
+reiwand-account.workspace = true
+getrandom.workspace = true
+reiwand-carry.workspace = true
+reiwand-web.workspace = true
+base64.workspace = true
+reiwand-rgb.workspace = true
+
+[dev-dependencies]
+roxmltree.workspace = true
+smithay-client-toolkit.workspace = true
+reiwand-format = { workspace = true, features = ["sign"] }
+wiremock.workspace = true
+reiwand-ktx2 = { workspace = true, features = ["encode"] }
+reiwand-fill.workspace = true
+rcgen.workspace = true
+tokio-rustls.workspace = true

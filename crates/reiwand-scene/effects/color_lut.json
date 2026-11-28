@@ -1,0 +1,40 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": "color",
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Grades color using a LUT image.",
+    "es": "Da un tratamiento de color con una imagen de tabla de colores."
+  },
+  "fuse": null,
+  "id": "color_lut",
+  "lighter": null,
+  "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Color grading"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "lut", "type": "lut", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": ["table"], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "intensity", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_color_lut", "grid": null, "inputs": ["previous"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
+}

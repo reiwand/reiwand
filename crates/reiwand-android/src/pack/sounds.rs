@@ -1,0 +1,30 @@
+use super::{extension, folder};
+use crate::{Error, store};
+use reiwand_format::Package;
+use reiwand_scene::Scene;
+use std::fs::{self, File};
+use std::io::BufReader;
+use std::path::{Path, PathBuf};
+
+pub(crate) type Sound = (String, PathBuf, f32);
+
+pub(super) fn extract(
+    package: &mut Package<BufReader<File>>,
+    scene: &Scene,
+    path: &Path,
+) -> Result<Vec<Sound>, Error> {
+    let mut sounds = Vec::new();
+    for (id, asset) in &scene.assets {
+        if !scene.sounds().any(|s| s.clips().any(|c| c == id)) {
+            continue;
+        }
+        let file = folder(path)?.join(format!("{id}.{}", extension(&asset.path)));
+        if !file.is_file() {
+            fs::create_dir_all(folder(path)?)?;
+            store::write_from(&file, |out| Ok(package.copy_file(&asset.path, out)?))?;
+        }
+        let seconds = reiwand_scene::Clip::file(&file).map_or(0.0, |clip| clip.seconds);
+        sounds.push((id.clone(), file, seconds));
+    }
+    Ok(sounds)
+}

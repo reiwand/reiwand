@@ -1,0 +1,260 @@
+{
+  "assets": {},
+  "canvas": {
+    "background": "#000000",
+    "blend_space": "linear",
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": "display",
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "gradient": {
+        "from": [
+          0.0,
+          0.0
+        ],
+        "radial": false,
+        "stops": [
+          [
+            0,
+            "#101828"
+          ],
+          [
+            1,
+            "#283a5c"
+          ]
+        ],
+        "to": [
+          0.0,
+          1.0
+        ]
+      },
+      "id": "background",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "rect": {
+          "radius": 0.0,
+          "size": [
+            1920,
+            1080
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": "center",
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#0b0e14",
+      "id": "box",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "rect": {
+          "radius": 0.0,
+          "size": [
+            260,
+            720
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": "center",
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#ff3b30",
+      "id": "red",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "ellipse": {
+          "size": [
+            180,
+            180
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          0,
+          -230
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": "center",
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#ffcc00",
+      "id": "amber",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "ellipse": {
+          "size": [
+            180,
+            180
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "anchor": "center",
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#34c759",
+      "id": "green",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "ellipse": {
+          "size": [
+            180,
+            180
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          0,
+          230
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [
+    {
+      "events": [
+        "init",
+        "update"
+      ],
+      "params": {},
+      "path": "scripts/traffic_light.js",
+      "uses": []
+    }
+  ],
+  "templates": {},
+  "timelines": []
+}

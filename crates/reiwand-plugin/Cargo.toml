@@ -1,0 +1,39 @@
+[package]
+name = "reiwand-plugin"
+description = "Provider plugins for Reiwand: TypeScript sources run in a sandbox with declared hosts"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+async-trait.workspace = true
+blake3.workspace = true
+libc.workspace = true
+reiwand-core = { workspace = true, features = ["http"] }
+reiwand-providers.workspace = true
+reqwest = { workspace = true, features = ["blocking"] }
+rquickjs.workspace = true
+schemars.workspace = true
+semver.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+swc_common.workspace = true
+swc_ecma_parser.workspace = true
+swc_ts_fast_strip.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+zip.workspace = true
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+reiwand-script.workspace = true
+
+[dev-dependencies]
+rcgen.workspace = true
+tempfile.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+tokio-rustls.workspace = true
+
+[[test]]
+name = "isolated"
+harness = false

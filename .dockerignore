@@ -1,0 +1,17 @@
+**/target
+**/target-*
+android
+.git
+.github
+dist
+docs
+integrations
+packaging
+!packaging/THIRD-PARTY-NOTICES
+scripts
+tests
+deploy
+.claude
+.env
+.env.*
+data

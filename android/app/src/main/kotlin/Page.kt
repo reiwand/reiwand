@@ -1,0 +1,175 @@
+package io.github.reiwand
+
+import android.annotation.SuppressLint
+import android.app.Presentation
+import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.hardware.display.DisplayManager
+import android.hardware.display.VirtualDisplay
+import android.view.MotionEvent
+import android.view.Surface
+import android.webkit.CookieManager
+import android.webkit.JavascriptInterface
+import android.webkit.RenderProcessGoneDetail
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebSettings
+import android.webkit.WebStorage
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
+import java.io.FileInputStream
+import org.json.JSONObject
+
+@SuppressLint("SetJavaScriptEnabled")
+class Page(private val context: Context, private val handle: Long, spec: JSONObject, val surface: Surface, size: Pair<Int, Int>, private val gone: () -> Unit, private val heard: () -> Unit, private val measured: () -> Unit, private val sounding: (Boolean) -> Unit) {
+    val key: String = spec.getString("key")
+    private val origin = spec.getString("origin")
+    private val host = spec.getString("url").removePrefix("https://").trimEnd('/')
+    private val storage = spec.getBoolean("storage")
+    private val dpi = context.resources.displayMetrics.densityDpi
+    private val display: VirtualDisplay =
+        context.getSystemService(DisplayManager::class.java).createVirtualDisplay(NAME, size.first, size.second, dpi, surface, 0)!!
+    private val presentation = Presentation(context, display.display)
+    val web = WebView(presentation.context)
+    private val touches = Touches(web)
+    private var failed = false
+    private var closed = false
+
+    init {
+        Refusing.workers()
+        runCatching { Pages.forget(true) }
+        val background = Color.parseColor(spec.getString("background"))
+        CookieManager.getInstance().setAcceptThirdPartyCookies(web, false)
+        web.settings.apply {
+            javaScriptEnabled = true
+            domStorageEnabled = true
+            allowFileAccess = false
+            allowContentAccess = false
+            // Without a proxy override WebSocket and WebRTC would skip the request filter: no network then.
+            blockNetworkLoads = !spec.getBoolean("network") || !Net.open() || !Reach.enforced
+            cacheMode = WebSettings.LOAD_NO_CACHE
+            mediaPlaybackRequiresUserGesture = false
+            javaScriptCanOpenWindowsAutomatically = false
+            safeBrowsingEnabled = false
+            textZoom = 100
+            setGeolocationEnabled(false)
+            setSupportMultipleWindows(false)
+            setSupportZoom(false)
+        }
+        web.setBackgroundColor(background)
+        web.isLongClickable = false
+        web.isHapticFeedbackEnabled = false
+        web.setOnLongClickListener { true }
+        web.isVerticalScrollBarEnabled = false
+        web.isHorizontalScrollBarEnabled = false
+        web.overScrollMode = WebView.OVER_SCROLL_NEVER
+        web.setDownloadListener { _, _, _, _, _ -> }
+        web.webViewClient = Client()
+        web.webChromeClient = Refusing()
+        // Only the package's own frames talk to the app: frames of other origins do not get the bridge.
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+            WebViewCompat.addWebMessageListener(web, BRIDGE, setOf(origin)) { _, message, _, _, _ -> message.data?.let(::told) }
+        } else {
+            web.addJavascriptInterface(Bridge(), BRIDGE)
+        }
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) WebViewCompat.addDocumentStartJavaScript(web, spec.getString("guard"), setOf(origin))
+        presentation.window?.setBackgroundDrawable(ColorDrawable(background))
+        presentation.setContentView(web)
+        presentation.show()
+        follow(spec)
+        val url = spec.getString("url")
+        measure()
+        val reach = spec.optJSONArray("reach")?.takeIf { Net.open() }
+        Reach.open(this, List(reach?.length() ?: 0) { reach!!.getString(it) }) { if (!closed) web.loadUrl(url) }
+    }
+
+    fun follow(spec: JSONObject) = touches.follow(spec)
+
+    fun tell(script: String) = web.evaluateJavascript(script, null)
+
+    fun visible(on: Boolean) {
+        if (on) return web.onResume()
+        web.onPause()
+        measure()
+    }
+
+    private fun measure() {
+        if (storage) WebStorage.getInstance().getUsageForOrigin(origin) { used -> told("{\"used\": ${used ?: 0}}") }
+    }
+
+    fun resize(width: Int, height: Int) = display.resize(width, height, dpi)
+
+    fun press(event: MotionEvent) = touches.press(event)
+
+    fun close() {
+        closed = true
+        Reach.close(this)
+        presentation.dismiss()
+        web.destroy()
+        display.release()
+        if (!storage) WebStorage.getInstance().deleteOrigin(origin)
+    }
+
+    private inner class Client : WebViewClient() {
+        override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? =
+            answer(Native.serve(handle, request.url.toString()))
+
+        override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest) = request.url.host != host
+
+        override fun onPageCommitVisible(view: WebView, url: String) {
+            touches.drawn = true
+        }
+
+        override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
+            gone()
+            return true
+        }
+    }
+
+    private fun told(message: String) {
+        val reply = Native.heard(handle, message)
+        if (message.startsWith(ERROR) && !failed) {
+            failed = true
+            Converting.finished?.invoke("")
+        }
+        if (message.startsWith(OPEN)) Shortcuts.each(Native.opened(handle)) { Shortcuts.open(context, it) }
+        if (message.startsWith(AUDIO) || message.startsWith(MEDIA)) heard()
+        if (message.startsWith(KEPT) || message.startsWith(USED)) measured()
+        if (message.startsWith(WROTE)) web.post(::measure)
+        if (message.startsWith(SOUNDING)) sounding(message.contains("true"))
+        reply ?: return
+        web.post { web.evaluateJavascript(reply, null) }
+    }
+
+    private inner class Bridge {
+        @JavascriptInterface
+        fun post(message: String) = told(message)
+    }
+
+    companion object {
+        private const val ERROR = "{\"error\""
+        private const val NAME = "reiwand-page"
+        private const val BRIDGE = "reiwandHost"
+        private const val AUDIO = "{\"audio\""
+        private const val OPEN = "{\"open\""
+        private const val MEDIA = "{\"media\""
+        private const val KEPT = "{\"kept\""
+        private const val USED = "{\"used\""
+        private const val WROTE = "{\"wrote\""
+        private const val SOUNDING = "{\"sounding\""
+
+        fun answer(text: String): WebResourceResponse? {
+            val reply = JSONObject(text)
+            if (reply.optBoolean("network") && Net.open()) return null
+            val mime = reply.optString("mime")
+            if (mime.isEmpty()) return WebResourceResponse("text/plain", "utf-8", 403, "Forbidden", emptyMap(), ByteArray(0).inputStream())
+            val body = if (reply.has("text")) reply.getString("text").byteInputStream() else FileInputStream(reply.getString("path"))
+            val headers = mapOf("Content-Security-Policy" to reply.getString("csp"), "X-Content-Type-Options" to "nosniff", "X-DNS-Prefetch-Control" to "off")
+            val encoding = if (mime.startsWith("text/") || mime.endsWith("json") || mime.endsWith("xml")) "utf-8" else null
+            return WebResourceResponse(mime, encoding, 200, "OK", headers, body)
+        }
+    }
+}

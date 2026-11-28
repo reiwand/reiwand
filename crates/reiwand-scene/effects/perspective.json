@@ -1,0 +1,42 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": "distort",
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Warps the four corners of the picture into a new quad.",
+    "es": "Deforma las cuatro esquinas de la imagen hacia un cuadrilátero nuevo."
+  },
+  "fuse": null,
+  "id": "perspective",
+  "lighter": null,
+  "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Perspective"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "top_left", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 3, "min": -2, "paint": null, "prefill": [0.04, 0], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "top_right", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 3, "min": -2, "paint": null, "prefill": [0.96, 0], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "bottom_right", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 3, "min": -2, "paint": null, "prefill": [1, 1], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "bottom_left", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 3, "min": -2, "paint": null, "prefill": [0, 1], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_perspective", "grid": null, "inputs": ["previous"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {},
+  "reach": null,
+  "solve": "homography",
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
+}

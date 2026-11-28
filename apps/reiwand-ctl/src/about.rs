@@ -1,0 +1,53 @@
+use crate::show::{clean, list};
+use crate::told::{told, tr};
+use reiwand_core::markup::plain;
+use reiwand_core::model::{About, PackageInfo};
+
+pub fn fields(about: &About, package: Option<&PackageInfo>) -> Vec<(&'static str, Option<String>)> {
+    let confirmed = |what: &str| package.is_some_and(|p| p.confirmed.iter().any(|c| c == what));
+    let reasons = Some(list(&about.descriptors)).filter(|r| !r.is_empty()).map(|r| format!(" ({r})"));
+    let content = about.content.clone().unwrap_or("unrated".into()) + &reasons.unwrap_or_default();
+    let flashing = about.photosensitive.map(|on| match (on, package.is_some_and(|p| p.flash_disabled)) {
+        (true, false) => tr(told("yes, allowed")),
+        (true, true) => tr(told("yes, disabled")),
+        (false, _) => "no".into(),
+    });
+    let work = |w: &reiwand_core::model::Work| {
+        w.title.as_ref().map_or(w.author.clone(), |t| format!("{t} by {}", w.author))
+    };
+    let works = list(about.derived_from.iter().map(work));
+    let origin = about.origin.clone().map(|o| if works.is_empty() { o } else { format!("{o} from {works}") });
+    let source = |c: &reiwand_core::model::PackageCredit| c.source.as_ref().map(|s| format!(" from {s}"));
+    let credits = about.credits.iter().map(|c| {
+        format!("{}: {} ({}){}", list(&c.paths), c.attribution, c.license, source(c).unwrap_or_default())
+    });
+    let needs = about.features.iter().map(|f| format!("{} ({})", f.name, f.why));
+    vec![
+        ("content", package.is_some().then_some(content)),
+        (
+            "mature shown",
+            (about.content.as_deref() == Some("mature")).then(|| confirmed("mature").to_string()),
+        ),
+        ("photosensitive", flashing),
+        ("origin", origin),
+        ("provider", about.provider.clone()),
+        ("source", about.source_url.clone()),
+        ("authors", Some(list(&about.authors))),
+        ("credits", Some(list(credits))),
+        ("links", Some(list(about.links.iter().map(|l| format!("{} {}", l.kind, l.url))))),
+        ("inputs", Some(list(&about.inputs))),
+        ("needs", Some(list(needs))),
+        ("made for", Some(list(&about.platforms))),
+        ("needs packages", Some(list(&about.packages))),
+        ("languages", Some(list(&about.languages))),
+        ("schema", Some(about.schema.clone())),
+    ]
+}
+
+pub fn texts(about: &About) -> String {
+    let block = |head: &str, text: &str| match text.trim() {
+        "" => String::new(),
+        text => format!("\n{head}\n{}\n", plain(text).lines().map(clean).collect::<Vec<_>>().join("\n")),
+    };
+    block(&tr(told("Description:")), &about.description) + &block(&tr(told("Changes:")), &about.changes)
+}

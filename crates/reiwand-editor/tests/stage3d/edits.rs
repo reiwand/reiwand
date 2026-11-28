@@ -1,0 +1,144 @@
+use super::{act, edit, layer, project, undone};
+use serde_json::json;
+
+#[test]
+fn models_are_added_placed_and_removed_with_undo() {
+    let root = tempfile::tempdir().unwrap();
+    let mut p = project(&root);
+    let before = p.doc.clone();
+    edit(&mut p, json!({ "model": { "add": { "asset": "toy", "id": "doll", "at": [1, 0, -2] } } })).unwrap();
+    undone(&mut p, &before);
+    assert_eq!(layer(&p, "doll")["type"], "model");
+    assert_eq!(layer(&p, "doll")["position"], json!([1.0, 0.0, -2.0]));
+    let before = p.doc.clone();
+    let set = json!({ "layer": "doll", "position": [0, 1, 0], "rotation": [0, 45, 0], "scale": [2, 2, 2], "env": "sky" });
+    edit(&mut p, json!({ "model": { "set": set } })).unwrap();
+    undone(&mut p, &before);
+    let toy = layer(&p, "doll");
+    assert_eq!((toy["rotation"].clone(), toy["env"].clone()), (json!([0.0, 45.0, 0.0]), json!("sky")));
+    for bad in [
+        json!({ "set": { "layer": "doll", "scale": [0, 1, 1] } }),
+        json!({ "set": { "layer": "doll", "position": [1e9, 0, 0] } }),
+        json!({ "set": { "layer": "doll", "env": "toy" } }),
+        json!({ "set": { "layer": "nothing", "position": [0, 0, 0] } }),
+        json!({ "add": { "asset": "sky" } }),
+    ] {
+        assert!(edit(&mut p, json!({ "model": bad.clone() })).is_err(), "{bad}");
+    }
+    act(&mut p, json!({ "add_layer": { "kind": "model", "id": "menu" } })).unwrap();
+    assert_eq!(layer(&p, "menu")["model"], "toy");
+    edit(&mut p, json!({ "model": { "remove": { "layer": "menu" } } })).unwrap();
+    assert!(reiwand_editor::actions::layer(&p.doc, "menu").is_err());
+}
+
+#[test]
+fn groups_turn_3d_and_their_flat_layers_choose_depth() {
+    let root = tempfile::tempdir().unwrap();
+    let mut p = project(&root);
+    edit(&mut p, json!({ "model": { "add": { "asset": "toy", "id": "doll" } } })).unwrap();
+    act(&mut p, json!({ "add_layer": { "kind": "solid", "id": "card" } })).unwrap();
+    assert!(edit(&mut p, json!({ "depth_test": { "layer": "card", "on": true } })).is_err());
+    let before = p.doc.clone();
+    edit(&mut p, json!({ "group": { "id": "world", "layers": ["doll", "card"] } })).unwrap();
+    undone(&mut p, &before);
+    assert_eq!(layer(&p, "world")["space"], "3d");
+    let before = p.doc.clone();
+    edit(&mut p, json!({ "depth_test": { "layer": "card", "on": true } })).unwrap();
+    undone(&mut p, &before);
+    assert_eq!(layer(&p, "card")["depth_test"], true);
+    assert!(edit(&mut p, json!({ "depth_test": { "layer": "doll", "on": true } })).is_err());
+    edit(&mut p, json!({ "space": { "layer": "world", "deep": false } })).unwrap();
+    assert_eq!(layer(&p, "world")["space"], "2d");
+    assert!(edit(&mut p, json!({ "space": { "layer": "card", "deep": true } })).is_err());
+    edit(&mut p, json!({ "group": { "id": "empty" } })).unwrap();
+    assert_eq!(
+        (layer(&p, "empty")["space"].clone(), layer(&p, "empty")["layers"].clone()),
+        (json!("3d"), json!([]))
+    );
+}
+
+#[test]
+fn materials_change_by_name_and_check_their_values() {
+    let root = tempfile::tempdir().unwrap();
+    let mut p = project(&root);
+    edit(&mut p, json!({ "model": { "add": { "asset": "toy", "id": "doll" } } })).unwrap();
+    let before = p.doc.clone();
+    let m = json!({ "layer": "doll", "name": "paint", "shader": "unlit", "double_sided": true, "cast_shadows": true,
+        "emissive": "#ff0000" });
+    edit(&mut p, json!({ "material": m })).unwrap();
+    undone(&mut p, &before);
+    let paint = &layer(&p, "doll")["materials"]["paint"];
+    assert_eq!((paint["shader"].clone(), paint["double_sided"].clone()), (json!("unlit"), json!(true)));
+    edit(&mut p, json!({ "material": { "layer": "doll", "name": "trim", "params": { "metallic": 0.8, "roughness": 0.2 } } })).unwrap();
+    assert_eq!(layer(&p, "doll")["materials"]["trim"]["params"]["metallic"], json!(0.8));
+    for bad in [
+        json!({ "layer": "doll", "name": "ghost", "lit": false }),
+        json!({ "layer": "doll", "name": "trim", "params": { "metallic": 2 } }),
+        json!({ "layer": "doll", "name": "trim", "params": { "wobble": 1 } }),
+        json!({ "layer": "doll", "name": "trim", "shader": "plastic" }),
+        json!({ "layer": "doll", "name": "trim", "color": "blue" }),
+    ] {
+        assert!(edit(&mut p, json!({ "material": bad.clone() })).is_err(), "{bad}");
+    }
+    edit(&mut p, json!({ "material": { "layer": "doll", "name": "paint", "clear": true } })).unwrap();
+    assert!(layer(&p, "doll")["materials"]["paint"].is_null());
+}
+
+#[test]
+fn a_glb_file_becomes_a_model_layer_in_one_step() {
+    let root = tempfile::tempdir().unwrap();
+    let mut p = project(&root);
+    let file = root.path().join("crate.glb");
+    std::fs::write(&file, super::glb()).unwrap();
+    let before = p.doc.clone();
+    act(&mut p, json!({ "add_layer": { "kind": "model", "name": "crate", "file": file } })).unwrap();
+    assert_eq!(layer(&p, "crate")["type"], "model");
+    assert_eq!(layer(&p, "crate")["model"], "crate_file");
+    undone(&mut p, &before);
+}
+
+#[test]
+fn particles_in_a_3d_group_say_whether_they_hide_one_by_one() {
+    let root = tempfile::tempdir().unwrap();
+    let mut p = project(&root);
+    let layers = p.doc["scene"]["layers"].as_array().unwrap().clone();
+    let found = layers.iter().find(|l| l["type"] == "particles").unwrap();
+    let (id, system) =
+        (found["id"].as_str().unwrap().to_owned(), found["system"].as_str().unwrap().to_owned());
+    edit(&mut p, json!({ "model": { "add": { "asset": "toy", "id": "doll" } } })).unwrap();
+    edit(&mut p, json!({ "group": { "id": "world", "layers": ["doll", id] } })).unwrap();
+    edit(&mut p, json!({ "depth_test": { "layer": id, "on": true } })).unwrap();
+    let way = |p: &reiwand_editor::Project| super::ask(p, json!({ "depth3d": { "layer": id } }));
+    let first = way(&p);
+    assert_eq!(
+        (&first["inside"], &first["depth_test"], &first["particles"]),
+        (&json!(true), &json!(true), &json!(true))
+    );
+    assert_eq!((&first["way"], &first["reason"]), (&json!("plane"), &json!("perspective")), "{first}");
+    let at = format!("/scene/particles/{system}");
+    act(
+        &mut p,
+        json!({ "set": { "pointer": format!("{at}/perspective"), "value": { "focal": 100, "near": 1 } } }),
+    )
+    .unwrap();
+    assert_eq!(way(&p)["way"], "one_by_one", "{}", way(&p));
+    act(&mut p, json!({ "set": { "pointer": format!("{at}/render/lit"), "value": true } })).unwrap();
+    assert_eq!(way(&p)["way"], "one_by_one", "lit particles hide one by one");
+    let bend = json!({ "normal": "sky", "units": "size", "amount": 0.5, "color": "none" });
+    act(&mut p, json!({ "set": { "pointer": format!("{at}/render/refract"), "value": bend } })).unwrap();
+    assert_eq!(
+        (way(&p)["way"].clone(), way(&p)["caveat"].clone()),
+        (json!("one_by_one"), json!("refract_edges"))
+    );
+    act(
+        &mut p,
+        json!({ "set": { "pointer": format!("{at}/render/trail"), "value": { "length": 4, "width": 1 } } }),
+    )
+    .unwrap();
+    assert_eq!(way(&p)["way"], "one_by_one", "trails hide one by one");
+    act(&mut p, json!({ "set": { "pointer": format!("{at}/render/rope"), "value": { "width": 4 } } }))
+        .unwrap();
+    assert_eq!(way(&p)["way"], "one_by_one", "ropes hide one by one");
+    assert_eq!(way(&p)["lowest"], "plane");
+    assert_eq!(super::ask(&p, json!({ "depth3d": { "layer": "nothing" } })), json!(null));
+}

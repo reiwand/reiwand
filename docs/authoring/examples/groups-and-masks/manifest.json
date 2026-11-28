@@ -1,0 +1,40 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": "en",
+  "description": "",
+  "entry": "scene.json",
+  "id": "org.example.groups-and-masks",
+  "inputs": [],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "photosensitive": false,
+  "platforms": [],
+  "presets": [],
+  "properties": {},
+  "requires": {
+    "engine": null,
+    "features": [
+      "capture",
+      "parent"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "Groups and masks",
+  "version": "0.1.0"
+}

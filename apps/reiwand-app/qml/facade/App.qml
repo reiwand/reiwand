@@ -1,0 +1,156 @@
+pragma Singleton
+import QtQuick
+import io.github.reiwand.app
+
+QtObject {
+    id: app
+
+    readonly property string stale: "io.github.reiwand.Error.Stale"
+    readonly property string conflict: "io.github.reiwand.Error.Conflict"
+    readonly property string invalidArgs: "org.freedesktop.DBus.Error.InvalidArgs"
+    readonly property Backend backend: Backend {
+        onReplied: (tag, json) => app.settle(tag, 0, JSON.parse(json))
+        onFailed: (tag, name, message) => app.settle(tag, 1, {
+                "name": name,
+                "message": message
+            })
+        onChanged: (topic, ids) => app.updated(topic, JSON.parse(ids))
+    }
+    readonly property var state: JSON.parse(backend.state || "{}")
+    readonly property var schema: JSON.parse(backend.schema || "{}")
+    readonly property var prefills: JSON.parse(backend.prefill())
+    readonly property bool unveiled: state.options?.["library.show_mature"] === true
+    readonly property bool cut: state.options?.["network.private"] === true
+    readonly property var jobs: JSON.parse(backend.jobs || "[]")
+    readonly property var outputs: Object.keys(state.outputs ?? {})
+    readonly property bool checking: backend.checking
+    property string media
+    property var libraryFilter: ({})
+
+    function fill(row) {
+        return prefills[row];
+    }
+
+    function takeMedia() {
+        const taken = media;
+        media = "";
+        return taken;
+    }
+
+    property int serial: 0
+    property var pending: ({})
+
+    signal navigate(int page, string query)
+    signal edit(var item)
+    signal compose(string folder, string starter, string text)
+    signal updated(string topic, var ids)
+
+    function settle(tag, slot, value) {
+        const handler = (pending[tag] ?? [])[slot];
+        delete pending[tag];
+        if (handler)
+            handler(value);
+    }
+
+    function remember(onReply, onError) {
+        const tag = String(++serial);
+        pending[tag] = [onReply, onError];
+        return tag;
+    }
+
+    function query(member, args, iface, onReply, onError) {
+        backend.call(remember(onReply, onError), iface ?? "Daemon1", member, JSON.stringify(args), !!onError);
+    }
+
+    function act(member, args, iface, onDone, onError) {
+        query(member, args, iface, onDone, onError);
+    }
+
+    function addExamples(onFailed) {
+        act("AddExamples", [], "Repos1", () => {}, failed => onFailed(failed.name === "io.github.reiwand.Error.NotFound" ? tr("This installation brings no example wallpapers. Add a repository with its address to find more.") : failed.message));
+    }
+
+    function addProvider(id, kind, options, secret, onDone, onError) {
+        backend.addProvider(remember(onDone, onError), id, kind, JSON.stringify(options), secret);
+    }
+
+    function carry(member, path, password, json, onDone, onError) {
+        backend.carry(remember(onDone, onError), member, path, password, json);
+    }
+
+    function setSecret(id, secret, onDone, onError) {
+        backend.setSecret(remember(onDone, onError), id, secret);
+    }
+
+    function sceneSecret(output, key, text, onDone, onError) {
+        backend.sceneSecret(remember(onDone, onError), output, key, text);
+    }
+
+    function writeText(url, text) {
+        return backend.writeText(String(url), text);
+    }
+
+    function readText(url) {
+        return backend.readText(String(url));
+    }
+
+    function licenses() {
+        return backend.licenses();
+    }
+
+    function tr(text) {
+        const args = arguments;
+        return backend.tr(text).replace(/%([1-9])/g, (mark, n) => n < args.length ? String(args[n]) : mark);
+    }
+
+    function screen(output, among) {
+        const own = name => /^(eDP|LVDS|DSI)/i.test(name);
+        if (own(output))
+            return tr("Laptop");
+        const others = (among ?? outputs).filter(name => !own(name)).sort();
+        const at = others.indexOf(output);
+        return others.length > 1 && at >= 0 ? tr("Monitor %1", at + 1) : tr("Monitor");
+    }
+
+    function screens(names, among) {
+        const words = names.map(name => screen(name, among));
+        return words.length < 2 ? words.join("") : tr("%1 and %2", words.slice(0, -1).join(", "), words[words.length - 1]);
+    }
+
+    function trc(context, text) {
+        const args = Array.prototype.slice.call(arguments, 1);
+        return tr.apply(null, [context + "\u0004" + text].concat(args.slice(1)));
+    }
+
+    function field(key) {
+        return Labels.field(key);
+    }
+
+    function value(text) {
+        return Labels.value(text);
+    }
+
+    function url(path) {
+        return path ? backend.url(path) : "";
+    }
+
+    function path(url) {
+        return backend.path(String(url));
+    }
+
+    function markup(text) {
+        return backend.markup(text ?? "");
+    }
+
+    function plain(text) {
+        return backend.plain(text ?? "");
+    }
+
+    function time(seconds) {
+        return seconds ? new Date(seconds * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat) : "";
+    }
+
+    function bytes(count) {
+        return count >= 1048576 ? tr("%1 MB", Math.round(count / 1048576)) : tr("%1 KB", Math.ceil(count / 1024));
+    }
+}

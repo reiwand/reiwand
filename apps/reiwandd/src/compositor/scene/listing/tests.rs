@@ -1,0 +1,151 @@
+use super::super::super::SceneSpec;
+use super::super::super::power::Power;
+use super::*;
+use crate::scenes::ScenePack;
+use reiwand_scene::{Scene, Tier};
+use serde_json::json;
+
+pub(super) fn state(folder: Option<&std::path::Path>) -> SceneState {
+    let scene = json!({ "schema": "reiwand.scene/2", "canvas": { "size": [16, 9] },
+        "scripts": [{ "path": "main.js", "uses": ["folders"] }],
+        "layers": [{ "blend_space": "canvas", "id": "photo", "type": "solid", "color": "#ffffff" }] });
+    let scene = Scene::from_json(&crate::whole::scene(&scene.to_string())).unwrap();
+    let properties = serde_json::from_value(crate::whole::properties(
+        json!({ "album": { "type": "folder", "mode": "all", "accept": ["image", "video"] } }),
+    ))
+    .unwrap();
+    let pack = Arc::new(ScenePack::bare(scene, properties, Vec::new()));
+    let chosen = folder.map(|f| json!({ "album": f }));
+    let values = serde_json::from_value(chosen.unwrap_or(json!({}))).unwrap();
+    let spec = SceneSpec {
+        values,
+        pack,
+        extra: Vec::new(),
+        clips: Vec::new(),
+        hold: None,
+        drafted: false,
+        heard: 1.0,
+        moving: false,
+        quality: None,
+        span: None,
+    };
+    SceneState::new(spec, Power::new(Tier::T3, false, 0))
+}
+
+pub(super) const PATIENCE: Duration = Duration::from_secs(120);
+
+pub(super) fn within(mut ready: impl FnMut() -> bool) -> bool {
+    let deadline = Instant::now() + PATIENCE;
+    loop {
+        if ready() {
+            return true;
+        }
+        if Instant::now() >= deadline {
+            return false;
+        }
+        std::thread::sleep(Duration::from_millis(5));
+    }
+}
+
+pub(super) fn listed(state: &mut SceneState, at: Instant) -> bool {
+    within(|| state.listing(at))
+}
+
+pub(super) fn picture(dir: &std::path::Path, name: &str) {
+    let staged = tempfile::tempdir().unwrap();
+    image::RgbaImage::new(2, 2).save(staged.path().join(name)).unwrap();
+    std::fs::hard_link(staged.path().join(name), dir.join(name)).unwrap();
+}
+
+#[test]
+fn a_still_scene_looks_at_its_folder_off_the_compositor_and_wakes_for_it() {
+    let dir = tempfile::tempdir().unwrap();
+    picture(dir.path(), "a.png");
+    let (mut state, start) = (state(Some(dir.path())), Instant::now());
+    assert!(!state.listing(start) && state.listing_wake(start) == Wake::At(SOON.as_secs_f64()));
+    assert!(listed(&mut state, start), "the first listing never arrived");
+    assert_eq!(state.listed.text.matches("a.png").count(), 1);
+    assert_eq!(state.listing_wake(start), Wake::At(EVERY.as_secs_f64()));
+    assert!(!state.listing(start + Duration::from_secs(1)), "a second look before 2 s");
+    picture(dir.path(), "b.png");
+    let later = start + EVERY;
+    assert!(listed(&mut state, later), "a new file was not seen");
+    assert!(state.listed.text.contains("b.png"));
+    let again = later + EVERY;
+    assert!(!listed(&mut state, again), "an unchanged folder counted as a change");
+    let mut unset = self::state(None);
+    assert!(unset.listing(start) && unset.listed.text == r#"{"album":[]}"#);
+    assert_eq!(unset.listing_wake(start + EVERY), Wake::Idle, "no folder chosen, nothing to look at");
+}
+
+#[test]
+fn videos_are_listed_as_such_and_shown_ones_become_clips_of_the_scene() {
+    let dir = tempfile::tempdir().unwrap();
+    picture(dir.path(), "a.png");
+    std::fs::write(dir.path().join("waves.webm"), b"not decoded here").unwrap();
+    let (mut state, start) = (state(Some(dir.path())), Instant::now());
+    assert!(listed(&mut state, start));
+    assert!(
+        state.listed.text.contains(r#""waves.webm","video"]"#)
+            && state.listed.text.contains(r#""a.png","image"]"#)
+    );
+    let key =
+        state.listed.files.iter().find(|(_, p)| p.ends_with("waves.webm")).map(|(k, _)| k.clone()).unwrap();
+    let mut outputs = ScriptOutputs::default();
+    outputs.layers.insert(
+        "photo".into(),
+        reiwand_scene::LayerOverride { file: Some(key.clone()), ..Default::default() },
+    );
+    state.show(&outputs);
+    assert!(state.listed.reels.len() == 1 && state.listed.reels[0].0 == key);
+    assert!(state.spec.clips.iter().any(|(k, reel)| *k == key && reel.path.ends_with("waves.webm")));
+    assert!(state.spec.reels().any(|(k, ..)| k == key), "the compositor opens a player for it");
+    state.show(&ScriptOutputs::default());
+    assert!(state.listed.reels.is_empty() && !state.spec.clips.iter().any(|(k, _)| *k == key));
+}
+
+#[test]
+fn a_watched_folder_is_looked_at_again_only_when_it_changes() {
+    let dir = tempfile::tempdir().unwrap();
+    picture(dir.path(), "a.png");
+    let mut state = state(Some(dir.path()));
+    let woken = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+    let seen = Arc::clone(&woken);
+    state.waker(|| {
+        Arc::new(move || {
+            seen.fetch_add(1, Ordering::SeqCst);
+        })
+    });
+    let start = Instant::now();
+    assert!(listed(&mut state, start), "the first listing never arrived");
+    if state.listed.watch.is_none() {
+        return eprintln!("no change notices on this system: the folder is looked at every 2 s instead");
+    }
+    let later = start + Duration::from_secs(600);
+    assert_eq!(state.listing_wake(later), Wake::Idle, "an unchanged folder wakes nothing");
+    assert!(!state.listing(later), "an unchanged folder was listed again");
+    let before = woken.load(Ordering::SeqCst);
+    picture(dir.path(), "b.png");
+    let told = within(|| state.listing_wake(later) == Wake::At(0.0));
+    assert!(told, "no change notice arrived within {PATIENCE:?}");
+    assert!(woken.load(Ordering::SeqCst) > before, "the change notice did not wake the daemon");
+    assert!(listed(&mut state, later) && state.listed.text.contains("b.png"));
+    assert_eq!(state.listing_wake(later), Wake::Idle);
+}
+
+#[test]
+fn a_shown_folder_video_gets_its_length_so_it_can_end() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut mp4 = b"\0\0\0\x6cmvhd\0\0\0\0\0\0\0\0\0\0\0\0".to_vec();
+    mp4.extend(1000u32.to_be_bytes().into_iter().chain(2500u32.to_be_bytes()));
+    std::fs::write(dir.path().join("clip.mp4"), mp4).unwrap();
+    let (mut state, start) = (state(Some(dir.path())), Instant::now());
+    assert!(listed(&mut state, start));
+    let key = state.listed.files.iter().find(|(_, p)| p.ends_with("clip.mp4")).unwrap().0.clone();
+    let mut outputs = ScriptOutputs::default();
+    let shown = reiwand_scene::LayerOverride { file: Some(key.clone()), ..Default::default() };
+    outputs.layers.insert("photo".into(), shown);
+    state.show(&outputs);
+    let (_, lengths) = state.listed.loading.take().unwrap().recv().unwrap();
+    assert_eq!(lengths, vec![(key, 2.5)], "the length is read off the compositor thread");
+}

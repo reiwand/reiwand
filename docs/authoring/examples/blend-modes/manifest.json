@@ -1,0 +1,41 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": "en",
+  "description": "Every blend mode side by side: the same turning color wheel mixed into a colorful backdrop with each of the 34 modes.",
+  "entry": "scene.json",
+  "id": "org.example.blend-modes",
+  "inputs": [],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "photosensitive": false,
+  "platforms": [],
+  "presets": [],
+  "properties": {},
+  "requires": {
+    "engine": null,
+    "features": [
+      "blend_modes2",
+      "text_layout",
+      "text_styles"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "Blend modes",
+  "version": "0.1.0"
+}

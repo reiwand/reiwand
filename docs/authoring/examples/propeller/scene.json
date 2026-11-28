@@ -1,0 +1,219 @@
+{
+  "assets": {},
+  "canvas": {
+    "background": "#05070f",
+    "blend_space": "linear",
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "perspective": 900,
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "add",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "propeller",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "solid": false,
+      "system": "propeller",
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "particles",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {
+    "propeller": {
+      "capacity": 900,
+      "children": [],
+      "collide": [],
+      "emitters": [
+        {
+          "audio_gate": false,
+          "bursts": [],
+          "delay": 0,
+          "duration": null,
+          "inherit": 0,
+          "rate": 60,
+          "shape": {
+            "around": {
+              "arc": 360.0,
+              "at": "p0",
+              "axis": [
+                0.5,
+                0,
+                0.866
+              ],
+              "count": 18,
+              "mode": "repeat",
+              "radius": 220,
+              "restart": false,
+              "speed": 40
+            }
+          }
+        }
+      ],
+      "forces": [
+        {
+          "vortex": {
+            "axis": [
+              0.5,
+              0,
+              0.866
+            ],
+            "center": [
+              960,
+              540
+            ],
+            "falloff": "linear",
+            "inner": 0,
+            "outer": null,
+            "radius": 0,
+            "strength": 160
+          },
+          "window": [
+            0,
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "drag": 0.4,
+          "window": [
+            0,
+            0,
+            1,
+            1
+          ]
+        }
+      ],
+      "init": {
+        "angle": [
+          0,
+          360,
+          1
+        ],
+        "color": [
+          "#9ad7ff",
+          "#c3a6ff",
+          1
+        ],
+        "frame": [
+          0.0,
+          0.0,
+          1
+        ],
+        "gradient": [],
+        "life": [
+          3,
+          4,
+          1
+        ],
+        "remap": [],
+        "rotation": [
+          0.0,
+          0.0,
+          1
+        ],
+        "size": [
+          6,
+          9,
+          1
+        ],
+        "speed": [
+          0,
+          0,
+          1
+        ],
+        "spin": [
+          0.0,
+          0.0,
+          1
+        ],
+        "tilt": {
+          "angle": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ],
+          "spin": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "lock": [],
+      "points": [
+        {
+          "angle": 0,
+          "at": [
+            960,
+            540
+          ],
+          "space": "local"
+        }
+      ],
+      "prewarm": 0.0,
+      "render": {
+        "angle": null,
+        "aspect": 1,
+        "color_over_life": [],
+        "cycles": null,
+        "fps": 12.0,
+        "lit": false,
+        "mix": false,
+        "size_over_life": []
+      },
+      "seed": 0,
+      "space": "local"
+    }
+  },
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": []
+}

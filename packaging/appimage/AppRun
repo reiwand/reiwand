@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HERE=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+VERSION=$(cat "$HERE/VERSION")
+LIB=${PREFIX:-$HOME/.local}/lib/reiwand
+
+usage() {
+  cat <<MSG
+reiwand $VERSION
+
+Usage: ${ARGV0:-reiwand} [option | command [arguments] | app arguments]
+
+  --install [--no-examples]  install this version for the current user, or upgrade to it
+  --uninstall [--purge]      remove Reiwand; --purge also deletes its configuration
+  --update [--check]         install the newest release after checking its signature;
+                             --check only says whether there is one
+  --version                  print the version
+  reiwandd, reiwand-ctl, reiwand-app, reiwand-web
+                             run that program of this version with the arguments that follow
+Anything else opens the app with those arguments, installing this version first when no
+version or an older one is installed.
+MSG
+}
+
+case ${1:-} in
+  --install) exec "$HERE/integrate.sh" "${@:2}" ;;
+  --uninstall) exec "$HERE/remove.sh" "${@:2}" ;;
+  --update) exec "$HERE/update.sh" "${@:2}" ;;
+  --version) echo "reiwand $VERSION" && exit ;;
+  --help | -h) usage && exit ;;
+  reiwandd | reiwand-ctl | reiwand-app | reiwand-web) exec "$HERE/bin/$1" "${@:2}" ;;
+esac
+
+installed=$(readlink "$LIB/current" 2>/dev/null || true)
+if [ -z "$installed" ]; then
+  echo "Reiwand is not installed yet: installing version ${VERSION%%+*}" >&2
+  "$HERE/integrate.sh" >&2
+elif [ "$installed" != "${VERSION%%+*}" ]; then
+  if [ "$(printf '%s\n' "$installed" "${VERSION%%+*}" | sort -V | tail -1)" = "$installed" ]; then
+    echo "Reiwand $installed is installed, newer than this file; to go back to ${VERSION%%+*}: ${APPIMAGE:-$0} --install" >&2
+  else
+    echo "Upgrading Reiwand $installed to ${VERSION%%+*}" >&2
+    "$HERE/integrate.sh" >&2
+  fi
+fi
+exec "$LIB/current/bin/reiwand-app" "$@"

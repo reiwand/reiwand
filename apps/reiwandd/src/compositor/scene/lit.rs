@@ -1,0 +1,32 @@
+use super::SceneState;
+use reiwand_render::Renderer;
+use reiwand_rgb::Strip;
+
+fn allowed(output: &str) -> bool {
+    crate::rgb::enabled() && crate::inputs::lights(output) && !crate::rgb::paused(output)
+}
+
+impl SceneState {
+    pub(in crate::compositor) fn sends_rgb(&self) -> bool {
+        reiwand_render::lit(&self.spec.pack.scene)
+    }
+
+    pub(in crate::compositor) fn want_rgb(&mut self, output: &str) -> bool {
+        let Some(view) = self.view.as_mut() else { return false };
+        let lit = reiwand_render::lit(&self.spec.pack.scene);
+        view.want_rgb(lit && (output.starts_with("preview:") || allowed(output)))
+    }
+
+    pub(in crate::compositor) fn send_rgb(&mut self, output: &str, renderer: &Renderer) {
+        if self.want_rgb(output) {
+            self.due = Some(std::time::Instant::now());
+        }
+        let Some(view) = self.view.as_mut() else { return };
+        if let Some(strip) = view.rgb(renderer).and_then(|(w, h, rgb)| Strip::new(w, h, rgb)) {
+            crate::rgb::frame(output, strip, allowed(output) && !output.starts_with("preview:"));
+        }
+        if view.rgb_pending() {
+            self.due = Some(std::time::Instant::now() + std::time::Duration::from_millis(30));
+        }
+    }
+}

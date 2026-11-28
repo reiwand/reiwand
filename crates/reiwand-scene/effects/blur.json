@@ -1,0 +1,46 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": "blur",
+  "compose": false,
+  "cost": {
+    "passes": 2,
+    "scale": 1,
+    "taps": 3
+  },
+  "description": {
+    "en": "Blurs the picture by a fixed radius.",
+    "es": "Desenfoca la imagen con un radio fijo."
+  },
+  "fuse": null,
+  "id": "blur",
+  "lighter": {
+    "cost": {"passes": 2, "scale": 0.5, "taps": 2},
+    "passes": [{"blend": null, "copy": null, "entry": "fs_blur_lite", "grid": null, "inputs": ["previous"], "output": "next", "scale": 0.5, "swap": null, "target": null, "vertex": null}, {"blend": null, "copy": null, "entry": "fs_blur_lite_mix", "grid": null, "inputs": ["previous", "input"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}],
+    "up_to": null
+  },
+  "mask_mode": "mix",
+  "min_fps": null,
+  "name": {
+    "en": "Blur"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "radius", "type": "float", "channels": null, "help": {}, "label": {}, "max": 128, "min": 0, "paint": null, "prefill": 8, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "blend", "type": "blend", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "normal", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "amount", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_blur_h", "grid": null, "inputs": ["previous"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null},
+    {"blend": null, "copy": null, "entry": "fs_blur_v", "grid": null, "inputs": ["previous", "input"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {},
+  "reach": "radius",
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
+}

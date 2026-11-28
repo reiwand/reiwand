@@ -1,0 +1,88 @@
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC2
+import io.github.reiwand.app
+
+ColumnLayout {
+    id: refs
+
+    required property var input
+    readonly property var field: input.field
+    readonly property string kind: field.widget.split(":")[0]
+    readonly property var value: input.value
+    readonly property var keys: Object.keys(value ?? {})
+
+    function label(option) {
+        if (Array.isArray(option))
+            return App.tr("A point");
+        if (option === "cursor")
+            return App.tr("The pointer");
+        const media = ((refs.input.page.view.assets ?? []).find(a => a.id === option) ?? {}).media;
+        if (media)
+            return (media === "current" ? App.tr("Cover of what plays (%1)", option) : App.tr("Previous cover (%1)", option));
+        const text = String(option);
+        if (text.startsWith("bone:"))
+            return App.tr("Bone %1", text.slice(5));
+        return text.startsWith("layer:") ? App.tr("Layer %1", text.slice(6)) : text;
+    }
+
+    QQC2.ComboBox {
+        readonly property var options: refs.input.at(refs.field.options, refs.value) >= 0 ? refs.field.options : refs.field.options.concat([refs.value])
+
+        Layout.fillWidth: true
+        visible: refs.kind === "ref"
+        model: options.map(o => refs.label(o))
+        currentIndex: refs.input.at(options, refs.value)
+        onActivated: index => refs.input.commit(options[index])
+    }
+
+    SceneCoverPick {
+        Layout.fillWidth: true
+        visible: refs.field.widget === "ref:image"
+        input: refs.input
+    }
+
+    Flow {
+        Layout.fillWidth: true
+        visible: refs.kind === "refs"
+
+        SceneRepeater {
+            id: listed
+
+            rows: refs.kind === "refs" ? refs.field.options : []
+
+            delegate: QQC2.CheckBox {
+                required property int index
+                readonly property var modelData: listed.rows[index]
+
+                text: String(modelData)
+                checked: (refs.value ?? []).includes(modelData)
+                onToggled: {
+                    const now = refs.value ?? [];
+                    refs.input.commit(refs.field.options.filter(o => o === modelData ? checked : now.includes(o)));
+                }
+            }
+        }
+    }
+
+    RowLayout {
+        visible: refs.kind === "map"
+
+        QQC2.ComboBox {
+            id: key
+
+            Layout.fillWidth: true
+            model: refs.field.options.filter(o => !refs.keys.includes(o))
+        }
+
+        QQC2.Button {
+            text: App.tr("Add")
+            icon.name: "list-add"
+            enabled: key.currentText !== ""
+            onClicked: refs.input.page.run("set", {
+                "pointer": refs.field.pointer + "/" + key.currentText.replace(/~/g, "~0").replace(/\//g, "~1"),
+                "value": refs.field.sample
+            })
+        }
+    }
+}

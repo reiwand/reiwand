@@ -1,0 +1,97 @@
+{
+  "effects": [],
+  "params": {
+    "bloom": [
+      {"id": "tint", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#ffffff", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "saturation", "type": "float", "channels": null, "help": {}, "label": {}, "max": 4, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "capped", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "limit", "type": "float", "channels": null, "help": {}, "label": {}, "max": 16, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": "capped", "yields_to": null},
+      {"id": "levels", "type": "int", "channels": null, "help": {}, "label": {}, "max": 8, "min": 1, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "scatter", "type": "float", "channels": null, "help": {}, "label": {}, "max": 2, "min": 0, "paint": null, "prefill": 0.5, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": "levels", "yields_to": null},
+      {"id": "unit", "type": "enum", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [{"label": {"en": "Canvas pixels", "es": "Píxeles del lienzo"}, "value": 0}, {"label": {"en": "Screen pixels", "es": "Píxeles de la pantalla"}, "value": 1}], "waits_for": null, "yields_to": null}
+    ],
+    "blur": [
+      {"id": "blend", "type": "blend", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "normal", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "amount", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+    ],
+    "blur_motion": [
+      {"id": "follow", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "shutter", "type": "float", "channels": null, "help": {}, "label": {}, "max": 0.5, "min": 0, "paint": null, "prefill": 0.05, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+    ],
+    "chromatic_aberration": [
+      {"id": "mode", "type": "enum", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [{"label": {"en": "Expansion", "es": "Expansión"}, "value": 0}, {"label": {"en": "Directional", "es": "Direccional"}, "value": 1}, {"label": {"en": "Radial", "es": "Radial"}, "value": 2}, {"label": {"en": "Barrel", "es": "Barril"}, "value": 3}], "waits_for": null, "yields_to": null},
+      {"id": "angle", "type": "float", "channels": null, "help": {}, "label": {}, "max": 360, "min": -360, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+    ],
+    "depth_parallax": [
+      {"id": "scale", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 1, "min": -1, "paint": null, "prefill": [1, 1], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "smooth", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+    ],
+    "film_grain": [
+      {"id": "mono", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "bias", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": -1, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "blend", "type": "blend", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "overlay", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+    ],
+    "flow": [
+      {"id": "noise", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "phase", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+    ],
+    "god_rays": [
+      {"id": "mode", "type": "enum", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [{"label": {"en": "Radial", "es": "Radial"}, "value": 0}, {"label": {"en": "Directional", "es": "Direccional"}, "value": 1}, {"label": {"en": "Star", "es": "Estrella"}, "value": 2}], "waits_for": null, "yields_to": null},
+      {"id": "angle", "type": "float", "channels": null, "help": {}, "label": {}, "max": 360, "min": -360, "paint": null, "prefill": 90, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "noise", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": "time", "values": [], "waits_for": null, "yields_to": null},
+      {"id": "edges", "type": "int", "channels": null, "help": {}, "label": {}, "max": 16, "min": 2, "paint": null, "prefill": 6, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+    ],
+    "iris": [
+      {"id": "background", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+    ],
+    "lens_distort": [
+      {"id": "background", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+    ],
+    "reflection": [
+      {"id": "angle", "type": "float", "channels": null, "help": {}, "label": {}, "max": 360, "min": -360, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+    ],
+    "scroll": [
+      {"id": "repeat_x", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": true, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "repeat_y", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": true, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+    ],
+    "shake": [
+      {"id": "noise", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "friction", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "bounds", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": [1, 1], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "phase", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": "gray", "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "flow", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": "#808000", "prefill": "", "tool": "flow", "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "motion", "type": "enum", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [{"label": {"en": "Noise", "es": "Ruido"}, "value": 0}, {"label": {"en": "Periodic push", "es": "Empuje periódico"}, "value": 1}], "waits_for": null, "yields_to": null},
+      {"id": "side", "type": "enum", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [{"label": {"en": "Both ways", "es": "A los dos lados"}, "value": 0}, {"label": {"en": "Forward", "es": "Hacia adelante"}, "value": 1}, {"label": {"en": "Backward", "es": "Hacia atrás"}, "value": 2}], "waits_for": null, "yields_to": null}
+    ],
+    "shine": [
+      {"id": "blend", "type": "blend", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "add", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "gradient", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "style", "type": "enum", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [{"label": {"en": "Line", "es": "Línea"}, "value": 0}, {"label": {"en": "Double line", "es": "Línea doble"}, "value": 1}, {"label": {"en": "Ring", "es": "Anillo"}, "value": 2}, {"label": {"en": "Glint", "es": "Destello"}, "value": 3}], "waits_for": null, "yields_to": null}
+    ],
+    "sway": [
+      {"id": "double", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "phase", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "foliage", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "ratio", "type": "float", "channels": null, "help": {}, "label": {}, "max": 10, "min": 0.1, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+    ],
+    "twirl": [
+      {"id": "aspect", "type": "float", "channels": null, "help": {}, "label": {}, "max": 10, "min": 0.1, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "inner", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "noise", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "repeat", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+    ],
+    "water_ripple": [
+      {"id": "perspective", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "reflection", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "tint", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#ffffff", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "walls", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "speed", "type": "float", "channels": null, "help": {}, "label": {}, "max": 4, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+    ],
+    "waves": [
+      {"id": "count", "type": "int", "channels": null, "help": {}, "label": {}, "max": 2, "min": 1, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "angle2", "type": "float", "channels": null, "help": {}, "label": {}, "max": 360, "min": -360, "paint": null, "prefill": 90, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "perspective", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+      {"id": "phase", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+    ]
+  }
+}

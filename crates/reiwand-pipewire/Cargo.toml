@@ -1,0 +1,16 @@
+[package]
+name = "reiwand-pipewire"
+description = "PipeWire video stream export for Reiwand"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+reiwand-core.workspace = true
+pipewire.workspace = true
+rustix.workspace = true
+libc.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+

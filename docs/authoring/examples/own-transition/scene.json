@@ -1,0 +1,165 @@
+{
+  "assets": {},
+  "canvas": {
+    "background": "#0b1026",
+    "blend_space": "linear",
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#0b1026",
+      "depth_test": false,
+      "effects": [],
+      "id": "background",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": "canvas",
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "solid",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#fff3c4",
+      "id": "moon",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "ellipse": {
+          "size": [
+            320,
+            320
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          1320,
+          420
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#ffb347",
+      "id": "ring",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "ring": {
+          "size": [
+            440,
+            440
+          ],
+          "width": 10
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          1320,
+          420
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": [],
+  "transition": {
+    "in": {
+      "curve": "in_out_sine",
+      "descriptor": "transitions/porthole.json",
+      "duration_ms": 1400,
+      "params": {
+        "edge": 0.25,
+        "tint": "#ffcf8a"
+      },
+      "wgsl": "transitions/porthole.wgsl"
+    },
+    "out": {
+      "curve": "in_cubic",
+      "descriptor": "transitions/porthole.json",
+      "duration_ms": 700,
+      "params": {
+        "edge": 0.1
+      },
+      "wgsl": "transitions/porthole.wgsl"
+    }
+  }
+}

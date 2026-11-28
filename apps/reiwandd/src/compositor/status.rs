@@ -1,0 +1,111 @@
+#[derive(Debug, Clone, Default, PartialEq, serde::Serialize)]
+pub struct OutputStatus {
+    pub kind: &'static str,
+    pub playing: bool,
+    pub error: Option<String>,
+    pub parallax: bool,
+    pub frames: u64,
+    pub page_frames: u64,
+    pub fps: u32,
+    pub sound: &'static str,
+    pub flashes: &'static str,
+    pub particles: &'static str,
+    pub level: Level,
+    pub decode: &'static str,
+    pub left_out: Vec<String>,
+    pub console: Vec<String>,
+    pub problems: Vec<String>,
+    pub software_still: bool,
+    pub package: Option<std::path::PathBuf>,
+    pub sandbox: &'static str,
+    pub helper: Option<u32>,
+    pub hdr: super::light::Hdr,
+    pub passage: Passage,
+}
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, serde::Serialize)]
+pub struct Level {
+    pub quality: &'static str,
+    pub reason: &'static str,
+    pub cost: f32,
+    pub budget: f32,
+    pub automatic: &'static str,
+    pub frame_ms: Option<f32>,
+    pub period_ms: Option<f32>,
+    pub step: &'static str,
+    pub pace: u32,
+}
+
+impl Level {
+    pub fn timing(&self) -> reiwand_core::model::QualityTiming {
+        let tenths = |ms: Option<f32>| ms.map(|ms| f64::from((ms * 10.0).round() / 10.0));
+        reiwand_core::model::QualityTiming {
+            quality_frame_ms: tenths(self.frame_ms),
+            quality_period_ms: tenths(self.period_ms),
+            quality_step: self.step.into(),
+            quality_pace: self.pace,
+        }
+    }
+}
+
+impl OutputStatus {
+    pub fn shown(&self) -> reiwand_core::model::Shown {
+        use reiwand_core::model::Shown;
+        match self.kind {
+            "image" => Shown::Image,
+            "video" => Shown::Video,
+            "scene" => Shown::Scene,
+            "web" => Shown::Web,
+            _ => Shown::Color,
+        }
+    }
+}
+
+pub(super) fn problems_changed(
+    now: &std::collections::BTreeMap<String, OutputStatus>,
+    old: &std::collections::BTreeMap<String, OutputStatus>,
+    names: &[String],
+) -> bool {
+    // an output that appears or goes away without problems changes none: a library card that starts its preview
+    // must not make the library load again
+    let problems = |all: &std::collections::BTreeMap<String, OutputStatus>, n: &String| {
+        all.get(n).map(|s| s.problems.clone()).unwrap_or_default()
+    };
+    names.iter().any(|n| problems(now, n) != problems(old, n))
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+pub struct Passage {
+    pub plays: &'static str,
+    pub why: &'static str,
+}
+
+impl Passage {
+    pub(super) const CUT: Passage = Passage { plays: "none", why: "cut" };
+    pub(super) const FALLEN: Passage = Passage { plays: "fade", why: "fallen" };
+}
+
+impl Default for Passage {
+    fn default() -> Self {
+        Passage::CUT
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::BTreeMap;
+
+    #[test]
+    fn only_problems_that_come_or_go_count_as_a_change() {
+        let name = String::from("preview:card-1");
+        let (none, mut quiet) = (BTreeMap::new(), BTreeMap::new());
+        quiet.insert(name.clone(), OutputStatus::default());
+        assert!(!problems_changed(&quiet, &none, std::slice::from_ref(&name)));
+        assert!(!problems_changed(&none, &quiet, std::slice::from_ref(&name)));
+        let mut broken = quiet.clone();
+        broken.get_mut(&name).unwrap().problems = vec!["the page failed".into()];
+        assert!(problems_changed(&broken, &none, std::slice::from_ref(&name)));
+        assert!(problems_changed(&broken, &quiet, std::slice::from_ref(&name)));
+    }
+}

@@ -1,0 +1,10 @@
+Edit.span	block	null
+Edit.depth	block	null
+Edit.parallax	block	null
+Edit.fit	value	"general"
+Geometry.crop	block	null
+Op.mask	value	""
+Op.opacity	block	null
+Depth.cuts	block	null
+Parallax.fill	value	"auto"
+Parallax.layers	value	"auto"

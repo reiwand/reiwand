@@ -1,0 +1,190 @@
+struct Look {
+    m0: vec4<f32>,
+    m1: vec4<f32>,
+    tint: vec4<f32>,
+    atlas: vec4<f32>,
+    trail: vec4<f32>,
+    shade: vec4<f32>,
+    extra: vec4<f32>,
+    cut: vec4<f32>,
+    turn: vec4<f32>,
+    deep: vec4<f32>,
+    strand: vec4<f32>,
+    cord: vec4<f32>,
+    light: vec4<f32>,
+    place: vec4<f32>,
+    bend: vec4<f32>,
+    hull: array<vec4<f32>, 2>,
+    crops: vec4<f32>,
+    sizes: array<vec4<f32>, 16>,
+    colors: array<vec4<f32>, 64>,
+    seen_a: vec4<f32>,
+    seen_b: vec4<f32>,
+    window: vec4<f32>,
+    tilt: array<vec4<f32>, 3>,
+};
+
+struct Corner {
+    @builtin(position) position: vec4<f32>,
+    @location(0) uv: vec2<f32>,
+    @location(1) color: vec4<f32>,
+    @location(2) @interpolate(flat) frames: vec3<f32>,
+    @location(3) @interpolate(flat) turn: vec4<f32>,
+    @location(4) @interpolate(flat) scale: f32,
+    @location(5) @interpolate(flat) tilt: vec4<f32>,
+    @location(6) @interpolate(flat) span: vec2<f32>,
+};
+
+@group(0) @binding(0) var<uniform> look: Look;
+@group(0) @binding(1) var samp: sampler;
+@group(0) @binding(2) var seen_depth: texture_2d<f32>;
+@group(1) @binding(0) var sprite: texture_2d<f32>;
+@group(1) @binding(1) var<uniform> rects: array<vec4<f32>, 256>;
+
+fn curve(t: f32) -> f32 {
+    let x = t * 63.0;
+    let i = min(u32(x), 62u);
+    let j = i + 1u;
+    return mix(look.sizes[i / 4u][i % 4u], look.sizes[j / 4u][j % 4u], x - f32(i));
+}
+
+fn decode(c: vec3<f32>) -> vec3<f32> {
+    return select(pow((c + 0.055) / 1.055, vec3<f32>(2.4)), c / 12.92, c <= vec3<f32>(0.04045));
+}
+
+fn encode(c: vec3<f32>) -> vec3<f32> {
+    return select(1.055 * pow(c, vec3<f32>(1.0 / 2.4)) - 0.055, c * 12.92, c <= vec3<f32>(0.0031308));
+}
+
+@vertex
+fn vs_particle(
+    @builtin(vertex_index) v: u32,
+    @location(0) a: vec4<f32>,
+    @location(1) b: vec4<f32>,
+    @location(2) c: vec4<f32>,
+    @location(3) color: vec4<f32>,
+    @location(4) e: vec4<f32>,
+    @location(5) d: vec4<f32>,
+) -> Corner {
+    var out: Corner;
+    out.position = vec4<f32>(2.0, 2.0, 2.0, 1.0);
+    let far = look.deep.x + d.x;
+    if b.x >= b.y || (look.deep.w > 0.5 && far <= look.deep.w) {
+        return out;
+    }
+    let t = clamp(b.x / b.y, 0.0, 1.0);
+    let k = select(1.0, look.deep.x / far, look.deep.w > 0.5);
+    let center = look.deep.yz + (a.xy - look.deep.yz) * k;
+    let size = b.z * curve(t) * look.tint.z * e.w * k;
+    let corner = select(vec2<f32>(f32(v & 1u), f32(v >> 1u)), hull_corner(v), look.hull[1].x > 0.0);
+    let motion = abs(look.trail.z - 2.0) < 0.5 && look.deep.w > 0.5;
+    let seen = select(a.zw, k * a.zw - (center - look.deep.yz) * d.y / far, motion);
+    var speed = length(seen);
+    var heading = seen / max(speed, 1e-9);
+    let relative = look.trail.y > 0.5;
+    let turned = !relative && look.shade.z > 0.0 && look.shade.z == look.shade.w;
+    let near = select(1.0, k, look.trail.z > 0.5 && look.trail.z < 1.5 && !relative);
+    var reach = clamp(look.trail.x * speed * near, look.shade.z * near, look.shade.w * near);
+    let spanned = look.trail.z > 2.5;
+    var middle = center;
+    if spanned {
+        let g = segment(a, d, size, k, b.w, relative);
+        speed = g.speed;
+        heading = g.axis;
+        reach = g.long;
+        middle = g.mid;
+    }
+    var tail = select(reach, 0.0, turned || speed <= 0.0);
+    var axis = vec2<f32>(cos(radians(b.w)), sin(radians(b.w)));
+    let driven = (tail > 0.0 || turned || relative || look.turn.x == 1.0) && speed > 0.0;
+    axis = select(axis, heading, driven);
+    let sides = select(vec2<f32>(1.0), look.tilt[2].yz, look.tilt[2].y > 0.0);
+    let upright = driven && sides.y > sides.x;
+    if look.turn.x == 2.0 {
+        axis = vec2<f32>(cos(look.turn.y - look.turn.z), sin(look.turn.y - look.turn.z));
+    }
+    let x = t * 63.0;
+    let i = min(u32(x), 62u);
+    let tone = mix(look.colors[i], look.colors[i + 1u], x - f32(i));
+    let base = select(vec4<f32>(decode(color.rgb), color.a), color, look.tint.y > 0.5);
+    let shade = base * tone * vec4<f32>(vec3<f32>(select(look.shade.x, 1.0, PIXELED)), look.tint.x * e.z);
+    let s = particle(Sprite(middle, a.zw, corner, corner, shade, size, degrees(atan2(axis.y, axis.x)), b.x, b.y));
+    let turn = vec2<f32>(cos(radians(s.rotation)), sin(radians(s.rotation)));
+    tail = select(tail, s.size * (reach - 1.0), relative);
+    let wide = vec2<f32>(mix(-0.5 * s.size * sides.x - tail, 0.5 * s.size * sides.x, s.corner.x), (s.corner.y - 0.5) * s.size * sides.y);
+    var q = select(wide, vec2<f32>((s.corner.x - 0.5) * s.size * sides.x, mix(-0.5 * s.size, 0.5 * s.size + tail, s.corner.y)), upright);
+    var squash = vec2<f32>(1.0);
+    if look.tilt[2].x > 0.5 {
+        let a = tilt_of(bitcast<u32>(c.z), b.x);
+        let reach_z = -q.x * a.w + q.y * a.y;
+        let f = select(1.0, 1.0 / max(1.0 + reach_z / look.deep.x, 0.1), look.deep.w > 0.5);
+        q = vec2<f32>(q.x * a.z, q.y * a.x) * f;
+        squash = vec2<f32>(a.z, a.x);
+        out.tilt = a;
+    }
+    let grow = cover(s.size, sides, tail, upright, squash);
+    if grow.z < 0.001 {
+        return out;
+    }
+    let mid = select(vec2<f32>(-0.5 * tail, 0.0), vec2<f32>(0.0, 0.5 * tail), upright) * squash;
+    q = mid + (q - mid) * grow.xy;
+    let off = select(q, vec2<f32>(-q.y, q.x), upright);
+    // A segment, or a stretch anchored at its centre (look.turn.w), is centred on the particle.
+    let lead = select(0.0, 0.5 * tail, spanned || look.turn.w > 0.5);
+    let p = vec3<f32>(s.position + turn * (off.x + lead) + vec2<f32>(-turn.y, turn.x) * off.y, 1.0);
+    out.position = vec4<f32>(dot(look.m0.xyz, p), dot(look.m1.xyz, p), 0.0, 1.0);
+    out.uv = select(s.uv, vec2<f32>(0.5), grow.xy > vec2<f32>(1.0));
+    out.color = vec4<f32>(s.color.rgb, s.color.a * grow.z);
+    out.scale = k;
+    out.span = vec2<f32>(s.age, s.life);
+    let spun = radians(s.rotation) + look.turn.z + select(0.0, 1.5707964, upright);
+    out.turn = vec4<f32>(cos(spun), sin(spun), s.size * look.light.w, 0.0);
+    out.frames = frame_mix(b, c, t);
+    return out;
+}
+
+fn cell(f: f32, uv: vec2<f32>) -> vec4<f32> {
+    if look.extra.x > 0.5 {
+        let r = rects[min(u32(f), 255u)];
+        let edge = min(0.5 / vec2<f32>(textureDimensions(sprite)), r.zw * 0.5);
+        return textureSample(sprite, samp, r.xy + clamp(uv * r.zw, edge, r.zw - edge));
+    }
+    let cols = max(look.atlas.x, 1.0);
+    let at = vec2<f32>(f % cols, floor(f / cols));
+    return textureSample(sprite, samp, (at + uv) / vec2<f32>(cols, max(look.atlas.y, 1.0)));
+}
+
+fn hidden(position: vec2<f32>, scale: f32) -> bool {
+    if look.window.w <= 0.0 {
+        return false;
+    }
+    let px = vec3<f32>(position * look.window.w + look.place.xy, 1.0);
+    let uv = vec2<f32>(dot(look.seen_a.xyz, px), dot(look.seen_b.xyz, px));
+    if any(uv < vec2<f32>(0.0)) || any(uv >= vec2<f32>(1.0)) {
+        return false;
+    }
+    let at = vec2<i32>(uv * vec2<f32>(textureDimensions(seen_depth)));
+    let n = look.window.x;
+    let f = look.window.y;
+    let d = clamp(look.window.z / max(scale, 1e-6), n, f);
+    return textureLoad(seen_depth, at, 0).x > n * (f - d) / ((f - n) * d);
+}
+
+fn painted(in: Corner) -> vec4<f32> {
+    if hidden(in.position.xy, in.scale) {
+        discard;
+    }
+    var s = mix(cell(in.frames.x, in.uv), cell(in.frames.y, in.uv), in.frames.z);
+    s = select(s, vec4<f32>(encode(s.rgb), s.a), look.tint.y > 0.5);
+    var c = select(vec4<f32>(1.0, 1.0, 1.0, 1.0 - smoothstep(0.5, 1.0, length(in.uv * 2.0 - 1.0))), s, look.tint.w > 0.5);
+    if look.cut.w > 0.5 {
+        c.a = clamp((c.a - look.cut.x) / (look.cut.y - look.cut.x), 0.0, 1.0) * look.cut.z;
+    }
+    let q = pixel(Pixel(c, in.color, look.shade.x, c.a * in.color.a, in.uv, in.span.x, in.span.y));
+    return vec4<f32>(q.rgb * q.a, q.a);
+}
+
+@fragment
+fn fs_particle(in: Corner) -> @location(0) vec4<f32> {
+    return painted(in);
+}

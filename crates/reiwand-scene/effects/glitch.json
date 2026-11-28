@@ -1,0 +1,49 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": "motion",
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Glitches the picture with shifted rows and color splits.",
+    "es": "Estropea la imagen con filas desplazadas y colores separados."
+  },
+  "fuse": null,
+  "id": "glitch",
+  "lighter": null,
+  "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Glitch"
+  },
+  "options": [],
+  "pace": {
+    "rate": "speed"
+  },
+  "params": [
+    {"id": "bursts", "type": "float", "channels": null, "help": {}, "label": {}, "max": 10, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": "time", "values": [], "waits_for": null, "yields_to": null},
+    {"id": "beat", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": "audio", "values": [], "waits_for": null, "yields_to": null},
+    {"id": "length", "type": "float", "channels": null, "help": {}, "label": {}, "max": 2, "min": 0.02, "paint": null, "prefill": 0.2, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "rows", "type": "float", "channels": null, "help": {}, "label": {}, "max": 256, "min": 1, "paint": null, "prefill": 24, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "threshold", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.7, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "shift", "type": "float", "channels": null, "help": {}, "label": {}, "max": 512, "min": 0, "paint": null, "prefill": 24, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "split", "type": "float", "channels": null, "help": {}, "label": {}, "max": 64, "min": 0, "paint": null, "prefill": 4, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "jitter", "type": "float", "channels": null, "help": {}, "label": {}, "max": 64, "min": 0, "paint": null, "prefill": 2, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "speed", "type": "float", "channels": null, "help": {}, "label": {}, "max": 60, "min": 0, "paint": null, "prefill": 12, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_glitch", "grid": null, "inputs": ["previous"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
+}

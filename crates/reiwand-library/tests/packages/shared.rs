@@ -1,0 +1,32 @@
+use super::{NOW, package};
+use reiwand_format::{Limits, Rating};
+use reiwand_library::Library;
+use serde_json::json;
+use std::fs;
+use tempfile::TempDir;
+
+#[test]
+fn assets_packages_are_listed_apart_from_wallpapers() {
+    let dir = TempDir::new().unwrap();
+    let mut library = Library::open(dir.path().join("library.db")).unwrap();
+    let root = dir.path().join("pictures");
+    package(&root, "meadow", Rating::General, false);
+    let source = dir.path().join("parts");
+    fs::create_dir_all(&source).unwrap();
+    let manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.parts", "version": "1.0.0",
+        "kind": "assets", "entry": "assets.json", "title": "Parts", "license": "CC0-1.0",
+        "origin": { "kind": "original" }, "content": { "rating": "general" }, "photosensitive": false,
+        "requires": { "features": ["assets"] } });
+    let scene = json!({ "schema": "reiwand.scene/2", "canvas": { "size": [64, 64] },
+        "layers": [{ "blend_space": "canvas", "id": "glow", "type": "solid", "color": "#ffcc00" }] });
+    fs::write(source.join("manifest.json"), reiwand_fill::manifests::whole(&manifest.to_string())).unwrap();
+    fs::write(source.join("assets.json"), reiwand_fill::whole(&scene.to_string())).unwrap();
+    reiwand_format::build(&source, root.join("parts.wpak"), &Limits::default()).unwrap();
+    let scanned = library.add_folder(&root, true).unwrap();
+    library.scan(&scanned, NOW).unwrap();
+    let count = |q: &str| library.count(q, NOW).unwrap();
+    assert_eq!(["", "kind:assets", "-kind:assets", "kind:package", "parts"].map(count), [1, 1, 1, 2, 0]);
+    let found = library.search("kind:assets", NOW, 0, 5).unwrap();
+    assert_eq!(found[0].package.as_ref().unwrap().kind, "assets");
+    assert!(library.count("kind:bundle", NOW).is_err());
+}

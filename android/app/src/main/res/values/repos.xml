@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="repos">Repositories</string>
+    <string name="repo_add">Add</string>
+    <string name="repo_examples">Example wallpapers</string>
+    <string name="repo_packages">Packages: %1$d</string>
+    <string name="repo_url">Repository address</string>
+    <string name="repo_add_url">Add the repository</string>
+    <string name="repo_browse">Explore</string>
+    <string name="repo_search">Search packages</string>
+    <string name="repo_install">Install</string>
+    <string name="repo_installed">Installed</string>
+    <string name="uninstall_in_use">This is the wallpaper in use: it will fall back to the default one.</string>
+    <string name="uninstall_presets">These presets need it and will stop working: %1$s</string>
+    <string name="repo_uninstall">Uninstall</string>
+    <string name="repo_updates">Updates</string>
+    <string name="repo_update_from">%1$s → %2$s</string>
+    <string name="repo_update">Update</string>
+    <string name="repo_update_asks">Not updated automatically: it now asks for %1$s</string>
+    <string name="repo_check">Check for updates</string>
+    <string name="needs_failed">This package is incomplete: %1$s could not be installed, so it may not work.</string>
+    <string name="auto_update">Update repositories automatically</string>
+    <string name="repo_on_phone">On this phone</string>
+    <string name="repo_search_all">Search the repositories</string>
+    <string name="repo_manage_note">Add, remove or update them</string>
+    <string name="repo_search_in">Search %1$s</string>
+    <string name="repo_installing">Installing…</string>
+</resources>

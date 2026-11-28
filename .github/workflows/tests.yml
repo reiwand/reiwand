@@ -1,0 +1,1108 @@
+name: Tests
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: "1"
+  CARGO_PROFILE_DEV_DEBUG: "0"
+
+jobs:
+  version:
+    name: Version
+    runs-on: ubuntu-24.04
+    outputs:
+      semver: ${{ steps.gitversion.outputs.semVer }}
+      informational: ${{ steps.gitversion.outputs.informationalVersion }}
+      rust: ${{ steps.changes.outputs.rust }}
+      android: ${{ steps.changes.outputs.android }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Conventional Commits and commit dates
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          kept() { grep -vFf <(sed -n 's/^ *- \([0-9a-f]\{40\}\)$/\1/p' GitVersion.yml); }
+          git cat-file -e "$BASE^{commit}" 2>/dev/null || BASE=$(git merge-base origin/master HEAD)
+          BASE=$(git describe --tags --abbrev=0 --match 'v[0-9]*' 2>/dev/null || echo "$BASE")
+          bad=$(git log --no-merges --format='%H %s' "$BASE..HEAD" | kept |
+            grep -Ev '^\S+ (build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([^()]+\))?!?: \S' || true)
+          [ -z "$bad" ] || { echo "$bad"; echo "::error::These subjects do not follow Conventional Commits"; exit 1; }
+          newest=$(git log --format='%ct %H' HEAD^@ | kept | sort -n | tail -1)
+          [ -z "$newest" ] || [ "$(git log -1 --format=%ct)" -gt "${newest%% *}" ] || { echo "::error::HEAD needs a later commit date than ${newest#* }"; exit 1; }
+
+      - uses: gittools/actions/gitversion/setup@7417b1089e2c7de93510f1901d656ddf60bb024f
+        with:
+          versionSpec: 6.8.2
+
+      - id: gitversion
+        uses: gittools/actions/gitversion/execute@7417b1089e2c7de93510f1901d656ddf60bb024f
+
+      - id: changes
+        name: Jobs that a change can affect
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          ALWAYS: ${{ github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
+        run: scripts/changes.sh "$BASE" "$ALWAYS" | tee -a "$GITHUB_OUTPUT"
+
+      - name: GitVersion versioned HEAD
+        env:
+          SHA: ${{ steps.gitversion.outputs.sha }}
+        run: test "$SHA" = "$(git rev-parse HEAD)"
+
+  workflows:
+    name: Workflow lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: actionlint with shellcheck
+        run: |
+          shellcheck --version | grep '^version'
+          "$(scripts/tools.sh actionlint "$RUNNER_TEMP/tools")" -color
+
+  docs-site:
+    name: Documentation site
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Pandoc
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends pandoc
+
+      - name: Build the site as the release publishes it
+        run: scripts/docs-site.sh "$RUNNER_TEMP/site"
+
+  lint:
+    name: Static checks
+    needs: version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: scripts/ci-apt.sh shellcheck qt6-declarative-dev-tools gettext
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          components: rustfmt
+
+      - name: Format
+        run: cargo fmt --all --check
+
+      - name: File lengths
+        run: scripts/file-lengths.sh
+
+      - name: Third-party notices are current
+        run: python3 scripts/notices.py check
+
+      - name: Every workspace package is in a test shard
+        run: scripts/test-shards.sh check
+
+      - name: Shell scripts
+        run: shellcheck apps/reiwand-server/skeleton.sh packaging/*.sh packaging/flatpak/*.sh scripts/*.sh
+
+      - name: Cache cleanup selection
+        run: scripts/ci-cache-clean-test.sh
+
+      - name: QML syntax
+        run: |
+          for f in integrations/*/metadata.json; do python3 -c "import json, sys; json.load(open(sys.argv[1]))" "$f"; done
+          for f in integrations/*/contents/ui/*.qml apps/reiwand-app/qml/*.qml apps/reiwand-app/qml/*/*.qml; do
+            /usr/lib/qt6/bin/qmlformat "$f" > /dev/null
+          done
+
+      - name: Translations
+        run: scripts/translations.sh check
+
+  clippy:
+    name: Clippy
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            pkg-config libclang-dev libpipewire-0.3-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            qt6-base-dev qt6-declarative-dev qt6-declarative-dev-tools gettext
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          components: clippy
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          save-if: ${{ github.ref == 'refs/heads/master' }}
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+
+  test:
+    name: Unit and render tests (shard ${{ matrix.shard }})
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            pkg-config libclang-dev libpipewire-0.3-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-pipewire gstreamer1.0-tools \
+            mesa-vulkan-drivers libvulkan1 \
+            pipewire pipewire-bin wireplumber dbus-x11 gnome-keyring \
+            qt6-base-dev qt6-declarative-dev qt6-declarative-dev-tools gettext
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: dev
+          save-if: false
+
+      - name: Unit and render tests
+        env:
+          REIWAND_REQUIRE_GPU: "1"
+          REIWAND_REQUIRE_VIDEO: "1"
+          SHARD: ${{ matrix.shard }}
+        run: |
+          mapfile -t packages < <(scripts/test-shards.sh "$SHARD")
+          cargo test "${packages[@]}" --all-features --locked
+
+  render-gl:
+    name: Render tests on OpenGL ES
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            pkg-config libclang-dev libpipewire-0.3-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+            libegl1 libgles2 libgl1-mesa-dri
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: dev
+          save-if: false
+
+      - name: Render tests with the OpenGL ES backend
+        env:
+          WGPU_BACKEND: gl
+          LIBGL_ALWAYS_SOFTWARE: "1"
+          REIWAND_REQUIRE_GPU: "1"
+        run: |
+          cargo test -p reiwand-render --all-features --locked
+
+  depth:
+    name: Depth model test
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            pkg-config libclang-dev libpipewire-0.3-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            mesa-vulkan-drivers libvulkan1
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: dev
+          save-if: false
+
+      - id: models
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: |
+            ~/.local/share/reiwand/models
+            ~/.local/share/reiwand/runtime
+          key: depth-anything-v2-small-46c4e8ee-onnxruntime-1.31.0
+
+      - name: Depth model test
+        run: |
+          cargo build --locked -p reiwand-ctl
+          target/debug/reiwand-ctl models download depth-anything-v2-small --yes
+          target/debug/reiwand-ctl models download onnxruntime --yes
+          REIWAND_DEPTH_MODEL=$HOME/.local/share/reiwand/models/depth-anything-v2-small/depth_anything_v2_vits_dynamic.onnx \
+            cargo test --locked -p reiwand-depth --all-features --test model -- --nocapture
+
+      - name: Scene examples of the creator documentation
+        run: |
+          cargo build --locked -p reiwand-ctl
+          scripts/docs-examples.sh target/debug
+
+      - uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25
+        if: github.ref == 'refs/heads/master' && steps.models.outputs.cache-hit != 'true'
+        with:
+          path: |
+            ~/.local/share/reiwand/models
+            ~/.local/share/reiwand/runtime
+          key: depth-anything-v2-small-46c4e8ee-onnxruntime-1.31.0
+
+  e2e:
+    name: End-to-end test (D-Bus + PipeWire + daemon)
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            pkg-config libclang-dev libpipewire-0.3-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-pipewire gstreamer1.0-tools \
+            mesa-vulkan-drivers libvulkan1 \
+            pipewire pipewire-bin wireplumber dbus-x11 gnome-keyring
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: dev
+          save-if: ${{ github.ref == 'refs/heads/master' }}
+          cache-on-failure: true
+
+      - name: User namespaces for the sandbox stand-in
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: End-to-end test (D-Bus + PipeWire + daemon)
+        run: |
+          cargo build --locked -p reiwandd -p reiwand-ctl -p reiwand-web
+          cargo build --locked -p reiwand-pipewire --example probe
+          cargo build --locked -p reiwandd --examples
+          cp target/debug/examples/probe target/debug/probe
+          scripts/integration-test.sh target/debug
+
+      - name: Regression net (reference pictures, frame counters, idle cost)
+        run: scripts/regression.sh target/debug
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        if: failure()
+        with:
+          name: regression-net
+          path: target/tmp/net
+          if-no-files-found: ignore
+          retention-days: 7
+
+  web:
+    name: Web wallpapers
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            pkg-config libclang-dev libpipewire-0.3-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            gstreamer1.0-plugins-base gstreamer1.0-plugins-good
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: dev
+          save-if: false
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: web-arch
+          workspaces: ". -> target-web"
+          save-if: ${{ github.ref == 'refs/heads/master' }}
+
+      - name: Daemon and test binaries
+        run: |
+          cargo build --locked -p reiwandd -p reiwand-ctl --bins --example complete
+          cargo build --locked -p reiwand-pipewire --example probe
+          cp target/debug/examples/probe target/debug/probe
+
+      - name: Virtual DRM devices
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: scripts/ci-drm.sh
+
+      - name: User namespaces for the Chromium sandbox
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Helper with Qt WebEngine, pages and daemon, and video sound through PipeWire 1.2 or newer
+        run: |
+          docker run --rm --device /dev/dri --security-opt seccomp=unconfined --security-opt apparmor=unconfined --security-opt systempaths=unconfined \
+            -v "$PWD:$PWD" -w "$PWD" \
+            docker.io/library/archlinux:base-20261018.0.612668@sha256:52dfbd5afb23a220d5ee92dafcb4c788d96c026ed04179890c23adef4c897fa0 bash -c '
+            set -e
+            # The packages of the day of the base image, from the Arch archive: the same set every run.
+            echo "Server = https://archive.archlinux.org/repos/2026/10/18/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist
+            install() {
+              pacman -Sy --noconfirm --needed archlinux-keyring >/dev/null
+              pacman -Syu --noconfirm --needed qt6-webengine qt6-declarative qt6-base rust gcc clang pkgconf make jq \
+                pipewire pipewire-audio gst-plugin-pipewire wireplumber dbus python procps-ng xorg-server-xvfb \
+                gst-plugins-base gst-plugins-good mesa vulkan-swrast vulkan-icd-loader >/dev/null
+            }
+            for attempt in 1 2 3 4; do
+              install && break
+              [ "$attempt" -lt 4 ] || exit 1
+              sleep $((attempt * 20))
+            done
+            pacman -Q qt6-webengine gst-plugin-pipewire
+            useradd -m -u "$(stat -c %u .)" tester
+            su tester -c scripts/web-engine-test.sh
+          '
+
+  sway:
+    name: Sway end-to-end
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            pkg-config libclang-dev libpipewire-0.3-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+            mesa-vulkan-drivers libvulkan1 \
+            pipewire pipewire-bin wireplumber dbus-x11 \
+            sway grim foot fonts-dejavu-core
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: dev
+          save-if: false
+
+      - name: Layer-shell surfaces on a headless Sway
+        run: |
+          cargo build --locked -p reiwandd -p reiwand-ctl --bins --example pointer --example complete
+          scripts/sway-test.sh target/debug
+
+  x11:
+    name: X11 end-to-end
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            pkg-config libclang-dev libpipewire-0.3-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+            mesa-vulkan-drivers libvulkan1 \
+            pipewire pipewire-bin wireplumber dbus-x11 \
+            xvfb x11-utils x11-xserver-utils xdotool imagemagick openbox
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: dev
+          save-if: false
+
+      - name: Desktop windows on Xvfb
+        run: |
+          cargo build --locked -p reiwandd -p reiwand-ctl --bins --example complete
+          scripts/x11-test.sh target/debug
+
+  build:
+    name: Release binaries (${{ matrix.name }})
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      matrix:
+        include:
+          - name: daemon
+            bins: reiwandd
+            cache: daemon
+            save: true
+            files: |
+              target/release/reiwandd
+          - name: tools
+            bins: reiwand-ctl
+            cache: daemon
+            save: false
+            files: |
+              target/release/reiwand-ctl
+    env:
+      REIWAND_VERSION: ${{ needs.version.outputs.informational }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - id: apt
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: ~/.cache/ci-apt
+          key: apt-${{ github.job }}-${{ hashFiles('.github/workflows/ci.yml') }}
+          restore-keys: apt-${{ github.job }}-
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            pkg-config libclang-dev libpipewire-0.3-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+
+      - uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25
+        if: github.ref == 'refs/heads/master' && steps.apt.outputs.cache-hit != 'true'
+        with:
+          path: ~/.cache/ci-apt
+          key: apt-${{ github.job }}-${{ hashFiles('.github/workflows/ci.yml') }}
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: release-${{ matrix.cache }}
+          save-if: ${{ github.ref == 'refs/heads/master' && matrix.save }}
+          cache-on-failure: ${{ matrix.save }}
+
+      - name: Build
+        env:
+          BINARIES: ${{ matrix.bins }}
+        run: |
+          read -ra bins <<< "$BINARIES"
+          scripts/build-release.sh "${bins[@]}"
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        if: always()
+        with:
+          name: build-timings-${{ matrix.name }}
+          path: target/cargo-timings/cargo-timing.html
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: release-bin-${{ matrix.name }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error
+          compression-level: 1
+          retention-days: 1
+
+  qt:
+    name: Qt for the app and the web helper
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Folder of the Qt prefix
+        run: sudo install -d -o "$USER" /opt/reiwand
+
+      - id: cache
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: /opt/reiwand/qt
+          key: qt-prefix-${{ hashFiles('packaging/appimage/qt.lock', 'scripts/qt-prefix.sh', 'scripts/tools.sh') }}
+          lookup-only: true
+
+      - name: Qt, Qt WebEngine and Kirigami from pinned sources
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          scripts/ci-apt.sh gettext libgl-dev libegl-dev libpipewire-0.3-dev libepoxy-dev libdrm-dev libgbm-dev \
+            libva-dev libavcodec-dev libavformat-dev libavfilter-dev libswscale-dev libmount-dev
+          scripts/qt-prefix.sh /opt/reiwand/qt
+
+      - uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25
+        if: steps.cache.outputs.cache-hit != 'true'
+        with:
+          path: /opt/reiwand/qt
+          key: qt-prefix-${{ hashFiles('packaging/appimage/qt.lock', 'scripts/qt-prefix.sh', 'scripts/tools.sh') }}
+
+  build-qt:
+    name: Release app and web helper with the bundled Qt
+    needs: [version, qt]
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    env:
+      REIWAND_VERSION: ${{ needs.version.outputs.informational }}
+      REIWAND_WEB_REQUIRE_ENGINE: "1"
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            pkg-config libclang-dev libpipewire-0.3-dev libgl-dev libegl-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev ccache
+
+      - name: Folder of the Qt prefix
+        run: sudo install -d -o "$USER" /opt/reiwand
+
+      - uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: /opt/reiwand/qt
+          key: qt-prefix-${{ hashFiles('packaging/appimage/qt.lock', 'scripts/qt-prefix.sh', 'scripts/tools.sh') }}
+          fail-on-cache-miss: true
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: release-qt
+          save-if: ${{ github.ref == 'refs/heads/master' }}
+
+      - id: ccache
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: ~/.cache/ccache
+          key: ccache-qt-${{ hashFiles('Cargo.lock', 'packaging/appimage/qt.lock', 'apps/reiwand-app/qml/**', 'apps/reiwand-app/qt-shim/**', 'apps/reiwand-app/src/**', 'apps/reiwand-web/**', 'po/**') }}
+          restore-keys: ccache-qt-
+
+      - name: Build against the Qt that the AppImage carries
+        run: |
+          export QMAKE=/opt/reiwand/qt/bin/qmake6 CC="ccache gcc" CXX="ccache g++" CCACHE_DIR=~/.cache/ccache
+          export CCACHE_BASEDIR=$GITHUB_WORKSPACE CCACHE_COMPRESS=1 CCACHE_MAXSIZE=600M
+          scripts/build-release.sh reiwand-app reiwand-web
+          LD_LIBRARY_PATH=/opt/reiwand/qt/lib ldd target/release/reiwand-web | grep -E "Qt6WebEngine|Qt6Quick"
+          ccache --show-stats
+
+      - uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25
+        if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
+        with:
+          path: ~/.cache/ccache
+          key: ccache-qt-${{ hashFiles('Cargo.lock', 'packaging/appimage/qt.lock', 'apps/reiwand-app/qml/**', 'apps/reiwand-app/qt-shim/**', 'apps/reiwand-app/src/**', 'apps/reiwand-web/**', 'po/**') }}
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: release-bin-qt
+          path: |
+            target/release/reiwand-app
+            target/release/reiwand-web
+          if-no-files-found: error
+          compression-level: 1
+          retention-days: 1
+
+  package:
+    name: Package
+    needs: [version, qt, build, build-qt]
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    env:
+      REIWAND_VERSION: ${{ needs.version.outputs.informational }}
+      REIWAND_BIN_DIR: ${{ github.workspace }}/bins
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            libpipewire-0.3-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gettext squashfs-tools patchelf
+
+      - name: Folder of the Qt prefix
+        run: sudo install -d -o "$USER" /opt/reiwand
+
+      - uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: /opt/reiwand/qt
+          key: qt-prefix-${{ hashFiles('packaging/appimage/qt.lock', 'scripts/qt-prefix.sh', 'scripts/tools.sh') }}
+          fail-on-cache-miss: true
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          pattern: release-bin-*
+          path: bins
+          merge-multiple: true
+
+      - name: Build the AppImage
+        env:
+          REIWAND_QT_PREFIX: /opt/reiwand/qt
+        run: scripts/package.sh dist
+
+      - name: The AppImage carries its version and no build machine data
+        run: scripts/appimage-check.sh dist/reiwand-*-x86_64.AppImage
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: reiwand-x86_64-appimage
+          path: dist/*.AppImage
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+  android-native:
+    name: Android native library (${{ matrix.abi }})
+    needs: version
+    if: needs.version.outputs.android == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      matrix:
+        include:
+          - abi: arm64-v8a
+            target: aarch64-linux-android
+          - abi: x86_64
+            target: x86_64-linux-android
+    env:
+      ABI: ${{ matrix.abi }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          targets: ${{ matrix.target }}
+          components: clippy
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          key: ${{ matrix.abi }}
+          save-if: ${{ github.ref == 'refs/heads/master' }}
+
+      - name: Install cargo-ndk
+        run: cargo install --locked cargo-ndk --version 4.1.2
+
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6
+        with:
+          cache-provider: basic
+          cache-read-only: true
+          add-job-summary: on-failure
+
+      - name: Release library
+        run: |
+          export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME" ANDROID_NDK_ROOT="$ANDROID_NDK_LATEST_HOME"
+          android/gradlew -p android :app:cargo -Pabis="$ABI"
+          ls -l "android/app/build/rustJniLibs/$ABI"
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: jni-${{ matrix.abi }}
+          path: android/app/build/rustJniLibs/${{ matrix.abi }}
+          if-no-files-found: error
+          compression-level: 1
+          retention-days: 1
+
+      - name: Clippy for Android
+        run: |
+          export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME" ANDROID_NDK_ROOT="$ANDROID_NDK_LATEST_HOME"
+          cargo ndk -t "$ABI" -P 31 clippy --locked -p reiwand-android -- -D warnings
+
+  android-lint:
+    name: Android lint and unit tests
+    needs: [version, android-native]
+    if: needs.version.outputs.android == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: jni-arm64-v8a
+          path: android/app/build/rustJniLibs/arm64-v8a
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: jni-x86_64
+          path: android/app/build/rustJniLibs/x86_64
+
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6
+        with:
+          cache-provider: basic
+          cache-read-only: ${{ github.ref != 'refs/heads/master' }}
+          add-job-summary: on-failure
+
+      - name: Lint and unit tests
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+          VERSION_NAME: ${{ needs.version.outputs.semver }}
+        run: |
+          export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME" ANDROID_NDK_ROOT="$ANDROID_NDK_LATEST_HOME"
+          android/gradlew -p android --refresh-dependencies lintRelease testDebugUnitTest compileDebugAndroidTestKotlin -x :app:cargo -PversionCode="$VERSION_CODE" -PversionName="$VERSION_NAME"
+
+  android-emulator:
+    name: Android emulator tests
+    needs: version
+    if: needs.version.outputs.android == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6
+        with:
+          cache-provider: basic
+          cache-read-only: true
+          add-job-summary: on-failure
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Compile the Kotlin sources while the native library builds
+        run: |
+          printf 'ANDROID_NDK_HOME=%s\nANDROID_NDK_ROOT=%s\n' "$ANDROID_NDK_LATEST_HOME" "$ANDROID_NDK_LATEST_HOME" >> "$GITHUB_ENV"
+          export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME" ANDROID_NDK_ROOT="$ANDROID_NDK_LATEST_HOME"
+          android/gradlew -p android --refresh-dependencies compileDebugKotlin compileDebugAndroidTestKotlin -Pabis=x86_64 -x :app:cargo
+
+      - name: Wait for the native library
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: scripts/wait-artifact.sh jni-x86_64 'Android native library (x86_64)'
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: jni-x86_64
+          path: android/app/build/rustJniLibs/x86_64
+
+      - name: App and test APKs for x86_64
+        run: android/gradlew -p android assembleDebug assembleDebugAndroidTest -Pabis=x86_64 -x :app:cargo
+
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          emulator-boot-timeout: 900
+          script: |
+            adb shell pm disable-user --user 0 com.google.android.gms
+            android/gradlew -p android connectedDebugAndroidTest -Pabis=x86_64 -x :app:cargo
+
+      - name: Failing instrumentation tests
+        if: failure()
+        run: scripts/android-failures.sh
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        if: failure()
+        with:
+          name: android-tests-report
+          path: |
+            android/app/build/reports/androidTests
+            android/app/build/outputs/androidTest-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+  flatpak:
+    name: Flatpak bundle (${{ matrix.arch }})
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+            bundle: reiwand.flatpak
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+            bundle: reiwand-aarch64.flatpak
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    env:
+      REIWAND_VERSION: ${{ needs.version.outputs.informational }}
+      BUNDLE: ${{ matrix.bundle }}
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.11@sha256:b0a8a2acb9e420dd0e3e083ff552bea5a817e17e41532f1d2287ff49ef9aae0e
+      options: --privileged
+      volumes:
+        - flatpak-installation:/var/lib/flatpak
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Tracked sources, vendored Cargo sources and version
+        run: packaging/flatpak/sources.sh
+
+      - name: Qt WebEngine base application
+        run: |
+          flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install -y --noninteractive flathub io.qt.qtwebengine.BaseApp//6.11
+
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@79327416609af08178ad73b352877e51450790b3
+        with:
+          manifest-path: packaging/flatpak/io.github.reiwand.Reiwand.yml
+          bundle: ${{ matrix.bundle }}
+          arch: ${{ matrix.arch }}
+          cache: false
+          upload-artifact: false
+
+      - name: Install and run the bundle
+        timeout-minutes: 20
+        run: packaging/flatpak/check.sh "$BUNDLE"
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: flatpak-${{ matrix.arch }}
+          path: ${{ matrix.bundle }}
+          if-no-files-found: error
+          retention-days: 7
+
+  flatpak-daemon:
+    name: Flatpak daemon (${{ matrix.arch }})
+    needs: [version, flatpak]
+    if: ${{ !cancelled() && needs.flatpak.result == 'success' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install Flatpak and a sound server
+        run: |
+          scripts/ci-apt.sh flatpak pipewire pipewire-bin wireplumber dbus-x11 dbus-bin sway
+          xdg-dbus-proxy --version
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: flatpak-${{ matrix.arch }}
+          path: bundle
+
+      - name: Install the bundle
+        run: flatpak install --user -y --noninteractive --bundle bundle/*.flatpak
+
+      - name: The daemon answers inside the sandbox
+        timeout-minutes: 10
+        run: scripts/private-audio.sh packaging/flatpak/serve-check.sh
+
+      - name: The web helper starts inside the sandbox on a headless compositor
+        timeout-minutes: 10
+        run: packaging/flatpak/web-check.sh
+
+  app-check:
+    name: Interface check
+    needs: [version, lint]
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      actions: read
+    env:
+      ARCH: docker.io/library/archlinux:base-20261018.0.612668@sha256:52dfbd5afb23a220d5ee92dafcb4c788d96c026ed04179890c23adef4c897fa0
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Virtual DRM devices
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: scripts/ci-drm.sh
+
+      - name: Plasma image
+        run: scripts/plasma-image.sh plasma-session
+
+      - name: Wait for the AppImage
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: scripts/wait-artifact.sh reiwand-x86_64-appimage Package
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: reiwand-x86_64-appimage
+          path: dist
+
+      - name: Every page of the app loads, with the Qt of the AppImage
+        run: |
+          docker run --rm --device /dev/dri -v "$PWD:/src" -w /src plasma-session bash -c '
+            set -e
+            chmod +x dist/reiwand-*.AppImage
+            dist/reiwand-*.AppImage --appimage-extract-and-run reiwand-app --check
+          '
+
+  plasma:
+    name: Plasma end-to-end
+    needs: [version, lint]
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      actions: read
+    env:
+      ARCH: docker.io/library/archlinux:base-20261018.0.612668@sha256:52dfbd5afb23a220d5ee92dafcb4c788d96c026ed04179890c23adef4c897fa0
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Virtual DRM devices
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: scripts/ci-drm.sh
+
+      - name: Plasma image
+        run: scripts/plasma-image.sh plasma-session
+
+      - name: Wait for the AppImage
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: scripts/wait-artifact.sh reiwand-x86_64-appimage Package
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: reiwand-x86_64-appimage
+          path: dist
+
+      - name: Run Plasma session test
+        run: |
+          docker run --rm --device /dev/dri -v "$PWD:/src" -w /src plasma-session bash -c '
+            set -e
+            scripts/plasma-test.sh dist/reiwand-*.AppImage plasma-test-output
+          '
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        if: always()
+        with:
+          name: plasma-test-output
+          path: plasma-test-output
+          if-no-files-found: warn
+          retention-days: 7
+
+  server:
+    name: Server container
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    env:
+      REIWAND_VERSION: ${{ needs.version.outputs.informational }}
+      REIWAND_PUBLIC_URL: http://127.0.0.1:8080
+      COMPOSE_FILE: compose.yaml:deploy/compose.local.yaml
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: ${{ runner.temp }}/reiwand-image
+          key: server-image-${{ github.sha }}
+          restore-keys: server-image-
+
+      - name: Build the image
+        env:
+          REIWAND_IMAGE_CACHE: ${{ runner.temp }}/reiwand-image
+          REIWAND_IMAGE_LOAD: "1"
+        run: scripts/server-image.sh reiwand-server local
+
+      - uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25
+        if: github.ref == 'refs/heads/master'
+        with:
+          path: ${{ runner.temp }}/reiwand-image
+          key: server-image-${{ github.sha }}
+
+      - name: Start with compose
+        run: docker compose up -d --no-build --wait --wait-timeout 180
+
+      - name: Health, setup, repository, backup and restore
+        run: scripts/server-smoke.sh
+
+      - name: Server logs
+        if: always()
+        run: docker compose logs
+
+      - name: Stop
+        if: always()
+        run: docker compose down --volumes

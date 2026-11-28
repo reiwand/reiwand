@@ -1,0 +1,140 @@
+mod adapter;
+#[cfg(test)]
+mod allocations;
+mod animation;
+#[cfg(target_os = "linux")]
+mod barrier;
+mod bench;
+mod bind;
+mod calibrate;
+mod choose;
+mod coded;
+mod color;
+mod crossing;
+mod damaged;
+mod deck;
+mod decode;
+mod deep;
+mod develop;
+mod device;
+#[cfg(target_os = "linux")]
+mod dmabuf;
+mod draw;
+mod encoding;
+mod export;
+#[cfg(target_os = "linux")]
+mod exported;
+mod filled;
+mod gles;
+pub mod hdr;
+#[cfg(target_os = "linux")]
+mod import;
+mod lit;
+mod looked;
+mod lost;
+mod luma;
+mod packed;
+#[cfg(target_os = "linux")]
+mod page;
+mod palette;
+mod parallax;
+#[cfg(target_os = "linux")]
+mod plane;
+mod platform;
+mod pq;
+mod readback;
+mod save;
+mod scene;
+mod shader;
+mod stack;
+mod surface;
+mod texture;
+mod timeout;
+#[cfg(test)]
+#[path = "../tests/whole.rs"]
+mod whole;
+mod yuv;
+
+pub use animation::{MAX_ANIMATION, Pictures, animation};
+pub use bench::{Bench, Ceiling, Level, WARMUP, ceiling, save_frame, scene_bench, spread};
+pub use choose::{Chosen, Fallback, bus_of};
+pub use coded::Coding;
+pub use crossing::{Building, Built, Crossing, Passing};
+pub use decode::{
+    decode_asset, decode_image, decode_limited, decode_reduced, decode_unoriented, decoded_size, image_size,
+    needed_edge, picture_limits, thumbnails,
+};
+pub use deep::{Deep, DeepPlanes, GAMUT, KNEE, PEAK_NITS, REFERENCE_NITS, deep_rows};
+pub use device::{Display, Renderer};
+#[cfg(target_os = "linux")]
+pub use dmabuf::{Dmabuf, Dmabufs};
+pub use draw::Target;
+pub use encoding::Encoding;
+#[cfg(target_os = "linux")]
+pub use exported::Exported;
+#[cfg(target_os = "linux")]
+pub use import::{Imported, Shared};
+pub use lit::{Lit, bright_picture, light_texels};
+#[cfg(target_os = "linux")]
+pub use page::{ARGB8888, PageBuffer, XRGB8888};
+pub use palette::{Palette, palette};
+pub use parallax::{DepthMap, Relief};
+pub use platform::{Platform, heif, set_platform_decoder};
+pub use pq::pq_code;
+pub use readback::TargetLimits;
+pub use reiwand_audio::Track;
+use reiwand_core::{Fit, UvRect};
+pub use save::{FORMATS, save};
+pub use scene::{
+    Films, MAX_FONT, MAX_SCENE_BUILD, Opened, Pixels, RGB_MOST, Reel, Rehearsal, SceneAssets, SceneStats,
+    SceneView, ScriptHost, Stamping, Trace, Versus, drawn_effects, finish_builds, finish_gpu, font, lit,
+    local_wall, on_today, profiled_passes, reset_profiled_passes, retry_effects, serve_script_host,
+    set_build_timeout, set_gpu_budget, split, stop_builds, stop_effects, swarm::set_step_budget,
+};
+use std::sync::OnceLock;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::{Duration, Instant};
+pub use surface::{Presentation, Surface};
+pub use texture::GpuImage;
+pub use yuv::{Planes, Yuv};
+
+const LOG_PERIOD: Duration = Duration::from_secs(5);
+
+#[derive(Debug, Clone, thiserror::Error)]
+pub enum RenderError {
+    #[error("no compatible GPU adapter found: {0}")]
+    NoAdapter(String),
+    #[error("cannot create GPU device: {0}")]
+    Device(String),
+    #[error("invalid target size {0}x{1}")]
+    InvalidSize(u32, u32),
+    #[error("GPU error: {0}")]
+    Gpu(String),
+    #[error("GPU readback failed: {0}")]
+    Readback(String),
+    #[error("the GPU stopped responding: {0}")]
+    DeviceLost(String),
+    #[error("cannot present to the surface: {0}")]
+    Surface(String),
+}
+
+#[derive(Clone, Copy)]
+pub struct Layer<'a> {
+    pub image: Option<&'a GpuImage>,
+    pub fit: Fit,
+    pub background: [u8; 3],
+    pub opacity: f32,
+    pub uv: Option<UvRect>,
+    pub relief: Option<Relief<'a>>,
+    pub flip: [bool; 2],
+    pub grade: Option<reiwand_core::Grade>,
+}
+
+pub fn log_allowed(last: &AtomicU64) -> bool {
+    static START: OnceLock<Instant> = OnceLock::new();
+    let period = LOG_PERIOD.as_millis() as u64;
+    let now = START.get_or_init(Instant::now).elapsed().as_millis() as u64 + period;
+    let previous = last.load(Ordering::Relaxed);
+    now >= previous + period
+        && last.compare_exchange(previous, now, Ordering::Relaxed, Ordering::Relaxed).is_ok()
+}

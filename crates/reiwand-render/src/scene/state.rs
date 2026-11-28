@@ -1,0 +1,199 @@
+use super::Pixels;
+use super::paint::Painter;
+use super::pool::Tex;
+use super::{Image, Src};
+use crate::Renderer;
+use crate::texture::next_id;
+use image::{Rgba, RgbaImage};
+use reiwand_scene::{Color, EffectDraw, GENERIC_PICTURES, Param, ParamKind, Scene, Value};
+
+pub(crate) struct Sim {
+    pub(crate) tex: [Tex; 2],
+    pub(crate) front: usize,
+    pub(crate) used: u64,
+    pub(crate) clock: Option<f32>,
+    pub(crate) owed: f32,
+    pub(crate) reset: u32,
+}
+
+pub(crate) fn volume(device: &wgpu::Device, queue: &wgpu::Queue, size: u32, data: &[[f32; 3]]) -> Tex {
+    let half = |v: f32| half::f16::from_f32(v).to_bits();
+    let texels: Vec<u16> = data.iter().flat_map(|&[r, g, b]| [r, g, b, 1.0]).map(half).collect();
+    let extent = wgpu::Extent3d { width: size, height: size, depth_or_array_layers: size };
+    let texture = device.create_texture(&wgpu::TextureDescriptor {
+        label: Some("reiwand-scene lut"),
+        size: extent,
+        mip_level_count: 1,
+        sample_count: 1,
+        dimension: wgpu::TextureDimension::D3,
+        format: wgpu::TextureFormat::Rgba16Float,
+        usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+        view_formats: &[],
+    });
+    let layout =
+        wgpu::TexelCopyBufferLayout { offset: 0, bytes_per_row: Some(size * 8), rows_per_image: Some(size) };
+    queue.write_texture(texture.as_image_copy(), bytemuck::cast_slice(&texels), layout, extent);
+    Tex { view: texture.create_view(&Default::default()), texture, id: next_id() }
+}
+
+impl Painter<'_, '_, '_> {
+    pub(crate) fn asset(&mut self, e: &EffectDraw<'_>, param: &str, kind: ParamKind) -> Option<Src> {
+        let def = e.descriptor.params.iter().find(|p| p.id == param && p.kind == kind)?;
+        if kind == ParamKind::Emitters {
+            let list = e.emitters.iter().find(|(id, _)| *id == param).map_or(&[][..], |(_, l)| l);
+            let key = reiwand_scene::emitter_key(list);
+            let found = self.paints.iter().find(|(owner, k, _)| owner.starts_with(EMITTERS) && *k == key);
+            return found.map(|(.., image)| &image.0).map(|image| self.ext(image));
+        }
+        let bound = e.textures.iter().find(|(id, _)| *id == param).map(|(_, name)| name.as_str());
+        let id = bound.or_else(|| def.named(e.effect));
+        let (images, luts, paints) = (self.images, self.luts, self.paints);
+        if kind == ParamKind::Lut {
+            return luts.iter().position(|(name, _)| Some(name.as_str()) == id).map(Src::Lut);
+        }
+        let painted = |(owner, key, _): &&(String, String, Image)| match owner.is_empty() {
+            true => Some(key.as_str()) == id,
+            false => *owner == e.descriptor.id && *key == def.id,
+        };
+        let found = id.and_then(|id| images.get(id)).or_else(|| paints.iter().find(painted).map(|(.., i)| i));
+        let moving = id.and_then(|id| self.moving(id));
+        let image = moving.or(found.map(|image| &image.0))?;
+        if image.crop == [1.0; 2] {
+            return Some(self.ext(image));
+        }
+        let r = self.r;
+        let exact = self
+            .pool
+            .exact
+            .entry(image.id)
+            .or_insert_with(|| r.exact(image).unwrap_or_else(|| image.clone()));
+        let exact = exact.clone();
+        Some(self.ext(&exact))
+    }
+
+    pub(crate) fn lut(&mut self, e: &EffectDraw<'_>) -> Src {
+        let found = e.descriptor.params.iter().find(|p| p.kind == ParamKind::Lut);
+        found.and_then(|p| self.asset(e, &p.id, ParamKind::Lut)).unwrap_or(Src::Void)
+    }
+}
+
+const EMITTERS: &str = "emitters";
+const LIVE: &str = "emitters:live";
+
+fn emitted<'a>(value: Option<&'a Value<Param>>, default: &'a Param) -> &'a [reiwand_scene::EffectEmitter] {
+    match (value, default) {
+        (Some(Value::Fixed(Param::Emitters(list))), _) | (None, Param::Emitters(list)) => list,
+        _ => &[],
+    }
+}
+
+fn emitters(list: &[reiwand_scene::EffectEmitter]) -> Option<RgbaImage> {
+    let texels: Vec<u8> = reiwand_scene::emitter_texels(list).into_iter().flatten().collect();
+    RgbaImage::from_raw((texels.len() / 4) as u32, 1, texels).filter(|_| !list.is_empty())
+}
+
+pub(crate) fn generic(name: &str) -> RgbaImage {
+    let mix = |v: u32| {
+        let v = v.wrapping_mul(0x9e37_79b1);
+        let v = (v ^ (v >> 15)).wrapping_mul(0x85eb_ca77);
+        (v ^ (v >> 13)) as u8
+    };
+    match name {
+        "black" => RgbaImage::from_pixel(1, 1, Rgba([0, 0, 0, 255])),
+        "normal_flat" => RgbaImage::from_pixel(1, 1, Rgba([128, 128, 255, 255])),
+        "noise" => RgbaImage::from_fn(64, 64, |x, y| {
+            let k = (y * 64 + x) * 4;
+            Rgba([mix(k), mix(k + 1), mix(k + 2), mix(k + 3)])
+        }),
+        _ => RgbaImage::from_pixel(1, 1, Rgba([255; 4])),
+    }
+}
+
+fn painted(paint: &Param) -> RgbaImage {
+    let byte = |v: f32| (v.clamp(0.0, 1.0) * 255.0).round() as u8;
+    let texel = match paint {
+        Param::Color(Color(c)) => c.map(byte),
+        Param::Number(n) => [byte(*n); 4],
+        _ => [0; 4],
+    };
+    RgbaImage::from_pixel(1, 1, Rgba(texel))
+}
+
+impl Renderer {
+    pub(crate) fn emitted(&self, view: &mut super::SceneView, frame: &reiwand_scene::Frame<'_>) {
+        let lists = frame.effects.iter().flat_map(|e| &e.emitters).map(|(_, l)| l);
+        let lists: Vec<_> =
+            lists.filter(|l| !l.is_empty()).map(|l| (reiwand_scene::emitter_key(l), l)).collect();
+        let paints = &mut view.paints;
+        let had = |paints: &[(String, String, Image)], key: &String| {
+            paints.iter().any(|(o, k, _)| o.starts_with(EMITTERS) && k == key)
+        };
+        for (key, list) in &lists {
+            if had(paints, key) {
+                continue;
+            }
+            let Some(image) = emitters(list) else { continue };
+            let free = |(o, k, i): &&mut (String, String, Image)| {
+                o == LIVE && i.0.size() == image.dimensions() && !lists.iter().any(|(w, _)| w == k)
+            };
+            if let Some(spare) = paints.iter_mut().find(|p| free(p)) {
+                self.rewrite(&spare.2.0, &image);
+                spare.1.clone_from(key);
+                continue;
+            }
+            let made = self.upload_pixels(&Pixels::new(image), true, Some(false));
+            view.pool.created += u32::from(made.is_some());
+            paints.extend(made.map(|image| (LIVE.to_owned(), key.clone(), image)));
+        }
+        paints.retain(|(o, k, _)| o != LIVE || lists.iter().any(|(w, _)| w == k));
+    }
+
+    fn rewrite(&self, gpu: &crate::texture::GpuImage, image: &RgbaImage) {
+        let (w, h) = image.dimensions();
+        let layout =
+            wgpu::TexelCopyBufferLayout { offset: 0, bytes_per_row: Some(w * 4), rows_per_image: Some(h) };
+        let extent = wgpu::Extent3d { width: w, height: h, depth_or_array_layers: 1 };
+        self.queue.write_texture(gpu.texture.as_image_copy(), image.as_raw(), layout, extent);
+    }
+
+    pub(crate) fn paints(&self, scene: &Scene) -> Vec<(String, String, Image)> {
+        let mut out: Vec<(String, String, Image)> = Vec::new();
+        for e in scene.drawable().flat_map(|l| &l.effects) {
+            let Some(d) = scene.effect(&e.effect) else { continue };
+            for p in d.params.iter().filter(|p| p.kind == ParamKind::Emitters) {
+                let list = emitted(e.params.get(&p.id), &p.prefill);
+                let key = reiwand_scene::emitter_key(list);
+                let fresh = !out.iter().any(|(o, k, _)| o == EMITTERS && *k == key);
+                let made = emitters(list)
+                    .filter(|_| fresh)
+                    .map(|i| self.upload_pixels(&Pixels::new(i), true, Some(false)));
+                out.extend(made.flatten().map(|image| (EMITTERS.to_owned(), key, image)));
+            }
+            for p in d.params.iter().filter(|p| p.kind.asset() && p.kind != ParamKind::Lut) {
+                let mapped = match e.params.get(&p.id) {
+                    Some(Value::Bound(b)) => b.map.iter().flat_map(|m| m.values()).collect(),
+                    _ => Vec::new(),
+                };
+                let names = p.named(e).into_iter().chain(mapped.into_iter().filter_map(|v| match v {
+                    Param::Text(t) => Some(t.as_str()),
+                    _ => None,
+                }));
+                let names = names.filter(|n| GENERIC_PICTURES.contains(n) && !scene.assets.contains_key(*n));
+                let mut wanted: Vec<(String, String, RgbaImage)> =
+                    names.map(|n| (String::new(), n.to_string(), generic(n))).collect();
+                if let Some(paint) = p.paint.as_ref().filter(|_| p.kind == ParamKind::Mask) {
+                    wanted.push((d.id.clone(), p.id.clone(), painted(paint)));
+                }
+                for (owner, key, pixels) in wanted {
+                    if out.iter().any(|(o, k, _)| *o == owner && *k == key) {
+                        continue;
+                    }
+                    if let Some(image) = self.upload_pixels(&Pixels::new(pixels), true, Some(false)) {
+                        out.push((owner, key, image));
+                    }
+                }
+            }
+        }
+        out
+    }
+}

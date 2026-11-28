@@ -1,0 +1,164 @@
+{
+  "assets": {
+    "rig": {
+      "animated": false,
+      "atlas": null,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "media": null,
+      "mipmaps": null,
+      "path": "rig.glb",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    }
+  },
+  "audio": null,
+  "camera3d": {
+    "center": [
+      0,
+      0,
+      0
+    ],
+    "eye": [
+      0,
+      0,
+      5
+    ],
+    "fade": null,
+    "far": 1000,
+    "fov": 60,
+    "near": 0.1,
+    "order": "sequential",
+    "paths": [],
+    "up": [
+      0,
+      1,
+      0
+    ]
+  },
+  "canvas": {
+    "ambient": null,
+    "background": "#000000",
+    "blend_space": "linear",
+    "bloom": null,
+    "camera": null,
+    "clear": true,
+    "fit": "fill",
+    "gusts": null,
+    "hdr": false,
+    "parallax": null,
+    "perspective": null,
+    "size": [
+      64,
+      32
+    ],
+    "sky": null,
+    "tonemap": null,
+    "wind": null
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "anchor": null,
+      "animations": [],
+      "attach": null,
+      "blend": "normal",
+      "blend_space": "canvas",
+      "brightness": null,
+      "cache": false,
+      "clips": [],
+      "colliders": [],
+      "color": "#40c060",
+      "depth": null,
+      "depth_test": false,
+      "effects": [],
+      "expressions": {},
+      "hit": [],
+      "id": "fox",
+      "ik": [
+        {
+          "bend": "clockwise",
+          "chain": [
+            "root",
+            "arm"
+          ],
+          "limits": {},
+          "target": [
+            8,
+            30
+          ],
+          "weight": 0.5
+        }
+      ],
+      "inherit": null,
+      "lighting": null,
+      "mask": null,
+      "mesh": "rig",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": null,
+      "parts": {},
+      "physics": [
+        {
+          "bone": "arm",
+          "damping": 1,
+          "gravity": 3,
+          "inertia": 0.5,
+          "mode": "rope",
+          "rotation": null,
+          "stiffness": 0,
+          "translation": null,
+          "wind": 0.0
+        }
+      ],
+      "rules": [],
+      "shapes": {},
+      "size": [
+        64,
+        32
+      ],
+      "solid": false,
+      "texture": null,
+      "transform": {
+        "origin": "anchor",
+        "position": null,
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": null,
+        "z": null
+      },
+      "type": "mesh",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": [],
+  "transition": null
+}

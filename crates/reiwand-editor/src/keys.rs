@@ -1,0 +1,192 @@
+use crate::action::KeyframeEdit;
+use crate::blend::added;
+use crate::handles::{based, end, key, reach, shaped};
+use crate::ops::{Op, set};
+use anyhow::{Result, anyhow, bail, ensure};
+use reiwand_core::message::said;
+use reiwand_scene::Color;
+use serde_json::{Value, json};
+
+pub(crate) fn time_of(key: &Value) -> f64 {
+    key[0].as_f64().unwrap_or(0.0)
+}
+
+pub(crate) fn mix(a: &Value, b: &Value, f: f32) -> Value {
+    let lerp = |x: f64, y: f64| ((x + (y - x) * f64::from(f)) * 1e6).round() / 1e6;
+    match (a, b) {
+        (Value::Number(x), Value::Number(y)) => {
+            json!(lerp(x.as_f64().unwrap_or(0.0), y.as_f64().unwrap_or(0.0)))
+        }
+        (Value::Array(x), Value::Array(y)) if x.len() == y.len() => {
+            x.iter().zip(y).map(|(x, y)| mix(x, y, f)).collect()
+        }
+        (Value::Object(x), Value::Object(y)) if x.keys().eq(y.keys()) => {
+            Value::Object(x.iter().zip(y.values()).map(|((k, x), y)| (k.clone(), mix(x, y, f))).collect())
+        }
+        (Value::String(x), Value::String(y)) => match (Color::parse(x), Color::parse(y)) {
+            (Some(x), Some(y)) => {
+                let c: [f32; 4] = std::array::from_fn(|i| x.0[i] + (y.0[i] - x.0[i]) * f);
+                json!(Color(c).hex())
+            }
+            _ if f < 1.0 => a.clone(),
+            _ => b.clone(),
+        },
+        _ if f < 1.0 => a.clone(),
+        _ => b.clone(),
+    }
+}
+
+pub fn sample(keys: &[Value], t: f64) -> Option<Value> {
+    reiwand_scene::sample_json(keys, t).or_else(|| crate::kinded::unread(keys, t))
+}
+
+pub fn value_at(value: &Value, t: f64) -> Value {
+    match value.get("keys").and_then(Value::as_array) {
+        Some(keys) => sample(keys, t).unwrap_or(Value::Null),
+        None => value.clone(),
+    }
+}
+
+pub fn keyframe(doc: &Value, e: &KeyframeEdit) -> Result<Vec<Op>> {
+    let pointer = e.pointer.as_str();
+    ensure!(
+        e.time.is_finite() && e.time >= 0.0,
+        said("editor.time_must_more", "the time must be 0 or more seconds", &[])
+    );
+    let time = (e.time * 1000.0).round() / 1000.0;
+    if e.straighten {
+        return crate::straight::straighten(doc, e, time);
+    }
+    if let Some(ease) = &e.ease {
+        crate::fits::ease("ease", ease)?;
+    }
+    shaped(e)?;
+    let current = doc.pointer(pointer);
+    let mut ops = match current.and_then(|c| c.get("keys")).and_then(Value::as_array) {
+        Some(old) => {
+            let mut keys = old.clone();
+            let (mut value, mut third) = (e.value.clone(), None);
+            if let Some(from) = e.from {
+                let i = keys.iter().position(|k| (time_of(k) - from).abs() < 1e-3).ok_or_else(|| {
+                    anyhow!(said("editor.no_keyframe_s", "%1 has no keyframe at %2 s", &[&pointer, &from]))
+                })?;
+                let moved = keys.remove(i);
+                value = value.or_else(|| Some(moved[1].clone()));
+                third = moved.get(2).cloned();
+            }
+            let at = keys.iter().position(|k| (time_of(k) - time).abs() < 1e-3);
+            ensure!(
+                e.from.is_none() || at.is_none() || e.remove,
+                said("editor.already_keyframe_s", "%1 already has a keyframe at %2 s", &[&pointer, &time])
+            );
+            if e.remove {
+                let i = at.ok_or_else(|| {
+                    anyhow!(said("editor.no_keyframe_s", "%1 has no keyframe at %2 s", &[&pointer, &time]))
+                })?;
+                let removed = keys.remove(i);
+                reach(pointer, old, &keys)?;
+                let base = current.and_then(|c| c.get("base")).filter(|b| !e.absolute && !b.is_null());
+                let last = match base {
+                    Some(b) => added(b, &removed[1]).ok_or_else(|| {
+                        anyhow!(said(
+                            "editor.base_unadded",
+                            "the base of %1 does not add to its last keyframe; remove it with absolute to keep the keyframe value",
+                            &[&pointer]
+                        ))
+                    })?,
+                    None => removed[1].clone(),
+                };
+                return Ok(match keys.is_empty() {
+                    true => set(doc, pointer, last),
+                    false => set(doc, &format!("{pointer}/keys"), Value::Array(keys)),
+                });
+            }
+            let kept = at.map(|i| keys[i][1].clone());
+            let list = format!("{pointer}/keys");
+            let value = value.or(kept).or_else(|| crate::kinded::sample_in(doc, &list, &keys, time));
+            let value = value.unwrap_or(Value::Null);
+            let third = third.or_else(|| at.and_then(|i| keys[i].get(2).cloned()));
+            let third = end(third.as_ref(), e.ease.as_ref(), [e.in_handle, e.out_handle], &value)?;
+            let new = key(time, value, third);
+            match at {
+                Some(i) => keys[i] = new,
+                None => keys.insert(keys.partition_point(|k| time_of(k) <= time), new),
+            }
+            reach(pointer, old, &keys)?;
+            set(doc, &format!("{pointer}/keys"), Value::Array(keys))
+        }
+        None => {
+            ensure!(
+                !e.remove && e.from.is_none(),
+                said("editor.no_keyframes", "%1 has no keyframes", &[&pointer])
+            );
+            if current.is_some_and(Value::is_object) {
+                bail!(said(
+                    "editor.follows_another_source",
+                    "%1 follows another source; set a plain value first",
+                    &[&pointer]
+                ));
+            }
+            let value = e
+                .value
+                .clone()
+                .or_else(|| current.filter(|v| !v.is_null()).cloned())
+                .or_else(|| crate::resting::of(doc, pointer));
+            let value = value.ok_or_else(|| {
+                anyhow!(said("editor.no_value_yet", "%1 has no value yet; give one", &[&pointer]))
+            })?;
+            let third = end(None, e.ease.as_ref(), [e.in_handle, e.out_handle], &value)?;
+            let new = [key(time, value, third)];
+            reach(pointer, &[], &new)?;
+            set(doc, pointer, json!({"keys": new}))
+        }
+    };
+    let mut staged = doc.clone();
+    crate::ops::apply(&mut staged, &ops)?;
+    if let Some(timeline) = &e.timeline {
+        let mut known = doc.pointer("/scene/timelines").and_then(Value::as_array).into_iter().flatten();
+        ensure!(
+            known.any(|t| t["id"] == timeline.as_str()),
+            said(
+                "editor.there_no_timeline_add",
+                "there is no timeline \"%1\"; add it with the timeline action first",
+                &[&timeline]
+            )
+        );
+        ops.extend(set(&staged, &format!("{pointer}/timeline"), json!(timeline)));
+        crate::ops::apply(&mut staged, &ops[ops.len() - 1..])?;
+    }
+    ops.extend(based(&staged, e)?);
+    fits(doc, e, &ops)?;
+    Ok(ops)
+}
+
+pub(crate) fn reads(doc: &Value) -> bool {
+    serde_json::from_value::<reiwand_scene::Scene>(doc["scene"].clone()).is_ok()
+}
+
+fn fits(doc: &Value, e: &KeyframeEdit, ops: &[Op]) -> Result<()> {
+    let Some(value) = &e.value else { return Ok(()) };
+    let mut staged = doc.clone();
+    crate::ops::apply(&mut staged, &crate::completing::complete_all(doc, ops.to_vec()))?;
+    if reads(&staged) || !reads(doc) {
+        return Ok(());
+    }
+    let like = match doc.pointer(&e.pointer).filter(|v| !v.is_null()) {
+        Some(like) => Some(like.pointer("/keys/0/1").unwrap_or(like).clone()),
+        None => taken(doc, &e.pointer),
+    };
+    bail!(match like {
+        Some(like) => crate::blend::fitting(&e.pointer, value, &like),
+        None => said("editor.keyframe_unread", "%1 cannot take the keyframe value %2", &[&e.pointer, value]),
+    })
+}
+
+pub(crate) fn taken(doc: &Value, pointer: &str) -> Option<Value> {
+    let shapes =
+        [json!("#ff8800"), json!([1, 1]), json!([1, 1, 1]), json!([1, 1, 1, 1]), json!(0.5), json!(true)];
+    shapes.into_iter().find(|shape| {
+        let mut tried = doc.clone();
+        crate::ops::apply(&mut tried, &set(doc, pointer, shape.clone())).is_ok() && reads(&tried)
+    })
+}

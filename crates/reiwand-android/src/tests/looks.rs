@@ -1,0 +1,67 @@
+use super::*;
+
+pub(super) fn drawn() {
+    let source = tempfile::tempdir().unwrap();
+    let floor =
+        image::RgbaImage::from_fn(16, 8, |_, y| image::Rgba([255, 255, 255, if y >= 5 { 255 } else { 0 }]));
+    floor.save(source.path().join("floor.png")).unwrap();
+    let rain = json!({ "capacity": 60, "seed": 3,
+        "emitters": [{ "shape": { "box": { "from": [4, 0], "to": [60, 4] } }, "rate": 60 }],
+        "init": { "life": [2, 2], "speed": [0, 0], "size": [3, 3], "gradient": [[0, "#ff0000"], [1, "#0000ff"]] },
+        "forces": [{ "gravity": [0, 200] }],
+        "collide": [{ "bounds": { "mask": { "texture": "floor" } }, "bounce": 0.2 }],
+        "render": { "order": "newest", "trail": { "length": 6, "width": 0.5 } } });
+    let glow = json!({ "audio": [0, 3], "kind": "relative", "unit": "db", "of": 16, "reduce": "max", "bounds": [0.1, 0.9], "exponent": 2,
+        "smooth": { "up": 0.05, "down": 0.5 }, "offset": 0.5 });
+    let mut text = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [64, 32], "background": "#000000" },
+        "assets": { "floor": { "path": "floor.png" } }, "audio": { "attack": 0.05, "release": 0.3, "gain_release": 5 },
+        "layers": [{ "blend_space": "canvas", "id": "rain", "type": "particles", "system": "rain", "blend": "normal", "opacity": glow }],
+        "particles": { "rain": rain } });
+    reiwand_fill::complete(reiwand_fill::Format::Scene, &mut text);
+    fs::write(source.path().join("scene.json"), text.to_string()).unwrap();
+    let mut manifest = json!({ "schema": reiwand_format::SCHEMA, "id": "org.example.rain", "version": "1.0.0", "title": "Rain",
+        "license": "CC0-1.0", "kind": "scene", "entry": "scene.json", "content": { "rating": "general" },
+        "photosensitive": false, "origin": { "kind": "original" }, "inputs": ["audio"] });
+    reiwand_fill::manifests::complete(&mut manifest);
+    fs::write(source.path().join("manifest.json"), manifest.to_string()).unwrap();
+    let built = source.path().join("rain.wpak");
+    reiwand_format::build(source.path(), &built, &reiwand_format::Limits::default()).unwrap();
+    let package = reiwand_format::open(&built, &reiwand_format::Limits::default()).unwrap();
+    let used: Vec<&str> = package.facts.features.iter().map(String::as_str).collect();
+    assert_eq!(used, ["audio_ranges", "audio_response", "inputs.audio", "particles2", "shaping"]);
+    assert!(reiwand_format::features::refused("android", &package.facts.features).is_empty());
+    let uid = store::store(&mut File::open(&built).unwrap(), "rain.wpak").unwrap().0;
+    let path = library::with(|lib| Ok(lib.item(&uid)?.path)).unwrap();
+    let power = power::Power {
+        charging: true,
+        saver: false,
+        low: false,
+        thermal: 0,
+        headroom: 0.0,
+        still: false,
+        percent: -1,
+    };
+    if let Some(r) = renderer() {
+        let mut stage = Stage::new(uid.clone(), pack::load(&path).unwrap());
+        for n in 0..20 {
+            let at = ((64, 32), n * 1_000_000_000 / 30, 60);
+            assert!(stage.render(r, at, (power, reiwand_scene::Tier::T3), &[], true).unwrap().fps > 0);
+        }
+        let engine = if r.compute() && !r.software() { "gpu" } else { "cpu" };
+        assert_eq!(crate::stage::report::particles(), engine);
+        let mut lock = Stage::new(uid.clone(), pack::load(&path).unwrap());
+        lock.reports = Some(1);
+        assert!(
+            lock.render(r, ((64, 32), 0, 60), (power, reiwand_scene::Tier::T3), &[], true).unwrap().fps > 0
+        );
+        crate::stage::report::forget(1);
+        assert_eq!(
+            crate::stage::report::particles(),
+            engine,
+            "the lock screen took the home scene's particles"
+        );
+        crate::stage::report::forget(crate::stage::report::HOME);
+        assert_eq!(crate::stage::report::particles(), "", "a slot without a scene kept its particles");
+    }
+    assert_eq!(ask(json!({ "op": "remove", "uids": [uid] })), Value::Null);
+}

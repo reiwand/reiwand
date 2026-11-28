@@ -1,0 +1,60 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": null,
+  "description": "",
+  "display": null,
+  "entry": "index.html",
+  "id": "org.example.tint",
+  "inputs": [],
+  "kind": "web",
+  "license": "CC0-1.0",
+  "links": null,
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "permissions": null,
+  "photosensitive": false,
+  "platforms": [],
+  "playback": null,
+  "presets": [],
+  "previews": null,
+  "properties": {
+    "tint": {
+      "alpha": false,
+      "default": "#0000ff",
+      "enabled_if": {},
+      "label": "Tint",
+      "order": 0,
+      "quality": {},
+      "type": "color",
+      "visible_if": {}
+    }
+  },
+  "requires": {
+    "engine": null,
+    "features": [
+      "web"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "Tint",
+  "version": "1.0.0",
+  "web": {
+    "background": "#000000",
+    "preload": null,
+    "storage_kib": 4
+  }
+}

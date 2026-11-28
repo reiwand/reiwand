@@ -1,0 +1,154 @@
+use image::{Rgba, RgbaImage};
+use reiwand_render::{Rehearsal, Renderer, SceneAssets, Trace, split};
+use reiwand_scene::Quality;
+use serde_json::json;
+
+#[test]
+fn battery_lowers_the_level_and_caps_the_rate_as_the_daemon_does() {
+    let wanted = Rehearsal { quality: Quality::Q3, fps: 120, ..Rehearsal::default() };
+    assert_eq!((wanted.level(), wanted.rate()), (Quality::Q3, 120));
+    let drained = Rehearsal { battery: true, ..wanted.clone() };
+    assert_eq!((drained.level(), drained.rate()), (Quality::Q2, 60));
+    let low = Rehearsal { quality: Quality::Q1, battery: true, ..wanted };
+    assert_eq!(low.level(), Quality::Q1, "a lower cap stays");
+}
+
+#[test]
+fn the_made_up_pointer_crosses_the_canvas_and_presses_in_the_middle() {
+    let trace = Trace { from: [0.0, 0.5], to: [1.0, 0.5], click: true };
+    let wanted = Rehearsal { frames: 11, pointer: Some(trace), ..Rehearsal::default() };
+    assert_eq!(wanted.pointer_at(0), (Some([0.0, 0.5]), 0));
+    assert_eq!(wanted.pointer_at(5), (Some([0.5, 0.5]), 1));
+    assert_eq!(wanted.pointer_at(10), (Some([1.0, 0.5]), 0));
+    let pressed: Vec<_> = (0..11).filter(|i| wanted.pointer_at(*i).1 == 1).collect();
+    assert_eq!(pressed, [4, 5, 6]);
+    let still = Rehearsal { pointer: None, ..wanted };
+    assert_eq!(still.pointer_at(5), (None, 0));
+    let single = Rehearsal { frames: 1, pointer: Some(trace), ..Rehearsal::default() };
+    assert_eq!(single.pointer_at(0).0, Some([0.0, 0.5]));
+}
+
+#[test]
+fn a_comparison_keeps_the_left_of_the_first_and_the_right_of_the_second() {
+    let (a, b) = (
+        RgbaImage::from_pixel(8, 2, Rgba([255, 0, 0, 255])),
+        RgbaImage::from_pixel(8, 2, Rgba([0, 0, 255, 255])),
+    );
+    let joined = split(&a, &b, 0.25);
+    assert_eq!(joined.get_pixel(1, 0), a.get_pixel(0, 0));
+    assert_eq!(joined.get_pixel(2, 1), b.get_pixel(0, 0));
+    assert_eq!(split(&a, &b, 1.0), a);
+    assert_eq!(split(&a, &b, 0.0), b);
+}
+
+#[test]
+fn frames_are_written_as_a_picture_a_sequence_or_an_animated_picture() {
+    let dir = tempfile::tempdir().unwrap();
+    let frame = |c: u8| RgbaImage::from_pixel(4, 4, Rgba([c, 0, 0, 255]));
+    let reel = |n: u8| reiwand_render::Reel {
+        frames: (0..n).map(|i| frame(i * 40)).collect(),
+        quality: Quality::Q3,
+        render_size: (4, 4),
+        fps: 10,
+        left_out: Vec::new(),
+        console: Vec::new(),
+        stopped: Vec::new(),
+    };
+    let one = reel(1).write(&dir.path().join("a.png")).unwrap();
+    assert_eq!(one, [dir.path().join("a.png")]);
+    let many = reel(3).write(&dir.path().join("b.png")).unwrap();
+    let names: Vec<_> = many.iter().map(|p| p.file_name().unwrap().to_str().unwrap().to_owned()).collect();
+    assert_eq!(names, ["b-0001.png", "b-0002.png", "b-0003.png"]);
+    let gif = reel(3).write(&dir.path().join("c.gif")).unwrap();
+    assert_eq!(&std::fs::read(&gif[0]).unwrap()[..3], b"GIF");
+    assert!(reel(1).write(&dir.path().join("d.txt")).is_err());
+}
+
+fn gpu() -> Option<&'static Renderer> {
+    match Renderer::shared() {
+        Ok(r) => Some(r),
+        Err(e) if std::env::var_os("REIWAND_REQUIRE_GPU").is_none() => {
+            eprintln!("skipping GPU test: {e}");
+            None
+        }
+        Err(e) => panic!("GPU required but unavailable: {e}"),
+    }
+}
+
+fn clocked(source: &str) -> (reiwand_scene::Scene, SceneAssets) {
+    let doc = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [32, 18], "background": "#000000" },
+        "scripts": [{ "path": "scripts/hour.js", "events": ["update"], "uses": ["layers", "console"] }],
+        "layers": [{ "blend_space": "canvas", "id": "lamp", "type": "solid", "color": "#ffffff", "visible": false }] });
+    let scene =
+        reiwand_scene::Scene::load(&crate::gpu::whole(&doc.to_string()), &Default::default()).unwrap();
+    let assets =
+        SceneAssets { scripts: vec![("scripts/hour.js".into(), source.into())], ..Default::default() };
+    (scene, assets)
+}
+
+const HOUR: &str = "import { scene, time } from 'reiwand';
+export function update() {
+  scene.layer('lamp').visible = time.format('HH') === '15';
+  console.log('hour ' + time.format('HH'));
+}";
+
+#[test]
+fn without_a_sandboxed_host_the_scripts_do_not_run_and_the_render_says_so() {
+    let Some(r) = gpu() else { return };
+    let (scene, assets) = clocked(HOUR);
+    let wanted = Rehearsal {
+        edge: 32,
+        wall: 15.5 * 3600.0,
+        script_host: Some(("/nonexistent/script-host".into(), Vec::new())),
+        ..Rehearsal::default()
+    };
+    let reel = r.rehearse(&scene, &assets, &Default::default(), &wanted).unwrap();
+    assert_eq!(reel.frames[0].get_pixel(16, 9).0[0], 0, "a script ran without its host");
+    assert!(reel.console.is_empty());
+    assert!(reel.stopped.iter().any(|l| l.contains("sandboxed script host")), "{:?}", reel.stopped);
+}
+
+#[test]
+fn no_code_of_a_scene_script_runs_in_the_rendering_process() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+    let banned = ["Script::load", "Local::new", ".update(&frame)", "Script::update"];
+    for dir in
+        ["reiwand-render/src", "reiwand-editor/src", "../apps/reiwand-ctl/src", "../apps/reiwand-app/src"]
+    {
+        let mut stack = vec![root.join(dir)];
+        while let Some(path) = stack.pop() {
+            if path.is_dir() {
+                stack.extend(std::fs::read_dir(&path).unwrap().map(|e| e.unwrap().path()));
+            } else if path.extension().is_some_and(|e| e == "rs") && !path.ends_with("tests.rs") {
+                let text = std::fs::read_to_string(&path).unwrap();
+                let hit = banned.iter().find(|b| text.contains(**b));
+                assert!(hit.is_none(), "{} runs script code itself: {hit:?}", path.display());
+            }
+        }
+    }
+}
+
+fn flowing_scene() -> (reiwand_scene::Scene, SceneAssets) {
+    let mut doc = json!({ "schema": reiwand_scene::SCHEMA, "canvas": { "size": [160, 80], "background": "#000000" },
+        "layers": [{ "id": "p", "type": "particles", "system": "a", "blend": "add" }],
+        "particles": { "a": { "capacity": 400, "seed": 3, 
+            "emitters": [{ "shape": { "point": [80, 40] }, "rate": 30, "duration": 2 }],
+            "init": { "life": [0.5, 0.5], "speed": [0, 0], "size": [24, 24], "color": ["#ffffff", "#ffffff"] } } } });
+    reiwand_fill::complete(reiwand_fill::Format::Scene, &mut doc);
+    (reiwand_scene::Scene::load(&doc.to_string(), &Default::default()).unwrap(), SceneAssets::default())
+}
+
+#[test]
+fn a_render_at_a_time_shows_the_particles_emitted_until_then() {
+    let Some(r) = gpu() else { return };
+    let (scene, assets) = flowing_scene();
+    let at = |time: f64| {
+        let wanted = Rehearsal { edge: 160, time, ..Rehearsal::default() };
+        r.rehearse(&scene, &assets, &Default::default(), &wanted).unwrap().frames.remove(0)
+    };
+    let (first, one, three) = (at(0.0), at(1.0), at(3.0));
+    assert!(first.pixels().all(|p| p.0[0] == 0), "nothing has been emitted at 0 s");
+    assert!(one.pixels().any(|p| p.0[0] > 0), "particles at 1 s");
+    assert_eq!(one, at(1.0), "deterministic");
+    assert!(three.pixels().all(|p| p.0[0] == 0), "the emitter ended and its particles died by 3 s");
+}

@@ -1,0 +1,197 @@
+mod setup;
+mod stored;
+
+use crate::changes::Changes;
+use crate::compositor::{Compositor, lock};
+use crate::controls::load;
+use crate::folders::Folders;
+use crate::jobs::Jobs;
+use crate::rotation::{Playing, Rotations};
+use crate::store::Store;
+use crate::streams::OutputInfo;
+use crate::thumbs::Thumbs;
+use anyhow::Context;
+use image::RgbaImage;
+use reiwand_core::{Config, Models};
+use reiwand_format::Installed;
+use reiwand_pipewire::Exporter;
+use reiwand_render::Renderer;
+pub(crate) use setup::{output_name, settings};
+use std::collections::HashMap;
+use std::path::PathBuf;
+use std::sync::{Arc, Mutex, MutexGuard, Weak};
+use std::time::SystemTime;
+use tokio::sync::{Notify, watch};
+
+#[derive(Default)]
+pub(crate) struct State {
+    pub(crate) config: Config,
+    pub(crate) config_path: PathBuf,
+    pub(crate) config_error: Option<String>,
+    pub(crate) outputs: HashMap<String, OutputInfo>,
+    pub(crate) images: HashMap<PathBuf, (Option<SystemTime>, Weak<RgbaImage>)>,
+    pub(crate) pixels: HashMap<PathBuf, (Option<SystemTime>, Weak<reiwand_render::Pixels>)>,
+    pub(crate) user_paused: bool,
+    pub(crate) on_battery: bool,
+    pub(crate) battery_percent: Option<u8>,
+    pub(crate) locked: bool,
+    pub(crate) items: HashMap<PathBuf, String>,
+    pub(crate) installed: Vec<Installed>,
+    pub(crate) playing: HashMap<String, Playing>,
+    pub(crate) held: HashMap<String, String>,
+    pub(crate) sidecars: crate::edits::Sidecars,
+    pub(crate) drafts: HashMap<String, crate::drafts::Draft>,
+    pub(crate) depths: HashMap<PathBuf, crate::relief::Cached>,
+    pub(crate) decks: crate::deck::Memory,
+    pub(crate) scenes: HashMap<PathBuf, ((i64, u64), Weak<crate::scenes::ScenePack>)>,
+    pub(crate) keys: crate::inputs::Keys,
+    pub(crate) modes: HashMap<String, ((u32, u32), u32)>,
+    pub(crate) resized: Vec<(String, (u32, u32))>,
+    pub(crate) turns: HashMap<String, tokio::time::Instant>,
+    pub(crate) missed: std::collections::HashSet<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub(crate) struct Props {
+    pub(crate) paused: bool,
+    pub(crate) volume: f64,
+    pub(crate) muted: bool,
+    pub(crate) private: bool,
+}
+
+pub struct Daemon {
+    pub(crate) compositor: Compositor,
+    pub(crate) state: Mutex<State>,
+    pub(crate) exporter: Arc<Exporter>,
+    pub(crate) streams_changed: Arc<Notify>,
+    pub(crate) props: watch::Sender<Props>,
+    pub(crate) adapter: String,
+    pub(crate) tier: (&'static str, bool),
+    pub(crate) compute: bool,
+    pub(crate) store: Store,
+    pub(crate) changes: Changes,
+    pub(crate) jobs: Jobs,
+    pub(crate) thumbs: Arc<Thumbs>,
+    pub(crate) folders: Folders,
+    pub(crate) rotations: Rotations,
+    pub(crate) remote: crate::remote::Remote,
+    pub(crate) accounts: crate::accounts::Book,
+    pub(crate) turned: Notify,
+    pub(crate) gpus: crate::gpus::Gpus,
+}
+
+impl Daemon {
+    pub fn new(config_path: PathBuf, display: Option<reiwand_render::Display>) -> anyhow::Result<Self> {
+        let store = Store::open();
+        reiwand_format::check_data(&store.data)?;
+        stored::check(&store.data)?;
+        let closed = || Config { models: Models { allow_download: false }, ..Config::default() };
+        let loaded = setup::first_load(&config_path, &store)?;
+        let (config, config_error) =
+            loaded.map_or_else(|e| (closed(), Some(e.to_string())), |config| (config, None));
+        match &config_error {
+            Some(e) => {
+                tracing::error!("cannot use the configuration file; using the defaults until it is fixed");
+                tracing::debug!("{e}");
+            }
+            None => tracing::debug!(path = %config_path.display(), "configuration loaded"),
+        }
+        let compositor = reiwand_wayland::compositor_device().and_then(reiwand_render::bus_of);
+        let chosen = Renderer::with_choice(display, &config.render.gpu, compositor.as_deref())
+            .context("cannot initialize the GPU renderer")?;
+        let (mut gpus, renderer) = crate::gpus::Gpus::start(chosen, &config.render.gpu, compositor);
+        let renderer = renderer.install();
+        gpus.renderer = Some(renderer);
+        let adapter = renderer.adapter().to_owned();
+        crate::streams::share_video(renderer);
+        let calibrated = renderer.calibrate(reiwand_core::gpu_tier().as_deref());
+        let tier = (["t0", "t1", "t2", "t3"][calibrated.tier as usize], calibrated.measured());
+        let compute = renderer.compute() && !renderer.software();
+        tracing::info!("renderer ready");
+        tracing::debug!(adapter, tier = tier.0, unit_ms = calibrated.unit_ms, "GPU adapter");
+        let changes = Changes::new();
+        let exporter = Arc::new(Exporter::start().context("cannot connect to PipeWire")?);
+        crate::streams::gpu_buffers(renderer).into_iter().for_each(|gpu| exporter.use_dmabuf(gpu));
+        crate::streams::timelines(&exporter);
+        let compositor =
+            Compositor::start(renderer, exporter.clone(), settings(&config), changes.notifier())?;
+        let (wake, streams_changed) = (compositor.waker(), Arc::new(Notify::new()));
+        let changed = streams_changed.clone();
+        exporter.on_change(move || {
+            wake();
+            crate::inputs::poke();
+            changed.notify_one();
+        })?;
+        let installed = reiwand_format::installed(&store.data).unwrap_or_default();
+        let state = State { config, config_path, config_error, installed, ..State::default() };
+        let props = watch::Sender::new(state.props());
+        let (jobs, thumbs, folders) = (Jobs::new(), Arc::new(Thumbs::new(&store.cache)), Folders::new());
+        let state = Mutex::new(state);
+        let daemon = Self {
+            compositor,
+            state,
+            exporter,
+            streams_changed,
+            props,
+            adapter,
+            tier,
+            compute,
+            store,
+            changes,
+            jobs,
+            thumbs,
+            folders,
+            rotations: Rotations::default(),
+            remote: Default::default(),
+            accounts: Default::default(),
+            turned: Notify::new(),
+            gpus,
+        };
+        daemon.refresh_items();
+        Ok(daemon)
+    }
+
+    pub(crate) fn state(&self) -> MutexGuard<'_, State> {
+        lock(&self.state)
+    }
+
+    pub(crate) fn publish(&self) {
+        let st = self.state();
+        self.props.send_if_modified(|props| std::mem::replace(props, st.props()) != *props);
+        self.changes.changed("state", Vec::new());
+    }
+
+    pub fn retry_effects(self: &Arc<Self>) -> anyhow::Result<()> {
+        crate::compositor::stops::forgive();
+        self.compositor.retry_effects();
+        crate::compositor::stops::recheck(self);
+        Ok(())
+    }
+
+    pub fn reload(&self) -> anyhow::Result<()> {
+        let settings = {
+            let mut st = self.state();
+            let loaded = load(&st.config_path, &self.store, false)
+                .inspect_err(|e| st.config_error = Some(e.to_string()))?;
+            (st.config, st.config_error) = (loaded, None);
+            st.installed = reiwand_format::installed(&self.store.data).unwrap_or_default();
+            settings(&st.config)
+        };
+        self.compositor.set_settings(settings);
+        crate::rgb::follow(self);
+        self.configure_all();
+        self.refresh_items();
+        self.watch_sources();
+        self.rotations.wake.notify_one();
+        self.remote.poke.notify_one();
+        self.publish();
+        Ok(())
+    }
+}
+
+impl State {
+    fn props(&self) -> Props {
+        let (playback, private) = (&self.config.playback, self.config.network.private);
+        Props { paused: self.user_paused, volume: playback.volume, muted: playback.muted, private }
+    }
+}

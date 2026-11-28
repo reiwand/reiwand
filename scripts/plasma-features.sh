@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+WORK=$1
+OUT=$2
+ctl() { "$HOME/.local/bin/reiwand-ctl" "$@"; }
+field() { ctl state | jq -r "$1"; }
+fail() { echo "FAIL: $*"; exit 1; }
+output=$(field '.outputs | keys[0]')
+at() { field ".outputs[\"$output\"].$1"; }
+is() { [ "$(at "$1")" = "$2" ]; }
+
+echo "===== video wallpaper on $output"
+ctl set "$WORK/magenta.webm" --fit stretch
+sleep 5
+if ! is kind video || ! is playing true; then fail "the video is not playing: $(ctl state)"; fi
+spectacle --background --nonotify --fullscreen --output "$OUT/video.png" >"$OUT/spectacle-video.log" 2>&1 || true
+wait_for 20 test -s "$OUT/video.png" || fail "no screenshot of the video"
+read -r w h < <(magick identify -format "%w %h\n" "$OUT/video.png")
+rgb=$(magick "$OUT/video.png" -format "%[fx:int(255*p{$((w / 2)),$((h / 2))}.r)] %[fx:int(255*p{$((w / 2)),$((h / 2))}.g)] %[fx:int(255*p{$((w / 2)),$((h / 2))}.b)]" info:)
+echo "video pixel: $rgb"
+read -r r g b <<<"$rgb"
+if [ "$r" -lt 160 ] || [ "$g" -gt 80 ] || [ "$b" -lt 50 ] || [ "$b" -gt 150 ]; then fail "the screenshot does not show the video"; fi
+
+echo "===== a maximized window pauses the video"
+printf 'import QtQuick\nWindow { visible: true; visibility: Window.Maximized; color: "white" }\n' >"$WORK/cover.qml"
+/usr/lib/qt6/bin/qml "$WORK/cover.qml" >"$OUT/cover.log" 2>&1 &
+cover=$!
+wait_for 20 is covered true || fail "the plugin did not report the maximized window"
+is playing false || fail "the video kept playing behind a maximized window"
+kill "$cover"
+wait_for 20 is covered false || fail "the plugin did not report the window closing"
+wait_for 10 is playing true || fail "the video did not resume"
+
+echo "===== tray icon"
+calls=$(grep -c "member=GetState" "$OUT/dbus-monitor.log" || true)
+timeout 15 plasmawindowed io.github.reiwand.tray >"$OUT/tray.log" 2>&1 || true
+grep -E "io.github.reiwand.tray.*(Error|error|not a type|not installed|Cannot)" "$OUT/tray.log" && fail "the tray icon has QML errors"
+[ "$(grep -c "member=GetState" "$OUT/dbus-monitor.log" || true)" -gt "$calls" ] || fail "the tray icon never asked for the state"
+
+echo "===== the tray finds the running app and opens its settings page"
+ui=$HOME/.local/share/plasma/plasmoids/io.github.reiwand.tray/contents/ui
+[ -f "$ui/Daemon.qml" ] || fail "the tray is not installed in $ui"
+probe() {
+  printf 'import QtQuick\nimport "file://%s"\nDaemon {\n    hasApp: %s\n    onHasAppChanged: %s\n    Component.onCompleted: findApp()\n}\n' \
+    "$ui" "$2" "$3" >"$WORK/$1.qml"
+}
+qml() { QT_QPA_PLATFORM=offscreen timeout 60 /usr/lib/qt6/bin/qml "$WORK/$1.qml" >"$OUT/tray-$1.log" 2>&1; }
+trap 'kill "${app:-}" "${monitor:-}" "${private:-}" 2>/dev/null || true' EXIT
+dbus-monitor --session "interface='io.github.reiwand.Library1',member='ListSources'" >"$OUT/app-monitor.log" 2>&1 &
+monitor=$!
+count() { grep -c "member=ListSources" "$OUT/app-monitor.log" || true; }
+listed() { [ "$(count)" -gt "$1" ]; }
+gone() { ! bus_has io.github.reiwand; }
+activatable() {
+  dbus-send --session --print-reply --dest=org.freedesktop.DBus /org/freedesktop/DBus \
+    org.freedesktop.DBus.ListActivatableNames | grep "\"$1\"" >/dev/null
+}
+"$HOME/.local/bin/reiwand-app" --page library >"$OUT/app.log" 2>&1 &
+app=$!
+wait_for 60 bus_has io.github.reiwand || fail "reiwand-app did not start"
+probe open false 'openApp("settings")'
+qml open &
+wait_for 30 listed 0 || fail "the Settings button of the tray did not open the settings page of the running app"
+pkill -f "$WORK/open.qml" || true
+kill "$app"
+wait_for 20 gone || fail "reiwand-app did not quit"
+
+echo "===== the launcher action opens the app on its settings page"
+before=$(count)
+"$HOME/.local/bin/reiwand-app" --page settings >"$OUT/app-page.log" 2>&1 &
+app=$!
+wait_for 60 listed "$before" || fail "reiwand-app --page settings did not open the settings page"
+kill "$app" "$monitor"
+
+echo "===== the tray offers the app only where it is installed"
+services=$WORK/services
+mkdir -p "$services"
+cp "$HOME/.local/share/dbus-1/services/io.github.reiwand.Daemon.service" "$services/"
+printf '<busconfig><listen>unix:dir=%s</listen><auth>EXTERNAL</auth><servicedir>%s</servicedir><policy context="default"><allow send_destination="*"/><allow receive_sender="*"/><allow own="*"/><deny send_destination="org.freedesktop.DBus" send_interface="org.freedesktop.DBus" send_member="ReloadConfig"/></policy></busconfig>\n' \
+  "$WORK" "$services" >"$WORK/bus.conf"
+dbus-daemon --nofork --print-address --config-file="$WORK/bus.conf" >"$WORK/bus.address" &
+private=$!
+wait_for 10 test -s "$WORK/bus.address" || fail "the private bus did not start"
+session=$DBUS_SESSION_BUS_ADDRESS
+DBUS_SESSION_BUS_ADDRESS=$(head -n 1 "$WORK/bus.address")
+probe flatpak true 'Qt.quit()'
+qml flatpak || fail "the tray offered the app where only the daemon is installed"
+printf 'import QtQuick\nimport "file://%s"\nDaemon {\n    onActionErrorChanged: Qt.quit()\n    Component.onCompleted: openApp("")\n}\n' "$ui" >"$WORK/unopened.qml"
+qml unopened || fail "the tray said nothing when the bus could not reload its services to open the app"
+cp "$HOME/.local/share/dbus-1/services/io.github.reiwand.service" "$services/"
+wait_for 10 activatable io.github.reiwand || fail "the private bus did not list the app"
+probe installed false 'Qt.quit()'
+qml installed || fail "the tray did not find the installed app"
+DBUS_SESSION_BUS_ADDRESS=$session
+
+echo "===== the tray rows show the wallpaper and its actions, and the app blurs a mature thumbnail until it is clicked or keyed"
+ln -sfn "${ui%/contents/ui}" "$WORK/plasmoid"
+QT_QPA_PLATFORM=offscreen timeout 60 /usr/lib/qt6/bin/qmltestrunner -input "$WORK/tray-row.qml" >"$OUT/tray-row.log" 2>&1 ||
+  fail "the screen thumbnails: $(grep -A 3 FAIL "$OUT/tray-row.log")"
+QT_QPA_PLATFORM=offscreen timeout 60 /usr/lib/qt6/bin/qmltestrunner -input "$WORK/tray-left-out.qml" >"$OUT/tray-left-out.log" 2>&1 ||
+  fail "the cost notes of the tray: $(grep -A 3 FAIL "$OUT/tray-left-out.log")"
+QT_QPA_PLATFORM=offscreen timeout 60 /usr/lib/qt6/bin/qmltestrunner -input "$WORK/tray-consent.qml" >"$OUT/tray-consent.log" 2>&1 ||
+  fail "the tray asks for permissions for a preview: $(grep -A 3 FAIL "$OUT/tray-consent.log")"
+
+echo "===== handing the screens back to Plasma"
+plugins() {
+  dbus-send --session --print-reply --dest=org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript \
+    string:'var all = desktops(); var kinds = []; for (var i = 0; i < all.length; i++) { kinds.push(all[i].wallpaperPlugin); } print(kinds.join(","));' |
+    sed -n 's/^ *string "\(.*\)"$/\1/p' | tr , '\n' | sort -u | paste -sd,
+}
+[ "$(plugins)" = io.github.reiwand ] || fail "the screen is not on the Reiwand plugin before handing back: $(plugins)"
+back=$(ctl plasma-back) || fail "plasma-back failed: $back"
+echo "$back"
+[ "$(plugins)" = org.kde.image ] || fail "the screens are not on the Plasma image wallpaper after plasma-back: $(plugins)"
+is kind video && fail "the daemon still holds the video after plasma-back"
+ctl state >"$OUT/state-back.json" || fail "the daemon died after plasma-back"
+case $back in "no screen was using"*) fail "plasma-back counted no screen on the Reiwand type: $back" ;; esac
+ctl set "$WORK/magenta.webm" --fit stretch
+ours() { [ "$(plugins)" = io.github.reiwand ]; }
+wait_for 30 ours || fail "the screens did not return to the Reiwand plugin after setting a wallpaper: $(plugins)"
+wait_for 30 is kind video || fail "the video does not play again after plasma-back: $(ctl state)"
+
+echo "plasma test passed"

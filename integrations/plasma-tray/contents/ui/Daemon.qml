@@ -1,0 +1,191 @@
+import QtQuick
+import org.kde.plasma.workspace.dbus as DBus
+
+QtObject {
+    id: daemon
+
+    property var current: ({})
+    property var inputs: ({})
+    property var profiles: []
+    property string pollError: ""
+    property string actionError: ""
+    property bool hasApp: true
+    // The version of the tray Plasma loaded, and whether the service runs another one: after an
+    // update the tray keeps its old code until Plasma starts again. A build of one's own
+    // ("-local") is not compared. "Later" hides the notice until Plasma starts again.
+    property string loaded: ""
+    property bool later: false
+    readonly property bool stale: {
+        const running = String(current.version ?? "").split("+")[0];
+        const mine = loaded.split("+")[0];
+        return running !== "" && mine !== "" && !running.endsWith("-local") && running !== mine;
+    }
+    readonly property string lastError: actionError || pollError
+    readonly property var signatures: ({
+            "Daemon1.SetWallpaper": "(sss)",
+            "Daemon1.ClearWallpaper": "(s)",
+            "Daemon1.RestoreWallpaper": "(s)",
+            "Daemon1.HandBackToPlasma": "()",
+            "Daemon1.SetPaused": "(b)",
+            "Daemon1.SetVolume": "(d)",
+            "Daemon1.SetMuted": "(b)",
+            "Daemon1.SetOption": "(ss)",
+            "Inputs1.Grant": "(ss)",
+            "Inputs1.GrantPackage": "(sss)",
+            "Inputs1.Revoke": "(ss)",
+            "Inputs1.GetInputs": "()",
+            "Inputs1.SetClicks": "(sb)",
+            "Library1.Thumbnail": "(su)",
+            "Library1.GetItem": "(s)",
+            "Library1.SetFavorite": "(asb)",
+            "Library1.Confirm": "(ass)",
+            "Daemon1.SetFilter": "(ss)",
+            "Playlists1.Next": "(s)",
+            "Playlists1.Browse": "(ssi)",
+            "Profiles1.Activate": "(s)"
+        })
+
+    signal updated(string topic, var ids)
+    signal choose(string name)
+
+    function restart() {
+        send({
+            "service": "org.freedesktop.systemd1",
+            "path": "/org/freedesktop/systemd1",
+            "iface": "org.freedesktop.systemd1.Manager",
+            "member": "RestartUnit",
+            "signature": "(ss)",
+            "arguments": ["reiwandd.service", "replace"]
+        }, () => daemon.refresh(), reply => daemon.actionError = reply?.error?.message || i18n("The Reiwand daemon is not running"));
+    }
+
+    // Plasma starts again with its user service, which loads the new tray.
+    function restartPlasma() {
+        send({
+            "service": "org.freedesktop.systemd1",
+            "path": "/org/freedesktop/systemd1",
+            "iface": "org.freedesktop.systemd1.Manager",
+            "member": "RestartUnit",
+            "signature": "(ss)",
+            "arguments": ["plasma-plasmashell.service", "replace"]
+        }, () => {}, reply => daemon.actionError = reply?.error?.message || i18n("Plasma could not be restarted; log out and in again"));
+    }
+
+    function browse(output) {
+        act("Browse", [output, "", 1], "Playlists1");
+    }
+
+    function send(message, onReply, onError) {
+        DBus.SessionBus.asyncCall(message, onReply, onError);
+    }
+
+    function call(member, args, iface, onReply, onError) {
+        send({
+            "service": "io.github.reiwand.Daemon",
+            "path": "/io/github/reiwand/Daemon",
+            "iface": "io.github.reiwand." + iface,
+            "member": member,
+            "signature": signatures[iface + "." + member] ?? "()",
+            "arguments": args
+        }, onReply, reply => onError(reply?.error?.message || i18n("The Reiwand daemon is not running"), String(reply?.error?.name ?? "")));
+    }
+
+    function query(member, args, iface, onReply, onError) {
+        call(member, args, iface ?? "Daemon1", reply => {
+            const text = String(reply.value ?? "");
+            onReply(text.startsWith("{") ? JSON.parse(text) : reply.values.map(String));
+        }, onError ?? (() => {}));
+    }
+
+    function act(member, args, iface, onDone, onError) {
+        actionError = "";
+        call(member, args, iface ?? "Daemon1", onDone ?? (() => {}), (message, name) => {
+            if (onError)
+                onError({
+                    "name": name,
+                    "message": message
+                });
+            else
+                daemon.actionError = message;
+        });
+    }
+
+    function refresh(topic) {
+        if (!topic || topic === "state")
+            query("GetState", [], "Daemon1", reply => {
+                if (!(reply.serial < daemon.current.serial))
+                    daemon.current = reply;
+                daemon.pollError = "";
+            }, error => daemon.pollError = error);
+        if (!topic || topic === "profiles")
+            query("List", [], "Profiles1", reply => daemon.profiles = reply.profiles ?? []);
+        if (!topic || topic === "inputs" || topic === "state")
+            query("GetInputs", [], "Inputs1", reply => daemon.inputs = reply);
+        if (!topic)
+            findApp();
+    }
+
+    function bus(member, args, onReply, onError) {
+        send({
+            "service": "org.freedesktop.DBus",
+            "path": "/org/freedesktop/DBus",
+            "iface": "org.freedesktop.DBus",
+            "member": member,
+            "signature": args.length ? "(s)" : "()",
+            "arguments": args
+        }, onReply, onError ?? (() => {}));
+    }
+
+    function findApp() {
+        const app = "io.github.reiwand";
+        bus("ListActivatableNames", [], reply => {
+            const names = Array.from(reply.value ?? []).map(String);
+            if (names.includes(app) || !names.includes(app + ".Daemon"))
+                daemon.hasApp = true;
+            else
+                bus("NameHasOwner", [app], reply => daemon.hasApp = reply.value === true);
+        });
+    }
+
+    function openApp(page, again) {
+        send({
+            "service": "io.github.reiwand",
+            "path": "/io/github/reiwand",
+            "iface": "org.freedesktop.Application",
+            "member": page ? "ActivateAction" : "Activate",
+            "signature": page ? "(sava{sv})" : "(a{sv})",
+            "arguments": page ? [page, [],
+                {}
+            ] : [
+                {}
+            ]
+        }, () => {}, reply => {
+            const failed = () => daemon.actionError = reply?.error?.message || i18n("Reiwand could not be opened");
+            if (!again && String(reply?.error?.name ?? "").endsWith(".ServiceUnknown"))
+                bus("ReloadConfig", [], () => daemon.openApp(page, true), failed);
+            else
+                failed();
+        });
+    }
+
+    function tr(text, first, second, third) {
+        return i18n(text, first, second, third);
+    }
+
+    function screen(output) {
+        const own = name => /^(eDP|LVDS|DSI)/i.test(name);
+        if (own(output))
+            return i18n("Laptop");
+        const others = Object.keys(current.outputs ?? {}).filter(name => !own(name)).sort();
+        const at = others.indexOf(output);
+        return others.length > 1 && at >= 0 ? i18n("Monitor %1", at + 1) : i18n("Monitor");
+    }
+
+    function url(path) {
+        return path ? "file://" + path.split("/").map(encodeURIComponent).join("/") : "";
+    }
+
+    function path(url) {
+        return decodeURIComponent(String(url).replace("file://", ""));
+    }
+}

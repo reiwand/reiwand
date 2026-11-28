@@ -1,0 +1,166 @@
+use crate::bus::url;
+use anyhow::{Context, Result, bail};
+use reiwand_core::edit::{self, Depth, Edit, Source};
+use reiwand_depth::models::assets;
+use reiwand_depth::{LAMA, MODEL, Part, Places, beside, read, sha256, write};
+use serde_json::json;
+use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicBool, Ordering::Relaxed};
+
+pub enum Work {
+    Open,
+    Download,
+    Lama,
+    Generate,
+    Adopt(PathBuf),
+    Keep,
+    Remove,
+    Install(PathBuf),
+    Rebuild,
+    DropLama,
+    CheckLama,
+}
+
+#[derive(Default)]
+pub struct Shown {
+    pub assets: String,
+    pub map: String,
+    pub sha: String,
+    pub ready: bool,
+    pub allowed: bool,
+    pub layers: String,
+    pub note: String,
+}
+
+pub struct Target {
+    pub image: PathBuf,
+    pub sha: String,
+    pub depth: Depth,
+    pub device: reiwand_depth::Device,
+}
+
+pub type Report<'a> = &'a mut dyn FnMut(&str, f64);
+
+pub fn sha(image: &Path, edit: &Edit) -> Result<String> {
+    match edit.source.sha256.as_str() {
+        "" => Ok(Source::read(image, [0; 2])?.sha256),
+        known => Ok(known.to_owned()),
+    }
+}
+
+pub fn run(
+    places: &Places,
+    mut target: Target,
+    work: Work,
+    stop: &AtomicBool,
+    report: Report<'_>,
+) -> (Shown, Option<String>) {
+    if target.sha.is_empty() && target.image.is_file() {
+        let edit = edit::load(&target.image, &edit::dir()).ok().flatten().map(|(_, e)| e).unwrap_or_default();
+        target.sha = sha(&target.image, &edit).unwrap_or_default();
+    }
+    let checked = matches!(work, Work::CheckLama);
+    let failed = act(places, &target, work, stop, report).err().filter(|_| !stop.load(Relaxed));
+    let note = if checked && failed.is_none() { "verified" } else { "" };
+    let failed = failed.map(|e| format!("{e:#}"));
+    let libraries = places.library(None);
+    let have = |a: &reiwand_depth::Asset| {
+        places.installed(a).is_some() || a.kind == Part::Runtime && !libraries.is_empty()
+    };
+    let list: Vec<_> = (assets().iter())
+        .map(|a| {
+            json!({"id": a.id, "title": a.title, "size": format!("{:.1} MB", a.bytes as f64 / 1e6),
+            "license": a.license, "license_url": a.license_url, "hosts": a.hosts(), "installed": have(a),
+            "inpaint": a.kind == Part::Inpaint, "runtime": a.kind == Part::Runtime})
+        })
+        .collect();
+    let map = places.find(&target.image, &target.sha, &target.depth).map(|p| url(&p.to_string_lossy()));
+    let ready = have(&MODEL) && !libraries.is_empty();
+    let (assets, allowed) = (json!(list).to_string(), reiwand_depth::allowed());
+    let layers = json!({"sets": places.layer_files().len(), "bytes": places.layer_bytes()}).to_string();
+    (
+        Shown {
+            assets,
+            map: map.unwrap_or_default(),
+            sha: target.sha,
+            ready,
+            allowed,
+            layers,
+            note: note.into(),
+        },
+        failed,
+    )
+}
+
+fn act(places: &Places, target: &Target, work: Work, stop: &AtomicBool, report: Report<'_>) -> Result<()> {
+    let (image, sha) = (&target.image, target.sha.as_str());
+    match work {
+        Work::Open => Ok(()),
+        Work::Download if !reiwand_depth::allowed() => bail!("downloads are turned off in the settings"),
+        Work::Lama if !reiwand_depth::allowed() => bail!("downloads are turned off in the settings"),
+        Work::Lama => fetch(places, Part::Inpaint, stop, report),
+        Work::Download => {
+            fetch(places, Part::Model, stop, report)?;
+            ready(places, target, stop, report)
+        }
+        Work::Generate => {
+            crate::depthproc::generate(image, (target.depth.input, target.device), stop, report)
+        }
+        Work::Adopt(file) => places.import(&file, image, sha).map(drop),
+        Work::Keep => {
+            let found = places.find(image, sha, &target.depth).context("the image has no depth map yet")?;
+            write(&read(&found)?, &beside(image))
+        }
+        Work::Remove => match places.unmap(image, sha, &target.depth) {
+            0 => bail!("the image has no depth map"),
+            _ => Ok(()),
+        },
+        Work::Rebuild => places.unlayer_all().map(drop),
+        Work::DropLama => places.remove(&LAMA).map(drop),
+        Work::CheckLama => match places.verify(&LAMA)? {
+            true => Ok(()),
+            false => bail!("LaMa is missing or damaged; download it again"),
+        },
+        Work::Install(file) => {
+            let sha = sha256(&file)?;
+            let asset = assets().into_iter().find(|a| a.sha256 == sha);
+            places
+                .install(&asset.context("this file is neither the depth model nor ONNX Runtime")?, &file)?;
+            ready(places, target, stop, report)
+        }
+    }
+}
+
+fn fetch(places: &Places, wanted: Part, stop: &AtomicBool, report: Report<'_>) -> Result<()> {
+    let missing = assets().into_iter().filter(|a| places.installed(a).is_none());
+    for asset in
+        missing.filter(|a| a.kind == wanted || a.kind == Part::Runtime && places.library(None).is_empty())
+    {
+        let mut shown = -1.0;
+        places.download(&asset, &mut |done, total| {
+            let part = (done * 200 / total.max(1)) as f64 / 200.0;
+            if part != shown {
+                shown = part;
+                report("download", part);
+            }
+            !stop.load(Relaxed)
+        })?;
+    }
+    Ok(())
+}
+
+fn ready(places: &Places, target: &Target, stop: &AtomicBool, report: Report<'_>) -> Result<()> {
+    let missing = places.installed(&MODEL).is_none() || places.library(None).is_empty();
+    if missing || !target.image.is_file() || places.find(&target.image, &target.sha, &target.depth).is_some()
+    {
+        return Ok(());
+    }
+    crate::depthproc::generate(&target.image, (target.depth.input, target.device), stop, report)
+}
+
+pub fn look(places: &Places, (image, sha): (&Path, &str), depth: &Depth, colour: bool) -> Result<PathBuf> {
+    let found = places.map(image, sha, depth, 1024)?.context("the image has no depth map yet")?;
+    let pixels =
+        image::DynamicImage::ImageRgb8(reiwand_depth::coloured(&reiwand_depth::shrink(found, 512), colour));
+    crate::picture::write(&pixels.into_rgba8())
+}

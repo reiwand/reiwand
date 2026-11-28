@@ -1,0 +1,28 @@
+[package]
+name = "reiwand-providers"
+description = "Wallpaper sources and the on-disk wallpaper cache for Reiwand"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+async-trait.workspace = true
+chrono = { workspace = true, features = ["clock"] }
+getrandom.workspace = true
+percent-encoding.workspace = true
+reqwest = { workspace = true, features = ["blocking"] }
+roxmltree.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["fs", "io-util"] }
+reiwand-core = { workspace = true, features = ["http"] }
+reiwand-format.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+reiwand-core = { workspace = true, features = ["http"] }
+tokio-rustls.workspace = true
+tokio.workspace = true
+wiremock.workspace = true

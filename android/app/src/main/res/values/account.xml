@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cannot_reach">Cannot reach %1$s</string>
+    <string name="check">Check</string>
+    <string name="cipher_group">Encryption</string>
+    <string name="connect">Connect</string>
+    <string name="connect_block">Connect to the server</string>
+    <string name="connected_to">Connected to %1$s</string>
+    <string name="fetch_all">Download</string>
+    <string name="more_options">More options</string>
+    <string name="not_connected">Not connected</string>
+    <string name="not_now">Not now</string>
+    <string name="not_synced_yet">Not synced yet</string>
+    <string name="offline_from">No connection to %1$s</string>
+    <string name="print_row">Certificate fingerprint</string>
+    <string name="print_same">It matches the certificate of the server.</string>
+    <string name="remove_server_row">Remove the server</string>
+    <string name="retry">Retry</string>
+    <string name="sealed">encrypted</string>
+    <string name="this_phone_row">This phone</string>
+    <string name="waiting_approval">Waiting for the approval…</string>
+</resources>

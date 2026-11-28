@@ -1,0 +1,44 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": "light",
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 4
+  },
+  "description": {
+    "en": "Draws a lens flare from a light source.",
+    "es": "Dibuja el destello de una lente desde una fuente de luz."
+  },
+  "fuse": null,
+  "id": "lens_flare",
+  "lighter": null,
+  "mask_mode": "mix",
+  "min_fps": null,
+  "name": {
+    "en": "Lens flare"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "source", "type": "position", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": [0.3, 0.3], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "follow", "type": "bool", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": false, "tool": null, "tools": [], "unit": null, "uses": "cursor", "values": [], "waits_for": null, "yields_to": null},
+    {"id": "intensity", "type": "float", "channels": null, "help": {}, "label": {}, "max": 4, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "ghosts", "type": "int", "channels": null, "help": {}, "label": {}, "max": 8, "min": 0, "paint": null, "prefill": 4, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "halo", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.3, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "color", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#ffffff", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_lens_flare", "grid": null, "inputs": ["previous"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
+}

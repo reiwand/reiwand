@@ -1,0 +1,61 @@
+use super::*;
+
+#[test]
+fn the_schema_describes_every_new_field() {
+    let schema = schema().to_string();
+    let words = [
+        "camera",
+        "shake",
+        "bloom",
+        "tonemap",
+        "perspective",
+        "ambient",
+        "sky",
+        "filter",
+        "mipmaps",
+        "face",
+        "rects",
+        "durations",
+        "animated",
+        "brightness",
+        "parent",
+        "inherit",
+        "lighting",
+        "tilt",
+        "playback",
+        "fallback",
+        "valign",
+        "wrap",
+        "line_height",
+        "letter_spacing",
+        "outline",
+        "shadow",
+        "render",
+        "volumetric",
+        "cone",
+        "sounds",
+        "pause",
+        "stream",
+        "play_on",
+        "events",
+        "base",
+        "bounds",
+        "exponent",
+        "reduce",
+        "strength",
+        "redraw",
+        "light",
+        "linear_burn",
+        "negation",
+        "sdf",
+        "agx",
+        "attack",
+        "release",
+        "gain_release",
+        "descriptor",
+        "wgsl",
+    ];
+    for word in words {
+        assert!(schema.contains(&format!("\"{word}\"")), "the scene schema lacks {word}");
+    }
+}

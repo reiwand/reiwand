@@ -1,0 +1,200 @@
+use anyhow::{Result, anyhow, bail, ensure};
+use reiwand_core::message::said;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "op", rename_all = "lowercase", deny_unknown_fields)]
+pub enum Op {
+    Add { path: String, value: Value },
+    Remove { path: String },
+    Replace { path: String, value: Value },
+    Move { from: String, path: String },
+}
+
+impl Op {
+    pub fn paths(&self) -> Vec<&str> {
+        match self {
+            Op::Add { path, .. } | Op::Remove { path } | Op::Replace { path, .. } => vec![path],
+            Op::Move { from, path } => vec![from, path],
+        }
+    }
+
+    pub fn size(&self) -> usize {
+        match self {
+            Op::Add { value, .. } | Op::Replace { value, .. } => value.to_string().len(),
+            _ => 0,
+        }
+    }
+}
+
+pub fn escape(key: &str) -> String {
+    key.replace('~', "~0").replace('/', "~1")
+}
+
+pub fn unescape(token: &str) -> String {
+    token.replace("~1", "/").replace("~0", "~")
+}
+
+fn split(path: &str) -> Result<(&str, String)> {
+    let (parent, key) = path
+        .rsplit_once('/')
+        .ok_or_else(|| anyhow!(said("editor.not_json_pointer", "\"%1\" is not a JSON Pointer", &[&path])))?;
+    ensure!(path.starts_with('/'), said("editor.not_json_pointer", "\"%1\" is not a JSON Pointer", &[&path]));
+    Ok((parent, key.replace("~1", "/").replace("~0", "~")))
+}
+
+fn index(key: &str, len: usize) -> Result<usize> {
+    let canonical = key == "0" || !key.starts_with('0');
+    let i = key.parse::<usize>().ok().filter(|i| canonical && *i <= len);
+    i.ok_or_else(|| {
+        anyhow!(said("editor.not_index_from", "\"%1\" is not an index from 0 to %2", &[&key, &len]))
+    })
+}
+
+fn container<'a>(doc: &'a mut Value, parent: &str) -> Result<&'a mut Value> {
+    doc.pointer_mut(parent)
+        .ok_or_else(|| anyhow!(said("editor.does_not_exist", "%1 does not exist", &[&parent])))
+}
+
+fn add(doc: &mut Value, path: &str, value: Value) -> Result<Op> {
+    let (parent, key) = split(path)?;
+    if !parent.is_empty() && doc.pointer(parent).is_none() && (key == "-" || key == "0") {
+        return add(doc, parent, Value::Array(vec![value]));
+    }
+    let held = container(doc, parent)?;
+    if held.is_null() && key != "-" && !key.bytes().all(|b| b.is_ascii_digit()) {
+        *held = Value::Object(serde_json::Map::from_iter([(key, value)]));
+        return Ok(Op::Replace { path: parent.into(), value: Value::Null });
+    }
+    match held {
+        Value::Array(items) => {
+            let i = if key == "-" { items.len() } else { index(&key, items.len())? };
+            items.insert(i, value);
+            Ok(Op::Remove { path: format!("{parent}/{i}") })
+        }
+        Value::Object(map) => Ok(match map.insert(key, value) {
+            Some(old) => Op::Replace { path: path.into(), value: old },
+            None => Op::Remove { path: path.into() },
+        }),
+        _ => bail!(said("editor.holds_neither_list", "%1 holds neither a list nor an object", &[&parent])),
+    }
+}
+
+fn remove(doc: &mut Value, path: &str) -> Result<(String, Value)> {
+    let (parent, key) = split(path)?;
+    let missing = || anyhow!(said("editor.does_not_exist_2", "%1 does not exist", &[&path]));
+    match container(doc, parent)? {
+        Value::Array(items) => {
+            let i = index(&key, items.len().saturating_sub(1)).ok().filter(|i| *i < items.len());
+            let i = i.ok_or_else(missing)?;
+            Ok((format!("{parent}/{i}"), items.remove(i)))
+        }
+        Value::Object(map) => Ok((path.into(), map.remove(&key).ok_or_else(missing)?)),
+        _ => Err(missing()),
+    }
+}
+
+fn shifted(path: &str, from: &str, after: bool) -> String {
+    let Some((home, at)) = from.rsplit_once('/').and_then(|(h, i)| Some((h, i.parse::<usize>().ok()?)))
+    else {
+        return path.to_owned();
+    };
+    let Some(rest) = path.strip_prefix(&format!("{home}/")) else { return path.to_owned() };
+    let (number, tail) = rest.split_once('/').map_or((rest, None), |(n, t)| (n, Some(t)));
+    let tail = tail.map(|t| format!("/{t}")).unwrap_or_default();
+    match number.parse::<usize>() {
+        Ok(n) if after && n > at => format!("{home}/{}{tail}", n - 1),
+        Ok(n) if !after && n >= at => format!("{home}/{}{tail}", n + 1),
+        _ => path.to_owned(),
+    }
+}
+
+pub(crate) fn once_removed(path: &str, from: &str) -> String {
+    shifted(path, from, true)
+}
+
+fn apply_one(doc: &mut Value, op: &Op) -> Result<Op> {
+    match op {
+        Op::Add { path, value } => add(doc, path, value.clone()),
+        Op::Remove { path } => remove(doc, path).map(|(path, value)| Op::Add { path, value }),
+        Op::Replace { path, value } => {
+            let slot = doc.pointer_mut(path).filter(|_| !path.is_empty());
+            let slot =
+                slot.ok_or_else(|| anyhow!(said("editor.does_not_exist_2", "%1 does not exist", &[&path])))?;
+            Ok(Op::Replace { path: path.clone(), value: std::mem::replace(slot, value.clone()) })
+        }
+        Op::Move { from, path } => {
+            ensure!(
+                !shifted(path, from, false).starts_with(&format!("{from}/")),
+                said("editor.cannot_move_into", "%1 cannot move into itself", &[&from])
+            );
+            let (from, value) = remove(doc, from)?;
+            let added = add(doc, path, value.clone());
+            if let Ok(Op::Remove { path }) = added {
+                return Ok(Op::Move { from: path, path: from });
+            }
+            if let Ok(Op::Replace { path, value: old }) = &added {
+                *container(doc, path)? = old.clone();
+            }
+            add(doc, &from, value)?;
+            Err(added
+                .err()
+                .unwrap_or_else(|| anyhow!(said("editor.already_exists", "%1 already exists", &[&path]))))
+        }
+    }
+}
+
+pub fn apply(doc: &mut Value, ops: &[Op]) -> Result<Vec<Op>> {
+    let mut undo = Vec::with_capacity(ops.len());
+    for op in ops {
+        match apply_one(doc, op) {
+            Ok(inverse) => undo.push(inverse),
+            Err(e) => {
+                undo.iter().rev().for_each(|inverse| drop(apply_one(doc, inverse)));
+                return Err(e);
+            }
+        }
+    }
+    undo.reverse();
+    Ok(undo)
+}
+
+pub fn set(doc: &Value, path: &str, value: Value) -> Vec<Op> {
+    if doc.pointer(path).is_some() {
+        return vec![Op::Replace { path: path.into(), value }];
+    }
+    let mut ops = Vec::new();
+    let mut at = String::new();
+    let parts: Vec<&str> = path.split('/').skip(1).collect();
+    for part in &parts[..parts.len().saturating_sub(1)] {
+        at = format!("{at}/{part}");
+        let empty = Value::Object(Default::default());
+        match doc.pointer(&at) {
+            None => ops.push(Op::Add { path: at.clone(), value: empty }),
+            Some(Value::Null) => ops.push(Op::Replace { path: at.clone(), value: empty }),
+            Some(_) => {}
+        }
+    }
+    ops.push(Op::Add { path: path.into(), value });
+    ops
+}
+
+pub fn diff(old: &Value, new: &Value, path: &str) -> Vec<Op> {
+    match (old, new) {
+        _ if old == new => Vec::new(),
+        (Value::Object(a), Value::Object(b)) => {
+            let at = |key: &str| format!("{path}/{}", escape(key));
+            let gone = a.keys().filter(|k| !b.contains_key(*k)).map(|k| Op::Remove { path: at(k) });
+            let mut ops: Vec<Op> = gone.collect();
+            for (key, value) in b {
+                match a.get(key) {
+                    Some(was) => ops.extend(diff(was, value, &at(key))),
+                    None => ops.push(Op::Add { path: at(key), value: value.clone() }),
+                }
+            }
+            ops
+        }
+        _ => vec![Op::Replace { path: path.into(), value: new.clone() }],
+    }
+}

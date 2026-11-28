@@ -1,0 +1,106 @@
+use super::SceneInput;
+use super::scene::SceneState;
+use super::state::State;
+use crate::inputs;
+use reiwand_scene::{AudioFrame, Uses};
+use reiwand_script::Mode;
+use std::time::Instant;
+
+pub(super) fn declare(output: &str, scene: Option<&SceneState>) {
+    let pack = scene.map(|s| &s.spec.pack);
+    let named = pack.map(|p| (p.props.id.as_str(), p.props.title.as_str(), p.key.as_str()));
+    let uses = scene.map(SceneState::uses).unwrap_or_default();
+    let lit = pack.is_some_and(|p| reiwand_render::lit(&p.scene));
+    if !lit {
+        crate::rgb::forget(output);
+    }
+    inputs::needs(
+        output,
+        named.unwrap_or_default(),
+        [uses.audio, uses.cursor, uses.clicks, false, lit, uses.media],
+    );
+}
+
+pub(super) fn declare_page(output: &str, page: &crate::pages::PageSpec) {
+    let (p, [audio, pointer, clicks, rgb, media]) = (&page.pack, page.pack.uses);
+    if !rgb {
+        crate::rgb::forget(output);
+    }
+    let named = (p.props.id.as_str(), p.props.title.as_str(), p.key.as_str());
+    inputs::needs(output, named, [audio, pointer, clicks, !p.network.is_empty(), rgb, media]);
+}
+
+struct Live {
+    name: String,
+    uses: Uses,
+    due: bool,
+    waiting: bool,
+}
+
+impl State {
+    fn feed(&mut self, input: SceneInput) {
+        let (SceneInput::Audio(name, _)
+        | SceneInput::Pointer(name, ..)
+        | SceneInput::Script(name, _)
+        | SceneInput::Media(name, _)) = &input;
+        if let Some(o) = self.outputs.get_mut(name) {
+            let changed = o.shown.scene.as_mut().is_some_and(|scene| scene.input(input));
+            o.dirty |= changed && o.active;
+        }
+    }
+
+    pub(super) fn feed_inputs(&mut self) {
+        let now = Instant::now();
+        let tx = &self.tx;
+        for (name, o) in self.outputs.iter_mut() {
+            o.dirty |= o.shown.scene.as_mut().is_some_and(|s| s.want_rgb(name));
+            let shown = o.active && o.open(self.exporter.is_streaming(name));
+            if let Some(s) = o.shown.scene.as_mut().filter(|_| shown) {
+                s.waker(|| {
+                    let tx = tx.clone();
+                    std::sync::Arc::new(move || drop(tx.send(super::Command::Wake)))
+                });
+                s.heard_folder(now);
+            }
+        }
+        let live: Vec<Live> = (self.outputs.iter())
+            .filter(|(name, o)| o.active && o.open(self.exporter.is_streaming(name)))
+            .filter_map(|(name, o)| {
+                let s = o.shown.scene.as_ref()?;
+                let due = o.dirty || s.due.is_none_or(|at| at <= now);
+                Some(Live { name: name.clone(), uses: s.uses(), due, waiting: due || !s.moving })
+            })
+            .collect();
+        let hearing: Vec<bool> =
+            live.iter().map(|l| l.uses.audio && l.waiting && inputs::hears(&l.name)).collect();
+        let heard = hearing.contains(&true).then(inputs::audio).unwrap_or_default();
+        for (live, hears) in live.into_iter().zip(hearing) {
+            if live.uses.audio && live.waiting {
+                let audio = if hears { heard.clone() } else { AudioFrame::default() };
+                if hears {
+                    inputs::metered(&live.name, &audio);
+                }
+                self.feed(SceneInput::Audio(live.name.clone(), Box::new(audio)));
+            }
+            if live.uses.media {
+                self.feed(SceneInput::Media(live.name.clone(), crate::media::of(&live.name)));
+            }
+            if live.uses.cursor {
+                let (pointer, presses, allowed) = inputs::touch(&live.name);
+                self.feed(SceneInput::Pointer(live.name.clone(), pointer, presses, allowed));
+            }
+            let mode = match live.name.starts_with("preview:") {
+                true => Mode::Editor,
+                false if self.locked => Mode::Lockscreen,
+                false => Mode::Wallpaper,
+            };
+            let scene = self.outputs.get_mut(&live.name).and_then(|o| o.shown.scene.as_mut());
+            if let Some(outputs) = scene.filter(|_| live.due).and_then(|s| s.script(&live.name, mode)) {
+                self.feed(SceneInput::Script(live.name.clone(), Box::new(outputs)));
+            }
+            if let Some(o) = self.outputs.get_mut(&live.name) {
+                o.dirty |= o.shown.scene.as_mut().is_some_and(|s| s.loaded());
+            }
+        }
+    }
+}

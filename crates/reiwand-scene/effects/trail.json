@@ -1,0 +1,44 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": "motion",
+  "compose": false,
+  "cost": {
+    "passes": 2,
+    "scale": 1,
+    "taps": 2
+  },
+  "description": {
+    "en": "Leaves a fading trail of past frames.",
+    "es": "Deja una estela que se desvanece con los fotogramas anteriores."
+  },
+  "fuse": null,
+  "id": "trail",
+  "lighter": null,
+  "mask_mode": "mix",
+  "min_fps": null,
+  "name": {
+    "en": "Motion trail"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "persistence", "type": "float", "channels": null, "help": {}, "label": {}, "max": 0.99, "min": 0, "paint": null, "prefill": 0.8, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_trail_step", "grid": null, "inputs": ["input", "state"], "output": "state", "scale": 1, "swap": null, "target": null, "vertex": null},
+    {"blend": null, "copy": null, "entry": "fs_trail", "grid": null, "inputs": ["state"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": {
+    "fade": "persistence",
+    "scale": 1,
+    "settle": 0.25
+  },
+  "targets": {},
+  "uses": [],
+  "velocity": null
+}

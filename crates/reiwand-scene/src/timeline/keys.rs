@@ -1,0 +1,74 @@
+use super::{Handles, Loop};
+use crate::Ease;
+use crate::animate::Animate;
+use serde::de::{self, Deserializer};
+use serde::ser::{SerializeTuple, Serializer};
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Key<T> {
+    pub t: f32,
+    pub v: T,
+    pub ease: Ease,
+    pub handles: Option<Handles>,
+}
+
+pub fn local(t: f32, d: f32, mode: Loop) -> f32 {
+    if d <= 0.0 {
+        return 0.0;
+    }
+    match mode {
+        Loop::Once => t.clamp(0.0, d),
+        Loop::Repeat => t.rem_euclid(d),
+        Loop::Pingpong => {
+            let u = t.rem_euclid(2.0 * d);
+            if u > d { 2.0 * d - u } else { u }
+        }
+    }
+}
+
+pub fn sample<T: Animate>(keys: &[Key<T>], t: f32) -> T {
+    let i = keys.partition_point(|k| k.t <= t);
+    match (i.checked_sub(1).map(|i| &keys[i]), keys.get(i)) {
+        (Some(a), Some(b)) => super::bend::curve(a, b, t)
+            .unwrap_or_else(|| a.v.lerp(&b.v, a.ease.apply((t - a.t) / (b.t - a.t).max(1e-6)))),
+        (Some(k), None) | (None, Some(k)) => k.v.clone(),
+        (None, None) => T::default(),
+    }
+}
+
+impl<T: Serialize> Serialize for Key<T> {
+    fn serialize<S: Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        let plain = self.ease == Ease::default() && self.handles.is_none();
+        let mut tuple = s.serialize_tuple(if plain { 2 } else { 3 })?;
+        tuple.serialize_element(&self.t)?;
+        tuple.serialize_element(&self.v)?;
+        match &self.handles {
+            Some(handles) => tuple.serialize_element(handles)?,
+            None if !plain => tuple.serialize_element(&self.ease)?,
+            None => {}
+        }
+        tuple.end()
+    }
+}
+
+impl<'de, T: Deserialize<'de>> Deserialize<'de> for Key<T> {
+    fn deserialize<D: Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        enum Repr<T> {
+            Plain((f32, T)),
+            Eased((f32, T, Ease)),
+            Handled((f32, T, Handles)),
+        }
+        let key = |t, v, ease, handles| Key { t, v, ease, handles };
+        match Repr::deserialize(d) {
+            Ok(Repr::Plain((t, v))) => Ok(key(t, v, Ease::default(), None)),
+            Ok(Repr::Eased((t, v, ease))) => Ok(key(t, v, ease, None)),
+            Ok(Repr::Handled((t, v, handles))) => Ok(key(t, v, Ease::default(), Some(handles))),
+            Err(_) => Err(de::Error::custom(
+                "a key is [time, value], [time, value, easing] or [time, value, { \"in\", \"out\" }]",
+            )),
+        }
+    }
+}

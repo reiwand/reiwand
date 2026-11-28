@@ -1,0 +1,93 @@
+#[cxx_qt::bridge]
+pub mod qobject {
+    unsafe extern "C++" {
+        include!("cxx-qt-lib/qstring.h");
+        type QString = cxx_qt_lib::QString;
+    }
+
+    #[auto_cxx_name]
+    extern "RustQt" {
+        #[qobject]
+        #[qml_element]
+        #[qproperty(QString, trial)]
+        #[qproperty(bool, busy)]
+        type Packer = super::PackerRust;
+
+        #[qinvokable]
+        fn weigh(self: Pin<&mut Packer>, folder: &QString, args: &QString);
+
+        #[qinvokable]
+        fn outdated(self: &Packer, folder: &QString, preview: &QString) -> bool;
+    }
+
+    impl cxx_qt::Threading for Packer {}
+}
+
+use crate::bus;
+use crate::scenefile::Shown;
+use cxx_qt::{CxxQtType, Threading};
+use cxx_qt_lib::QString;
+use qobject::Packer;
+use reiwand_editor::actions::AssetEdit;
+use serde_json::{Value, json};
+use std::path::PathBuf;
+use std::pin::Pin;
+
+#[derive(Default)]
+pub struct PackerRust {
+    pub trial: QString,
+    pub busy: bool,
+    pub serial: u64,
+}
+
+fn cache() -> PathBuf {
+    dirs::cache_dir().unwrap_or_else(std::env::temp_dir).join("reiwand").join("ktx2")
+}
+
+fn weighed(folder: PathBuf, args: Value) -> anyhow::Result<Value> {
+    let wanted: AssetEdit = serde_json::from_value(json!({
+        "asset": args["asset"], "ktx2": true, "codec": args["codec"], "quality": args["quality"],
+        "cube": args["cube"].as_bool().unwrap_or(false),
+        "faces": args["faces"].as_array().cloned().unwrap_or_default()
+    }))?;
+    let mut assets = args["entries"].as_object().cloned().unwrap_or_default();
+    assets.insert(wanted.asset.clone(), args["entry"].clone());
+    let doc = json!({ "scene": { "assets": assets } });
+    let renderer = reiwand_render::Renderer::shared().ok();
+    let gpu = |bytes: &[u8], target| renderer.and_then(|r| r.look_ktx2(bytes, target));
+    reiwand_editor::packing::trial(&folder, &doc, &wanted, Some((&cache(), Some(&gpu))))
+}
+
+impl Packer {
+    pub fn weigh(mut self: Pin<&mut Self>, folder: &QString, args: &QString) {
+        let folder = PathBuf::from(folder.to_string());
+        let args = serde_json::from_str::<Value>(&args.to_string()).unwrap_or_default();
+        let serial = {
+            let mut this = self.as_mut().rust_mut();
+            this.serial += 1;
+            this.serial
+        };
+        self.as_mut().set_busy(true);
+        let qt = self.qt_thread();
+        bus::spawn(async move {
+            let done = tokio::task::spawn_blocking(move || weighed(folder, args)).await;
+            let value = match done.map_err(anyhow::Error::from).and_then(|r| r) {
+                Ok(value) => value,
+                Err(e) => json!({ "error": e.shown() }),
+            };
+            qt.queue(move |mut packer| {
+                if packer.serial == serial {
+                    packer.as_mut().set_busy(false);
+                    packer.as_mut().set_trial(QString::from(&value.to_string()));
+                }
+            })
+            .ok();
+        });
+    }
+}
+
+impl Packer {
+    pub fn outdated(&self, folder: &QString, preview: &QString) -> bool {
+        reiwand_editor::previews::outdated(&PathBuf::from(folder.to_string()), &preview.to_string())
+    }
+}

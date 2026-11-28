@@ -1,0 +1,51 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": "motion",
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 4
+  },
+  "description": {
+    "en": "Draws drifting procedural clouds or fog.",
+    "es": "Dibuja nubes o niebla que van a la deriva."
+  },
+  "fuse": "color",
+  "id": "clouds",
+  "lighter": null,
+  "mask_mode": "mix",
+  "min_fps": 20,
+  "name": {
+    "en": "Clouds and fog"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "color", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#ffffff", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "shade", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#a7b0c2", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "opacity", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.8, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "coverage", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0.45, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "softness", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0.01, "paint": null, "prefill": 0.3, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "size", "type": "float", "channels": null, "help": {}, "label": {}, "max": 16384, "min": 8, "paint": null, "prefill": 320, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "speed", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 1024, "min": -1024, "paint": null, "prefill": [6, 0], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "warp", "type": "float", "channels": null, "help": {}, "label": {}, "max": 4, "min": 0, "paint": null, "prefill": 0.8, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "octaves", "type": "float", "channels": null, "help": {}, "label": {}, "max": 8, "min": 1, "paint": null, "prefill": 5, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "height", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [],
+  "quality": {
+    "q1": {"freeze": false, "params": {"octaves": 3}, "scale": null},
+    "q2": {"freeze": false, "params": {"octaves": 4}, "scale": null}
+  },
+  "reach": null,
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [
+    "time"
+  ],
+  "velocity": null
+}

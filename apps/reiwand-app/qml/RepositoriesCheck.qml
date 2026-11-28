@@ -1,0 +1,77 @@
+import QtQuick
+import io.github.reiwand.app
+
+QtObject {
+    id: check
+
+    required property var page
+
+    function expect(ok, what) {
+        if (!ok)
+            throw new Error("repositories: " + what);
+    }
+
+    function exercise() {
+        page.repos = [{
+                "repo_id": "aa11",
+                "name": "",
+                "url": "file:///examples",
+                "bundled": true,
+                "packages": 5,
+                "hosts": [],
+                "fingerprints": ["ab"],
+                "warnings": []
+            }, {
+                "repo_id": "bb22",
+                "name": "Home",
+                "url": "https://home.example/wallpapers",
+                "packages": 2,
+                "hosts": ["home.example"],
+                "fingerprints": ["cd"],
+                "warnings": [],
+                "last_error": "connection refused"
+            }];
+        expect(page.list.count === 2, "each repository must get its row");
+        const bundled = page.list.itemAt(0);
+        const home = page.list.itemAt(1);
+        expect(bundled.row.text === App.tr("Examples") && !bundled.remove.visible, "the examples must keep their name and cannot be removed");
+        expect(home.row.text === "Home" && home.row.note === "home.example" && home.row.statusTone === "coral", "a failing repository must show its host and its trouble");
+        expect(page.examples, "with the examples present there is nothing to add back");
+        page.accounts = [{
+                "id": "a1",
+                "user": "reader",
+                "label": "reader@home.example",
+                "repos": [{
+                        "url": "https://home.example/wallpapers/",
+                        "repo_id": null
+                    }]
+            }];
+        page.repos = [page.repos[0], Object.assign({}, page.repos[1], {
+                "last_error": null,
+                "warnings": ["signature_changed"]
+            })];
+        const warned = page.list.itemAt(1);
+        expect(warned.row.statusTone === "coral" && warned.row.status === App.tr("Needs a look"), "a changed signature must mark the repository");
+        expect(warned.row.note === "home.example · reader@home.example", "a private repository must name its account: " + warned.row.note);
+        expect(page.link.text === App.tr("Add a repository"), "the page must offer the same entry as Explore");
+        page.repos = [page.repos[1]];
+        expect(!page.examples, "without the examples the page must offer them again");
+        const shown = Qt.createComponent("RepoAddress.qml").createObject(page, {
+            "text": "file:///repo/"
+        });
+        shown.copy();
+        const board = Qt.createQmlObject("import QtQuick; TextEdit { visible: false }", page);
+        board.paste();
+        expect(shown.copied && board.text === "file:///repo/", "the repository address was not copied: " + board.text);
+        board.destroy();
+        shown.destroy();
+        const link = Qt.createComponent("RepoAddLink.qml").createObject(page);
+        link.open();
+        link.address.text = "https://home.example/" + "x".repeat(300);
+        const edge = link.address.mapToItem(link.contentItem, link.address.width, 0).x;
+        expect(edge <= link.contentItem.width - Look.e4 + 1, "the address field sticks out of its popup: " + edge + " in " + link.contentItem.width);
+        link.close();
+        link.destroy();
+        page.load();
+    }
+}

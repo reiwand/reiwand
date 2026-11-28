@@ -1,0 +1,197 @@
+mod deep;
+
+use super::{Op, SceneAssets, SceneView, encode, pipes};
+use crate::allocations::allocations;
+use crate::{Pixels, Renderer};
+use image::{Rgba, RgbaImage};
+use reiwand_scene::{Budget, Quality, Runtime, Scene, Spare, Tier, Values};
+use std::sync::Arc;
+
+pub(crate) const SCENE: &str = r##"{ "schema": "reiwand.scene/2",
+  "canvas": { "size": [320, 180], "background": "#102030" },
+  "assets": { "photo": { "path": "p.png", "mipmaps": true, "wrap": "repeat" },
+              "sheet": { "path": "s.png", "atlas": [1, 4], "fps": 8 } },
+  "timelines": [{ "id": "swing", "duration": 4, "loop": "repeat" }],
+  "layers": [
+    { "blend_space": "canvas", "id": "back", "type": "image", "image": "photo", "size": [320, 180], "parallax": [0.1, 0.1] },
+    { "blend_space": "canvas", "id": "spin", "type": "image", "image": "photo", "size": [60, 60], "color": "#ff8080", "brightness": 1.2,
+      "transform": { "position": [60, 60], "rotation": { "timeline": "swing", "keys": [[0, 0], [4, 360]] } } },
+    { "blend_space": "canvas", "id": "kid", "type": "solid", "color": "#00ff00", "size": [12, 12], "parent": "spin", "transform": { "position": [40, 0] } },
+    { "blend_space": "canvas", "id": "sprite", "type": "image", "image": "sheet", "size": [40, 40], "transform": { "position": [270, 40] } },
+    { "blend_space": "canvas", "id": "glow", "type": "group", "color": "#c0ffc0", "effects": [{ "effect": "blur", "params": { "radius": 6 } }], "layers": [
+      { "blend_space": "canvas", "id": "dot", "type": "shape", "shape": { "ellipse": { "size": [50, 50] } }, "fill": "#ffcc66",
+        "transform": { "position": { "keys": [[0, [100, 130]], [2, [220, 130]]], "loop": "pingpong" } } } ] },
+    { "blend_space": "canvas", "id": "over", "type": "solid", "color": "#4060ff", "size": [80, 50], "blend": "overlay",
+      "transform": { "position": { "keys": [[0, [160, 90]], [2, [200, 100]]], "loop": "pingpong" } } },
+    { "blend_space": "canvas", "id": "masked", "type": "solid", "color": "#ffffff", "size": [40, 40], "mask": { "shape": { "ellipse": { "size": [1, 1] } } },
+      "transform": { "position": [250, 140], "scale": { "keys": [[0, [1, 1]], [2, [1.5, 1.5]]], "loop": "pingpong" } } },
+    { "blend_space": "canvas", "id": "words", "type": "text", "text": "Steady", "size": 20, "color": "#ffffff", "transform": { "position": [160, 20] } },
+    { "blend_space": "canvas", "id": "post", "type": "adjustment", "effects": [{ "effect": "vignette", "params": { "intensity": 0.4 } }] }
+  ] }"##;
+
+const OWN: &str = r##"{ "schema": "reiwand.scene/2",
+  "canvas": { "size": [320, 180], "background": "#102030" },
+  "effects": { "smear": { "descriptor": "fx/smear.json", "wgsl": "fx/smear.wgsl" } },
+  "layers": [
+    { "blend_space": "canvas", "id": "src", "type": "solid", "color": "#ff8040", "size": [80, 80], "visible": false,
+      "transform": { "position": { "keys": [[0, [100, 90]], [2, [220, 90]]], "loop": "pingpong" } } },
+    { "blend_space": "canvas", "id": "back", "type": "solid", "color": "#203040", "size": [320, 180],
+      "effects": [{ "effect": "smear", "params": { "shape": { "layer": "src" }, "boost": 2 } }] }
+  ] }"##;
+
+const TRAIL: &str = r#"{ "id": "smear", "cost": {}, "params": [{ "id": "shape", "type": "texture", "prefill": "" }],
+  "targets": { "a": { "scale": 0.5 }, "b": { "scale": 0.5 } },
+  "options": [{ "id": "boost", "values": [1, 2], "prefill": 1 }],
+  "passes": [{ "entry": "fs_fill", "target": "a", "inputs": ["previous", "asset:shape"] }, { "swap": ["a", "b"] },
+             { "entry": "fs_show", "inputs": ["previous", "target:b"] }] }"#;
+
+const SHADER: &str = "override boost: i32 = 1;
+@fragment fn fs_fill(in: VertexOut) -> @location(0) vec4<f32> { return sample(aux0, in.uv) * f32(boost); }
+@fragment fn fs_show(in: VertexOut) -> @location(0) vec4<f32> { return tap(in.uv) + sample(aux0, in.uv) * 0.5; }";
+
+pub(crate) fn assets() -> SceneAssets {
+    let photo = RgbaImage::from_fn(256, 256, |x, y| Rgba([x as u8, y as u8, (x ^ y) as u8, 255]));
+    let sheet = RgbaImage::from_fn(64, 16, |x, _| Rgba([(x / 16 * 80) as u8, 0, 200, 255]));
+    let images = [("photo".to_string(), Pixels::new(photo)), ("sheet".to_string(), Pixels::new(sheet))];
+    SceneAssets { images: images.into(), ..Default::default() }
+}
+
+fn frame(r: &Renderer, view: &mut SceneView, runtime: &mut Runtime, spare: &mut Spare) -> [u64; 2] {
+    runtime.advance(1.0 / 30.0);
+    let mut frame = None;
+    let kept = std::mem::take(spare);
+    let evaluated = allocations(|| frame = Some(runtime.frame_in(kept, view.view((320, 180)), Quality::Q3)));
+    let frame = frame.expect("evaluated above");
+    let spent = allocations(|| {
+        r.render_scene(view, runtime, &frame, (320, 180), Quality::Q3, &[]).unwrap();
+    });
+    *spare = frame.spare();
+    r.finish().unwrap();
+    [evaluated, spent]
+}
+
+fn replay(r: &Renderer, view: &mut SceneView, ops: &[Op], data: &[u8]) -> u64 {
+    let SceneView { pool, caches, states, luts, target, swarms, scratch, uniform, clock, id, .. } = view;
+    let (canvas, output) = target.as_ref().unwrap();
+    let sources = encode::Sources {
+        caches,
+        states,
+        luts,
+        exts: &scratch.exts,
+        canvas,
+        output,
+        swarms: swarms.as_ref(),
+        scissor: None,
+        sets: &scratch.sets,
+    };
+    let pipes = r.pipes();
+    let (timing, read) = clock.again(r, ops);
+    let spent = allocations(|| {
+        r.queue.write_buffer(uniform, 0, &data[..size_of::<super::item::FrameData>()]);
+        pool.upload(&r.device, &r.queue, pipes, uniform);
+        let clock = (&*clock, timing);
+        r.scoped(|| r.encode_scene(pool, &sources, ops, None, clock, (*id, 0, false))).unwrap();
+    });
+    r.finish().unwrap();
+    read + spent
+}
+
+fn measure(r: &Renderer, scene: Scene) -> (SceneView, Runtime, [i64; 2], u32) {
+    let mut runtime = Runtime::new(Arc::new(scene), Values::new());
+    let mut view = r.scene_view(&runtime.scene, &assets(), runtime.props()).unwrap();
+    let mut spare = Spare::default();
+    (0..8).for_each(|_| _ = frame(r, &mut view, &mut runtime, &mut spare));
+    let (mut extra, mut passes, mut evaluated) = (Vec::new(), 0, Vec::new());
+    for _ in 0..9 {
+        let [eval, spent] = frame(r, &mut view, &mut runtime, &mut spare);
+        evaluated.push(eval as i64);
+        passes = view.stats().passes;
+        let ops = view.scratch.ops.clone();
+        let slot = |op: &Op| match op {
+            Op::Draw { slot, .. } | Op::Particles { slot, .. } => *slot as usize,
+            Op::Effect(f) => f.slot.max(f.more.unwrap_or(0)) as usize,
+            _ => 0,
+        };
+        view.pool.data.resize(ops.iter().map(slot).max().unwrap_or(0) + pipes::STRIDE as usize, 0);
+        extra.push(spent as i64 - replay(r, &mut view, &ops, &[0; 1024]) as i64);
+        view.pool.data.clear();
+    }
+    extra.sort_unstable();
+    evaluated.sort_unstable();
+    (view, runtime, [extra[extra.len() / 2], evaluated[evaluated.len() / 2]], passes)
+}
+
+#[test]
+fn steady_scene_frames_allocate_nothing_beyond_their_gpu_calls() {
+    let own = match Renderer::new() {
+        Ok(r) => r,
+        Err(e) => return assert!(std::env::var_os("REIWAND_REQUIRE_GPU").is_none(), "GPU required: {e}"),
+    };
+    let r = &own;
+    let (mut view, runtime, [extra, evaluated], passes) =
+        measure(r, Scene::load(&crate::whole::whole(SCENE), &Default::default()).unwrap());
+    assert!(passes >= 5 && view.stats().created == 0, "{:?}", view.stats());
+    assert_eq!(evaluated, 0, "evaluating a steady frame allocated");
+    let power = Budget { heat: reiwand_scene::Heat::Warm, ..Budget::new(Tier::T1, false, 0) };
+    let schedule = || {
+        let quality = power.quality(&runtime);
+        std::hint::black_box((power.fps(&runtime, quality, 60), power.still(&runtime)));
+    };
+    schedule();
+    assert_eq!(allocations(schedule), 0, "choosing the quality and rate of a steady frame allocated");
+    assert!(extra <= 0, "a steady frame made {extra} allocations more than its GPU calls alone");
+    let draws: Vec<Op> =
+        view.scratch.ops.iter().copied().filter(|op| matches!(op, Op::Draw { .. })).collect();
+    let lookups = allocations(|| {
+        for op in &draws {
+            let Op::Draw { entry, mode, tex, .. } = op else { continue };
+            drop(r.pipes().get(&r.device, pipes::Shader::Scene(entry), *mode, view.format));
+            let SceneView { pool, caches, states, luts, target, swarms, scratch, .. } = &mut view;
+            let (canvas, output) = target.as_ref().unwrap();
+            let exts = &scratch.exts;
+            let sources = encode::Sources {
+                caches,
+                states,
+                luts,
+                exts,
+                canvas,
+                output,
+                swarms: swarms.as_ref(),
+                scissor: None,
+                sets: &scratch.sets,
+            };
+            drop(sources.group(r, pool, false, tex));
+        }
+    });
+    assert_eq!(lookups, 0, "pipelines and bind groups of a steady frame were not all cached");
+}
+
+#[test]
+fn steady_package_effect_frames_allocate_nothing_beyond_their_gpu_calls() {
+    let Ok(own) = Renderer::new() else { return };
+    let r = &own;
+    let mut scene = Scene::load(&crate::whole::whole(OWN), &Default::default()).unwrap();
+    let files = |path: &str, _: usize| match path {
+        "fx/smear.json" => Ok(reiwand_fill::descriptors::completed(TRAIL).into_bytes()),
+        "fx/smear.wgsl" => Ok(SHADER.as_bytes().to_vec()),
+        _ => Err("missing"),
+    };
+    scene.adopt(&Default::default(), files).unwrap();
+    let (view, _, [extra, evaluated], passes) = measure(r, scene);
+    assert!(view.left_out().is_empty(), "{:?}", view.left_out());
+    assert!(passes >= 4 && view.stats().created == 0, "{passes} {:?}", view.stats());
+    assert_eq!(evaluated, 0, "evaluating a steady frame allocated");
+    assert!(extra <= 0, "a steady frame made {extra} allocations more than its GPU calls alone");
+}
+
+#[test]
+fn a_loaded_scene_draws_its_first_frames_without_compiling() {
+    let Ok(r) = Renderer::shared() else { return };
+    let scene = Scene::load(&crate::whole::whole(SCENE), &Default::default()).unwrap();
+    let mut runtime = Runtime::new(Arc::new(scene), Values::new());
+    let mut view = r.scene_view(&runtime.scene, &assets(), runtime.props()).unwrap();
+    for _ in 0..3 {
+        frame(r, &mut view, &mut runtime, &mut Spare::default());
+        assert_eq!(view.stats().compiled, 0, "{:?}", view.stats());
+    }
+}

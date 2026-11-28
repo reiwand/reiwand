@@ -1,0 +1,115 @@
+use crate::display::FrameRate;
+use crate::{Control, Manifest, Property, Text};
+use reiwand_scene::Slider;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
+
+pub const VIDEO_PROPERTIES: [&str; 7] = ["speed", "start", "end", "volume", "zoom", "x", "y"];
+const MAX_START: f64 = 3600.0;
+const TAIL: f64 = 0.5;
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct Playback {
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
+    pub speed: Option<f64>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
+    pub start: Option<f64>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
+    pub end: Option<f64>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
+    pub volume: Option<f64>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
+    pub max_fps: Option<FrameRate>,
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
+    pub muted: Option<bool>,
+    #[serde(rename = "loop")]
+    #[serde(deserialize_with = "reiwand_core::explicit::null")]
+    #[schemars(required, extend("x-null" = true))]
+    pub repeat: Option<bool>,
+}
+
+fn within(value: Option<f64>, min: f64, max: f64) -> bool {
+    value.is_none_or(|v| v.is_finite() && (min..=max).contains(&v))
+}
+
+impl Playback {
+    pub(crate) fn valid(&self) -> bool {
+        let ends = self.end.is_none_or(|end| end > self.start.unwrap_or(0.0));
+        within(self.speed, 0.1, 4.0)
+            && within(self.start, 0.0, MAX_START)
+            && within(self.end, 0.0, MAX_START)
+            && ends
+            && within(self.volume, 0.0, 1.0)
+            && self.max_fps.is_none_or(FrameRate::valid)
+    }
+
+    pub(crate) fn newer(&self) -> bool {
+        self.max_fps.is_some() || self.muted.is_some() || self.repeat.is_some()
+    }
+
+    pub(crate) fn scenic(&self) -> bool {
+        (self.speed, self.start, self.end, self.repeat) == (None, None, None, None)
+    }
+
+    pub fn loudness(&self) -> f64 {
+        let volume = if self.muted == Some(true) { 0.0 } else { self.volume.unwrap_or(1.0) };
+        (volume * 20.0).round() * 5.0
+    }
+
+    pub fn frame_cap(&self) -> u32 {
+        match self.max_fps {
+            Some(FrameRate::Fixed(fps)) => fps,
+            _ => reiwand_core::settings::fps::DISPLAY,
+        }
+    }
+
+    pub fn once(&self) -> bool {
+        self.repeat == Some(false)
+    }
+}
+
+impl Manifest {
+    pub fn pace(&self, scene: &mut reiwand_scene::Scene) {
+        let cap = self.playback.as_ref().map_or(reiwand_core::settings::fps::DISPLAY, Playback::frame_cap);
+        scene.clock.max_fps = reiwand_core::settings::fps::lower(scene.clock.max_fps, cap);
+    }
+
+    pub fn video_properties(&self, labels: &[String; 8], length: Option<f64>) -> BTreeMap<String, Property> {
+        let (play, show) =
+            (self.playback.clone().unwrap_or_default(), self.display.clone().unwrap_or_default());
+        let length = length.filter(|l| l.is_finite() && *l >= 1.0).unwrap_or(MAX_START);
+        let [x, y] = show.position.unwrap_or_default();
+        let slider = |min: f64, max: f64, default: f64, places: u8, unit: &str| Slider {
+            decimals: Some(places),
+            editable: true,
+            unit: Some(unit.to_owned()).filter(|u| !u.is_empty()),
+            ..Slider::new(min, max, None, default.clamp(min, max))
+        };
+        let controls = [
+            Slider { log: true, ..slider(0.1, 4.0, play.speed.unwrap_or(1.0), 2, "×") },
+            slider(0.0, length - TAIL, play.start.unwrap_or(0.0), 1, "s"),
+            slider(0.0, length, play.end.unwrap_or(0.0), 1, "s"),
+            Slider { integer: true, step: Some(5.0), ..slider(0.0, 100.0, play.loudness(), 0, "%") },
+            slider(1.0, 8.0, show.zoom.unwrap_or(1.0), 2, "×"),
+            slider(-1.0, 1.0, x, 2, ""),
+            slider(-1.0, 1.0, y, 2, ""),
+        ];
+        let named = VIDEO_PROPERTIES.iter().zip(controls).enumerate().map(|(i, (id, control))| {
+            let help = (*id == "end").then(|| Text::Plain(labels[7].clone()));
+            let label = Some(Text::Plain(labels[i].clone()));
+            (
+                id.to_string(),
+                Property { label, help, order: i as f64, ..Property::new(Control::Slider(control)) },
+            )
+        });
+        named.collect()
+    }
+}

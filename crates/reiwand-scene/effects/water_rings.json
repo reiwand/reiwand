@@ -1,0 +1,41 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": "motion",
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Draws expanding rings like drops on water.",
+    "es": "Dibuja anillos que se expanden, como gotas en el agua."
+  },
+  "fuse": "uv",
+  "id": "water_rings",
+  "lighter": null,
+  "mask_mode": "strength",
+  "min_fps": 30,
+  "name": {
+    "en": "Water rings"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "amplitude", "type": "float", "channels": null, "help": {}, "label": {}, "max": 128, "min": 0, "paint": null, "prefill": 4, "tool": null, "tools": [], "unit": null, "uses": "time", "values": [], "waits_for": null, "yields_to": null},
+    {"id": "wavelength", "type": "float", "channels": null, "help": {}, "label": {}, "max": 4096, "min": 2, "paint": null, "prefill": 48, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "speed", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1024, "min": -1024, "paint": null, "prefill": 32, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "falloff", "type": "float", "channels": null, "help": {}, "label": {}, "max": 16384, "min": 1, "paint": null, "prefill": 400, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "center", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 2, "min": -1, "paint": null, "prefill": [0.5, 0.5], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [],
+  "quality": {},
+  "reach": "amplitude",
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
+}

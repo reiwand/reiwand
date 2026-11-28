@@ -1,0 +1,176 @@
+use crate::daemon::Daemon;
+use crate::error::{Result, failed};
+use crate::items::{MAX_UIDS, limited};
+use reiwand_library::EntryEdit;
+use std::sync::{Arc, Weak};
+use zbus::object_server::SignalEmitter;
+
+pub struct Playlists(pub Weak<Daemon>);
+
+pub fn library(daemon: &Weak<Daemon>) -> Result<Arc<Daemon>> {
+    let daemon = daemon.upgrade().ok_or_else(|| failed("the daemon is stopping"))?;
+    daemon.store.error.as_ref().map_or(Ok(daemon.clone()), |e| Err(failed(e.clone())))
+}
+
+fn refs(uids: &[String]) -> Result<Vec<&str>> {
+    limited(uids, MAX_UIDS)?;
+    Ok(uids.iter().map(String::as_str).collect())
+}
+
+#[zbus::interface(name = "io.github.reiwand.Playlists1")]
+impl Playlists {
+    #[zbus(out_args("json"))]
+    async fn list(&self) -> Result<String> {
+        library(&self.0)?.run(|d| d.list_playlists()).await
+    }
+
+    #[zbus(out_args("json"))]
+    async fn get(&self, playlist: String, offset: u32, limit: u32) -> Result<String> {
+        library(&self.0)?.run(move |d| d.get_playlist(&playlist, offset, limit)).await
+    }
+
+    #[zbus(out_args("uid"))]
+    async fn create(&self, name: String, query: String) -> Result<String> {
+        library(&self.0)?.run(move |d| d.create_playlist(&name, &query)).await
+    }
+
+    async fn rename(&self, playlist: String, name: String) -> Result<()> {
+        library(&self.0)?.run(move |d| d.rename_playlist(&playlist, &name)).await
+    }
+
+    async fn set_query(&self, playlist: String, query: String) -> Result<()> {
+        library(&self.0)?.run(move |d| d.set_query(&playlist, &query)).await
+    }
+
+    async fn delete(&self, playlist: String) -> Result<()> {
+        library(&self.0)?.run(move |d| d.delete_playlist(&playlist)).await
+    }
+
+    async fn add_items(&self, playlist: String, uids: Vec<String>) -> Result<()> {
+        let edit = move |d: &Arc<Daemon>| {
+            let uids = refs(&uids)?;
+            d.edit_entries(&playlist, |lib, uid| lib.add_to_playlist(uid, &uids))
+        };
+        library(&self.0)?.run(edit).await
+    }
+
+    async fn remove_items(&self, playlist: String, uids: Vec<String>) -> Result<()> {
+        let edit = move |d: &Arc<Daemon>| {
+            let uids = refs(&uids)?;
+            d.edit_entries(&playlist, |lib, uid| lib.remove_from_playlist_many(uid, &uids))
+        };
+        library(&self.0)?.run(edit).await
+    }
+
+    async fn remove_entries(&self, playlist: String, indexes: Vec<u32>, expected: Vec<String>) -> Result<()> {
+        library(&self.0)?.run(move |d| d.remove_entries(&playlist, &indexes, &expected)).await
+    }
+
+    async fn move_item(&self, playlist: String, from: u32, to: u32, expected: String) -> Result<()> {
+        let edit = move |d: &Arc<Daemon>| {
+            let edit = EntryEdit::Move { from, to, expected: &expected };
+            d.edit_entries(&playlist, |lib, uid| lib.edit_entries(uid, edit))
+        };
+        library(&self.0)?.run(edit).await
+    }
+
+    async fn set_rule(&self, playlist: String, key: String, value: String) -> Result<()> {
+        library(&self.0)?.run(move |d| d.set_playlist_rule(&playlist, &key, &value)).await
+    }
+
+    #[zbus(out_args("count"))]
+    async fn add_folder(&self, playlist: String, path: String, follow: bool) -> Result<u32> {
+        library(&self.0)?.run(move |d| d.add_folder(&playlist, &path, follow)).await
+    }
+
+    #[zbus(out_args("uid"))]
+    async fn rotate(
+        &self,
+        name: String,
+        uids: Vec<String>,
+        folder: String,
+        follow: bool,
+        every: String,
+        output: String,
+    ) -> Result<String> {
+        let rotate = move |d: &Arc<Daemon>| {
+            limited(&uids, MAX_UIDS)?;
+            d.rotate_playlist(&name, &uids, (&folder, follow), &every, &output)
+        };
+        library(&self.0)?.render(rotate).await
+    }
+
+    async fn start(&self, playlist: String, output: String) -> Result<()> {
+        library(&self.0)?.render(move |d| d.start(&playlist, &output)).await
+    }
+
+    async fn stop(&self, output: String) -> Result<()> {
+        library(&self.0)?.render(move |d| d.stop(&output)).await
+    }
+
+    async fn next(&self, output: String) -> Result<()> {
+        library(&self.0)?.render(move |d| d.step(&output, true)).await
+    }
+
+    async fn previous(&self, output: String) -> Result<()> {
+        library(&self.0)?.render(move |d| d.step(&output, false)).await
+    }
+
+    #[zbus(out_args("json"))]
+    async fn browse(
+        &self,
+        output: String,
+        source: String,
+        steps: i32,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<String> {
+        let output = crate::browse::pointer::resolve(&self.0, emitter.connection(), output).await;
+        let told = library(&self.0)?.run(move |d| d.browse_move(&output, &source, steps)).await?;
+        crate::browse::told(&self.0, emitter, told).await
+    }
+
+    #[zbus(out_args("json"))]
+    async fn browse_apply(
+        &self,
+        output: String,
+        transition: String,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<String> {
+        let told = library(&self.0)?.render(move |d| d.browse_apply(&output, &transition)).await?;
+        crate::browse::told(&self.0, emitter, told).await
+    }
+
+    #[zbus(out_args("json"))]
+    async fn browse_transition(
+        &self,
+        output: String,
+        transition: String,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<String> {
+        let told = library(&self.0)?.run(move |d| d.browse_transition(&output, &transition)).await?;
+        crate::browse::told(&self.0, emitter, told).await
+    }
+
+    #[zbus(out_args("json"))]
+    async fn browse_cancel(
+        &self,
+        output: String,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<String> {
+        let told = library(&self.0)?.run(move |d| d.browse_cancel(&output)).await?;
+        crate::browse::told(&self.0, emitter, told).await
+    }
+
+    #[zbus(out_args("json"))]
+    async fn get_browse(&self, output: String) -> Result<String> {
+        library(&self.0)?.run(move |d| d.get_browse(&output)).await
+    }
+
+    #[zbus(signal)]
+    pub async fn browse_changed(emitter: &SignalEmitter<'_>, output: &str, json: &str) -> zbus::Result<()>;
+
+    #[zbus(out_args("json"))]
+    async fn history(&self, output: String, limit: u32) -> Result<String> {
+        library(&self.0)?.run(move |d| d.history(&output, limit)).await
+    }
+}

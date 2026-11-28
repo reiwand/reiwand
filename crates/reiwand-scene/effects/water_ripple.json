@@ -1,0 +1,59 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": "motion",
+  "compose": false,
+  "cost": {
+    "passes": 2,
+    "scale": 1,
+    "taps": 3
+  },
+  "description": {
+    "en": "Simulates ripples on water that react to the pointer and clicks.",
+    "es": "Simula ondas en el agua que reaccionan al puntero y a los clics."
+  },
+  "fuse": null,
+  "id": "water_ripple",
+  "lighter": null,
+  "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Water ripples"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "strength", "type": "float", "channels": null, "help": {}, "label": {}, "max": 256, "min": 0, "paint": null, "prefill": 32, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "damping", "type": "float", "channels": null, "help": {}, "label": {}, "max": 0.97, "min": 0.5, "paint": null, "prefill": 0.96, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "radius", "type": "float", "channels": null, "help": {}, "label": {}, "max": 256, "min": 1, "paint": null, "prefill": 24, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "cursor", "type": "float", "channels": null, "help": {}, "label": {}, "max": 8, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "click", "type": "float", "channels": null, "help": {}, "label": {}, "max": 8, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": "clicks", "values": [], "waits_for": null, "yields_to": null},
+    {"id": "beat", "type": "float", "channels": null, "help": {}, "label": {}, "max": 8, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": "audio", "values": [], "waits_for": null, "yields_to": null},
+    {"id": "specular", "type": "float", "channels": null, "help": {}, "label": {}, "max": 2, "min": 0, "paint": null, "prefill": 0.15, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "perspective", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "reflection", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": ["gray"], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "tint", "type": "color", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "#ffffff", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "walls", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": null, "tools": ["gray"], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "speed", "type": "float", "channels": null, "help": {}, "label": {}, "max": 4, "min": 0, "paint": null, "prefill": 1, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_water_ripple_step", "grid": null, "inputs": ["state", "asset:walls"], "output": "state", "scale": 0.25, "swap": null, "target": null, "vertex": null},
+    {"blend": null, "copy": null, "entry": "fs_water_ripple", "grid": null, "inputs": ["input", "state", "asset:reflection"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {
+    "q1": {"freeze": false, "params": {}, "scale": 0.5}
+  },
+  "reach": "strength",
+  "solve": null,
+  "stage": "layer",
+  "state": {
+    "fade": null,
+    "scale": 0.25,
+    "settle": 4
+  },
+  "targets": {},
+  "uses": [
+    "cursor"
+  ],
+  "velocity": null
+}

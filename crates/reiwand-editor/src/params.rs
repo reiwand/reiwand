@@ -1,0 +1,122 @@
+use crate::inspect::{Field, SOURCES, candidates};
+use crate::layers::walk;
+use crate::ops::escape;
+use reiwand_scene::{Entry, ParamDef, ParamKind, Text, Variant};
+use serde_json::{Value, json};
+
+const PICTURED: [(&str, &str); 2] = [("shine", "style"), ("depth_parallax", "reach")];
+
+fn source(current: Option<&Value>) -> String {
+    SOURCES
+        .iter()
+        .find(|s| current.is_some_and(|c| c.get(**s).is_some_and(|v| !v.is_null())))
+        .map_or("", |s| *s)
+        .into()
+}
+
+fn local(texts: &std::collections::BTreeMap<String, String>) -> String {
+    match texts.is_empty() {
+        true => String::new(),
+        false => Text::Localized(texts.clone()).pick(&reiwand_core::locale::languages()),
+    }
+}
+
+pub(crate) fn param(doc: &Value, p: &ParamDef, value: &Value, base: &str, depth: usize) -> Field {
+    let current = value["params"].get(&p.id);
+    let (widget, reference) = match p.kind {
+        ParamKind::Texture if p.tool.is_some() => ("ref:mask", Some("image")),
+        ParamKind::Float => ("number", None),
+        ParamKind::Vec2 | ParamKind::Position => ("vec2", None),
+        ParamKind::Color => ("color", None),
+        ParamKind::Bool => ("bool", None),
+        ParamKind::Texture => ("ref:image", Some("image")),
+        ParamKind::Mask => ("ref:mask", Some("image")),
+        ParamKind::Lut => ("ref:lut", Some("lut")),
+        ParamKind::Int => ("integer", None),
+        ParamKind::Enum | ParamKind::Blend => ("enum", None),
+        ParamKind::Emitters => ("emitters", None),
+    };
+    let listed = match p.kind {
+        ParamKind::Blend => {
+            reiwand_scene::BLENDS.iter().filter_map(|b| serde_json::to_value(b).ok()).collect()
+        }
+        _ => p.values.iter().map(|e| json!(e.value)).collect(),
+    };
+    let mut options = reference.map(|r| candidates(doc, r, base)).unwrap_or(listed);
+    if matches!(p.kind, ParamKind::Texture | ParamKind::Mask) {
+        options = crate::films::pictures(doc);
+    }
+    if reference == Some("image") {
+        let generic: Vec<Value> = reiwand_scene::GENERIC_PICTURES.iter().map(|g| json!(g)).collect();
+        let free: Vec<Value> = generic.into_iter().filter(|g| !options.contains(g)).collect();
+        options.extend(free);
+        let own = base.split("/effects/").next().and_then(|l| doc.pointer(l)).and_then(|l| l["id"].as_str());
+        let layers = walk(doc).into_iter().filter_map(|(_, l)| l["id"].as_str().map(String::from));
+        options.extend(layers.filter(|id| Some(id.as_str()) != own).map(|id| json!({ "layer": id })));
+    }
+    let labeled = p.kind == ParamKind::Enum && p.values.iter().all(|e| !e.label.is_empty());
+    let names = if labeled { p.values.iter().map(|e: &Entry| local(&e.label)).collect() } else { Vec::new() };
+    let tools = crate::textools::of(value["effect"].as_str().unwrap_or_default(), p);
+    let drawn = value["effect"].as_str().filter(|e| PICTURED.contains(&(*e, p.id.as_str())));
+    Field {
+        pointer: format!("{base}/{}", escape(&p.id)),
+        key: p.id.clone(),
+        widget: drawn.map_or(widget, |_| "styles").into(),
+        value: current.cloned().unwrap_or_default(),
+        default: serde_json::to_value(&p.prefill).unwrap_or_default(),
+        set: current.is_some(),
+        options,
+        range: p.min.zip(p.max).map_or(Value::Null, |(a, b)| json!([a, b])),
+        bindable: reference.is_none(),
+        source: source(current),
+        depth,
+        names,
+        title: local(&p.label),
+        sample: match (p.kind, drawn) {
+            (ParamKind::Mask, _) => json!({ "channels": p.channels.unwrap_or(1) }),
+            (ParamKind::Texture, _) if p.tool.is_some() => {
+                json!({ "channels": 1, "tool": p.tool, "tools": tools })
+            }
+            (ParamKind::Texture | ParamKind::Lut, _) if !tools.is_empty() => json!({ "tools": tools }),
+            (_, Some(effect)) => json!({ "effect": effect }),
+            _ => Value::Null,
+        },
+        help: local(&p.help),
+        dial: p.kind == ParamKind::Float && p.unit == Some(reiwand_scene::Unit::Degrees),
+        ..Field::default()
+    }
+}
+
+pub(crate) fn option(o: &Variant, value: &Value, base: &str, depth: usize) -> Field {
+    let current = value["params"].get(&o.id);
+    Field {
+        pointer: format!("{base}/{}", escape(&o.id)),
+        key: o.id.clone(),
+        widget: "enum".into(),
+        value: current.cloned().unwrap_or_default(),
+        default: serde_json::to_value(&o.prefill).unwrap_or_default(),
+        set: current.is_some(),
+        options: o.values.iter().filter_map(|v| serde_json::to_value(v).ok()).collect(),
+        bindable: true,
+        source: source(current),
+        depth,
+        ..Field::default()
+    }
+}
+
+pub(crate) fn wake(doc: &Value, d: &reiwand_scene::Descriptor, base: &str, depth: usize) -> Field {
+    let own = doc.pointer(&format!("/scene/effects/{}", escape(&d.id))).is_some();
+    let params = d
+        .params
+        .iter()
+        .map(|p| json!({ "id": p.id, "uses": p.uses, "waits_for": p.waits_for, "yields_to": p.yields_to }));
+    let value = json!({ "effect": d.id, "own": own, "uses": d.uses, "params": params.collect::<Vec<_>>() });
+    Field {
+        pointer: format!("{base}/wake"),
+        key: "wake".into(),
+        widget: "rules".into(),
+        value,
+        depth,
+        ..Field::default()
+    }
+}

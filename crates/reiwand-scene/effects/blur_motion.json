@@ -1,0 +1,39 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": "blur",
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 2
+  },
+  "description": {
+    "en": "Blurs the picture in one direction, as if it moved fast.",
+    "es": "Desenfoca la imagen en una dirección, como si se moviera rápido."
+  },
+  "id": "blur_motion",
+  "mask_mode": "strength",
+  "name": {
+    "en": "Motion blur"
+  },
+  "options": [],
+  "params": [
+    {"id": "angle", "type": "float", "help": {}, "label": {}, "max": 360, "min": -360, "prefill": 0, "tools": [], "unit": "degrees", "values": []},
+    {"id": "length", "type": "float", "help": {}, "label": {}, "max": 256, "min": 0, "prefill": 16, "tools": [], "values": []},
+    {"id": "samples", "type": "float", "help": {}, "label": {}, "max": 32, "min": 2, "prefill": 12, "tools": [], "values": []},
+    {"id": "follow", "type": "bool", "help": {}, "label": {}, "prefill": false, "tools": [], "values": []},
+    {"id": "shutter", "type": "float", "help": {}, "label": {}, "max": 0.5, "min": 0, "prefill": 0.05, "tools": [], "values": []}
+  ],
+  "passes": [
+    {"entry": "fs_blur_motion", "inputs": ["previous"], "output": "next", "scale": 1}
+  ],
+  "quality": {
+    "q1": {"freeze": false, "params": {"samples": 8}}
+  },
+  "reach": "length",
+  "stage": "layer",
+  "targets": {},
+  "uses": [],
+  "velocity": "follow"
+}

@@ -1,0 +1,333 @@
+{
+  "assets": {
+    "crate": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/crate.glb",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    }
+  },
+  "camera3d": {
+    "center": [
+      0,
+      0.4,
+      0
+    ],
+    "eye": [
+      4,
+      3,
+      8
+    ],
+    "far": 1000.0,
+    "fov": 40,
+    "near": 0.1,
+    "order": "sequential",
+    "paths": [],
+    "up": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  "canvas": {
+    "ambient": "#232a4a",
+    "background": "#10162b",
+    "blend_space": "linear",
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "size": [
+      1920,
+      1080
+    ],
+    "sky": "#34447a"
+  },
+  "clock": {
+    "max_fps": "display",
+    "poster_time": 2,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#10162b",
+      "depth_test": false,
+      "effects": [],
+      "id": "backdrop",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": "canvas",
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "solid",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "clip": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "stage",
+      "layers": [
+        {
+          "animations": [],
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "clips": [],
+          "colliders": [],
+          "depth_test": false,
+          "effects": [],
+          "expressions": {},
+          "hit": [],
+          "id": "floor",
+          "ik": [],
+          "materials": {
+            "paint": {
+              "blend": null,
+              "cast_shadows": null,
+              "color": "#3a4468",
+              "cull": null,
+              "depth_test": null,
+              "depth_write": null,
+              "double_sided": null,
+              "lit": null,
+              "maps": {},
+              "params": {
+                "roughness": 0.8
+              },
+              "receive_shadows": null,
+              "shader": "pbr"
+            }
+          },
+          "model": "crate",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "physics": [],
+          "position": [
+            0,
+            -1.2,
+            0
+          ],
+          "root_motion": false,
+          "rules": [],
+          "scale": [
+            5,
+            0.1,
+            5
+          ],
+          "shapes": {},
+          "size": "canvas",
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "model",
+          "visible": true
+        },
+        {
+          "animations": [],
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "clips": [],
+          "colliders": [],
+          "depth_test": false,
+          "effects": [],
+          "expressions": {},
+          "hit": [],
+          "id": "box",
+          "ik": [],
+          "materials": {},
+          "model": "crate",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "physics": [],
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "root_motion": false,
+          "rotation": {
+            "invert": false,
+            "keys": [
+              [
+                0,
+                [
+                  0,
+                  0,
+                  0
+                ]
+              ],
+              [
+                12,
+                [
+                  0,
+                  360,
+                  0
+                ]
+              ]
+            ],
+            "timeline": "turn"
+          },
+          "rules": [],
+          "shapes": {},
+          "size": "canvas",
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "model",
+          "visible": true
+        }
+      ],
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "solid": false,
+      "space": "3d",
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "group",
+      "visible": true
+    },
+    {
+      "aim3d": [
+        0,
+        0,
+        0
+      ],
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#fff1d6",
+      "cone": [
+        30,
+        60
+      ],
+      "depth_test": false,
+      "effects": [],
+      "id": "sun",
+      "intensity": 1.4,
+      "length": 256,
+      "light": "directional",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "position3d": [
+        4,
+        6,
+        3
+      ],
+      "radius": 512.0,
+      "shadow_bias": 0.2,
+      "shadow_resolution": 1024,
+      "shadows": true,
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "light",
+      "visible": true,
+      "z": 100.0
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": [
+    {
+      "autoplay": true,
+      "delay": 0.0,
+      "duration": 12,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "turn",
+      "loop": "repeat",
+      "speed": 1.0,
+      "wrap": false
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sync_now">Sync now</string>
+    <string name="mobile_data">Use mobile data in the background too</string>
+    <string name="device_code">Code of the new device</string>
+    <string name="asked">A device on %1$s running %2$s asked for this code at %3$s.</string>
+    <string name="approved">Device approved</string>
+</resources>

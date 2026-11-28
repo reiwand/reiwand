@@ -1,0 +1,169 @@
+use super::super::Reel;
+use super::super::power::Power;
+use super::super::slot::PlayerSlot;
+use super::{CALM, POLL, SETTLE, SceneState, after, assets};
+use reiwand_render::{GpuImage, RenderError, Renderer};
+use reiwand_scene::{PointerState, Wake};
+use std::collections::HashMap;
+use std::time::{Duration, Instant};
+
+impl SceneState {
+    pub(in crate::compositor) fn render(
+        &mut self,
+        renderer: &Renderer,
+        (size, refresh): ((u32, u32), u32),
+        power: Power,
+        players: &HashMap<Reel, PlayerSlot>,
+        active: bool,
+        now: Instant,
+    ) -> Result<bool, RenderError> {
+        self.due = None;
+        self.runtime.set_battery(power.on_battery || self.spec.pack.battery);
+        let dt = self.step(active, now);
+        let p = self.pointer;
+        let pointer = match self.spec.pack.probe {
+            Some((pos, tilt)) => {
+                self.runtime.set_tilt(tilt);
+                PointerState {
+                    pos: Some(pos),
+                    smooth: pos,
+                    inside: true,
+                    presence: 1.0,
+                    ..Default::default()
+                }
+            }
+            None => self.runtime.pointer().follow(p.pos, p.buttons, dt as f32),
+        };
+        self.runtime.set_pointer(pointer);
+        self.runtime.set_wall(crate::zone::wall() + self.spec.pack.wall_shift.unwrap_or(0.0));
+        let uses = self.uses;
+        let quality = self.level(power);
+        if quality != self.quality {
+            let retuned = self.runtime.set_quality(quality);
+            self.restock |= retuned;
+            if retuned {
+                self.exposed = reiwand_scene::exposed(&self.spec.pack.props.properties, self.runtime.props());
+            }
+            (self.quality, self.uses) = (quality, self.needs(quality));
+        }
+        if let Some(view) = self.view.as_mut().filter(|_| std::mem::take(&mut self.restock)) {
+            let assets = assets(&self.spec, &self.media.covers);
+            renderer.refresh_scene(view, (&self.spec.pack.scene, self.runtime.props()), &assets)?;
+        }
+        if self.view.is_none() {
+            let view = renderer.scene_view(
+                &self.spec.pack.scene,
+                &assets(&self.spec, &self.media.covers),
+                self.runtime.props(),
+            )?;
+            if view.gpu_particles() == Some(false) {
+                tracing::debug!("particles run on the CPU with a smaller budget");
+            }
+            self.view = Some(view);
+        }
+        let (listing, fps) = (self.listing_wake(now), self.fps(power, refresh));
+        let view = self.view.as_mut().expect("created above");
+        view.spread(self.spec.span);
+        view.light(self.lit);
+        view.show_shift(self.spec.pack.shift);
+        self.runtime.set_magnify(view.magnify(size));
+        self.runtime.set_device(renderer.tier(), false);
+        let inner = view.inner(renderer, size, quality);
+        let rect = view.view(inner);
+        let presses = std::mem::take(&mut self.presses);
+        if self.uses.cursor && self.runtime.point(view.hitboxes(), rect, &presses, self.allowed.into()) {
+            self.calm = 0;
+            let room = reiwand_scene::MAX_TOUCHES.saturating_sub(self.touches.len());
+            self.touches.extend(self.runtime.take_touches().into_iter().take(room));
+        }
+        let frame = self.runtime.frame_in(std::mem::take(&mut self.spare), rect, quality);
+        let videos: Vec<(&str, &GpuImage)> = self
+            .spec
+            .reels()
+            .filter_map(|(id, reel, _)| Some((id, players.get(reel)?.texture.as_ref()?)))
+            .collect();
+        match self.guard.as_mut() {
+            Some(guard) => guard.watch(renderer, view, now, &self.spec.pack.props.id)?,
+            None => _ = renderer.luma(view, None)?,
+        }
+        let rendered = renderer.render_scene(view, &self.runtime, &frame, inner, quality, &videos).map(drop);
+        if view.left_key() != self.left_key {
+            (self.left, self.left_key) = (view.left_out(), view.left_key());
+        }
+        rendered?;
+        self.damage = reiwand_core::damage::join(self.damage, view.damage().map(|r| r.scaled(inner, size)));
+        let timed = view.gpu_time();
+        let interval = Duration::from_secs(1) / fps;
+        self.sent = (std::mem::take(&mut self.sent.0), frame.view, [size.0, size.1], fps);
+        let stopped = self.guard.as_ref().is_some_and(|g| g.speed() == 0.0);
+        let busy = self.runtime.script_busy();
+        let timer = match self.timer - self.runtime.time() {
+            left if left.is_finite() => Wake::At(left.max(0.0)),
+            _ => Wake::Idle,
+        }
+        .min(listing);
+        let wake = match &self.host {
+            _ if self.still || stopped => Wake::Idle,
+            Some(h) if !self.answered || h.progress().1 < self.awaiting => Wake::Frame,
+            Some(_) if self.calm < if busy { CALM } else { SETTLE } => Wake::Frame,
+            Some(_) if busy => frame.wake.min(Wake::At(POLL)).min(timer),
+            Some(_) => frame.wake.min(timer),
+            None => frame.wake,
+        };
+        let wake = if self.hushed { self.runtime.calmed(wake) } else { wake };
+        self.spare = frame.spare();
+        self.calm = self.calm.saturating_add(1);
+        self.moving = wake == Wake::Frame;
+        self.due = match wake {
+            Wake::Frame => Some(now + interval),
+            Wake::At(seconds) => Some(now + after(seconds).max(interval)),
+            Wake::Idle => None,
+        };
+        if self.due.is_none() {
+            view.trim();
+        }
+        self.judge(timed, power, refresh, now);
+        self.listen(interval, now);
+        Ok(uses != self.uses)
+    }
+
+    fn step(&mut self, active: bool, now: Instant) -> f64 {
+        let dt = self.tick.filter(|_| active).map_or(0.0, |t| now.saturating_duration_since(t).as_secs_f64());
+        if active && !self.still && !self.hushed {
+            let rate = self.guard.as_ref().map_or(1.0, |g| g.speed());
+            let shared = self.shared.as_ref().map(|c| super::clock::tick(c, now, self.tick.is_some(), rate));
+            self.runtime.advance(shared.map_or(dt * rate, |t| t - self.runtime.time()).max(0.0));
+        }
+        self.tick = active.then_some(now);
+        dt
+    }
+
+    pub(in crate::compositor) fn tracks(&self) -> Vec<reiwand_video::Track> {
+        let sounds = self.spec.pack.scene.sounds();
+        let fades = |s: &reiwand_scene::Sound| (s.fade_in, s.fade_out);
+        let lists = self.runtime.playlists().iter().cloned().zip(sounds.map(fades));
+        lists.map(|(list, (fade_in, fade_out))| reiwand_video::Track { list, fade_in, fade_out }).collect()
+    }
+
+    pub(in crate::compositor) fn hold(&mut self) {
+        self.tick = None;
+    }
+
+    pub(in crate::compositor) fn hear(&mut self, interval: Duration, now: Instant) {
+        self.step(true, now);
+        self.listen(interval, now);
+    }
+
+    fn listen(&mut self, interval: Duration, now: Instant) {
+        if self.spec.pack.sounds.is_empty() {
+            return;
+        }
+        let (voices, wake) = self.runtime.voices();
+        self.voices = voices;
+        self.heard = match wake {
+            Wake::Frame => Some(now + interval),
+            Wake::At(seconds) => Some(now + after(seconds).max(interval)),
+            Wake::Idle => None,
+        };
+    }
+}

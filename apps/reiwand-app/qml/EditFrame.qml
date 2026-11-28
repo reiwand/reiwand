@@ -1,0 +1,88 @@
+import QtQuick
+import QtQuick.Controls as QQC2
+import org.kde.kirigami as Kirigami
+import io.github.reiwand.app
+
+Rectangle {
+    id: frame
+
+    required property var rect
+    property string label
+    property bool dim
+    property var moving: null
+    readonly property var shown: moving ?? rect
+
+    signal moved(string rect)
+
+    function drag(dx, dy, resize) {
+        const r = rect, fx = dx / parent.width, fy = dy / parent.height;
+        if (resize)
+            moving = [r[0], r[1], Math.min(1 - r[0], Math.max(0.02, r[2] + fx)), Math.min(1 - r[1], Math.max(0.02, r[3] + fy))];
+        else
+            moving = [Math.min(1 - r[2], Math.max(0, r[0] + fx)), Math.min(1 - r[3], Math.max(0, r[1] + fy)), r[2], r[3]];
+    }
+
+    function release() {
+        if (moving)
+            moved(moving.map(v => v.toFixed(4)).join(","));
+        moving = null;
+    }
+
+    x: shown[0] * parent.width
+    y: shown[1] * parent.height
+    width: shown[2] * parent.width
+    height: shown[3] * parent.height
+    color: "transparent"
+    border.color: Look.amber
+    border.width: 2
+
+    Rectangle {
+        anchors.centerIn: parent
+        width: parent.width + 2 * border.width
+        height: parent.height + 2 * border.width
+        visible: frame.dim
+        color: "transparent"
+        border.width: Math.max(frame.parent.width, frame.parent.height)
+        border.color: Qt.rgba(0, 0, 0, 0.45)
+    }
+
+    QQC2.Label {
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.margins: Kirigami.Units.smallSpacing
+        text: frame.label
+        color: Kirigami.Theme.backgroundColor
+        visible: text !== ""
+
+        background: Rectangle {
+            color: Look.amber
+        }
+    }
+
+    Repeater {
+        model: [false, true]
+
+        delegate: MouseArea {
+            required property bool modelData
+            property point start
+
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            width: modelData ? Kirigami.Units.gridUnit : parent.width
+            height: modelData ? Kirigami.Units.gridUnit : parent.height
+            cursorShape: modelData ? Qt.SizeFDiagCursor : Qt.SizeAllCursor
+            onPressed: mouse => start = mapToItem(frame.parent, mouse.x, mouse.y)
+            onPositionChanged: mouse => {
+                const at = mapToItem(frame.parent, mouse.x, mouse.y);
+                frame.drag(at.x - start.x, at.y - start.y, modelData);
+            }
+            onReleased: frame.release()
+
+            Rectangle {
+                anchors.fill: parent
+                visible: parent.modelData
+                color: Look.amber
+            }
+        }
+    }
+}

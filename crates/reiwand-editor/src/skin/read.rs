@@ -1,0 +1,101 @@
+use super::{Glb, Piece, Skin};
+use anyhow::{Result, ensure};
+use reiwand_core::message::said;
+use reiwand_scene::mesh_math::{Mat, apply, mul};
+use reiwand_scene::{Rigged, VERTEX_FLOATS};
+use serde_json::Value;
+
+fn list(v: &Value) -> &[Value] {
+    v.as_array().map_or(&[], Vec::as_slice)
+}
+
+fn blend(bent: &[Mat], f: &[f32]) -> Mat {
+    let mut m = [0.0; 12];
+    for k in 0..4 {
+        let (slot, w) = (f[5 + k] as usize, f[9 + k]);
+        if w > 0.0
+            && let Some(b) = bent.get(slot)
+        {
+            m.iter_mut().zip(b).for_each(|(x, y)| *x += y * w);
+        }
+    }
+    m
+}
+
+impl Skin {
+    pub(super) fn from(mut glb: Glb, rig: &Rigged, size: [f32; 2]) -> Result<Skin> {
+        glb.unshare();
+        let doc = &glb.json;
+        let nodes = list(&doc["nodes"]);
+        let mesh = |n: usize| nodes[n]["mesh"].as_u64().map(|m| m as usize);
+        let drawn: Vec<usize> = (0..nodes.len()).filter_map(mesh).collect();
+        let primitives: usize = drawn.iter().map(|m| list(&doc["meshes"][*m]["primitives"]).len()).sum();
+        ensure!(
+            primitives == rig.pieces.len() && nodes.len() == rig.joints.len(),
+            said("editor.mesh_parts", "the parts of this mesh do not match the primitives of its file", &[])
+        );
+        Ok(Skin::seen(glb, rig, size))
+    }
+
+    pub(super) fn seen(glb: Glb, rig: &Rigged, size: [f32; 2]) -> Skin {
+        let doc = &glb.json;
+        let nodes = list(&doc["nodes"]);
+        let mesh = |n: usize| nodes.get(n).and_then(|n| n["mesh"].as_u64()).map(|m| m as usize);
+        let joints: Vec<u64> =
+            list(&doc["skins"]).iter().flat_map(|s| list(&s["joints"])).filter_map(Value::as_u64).collect();
+        let point = |n: usize| nodes.get(n).is_some_and(|n| n["extras"]["point"] == true);
+        let loose = |n: usize| mesh(n).is_none() && !point(n);
+        let bones = (0..nodes.len()).filter(|n| joints.contains(&(*n as u64)) || loose(*n)).collect();
+        let auto = list(&doc["skins"]).first().is_none_or(|s| s["extras"]["weights"] == "auto");
+        let mut skin = Skin {
+            size,
+            names: rig.joints.iter().map(|j| j.name.clone()).collect(),
+            parents: rig.joints.iter().map(|j| j.parent.map(usize::from)).collect(),
+            locals: rig.joints.iter().map(|j| j.rest).collect(),
+            bones,
+            points: Vec::with_capacity(rig.vertex_count()),
+            weights: Vec::with_capacity(rig.vertex_count()),
+            loose: Vec::with_capacity(rig.vertex_count()),
+            triangles: rig.indices.as_chunks::<3>().0.to_vec(),
+            pieces: Vec::with_capacity(rig.pieces.len()),
+            auto,
+            glb,
+        };
+        let worlds = skin.worlds();
+        let bent: Vec<Mat> = rig.palette.iter().map(|(n, ibm)| mul(&worlds[*n as usize], ibm)).collect();
+        for n in 0..skin.names.len() {
+            let Some(m) = skin.glb.json["nodes"][n]["mesh"].as_u64().map(|m| m as usize) else { continue };
+            let count = list(&skin.glb.json["meshes"][m]["primitives"]).len();
+            for primitive in 0..count {
+                let source = [n as u16, primitive as u16];
+                let Some(piece) = rig.pieces.iter().find(|p| p.source == source) else { continue };
+                let first = skin.points.len();
+                let mut linear = Vec::with_capacity(piece.vertices as usize);
+                for v in piece.base..piece.base + piece.vertices {
+                    let f = &rig.vertices[v as usize * VERTEX_FLOATS..][..VERTEX_FLOATS];
+                    let m = blend(&bent, f);
+                    skin.points.push(apply(&m, [f[0], f[1], f[2]]));
+                    let w: Vec<(usize, f32)> = (0..4)
+                        .filter(|k| f[9 + k] > 0.0)
+                        .map(|k| (rig.palette[f[5 + k] as usize].0 as usize, f[9 + k]))
+                        .collect();
+                    skin.loose.push(w.iter().any(|(b, _)| !skin.bones.contains(b)));
+                    skin.weights.push(w);
+                    linear.push([m[0], m[1], m[2], 0.0, m[4], m[5], m[6], 0.0, m[8], m[9], m[10], 0.0]);
+                }
+                let json = list(&skin.glb.json["meshes"][m]["primitives"][primitive]["targets"]);
+                let named = (0..json.len()).filter(|t| json[*t].get("POSITION").is_some());
+                let targets = named
+                    .zip(&piece.targets)
+                    .map(|(t, (_, base))| {
+                        let deltas = &rig.morphs[*base as usize..(*base + piece.vertices) as usize];
+                        (t, deltas.iter().zip(&linear).map(|(d, l)| apply(l, [d[0], d[1], d[2]])).collect())
+                    })
+                    .collect();
+                let count = piece.vertices as usize;
+                skin.pieces.push(Piece { node: n, mesh: m, primitive, first, count, targets });
+            }
+        }
+        skin
+    }
+}

@@ -1,0 +1,162 @@
+use crate::custom::{CONTRACT, MAX_WGSL};
+use crate::effects::Descriptor;
+use crate::measure::measure;
+use crate::memory::memory;
+use crate::shader::{bindings, compile, reads};
+use crate::value::Param;
+use sha2::{Digest, Sha256};
+use std::sync::OnceLock;
+
+pub(crate) fn key(json: &str, wgsl: &str) -> u64 {
+    let digest = Sha256::new().chain_update(json).chain_update([0]).chain_update(wgsl).finalize();
+    u64::from_le_bytes(digest[..8].try_into().unwrap_or_default()) | 1
+}
+
+pub(crate) fn checked(id: &str, json: &str, wgsl: &str) -> Result<Descriptor, String> {
+    let raw: serde_json::Value = serde_json::from_str(json).map_err(|e| e.to_string())?;
+    let mut d = Descriptor::parse(json, wgsl).map_err(|e| e.to_string())?;
+    let taken = crate::reserved(&d.id);
+    let checks = [
+        (!taken, format!("{} is the name of a built-in effect", d.id)),
+        (d.id == id, format!("declares the id {}, expected {id}", d.id)),
+        (raw.get("cost").is_some(), "needs a cost".into()),
+        (wgsl.len() <= MAX_WGSL, format!("its shader is larger than {} KiB", MAX_WGSL >> 10)),
+        (
+            d.passes.iter().all(|p| p.output != crate::Output::Step),
+            "only built-in effects have step passes".into(),
+        ),
+    ];
+    if let Some((_, problem)) = checks.into_iter().find(|(ok, _)| !ok) {
+        return Err(problem);
+    }
+    if let Some(problem) = d.problems().into_iter().next() {
+        return Err(problem);
+    }
+    let source = crate::guard::source(&d);
+    let (module, info) = compile(&source)?;
+    d.key = key(json, wgsl);
+    let entries: Vec<&str> =
+        d.passes.iter().flat_map(|p| [p.entry.as_str()].into_iter().chain(p.vertex.as_deref())).collect();
+    let mut entries: Vec<&str> = entries.into_iter().filter(|e| !e.is_empty()).collect();
+    if let Some(missing) = entries.iter().find(|e| !module.entry_points.iter().any(|p| p.name == **e)) {
+        return Err(format!("its shader has no entry point {missing}"));
+    }
+    if let Some((name, kind)) = d.stage.function() {
+        let typed = |h: naga::Handle<naga::Type>| module.types[h].name.as_deref() == Some(kind);
+        let found = module.functions.iter().any(|(_, f)| {
+            let args = matches!(f.arguments.as_slice(), [a] if typed(a.ty));
+            f.name.as_deref() == Some(name) && args && f.result.as_ref().is_some_and(|r| typed(r.ty))
+        });
+        if !found {
+            return Err(format!("its shader needs fn {name}(value: {kind}) -> {kind}"));
+        }
+        entries.push(name);
+        if d.stage == crate::Stage::Particle {
+            let pixel = module.functions.iter().filter(|(_, f)| f.name.as_deref() == Some("pixel")).count();
+            let right = |f: &naga::Function| {
+                let float4 = |h: naga::Handle<naga::Type>| {
+                    matches!(module.types[h].inner, naga::TypeInner::Vector { size: naga::VectorSize::Quad, scalar }
+                        if scalar == naga::Scalar::F32)
+                };
+                matches!(f.arguments.as_slice(), [a] if module.types[a.ty].name.as_deref() == Some("Pixel"))
+                    && f.result.as_ref().is_some_and(|r| float4(r.ty))
+            };
+            let fits = module.functions.iter().any(|(_, f)| f.name.as_deref() == Some("pixel") && right(f));
+            if pixel > 0 {
+                if !fits {
+                    return Err("its shader needs fn pixel(value: Pixel) -> vec4<f32>".into());
+                }
+                entries.push("pixel");
+            }
+        }
+    }
+    crate::surfaces::check(&d)?;
+    crate::passage::shader::check(&d)?;
+    if let Some(o) =
+        d.options.iter().find(|o| !module.overrides.iter().any(|(_, v)| v.name.as_deref() == Some(&o.id)))
+    {
+        return Err(format!("its shader declares no override {}", o.id));
+    }
+    let range = |o: &crate::Variant| {
+        let found = module.overrides.iter().find(|(_, v)| v.name.as_deref() == Some(&o.id));
+        let kind = found.and_then(|(_, v)| module.types[v.ty].inner.scalar_kind());
+        let (lo, hi) = match kind {
+            Some(naga::ScalarKind::Sint) => (f64::from(i32::MIN), f64::from(i32::MAX)),
+            Some(naga::ScalarKind::Uint | naga::ScalarKind::Bool) => (0.0, f64::from(u32::MAX)),
+            _ => (f64::MIN, f64::MAX),
+        };
+        o.values.iter().filter_map(Param::whole).all(|v| (lo..=hi).contains(&v))
+    };
+    if let Some(o) = d.options.iter().find(|o| !range(o)) {
+        return Err(format!("the option {} has values its override cannot hold", o.id));
+    }
+    memory((&module, &info))?;
+    let (sampled, ops, size) = measure(&d, (&module, &info), &entries)?;
+    (d.reads, d.ops, d.size) = (sampled, ops, size);
+    static ALLOWED: OnceLock<usize> = OnceLock::new();
+    let allowed = *ALLOWED.get_or_init(|| compile(CONTRACT).map_or(0, |(m, _)| bindings(&m)));
+    if bindings(&module) > allowed {
+        return Err("its shader declares bindings of its own".into());
+    }
+    for found in reads(&module, &entries) {
+        if !d.uses.contains(&found) {
+            d.uses.push(found);
+        }
+    }
+    lighter(&mut d, (&module, &info), key(&format!("{json}\0lighter"), wgsl))?;
+    crate::guard::armed(module, &source)?;
+    Ok(d)
+}
+
+fn lighter(
+    d: &mut Descriptor,
+    (module, info): (&naga::Module, &naga::valid::ModuleInfo),
+    key: u64,
+) -> Result<(), String> {
+    let full = d.units();
+    let Some(lite) = d.lite.as_mut().map(std::sync::Arc::make_mut) else { return Ok(()) };
+    let entries: Vec<&str> =
+        lite.passes.iter().flat_map(|p| [p.entry.as_str()].into_iter().chain(p.vertex.as_deref())).collect();
+    let entries: Vec<&str> = entries.into_iter().filter(|e| !e.is_empty()).collect();
+    if let Some(missing) = entries.iter().find(|e| !module.entry_points.iter().any(|p| p.name == **e)) {
+        return Err(format!("its shader has no entry point {missing} for its lighter variant"));
+    }
+    let (sampled, ops, size) = measure(lite, (module, info), &entries)?;
+    (lite.reads, lite.ops, lite.size, lite.key) = (sampled, ops, size, key);
+    for found in reads(module, &entries) {
+        if !lite.uses.contains(&found) {
+            lite.uses.push(found);
+        }
+    }
+    let light = lite.units();
+    if light >= full {
+        return Err(format!(
+            "its lighter variant costs {light:.2} units, not less than the {full:.2} of the effect"
+        ));
+    }
+    Ok(())
+}
+
+impl Descriptor {
+    pub fn packaged(id: &str, json: &str, wgsl: &str) -> Result<Descriptor, String> {
+        let trial = crate::package::key(json, wgsl) & !1;
+        let again = |e| format!("its shader is not checked again: {e}");
+        if crate::struck(trial) {
+            return Err(again(crate::STOPPED.into()));
+        }
+        crate::verdicts::vetted(id, json, wgsl)?;
+        crate::trying(trial).map_err(again)?;
+        let checked = crate::shader::roomy(|| crate::package::checked(id, json, wgsl));
+        crate::tried(trial);
+        // the lighter variant comes from the same shader, checked whole above: it passes with the effect
+        checked.inspect(|d| {
+            crate::verdicts::pass(d.key);
+            d.lite.iter().for_each(|lite| crate::verdicts::pass(lite.key));
+        })
+    }
+}
+
+pub fn shader_line(line: usize) -> Option<usize> {
+    let before = CONTRACT.lines().count() + 1;
+    line.checked_sub(before).filter(|l| *l > 0)
+}

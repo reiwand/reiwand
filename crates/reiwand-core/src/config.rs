@@ -1,0 +1,192 @@
+use crate::filter::Filter;
+use crate::fit::Fit;
+use crate::gpu::Render;
+use crate::layout::Layout;
+use crate::settings::{Library, Media, Models, Pause, Playback, Repos, Transition};
+use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
+use std::path::PathBuf;
+
+pub use crate::outputs::OutputConfig;
+pub use crate::store::ConfigError;
+
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Config {
+    pub format: u32,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    #[serde(with = "crate::explicit::empty")]
+    pub profile: Option<String>,
+    pub default: OutputConfig,
+    pub outputs: BTreeMap<String, OutputConfig>,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value", extend("x-null" = true, "x-block" = true)))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "crate::explicit::block")]
+    pub lock: Option<crate::lock::Lock>,
+    pub playback: Playback,
+    pub transition: Transition,
+    pub pause: Pause,
+    pub library: Library,
+    pub repos: Repos,
+    pub models: Models,
+    pub media: Media,
+    pub network: crate::net::Network,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value", extend("x-null" = true, "x-block" = true)))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "crate::explicit::block")]
+    pub updates: Option<crate::net::Updates>,
+    pub rgb: crate::rgb::Rgb,
+    pub shortcuts: crate::shortcuts::Shortcuts,
+    pub layout: Layout,
+    pub render: Render,
+    pub surfaces: crate::Surfaces,
+    #[cfg_attr(feature = "schema", schemars(with = "serde_json::Value"))]
+    pub providers: BTreeMap<String, toml::Value>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Resolved {
+    pub image: Option<PathBuf>,
+    pub playlist: Option<String>,
+    pub fit: Fit,
+    pub background: [u8; 3],
+}
+
+pub const PRIVATE_PREFIX: &str = "preview:";
+
+impl Config {
+    pub const FORMAT: u32 = 3;
+
+    pub fn normalize(&mut self) -> Vec<String> {
+        let before = self.options();
+        self.playback = self.playback.sanitized();
+        self.rgb = std::mem::take(&mut self.rgb).sanitized();
+        self.transition.duration_ms = self.transition.duration_ms.min(Transition::MAX_MS);
+        self.library.thumb_cache_mb = self.library.thumb_cache_mb.clamp(Library::MIN_MB, Library::MAX_MB);
+        self.layout.bezel_mm = self.layout.bezel_mm.clamp(0.0, Layout::MAX_BEZEL_MM).max(0.0);
+        self.layout.tidy();
+        let changed = |(key, value): (String, toml::Value)| (before.get(&key) != Some(&value)).then_some(key);
+        let mut fixed: Vec<String> = self.options().into_iter().filter_map(changed).collect();
+        let sections = std::iter::once(("default".to_owned(), &mut self.default))
+            .chain(self.outputs.iter_mut().map(|(name, o)| (format!("outputs.{name}"), o)));
+        for (section, o) in sections {
+            if o.background.take_if(|c| parse_hex_color(c).is_none()).is_some() {
+                fixed.push(format!("{section}.background"));
+            }
+            if let Some(f) = o.filter.as_mut().filter(|f| !f.valid()) {
+                *f = f.sanitized();
+                fixed.push(format!("{section}.filter"));
+            }
+        }
+        fixed
+    }
+
+    pub fn resolve(&self, output: &str) -> Resolved {
+        if let Some(screen) = crate::lock::screen_of(output) {
+            let mut seen = self.resolve(screen);
+            if let Some(show) = self.lock_choice(screen) {
+                (seen.image, seen.playlist) = (show.image.filter(|_| show.playlist.is_none()), show.playlist);
+            }
+            return seen;
+        }
+        let own = self.outputs.get(output).filter(|o| o.sets_content());
+        let content = match (own, output.starts_with(PRIVATE_PREFIX)) {
+            (Some(own), _) => own,
+            (None, true) => &OutputConfig::default(),
+            (None, false) => &self.default,
+        };
+        let (fit, background) = self.chosen(output);
+        Resolved {
+            image: content.image.clone().filter(|_| content.playlist.is_none()),
+            playlist: content.playlist.clone(),
+            fit: fit.unwrap_or_default(),
+            background: background.unwrap_or_default(),
+        }
+    }
+
+    pub fn chosen(&self, output: &str) -> (Option<Fit>, Option<[u8; 3]>) {
+        let background = self.pick(output, |o| o.background.as_deref().and_then(parse_hex_color));
+        (self.pick(output, |o| o.fit), background)
+    }
+
+    fn pick<T>(&self, output: &str, field: impl Fn(&OutputConfig) -> Option<T>) -> Option<T> {
+        self.outputs.get(crate::lock::seat(output)).and_then(&field).or_else(|| field(&self.default))
+    }
+
+    pub fn set_image(&mut self, output: &str, image: PathBuf, fit: Option<Fit>) {
+        self.set_content(output, Some(image), None);
+        if let Some(fit) = fit {
+            self.set_fit(output, fit);
+        }
+    }
+
+    pub fn set_playlist(&mut self, output: &str, playlist: String) {
+        self.set_content(output, None, Some(playlist));
+    }
+
+    fn set_content(&mut self, output: &str, image: Option<PathBuf>, playlist: Option<String>) {
+        let o = self.section(output, |o| (o.image, o.playlist, o.preset, o.blank) = (None, None, None, None));
+        (o.image, o.playlist, o.preset, o.blank) = (image, playlist, None, None);
+    }
+
+    pub fn set_fit(&mut self, output: &str, fit: Fit) {
+        self.section(output, |o| o.fit = None).fit = Some(fit);
+    }
+
+    pub fn set_background(&mut self, output: &str, color: &str) -> Result<(), String> {
+        let [r, g, b] =
+            parse_hex_color(color).ok_or_else(|| format!("invalid color '{color}', expected #rrggbb"))?;
+        self.section(output, |o| o.background = None).background = Some(format!("#{r:02x}{g:02x}{b:02x}"));
+        Ok(())
+    }
+
+    pub fn clicks(&self, output: &str) -> bool {
+        self.pick(output, |o| o.clicks).unwrap_or(false)
+    }
+
+    pub fn set_clicks(&mut self, output: &str, on: bool) {
+        self.section(output, |o| o.clicks = None).clicks = Some(on);
+    }
+
+    pub fn filter(&self, output: &str) -> Filter {
+        self.pick(output, |o| o.filter).unwrap_or_default()
+    }
+
+    pub fn set_filter(&mut self, output: &str, filter: Filter) {
+        let kept = (!filter.is_identity() || !output.is_empty()).then_some(filter.sanitized());
+        self.section(output, |o| o.filter = None).filter = kept;
+    }
+
+    fn section(&mut self, output: &str, clear: impl FnMut(&mut OutputConfig)) -> &mut OutputConfig {
+        if !output.is_empty() {
+            return self.outputs.entry(output.to_owned()).or_default();
+        }
+        self.outputs.values_mut().for_each(clear);
+        self.outputs.retain(|_, o| *o != OutputConfig::default());
+        &mut self.default
+    }
+
+    pub fn scene_values(&self, output: &str, package: &str) -> Vec<&BTreeMap<String, toml::Value>> {
+        let own = self.outputs.get(crate::lock::seat(output)).filter(|_| !output.is_empty());
+        let own = own.and_then(|o| o.scenes.get(package));
+        own.into_iter().chain(self.default.scenes.get(package)).collect()
+    }
+
+    pub fn scene_section(&mut self, output: &str) -> &mut BTreeMap<String, BTreeMap<String, toml::Value>> {
+        match output {
+            "" => &mut self.default.scenes,
+            name => &mut self.outputs.entry(name.to_owned()).or_default().scenes,
+        }
+    }
+
+    pub fn read_providers<T: DeserializeOwned>(&self) -> impl Iterator<Item = (&str, Result<T, String>)> {
+        let read = |entry: &toml::Value| T::deserialize(entry.clone()).map_err(|e| e.message().to_owned());
+        self.providers.iter().map(move |(id, entry)| (id.as_str(), read(entry)))
+    }
+}
+
+pub fn parse_hex_color(s: &str) -> Option<[u8; 3]> {
+    let s = s.trim().trim_start_matches('#');
+    let byte = |i: usize| u8::from_str_radix(s.get(i..i + 2)?, 16).ok();
+    (s.len() == 6 && s.is_ascii()).then(|| Some([byte(0)?, byte(2)?, byte(4)?])).flatten()
+}

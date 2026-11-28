@@ -1,0 +1,43 @@
+[package]
+name = "reiwand-server"
+description = "Self-hosted server of Reiwand: signed package repository, catalog, uploads with moderation and device sync"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+reiwand-format = { workspace = true, features = ["sign"] }
+reiwand-palette.workspace = true
+reiwand-scene.workspace = true
+anyhow.workspace = true
+argon2.workspace = true
+axum.workspace = true
+base64.workspace = true
+chacha20poly1305.workspace = true
+chrono.workspace = true
+clap.workspace = true
+futures-util.workspace = true
+getrandom.workspace = true
+hyper-util.workspace = true
+image.workspace = true
+lettre.workspace = true
+maud.workspace = true
+percent-encoding.workspace = true
+rcgen.workspace = true
+x509-parser.workspace = true
+rusqlite.workspace = true
+rustix = { workspace = true, features = ["process", "fs"] }
+semver.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+tempfile.workspace = true
+tokio = { workspace = true, features = ["net", "fs", "io-util", "process"] }
+tokio-rustls = { workspace = true, features = ["aws-lc-rs"] }
+tokio-util.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+reqwest = { workspace = true, features = ["form", "multipart"] }

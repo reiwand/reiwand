@@ -1,0 +1,86 @@
+import QtQuick
+import org.kde.kirigami as Kirigami
+import io.github.reiwand.app
+
+Item {
+    id: knobs
+
+    required property var gizmo
+    readonly property var light: gizmo.light
+    readonly property real ratio: gizmo.ratio
+
+    visible: gizmo.chosen
+
+    SceneKnob {
+        at: knobs.light.z_knob
+        ratio: knobs.ratio
+        square: true
+        label: App.tr("Height %1", Math.round(knobs.light.z))
+        tip: App.tr("Drag up or down to raise or lower the light")
+        onMoved: (to, done) => knobs.gizmo.keyed({
+                "z": Math.round((knobs.gizmo.at[1] - to[1]) / 0.5)
+            })
+    }
+
+    SceneKnob {
+        at: knobs.light.radius_knob
+        ratio: knobs.ratio
+        tint: Look.sprout
+        tip: App.tr("Drag to change where the light ends")
+        onMoved: (to, done) => knobs.gizmo.keyed({
+                "radius": Math.max(1, Math.round(Math.hypot(to[0] - knobs.gizmo.at[0], to[1] - knobs.gizmo.at[1])))
+            })
+    }
+
+    SceneKnob {
+        at: knobs.light.aim ?? null
+        ratio: knobs.ratio
+        tip: App.tr("Drag to turn the light")
+        onMoved: (to, done) => knobs.gizmo.aim(to)
+    }
+
+    SceneKnob {
+        at: knobs.light.tilt_knob ?? null
+        ratio: knobs.ratio
+        square: true
+        tint: Look.amber
+        label: App.tr("Tilt %1°", Math.round(knobs.light.tilt))
+        tip: App.tr("Drag along the aim line to tilt the light: nearer the light it faces the canvas, nearer the end it lies flat")
+        onMoved: (to, done) => knobs.gizmo.tilt(to)
+    }
+
+    SceneRepeater {
+        id: listed2
+
+        rows: knobs.light.type === "spot" ? [[knobs.light.outer[1], false], [knobs.light.inner[1], true]] : []
+
+        delegate: SceneKnob {
+            required property int index
+            readonly property var modelData: listed2.rows[index]
+
+            at: modelData[0]
+            ratio: knobs.ratio
+            square: true
+            tint: modelData[1] ? Look.sprout : Look.coral
+            tip: modelData[1] ? App.tr("Drag to widen or narrow the bright middle of the cone") : App.tr("Drag to widen or narrow the cone")
+            onMoved: (to, done) => knobs.gizmo.cone(to, modelData[1])
+        }
+    }
+
+    SceneRepeater {
+        id: listed
+
+        rows: knobs.light.ends ?? []
+
+        delegate: SceneKnob {
+            readonly property var modelData: listed.rows[index]
+            required property int index
+
+            at: modelData
+            ratio: knobs.ratio
+            square: true
+            tip: App.tr("Drag to move this end of the tube")
+            onMoved: (to, done) => knobs.gizmo.end(to, knobs.light.ends[1 - index], index === 1)
+        }
+    }
+}

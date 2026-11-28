@@ -1,0 +1,50 @@
+use crate::compositor::Depth;
+use crate::daemon::Daemon;
+use reiwand_core::edit::{self, Edit, Source};
+use reiwand_core::travel::Still;
+use reiwand_depth::Places;
+use reiwand_render::DepthMap;
+use std::path::Path;
+use std::sync::{Arc, Weak};
+use std::time::SystemTime;
+
+const MAX_EDGE: u32 = 1024;
+
+pub(crate) type Cached = (Option<SystemTime>, edit::Depth, Weak<DepthMap>);
+
+impl Daemon {
+    pub(crate) fn depth_for(&self, file: &Path, edit: &Edit, edge: u32) -> Option<Depth> {
+        let settings = edit.depth.clone().unwrap_or_default();
+        let sha = match edit.source.sha256.as_str() {
+            "" => Source::read(file, [0; 2]).ok()?.sha256,
+            sha => sha.to_owned(),
+        };
+        let places = Places { data: self.store.data.clone(), cache: self.store.cache.clone() };
+        let Some(found) = places.find(file, &sha, &settings) else {
+            let ready = places.installed(&reiwand_depth::MODEL).is_some() && !places.library(None).is_empty();
+            let still = edit.moving().map(|_| if ready { Still::NoMap } else { Still::NoModel });
+            self.state().decks.mark(file, still);
+            return None;
+        };
+        let modified = std::fs::metadata(&found).and_then(|m| m.modified()).ok();
+        let cached = self.state().depths.get(&found).and_then(|(time, used, map)| {
+            (*time == modified && *used == settings).then(|| map.upgrade()).flatten()
+        });
+        let map = match cached {
+            Some(map) => map,
+            None => {
+                let loaded = places.map(file, &sha, &settings, MAX_EDGE).inspect_err(|e| {
+                    tracing::warn!("cannot use a depth map");
+                    tracing::debug!("{e:#}")
+                });
+                let map = Arc::new(loaded.ok()??);
+                let mut st = self.state();
+                st.depths.retain(|_, (.., weak)| weak.strong_count() > 0);
+                st.depths.insert(found.clone(), (modified, settings, Arc::downgrade(&map)));
+                map
+            }
+        };
+        let deck = self.deck_for(file, &sha, edit, (&places, edge));
+        Some(Depth { file: found, modified, map, deck })
+    }
+}

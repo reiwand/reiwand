@@ -1,0 +1,133 @@
+use super::*;
+
+#[test]
+fn scenes_name_their_newer_features_and_engines_refuse_what_they_cannot_draw() {
+    let layers = json!([
+        { "blend_space": "canvas", "id": "sky", "type": "image", "image": "sky", "blend": "linear_burn", "lighting": { "roughness": 0.5 } },
+        { "blend_space": "canvas", "id": "lamp", "type": "light", "light": "point", "intensity": 2, "shadows": true },
+        { "blend_space": "canvas", "id": "title", "type": "text", "text": { "media": "title" } },
+        { "blend_space": "canvas", "id": "rain", "type": "sound", "sound": "rain", "stream": true }
+    ]);
+    let text =
+        scene(layers, json!({ "assets": { "sky": { "path": "sky.png" }, "rain": { "path": "rain.wav" } } }));
+    let wav = [&b"RIFF\0\0\0\0WAVEfmt \x10\0\0\0\x01\0\x01\0\x40\x1f\0\0\x80\x3e\0\0\x02\0\x10\0data\x80\x3e\0\0"[..], &[0; 16_000]].concat();
+    let files: [(&str, &[u8]); 2] = [("scene.json", text.as_bytes()), ("rain.wav", &wav)];
+    let all =
+        ["blend_modes2", "inputs.media", "lighting2d", "lights", "media_info", "shadows", "sound", "sound2"];
+    let mut listed = manifest(&all);
+    listed.inputs = vec![reiwand_format::Input::Media];
+    let package = load(&listed, &files).unwrap();
+    assert_eq!(package.facts.features.iter().collect::<Vec<_>>(), all);
+    assert!(features::playable(&package.manifest, &package.facts, Platform::Desktop).is_ok());
+    assert!(features::playable(&package.manifest, &package.facts, Platform::Android).is_ok());
+    assert!(features::lacks("android", &package.facts.features).is_empty());
+    assert!(package.facts.facets.iter().any(|f| f == "desktop"));
+    assert!(package.facts.facets.iter().any(|f| f == "android"));
+    let mut few = manifest(&["sound", "sound2"]);
+    few.inputs = vec![reiwand_format::Input::Media];
+    let unlisted = load(&few, &files).map(drop).unwrap_err().to_string();
+    assert!(
+        unlisted.contains("add \"blend_modes2\" (mixes layers with the newer blend modes)"),
+        "{unlisted}"
+    );
+    let plain = scene(
+        json!([{ "blend_space": "canvas", "id": "sky", "type": "image", "image": "sky", "parallax": [0.2, 0.2] }]),
+        json!({}),
+    );
+    let package = load(&manifest(&["inputs.pointer"]), &[("scene.json", plain.as_bytes())]);
+    assert!(package.is_err_and(|e| e.to_string().contains("inputs")));
+}
+
+#[test]
+fn package_effects_are_read_compiled_and_checked() {
+    let effects = json!({ "effects": { "ripple": { "descriptor": "effects/ripple.json", "wgsl": "effects/ripple.wgsl" } } });
+    let text = scene(
+        json!([{ "blend_space": "canvas", "id": "sky", "type": "image", "image": "sky", "effects": [{ "effect": "ripple" }] }]),
+        effects,
+    );
+    let descriptor =
+        descriptor(json!({ "id": "ripple", "passes": [{ "entry": "fs_ripple" }], "cost": { "taps": 1 } }));
+    let files = |wgsl: &'static str| -> Vec<(&'static str, Vec<u8>)> {
+        vec![
+            ("effects/ripple.json", descriptor.clone().into_bytes()),
+            ("effects/ripple.wgsl", wgsl.as_bytes().to_vec()),
+        ]
+    };
+    let listed = manifest(&["custom_effects"]);
+    let good = files(RIPPLE);
+    let good: Vec<(&str, &[u8])> = good.iter().map(|(p, d)| (*p, d.as_slice())).collect();
+    let mut package = load(&listed, &[&[("scene.json", text.as_bytes())][..], &good].concat()).unwrap();
+    assert_eq!(package.facts.features.iter().collect::<Vec<_>>(), ["custom_effects"]);
+    assert_eq!(package.scene().unwrap().effect("ripple").unwrap().uses, [reiwand_scene::Use::Time]);
+    let bad = files("fn fs_ripple(");
+    let bad: Vec<(&str, &[u8])> = bad.iter().map(|(p, d)| (*p, d.as_slice())).collect();
+    let fault =
+        load(&listed, &[&[("scene.json", text.as_bytes())][..], &bad].concat()).map(drop).unwrap_err();
+    assert!(fault.to_string().contains("/effects/ripple"), "{fault}");
+    let missing = load(&listed, &[("scene.json", text.as_bytes())]).map(drop).unwrap_err();
+    assert!(matches!(missing, Error::Missing(path) if path.starts_with("effects/ripple")));
+}
+
+#[test]
+fn long_sounds_need_streaming_and_font_collections_are_allowed() {
+    let frame = [&[0xffu8, 0xfb, 0x90, 0x00][..], &[0; 413]].concat();
+    let mut first = frame.clone();
+    first[36..44].copy_from_slice(b"Xing\0\0\0\x01");
+    first[44..48].copy_from_slice(&4000u32.to_be_bytes());
+    let song = [first, frame].concat();
+    let layer = |stream: bool| json!([{ "blend_space": "canvas", "id": "song", "type": "sound", "sound": "song", "stream": stream }]);
+    let assets = json!({ "assets": { "sky": { "path": "sky.png" }, "song": { "path": "song.mp3" },
+        "serif": { "path": "serif.ttc", "face": 1 } } });
+    let streamed = scene(layer(true), assets.clone());
+    let wanted = ["fonts2", "sound", "sound2"];
+    let files = |text: &String| -> Vec<(&'static str, Vec<u8>)> {
+        vec![
+            ("scene.json", text.clone().into_bytes()),
+            ("song.mp3", song.clone()),
+            ("serif.ttc", b"ttcf".to_vec()),
+        ]
+    };
+    let ok = files(&streamed);
+    let ok: Vec<(&str, &[u8])> = ok.iter().map(|(p, d)| (*p, d.as_slice())).collect();
+    let package = load(&manifest(&wanted), &ok).unwrap();
+    assert_eq!(package.facts.features.iter().collect::<Vec<_>>(), wanted);
+    let held = files(&scene(layer(false), assets));
+    let held: Vec<(&str, &[u8])> = held.iter().map(|(p, d)| (*p, d.as_slice())).collect();
+    let fault = load(&manifest(&wanted), &held).map(drop).unwrap_err().to_string();
+    assert!(fault.contains("song.mp3") && fault.contains("lasts 104.5 s, at most 60 s"), "{fault}");
+}
+
+#[test]
+fn a_text_layer_in_several_languages_needs_the_default_language_and_names_its_feature() {
+    let layers = json!([{ "blend_space": "canvas", "id": "hello", "type": "text", "text": { "de": "Hallo", "en": "Hello" } }]);
+    let text = scene(layers, json!({}));
+    let files: [(&str, &[u8]); 1] = [("scene.json", text.as_bytes())];
+    let mut listed = manifest(&["text_languages"]);
+    listed.default_locale = Some("en".into());
+    let package = load(&listed, &files).unwrap();
+    assert!(package.facts.features.contains("text_languages"));
+    let unlisted = load(&manifest(&[]), &files).map(drop).unwrap_err().to_string();
+    assert!(unlisted.contains("text_languages") || unlisted.contains("default_locale"), "{unlisted}");
+    let mut other = manifest(&["text_languages"]);
+    other.default_locale = Some("fr".into());
+    let refused = load(&other, &files).map(drop).unwrap_err().to_string();
+    assert!(refused.contains("hello") && refused.contains("default language"), "{refused}");
+    let mut none = manifest(&["text_languages"]);
+    none.default_locale = None;
+    let refused = load(&none, &files).map(drop).unwrap_err().to_string();
+    assert!(refused.contains("default_locale"), "{refused}");
+}
+
+#[test]
+fn the_language_of_a_scene_is_chosen_among_those_its_text_layers_speak() {
+    let layers = json!([{ "blend_space": "canvas", "id": "hello", "type": "text", "text": { "de": "Hallo", "en": "Hello" } }]);
+    let text = scene(layers, json!({}));
+    let mut listed = manifest(&["text_languages"]);
+    listed.default_locale = Some("en".into());
+    let mut package = load(&listed, &[("scene.json", text.as_bytes())]).unwrap();
+    let scene = package.scene().unwrap();
+    let user = |l: &str| vec![l.to_string()];
+    assert_eq!(package.manifest.scene_locale_in(&scene, &user("de_AT.UTF-8")), "de");
+    assert_eq!(package.manifest.scene_locale_in(&scene, &user("fr")), "en");
+    assert_eq!(package.manifest.locale_in(&user("de")), "en");
+}

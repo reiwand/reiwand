@@ -1,0 +1,140 @@
+use crate::meta::facts_of;
+use crate::package::problems;
+use reiwand_format::features::{self, explain};
+use reiwand_format::{Error, Facts, MANIFEST, Manifest, Platform, SIGNATURE};
+use serde_json::{Value, json};
+use std::fs;
+use std::path::Path;
+
+fn file_of(doc: &Value, pointer: &str) -> String {
+    if let Some(path) = doc.pointer(pointer).and_then(Value::as_str).filter(|_| pointer.ends_with("/path")) {
+        return path.to_owned();
+    }
+    match pointer {
+        p if p.starts_with("/scene") => "scene.json",
+        p if p.starts_with("/manifest") => MANIFEST,
+        _ => "",
+    }
+    .to_owned()
+}
+
+fn finding(doc: &Value, level: &str, pointer: &str, message: &str) -> Value {
+    json!({ "level": level, "pointer": pointer, "file": file_of(doc, pointer), "message": message })
+}
+
+pub fn platforms(manifest: &Manifest, facts: &Facts) -> Value {
+    let plays = |p: Platform| {
+        let refused = features::playable(manifest, facts, p).err().map(|e| e.to_string());
+        json!({"refused": refused, "without": features::lacks(p.name(), &facts.features)})
+    };
+    Platform::ALL
+        .into_iter()
+        .map(|p| (p.name().to_owned(), plays(p)))
+        .collect::<serde_json::Map<_, _>>()
+        .into()
+}
+
+pub fn needs(manifest: &Manifest, facts: &Facts) -> (Vec<Value>, Vec<Value>) {
+    let why = |f: &String| json!({"name": f, "why": explain(f)});
+    let listed = manifest.features();
+    let missing = facts.features.iter().filter(|f| !listed.contains(f));
+    (facts.features.iter().map(why).collect(), missing.map(why).collect())
+}
+
+pub fn report(dir: &Path, doc: &Value) -> Value {
+    report_in(dir, doc, &reiwand_core::message::tr)
+}
+
+pub fn report_in(dir: &Path, doc: &Value, tr: &dyn Fn(&str) -> String) -> Value {
+    let found = problems(dir, doc);
+    let mut findings: Vec<Value> = found
+        .iter()
+        .map(|p| finding(doc, if p.warning { "warning" } else { "error" }, &p.pointer, &p.said.told(tr)))
+        .collect();
+    let mut out = json!({ "signature": signature(dir, &[]) });
+    if let Some((manifest, facts)) = facts_of(doc, Some(dir)) {
+        let notes = features::notes(&manifest, &facts);
+        let fresh = notes.iter().filter(|n| !found.iter().any(|p| p.message == n.to_string()));
+        findings.extend(fresh.map(|n| finding(doc, "note", "/manifest/requires/features", &n.told(tr))));
+        for p in Platform::ALL {
+            if let Err(e) = features::playable(&manifest, &facts, p) {
+                let reason = e.message().told(tr);
+                findings.push(finding(
+                    doc,
+                    "warning",
+                    "/manifest/platforms",
+                    &format!("{}: {reason}", p.name()),
+                ));
+            }
+        }
+        let platforms = platforms(&manifest, &facts);
+        let (needed, added) = needs(&manifest, &facts);
+        out["needs"] = json!(needed);
+        out["build_adds"] = json!(added);
+        out["platforms"] = platforms;
+        out["facets"] = json!(facts.facets);
+    }
+    out["findings"] = json!(findings);
+    out
+}
+
+fn accepted(keys: &[String]) -> Result<Vec<(String, String)>, Error> {
+    let texts = keys.iter().map(|k| reiwand_format::key_text(k)).collect::<Result<Vec<_>, _>>()?;
+    texts.iter().map(|t| Ok((reiwand_format::fingerprint(t)?, reiwand_format::public_key(t)?))).collect()
+}
+
+pub fn signature(path: &Path, keys: &[String]) -> Value {
+    let (manifest, signed) = match path.is_dir() {
+        true => (
+            fs::read(path.join(MANIFEST)).map_err(Error::from),
+            fs::read_to_string(path.join(SIGNATURE)).ok(),
+        ),
+        false => return packed(path, keys),
+    };
+    let Some(signed) = signed else { return json!({"state": "unsigned"}) };
+    let Ok(json) = manifest else {
+        return json!({"state": "invalid", "error": "manifest.json cannot be read"});
+    };
+    match Manifest::from_json(&json) {
+        Ok(m) => match reiwand_format::source_digest(path) {
+            Ok(files) => {
+                judged(&json, &signed, &reiwand_format::manifest_comment(&m.id, &m.version, &files), keys)
+            }
+            Err(e) => json!({"state": "invalid", "error": e.to_string()}),
+        },
+        Err(e) => json!({"state": "invalid", "error": e.to_string()}),
+    }
+}
+
+fn packed(path: &Path, keys: &[String]) -> Value {
+    let mut package = match reiwand_format::open(path, &reiwand_format::Limits::default()) {
+        Ok(p) => p,
+        Err(e) => return json!({"state": "invalid", "error": e.to_string()}),
+    };
+    let Ok(signed) = package.read_file(SIGNATURE) else { return json!({"state": "unsigned"}) };
+    let Ok(json) = package.read_file(MANIFEST) else {
+        return json!({"state": "invalid", "error": "no manifest"});
+    };
+    let files = match package.files_digest() {
+        Ok(files) => files,
+        Err(e) => return json!({"state": "invalid", "error": e.to_string()}),
+    };
+    let comment = reiwand_format::manifest_comment(&package.manifest.id, &package.manifest.version, &files);
+    judged(&json, &String::from_utf8_lossy(&signed), &comment, keys)
+}
+
+fn judged(data: &[u8], signed: &str, comment: &str, keys: &[String]) -> Value {
+    let pairs = match accepted(keys) {
+        Ok(p) => p,
+        Err(e) => return json!({"state": "invalid", "error": e.to_string()}),
+    };
+    if pairs.is_empty() {
+        return json!({"state": "unchecked", "blocks": signed.lines().count() / 4});
+    }
+    let known: Vec<(&str, &str)> = pairs.iter().map(|(f, k)| (f.as_str(), k.as_str())).collect();
+    match reiwand_format::verify_blocks(data, signed, comment, &known) {
+        Ok(signers) if !signers.is_empty() => json!({"state": "valid", "signers": signers}),
+        Ok(_) => json!({"state": "invalid", "error": "none of the given keys signed it"}),
+        Err(e) => json!({"state": "invalid", "error": e.to_string()}),
+    }
+}

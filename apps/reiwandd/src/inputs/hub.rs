@@ -1,0 +1,193 @@
+use super::{Bound, Control, Grants, Hub, View, Wake};
+use crate::compositor::lock;
+use reiwand_audio::Capture;
+use reiwand_core::model::Input;
+use reiwand_scene::{PointerState, Press};
+use std::collections::{BTreeMap, BTreeSet};
+use std::path::Path;
+use std::sync::Mutex;
+use tokio::sync::watch;
+
+impl Hub {
+    pub(crate) fn new((grants, declined): (Bound, Grants), wake: Wake, changed: Wake) -> Hub {
+        let control = Mutex::new(Control { grants, declined, ..Control::default() });
+        let tracking = watch::Sender::new(false);
+        let (switch, audio, pointers, presses, reported, moved, poke) = Default::default();
+        Hub { control, tracking, switch, audio, pointers, presses, reported, moved, poke, wake, changed }
+    }
+
+    pub(crate) fn grant(&self, path: &Path, scene: &str, key: &str, input: Input) -> anyhow::Result<()> {
+        self.decide(path, scene, Some(key), (input, true))
+    }
+
+    pub(crate) fn decline(&self, path: &Path, scene: &str, key: &str, input: Input) -> anyhow::Result<()> {
+        self.decide(path, scene, Some(key), (input, false))
+    }
+
+    pub(crate) fn revoke(&self, path: &Path, scene: &str, input: Input) -> anyhow::Result<()> {
+        self.decide(path, scene, None, (input, false))
+    }
+
+    pub(crate) fn changed(&self) {
+        (self.changed)()
+    }
+
+    fn decide(
+        &self,
+        path: &Path,
+        scene: &str,
+        key: Option<&str>,
+        (input, granted): (Input, bool),
+    ) -> anyhow::Result<()> {
+        let switch = lock(&self.switch);
+        let (mut grants, mut declined) = {
+            let control = lock(&self.control);
+            if let Some(key) = key.filter(|_| granted) {
+                control.package(scene, Some(key))?;
+            }
+            (control.grants.clone(), control.declined.clone())
+        };
+        let bound = grants.entry(scene.to_owned()).or_default();
+        let changed = match key {
+            Some(key) => toggle(bound, key, input, granted),
+            None => bound.clone().keys().fold(false, |c, key| toggle(bound, key, input, false) | c),
+        };
+        grants.retain(|_, keys| !keys.is_empty());
+        let decided = toggle(&mut declined, scene, input, !granted);
+        if changed {
+            super::save(path, &grants)?;
+        }
+        if decided {
+            super::save(&super::declined_path(path), &declined)?;
+        }
+        if !changed && !decided {
+            return Ok(());
+        }
+        let mut control = lock(&self.control);
+        (control.grants, control.declined) = (grants, declined);
+        drop((control, switch));
+        tracing::info!(scene, input = input.as_str(), granted, "input permission changed");
+        self.update(None);
+        if input == Input::Rgb {
+            (self.wake)();
+        }
+        (self.changed)();
+        Ok(())
+    }
+
+    pub(crate) fn update(&self, views: Option<(BTreeMap<String, View>, bool)>) {
+        let mut switch = lock(&self.switch);
+        let mut control = lock(&self.control);
+        if let Some((views, blocked)) = views {
+            super::gate::told(&control, &views);
+            (control.views, control.blocked) = (views, blocked);
+        }
+        let (audio, pointed) = (!control.wants(Input::Audio).is_empty(), control.wants(Input::Pointer));
+        let followed: BTreeSet<String> =
+            pointed.iter().cloned().chain(control.wants(Input::Clicks)).collect();
+        let flips: Vec<_> = (control.windows.iter())
+            .filter(|(output, _)| control.followed.contains(*output) != followed.contains(*output))
+            .map(|(output, window)| (window.clone(), followed.contains(output)))
+            .collect();
+        let refollowed = std::mem::replace(&mut control.followed, followed.clone()) != followed;
+        let mut media = control.wants(Input::Media);
+        media.retain(|output| !crate::media::simulated(output));
+        drop(control);
+        let listened = !media.is_empty();
+        crate::media::using(media);
+        crate::media::follow(listened);
+        flips.into_iter().for_each(|(window, on)| window.track_pointer(on));
+        if refollowed {
+            lock(&self.pointers).retain(|output, _| followed.contains(output));
+            lock(&self.presses).retain(|output, _| followed.contains(output));
+        }
+        let on = !pointed.is_empty();
+        if !on {
+            lock(&self.reported).clear();
+        }
+        let tracked = self.tracking.send_if_modified(|was| std::mem::replace(was, on) != on);
+        if refollowed || tracked {
+            tracing::info!(outputs = followed.len(), tracked = on, "pointer feed");
+        }
+        let switched = audio != switch.audio;
+        if switched {
+            lock(&self.audio).attach(None);
+            drop(switch.capture.take());
+            let wake = self.wake.clone();
+            let started = audio.then(|| Capture::start(move || wake())).transpose();
+            let started = started.inspect_err(|e| tracing::warn!("cannot capture audio: {e}"));
+            let (capture, feed) = started.ok().flatten().unzip();
+            lock(&self.audio).attach(feed);
+            (switch.audio, switch.capture) = (audio, capture);
+            lock(&self.control).capturing = switch.capture.is_some();
+            tracing::info!(on = switch.capture.is_some(), "audio capture");
+        }
+        drop(switch);
+        if refollowed || tracked || switched {
+            (self.changed)()
+        }
+    }
+
+    pub(crate) fn away(&self, output: &str) -> bool {
+        lock(&self.reported).get(output) == Some(&false)
+    }
+
+    pub(crate) fn touch(&self, output: &str) -> (PointerState, Vec<Press>, [bool; 2]) {
+        let control = lock(&self.control);
+        let allowed = [control.allows(output, Input::Pointer), control.allows(output, Input::Clicks)];
+        drop(control);
+        let state = lock(&self.pointers).get(output).copied().unwrap_or_default();
+        let presses = lock(&self.presses).remove(output).filter(|_| allowed[1]).unwrap_or_default();
+        let state = match allowed {
+            [true, clicks] => PointerState { buttons: if clicks { state.buttons } else { 0 }, ..state },
+            _ => PointerState::default(),
+        };
+        (state, presses, allowed)
+    }
+
+    pub(crate) fn set_pointer(&self, x: f64, y: f64) {
+        let control = lock(&self.control);
+        let followed = control.views.iter().filter(|(output, _)| control.followed.contains(*output));
+        let pointers = lock(&self.pointers);
+        let place = |(output, view): (&String, &View)| {
+            let (pos, buttons) = (view.place(x, y), pointers.get(output).map_or(0, |p| p.buttons));
+            (output.clone(), PointerState { pos, buttons, inside: pos.is_some(), ..PointerState::default() })
+        };
+        let states: Vec<_> = followed.map(place).collect();
+        drop((pointers, control));
+        *lock(&self.reported) = states.iter().map(|(output, state)| (output.clone(), state.inside)).collect();
+        self.store(states);
+    }
+
+    pub(super) fn store(&self, states: impl IntoIterator<Item = (String, PointerState)>) {
+        let followed = lock(&self.control).followed.clone();
+        self.keep(states.into_iter().filter(|(output, _)| followed.contains(output)));
+    }
+
+    pub(crate) fn simulate(&self, output: &str, state: PointerState) {
+        let taken = |input| lock(&self.control).allows(output, input);
+        if taken(Input::Pointer) || taken(Input::Clicks) {
+            self.keep([(output.to_owned(), state)]);
+        }
+    }
+
+    fn keep(&self, states: impl IntoIterator<Item = (String, PointerState)>) {
+        let (mut pointers, mut presses, mut moved) = (lock(&self.pointers), lock(&self.presses), false);
+        for (output, state) in states {
+            if pointers.get(&output).map_or(0, |p| p.buttons) != state.buttons {
+                super::pressed(&mut presses, &output, &state);
+            }
+            moved |= pointers.insert(output, state) != Some(state);
+        }
+        if moved {
+            self.moved.notify_one();
+        }
+    }
+}
+
+fn toggle(map: &mut Grants, scene: &str, input: Input, on: bool) -> bool {
+    let inputs = map.entry(scene.to_owned()).or_default();
+    let changed = if on { inputs.insert(input) } else { inputs.remove(&input) };
+    map.retain(|_, inputs| !inputs.is_empty());
+    changed
+}

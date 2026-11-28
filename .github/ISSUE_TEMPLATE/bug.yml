@@ -1,0 +1,51 @@
+name: Something does not work
+description: A wallpaper, the app, the editor, the phone or the server does something it promises not to, or fails.
+labels: [bug]
+body:
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to see it
+      description: From a fresh start, what to do so that it happens again.
+      placeholder: |
+        1. Open the app
+        2. …
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The output of `reiwand-ctl --version`, or the Version row of Settings on the phone.
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where
+      options:
+        - KDE Plasma 6
+        - Sway, Hyprland, river, niri or COSMIC
+        - X11
+        - Android
+        - Own server
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: System and graphics card
+      description: Distribution, how Reiwand was installed (AppImage, Flatpak, package) and the GPU.
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: The last lines of `journalctl --user -u reiwandd`, if they say something. Remove anything private.
+      render: text

@@ -1,0 +1,32 @@
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC2
+import io.github.reiwand.app
+
+RowLayout {
+    id: row
+
+    property string text
+    default property alias control: slot.data
+
+    Layout.fillWidth: true
+    Layout.minimumHeight: Look.fieldHeight
+    spacing: Look.e3
+
+    QQC2.Label {
+        Layout.fillWidth: true
+        Layout.preferredWidth: Look.e8
+        Layout.minimumWidth: Math.min(implicitWidth, Look.e8 + Look.e5)
+        text: row.text
+        color: Look.mist
+        wrapMode: Text.Wrap
+    }
+
+    RowLayout {
+        id: slot
+
+        Layout.fillWidth: true
+        Layout.maximumWidth: implicitWidth
+        spacing: Look.e2
+    }
+}

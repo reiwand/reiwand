@@ -1,0 +1,81 @@
+import QtQuick
+import org.kde.kirigami as Kirigami
+import io.github.reiwand.app
+
+Item {
+    id: gizmo
+
+    required property var stage
+    required property var model
+    readonly property real ratio: stage.ratio
+    readonly property bool chosen: stage.selected === model.pointer
+    readonly property var tints: [Look.coral, Look.sprout, Look.moon]
+
+    function three(field) {
+        return model.now[field].slice();
+    }
+
+    function free(field) {
+        return model.held[field] !== "bound";
+    }
+
+    function grab(handle, from, to, held) {
+        stage.grab({
+            "model": {
+                "layer": model.id
+            }
+        }, handle, from, to, model.held[handle.startsWith("turn") ? "rotation" : "position"] === "bound" && (held & Qt.ShiftModifier));
+    }
+
+    Rectangle {
+        x: gizmo.model.box[0] * gizmo.ratio
+        y: gizmo.model.box[1] * gizmo.ratio
+        width: (gizmo.model.box[2] - gizmo.model.box[0]) * gizmo.ratio
+        height: (gizmo.model.box[3] - gizmo.model.box[1]) * gizmo.ratio
+        color: "transparent"
+        border.color: gizmo.chosen ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor
+        opacity: gizmo.chosen ? 0.9 : 0.4
+
+        TapHandler {
+            gesturePolicy: TapHandler.ReleaseWithinBounds
+            onTapped: gizmo.stage.page.editor.select(gizmo.model.pointer)
+        }
+    }
+
+    SceneLightLines {
+        anchors.fill: parent
+        visible: gizmo.chosen
+        ratio: gizmo.ratio
+        segments: gizmo.model.arms.map(arm => [gizmo.model.at, arm])
+    }
+
+    SceneRepeater {
+        id: listed
+
+        rows: gizmo.chosen ? gizmo.model.arms : []
+
+        delegate: SceneKnob {
+            readonly property var modelData: listed.rows[index]
+            required property int index
+
+            at: modelData
+            ratio: gizmo.ratio
+            label: ["X", "Y", "Z"][index]
+            tint: gizmo.tints[index]
+            tip: gizmo.free("position") ? App.tr("Drag to move the model along this direction") : App.tr("The position follows a binding; drag with Shift to replace it with a value")
+            opacity: gizmo.free("position") ? 1 : 0.4
+            onMoved: (to, done) => {
+                if (done)
+                    gizmo.grab(["x", "y", "z"][index], modelData, to, held);
+            }
+        }
+    }
+
+    SceneModelTurn {
+        gizmo: gizmo
+    }
+
+    SceneModelRings {
+        gizmo: gizmo
+    }
+}

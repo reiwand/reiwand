@@ -1,0 +1,32 @@
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
+pub enum SwarmLight {
+    Lit {
+        system: String,
+        #[serde(default)]
+        layer: Option<String>,
+        #[serde(default)]
+        lit: Option<bool>,
+        #[serde(default)]
+        normal: Option<String>,
+    },
+    Refract {
+        system: String,
+        #[serde(default)]
+        layer: Option<String>,
+        #[serde(default)]
+        normal: Option<String>,
+        #[serde(default)]
+        units: Option<String>,
+        #[serde(default)]
+        amount: Option<f64>,
+        #[serde(default)]
+        shift: Option<f64>,
+        #[serde(default)]
+        color: Option<String>,
+        #[serde(default)]
+        off: bool,
+    },
+}

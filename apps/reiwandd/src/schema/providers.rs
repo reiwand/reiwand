@@ -1,0 +1,100 @@
+use super::{DAY, clearable, field, interval, range, required, values};
+use reiwand_core::model::{Field, FieldKind, ProviderKind, SecretField};
+use reiwand_plugin::{Kind, Manifest};
+use reiwand_providers::{catalog, wallhaven};
+use serde_json::{Value, json};
+
+fn common(refresh: f64) -> [Field; 2] {
+    [
+        interval("refresh", refresh, 900.0, true),
+        range(field("cache_mb", FieldKind::Int, json!(1024)), 16.0, 65_536.0, Some(1.0)),
+    ]
+}
+
+fn provider(kind: &str, refresh: f64, own: Vec<Field>) -> ProviderKind {
+    let base = catalog::find(kind);
+    let hosts = base.map_or(&[][..], |b| b.hosts);
+    let options = own.into_iter().chain(common(refresh)).collect();
+    let secret =
+        base.and_then(|b| b.secret).map(|(name, required)| SecretField { name: name.into(), required });
+    ProviderKind { kind: kind.into(), hosts: hosts.iter().map(|h| h.to_string()).collect(), options, secret }
+}
+
+pub fn plugin(manifest: &Manifest) -> ProviderKind {
+    let setting = |s: &reiwand_plugin::Setting| {
+        let mut own = field(&s.key, FieldKind::Text, s.prefill.clone());
+        own.label = Some(s.label.clone());
+        match s.kind {
+            Kind::Text => {}
+            Kind::Bool => own.kind = FieldKind::Bool,
+            Kind::Choice => (own.kind, own.values) = (FieldKind::Enum, s.values.clone()),
+            Kind::Int => {
+                own.kind = FieldKind::Int;
+                (own.min, own.max, own.step) = (s.min.map(|n| n as f64), s.max.map(|n| n as f64), Some(1.0));
+            }
+        }
+        own
+    };
+    let options = manifest.settings.iter().map(setting).chain(common(DAY)).collect();
+    let secret =
+        manifest.secret.as_ref().map(|s| SecretField { name: s.label.clone(), required: s.required });
+    let kind = format!("{}{}", crate::plugins::PREFIX, manifest.id);
+    ProviderKind { kind, hosts: manifest.hosts.clone(), options, secret }
+}
+
+pub fn providers() -> Vec<ProviderKind> {
+    let text = |key: &str, default: &str| field(key, FieldKind::Text, json!(default));
+    let int = |key: &str, default: u32, min: f64, max: f64| {
+        range(field(key, FieldKind::Int, json!(default)), min, max, Some(1.0))
+    };
+    let flag = |key: &str, default: bool| field(key, FieldKind::Bool, json!(default));
+    let url = |key: &str| required(field(key, FieldKind::Url, Value::Null));
+    let user = || required(field("user", FieldKind::Text, Value::Null));
+    let list =
+        |key: &str, choices: &[&str]| clearable(values(field(key, FieldKind::List, json!("")), choices));
+    let flags = |key: &str, default: &str, names: &[&str]| {
+        values(field(key, FieldKind::Flags, json!(default)), names)
+    };
+    let choice = |key: &str, default: &str, choices: &[&str]| {
+        values(field(key, FieldKind::Enum, json!(default)), choices)
+    };
+    vec![
+        provider(
+            "bing",
+            DAY / 2.0,
+            vec![text("market", "en-US"), flag("uhd", true), int("count", 8, 1.0, 8.0)],
+        ),
+        provider("apod", DAY / 2.0, vec![int("days", 1, 1.0, 30.0), flag("videos", false)]),
+        provider("wikimedia", DAY / 2.0, vec![int("days", 1, 1.0, 30.0), int("width", 3840, 640.0, 7680.0)]),
+        provider(
+            "wallhaven",
+            DAY,
+            vec![
+                text("query", ""),
+                flags("categories", "111", &wallhaven::CATEGORIES),
+                flags("purity", "100", &wallhaven::PURITIES),
+                choice("sorting", "toplist", &wallhaven::SORTINGS),
+                choice("order", "desc", &wallhaven::ORDERS),
+                choice("top_range", "1M", &wallhaven::RANGES),
+                clearable(text("atleast", "")),
+                list("resolutions", &wallhaven::RESOLUTIONS),
+                list("ratios", &wallhaven::RATIOS),
+                clearable(values(field("colors", FieldKind::Palette, json!("")), &wallhaven::PALETTE)),
+                clearable(text("similar", "")),
+                clearable(text("tag", "")),
+                clearable(text("uploader", "")),
+                clearable(text("collection", "")),
+                int("page", 1, 1.0, 1000.0),
+                int("pages", 1, 1.0, 10.0),
+                int("max_items", 240, 1.0, 240.0),
+            ],
+        ),
+        provider("webdav", 3600.0, vec![url("url"), user()]),
+        provider("nextcloud", 3600.0, vec![url("server"), user(), text("folder", "")]),
+        provider(
+            "immich",
+            3600.0,
+            vec![url("server"), required(field("album", FieldKind::Text, Value::Null))],
+        ),
+    ]
+}

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="account_remove">Remove this account</string>
+    <string name="account_unlink">Stop using it for this repository</string>
+    <string name="accounts_group">Accounts</string>
+    <string name="accounts_none">No accounts. One is created when you sign in to a private repository.</string>
+    <string name="carry_choose">Choose a file</string>
+    <string name="carry_done">Done</string>
+    <string name="carry_export">Export the configuration</string>
+    <string name="carry_export_note">The file brings the sections below. Your own wallpapers make it bigger.</string>
+    <string name="carry_export_sub">Saves your repositories, lists and settings in a file</string>
+    <string name="carry_exported">The file was saved.</string>
+    <string name="carry_favourites">Favourites</string>
+    <string name="carry_group">Configuration file</string>
+    <string name="carry_import">Import a configuration</string>
+    <string name="carry_import_note">Choose a file exported by Reiwand on this or another device. Only what you tick is added; what you already have stays.</string>
+    <string name="carry_import_sub">Adds what a file brings; nothing is replaced</string>
+    <string name="carry_imported">The file was imported.</string>
+    <string name="carry_installed">Installed wallpapers</string>
+    <string name="carry_lists">Lists</string>
+    <string name="carry_lists_both">Keep both lists when a name repeats</string>
+    <string name="carry_open">Open the file</string>
+    <string name="carry_own">Your own wallpapers</string>
+    <string name="carry_password">Password</string>
+    <string name="carry_providers">Providers</string>
+    <string name="carry_ratings">Ratings</string>
+    <string name="carry_repositories">Repositories</string>
+    <string name="carry_row">%1$d new, %2$d already here</string>
+    <string name="carry_secrets">Passwords and keys</string>
+    <string name="carry_secrets_note">Passwords and keys are saved only encrypted with the password you choose here. Keep it: without it they cannot be recovered.</string>
+    <string name="carry_sessions_note">Account sessions are not imported: sign in again to the private repositories.</string>
+    <string name="carry_settings">Settings</string>
+    <string name="carry_tags">Tags</string>
+    <string name="carry_unreadable">This file cannot be read.</string>
+    <string name="carry_working">Working…</string>
+    <string name="repo_private">%1$s is private: sign in with an account to open it.</string>
+    <string name="repo_server_note">This address is a server. Pick the repository to add.</string>
+    <string name="repo_server_pick">Repositories of the server</string>
+    <string name="repo_trust">Trust this certificate</string>
+    <string name="repo_trust_ask">The certificate of %1$s is not from a known authority. Its fingerprint is %2$s. Trust it only if you know that this is the right one.</string>
+    <string name="sign_in_browser">Sign in with the browser</string>
+    <string name="sign_in_code">Code: %1$s</string>
+    <string name="sign_in_waiting">Waiting for you to approve the code in the browser…</string>
+    <string name="use_account">Use the account %1$s</string>
+    <string name="use_other_account">Use another account</string>
+</resources>

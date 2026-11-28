@@ -1,0 +1,115 @@
+use super::paint::Painter;
+use super::pool::{BUDGET, HELD, Tex, bytes};
+use reiwand_scene::{EffectDraw, Layer, Over, Scene, Spend, Tier, over};
+use std::collections::{BTreeMap, HashMap, HashSet};
+
+#[derive(Default)]
+pub(crate) struct Ledger {
+    spends: Vec<Spend>,
+    tier: Option<Tier>,
+    base: HashSet<usize>,
+    sized: Vec<usize>,
+    out: Vec<(String, usize)>,
+    seen: (u32, u32),
+    cut: HashMap<String, Vec<usize>>,
+    lighter: Vec<usize>,
+    lit: HashMap<String, Vec<usize>>,
+    pub(crate) light: BTreeMap<String, String>,
+}
+
+fn index(layer: &Layer, e: &EffectDraw<'_>) -> usize {
+    layer.effects.iter().position(|u| std::ptr::eq(u, e.effect)).unwrap_or(usize::MAX)
+}
+
+impl Ledger {
+    pub(crate) fn new(
+        scene: &Scene,
+        tier: Tier,
+        refused: &mut BTreeMap<String, String>,
+    ) -> (Ledger, Option<Scene>) {
+        let spends = scene.spends();
+        let [w, h] = scene.canvas.size.map(|v| v as f32);
+        let found = over(&spends, |_| false, tier, [0.0, 0.0, w, h], 0.0);
+        let (lighter, found): (Vec<Over>, Vec<Over>) = found.into_iter().partition(|c| c.lighter);
+        let built = (!found.is_empty()).then(|| scene.without(found.iter().map(|c| &spends[c.at])));
+        let base = found.iter().map(|c| c.at).collect();
+        found.into_iter().for_each(|c| drop(refused.insert(spends[c.at].key(), c.why)));
+        let mut ledger = Ledger { spends, tier: Some(tier), base, ..Ledger::default() };
+        ledger.lighten(lighter);
+        ledger.mark();
+        (ledger, built)
+    }
+
+    fn lighten(&mut self, lighter: Vec<Over>) {
+        self.lighter = lighter.iter().map(|c| c.at).collect();
+        self.light = lighter.into_iter().map(|c| (self.key(c.at), c.why)).collect();
+        self.lit.clear();
+        for &i in &self.lighter {
+            self.lit.entry(self.spends[i].layer.clone()).or_default().push(self.spends[i].index);
+        }
+    }
+
+    fn mark(&mut self) {
+        self.cut.clear();
+        let spent =
+            self.base.iter().chain(&self.sized).map(|&i| (&self.spends[i].layer, self.spends[i].index));
+        for (layer, at) in spent.chain(self.out.iter().map(|(l, at)| (l, *at))) {
+            self.cut.entry(layer.clone()).or_default().push(at);
+        }
+    }
+
+    fn key(&self, i: usize) -> String {
+        self.spends[i].key()
+    }
+}
+
+impl Painter<'_, '_, '_> {
+    pub(crate) fn spend(&mut self) {
+        let size = self.full.size();
+        let held = self.caches.values().map(|c| c.tex.bytes());
+        let held = held.chain(self.states.values().flat_map(|s| s.tex.iter().map(Tex::bytes))).sum::<u64>();
+        self.pool.outside = held + 2 * bytes(size, self.format);
+        self.pool.lend = BUDGET.max(4 * bytes(size, self.format));
+        self.pool.cap = HELD.max(self.pool.outside + self.pool.lend + 2 * bytes(size, self.format));
+        let ledger = &mut self.pool.ledger;
+        let Some(tier) = ledger.tier.filter(|_| ledger.seen != size) else { return };
+        ledger.seen = size;
+        let pixels = size.0 as f32 * size.1 as f32;
+        let base = &ledger.base;
+        let found = over(&ledger.spends, |i| base.contains(&i), tier, self.frame.view, pixels);
+        let (lighter, found): (Vec<Over>, Vec<Over>) = found.into_iter().partition(|c| c.lighter);
+        ledger.lighten(lighter);
+        let old = std::mem::replace(&mut ledger.sized, found.iter().map(|c| c.at).collect());
+        ledger.mark();
+        let kept: Vec<String> = ledger.base.iter().chain(&ledger.sized).map(|&i| ledger.key(i)).collect();
+        old.into_iter().map(|i| ledger.key(i)).filter(|k| !kept.contains(k)).for_each(|k| {
+            self.refused.remove(&k);
+        });
+        found.into_iter().for_each(|c| drop(self.refused.insert(ledger.key(c.at), c.why)));
+    }
+
+    pub(crate) fn lightened(&self, i: usize, e: &EffectDraw<'_>) -> bool {
+        let lit = &self.pool.ledger.lit;
+        let layer = self.frame.draws[i].layer;
+        !lit.is_empty() && lit.get(layer.id.as_str()).is_some_and(|at| at.contains(&index(layer, e)))
+    }
+
+    pub(crate) fn cut(&self, i: usize, e: &EffectDraw<'_>) -> bool {
+        let cut = &self.pool.ledger.cut;
+        let layer = self.frame.draws[i].layer;
+        !cut.is_empty() && cut.get(layer.id.as_str()).is_some_and(|at| at.contains(&index(layer, e)))
+    }
+
+    pub(crate) fn idle(&self, i: usize) -> bool {
+        let frame = self.frame;
+        let list = &frame.effects[frame.draws[i].effects.clone()];
+        !self.pool.ledger.cut.is_empty() && list.iter().all(|e| self.cut(i, e))
+    }
+
+    pub(crate) fn leave(&mut self, i: usize, e: &EffectDraw<'_>, why: String) {
+        let layer = self.frame.draws[i].layer;
+        self.refused.insert(format!("{} on {}", e.effect.effect, layer.id), why);
+        self.pool.ledger.out.push((layer.id.clone(), index(layer, e)));
+        self.pool.ledger.mark();
+    }
+}

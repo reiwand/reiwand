@@ -1,0 +1,23 @@
+[package]
+name = "reiwand-library"
+description = "The Reiwand catalog: sources, items, tags, search, playlists, presets and profiles in SQLite"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+reiwand-core.workspace = true
+reiwand-format.workspace = true
+reiwand-schedule.workspace = true
+rusqlite.workspace = true
+ulid.workspace = true
+sha2.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+chrono.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+reiwand-fill.workspace = true

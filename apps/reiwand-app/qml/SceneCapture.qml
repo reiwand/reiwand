@@ -1,0 +1,34 @@
+import QtQuick
+import QtQuick.Controls as QQC2
+import io.github.reiwand.app
+
+QQC2.ToolButton {
+    id: capture
+
+    required property var page
+    property bool above: false
+    readonly property alias window: window
+
+    icon.name: "download-simple"
+    text: App.tr("Capture")
+    checked: window.visible
+    QQC2.ToolTip.text: App.tr("Save a picture or a clip of what the canvas shows, with the values of Try")
+    QQC2.ToolTip.visible: hovered && !window.visible
+    onClicked: window.visible ? window.close() : window.open()
+
+    QQC2.Popup {
+        id: window
+
+        x: capture.width - width
+        y: capture.above ? -height : capture.height
+        width: Look.smallPanel
+        padding: Look.e3
+        focus: true
+        closePolicy: QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutsideParent
+        onClosed: capture.forceActiveFocus()
+
+        contentItem: ScenePreviewSave {
+            page: capture.page
+        }
+    }
+}

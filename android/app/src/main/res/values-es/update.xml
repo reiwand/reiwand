@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="block_about">Acerca de Reiwand</string>
+    <string name="app_version_name">Versión</string>
+    <string name="app_version">Reiwand %s</string>
+    <string name="app_update_look">Buscar una versión nueva</string>
+    <string name="app_update_checking">Buscando una versión nueva…</string>
+    <string name="app_update_current">Esta es la última versión</string>
+    <string name="app_update_ready">Reiwand %s está lista para instalar</string>
+    <string name="app_update_install">Instalar %s</string>
+    <string name="app_update_tap">Toca para instalarla; Android pregunta antes de reemplazar la app.</string>
+    <string name="app_update_channel">Versiones nuevas de Reiwand</string>
+    <string name="app_update_auto">Buscar versiones nuevas automáticamente</string>
+    <string name="app_update_auto_sub">Una vez al día, con wifi salvo que los datos móviles estén encendidos. Instalar siempre te pregunta.</string>
+    <string name="app_update_private">El modo privado corta la red: no se busca versión.</string>
+    <string name="app_update_offline">No se pudo llegar a GitHub. Inténtalo más tarde.</string>
+    <string name="app_update_unlisted">La versión nueva no trae archivo para este teléfono. No se instaló nada.</string>
+    <string name="app_update_broken">La descarga no coincide con la versión publicada. No se instaló nada.</string>
+    <string name="app_update_signer">La descarga no está firmada por Reiwand. No se instaló nada.</string>
+    <string name="app_update_gone">La descarga ya no está. Vuelve a buscar una versión nueva.</string>
+    <string name="app_update_failed">Android no instaló la versión nueva.</string>
+</resources>

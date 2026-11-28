@@ -1,0 +1,132 @@
+mod gpu;
+mod link;
+mod policy;
+mod spawn;
+mod stop;
+
+pub use gpu::{PROBE, device};
+pub use link::{Link, MAX_MESSAGE};
+pub use policy::{csp, languages, mime};
+pub use spawn::{Isolation, isolated, scope, spawn, unscoped};
+pub use stop::{DRAIN, GRACE, drain, end, members};
+
+use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
+use std::path::PathBuf;
+
+pub const SCHEME: &str = "wpak";
+pub const USER_SCHEME: &str = "wpak-user";
+pub const BANDS: usize = 64;
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+pub struct Settings {
+    pub fps: u32,
+    pub quality: u8,
+    pub locale: String,
+    pub volume: f64,
+}
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Allowed {
+    pub audio: bool,
+    pub pointer: bool,
+    pub clicks: bool,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Folder {
+    pub prop: String,
+    pub all: bool,
+    pub files: Vec<(String, PathBuf)>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+pub struct Start {
+    pub package: PathBuf,
+    pub id: String,
+    pub entry: String,
+    pub preload: Option<String>,
+    pub background: [u8; 3],
+    pub network: Vec<String>,
+    pub storage: Option<PathBuf>,
+    pub languages: Vec<String>,
+    pub mask_gpu: bool,
+    pub device: Option<String>,
+    pub modifiers: Vec<u64>,
+    pub properties: Map<String, Value>,
+    pub shape: Value,
+    pub settings: Settings,
+    pub allowed: Allowed,
+    pub folders: Vec<Folder>,
+    pub files: Vec<(String, PathBuf)>,
+    /// Renders the page on a frame clock: its time stands still from this wall clock (seconds since 1970) until
+    /// `ToWeb::Step { at }` moves it to `at` seconds, and `FromWeb::Stepped` follows once the page painted that
+    /// time. `None` for a wallpaper, which runs on the real clock.
+    pub clock: Option<f64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum ToWeb {
+    Start(Box<Start>),
+    Open { view: u32, size: (u32, u32), scale: f64, properties: Map<String, Value> },
+    Close(u32),
+    Resize { view: u32, size: (u32, u32), scale: f64 },
+    Visible { view: u32, visible: bool },
+    Fps { view: u32, fps: u32 },
+    Lights { view: u32, on: bool },
+    Settings(Settings),
+    Properties { view: u32, values: Map<String, Value> },
+    Allowed(Allowed),
+    Audio { left: Vec<f32>, right: Vec<f32> },
+    Media(Value),
+    Pointer { view: u32, at: Option<(f64, f64)> },
+    Press { view: u32, at: (f64, f64), button: u32 },
+    Folder(Folder),
+    Files(Vec<(String, PathBuf)>),
+    Action(String),
+    Released { view: u32, buffer: u32 },
+    Freed { view: u32, slot: u32 },
+    Copy,
+    Shot { view: u32 },
+    Step { view: u32, at: f64 },
+    Quit,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum FromWeb {
+    Ready { version: String, sandboxed: bool },
+    Unavailable(String),
+    Failed(String),
+    Buffer { view: u32, id: u32, size: (u32, u32), fourcc: u32, modifier: u64, offset: u32, stride: u32 },
+    Forget { view: u32 },
+    Frame { view: u32, buffer: u32 },
+    Pixels { view: u32, slot: u32, size: (u32, u32), stride: u32, fresh: bool },
+    Wants { audio: bool },
+    Loaded { view: u32 },
+    Crashed { view: u32 },
+    Broken { view: u32 },
+    Said(String),
+    Idle,
+    Console { view: u32, line: String },
+    Open { view: u32, prop: String },
+    Rgb { view: u32, size: (u32, u32), rgb: Vec<u8> },
+    Stepped { view: u32, at: f64 },
+}
+
+pub fn changed(old: &Map<String, Value>, new: &Map<String, Value>) -> Map<String, Value> {
+    let gone = old.keys().filter(|k| !new.contains_key(*k)).map(|k| (k.clone(), Value::Null));
+    let fresh = new.iter().filter(|(k, v)| old.get(*k) != Some(v)).map(|(k, v)| (k.clone(), v.clone()));
+    fresh.chain(gone).collect()
+}
+
+pub fn token(prop: &str, salt: &[u8; 32], path: &std::path::Path) -> String {
+    use std::os::unix::fs::MetadataExt;
+    let stamp = std::fs::metadata(path).map_or([0; 3], |m| [m.len() as i64, m.mtime(), m.mtime_nsec()]);
+    let mut hasher = blake3::Hasher::new_keyed(salt);
+    hasher.update(path.as_os_str().as_encoded_bytes());
+    for n in stamp {
+        hasher.update(&n.to_le_bytes());
+    }
+    let hash = hasher.finalize().to_hex();
+    format!("{USER_SCHEME}://{prop}/{}", reiwand_format::page::token_name(path, &hash))
+}

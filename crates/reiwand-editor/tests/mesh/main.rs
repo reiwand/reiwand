@@ -1,0 +1,24 @@
+mod clips;
+mod curves;
+mod cutouts;
+mod events;
+mod kit;
+mod limbs;
+mod many;
+mod outside;
+mod parts;
+mod pins;
+mod points;
+mod refs;
+mod revisions;
+mod rules;
+mod scoped;
+mod script_calls;
+mod seen;
+mod shapes;
+mod swing;
+mod tidy;
+mod timing;
+mod weights;
+#[path = "../support/whole.rs"]
+mod whole;

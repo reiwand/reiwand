@@ -1,0 +1,69 @@
+package io.github.reiwand
+
+import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ListenableWorker
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
+import androidx.work.Worker
+import androidx.work.WorkerParameters
+import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONObject
+
+class RepoCheck(context: Context, params: WorkerParameters) : Worker(context, params) {
+    override fun doWork() = Updates.check(applicationContext)
+}
+
+object Updates {
+    const val WORK = "repos"
+    const val SETTING = "repos.auto_refresh"
+    const val AUTO = "repos.auto_update"
+    val count = mutableIntStateOf(0)
+    private val main = Handler(Looper.getMainLooper())
+
+    fun found(updates: Int) = main.post { count.intValue = updates }
+
+    fun count() = runCatching { JSONArray(Native.account("{\"op\": \"updates\"}")).length() }.getOrDefault(0)
+
+    fun repos() = runCatching {
+        JSONObject(Native.account("{\"op\": \"repos\"}")).optJSONArray("repos")?.let { all -> (0 until all.length()).count { !all.getJSONObject(it).optBoolean("bundled") } }
+    }.getOrNull() ?: 0
+
+    fun on() = runCatching { Native.setting(SETTING, null) }.getOrNull() != "false"
+
+    fun active() = updatesWanted(
+        runCatching { Native.setting(SETTING, null) }.getOrNull(),
+        runCatching { Native.setting(AUTO, null) }.getOrNull(),
+    )
+
+    fun check(context: Context): ListenableWorker.Result {
+        if (!Net.open()) return ListenableWorker.Result.success()
+        if (!active()) return ListenableWorker.Result.success().also { schedule(context) }
+        val found = runCatching { answer(Native::account, "refresh_repos", arrayOf("force" to false)) as JSONArray }
+        found(found.getOrNull()?.length() ?: return ListenableWorker.Result.retry())
+        return ListenableWorker.Result.success()
+    }
+
+    var counted: () -> Int = { repos() }
+
+    suspend fun settled(context: Context) {
+        withContext(NonCancellable + Dispatchers.IO) { schedule(context) }
+    }
+
+    fun schedule(context: Context, repos: Int = counted()) {
+        val work = WorkManager.getInstance(context)
+        if (repos == 0 || !active()) {
+            work.cancelUniqueWork(WORK)
+            return
+        }
+        val request = PeriodicWorkRequest.Builder(RepoCheck::class.java, 1, TimeUnit.DAYS).setConstraints(Network.constraints()).build()
+        work.enqueueUniquePeriodicWork(WORK, ExistingPeriodicWorkPolicy.UPDATE, request)
+    }
+}

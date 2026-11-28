@@ -1,0 +1,31 @@
+[Unit]
+Description=reiwand wallpaper daemon
+Documentation=https://github.com/reiwand/reiwand
+PartOf=graphical-session.target
+After=graphical-session.target pipewire.service
+Wants=pipewire.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=dbus
+BusName=io.github.reiwand.Daemon
+ExecStart=@BINDIR@/reiwandd
+Restart=on-failure
+RestartSec=2
+UMask=0077
+LimitCORE=0
+NoNewPrivileges=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+# The web helper runs a page without network in its own user and network namespaces (and, drawn
+# on the processor, in a mount namespace hiding /dev/dri): only those kinds, and mount for it.
+RestrictNamespaces=user net mnt
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6
+SystemCallArchitectures=native
+SystemCallFilter=@system-service @sandbox mount
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=graphical-session.target

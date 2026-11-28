@@ -1,0 +1,119 @@
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC2
+import org.kde.kirigami as Kirigami
+import io.github.reiwand.app
+
+// The curve editor: the curves of the keyed values part by part, with handles, several keys at
+// once, copy and paste. The same piece draws the Curves panel and the curve editor dialog.
+ColumnLayout {
+    id: graph
+
+    required property var page
+    // Whether the curves follow the scene as it changes, and whether the keys of the editor work.
+    property bool live: visible
+    property bool keyed: live
+    property bool explained: true
+    // A narrow editor keeps few tools on its row (the Curves panel in a small group).
+    readonly property bool compact: width < Look.smallPanel * 2
+    property var sources: []
+    property real now: 0
+    property var shown: []
+    property var hidden: ({})
+    property var chosen: []
+    readonly property bool pasteable: SceneGraphSources.pasteable
+    property bool aligned: true
+    property bool linked: true
+    readonly property alias plot: plot
+    readonly property SceneGraphKeys ops: SceneGraphKeys {
+        graph: graph
+    }
+    readonly property var watch: page.view
+    readonly property var span: {
+        const all = shown.map(c => c.range ?? [0, 1]);
+        return all.length ? [Math.min.apply(null, all.map(r => r[0])), Math.max.apply(null, all.map(r => r[1]))] : [0, 1];
+    }
+
+    function named(part) {
+        const names = {
+            "value": App.tr("Value"),
+            "x": "X",
+            "y": "Y",
+            "z": "Z",
+            "red": App.tr("Red"),
+            "green": App.tr("Green"),
+            "blue": App.tr("Blue"),
+            "alpha": App.tr("Alpha")
+        };
+        return names[part] ?? part;
+    }
+
+    function tint(s, part) {
+        const colors = [Look.coral, Look.sprout, Look.moon, Look.amber];
+        return (shown[s]?.tracks.length ?? 0) > 1 ? colors[part % 4] : Kirigami.Theme.highlightColor;
+    }
+
+    function load() {
+        shown = sources.map(s => JSON.parse(page.editor.rig("", JSON.stringify({
+                "curves": Object.assign({
+                    "samples": 160
+                }, s)
+            })) || "{}")).map((c, i) => Object.assign(c, {
+                "label": sources[i].label,
+                "source": sources[i]
+            })).filter(c => c.list !== undefined);
+        chosen = chosen.filter(c => shown[c.s]?.keys.some(k => Math.abs(k.t - c.t) < 1e-3));
+    }
+
+    function picked(s, t) {
+        return chosen.some(c => c.s === s && Math.abs(c.t - t) < 1e-3);
+    }
+
+    function choose(s, t, adding) {
+        const rest = adding ? chosen.filter(c => !(c.s === s && Math.abs(c.t - t) < 1e-3)) : [];
+        chosen = adding && rest.length < chosen.length ? rest : rest.concat([
+            {
+                "s": s,
+                "t": t
+            }
+        ]);
+    }
+
+    spacing: Kirigami.Units.smallSpacing
+    onWatchChanged: live && load()
+    onLiveChanged: live && load()
+    onSourcesChanged: {
+        chosen = [];
+        plot.view.fitAll();
+        if (live)
+            load();
+    }
+
+    SceneGraphTools {
+        Layout.fillWidth: true
+        graph: graph
+    }
+
+    SceneGraphPlot {
+        id: plot
+
+        Layout.fillWidth: true
+        Layout.preferredHeight: Kirigami.Units.gridUnit * 18
+        Layout.fillHeight: true
+        graph: graph
+    }
+
+    SceneGraphTracks {
+        Layout.fillWidth: true
+        graph: graph
+        plot: plot
+    }
+
+    QQC2.Label {
+        Layout.fillWidth: true
+        visible: graph.explained || graph.shown.length === 0
+        wrapMode: Text.Wrap
+        color: Kirigami.Theme.disabledTextColor
+        text: graph.shown.length === 0 ? App.tr("No keys to show: add keyframes to a value first.") : App.tr("Click a key to pick it, Ctrl+click to add it, drag around keys to pick several. Drag picked keys to move them in time and value (keys of several values too, when they are of one kind and unit), Alt and drag to scale their values, the grip at the right of the selection to stretch their times, and the round handles to bend the curve. Each track is drawn on its own scale.")
+    }
+}

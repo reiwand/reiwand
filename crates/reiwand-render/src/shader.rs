@@ -1,0 +1,127 @@
+use std::sync::{Mutex, PoisonError};
+
+pub(crate) fn bind_group_layout(device: &wgpu::Device, textures: u32) -> wgpu::BindGroupLayout {
+    layout_of(device, &vec![wgpu::TextureViewDimension::D2; textures as usize])
+}
+
+pub(crate) fn layout_of(
+    device: &wgpu::Device,
+    dimensions: &[wgpu::TextureViewDimension],
+) -> wgpu::BindGroupLayout {
+    let textures = dimensions.len() as u32;
+    let entry = |binding, ty| wgpu::BindGroupLayoutEntry {
+        binding,
+        visibility: wgpu::ShaderStages::FRAGMENT,
+        ty,
+        count: None,
+    };
+    let uniform = wgpu::BindingType::Buffer {
+        ty: wgpu::BufferBindingType::Uniform,
+        has_dynamic_offset: false,
+        min_binding_size: None,
+    };
+    let texture = |view_dimension| wgpu::BindingType::Texture {
+        sample_type: wgpu::TextureSampleType::Float { filterable: true },
+        view_dimension,
+        multisampled: false,
+    };
+    let sampler = wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering);
+    let entries: Vec<_> = std::iter::once(entry(0, uniform))
+        .chain(dimensions.iter().enumerate().map(|(i, d)| entry(i as u32 + 1, texture(*d))))
+        .chain([entry(textures + 1, sampler)])
+        .collect();
+    device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+        label: Some("reiwand-render bind group layout"),
+        entries: &entries,
+    })
+}
+
+pub(crate) fn module(device: &wgpu::Device, source: &str) -> wgpu::ShaderModule {
+    device.create_shader_module(wgpu::ShaderModuleDescriptor {
+        label: Some("reiwand-render shader"),
+        source: wgpu::ShaderSource::Wgsl(source.into()),
+    })
+}
+
+pub(crate) fn pipeline(
+    device: &wgpu::Device,
+    layout: &wgpu::BindGroupLayout,
+    shader: &wgpu::ShaderModule,
+    entry: &str,
+    target: wgpu::ColorTargetState,
+) -> wgpu::RenderPipeline {
+    let layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+        label: Some("reiwand-render pipeline layout"),
+        bind_group_layouts: &[Some(layout)],
+        immediate_size: 0,
+    });
+    device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+        label: Some("reiwand-render pipeline"),
+        layout: Some(&layout),
+        vertex: wgpu::VertexState {
+            module: shader,
+            entry_point: Some("vs_main"),
+            compilation_options: Default::default(),
+            buffers: &[],
+        },
+        fragment: Some(wgpu::FragmentState {
+            module: shader,
+            entry_point: Some(entry),
+            compilation_options: Default::default(),
+            targets: &[Some(target)],
+        }),
+        primitive: Default::default(),
+        depth_stencil: None,
+        multisample: Default::default(),
+        multiview_mask: None,
+        cache: None,
+    })
+}
+
+pub(crate) fn pair(
+    device: &wgpu::Device,
+    layout: &wgpu::BindGroupLayout,
+    shader: &wgpu::ShaderModule,
+    entry: &str,
+    format: wgpu::TextureFormat,
+) -> [wgpu::RenderPipeline; 2] {
+    let fade = wgpu::BlendComponent {
+        src_factor: wgpu::BlendFactor::Constant,
+        dst_factor: wgpu::BlendFactor::OneMinusConstant,
+        operation: wgpu::BlendOperation::Add,
+    };
+    [None, Some(wgpu::BlendState { color: fade, alpha: fade })].map(|blend| {
+        pipeline(device, layout, shader, entry, wgpu::ColorTargetState { blend, ..format.into() })
+    })
+}
+
+pub(crate) struct Pairs {
+    pub(crate) layout: wgpu::BindGroupLayout,
+    shader: wgpu::ShaderModule,
+    entry: &'static str,
+    made: Mutex<Vec<(wgpu::TextureFormat, [wgpu::RenderPipeline; 2])>>,
+}
+
+impl Pairs {
+    pub(crate) fn new(
+        layout: wgpu::BindGroupLayout,
+        shader: wgpu::ShaderModule,
+        entry: &'static str,
+    ) -> Self {
+        Self { layout, shader, entry, made: Mutex::default() }
+    }
+
+    pub(crate) fn get(
+        &self,
+        device: &wgpu::Device,
+        format: wgpu::TextureFormat,
+    ) -> [wgpu::RenderPipeline; 2] {
+        let mut made = self.made.lock().unwrap_or_else(PoisonError::into_inner);
+        if let Some((_, found)) = made.iter().find(|(f, _)| *f == format) {
+            return found.clone();
+        }
+        let found = pair(device, &self.layout, &self.shader, self.entry, format);
+        made.push((format, found.clone()));
+        found
+    }
+}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}} · Reiwand</title>
+<link rel="stylesheet" href="{{root}}assets/site.css">
+<script defer src="{{root}}assets/search.js" data-root="{{root}}"></script>
+</head>
+<body class="{{kind}}">
+<header class="bar">
+  <a class="brand" href="{{root}}index.html"><img class="mark" src="{{root}}assets/reiwand.svg" alt="" width="28" height="28">Reiwand <em>docs</em></a>
+  <label class="find"><span class="sr">Search the documentation</span>
+    <input type="search" id="find" placeholder="Search" autocomplete="off" spellcheck="false">
+    <kbd>/</kbd>
+  </label>
+  <a class="code" href="https://github.com/reiwand/reiwand">Source</a>
+</header>
+<div id="found" hidden></div>
+<div class="frame">
+  <nav class="side" aria-label="Documentation">
+    <details class="menu"><summary>Pages</summary><div>{{nav}}</div></details>
+    <div class="wide">{{nav}}</div>
+  </nav>
+  <main>
+    <p class="crumbs">{{crumbs}}</p>
+    <article>
+{{body}}
+    </article>
+    <nav class="near" aria-label="Pages around this one">{{near}}</nav>
+    <p class="source"><a href="https://github.com/reiwand/reiwand/blob/master/docs/{{source}}">Edit or read this page as Markdown</a> · GPL-3.0-or-later</p>
+  </main>
+  <aside class="toc" aria-label="On this page">{{toc}}</aside>
+</div>
+</body>
+</html>

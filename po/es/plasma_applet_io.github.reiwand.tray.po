@@ -1,0 +1,829 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Reiwand\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-27 00:00+0000\n"
+"PO-Revision-Date: 2026-10-22 00:00+0000\n"
+"Last-Translator: Reiwand contributors\n"
+"Language-Team: Reiwand contributors\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: integrations/plasma-tray/contents/ui/Ask.qml
+#: integrations/plasma-tray/contents/ui/Consent.qml
+#, kde-format
+msgid "The wallpaper %1 asks for your permission:"
+msgstr "El fondo %1 te pide permiso:"
+
+#: integrations/plasma-tray/contents/ui/Ask.qml
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid "Confirm it in the desktop notification."
+msgstr "Confírmalo en la notificación del escritorio."
+
+#: integrations/plasma-tray/contents/ui/Ask.qml
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid ""
+"The notification was closed without an answer; try again in a few minutes."
+msgstr ""
+"La notificación se cerró sin respuesta; vuelve a intentarlo dentro de unos "
+"minutos."
+
+#: integrations/plasma-tray/contents/ui/Ask.qml
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid "Allow"
+msgstr "Permitir"
+
+#: integrations/plasma-tray/contents/ui/Ask.qml
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid "Not now"
+msgstr "Ahora no"
+
+#: integrations/plasma-tray/contents/ui/Choose.qml
+#, kde-format
+msgid "Images and videos"
+msgstr "Imágenes y vídeos"
+
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid "Follow the sound that plays"
+msgstr "Seguir el sonido que se reproduce"
+
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid ""
+"The sound is turned into levels on this computer while the wallpaper is "
+"shown; nothing is recorded, kept or sent, and the desktop may show a "
+"microphone indicator."
+msgstr ""
+"Mientras se muestra el fondo, el sonido se convierte en niveles en este "
+"equipo; no se graba, no se guarda ni se envía, y el escritorio puede mostrar "
+"un indicador de micrófono."
+
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid "Follow the pointer"
+msgstr "Seguir el puntero"
+
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid ""
+"Only the latest pointer position over this screen reaches the wallpaper; "
+"positions are never kept and keys are never read."
+msgstr ""
+"Al fondo solo le llega la última posición del puntero sobre esta pantalla; "
+"las posiciones nunca se guardan y las teclas nunca se leen."
+
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid "Take clicks and taps"
+msgstr "Recibir clics y toques"
+
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid ""
+"Only real clicks and taps on the wallpaper of this screen reach it; they are "
+"never kept and keys are never read."
+msgstr ""
+"Solo le llegan al fondo los clics y toques reales sobre esta pantalla; nunca "
+"se guardan y nunca se leen las teclas."
+
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid "Show what the media player plays"
+msgstr "Mostrar lo que suena"
+
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid ""
+"While the wallpaper is shown, the title, artist, album, cover and progress "
+"of what a media player on this computer plays reach it; nothing of it is "
+"kept, logged or sent."
+msgstr ""
+"Mientras el fondo se ve, le llegan el título, el artista, el álbum, la "
+"carátula y el avance de lo que suena en un reproductor de este equipo; nada "
+"de eso se guarda, se registra ni se envía."
+
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid "Show what plays even though it can reach the network"
+msgstr "Mostrar lo que suena aunque pueda salir a internet"
+
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid ""
+"This web wallpaper may also reach the sites it names, so the title, artist "
+"and cover of what plays could leave this computer. Allow it only if you "
+"trust it with them."
+msgstr ""
+"Este fondo web también puede conectarse a los sitios que nombra, así que el "
+"título, el artista y la carátula de lo que suena podrían salir de este "
+"equipo. Permítelo solo si le confías esos datos."
+
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid "Follow the sound even though it can reach the network"
+msgstr "Seguir el sonido aunque pueda salir a internet"
+
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid ""
+"This web wallpaper may also reach the sites it names, so what it hears, the "
+"sound that plays or the microphone, could leave this computer. Allow it only "
+"if you trust it with that."
+msgstr ""
+"Este fondo web también puede conectarse a los sitios que nombra, así que lo "
+"que oye, el sonido que suena o el micrófono, podría salir de este equipo. "
+"Permítelo solo si le confías eso."
+
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid "Send its colors to the RGB lighting"
+msgstr "Mandar sus colores a la iluminación RGB"
+
+#: integrations/plasma-tray/contents/ui/Consent.qml
+msgid ""
+"Up to 64 × 16 colors of the wallpaper go to your keyboard, mouse and other "
+"lights through the OpenRGB server set in Settings, on this computer unless "
+"you set another address, and only while RGB lighting is on there."
+msgstr ""
+"Hasta 64 × 16 colores del fondo van al teclado, el ratón y otras luces a "
+"través del servidor de OpenRGB de Ajustes, en este equipo salvo que pongas "
+"otra dirección, y solo mientras la iluminación RGB está encendida allí."
+
+#: integrations/plasma-tray/contents/ui/Daemon.qml
+#, kde-format
+msgid "The Reiwand daemon is not running"
+msgstr "El servicio de Reiwand no se está ejecutando"
+
+#: integrations/plasma-tray/contents/ui/Daemon.qml
+#, kde-format
+msgid "Plasma could not be restarted; log out and in again"
+msgstr "No se pudo reiniciar Plasma; cierra la sesión y vuelve a entrar"
+
+#: integrations/plasma-tray/contents/ui/Daemon.qml
+#, kde-format
+msgid "Reiwand could not be opened"
+msgstr "No se pudo abrir Reiwand"
+
+#: integrations/plasma-tray/contents/ui/Daemon.qml
+#, kde-format
+msgid "Laptop"
+msgstr "Portátil"
+
+#: integrations/plasma-tray/contents/ui/Daemon.qml
+#, kde-format
+msgid "Monitor %1"
+msgstr "Monitor %1"
+
+#: integrations/plasma-tray/contents/ui/Daemon.qml
+#, kde-format
+msgid "Monitor"
+msgstr "Monitor"
+
+#: integrations/plasma-tray/contents/ui/Foot.qml
+#, kde-format
+msgid "Open Reiwand"
+msgstr "Abrir Reiwand"
+
+#: integrations/plasma-tray/contents/ui/Foot.qml
+#, kde-format
+msgid "Settings…"
+msgstr "Ajustes…"
+
+#: integrations/plasma-tray/contents/ui/Foot.qml
+#: integrations/plasma-tray/contents/ui/More.qml
+#, kde-format
+msgid "The other settings: in Settings… or with reiwand-ctl"
+msgstr "Los demás ajustes: en Ajustes… o con reiwand-ctl"
+
+#: integrations/plasma-tray/contents/ui/Head.qml
+#, kde-format
+msgid "Resume"
+msgstr "Reanudar"
+
+#: integrations/plasma-tray/contents/ui/Head.qml
+#, kde-format
+msgid "Pause"
+msgstr "Pausar"
+
+#: integrations/plasma-tray/contents/ui/Head.qml
+#, kde-format
+msgid "Unmute"
+msgstr "Activar el sonido"
+
+#: integrations/plasma-tray/contents/ui/Head.qml
+#, kde-format
+msgid "Mute all"
+msgstr "Silenciar todo"
+
+#: integrations/plasma-tray/contents/ui/Head.qml
+#, kde-format
+msgid "Master volume"
+msgstr "Volumen general"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "it is too slow for this graphics card"
+msgstr "es demasiado lento para esta tarjeta gráfica"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "it stopped the graphics card or the program twice"
+msgstr "detuvo dos veces la tarjeta gráfica o el programa"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid ""
+"the graphics card or the program stopped twice while it built or drew this "
+"effect"
+msgstr ""
+"la tarjeta gráfica o el programa se detuvo dos veces mientras preparaba o "
+"dibujaba este efecto"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "the graphics card or the program stopped while it drew this effect"
+msgstr ""
+"la tarjeta gráfica o el programa se detuvo mientras dibujaba este efecto"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "it kept the graphics card busy for too long"
+msgstr "mantuvo ocupada la tarjeta gráfica demasiado tiempo"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "its shader could not be checked"
+msgstr "no se pudo revisar su shader"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid ""
+"the effects of the scene would do more work than this graphics card allows"
+msgstr "la escena haría más trabajo del que permite esta tarjeta gráfica"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "the scene has more than 16 effects that keep a state"
+msgstr "la escena tiene más de 16 efectos que guardan un estado"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "its state textures would take too much memory"
+msgstr "sus texturas de estado ocuparían demasiada memoria"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "its textures would take too much memory"
+msgstr "sus texturas ocuparían demasiada memoria"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "The effect %1 was left out: %2"
+msgstr "Se omitió el efecto %1: %2"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "your time zone"
+msgstr "tu zona horaria"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "your language"
+msgstr "tu idioma"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "what your graphics card can do"
+msgstr "lo que puede hacer tu tarjeta gráfica"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "data it keeps on this computer"
+msgstr "datos que guarda en este equipo"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "the network, to reach the sites it names"
+msgstr "la red, para llegar a los sitios que nombra"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid ""
+"This web wallpaper uses %1. You can restrict each of them in its settings in "
+"the app."
+msgstr ""
+"Este fondo web usa %1. Puedes restringir cada cosa en sus ajustes de la app."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "Its web engine runs without part of its sandbox on this computer."
+msgstr "Su motor web funciona sin parte de su aislamiento en este equipo."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "the most this graphics card allows"
+msgstr "lo máximo que permite esta tarjeta gráfica"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "lowered because the scene is heavy for this graphics card"
+msgstr "rebajada porque la escena pesa demasiado para esta tarjeta gráfica"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "lowered on battery"
+msgstr "rebajada con batería"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "lowered while saving power"
+msgstr "rebajada mientras se ahorra energía"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "lowered while the computer is hot"
+msgstr "rebajada mientras el equipo está caliente"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "lowered because its frames took too long on the graphics card"
+msgstr ""
+"rebajada porque sus fotogramas tardaban demasiado en la tarjeta gráfica"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "chosen by you"
+msgstr "elegida por ti"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "Quality %1 of 3 at %2 frames a second"
+msgstr "Calidad %1 de 3 a %2 fotogramas por segundo"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "Quality %1 of 3"
+msgstr "Calidad %1 de 3"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "graphics card class %1 of 3, measured"
+msgstr "tarjeta gráfica de clase %1 de 3, medida"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "graphics card class %1 of 3, from its model"
+msgstr "tarjeta gráfica de clase %1 de 3, según su modelo"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "The level comes from the estimate until frames are measured."
+msgstr "El nivel sale de la estimación hasta que se miden fotogramas."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "The level holds: frames fit, without enough room for the next level."
+msgstr ""
+"El nivel se mantiene: los fotogramas caben, sin margen para el nivel "
+"siguiente."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "The level went up: frames had time to spare."
+msgstr "El nivel subió: a los fotogramas les sobraba tiempo."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "The level went down: frames took longer than the target."
+msgstr "El nivel bajó: los fotogramas tardaban más que el objetivo."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "This is the highest level allowed now."
+msgstr "Es el nivel más alto permitido ahora."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "The next level was measured and does not fit."
+msgstr "El nivel siguiente se midió y no cabe."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid ""
+"Even the lowest level is far too slow, so the scene stays still at its "
+"poster."
+msgstr ""
+"Ni el nivel más bajo alcanza, así que la escena queda quieta en su póster."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid ""
+"The frame rate was halved: frames took longer than the target and the level "
+"stays."
+msgstr ""
+"Los fotogramas por segundo bajaron a la mitad: tardaban más que el objetivo "
+"y el nivel se mantiene."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "The frame rate went back up: frames had time to spare."
+msgstr ""
+"Los fotogramas por segundo volvieron al ritmo completo: les sobraba tiempo."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "GPU time not measured yet. %1"
+msgstr "Tiempo de GPU sin medir todavía. %1"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "Measured GPU time: %1 ms a frame, for a target of %2 ms. %3"
+msgstr ""
+"Tiempo de GPU medido: %1 ms por fotograma, con un objetivo de %2 ms. %3"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid ""
+"Effects left out to protect the graphics card stay out at every level: %1"
+msgstr ""
+"Los efectos que quedan fuera para proteger la tarjeta gráfica siguen fuera "
+"en todos los niveles: %1"
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid ""
+"This scene costs %1 units a frame at this level, more than the %2 this "
+"device is estimated to hold: frames may drop and battery use rise."
+msgstr ""
+"Esta escena cuesta %1 unidades por fotograma en este nivel, más de las %2 "
+"que se calcula que aguanta este equipo: puede perder fotogramas y gastar más "
+"batería."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid ""
+"Its frames take %1 ms on the graphics card, more than the %2 ms a frame has "
+"at %3 frames a second: frames drop and battery use rises."
+msgstr ""
+"Sus fotogramas tardan %1 ms en la tarjeta gráfica, más que los %2 ms que "
+"tiene cada fotograma a %3 fotogramas por segundo: se pierden fotogramas y se "
+"gasta más batería."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "Automatic quality would keep it still at its poster."
+msgstr "La calidad automática la dejaría quieta en su póster."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid "Automatic quality would lower it."
+msgstr "La calidad automática la bajaría."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid ""
+"This scene draws more model triangles than this device holds: frames may "
+"drop and battery use rise. Automatic quality would keep it still at its "
+"poster."
+msgstr ""
+"Esta escena dibuja más triángulos de modelos de los que aguanta este equipo: "
+"puede perder fotogramas y gastar más batería. La calidad automática la "
+"dejaría quieta en su póster."
+
+#: integrations/plasma-tray/contents/ui/LeftOut.qml
+#, kde-format
+msgid ""
+"This scene is too heavy for this device, so automatic quality keeps it still "
+"at its poster. A fixed level plays it anyway, with fewer frames per second "
+"and more battery use."
+msgstr ""
+"Esta escena es demasiado pesada para este equipo, así que la calidad "
+"automática la deja quieta en su póster. Un nivel fijo la reproduce igual, "
+"con menos fotogramas por segundo y más gasto de batería."
+
+#: integrations/plasma-tray/contents/ui/More.qml
+#, kde-format
+msgid "Never"
+msgstr "Nunca"
+
+#: integrations/plasma-tray/contents/ui/More.qml
+#, kde-format
+msgid "Always"
+msgstr "Siempre"
+
+#: integrations/plasma-tray/contents/ui/More.qml
+#, kde-format
+msgid "Below 20 %"
+msgstr "Por debajo del 20 %"
+
+#: integrations/plasma-tray/contents/ui/More.qml
+#, kde-format
+msgid "Let scenes play their sounds"
+msgstr "Dejar que las escenas reproduzcan sus sonidos"
+
+#: integrations/plasma-tray/contents/ui/More.qml
+#, kde-format
+msgid "Let scenes react to the sound that plays"
+msgstr "Dejar que las escenas reaccionen al sonido que suena"
+
+#: integrations/plasma-tray/contents/ui/More.qml
+#, kde-format
+msgid "Silence wallpapers while another application plays sound"
+msgstr "Silenciar los fondos mientras otra aplicación reproduce sonido"
+
+#: integrations/plasma-tray/contents/ui/More.qml
+#, kde-format
+msgid "Allow wallpapers that flash"
+msgstr "Permitir los fondos que destellan"
+
+#: integrations/plasma-tray/contents/ui/More.qml
+#, kde-format
+msgid "Pause on battery"
+msgstr "Pausar con batería"
+
+#: integrations/plasma-tray/contents/ui/Notes.qml
+#, kde-format
+msgid ""
+"“%1” comes from your other computers, but its file is not on this computer."
+msgstr ""
+"«%1» viene de tus otros equipos, pero su archivo no está en este equipo."
+
+#: integrations/plasma-tray/contents/ui/Notes.qml
+#, kde-format
+msgid "On the computer that has it, use “Send files to my other computers”."
+msgstr ""
+"En el equipo que lo tiene, usa «Enviar los archivos a mis otros equipos»."
+
+#: integrations/plasma-tray/contents/ui/Notes.qml
+#, kde-format
+msgid "Its particles run on the processor, so fewer of them are shown"
+msgstr "Sus partículas se mueven en el procesador, así que se muestran menos"
+
+#: integrations/plasma-tray/contents/ui/Notes.qml
+#, kde-format
+msgid "Has flashes, turned off"
+msgstr "Tiene destellos, desactivado"
+
+#: integrations/plasma-tray/contents/ui/Notes.qml
+#, kde-format
+msgid "Try again"
+msgstr "Probar de nuevo"
+
+#: integrations/plasma-tray/contents/ui/Notice.qml
+#, kde-format
+msgid "The wallpaper service is not answering"
+msgstr "El servicio del fondo no responde"
+
+#: integrations/plasma-tray/contents/ui/Notice.qml
+#, kde-format
+msgid "No screen shows Reiwand"
+msgstr "Ninguna pantalla muestra Reiwand"
+
+#: integrations/plasma-tray/contents/ui/Notice.qml
+#, kde-format
+msgid "Choose Reiwand as the wallpaper type in the desktop settings."
+msgstr "Elige Reiwand como tipo de fondo en los ajustes del escritorio."
+
+#: integrations/plasma-tray/contents/ui/Notice.qml
+#, kde-format
+msgid "Restart the service"
+msgstr "Reiniciar el servicio"
+
+#: integrations/plasma-tray/contents/ui/Notice.qml
+#, kde-format
+msgid "Details"
+msgstr "Detalles"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Fill"
+msgstr "Rellenar"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Fit"
+msgstr "Ajuste"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Stretch"
+msgstr "Estirar"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Center"
+msgstr "Centrar"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Tile"
+msgstr "Mosaico"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "None"
+msgstr "Ninguno"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Warm"
+msgstr "Cálido"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Cool"
+msgstr "Frío"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Golden"
+msgstr "Dorado"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Vivid"
+msgstr "Vivo"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Punch"
+msgstr "Intenso"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Subdued"
+msgstr "Apagado"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Matte"
+msgstr "Mate"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Faded"
+msgstr "Desvaído"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Black and white"
+msgstr "Blanco y negro"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Noir"
+msgstr "Negro intenso"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Sepia"
+msgstr "Sepia"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Dusk"
+msgstr "Crepúsculo"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Mint"
+msgstr "Menta"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Rose"
+msgstr "Rosa"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Night"
+msgstr "Noche"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Favorite"
+msgstr "Favorito"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Filter"
+msgstr "Filtro"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Let clicks and taps on this screen reach its wallpaper"
+msgstr "Dejar que los clics y toques de esta pantalla lleguen a su fondo"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Remove the wallpaper of this screen"
+msgstr "Quitar el fondo de esta pantalla"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Go back to Plasma's wallpaper"
+msgstr "Volver al fondo de Plasma"
+
+#: integrations/plasma-tray/contents/ui/Own.qml
+#, kde-format
+msgid "Bring back the previous one"
+msgstr "Recuperar el anterior"
+
+#: integrations/plasma-tray/contents/ui/Panel.qml
+#, kde-format
+msgid "More"
+msgstr "Más"
+
+#: integrations/plasma-tray/contents/ui/Panel.qml
+#, kde-format
+msgid "Change with preview…"
+msgstr "Cambiar con vista previa…"
+
+#: integrations/plasma-tray/contents/ui/Panel.qml
+#, kde-format
+msgid "More · all screens"
+msgstr "Más · todas las pantallas"
+
+#: integrations/plasma-tray/contents/ui/ScreenRow.qml
+#, kde-format
+msgid "Background color"
+msgstr "Color de fondo"
+
+#: integrations/plasma-tray/contents/ui/ScreenRow.qml
+#, kde-format
+msgid "Scene"
+msgstr "Escena"
+
+#: integrations/plasma-tray/contents/ui/ScreenRow.qml
+#, kde-format
+msgid "Video"
+msgstr "Vídeo"
+
+#: integrations/plasma-tray/contents/ui/ScreenRow.qml
+#, kde-format
+msgid "Image"
+msgstr "Imagen"
+
+#: integrations/plasma-tray/contents/ui/ScreenRow.qml
+#, kde-format
+msgid "Web page"
+msgstr "Página web"
+
+#: integrations/plasma-tray/contents/ui/ScreenRow.qml
+#, kde-format
+msgid "Color"
+msgstr "Color"
+
+#: integrations/plasma-tray/contents/ui/ScreenRow.qml
+#, kde-format
+msgid "“%1”, %2 of %3"
+msgstr "«%1», %2 de %3"
+
+#: integrations/plasma-tray/contents/ui/ScreenRow.qml
+#, kde-format
+msgid "no playlist running"
+msgstr "sin lista en marcha"
+
+#: integrations/plasma-tray/contents/ui/ScreenRow.qml
+#, kde-format
+msgid "Next"
+msgstr "Siguiente"
+
+#: integrations/plasma-tray/contents/ui/ScreenRow.qml
+#, kde-format
+msgid "Choose…"
+msgstr "Elegir…"
+
+#: integrations/plasma-tray/contents/ui/ScreenRow.qml
+#, kde-format
+msgid "Favorite, Fit, Filter and remove"
+msgstr "Favorito, ajuste, filtro y quitar"
+
+#: integrations/plasma-tray/contents/ui/Status.qml
+#: integrations/plasma-tray/contents/ui/main.qml
+#, kde-format
+msgid "Paused"
+msgstr "En pausa"
+
+#: integrations/plasma-tray/contents/ui/Status.qml
+#: integrations/plasma-tray/contents/ui/main.qml
+#, kde-format
+msgid "Playing"
+msgstr "Reproduciendo"
+
+#: integrations/plasma-tray/contents/ui/Updated.qml
+#, kde-format
+msgid "Reiwand was updated"
+msgstr "Reiwand se actualizó"
+
+#: integrations/plasma-tray/contents/ui/Updated.qml
+#, kde-format
+msgid ""
+"This tray still runs the version Plasma loaded when it started (%1; the "
+"service runs %2). Restart Plasma, or log out and in again, to load the new "
+"one."
+msgstr ""
+"Esta bandeja todavía usa la versión que Plasma cargó al arrancar (%1; el "
+"servicio usa %2). Reinicia Plasma, o cierra la sesión y vuelve a entrar, "
+"para cargar la nueva."
+
+#: integrations/plasma-tray/contents/ui/Updated.qml
+#, kde-format
+msgid "Restart Plasma"
+msgstr "Reiniciar Plasma"
+
+#: integrations/plasma-tray/contents/ui/Updated.qml
+#, kde-format
+msgid "Later"
+msgstr "Más tarde"

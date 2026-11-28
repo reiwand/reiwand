@@ -1,0 +1,200 @@
+mod build;
+mod builders;
+mod capture;
+mod chains;
+mod clock;
+mod crop;
+mod damage;
+mod draw;
+mod dropped;
+mod effects;
+mod encode;
+mod fed;
+mod field;
+mod flight;
+mod fused;
+mod gather;
+mod held;
+mod hits;
+mod inked;
+mod item;
+mod lamps;
+mod limit;
+mod load;
+mod make;
+mod map;
+mod mips;
+pub(crate) mod molds;
+mod own;
+mod packages;
+mod paint;
+mod pipes;
+mod placed;
+mod pool;
+mod poster;
+mod probe;
+pub(crate) mod profile;
+mod rasters;
+mod ready;
+mod region;
+mod rehearse;
+mod render;
+mod sampling;
+mod scripted;
+mod sized;
+pub(crate) mod skins;
+pub(crate) mod solids;
+mod sources;
+mod state;
+#[cfg(test)]
+mod steady;
+mod stops;
+mod straight;
+mod strip;
+pub(crate) mod swarm;
+mod timed;
+mod under;
+mod uploads;
+mod view;
+mod warm;
+use crate::{Renderer, texture::GpuImage};
+pub use builders::{finish_builds, finish_gpu, stop_builds};
+pub use clock::{Stamping, set_gpu_budget};
+pub use flight::drawn_effects;
+pub(crate) use flight::hanging;
+pub use packages::{MAX_SCENE_BUILD, set_build_timeout};
+pub(crate) use pipes::Pipes;
+use pipes::{Mode, Shader};
+use pool::Tex;
+pub use profile::{profiled_passes, reset_profiled_passes};
+pub use rehearse::{Films, Opened, Reel, Rehearsal, Trace, Versus, local_wall, on_today, split};
+use reiwand_scene::Lut;
+pub use reiwand_type::{MAX_FONT, font};
+pub(crate) use sampling::layout;
+pub use scripted::{ScriptHost, serve_script_host};
+use std::{collections::HashMap, sync::Arc};
+pub use stops::{retry_effects, stop_effects};
+pub use strip::{MOST as RGB_MOST, lit};
+use swarm::Pass;
+pub use uploads::Pixels;
+pub(crate) use uploads::Uploads;
+pub use view::SceneView;
+
+const TEXT_FRAMES: u64 = 120;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub(crate) enum Src {
+    Pool(usize),
+    Ext(usize),
+    Cache(usize),
+    White,
+    Clear,
+    Canvas,
+    State(usize, usize),
+    Lut(usize),
+    Void,
+}
+
+#[derive(Clone, Copy)]
+pub(crate) enum Op {
+    Clear(Src, [f64; 4]),
+    Copy { from: Src, to: Src, origin: [u32; 2], size: (u32, u32), at: [u32; 2] },
+    Draw { target: Src, entry: &'static str, mode: Mode, slot: u32, tex: [Src; 3] },
+    Lit { target: Src, entry: &'static str, mode: Mode, slot: u32, tex: [Src; 3], maps: [Src; 8] },
+    Effect(Fill),
+    Particles { target: Src, system: usize, slot: u32, mode: Mode, timed: u64, pass: Pass, cast: [Src; 4] },
+    Read { from: Src, map: usize, size: (u32, u32) },
+    Strip { from: Src },
+}
+
+#[derive(Clone, Copy)]
+pub(crate) struct Fill {
+    pub(crate) target: Src,
+    pub(crate) shader: Shader,
+    pub(crate) slot: u32,
+    pub(crate) tex: u32,
+    pub(crate) more: Option<u32>,
+    pub(crate) mode: Mode,
+    pub(crate) load: bool,
+    pub(crate) vertices: u32,
+    pub(crate) scissor: Option<[u32; 4]>,
+}
+
+pub(crate) struct Cached {
+    key: u64,
+    tex: Tex,
+}
+
+#[derive(Default)]
+pub(crate) struct Scratch {
+    ops: Vec<Op>,
+    exts: Vec<GpuImage>,
+    kept: Vec<usize>,
+    outputs: Vec<Src>,
+    texts: Vec<(usize, u64)>,
+    marks: Vec<damage::Mark>,
+    drawn: Vec<u64>,
+    sets: Vec<[Src; 11]>,
+    made: Vec<Src>,
+    isolated: Vec<(usize, Option<(Src, item::Rect)>)>,
+    chains: Vec<Option<(u64, bool)>>,
+    flocks: Vec<u64>,
+}
+
+pub(crate) type Image = Arc<(GpuImage, [f32; 2])>;
+
+#[derive(Debug, Clone, Default)]
+pub struct SceneAssets {
+    pub images: HashMap<String, Arc<Pixels>>,
+    pub fonts: HashMap<String, Arc<Vec<u8>>>,
+    pub luts: HashMap<String, Arc<Lut>>,
+    pub sheets: HashMap<String, Vec<f32>>,
+    pub scripts: Vec<(String, String)>,
+    pub films: Option<Arc<dyn Films>>,
+}
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct SceneStats {
+    pub passes: u32,
+    pub draws: u32,
+    pub created: u32,
+    pub compiled: u32,
+    pub textures: u32,
+    pub reused: u32,
+    pub steps: u32,
+    pub particles: u32,
+    pub sim_us: u32,
+    pub damage: u32,
+    pub in_flight: u32,
+    pub gpu_us: u32,
+    pub sim_gpu_us: u32,
+}
+
+impl Renderer {
+    pub fn software(&self) -> bool {
+        self.kind == wgpu::DeviceType::Cpu
+    }
+
+    pub fn discrete(&self) -> bool {
+        self.kind == wgpu::DeviceType::DiscreteGpu
+    }
+
+    pub fn compute(&self) -> bool {
+        swarm::compute(self)
+    }
+
+    pub(crate) fn gpu_class(&self) -> reiwand_scene::Gpu<'_> {
+        let meminfo = std::fs::read_to_string("/proc/meminfo").unwrap_or_default();
+        let total = meminfo
+            .lines()
+            .find_map(|l| l.strip_prefix("MemTotal:")?.trim().strip_suffix(" kB")?.parse().ok());
+        reiwand_scene::Gpu {
+            name: &self.name,
+            software: self.software(),
+            discrete: self.discrete(),
+            compute: self.compute(),
+            max_texture: self.device.limits().max_texture_dimension_2d,
+            memory_mib: total.map_or(0, |kib: u64| kib / 1024),
+        }
+    }
+}

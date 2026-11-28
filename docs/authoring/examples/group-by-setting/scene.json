@@ -1,0 +1,306 @@
+{
+  "assets": {},
+  "canvas": {
+    "background": "#000000",
+    "blend_space": "linear",
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": "display",
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "clip": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "day",
+      "layers": [
+        {
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "gradient": {
+            "from": [
+              0.0,
+              0.0
+            ],
+            "radial": false,
+            "stops": [
+              [
+                0,
+                "#5aa9ff"
+              ],
+              [
+                1,
+                "#cfeaff"
+              ]
+            ],
+            "to": [
+              0.0,
+              1.0
+            ]
+          },
+          "id": "sky_day",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "shape": {
+            "rect": {
+              "radius": 0.0,
+              "size": [
+                1920,
+                1080
+              ]
+            }
+          },
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "shape",
+          "visible": true
+        },
+        {
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#ffd84a",
+          "id": "sun",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "shape": {
+            "ellipse": {
+              "size": [
+                260,
+                260
+              ]
+            }
+          },
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "position": [
+              1400,
+              300
+            ],
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "shape",
+          "visible": true
+        }
+      ],
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "solid": false,
+      "space": "2d",
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "group",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "clip": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "night",
+      "layers": [
+        {
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "gradient": {
+            "from": [
+              0.0,
+              0.0
+            ],
+            "radial": false,
+            "stops": [
+              [
+                0,
+                "#050816"
+              ],
+              [
+                1,
+                "#1b2a55"
+              ]
+            ],
+            "to": [
+              0.0,
+              1.0
+            ]
+          },
+          "id": "sky_night",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "shape": {
+            "rect": {
+              "radius": 0.0,
+              "size": [
+                1920,
+                1080
+              ]
+            }
+          },
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "shape",
+          "visible": true
+        },
+        {
+          "blend": "normal",
+          "blend_space": "canvas",
+          "cache": false,
+          "depth_test": false,
+          "effects": [],
+          "fill": "#e8eeff",
+          "id": "moon",
+          "opacity": 1.0,
+          "parallax": [
+            0,
+            0
+          ],
+          "shape": {
+            "ellipse": {
+              "size": [
+                200,
+                200
+              ]
+            }
+          },
+          "solid": false,
+          "transform": {
+            "origin": "anchor",
+            "position": [
+              520,
+              280
+            ],
+            "rotation": 0.0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "skew": [
+              0.0,
+              0.0
+            ]
+          },
+          "type": "shape",
+          "visible": true
+        }
+      ],
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "solid": false,
+      "space": "2d",
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "group",
+      "visible": false
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [
+    {
+      "events": [
+        "properties"
+      ],
+      "params": {},
+      "path": "scripts/moment.js",
+      "uses": [
+        "timers"
+      ]
+    }
+  ],
+  "templates": {},
+  "timelines": []
+}

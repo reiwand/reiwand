@@ -1,0 +1,195 @@
+use crate::bus::{self, Event};
+use crate::landing::{Landed, Settled};
+use crate::scene::qobject::SceneEditor;
+use cxx_qt::{CxxQtType, Threading};
+use cxx_qt_lib::QString;
+use reiwand_editor::{Action, applying, check, package};
+use serde_json::{Value, json};
+use std::path::{Path, PathBuf};
+use std::pin::Pin;
+
+type Done<T> = Box<dyn FnOnce(Pin<&mut SceneEditor>, T) + Send>;
+
+pub fn queued(action: &Action) -> bool {
+    let placing = matches!(action, Action::AddLayer { file: Some(_), .. });
+    placing
+        || matches!(
+            action,
+            Action::Import { .. } | Action::Thumbnail { .. } | Action::Shot(_) | Action::Asset(_)
+        )
+}
+
+impl SceneEditor {
+    pub(crate) fn work<T: Send + 'static>(
+        mut self: Pin<&mut Self>,
+        job: impl FnOnce() -> anyhow::Result<T> + Send + 'static,
+        done: Done<T>,
+    ) {
+        self.as_mut().set_busy(true);
+        let qt = self.qt_thread();
+        bus::spawn(async move {
+            let result = tokio::task::spawn_blocking(job).await.map_err(anyhow::Error::from).and_then(|r| r);
+            qt.queue(move |mut editor| {
+                editor.as_mut().set_busy(false);
+                match result {
+                    Ok(value) => done(editor.as_mut(), value),
+                    Err(e) => editor.as_mut().fail(e),
+                }
+                editor.next();
+            })
+            .ok();
+        });
+    }
+
+    fn next(mut self: Pin<&mut Self>) {
+        if self.busy || self.imports.is_empty() {
+            return;
+        }
+        let action = self.as_mut().rust_mut().imports.remove(0);
+        let Some(project) = self.project.as_ref() else { return };
+        let (dir, doc) = (project.dir.clone(), project.doc.clone());
+        let label = action.name();
+        let job = move || crate::landing::land(&dir, doc, action);
+        self.work(job, Box::new(move |editor, landed| editor.landed(landed, label)));
+    }
+
+    fn landed(mut self: Pin<&mut Self>, landed: Landed, label: String) {
+        let recorded = {
+            let mut this = self.as_mut().rust_mut();
+            let Some(project) = this.project.as_mut() else { return };
+            crate::landing::settle(project, landed, &label)
+        };
+        match recorded {
+            Ok(Settled::Recorded) => {
+                self.as_mut().rescan();
+                self.changed();
+            }
+            Ok(Settled::Stale(landed)) => {
+                let Some(project) = self.project.as_ref() else { return };
+                let (dir, doc) = (project.dir.clone(), project.doc.clone());
+                let job = move || crate::landing::redo(&dir, doc, landed);
+                self.work(job, Box::new(move |editor, landed| editor.landed(landed, label)));
+            }
+            Err(e) => self.fail(e),
+        }
+    }
+
+    pub fn import(mut self: Pin<&mut Self>, action: Action) {
+        self.as_mut().rust_mut().imports.push(action);
+        self.next();
+    }
+
+    pub fn rescan(mut self: Pin<&mut Self>) {
+        let files = self.project.as_ref().map(|p| check::check_files(&p.dir, &p.doc)).unwrap_or_default();
+        self.as_mut().rust_mut().files = files;
+        self.refresh();
+    }
+
+    fn saved(mut self: Pin<&mut Self>) -> Option<(PathBuf, Value)> {
+        if self.busy {
+            return None;
+        }
+        let project = self.as_mut().rust_mut().project.as_mut().map(|p| (p.dirty(), p.settle()));
+        match project? {
+            (true, _) => self.as_mut().fail("save the scene first"),
+            (_, Err(e)) => self.as_mut().fail(e),
+            (_, Ok(settled)) => {
+                if settled {
+                    self.as_mut().refresh();
+                }
+                let project = self.project.as_ref()?;
+                return Some((project.dir.clone(), project.doc.clone()));
+            }
+        }
+        None
+    }
+
+    pub fn build(mut self: Pin<&mut Self>, out: &QString, key: &QString, password: &QString) {
+        let Some((dir, doc)) = self.as_mut().saved() else { return };
+        let out = Some(out.to_string()).filter(|o| !o.is_empty()).map(PathBuf::from);
+        let (key, password) = (key.to_string(), Some(password.to_string()).filter(|p| !p.is_empty()));
+        let job = move || {
+            let out = out.map_or_else(|| package::output(&dir, &doc), Ok)?;
+            std::fs::create_dir_all(out.parent().unwrap_or(Path::new(".")))?;
+            let signer = (!key.is_empty()).then(|| package::signer(Path::new(&key), password)).transpose()?;
+            let (sha256, _) = package::publish(&dir, &doc, &out, signer.as_ref())?;
+            Ok(format!("{}\n{sha256}", out.display()))
+        };
+        self.work(
+            job,
+            Box::new(|mut editor, message| {
+                editor.as_mut().rescan();
+                editor.finished(QString::from(&message));
+            }),
+        );
+    }
+
+    pub fn apply(mut self: Pin<&mut Self>, output: &QString) {
+        let Some((dir, doc)) = self.as_mut().saved() else { return };
+        let output = output.to_string();
+        let titled = doc.clone();
+        let job = move || {
+            let out = package::applied(&doc)?;
+            applying::build(&dir, &doc, &out)?;
+            Ok(out.to_string_lossy().into_owned())
+        };
+        self.work(
+            job,
+            Box::new(move |mut editor, path| {
+                editor.as_mut().rescan();
+                let qt = editor.qt_thread();
+                bus::spawn(async move {
+                    let done = install(path, output.clone(), titled).await;
+                    qt.queue(move |mut editor| match done {
+                        Ok(said) => {
+                            editor.as_mut().set_placed(QString::from(&output));
+                            editor.as_mut().finished(QString::from(&said));
+                        }
+                        Err(e) => editor.fail(e),
+                    })
+                    .ok();
+                });
+            }),
+        );
+    }
+}
+
+async fn install(path: String, output: String, doc: Value) -> Result<String, String> {
+    let mut events = bus::events();
+    let message = |e: reiwand_client::Error| e.message;
+    let reply = bus::call("Library1", "Import", vec![json!([path]), json!(false)]).await.map_err(message)?;
+    let job =
+        serde_json::from_str::<Value>(&reply).ok().and_then(|r| r[0].as_u64()).ok_or("no import job")?;
+    loop {
+        match events.recv().await {
+            Some(Event::Finished(id, state, _, error)) if id == job && state != "done" => return Err(error),
+            Some(Event::Finished(id, ..)) if id == job => break,
+            Some(_) => {}
+            None => return Err("the daemon stopped answering".into()),
+        }
+    }
+    let reply = bus::call("Daemon1", "GetJob", vec![json!(job)]).await.map_err(message)?;
+    let report = serde_json::from_str::<Value>(&reply).unwrap_or_default();
+    let output_report = &report["job"]["output"];
+    let uid = output_report["imported"][0]["uid"].as_str().map(String::from);
+    let uid =
+        uid.ok_or_else(|| output_report["failed"][0]["error"].as_str().unwrap_or("not imported").to_owned())?;
+    bus::call("Library1", "Apply", vec![json!(uid), json!(output), json!(""), json!("")])
+        .await
+        .map_err(message)?;
+    let mut shown = Vec::new();
+    for _ in 0..30 {
+        let state = bus::call("Daemon1", "GetState", vec![]).await.map_err(message)?;
+        let state = serde_json::from_str::<Value>(&state).unwrap_or_default();
+        shown = applying::screens(&state, &uid, &output);
+        if applying::settled(&shown) {
+            break;
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+    }
+    let mut said = applying::done(&doc, &shown).local();
+    if let Some(why) = applying::failed(&shown) {
+        said = format!("{said}\n{}", why.local());
+    }
+    Ok(said)
+}

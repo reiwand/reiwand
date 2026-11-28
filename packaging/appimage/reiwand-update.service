@@ -1,0 +1,7 @@
+[Unit]
+Description=Look for a new version of Reiwand and install it
+Documentation=https://github.com/reiwand/reiwand/blob/master/docs/user/installation.md
+
+[Service]
+Type=oneshot
+ExecStart=@BINDIR@/reiwand --update --auto

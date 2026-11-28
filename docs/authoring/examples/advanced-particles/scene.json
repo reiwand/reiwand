@@ -1,0 +1,690 @@
+{
+  "assets": {},
+  "canvas": {
+    "background": "#05070f",
+    "blend_space": "linear",
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "add",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "rockets",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "solid": false,
+      "system": "rockets",
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "particles",
+      "visible": true
+    },
+    {
+      "blend": "add",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "stars",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "solid": false,
+      "system": "stars",
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "particles",
+      "visible": true
+    },
+    {
+      "blend": "add",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "fireflies",
+      "instance": {
+        "alpha": 0.8,
+        "brightness": 1.2,
+        "count": 1,
+        "points": []
+      },
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "solid": false,
+      "system": "fireflies",
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "particles",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {
+    "rockets": {
+      "capacity": 200,
+      "children": [
+        {
+          "angle": 0,
+          "follow_inherit": false,
+          "inherit": [
+            "color"
+          ],
+          "offset": [
+            0,
+            0
+          ],
+          "on": "death",
+          "points_from": false,
+          "probability": 1.0,
+          "scale": 1.0,
+          "system": "stars"
+        }
+      ],
+      "collide": [],
+      "emitters": [
+        {
+          "audio_gate": false,
+          "bursts": [
+            {
+              "at": 0,
+              "count": 1,
+              "every": 1.6
+            }
+          ],
+          "delay": 0,
+          "duration": null,
+          "inherit": 0,
+          "rate": 0,
+          "shape": {
+            "point": [
+              960,
+              1040
+            ]
+          }
+        }
+      ],
+      "forces": [
+        {
+          "gravity": [
+            0,
+            500
+          ],
+          "window": [
+            0,
+            0,
+            1,
+            1
+          ]
+        }
+      ],
+      "init": {
+        "angle": [
+          255,
+          285,
+          1
+        ],
+        "color": [
+          "#ffe9a8",
+          "#ffb347",
+          1
+        ],
+        "frame": [
+          0.0,
+          0.0,
+          1
+        ],
+        "gradient": [],
+        "life": [
+          1.1,
+          1.5,
+          1
+        ],
+        "remap": [],
+        "rotation": [
+          0.0,
+          0.0,
+          1
+        ],
+        "size": [
+          10,
+          12,
+          1
+        ],
+        "speed": [
+          700,
+          850,
+          1
+        ],
+        "spin": [
+          0.0,
+          0.0,
+          1
+        ],
+        "tilt": {
+          "angle": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ],
+          "spin": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "lock": [],
+      "points": [],
+      "prewarm": 0.0,
+      "render": {
+        "angle": null,
+        "aspect": 1,
+        "color_over_life": [],
+        "cycles": null,
+        "fps": 12.0,
+        "lit": false,
+        "mix": false,
+        "size_over_life": [],
+        "trail": {
+          "length": 12,
+          "segments": null,
+          "subdivide": 0,
+          "textured": false,
+          "uv_scale": 1,
+          "uv_scroll": 0,
+          "width": 0.6
+        }
+      },
+      "seed": 0,
+      "space": "local"
+    },
+    "stars": {
+      "capacity": 3000,
+      "children": [],
+      "collide": [],
+      "emitters": [
+        {
+          "audio_gate": false,
+          "bursts": [
+            {
+              "at": 0,
+              "count": 60,
+              "every": null
+            }
+          ],
+          "delay": 0,
+          "duration": null,
+          "inherit": 0,
+          "rate": 0,
+          "shape": {
+            "point": [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "forces": [
+        {
+          "gravity": [
+            0,
+            160
+          ],
+          "window": [
+            0,
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "drag": 0.8,
+          "window": [
+            0,
+            0,
+            1,
+            1
+          ]
+        }
+      ],
+      "init": {
+        "angle": [
+          0,
+          360,
+          1
+        ],
+        "color": [
+          "#ffffff",
+          "#9ad1ff",
+          1
+        ],
+        "frame": [
+          0.0,
+          0.0,
+          1
+        ],
+        "gradient": [],
+        "life": [
+          0.9,
+          1.6,
+          1
+        ],
+        "remap": [],
+        "rotation": [
+          0.0,
+          0.0,
+          1
+        ],
+        "size": [
+          5,
+          9,
+          1
+        ],
+        "speed": [
+          80,
+          320,
+          1
+        ],
+        "spin": [
+          0.0,
+          0.0,
+          1
+        ],
+        "tilt": {
+          "angle": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ],
+          "spin": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "lock": [],
+      "points": [],
+      "prewarm": 0.0,
+      "render": {
+        "angle": null,
+        "aspect": 1,
+        "color_over_life": [
+          [
+            0,
+            "#ffffff"
+          ],
+          [
+            1,
+            "#ffffff00"
+          ]
+        ],
+        "cycles": null,
+        "fps": 12.0,
+        "lit": false,
+        "mix": false,
+        "size_over_life": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ]
+        ]
+      },
+      "seed": 0,
+      "space": "local"
+    },
+    "fireflies": {
+      "capacity": 600,
+      "children": [],
+      "collide": [],
+      "emitters": [
+        {
+          "audio_gate": false,
+          "bursts": [],
+          "delay": 0,
+          "duration": null,
+          "inherit": 0,
+          "max_per_step": 4,
+          "periodic": {
+            "off": [
+              1,
+              2
+            ],
+            "on": [
+              4,
+              6
+            ]
+          },
+          "rate": 40,
+          "shape": {
+            "around": {
+              "arc": 360.0,
+              "at": "p0",
+              "axis": [
+                0,
+                0,
+                1
+              ],
+              "count": 24,
+              "mode": "repeat",
+              "radius": 420,
+              "restart": false,
+              "speed": 20
+            }
+          }
+        }
+      ],
+      "forces": [
+        {
+          "turbulence": {
+            "mask": [
+              1,
+              1
+            ],
+            "scale": 0.003,
+            "speed": 0,
+            "strength": 40,
+            "time_scale": 1
+          },
+          "window": [
+            0,
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "attractor": {
+            "falloff": "linear",
+            "radius": 500,
+            "strength": 4000,
+            "target": "p1"
+          },
+          "window": [
+            0,
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "oscillate": {
+            "freq": [
+              0.5,
+              1.5
+            ],
+            "from": "top",
+            "mask": [
+              1,
+              1
+            ],
+            "phase": [
+              0.0,
+              0.0
+            ],
+            "random": "shared",
+            "scale": [
+              0.2,
+              0.5
+            ],
+            "what": "alpha"
+          },
+          "window": [
+            0,
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "drag": 0.3,
+          "window": [
+            0,
+            0.2,
+            0.8,
+            1
+          ]
+        }
+      ],
+      "init": {
+        "alpha": [
+          0.5,
+          1,
+          1
+        ],
+        "angle": [
+          0,
+          360,
+          1
+        ],
+        "color": [
+          "#ffffff",
+          "#ffffff",
+          1
+        ],
+        "frame": [
+          0.0,
+          0.0,
+          1
+        ],
+        "gradient": [],
+        "hsv": {
+          "hue": [
+            50,
+            120
+          ],
+          "sat": [
+            0.5,
+            0.9
+          ],
+          "steps": 0,
+          "val": [
+            0.9,
+            1
+          ]
+        },
+        "life": [
+          3,
+          6,
+          1
+        ],
+        "remap": [
+          {
+            "clamp_in": false,
+            "clamp_out": false,
+            "in": [
+              3,
+              6
+            ],
+            "input": "life",
+            "op": "mul",
+            "out": [
+              1,
+              0.3
+            ],
+            "output": "size",
+            "wave": "none"
+          }
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          1
+        ],
+        "size": [
+          6,
+          14,
+          1
+        ],
+        "speed": [
+          10,
+          30,
+          2
+        ],
+        "spin": [
+          0.0,
+          0.0,
+          1
+        ],
+        "tilt": {
+          "angle": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ],
+          "spin": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "lock": [],
+      "points": [
+        {
+          "angle": 0,
+          "at": [
+            960,
+            540
+          ],
+          "space": "local"
+        },
+        {
+          "angle": 0,
+          "follow": "cursor",
+          "space": "local"
+        }
+      ],
+      "prewarm": 3,
+      "render": {
+        "angle": null,
+        "aspect": 1,
+        "color_over_life": [],
+        "cutout": [
+          0.1,
+          0.9,
+          1
+        ],
+        "cycles": null,
+        "fps": 12.0,
+        "lit": false,
+        "mix": false,
+        "order": "newest",
+        "size_over_life": [
+          [
+            0,
+            0
+          ],
+          [
+            0.2,
+            1
+          ],
+          [
+            1,
+            0
+          ]
+        ]
+      },
+      "seed": 0,
+      "space": "world"
+    }
+  },
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": []
+}

@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$(dirname "$0")"/integration-env.sh "$@"
+
+source "$(dirname "$0")"/integration-video.sh
+source "$(dirname "$0")"/integration-streams.sh
+source "$(dirname "$0")"/integration-library.sh
+source "$(dirname "$0")"/integration-playlists.sh
+source "$(dirname "$0")"/integration-lock.sh
+source "$(dirname "$0")"/integration-browse.sh
+source "$(dirname "$0")"/integration-repos.sh
+source "$(dirname "$0")"/integration-scenes.sh
+source "$(dirname "$0")"/integration-crossing.sh
+source "$(dirname "$0")"/integration-passages.sh
+source "$(dirname "$0")"/integration-removal.sh
+source "$(dirname "$0")"/integration-vanish.sh
+source "$(dirname "$0")"/integration-folder.sh
+source "$(dirname "$0")"/integration-flip.sh
+source "$(dirname "$0")"/integration-sandbox.sh
+source "$(dirname "$0")"/integration-ktx2.sh
+source "$(dirname "$0")"/integration-rgb.sh
+source "$(dirname "$0")"/integration-content.sh
+source "$(dirname "$0")"/integration-inputs.sh
+source "$(dirname "$0")"/integration-templates.sh
+source "$(dirname "$0")"/integration-reload.sh
+source "$(dirname "$0")"/integration-audio.sh
+source "$(dirname "$0")"/integration-media.sh
+source "$(dirname "$0")"/integration-media-cues.sh
+source "$(dirname "$0")"/integration-sound.sh
+source "$(dirname "$0")"/integration-tools.sh
+source "$(dirname "$0")"/integration-layers.sh
+source "$(dirname "$0")"/integration-recovery.sh
+source "$(dirname "$0")"/integration-sources.sh
+source "$(dirname "$0")"/integration-plugins.sh
+source "$(dirname "$0")"/integration-web.sh
+source "$(dirname "$0")"/integration-pages.sh
+source "$(dirname "$0")"/integration-gpu.sh
+source "$(dirname "$0")"/integration-quality.sh
+source "$(dirname "$0")"/integration-hearing.sh
+source "$(dirname "$0")"/integration-proxy.sh
+source "$(dirname "$0")"/integration-bundled.sh
+source "$(dirname "$0")"/integration-private.sh
+
+stop_daemon "$daemon" "$WORK/reiwandd.log"
+REIWAND_RENDER_STOP=1 start_daemon "$WORK/stopped.log"
+sleep 1
+kill -USR2 "$daemon"
+guarded() { ! ctl pause 2>"$WORK/guard.out" && grep -q "the renderer stopped after an error; restart reiwandd" "$WORK/guard.out"; }
+wait_for 10 guarded || fail "a change was accepted without a renderer: $(cat "$WORK/guard.out")"
+if ctl set "$ROOT/tests/fixtures/green-64x32.png" 2>/dev/null; then fail "a wallpaper was set without a renderer"; fi
+{ ctl lib search "" && ctl playlist ls && ctl provider ls && ctl state; } >/dev/null || fail "the library stopped with the renderer"
+kill -0 "$daemon" || fail "the daemon exited with its renderer"
+echo "renderer guard checks passed"
+
+# export and import run two daemons of their own, so they go as a separate script
+bash "$(dirname "$0")"/integration-carry.sh "$BIN"
+bash "$(dirname "$0")"/integration-accounts.sh "$BIN"
+
+status=0
+echo "integration test passed"

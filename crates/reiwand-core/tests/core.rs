@@ -1,0 +1,176 @@
+use reiwand_core::config::parse_hex_color;
+use reiwand_core::{Config, Fit, UvRect};
+use std::os::unix::fs::PermissionsExt;
+use std::path::{Path, PathBuf};
+
+fn approx(a: [f32; 2], b: [f32; 2]) -> bool {
+    (a[0] - b[0]).abs() < 1e-5 && (a[1] - b[1]).abs() < 1e-5
+}
+
+#[test]
+fn fit_names_roundtrip() {
+    Fit::ALL.into_iter().for_each(|f| assert_eq!(f.as_str().parse::<Fit>().unwrap(), f));
+    assert_eq!(" FILL ".parse::<Fit>().unwrap(), Fit::Fill);
+    assert!("zoom".parse::<Fit>().is_err());
+}
+
+#[test]
+fn uv_mapping_per_fit() {
+    let uv = UvRect::compute;
+    assert!(approx(uv(Fit::Stretch, (100, 50), (1920, 1080)).scale, [1.0, 1.0]));
+    assert!(approx(uv(Fit::Fill, (1280, 720), (1920, 1080)).scale, [1.0, 1.0]));
+    let fill = uv(Fit::Fill, (100, 100), (200, 100));
+    assert!(approx(fill.scale, [1.0, 0.5]) && approx(fill.offset, [0.0, 0.25]));
+    let fit = uv(Fit::Fit, (100, 100), (200, 100));
+    assert!(approx(fit.scale, [2.0, 1.0]) && approx(fit.offset, [-0.5, 0.0]));
+    let center = uv(Fit::Center, (100, 50), (200, 100));
+    assert!(approx(center.scale, [2.0, 2.0]) && approx(center.offset, [-0.5, -0.5]) && !center.repeat);
+    let tile = uv(Fit::Tile, (100, 50), (200, 100));
+    assert!(approx(tile.scale, [2.0, 2.0]) && approx(tile.offset, [0.0, 0.0]) && tile.repeat);
+    assert!(uv(Fit::Fill, (0, 0), (0, 0)).scale.iter().all(|s| s.is_finite()));
+}
+
+#[test]
+fn missing_file_is_default() {
+    assert_eq!(Config::load(Path::new("/nonexistent/reiwand/config.toml")).unwrap(), Config::default());
+}
+
+#[test]
+fn resolve_falls_back_per_field() {
+    let text = "[default]\nimage = \"/a.png\"\nfit = \"fit\"\nbackground = \"#102030\"\n[outputs.DP-1]\nimage = \"/b.png\"";
+    let c = Config::parse(&Config::complete(text)).unwrap();
+    let dp = c.resolve("DP-1");
+    assert_eq!(
+        (dp.image.as_deref(), dp.fit, dp.background),
+        (Some(Path::new("/b.png")), Fit::Fit, [16, 32, 48])
+    );
+    assert_eq!(c.resolve("HDMI-A-1").image.as_deref(), Some(Path::new("/a.png")));
+    assert!(Config::parse(&Config::complete("[default]\nimgae = \"/x\"")).is_err());
+}
+
+#[test]
+fn setting_every_output_clears_overrides() {
+    let mut c = Config::default();
+    c.set_image("DP-1", "/b.png".into(), None);
+    c.set_image("", "/a.png".into(), Some(Fit::Center));
+    let dp = c.resolve("DP-1");
+    assert_eq!((dp.image.as_deref(), dp.fit), (Some(Path::new("/a.png")), Fit::Center));
+}
+
+#[test]
+fn save_and_load_roundtrip() {
+    let path =
+        std::env::temp_dir().join(format!("reiwand-core-test-{}", std::process::id())).join("config.toml");
+    let mut c = Config::default();
+    c.set_image("DP-2", "/c.png".into(), Some(Fit::Tile));
+    c.save(&path).unwrap();
+    assert_eq!(Config::load(&path).unwrap(), c);
+    std::fs::remove_dir_all(path.parent().unwrap()).unwrap();
+}
+
+#[test]
+fn hex_colors() {
+    assert_eq!(parse_hex_color("#ff0080"), Some([255, 0, 128]));
+    assert_eq!(parse_hex_color("ff0080"), Some([255, 0, 128]));
+    assert_eq!(parse_hex_color("#fff"), None);
+    assert_eq!(parse_hex_color("#gg0000"), None);
+}
+
+#[test]
+fn uri_schemes() {
+    let scheme = reiwand_core::dbus::uri_scheme;
+    assert_eq!(scheme("http://127.0.0.1:9/x.webm"), Some("http"));
+    assert_eq!(scheme("file:///tmp/a.png"), Some("file"));
+    assert_eq!(scheme("svn+ssh:x"), Some("svn+ssh"));
+    assert_eq!(scheme("/tmp/a:b.png"), None);
+    assert_eq!(scheme("a b:c.png"), None);
+    assert_eq!(scheme("1x:y"), None);
+}
+
+#[test]
+fn the_window_names_the_launcher_of_the_sandbox_it_runs_in() {
+    let launcher = reiwand_core::dbus::launcher;
+    assert_eq!(launcher(Some("io.github.reiwand.Reiwand".into())), "io.github.reiwand.Reiwand");
+    assert_eq!(launcher(Some(String::new())), reiwand_core::dbus::APP_ID);
+    assert_eq!(launcher(None), reiwand_core::dbus::APP_ID);
+}
+
+fn mode(path: &Path) -> u32 {
+    std::fs::metadata(path).unwrap().permissions().mode() & 0o777
+}
+
+#[test]
+fn a_fit_for_every_output_clears_per_output_fits() {
+    let mut c = Config::default();
+    c.set_image("DP-1", "/b.png".into(), Some(Fit::Tile));
+    c.set_image("", "/a.png".into(), Some(Fit::Center));
+    assert_eq!(c.resolve("DP-1"), c.resolve("HDMI-A-1"));
+    assert_eq!(c.resolve("DP-1").fit, Fit::Center);
+}
+
+#[test]
+fn fit_only_changes_keep_the_images() {
+    let mut c = Config::default();
+    c.set_image("", "/a.png".into(), None);
+    c.set_image("DP-1", "/b.png".into(), Some(Fit::Tile));
+    c.set_fit("HDMI-A-1", Fit::Stretch);
+    let hdmi = c.resolve("HDMI-A-1");
+    assert_eq!((hdmi.image, hdmi.fit), (Some(PathBuf::from("/a.png")), Fit::Stretch));
+    c.set_fit("", Fit::Center);
+    let dp = c.resolve("DP-1");
+    assert_eq!((dp.image, dp.fit), (Some(PathBuf::from("/b.png")), Fit::Center));
+    assert_eq!(c.resolve("HDMI-A-1").fit, Fit::Center);
+}
+
+#[test]
+fn saving_through_a_symlink_keeps_the_link() {
+    let dir = tempfile::tempdir().unwrap();
+    let (real, link) = (dir.path().join("shared/config.toml"), dir.path().join("config/config.toml"));
+    std::fs::create_dir_all(link.parent().unwrap()).unwrap();
+    std::os::unix::fs::symlink("../shared/config.toml", &link).unwrap();
+    let mut c = Config::default();
+    for fit in [Fit::Center, Fit::Tile] {
+        c.set_fit("", fit);
+        c.save(&link).unwrap();
+        assert!(link.symlink_metadata().unwrap().file_type().is_symlink());
+        assert_eq!(Config::load(&real).unwrap(), c);
+    }
+    assert_eq!(std::fs::read_dir(real.parent().unwrap()).unwrap().count(), 1);
+}
+
+#[test]
+fn invalid_colors_are_rejected_when_set_and_ignored_when_loaded() {
+    let mut c = Config::default();
+    assert!(c.set_background("", "red").is_err());
+    c.set_background("", "#A0B0C0").unwrap();
+    c.set_background("DP-1", "102030").unwrap();
+    assert_eq!(
+        (c.default.background.as_deref(), c.resolve("DP-1").background),
+        (Some("#a0b0c0"), [16, 32, 48])
+    );
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("config.toml");
+    std::fs::write(
+        &path,
+        Config::complete("[default]\nbackground = \"#102030\"\n[outputs.DP-1]\nbackground = \"red\"\n"),
+    )
+    .unwrap();
+    let c = Config::load(&path).unwrap();
+    assert_eq!((c.resolve("DP-1").background, c.outputs["DP-1"].background.as_deref()), ([16, 32, 48], None));
+}
+
+#[test]
+fn configuration_files_are_private() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("reiwand/config.toml");
+    Config::default().save(&path).unwrap();
+    assert_eq!((mode(&path), mode(path.parent().unwrap())), (0o600, 0o700));
+    std::fs::write(&path, "[default").unwrap();
+    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o644)).unwrap();
+    assert!(Config::load(&path).is_err());
+    let backup = Config::backup_broken(&path).unwrap();
+    assert_eq!((backup.file_name().unwrap().to_str(), mode(&backup)), (Some("config.toml.broken"), 0o600));
+    assert_eq!(std::fs::read_to_string(&backup).unwrap(), "[default");
+    Config::default().save(&path).unwrap();
+    assert_eq!(mode(&path), 0o600);
+}

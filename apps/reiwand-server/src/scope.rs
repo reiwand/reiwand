@@ -1,0 +1,37 @@
+use crate::App;
+use crate::auth::Auth;
+use crate::error::Problem;
+use axum::extract::{FromRequestParts, RawPathParams};
+use axum::http::request::Parts;
+use std::sync::Arc;
+
+pub struct Scope {
+    pub repo: String,
+    pub id: String,
+}
+
+impl FromRequestParts<Arc<App>> for Scope {
+    type Rejection = Problem;
+
+    async fn from_request_parts(parts: &mut Parts, app: &Arc<App>) -> Result<Scope, Problem> {
+        let params = RawPathParams::from_request_parts(parts, app).await.map_err(Problem::internal)?;
+        let get = |key: &str| params.iter().find(|(k, _)| *k == key).map(|(_, v)| v.to_string());
+        let name = get("repo").ok_or_else(|| Problem::missing("repository"))?;
+        let repo = app.repos.get(&name).ok_or_else(|| Problem::missing("repository"))?.name.clone();
+        let auth = Option::<Auth>::from_request_parts(parts, app).await?;
+        crate::access::read(app, &repo, auth.as_ref()).await?;
+        Ok(Scope { repo, id: get("id").unwrap_or_default() })
+    }
+}
+
+pub fn first(app: &App) -> String {
+    app.repos.first().name.clone()
+}
+
+pub fn resolve(app: &App, name: &str) -> Result<Arc<crate::repo::Repo>, Problem> {
+    app.repos.get(name).ok_or_else(|| Problem::missing("repository"))
+}
+
+pub fn at(router: crate::Router, path: &str, method: axum::routing::MethodRouter<Arc<App>>) -> crate::Router {
+    router.route(&path.replacen("/api/v1/", "/api/v1/r/{repo}/", 1), method)
+}

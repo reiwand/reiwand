@@ -1,0 +1,189 @@
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC2
+import org.kde.kirigami as Kirigami
+import io.github.reiwand.app
+
+QQC2.ScrollView {
+    id: panel
+
+    required property var page
+    readonly property var host: page.host
+    readonly property string levelName: page.level === "more" ? App.tr("More") : page.level === "presets" ? App.tr("My presets") : ""
+    readonly property bool first: page.level === "" && !broken.hurt
+    readonly property list<QtObject> actions: [
+        Kirigami.Action {
+            text: panel.host.item.favorite ? App.tr("Unfavorite") : App.tr("Favorite")
+            icon.name: panel.host.item.favorite ? "heart-fill" : "heart"
+            onTriggered: {
+                const on = !panel.host.item.favorite;
+                App.act("SetFavorite", [[panel.page.opened], on], "Library1", () => panel && on && applicationWindow().favorited(1));
+            }
+        }
+    ]
+
+    property Item putButton: null
+    property string was
+    readonly property bool puts: !broken.hurt && (!!host.pkg ? host.pkg.kind !== "assets" : true)
+    readonly property string caption: [host.item.kind ? Labels.value(host.pkg?.kind === "scene" ? "scene" : host.item.kind) : "", (host.details.about?.authors ?? []).join(", "), host.repo].filter(t => t).join(" · ")
+    readonly property Component badge: Component {
+        Item {
+            implicitWidth: panel.host.preview !== "" ? Math.round(Look.cover * 3 / 4) : 0
+            implicitHeight: Math.round(Look.cover * 3 / 4 * 9 / 16)
+
+            Photo {
+                anchors.fill: parent
+                visible: !moving.visible
+                source: panel.host.preview !== "" ? App.url(panel.host.preview) : ""
+                cache: false
+            }
+
+            AnimatedImage {
+                id: moving
+
+                anchors.fill: parent
+                visible: panel.host.animated !== "" && status === AnimatedImage.Ready
+                source: panel.host.animated
+                playing: visible && !(App.state.on_battery ?? false)
+                fillMode: Image.PreserveAspectCrop
+                cache: false
+            }
+        }
+    }
+    readonly property Component head: Component {
+        Row {
+            visible: panel.puts
+            spacing: Look.e3
+
+            QQC2.Button {
+                highlighted: true
+                Keys.onReturnPressed: panel.put()
+                Keys.onEnterPressed: panel.put()
+                Component.onCompleted: panel.putButton = this
+                text: App.outputs.length > 1 ? App.tr("Set as wallpaper on %1", App.screen(panel.page.target)) : App.tr("Set as wallpaper")
+                icon.name: "image"
+                onClicked: panel.put()
+            }
+
+            PiecesKey {
+                anchors.verticalCenter: parent.verticalCenter
+                text: App.trc("key", "Enter")
+            }
+        }
+    }
+
+    function reachable(item) {
+        for (const child of item.children) {
+            if (!child.visible)
+                continue;
+            if (child.activeFocusOnTab && child.enabled)
+                return child;
+            const found = reachable(child);
+            if (found)
+                return found;
+        }
+        return null;
+    }
+
+    function arrive() {
+        const button = page.level === "" && putButton && putButton.visible ? putButton : null;
+        (button ?? reachable(body) ?? panel).forceActiveFocus(Qt.TabFocusReason);
+    }
+
+    function put() {
+        if (puts)
+            page.tools.put(page.opened);
+        else if (broken.hurt && broken.from !== "" && !!host.details.installed)
+            broken.reinstall();
+    }
+
+    contentWidth: availableWidth
+    onVisibleChanged: visible && Qt.callLater(() => panel && panel.arrive())
+    Keys.onReturnPressed: put()
+    Keys.onEnterPressed: put()
+
+    Connections {
+        target: panel.page
+
+        function onLevelChanged() {
+            const back = panel.page.level === "" ? (panel.was === "more" ? more : presetsRow) : null;
+            panel.was = panel.page.level;
+            Qt.callLater(() => panel && (back ? back.forceActiveFocus(Qt.TabFocusReason) : panel.arrive()));
+        }
+    }
+
+    ColumnLayout {
+        id: body
+
+        width: Math.min(panel.availableWidth, Look.coverFocus * 2)
+        spacing: Look.e3
+
+        SceneBroken {
+            id: broken
+
+            Layout.fillWidth: true
+            page: panel.page
+            visible: hurt && panel.page.level === ""
+        }
+
+        SceneStill {
+            Layout.fillWidth: true
+            host: panel.host
+            visible: reason !== "" && panel.first
+        }
+
+        ItemSettings {
+            Layout.fillWidth: true
+            host: panel.host
+            visible: tunable && panel.first
+        }
+
+        Section {
+            visible: panel.first
+            text: App.tr("Yours")
+        }
+
+        ItemDepth {
+            Layout.fillWidth: true
+            host: panel.host
+            visible: path !== "" && panel.first
+        }
+
+        ListRow {
+            id: presetsRow
+
+            Layout.fillWidth: true
+            visible: panel.first && !!panel.host.pkg && panel.host.pkg.kind !== "assets"
+            kind: "page"
+            text: App.tr("My presets")
+            note: App.tr("They work for every scene")
+            number: String(presets.all.length)
+            onOpened: panel.page.level = "presets"
+        }
+
+        ListRow {
+            id: more
+
+            Layout.fillWidth: true
+            visible: panel.first
+            kind: "page"
+            text: App.tr("More")
+            note: App.tr("Tags, playlists, rating, credits, details, remove")
+            onOpened: panel.page.level = "more"
+        }
+
+        ItemPresets {
+            id: presets
+
+            Layout.fillWidth: true
+            visible: panel.page.level === "presets"
+            page: panel.page
+        }
+
+        LibraryMore {
+            Layout.fillWidth: true
+            visible: panel.page.level === "more"
+            page: panel.page
+        }
+    }
+}

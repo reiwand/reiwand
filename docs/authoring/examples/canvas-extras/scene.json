@@ -1,0 +1,667 @@
+{
+  "assets": {},
+  "canvas": {
+    "background": "#05040c",
+    "blend_space": "linear",
+    "camera": {
+      "center": "canvas",
+      "rotation": {
+        "invert": false,
+        "keys": [
+          [
+            0,
+            0
+          ],
+          [
+            120,
+            360
+          ]
+        ],
+        "timeline": "roll"
+      },
+      "shake": {
+        "amplitude": 4,
+        "enabled": true,
+        "roughness": 0.6,
+        "speed": 1.5
+      },
+      "zoom": 1.0
+    },
+    "clear": false,
+    "fit": "fill",
+    "gusts": 0.7,
+    "hdr": true,
+    "parallax": {
+      "amount": {
+        "invert": false,
+        "keys": [
+          [
+            0,
+            0.5
+          ],
+          [
+            30,
+            2.0,
+            "in_out_sine"
+          ]
+        ],
+        "timeline": "drift"
+      },
+      "delay": 0.6,
+      "gyro": true,
+      "offset": {
+        "invert": false,
+        "keys": [
+          [
+            0,
+            [
+              -0.3,
+              0
+            ]
+          ],
+          [
+            30,
+            [
+              0.3,
+              0.1
+            ],
+            "in_out_sine"
+          ]
+        ],
+        "timeline": "drift"
+      },
+      "pointer": 1.0
+    },
+    "size": [
+      1920,
+      1080
+    ],
+    "tonemap": "agx",
+    "wind": [
+      60,
+      0
+    ]
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 30
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#05040c",
+      "depth_test": false,
+      "effects": [],
+      "id": "fade",
+      "opacity": 0.03,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": "canvas",
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "solid",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#00000000",
+      "id": "arm",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "ellipse": {
+          "size": [
+            2,
+            2
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          960,
+          540
+        ],
+        "rotation": {
+          "invert": false,
+          "keys": [
+            [
+              0,
+              0
+            ],
+            [
+              9,
+              360
+            ]
+          ],
+          "timeline": "spin_slow"
+        },
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#00000000",
+      "id": "elbow_a",
+      "inherit": [
+        "transform"
+      ],
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": "arm",
+      "shape": {
+        "ellipse": {
+          "size": [
+            2,
+            2
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          300,
+          0
+        ],
+        "rotation": {
+          "invert": false,
+          "keys": [
+            [
+              0,
+              0
+            ],
+            [
+              4,
+              -360
+            ]
+          ],
+          "timeline": "spin_mid"
+        },
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#00000000",
+      "id": "elbow_b",
+      "inherit": [
+        "transform"
+      ],
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": "arm",
+      "shape": {
+        "ellipse": {
+          "size": [
+            2,
+            2
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          -300,
+          0
+        ],
+        "rotation": {
+          "invert": false,
+          "keys": [
+            [
+              0,
+              0
+            ],
+            [
+              2.2,
+              360
+            ]
+          ],
+          "timeline": "spin_fast"
+        },
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "add",
+      "blend_space": "canvas",
+      "brightness": 3.0,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "gradient": {
+        "from": [
+          0.5,
+          0.5
+        ],
+        "radial": true,
+        "stops": [
+          [
+            0,
+            "#ffffff"
+          ],
+          [
+            0.18,
+            "#ff6fb5"
+          ],
+          [
+            0.45,
+            "#ff6fb550"
+          ],
+          [
+            1,
+            "#ff6fb500"
+          ]
+        ],
+        "to": [
+          1.0,
+          0.5
+        ]
+      },
+      "id": "orb_a",
+      "inherit": [
+        "transform"
+      ],
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": "elbow_a",
+      "shape": {
+        "ellipse": {
+          "size": [
+            56,
+            56
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          200,
+          0
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "add",
+      "blend_space": "canvas",
+      "brightness": 3.0,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "gradient": {
+        "from": [
+          0.5,
+          0.5
+        ],
+        "radial": true,
+        "stops": [
+          [
+            0,
+            "#ffffff"
+          ],
+          [
+            0.18,
+            "#57d8ff"
+          ],
+          [
+            0.45,
+            "#57d8ff50"
+          ],
+          [
+            1,
+            "#57d8ff00"
+          ]
+        ],
+        "to": [
+          1.0,
+          0.5
+        ]
+      },
+      "id": "orb_b",
+      "inherit": [
+        "transform"
+      ],
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": "elbow_b",
+      "shape": {
+        "ellipse": {
+          "size": [
+            56,
+            56
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          150,
+          0
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "add",
+      "blend_space": "canvas",
+      "brightness": 2.5,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "gradient": {
+        "from": [
+          0.5,
+          0.5
+        ],
+        "radial": true,
+        "stops": [
+          [
+            0,
+            "#ffffff"
+          ],
+          [
+            0.18,
+            "#ffd36e"
+          ],
+          [
+            0.45,
+            "#ffd36e50"
+          ],
+          [
+            1,
+            "#ffd36e00"
+          ]
+        ],
+        "to": [
+          1.0,
+          0.5
+        ]
+      },
+      "id": "orb_c",
+      "inherit": [
+        "transform"
+      ],
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": "elbow_a",
+      "shape": {
+        "ellipse": {
+          "size": [
+            56,
+            56
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          -90,
+          0
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "add",
+      "blend_space": "canvas",
+      "brightness": 1.5,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#9fb4ff",
+      "id": "dust_far",
+      "opacity": 1.0,
+      "parallax": [
+        0.15,
+        0.15
+      ],
+      "shape": {
+        "star": {
+          "inner": 0.3,
+          "points": 4,
+          "size": 10
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          420,
+          260
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "add",
+      "blend_space": "canvas",
+      "brightness": 2.0,
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#ffffff",
+      "id": "dust_near",
+      "opacity": 1.0,
+      "parallax": [
+        0.4,
+        0.4
+      ],
+      "shape": {
+        "star": {
+          "inner": 0.3,
+          "points": 4,
+          "size": 16
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          1500,
+          820
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": [
+    {
+      "autoplay": true,
+      "delay": 0.0,
+      "duration": 9,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "spin_slow",
+      "loop": "repeat",
+      "speed": 1.0,
+      "wrap": false
+    },
+    {
+      "autoplay": true,
+      "delay": 0.0,
+      "duration": 4,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "spin_mid",
+      "loop": "repeat",
+      "speed": 1.0,
+      "wrap": false
+    },
+    {
+      "autoplay": true,
+      "delay": 0.0,
+      "duration": 2.2,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "spin_fast",
+      "loop": "repeat",
+      "speed": 1.0,
+      "wrap": false
+    },
+    {
+      "autoplay": true,
+      "delay": 0.0,
+      "duration": 120,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "roll",
+      "loop": "repeat",
+      "speed": 1.0,
+      "wrap": false
+    },
+    {
+      "autoplay": true,
+      "delay": 0.0,
+      "duration": 30,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "drift",
+      "loop": "pingpong",
+      "speed": 1.0,
+      "wrap": false
+    }
+  ]
+}

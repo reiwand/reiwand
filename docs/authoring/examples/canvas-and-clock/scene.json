@@ -1,0 +1,201 @@
+{
+  "assets": {
+    "sky": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/sky.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    }
+  },
+  "canvas": {
+    "background": "#0b1020",
+    "blend_space": "linear",
+    "bloom": {
+      "knee": 0.5,
+      "limit": null,
+      "radius": 24,
+      "radius_unit": "canvas",
+      "saturation": 1.0,
+      "strength": 0.6,
+      "threshold": 0.8,
+      "tint": "#ffffff"
+    },
+    "camera": {
+      "center": "canvas",
+      "rotation": 0.0,
+      "shake": {
+        "amplitude": 6,
+        "enabled": false,
+        "roughness": 0.5,
+        "speed": 1
+      },
+      "zoom": 1.05
+    },
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "parallax": {
+      "amount": 1,
+      "delay": 0.15,
+      "gyro": false,
+      "offset": [
+        0,
+        0
+      ],
+      "pointer": 1
+    },
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": 30,
+    "poster_time": 2,
+    "seed": 7,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "background",
+      "image": "sky",
+      "opacity": 1.0,
+      "parallax": [
+        0.01,
+        0.01
+      ],
+      "size": [
+        2000,
+        1125
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "align": "center",
+      "anchor": "center",
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "fallback": [],
+      "font": "sans-serif",
+      "id": "time",
+      "line_height": null,
+      "opacity": 1.0,
+      "padding": 0,
+      "parallax": [
+        0.03,
+        0.03
+      ],
+      "render": "auto",
+      "size": 220,
+      "solid": false,
+      "text": {
+        "clock": "HH:mm",
+        "invert": false
+      },
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "text",
+      "valign": "center",
+      "visible": true,
+      "wrap": null
+    },
+    {
+      "align": "center",
+      "anchor": "bottom",
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#cfe0ff",
+      "depth_test": false,
+      "effects": [],
+      "fallback": [],
+      "font": "sans-serif",
+      "id": "date",
+      "line_height": null,
+      "opacity": 1.0,
+      "padding": 0,
+      "parallax": [
+        0,
+        0
+      ],
+      "render": "auto",
+      "size": 56,
+      "solid": false,
+      "text": {
+        "date": "EEEE d MMMM",
+        "invert": false
+      },
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          0,
+          -120
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "text",
+      "valign": "center",
+      "visible": true,
+      "wrap": null
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": []
+}

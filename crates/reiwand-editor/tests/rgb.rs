@@ -1,0 +1,105 @@
+#[path = "support/whole.rs"]
+mod whole;
+use reiwand_editor::Project;
+use reiwand_editor::actions::Action;
+use reiwand_editor::starters::starter;
+use serde_json::{Value, json};
+use std::sync::OnceLock;
+use tempfile::TempDir;
+
+fn project(root: &TempDir) -> Project {
+    static STATE: OnceLock<TempDir> = OnceLock::new();
+    STATE.get_or_init(|| {
+        let dir = tempfile::tempdir().unwrap();
+        unsafe { std::env::set_var("XDG_STATE_HOME", dir.path()) };
+        dir
+    });
+    let mut p = Project::create(
+        &root.path().join("lights"),
+        starter("empty", "org.example.lights", "Lights", "en").unwrap(),
+    )
+    .unwrap();
+    act(&mut p, json!({ "add_layer": { "kind": "adjustment", "id": "glow" } })).unwrap();
+    act(&mut p, json!({ "add_layer": { "kind": "solid", "id": "box" } })).unwrap();
+    p
+}
+
+fn act(p: &mut Project, action: Value) -> anyhow::Result<()> {
+    p.act(&serde_json::from_value::<Action>(whole::action(p, action)).unwrap()).map(drop)
+}
+
+fn layer(p: &Project) -> Value {
+    p.doc["scene"]["layers"].as_array().unwrap().iter().find(|l| l["id"] == "glow").unwrap().clone()
+}
+
+#[test]
+fn an_adjustment_layer_sends_to_rgb_lighting_with_its_permission_in_one_step() {
+    let root = tempfile::tempdir().unwrap();
+    let mut p = project(&root);
+    act(&mut p, json!({ "rgb": { "layer": "glow", "on": true, "size": [640, 80] } })).unwrap();
+    assert_eq!((layer(&p)["rgb"].clone(), layer(&p)["size"].clone()), (json!(true), json!([640.0, 80.0])));
+    assert_eq!(p.doc["manifest"]["permissions"]["rgb"], json!(true));
+    assert_eq!(layer(&p)["transform"]["position"], json!([960.0, 540.0]));
+    act(&mut p, json!({ "rgb": { "layer": "glow", "whole": true } })).unwrap();
+    assert_eq!(layer(&p)["size"], json!("canvas"));
+    act(&mut p, json!({ "undo": {} })).unwrap();
+    assert_eq!(layer(&p)["size"], json!([640.0, 80.0]));
+    act(&mut p, json!({ "redo": {} })).unwrap();
+    act(&mut p, json!({ "rgb": { "layer": "glow", "on": false } })).unwrap();
+    assert_eq!(layer(&p)["rgb"], json!(false));
+    assert!(p.doc["manifest"]["permissions"].is_null(), "{}", p.doc["manifest"]);
+    act(&mut p, json!({ "undo": {} })).unwrap();
+    assert_eq!(p.doc["manifest"]["permissions"]["rgb"], json!(true));
+}
+
+#[test]
+fn bad_rgb_changes_are_refused_and_change_nothing() {
+    let root = tempfile::tempdir().unwrap();
+    let mut p = project(&root);
+    let before = p.doc.clone();
+    for bad in [
+        json!({ "rgb": { "layer": "box", "on": true } }),
+        json!({ "rgb": { "layer": "nothing", "on": true } }),
+        json!({ "rgb": { "layer": "glow" } }),
+        json!({ "rgb": { "layer": "glow", "size": [0, 10] } }),
+        json!({ "rgb": { "layer": "glow", "size": [10, 100000] } }),
+    ] {
+        assert!(act(&mut p, bad.clone()).is_err(), "{bad}");
+    }
+    assert!(serde_json::from_value::<Action>(json!({ "rgb": { "layer": "glow", "colour": 1 } })).is_err());
+    assert_eq!(p.doc, before);
+}
+
+#[test]
+fn the_permission_follows_the_layers_that_send_colors_whatever_the_edit() {
+    let root = tempfile::tempdir().unwrap();
+    let mut p = project(&root);
+    let features = |p: &Project| p.doc["manifest"]["requires"]["features"].clone();
+    assert!(p.doc["manifest"]["permissions"].is_null());
+    act(&mut p, json!({ "set": { "pointer": "/scene/layers/0/rgb", "value": true } })).unwrap();
+    assert_eq!(p.doc["manifest"]["permissions"]["rgb"], json!(true));
+    assert!(features(&p).as_array().is_some_and(|f| f.contains(&json!("rgb"))), "{}", features(&p));
+    act(&mut p, json!({ "duplicate_layer": { "id": "glow" } })).unwrap();
+    act(&mut p, json!({ "remove_layer": { "id": "glow" } })).unwrap();
+    assert_eq!(p.doc["manifest"]["permissions"]["rgb"], json!(true));
+    let copy = p.doc["scene"]["layers"][0]["id"].as_str().unwrap().to_owned();
+    act(&mut p, json!({ "remove_layer": { "id": copy } })).unwrap();
+    assert!(p.doc["manifest"]["permissions"].is_null(), "{}", p.doc["manifest"]);
+    assert!(!features(&p).as_array().is_some_and(|f| f.contains(&json!("rgb"))), "{}", features(&p));
+    act(&mut p, json!({ "undo": {} })).unwrap();
+    assert_eq!(p.doc["manifest"]["permissions"]["rgb"], json!(true));
+}
+
+#[test]
+fn the_inspector_does_not_offer_the_rgb_permission_of_a_scene_it_keeps_in_step_itself() {
+    let root = tempfile::tempdir().unwrap();
+    let mut p = project(&root);
+    act(&mut p, json!({ "rgb": { "layer": "glow", "on": true } })).unwrap();
+    let offered = |pointer: &str| {
+        reiwand_editor::inspect::fields(&p.doc, pointer)
+            .iter()
+            .any(|f| f.pointer == "/manifest/permissions/rgb")
+    };
+    assert_eq!(p.doc["manifest"]["permissions"]["rgb"], json!(true));
+    assert!(!offered("/manifest/permissions") && !offered("/manifest"));
+}

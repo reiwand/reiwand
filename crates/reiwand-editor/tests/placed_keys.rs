@@ -1,0 +1,29 @@
+#[path = "support/whole.rs"]
+mod whole;
+use reiwand_editor::actions::{Action, plan};
+use reiwand_editor::inspect::fields_from;
+use reiwand_editor::ops::apply;
+use reiwand_editor::starters::starter;
+use serde_json::{Value, json};
+
+fn act(doc: &mut Value, action: Value) {
+    let action: Action = serde_json::from_value(whole::action_doc(doc, action)).unwrap();
+    apply(doc, &reiwand_editor::completing::complete_all(doc, plan(doc, &action).unwrap())).unwrap();
+}
+
+#[test]
+fn a_key_placed_near_a_whole_second_shows_its_own_value_in_the_field() {
+    let mut doc = starter("clock", "org.example.test", "Test", "en").unwrap();
+    let rotation = "/scene/layers/1/transform/rotation";
+    act(&mut doc, json!({"keyframe": {"pointer": rotation, "time": 0, "value": 0}}));
+    act(&mut doc, json!({"keyframe": {"pointer": rotation, "time": 7.99999, "value": 360}}));
+    let keys = doc.pointer(&format!("{rotation}/keys")).unwrap().clone();
+    assert_eq!(keys[1], json!([8.0, 360]));
+    for time in [7.99999, 8.0, 8.00004] {
+        let shown = fields_from(None, &doc, "/scene/layers/1", time, &Default::default())
+            .into_iter()
+            .find(|f| f.pointer == rotation)
+            .and_then(|f| f.shown.as_f64());
+        assert_eq!(shown, Some(360.0), "at {time}");
+    }
+}

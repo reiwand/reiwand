@@ -1,0 +1,20 @@
+{
+  "schema": "reiwand.provider/1",
+  "id": "example-gallery",
+  "version": "1.0.0",
+  "title": "Example gallery",
+  "license": "CC0-1.0",
+  "hosts": ["api.example.org", "images.example.org"],
+  "secret": {
+    "label": "API key",
+    "header": "Authorization",
+    "prefix": "Bearer ",
+    "hosts": ["api.example.org"],
+    "required": false
+  },
+  "settings": [
+    {"key": "query", "label": "Search", "kind": "text", "prefill": "mountains", "min": null, "max": null, "values": []},
+    {"key": "per_page", "label": "Photos per page", "kind": "int", "prefill": 30, "min": 1, "max": 100, "values": []},
+    {"key": "videos", "label": "Include videos", "kind": "bool", "prefill": false, "min": null, "max": null, "values": []}
+  ]
+}

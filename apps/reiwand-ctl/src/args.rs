@@ -1,0 +1,95 @@
+use crate::told::{fill, told};
+use anyhow::Result;
+use clap::Args;
+use reiwand_client::Daemon1Proxy;
+use tokio::signal::unix::{SignalKind, signal};
+
+pub const OUTPUT: &str = "Output name such as DP-1; every output when omitted";
+pub const FIT: &str = "Placement: fill, fit, stretch, center or tile";
+pub const JSON: &str = "Print the daemon reply as JSON";
+pub const ITEM: &str = "Item: a file path, a uid or the last 6 or more characters of one";
+
+#[derive(Args, Debug)]
+pub struct Out {
+    #[arg(short, long, default_value = "", help = OUTPUT)]
+    pub output: String,
+}
+
+#[derive(Args, Debug)]
+pub struct Wait {
+    #[arg(long, help = "Wait for the job, showing its progress, and print the finished job")]
+    pub wait: bool,
+    #[arg(long, help = "With --wait, print the finished job as JSON")]
+    pub json: bool,
+}
+
+#[derive(Args, Debug)]
+pub struct Page {
+    #[arg(long, default_value_t = 0, help = "Number of entries to skip")]
+    pub offset: u32,
+    #[arg(long, default_value_t = 50, help = "Number of entries to print, at most 500")]
+    pub limit: u32,
+}
+
+#[derive(Args, Debug)]
+pub struct Placement {
+    #[arg(help = "Name of the output")]
+    output: String,
+    #[arg(
+        long,
+        value_name = "X,Y",
+        default_value = "0,0",
+        allow_hyphen_values = true,
+        help = "Logical position"
+    )]
+    pos: String,
+    #[arg(long, value_name = "WxH", help = "Logical size")]
+    size: String,
+    #[arg(long, default_value_t = 1.0, help = "Scale of the screen: physical pixels per logical pixel")]
+    scale: f64,
+    #[arg(long, default_value_t = 0.0, help = "Physical pixels per millimetre, 0 when unknown")]
+    density: f64,
+    #[arg(long, default_value = "", help = "Maker, model and serial number of the screen")]
+    identity: String,
+}
+
+impl Placement {
+    pub async fn tell(self, daemon: &Daemon1Proxy<'_>) -> Result<()> {
+        let Placement { output, pos, size, scale, density, identity } = self;
+        let point =
+            pos.split_once(',').and_then(|(x, y)| Some((x.trim().parse().ok()?, y.trim().parse().ok()?)));
+        let (x, y) = point.ok_or_else(|| crate::usage(fill(told("%1 is not X,Y"), &[&pos])))?;
+        let (width, height) = crate::editing::dimensions(&size)?;
+        Ok(daemon.set_output_info(&output, x, y, width, height, scale, density, &identity).await?)
+    }
+}
+
+pub fn interrupted() -> std::io::Result<impl Future<Output = ()>> {
+    let (mut interrupt, mut terminate) = (signal(SignalKind::interrupt())?, signal(SignalKind::terminate())?);
+    Ok(async move {
+        tokio::select! {
+            _ = interrupt.recv() => {}
+            _ = terminate.recv() => {}
+        }
+    })
+}
+
+#[derive(Args, Debug)]
+pub struct Streaming {
+    #[arg(help = "Name of the output, such as TEST-1")]
+    pub output: String,
+    #[arg(help = "Width of the stream in pixels")]
+    pub width: u32,
+    #[arg(help = "Height of the stream in pixels")]
+    pub height: u32,
+    #[arg(long, help = "Keep the stream only until this command is interrupted, like a desktop client")]
+    pub wait: bool,
+}
+
+#[derive(Args, Debug)]
+pub struct Cover {
+    #[arg(help = "Name of the output")]
+    pub output: String,
+    #[arg(action = clap::ArgAction::Set, help = "true when a window covers the output, false when not")]
+    pub covered: bool,
+}

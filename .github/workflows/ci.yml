@@ -1,0 +1,776 @@
+name: Release
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: "1"
+  CARGO_PROFILE_DEV_DEBUG: "0"
+
+jobs:
+  version:
+    name: Version
+    runs-on: ubuntu-24.04
+    outputs:
+      semver: ${{ steps.gitversion.outputs.semVer }}
+      informational: ${{ steps.gitversion.outputs.informationalVersion }}
+      rust: ${{ steps.changes.outputs.rust }}
+      android: ${{ steps.changes.outputs.android }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Conventional Commits and commit dates
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          kept() { grep -vFf <(sed -n 's/^ *- \([0-9a-f]\{40\}\)$/\1/p' GitVersion.yml); }
+          git cat-file -e "$BASE^{commit}" 2>/dev/null || BASE=$(git merge-base origin/master HEAD)
+          BASE=$(git describe --tags --abbrev=0 --match 'v[0-9]*' 2>/dev/null || echo "$BASE")
+          bad=$(git log --no-merges --format='%H %s' "$BASE..HEAD" | kept |
+            grep -Ev '^\S+ (build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([^()]+\))?!?: \S' || true)
+          [ -z "$bad" ] || { echo "$bad"; echo "::error::These subjects do not follow Conventional Commits"; exit 1; }
+          newest=$(git log --format='%ct %H' HEAD^@ | kept | sort -n | tail -1)
+          [ -z "$newest" ] || [ "$(git log -1 --format=%ct)" -gt "${newest%% *}" ] || { echo "::error::HEAD needs a later commit date than ${newest#* }"; exit 1; }
+
+      - uses: gittools/actions/gitversion/setup@7417b1089e2c7de93510f1901d656ddf60bb024f
+        with:
+          versionSpec: 6.8.2
+
+      - id: gitversion
+        uses: gittools/actions/gitversion/execute@7417b1089e2c7de93510f1901d656ddf60bb024f
+
+      - id: changes
+        name: Jobs that a change can affect
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          ALWAYS: ${{ github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
+        run: scripts/changes.sh "$BASE" "$ALWAYS" | tee -a "$GITHUB_OUTPUT"
+
+      - name: GitVersion versioned HEAD
+        env:
+          SHA: ${{ steps.gitversion.outputs.sha }}
+        run: test "$SHA" = "$(git rev-parse HEAD)"
+
+  build:
+    name: Release binaries (${{ matrix.name }})
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      matrix:
+        include:
+          - name: daemon
+            bins: reiwandd
+            cache: daemon
+            save: true
+            files: |
+              target/release/reiwandd
+          - name: tools
+            bins: reiwand-ctl
+            cache: daemon
+            save: false
+            files: |
+              target/release/reiwand-ctl
+    env:
+      REIWAND_VERSION: ${{ needs.version.outputs.informational }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - id: apt
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: ~/.cache/ci-apt
+          key: apt-${{ github.job }}-${{ hashFiles('.github/workflows/ci.yml') }}
+          restore-keys: apt-${{ github.job }}-
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            pkg-config libclang-dev libpipewire-0.3-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+
+      - uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25
+        if: github.ref == 'refs/heads/master' && steps.apt.outputs.cache-hit != 'true'
+        with:
+          path: ~/.cache/ci-apt
+          key: apt-${{ github.job }}-${{ hashFiles('.github/workflows/ci.yml') }}
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: release-${{ matrix.cache }}
+          save-if: ${{ github.ref == 'refs/heads/master' && matrix.save }}
+          cache-on-failure: ${{ matrix.save }}
+
+      - name: Build
+        env:
+          BINARIES: ${{ matrix.bins }}
+        run: |
+          read -ra bins <<< "$BINARIES"
+          scripts/build-release.sh "${bins[@]}"
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        if: always()
+        with:
+          name: build-timings-${{ matrix.name }}
+          path: target/cargo-timings/cargo-timing.html
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: release-bin-${{ matrix.name }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error
+          compression-level: 1
+          retention-days: 1
+
+  qt:
+    name: Qt for the app and the web helper
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Folder of the Qt prefix
+        run: sudo install -d -o "$USER" /opt/reiwand
+
+      - id: cache
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: /opt/reiwand/qt
+          key: qt-prefix-${{ hashFiles('packaging/appimage/qt.lock', 'scripts/qt-prefix.sh', 'scripts/tools.sh') }}
+          lookup-only: true
+
+      - name: Qt, Qt WebEngine and Kirigami from pinned sources
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          scripts/ci-apt.sh gettext libgl-dev libegl-dev libpipewire-0.3-dev libepoxy-dev libdrm-dev libgbm-dev \
+            libva-dev libavcodec-dev libavformat-dev libavfilter-dev libswscale-dev libmount-dev
+          scripts/qt-prefix.sh /opt/reiwand/qt
+
+      - uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25
+        if: steps.cache.outputs.cache-hit != 'true'
+        with:
+          path: /opt/reiwand/qt
+          key: qt-prefix-${{ hashFiles('packaging/appimage/qt.lock', 'scripts/qt-prefix.sh', 'scripts/tools.sh') }}
+
+  build-qt:
+    name: Release app and web helper with the bundled Qt
+    needs: [version, qt]
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    env:
+      REIWAND_VERSION: ${{ needs.version.outputs.informational }}
+      REIWAND_WEB_REQUIRE_ENGINE: "1"
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            pkg-config libclang-dev libpipewire-0.3-dev libgl-dev libegl-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev ccache
+
+      - name: Folder of the Qt prefix
+        run: sudo install -d -o "$USER" /opt/reiwand
+
+      - uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: /opt/reiwand/qt
+          key: qt-prefix-${{ hashFiles('packaging/appimage/qt.lock', 'scripts/qt-prefix.sh', 'scripts/tools.sh') }}
+          fail-on-cache-miss: true
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          shared-key: release-qt
+          save-if: ${{ github.ref == 'refs/heads/master' }}
+
+      - id: ccache
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: ~/.cache/ccache
+          key: ccache-qt-${{ hashFiles('Cargo.lock', 'packaging/appimage/qt.lock', 'apps/reiwand-app/qml/**', 'apps/reiwand-app/qt-shim/**', 'apps/reiwand-app/src/**', 'apps/reiwand-web/**', 'po/**') }}
+          restore-keys: ccache-qt-
+
+      - name: Build against the Qt that the AppImage carries
+        run: |
+          export QMAKE=/opt/reiwand/qt/bin/qmake6 CC="ccache gcc" CXX="ccache g++" CCACHE_DIR=~/.cache/ccache
+          export CCACHE_BASEDIR=$GITHUB_WORKSPACE CCACHE_COMPRESS=1 CCACHE_MAXSIZE=600M
+          scripts/build-release.sh reiwand-app reiwand-web
+          LD_LIBRARY_PATH=/opt/reiwand/qt/lib ldd target/release/reiwand-web | grep -E "Qt6WebEngine|Qt6Quick"
+          ccache --show-stats
+
+      - uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25
+        if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
+        with:
+          path: ~/.cache/ccache
+          key: ccache-qt-${{ hashFiles('Cargo.lock', 'packaging/appimage/qt.lock', 'apps/reiwand-app/qml/**', 'apps/reiwand-app/qt-shim/**', 'apps/reiwand-app/src/**', 'apps/reiwand-web/**', 'po/**') }}
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: release-bin-qt
+          path: |
+            target/release/reiwand-app
+            target/release/reiwand-web
+          if-no-files-found: error
+          compression-level: 1
+          retention-days: 1
+
+  package:
+    name: Package
+    needs: [version, qt, build, build-qt]
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    env:
+      REIWAND_VERSION: ${{ needs.version.outputs.informational }}
+      REIWAND_BIN_DIR: ${{ github.workspace }}/bins
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Install system packages
+        run: |
+          scripts/ci-apt.sh \
+            libpipewire-0.3-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gettext squashfs-tools patchelf
+
+      - name: Folder of the Qt prefix
+        run: sudo install -d -o "$USER" /opt/reiwand
+
+      - uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: /opt/reiwand/qt
+          key: qt-prefix-${{ hashFiles('packaging/appimage/qt.lock', 'scripts/qt-prefix.sh', 'scripts/tools.sh') }}
+          fail-on-cache-miss: true
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          pattern: release-bin-*
+          path: bins
+          merge-multiple: true
+
+      - name: Build the AppImage
+        env:
+          REIWAND_QT_PREFIX: /opt/reiwand/qt
+        run: scripts/package.sh dist
+
+      - name: The AppImage carries its version and no build machine data
+        run: scripts/appimage-check.sh dist/reiwand-*-x86_64.AppImage
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: reiwand-x86_64-appimage
+          path: dist/*.AppImage
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+  android-native:
+    name: Android native library (${{ matrix.abi }})
+    needs: version
+    if: needs.version.outputs.android == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      matrix:
+        include:
+          - abi: arm64-v8a
+            target: aarch64-linux-android
+          - abi: x86_64
+            target: x86_64-linux-android
+    env:
+      ABI: ${{ matrix.abi }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          targets: ${{ matrix.target }}
+          components: clippy
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          key: ${{ matrix.abi }}
+          save-if: ${{ github.ref == 'refs/heads/master' }}
+
+      - name: Install cargo-ndk
+        run: cargo install --locked cargo-ndk --version 4.1.2
+
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6
+        with:
+          cache-provider: basic
+          cache-read-only: true
+          add-job-summary: on-failure
+
+      - name: Release library
+        run: |
+          export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME" ANDROID_NDK_ROOT="$ANDROID_NDK_LATEST_HOME"
+          android/gradlew -p android :app:cargo -Pabis="$ABI"
+          ls -l "android/app/build/rustJniLibs/$ABI"
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: jni-${{ matrix.abi }}
+          path: android/app/build/rustJniLibs/${{ matrix.abi }}
+          if-no-files-found: error
+          compression-level: 1
+          retention-days: 1
+
+  android:
+    name: Android APK
+    needs: [version, android-native]
+    if: needs.version.outputs.android == 'true'
+    # The signing key lives in the environment android-signing, which only master may use; other
+    # branches, pull requests and copies run without an environment and never see the key.
+    environment: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/master' && github.repository_owner == 'reiwand') && 'android-signing' || '' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: jni-arm64-v8a
+          path: android/app/build/rustJniLibs/arm64-v8a
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: jni-x86_64
+          path: android/app/build/rustJniLibs/x86_64
+
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6
+        with:
+          cache-provider: basic
+          cache-read-only: true
+          add-job-summary: on-failure
+
+      - name: Release APK
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+          VERSION_NAME: ${{ needs.version.outputs.semver }}
+          KEYSTORE: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/master' && github.repository_owner == 'reiwand') && secrets.ANDROID_KEYSTORE || '' }}
+          REIWAND_KEYSTORE_PASSWORD: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/master' && github.repository_owner == 'reiwand') && secrets.ANDROID_KEYSTORE_PASSWORD || '' }}
+          PUBLISHED: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && github.repository_owner == 'reiwand' }}
+        run: |
+          export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME" ANDROID_NDK_ROOT="$ANDROID_NDK_LATEST_HOME"
+          trap 'rm -f "$RUNNER_TEMP/reiwand.keystore"' EXIT
+          if [ -n "$KEYSTORE" ]; then
+            base64 -d <<< "$KEYSTORE" > "$RUNNER_TEMP/reiwand.keystore"
+            export REIWAND_KEYSTORE="$RUNNER_TEMP/reiwand.keystore"
+          elif [ "$PUBLISHED" = true ]; then
+            echo "::error::ANDROID_KEYSTORE is not set: a published APK is never signed with a temporary key"
+            exit 1
+          else
+            echo "::warning::ANDROID_KEYSTORE is not set, so this APK is signed with a temporary debug key"
+          fi
+          android/gradlew -p android --refresh-dependencies assembleRelease -x :app:cargo -PversionCode="$VERSION_CODE" -PversionName="$VERSION_NAME"
+
+      - name: Native libraries, 16 KB page alignment, no build paths and the release signer
+        env:
+          CERT_SHA256: ${{ vars.ANDROID_CERT_SHA256 }}
+          REQUIRE_CERT: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && github.repository_owner == 'reiwand' }}
+        run: |
+          scripts/apk-all.sh .
+          ls -l reiwand-android*.apk >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          path: reiwand-android.apk
+          archive: false
+          if-no-files-found: error
+          retention-days: 7
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          path: reiwand-android-arm64-v8a.apk
+          archive: false
+          if-no-files-found: error
+          retention-days: 7
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          path: reiwand-android-x86_64.apk
+          archive: false
+          if-no-files-found: error
+          retention-days: 7
+
+  rpm:
+    name: Fedora package
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
+    env:
+      REIWAND_VERSION: ${{ needs.version.outputs.informational }}
+      FEDORA: docker.io/library/fedora:44@sha256:43b29f65a41eb9c35e1cd5323e3bdf3b655c2357a9f4f1ff2f9c2798e5045d80
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Fedora image with the build tools
+        run: |
+          docker run --name prepare "$FEDORA" \
+            dnf -y -q install rpm-build systemd-rpm-macros squashfs-tools gstreamer1 gstreamer1-plugins-base >/dev/null
+          docker commit prepare fedora-rpm >/dev/null
+          docker rm prepare >/dev/null
+
+      - name: Wait for the AppImage
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: scripts/wait-artifact.sh reiwand-x86_64-appimage Package
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: reiwand-x86_64-appimage
+          path: dist
+
+      - name: Build and install the RPM without its desktop dependencies
+        run: |
+          docker run --rm -e REIWAND_VERSION -v "$PWD:/src" -w /src fedora-rpm bash -c '
+            set -e
+            chmod +x dist/reiwand-*.AppImage
+            scripts/rpm.sh dist/reiwand-*.AppImage rpm
+            test "$(rpm -qp --qf "%{BUILDHOST}\n" rpm/*.rpm | sort -u)" = localhost
+            own=$(rpm -qp --provides rpm/*.rpm | cut -d" " -f1)
+            rpm -qpR rpm/*.rpm | grep -v "^rpmlib(" | sort -u | while read -r dep; do
+              grep -qxF "${dep%% *}" <<< "$own" && continue
+              dnf -q repoquery --whatprovides "$dep" | grep -q . || { echo "nothing provides $dep"; exit 1; }
+            done
+            rpm -i --nodeps rpm/*.rpm
+            rpm -ql reiwand
+            test "$(reiwand-ctl --version)" = "reiwand-ctl $REIWAND_VERSION"
+          '
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: reiwand-fedora-rpm
+          path: rpm/*.rpm
+          if-no-files-found: error
+          retention-days: 7
+
+  flatpak:
+    name: Flatpak bundle (${{ matrix.arch }})
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+            bundle: reiwand.flatpak
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+            bundle: reiwand-aarch64.flatpak
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    env:
+      REIWAND_VERSION: ${{ needs.version.outputs.informational }}
+      BUNDLE: ${{ matrix.bundle }}
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.11@sha256:b0a8a2acb9e420dd0e3e083ff552bea5a817e17e41532f1d2287ff49ef9aae0e
+      options: --privileged
+      volumes:
+        - flatpak-installation:/var/lib/flatpak
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Tracked sources, vendored Cargo sources and version
+        run: packaging/flatpak/sources.sh
+
+      - name: Qt WebEngine base application
+        run: |
+          flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install -y --noninteractive flathub io.qt.qtwebengine.BaseApp//6.11
+
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@79327416609af08178ad73b352877e51450790b3
+        with:
+          manifest-path: packaging/flatpak/io.github.reiwand.Reiwand.yml
+          bundle: ${{ matrix.bundle }}
+          arch: ${{ matrix.arch }}
+          cache: false
+          upload-artifact: false
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: flatpak-${{ matrix.arch }}
+          path: ${{ matrix.bundle }}
+          if-no-files-found: error
+          retention-days: 7
+
+  server:
+    name: Server image build
+    needs: version
+    if: needs.version.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    env:
+      REIWAND_VERSION: ${{ needs.version.outputs.informational }}
+      REIWAND_PUBLIC_URL: http://127.0.0.1:8080
+      COMPOSE_FILE: compose.yaml:deploy/compose.local.yaml
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: ${{ runner.temp }}/reiwand-image
+          key: server-image-${{ github.sha }}
+          restore-keys: server-image-
+
+      - name: Build the image
+        env:
+          REIWAND_IMAGE_CACHE: ${{ runner.temp }}/reiwand-image
+          REIWAND_IMAGE_LOAD: "1"
+        run: scripts/server-image.sh reiwand-server local
+
+      - uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25
+        if: github.ref == 'refs/heads/master'
+        with:
+          path: ${{ runner.temp }}/reiwand-image
+          key: server-image-${{ github.sha }}
+
+  release:
+    name: Release
+    if: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    needs: [version, build, qt, build-qt, package, android-native, android, rpm, server]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      id-token: write
+    outputs:
+      tag: ${{ steps.publish.outputs.tag }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          pattern: reiwand-*
+          path: artifacts
+          merge-multiple: true
+
+      - name: Publish the version with an SBOM and signed checksums
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.version.outputs.semver }}
+          SIGN: ${{ github.repository_owner == 'reiwand' }}
+          FLATPAK_GPG_PRIVATE_KEY: ${{ secrets.FLATPAK_GPG_PRIVATE_KEY }}
+        run: scripts/release.sh artifacts
+
+  image:
+    name: Server image
+    needs: [version, release, server]
+    if: needs.release.outputs.tag != '' && github.repository_owner == 'reiwand'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    env:
+      REIWAND_VERSION: ${{ needs.version.outputs.informational }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: ${{ runner.temp }}/reiwand-image
+          key: server-image-${{ github.sha }}
+
+      - name: Push the image with its SBOM and sign it
+        env:
+          REIWAND_IMAGE_CACHE: ${{ runner.temp }}/reiwand-image
+          ACTOR: ${{ github.actor }}
+          TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.version.outputs.semver }}
+        run: |
+          docker login ghcr.io --username "$ACTOR" --password-stdin <<< "$TOKEN"
+          scripts/server-image.sh "ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/reiwand-server" "$VERSION" latest
+          docker logout ghcr.io
+
+  pages-docs:
+    name: Documentation on Pages
+    needs: [version, release]
+    if: ${{ !cancelled() && needs.release.outputs.tag != '' && github.repository_owner == 'reiwand' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - name: Pandoc
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends pandoc
+
+      - name: Build the site into its own folder of the Pages branch
+        run: |
+          scripts/pages-publish.sh fetch pages
+          rm -rf pages/docs
+          scripts/docs-site.sh pages/docs
+          cp packaging/docs/root.html pages/index.html
+          touch pages/.nojekyll
+
+      - name: Publish the Pages branch
+        env:
+          TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.version.outputs.semver }}
+        run: scripts/pages-publish.sh push pages "Documentation of $VERSION"
+
+  flatpak-repo:
+    name: Flatpak repository on Pages
+    needs: [version, release, flatpak]
+    if: ${{ !cancelled() && needs.release.outputs.tag != '' && needs.flatpak.result == 'success' && github.repository_owner == 'reiwand' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          pattern: flatpak-*
+          path: bundles
+          merge-multiple: true
+
+      - name: Flatpak and OSTree
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends flatpak ostree
+
+      - name: Add the bundles to the signed repository
+        env:
+          FLATPAK_GPG_PRIVATE_KEY: ${{ secrets.FLATPAK_GPG_PRIVATE_KEY }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          scripts/pages-publish.sh fetch pages
+          owner=${GITHUB_REPOSITORY_OWNER,,}
+          PAGES_URL=https://$owner.github.io/${GITHUB_REPOSITORY#*/} scripts/flatpak-repo.sh bundles pages remote
+
+      - name: Publish the Pages branch
+        env:
+          TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.version.outputs.semver }}
+        run: scripts/pages-publish.sh push pages "Flatpak repository with $VERSION"
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: remote-flatpak
+          path: remote/*.flatpak
+          if-no-files-found: error
+          retention-days: 7
+
+  flatpak-release:
+    name: Sign and publish the version
+    needs: [version, release, flatpak, flatpak-repo]
+    if: ${{ !cancelled() && needs.release.outputs.tag != '' }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+
+      - if: needs.flatpak.result == 'success'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          pattern: flatpak-*
+          path: bundles
+          merge-multiple: true
+
+      - name: Bundles that update from the Flatpak repository
+        if: needs.flatpak.result == 'success' && needs.flatpak-repo.result == 'success'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: remote-flatpak
+          path: bundles
+
+      - name: Attach the bundles, sign the checksums once and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.version.outputs.semver }}
+          SIGN: ${{ github.repository_owner == 'reiwand' }}
+          FLATPAK_GPG_PRIVATE_KEY: ${{ secrets.FLATPAK_GPG_PRIVATE_KEY }}
+        run: scripts/release-finish.sh ${{ needs.flatpak.result == 'success' && 'bundles' || '' }}
+
+  cache-cleanup:
+    name: Cache cleanup
+    needs: [version, build, qt, build-qt, package, android-native, android, rpm, flatpak, server, release, image, pages-docs, flatpak-repo, flatpak-release]
+    if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    continue-on-error: true
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+          sparse-checkout: scripts
+
+      - name: Delete the caches of older generations and the ones not read for six days
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CACHE_MAX_AGE_DAYS: "6"
+        run: scripts/ci-cache-clean.sh

@@ -1,0 +1,10 @@
+[package]
+name = "reiwand-mix"
+description = "Mixer of the sound layers of a scene for Reiwand"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+reiwand-scene.workspace = true

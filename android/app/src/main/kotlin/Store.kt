@@ -1,0 +1,192 @@
+package io.github.reiwand
+
+import android.content.Context
+import android.content.res.AssetManager
+import android.graphics.BitmapFactory
+import android.media.MediaCodecList
+import android.media.MediaExtractor
+import android.media.MediaFormat
+import android.media.MediaMetadataRetriever
+import android.media.MediaMetadataRetriever.METADATA_KEY_DURATION
+import android.media.MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO
+import android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT
+import android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION
+import android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH
+import android.media.MediaMetadataRetriever.OPTION_CLOSEST_SYNC
+import android.util.LruCache
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.produceState
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.withContext
+import java.io.File
+import org.json.JSONArray
+import org.json.JSONObject
+import org.json.JSONTokener
+
+class Item(json: JSONObject) {
+    val uid: String = json.getString("uid")
+    val title: String = json.getString("title")
+    val path: String = json.getString("path")
+    private val pack = json.optJSONObject("package")
+    private val packed = pack?.optString("kind")
+    val video = json.getString("kind") == "video" || packed == "video"
+    val preset = packed == "preset"
+    val scene = json.getString("kind") == "package" && packed != "video" && packed != "image" && !preset
+    val web = packed == "web"
+    val reel = packed == "video"
+    val exposes = strings(pack?.optJSONArray("exposes"))
+    val thumb: String? = if (json.isNull("thumb")) null else json.getString("thumb")
+    val width = json.optInt("width")
+    val height = json.optInt("height")
+    val millis = json.optInt("duration_ms")
+    val favorite = json.optBoolean("favorite")
+    val rating = json.optInt("rating")
+    val tags: List<String> = json.optJSONArray("tags").strings()
+    val silent = json.optBoolean("sound_muted")
+    val loudness = if (json.isNull("sound_volume")) 100 else json.optInt("sound_volume", 100)
+    private val details = json.optJSONObject("about")
+    val about: String = details?.optString("description").orEmpty()
+    val animated: String? = details?.takeUnless { it.isNull("animated") }?.optString("animated")?.takeIf { it.isNotEmpty() }
+    val refused = (details?.optJSONArray("refused")?.length() ?: 0) > 0
+    val lacks = json.optJSONArray("lacks")?.let { list -> List(list.length(), list::getString) }.orEmpty()
+    private val confirmed = pack?.optJSONArray("confirmed")?.let { list -> List(list.length(), list::getString) }.orEmpty()
+    val mature = pack?.optString("content") == "mature" && "mature" !in confirmed && !Unveil.mature
+    val flashing = pack?.optBoolean("flash_disabled") == true
+    val moving = "motion" in confirmed
+    val failing: String? = json.takeUnless { it.isNull("error") }?.optString("error")?.takeIf { it.isNotEmpty() }
+    val flashes = pack?.optBoolean("photosensitive") == true
+}
+
+object Unveil {
+    const val KEY = "library.show_mature"
+
+    @Volatile
+    var mature = false
+
+    fun load() {
+        mature = runCatching { Native.setting(KEY, null) == "true" }.getOrDefault(false)
+    }
+}
+
+class Playlist(json: JSONObject) {
+    val info: JSONObject = json.getJSONObject("playlist")
+    val count = json.getInt("count")
+    val current = json.getBoolean("current")
+    val uid: String = info.getString("uid")
+    val name: String = info.getString("name")
+    val rules: JSONObject = info.getJSONObject("rules")
+}
+
+fun Playlist.ruled(key: String, value: Any): JSONObject =
+    JSONObject(info.toString()).apply { getJSONObject("rules").put(key, value) }
+
+internal fun answer(native: (String) -> String, op: String, args: Array<out Pair<String, Any?>>): Any? {
+    val answer = JSONTokener(native(JSONObject(mapOf("op" to op, *args)).toString())).nextValue()
+    if (answer is JSONObject) refusal(answer)?.let { throw it }
+    return answer.takeUnless { it == JSONObject.NULL }
+}
+
+suspend fun ask(op: String, vararg args: Pair<String, Any?>): Any? =
+    withContext(Dispatchers.IO) { answer(Native::library, op, args) }
+
+fun depth(op: String, vararg args: Pair<String, Any?>): Any? = answer(Native::depth, op, args)
+
+fun examples(context: Context, force: Boolean = true) {
+    val stamp = context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime
+    if (!force && answer(Native::library, "examples_due", arrayOf("stamp" to stamp)) != true) return
+    withExamples(context) { answer(Native::library, "examples_repo", arrayOf("dir" to it.path, "stamp" to stamp, "force" to force)) }
+}
+
+internal fun withExamples(context: Context, use: (File) -> Unit) {
+    val root = File(context.cacheDir, "examples").apply { deleteRecursively() }
+    unpack(context.assets, "scenes", root)
+    try {
+        use(root)
+    } finally {
+        root.deleteRecursively()
+    }
+}
+
+private fun unpack(assets: AssetManager, path: String, to: File) {
+    val names = assets.list(path).orEmpty()
+    if (names.isEmpty()) assets.open(path).use { input -> to.outputStream().use { input.copyTo(it) } }
+    else names.forEach { unpack(assets, "$path/$it", File(to.apply { mkdirs() }, it)) }
+}
+
+suspend fun account(op: String, vararg args: Pair<String, Any?>): Any? =
+    withContext(Dispatchers.IO) { answer(Native::account, op, args) }
+
+suspend fun fetch(op: String, vararg args: Pair<String, Any?>) =
+    (ask(op, *args) as? JSONArray)?.let { list -> List(list.length()) { Item(list.getJSONObject(it)) } }.orEmpty()
+
+suspend fun playlists() =
+    (ask("playlists") as? JSONArray)?.let { list -> List(list.length()) { Playlist(list.getJSONObject(it)) } }.orEmpty()
+
+fun choice(kind: String, uid: String): JSONObject = JSONObject().put(kind, uid)
+
+@Composable
+fun <T> loaded(initial: T, vararg keys: Any?, load: suspend () -> T): State<T> =
+    produceState(initial, *keys) {
+        value = runCatching { withContext(Dispatchers.IO) { load() } }.getOrDefault(initial)
+    }
+
+private val thumbs = object : LruCache<String, ImageBitmap>(BYTES) {
+    override fun sizeOf(key: String, value: ImageBitmap) = value.width * value.height * 4
+}
+
+fun forget() = thumbs.evictAll()
+
+@Composable
+fun thumbnail(item: Item): State<ImageBitmap?> = produceState(thumbs[item.uid], item.uid, item.thumb) {
+    value = value ?: runCatching { withContext(Dispatchers.IO) { picture(item) } }.getOrNull()
+}
+
+private val fetching = Semaphore(2)
+
+suspend fun remote(spec: String): ImageBitmap? = thumbs[spec] ?: fetching.withPermit {
+    val path = runCatching { account("thumb", "spec" to spec) as? String }.getOrNull()
+    val small = BitmapFactory.Options().apply { inSampleSize = 4 }
+    path?.let { BitmapFactory.decodeFile(it, small)?.asImageBitmap() }?.also { thumbs.put(spec, it) }
+}
+
+@Composable
+fun preview(spec: String): State<ImageBitmap?> = produceState(thumbs[spec], spec) { value = value ?: remote(spec) }
+
+private suspend fun picture(item: Item): ImageBitmap? {
+    val made = suspend { ask("thumb", "uid" to item.uid) as? String }
+    val path = item.thumb ?: made() ?: poster(item.uid) { setDataSource(item.path) }?.let { made() }
+    return path?.let { BitmapFactory.decodeFile(it)?.asImageBitmap() }?.also { thumbs.put(item.uid, it) }
+}
+
+fun playable(open: MediaExtractor.() -> Unit): Boolean = runCatching {
+    val extractor = MediaExtractor().apply(open)
+    try {
+        val codecs = MediaCodecList(MediaCodecList.REGULAR_CODECS)
+        val formats = (0 until extractor.trackCount).map(extractor::getTrackFormat)
+        formats.filter { it.getString(MediaFormat.KEY_MIME).orEmpty().startsWith("video/") }.any { codecs.findDecoderForFormat(it) != null }
+    } finally {
+        extractor.release()
+    }
+}.getOrDefault(false)
+
+fun poster(uid: String, open: MediaMetadataRetriever.() -> Unit) = runCatching {
+    MediaMetadataRetriever().use { retriever ->
+        retriever.open()
+        val frame = checkNotNull(retriever.getScaledFrameAtTime(0, OPTION_CLOSEST_SYNC, EDGE, EDGE))
+        val pixels = IntArray(frame.width * frame.height)
+        frame.getPixels(pixels, 0, frame.width, 0, 0, frame.width, frame.height)
+        fun read(key: Int) = retriever.extractMetadata(key)?.toIntOrNull() ?: 0
+        val size = intArrayOf(read(METADATA_KEY_VIDEO_WIDTH), read(METADATA_KEY_VIDEO_HEIGHT))
+        if (read(METADATA_KEY_VIDEO_ROTATION) % 180 != 0) size.reverse()
+        val audio = retriever.extractMetadata(METADATA_KEY_HAS_AUDIO) == "yes"
+        Native.poster(uid, pixels, frame.width, size + read(METADATA_KEY_DURATION), audio)
+    }
+}.getOrNull()
+
+private const val EDGE = 512
+private const val BYTES = 32 shl 20

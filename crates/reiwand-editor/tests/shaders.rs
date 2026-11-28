@@ -1,0 +1,182 @@
+#[path = "support/whole.rs"]
+mod whole;
+use reiwand_editor::Project;
+use reiwand_editor::actions::Action;
+use reiwand_editor::inspect::fields_from;
+use reiwand_editor::outline::outline;
+use reiwand_editor::starters::starter;
+use serde_json::{Value, json};
+use std::fs;
+
+const WGSL: &str = "override soft: bool = false;
+@fragment fn fs_glow(in: VertexOut) -> @location(0) vec4<f32> {
+    return tap(in.uv) * select(param(0u).x, 1.0, soft);
+}";
+
+fn english() {
+    unsafe {
+        std::env::set_var("LC_ALL", "C");
+        std::env::remove_var("LANGUAGE");
+    }
+}
+
+fn descriptor(id: &str) -> Value {
+    json!({ "id": id, "name": { "en": "Glow", "de": "Glanz" }, "cost": { "taps": 1 }, "passes": [{ "entry": "fs_glow" }],
+        "params": [{ "id": "gain", "type": "float", "prefill": 1, "min": 0, "max": 4,
+            "label": { "en": "Gain", "de": "Verstärkung" } },
+            { "id": "style", "type": "enum", "prefill": 0, "values": [{ "value": 0, "label": { "en": "Soft" } }, { "value": 1, "label": { "en": "Hard" } }] },
+            { "id": "shape", "type": "texture", "prefill": "", "help": { "en": "What the glow follows" } }],
+        "options": [{ "id": "soft", "values": [false, true], "prefill": false }] })
+}
+
+#[test]
+fn package_effects_are_imported_listed_and_inspected() {
+    english();
+    let root = tempfile::tempdir().unwrap();
+    unsafe { std::env::set_var("XDG_STATE_HOME", root.path().join("state")) };
+    let dir = root.path().join("glow");
+    let mut project =
+        Project::create(&dir, starter("empty", "org.example.glow", "Glow", "en").unwrap()).unwrap();
+    let source = root.path().join("source");
+    fs::create_dir_all(&source).unwrap();
+    fs::write(source.join("glow.json"), whole::descriptor(&descriptor("glow").to_string())).unwrap();
+    fs::write(source.join("glow.wgsl"), WGSL).unwrap();
+    fs::write(source.join("blur.json"), whole::descriptor(&descriptor("blur").to_string())).unwrap();
+    fs::write(source.join("loop.json"), whole::descriptor(&descriptor("loop").to_string())).unwrap();
+    fs::write(source.join("loop.wgsl"), WGSL.replace("return", "loop { }\n    return")).unwrap();
+    let import = |p: &mut Project, name: &str, wgsl: Option<&str>| {
+        let wgsl = wgsl.map(|w| source.join(w));
+        p.act(&Action::ImportEffect { descriptor: source.join(name), wgsl })
+    };
+    import(&mut project, "glow.json", None).unwrap();
+    assert_eq!(
+        project.doc["scene"]["effects"]["glow"],
+        json!({ "descriptor": "effects/glow.json", "wgsl": "effects/glow.wgsl" })
+    );
+    assert!(dir.join("effects/glow.wgsl").is_file());
+    let blur = import(&mut project, "blur.json", Some("glow.wgsl")).unwrap_err().to_string();
+    assert!(blur.contains("blur is the name of a built-in effect"), "{blur}");
+    let looped = import(&mut project, "loop.json", None).unwrap_err().to_string();
+    assert!(looped.contains("a counter that a literal limits"), "{looped}");
+    let listed = outline(&project, 0.0, &[]);
+    assert!(listed["effects"].as_array().unwrap().contains(&json!("glow")));
+    let layer = json!({"add_layer": {"kind": "solid", "id": "fill"}});
+    project.act(&serde_json::from_value::<Action>(whole::action(&project, layer)).unwrap()).unwrap();
+    let pointer = reiwand_editor::layers::find(&project.doc, "fill").unwrap();
+    let effect = json!({"add": {"pointer": format!("{pointer}/effects"), "value": [{ "effect": "glow", "params": { "gain": 2, "style": 0, "shape": "", "soft": false } }]}});
+    project.act(&serde_json::from_value::<Action>(whole::action(&project, effect)).unwrap()).unwrap();
+    let at = format!("{pointer}/effects/0");
+    assert!(fields_from(None, &project.doc, &at, 0.0, &Default::default()).iter().all(|f| f.key != "gain"));
+    let fields = fields_from(None, &project.doc, &at, 0.0, &project.effects());
+    let gain = fields.iter().find(|f| f.key == "gain").unwrap();
+    assert_eq!((gain.title.as_str(), &gain.range, &gain.shown), ("Gain", &json!([0.0, 4.0]), &json!(2)));
+    let style = fields.iter().find(|f| f.key == "style").unwrap();
+    assert_eq!(
+        (style.widget.as_str(), style.names.clone()),
+        ("enum", vec!["Soft".to_string(), "Hard".into()])
+    );
+    let shape = fields.iter().find(|f| f.pointer.ends_with("/params/shape")).unwrap();
+    assert_eq!((shape.widget.as_str(), shape.help.as_str()), ("ref:image", "What the glow follows"));
+    assert!(!shape.options.contains(&json!({ "layer": "fill" })), "{:?}", shape.options);
+    assert!(["white", "black", "noise", "normal_flat"].iter().all(|g| shape.options.contains(&json!(g))));
+    let soft = fields.iter().find(|f| f.key == "soft").unwrap();
+    assert_eq!(
+        (soft.widget.as_str(), &soft.options, soft.bindable),
+        ("enum", &vec![json!(false), json!(true)], true)
+    );
+    assert_eq!(outline(&project, 0.0, &[])["effect_names"]["glow"], "Glow");
+    let other = json!({"add_layer": {"kind": "solid", "id": "light"}});
+    project.act(&serde_json::from_value::<Action>(whole::action(&project, other)).unwrap()).unwrap();
+    let pointer = reiwand_editor::layers::find(&project.doc, "fill").unwrap();
+    let at = format!("{pointer}/effects/0");
+    let fields = fields_from(None, &project.doc, &at, 0.0, &project.effects());
+    let shape = fields.iter().find(|f| f.pointer.ends_with("/params/shape")).unwrap();
+    assert!(shape.options.contains(&json!({ "layer": "light" })), "{:?}", shape.options);
+    let calm = json!({"add_property": {"kind": "bool", "id": "calm"}});
+    project.act(&serde_json::from_value::<Action>(whole::action(&project, calm)).unwrap()).unwrap();
+    for (key, value) in [("shape", json!({ "layer": "light" })), ("soft", json!({ "prop": "calm" }))] {
+        let set = json!({"set": {"pointer": format!("{at}/params/{key}"), "value": value}});
+        project.act(&serde_json::from_value::<Action>(whole::action(&project, set)).unwrap()).unwrap();
+    }
+    let fields = fields_from(None, &project.doc, &at, 0.0, &project.effects());
+    let found =
+        |key: &str| fields.iter().find(|f| f.key == key && f.pointer.contains("/params/")).unwrap().clone();
+    assert_eq!(
+        (found("shape").value["layer"].clone(), found("soft").source),
+        (json!("light"), "prop".into())
+    );
+    assert!(
+        reiwand_editor::check::review(&project.doc, Some(&dir)).iter().all(|p| p.warning),
+        "{:?}",
+        reiwand_editor::check::review(&project.doc, Some(&dir))
+    );
+}
+
+#[test]
+fn shine_styles_are_picked_from_drawn_choices() {
+    english();
+    let root = tempfile::tempdir().unwrap();
+    unsafe { std::env::set_var("XDG_STATE_HOME", root.path().join("state")) };
+    let dir = root.path().join("shine");
+    let mut project =
+        Project::create(&dir, starter("empty", "org.example.shine", "Shine", "en").unwrap()).unwrap();
+    let layer = json!({"add_layer": {"kind": "solid", "id": "fill"}});
+    project.act(&serde_json::from_value::<Action>(whole::action(&project, layer)).unwrap()).unwrap();
+    let pointer = reiwand_editor::layers::find(&project.doc, "fill").unwrap();
+    let effect = json!({"add": {"pointer": format!("{pointer}/effects"), "value": [{ "effect": "shine" }]}});
+    project.act(&serde_json::from_value::<Action>(whole::action(&project, effect)).unwrap()).unwrap();
+    let at = format!("{pointer}/effects/0");
+    let fields = fields_from(None, &project.doc, &at, 0.0, &project.effects());
+    let style = fields.iter().find(|f| f.key == "style").unwrap();
+    assert_eq!((style.widget.as_str(), &style.sample), ("styles", &json!({ "effect": "shine" })));
+    assert_eq!(style.options, vec![json!(0.0), json!(1.0), json!(2.0), json!(3.0)]);
+    assert_eq!(style.names, ["Line", "Double line", "Ring", "Glint"]);
+    let blend = fields.iter().find(|f| f.key == "blend").unwrap();
+    assert_eq!(blend.widget, "enum");
+    let set = json!({"set": {"pointer": format!("{at}/params/style"), "value": 2}});
+    project.act(&serde_json::from_value::<Action>(whole::action(&project, set)).unwrap()).unwrap();
+    assert_eq!(project.doc.pointer(&format!("{at}/params/style")), Some(&json!(2)));
+    let wrong = json!({"set": {"pointer": format!("{at}/params/style"), "value": 9}});
+    project.act(&serde_json::from_value::<Action>(whole::action(&project, wrong)).unwrap()).unwrap();
+    let found = reiwand_editor::check::review(&project.doc, Some(&dir));
+    assert!(found.iter().any(|p| !p.warning && p.message.contains("style")), "{found:?}");
+}
+
+#[test]
+fn the_wake_rules_of_package_effects_are_shown_and_changed_in_their_descriptor() {
+    let root = tempfile::tempdir().unwrap();
+    unsafe { std::env::set_var("XDG_STATE_HOME", root.path().join("state")) };
+    let dir = root.path().join("rules");
+    let mut p = Project::create(&dir, starter("empty", "org.example.rules", "Rules", "en").unwrap()).unwrap();
+    let source = root.path().join("source");
+    fs::create_dir_all(&source).unwrap();
+    fs::write(source.join("glow.json"), whole::descriptor(&descriptor("glow").to_string())).unwrap();
+    fs::write(source.join("glow.wgsl"), WGSL).unwrap();
+    p.act(&Action::ImportEffect { descriptor: source.join("glow.json"), wgsl: None }).unwrap();
+    let rule = |p: &mut Project, rule: Value| {
+        p.act(&serde_json::from_value(json!({ "effect_rule": rule })).unwrap())
+    };
+    let at = |p: &Project| p.dir.join(p.doc["scene"]["effects"]["glow"]["descriptor"].as_str().unwrap());
+    let read = |p: &Project| -> Value { serde_json::from_str(&fs::read_to_string(at(p)).unwrap()).unwrap() };
+    rule(&mut p, json!({ "effect": "glow", "param": "gain", "uses": "time", "waits_for": "style" })).unwrap();
+    let written = read(&p)["params"][0].clone();
+    assert_eq!((&written["uses"], &written["waits_for"]), (&json!("time"), &json!("style")));
+    assert!(p.dirty(), "a changed rule is a change of the project");
+    p.act(&Action::Undo {}).unwrap();
+    assert!(read(&p)["params"][0]["waits_for"].is_null(), "undo puts the old rule back");
+    p.act(&Action::Redo {}).unwrap();
+    assert_eq!(read(&p)["params"][0]["waits_for"], json!("style"), "redo brings the new rule again");
+    let shown = reiwand_editor::rigs::query(&p.dir, &p.doc, "", &json!({ "rules": { "effect": "glow" } }));
+    assert_eq!((&shown["own"], &shown["params"][0]["waits_for"]), (&json!(true), &json!("style")), "{shown}");
+    assert!(rule(&mut p, json!({ "effect": "glow", "param": "gain", "waits_for": "nothing" })).is_err());
+    assert!(
+        rule(&mut p, json!({ "effect": "fluid", "param": "strength", "uses": "time" })).is_err(),
+        "built-in rules stay"
+    );
+    rule(&mut p, json!({ "effect": "glow", "param": "gain", "uses": "", "waits_for": "" })).unwrap();
+    let cleared = read(&p);
+    assert!(cleared["params"][0]["uses"].is_null() && cleared["params"][0]["waits_for"].is_null());
+    let fluid = reiwand_editor::rigs::query(&p.dir, &p.doc, "", &json!({ "rules": { "effect": "fluid" } }));
+    assert_eq!(fluid["own"], json!(false));
+    assert!(fluid["params"].as_array().unwrap().iter().any(|q| q["waits_for"] == "strength"), "{fluid}");
+}

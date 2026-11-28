@@ -1,0 +1,199 @@
+use super::super::lock;
+use super::super::state::State;
+use super::slot::{FIRST_FRAME, PageSlot, RETRIES};
+use super::view::Shared;
+use super::{SCAN, folders, values};
+use reiwand_web::{FromWeb, ToWeb};
+use std::time::{Duration, Instant};
+
+const CLICK: Duration = Duration::from_secs(2);
+const APART: Duration = Duration::from_secs(1);
+
+impl State {
+    pub(super) fn sync_link(&self, slot: &mut PageSlot, now: Instant) {
+        let (mut out, mut files) = (Vec::new(), Vec::new());
+        let quality = super::level(self.power, &slot.spec);
+        for view in slot.views.values_mut() {
+            let (values, own) = values(view.spec.as_ref().unwrap_or(&slot.spec), &slot.salt, quality);
+            files.extend(own);
+            let changed = reiwand_web::changed(&view.sent, &values);
+            if view.opened && !changed.is_empty() {
+                out.push(ToWeb::Properties { view: view.id, values: changed });
+            }
+            view.sent = values;
+        }
+        if files != slot.files {
+            out.insert(0, ToWeb::Files(files.clone()));
+            slot.files = files;
+        }
+        for view in slot.views.values_mut().filter(|v| !v.opened) {
+            view.opened = true;
+            let properties = view.sent.clone();
+            out.push(ToWeb::Open { view: view.id, size: view.size, scale: 1.0, properties });
+            out.push(ToWeb::Fps { view: view.id, fps: view.fps.max(1) });
+            if !view.live {
+                out.push(ToWeb::Visible { view: view.id, visible: false });
+            }
+            view.visible = Some(view.live);
+        }
+        let settings = self.page_settings(slot);
+        if settings != slot.settings {
+            out.push(ToWeb::Settings(settings.clone()));
+            slot.settings = settings;
+        }
+        let shown = slot.views.values().any(|v| v.live);
+        if shown && slot.scanned.is_none_or(|at| now.duration_since(at) >= SCAN) {
+            slot.scanned = Some(now);
+            for folder in folders(&slot.spec, &slot.salt) {
+                if slot.folders.get(&folder.prop) != Some(&folder) {
+                    out.push(ToWeb::Folder(folder.clone()));
+                    slot.folders.insert(folder.prop.clone(), folder);
+                }
+            }
+        }
+        out.iter().for_each(|m| slot.send(m));
+        match slot.waiting {
+            Some(at) if at <= now && !shown => slot.waiting = Some(now + FIRST_FRAME),
+            Some(at) if at <= now && !slot.hidden => {
+                tracing::info!(
+                    "the web page drew nothing on the graphics card, drawing it in memory instead"
+                );
+                (slot.hidden, slot.due) = (true, Some(now));
+                slot.stop();
+            }
+            Some(at) if at <= now => slot.fail(crate::words::web_stalled(), now),
+            _ => {}
+        }
+    }
+
+    pub(in crate::compositor) fn take_page_frames(&mut self) {
+        let now = Instant::now();
+        let renderer = self.renderer;
+        for slot in self.pages.values_mut() {
+            let messages = std::mem::take(&mut *lock(&slot.inbox));
+            for (message, fds) in messages {
+                take(slot, renderer, message, fds, now);
+            }
+        }
+        let general = self.power.choice;
+        for (name, output) in &mut self.outputs {
+            let Some(path) = output.shown.content.page().map(|p| p.key(general)) else { continue };
+            let view = self.pages.get_mut(&path).and_then(|s| s.views.get_mut(name));
+            let drawn = view.as_ref().map_or(0, |v| v.drawn);
+            lock(&self.status).get_mut(name).into_iter().for_each(|s| s.page_frames = drawn);
+            if let Some(view) = view.filter(|v| v.fresh) {
+                view.fresh = false;
+                output.shown.image = view.texture.clone();
+                output.dirty = true;
+            }
+        }
+    }
+}
+
+fn view_of(slot: &mut PageSlot, id: u32) -> Option<&mut super::ViewSlot> {
+    slot.views.values_mut().find(|v| v.id == id)
+}
+
+fn take(
+    slot: &mut PageSlot,
+    renderer: &reiwand_render::Renderer,
+    message: FromWeb,
+    fds: Vec<std::os::fd::OwnedFd>,
+    now: Instant,
+) {
+    match message {
+        FromWeb::Ready { version, .. } => {
+            slot.ready = true;
+            tracing::debug!(version, "the web helper started");
+        }
+        FromWeb::Unavailable(reason) => {
+            slot.failures = RETRIES;
+            slot.fail(reason.clone(), now);
+            slot.error = Some(crate::words::web_old(&reason));
+        }
+        FromWeb::Failed(reason) => {
+            if slot.scoped && !slot.ready {
+                tracing::info!("the web helper does not start in a limited scope, starting it without one");
+                reiwand_web::unscoped();
+            }
+            slot.fail(reason, now)
+        }
+        FromWeb::Buffer { view, id, size, fourcc, modifier, offset, stride } => {
+            let shared = Shared { id, size, fourcc, modifier, offset, stride };
+            let imported = match (view_of(slot, view), fds.first()) {
+                (Some(v), Some(fd)) => v.import(renderer, &shared, fd).map_err(|e| e.to_string()),
+                _ => Err("no buffer".into()),
+            };
+            if let Err(e) = imported
+                && slot.shared
+            {
+                tracing::info!("the GPU cannot read the web page in place, copying it instead: {e}");
+                slot.shared = false;
+                slot.send(&ToWeb::Copy);
+            }
+        }
+        FromWeb::Forget { view } => view_of(slot, view).into_iter().for_each(|v| v.forget()),
+        FromWeb::Frame { view, buffer } => {
+            let shown = view_of(slot, view).map(|v| (v.frame(buffer), v.shown == Some(buffer)));
+            let release = match shown {
+                Some((old, true)) => old,
+                _ => Some(buffer),
+            };
+            release.into_iter().for_each(|buffer| slot.send(&ToWeb::Released { view, buffer }));
+            drawn(slot, view);
+        }
+        FromWeb::Pixels { view, slot: index, size, stride, fresh } => {
+            let mapped = match (view_of(slot, view), fds.first().filter(|_| fresh)) {
+                (Some(v), Some(fd)) => v.map(fd, size, stride),
+                _ => Ok(()),
+            };
+            if let Err(e) = mapped {
+                return slot.fail(format!("the web helper sent a frame that cannot be read: {e}"), now);
+            }
+            let uploaded = view_of(slot, view).map(|v| v.pixels(renderer, index, size));
+            if let Some(Err(e)) = uploaded {
+                tracing::debug!("cannot upload a web frame: {e}");
+            }
+            slot.send(&ToWeb::Freed { view, slot: index });
+            drawn(slot, view);
+        }
+        FromWeb::Wants { audio } => slot.audio = audio,
+        FromWeb::Idle => {
+            tracing::debug!("the web helper has no visible page and is closed");
+            slot.sleep();
+        }
+        FromWeb::Loaded { view } => {
+            view_of(slot, view).into_iter().for_each(|v| v.loaded = true);
+            tracing::debug!("the web page loaded");
+        }
+        FromWeb::Crashed { .. } => slot.views.values_mut().for_each(|v| v.loaded = false),
+        FromWeb::Broken { .. } => {
+            slot.failures = RETRIES;
+            slot.fail(crate::words::web_crashed(), now);
+            slot.error = Some(crate::words::web_crashed());
+        }
+        FromWeb::Said(text) if text == "sandbox: off" => slot.sandbox = "reduced",
+        FromWeb::Said(text) => tracing::debug!("web page: {text}"),
+        FromWeb::Console { view, line } => super::console::keep(slot, view, line),
+        FromWeb::Open { view, prop } => open(slot, view, &prop, now),
+        FromWeb::Rgb { view, size, rgb } => super::feed::lit(slot, view, size, rgb),
+        FromWeb::Stepped { .. } => {}
+    }
+}
+
+fn open(slot: &mut PageSlot, id: u32, prop: &str, now: Instant) {
+    let package = slot.spec.pack.props.id.clone();
+    let Some((name, view)) = slot.views.iter_mut().find(|(_, v)| v.id == id) else { return };
+    let recent = view.pressed[0].is_some_and(|at| now.duration_since(at) < CLICK);
+    if recent && view.pressed[1].is_none_or(|at| now.duration_since(at) >= APART) {
+        view.pressed = [None, Some(now)];
+        crate::shortcuts::ask(name, &package, prop);
+    }
+}
+
+fn drawn(slot: &mut PageSlot, view: u32) {
+    view_of(slot, view).into_iter().for_each(|v| v.drawn += 1);
+    if slot.waiting.take().is_some() {
+        (slot.failures, slot.error) = (0, slot.full.then(crate::words::web_full));
+    }
+}

@@ -1,0 +1,185 @@
+mod accent;
+mod accounts;
+mod accounts1;
+mod activate;
+mod announce;
+mod apply;
+mod blank;
+mod browse;
+mod bus;
+mod calibration;
+mod callers;
+mod carry;
+mod carry1;
+mod catalogue;
+mod changes;
+mod charge;
+mod choice;
+mod clock;
+mod compositor;
+mod confirm;
+mod controls;
+mod daemon;
+#[cfg(test)]
+mod deadline;
+mod deck;
+mod decode;
+mod drafts;
+mod duck;
+mod editpreview;
+mod edits;
+mod error;
+mod examples;
+#[cfg(test)]
+mod exit_tests;
+mod flatpak;
+mod folders;
+mod gpus;
+mod hearing;
+mod import;
+mod imports;
+mod inputs;
+mod inputs1;
+mod items;
+mod jobs;
+mod keyring;
+mod kinds;
+mod layers;
+mod library1;
+mod lights;
+mod lockscreen;
+mod look;
+mod media;
+mod orphans;
+mod outside;
+mod packages;
+mod pages;
+mod pagespec;
+mod particles;
+mod picks;
+mod pixels;
+mod plasma;
+mod playback;
+mod playlists;
+mod playlists1;
+mod plugins;
+mod pool;
+mod present;
+mod presets;
+mod previews;
+mod profiles;
+mod profiles1;
+mod props;
+mod provider_edits;
+mod providers;
+mod providers1;
+mod publish1;
+mod relief;
+mod remote;
+mod repos;
+mod repos1;
+mod rest;
+mod restart;
+mod reveals;
+mod rgb;
+mod rgb1;
+mod rotating;
+mod rotation;
+mod scan;
+mod scenepresets;
+mod sceneprops;
+mod scenes;
+mod sceneshown;
+mod scenevalues;
+mod schema;
+mod secrets;
+mod secretstore;
+mod serve;
+mod service;
+mod shortcuts;
+#[cfg(test)]
+mod spec;
+mod spread;
+mod still;
+mod store;
+mod streams;
+mod surfaces;
+mod sync;
+mod thumbs;
+mod tidy;
+mod timing;
+mod tones;
+mod updating;
+mod variants;
+mod wallhaven;
+mod wallpaper;
+mod watch;
+#[cfg(test)]
+mod whole;
+mod words;
+mod worker;
+mod zone;
+
+use clap::Parser;
+use std::path::PathBuf;
+use tracing_subscriber::EnvFilter;
+
+#[derive(Parser)]
+#[command(
+    version = reiwand_core::VERSION,
+    about = "Renders wallpapers and shows them through PipeWire streams, layer-shell surfaces or X11 windows"
+)]
+pub(crate) struct Args {
+    #[arg(long, help = "Configuration file to use instead of the default one")]
+    pub(crate) config: Option<PathBuf>,
+    #[arg(long, hide = true)]
+    worker: bool,
+    #[arg(long, hide = true)]
+    script_host: bool,
+    #[arg(long, value_enum, default_value = "auto", help = "How wallpapers reach the desktop")]
+    pub(crate) backend: present::Backend,
+    #[arg(long, value_name = "NAME", value_parser = layers::valid, help = "Namespace of the layer-shell surfaces, or auto; also REIWAND_LAYER_NAMESPACE")]
+    pub(crate) layer_namespace: Option<String>,
+}
+
+fn main() -> anyhow::Result<()> {
+    reiwand_plugin::serve_if_asked();
+    reiwand_scene::serve_check();
+    reiwand_scene::check_out_of_process(true);
+    let args = Args::parse();
+    if args.worker {
+        return worker::run();
+    }
+    if args.script_host {
+        return Ok(reiwand_script::serve()?);
+    }
+    skip_vulkan_device_selection_layer();
+    let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
+    let quiet =
+        ["zbus", "hyper", "hyper_util", "h2", "reqwest"].map(|target| format!("{target}=warn").parse());
+    let filter = quiet.into_iter().flatten().fold(filter, EnvFilter::add_directive);
+    tracing_subscriber::fmt().with_env_filter(filter).init();
+    std::panic::set_hook(Box::new(|info| {
+        let thread = std::thread::current();
+        fatal(&format!("thread {} {info}", thread.name().unwrap_or("unnamed")))
+    }));
+    serve::run(args).map(|()| reiwand_render::finish_gpu(0))
+}
+
+fn skip_vulkan_device_selection_layer() {
+    if std::env::var_os("NODEVICE_SELECT").is_none() {
+        unsafe { std::env::set_var("NODEVICE_SELECT", "1") };
+    }
+}
+
+pub(crate) fn fatal(reason: &str) -> ! {
+    tracing::error!("{reason}; exiting so that the service manager restarts the daemon");
+    quit(70)
+}
+
+pub(crate) fn quit(status: i32) -> ! {
+    if status == 0 {
+        reiwand_scene::end_trials();
+    }
+    unsafe { libc::_exit(status) }
+}

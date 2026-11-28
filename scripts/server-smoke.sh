@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+URL=http://127.0.0.1:8080
+PASSWORD=correct-horse-battery
+
+id=$(docker compose ps -q reiwand)
+test "$(docker inspect --format '{{.State.Health.Status}}' "$id")" = healthy
+if docker compose exec -T reiwand sh -c true 2>/dev/null; then
+  echo "the image must not contain a shell" >&2
+  exit 1
+fi
+
+test "$(curl -fsS "$URL/healthz")" = ok
+curl -fsS "$URL/.well-known/reiwand-server" | grep '"name"' > /dev/null
+[ -z "${REIWAND_VERSION:-}" ] || curl -fsS "$URL/.well-known/reiwand-server" | grep -F "\"version\":\"$REIWAND_VERSION\"" > /dev/null
+docker compose logs reiwand | grep 'one-time setup token' > /dev/null
+
+token=$(docker compose exec -T reiwand reiwand-server setup-token)
+jar=$(mktemp)
+step() { curl -s -o /dev/null -w '%{http_code}' -b "$jar" -c "$jar" "$@"; }
+test "$(step --data-urlencode "token=$token" "$URL/setup")" = 303
+test "$(step -d network=own "$URL/setup/network")" = 303
+test "$(step -d handle=admin -d "password=$PASSWORD" "$URL/setup/account")" = 303
+
+docker compose exec -T reiwand reiwand-server repo init --name "Smoke test" | grep 'Root key fingerprint' > /dev/null
+test "$(step -d access=closed "$URL/setup/access")" = 303
+test "$(step --data-urlencode "token=$token" "$URL/setup")" = 403
+rm -f "$jar"
+docker compose exec -T reiwand reiwand-server repo publish
+latest=$(curl -fsS "$URL/r/main/entry/latest")
+curl -fsS "$URL/r/main/entry/$latest.json.minisig" > /dev/null
+curl -fsS "$URL/r/main/entry/$latest.json" > /dev/null
+
+docker compose exec -T reiwand reiwand-server backup /data/backups/smoke
+docker compose stop reiwand
+docker compose run --rm -T reiwand restore /data/backups/smoke --force
+docker compose up -d --wait reiwand
+test "$(curl -fsS "$URL/r/main/entry/latest")" -gt "$latest"
+
+login='{"handle":"admin","password":"'"$PASSWORD"'","device":{"platform":"linux"}}'
+status=$(curl -s -o /dev/null -w '%{http_code}' -H 'content-type: application/json' -d "$login" "$URL/api/v1/auth/login")
+test "$status" = 200
+echo "server smoke test passed"

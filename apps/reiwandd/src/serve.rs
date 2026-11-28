@@ -1,0 +1,108 @@
+use crate::*;
+use anyhow::Context;
+use reiwand_core::{Config, dbus};
+use std::sync::Arc;
+use std::time::Duration;
+use tokio::signal::unix::{SignalKind, signal};
+use zbus::fdo::{DBusProxy, RequestNameFlags};
+
+fn hurry(grace: Duration) {
+    std::thread::spawn(move || {
+        std::thread::sleep(grace);
+        tracing::warn!("shutdown took longer than {grace:?}; exiting");
+        unsafe { libc::_exit(0) }
+    });
+}
+
+#[tokio::main]
+pub(crate) async fn run(args: Args) -> anyhow::Result<()> {
+    let config_path = args.config.map_or_else(Config::default_path, Ok)?;
+    let connection = reiwand_client::bus::session().await.context("cannot connect to the session bus")?;
+    let bus = DBusProxy::new(&connection).await?;
+    let taken = || anyhow::anyhow!("another reiwandd already owns {} on the session bus", dbus::BUS_NAME);
+    if bus.name_has_owner(dbus::BUS_NAME.try_into()?).await? {
+        return Err(taken());
+    }
+    compositor::stops::restore();
+    let option = args.layer_namespace.as_deref();
+    let session = present::select(args.backend, &bus, || layers::choose(option, &config_path)).await?;
+    let display = session.as_ref().map(|s| Box::new(s.display()) as reiwand_render::Display);
+    let daemon =
+        Arc::new(tokio::task::spawn_blocking(move || daemon::Daemon::new(config_path, display)).await??);
+    let vanished = bus.receive_name_owner_changed_with_args(&[(2, "")]).await?;
+    tokio::spawn(watch::clients(vanished, daemon.clone()));
+    let server = connection.object_server();
+    let weak = Arc::downgrade(&daemon);
+    deck::start(&daemon);
+    server.at(dbus::OBJECT_PATH, service::Service(weak.clone())).await?;
+    server.at(dbus::OBJECT_PATH, library1::Library(weak.clone())).await?;
+    server.at(dbus::OBJECT_PATH, playlists1::Playlists(weak.clone())).await?;
+    server.at(dbus::OBJECT_PATH, profiles1::Profiles(weak.clone())).await?;
+    server.at(dbus::OBJECT_PATH, providers1::Providers(weak.clone())).await?;
+    server.at(dbus::OBJECT_PATH, inputs1::Inputs(weak.clone())).await?;
+    server.at(dbus::OBJECT_PATH, repos1::Repos(weak.clone())).await?;
+    server.at(dbus::OBJECT_PATH, carry1::Carry(weak.clone())).await?;
+    server.at(dbus::OBJECT_PATH, rgb1::Rgb(weak.clone())).await?;
+    server.at(dbus::OBJECT_PATH, accounts1::Accounts(weak.clone())).await?;
+    server.at(dbus::OBJECT_PATH, publish1::Publish(weak)).await?;
+    tokio::spawn(changes::emit(connection.clone(), daemon.clone()));
+    inputs1::start(&daemon, connection.clone())?;
+    pool::start(&daemon);
+    folders::start(&daemon);
+    remote::start(&daemon, connection.clone());
+    accounts::start(&daemon, connection.clone());
+    edits::start(&daemon);
+    gpus::watch(&daemon);
+    tokio::task::spawn_blocking({
+        let daemon = daemon.clone();
+        move || daemon.tidy()
+    });
+    let flags = RequestNameFlags::DO_NOT_QUEUE;
+    connection.request_name_with_flags(dbus::BUS_NAME, flags).await.map_err(|e| match e {
+        zbus::Error::NameTaken => taken(),
+        e => e.into(),
+    })?;
+    tracing::info!("serving {} on the session bus", dbus::BUS_NAME);
+    match session {
+        Some(session) => surfaces::start(session, daemon.clone())?,
+        None if std::env::var_os("WAYLAND_DISPLAY").is_some() => pixels::follow_modes(&daemon),
+        None => {}
+    }
+    tokio::spawn(flatpak::request_background(connection.clone()));
+    let (power, known) = tokio::sync::oneshot::channel();
+    tokio::spawn(watch::battery(daemon.clone(), power));
+    tokio::spawn(watch::screen_lock(connection.clone(), daemon.clone()));
+    tokio::spawn(crate::props::properties(connection.clone(), daemon.clone()));
+    tokio::spawn(watch::motion(connection.clone(), daemon.clone()));
+    tokio::spawn(watch::saver(daemon.clone()));
+    tokio::spawn(announce::announce_streams(connection.clone(), daemon.clone()));
+    tokio::spawn(playback::run(daemon.clone()));
+    tokio::spawn(picks::run(daemon.clone()));
+    tokio::spawn(crate::shortcuts::serve(connection.clone(), daemon.clone()));
+    tokio::spawn(crate::browse::shortcuts::serve(connection.clone(), daemon.clone()));
+    crate::duck::follow(&daemon);
+    crate::rgb::follow(&daemon);
+    tokio::spawn(crate::choice::follow(daemon.clone(), known));
+    if cfg!(debug_assertions) && std::env::var_os("REIWAND_RENDER_STOP").is_some() {
+        let (daemon, mut stop) = (daemon.clone(), signal(SignalKind::user_defined2())?);
+        tokio::spawn(async move { stop.recv().await.map(|()| daemon.compositor.stop()) });
+    }
+    let mut terminate = signal(SignalKind::terminate())?;
+    tokio::select! {
+        _ = tokio::signal::ctrl_c() => {}
+        _ = terminate.recv() => {}
+        _ = crate::restart::asked() => {}
+    }
+    tracing::info!("shutting down");
+    hurry(Duration::from_secs(6));
+    tokio::time::timeout(Duration::from_secs(1), connection.release_name(dbus::BUS_NAME)).await.ok();
+    tokio::task::spawn_blocking(crate::rgb::stop).await.ok();
+    reiwand_scene::end_trials();
+    inputs::stop(&connection).await;
+    reiwand_render::finish_builds(0);
+    if crate::restart::wanted() {
+        connection.release_name(dbus::BUS_NAME).await.ok();
+        crate::restart::again();
+    }
+    Ok(())
+}

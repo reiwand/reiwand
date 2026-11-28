@@ -1,0 +1,47 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": "en",
+  "description": "A valley turning from day to night: a gradient wipe, a drifting texture, a lantern that shows the day, an owl whose eyes look around, a title that burns away and mist that blurs what it covers.",
+  "entry": "scene.json",
+  "id": "org.example.effects-reveal",
+  "inputs": [
+    "pointer"
+  ],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "photosensitive": false,
+  "platforms": [],
+  "presets": [],
+  "properties": {},
+  "requires": {
+    "engine": null,
+    "features": [
+      "effect.blend_gradient",
+      "effect.blend_texture",
+      "effect.reveal",
+      "effect_masks",
+      "inputs.pointer",
+      "text_styles",
+      "texture_options"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "Reveal effects",
+  "version": "0.1.0"
+}

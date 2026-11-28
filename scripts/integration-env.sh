@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+BIN=$(realpath "${1:?usage: $0 <bin-dir>}")
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+WORK=$(mktemp -d /tmp/reiwand-it.XXXXXX)
+export XDG_RUNTIME_DIR=$WORK/run XDG_CONFIG_HOME=$WORK/config XDG_DATA_HOME=$WORK/data XDG_CACHE_HOME=$WORK/cache XDG_STATE_HOME=$WORK/state
+mkdir -p "$XDG_RUNTIME_DIR" "$XDG_CONFIG_HOME"
+chmod 700 "$XDG_RUNTIME_DIR"
+unset LANGUAGE LC_MESSAGES
+export LANG=C.UTF-8 LC_ALL=C.UTF-8
+
+pids=()
+ended() {
+  for _ in $(seq 100); do kill -0 "$1" 2>/dev/null || return 0; sleep 0.1; done
+  kill -KILL "$1" 2>/dev/null || true
+}
+cleanup() {
+  for p in "${pids[@]}"; do kill -CONT "$p" 2>/dev/null || true; kill "$p" 2>/dev/null || true; done
+  for p in "${pids[@]}"; do ended "$p"; wait "$p" 2>/dev/null || true; done
+  if [ -n "${DBUS_SESSION_BUS_PID:-}" ] && kill "$DBUS_SESSION_BUS_PID" 2>/dev/null; then ended "$DBUS_SESSION_BUS_PID"; fi
+  if [ "${status:-1}" != 0 ]; then
+    for f in "$WORK"/*.log; do echo "== $f"; tail -n 40 "$f"; done
+  fi
+  discard "$WORK"
+}
+trap cleanup EXIT
+set -E
+trap 'echo "FAIL: $(basename "${BASH_SOURCE[0]}") line $LINENO: $BASH_COMMAND"' ERR
+
+wait_for() {
+  local seconds=$1; shift
+  for _ in $(seq $((seconds * 10))); do "$@" >/dev/null 2>&1 && return 0; sleep 0.1; done
+  return 1
+}
+
+ctl() { "$BIN/reiwand-ctl" "$@"; }
+field() { ctl state | python3 -c "import json, sys; s = json.load(sys.stdin); print(eval(sys.argv[1]))" "$1"; }
+expect() {
+  local ends=$((SECONDS + 30))
+  while [ "$SECONDS" -lt "$ends" ]; do [ "$(field "$1")" = "$2" ] && return; sleep 0.1; done
+  echo "FAIL: $1 is $(field "$1"), expected $2" && exit 1
+}
+fail() { echo "FAIL: $*"; exit 1; }
+source "$(dirname "${BASH_SOURCE[0]}")"/integration-complete.sh
+
+scene_doc() {
+  python3 -c 'import json, sys
+read = lambda name: json.load(open(sys.argv[1] + "/" + name))
+manifest = read("manifest.json")
+doc = {"manifest": manifest}
+if manifest.get("kind", "scene") in ("scene", "assets"):
+    doc["scene"] = read(manifest.get("entry", "scene.json"))
+for key in (sys.argv[2:] or [""])[0].split("/")[1:]:
+    key = key.replace("~1", "/").replace("~0", "~")
+    doc = doc[int(key)] if isinstance(doc, list) else doc[key]
+print(json.dumps(doc, indent=2, ensure_ascii=False))' "$@" 2>/dev/null
+}
+source "$(dirname "${BASH_SOURCE[0]}")"/integration-daemon.sh
+
+bus_conf() {
+  printf '<busconfig><type>session</type><listen>unix:dir=%s</listen><auth>EXTERNAL</auth><policy context="default">
+    <allow send_destination="*" eavesdrop="true"/><allow eavesdrop="true"/><allow own="*"/></policy></busconfig>' "$WORK" >"$1"
+}
+bus_conf "$WORK/session.conf"
+{ read -r DBUS_SESSION_BUS_ADDRESS; read -r DBUS_SESSION_BUS_PID; } < <(dbus-daemon --config-file="$WORK/session.conf" --fork --print-address=1 --print-pid=1)
+export DBUS_SESSION_BUS_ADDRESS DBUS_SESSION_BUS_PID
+export REIWAND_PRIVATE_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS
+pipewire >"$WORK/pipewire.log" 2>&1 & pids+=($!)
+wait_for 10 test -S "$XDG_RUNTIME_DIR/pipewire-0"
+wireplumber >"$WORK/wireplumber.log" 2>&1 & pids+=($!)
+bridge=
+if command -v pipewire-pulse >/dev/null; then
+  pipewire-pulse >"$WORK/pipewire-pulse.log" 2>&1 & bridge=$!; pids+=("$bridge")
+  wait_for 10 test -S "$XDG_RUNTIME_DIR/pulse/native"
+fi
+export REIWAND_PREVIEW_APP=$WORK/preview-window REIWAND_BROWSE_IDLE_MS=8000
+printf '#!/usr/bin/env bash\necho "$*" >>%q\n[ -e %q ] || exit 0\nexec env QT_QPA_PLATFORM=offscreen %q "$@"\n' \
+  "$WORK/preview-opened" "$WORK/preview-real" "$BIN/reiwand-app" >"$REIWAND_PREVIEW_APP"
+chmod +x "$REIWAND_PREVIEW_APP"
+log=${REIWAND_IT_LOG:-debug},naga=warn,wgpu_core=warn,wgpu_hal=warn
+export ROOT log

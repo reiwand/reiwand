@@ -1,0 +1,108 @@
+use super::item::{Fx, Rect, channel, rows, scale_of};
+use super::paint::Painter;
+use super::pipes::{Mode, Shader};
+use super::{Fill, Op, Src};
+use reiwand_scene::{Affine, Descriptor, EffectDraw};
+
+impl Painter<'_, '_, '_> {
+    pub(crate) fn pass(
+        &mut self,
+        shader: Shader,
+        rect: Rect,
+        out: Option<Src>,
+        scale: f32,
+        tex: [Src; 7],
+        fx: Fx,
+    ) -> Src {
+        let Some((target, slot)) = self.place(rect, out, scale, tex[0], fx) else { return tex[0] };
+        let mut all = [Src::Clear; 11];
+        all[..7].copy_from_slice(&tex);
+        let (more, mode, load, vertices, tex) = (None, Mode::Replace, false, 3, self.set(all));
+        self.ops.push(Op::Effect(Fill {
+            target,
+            shader,
+            slot,
+            tex,
+            more,
+            mode,
+            load,
+            vertices,
+            scissor: None,
+        }));
+        target
+    }
+
+    pub(crate) fn set(&mut self, tex: [Src; 11]) -> u32 {
+        self.sets.push(tex);
+        self.sets.len() as u32 - 1
+    }
+
+    pub(crate) fn bare(&mut self, entry: &'static str, rect: Rect, tex: [Src; 7], fx: Fx) -> Src {
+        let lease = Some(&mut *self.lease);
+        let plain = self.r.pipes().chain(&self.r.device, std::iter::empty::<&Descriptor>(), lease);
+        self.pass(Shader::Fx(plain, entry), rect, None, 1.0, tex, fx)
+    }
+
+    pub(crate) fn place(
+        &mut self,
+        rect: Rect,
+        out: Option<Src>,
+        scale: f32,
+        first: Src,
+        fx: Fx,
+    ) -> Option<(Src, u32)> {
+        let scale = scale * self.density;
+        let side = |v: f32| ((v * scale - 1e-3).ceil().max(1.0)) as u32;
+        let size = (side(rect.w), side(rect.h));
+        let out = out.or_else(|| self.acquire(size))?;
+        let mut fx = self.placed(rect, self.size_of(first), fx);
+        if let Some((_, _, view)) = self.virt.filter(|v| v.0 == first) {
+            fx.view = view;
+        }
+        Some((out, self.pool.push(&fx)))
+    }
+
+    pub(crate) fn placed(&self, rect: Rect, (w, h): (u32, u32), fx: Fx) -> Fx {
+        let px = scale_of(self.screen) * w as f32 / rect.w.max(1.0);
+        let f = self.full;
+        let (x0, y0) = (((f.x - rect.x) / rect.w).max(0.0), ((f.y - rect.y) / rect.h).max(0.0));
+        let (x1, y1) = (((f.x + f.w - rect.x) / rect.w).min(1.0), ((f.y + f.h - rect.y) / rect.h).min(1.0));
+        Fx {
+            texel: [1.0 / w as f32, 1.0 / h as f32, w as f32, h as f32],
+            info: [fx.info[0], fx.info[1], fx.info[2], px],
+            area: [rect.x, rect.y, rect.w, rect.h],
+            clip: [x0, y0, x1.max(x0), y1.max(y0)],
+            ..fx
+        }
+    }
+
+    pub(crate) fn base(&mut self, e: &EffectDraw<'_>, layer_uv: Affine) -> (Fx, Src) {
+        let mask = e.mask_texture.as_deref().and_then(|id| self.picture(id));
+        let crop = mask.map_or([1.0; 2], |image| image.crop);
+        let mask = mask.map_or(Src::White, |image| self.ext(image));
+        let mut fx = uniforms(e, layer_uv);
+        fx.mask_m0[..3].iter_mut().for_each(|v| *v *= crop[0]);
+        fx.mask_m1[..3].iter_mut().for_each(|v| *v *= crop[1]);
+        (fx, mask)
+    }
+}
+
+pub(crate) fn uniforms(e: &EffectDraw<'_>, layer_uv: Affine) -> Fx {
+    let (mut mask_m0, mask_m1) = rows(layer_uv);
+    mask_m0[3] = 1.0 - e.mask_strength;
+    let mut slots = [[0.0; 4]; reiwand_scene::FX_SLOTS];
+    slots[..e.slots.len()].copy_from_slice(&e.slots);
+    Fx {
+        slots,
+        texel: [0.0; 4],
+        channel: e.mask.map_or([0.0, 0.0, 0.0, 1.0], |m| channel(m.channel)),
+        mask_m0,
+        mask_m1,
+        info: [f32::from(u8::from(e.mask.is_some_and(|m| m.invert))), 0.0, 0.0, 0.0],
+        area: [0.0; 4],
+        clip: [0.0, 0.0, 1.0, 1.0],
+        velocity: [e.velocity[0], e.velocity[1], 0.0, 0.0],
+        crop: [[0.0; 4]; 2],
+        view: [[0.0; 4]; 3],
+    }
+}

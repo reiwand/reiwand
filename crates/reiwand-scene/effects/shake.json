@@ -1,0 +1,48 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": "motion",
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": {
+    "en": "Shakes the picture along a direction or a painted flow map, by noise or a periodic push.",
+    "es": "Sacude la imagen en una dirección o según un mapa de flujo pintado, con ruido o un empuje periódico."
+  },
+  "fuse": "uv",
+  "id": "shake",
+  "lighter": null,
+  "mask_mode": "strength",
+  "min_fps": null,
+  "name": {
+    "en": "Shake"
+  },
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "strength", "type": "float", "channels": null, "help": {}, "label": {}, "max": 256, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": "time", "values": [], "waits_for": null, "yields_to": null},
+    {"id": "speed", "type": "float", "channels": null, "help": {}, "label": {}, "max": 60, "min": 0, "paint": null, "prefill": 2, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "direction", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 1, "min": -1, "paint": null, "prefill": [1, 1], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "noise", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "friction", "type": "float", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "bounds", "type": "vec2", "channels": null, "help": {}, "label": {}, "max": 1, "min": 0, "paint": null, "prefill": [1, 1], "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "phase", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": "", "tool": "gray", "tools": ["gray"], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "flow", "type": "texture", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": "#808000", "prefill": "", "tool": "flow", "tools": ["flow"], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "motion", "type": "enum", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [{"label": {"en": "Noise", "es": "Ruido"}, "value": 0}, {"label": {"en": "Periodic push", "es": "Empuje periódico"}, "value": 1}], "waits_for": null, "yields_to": null},
+    {"id": "side", "type": "enum", "channels": null, "help": {}, "label": {}, "max": null, "min": null, "paint": null, "prefill": 0, "tool": null, "tools": [], "unit": null, "uses": null, "values": [{"label": {"en": "Both ways", "es": "A los dos lados"}, "value": 0}, {"label": {"en": "Forward", "es": "Hacia adelante"}, "value": 1}, {"label": {"en": "Backward", "es": "Hacia atrás"}, "value": 2}], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [
+    {"blend": null, "copy": null, "entry": "fs_shake", "grid": null, "inputs": ["previous", "asset:phase", "asset:flow"], "output": "next", "scale": 1, "swap": null, "target": null, "vertex": null}
+  ],
+  "quality": {},
+  "reach": "strength",
+  "solve": null,
+  "stage": "layer",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
+}

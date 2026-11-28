@@ -1,0 +1,143 @@
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC2
+import org.kde.kirigami as Kirigami
+import io.github.reiwand.app
+
+Kirigami.Page {
+    id: page
+
+    required property string folder
+    property string starter
+    property string heading
+    property string source
+    property alias editor: editor
+    property alias builder: builder
+    property alias use: use
+    property alias docks: area
+    property alias layout: area.layout
+    property alias status: status
+    // The same top bar as a scene: menus as words, the layouts and the status bar with keys.
+    readonly property bool dense: true
+    property var menus: null
+    property bool alone: false
+    property string spot
+    property string notice
+    property real clock: 0
+    readonly property var view: JSON.parse(editor.view || "{}")
+    readonly property var fields: JSON.parse(editor.fields || "[]")
+    readonly property var manifest: page.view.id === undefined ? ({}) : JSON.parse(editor.value("/manifest") || "{}")
+    readonly property string kind: view.kind ?? ""
+    readonly property bool viewable: ["web", "image", "video"].includes(kind)
+    readonly property var packagePage: page
+    property Component topBar: builder.shown ? null : packageTop
+    property Component packageTop: Component {
+        SceneTop {
+            page: packagePage
+        }
+    }
+
+    function run(action, args, gesture) {
+        const word = action === "add_layer" && args.name === undefined && args.id === undefined ? SceneValues.kinds[args.kind] : undefined;
+        editor.run(action, JSON.stringify(word ? Object.assign({
+            "name": word
+        }, args) : args ?? {}), gesture === true);
+    }
+
+    function change(pointer, value, gesture) {
+        run("set", {
+            "pointer": pointer,
+            "value": value
+        }, gesture);
+    }
+
+    function manifestEdit(what, args, gesture) {
+        const edit = {};
+        edit[what] = args;
+        run("manifest", edit, gesture);
+    }
+
+    function jump(pointer) {
+        editor.select(pointer);
+        spot = pointer;
+    }
+
+    title: builder.shown ? builder.title : view.title ?? ""
+    padding: 0
+    actions: builder.shown ? builder.actions : []
+    Component.onCompleted: {
+        if (starter) {
+            editor.create(folder, starter, heading);
+            const media = App.takeMedia();
+            if (media)
+                manifestEdit("media", {
+                    "file": media
+                });
+        } else
+            editor.open(folder, source);
+        editor.select("/manifest");
+        if (App.checking)
+            Qt.createComponent("PackageCheck.qml").createObject(page, {
+                "page": page
+            }).exercise();
+    }
+
+    SceneEditor {
+        id: editor
+
+        onFinished: message => use.placing ? use.placed(message) : page.notice = message
+    }
+
+    SceneUse {
+        id: use
+
+        page: page
+    }
+
+    Timer {
+        interval: 30000
+        running: editor.ready
+        repeat: true
+        onTriggered: editor.autosave()
+    }
+
+    header: SceneNotes {
+        page: page
+    }
+
+    Keys.onPressed: event => {
+        alone = event.key === Qt.Key_Alt && (event.modifiers & ~Qt.AltModifier) === 0;
+        if (menus)
+            menus.cued = alone;
+    }
+    Keys.onReleased: event => {
+        if (event.key === Qt.Key_Alt && alone && menus)
+            menus.enter();
+        else if (menus && !menus.popup.opened)
+            menus.cued = false;
+        alone = false;
+    }
+
+    PackageDocks {
+        id: area
+
+        width: parent.width
+        height: parent.height - status.height
+        enabled: editor.ready
+        page: page
+    }
+
+    SceneStatus {
+        id: status
+
+        y: area.height
+        width: parent.width
+        page: page
+    }
+
+    Publish {
+        id: builder
+
+        page: page
+    }
+}

@@ -1,0 +1,133 @@
+use crate::ops::{Op, diff, escape, set};
+use crate::props::{clash, path, valid};
+use crate::settings::{condition as problem, parse};
+use anyhow::{Result, bail, ensure};
+use reiwand_core::message::said;
+use reiwand_scene::Condition;
+use serde_json::Value;
+use std::path::Path;
+
+pub fn rename_property(doc: &Value, id: &str, to: &str) -> Result<Vec<Op>> {
+    ensure!(
+        doc.pointer(&path(id)).is_some(),
+        said("editor.there_no_property", "there is no property \"%1\"", &[&id])
+    );
+    valid(to)?;
+    ensure!(!clash(doc, to, id), said("editor.id_use_2", "the id %1 is in use", &[&to]));
+    let renames = reiwand_format::Renames::from([(id.to_owned(), to.to_owned())]);
+    let (mut manifest, mut scene) = (doc["manifest"].clone(), doc["scene"].clone());
+    reiwand_format::rename_json(&mut manifest, Some(&mut scene), &renames);
+    let mut ops = diff(&doc["manifest"], &manifest, "/manifest");
+    ops.extend(diff(&doc["scene"], &scene, "/scene"));
+    Ok(ops)
+}
+
+pub fn remove_property(doc: &Value, id: &str) -> Result<Vec<Op>> {
+    ensure!(
+        doc.pointer(&path(id)).is_some(),
+        said("editor.there_no_property", "there is no property \"%1\"", &[&id])
+    );
+    let users = users(doc, id);
+    ensure!(
+        users.is_empty(),
+        said(
+            "editor.still_named_change",
+            "%1 is still named by %2; change them first",
+            &[&id, &(users.join(", "))]
+        )
+    );
+    let mut manifest = doc["manifest"].clone();
+    let props = manifest["properties"].as_object_mut().into_iter().flat_map(|all| {
+        all.remove(id);
+        all.values_mut().filter_map(Value::as_object_mut)
+    });
+    for prop in props {
+        if prop.get("group").is_some_and(|g| g == id) {
+            prop.insert("group".into(), Value::Null);
+        }
+        for key in ["visible_if", "enabled_if"] {
+            if let Some(Value::Object(map)) = prop.get_mut(key) {
+                map.remove(id);
+                if map.is_empty() {
+                    prop.insert(key.into(), Value::Object(Default::default()));
+                }
+            }
+        }
+    }
+    let presets = manifest.get_mut("presets").and_then(Value::as_array_mut).into_iter().flatten();
+    for values in presets.filter_map(|p| p.get_mut("values").and_then(Value::as_object_mut)) {
+        values.remove(id);
+    }
+    Ok(diff(&doc["manifest"], &manifest, "/manifest"))
+}
+
+fn users(doc: &Value, id: &str) -> Vec<String> {
+    let all = doc["manifest"]["properties"].as_object().into_iter().flatten();
+    let mut out: Vec<String> = all
+        .filter(|(other, _)| *other != id)
+        .flat_map(|(other, p)| ["visible_if", "enabled_if"].map(move |key| (other, key, &p[key])))
+        .filter(|(_, _, c)| {
+            c.as_str().is_some_and(|t| Condition::Expr(t.into()).ids().iter().any(|n| n == id))
+        })
+        .map(|(other, key, _)| format!("{}/{key}", path(other)))
+        .collect();
+    bound(&doc["scene"], "/scene", id, &mut out);
+    if doc["manifest"]["display"]["accent"]["prop"] == id {
+        out.push("/manifest/display/accent".into());
+    }
+    out
+}
+
+fn bound(value: &Value, pointer: &str, id: &str, out: &mut Vec<String>) {
+    let trigger = format!("prop:{id}");
+    match value {
+        Value::Object(map) if map.get("prop").is_some_and(|p| p == id) => out.push(pointer.into()),
+        Value::Object(map) => map.iter().for_each(|(key, v)| {
+            let here = format!("{pointer}/{}", escape(key));
+            match key == "trigger" && v.as_str() == Some(&trigger) {
+                true => out.push(here),
+                false => bound(v, &here, id, out),
+            }
+        }),
+        Value::Array(list) => {
+            list.iter().enumerate().for_each(|(i, v)| bound(v, &format!("{pointer}/{i}"), id, out))
+        }
+        _ => {}
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
+pub struct ScriptUse {
+    pub path: String,
+    pub line: usize,
+}
+
+pub fn script_uses(dir: &Path, doc: &Value, id: &str) -> Vec<ScriptUse> {
+    let quoted = ['"', '\'', '`'].map(|q| format!("{q}{id}{q}"));
+    let list = doc["scene"]["scripts"].as_array().into_iter().flatten().filter_map(|s| s["path"].as_str());
+    let mut found = Vec::new();
+    for path in list.filter(|p| reiwand_format::check_path(p).is_ok()) {
+        let Ok(text) = std::fs::read_to_string(dir.join(path)) else { continue };
+        let lines = text.lines().enumerate();
+        let named = lines.filter(|(_, l)| quoted.iter().any(|q| l.contains(q.as_str())));
+        found.extend(named.map(|(i, _)| ScriptUse { path: path.to_owned(), line: i + 1 }));
+    }
+    found
+}
+
+pub fn scripts(dir: &Path, doc: &Value, id: &str) -> Vec<String> {
+    script_uses(dir, doc, id).into_iter().map(|u| format!("{}:{}", u.path, u.line)).collect()
+}
+
+pub fn condition(doc: &Value, id: &str, enabled: bool, text: &str) -> Result<Vec<Op>> {
+    ensure!(
+        doc.pointer(&path(id)).is_some(),
+        said("editor.there_no_property", "there is no property \"%1\"", &[&id])
+    );
+    let key = if enabled { "enabled_if" } else { "visible_if" };
+    let pointer = format!("{}/{key}", path(id));
+    if let Some(reason) = problem(doc, &pointer, text) {
+        bail!(said("editor.text_2", "%1: %2 %3", &[&id, &key, &reason]));
+    }
+    Ok(set(doc, &pointer, serde_json::to_value(parse(text))?))
+}

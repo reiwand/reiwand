@@ -1,0 +1,41 @@
+package io.github.reiwand
+
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+
+@Composable
+fun LamaNote(main: Main, wanted: Boolean, changes: Int) {
+    var consent by remember { mutableStateOf<JSONObject?>(null) }
+    val lama by loaded(JSONObject(), changes, Depth.working.value) { depth("lama") as JSONObject }
+    val busy = Depth.working.value != null
+    val off = stringResource(R.string.downloads_off)
+    if (lama.optBoolean("installed")) {
+        Setting(stringResource(R.string.lama_model, lama.optString("size")), trailing = {
+            WordAction({ main.act { withContext(Dispatchers.IO) { depth("forget_lama") } } }, enabled = !busy) {
+                Text(stringResource(R.string.delete_model))
+            }
+        })
+    } else if (wanted && lama.has("files")) {
+        Note(stringResource(R.string.lama_missing), MaterialTheme.colorScheme.error)
+        WordAction({ if (lama.optBoolean("allowed")) consent = lama else main.toast(off) }, enabled = !busy) {
+            Text(stringResource(R.string.download_lama))
+        }
+    }
+    consent?.let { model ->
+        val terms = listOf("title", "size", "hosts", "license", "license_url").map(model::getString)
+        val close = { consent = null }
+        Question(stringResource(R.string.download_lama), stringResource(R.string.lama_terms, *terms.toTypedArray()), stringResource(R.string.download), stringResource(R.string.cancel), false, close) {
+            close()
+            Depth.fetchLama()
+        }
+    }
+}

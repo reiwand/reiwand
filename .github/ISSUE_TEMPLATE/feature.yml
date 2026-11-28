@@ -1,0 +1,19 @@
+name: An idea
+description: Something you cannot do today and would like to.
+labels: [idea]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What you want to do
+      description: The situation and what stops you today, before any solution.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: How it could work
+      description: Optional. What you picture, in your own words.
+  - type: markdown
+    attributes:
+      value: The principles every change follows are in [docs/guidelines.md](https://github.com/reiwand/reiwand/blob/master/docs/guidelines.md).

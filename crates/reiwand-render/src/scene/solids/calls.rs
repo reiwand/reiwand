@@ -1,0 +1,167 @@
+use super::pipes::Key;
+use super::uniform::DrawSlots;
+use super::{BONES_SLOT, FINISH_SLOT, SLOT, Staged};
+use reiwand_scene::{Frame, Stage3d};
+
+#[derive(Clone, Copy)]
+pub(crate) struct Call {
+    pub(super) model: u64,
+    pub(super) first: u32,
+    pub(super) count: u32,
+    pub(super) maps: usize,
+    pub(super) pictures: u64,
+    pub(super) object: u32,
+    pub(super) finish: u32,
+    pub(super) bones: u32,
+    pub(super) draw: u32,
+    pub(super) shells: u32,
+    pub(super) cast_shells: u32,
+    pub(super) cast: bool,
+    pub(super) faded: bool,
+    pub(super) key: Key,
+    pub(super) far: f32,
+}
+
+pub(super) fn sized(size: [f32; 2], scale: f32, frame: &Frame, edge: u32) -> (u32, u32) {
+    let k = scale * frame.quality.render_scale();
+    let [w, h] = size.map(|v| ((v * k).round() as u32).clamp(1, edge));
+    (w, h)
+}
+
+pub(super) fn put<T: bytemuck::Pod>(bytes: &mut Vec<u8>, at: u64, value: &T) {
+    put_bytes(bytes, at, bytemuck::bytes_of(value));
+}
+
+pub(super) fn put_bytes(bytes: &mut Vec<u8>, at: u64, raw: &[u8]) {
+    let at = at as usize;
+    if bytes.len() < at + raw.len() {
+        bytes.resize(at + raw.len(), 0);
+    }
+    bytes[at..at + raw.len()].copy_from_slice(raw);
+}
+
+pub(super) fn rooms(frame: &Frame, stage: &Stage3d) -> (usize, usize, usize) {
+    let placed = &frame.placed[stage.models.clone()];
+    let finishes: usize = placed.iter().map(|p| p.model.materials.len() + 1).sum();
+    let draws: usize =
+        placed.iter().filter(|p| !p.model.morphs.is_empty()).map(|p| p.model.primitives.len()).sum();
+    let bones = placed.iter().filter(|p| p.model.posed()).count();
+    (finishes, draws + 1, bones)
+}
+
+pub(super) fn plan(s: &mut Staged, frame: &Frame, stage: &Stage3d, debug: &reiwand_scene::Drafted) {
+    let (mut calls, mut objects, mut finishes) = (
+        std::mem::take(&mut s.calls),
+        std::mem::take(&mut s.objects_bytes),
+        std::mem::take(&mut s.finish_bytes),
+    );
+    let (mut bones, mut draws) = (std::mem::take(&mut s.bone_bytes), std::mem::take(&mut s.draw_bytes));
+    calls.clear();
+    objects.clear();
+    finishes.clear();
+    bones.clear();
+    draws.clear();
+    put(&mut draws, 0, &DrawSlots::default());
+    let (mut slot, mut posed, mut drawn) = (0u32, 0u32, 1u32);
+    let primed = frame.quality != reiwand_scene::Quality::Q0;
+    let tall = frame.quality >= reiwand_scene::Quality::Q2;
+    for (o, p) in frame.placed[stage.models.clone()].iter().enumerate() {
+        let first = calls.len();
+        let (object, flipped) = super::looks::object(p);
+        put(&mut objects, o as u64 * SLOT, &object);
+        let skinned = p.model.posed();
+        let bone = if skinned { posed } else { 0 };
+        if skinned {
+            let palette = p.pose.map_or(&p.model.rest[..], |q| &q.palette[..]);
+            let flat: &[f32] = bytemuck::cast_slice(palette);
+            put_bytes(
+                &mut bones,
+                u64::from(posed) * BONES_SLOT,
+                bytemuck::cast_slice(&flat[..flat.len().min(768 * 4)]),
+            );
+            posed += 1;
+        }
+        let looks = &frame.looks[p.looks.clone()];
+        let far = stage.eye.depth([p.matrix[12], p.matrix[13], p.matrix[14]]);
+        let defaults = reiwand_scene::Finish::default();
+        for (m, f) in p.model.materials.iter().chain([&defaults]).enumerate() {
+            let look = looks.iter().find(|l| usize::from(l.material) == m);
+            let opacity = if stage.layer == p.layer.id { 1.0 } else { p.opacity };
+            let shape = (opacity, flipped, p.model.radius(), super::looks::grow(p));
+            let (mut uniform, key, shells) = super::looks::finish(f, look, shape, (s.hdr, skinned));
+            uniform.more[3] = f32::from(debug.debug_of(&p.layer.id, &f.name));
+            put(&mut finishes, u64::from(slot + m as u32) * FINISH_SLOT, &uniform);
+            let cast = look.and_then(|l| l.cast).unwrap_or(true) && key.blend == 0;
+            let faded = uniform.flags[3] > 0.5 && opacity < 1.0;
+            let mine =
+                |q: &&reiwand_scene::Primitive| q.material.map_or(p.model.materials.len(), usize::from) == m;
+            for prim in p.model.primitives.iter().filter(mine) {
+                let weights = p.pose.and_then(|q| q.morphs.get(usize::from(prim.piece)));
+                let draw = match weights.filter(|w| w.iter().any(|(_, x)| *x != 0.0)) {
+                    Some(w) => {
+                        let mut d = DrawSlots {
+                            first: [prim.base as f32, 1.0, prim.stride as f32, 0.0],
+                            ..Default::default()
+                        };
+                        for (k, (b, x)) in w.iter().enumerate() {
+                            d.slots[k / 2][(k % 2) * 2] = *b as f32;
+                            d.slots[k / 2][(k % 2) * 2 + 1] = *x;
+                        }
+                        put(&mut draws, u64::from(drawn) * SLOT, &d);
+                        drawn += 1;
+                        drawn - 1
+                    }
+                    None => 0,
+                };
+                let (first, count, maps, object, finish) =
+                    (prim.first, prim.count, m, o as u32, slot + m as u32);
+                calls.push(Call {
+                    model: super::dress::drawn(p),
+                    first,
+                    count,
+                    maps,
+                    pictures: super::pictures::key(look),
+                    object,
+                    finish,
+                    bones: bone,
+                    draw,
+                    shells,
+                    cast_shells: if tall && shells > 1 { 2 } else { 1 },
+                    cast,
+                    faded,
+                    key,
+                    far,
+                });
+            }
+        }
+        slot += p.model.materials.len() as u32 + 1;
+        if primed && stage.layer != p.layer.id && p.opacity < 1.0 {
+            prime(&mut calls, first);
+        }
+    }
+    calls.sort_by(|a, b| {
+        (a.key.blend > 0).cmp(&(b.key.blend > 0)).then(match a.key.blend > 0 {
+            true => b.far.total_cmp(&a.far),
+            false => std::cmp::Ordering::Equal,
+        })
+    });
+    (s.calls, s.objects_bytes, s.finish_bytes, s.bone_bytes, s.draw_bytes) =
+        (calls, objects, finishes, bones, draws);
+}
+
+fn prime(calls: &mut Vec<Call>, first: usize) {
+    let faded = |c: &Call| c.key.blend == 1 && !c.key.write && c.faded;
+    let start = calls.len();
+    calls.extend_from_within(first..);
+    let mut kept = start;
+    for k in start..calls.len() {
+        if faded(&calls[k]) {
+            calls[kept] = calls[k];
+            calls[kept].key = Key { prime: true, write: true, ..calls[kept].key };
+            calls[kept].cast = false;
+            kept += 1;
+        }
+    }
+    calls.truncate(kept);
+    calls[first..].rotate_right(kept - start);
+}

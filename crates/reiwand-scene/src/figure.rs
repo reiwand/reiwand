@@ -1,0 +1,185 @@
+use crate::Color;
+use crate::rig::Rig;
+use crate::value::{Param, Value, Vec3};
+use reiwand_core::explicit::{block, null};
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
+
+pub const MATERIALS: [&str; 5] = ["pbr", "unlit", "fur", "foliage", "chroma"];
+pub const MAX_FIGURES: usize = 16;
+pub const MAX_SHADOWS: usize = 2;
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct MeshLayer {
+    #[schemars(extend("x-ref" = "model"))]
+    pub mesh: String,
+    #[schemars(extend("x-ref" = "image"))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub texture: Option<Value<String>>,
+    #[schemars(extend("x-unit" = "px"))]
+    pub size: crate::Ctx<[f32; 2], { crate::CANVAS }>,
+    pub color: Value<Color>,
+    #[schemars(extend("x-ref" = "part"))]
+    pub parts: BTreeMap<String, MeshPart>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub depth: Option<MeshDepth>,
+    #[serde(flatten)]
+    pub rig: Rig,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct MeshPart {
+    #[schemars(extend("x-range" = [-1000, 1000]))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub order: Option<Value<f32>>,
+    #[schemars(extend("x-ref" = "part"))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub clip_to: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub visible: Option<Value<bool>>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct MeshDepth {
+    #[schemars(extend("x-range" = [0, 10]))]
+    pub scale: f32,
+    pub cull: bool,
+    pub sort: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ModelLayer {
+    #[schemars(extend("x-ref" = "model"))]
+    pub model: String,
+    #[schemars(extend("x-unit" = "px"))]
+    pub size: crate::Ctx<[f32; 2], { crate::CANVAS }>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub position: Option<Value<Vec3>>,
+    #[schemars(extend("x-unit" = "°"))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub rotation: Option<Value<Vec3>>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub scale: Option<Value<Vec3>>,
+    pub materials: BTreeMap<String, Material>,
+    pub root_motion: bool,
+    #[schemars(extend("x-ref" = "image"))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub env: Option<String>,
+    #[serde(flatten)]
+    pub rig: Rig,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum Cull {
+    Back,
+    Front,
+    None,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum Coverage {
+    Opaque,
+    Mask,
+    Blend,
+    Add,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct Material {
+    #[schemars(extend("x-ref" = "material"))]
+    pub shader: String,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub color: Option<Value<Color>>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub emissive: Option<Value<Color>>,
+    #[serde(deserialize_with = "null")]
+    #[schemars(required, extend("x-null" = true))]
+    pub lit: Option<bool>,
+    #[serde(deserialize_with = "null")]
+    #[schemars(required, extend("x-null" = true))]
+    pub double_sided: Option<bool>,
+    #[serde(deserialize_with = "null")]
+    #[schemars(required, extend("x-null" = true))]
+    pub cast_shadows: Option<bool>,
+    #[serde(deserialize_with = "null")]
+    #[schemars(required, extend("x-null" = true))]
+    pub receive_shadows: Option<bool>,
+    #[serde(deserialize_with = "null")]
+    #[schemars(required, extend("x-null" = true))]
+    pub cull: Option<Cull>,
+    #[serde(deserialize_with = "null")]
+    #[schemars(required, extend("x-null" = true))]
+    pub depth_test: Option<bool>,
+    #[serde(deserialize_with = "null")]
+    #[schemars(required, extend("x-null" = true))]
+    pub depth_write: Option<bool>,
+    #[serde(deserialize_with = "null")]
+    #[schemars(required, extend("x-null" = true))]
+    pub blend: Option<Coverage>,
+    pub maps: crate::finish_maps::MaterialMaps,
+    pub params: BTreeMap<String, Value<Param>>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
+pub enum Space {
+    #[default]
+    #[serde(rename = "2d")]
+    Flat,
+    #[serde(rename = "3d")]
+    Depth,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum Follows {
+    Position,
+    Rotation,
+    Scale,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct Attach {
+    #[schemars(extend("x-ref" = "layer"))]
+    pub layer: String,
+    #[schemars(extend("x-ref" = "bone"))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub bone: Option<String>,
+    #[schemars(extend("x-ref" = "point"))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub point: Option<String>,
+    #[schemars(extend("x-unit" = "px"))]
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub offset: Option<[f32; 2]>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "block")]
+    #[schemars(extend("x-null" = true, "x-block" = true))]
+    pub inherit: Option<Vec<Follows>>,
+}
+
+impl Default for MeshDepth {
+    fn default() -> Self {
+        MeshDepth { scale: 1.0, cull: false, sort: true }
+    }
+}

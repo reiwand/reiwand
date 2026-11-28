@@ -1,0 +1,177 @@
+use super::super::clock::SIM_AT;
+use super::dispatch::Job;
+use super::{Stamp, Swarms};
+use crate::{RenderError, Renderer};
+use reiwand_scene::{Cloud, Content, Draw, Frame, Quality, Runtime, Sim};
+use std::sync::atomic::{AtomicU64, Ordering::Relaxed};
+use std::time::{Duration, Instant};
+
+const CUT_US: u64 = 200_000;
+static LIMIT_US: AtomicU64 = AtomicU64::new(CUT_US);
+
+pub fn set_step_budget(limit: Option<Duration>) {
+    LIMIT_US.store(limit.map_or(u64::MAX, |l| u64::try_from(l.as_micros()).unwrap_or(u64::MAX)), Relaxed);
+}
+
+pub(super) fn cut() -> Duration {
+    Duration::from_micros(LIMIT_US.load(Relaxed))
+}
+
+/// How long the systems catching up after a seek may have run, together, once the one at `turn`
+/// (of `of` that catch up in this frame) is done: each gets an even share of the budget, and what
+/// one leaves goes to the next, so a later system is not left empty by the ones before it.
+pub(super) fn share(cut: Duration, turn: u32, of: u32) -> Duration {
+    if cut >= Duration::from_micros(u64::MAX) { cut } else { cut.saturating_mul(turn + 1) / of.max(1) }
+}
+
+impl Swarms {
+    pub(crate) fn run(
+        &mut self,
+        r: &Renderer,
+        runtime: &Runtime,
+        frame: &Frame<'_>,
+        quality: Quality,
+        (stamp, ahead): (Option<&wgpu::QuerySet>, &mut super::super::pool::Pool),
+    ) -> Result<bool, RenderError> {
+        let start = Instant::now();
+        let heard = |herd: usize, part: usize, e: usize| {
+            runtime.swarm(herd).filter(|s| s.count() > 0).map(|s| s.sim(0, part).emitters[4 * e + 1][0])
+        };
+        self.collect(r, heard);
+        self.stamp = Stamp { set: stamp.cloned(), ..Stamp::default() };
+        (self.steps, self.created, self.quality) = (0, 0, quality);
+        self.looks.clear();
+        self.seen.clear();
+        let mut jobs = Vec::new();
+        self.kitted.clear();
+        let shown_of = |i: usize, d: &Draw| {
+            !d.hidden && matches!(d.content, Content::Particles { flock, .. } if flock == i)
+        };
+        let catching = (0..self.herds.len())
+            .filter(|&i| {
+                runtime.swarm(i).is_some_and(|s| s.count() > 1) && frame.draws.iter().any(|d| shown_of(i, d))
+            })
+            .count() as u32;
+        let mut turn = 0;
+        for i in 0..self.herds.len() {
+            let shown = |d: &Draw| shown_of(i, d);
+            let Some(swarm) = runtime.swarm(i).filter(|_| frame.draws.iter().any(shown)) else { continue };
+            if self.flights[i].is_none() {
+                self.flights[i] = Some(self.flight(r, i));
+                self.created += 1;
+            }
+            let mark = std::mem::replace(&mut self.marks[i], (swarm.stamp, swarm.epoch));
+            let (bake, Some(flight)) = (&self.herds[i].bake, &mut self.flights[i]) else { continue };
+            if mark == (swarm.stamp, swarm.epoch) {
+                continue;
+            }
+            let (reset, parts, count) = (mark.1 != swarm.epoch, bake.allocs.len(), swarm.count());
+            self.steps += count as u32;
+            if !flight.clouds.is_empty() {
+                if reset {
+                    flight.clouds.iter_mut().for_each(Cloud::clear);
+                }
+                flight.sims.resize(parts, Sim::default());
+                // One step is a frame as usual, against the whole budget; more are a catch up
+                // after a seek, which keeps to this system's share.
+                let ends = if count > 1 { share(cut(), turn, catching) } else { cut() };
+                turn += u32::from(count > 1);
+                for j in 0..count {
+                    if start.elapsed() > if j == 0 { cut() } else { ends } {
+                        break;
+                    }
+                    (0..parts).for_each(|p| flight.sims[p] = bake.apply(p, swarm.sim(j, p)));
+                    Cloud::brood(&mut flight.clouds, &flight.sims, &bake.hosts, &bake.points);
+                }
+                for (cloud, (sim, store)) in
+                    flight.clouds.iter_mut().zip(flight.sims.iter().zip(&flight.stores))
+                {
+                    let Some(rope) = &store.rope else { continue };
+                    cloud.strand(sim);
+                    r.queue.write_buffer(rope, super::flight::ROPE_AT, bytemuck::cast_slice(&cloud.rope));
+                }
+                for (store, cloud) in flight.stores.iter().zip(&flight.clouds) {
+                    r.queue.write_buffer(&store.particles, 0, bytemuck::cast_slice(&cloud.particles));
+                    if let Some(trail) = store.trail.as_ref().filter(|_| !cloud.trail.is_empty()) {
+                        r.queue.write_buffer(trail, 20, bytemuck::cast_slice(&cloud.trail));
+                    }
+                }
+                super::sort::stack(r, self.canvas[1], &mut flight.stores, &flight.clouds);
+                continue;
+            }
+            jobs.push(Job { herd: i, count, reset });
+        }
+        self.dispatch(r, runtime, &jobs, start)?;
+        self.stamp.close(r);
+        let stamp = std::mem::take(&mut self.stamp);
+        stamp.done.into_iter().for_each(|done| ahead.defer(done));
+        if self.profile {
+            ahead.send_ahead(&r.queue);
+            r.finish()?;
+        }
+        self.micros = start.elapsed().as_micros().min(u128::from(u32::MAX)) as u32;
+        Ok(stamp.begun)
+    }
+}
+
+impl Stamp {
+    pub(super) fn encoder(&mut self, r: &Renderer) -> &mut wgpu::CommandEncoder {
+        let (set, begun) = (&self.set, &mut self.begun);
+        self.open.get_or_insert_with(|| {
+            let mut encoder = r.device.create_command_encoder(&Default::default());
+            mark(set.as_ref(), begun, &mut encoder, false);
+            encoder
+        })
+    }
+
+    pub(super) fn cut(&mut self) {
+        if let Some(encoder) = self.open.take() {
+            self.done.push(encoder.finish());
+        }
+    }
+
+    pub(super) fn submit(&mut self, r: &Renderer) {
+        self.close(r);
+        r.queue.submit(self.done.drain(..));
+    }
+
+    fn close(&mut self, r: &Renderer) {
+        if self.open.is_none() && self.done.is_empty() {
+            return;
+        }
+        let mut encoder =
+            self.open.take().unwrap_or_else(|| r.device.create_command_encoder(&Default::default()));
+        mark(self.set.as_ref(), &mut self.begun, &mut encoder, true);
+        self.done.push(encoder.finish());
+    }
+}
+
+fn mark(set: Option<&wgpu::QuerySet>, begun: &mut bool, encoder: &mut wgpu::CommandEncoder, end: bool) {
+    let Some(query_set) = set.filter(|_| end || !*begun) else { return };
+    *begun |= !end;
+    let at = Some(SIM_AT + u32::from(end));
+    let (beginning_of_pass_write_index, end_of_pass_write_index) = if end { (None, at) } else { (at, None) };
+    let timestamp_writes = Some(wgpu::ComputePassTimestampWrites {
+        query_set,
+        beginning_of_pass_write_index,
+        end_of_pass_write_index,
+    });
+    drop(encoder.begin_compute_pass(&wgpu::ComputePassDescriptor { label: None, timestamp_writes }));
+}
+
+#[cfg(test)]
+mod tests {
+    use super::share;
+    use std::time::Duration;
+
+    #[test]
+    fn systems_catching_up_share_the_budget_evenly_and_pass_on_what_they_leave() {
+        let cut = Duration::from_millis(200);
+        let ends: Vec<_> = (0..4).map(|turn| share(cut, turn, 4)).collect();
+        assert_eq!(ends, [50, 100, 150, 200].map(Duration::from_millis));
+        assert_eq!(share(cut, 0, 1), cut);
+        assert_eq!(share(cut, 0, 0), cut);
+        let none = Duration::from_micros(u64::MAX);
+        assert_eq!(share(none, 0, 3), none, "no budget stays no budget");
+    }
+}

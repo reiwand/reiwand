@@ -1,0 +1,279 @@
+{
+  "assets": {
+    "ball": {
+      "animated": false,
+      "atlas": [
+        1,
+        4
+      ],
+      "durations": [],
+      "face": null,
+      "filter": "nearest",
+      "fps": 6,
+      "frames": 4,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/ball.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    },
+    "tap": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/hum.wav",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    }
+  },
+  "canvas": {
+    "background": "#10141f",
+    "blend_space": "linear",
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "dance",
+      "image": "ball",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "playback": {
+        "end": "end",
+        "loop": true,
+        "own_clock": false,
+        "playing": true,
+        "rate": 1,
+        "start": 0.0
+      },
+      "size": [
+        256,
+        256
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          700,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#3b82f6",
+      "id": "button",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "rect": {
+          "radius": 70,
+          "size": [
+            360,
+            140
+          ]
+        }
+      },
+      "solid": true,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          1250,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": {
+          "invert": false,
+          "keys": [
+            [
+              0,
+              [
+                1,
+                1
+              ]
+            ],
+            [
+              0.15,
+              [
+                0.9,
+                0.9
+              ],
+              "out_quad"
+            ],
+            [
+              0.4,
+              [
+                1,
+                1
+              ],
+              "out_back"
+            ]
+          ],
+          "timeline": "press"
+        },
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "align": "center",
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "fallback": [],
+      "font": "sans-serif",
+      "id": "label",
+      "inherit": [
+        "transform",
+        "visible"
+      ],
+      "line_height": null,
+      "opacity": 1.0,
+      "padding": 0,
+      "parallax": [
+        0,
+        0
+      ],
+      "parent": "button",
+      "render": "auto",
+      "size": 54,
+      "solid": false,
+      "text": "Tap here",
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "text",
+      "valign": "center",
+      "visible": true,
+      "wrap": null
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fade_in": 0.0,
+      "fade_out": 0.0,
+      "id": "sound",
+      "loop": false,
+      "mode": "sequence",
+      "opacity": 1.0,
+      "pan": 0.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "play": true,
+      "play_on": "event:hit",
+      "solid": false,
+      "sound": "tap",
+      "sounds": [],
+      "stream": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "sound",
+      "visible": true,
+      "volume": 0.6
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": [
+    {
+      "autoplay": false,
+      "delay": 0.0,
+      "duration": 0.4,
+      "events": [
+        {
+          "name": "hit",
+          "t": 0.15
+        }
+      ],
+      "fps": null,
+      "frames": null,
+      "id": "press",
+      "loop": "once",
+      "speed": 1.0,
+      "trigger": "click:button",
+      "wrap": false
+    }
+  ]
+}

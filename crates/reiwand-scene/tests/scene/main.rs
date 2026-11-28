@@ -1,0 +1,21 @@
+use reiwand_scene::*;
+use std::collections::BTreeMap;
+
+mod shaders;
+mod valid;
+
+const SAMPLE: &str = include_str!("../sample.json");
+
+fn props() -> BTreeMap<String, Property> {
+    reiwand_scene::prefill::properties(serde_json::from_str(include_str!("../props.json")).unwrap())
+}
+
+fn sample() -> Scene {
+    Scene::from_json(&reiwand_fill::whole(SAMPLE)).unwrap()
+}
+
+fn issues(edit: impl FnOnce(&mut Scene)) -> Vec<Issue> {
+    let mut scene = sample();
+    edit(&mut scene);
+    scene.validate(&props())
+}

@@ -1,0 +1,130 @@
+use super::*;
+
+fn flowing(more: Json) -> Json {
+    let mut e = json!({ "shape": { "point": [100, 50] }, "rate": 60 });
+    more.as_object().unwrap().iter().for_each(|(k, v)| e[k] = v.clone());
+    still(json!({ "capacity": 2000, "emitters": [e], "init": { "life": [0.1, 0.1], "speed": [0, 0] } }))
+}
+
+#[test]
+fn emitters_wait_stop_and_sleep() {
+    let mut fly = Fly::of(json!({ "a": flowing(json!({ "delay": 1, "duration": 0.5 })) }));
+    let wake = fly.frame(0.0);
+    assert!(matches!(wake, Wake::At(t) if (t - 1.0).abs() < 0.02), "{wake:?}");
+    fly.run(0.9);
+    assert_eq!(fly.births, 0);
+    fly.run(0.3);
+    assert!(fly.births > 0);
+    fly.run(1.0);
+    let (births, wake) = (fly.births, fly.frame(1.0 / 30.0));
+    assert!((25..=35).contains(&births) && wake == Wake::Idle, "{births} {wake:?}");
+}
+
+#[test]
+fn periodic_windows_and_single_births_per_step() {
+    let mut fly =
+        Fly::of(json!({ "a": flowing(json!({ "periodic": { "on": [0.5, 0.5], "off": [0.5, 0.5] } })) }));
+    let mut counts = Vec::new();
+    for _ in 0..4 {
+        let before = fly.births;
+        fly.run(0.5);
+        counts.push(fly.births - before);
+    }
+    assert!(counts[0] > 20 && counts[1] < 3 && counts[2] > 20 && counts[3] < 3, "{counts:?}");
+    let mut one = Fly::of(json!({ "a": flowing(json!({ "rate": 600, "max_per_step": 1 })) }));
+    one.run(1.0);
+    let swarm = one.rt.swarm(0).unwrap();
+    assert!((0..swarm.count()).all(|j| swarm.sim(j, 0).total() <= 1));
+    assert!((55..=65).contains(&one.births), "{}", one.births);
+}
+
+#[test]
+fn gated_emitters_wait_for_sound() {
+    let mut fly = Fly::of(json!({ "a": flowing(json!({ "audio_gate": true })) }));
+    fly.rt.set_audio(AudioFrame { silent: true, ..AudioFrame::default() });
+    fly.run(0.5);
+    assert_eq!(fly.births, 0);
+    fly.rt.set_audio(AudioFrame { silent: false, level: 0.5, ..AudioFrame::default() });
+    fly.run(0.5);
+    assert!(fly.births > 20, "{}", fly.births);
+    assert!(fly.rt.uses().audio);
+}
+
+#[test]
+fn prewarm_runs_in_coarse_steps() {
+    let warm = still(json!({ "prewarm": 30, "emitters": [{ "shape": { "point": [100, 50] }, "rate": 10 }] }));
+    let mut fly = Fly::of(json!({ "a": warm }));
+    fly.frame(0.0);
+    let swarm = fly.rt.swarm(0).unwrap();
+    assert_eq!((swarm.count(), swarm.sim(0, 0).clock[0]), (450, WARM));
+    let big = still(json!({ "capacity": 100000, "prewarm": 30 }));
+    let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "a" }, { "blend_space": "canvas", "id": "q", "type": "particles", "system": "b" }]);
+    let rt = runtime(json!({ "a": big.clone(), "b": big }), layers);
+    rt.frame(VIEW, Quality::Q3);
+    let steps: Vec<usize> = (0..2).map(|i| rt.swarm(i).unwrap().count()).collect();
+    assert_eq!(steps, [150, 150], "the scene shares one warm-up budget");
+}
+
+fn first_frame_at(seek: f64, extra: Json) -> (usize, u32) {
+    let mut fly = Fly::of(json!({ "a": flowing(extra) }));
+    fly.rt.seek(seek);
+    fly.frame(0.0);
+    (fly.rt.swarm(0).unwrap().count(), fly.births)
+}
+
+#[test]
+fn a_seek_simulates_the_scene_time_on_top_of_the_prewarm() {
+    let none = first_frame_at(0.0, json!({}));
+    let (one, three) = (first_frame_at(1.0, json!({})), first_frame_at(3.0, json!({})));
+    assert_eq!(none.0, 1, "no time, no warm-up");
+    assert_eq!((one.0, three.0), (15, 45), "steps of the prewarm length");
+    assert!((55..=65).contains(&one.1) && (175..=185).contains(&three.1), "{one:?} {three:?}");
+    let warm = still(json!({ "prewarm": 1, "emitters": [{ "shape": { "point": [100, 50] }, "rate": 60 }] }));
+    let mut fly = Fly::of(json!({ "a": warm }));
+    fly.rt.seek(2.0);
+    fly.frame(0.0);
+    assert_eq!(fly.rt.swarm(0).unwrap().count(), 45, "prewarm plus time");
+    let far = first_frame_at(100.0, json!({}));
+    assert_eq!(far.0, 450, "capped like the prewarm");
+}
+
+#[test]
+fn a_system_revealed_live_starts_from_its_prewarm_only() {
+    let props: BTreeMap<String, Property> =
+        reiwand_scene::prefill::properties(serde_json::from_str(include_str!("../props.json")).unwrap());
+    let layers = json!([{ "id": "p", "type": "particles", "system": "a", "visible": { "prop": "soft" } }]);
+    let text = json!({ "schema": SCHEMA, "canvas": { "size": [200, 100] }, "layers": layers,
+        "particles": { "a": flowing(json!({})) } });
+    let scene = Scene::load(&reiwand_fill::whole(&text.to_string()), &props).unwrap();
+    let mut values = effective(&props, &[]);
+    values.insert("soft".into(), json!(false));
+    let mut fly = Fly::new(Runtime::new(Arc::new(scene), values.clone()));
+    fly.rt.advance(5.0);
+    fly.rt.frame(VIEW, Quality::Q3);
+    assert!(fly.rt.swarm(0).is_none_or(|s| s.count() == 0), "hidden systems do not run");
+    values.insert("soft".into(), json!(true));
+    fly.rt.set_props(values);
+    fly.rt.frame(VIEW, Quality::Q3);
+    assert_eq!(fly.rt.swarm(0).unwrap().count(), 1, "no warm-up for the time already elapsed");
+}
+
+fn seeked_with_time_scale(scale: f64, seek: f64) -> (usize, u32, usize) {
+    let slow = still(
+        json!({ "emitters": [{ "shape": { "point": [100, 50] }, "rate": 3 }], "init": { "life": [20, 20], "speed": [0, 0], "size": [2, 2] } }),
+    );
+    let tuned = prefill::instance(json!({ "time_scale": scale }));
+    let layers = json!([{ "blend_space": "canvas", "id": "p", "type": "particles", "system": "a", "instance": tuned }]);
+    let mut fly = Fly::new(runtime(json!({ "a": slow }), layers));
+    fly.rt.seek(seek);
+    fly.frame(0.0);
+    (fly.rt.swarm(0).unwrap().count(), fly.births, fly.alive(0).len())
+}
+
+#[test]
+fn a_seek_runs_a_slowed_layer_on_its_own_clock() {
+    let half = seeked_with_time_scale(0.5, 10.0);
+    assert_eq!(half, seeked_with_time_scale(1.0, 5.0), "half the time scale, half the simulated time");
+    assert!((13..=17).contains(&half.2), "{half:?}");
+    let full = seeked_with_time_scale(1.0, 10.0);
+    assert!((28..=32).contains(&full.2), "{full:?}");
+}
