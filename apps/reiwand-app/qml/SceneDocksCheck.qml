@@ -151,6 +151,9 @@ QtObject {
         Qt.createComponent("SceneLeftOutCheck.qml").createObject(page, {
             "page": page
         }).exercise();
+        Qt.createComponent("SceneCanvasWaitCheck.qml").createObject(page, {
+            "page": page
+        }).exercise();
         Qt.createComponent("SceneBenchKeysCheck.qml").createObject(page, {
             "page": page
         }).exercise();

@@ -145,9 +145,10 @@ impl Drop for SceneEditorRust {
             None => {}
         }
         let (output, shown, split) = (self.output.to_string(), self.shown, self.halves.output.clone());
+        let stale = std::mem::take(&mut self.replaced);
         let desk = self.desk.clone();
         let dir = self.project.as_ref().map(|p| p.dir.to_string_lossy().into_owned()).unwrap_or_default();
-        if output.is_empty() && !shown && split.is_empty() {
+        if output.is_empty() && !shown && split.is_empty() && stale.is_empty() {
             return;
         }
         bus::farewell(async move {
@@ -156,7 +157,7 @@ impl Drop for SceneEditorRust {
                     .await
                     .ok();
             }
-            for output in [output, split].into_iter().filter(|o| !o.is_empty()) {
+            for output in [output, split].into_iter().chain(stale).filter(|o| !o.is_empty()) {
                 bus::call("Daemon1", "ReleaseStream", vec![json!(output)]).await.ok();
             }
         });

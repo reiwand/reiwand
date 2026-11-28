@@ -47,14 +47,14 @@ impl SceneEditor {
             return;
         }
         let output = format!("preview:{}-{}", std::process::id(), STREAMS.fetch_add(1, Ordering::Relaxed));
+        // The stream shown goes on until the canvas has the new one, so its consumer never sees its
+        // node taken away while it reads it, and the canvas shows no gap.
         let (old, qt) = (self.output.to_string(), self.qt_thread());
+        self.as_mut().rust_mut().replaced.extend((!old.is_empty()).then_some(old));
         self.as_mut().rust_mut().attached = pixels;
         self.as_mut().set_output(QString::from(&output));
         self.as_mut().pair();
         bus::spawn(async move {
-            if !old.is_empty() {
-                bus::call("Daemon1", "ReleaseStream", vec![json!(old)]).await.ok();
-            }
             let reply =
                 bus::call("Daemon1", "RequestStream", vec![json!(output), json!(pixels.0), json!(pixels.1)])
                     .await;
@@ -72,12 +72,14 @@ impl SceneEditor {
                     editor.as_mut().clear_stream_error();
                     editor.as_mut().set_node(r[0].as_u64().unwrap_or(0) as u32);
                     editor.as_mut().set_serial(r[1].as_f64().unwrap_or(0.0));
+                    editor.as_mut().let_go();
                     editor.send();
                 }
                 // An older stream that a newer one replaced is refused as removed: not an error of this canvas.
                 Err(_) if editor.output.to_string() != asked => {}
                 // The service may not answer yet (it starts after the app, or restarts): ask again shortly.
                 Err(e) => {
+                    editor.as_mut().let_go();
                     editor.as_mut().rust_mut().attached = (0, 0);
                     editor.as_mut().rust_mut().stream_failed = true;
                     editor.as_mut().fail(e.message);
@@ -89,6 +91,23 @@ impl SceneEditor {
                 }
             })
             .ok();
+        });
+    }
+
+    /// A new stream of the same size, for a canvas whose stream never gave a picture.
+    pub fn restream(mut self: Pin<&mut Self>) {
+        self.as_mut().rust_mut().attached = (0, 0);
+        self.attach(0);
+    }
+
+    /// Lets the replaced streams go, after the canvas was handed the new one (it connects to it on the
+    /// same turn of the event loop, so the release reaches the service after that).
+    fn let_go(self: Pin<&mut Self>) {
+        let stale = std::mem::take(&mut self.rust_mut().replaced);
+        bus::spawn(async move {
+            for output in stale {
+                bus::call("Daemon1", "ReleaseStream", vec![json!(output)]).await.ok();
+            }
         });
     }
 

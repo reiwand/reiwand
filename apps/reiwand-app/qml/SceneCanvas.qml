@@ -35,6 +35,10 @@ ColumnLayout {
         }
     }
 
+    SceneCanvasWait {
+        canvas: canvas
+    }
+
     spacing: 0
     // While the window is being resized the stream is asked for once the size rests, not at every step.
     onShownChanged: App.checking || settle.restart()
