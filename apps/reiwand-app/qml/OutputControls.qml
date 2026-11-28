@@ -112,21 +112,8 @@ ColumnLayout {
             onClicked: host.daemon.act("SetMuted", [!host.muted])
         }
 
-        QQC2.Slider {
-            id: loudness
-
-            visible: host.sound !== ""
-            from: 0
-            to: 1
-            onMoved: debounce.restart()
-
-            // While it is held, or what it sent is still on its way back, a state that comes in does not
-            // move it under the pointer.
-            Binding on value {
-                value: host.daemon.state?.volume
-                when: !loudness.pressed && !debounce.running && !settle.running
-                restoreMode: Binding.RestoreNone
-            }
+        OutputLoudness {
+            host: controls.host
         }
 
         QQC2.ToolButton {
@@ -183,23 +170,6 @@ ColumnLayout {
 
         sourceComponent: OutputFilter {
             host: controls.host
-        }
-    }
-
-    Timer {
-        id: settle
-
-        interval: 600
-    }
-
-    Timer {
-        id: debounce
-
-        interval: 200
-        onTriggered: {
-            host.daemon.act("SetVolume", [loudness.value]);
-            host.daemon.act("SetMuted", [false]);
-            settle.restart();
         }
     }
 
