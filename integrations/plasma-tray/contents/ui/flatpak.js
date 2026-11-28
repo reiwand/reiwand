@@ -59,7 +59,8 @@ function newer(installedVersion, running, flatpak) {
 // The processes of the old service: only reiwandd, since `flatpak kill` would also end the app and
 // lose what its editor has not kept yet. The shell prints their host process ids.
 function services() {
-    return "flatpak ps --columns=child-pid,application | while read p a; do [ \"$a\" = " + APP + " ] && [ \"$(cat /proc/$p/comm 2>/dev/null)\" = reiwandd ] && echo $p; done";
+    // flatpak ps gives the sandbox's own first process (bwrap); reiwandd runs as its child
+    return "flatpak ps --columns=child-pid,application | while read p a; do [ \"$a\" = " + APP + " ] || continue; for c in $p $(pgrep -P $p 2>/dev/null || cat /proc/$p/task/*/children 2>/dev/null); do [ \"$(cat /proc/$c/comm 2>/dev/null)\" = reiwandd ] && echo $c; done; done";
 }
 
 // The guided restart, outside Plasma so it outlives it: the new version copies its wallpaper
