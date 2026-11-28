@@ -1,11 +1,23 @@
 use gstreamer as gst;
 use gstreamer::prelude::*;
 use std::path::Path;
+use std::sync::OnceLock;
 
 pub(crate) const SINK: &str = "reiwand-audio";
 const FIXED_POOL: (u32, u32) = (1, 2);
 
 pub(crate) const SINKS: [&str; 2] = ["pulsesink", "pipewiresink"];
+
+/// The property every sound stream of this process carries, and its value, unique to this process.
+/// A process id cannot tell: PipeWire streams leave it out, and a sandbox numbers its own processes.
+pub fn stream_owner() -> (&'static str, &'static str) {
+    static OWNER: OnceLock<String> = OnceLock::new();
+    let owner = OWNER.get_or_init(|| {
+        let born = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default();
+        format!("{}-{}", std::process::id(), born.as_nanos())
+    });
+    ("reiwand.owner", owner)
+}
 
 fn pulse_reachable() -> bool {
     let set = std::env::var_os("PULSE_SERVER").is_some_and(|v| !v.is_empty());
@@ -24,7 +36,8 @@ fn period(latency: &str) -> Option<i64> {
 }
 
 fn pulse(factory: &gst::ElementFactory, latency: Option<&str>) -> Option<gst::Element> {
-    let props = gst::Structure::builder("props").field("media.role", "Movie").build();
+    let (key, owner) = stream_owner();
+    let props = gst::Structure::builder("props").field("media.role", "Movie").field(key, owner).build();
     let sink = factory.create().name(SINK).build().ok()?;
     sink.set_property("client-name", "reiwand");
     sink.set_property("stream-properties", props);
@@ -46,7 +59,8 @@ pub(crate) fn sink(latency: Option<&str>) -> Option<gst::Element> {
         tracing::info!(%version, "the PipeWire GStreamer plugin is older than 1.2, using the default audio output");
         return None;
     }
-    let props = gst::Structure::builder("props").field("media.role", "Movie");
+    let (key, owner) = stream_owner();
+    let props = gst::Structure::builder("props").field("media.role", "Movie").field(key, owner);
     let props = match latency {
         Some(latency) => props.field("node.latency", latency),
         None => props,

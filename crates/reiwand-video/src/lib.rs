@@ -23,6 +23,7 @@ pub use dmabuf::{Dmabuf, accept as accept_dmabuf};
 pub use feed::Disk;
 pub use listened::listen;
 pub use loading::create_first_elements;
+pub use pipewire::stream_owner;
 pub use player::Player;
 pub use probe::probe;
 pub use reiwand_mix::{Clip, Mix, RATE, Source, Track};
