@@ -1,0 +1,221 @@
+{
+  "assets": {
+    "sky": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/sky.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    },
+    "depth": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": true,
+      "mipmaps": null,
+      "path": "assets/depth.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    }
+  },
+  "canvas": {
+    "background": "#000000",
+    "blend_space": "linear",
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "parallax": {
+      "amount": 1,
+      "delay": 0.2,
+      "gyro": false,
+      "offset": [
+        0,
+        0
+      ],
+      "pointer": 1
+    },
+    "perspective": 1400,
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "depth_parallax",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "depth": "depth",
+            "focus": 0.5,
+            "follow": true,
+            "orbit": true,
+            "overscan": 1.0,
+            "reach": 0,
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "smooth": false,
+            "steps": 16,
+            "strength": 40
+          }
+        }
+      ],
+      "id": "background",
+      "image": "sky",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        1920,
+        1080
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#ffffffcc",
+      "id": "sign",
+      "opacity": 1.0,
+      "parallax": [
+        0.03,
+        0.03
+      ],
+      "shape": {
+        "rect": {
+          "radius": 30,
+          "size": [
+            640,
+            360
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          960,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": [
+          0,
+          25
+        ],
+        "z": 120
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "align": "center",
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#1b2440",
+      "depth_test": false,
+      "effects": [],
+      "fallback": [],
+      "font": "sans-serif",
+      "id": "title",
+      "line_height": null,
+      "opacity": 1.0,
+      "padding": 0,
+      "parallax": [
+        0.04,
+        0.04
+      ],
+      "render": "auto",
+      "size": 110,
+      "solid": false,
+      "text": "Depth",
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          960,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ],
+        "tilt": [
+          0,
+          25
+        ],
+        "z": 130
+      },
+      "type": "text",
+      "valign": "center",
+      "visible": true,
+      "wrap": null
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": []
+}

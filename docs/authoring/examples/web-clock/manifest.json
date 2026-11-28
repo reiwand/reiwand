@@ -1,0 +1,56 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": "en",
+  "description": "",
+  "entry": "index.html",
+  "id": "org.example.web-clock",
+  "inputs": [],
+  "kind": "web",
+  "license": "CC0-1.0",
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "photosensitive": false,
+  "platforms": [],
+  "presets": [],
+  "properties": {
+    "color": {
+      "alpha": false,
+      "default": "#f2f5ff",
+      "enabled_if": {},
+      "label": "@reiwand.color",
+      "order": 0,
+      "quality": {},
+      "type": "color",
+      "visible_if": {}
+    }
+  },
+  "requires": {
+    "engine": null,
+    "features": [
+      "engine_strings",
+      "web"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "Web clock",
+  "version": "0.1.0",
+  "web": {
+    "background": "#101828",
+    "preload": null,
+    "storage_kib": 0
+  }
+}

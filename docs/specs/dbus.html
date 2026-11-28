@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D-Bus interface · Reiwand</title>
+<link rel="stylesheet" href="../assets/site.css">
+<script defer src="../assets/search.js" data-root="../"></script>
+</head>
+<body class="page">
+<header class="bar">
+  <a class="brand" href="../index.html"><img class="mark" src="../assets/reiwand.svg" alt="" width="28" height="28">Reiwand <em>docs</em></a>
+  <label class="find"><span class="sr">Search the documentation</span>
+    <input type="search" id="find" placeholder="Search" autocomplete="off" spellcheck="false">
+    <kbd>/</kbd>
+  </label>
+  <a class="code" href="https://github.com/reiwand/reiwand">Source</a>
+</header>
+<div id="found" hidden></div>
+<div class="frame">
+  <nav class="side" aria-label="Documentation">
+    <details class="menu"><summary>Pages</summary><div><details><summary>Get started</summary><ul><li><a href="../user/index.html">Getting started</a></li></ul></details><details><summary>Using Reiwand</summary><ul><li><details class=sub><summary>Desktop app</summary><ul><li class=has><details><summary><a href="../user/app.html">The desktop app</a></summary><ul><li><a href="../user/app/library.html">Keys and the library</a></li><li><a href="../user/app/getting-wallpapers.html">Getting and making wallpapers</a></li><li><a href="../user/app/lists-and-tray.html">Lists, the preview and the tray</a></li><li><a href="../user/app/settings.html">Settings and permissions</a></li></ul></details></li><li><a href="../user/other-desktops.html">Sway, Hyprland, river, niri and COSMIC</a></li><li><a href="../user/keyboard-switching.html">Changing the wallpaper with the keyboard</a></li><li class=has><details><summary><a href="../user/packages.html">Packages: rating, languages and credits</a></summary><ul><li><a href="../user/packages/manifest.html">The package manifest</a></li><li><a href="../user/packages/ratings-and-search.html">Mature content, flashing and search</a></li><li><a href="../user/packages/assets-and-presets.html">Assets, presets and dependencies</a></li><li><a href="../user/packages/playback.html">Accent color, playback and shortcuts</a></li><li><a href="../user/packages/scene-features.html">Scene features</a></li><li><a href="../user/packages/timelines-and-sound.html">Timelines, sound and video clocks</a></li><li><a href="../user/packages/package-effects.html">Package effects</a></li><li><a href="../user/packages/built-in-effects.html">Built-in effects</a></li><li><a href="../user/packages/advanced-scenes.html">Advanced scenes</a></li><li><a href="../user/packages/meshes.html">Skeleton meshes</a></li><li><a href="../user/packages/particles.html">Particles</a></li><li><a href="../user/packages/lights.html">Lights</a></li><li><a href="../user/packages/models.html">3D models</a></li><li><a href="../user/packages/compatibility.html">Compatibility and versions</a></li></ul></details></li><li><a href="../user/web-wallpapers.html">Web wallpapers</a></li><li><a href="../user/rgb-lighting.html">RGB lighting</a></li><li><a href="../user/player.html">Media player</a></li><li class=has><details><summary><a href="../user/privacy.html">Privacy</a></summary><ul><li><a href="../user/privacy/network.html">Network and updates</a></li><li><a href="../user/privacy/stored-data.html">Stored data and secrets</a></li><li><a href="../user/privacy/scene-permissions.html">Scenes and what they can see</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Phone</summary><ul><li><a href="../user/phone.html">The phone app</a></li><li class=has><details><summary><a href="../user/android.html">Android</a></summary><ul><li><a href="../user/android/install.html">Installing on Android</a></li><li><a href="../user/android/library.html">The app and the library</a></li><li><a href="../user/android/images.html">Images and setting the wallpaper</a></li><li><a href="../user/android/lists.html">Lists</a></li><li><a href="../user/android/videos.html">Videos</a></li><li><a href="../user/android/parallax-depth.html">Parallax and depth</a></li><li><a href="../user/android/packages.html">Packages</a></li><li><a href="../user/android/scenes.html">Scenes</a></li><li><a href="../user/android/media-sound-touch.html">Media, sound and touch</a></li><li><a href="../user/android/settings.html">Settings</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Command line</summary><ul><li class=has><details><summary><a href="../user/command-line.html">Using it from the terminal</a></summary><ul><li><a href="../user/command-line/everyday-commands.html">Everyday commands</a></li><li><a href="../user/command-line/stepping-with-the-keyboard.html">Stepping through wallpapers with the keyboard</a></li><li><a href="../user/command-line/library-lists-and-packages.html">Library, lists and packages</a></li><li><a href="../user/command-line/scripts-jobs-and-output.html">Scripts, jobs and output</a></li><li><a href="../user/command-line/providers.html">Providers</a></li><li><a href="../user/command-line/repositories.html">Repositories</a></li><li><a href="../user/command-line/accounts-and-phone.html">Accounts and the phone&#x27;s repositories</a></li><li><a href="../user/command-line/frame-rate-and-automatic-quality.html">Frame rate and automatic scene quality</a></li><li><a href="../user/command-line/choosing-scene-quality.html">Choosing the scene quality</a></li><li><a href="../user/command-line/hdr-power-and-motion.html">HDR, power, motion and flashing</a></li><li><a href="../user/command-line/graphics-card.html">Choosing the graphics card</a></li><li><a href="../user/command-line/streams-and-video-decoding.html">Streams and video decoding</a></li><li><a href="../user/command-line/editing-images.html">Editing images</a></li><li><a href="../user/command-line/depth-and-parallax.html">Depth maps and parallax</a></li><li><a href="../user/command-line/parallax-layers.html">3D parallax layers</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Installation</summary><ul><li class=has><details><summary><a href="../user/installation.html">Installation (without root)</a></summary><ul><li><a href="../user/installation/appimage.html">Download and install the AppImage</a></li><li><a href="../user/installation/requirements.html">Requirements</a></li><li><a href="../user/installation/plasma.html">Setting up Plasma and the tray</a></li><li><a href="../user/installation/updates-and-versions.html">Updates and versions</a></li></ul></details></li><li><a href="../user/flatpak.html">Installation with Flatpak</a></li></ul></details></li></ul></details><details><summary>Your own server</summary><ul><li class=has><details><summary><a href="../user/server.html">Your own server</a></summary><ul><li><a href="../user/server/install.html">Installing the server</a></li><li><a href="../user/server/configuration.html">Image and configuration</a></li><li><a href="../user/server/https.html">HTTPS</a></li><li><a href="../user/server/backups-and-versions.html">Backups and data from another version</a></li><li><a href="../user/server/repositories-and-accounts.html">Repositories and accounts</a></li><li><a href="../user/server/uploads-and-catalog.html">Uploads and the catalog</a></li><li><a href="../user/server/taking-wallpapers-away.html">Taking a wallpaper away</a></li><li><a href="../user/server/author-keys.html">Author keys and package tools</a></li><li><a href="../user/server/static-repositories.html">Static repositories</a></li><li><a href="../user/server/moving-configuration.html">Moving the configuration to another computer</a></li><li><a href="../user/server/scenes.html">Scene properties</a></li><li><a href="../user/server/scene-sound-and-examples.html">Example scenes and sound</a></li></ul></details></li><li class=has><details><summary><a href="../specs/server.html">Self-hosted server</a></summary><ul><li><a href="../specs/server/running.html">Running</a></li><li><a href="../specs/server/conventions.html">Conventions and Discovery and health</a></li><li><a href="../specs/server/repository.html">Repository</a></li><li><a href="../specs/server/catalog.html">Catalog and Accounts</a></li><li><a href="../specs/server/uploads.html">Uploads</a></li><li><a href="../specs/server/moderation-and-administration.html">Moderation and administration</a></li><li><a href="../specs/server/legal-pages.html">Legal pages and Operating a public server</a></li></ul></details></li><li class=has><details><summary><a href="../specs/repo.html">Signed repositories</a></summary><ul><li><a href="../specs/repo/keys-and-roles.html">Keys and roles, Signature files, Layout and Identity and URL</a></li><li><a href="../specs/repo/formats.html">Formats and Package signatures</a></li><li><a href="../specs/repo/online-authors.html">Online authors, Operator workflow, Client update, Package installation, Broken repositories and Client storage</a></li><li><a href="../specs/repo/bundled-example-repository.html">Bundled example repository, Network interface and Adding a repository in the desktop app</a></li></ul></details></li></ul></details><details><summary>Creating wallpapers</summary><ul><li><details class=sub><summary>First scene</summary><ul><li><a href="../authoring/index.html">Creating scenes</a></li><li><a href="../authoring/start/first-scene.html">Your first scene</a></li><li class=has><details><summary><a href="../authoring/scene.html">The scene file</a></summary><ul><li><a href="../authoring/scene/folder.html">The folder, the clock and the assets</a></li><li><a href="../authoring/scene/canvas.html">The canvas</a></li><li><a href="../authoring/scene/cost.html">What a scene costs</a></li><li><a href="../authoring/scene/values.html">Values that move</a></li><li><a href="../authoring/scene/timelines-and-inputs.html">Timelines and inputs</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Layers</summary><ul><li class=has><details><summary><a href="../authoring/layers.html">Layers</a></summary><ul><li><a href="../authoring/layers/basics.html">Layer basics</a></li><li><a href="../authoring/layers/image-and-video.html">Image and video layers</a></li><li><a href="../authoring/layers/text.html">Text layer (text)</a></li><li><a href="../authoring/layers/shapes.html">Shape, solid and spectrum layers</a></li><li><a href="../authoring/layers/groups.html">Group and adjustment layers</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/properties.html">User properties</a></summary><ul><li><a href="../authoring/properties/declaring.html">Declaring properties</a></li><li><a href="../authoring/properties/behavior.html">Conditions, presets and translations</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/meshes.html">Meshes, bones and animation</a></summary><ul><li><a href="../authoring/meshes/layer-and-parts.html">The mesh layer and its parts</a></li><li><a href="../authoring/meshes/motion.html">Clips, bones and expressions</a></li><li><a href="../authoring/meshes/attaching.html">Attached layers and models</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/3d.html">Lights, 3D, camera and depth</a></summary><ul><li><a href="../authoring/3d/flat-lights.html">Lights on flat layers</a></li><li><a href="../authoring/3d/models.html">3D models</a></li><li><a href="../authoring/3d/lights-and-camera.html">Lights, shadows and the camera</a></li><li><a href="../authoring/3d/depth-and-hdr.html">Depth and bright colors</a></li></ul></details></li><li><a href="../authoring/transitions.html">Make and try your own transition</a></li></ul></details></li><li><details class=sub><summary>Effects</summary><ul><li class=has><details><summary><a href="../authoring/effects.html">Effects</a></summary><ul><li><a href="../authoring/effects/on-a-layer.html">Putting effects on a layer</a></li><li><a href="../authoring/effects/motion.html">Motion effects</a></li><li><a href="../authoring/effects/light-and-color.html">Light and color effects</a></li><li><a href="../authoring/effects/blur-and-style.html">Blur, distortion and style effects</a></li><li><a href="../authoring/effects/own-descriptor.html">Your own effect: the descriptor</a></li><li><a href="../authoring/effects/own-shader.html">Your own effect: the shader</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Particles and sound</summary><ul><li class=has><details><summary><a href="../authoring/particles-and-sound.html">Particles and sound</a></summary><ul><li><a href="../authoring/particles-and-sound/systems.html">Particle systems and emitters</a></li><li><a href="../authoring/particles-and-sound/motion.html">How particles start and move</a></li><li><a href="../authoring/particles-and-sound/drawing.html">How particles are drawn</a></li><li><a href="../authoring/particles-and-sound/control-points.html">Control points, children and depth</a></li><li><a href="../authoring/particles-and-sound/sound.html">Sound</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Scripts</summary><ul><li><a href="../authoring/scripts-guide.html">Guide for script authors</a></li><li class=has><details><summary><a href="../authoring/scripts.html">Scripts</a></summary><ul><li><a href="../authoring/scripts/basics.html">Script basics</a></li><li><a href="../authoring/scripts/exports-and-events.html">Exports, events and inputs</a></li><li><a href="../authoring/scripts/interface-scene.html">The scene from a script</a></li><li><a href="../authoring/scripts/interface-more.html">More of the script interface</a></li><li><a href="../authoring/scripts/testing.html">Test and debug</a></li><li><a href="../authoring/scripts/examples.html">Complete examples</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Web</summary><ul><li class=has><details><summary><a href="../authoring/web-wallpapers.html">Web wallpapers</a></summary><ul><li><a href="../authoring/web-wallpapers/basics.html">The minimum web wallpaper</a></li><li><a href="../authoring/web-wallpapers/interface.html">The page and the program</a></li><li><a href="../authoring/web-wallpapers/isolation.html">What a page may reach</a></li><li><a href="../authoring/web-wallpapers/phone-and-apps.html">Phones and existing applications</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Publishing</summary><ul><li class=has><details><summary><a href="../authoring/package.html">From the scene folder to a package that others install</a></summary><ul><li><a href="../authoring/package/manifest.html">The manifest</a></li><li><a href="../authoring/package/manifest-rights.html">Languages, licenses and ratings</a></li><li><a href="../authoring/package/checking.html">Previews and checking</a></li><li><a href="../authoring/package/signing.html">Packaging and signing</a></li><li><a href="../authoring/package/publishing.html">Publishing and copies</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/cli.html">The reiwand-ctl authoring commands</a></summary><ul><li><a href="../authoring/cli/create.html">Create, change and import</a></li><li><a href="../authoring/cli/view.html">Viewing the scene</a></li><li><a href="../authoring/cli/capture.html">Capture</a></li><li><a href="../authoring/cli/check-and-publish.html">Check, package and publish</a></li><li><a href="../authoring/cli/actions.html">The editor&#x27;s actions from the terminal</a></li></ul></details></li><li><a href="../authoring/provider-plugins.html">Provider plugins</a></li></ul></details></li><li><details class=sub><summary>The editor</summary><ul><li class=has><details><summary><a href="../authoring/editor.html">The scene editor: getting started, saving, undo, preview and shortcuts</a></summary><ul><li><a href="../authoring/editor/opening.html">The editor and its window</a></li><li><a href="../authoring/editor/creating-and-saving.html">Creating, saving and undoing</a></li><li><a href="../authoring/editor/checking-and-viewing.html">Problems and previews</a></li><li><a href="../authoring/editor/cost-and-package.html">Cost, the package and the image editor</a></li><li><a href="../authoring/editor/shortcuts.html">All keyboard shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-features.html">Scene editor</a></summary><ul><li><a href="../authoring/editor-features/parts.html">The parts of the editor</a></li><li><a href="../authoring/editor-features/package-and-assets.html">The package, properties and assets</a></li><li><a href="../authoring/editor-features/problems-and-masks.html">Problems and painted masks</a></li><li><a href="../authoring/editor-features/meshes.html">Meshes, clips and chains</a></li><li><a href="../authoring/editor-features/particles.html">Particle tools</a></li><li><a href="../authoring/editor-features/files-and-3d.html">Layers from files and 3D models</a></li><li><a href="../authoring/editor-features/fbx-and-obj.html">Converting FBX and OBJ models to glTF with Blender</a></li></ul></details></li><li><a href="../authoring/other-editor-packages.html">Web wallpapers and other packages in the editor</a></li><li class=has><details><summary><a href="../authoring/editor-canvas.html">Canvas, layers and inspector of the editor</a></summary><ul><li><a href="../authoring/editor-canvas/choosing-and-moving.html">Choosing and moving layers</a></li><li><a href="../authoring/editor-canvas/view-and-canvas.html">The view and the canvas</a></li><li><a href="../authoring/editor-canvas/layers.html">Adding and arranging layers</a></li><li><a href="../authoring/editor-canvas/inspector-and-assets.html">The inspector, templates and assets</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-drawing.html">Drawing in the editor: shapes, text, maps, sprites and depth</a></summary><ul><li><a href="../authoring/editor-drawing/shapes-and-text.html">Shapes, gradients and text</a></li><li><a href="../authoring/editor-drawing/fonts-and-maps.html">Fonts, light maps and sprite sheets</a></li><li><a href="../authoring/editor-drawing/depth.html">Depth maps and cuts</a></li><li><a href="../authoring/editor-drawing/regions.html">Regions and the parallax model</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-effects.html">Effects, masks and shaders in the scene editor</a></summary><ul><li><a href="../authoring/editor-effects/basics.html">Adding effects</a></li><li><a href="../authoring/editor-effects/catalog.html">The effect catalog and parameters</a></li><li><a href="../authoring/editor-effects/masks.html">Masks, maps and glow</a></li><li><a href="../authoring/editor-effects/adjust-and-cost.html">Adjustment layers, rest rules and cost</a></li><li><a href="../authoring/editor-effects/package-effects.html">Package effects and shaders</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-animation.html">Animation in the editor: timelines, keys, curves and clips</a></summary><ul><li><a href="../authoring/editor-animation/clips-and-videos.html">Clips and videos</a></li><li><a href="../authoring/editor-animation/keys.html">Keys and the time strip</a></li><li><a href="../authoring/editor-animation/timelines.html">Timelines, triggers and curves</a></li><li><a href="../authoring/editor-animation/sprites-and-rest.html">Sprites, rest rules and shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-particles-and-sound.html">Particles and sound in the editor</a></summary><ul><li><a href="../authoring/editor-particles-and-sound/systems-and-emitters.html">Particle systems and emitters</a></li><li><a href="../authoring/editor-particles-and-sound/starts-and-forces.html">How particles start and the forces</a></li><li><a href="../authoring/editor-particles-and-sound/colliders-and-look.html">Colliders, trails and the look</a></li><li><a href="../authoring/editor-particles-and-sound/sound.html">Sound layers and links</a></li><li><a href="../authoring/editor-particles-and-sound/sound-response.html">Sound levels and shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-meshes.html">Meshes, bones and expressions in the editor</a></summary><ul><li><a href="../authoring/editor-meshes/bones.html">Meshes and bones</a></li><li><a href="../authoring/editor-meshes/motion-and-shapes.html">Bone motion, blend shapes and parts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-3d.html">Editor: 3D, lights, camera and materials</a></summary><ul><li><a href="../authoring/editor-3d/models.html">Models and moving in 3D</a></li><li><a href="../authoring/editor-3d/camera-and-lights.html">The camera and lights</a></li><li><a href="../authoring/editor-3d/light-and-materials.html">Light, shadows and materials</a></li><li><a href="../authoring/editor-3d/animation-and-cost.html">3D animation and cost</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-properties.html">User properties and presets in the editor</a></summary><ul><li><a href="../authoring/editor-properties/adding.html">Adding properties</a></li><li><a href="../authoring/editor-properties/types-and-order.html">Other types and order</a></li><li><a href="../authoring/editor-properties/behavior.html">Following properties and conditions</a></li><li><a href="../authoring/editor-properties/presets.html">Translations and presets</a></li><li><a href="../authoring/editor-properties/preset-packages.html">Making a preset package</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Editor actions from the terminal</summary><ul><li><a href="../authoring/actions.html">Editor actions and queries from the command line</a></li><li class=has><details><summary><a href="../authoring/actions-layers.html">Actions: layers, assets and canvas</a></summary><ul><li><a href="../authoring/actions-layers/before-you-start.html">Before you start</a></li><li><a href="../authoring/actions-layers/layers.html">Layers</a></li><li><a href="../authoring/actions-layers/place-and-shape-a-layer.html">Place and shape a layer</a></li><li><a href="../authoring/actions-layers/assets.html">Assets</a></li><li><a href="../authoring/actions-layers/canvas.html">Canvas</a></li><li><a href="../authoring/actions-layers/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-effects.html">Actions: effects and masks</a></summary><ul><li><a href="../authoring/actions-effects/a-layer-s-effects.html">A layer&#x27;s effects</a></li><li><a href="../authoring/actions-effects/masks-and-painted-maps.html">Masks, painted maps and own transitions</a></li><li><a href="../authoring/actions-effects/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-meshes.html">Actions: meshes, bones and animation</a></summary><ul><li><a href="../authoring/actions-meshes/before-you-start-with-meshes-bones-and-a.html">Before you start and creating a mesh</a></li><li><a href="../authoring/actions-meshes/bones-and-weights.html">Bones and weights</a></li><li><a href="../authoring/actions-meshes/clips-and-keys.html">Clips and keys</a></li><li><a href="../authoring/actions-meshes/blend-shapes-and-expressions.html">Blend shapes and expressions</a></li><li><a href="../authoring/actions-meshes/kinematics-and-physics.html">Kinematics and physics</a></li><li><a href="../authoring/actions-meshes/parts-and-attachments.html">Parts and attachments</a></li><li><a href="../authoring/actions-meshes/play-and-blend-animations.html">Play and blend animations</a></li><li><a href="../authoring/actions-meshes/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-particles-and-lights.html">Actions: particles, lights and sound</a></summary><ul><li><a href="../authoring/actions-particles-and-lights/particles.html">Particles</a></li><li><a href="../authoring/actions-particles-and-lights/lights-and-ambient-light.html">Lights and ambient light</a></li><li><a href="../authoring/actions-particles-and-lights/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-3d.html">Actions: 3D scene</a></summary><ul><li><a href="../authoring/actions-3d/3d-scene-how-it-works.html">How 3D works, models and groups</a></li><li><a href="../authoring/actions-3d/3d-scene-materials.html">Materials</a></li><li><a href="../authoring/actions-3d/3d-scene-camera-and-view.html">Camera, view, lights and shadows</a></li><li><a href="../authoring/actions-3d/3d-scene-camera-paths.html">Camera paths and dragging handles</a></li><li><a href="../authoring/actions-3d/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-time-and-package.html">Actions: time, package, properties and scripts</a></summary><ul><li><a href="../authoring/actions-time-and-package/timeline-and-keys.html">Timeline and keys</a></li><li><a href="../authoring/actions-time-and-package/package.html">Package</a></li><li><a href="../authoring/actions-time-and-package/user-properties.html">User properties</a></li><li><a href="../authoring/actions-time-and-package/scripts-and-templates.html">Scripts and templates</a></li><li><a href="../authoring/actions-time-and-package/shaders.html">Shaders, undo and redo</a></li><li><a href="../authoring/actions-time-and-package/queries.html">Queries</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Examples</summary><ul><li class=has><details><summary><a href="../authoring/coverage.html">What each example shows</a></summary><ul><li><a href="../authoring/coverage/features.html">Features, effects, blends and layers</a></li><li><a href="../authoring/coverage/values-and-scripts.html">Values, triggers, files and scripts</a></li><li><a href="../authoring/coverage/scene.html">Everything else in scene.json</a></li></ul></details></li><li><a href="../authoring/examples/ORIGIN.html">Origin of the example files</a></li></ul></details></li></ul></details><details open><summary>Reference</summary><ul><li><details class=sub open><summary>Formats and interfaces</summary><ul><li class=has><details><summary><a href="../specs/scene.html">Scene format</a></summary><ul><li><a href="../specs/scene/every-value-is-written.html">Every value is written</a></li><li><a href="../specs/scene/canvas-clock-and-assets.html">Canvas, clock and assets</a></li><li><a href="../specs/scene/canvas-clock-and-assets-ktx2-textures.html">KTX2 textures</a></li><li><a href="../specs/scene/cost-and-frame-rate.html">Cost and frame rate</a></li><li><a href="../specs/scene/layers.html">Layers</a></li><li><a href="../specs/scene/layers-text.html">Text</a></li><li><a href="../specs/scene/layers-lights.html">Lights</a></li><li><a href="../specs/scene/layers-meshes.html">Meshes</a></li><li><a href="../specs/scene/layers-models-and-3d.html">Models and 3D</a></li><li><a href="../specs/scene/values.html">Values</a></li><li><a href="../specs/scene/effects.html">Effects</a></li><li><a href="../specs/scene/effects-writing-an-effect.html">Writing an effect</a></li><li><a href="../specs/scene/effects-package-effects.html">Package effects</a></li><li><a href="../specs/scene/effects-package-transitions.html">Package transitions</a></li><li><a href="../specs/scene/effects-newer-effects-and-parame.html">Newer effects and parameters</a></li><li><a href="../specs/scene/sound.html">Sound</a></li><li><a href="../specs/scene/particles.html">Particles</a></li><li><a href="../specs/scene/particles-newer-particle-fields.html">Newer particle fields</a></li><li><a href="../specs/scene/user-properties-and-presets.html">User properties and presets</a></li><li><a href="../specs/scene/inputs.html">Inputs</a></li><li><a href="../specs/scene/scripts.html">Scripts</a></li><li><a href="../specs/scene/scripts-the-reiwand-module.html">The reiwand module</a></li><li><a href="../specs/scene/scripts-parents-the-camera-shape.html">Parents, the camera, shapes, storage and folders</a></li><li><a href="../specs/scene/scripts-when-a-script-fails.html">When a script fails, Listening to the audio from a script and Script declarations</a></li><li><a href="../specs/scene/rebuilding-a-scene-by-hand.html">Rebuilding a scene by hand</a></li><li><a href="../specs/scene/rebuilding-a-scene-by-hand-porting-a-shader-to-wgsl.html">Porting a shader to WGSL</a></li></ul></details></li><li class=has><details><summary><a href="../specs/package.html">Packages</a></summary><ul><li><a href="../specs/package/versions.html">Versions and Manifest</a></li><li><a href="../specs/package/display-and-playback.html">Display and playback and Rating and photosensitivity</a></li><li><a href="../specs/package/inputs.html">Inputs</a></li><li><a href="../specs/package/features.html">Features</a></li><li><a href="../specs/package/profiles.html">Profiles, Platforms, Dependencies, Origin and Web pages</a></li><li><a href="../specs/package/presets.html">Presets, Shared resources, Languages and Markup</a></li><li><a href="../specs/package/facets-and-tags.html">Facets and tags</a></li></ul></details></li><li class=has><details><summary><a href="../specs/web.html">Web pages</a></summary><ul><li><a href="../specs/web/engine.html">Engine, Frames, Lifecycle and Session and the page&#x27;s view</a></li><li><a href="../specs/web/protocol.html">Protocol, Frame clock, Console of a preview and Sandbox</a></li><li><a href="../specs/web/privacy.html">Privacy and The page interface</a></li><li><a href="../specs/web/on-the-phone.html">On the phone</a></li></ul></details></li><li class=has><details><summary><a href="../specs/editor.html">Scene editor</a></summary><ul><li><a href="../specs/editor/document.html">Document and Operations</a></li><li><a href="../specs/editor/actions.html">Actions</a></li><li><a href="../specs/editor/actions-curve-editor.html">Curve editor</a></li><li><a href="../specs/editor/actions-from-the-command-line.html">Actions from the command line and Scripts and templates</a></li><li><a href="../specs/editor/package-effects-and-shaders.html">Package effects and shaders and History</a></li><li><a href="../specs/editor/inspector.html">Inspector</a></li><li><a href="../specs/editor/inspector-shapes-text-and-fonts.html">Shapes, text and fonts, Hearing, shaping and trying a binding and Sound layers</a></li><li><a href="../specs/editor/package-details.html">Package details</a></li><li><a href="../specs/editor/user-properties-and-presets.html">User properties and presets</a></li><li><a href="../specs/editor/user-properties-and-presets-mesh-layers.html">Mesh layers</a></li><li><a href="../specs/editor/user-properties-and-presets-particle-systems.html">Particle systems</a></li><li><a href="../specs/editor/user-properties-and-presets-lights.html">Lights</a></li><li><a href="../specs/editor/user-properties-and-presets-models-and-3d.html">Models and 3D</a></li><li><a href="../specs/editor/editor-frame.html">Editor frame</a></li><li><a href="../specs/editor/editor-layouts.html">Layouts</a></li><li><a href="../specs/editor/editor-panels.html">Editor panels</a></li><li><a href="../specs/editor/preview.html">Preview</a></li><li><a href="../specs/editor/pointer-areas-and-sound-bindings.html">Pointer areas and sound bindings and Shared parts</a></li><li><a href="../specs/editor/web-pages-and-other-packages.html">Web pages and other packages</a></li><li><a href="../specs/editor/web-pages-and-other-packages-preset-packages.html">Preset packages</a></li><li><a href="../specs/editor/starting-points-building-and-applying.html">Starting points, building and applying</a></li><li><a href="../specs/editor/picture-depth-tools.html">Picture depth tools</a></li><li><a href="../specs/editor/editor-keyboard-and-non-scene-packages.html">Editor keyboard and non-scene packages and The own transition of a scene</a></li></ul></details></li><li class=has><details open><summary><a href="../specs/dbus.html" aria-current=page>D-Bus interface</a></summary><ul><li><a href="../specs/dbus/conventions.html">Conventions, Errors and Streams and claims</a></li><li><a href="../specs/dbus/layer-shell-and-x11-outputs.html">Layer-shell and X11 outputs</a></li><li><a href="../specs/dbus/frame-rate.html">Frame rate and Video decoding</a></li><li><a href="../specs/dbus/stream-buffers.html">Stream buffers</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1.html">io.github.reiwand.Daemon1</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html">io.github.reiwand.Daemon1: ClearWallpaper to SetSceneProperty</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-listapplications-s-json.html">io.github.reiwand.Daemon1: ListApplications → to ShareSceneValues</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-setoption-s-key-s-value.html">io.github.reiwand.Daemon1: SetOption</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-reload.html">io.github.reiwand.Daemon1: Reload to Signal JobFinished</a></li><li><a href="../specs/dbus/io-github-reiwand-library1.html">io.github.reiwand.Library1</a></li><li><a href="../specs/dbus/io-github-reiwand-library1-renametag-s-from-s-to.html">io.github.reiwand.Library1: RenameTag to Signal ThumbnailReady</a></li><li><a href="../specs/dbus/io-github-reiwand-playlists1.html">io.github.reiwand.Playlists1</a></li><li><a href="../specs/dbus/io-github-reiwand-playlists1-history-s-output-u-limit.html">io.github.reiwand.Playlists1: History → to Signal BrowseChanged</a></li><li><a href="../specs/dbus/io-github-reiwand-profiles1.html">io.github.reiwand.Profiles1</a></li><li><a href="../specs/dbus/io-github-reiwand-providers1.html">io.github.reiwand.Providers1</a></li><li><a href="../specs/dbus/io-github-reiwand-providers1-clearcache-s-id.html">io.github.reiwand.Providers1: ClearCache to RemovePlugin</a></li><li><a href="../specs/dbus/io-github-reiwand-repos1.html">io.github.reiwand.Repos1</a></li><li><a href="../specs/dbus/io-github-reiwand-inputs1.html">io.github.reiwand.Inputs1</a></li><li><a href="../specs/dbus/io-github-reiwand-inputs1-decide-s-scene-s-key-as-.html">io.github.reiwand.Inputs1: Decide to Bands →</a></li><li><a href="../specs/dbus/io-github-reiwand-inputs1-touch-s-output-d-x-d-y-u.html">io.github.reiwand.Inputs1: Touch to SetPointer</a></li><li><a href="../specs/dbus/io-github-reiwand-rgb1.html">io.github.reiwand.Rgb1</a></li><li><a href="../specs/dbus/io-github-reiwand-publish1.html">io.github.reiwand.Publish1, io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li><li><a href="../specs/dbus/the-app-io-github-reiwand.html">The app: io.github.reiwand</a></li><li><a href="../specs/dbus/edits-and-spanning.html">Edits and spanning</a></li><li><a href="../specs/dbus/scenes.html">Scenes, Scene sound and Change notification</a></li><li><a href="../specs/dbus/jobs.html">Jobs and Thumbnails</a></li><li><a href="../specs/dbus/json-model.html">JSON model</a></li><li><a href="../specs/dbus/configuration-file.html">Configuration file</a></li></ul></details></li><li><a href="../specs/export.html">Export and import file (.reiwand)</a></li><li><a href="../specs/explicit-values.html">Explicit values</a></li><li><a href="../specs/provider-plugins.html">Provider plugins</a></li></ul></details></li><li><details class=sub><summary>The app and its screens</summary><ul><li class=has><details><summary><a href="../specs/library.html">Library of the desktop app</a></summary><ul><li><a href="../specs/library/shelf.html">Shelf</a></li><li><a href="../specs/library/see-all.html">See all, Several chosen, Damaged or missing file, No results and failures, First start, Options of a wallpaper, My presets, Permission question, Still on its poster and Damaged scene</a></li></ul></details></li><li><a href="../specs/create.html">Create page</a></li><li class=has><details><summary><a href="../specs/shell.html">Window of the desktop app</a></summary><ul><li><a href="../specs/shell/image-and-tones.html">Image and tones, Menu, Skeletons, Keyboard, Choosing files and folders, Notices, Size and What a page declares</a></li><li><a href="../specs/shell/low-band-of-the-title-screens.html">Low band of the title screens, Sources and Settings</a></li><li><a href="../specs/shell/private-mode.html">Private mode, Name of the screens, Now block, Lists and Third-party licenses</a></li></ul></details></li><li><a href="../specs/look.html">Look of the desktop app</a></li><li><a href="../specs/palette.html">Interface palette</a></li><li><a href="../specs/icon.html">Icon</a></li><li><a href="../specs/settings-pieces.html">Pieces for what is adjusted and for what each screen says</a></li><li><a href="../specs/choose-pieces.html">Pieces for choosing wallpapers</a></li><li><a href="../specs/phone-daily-use.html">Phone: daily use</a></li></ul></details></li></ul></details><details><summary>Development</summary><ul><li><a href="../development/development.html">Development</a></li><li><a href="../development/design.html">Design guide</a></li><li><a href="../development/qml.html">Known QML pitfalls</a></li><li><a href="../development/regression-net.html">Regression net</a></li><li><a href="../guidelines.html">Reiwand guidelines</a></li></ul></details><details><summary>Specifications</summary><ul><li><a href="../specs/dbus/edits-and-spanning/adjustments-and-spanning.html">Adjustments and spanning</a></li><li><a href="../specs/dbus/edits-and-spanning/depth.html">Depth maps and depth layers</a></li><li><a href="../specs/dbus/edits-and-spanning/edit-file.html">The edit file</a></li><li><a href="../specs/dbus/json-model/lists-providers-inputs.html">Lists, providers, inputs and accounts</a></li><li><a href="../specs/dbus/json-model/rules.html">The rules of the model</a></li><li><a href="../specs/dbus/json-model/state-jobs-library.html">State, jobs and the library</a></li><li><a href="../specs/editor/actions/animation-and-3d.html">Animation and 3D</a></li><li><a href="../specs/editor/actions/bones-clips-and-expressions.html">Bones, clips and expressions</a></li><li><a href="../specs/editor/actions/document-and-layers.html">Document and layers</a></li><li><a href="../specs/editor/actions/effects-and-layer-fields.html">Effects and layer fields</a></li><li><a href="../specs/editor/actions/keys-imports-and-effects.html">Keys, imports and effects</a></li><li><a href="../specs/editor/actions/kinematics-physics-and-parts.html">Kinematics, physics and parts</a></li><li><a href="../specs/editor/actions/lights-and-maps.html">Lights and maps</a></li><li><a href="../specs/editor/actions/manifest-canvas-timelines-and-media.html">Manifest, canvas, timelines and media</a></li><li><a href="../specs/editor/actions/media-assets-and-sprites.html">Media, assets, ids, keys and timelines</a></li><li><a href="../specs/editor/actions/particles.html">Particles</a></li><li><a href="../specs/editor/actions/scripts-templates-and-assets.html">Scripts, templates and assets</a></li><li><a href="../specs/editor/actions/translations-captures-and-properties.html">Translations, captures and properties</a></li><li><a href="../specs/editor/preview/outlines.html">Layer outlines on the canvas</a></li><li><a href="../specs/editor/preview/pictures-and-console.html">Pictures, clips and the console</a></li><li><a href="../specs/editor/preview/stream-and-level.html">The preview stream and its level</a></li><li><a href="../specs/scene/canvas-clock-and-assets/audio-media-fonts.html">Scene audio, media and fonts</a></li><li><a href="../specs/scene/canvas-clock-and-assets/main-fields.html">The main fields</a></li><li><a href="../specs/scene/canvas-clock-and-assets/newer-canvas-fields.html">Newer canvas fields</a></li><li><a href="../specs/scene/cost-and-frame-rate/drawing-less.html">Drawing less</a></li><li><a href="../specs/scene/cost-and-frame-rate/frame-cost-and-tier.html">The cost of a frame and the tier</a></li><li><a href="../specs/scene/cost-and-frame-rate/quality-levels.html">Quality levels and the budget</a></li><li><a href="../specs/scene/effects-package-effects/descriptor.html">The descriptor</a></li><li><a href="../specs/scene/effects-package-effects/passes-and-compiling.html">Passes, the check and compiling</a></li><li><a href="../specs/scene/effects-package-effects/running.html">Running package effects</a></li><li><a href="../specs/scene/layers-meshes/fields-and-clips.html">Mesh fields, clips and animation layers</a></li><li><a href="../specs/scene/layers-meshes/mesh-file.html">The mesh file</a></li><li><a href="../specs/scene/layers-meshes/reaching-and-swinging.html">Reaching and swinging</a></li><li><a href="../specs/scene/layers-models-and-3d/camera-and-animation.html">The 3D camera and animated models</a></li><li><a href="../specs/scene/layers-models-and-3d/lights-and-groups.html">Shadows, lights and 3D groups</a></li><li><a href="../specs/scene/layers-models-and-3d/model-and-materials.html">The model layer and materials</a></li><li><a href="../specs/scene/particles-newer-particle-fields/fields.html">The newer fields</a></li><li><a href="../specs/scene/particles-newer-particle-fields/look-and-births.html">Looks and births</a></li><li><a href="../specs/scene/particles-newer-particle-fields/shaders-colliders-limits.html">Shaders, colliders and limits</a></li><li><a href="../specs/scene/particles-newer-particle-fields/space-forces-children.html">Space, forces and children</a></li><li><a href="../specs/scene/values/newer-forms-and-media.html">Newer forms, events and media</a></li><li><a href="../specs/scene/values/sources-and-timelines.html">Sources, modifiers and timelines</a></li></ul></details></div></details>
+    <div class="wide"><details><summary>Get started</summary><ul><li><a href="../user/index.html">Getting started</a></li></ul></details><details><summary>Using Reiwand</summary><ul><li><details class=sub><summary>Desktop app</summary><ul><li class=has><details><summary><a href="../user/app.html">The desktop app</a></summary><ul><li><a href="../user/app/library.html">Keys and the library</a></li><li><a href="../user/app/getting-wallpapers.html">Getting and making wallpapers</a></li><li><a href="../user/app/lists-and-tray.html">Lists, the preview and the tray</a></li><li><a href="../user/app/settings.html">Settings and permissions</a></li></ul></details></li><li><a href="../user/other-desktops.html">Sway, Hyprland, river, niri and COSMIC</a></li><li><a href="../user/keyboard-switching.html">Changing the wallpaper with the keyboard</a></li><li class=has><details><summary><a href="../user/packages.html">Packages: rating, languages and credits</a></summary><ul><li><a href="../user/packages/manifest.html">The package manifest</a></li><li><a href="../user/packages/ratings-and-search.html">Mature content, flashing and search</a></li><li><a href="../user/packages/assets-and-presets.html">Assets, presets and dependencies</a></li><li><a href="../user/packages/playback.html">Accent color, playback and shortcuts</a></li><li><a href="../user/packages/scene-features.html">Scene features</a></li><li><a href="../user/packages/timelines-and-sound.html">Timelines, sound and video clocks</a></li><li><a href="../user/packages/package-effects.html">Package effects</a></li><li><a href="../user/packages/built-in-effects.html">Built-in effects</a></li><li><a href="../user/packages/advanced-scenes.html">Advanced scenes</a></li><li><a href="../user/packages/meshes.html">Skeleton meshes</a></li><li><a href="../user/packages/particles.html">Particles</a></li><li><a href="../user/packages/lights.html">Lights</a></li><li><a href="../user/packages/models.html">3D models</a></li><li><a href="../user/packages/compatibility.html">Compatibility and versions</a></li></ul></details></li><li><a href="../user/web-wallpapers.html">Web wallpapers</a></li><li><a href="../user/rgb-lighting.html">RGB lighting</a></li><li><a href="../user/player.html">Media player</a></li><li class=has><details><summary><a href="../user/privacy.html">Privacy</a></summary><ul><li><a href="../user/privacy/network.html">Network and updates</a></li><li><a href="../user/privacy/stored-data.html">Stored data and secrets</a></li><li><a href="../user/privacy/scene-permissions.html">Scenes and what they can see</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Phone</summary><ul><li><a href="../user/phone.html">The phone app</a></li><li class=has><details><summary><a href="../user/android.html">Android</a></summary><ul><li><a href="../user/android/install.html">Installing on Android</a></li><li><a href="../user/android/library.html">The app and the library</a></li><li><a href="../user/android/images.html">Images and setting the wallpaper</a></li><li><a href="../user/android/lists.html">Lists</a></li><li><a href="../user/android/videos.html">Videos</a></li><li><a href="../user/android/parallax-depth.html">Parallax and depth</a></li><li><a href="../user/android/packages.html">Packages</a></li><li><a href="../user/android/scenes.html">Scenes</a></li><li><a href="../user/android/media-sound-touch.html">Media, sound and touch</a></li><li><a href="../user/android/settings.html">Settings</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Command line</summary><ul><li class=has><details><summary><a href="../user/command-line.html">Using it from the terminal</a></summary><ul><li><a href="../user/command-line/everyday-commands.html">Everyday commands</a></li><li><a href="../user/command-line/stepping-with-the-keyboard.html">Stepping through wallpapers with the keyboard</a></li><li><a href="../user/command-line/library-lists-and-packages.html">Library, lists and packages</a></li><li><a href="../user/command-line/scripts-jobs-and-output.html">Scripts, jobs and output</a></li><li><a href="../user/command-line/providers.html">Providers</a></li><li><a href="../user/command-line/repositories.html">Repositories</a></li><li><a href="../user/command-line/accounts-and-phone.html">Accounts and the phone&#x27;s repositories</a></li><li><a href="../user/command-line/frame-rate-and-automatic-quality.html">Frame rate and automatic scene quality</a></li><li><a href="../user/command-line/choosing-scene-quality.html">Choosing the scene quality</a></li><li><a href="../user/command-line/hdr-power-and-motion.html">HDR, power, motion and flashing</a></li><li><a href="../user/command-line/graphics-card.html">Choosing the graphics card</a></li><li><a href="../user/command-line/streams-and-video-decoding.html">Streams and video decoding</a></li><li><a href="../user/command-line/editing-images.html">Editing images</a></li><li><a href="../user/command-line/depth-and-parallax.html">Depth maps and parallax</a></li><li><a href="../user/command-line/parallax-layers.html">3D parallax layers</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Installation</summary><ul><li class=has><details><summary><a href="../user/installation.html">Installation (without root)</a></summary><ul><li><a href="../user/installation/appimage.html">Download and install the AppImage</a></li><li><a href="../user/installation/requirements.html">Requirements</a></li><li><a href="../user/installation/plasma.html">Setting up Plasma and the tray</a></li><li><a href="../user/installation/updates-and-versions.html">Updates and versions</a></li></ul></details></li><li><a href="../user/flatpak.html">Installation with Flatpak</a></li></ul></details></li></ul></details><details><summary>Your own server</summary><ul><li class=has><details><summary><a href="../user/server.html">Your own server</a></summary><ul><li><a href="../user/server/install.html">Installing the server</a></li><li><a href="../user/server/configuration.html">Image and configuration</a></li><li><a href="../user/server/https.html">HTTPS</a></li><li><a href="../user/server/backups-and-versions.html">Backups and data from another version</a></li><li><a href="../user/server/repositories-and-accounts.html">Repositories and accounts</a></li><li><a href="../user/server/uploads-and-catalog.html">Uploads and the catalog</a></li><li><a href="../user/server/taking-wallpapers-away.html">Taking a wallpaper away</a></li><li><a href="../user/server/author-keys.html">Author keys and package tools</a></li><li><a href="../user/server/static-repositories.html">Static repositories</a></li><li><a href="../user/server/moving-configuration.html">Moving the configuration to another computer</a></li><li><a href="../user/server/scenes.html">Scene properties</a></li><li><a href="../user/server/scene-sound-and-examples.html">Example scenes and sound</a></li></ul></details></li><li class=has><details><summary><a href="../specs/server.html">Self-hosted server</a></summary><ul><li><a href="../specs/server/running.html">Running</a></li><li><a href="../specs/server/conventions.html">Conventions and Discovery and health</a></li><li><a href="../specs/server/repository.html">Repository</a></li><li><a href="../specs/server/catalog.html">Catalog and Accounts</a></li><li><a href="../specs/server/uploads.html">Uploads</a></li><li><a href="../specs/server/moderation-and-administration.html">Moderation and administration</a></li><li><a href="../specs/server/legal-pages.html">Legal pages and Operating a public server</a></li></ul></details></li><li class=has><details><summary><a href="../specs/repo.html">Signed repositories</a></summary><ul><li><a href="../specs/repo/keys-and-roles.html">Keys and roles, Signature files, Layout and Identity and URL</a></li><li><a href="../specs/repo/formats.html">Formats and Package signatures</a></li><li><a href="../specs/repo/online-authors.html">Online authors, Operator workflow, Client update, Package installation, Broken repositories and Client storage</a></li><li><a href="../specs/repo/bundled-example-repository.html">Bundled example repository, Network interface and Adding a repository in the desktop app</a></li></ul></details></li></ul></details><details><summary>Creating wallpapers</summary><ul><li><details class=sub><summary>First scene</summary><ul><li><a href="../authoring/index.html">Creating scenes</a></li><li><a href="../authoring/start/first-scene.html">Your first scene</a></li><li class=has><details><summary><a href="../authoring/scene.html">The scene file</a></summary><ul><li><a href="../authoring/scene/folder.html">The folder, the clock and the assets</a></li><li><a href="../authoring/scene/canvas.html">The canvas</a></li><li><a href="../authoring/scene/cost.html">What a scene costs</a></li><li><a href="../authoring/scene/values.html">Values that move</a></li><li><a href="../authoring/scene/timelines-and-inputs.html">Timelines and inputs</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Layers</summary><ul><li class=has><details><summary><a href="../authoring/layers.html">Layers</a></summary><ul><li><a href="../authoring/layers/basics.html">Layer basics</a></li><li><a href="../authoring/layers/image-and-video.html">Image and video layers</a></li><li><a href="../authoring/layers/text.html">Text layer (text)</a></li><li><a href="../authoring/layers/shapes.html">Shape, solid and spectrum layers</a></li><li><a href="../authoring/layers/groups.html">Group and adjustment layers</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/properties.html">User properties</a></summary><ul><li><a href="../authoring/properties/declaring.html">Declaring properties</a></li><li><a href="../authoring/properties/behavior.html">Conditions, presets and translations</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/meshes.html">Meshes, bones and animation</a></summary><ul><li><a href="../authoring/meshes/layer-and-parts.html">The mesh layer and its parts</a></li><li><a href="../authoring/meshes/motion.html">Clips, bones and expressions</a></li><li><a href="../authoring/meshes/attaching.html">Attached layers and models</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/3d.html">Lights, 3D, camera and depth</a></summary><ul><li><a href="../authoring/3d/flat-lights.html">Lights on flat layers</a></li><li><a href="../authoring/3d/models.html">3D models</a></li><li><a href="../authoring/3d/lights-and-camera.html">Lights, shadows and the camera</a></li><li><a href="../authoring/3d/depth-and-hdr.html">Depth and bright colors</a></li></ul></details></li><li><a href="../authoring/transitions.html">Make and try your own transition</a></li></ul></details></li><li><details class=sub><summary>Effects</summary><ul><li class=has><details><summary><a href="../authoring/effects.html">Effects</a></summary><ul><li><a href="../authoring/effects/on-a-layer.html">Putting effects on a layer</a></li><li><a href="../authoring/effects/motion.html">Motion effects</a></li><li><a href="../authoring/effects/light-and-color.html">Light and color effects</a></li><li><a href="../authoring/effects/blur-and-style.html">Blur, distortion and style effects</a></li><li><a href="../authoring/effects/own-descriptor.html">Your own effect: the descriptor</a></li><li><a href="../authoring/effects/own-shader.html">Your own effect: the shader</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Particles and sound</summary><ul><li class=has><details><summary><a href="../authoring/particles-and-sound.html">Particles and sound</a></summary><ul><li><a href="../authoring/particles-and-sound/systems.html">Particle systems and emitters</a></li><li><a href="../authoring/particles-and-sound/motion.html">How particles start and move</a></li><li><a href="../authoring/particles-and-sound/drawing.html">How particles are drawn</a></li><li><a href="../authoring/particles-and-sound/control-points.html">Control points, children and depth</a></li><li><a href="../authoring/particles-and-sound/sound.html">Sound</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Scripts</summary><ul><li><a href="../authoring/scripts-guide.html">Guide for script authors</a></li><li class=has><details><summary><a href="../authoring/scripts.html">Scripts</a></summary><ul><li><a href="../authoring/scripts/basics.html">Script basics</a></li><li><a href="../authoring/scripts/exports-and-events.html">Exports, events and inputs</a></li><li><a href="../authoring/scripts/interface-scene.html">The scene from a script</a></li><li><a href="../authoring/scripts/interface-more.html">More of the script interface</a></li><li><a href="../authoring/scripts/testing.html">Test and debug</a></li><li><a href="../authoring/scripts/examples.html">Complete examples</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Web</summary><ul><li class=has><details><summary><a href="../authoring/web-wallpapers.html">Web wallpapers</a></summary><ul><li><a href="../authoring/web-wallpapers/basics.html">The minimum web wallpaper</a></li><li><a href="../authoring/web-wallpapers/interface.html">The page and the program</a></li><li><a href="../authoring/web-wallpapers/isolation.html">What a page may reach</a></li><li><a href="../authoring/web-wallpapers/phone-and-apps.html">Phones and existing applications</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Publishing</summary><ul><li class=has><details><summary><a href="../authoring/package.html">From the scene folder to a package that others install</a></summary><ul><li><a href="../authoring/package/manifest.html">The manifest</a></li><li><a href="../authoring/package/manifest-rights.html">Languages, licenses and ratings</a></li><li><a href="../authoring/package/checking.html">Previews and checking</a></li><li><a href="../authoring/package/signing.html">Packaging and signing</a></li><li><a href="../authoring/package/publishing.html">Publishing and copies</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/cli.html">The reiwand-ctl authoring commands</a></summary><ul><li><a href="../authoring/cli/create.html">Create, change and import</a></li><li><a href="../authoring/cli/view.html">Viewing the scene</a></li><li><a href="../authoring/cli/capture.html">Capture</a></li><li><a href="../authoring/cli/check-and-publish.html">Check, package and publish</a></li><li><a href="../authoring/cli/actions.html">The editor&#x27;s actions from the terminal</a></li></ul></details></li><li><a href="../authoring/provider-plugins.html">Provider plugins</a></li></ul></details></li><li><details class=sub><summary>The editor</summary><ul><li class=has><details><summary><a href="../authoring/editor.html">The scene editor: getting started, saving, undo, preview and shortcuts</a></summary><ul><li><a href="../authoring/editor/opening.html">The editor and its window</a></li><li><a href="../authoring/editor/creating-and-saving.html">Creating, saving and undoing</a></li><li><a href="../authoring/editor/checking-and-viewing.html">Problems and previews</a></li><li><a href="../authoring/editor/cost-and-package.html">Cost, the package and the image editor</a></li><li><a href="../authoring/editor/shortcuts.html">All keyboard shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-features.html">Scene editor</a></summary><ul><li><a href="../authoring/editor-features/parts.html">The parts of the editor</a></li><li><a href="../authoring/editor-features/package-and-assets.html">The package, properties and assets</a></li><li><a href="../authoring/editor-features/problems-and-masks.html">Problems and painted masks</a></li><li><a href="../authoring/editor-features/meshes.html">Meshes, clips and chains</a></li><li><a href="../authoring/editor-features/particles.html">Particle tools</a></li><li><a href="../authoring/editor-features/files-and-3d.html">Layers from files and 3D models</a></li><li><a href="../authoring/editor-features/fbx-and-obj.html">Converting FBX and OBJ models to glTF with Blender</a></li></ul></details></li><li><a href="../authoring/other-editor-packages.html">Web wallpapers and other packages in the editor</a></li><li class=has><details><summary><a href="../authoring/editor-canvas.html">Canvas, layers and inspector of the editor</a></summary><ul><li><a href="../authoring/editor-canvas/choosing-and-moving.html">Choosing and moving layers</a></li><li><a href="../authoring/editor-canvas/view-and-canvas.html">The view and the canvas</a></li><li><a href="../authoring/editor-canvas/layers.html">Adding and arranging layers</a></li><li><a href="../authoring/editor-canvas/inspector-and-assets.html">The inspector, templates and assets</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-drawing.html">Drawing in the editor: shapes, text, maps, sprites and depth</a></summary><ul><li><a href="../authoring/editor-drawing/shapes-and-text.html">Shapes, gradients and text</a></li><li><a href="../authoring/editor-drawing/fonts-and-maps.html">Fonts, light maps and sprite sheets</a></li><li><a href="../authoring/editor-drawing/depth.html">Depth maps and cuts</a></li><li><a href="../authoring/editor-drawing/regions.html">Regions and the parallax model</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-effects.html">Effects, masks and shaders in the scene editor</a></summary><ul><li><a href="../authoring/editor-effects/basics.html">Adding effects</a></li><li><a href="../authoring/editor-effects/catalog.html">The effect catalog and parameters</a></li><li><a href="../authoring/editor-effects/masks.html">Masks, maps and glow</a></li><li><a href="../authoring/editor-effects/adjust-and-cost.html">Adjustment layers, rest rules and cost</a></li><li><a href="../authoring/editor-effects/package-effects.html">Package effects and shaders</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-animation.html">Animation in the editor: timelines, keys, curves and clips</a></summary><ul><li><a href="../authoring/editor-animation/clips-and-videos.html">Clips and videos</a></li><li><a href="../authoring/editor-animation/keys.html">Keys and the time strip</a></li><li><a href="../authoring/editor-animation/timelines.html">Timelines, triggers and curves</a></li><li><a href="../authoring/editor-animation/sprites-and-rest.html">Sprites, rest rules and shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-particles-and-sound.html">Particles and sound in the editor</a></summary><ul><li><a href="../authoring/editor-particles-and-sound/systems-and-emitters.html">Particle systems and emitters</a></li><li><a href="../authoring/editor-particles-and-sound/starts-and-forces.html">How particles start and the forces</a></li><li><a href="../authoring/editor-particles-and-sound/colliders-and-look.html">Colliders, trails and the look</a></li><li><a href="../authoring/editor-particles-and-sound/sound.html">Sound layers and links</a></li><li><a href="../authoring/editor-particles-and-sound/sound-response.html">Sound levels and shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-meshes.html">Meshes, bones and expressions in the editor</a></summary><ul><li><a href="../authoring/editor-meshes/bones.html">Meshes and bones</a></li><li><a href="../authoring/editor-meshes/motion-and-shapes.html">Bone motion, blend shapes and parts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-3d.html">Editor: 3D, lights, camera and materials</a></summary><ul><li><a href="../authoring/editor-3d/models.html">Models and moving in 3D</a></li><li><a href="../authoring/editor-3d/camera-and-lights.html">The camera and lights</a></li><li><a href="../authoring/editor-3d/light-and-materials.html">Light, shadows and materials</a></li><li><a href="../authoring/editor-3d/animation-and-cost.html">3D animation and cost</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-properties.html">User properties and presets in the editor</a></summary><ul><li><a href="../authoring/editor-properties/adding.html">Adding properties</a></li><li><a href="../authoring/editor-properties/types-and-order.html">Other types and order</a></li><li><a href="../authoring/editor-properties/behavior.html">Following properties and conditions</a></li><li><a href="../authoring/editor-properties/presets.html">Translations and presets</a></li><li><a href="../authoring/editor-properties/preset-packages.html">Making a preset package</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Editor actions from the terminal</summary><ul><li><a href="../authoring/actions.html">Editor actions and queries from the command line</a></li><li class=has><details><summary><a href="../authoring/actions-layers.html">Actions: layers, assets and canvas</a></summary><ul><li><a href="../authoring/actions-layers/before-you-start.html">Before you start</a></li><li><a href="../authoring/actions-layers/layers.html">Layers</a></li><li><a href="../authoring/actions-layers/place-and-shape-a-layer.html">Place and shape a layer</a></li><li><a href="../authoring/actions-layers/assets.html">Assets</a></li><li><a href="../authoring/actions-layers/canvas.html">Canvas</a></li><li><a href="../authoring/actions-layers/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-effects.html">Actions: effects and masks</a></summary><ul><li><a href="../authoring/actions-effects/a-layer-s-effects.html">A layer&#x27;s effects</a></li><li><a href="../authoring/actions-effects/masks-and-painted-maps.html">Masks, painted maps and own transitions</a></li><li><a href="../authoring/actions-effects/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-meshes.html">Actions: meshes, bones and animation</a></summary><ul><li><a href="../authoring/actions-meshes/before-you-start-with-meshes-bones-and-a.html">Before you start and creating a mesh</a></li><li><a href="../authoring/actions-meshes/bones-and-weights.html">Bones and weights</a></li><li><a href="../authoring/actions-meshes/clips-and-keys.html">Clips and keys</a></li><li><a href="../authoring/actions-meshes/blend-shapes-and-expressions.html">Blend shapes and expressions</a></li><li><a href="../authoring/actions-meshes/kinematics-and-physics.html">Kinematics and physics</a></li><li><a href="../authoring/actions-meshes/parts-and-attachments.html">Parts and attachments</a></li><li><a href="../authoring/actions-meshes/play-and-blend-animations.html">Play and blend animations</a></li><li><a href="../authoring/actions-meshes/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-particles-and-lights.html">Actions: particles, lights and sound</a></summary><ul><li><a href="../authoring/actions-particles-and-lights/particles.html">Particles</a></li><li><a href="../authoring/actions-particles-and-lights/lights-and-ambient-light.html">Lights and ambient light</a></li><li><a href="../authoring/actions-particles-and-lights/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-3d.html">Actions: 3D scene</a></summary><ul><li><a href="../authoring/actions-3d/3d-scene-how-it-works.html">How 3D works, models and groups</a></li><li><a href="../authoring/actions-3d/3d-scene-materials.html">Materials</a></li><li><a href="../authoring/actions-3d/3d-scene-camera-and-view.html">Camera, view, lights and shadows</a></li><li><a href="../authoring/actions-3d/3d-scene-camera-paths.html">Camera paths and dragging handles</a></li><li><a href="../authoring/actions-3d/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-time-and-package.html">Actions: time, package, properties and scripts</a></summary><ul><li><a href="../authoring/actions-time-and-package/timeline-and-keys.html">Timeline and keys</a></li><li><a href="../authoring/actions-time-and-package/package.html">Package</a></li><li><a href="../authoring/actions-time-and-package/user-properties.html">User properties</a></li><li><a href="../authoring/actions-time-and-package/scripts-and-templates.html">Scripts and templates</a></li><li><a href="../authoring/actions-time-and-package/shaders.html">Shaders, undo and redo</a></li><li><a href="../authoring/actions-time-and-package/queries.html">Queries</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Examples</summary><ul><li class=has><details><summary><a href="../authoring/coverage.html">What each example shows</a></summary><ul><li><a href="../authoring/coverage/features.html">Features, effects, blends and layers</a></li><li><a href="../authoring/coverage/values-and-scripts.html">Values, triggers, files and scripts</a></li><li><a href="../authoring/coverage/scene.html">Everything else in scene.json</a></li></ul></details></li><li><a href="../authoring/examples/ORIGIN.html">Origin of the example files</a></li></ul></details></li></ul></details><details open><summary>Reference</summary><ul><li><details class=sub open><summary>Formats and interfaces</summary><ul><li class=has><details><summary><a href="../specs/scene.html">Scene format</a></summary><ul><li><a href="../specs/scene/every-value-is-written.html">Every value is written</a></li><li><a href="../specs/scene/canvas-clock-and-assets.html">Canvas, clock and assets</a></li><li><a href="../specs/scene/canvas-clock-and-assets-ktx2-textures.html">KTX2 textures</a></li><li><a href="../specs/scene/cost-and-frame-rate.html">Cost and frame rate</a></li><li><a href="../specs/scene/layers.html">Layers</a></li><li><a href="../specs/scene/layers-text.html">Text</a></li><li><a href="../specs/scene/layers-lights.html">Lights</a></li><li><a href="../specs/scene/layers-meshes.html">Meshes</a></li><li><a href="../specs/scene/layers-models-and-3d.html">Models and 3D</a></li><li><a href="../specs/scene/values.html">Values</a></li><li><a href="../specs/scene/effects.html">Effects</a></li><li><a href="../specs/scene/effects-writing-an-effect.html">Writing an effect</a></li><li><a href="../specs/scene/effects-package-effects.html">Package effects</a></li><li><a href="../specs/scene/effects-package-transitions.html">Package transitions</a></li><li><a href="../specs/scene/effects-newer-effects-and-parame.html">Newer effects and parameters</a></li><li><a href="../specs/scene/sound.html">Sound</a></li><li><a href="../specs/scene/particles.html">Particles</a></li><li><a href="../specs/scene/particles-newer-particle-fields.html">Newer particle fields</a></li><li><a href="../specs/scene/user-properties-and-presets.html">User properties and presets</a></li><li><a href="../specs/scene/inputs.html">Inputs</a></li><li><a href="../specs/scene/scripts.html">Scripts</a></li><li><a href="../specs/scene/scripts-the-reiwand-module.html">The reiwand module</a></li><li><a href="../specs/scene/scripts-parents-the-camera-shape.html">Parents, the camera, shapes, storage and folders</a></li><li><a href="../specs/scene/scripts-when-a-script-fails.html">When a script fails, Listening to the audio from a script and Script declarations</a></li><li><a href="../specs/scene/rebuilding-a-scene-by-hand.html">Rebuilding a scene by hand</a></li><li><a href="../specs/scene/rebuilding-a-scene-by-hand-porting-a-shader-to-wgsl.html">Porting a shader to WGSL</a></li></ul></details></li><li class=has><details><summary><a href="../specs/package.html">Packages</a></summary><ul><li><a href="../specs/package/versions.html">Versions and Manifest</a></li><li><a href="../specs/package/display-and-playback.html">Display and playback and Rating and photosensitivity</a></li><li><a href="../specs/package/inputs.html">Inputs</a></li><li><a href="../specs/package/features.html">Features</a></li><li><a href="../specs/package/profiles.html">Profiles, Platforms, Dependencies, Origin and Web pages</a></li><li><a href="../specs/package/presets.html">Presets, Shared resources, Languages and Markup</a></li><li><a href="../specs/package/facets-and-tags.html">Facets and tags</a></li></ul></details></li><li class=has><details><summary><a href="../specs/web.html">Web pages</a></summary><ul><li><a href="../specs/web/engine.html">Engine, Frames, Lifecycle and Session and the page&#x27;s view</a></li><li><a href="../specs/web/protocol.html">Protocol, Frame clock, Console of a preview and Sandbox</a></li><li><a href="../specs/web/privacy.html">Privacy and The page interface</a></li><li><a href="../specs/web/on-the-phone.html">On the phone</a></li></ul></details></li><li class=has><details><summary><a href="../specs/editor.html">Scene editor</a></summary><ul><li><a href="../specs/editor/document.html">Document and Operations</a></li><li><a href="../specs/editor/actions.html">Actions</a></li><li><a href="../specs/editor/actions-curve-editor.html">Curve editor</a></li><li><a href="../specs/editor/actions-from-the-command-line.html">Actions from the command line and Scripts and templates</a></li><li><a href="../specs/editor/package-effects-and-shaders.html">Package effects and shaders and History</a></li><li><a href="../specs/editor/inspector.html">Inspector</a></li><li><a href="../specs/editor/inspector-shapes-text-and-fonts.html">Shapes, text and fonts, Hearing, shaping and trying a binding and Sound layers</a></li><li><a href="../specs/editor/package-details.html">Package details</a></li><li><a href="../specs/editor/user-properties-and-presets.html">User properties and presets</a></li><li><a href="../specs/editor/user-properties-and-presets-mesh-layers.html">Mesh layers</a></li><li><a href="../specs/editor/user-properties-and-presets-particle-systems.html">Particle systems</a></li><li><a href="../specs/editor/user-properties-and-presets-lights.html">Lights</a></li><li><a href="../specs/editor/user-properties-and-presets-models-and-3d.html">Models and 3D</a></li><li><a href="../specs/editor/editor-frame.html">Editor frame</a></li><li><a href="../specs/editor/editor-layouts.html">Layouts</a></li><li><a href="../specs/editor/editor-panels.html">Editor panels</a></li><li><a href="../specs/editor/preview.html">Preview</a></li><li><a href="../specs/editor/pointer-areas-and-sound-bindings.html">Pointer areas and sound bindings and Shared parts</a></li><li><a href="../specs/editor/web-pages-and-other-packages.html">Web pages and other packages</a></li><li><a href="../specs/editor/web-pages-and-other-packages-preset-packages.html">Preset packages</a></li><li><a href="../specs/editor/starting-points-building-and-applying.html">Starting points, building and applying</a></li><li><a href="../specs/editor/picture-depth-tools.html">Picture depth tools</a></li><li><a href="../specs/editor/editor-keyboard-and-non-scene-packages.html">Editor keyboard and non-scene packages and The own transition of a scene</a></li></ul></details></li><li class=has><details open><summary><a href="../specs/dbus.html" aria-current=page>D-Bus interface</a></summary><ul><li><a href="../specs/dbus/conventions.html">Conventions, Errors and Streams and claims</a></li><li><a href="../specs/dbus/layer-shell-and-x11-outputs.html">Layer-shell and X11 outputs</a></li><li><a href="../specs/dbus/frame-rate.html">Frame rate and Video decoding</a></li><li><a href="../specs/dbus/stream-buffers.html">Stream buffers</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1.html">io.github.reiwand.Daemon1</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html">io.github.reiwand.Daemon1: ClearWallpaper to SetSceneProperty</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-listapplications-s-json.html">io.github.reiwand.Daemon1: ListApplications → to ShareSceneValues</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-setoption-s-key-s-value.html">io.github.reiwand.Daemon1: SetOption</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-reload.html">io.github.reiwand.Daemon1: Reload to Signal JobFinished</a></li><li><a href="../specs/dbus/io-github-reiwand-library1.html">io.github.reiwand.Library1</a></li><li><a href="../specs/dbus/io-github-reiwand-library1-renametag-s-from-s-to.html">io.github.reiwand.Library1: RenameTag to Signal ThumbnailReady</a></li><li><a href="../specs/dbus/io-github-reiwand-playlists1.html">io.github.reiwand.Playlists1</a></li><li><a href="../specs/dbus/io-github-reiwand-playlists1-history-s-output-u-limit.html">io.github.reiwand.Playlists1: History → to Signal BrowseChanged</a></li><li><a href="../specs/dbus/io-github-reiwand-profiles1.html">io.github.reiwand.Profiles1</a></li><li><a href="../specs/dbus/io-github-reiwand-providers1.html">io.github.reiwand.Providers1</a></li><li><a href="../specs/dbus/io-github-reiwand-providers1-clearcache-s-id.html">io.github.reiwand.Providers1: ClearCache to RemovePlugin</a></li><li><a href="../specs/dbus/io-github-reiwand-repos1.html">io.github.reiwand.Repos1</a></li><li><a href="../specs/dbus/io-github-reiwand-inputs1.html">io.github.reiwand.Inputs1</a></li><li><a href="../specs/dbus/io-github-reiwand-inputs1-decide-s-scene-s-key-as-.html">io.github.reiwand.Inputs1: Decide to Bands →</a></li><li><a href="../specs/dbus/io-github-reiwand-inputs1-touch-s-output-d-x-d-y-u.html">io.github.reiwand.Inputs1: Touch to SetPointer</a></li><li><a href="../specs/dbus/io-github-reiwand-rgb1.html">io.github.reiwand.Rgb1</a></li><li><a href="../specs/dbus/io-github-reiwand-publish1.html">io.github.reiwand.Publish1, io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li><li><a href="../specs/dbus/the-app-io-github-reiwand.html">The app: io.github.reiwand</a></li><li><a href="../specs/dbus/edits-and-spanning.html">Edits and spanning</a></li><li><a href="../specs/dbus/scenes.html">Scenes, Scene sound and Change notification</a></li><li><a href="../specs/dbus/jobs.html">Jobs and Thumbnails</a></li><li><a href="../specs/dbus/json-model.html">JSON model</a></li><li><a href="../specs/dbus/configuration-file.html">Configuration file</a></li></ul></details></li><li><a href="../specs/export.html">Export and import file (.reiwand)</a></li><li><a href="../specs/explicit-values.html">Explicit values</a></li><li><a href="../specs/provider-plugins.html">Provider plugins</a></li></ul></details></li><li><details class=sub><summary>The app and its screens</summary><ul><li class=has><details><summary><a href="../specs/library.html">Library of the desktop app</a></summary><ul><li><a href="../specs/library/shelf.html">Shelf</a></li><li><a href="../specs/library/see-all.html">See all, Several chosen, Damaged or missing file, No results and failures, First start, Options of a wallpaper, My presets, Permission question, Still on its poster and Damaged scene</a></li></ul></details></li><li><a href="../specs/create.html">Create page</a></li><li class=has><details><summary><a href="../specs/shell.html">Window of the desktop app</a></summary><ul><li><a href="../specs/shell/image-and-tones.html">Image and tones, Menu, Skeletons, Keyboard, Choosing files and folders, Notices, Size and What a page declares</a></li><li><a href="../specs/shell/low-band-of-the-title-screens.html">Low band of the title screens, Sources and Settings</a></li><li><a href="../specs/shell/private-mode.html">Private mode, Name of the screens, Now block, Lists and Third-party licenses</a></li></ul></details></li><li><a href="../specs/look.html">Look of the desktop app</a></li><li><a href="../specs/palette.html">Interface palette</a></li><li><a href="../specs/icon.html">Icon</a></li><li><a href="../specs/settings-pieces.html">Pieces for what is adjusted and for what each screen says</a></li><li><a href="../specs/choose-pieces.html">Pieces for choosing wallpapers</a></li><li><a href="../specs/phone-daily-use.html">Phone: daily use</a></li></ul></details></li></ul></details><details><summary>Development</summary><ul><li><a href="../development/development.html">Development</a></li><li><a href="../development/design.html">Design guide</a></li><li><a href="../development/qml.html">Known QML pitfalls</a></li><li><a href="../development/regression-net.html">Regression net</a></li><li><a href="../guidelines.html">Reiwand guidelines</a></li></ul></details><details><summary>Specifications</summary><ul><li><a href="../specs/dbus/edits-and-spanning/adjustments-and-spanning.html">Adjustments and spanning</a></li><li><a href="../specs/dbus/edits-and-spanning/depth.html">Depth maps and depth layers</a></li><li><a href="../specs/dbus/edits-and-spanning/edit-file.html">The edit file</a></li><li><a href="../specs/dbus/json-model/lists-providers-inputs.html">Lists, providers, inputs and accounts</a></li><li><a href="../specs/dbus/json-model/rules.html">The rules of the model</a></li><li><a href="../specs/dbus/json-model/state-jobs-library.html">State, jobs and the library</a></li><li><a href="../specs/editor/actions/animation-and-3d.html">Animation and 3D</a></li><li><a href="../specs/editor/actions/bones-clips-and-expressions.html">Bones, clips and expressions</a></li><li><a href="../specs/editor/actions/document-and-layers.html">Document and layers</a></li><li><a href="../specs/editor/actions/effects-and-layer-fields.html">Effects and layer fields</a></li><li><a href="../specs/editor/actions/keys-imports-and-effects.html">Keys, imports and effects</a></li><li><a href="../specs/editor/actions/kinematics-physics-and-parts.html">Kinematics, physics and parts</a></li><li><a href="../specs/editor/actions/lights-and-maps.html">Lights and maps</a></li><li><a href="../specs/editor/actions/manifest-canvas-timelines-and-media.html">Manifest, canvas, timelines and media</a></li><li><a href="../specs/editor/actions/media-assets-and-sprites.html">Media, assets, ids, keys and timelines</a></li><li><a href="../specs/editor/actions/particles.html">Particles</a></li><li><a href="../specs/editor/actions/scripts-templates-and-assets.html">Scripts, templates and assets</a></li><li><a href="../specs/editor/actions/translations-captures-and-properties.html">Translations, captures and properties</a></li><li><a href="../specs/editor/preview/outlines.html">Layer outlines on the canvas</a></li><li><a href="../specs/editor/preview/pictures-and-console.html">Pictures, clips and the console</a></li><li><a href="../specs/editor/preview/stream-and-level.html">The preview stream and its level</a></li><li><a href="../specs/scene/canvas-clock-and-assets/audio-media-fonts.html">Scene audio, media and fonts</a></li><li><a href="../specs/scene/canvas-clock-and-assets/main-fields.html">The main fields</a></li><li><a href="../specs/scene/canvas-clock-and-assets/newer-canvas-fields.html">Newer canvas fields</a></li><li><a href="../specs/scene/cost-and-frame-rate/drawing-less.html">Drawing less</a></li><li><a href="../specs/scene/cost-and-frame-rate/frame-cost-and-tier.html">The cost of a frame and the tier</a></li><li><a href="../specs/scene/cost-and-frame-rate/quality-levels.html">Quality levels and the budget</a></li><li><a href="../specs/scene/effects-package-effects/descriptor.html">The descriptor</a></li><li><a href="../specs/scene/effects-package-effects/passes-and-compiling.html">Passes, the check and compiling</a></li><li><a href="../specs/scene/effects-package-effects/running.html">Running package effects</a></li><li><a href="../specs/scene/layers-meshes/fields-and-clips.html">Mesh fields, clips and animation layers</a></li><li><a href="../specs/scene/layers-meshes/mesh-file.html">The mesh file</a></li><li><a href="../specs/scene/layers-meshes/reaching-and-swinging.html">Reaching and swinging</a></li><li><a href="../specs/scene/layers-models-and-3d/camera-and-animation.html">The 3D camera and animated models</a></li><li><a href="../specs/scene/layers-models-and-3d/lights-and-groups.html">Shadows, lights and 3D groups</a></li><li><a href="../specs/scene/layers-models-and-3d/model-and-materials.html">The model layer and materials</a></li><li><a href="../specs/scene/particles-newer-particle-fields/fields.html">The newer fields</a></li><li><a href="../specs/scene/particles-newer-particle-fields/look-and-births.html">Looks and births</a></li><li><a href="../specs/scene/particles-newer-particle-fields/shaders-colliders-limits.html">Shaders, colliders and limits</a></li><li><a href="../specs/scene/particles-newer-particle-fields/space-forces-children.html">Space, forces and children</a></li><li><a href="../specs/scene/values/newer-forms-and-media.html">Newer forms, events and media</a></li><li><a href="../specs/scene/values/sources-and-timelines.html">Sources, modifiers and timelines</a></li></ul></details></div>
+  </nav>
+  <main>
+    <p class="crumbs"><a href="../index.html">Docs</a><span>Reference</span><span>Formats and interfaces</span></p>
+    <article>
+<h1 id="d-bus-interface">D-Bus interface</h1>
+<p>Every component takes these names from
+<code>reiwand_core::dbus</code>. The command line client
+(<code>reiwand-ctl</code>) and the desktop app are plain clients of this
+interface: every action is available in both. The system tray and the
+desktop integration offer a subset.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Item</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bus</td>
+<td>session</td>
+</tr>
+<tr class="even">
+<td>Well-known name</td>
+<td><code>io.github.reiwand.Daemon</code></td>
+</tr>
+<tr class="odd">
+<td>Object path</td>
+<td><code>/io/github/reiwand/Daemon</code></td>
+</tr>
+<tr class="even">
+<td>Interfaces</td>
+<td><code>io.github.reiwand.Daemon1</code>, <code>Library1</code>,
+<code>Playlists1</code>, <code>Profiles1</code>,
+<code>Providers1</code>, <code>Repos1</code>, <code>Inputs1</code>,
+<code>Publish1</code>, <code>Accounts1</code>, <code>Carry1</code>, all
+on that object</td>
+</tr>
+</tbody>
+</table>
+<p>The daemon is D-Bus activatable (<code>packaging/dbus</code>) and
+runs as the systemd user unit <code>reiwandd.service</code>. In the
+Flatpak (<code>packaging/flatpak</code>) it owns the name through
+<code>--own-name</code>, so Flatpak exports the same activation file,
+starts the daemon with <code>flatpak run</code> and drops
+<code>SystemdService</code>; there is no systemd unit there. The name is
+owned without allowing replacement. A second daemon checks the name
+before initializing the GPU and PipeWire and exits at once with an error
+saying that another reiwandd owns it.</p>
+<p>Every connection of the workspace to the session or the system bus
+(daemon, <code>reiwand-ctl</code>, the app) goes through
+<code>reiwand_client::bus</code>, which sends each authentication
+command only after the bus answered the one before. Inside the Flatpak
+both buses are reached through <code>xdg-dbus-proxy</code>, and its
+releases before 0.1.6 drop a client that sends its authentication
+commands in one write; with this handshake the daemon and the clients
+connect through any proxy version. Those releases also drop a client
+whose message serials do not increase strictly, and the bus library
+numbers a message when it builds it, not when it writes it; so after the
+handshake the adapter gives every outgoing message the next serial of
+its connection, in the order the messages reach the socket, and gives
+each reply back the serial of the call it answers.
+<code>scripts/integration-proxy.sh</code> checks both when
+<code>REIWAND_BUS_PROXY</code> names a proxy binary, restarting the
+daemon fifteen times behind it.</p>
+<p>A panic in any thread of the daemon, a lost GPU device, a GPU that
+stops responding or a Wayland protocol error from the compositor makes
+the daemon exit with status 70 at once, without running the exit
+handlers of the libraries it uses (a GPU driver that stopped answering
+cannot hang it there), and the end of the display server connection with
+status 0 the same way; the user unit restarts it
+(<code>Restart=on-failure</code>, at most 5 starts in 60 s) and clients
+get their streams again through <code>RequestStream</code>. Only the
+methods that change what is shown (<code>Library1.Apply</code>,
+<code>Playlists1.Start</code>, <code>Stop</code>, <code>Next</code> and
+<code>Previous</code>, <code>Profiles1.Activate</code> and the
+<code>Daemon1</code> methods that change something) need the renderer:
+while it is not running they return <code>Failed</code>
+(<code>the renderer stopped after an error; restart reiwandd</code>) and
+change nothing. Every other method keeps working. Debug builds started
+with <code>REIWAND_RENDER_STOP=1</code> stop their renderer on
+<code>SIGUSR2</code>, so tests can check this.</p>
+<p>The daemon opens network connections only to the providers,
+repositories and the servers the user added (the accounts they signed in
+with) (including the signed mirrors of a repository, the only hosts a
+repository request may be redirected to), with a generic
+<code>User-Agent: reiwand/&lt;version&gt; (+https://github.com/reiwand/reiwand)</code>
+(the program and the address of the project, nothing about the person or
+the computer) and without cookies or <code>Referer</code>. At startup it
+contacts only providers due for their automatic sync; the daily
+repository refresh starts 10 minutes later.</p>
+<p>The specification, part by part:</p>
+<ul>
+<li><a href="dbus/conventions.html">Conventions, Errors and Streams and
+claims</a>: conventions, errors, streams and claims.</li>
+<li><a href="dbus/layer-shell-and-x11-outputs.html">Layer-shell and X11
+outputs</a>: layer-shell and x11 outputs.</li>
+<li><a href="dbus/frame-rate.html">Frame rate and Video decoding</a>:
+frame rate, video decoding.</li>
+<li><a href="dbus/stream-buffers.html">Stream buffers</a>: stream
+buffers.</li>
+<li><a
+href="dbus/io-github-reiwand-daemon1.html">io.github.reiwand.Daemon1</a>:
+<code>requeststream →</code>, <code>holdstream →</code>,
+<code>releasestream</code>, <code>setoutputcovered</code>,
+<code>setoutputinfo</code>, <code>previewedit</code>,
+<code>showcalibration</code>, <code>previewscene</code>,
+<code>setwallpaper</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html"><code>io.github.reiwand.Daemon1</code>:
+<code>ClearWallpaper</code> to <code>SetSceneProperty</code></a>:
+<code>clearwallpaper</code>, <code>restorewallpaper</code>,
+<code>setlockwallpaper</code>, <code>setlockplaylist</code>,
+<code>followdesktoponlock</code>, <code>showdesktoponlock</code>,
+<code>getlock →</code>, <code>handbacktoplasma →</code>,
+<code>setbackground</code>, <code>setfilter</code>,
+<code>getsceneproperties →</code>, <code>setsceneproperty</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-daemon1-listapplications-s-json.html"><code>io.github.reiwand.Daemon1</code>:
+<code>ListApplications →</code> to <code>ShareSceneValues</code></a>:
+<code>listapplications →</code>, <code>checkshortcut</code>,
+<code>applyscenepreset</code>, <code>resetsceneproperties</code>,
+<code>savescenepreset →</code>, <code>renamescenepreset</code>,
+<code>deletescenepreset</code>, <code>exportscenevalues →</code>,
+<code>importscenevalues →</code>, <code>pressscenebutton</code>,
+<code>capturepage →</code>, <code>getparticlestats →</code>,
+<code>sharescenevalues</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-daemon1-setoption-s-key-s-value.html"><code>io.github.reiwand.Daemon1</code>:
+<code>SetOption</code></a>: <code>setoption</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-daemon1-reload.html"><code>io.github.reiwand.Daemon1</code>:
+<code>Reload</code> to Signal <code>JobFinished</code></a>:
+<code>reload</code>, <code>restart</code>, <code>retryeffects</code>,
+<code>retrylayers</code>, <code>getstate →</code>,
+<code>getschema →</code>, <code>setpaused</code>,
+<code>setvolume</code>, <code>setmuted</code>,
+<code>setprivatemode</code>, <code>waitchanged →</code>,
+<code>listjobs →</code>, <code>getjob →</code>, <code>canceljob</code>,
+property <code>paused</code>, property <code>volume</code>, property
+<code>muted</code>, property <code>privatemode</code>, property
+<code>serial</code>, property <code>model</code>, signal
+<code>streamchanged</code>, signal <code>changed</code>, signal
+<code>jobprogress</code>, signal <code>jobfinished</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-library1.html">io.github.reiwand.Library1</a>:
+<code>addsource →</code>, <code>removesource</code>,
+<code>listsources →</code>, <code>rescan →</code>,
+<code>import →</code>, <code>importpackages →</code>,
+<code>resolve →</code>, <code>remove</code>, <code>search →</code>,
+<code>getitem →</code>, <code>settitle</code>, <code>setrating</code>,
+<code>setsound</code>, <code>setfavorite</code>, <code>settags</code>,
+<code>listtags →</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-library1-renametag-s-from-s-to.html"><code>io.github.reiwand.Library1</code>:
+<code>RenameTag</code> to Signal <code>ThumbnailReady</code></a>:
+<code>renametag</code>, <code>thumbnail →</code>,
+<code>requestthumbnails →</code>, <code>apply</code>,
+<code>confirm</code>, <code>unconfirm</code>, <code>cleardata</code>,
+signal <code>thumbnailready</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-playlists1.html">io.github.reiwand.Playlists1</a>:
+<code>list →</code>, <code>get →</code>, <code>create →</code>,
+<code>rename</code>, <code>setquery</code>, <code>delete</code>,
+<code>additems</code>, <code>addfolder →</code>, <code>rotate →</code>,
+<code>removeitems</code>, <code>removeentries</code>,
+<code>moveitem</code>, <code>setrule</code>, <code>start</code>,
+<code>stop</code>, <code>next</code>, <code>previous</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-playlists1-history-s-output-u-limit.html"><code>io.github.reiwand.Playlists1</code>:
+<code>History →</code> to Signal <code>BrowseChanged</code></a>:
+<code>history →</code>, <code>browse →</code>,
+<code>browseapply →</code>, <code>browsetransition →</code>,
+<code>browsecancel →</code>, <code>getbrowse →</code>, signal
+<code>browsechanged</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-profiles1.html">io.github.reiwand.Profiles1</a>:
+<code>io.github.reiwand.profiles1</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-providers1.html">io.github.reiwand.Providers1</a>:
+<code>list →</code>, <code>add →</code>, <code>set</code>,
+<code>update</code>, <code>remove</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-providers1-clearcache-s-id.html"><code>io.github.reiwand.Providers1</code>:
+<code>ClearCache</code> to <code>RemovePlugin</code></a>:
+<code>clearcache</code>, <code>sync →</code>,
+<code>collections →</code>, <code>reseed →</code>,
+<code>setsecret</code>, <code>forgetsecret</code>,
+<code>setsecretstore</code>, <code>inspectplugin →</code>,
+<code>installplugin →</code>, <code>listplugins →</code>,
+<code>removeplugin</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-repos1.html">io.github.reiwand.Repos1</a>:
+<code>io.github.reiwand.repos1</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-inputs1.html">io.github.reiwand.Inputs1</a>:
+<code>grant</code>, <code>grantpackage</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-inputs1-decide-s-scene-s-key-as-.html"><code>io.github.reiwand.Inputs1</code>:
+<code>Decide</code> to <code>Bands →</code></a>: <code>decide</code>,
+<code>revoke</code>, <code>getinputs →</code>, <code>setclicks</code>,
+<code>simulatemedia</code>, <code>simulatetouch</code>,
+<code>simulatetrigger</code>, <code>bands →</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-inputs1-touch-s-output-d-x-d-y-u.html"><code>io.github.reiwand.Inputs1</code>:
+<code>Touch</code> to <code>SetPointer</code></a>: <code>touch</code>,
+<code>setpointer</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-rgb1.html">io.github.reiwand.Rgb1</a>:
+<code>io.github.reiwand.rgb1</code>.</li>
+<li><a
+href="dbus/io-github-reiwand-publish1.html"><code>io.github.reiwand.Publish1</code>,
+<code>io.github.reiwand.Carry1</code> and
+<code>io.github.reiwand.Accounts1</code></a>:
+<code>io.github.reiwand.publish1</code>,
+<code>io.github.reiwand.carry1</code>,
+<code>io.github.reiwand.accounts1</code>.</li>
+<li><a href="dbus/the-app-io-github-reiwand.html">The app:
+<code>io.github.reiwand</code></a>: the app:
+<code>io.github.reiwand</code>.</li>
+<li><a href="dbus/edits-and-spanning.html">Edits and spanning</a>: edits
+and spanning.</li>
+<li><a href="dbus/scenes.html">Scenes, Scene sound and Change
+notification</a>: scenes, scene sound, change notification.</li>
+<li><a href="dbus/jobs.html">Jobs and Thumbnails</a>: jobs,
+thumbnails.</li>
+<li><a href="dbus/json-model.html">JSON model</a>: json model.</li>
+<li><a href="dbus/configuration-file.html">Configuration file</a>:
+configuration file.</li>
+</ul>
+<h2 id="where-the-sections-went">Where the sections went<a class="anchor" href="#where-the-sections-went" aria-label="Link to this section">#</a></h2>
+<p>The sections of this page moved to the pages above; links to them
+still land here:</p>
+<ul>
+<li><a id="conventions"></a><a
+href="dbus/conventions.html#conventions">Conventions</a></li>
+<li><a id="errors"></a><a
+href="dbus/conventions.html#errors">Errors</a></li>
+<li><a id="streams-and-claims"></a><a
+href="dbus/conventions.html#streams-and-claims">Streams and
+claims</a></li>
+<li><a id="layer-shell-and-x11-outputs"></a><a
+href="dbus/layer-shell-and-x11-outputs.html#layer-shell-and-x11-outputs">Layer-shell
+and X11 outputs</a></li>
+<li><a id="frame-rate"></a><a
+href="dbus/frame-rate.html#frame-rate">Frame rate</a></li>
+<li><a id="graphics-card"></a><a
+href="dbus/frame-rate.html#graphics-card">Graphics card</a></li>
+<li><a id="video-decoding"></a><a
+href="dbus/frame-rate.html#video-decoding">Video decoding</a></li>
+<li><a id="stream-buffers"></a><a
+href="dbus/stream-buffers.html#stream-buffers">Stream buffers</a></li>
+<li><a id="iogithubreiwanddaemon1"></a><a
+href="dbus/io-github-reiwand-daemon1.html#iogithubreiwanddaemon1">io.github.reiwand.Daemon1</a></li>
+<li><a id="requeststreams-output-u-width-u-height--u-node_id-t-serial"></a><a
+href="dbus/io-github-reiwand-daemon1.html#requeststreams-output-u-width-u-height--u-node_id-t-serial">io.github.reiwand.Daemon1</a></li>
+<li><a id="holdstreams-output-u-width-u-height--u-node_id-t-serial"></a><a
+href="dbus/io-github-reiwand-daemon1.html#holdstreams-output-u-width-u-height--u-node_id-t-serial">io.github.reiwand.Daemon1</a></li>
+<li><a id="releasestreams-output"></a><a
+href="dbus/io-github-reiwand-daemon1.html#releasestreams-output">io.github.reiwand.Daemon1</a></li>
+<li><a id="setoutputcovereds-output-b-covered"></a><a
+href="dbus/io-github-reiwand-daemon1.html#setoutputcovereds-output-b-covered">io.github.reiwand.Daemon1</a></li>
+<li><a id="setoutputinfos-output-i-x-i-y-u-width-u-height-d-scale-d-px_per_mm-s-identity"></a><a
+href="dbus/io-github-reiwand-daemon1.html#setoutputinfos-output-i-x-i-y-u-width-u-height-d-scale-d-px_per_mm-s-identity">io.github.reiwand.Daemon1</a></li>
+<li><a id="previewedits-path-s-edit_json"></a><a
+href="dbus/io-github-reiwand-daemon1.html#previewedits-path-s-edit_json">io.github.reiwand.Daemon1</a></li>
+<li><a id="showcalibrationb-on"></a><a
+href="dbus/io-github-reiwand-daemon1.html#showcalibrationb-on">io.github.reiwand.Daemon1</a></li>
+<li><a id="previewscenes-output-s-dir-s-document-d-time"></a><a
+href="dbus/io-github-reiwand-daemon1.html#previewscenes-output-s-dir-s-document-d-time">io.github.reiwand.Daemon1</a></li>
+<li><a id="setwallpapers-path-s-output-s-fit"></a><a
+href="dbus/io-github-reiwand-daemon1.html#setwallpapers-path-s-output-s-fit">io.github.reiwand.Daemon1</a></li>
+<li><a id="clearwallpapers-output"></a><a
+href="dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html#clearwallpapers-output">io.github.reiwand.Daemon1:
+ClearWallpaper to SetSceneProperty</a></li>
+<li><a id="restorewallpapers-output"></a><a
+href="dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html#restorewallpapers-output">io.github.reiwand.Daemon1:
+ClearWallpaper to SetSceneProperty</a></li>
+<li><a id="setlockwallpapers-uid-s-output"></a><a
+href="dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html#setlockwallpapers-uid-s-output">io.github.reiwand.Daemon1:
+ClearWallpaper to SetSceneProperty</a></li>
+<li><a id="setlockplaylists-playlist-s-output"></a><a
+href="dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html#setlockplaylists-playlist-s-output">io.github.reiwand.Daemon1:
+ClearWallpaper to SetSceneProperty</a></li>
+<li><a id="followdesktoponlocks-output"></a><a
+href="dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html#followdesktoponlocks-output">io.github.reiwand.Daemon1:
+ClearWallpaper to SetSceneProperty</a></li>
+<li><a id="showdesktoponlocks-output"></a><a
+href="dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html#showdesktoponlocks-output">io.github.reiwand.Daemon1:
+ClearWallpaper to SetSceneProperty</a></li>
+<li><a id="getlock--s-json"></a><a
+href="dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html#getlock--s-json">io.github.reiwand.Daemon1:
+ClearWallpaper to SetSceneProperty</a></li>
+<li><a id="handbacktoplasma--u-screens"></a><a
+href="dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html#handbacktoplasma--u-screens">io.github.reiwand.Daemon1:
+ClearWallpaper to SetSceneProperty</a></li>
+<li><a id="setbackgrounds-color-s-output"></a><a
+href="dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html#setbackgrounds-color-s-output">io.github.reiwand.Daemon1:
+ClearWallpaper to SetSceneProperty</a></li>
+<li><a id="setfilters-filter-s-output"></a><a
+href="dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html#setfilters-filter-s-output">io.github.reiwand.Daemon1:
+ClearWallpaper to SetSceneProperty</a></li>
+<li><a id="getscenepropertiess-output--s-json"></a><a
+href="dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html#getscenepropertiess-output--s-json">io.github.reiwand.Daemon1:
+ClearWallpaper to SetSceneProperty</a></li>
+<li><a id="setscenepropertys-output-s-id-s-value_json"></a><a
+href="dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html#setscenepropertys-output-s-id-s-value_json">io.github.reiwand.Daemon1:
+ClearWallpaper to SetSceneProperty</a></li>
+<li><a id="listapplications--s-json"></a><a
+href="dbus/io-github-reiwand-daemon1-listapplications-s-json.html#listapplications--s-json">io.github.reiwand.Daemon1:
+ListApplications → to ShareSceneValues</a></li>
+<li><a id="checkshortcuts-value_json"></a><a
+href="dbus/io-github-reiwand-daemon1-listapplications-s-json.html#checkshortcuts-value_json">io.github.reiwand.Daemon1:
+ListApplications → to ShareSceneValues</a></li>
+<li><a id="applyscenepresets-output-s-preset"></a><a
+href="dbus/io-github-reiwand-daemon1-listapplications-s-json.html#applyscenepresets-output-s-preset">io.github.reiwand.Daemon1:
+ListApplications → to ShareSceneValues</a></li>
+<li><a id="resetscenepropertiess-output"></a><a
+href="dbus/io-github-reiwand-daemon1-listapplications-s-json.html#resetscenepropertiess-output">io.github.reiwand.Daemon1:
+ListApplications → to ShareSceneValues</a></li>
+<li><a id="savescenepresets-output-s-name--s-preset"></a><a
+href="dbus/io-github-reiwand-daemon1-listapplications-s-json.html#savescenepresets-output-s-name--s-preset">io.github.reiwand.Daemon1:
+ListApplications → to ShareSceneValues</a></li>
+<li><a id="renamescenepresets-preset-s-name"></a><a
+href="dbus/io-github-reiwand-daemon1-listapplications-s-json.html#renamescenepresets-preset-s-name">io.github.reiwand.Daemon1:
+ListApplications → to ShareSceneValues</a></li>
+<li><a id="deletescenepresets-preset"></a><a
+href="dbus/io-github-reiwand-daemon1-listapplications-s-json.html#deletescenepresets-preset">io.github.reiwand.Daemon1:
+ListApplications → to ShareSceneValues</a></li>
+<li><a id="exportscenevaluess-output-s-preset--s-values"></a><a
+href="dbus/io-github-reiwand-daemon1-listapplications-s-json.html#exportscenevaluess-output-s-preset--s-values">io.github.reiwand.Daemon1:
+ListApplications → to ShareSceneValues</a></li>
+<li><a id="importscenevaluess-output-s-json-s-name--as-warnings"></a><a
+href="dbus/io-github-reiwand-daemon1-listapplications-s-json.html#importscenevaluess-output-s-json-s-name--as-warnings">io.github.reiwand.Daemon1:
+ListApplications → to ShareSceneValues</a></li>
+<li><a id="pressscenebuttons-output-s-id"></a><a
+href="dbus/io-github-reiwand-daemon1-listapplications-s-json.html#pressscenebuttons-output-s-id">io.github.reiwand.Daemon1:
+ListApplications → to ShareSceneValues</a></li>
+<li><a id="capturepages-output--s-path"></a><a
+href="dbus/io-github-reiwand-daemon1-listapplications-s-json.html#capturepages-output--s-path">io.github.reiwand.Daemon1:
+ListApplications → to ShareSceneValues</a></li>
+<li><a id="getparticlestatss-output--s-json"></a><a
+href="dbus/io-github-reiwand-daemon1-listapplications-s-json.html#getparticlestatss-output--s-json">io.github.reiwand.Daemon1:
+ListApplications → to ShareSceneValues</a></li>
+<li><a id="sharescenevaluess-output-b-shared"></a><a
+href="dbus/io-github-reiwand-daemon1-listapplications-s-json.html#sharescenevaluess-output-b-shared">io.github.reiwand.Daemon1:
+ListApplications → to ShareSceneValues</a></li>
+<li><a id="setoptions-key-s-value"></a><a
+href="dbus/io-github-reiwand-daemon1-setoption-s-key-s-value.html#setoptions-key-s-value">io.github.reiwand.Daemon1:
+SetOption</a></li>
+<li><a id="reload"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#reload">io.github.reiwand.Daemon1:
+Reload to Signal JobFinished</a></li>
+<li><a id="restart"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#restart">io.github.reiwand.Daemon1:
+Reload to Signal JobFinished</a></li>
+<li><a id="retryeffects"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#retryeffects">io.github.reiwand.Daemon1:
+Reload to Signal JobFinished</a></li>
+<li><a id="retrylayerss-path"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#retrylayerss-path">io.github.reiwand.Daemon1:
+Reload to Signal JobFinished</a></li>
+<li><a id="getstate--s-json"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#getstate--s-json">io.github.reiwand.Daemon1:
+Reload to Signal JobFinished</a></li>
+<li><a id="getschema--s-json"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#getschema--s-json">io.github.reiwand.Daemon1:
+Reload to Signal JobFinished</a></li>
+<li><a id="setpausedb-paused"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#setpausedb-paused">io.github.reiwand.Daemon1:
+Reload to Signal JobFinished</a></li>
+<li><a id="setvolumed-volume"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#setvolumed-volume">io.github.reiwand.Daemon1:
+Reload to Signal JobFinished</a></li>
+<li><a id="setmutedb-muted"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#setmutedb-muted">io.github.reiwand.Daemon1:
+Reload to Signal JobFinished</a></li>
+<li><a id="setprivatemodeb-on"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#setprivatemodeb-on">io.github.reiwand.Daemon1:
+Reload to Signal JobFinished</a></li>
+<li><a id="waitchangedt-serial-u-timeout_ms--t-serial-as-topics"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#waitchangedt-serial-u-timeout_ms--t-serial-as-topics">io.github.reiwand.Daemon1:
+Reload to Signal JobFinished</a></li>
+<li><a id="listjobs--s-json"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#listjobs--s-json">io.github.reiwand.Daemon1:
+Reload to Signal JobFinished</a></li>
+<li><a id="getjobt-job--s-json"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#getjobt-job--s-json">io.github.reiwand.Daemon1:
+Reload to Signal JobFinished</a></li>
+<li><a id="canceljobt-job"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#canceljobt-job">io.github.reiwand.Daemon1:
+Reload to Signal JobFinished</a></li>
+<li><a id="property-paused-b"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#property-paused-b">Property
+<code>Paused</code> (<code>b</code>)</a></li>
+<li><a id="property-volume-d"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#property-volume-d">Property
+<code>Volume</code> (<code>d</code>)</a></li>
+<li><a id="property-muted-b"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#property-muted-b">Property
+<code>Muted</code> (<code>b</code>)</a></li>
+<li><a id="property-privatemode-b"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#property-privatemode-b">Property
+<code>PrivateMode</code> (<code>b</code>)</a></li>
+<li><a id="property-serial-t"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#property-serial-t">Property
+<code>Serial</code> (<code>t</code>)</a></li>
+<li><a id="property-model-u"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#property-model-u">Property
+<code>Model</code> (<code>u</code>)</a></li>
+<li><a id="signal-streamchangeds-output-u-node_id-t-serial"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#signal-streamchangeds-output-u-node_id-t-serial">Signal
+<code>StreamChanged(s output, u node_id, t serial)</code></a></li>
+<li><a id="signal-changeds-topic-as-ids-t-serial"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#signal-changeds-topic-as-ids-t-serial">Signal
+<code>Changed(s topic, as ids, t serial)</code></a></li>
+<li><a id="signal-jobprogresst-job-t-done-t-total"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#signal-jobprogresst-job-t-done-t-total">Signal
+<code>JobProgress(t job, t done, t total)</code></a></li>
+<li><a id="signal-jobfinishedt-job-s-state-s-error_name-s-message"></a><a
+href="dbus/io-github-reiwand-daemon1-reload.html#signal-jobfinishedt-job-s-state-s-error_name-s-message">Signal
+<code>JobFinished(t job, s state, s error_name, s message)</code></a></li>
+<li><a id="iogithubreiwandlibrary1"></a><a
+href="dbus/io-github-reiwand-library1.html#iogithubreiwandlibrary1">io.github.reiwand.Library1</a></li>
+<li><a id="addsources-path-b-recursive--s-source-t-job"></a><a
+href="dbus/io-github-reiwand-library1.html#addsources-path-b-recursive--s-source-t-job">io.github.reiwand.Library1</a></li>
+<li><a id="removesources-source"></a><a
+href="dbus/io-github-reiwand-library1.html#removesources-source">io.github.reiwand.Library1</a></li>
+<li><a id="listsources--s-json"></a><a
+href="dbus/io-github-reiwand-library1.html#listsources--s-json">io.github.reiwand.Library1</a></li>
+<li><a id="rescans-source--t-job"></a><a
+href="dbus/io-github-reiwand-library1.html#rescans-source--t-job">io.github.reiwand.Library1</a></li>
+<li><a id="importas-paths-b-copy--t-job"></a><a
+href="dbus/io-github-reiwand-library1.html#importas-paths-b-copy--t-job">io.github.reiwand.Library1</a></li>
+<li><a id="importpackagesas-paths-b-allow_older--t-job"></a><a
+href="dbus/io-github-reiwand-library1.html#importpackagesas-paths-b-allow_older--t-job">io.github.reiwand.Library1</a></li>
+<li><a id="resolveas-refs--as-uids"></a><a
+href="dbus/io-github-reiwand-library1.html#resolveas-refs--as-uids">io.github.reiwand.Library1</a></li>
+<li><a id="removeas-uids-b-delete_files"></a><a
+href="dbus/io-github-reiwand-library1.html#removeas-uids-b-delete_files">io.github.reiwand.Library1</a></li>
+<li><a id="searchs-query-u-offset-u-limit--s-json"></a><a
+href="dbus/io-github-reiwand-library1.html#searchs-query-u-offset-u-limit--s-json">io.github.reiwand.Library1</a></li>
+<li><a id="getitems-uid--s-json"></a><a
+href="dbus/io-github-reiwand-library1.html#getitems-uid--s-json">io.github.reiwand.Library1</a></li>
+<li><a id="settitles-uid-s-title"></a><a
+href="dbus/io-github-reiwand-library1.html#settitles-uid-s-title">io.github.reiwand.Library1</a></li>
+<li><a id="setratingas-uids-u-rating"></a><a
+href="dbus/io-github-reiwand-library1.html#setratingas-uids-u-rating">io.github.reiwand.Library1</a></li>
+<li><a id="setsoundas-uids-s-muted-s-volume"></a><a
+href="dbus/io-github-reiwand-library1.html#setsoundas-uids-s-muted-s-volume">io.github.reiwand.Library1</a></li>
+<li><a id="setfavoriteas-uids-b-favorite"></a><a
+href="dbus/io-github-reiwand-library1.html#setfavoriteas-uids-b-favorite">io.github.reiwand.Library1</a></li>
+<li><a id="settagsas-uids-as-add-as-remove"></a><a
+href="dbus/io-github-reiwand-library1.html#settagsas-uids-as-add-as-remove">io.github.reiwand.Library1</a></li>
+<li><a id="listtags--s-json"></a><a
+href="dbus/io-github-reiwand-library1.html#listtags--s-json">io.github.reiwand.Library1</a></li>
+<li><a id="renametags-from-s-to"></a><a
+href="dbus/io-github-reiwand-library1-renametag-s-from-s-to.html#renametags-from-s-to">io.github.reiwand.Library1:
+RenameTag to Signal ThumbnailReady</a></li>
+<li><a id="thumbnails-uid-u-size--s-path"></a><a
+href="dbus/io-github-reiwand-library1-renametag-s-from-s-to.html#thumbnails-uid-u-size--s-path">io.github.reiwand.Library1:
+RenameTag to Signal ThumbnailReady</a></li>
+<li><a id="requestthumbnailsas-uids-u-size--ass-paths"></a><a
+href="dbus/io-github-reiwand-library1-renametag-s-from-s-to.html#requestthumbnailsas-uids-u-size--ass-paths">io.github.reiwand.Library1:
+RenameTag to Signal ThumbnailReady</a></li>
+<li><a id="applys-uid-s-output-s-fit-s-preset"></a><a
+href="dbus/io-github-reiwand-library1-renametag-s-from-s-to.html#applys-uid-s-output-s-fit-s-preset">io.github.reiwand.Library1:
+RenameTag to Signal ThumbnailReady</a></li>
+<li><a id="confirmas-uids-s-what"></a><a
+href="dbus/io-github-reiwand-library1-renametag-s-from-s-to.html#confirmas-uids-s-what">io.github.reiwand.Library1:
+RenameTag to Signal ThumbnailReady</a></li>
+<li><a id="unconfirmas-uids-s-what"></a><a
+href="dbus/io-github-reiwand-library1-renametag-s-from-s-to.html#unconfirmas-uids-s-what">io.github.reiwand.Library1:
+RenameTag to Signal ThumbnailReady</a></li>
+<li><a id="cleardataas-uids"></a><a
+href="dbus/io-github-reiwand-library1-renametag-s-from-s-to.html#cleardataas-uids">io.github.reiwand.Library1:
+RenameTag to Signal ThumbnailReady</a></li>
+<li><a id="signal-thumbnailreadys-uid-u-size-s-path"></a><a
+href="dbus/io-github-reiwand-library1-renametag-s-from-s-to.html#signal-thumbnailreadys-uid-u-size-s-path">Signal
+<code>ThumbnailReady(s uid, u size, s path)</code></a></li>
+<li><a id="iogithubreiwandplaylists1"></a><a
+href="dbus/io-github-reiwand-playlists1.html#iogithubreiwandplaylists1">io.github.reiwand.Playlists1</a></li>
+<li><a id="list--s-json"></a><a
+href="dbus/io-github-reiwand-playlists1.html#list--s-json">io.github.reiwand.Playlists1</a></li>
+<li><a id="gets-playlist-u-offset-u-limit--s-json"></a><a
+href="dbus/io-github-reiwand-playlists1.html#gets-playlist-u-offset-u-limit--s-json">io.github.reiwand.Playlists1</a></li>
+<li><a id="creates-name-s-query--s-uid"></a><a
+href="dbus/io-github-reiwand-playlists1.html#creates-name-s-query--s-uid">io.github.reiwand.Playlists1</a></li>
+<li><a id="renames-playlist-s-name"></a><a
+href="dbus/io-github-reiwand-playlists1.html#renames-playlist-s-name">io.github.reiwand.Playlists1</a></li>
+<li><a id="setquerys-playlist-s-query"></a><a
+href="dbus/io-github-reiwand-playlists1.html#setquerys-playlist-s-query">io.github.reiwand.Playlists1</a></li>
+<li><a id="deletes-playlist"></a><a
+href="dbus/io-github-reiwand-playlists1.html#deletes-playlist">io.github.reiwand.Playlists1</a></li>
+<li><a id="additemss-playlist-as-uids"></a><a
+href="dbus/io-github-reiwand-playlists1.html#additemss-playlist-as-uids">io.github.reiwand.Playlists1</a></li>
+<li><a id="addfolders-playlist-s-path-b-follow--u-count"></a><a
+href="dbus/io-github-reiwand-playlists1.html#addfolders-playlist-s-path-b-follow--u-count">io.github.reiwand.Playlists1</a></li>
+<li><a id="rotates-name-as-uids-s-folder-b-follow-s-every-s-output--s-uid"></a><a
+href="dbus/io-github-reiwand-playlists1.html#rotates-name-as-uids-s-folder-b-follow-s-every-s-output--s-uid">io.github.reiwand.Playlists1</a></li>
+<li><a id="removeitemss-playlist-as-uids"></a><a
+href="dbus/io-github-reiwand-playlists1.html#removeitemss-playlist-as-uids">io.github.reiwand.Playlists1</a></li>
+<li><a id="removeentriess-playlist-au-indexes-as-expected"></a><a
+href="dbus/io-github-reiwand-playlists1.html#removeentriess-playlist-au-indexes-as-expected">io.github.reiwand.Playlists1</a></li>
+<li><a id="moveitems-playlist-u-from-u-to-s-expected"></a><a
+href="dbus/io-github-reiwand-playlists1.html#moveitems-playlist-u-from-u-to-s-expected">io.github.reiwand.Playlists1</a></li>
+<li><a id="setrules-playlist-s-key-s-value"></a><a
+href="dbus/io-github-reiwand-playlists1.html#setrules-playlist-s-key-s-value">io.github.reiwand.Playlists1</a></li>
+<li><a id="starts-playlist-s-output"></a><a
+href="dbus/io-github-reiwand-playlists1.html#starts-playlist-s-output">io.github.reiwand.Playlists1</a></li>
+<li><a id="stops-output"></a><a
+href="dbus/io-github-reiwand-playlists1.html#stops-output">io.github.reiwand.Playlists1</a></li>
+<li><a id="nexts-output"></a><a
+href="dbus/io-github-reiwand-playlists1.html#nexts-output">io.github.reiwand.Playlists1</a></li>
+<li><a id="previouss-output"></a><a
+href="dbus/io-github-reiwand-playlists1.html#previouss-output">io.github.reiwand.Playlists1</a></li>
+<li><a id="historys-output-u-limit--s-json"></a><a
+href="dbus/io-github-reiwand-playlists1-history-s-output-u-limit.html#historys-output-u-limit--s-json">io.github.reiwand.Playlists1:
+History → to Signal BrowseChanged</a></li>
+<li><a id="browses-output-s-source-i-steps--s-json"></a><a
+href="dbus/io-github-reiwand-playlists1-history-s-output-u-limit.html#browses-output-s-source-i-steps--s-json">io.github.reiwand.Playlists1:
+History → to Signal BrowseChanged</a></li>
+<li><a id="browseapplys-output-s-transition--s-json"></a><a
+href="dbus/io-github-reiwand-playlists1-history-s-output-u-limit.html#browseapplys-output-s-transition--s-json">io.github.reiwand.Playlists1:
+History → to Signal BrowseChanged</a></li>
+<li><a id="browsetransitions-output-s-transition--s-json"></a><a
+href="dbus/io-github-reiwand-playlists1-history-s-output-u-limit.html#browsetransitions-output-s-transition--s-json">io.github.reiwand.Playlists1:
+History → to Signal BrowseChanged</a></li>
+<li><a id="browsecancels-output--s-json"></a><a
+href="dbus/io-github-reiwand-playlists1-history-s-output-u-limit.html#browsecancels-output--s-json">io.github.reiwand.Playlists1:
+History → to Signal BrowseChanged</a></li>
+<li><a id="getbrowses-output--s-json"></a><a
+href="dbus/io-github-reiwand-playlists1-history-s-output-u-limit.html#getbrowses-output--s-json">io.github.reiwand.Playlists1:
+History → to Signal BrowseChanged</a></li>
+<li><a id="signal-browsechangeds-output-s-json"></a><a
+href="dbus/io-github-reiwand-playlists1-history-s-output-u-limit.html#signal-browsechangeds-output-s-json">Signal
+<code>BrowseChanged(s output, s json)</code></a></li>
+<li><a id="iogithubreiwandprofiles1"></a><a
+href="dbus/io-github-reiwand-profiles1.html#iogithubreiwandprofiles1">io.github.reiwand.Profiles1</a></li>
+<li><a id="list--s-json-1"></a><a
+href="dbus/io-github-reiwand-profiles1.html#list--s-json">io.github.reiwand.Profiles1</a></li>
+<li><a id="gets-profile--s-json"></a><a
+href="dbus/io-github-reiwand-profiles1.html#gets-profile--s-json">io.github.reiwand.Profiles1</a></li>
+<li><a id="saves-name-b-with_options--s-uid"></a><a
+href="dbus/io-github-reiwand-profiles1.html#saves-name-b-with_options--s-uid">io.github.reiwand.Profiles1</a></li>
+<li><a id="activates-profile"></a><a
+href="dbus/io-github-reiwand-profiles1.html#activates-profile">io.github.reiwand.Profiles1</a></li>
+<li><a id="renames-profile-s-name"></a><a
+href="dbus/io-github-reiwand-profiles1.html#renames-profile-s-name">io.github.reiwand.Profiles1</a></li>
+<li><a id="deletes-profile"></a><a
+href="dbus/io-github-reiwand-profiles1.html#deletes-profile">io.github.reiwand.Profiles1</a></li>
+<li><a id="setautos-profile-s-key-s-value"></a><a
+href="dbus/io-github-reiwand-profiles1.html#setautos-profile-s-key-s-value">io.github.reiwand.Profiles1</a></li>
+<li><a id="listpresetss-item--s-json"></a><a
+href="dbus/io-github-reiwand-profiles1.html#listpresetss-item--s-json">io.github.reiwand.Profiles1</a></li>
+<li><a id="savepresets-item-s-name-ass-values--s-uid"></a><a
+href="dbus/io-github-reiwand-profiles1.html#savepresets-item-s-name-ass-values--s-uid">io.github.reiwand.Profiles1</a></li>
+<li><a id="deletepresets-preset"></a><a
+href="dbus/io-github-reiwand-profiles1.html#deletepresets-preset">io.github.reiwand.Profiles1</a></li>
+<li><a id="iogithubreiwandproviders1"></a><a
+href="dbus/io-github-reiwand-providers1.html#iogithubreiwandproviders1">io.github.reiwand.Providers1</a></li>
+<li><a id="list--s-json-2"></a><a
+href="dbus/io-github-reiwand-providers1.html#list--s-json">io.github.reiwand.Providers1</a></li>
+<li><a id="adds-id-s-kind-ass-options-s-secret--s-source"></a><a
+href="dbus/io-github-reiwand-providers1.html#adds-id-s-kind-ass-options-s-secret--s-source">io.github.reiwand.Providers1</a></li>
+<li><a id="sets-id-s-key-s-value"></a><a
+href="dbus/io-github-reiwand-providers1.html#sets-id-s-key-s-value">io.github.reiwand.Providers1</a></li>
+<li><a id="updates-id-ass-options"></a><a
+href="dbus/io-github-reiwand-providers1.html#updates-id-ass-options">io.github.reiwand.Providers1</a></li>
+<li><a id="removes-id-b-purge"></a><a
+href="dbus/io-github-reiwand-providers1.html#removes-id-b-purge">io.github.reiwand.Providers1</a></li>
+<li><a id="clearcaches-id"></a><a
+href="dbus/io-github-reiwand-providers1-clearcache-s-id.html#clearcaches-id">io.github.reiwand.Providers1:
+ClearCache to RemovePlugin</a></li>
+<li><a id="syncs-id--t-job"></a><a
+href="dbus/io-github-reiwand-providers1-clearcache-s-id.html#syncs-id--t-job">io.github.reiwand.Providers1:
+ClearCache to RemovePlugin</a></li>
+<li><a id="collectionss-id-s-owner--s-json"></a><a
+href="dbus/io-github-reiwand-providers1-clearcache-s-id.html#collectionss-id-s-owner--s-json">io.github.reiwand.Providers1:
+ClearCache to RemovePlugin</a></li>
+<li><a id="reseeds-id--t-job"></a><a
+href="dbus/io-github-reiwand-providers1-clearcache-s-id.html#reseeds-id--t-job">io.github.reiwand.Providers1:
+ClearCache to RemovePlugin</a></li>
+<li><a id="setsecrets-id-s-secret"></a><a
+href="dbus/io-github-reiwand-providers1-clearcache-s-id.html#setsecrets-id-s-secret">io.github.reiwand.Providers1:
+ClearCache to RemovePlugin</a></li>
+<li><a id="forgetsecrets-id"></a><a
+href="dbus/io-github-reiwand-providers1-clearcache-s-id.html#forgetsecrets-id">io.github.reiwand.Providers1:
+ClearCache to RemovePlugin</a></li>
+<li><a id="setsecretstores-store"></a><a
+href="dbus/io-github-reiwand-providers1-clearcache-s-id.html#setsecretstores-store">io.github.reiwand.Providers1:
+ClearCache to RemovePlugin</a></li>
+<li><a id="inspectplugins-path--s-json"></a><a
+href="dbus/io-github-reiwand-providers1-clearcache-s-id.html#inspectplugins-path--s-json">io.github.reiwand.Providers1:
+ClearCache to RemovePlugin</a></li>
+<li><a id="installplugins-path-s-token--s-kind"></a><a
+href="dbus/io-github-reiwand-providers1-clearcache-s-id.html#installplugins-path-s-token--s-kind">io.github.reiwand.Providers1:
+ClearCache to RemovePlugin</a></li>
+<li><a id="listplugins--s-json"></a><a
+href="dbus/io-github-reiwand-providers1-clearcache-s-id.html#listplugins--s-json">io.github.reiwand.Providers1:
+ClearCache to RemovePlugin</a></li>
+<li><a id="removeplugins-id"></a><a
+href="dbus/io-github-reiwand-providers1-clearcache-s-id.html#removeplugins-id">io.github.reiwand.Providers1:
+ClearCache to RemovePlugin</a></li>
+<li><a id="iogithubreiwandrepos1"></a><a
+href="dbus/io-github-reiwand-repos1.html#iogithubreiwandrepos1">io.github.reiwand.Repos1</a></li>
+<li><a id="list--s-json-3"></a><a
+href="dbus/io-github-reiwand-repos1.html#list--s-json">io.github.reiwand.Repos1</a></li>
+<li><a id="adds-url--t-job"></a><a
+href="dbus/io-github-reiwand-repos1.html#adds-url--t-job">io.github.reiwand.Repos1</a></li>
+<li><a id="addtrustings-url-s-certificate--t-job"></a><a
+href="dbus/io-github-reiwand-repos1.html#addtrustings-url-s-certificate--t-job">io.github.reiwand.Repos1</a></li>
+<li><a id="addexamples--t-job"></a><a
+href="dbus/io-github-reiwand-repos1.html#addexamples--t-job">io.github.reiwand.Repos1</a></li>
+<li><a id="refreshs-repo--t-job"></a><a
+href="dbus/io-github-reiwand-repos1.html#refreshs-repo--t-job">io.github.reiwand.Repos1</a></li>
+<li><a id="removes-repo-b-uninstall"></a><a
+href="dbus/io-github-reiwand-repos1.html#removes-repo-b-uninstall">io.github.reiwand.Repos1</a></li>
+<li><a id="browses-query-u-offset-u-limit--s-json"></a><a
+href="dbus/io-github-reiwand-repos1.html#browses-query-u-offset-u-limit--s-json">io.github.reiwand.Repos1</a></li>
+<li><a id="reveals-spec"></a><a
+href="dbus/io-github-reiwand-repos1.html#reveals-spec">io.github.reiwand.Repos1</a></li>
+<li><a id="requestpreviewsas-specs--ass-paths"></a><a
+href="dbus/io-github-reiwand-repos1.html#requestpreviewsas-specs--ass-paths">io.github.reiwand.Repos1</a></li>
+<li><a id="requestanimatedpreviewsas-specs--ass-paths"></a><a
+href="dbus/io-github-reiwand-repos1.html#requestanimatedpreviewsas-specs--ass-paths">io.github.reiwand.Repos1</a></li>
+<li><a id="installs-spec-b-allow_stale-b-allow_downgrade--t-job"></a><a
+href="dbus/io-github-reiwand-repos1.html#installs-spec-b-allow_stale-b-allow_downgrade--t-job">io.github.reiwand.Repos1</a></li>
+<li><a id="uninstalls-id-s-version"></a><a
+href="dbus/io-github-reiwand-repos1.html#uninstalls-id-s-version">io.github.reiwand.Repos1</a></li>
+<li><a id="listinstalled--s-json"></a><a
+href="dbus/io-github-reiwand-repos1.html#listinstalled--s-json">io.github.reiwand.Repos1</a></li>
+<li><a id="signal-previewreadys-spec-s-path"></a><a
+href="dbus/io-github-reiwand-repos1.html#signal-previewreadys-spec-s-path">Signal
+<code>PreviewReady(s spec, s path)</code></a></li>
+<li><a id="iogithubreiwandinputs1"></a><a
+href="dbus/io-github-reiwand-inputs1.html#iogithubreiwandinputs1">io.github.reiwand.Inputs1</a></li>
+<li><a id="grants-scene-s-input"></a><a
+href="dbus/io-github-reiwand-inputs1.html#grants-scene-s-input">io.github.reiwand.Inputs1</a></li>
+<li><a id="grantpackages-scene-s-key-s-input"></a><a
+href="dbus/io-github-reiwand-inputs1.html#grantpackages-scene-s-key-s-input">io.github.reiwand.Inputs1</a></li>
+<li><a id="decides-scene-s-key-as-allow-as-deny"></a><a
+href="dbus/io-github-reiwand-inputs1-decide-s-scene-s-key-as-.html#decides-scene-s-key-as-allow-as-deny">io.github.reiwand.Inputs1:
+Decide to Bands →</a></li>
+<li><a id="revokes-scene-s-input"></a><a
+href="dbus/io-github-reiwand-inputs1-decide-s-scene-s-key-as-.html#revokes-scene-s-input">io.github.reiwand.Inputs1:
+Decide to Bands →</a></li>
+<li><a id="getinputs--s-json"></a><a
+href="dbus/io-github-reiwand-inputs1-decide-s-scene-s-key-as-.html#getinputs--s-json">io.github.reiwand.Inputs1:
+Decide to Bands →</a></li>
+<li><a id="setclickss-output-b-on"></a><a
+href="dbus/io-github-reiwand-inputs1-decide-s-scene-s-key-as-.html#setclickss-output-b-on">io.github.reiwand.Inputs1:
+Decide to Bands →</a></li>
+<li><a id="simulatemedias-output-s-track-ay-cover"></a><a
+href="dbus/io-github-reiwand-inputs1-decide-s-scene-s-key-as-.html#simulatemedias-output-s-track-ay-cover">io.github.reiwand.Inputs1:
+Decide to Bands →</a></li>
+<li><a id="simulatetouchs-output-d-x-d-y-u-buttons"></a><a
+href="dbus/io-github-reiwand-inputs1-decide-s-scene-s-key-as-.html#simulatetouchs-output-d-x-d-y-u-buttons">io.github.reiwand.Inputs1:
+Decide to Bands →</a></li>
+<li><a id="simulatetriggers-output-s-trigger"></a><a
+href="dbus/io-github-reiwand-inputs1-decide-s-scene-s-key-as-.html#simulatetriggers-output-s-trigger">io.github.reiwand.Inputs1:
+Decide to Bands →</a></li>
+<li><a id="bandss-output--s-json"></a><a
+href="dbus/io-github-reiwand-inputs1-decide-s-scene-s-key-as-.html#bandss-output--s-json">io.github.reiwand.Inputs1:
+Decide to Bands →</a></li>
+<li><a id="touchs-output-d-x-d-y-u-buttons"></a><a
+href="dbus/io-github-reiwand-inputs1-touch-s-output-d-x-d-y-u.html#touchs-output-d-x-d-y-u-buttons">io.github.reiwand.Inputs1:
+Touch to SetPointer</a></li>
+<li><a id="setpointeri-x-i-y"></a><a
+href="dbus/io-github-reiwand-inputs1-touch-s-output-d-x-d-y-u.html#setpointeri-x-i-y">io.github.reiwand.Inputs1:
+Touch to SetPointer</a></li>
+<li><a id="iogithubreiwandrgb1"></a><a
+href="dbus/io-github-reiwand-rgb1.html#iogithubreiwandrgb1">io.github.reiwand.Rgb1</a></li>
+<li><a id="getstatus--s-json"></a><a
+href="dbus/io-github-reiwand-rgb1.html#getstatus--s-json">io.github.reiwand.Rgb1</a></li>
+<li><a id="connect"></a><a
+href="dbus/io-github-reiwand-rgb1.html#connect">io.github.reiwand.Rgb1</a></li>
+<li><a id="testi-device"></a><a
+href="dbus/io-github-reiwand-rgb1.html#testi-device">io.github.reiwand.Rgb1</a></li>
+<li><a id="getstrips-output--u-width-u-height-ay-rgb"></a><a
+href="dbus/io-github-reiwand-rgb1.html#getstrips-output--u-width-u-height-ay-rgb">io.github.reiwand.Rgb1</a></li>
+<li><a id="iogithubreiwandpublish1"></a><a
+href="dbus/io-github-reiwand-publish1.html#iogithubreiwandpublish1">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="uploadass-repo-s-path-s-visibility--t-job"></a><a
+href="dbus/io-github-reiwand-publish1.html#uploadass-repo-s-path-s-visibility--t-job">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="listpackagess-repo--s-json"></a><a
+href="dbus/io-github-reiwand-publish1.html#listpackagess-repo--s-json">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="setvisibilitys-repo-s-id-s-version-s-visibility"></a><a
+href="dbus/io-github-reiwand-publish1.html#setvisibilitys-repo-s-id-s-version-s-visibility">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="withdrawpackages-repo-s-id"></a><a
+href="dbus/io-github-reiwand-publish1.html#withdrawpackages-repo-s-id">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="listauthorkeyss-repo--s-json"></a><a
+href="dbus/io-github-reiwand-publish1.html#listauthorkeyss-repo--s-json">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="addauthorkeys-repo-s-public_key--s-fingerprint"></a><a
+href="dbus/io-github-reiwand-publish1.html#addauthorkeys-repo-s-public_key--s-fingerprint">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="rotateauthorkeys-repo-s-from-s-public_key-s-signature--s-fingerprint"></a><a
+href="dbus/io-github-reiwand-publish1.html#rotateauthorkeys-repo-s-from-s-public_key-s-signature--s-fingerprint">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="removeauthorkeys-repo-s-fingerprint"></a><a
+href="dbus/io-github-reiwand-publish1.html#removeauthorkeys-repo-s-fingerprint">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="listuploadss-repo--s-json"></a><a
+href="dbus/io-github-reiwand-publish1.html#listuploadss-repo--s-json">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="canceluploads-repo-s-id"></a><a
+href="dbus/io-github-reiwand-publish1.html#canceluploads-repo-s-id">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="votes-id-s-vote--s-json"></a><a
+href="dbus/io-github-reiwand-publish1.html#votes-id-s-vote--s-json">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="getvotesas-ids--s-json"></a><a
+href="dbus/io-github-reiwand-publish1.html#getvotesas-ids--s-json">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="iogithubreiwandcarry1"></a><a
+href="dbus/io-github-reiwand-publish1.html#iogithubreiwandcarry1">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="exports-path-s-options_json--t-job"></a><a
+href="dbus/io-github-reiwand-publish1.html#exports-path-s-options_json--t-job">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="previewimports-path-s-password--s-json"></a><a
+href="dbus/io-github-reiwand-publish1.html#previewimports-path-s-password--s-json">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="importchosens-path-s-password-s-choices_json--t-job"></a><a
+href="dbus/io-github-reiwand-publish1.html#importchosens-path-s-password-s-choices_json--t-job">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="iogithubreiwandaccounts1"></a><a
+href="dbus/io-github-reiwand-publish1.html#iogithubreiwandaccounts1">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="list--s-json-4"></a><a
+href="dbus/io-github-reiwand-publish1.html#list--s-json">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="signins-repo_url--s-user_code-s-verification_uri-t-job"></a><a
+href="dbus/io-github-reiwand-publish1.html#signins-repo_url--s-user_code-s-verification_uri-t-job">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="uses-repo-s-account"></a><a
+href="dbus/io-github-reiwand-publish1.html#uses-repo-s-account">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="unlinks-repo"></a><a
+href="dbus/io-github-reiwand-publish1.html#unlinks-repo">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="signouts-account"></a><a
+href="dbus/io-github-reiwand-publish1.html#signouts-account">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="removes-account"></a><a
+href="dbus/io-github-reiwand-publish1.html#removes-account">io.github.reiwand.Publish1,
+io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li>
+<li><a id="the-app-iogithubreiwand"></a><a
+href="dbus/the-app-io-github-reiwand.html#the-app-iogithubreiwand">The
+app: <code>io.github.reiwand</code></a></li>
+<li><a id="edits-and-spanning"></a><a
+href="dbus/edits-and-spanning.html#edits-and-spanning">Edits and
+spanning</a></li>
+<li><a id="scenes"></a><a href="dbus/scenes.html#scenes">Scenes</a></li>
+<li><a id="scene-sound"></a><a href="dbus/scenes.html#scene-sound">Scene
+sound</a></li>
+<li><a id="change-notification"></a><a
+href="dbus/scenes.html#change-notification">Change notification</a></li>
+<li><a id="jobs"></a><a href="dbus/jobs.html#jobs">Jobs</a></li>
+<li><a id="thumbnails"></a><a
+href="dbus/jobs.html#thumbnails">Thumbnails</a></li>
+<li><a id="json-model"></a><a
+href="dbus/json-model.html#json-model">JSON model</a></li>
+<li><a id="configuration-file"></a><a
+href="dbus/configuration-file.html#configuration-file">Configuration
+file</a></li>
+</ul>
+    </article>
+    <nav class="near" aria-label="Pages around this one"><a class="previous" href="../specs/editor/editor-keyboard-and-non-scene-packages.html"><span>Previous</span>Editor keyboard and non-scene packages and The own transition of a scene</a><a class="next" href="../specs/dbus/conventions.html"><span>Next</span>Conventions, Errors and Streams and claims</a></nav>
+    <p class="source"><a href="https://github.com/reiwand/reiwand/blob/master/docs/specs/dbus.md">Edit or read this page as Markdown</a> · GPL-3.0-or-later</p>
+  </main>
+  <aside class="toc" aria-label="On this page"><ul>
+<li><a href="#d-bus-interface" id="toc-d-bus-interface">D-Bus
+interface</a>
+<ul>
+<li><a href="#where-the-sections-went"
+id="toc-where-the-sections-went">Where the sections went</a></li>
+</ul></li>
+</ul></aside>
+</div>
+</body>
+</html>

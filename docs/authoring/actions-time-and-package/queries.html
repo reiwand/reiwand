@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Queries · Reiwand</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script defer src="../../assets/search.js" data-root="../../"></script>
+</head>
+<body class="page">
+<header class="bar">
+  <a class="brand" href="../../index.html"><img class="mark" src="../../assets/reiwand.svg" alt="" width="28" height="28">Reiwand <em>docs</em></a>
+  <label class="find"><span class="sr">Search the documentation</span>
+    <input type="search" id="find" placeholder="Search" autocomplete="off" spellcheck="false">
+    <kbd>/</kbd>
+  </label>
+  <a class="code" href="https://github.com/reiwand/reiwand">Source</a>
+</header>
+<div id="found" hidden></div>
+<div class="frame">
+  <nav class="side" aria-label="Documentation">
+    <details class="menu"><summary>Pages</summary><div><details><summary>Get started</summary><ul><li><a href="../../user/index.html">Getting started</a></li></ul></details><details><summary>Using Reiwand</summary><ul><li><details class=sub><summary>Desktop app</summary><ul><li class=has><details><summary><a href="../../user/app.html">The desktop app</a></summary><ul><li><a href="../../user/app/library.html">Keys and the library</a></li><li><a href="../../user/app/getting-wallpapers.html">Getting and making wallpapers</a></li><li><a href="../../user/app/lists-and-tray.html">Lists, the preview and the tray</a></li><li><a href="../../user/app/settings.html">Settings and permissions</a></li></ul></details></li><li><a href="../../user/other-desktops.html">Sway, Hyprland, river, niri and COSMIC</a></li><li><a href="../../user/keyboard-switching.html">Changing the wallpaper with the keyboard</a></li><li class=has><details><summary><a href="../../user/packages.html">Packages: rating, languages and credits</a></summary><ul><li><a href="../../user/packages/manifest.html">The package manifest</a></li><li><a href="../../user/packages/ratings-and-search.html">Mature content, flashing and search</a></li><li><a href="../../user/packages/assets-and-presets.html">Assets, presets and dependencies</a></li><li><a href="../../user/packages/playback.html">Accent color, playback and shortcuts</a></li><li><a href="../../user/packages/scene-features.html">Scene features</a></li><li><a href="../../user/packages/timelines-and-sound.html">Timelines, sound and video clocks</a></li><li><a href="../../user/packages/package-effects.html">Package effects</a></li><li><a href="../../user/packages/built-in-effects.html">Built-in effects</a></li><li><a href="../../user/packages/advanced-scenes.html">Advanced scenes</a></li><li><a href="../../user/packages/meshes.html">Skeleton meshes</a></li><li><a href="../../user/packages/particles.html">Particles</a></li><li><a href="../../user/packages/lights.html">Lights</a></li><li><a href="../../user/packages/models.html">3D models</a></li><li><a href="../../user/packages/compatibility.html">Compatibility and versions</a></li></ul></details></li><li><a href="../../user/web-wallpapers.html">Web wallpapers</a></li><li><a href="../../user/rgb-lighting.html">RGB lighting</a></li><li><a href="../../user/player.html">Media player</a></li><li class=has><details><summary><a href="../../user/privacy.html">Privacy</a></summary><ul><li><a href="../../user/privacy/network.html">Network and updates</a></li><li><a href="../../user/privacy/stored-data.html">Stored data and secrets</a></li><li><a href="../../user/privacy/scene-permissions.html">Scenes and what they can see</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Phone</summary><ul><li><a href="../../user/phone.html">The phone app</a></li><li class=has><details><summary><a href="../../user/android.html">Android</a></summary><ul><li><a href="../../user/android/install.html">Installing on Android</a></li><li><a href="../../user/android/library.html">The app and the library</a></li><li><a href="../../user/android/images.html">Images and setting the wallpaper</a></li><li><a href="../../user/android/lists.html">Lists</a></li><li><a href="../../user/android/videos.html">Videos</a></li><li><a href="../../user/android/parallax-depth.html">Parallax and depth</a></li><li><a href="../../user/android/packages.html">Packages</a></li><li><a href="../../user/android/scenes.html">Scenes</a></li><li><a href="../../user/android/media-sound-touch.html">Media, sound and touch</a></li><li><a href="../../user/android/settings.html">Settings</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Command line</summary><ul><li class=has><details><summary><a href="../../user/command-line.html">Using it from the terminal</a></summary><ul><li><a href="../../user/command-line/everyday-commands.html">Everyday commands</a></li><li><a href="../../user/command-line/stepping-with-the-keyboard.html">Stepping through wallpapers with the keyboard</a></li><li><a href="../../user/command-line/library-lists-and-packages.html">Library, lists and packages</a></li><li><a href="../../user/command-line/scripts-jobs-and-output.html">Scripts, jobs and output</a></li><li><a href="../../user/command-line/providers.html">Providers</a></li><li><a href="../../user/command-line/repositories.html">Repositories</a></li><li><a href="../../user/command-line/accounts-and-phone.html">Accounts and the phone&#x27;s repositories</a></li><li><a href="../../user/command-line/frame-rate-and-automatic-quality.html">Frame rate and automatic scene quality</a></li><li><a href="../../user/command-line/choosing-scene-quality.html">Choosing the scene quality</a></li><li><a href="../../user/command-line/hdr-power-and-motion.html">HDR, power, motion and flashing</a></li><li><a href="../../user/command-line/graphics-card.html">Choosing the graphics card</a></li><li><a href="../../user/command-line/streams-and-video-decoding.html">Streams and video decoding</a></li><li><a href="../../user/command-line/editing-images.html">Editing images</a></li><li><a href="../../user/command-line/depth-and-parallax.html">Depth maps and parallax</a></li><li><a href="../../user/command-line/parallax-layers.html">3D parallax layers</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Installation</summary><ul><li class=has><details><summary><a href="../../user/installation.html">Installation (without root)</a></summary><ul><li><a href="../../user/installation/appimage.html">Download and install the AppImage</a></li><li><a href="../../user/installation/requirements.html">Requirements</a></li><li><a href="../../user/installation/plasma.html">Setting up Plasma and the tray</a></li><li><a href="../../user/installation/updates-and-versions.html">Updates and versions</a></li></ul></details></li><li><a href="../../user/flatpak.html">Installation with Flatpak</a></li></ul></details></li></ul></details><details><summary>Your own server</summary><ul><li class=has><details><summary><a href="../../user/server.html">Your own server</a></summary><ul><li><a href="../../user/server/install.html">Installing the server</a></li><li><a href="../../user/server/configuration.html">Image and configuration</a></li><li><a href="../../user/server/https.html">HTTPS</a></li><li><a href="../../user/server/backups-and-versions.html">Backups and data from another version</a></li><li><a href="../../user/server/repositories-and-accounts.html">Repositories and accounts</a></li><li><a href="../../user/server/uploads-and-catalog.html">Uploads and the catalog</a></li><li><a href="../../user/server/taking-wallpapers-away.html">Taking a wallpaper away</a></li><li><a href="../../user/server/author-keys.html">Author keys and package tools</a></li><li><a href="../../user/server/static-repositories.html">Static repositories</a></li><li><a href="../../user/server/moving-configuration.html">Moving the configuration to another computer</a></li><li><a href="../../user/server/scenes.html">Scene properties</a></li><li><a href="../../user/server/scene-sound-and-examples.html">Example scenes and sound</a></li></ul></details></li><li class=has><details><summary><a href="../../specs/server.html">Self-hosted server</a></summary><ul><li><a href="../../specs/server/running.html">Running</a></li><li><a href="../../specs/server/conventions.html">Conventions and Discovery and health</a></li><li><a href="../../specs/server/repository.html">Repository</a></li><li><a href="../../specs/server/catalog.html">Catalog and Accounts</a></li><li><a href="../../specs/server/uploads.html">Uploads</a></li><li><a href="../../specs/server/moderation-and-administration.html">Moderation and administration</a></li><li><a href="../../specs/server/legal-pages.html">Legal pages and Operating a public server</a></li></ul></details></li><li class=has><details><summary><a href="../../specs/repo.html">Signed repositories</a></summary><ul><li><a href="../../specs/repo/keys-and-roles.html">Keys and roles, Signature files, Layout and Identity and URL</a></li><li><a href="../../specs/repo/formats.html">Formats and Package signatures</a></li><li><a href="../../specs/repo/online-authors.html">Online authors, Operator workflow, Client update, Package installation, Broken repositories and Client storage</a></li><li><a href="../../specs/repo/bundled-example-repository.html">Bundled example repository, Network interface and Adding a repository in the desktop app</a></li></ul></details></li></ul></details><details open><summary>Creating wallpapers</summary><ul><li><details class=sub><summary>First scene</summary><ul><li><a href="../../authoring/index.html">Creating scenes</a></li><li><a href="../../authoring/start/first-scene.html">Your first scene</a></li><li class=has><details><summary><a href="../../authoring/scene.html">The scene file</a></summary><ul><li><a href="../../authoring/scene/folder.html">The folder, the clock and the assets</a></li><li><a href="../../authoring/scene/canvas.html">The canvas</a></li><li><a href="../../authoring/scene/cost.html">What a scene costs</a></li><li><a href="../../authoring/scene/values.html">Values that move</a></li><li><a href="../../authoring/scene/timelines-and-inputs.html">Timelines and inputs</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Layers</summary><ul><li class=has><details><summary><a href="../../authoring/layers.html">Layers</a></summary><ul><li><a href="../../authoring/layers/basics.html">Layer basics</a></li><li><a href="../../authoring/layers/image-and-video.html">Image and video layers</a></li><li><a href="../../authoring/layers/text.html">Text layer (text)</a></li><li><a href="../../authoring/layers/shapes.html">Shape, solid and spectrum layers</a></li><li><a href="../../authoring/layers/groups.html">Group and adjustment layers</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/properties.html">User properties</a></summary><ul><li><a href="../../authoring/properties/declaring.html">Declaring properties</a></li><li><a href="../../authoring/properties/behavior.html">Conditions, presets and translations</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/meshes.html">Meshes, bones and animation</a></summary><ul><li><a href="../../authoring/meshes/layer-and-parts.html">The mesh layer and its parts</a></li><li><a href="../../authoring/meshes/motion.html">Clips, bones and expressions</a></li><li><a href="../../authoring/meshes/attaching.html">Attached layers and models</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/3d.html">Lights, 3D, camera and depth</a></summary><ul><li><a href="../../authoring/3d/flat-lights.html">Lights on flat layers</a></li><li><a href="../../authoring/3d/models.html">3D models</a></li><li><a href="../../authoring/3d/lights-and-camera.html">Lights, shadows and the camera</a></li><li><a href="../../authoring/3d/depth-and-hdr.html">Depth and bright colors</a></li></ul></details></li><li><a href="../../authoring/transitions.html">Make and try your own transition</a></li></ul></details></li><li><details class=sub><summary>Effects</summary><ul><li class=has><details><summary><a href="../../authoring/effects.html">Effects</a></summary><ul><li><a href="../../authoring/effects/on-a-layer.html">Putting effects on a layer</a></li><li><a href="../../authoring/effects/motion.html">Motion effects</a></li><li><a href="../../authoring/effects/light-and-color.html">Light and color effects</a></li><li><a href="../../authoring/effects/blur-and-style.html">Blur, distortion and style effects</a></li><li><a href="../../authoring/effects/own-descriptor.html">Your own effect: the descriptor</a></li><li><a href="../../authoring/effects/own-shader.html">Your own effect: the shader</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Particles and sound</summary><ul><li class=has><details><summary><a href="../../authoring/particles-and-sound.html">Particles and sound</a></summary><ul><li><a href="../../authoring/particles-and-sound/systems.html">Particle systems and emitters</a></li><li><a href="../../authoring/particles-and-sound/motion.html">How particles start and move</a></li><li><a href="../../authoring/particles-and-sound/drawing.html">How particles are drawn</a></li><li><a href="../../authoring/particles-and-sound/control-points.html">Control points, children and depth</a></li><li><a href="../../authoring/particles-and-sound/sound.html">Sound</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Scripts</summary><ul><li><a href="../../authoring/scripts-guide.html">Guide for script authors</a></li><li class=has><details><summary><a href="../../authoring/scripts.html">Scripts</a></summary><ul><li><a href="../../authoring/scripts/basics.html">Script basics</a></li><li><a href="../../authoring/scripts/exports-and-events.html">Exports, events and inputs</a></li><li><a href="../../authoring/scripts/interface-scene.html">The scene from a script</a></li><li><a href="../../authoring/scripts/interface-more.html">More of the script interface</a></li><li><a href="../../authoring/scripts/testing.html">Test and debug</a></li><li><a href="../../authoring/scripts/examples.html">Complete examples</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Web</summary><ul><li class=has><details><summary><a href="../../authoring/web-wallpapers.html">Web wallpapers</a></summary><ul><li><a href="../../authoring/web-wallpapers/basics.html">The minimum web wallpaper</a></li><li><a href="../../authoring/web-wallpapers/interface.html">The page and the program</a></li><li><a href="../../authoring/web-wallpapers/isolation.html">What a page may reach</a></li><li><a href="../../authoring/web-wallpapers/phone-and-apps.html">Phones and existing applications</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Publishing</summary><ul><li class=has><details><summary><a href="../../authoring/package.html">From the scene folder to a package that others install</a></summary><ul><li><a href="../../authoring/package/manifest.html">The manifest</a></li><li><a href="../../authoring/package/manifest-rights.html">Languages, licenses and ratings</a></li><li><a href="../../authoring/package/checking.html">Previews and checking</a></li><li><a href="../../authoring/package/signing.html">Packaging and signing</a></li><li><a href="../../authoring/package/publishing.html">Publishing and copies</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/cli.html">The reiwand-ctl authoring commands</a></summary><ul><li><a href="../../authoring/cli/create.html">Create, change and import</a></li><li><a href="../../authoring/cli/view.html">Viewing the scene</a></li><li><a href="../../authoring/cli/capture.html">Capture</a></li><li><a href="../../authoring/cli/check-and-publish.html">Check, package and publish</a></li><li><a href="../../authoring/cli/actions.html">The editor&#x27;s actions from the terminal</a></li></ul></details></li><li><a href="../../authoring/provider-plugins.html">Provider plugins</a></li></ul></details></li><li><details class=sub><summary>The editor</summary><ul><li class=has><details><summary><a href="../../authoring/editor.html">The scene editor: getting started, saving, undo, preview and shortcuts</a></summary><ul><li><a href="../../authoring/editor/opening.html">The editor and its window</a></li><li><a href="../../authoring/editor/creating-and-saving.html">Creating, saving and undoing</a></li><li><a href="../../authoring/editor/checking-and-viewing.html">Problems and previews</a></li><li><a href="../../authoring/editor/cost-and-package.html">Cost, the package and the image editor</a></li><li><a href="../../authoring/editor/shortcuts.html">All keyboard shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-features.html">Scene editor</a></summary><ul><li><a href="../../authoring/editor-features/parts.html">The parts of the editor</a></li><li><a href="../../authoring/editor-features/package-and-assets.html">The package, properties and assets</a></li><li><a href="../../authoring/editor-features/problems-and-masks.html">Problems and painted masks</a></li><li><a href="../../authoring/editor-features/meshes.html">Meshes, clips and chains</a></li><li><a href="../../authoring/editor-features/particles.html">Particle tools</a></li><li><a href="../../authoring/editor-features/files-and-3d.html">Layers from files and 3D models</a></li><li><a href="../../authoring/editor-features/fbx-and-obj.html">Converting FBX and OBJ models to glTF with Blender</a></li></ul></details></li><li><a href="../../authoring/other-editor-packages.html">Web wallpapers and other packages in the editor</a></li><li class=has><details><summary><a href="../../authoring/editor-canvas.html">Canvas, layers and inspector of the editor</a></summary><ul><li><a href="../../authoring/editor-canvas/choosing-and-moving.html">Choosing and moving layers</a></li><li><a href="../../authoring/editor-canvas/view-and-canvas.html">The view and the canvas</a></li><li><a href="../../authoring/editor-canvas/layers.html">Adding and arranging layers</a></li><li><a href="../../authoring/editor-canvas/inspector-and-assets.html">The inspector, templates and assets</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-drawing.html">Drawing in the editor: shapes, text, maps, sprites and depth</a></summary><ul><li><a href="../../authoring/editor-drawing/shapes-and-text.html">Shapes, gradients and text</a></li><li><a href="../../authoring/editor-drawing/fonts-and-maps.html">Fonts, light maps and sprite sheets</a></li><li><a href="../../authoring/editor-drawing/depth.html">Depth maps and cuts</a></li><li><a href="../../authoring/editor-drawing/regions.html">Regions and the parallax model</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-effects.html">Effects, masks and shaders in the scene editor</a></summary><ul><li><a href="../../authoring/editor-effects/basics.html">Adding effects</a></li><li><a href="../../authoring/editor-effects/catalog.html">The effect catalog and parameters</a></li><li><a href="../../authoring/editor-effects/masks.html">Masks, maps and glow</a></li><li><a href="../../authoring/editor-effects/adjust-and-cost.html">Adjustment layers, rest rules and cost</a></li><li><a href="../../authoring/editor-effects/package-effects.html">Package effects and shaders</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-animation.html">Animation in the editor: timelines, keys, curves and clips</a></summary><ul><li><a href="../../authoring/editor-animation/clips-and-videos.html">Clips and videos</a></li><li><a href="../../authoring/editor-animation/keys.html">Keys and the time strip</a></li><li><a href="../../authoring/editor-animation/timelines.html">Timelines, triggers and curves</a></li><li><a href="../../authoring/editor-animation/sprites-and-rest.html">Sprites, rest rules and shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-particles-and-sound.html">Particles and sound in the editor</a></summary><ul><li><a href="../../authoring/editor-particles-and-sound/systems-and-emitters.html">Particle systems and emitters</a></li><li><a href="../../authoring/editor-particles-and-sound/starts-and-forces.html">How particles start and the forces</a></li><li><a href="../../authoring/editor-particles-and-sound/colliders-and-look.html">Colliders, trails and the look</a></li><li><a href="../../authoring/editor-particles-and-sound/sound.html">Sound layers and links</a></li><li><a href="../../authoring/editor-particles-and-sound/sound-response.html">Sound levels and shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-meshes.html">Meshes, bones and expressions in the editor</a></summary><ul><li><a href="../../authoring/editor-meshes/bones.html">Meshes and bones</a></li><li><a href="../../authoring/editor-meshes/motion-and-shapes.html">Bone motion, blend shapes and parts</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-3d.html">Editor: 3D, lights, camera and materials</a></summary><ul><li><a href="../../authoring/editor-3d/models.html">Models and moving in 3D</a></li><li><a href="../../authoring/editor-3d/camera-and-lights.html">The camera and lights</a></li><li><a href="../../authoring/editor-3d/light-and-materials.html">Light, shadows and materials</a></li><li><a href="../../authoring/editor-3d/animation-and-cost.html">3D animation and cost</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-properties.html">User properties and presets in the editor</a></summary><ul><li><a href="../../authoring/editor-properties/adding.html">Adding properties</a></li><li><a href="../../authoring/editor-properties/types-and-order.html">Other types and order</a></li><li><a href="../../authoring/editor-properties/behavior.html">Following properties and conditions</a></li><li><a href="../../authoring/editor-properties/presets.html">Translations and presets</a></li><li><a href="../../authoring/editor-properties/preset-packages.html">Making a preset package</a></li></ul></details></li></ul></details></li><li><details class=sub open><summary>Editor actions from the terminal</summary><ul><li><a href="../../authoring/actions.html">Editor actions and queries from the command line</a></li><li class=has><details><summary><a href="../../authoring/actions-layers.html">Actions: layers, assets and canvas</a></summary><ul><li><a href="../../authoring/actions-layers/before-you-start.html">Before you start</a></li><li><a href="../../authoring/actions-layers/layers.html">Layers</a></li><li><a href="../../authoring/actions-layers/place-and-shape-a-layer.html">Place and shape a layer</a></li><li><a href="../../authoring/actions-layers/assets.html">Assets</a></li><li><a href="../../authoring/actions-layers/canvas.html">Canvas</a></li><li><a href="../../authoring/actions-layers/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/actions-effects.html">Actions: effects and masks</a></summary><ul><li><a href="../../authoring/actions-effects/a-layer-s-effects.html">A layer&#x27;s effects</a></li><li><a href="../../authoring/actions-effects/masks-and-painted-maps.html">Masks, painted maps and own transitions</a></li><li><a href="../../authoring/actions-effects/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/actions-meshes.html">Actions: meshes, bones and animation</a></summary><ul><li><a href="../../authoring/actions-meshes/before-you-start-with-meshes-bones-and-a.html">Before you start and creating a mesh</a></li><li><a href="../../authoring/actions-meshes/bones-and-weights.html">Bones and weights</a></li><li><a href="../../authoring/actions-meshes/clips-and-keys.html">Clips and keys</a></li><li><a href="../../authoring/actions-meshes/blend-shapes-and-expressions.html">Blend shapes and expressions</a></li><li><a href="../../authoring/actions-meshes/kinematics-and-physics.html">Kinematics and physics</a></li><li><a href="../../authoring/actions-meshes/parts-and-attachments.html">Parts and attachments</a></li><li><a href="../../authoring/actions-meshes/play-and-blend-animations.html">Play and blend animations</a></li><li><a href="../../authoring/actions-meshes/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/actions-particles-and-lights.html">Actions: particles, lights and sound</a></summary><ul><li><a href="../../authoring/actions-particles-and-lights/particles.html">Particles</a></li><li><a href="../../authoring/actions-particles-and-lights/lights-and-ambient-light.html">Lights and ambient light</a></li><li><a href="../../authoring/actions-particles-and-lights/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/actions-3d.html">Actions: 3D scene</a></summary><ul><li><a href="../../authoring/actions-3d/3d-scene-how-it-works.html">How 3D works, models and groups</a></li><li><a href="../../authoring/actions-3d/3d-scene-materials.html">Materials</a></li><li><a href="../../authoring/actions-3d/3d-scene-camera-and-view.html">Camera, view, lights and shadows</a></li><li><a href="../../authoring/actions-3d/3d-scene-camera-paths.html">Camera paths and dragging handles</a></li><li><a href="../../authoring/actions-3d/queries.html">Queries</a></li></ul></details></li><li class=has><details open><summary><a href="../../authoring/actions-time-and-package.html">Actions: time, package, properties and scripts</a></summary><ul><li><a href="../../authoring/actions-time-and-package/timeline-and-keys.html">Timeline and keys</a></li><li><a href="../../authoring/actions-time-and-package/package.html">Package</a></li><li><a href="../../authoring/actions-time-and-package/user-properties.html">User properties</a></li><li><a href="../../authoring/actions-time-and-package/scripts-and-templates.html">Scripts and templates</a></li><li><a href="../../authoring/actions-time-and-package/shaders.html">Shaders, undo and redo</a></li><li><a href="../../authoring/actions-time-and-package/queries.html" aria-current=page>Queries</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Examples</summary><ul><li class=has><details><summary><a href="../../authoring/coverage.html">What each example shows</a></summary><ul><li><a href="../../authoring/coverage/features.html">Features, effects, blends and layers</a></li><li><a href="../../authoring/coverage/values-and-scripts.html">Values, triggers, files and scripts</a></li><li><a href="../../authoring/coverage/scene.html">Everything else in scene.json</a></li></ul></details></li><li><a href="../../authoring/examples/ORIGIN.html">Origin of the example files</a></li></ul></details></li></ul></details><details><summary>Reference</summary><ul><li><details class=sub><summary>Formats and interfaces</summary><ul><li class=has><details><summary><a href="../../specs/scene.html">Scene format</a></summary><ul><li><a href="../../specs/scene/every-value-is-written.html">Every value is written</a></li><li><a href="../../specs/scene/canvas-clock-and-assets.html">Canvas, clock and assets</a></li><li><a href="../../specs/scene/canvas-clock-and-assets-ktx2-textures.html">KTX2 textures</a></li><li><a href="../../specs/scene/cost-and-frame-rate.html">Cost and frame rate</a></li><li><a href="../../specs/scene/layers.html">Layers</a></li><li><a href="../../specs/scene/layers-text.html">Text</a></li><li><a href="../../specs/scene/layers-lights.html">Lights</a></li><li><a href="../../specs/scene/layers-meshes.html">Meshes</a></li><li><a href="../../specs/scene/layers-models-and-3d.html">Models and 3D</a></li><li><a href="../../specs/scene/values.html">Values</a></li><li><a href="../../specs/scene/effects.html">Effects</a></li><li><a href="../../specs/scene/effects-writing-an-effect.html">Writing an effect</a></li><li><a href="../../specs/scene/effects-package-effects.html">Package effects</a></li><li><a href="../../specs/scene/effects-package-transitions.html">Package transitions</a></li><li><a href="../../specs/scene/effects-newer-effects-and-parame.html">Newer effects and parameters</a></li><li><a href="../../specs/scene/sound.html">Sound</a></li><li><a href="../../specs/scene/particles.html">Particles</a></li><li><a href="../../specs/scene/particles-newer-particle-fields.html">Newer particle fields</a></li><li><a href="../../specs/scene/user-properties-and-presets.html">User properties and presets</a></li><li><a href="../../specs/scene/inputs.html">Inputs</a></li><li><a href="../../specs/scene/scripts.html">Scripts</a></li><li><a href="../../specs/scene/scripts-the-reiwand-module.html">The reiwand module</a></li><li><a href="../../specs/scene/scripts-parents-the-camera-shape.html">Parents, the camera, shapes, storage and folders</a></li><li><a href="../../specs/scene/scripts-when-a-script-fails.html">When a script fails, Listening to the audio from a script and Script declarations</a></li><li><a href="../../specs/scene/rebuilding-a-scene-by-hand.html">Rebuilding a scene by hand</a></li><li><a href="../../specs/scene/rebuilding-a-scene-by-hand-porting-a-shader-to-wgsl.html">Porting a shader to WGSL</a></li></ul></details></li><li class=has><details><summary><a href="../../specs/package.html">Packages</a></summary><ul><li><a href="../../specs/package/versions.html">Versions and Manifest</a></li><li><a href="../../specs/package/display-and-playback.html">Display and playback and Rating and photosensitivity</a></li><li><a href="../../specs/package/inputs.html">Inputs</a></li><li><a href="../../specs/package/features.html">Features</a></li><li><a href="../../specs/package/profiles.html">Profiles, Platforms, Dependencies, Origin and Web pages</a></li><li><a href="../../specs/package/presets.html">Presets, Shared resources, Languages and Markup</a></li><li><a href="../../specs/package/facets-and-tags.html">Facets and tags</a></li></ul></details></li><li class=has><details><summary><a href="../../specs/web.html">Web pages</a></summary><ul><li><a href="../../specs/web/engine.html">Engine, Frames, Lifecycle and Session and the page&#x27;s view</a></li><li><a href="../../specs/web/protocol.html">Protocol, Frame clock, Console of a preview and Sandbox</a></li><li><a href="../../specs/web/privacy.html">Privacy and The page interface</a></li><li><a href="../../specs/web/on-the-phone.html">On the phone</a></li></ul></details></li><li class=has><details><summary><a href="../../specs/editor.html">Scene editor</a></summary><ul><li><a href="../../specs/editor/document.html">Document and Operations</a></li><li><a href="../../specs/editor/actions.html">Actions</a></li><li><a href="../../specs/editor/actions-curve-editor.html">Curve editor</a></li><li><a href="../../specs/editor/actions-from-the-command-line.html">Actions from the command line and Scripts and templates</a></li><li><a href="../../specs/editor/package-effects-and-shaders.html">Package effects and shaders and History</a></li><li><a href="../../specs/editor/inspector.html">Inspector</a></li><li><a href="../../specs/editor/inspector-shapes-text-and-fonts.html">Shapes, text and fonts, Hearing, shaping and trying a binding and Sound layers</a></li><li><a href="../../specs/editor/package-details.html">Package details</a></li><li><a href="../../specs/editor/user-properties-and-presets.html">User properties and presets</a></li><li><a href="../../specs/editor/user-properties-and-presets-mesh-layers.html">Mesh layers</a></li><li><a href="../../specs/editor/user-properties-and-presets-particle-systems.html">Particle systems</a></li><li><a href="../../specs/editor/user-properties-and-presets-lights.html">Lights</a></li><li><a href="../../specs/editor/user-properties-and-presets-models-and-3d.html">Models and 3D</a></li><li><a href="../../specs/editor/editor-frame.html">Editor frame</a></li><li><a href="../../specs/editor/editor-layouts.html">Layouts</a></li><li><a href="../../specs/editor/editor-panels.html">Editor panels</a></li><li><a href="../../specs/editor/preview.html">Preview</a></li><li><a href="../../specs/editor/pointer-areas-and-sound-bindings.html">Pointer areas and sound bindings and Shared parts</a></li><li><a href="../../specs/editor/web-pages-and-other-packages.html">Web pages and other packages</a></li><li><a href="../../specs/editor/web-pages-and-other-packages-preset-packages.html">Preset packages</a></li><li><a href="../../specs/editor/starting-points-building-and-applying.html">Starting points, building and applying</a></li><li><a href="../../specs/editor/picture-depth-tools.html">Picture depth tools</a></li><li><a href="../../specs/editor/editor-keyboard-and-non-scene-packages.html">Editor keyboard and non-scene packages and The own transition of a scene</a></li></ul></details></li><li class=has><details><summary><a href="../../specs/dbus.html">D-Bus interface</a></summary><ul><li><a href="../../specs/dbus/conventions.html">Conventions, Errors and Streams and claims</a></li><li><a href="../../specs/dbus/layer-shell-and-x11-outputs.html">Layer-shell and X11 outputs</a></li><li><a href="../../specs/dbus/frame-rate.html">Frame rate and Video decoding</a></li><li><a href="../../specs/dbus/stream-buffers.html">Stream buffers</a></li><li><a href="../../specs/dbus/io-github-reiwand-daemon1.html">io.github.reiwand.Daemon1</a></li><li><a href="../../specs/dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html">io.github.reiwand.Daemon1: ClearWallpaper to SetSceneProperty</a></li><li><a href="../../specs/dbus/io-github-reiwand-daemon1-listapplications-s-json.html">io.github.reiwand.Daemon1: ListApplications → to ShareSceneValues</a></li><li><a href="../../specs/dbus/io-github-reiwand-daemon1-setoption-s-key-s-value.html">io.github.reiwand.Daemon1: SetOption</a></li><li><a href="../../specs/dbus/io-github-reiwand-daemon1-reload.html">io.github.reiwand.Daemon1: Reload to Signal JobFinished</a></li><li><a href="../../specs/dbus/io-github-reiwand-library1.html">io.github.reiwand.Library1</a></li><li><a href="../../specs/dbus/io-github-reiwand-library1-renametag-s-from-s-to.html">io.github.reiwand.Library1: RenameTag to Signal ThumbnailReady</a></li><li><a href="../../specs/dbus/io-github-reiwand-playlists1.html">io.github.reiwand.Playlists1</a></li><li><a href="../../specs/dbus/io-github-reiwand-playlists1-history-s-output-u-limit.html">io.github.reiwand.Playlists1: History → to Signal BrowseChanged</a></li><li><a href="../../specs/dbus/io-github-reiwand-profiles1.html">io.github.reiwand.Profiles1</a></li><li><a href="../../specs/dbus/io-github-reiwand-providers1.html">io.github.reiwand.Providers1</a></li><li><a href="../../specs/dbus/io-github-reiwand-providers1-clearcache-s-id.html">io.github.reiwand.Providers1: ClearCache to RemovePlugin</a></li><li><a href="../../specs/dbus/io-github-reiwand-repos1.html">io.github.reiwand.Repos1</a></li><li><a href="../../specs/dbus/io-github-reiwand-inputs1.html">io.github.reiwand.Inputs1</a></li><li><a href="../../specs/dbus/io-github-reiwand-inputs1-decide-s-scene-s-key-as-.html">io.github.reiwand.Inputs1: Decide to Bands →</a></li><li><a href="../../specs/dbus/io-github-reiwand-inputs1-touch-s-output-d-x-d-y-u.html">io.github.reiwand.Inputs1: Touch to SetPointer</a></li><li><a href="../../specs/dbus/io-github-reiwand-rgb1.html">io.github.reiwand.Rgb1</a></li><li><a href="../../specs/dbus/io-github-reiwand-publish1.html">io.github.reiwand.Publish1, io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li><li><a href="../../specs/dbus/the-app-io-github-reiwand.html">The app: io.github.reiwand</a></li><li><a href="../../specs/dbus/edits-and-spanning.html">Edits and spanning</a></li><li><a href="../../specs/dbus/scenes.html">Scenes, Scene sound and Change notification</a></li><li><a href="../../specs/dbus/jobs.html">Jobs and Thumbnails</a></li><li><a href="../../specs/dbus/json-model.html">JSON model</a></li><li><a href="../../specs/dbus/configuration-file.html">Configuration file</a></li></ul></details></li><li><a href="../../specs/export.html">Export and import file (.reiwand)</a></li><li><a href="../../specs/explicit-values.html">Explicit values</a></li><li><a href="../../specs/provider-plugins.html">Provider plugins</a></li></ul></details></li><li><details class=sub><summary>The app and its screens</summary><ul><li class=has><details><summary><a href="../../specs/library.html">Library of the desktop app</a></summary><ul><li><a href="../../specs/library/shelf.html">Shelf</a></li><li><a href="../../specs/library/see-all.html">See all, Several chosen, Damaged or missing file, No results and failures, First start, Options of a wallpaper, My presets, Permission question, Still on its poster and Damaged scene</a></li></ul></details></li><li><a href="../../specs/create.html">Create page</a></li><li class=has><details><summary><a href="../../specs/shell.html">Window of the desktop app</a></summary><ul><li><a href="../../specs/shell/image-and-tones.html">Image and tones, Menu, Skeletons, Keyboard, Choosing files and folders, Notices, Size and What a page declares</a></li><li><a href="../../specs/shell/low-band-of-the-title-screens.html">Low band of the title screens, Sources and Settings</a></li><li><a href="../../specs/shell/private-mode.html">Private mode, Name of the screens, Now block, Lists and Third-party licenses</a></li></ul></details></li><li><a href="../../specs/look.html">Look of the desktop app</a></li><li><a href="../../specs/palette.html">Interface palette</a></li><li><a href="../../specs/icon.html">Icon</a></li><li><a href="../../specs/settings-pieces.html">Pieces for what is adjusted and for what each screen says</a></li><li><a href="../../specs/choose-pieces.html">Pieces for choosing wallpapers</a></li><li><a href="../../specs/phone-daily-use.html">Phone: daily use</a></li></ul></details></li></ul></details><details><summary>Development</summary><ul><li><a href="../../development/development.html">Development</a></li><li><a href="../../development/design.html">Design guide</a></li><li><a href="../../development/qml.html">Known QML pitfalls</a></li><li><a href="../../development/regression-net.html">Regression net</a></li><li><a href="../../guidelines.html">Reiwand guidelines</a></li></ul></details><details><summary>Specifications</summary><ul><li><a href="../../specs/dbus/edits-and-spanning/adjustments-and-spanning.html">Adjustments and spanning</a></li><li><a href="../../specs/dbus/edits-and-spanning/depth.html">Depth maps and depth layers</a></li><li><a href="../../specs/dbus/edits-and-spanning/edit-file.html">The edit file</a></li><li><a href="../../specs/dbus/json-model/lists-providers-inputs.html">Lists, providers, inputs and accounts</a></li><li><a href="../../specs/dbus/json-model/rules.html">The rules of the model</a></li><li><a href="../../specs/dbus/json-model/state-jobs-library.html">State, jobs and the library</a></li><li><a href="../../specs/editor/actions/animation-and-3d.html">Animation and 3D</a></li><li><a href="../../specs/editor/actions/bones-clips-and-expressions.html">Bones, clips and expressions</a></li><li><a href="../../specs/editor/actions/document-and-layers.html">Document and layers</a></li><li><a href="../../specs/editor/actions/effects-and-layer-fields.html">Effects and layer fields</a></li><li><a href="../../specs/editor/actions/keys-imports-and-effects.html">Keys, imports and effects</a></li><li><a href="../../specs/editor/actions/kinematics-physics-and-parts.html">Kinematics, physics and parts</a></li><li><a href="../../specs/editor/actions/lights-and-maps.html">Lights and maps</a></li><li><a href="../../specs/editor/actions/manifest-canvas-timelines-and-media.html">Manifest, canvas, timelines and media</a></li><li><a href="../../specs/editor/actions/media-assets-and-sprites.html">Media, assets, ids, keys and timelines</a></li><li><a href="../../specs/editor/actions/particles.html">Particles</a></li><li><a href="../../specs/editor/actions/scripts-templates-and-assets.html">Scripts, templates and assets</a></li><li><a href="../../specs/editor/actions/translations-captures-and-properties.html">Translations, captures and properties</a></li><li><a href="../../specs/editor/preview/outlines.html">Layer outlines on the canvas</a></li><li><a href="../../specs/editor/preview/pictures-and-console.html">Pictures, clips and the console</a></li><li><a href="../../specs/editor/preview/stream-and-level.html">The preview stream and its level</a></li><li><a href="../../specs/scene/canvas-clock-and-assets/audio-media-fonts.html">Scene audio, media and fonts</a></li><li><a href="../../specs/scene/canvas-clock-and-assets/main-fields.html">The main fields</a></li><li><a href="../../specs/scene/canvas-clock-and-assets/newer-canvas-fields.html">Newer canvas fields</a></li><li><a href="../../specs/scene/cost-and-frame-rate/drawing-less.html">Drawing less</a></li><li><a href="../../specs/scene/cost-and-frame-rate/frame-cost-and-tier.html">The cost of a frame and the tier</a></li><li><a href="../../specs/scene/cost-and-frame-rate/quality-levels.html">Quality levels and the budget</a></li><li><a href="../../specs/scene/effects-package-effects/descriptor.html">The descriptor</a></li><li><a href="../../specs/scene/effects-package-effects/passes-and-compiling.html">Passes, the check and compiling</a></li><li><a href="../../specs/scene/effects-package-effects/running.html">Running package effects</a></li><li><a href="../../specs/scene/layers-meshes/fields-and-clips.html">Mesh fields, clips and animation layers</a></li><li><a href="../../specs/scene/layers-meshes/mesh-file.html">The mesh file</a></li><li><a href="../../specs/scene/layers-meshes/reaching-and-swinging.html">Reaching and swinging</a></li><li><a href="../../specs/scene/layers-models-and-3d/camera-and-animation.html">The 3D camera and animated models</a></li><li><a href="../../specs/scene/layers-models-and-3d/lights-and-groups.html">Shadows, lights and 3D groups</a></li><li><a href="../../specs/scene/layers-models-and-3d/model-and-materials.html">The model layer and materials</a></li><li><a href="../../specs/scene/particles-newer-particle-fields/fields.html">The newer fields</a></li><li><a href="../../specs/scene/particles-newer-particle-fields/look-and-births.html">Looks and births</a></li><li><a href="../../specs/scene/particles-newer-particle-fields/shaders-colliders-limits.html">Shaders, colliders and limits</a></li><li><a href="../../specs/scene/particles-newer-particle-fields/space-forces-children.html">Space, forces and children</a></li><li><a href="../../specs/scene/values/newer-forms-and-media.html">Newer forms, events and media</a></li><li><a href="../../specs/scene/values/sources-and-timelines.html">Sources, modifiers and timelines</a></li></ul></details></div></details>
+    <div class="wide"><details><summary>Get started</summary><ul><li><a href="../../user/index.html">Getting started</a></li></ul></details><details><summary>Using Reiwand</summary><ul><li><details class=sub><summary>Desktop app</summary><ul><li class=has><details><summary><a href="../../user/app.html">The desktop app</a></summary><ul><li><a href="../../user/app/library.html">Keys and the library</a></li><li><a href="../../user/app/getting-wallpapers.html">Getting and making wallpapers</a></li><li><a href="../../user/app/lists-and-tray.html">Lists, the preview and the tray</a></li><li><a href="../../user/app/settings.html">Settings and permissions</a></li></ul></details></li><li><a href="../../user/other-desktops.html">Sway, Hyprland, river, niri and COSMIC</a></li><li><a href="../../user/keyboard-switching.html">Changing the wallpaper with the keyboard</a></li><li class=has><details><summary><a href="../../user/packages.html">Packages: rating, languages and credits</a></summary><ul><li><a href="../../user/packages/manifest.html">The package manifest</a></li><li><a href="../../user/packages/ratings-and-search.html">Mature content, flashing and search</a></li><li><a href="../../user/packages/assets-and-presets.html">Assets, presets and dependencies</a></li><li><a href="../../user/packages/playback.html">Accent color, playback and shortcuts</a></li><li><a href="../../user/packages/scene-features.html">Scene features</a></li><li><a href="../../user/packages/timelines-and-sound.html">Timelines, sound and video clocks</a></li><li><a href="../../user/packages/package-effects.html">Package effects</a></li><li><a href="../../user/packages/built-in-effects.html">Built-in effects</a></li><li><a href="../../user/packages/advanced-scenes.html">Advanced scenes</a></li><li><a href="../../user/packages/meshes.html">Skeleton meshes</a></li><li><a href="../../user/packages/particles.html">Particles</a></li><li><a href="../../user/packages/lights.html">Lights</a></li><li><a href="../../user/packages/models.html">3D models</a></li><li><a href="../../user/packages/compatibility.html">Compatibility and versions</a></li></ul></details></li><li><a href="../../user/web-wallpapers.html">Web wallpapers</a></li><li><a href="../../user/rgb-lighting.html">RGB lighting</a></li><li><a href="../../user/player.html">Media player</a></li><li class=has><details><summary><a href="../../user/privacy.html">Privacy</a></summary><ul><li><a href="../../user/privacy/network.html">Network and updates</a></li><li><a href="../../user/privacy/stored-data.html">Stored data and secrets</a></li><li><a href="../../user/privacy/scene-permissions.html">Scenes and what they can see</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Phone</summary><ul><li><a href="../../user/phone.html">The phone app</a></li><li class=has><details><summary><a href="../../user/android.html">Android</a></summary><ul><li><a href="../../user/android/install.html">Installing on Android</a></li><li><a href="../../user/android/library.html">The app and the library</a></li><li><a href="../../user/android/images.html">Images and setting the wallpaper</a></li><li><a href="../../user/android/lists.html">Lists</a></li><li><a href="../../user/android/videos.html">Videos</a></li><li><a href="../../user/android/parallax-depth.html">Parallax and depth</a></li><li><a href="../../user/android/packages.html">Packages</a></li><li><a href="../../user/android/scenes.html">Scenes</a></li><li><a href="../../user/android/media-sound-touch.html">Media, sound and touch</a></li><li><a href="../../user/android/settings.html">Settings</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Command line</summary><ul><li class=has><details><summary><a href="../../user/command-line.html">Using it from the terminal</a></summary><ul><li><a href="../../user/command-line/everyday-commands.html">Everyday commands</a></li><li><a href="../../user/command-line/stepping-with-the-keyboard.html">Stepping through wallpapers with the keyboard</a></li><li><a href="../../user/command-line/library-lists-and-packages.html">Library, lists and packages</a></li><li><a href="../../user/command-line/scripts-jobs-and-output.html">Scripts, jobs and output</a></li><li><a href="../../user/command-line/providers.html">Providers</a></li><li><a href="../../user/command-line/repositories.html">Repositories</a></li><li><a href="../../user/command-line/accounts-and-phone.html">Accounts and the phone&#x27;s repositories</a></li><li><a href="../../user/command-line/frame-rate-and-automatic-quality.html">Frame rate and automatic scene quality</a></li><li><a href="../../user/command-line/choosing-scene-quality.html">Choosing the scene quality</a></li><li><a href="../../user/command-line/hdr-power-and-motion.html">HDR, power, motion and flashing</a></li><li><a href="../../user/command-line/graphics-card.html">Choosing the graphics card</a></li><li><a href="../../user/command-line/streams-and-video-decoding.html">Streams and video decoding</a></li><li><a href="../../user/command-line/editing-images.html">Editing images</a></li><li><a href="../../user/command-line/depth-and-parallax.html">Depth maps and parallax</a></li><li><a href="../../user/command-line/parallax-layers.html">3D parallax layers</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Installation</summary><ul><li class=has><details><summary><a href="../../user/installation.html">Installation (without root)</a></summary><ul><li><a href="../../user/installation/appimage.html">Download and install the AppImage</a></li><li><a href="../../user/installation/requirements.html">Requirements</a></li><li><a href="../../user/installation/plasma.html">Setting up Plasma and the tray</a></li><li><a href="../../user/installation/updates-and-versions.html">Updates and versions</a></li></ul></details></li><li><a href="../../user/flatpak.html">Installation with Flatpak</a></li></ul></details></li></ul></details><details><summary>Your own server</summary><ul><li class=has><details><summary><a href="../../user/server.html">Your own server</a></summary><ul><li><a href="../../user/server/install.html">Installing the server</a></li><li><a href="../../user/server/configuration.html">Image and configuration</a></li><li><a href="../../user/server/https.html">HTTPS</a></li><li><a href="../../user/server/backups-and-versions.html">Backups and data from another version</a></li><li><a href="../../user/server/repositories-and-accounts.html">Repositories and accounts</a></li><li><a href="../../user/server/uploads-and-catalog.html">Uploads and the catalog</a></li><li><a href="../../user/server/taking-wallpapers-away.html">Taking a wallpaper away</a></li><li><a href="../../user/server/author-keys.html">Author keys and package tools</a></li><li><a href="../../user/server/static-repositories.html">Static repositories</a></li><li><a href="../../user/server/moving-configuration.html">Moving the configuration to another computer</a></li><li><a href="../../user/server/scenes.html">Scene properties</a></li><li><a href="../../user/server/scene-sound-and-examples.html">Example scenes and sound</a></li></ul></details></li><li class=has><details><summary><a href="../../specs/server.html">Self-hosted server</a></summary><ul><li><a href="../../specs/server/running.html">Running</a></li><li><a href="../../specs/server/conventions.html">Conventions and Discovery and health</a></li><li><a href="../../specs/server/repository.html">Repository</a></li><li><a href="../../specs/server/catalog.html">Catalog and Accounts</a></li><li><a href="../../specs/server/uploads.html">Uploads</a></li><li><a href="../../specs/server/moderation-and-administration.html">Moderation and administration</a></li><li><a href="../../specs/server/legal-pages.html">Legal pages and Operating a public server</a></li></ul></details></li><li class=has><details><summary><a href="../../specs/repo.html">Signed repositories</a></summary><ul><li><a href="../../specs/repo/keys-and-roles.html">Keys and roles, Signature files, Layout and Identity and URL</a></li><li><a href="../../specs/repo/formats.html">Formats and Package signatures</a></li><li><a href="../../specs/repo/online-authors.html">Online authors, Operator workflow, Client update, Package installation, Broken repositories and Client storage</a></li><li><a href="../../specs/repo/bundled-example-repository.html">Bundled example repository, Network interface and Adding a repository in the desktop app</a></li></ul></details></li></ul></details><details open><summary>Creating wallpapers</summary><ul><li><details class=sub><summary>First scene</summary><ul><li><a href="../../authoring/index.html">Creating scenes</a></li><li><a href="../../authoring/start/first-scene.html">Your first scene</a></li><li class=has><details><summary><a href="../../authoring/scene.html">The scene file</a></summary><ul><li><a href="../../authoring/scene/folder.html">The folder, the clock and the assets</a></li><li><a href="../../authoring/scene/canvas.html">The canvas</a></li><li><a href="../../authoring/scene/cost.html">What a scene costs</a></li><li><a href="../../authoring/scene/values.html">Values that move</a></li><li><a href="../../authoring/scene/timelines-and-inputs.html">Timelines and inputs</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Layers</summary><ul><li class=has><details><summary><a href="../../authoring/layers.html">Layers</a></summary><ul><li><a href="../../authoring/layers/basics.html">Layer basics</a></li><li><a href="../../authoring/layers/image-and-video.html">Image and video layers</a></li><li><a href="../../authoring/layers/text.html">Text layer (text)</a></li><li><a href="../../authoring/layers/shapes.html">Shape, solid and spectrum layers</a></li><li><a href="../../authoring/layers/groups.html">Group and adjustment layers</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/properties.html">User properties</a></summary><ul><li><a href="../../authoring/properties/declaring.html">Declaring properties</a></li><li><a href="../../authoring/properties/behavior.html">Conditions, presets and translations</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/meshes.html">Meshes, bones and animation</a></summary><ul><li><a href="../../authoring/meshes/layer-and-parts.html">The mesh layer and its parts</a></li><li><a href="../../authoring/meshes/motion.html">Clips, bones and expressions</a></li><li><a href="../../authoring/meshes/attaching.html">Attached layers and models</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/3d.html">Lights, 3D, camera and depth</a></summary><ul><li><a href="../../authoring/3d/flat-lights.html">Lights on flat layers</a></li><li><a href="../../authoring/3d/models.html">3D models</a></li><li><a href="../../authoring/3d/lights-and-camera.html">Lights, shadows and the camera</a></li><li><a href="../../authoring/3d/depth-and-hdr.html">Depth and bright colors</a></li></ul></details></li><li><a href="../../authoring/transitions.html">Make and try your own transition</a></li></ul></details></li><li><details class=sub><summary>Effects</summary><ul><li class=has><details><summary><a href="../../authoring/effects.html">Effects</a></summary><ul><li><a href="../../authoring/effects/on-a-layer.html">Putting effects on a layer</a></li><li><a href="../../authoring/effects/motion.html">Motion effects</a></li><li><a href="../../authoring/effects/light-and-color.html">Light and color effects</a></li><li><a href="../../authoring/effects/blur-and-style.html">Blur, distortion and style effects</a></li><li><a href="../../authoring/effects/own-descriptor.html">Your own effect: the descriptor</a></li><li><a href="../../authoring/effects/own-shader.html">Your own effect: the shader</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Particles and sound</summary><ul><li class=has><details><summary><a href="../../authoring/particles-and-sound.html">Particles and sound</a></summary><ul><li><a href="../../authoring/particles-and-sound/systems.html">Particle systems and emitters</a></li><li><a href="../../authoring/particles-and-sound/motion.html">How particles start and move</a></li><li><a href="../../authoring/particles-and-sound/drawing.html">How particles are drawn</a></li><li><a href="../../authoring/particles-and-sound/control-points.html">Control points, children and depth</a></li><li><a href="../../authoring/particles-and-sound/sound.html">Sound</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Scripts</summary><ul><li><a href="../../authoring/scripts-guide.html">Guide for script authors</a></li><li class=has><details><summary><a href="../../authoring/scripts.html">Scripts</a></summary><ul><li><a href="../../authoring/scripts/basics.html">Script basics</a></li><li><a href="../../authoring/scripts/exports-and-events.html">Exports, events and inputs</a></li><li><a href="../../authoring/scripts/interface-scene.html">The scene from a script</a></li><li><a href="../../authoring/scripts/interface-more.html">More of the script interface</a></li><li><a href="../../authoring/scripts/testing.html">Test and debug</a></li><li><a href="../../authoring/scripts/examples.html">Complete examples</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Web</summary><ul><li class=has><details><summary><a href="../../authoring/web-wallpapers.html">Web wallpapers</a></summary><ul><li><a href="../../authoring/web-wallpapers/basics.html">The minimum web wallpaper</a></li><li><a href="../../authoring/web-wallpapers/interface.html">The page and the program</a></li><li><a href="../../authoring/web-wallpapers/isolation.html">What a page may reach</a></li><li><a href="../../authoring/web-wallpapers/phone-and-apps.html">Phones and existing applications</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Publishing</summary><ul><li class=has><details><summary><a href="../../authoring/package.html">From the scene folder to a package that others install</a></summary><ul><li><a href="../../authoring/package/manifest.html">The manifest</a></li><li><a href="../../authoring/package/manifest-rights.html">Languages, licenses and ratings</a></li><li><a href="../../authoring/package/checking.html">Previews and checking</a></li><li><a href="../../authoring/package/signing.html">Packaging and signing</a></li><li><a href="../../authoring/package/publishing.html">Publishing and copies</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/cli.html">The reiwand-ctl authoring commands</a></summary><ul><li><a href="../../authoring/cli/create.html">Create, change and import</a></li><li><a href="../../authoring/cli/view.html">Viewing the scene</a></li><li><a href="../../authoring/cli/capture.html">Capture</a></li><li><a href="../../authoring/cli/check-and-publish.html">Check, package and publish</a></li><li><a href="../../authoring/cli/actions.html">The editor&#x27;s actions from the terminal</a></li></ul></details></li><li><a href="../../authoring/provider-plugins.html">Provider plugins</a></li></ul></details></li><li><details class=sub><summary>The editor</summary><ul><li class=has><details><summary><a href="../../authoring/editor.html">The scene editor: getting started, saving, undo, preview and shortcuts</a></summary><ul><li><a href="../../authoring/editor/opening.html">The editor and its window</a></li><li><a href="../../authoring/editor/creating-and-saving.html">Creating, saving and undoing</a></li><li><a href="../../authoring/editor/checking-and-viewing.html">Problems and previews</a></li><li><a href="../../authoring/editor/cost-and-package.html">Cost, the package and the image editor</a></li><li><a href="../../authoring/editor/shortcuts.html">All keyboard shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-features.html">Scene editor</a></summary><ul><li><a href="../../authoring/editor-features/parts.html">The parts of the editor</a></li><li><a href="../../authoring/editor-features/package-and-assets.html">The package, properties and assets</a></li><li><a href="../../authoring/editor-features/problems-and-masks.html">Problems and painted masks</a></li><li><a href="../../authoring/editor-features/meshes.html">Meshes, clips and chains</a></li><li><a href="../../authoring/editor-features/particles.html">Particle tools</a></li><li><a href="../../authoring/editor-features/files-and-3d.html">Layers from files and 3D models</a></li><li><a href="../../authoring/editor-features/fbx-and-obj.html">Converting FBX and OBJ models to glTF with Blender</a></li></ul></details></li><li><a href="../../authoring/other-editor-packages.html">Web wallpapers and other packages in the editor</a></li><li class=has><details><summary><a href="../../authoring/editor-canvas.html">Canvas, layers and inspector of the editor</a></summary><ul><li><a href="../../authoring/editor-canvas/choosing-and-moving.html">Choosing and moving layers</a></li><li><a href="../../authoring/editor-canvas/view-and-canvas.html">The view and the canvas</a></li><li><a href="../../authoring/editor-canvas/layers.html">Adding and arranging layers</a></li><li><a href="../../authoring/editor-canvas/inspector-and-assets.html">The inspector, templates and assets</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-drawing.html">Drawing in the editor: shapes, text, maps, sprites and depth</a></summary><ul><li><a href="../../authoring/editor-drawing/shapes-and-text.html">Shapes, gradients and text</a></li><li><a href="../../authoring/editor-drawing/fonts-and-maps.html">Fonts, light maps and sprite sheets</a></li><li><a href="../../authoring/editor-drawing/depth.html">Depth maps and cuts</a></li><li><a href="../../authoring/editor-drawing/regions.html">Regions and the parallax model</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-effects.html">Effects, masks and shaders in the scene editor</a></summary><ul><li><a href="../../authoring/editor-effects/basics.html">Adding effects</a></li><li><a href="../../authoring/editor-effects/catalog.html">The effect catalog and parameters</a></li><li><a href="../../authoring/editor-effects/masks.html">Masks, maps and glow</a></li><li><a href="../../authoring/editor-effects/adjust-and-cost.html">Adjustment layers, rest rules and cost</a></li><li><a href="../../authoring/editor-effects/package-effects.html">Package effects and shaders</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-animation.html">Animation in the editor: timelines, keys, curves and clips</a></summary><ul><li><a href="../../authoring/editor-animation/clips-and-videos.html">Clips and videos</a></li><li><a href="../../authoring/editor-animation/keys.html">Keys and the time strip</a></li><li><a href="../../authoring/editor-animation/timelines.html">Timelines, triggers and curves</a></li><li><a href="../../authoring/editor-animation/sprites-and-rest.html">Sprites, rest rules and shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-particles-and-sound.html">Particles and sound in the editor</a></summary><ul><li><a href="../../authoring/editor-particles-and-sound/systems-and-emitters.html">Particle systems and emitters</a></li><li><a href="../../authoring/editor-particles-and-sound/starts-and-forces.html">How particles start and the forces</a></li><li><a href="../../authoring/editor-particles-and-sound/colliders-and-look.html">Colliders, trails and the look</a></li><li><a href="../../authoring/editor-particles-and-sound/sound.html">Sound layers and links</a></li><li><a href="../../authoring/editor-particles-and-sound/sound-response.html">Sound levels and shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-meshes.html">Meshes, bones and expressions in the editor</a></summary><ul><li><a href="../../authoring/editor-meshes/bones.html">Meshes and bones</a></li><li><a href="../../authoring/editor-meshes/motion-and-shapes.html">Bone motion, blend shapes and parts</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-3d.html">Editor: 3D, lights, camera and materials</a></summary><ul><li><a href="../../authoring/editor-3d/models.html">Models and moving in 3D</a></li><li><a href="../../authoring/editor-3d/camera-and-lights.html">The camera and lights</a></li><li><a href="../../authoring/editor-3d/light-and-materials.html">Light, shadows and materials</a></li><li><a href="../../authoring/editor-3d/animation-and-cost.html">3D animation and cost</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/editor-properties.html">User properties and presets in the editor</a></summary><ul><li><a href="../../authoring/editor-properties/adding.html">Adding properties</a></li><li><a href="../../authoring/editor-properties/types-and-order.html">Other types and order</a></li><li><a href="../../authoring/editor-properties/behavior.html">Following properties and conditions</a></li><li><a href="../../authoring/editor-properties/presets.html">Translations and presets</a></li><li><a href="../../authoring/editor-properties/preset-packages.html">Making a preset package</a></li></ul></details></li></ul></details></li><li><details class=sub open><summary>Editor actions from the terminal</summary><ul><li><a href="../../authoring/actions.html">Editor actions and queries from the command line</a></li><li class=has><details><summary><a href="../../authoring/actions-layers.html">Actions: layers, assets and canvas</a></summary><ul><li><a href="../../authoring/actions-layers/before-you-start.html">Before you start</a></li><li><a href="../../authoring/actions-layers/layers.html">Layers</a></li><li><a href="../../authoring/actions-layers/place-and-shape-a-layer.html">Place and shape a layer</a></li><li><a href="../../authoring/actions-layers/assets.html">Assets</a></li><li><a href="../../authoring/actions-layers/canvas.html">Canvas</a></li><li><a href="../../authoring/actions-layers/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/actions-effects.html">Actions: effects and masks</a></summary><ul><li><a href="../../authoring/actions-effects/a-layer-s-effects.html">A layer&#x27;s effects</a></li><li><a href="../../authoring/actions-effects/masks-and-painted-maps.html">Masks, painted maps and own transitions</a></li><li><a href="../../authoring/actions-effects/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/actions-meshes.html">Actions: meshes, bones and animation</a></summary><ul><li><a href="../../authoring/actions-meshes/before-you-start-with-meshes-bones-and-a.html">Before you start and creating a mesh</a></li><li><a href="../../authoring/actions-meshes/bones-and-weights.html">Bones and weights</a></li><li><a href="../../authoring/actions-meshes/clips-and-keys.html">Clips and keys</a></li><li><a href="../../authoring/actions-meshes/blend-shapes-and-expressions.html">Blend shapes and expressions</a></li><li><a href="../../authoring/actions-meshes/kinematics-and-physics.html">Kinematics and physics</a></li><li><a href="../../authoring/actions-meshes/parts-and-attachments.html">Parts and attachments</a></li><li><a href="../../authoring/actions-meshes/play-and-blend-animations.html">Play and blend animations</a></li><li><a href="../../authoring/actions-meshes/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/actions-particles-and-lights.html">Actions: particles, lights and sound</a></summary><ul><li><a href="../../authoring/actions-particles-and-lights/particles.html">Particles</a></li><li><a href="../../authoring/actions-particles-and-lights/lights-and-ambient-light.html">Lights and ambient light</a></li><li><a href="../../authoring/actions-particles-and-lights/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../../authoring/actions-3d.html">Actions: 3D scene</a></summary><ul><li><a href="../../authoring/actions-3d/3d-scene-how-it-works.html">How 3D works, models and groups</a></li><li><a href="../../authoring/actions-3d/3d-scene-materials.html">Materials</a></li><li><a href="../../authoring/actions-3d/3d-scene-camera-and-view.html">Camera, view, lights and shadows</a></li><li><a href="../../authoring/actions-3d/3d-scene-camera-paths.html">Camera paths and dragging handles</a></li><li><a href="../../authoring/actions-3d/queries.html">Queries</a></li></ul></details></li><li class=has><details open><summary><a href="../../authoring/actions-time-and-package.html">Actions: time, package, properties and scripts</a></summary><ul><li><a href="../../authoring/actions-time-and-package/timeline-and-keys.html">Timeline and keys</a></li><li><a href="../../authoring/actions-time-and-package/package.html">Package</a></li><li><a href="../../authoring/actions-time-and-package/user-properties.html">User properties</a></li><li><a href="../../authoring/actions-time-and-package/scripts-and-templates.html">Scripts and templates</a></li><li><a href="../../authoring/actions-time-and-package/shaders.html">Shaders, undo and redo</a></li><li><a href="../../authoring/actions-time-and-package/queries.html" aria-current=page>Queries</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Examples</summary><ul><li class=has><details><summary><a href="../../authoring/coverage.html">What each example shows</a></summary><ul><li><a href="../../authoring/coverage/features.html">Features, effects, blends and layers</a></li><li><a href="../../authoring/coverage/values-and-scripts.html">Values, triggers, files and scripts</a></li><li><a href="../../authoring/coverage/scene.html">Everything else in scene.json</a></li></ul></details></li><li><a href="../../authoring/examples/ORIGIN.html">Origin of the example files</a></li></ul></details></li></ul></details><details><summary>Reference</summary><ul><li><details class=sub><summary>Formats and interfaces</summary><ul><li class=has><details><summary><a href="../../specs/scene.html">Scene format</a></summary><ul><li><a href="../../specs/scene/every-value-is-written.html">Every value is written</a></li><li><a href="../../specs/scene/canvas-clock-and-assets.html">Canvas, clock and assets</a></li><li><a href="../../specs/scene/canvas-clock-and-assets-ktx2-textures.html">KTX2 textures</a></li><li><a href="../../specs/scene/cost-and-frame-rate.html">Cost and frame rate</a></li><li><a href="../../specs/scene/layers.html">Layers</a></li><li><a href="../../specs/scene/layers-text.html">Text</a></li><li><a href="../../specs/scene/layers-lights.html">Lights</a></li><li><a href="../../specs/scene/layers-meshes.html">Meshes</a></li><li><a href="../../specs/scene/layers-models-and-3d.html">Models and 3D</a></li><li><a href="../../specs/scene/values.html">Values</a></li><li><a href="../../specs/scene/effects.html">Effects</a></li><li><a href="../../specs/scene/effects-writing-an-effect.html">Writing an effect</a></li><li><a href="../../specs/scene/effects-package-effects.html">Package effects</a></li><li><a href="../../specs/scene/effects-package-transitions.html">Package transitions</a></li><li><a href="../../specs/scene/effects-newer-effects-and-parame.html">Newer effects and parameters</a></li><li><a href="../../specs/scene/sound.html">Sound</a></li><li><a href="../../specs/scene/particles.html">Particles</a></li><li><a href="../../specs/scene/particles-newer-particle-fields.html">Newer particle fields</a></li><li><a href="../../specs/scene/user-properties-and-presets.html">User properties and presets</a></li><li><a href="../../specs/scene/inputs.html">Inputs</a></li><li><a href="../../specs/scene/scripts.html">Scripts</a></li><li><a href="../../specs/scene/scripts-the-reiwand-module.html">The reiwand module</a></li><li><a href="../../specs/scene/scripts-parents-the-camera-shape.html">Parents, the camera, shapes, storage and folders</a></li><li><a href="../../specs/scene/scripts-when-a-script-fails.html">When a script fails, Listening to the audio from a script and Script declarations</a></li><li><a href="../../specs/scene/rebuilding-a-scene-by-hand.html">Rebuilding a scene by hand</a></li><li><a href="../../specs/scene/rebuilding-a-scene-by-hand-porting-a-shader-to-wgsl.html">Porting a shader to WGSL</a></li></ul></details></li><li class=has><details><summary><a href="../../specs/package.html">Packages</a></summary><ul><li><a href="../../specs/package/versions.html">Versions and Manifest</a></li><li><a href="../../specs/package/display-and-playback.html">Display and playback and Rating and photosensitivity</a></li><li><a href="../../specs/package/inputs.html">Inputs</a></li><li><a href="../../specs/package/features.html">Features</a></li><li><a href="../../specs/package/profiles.html">Profiles, Platforms, Dependencies, Origin and Web pages</a></li><li><a href="../../specs/package/presets.html">Presets, Shared resources, Languages and Markup</a></li><li><a href="../../specs/package/facets-and-tags.html">Facets and tags</a></li></ul></details></li><li class=has><details><summary><a href="../../specs/web.html">Web pages</a></summary><ul><li><a href="../../specs/web/engine.html">Engine, Frames, Lifecycle and Session and the page&#x27;s view</a></li><li><a href="../../specs/web/protocol.html">Protocol, Frame clock, Console of a preview and Sandbox</a></li><li><a href="../../specs/web/privacy.html">Privacy and The page interface</a></li><li><a href="../../specs/web/on-the-phone.html">On the phone</a></li></ul></details></li><li class=has><details><summary><a href="../../specs/editor.html">Scene editor</a></summary><ul><li><a href="../../specs/editor/document.html">Document and Operations</a></li><li><a href="../../specs/editor/actions.html">Actions</a></li><li><a href="../../specs/editor/actions-curve-editor.html">Curve editor</a></li><li><a href="../../specs/editor/actions-from-the-command-line.html">Actions from the command line and Scripts and templates</a></li><li><a href="../../specs/editor/package-effects-and-shaders.html">Package effects and shaders and History</a></li><li><a href="../../specs/editor/inspector.html">Inspector</a></li><li><a href="../../specs/editor/inspector-shapes-text-and-fonts.html">Shapes, text and fonts, Hearing, shaping and trying a binding and Sound layers</a></li><li><a href="../../specs/editor/package-details.html">Package details</a></li><li><a href="../../specs/editor/user-properties-and-presets.html">User properties and presets</a></li><li><a href="../../specs/editor/user-properties-and-presets-mesh-layers.html">Mesh layers</a></li><li><a href="../../specs/editor/user-properties-and-presets-particle-systems.html">Particle systems</a></li><li><a href="../../specs/editor/user-properties-and-presets-lights.html">Lights</a></li><li><a href="../../specs/editor/user-properties-and-presets-models-and-3d.html">Models and 3D</a></li><li><a href="../../specs/editor/editor-frame.html">Editor frame</a></li><li><a href="../../specs/editor/editor-layouts.html">Layouts</a></li><li><a href="../../specs/editor/editor-panels.html">Editor panels</a></li><li><a href="../../specs/editor/preview.html">Preview</a></li><li><a href="../../specs/editor/pointer-areas-and-sound-bindings.html">Pointer areas and sound bindings and Shared parts</a></li><li><a href="../../specs/editor/web-pages-and-other-packages.html">Web pages and other packages</a></li><li><a href="../../specs/editor/web-pages-and-other-packages-preset-packages.html">Preset packages</a></li><li><a href="../../specs/editor/starting-points-building-and-applying.html">Starting points, building and applying</a></li><li><a href="../../specs/editor/picture-depth-tools.html">Picture depth tools</a></li><li><a href="../../specs/editor/editor-keyboard-and-non-scene-packages.html">Editor keyboard and non-scene packages and The own transition of a scene</a></li></ul></details></li><li class=has><details><summary><a href="../../specs/dbus.html">D-Bus interface</a></summary><ul><li><a href="../../specs/dbus/conventions.html">Conventions, Errors and Streams and claims</a></li><li><a href="../../specs/dbus/layer-shell-and-x11-outputs.html">Layer-shell and X11 outputs</a></li><li><a href="../../specs/dbus/frame-rate.html">Frame rate and Video decoding</a></li><li><a href="../../specs/dbus/stream-buffers.html">Stream buffers</a></li><li><a href="../../specs/dbus/io-github-reiwand-daemon1.html">io.github.reiwand.Daemon1</a></li><li><a href="../../specs/dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html">io.github.reiwand.Daemon1: ClearWallpaper to SetSceneProperty</a></li><li><a href="../../specs/dbus/io-github-reiwand-daemon1-listapplications-s-json.html">io.github.reiwand.Daemon1: ListApplications → to ShareSceneValues</a></li><li><a href="../../specs/dbus/io-github-reiwand-daemon1-setoption-s-key-s-value.html">io.github.reiwand.Daemon1: SetOption</a></li><li><a href="../../specs/dbus/io-github-reiwand-daemon1-reload.html">io.github.reiwand.Daemon1: Reload to Signal JobFinished</a></li><li><a href="../../specs/dbus/io-github-reiwand-library1.html">io.github.reiwand.Library1</a></li><li><a href="../../specs/dbus/io-github-reiwand-library1-renametag-s-from-s-to.html">io.github.reiwand.Library1: RenameTag to Signal ThumbnailReady</a></li><li><a href="../../specs/dbus/io-github-reiwand-playlists1.html">io.github.reiwand.Playlists1</a></li><li><a href="../../specs/dbus/io-github-reiwand-playlists1-history-s-output-u-limit.html">io.github.reiwand.Playlists1: History → to Signal BrowseChanged</a></li><li><a href="../../specs/dbus/io-github-reiwand-profiles1.html">io.github.reiwand.Profiles1</a></li><li><a href="../../specs/dbus/io-github-reiwand-providers1.html">io.github.reiwand.Providers1</a></li><li><a href="../../specs/dbus/io-github-reiwand-providers1-clearcache-s-id.html">io.github.reiwand.Providers1: ClearCache to RemovePlugin</a></li><li><a href="../../specs/dbus/io-github-reiwand-repos1.html">io.github.reiwand.Repos1</a></li><li><a href="../../specs/dbus/io-github-reiwand-inputs1.html">io.github.reiwand.Inputs1</a></li><li><a href="../../specs/dbus/io-github-reiwand-inputs1-decide-s-scene-s-key-as-.html">io.github.reiwand.Inputs1: Decide to Bands →</a></li><li><a href="../../specs/dbus/io-github-reiwand-inputs1-touch-s-output-d-x-d-y-u.html">io.github.reiwand.Inputs1: Touch to SetPointer</a></li><li><a href="../../specs/dbus/io-github-reiwand-rgb1.html">io.github.reiwand.Rgb1</a></li><li><a href="../../specs/dbus/io-github-reiwand-publish1.html">io.github.reiwand.Publish1, io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li><li><a href="../../specs/dbus/the-app-io-github-reiwand.html">The app: io.github.reiwand</a></li><li><a href="../../specs/dbus/edits-and-spanning.html">Edits and spanning</a></li><li><a href="../../specs/dbus/scenes.html">Scenes, Scene sound and Change notification</a></li><li><a href="../../specs/dbus/jobs.html">Jobs and Thumbnails</a></li><li><a href="../../specs/dbus/json-model.html">JSON model</a></li><li><a href="../../specs/dbus/configuration-file.html">Configuration file</a></li></ul></details></li><li><a href="../../specs/export.html">Export and import file (.reiwand)</a></li><li><a href="../../specs/explicit-values.html">Explicit values</a></li><li><a href="../../specs/provider-plugins.html">Provider plugins</a></li></ul></details></li><li><details class=sub><summary>The app and its screens</summary><ul><li class=has><details><summary><a href="../../specs/library.html">Library of the desktop app</a></summary><ul><li><a href="../../specs/library/shelf.html">Shelf</a></li><li><a href="../../specs/library/see-all.html">See all, Several chosen, Damaged or missing file, No results and failures, First start, Options of a wallpaper, My presets, Permission question, Still on its poster and Damaged scene</a></li></ul></details></li><li><a href="../../specs/create.html">Create page</a></li><li class=has><details><summary><a href="../../specs/shell.html">Window of the desktop app</a></summary><ul><li><a href="../../specs/shell/image-and-tones.html">Image and tones, Menu, Skeletons, Keyboard, Choosing files and folders, Notices, Size and What a page declares</a></li><li><a href="../../specs/shell/low-band-of-the-title-screens.html">Low band of the title screens, Sources and Settings</a></li><li><a href="../../specs/shell/private-mode.html">Private mode, Name of the screens, Now block, Lists and Third-party licenses</a></li></ul></details></li><li><a href="../../specs/look.html">Look of the desktop app</a></li><li><a href="../../specs/palette.html">Interface palette</a></li><li><a href="../../specs/icon.html">Icon</a></li><li><a href="../../specs/settings-pieces.html">Pieces for what is adjusted and for what each screen says</a></li><li><a href="../../specs/choose-pieces.html">Pieces for choosing wallpapers</a></li><li><a href="../../specs/phone-daily-use.html">Phone: daily use</a></li></ul></details></li></ul></details><details><summary>Development</summary><ul><li><a href="../../development/development.html">Development</a></li><li><a href="../../development/design.html">Design guide</a></li><li><a href="../../development/qml.html">Known QML pitfalls</a></li><li><a href="../../development/regression-net.html">Regression net</a></li><li><a href="../../guidelines.html">Reiwand guidelines</a></li></ul></details><details><summary>Specifications</summary><ul><li><a href="../../specs/dbus/edits-and-spanning/adjustments-and-spanning.html">Adjustments and spanning</a></li><li><a href="../../specs/dbus/edits-and-spanning/depth.html">Depth maps and depth layers</a></li><li><a href="../../specs/dbus/edits-and-spanning/edit-file.html">The edit file</a></li><li><a href="../../specs/dbus/json-model/lists-providers-inputs.html">Lists, providers, inputs and accounts</a></li><li><a href="../../specs/dbus/json-model/rules.html">The rules of the model</a></li><li><a href="../../specs/dbus/json-model/state-jobs-library.html">State, jobs and the library</a></li><li><a href="../../specs/editor/actions/animation-and-3d.html">Animation and 3D</a></li><li><a href="../../specs/editor/actions/bones-clips-and-expressions.html">Bones, clips and expressions</a></li><li><a href="../../specs/editor/actions/document-and-layers.html">Document and layers</a></li><li><a href="../../specs/editor/actions/effects-and-layer-fields.html">Effects and layer fields</a></li><li><a href="../../specs/editor/actions/keys-imports-and-effects.html">Keys, imports and effects</a></li><li><a href="../../specs/editor/actions/kinematics-physics-and-parts.html">Kinematics, physics and parts</a></li><li><a href="../../specs/editor/actions/lights-and-maps.html">Lights and maps</a></li><li><a href="../../specs/editor/actions/manifest-canvas-timelines-and-media.html">Manifest, canvas, timelines and media</a></li><li><a href="../../specs/editor/actions/media-assets-and-sprites.html">Media, assets, ids, keys and timelines</a></li><li><a href="../../specs/editor/actions/particles.html">Particles</a></li><li><a href="../../specs/editor/actions/scripts-templates-and-assets.html">Scripts, templates and assets</a></li><li><a href="../../specs/editor/actions/translations-captures-and-properties.html">Translations, captures and properties</a></li><li><a href="../../specs/editor/preview/outlines.html">Layer outlines on the canvas</a></li><li><a href="../../specs/editor/preview/pictures-and-console.html">Pictures, clips and the console</a></li><li><a href="../../specs/editor/preview/stream-and-level.html">The preview stream and its level</a></li><li><a href="../../specs/scene/canvas-clock-and-assets/audio-media-fonts.html">Scene audio, media and fonts</a></li><li><a href="../../specs/scene/canvas-clock-and-assets/main-fields.html">The main fields</a></li><li><a href="../../specs/scene/canvas-clock-and-assets/newer-canvas-fields.html">Newer canvas fields</a></li><li><a href="../../specs/scene/cost-and-frame-rate/drawing-less.html">Drawing less</a></li><li><a href="../../specs/scene/cost-and-frame-rate/frame-cost-and-tier.html">The cost of a frame and the tier</a></li><li><a href="../../specs/scene/cost-and-frame-rate/quality-levels.html">Quality levels and the budget</a></li><li><a href="../../specs/scene/effects-package-effects/descriptor.html">The descriptor</a></li><li><a href="../../specs/scene/effects-package-effects/passes-and-compiling.html">Passes, the check and compiling</a></li><li><a href="../../specs/scene/effects-package-effects/running.html">Running package effects</a></li><li><a href="../../specs/scene/layers-meshes/fields-and-clips.html">Mesh fields, clips and animation layers</a></li><li><a href="../../specs/scene/layers-meshes/mesh-file.html">The mesh file</a></li><li><a href="../../specs/scene/layers-meshes/reaching-and-swinging.html">Reaching and swinging</a></li><li><a href="../../specs/scene/layers-models-and-3d/camera-and-animation.html">The 3D camera and animated models</a></li><li><a href="../../specs/scene/layers-models-and-3d/lights-and-groups.html">Shadows, lights and 3D groups</a></li><li><a href="../../specs/scene/layers-models-and-3d/model-and-materials.html">The model layer and materials</a></li><li><a href="../../specs/scene/particles-newer-particle-fields/fields.html">The newer fields</a></li><li><a href="../../specs/scene/particles-newer-particle-fields/look-and-births.html">Looks and births</a></li><li><a href="../../specs/scene/particles-newer-particle-fields/shaders-colliders-limits.html">Shaders, colliders and limits</a></li><li><a href="../../specs/scene/particles-newer-particle-fields/space-forces-children.html">Space, forces and children</a></li><li><a href="../../specs/scene/values/newer-forms-and-media.html">Newer forms, events and media</a></li><li><a href="../../specs/scene/values/sources-and-timelines.html">Sources, modifiers and timelines</a></li></ul></details></div>
+  </nav>
+  <main>
+    <p class="crumbs"><a href="../../index.html">Docs</a><span>Creating wallpapers</span><span>Editor actions from the terminal</span><span><a href="../../authoring/actions-time-and-package.html">Actions: time, package, properties and scripts</a></span></p>
+    <article>
+<h1 id="queries">Queries</h1>
+<h3 id="before-you-start">Before you start<a class="anchor" href="#before-you-start" aria-label="Link to this section">#</a></h3>
+<p>Queries are made with
+<code>reiwand-ctl scene ask FOLDER NAME 'JSON'</code> and answer with
+JSON; they change nothing. Some ask for an object with arguments, others
+a single value (such as an asset's id in quotes). The rules for ids,
+paths and coordinates are those of <a href="#before-you-start">the
+actions</a>. The layers that are copied are asked for with <a
+href="../actions-layers/queries.html#copy">Queries</a>; from the command
+line there is also <code>reiwand-ctl scene ask FOLDER copy</code>.</p>
+<h3 id="package-texts-credits-and-notices">Package texts, credits and
+notices<a class="anchor" href="#package-texts-credits-and-notices" aria-label="Link to this section">#</a></h3>
+<h4 id="strings"><code>strings</code><a class="anchor" href="#strings" aria-label="Link to this section">#</a></h4>
+<p>Answers with the package's text table: which languages there are,
+which keys, in which languages each one is missing, where the texts live
+and the texts the engine already brings. It is for knowing what is left
+to translate before publishing. It is written with the <code>text</code>
+variant of <a href="package.html#manifest">Package</a>.</p>
+<p>It takes no arguments: pass <code>{}</code>.</p>
+<p>The answer has: <code>default</code> (the base language),
+<code>languages</code> (all the languages), <code>places</code> (per
+language, <code>manifest</code> if its texts are in the data sheet or
+<code>file</code> if they are in <code>locale/LANGUAGE.json</code>),
+<code>keys</code> (for each key: <code>key</code>, <code>texts</code>
+with the text of each language, <code>missing</code> with the languages
+it lacks and <code>used</code>, which says whether any text in the data
+sheet or the scene names it as <code>@key</code>), <code>engine</code>
+(the texts the engine already knows how to say, with their
+<code>key</code>, <code>en</code> and <code>es</code>) and
+<code>reads_files</code> (whether the package declares that it reads
+language files).</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene manifest <span class="st">&#39;{&quot;text&quot;:{&quot;key&quot;:&quot;greeting&quot;,&quot;language&quot;:&quot;en&quot;,&quot;text&quot;:&quot;Hello&quot;}}&#39;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene manifest <span class="st">&#39;{&quot;text&quot;:{&quot;key&quot;:&quot;greeting&quot;,&quot;language&quot;:&quot;de&quot;,&quot;text&quot;:&quot;Hallo&quot;}}&#39;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene strings <span class="st">&#39;{}&#39;</span></span></code></pre></div>
+<h4 id="credits"><code>credits</code><a class="anchor" href="#credits" aria-label="Link to this section">#</a></h4>
+<p>Answers with the package files that can be credited, the credits
+there are and the files that have none. It is for not publishing other
+people's files without giving their author. It is written with the
+<code>credit</code> and <code>uncredit</code> variants of <a
+href="package.html#manifest">Package</a>.</p>
+<p>It takes no arguments: pass <code>{}</code>.</p>
+<p>The answer has: <code>assets</code> (each file with its
+<code>path</code>, its <code>kind</code>, its <code>size</code> in bytes
+and <code>credited</code>, whether any credit covers it),
+<code>credits</code> (each with <code>paths</code>,
+<code>license</code>, <code>attribution</code> and <code>url</code>) and
+<code>missing</code> (the paths of the files with no credit).</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene import <span class="st">&#39;{&quot;file&quot;:&quot;picture.png&quot;}&#39;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene import <span class="st">&#39;{&quot;file&quot;:&quot;sound.ogg&quot;}&#39;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene manifest <span class="st">&#39;{&quot;credit&quot;:{&quot;paths&quot;:[&quot;assets/picture.png&quot;],&quot;license&quot;:&quot;CC-BY-4.0&quot;,&quot;attribution&quot;:&quot;Alex Morgan&quot;}}&#39;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene credits <span class="st">&#39;{}&#39;</span></span></code></pre></div>
+<p>The last line gives <code>"missing": ["assets/sound.ogg"]</code>.</p>
+<h4 id="preset_steps"><code>preset_steps</code><a class="anchor" href="#preset_steps" aria-label="Link to this section">#</a></h4>
+<p>Answers what a preset package still lacks before it is published. It
+is for knowing whether it can already be packaged, signed and added to a
+repository. On a package that is not a preset it answers
+<code>"preset": false</code>.</p>
+<p>It takes no arguments: pass <code>{}</code>.</p>
+<p>The answer has: <code>preset</code> (whether the package is a
+preset), <code>ready</code> (whether all the steps are done),
+<code>errors</code> (how many errors the check has) and
+<code>steps</code>, with an <code>id</code> and a <code>done</code> per
+step: <code>base</code> (the base package is chosen),
+<code>values</code> (the preset gives some value or file),
+<code>title</code>, <code>license</code>, <code>preview</code> (it has a
+thumbnail) and <code>check</code> (the check has no errors).</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene new my-scene <span class="at">--from</span> preset</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene preset_steps <span class="st">&#39;{}&#39;</span></span></code></pre></div>
+<p>The last line gives <code>"ready": false</code>: a freshly created
+preset already has a title and a license, and lacks <code>base</code>,
+<code>values</code>, <code>preview</code> and <code>check</code>.</p>
+<h4 id="flashes"><code>flashes</code><a class="anchor" href="#flashes" aria-label="Link to this section">#</a></h4>
+<p>Answers with the last result of measuring how much the scene flashes,
+or with a new measurement if you ask for <code>run</code>. It is for
+deciding whether the package should be marked as sensitive to flashes.
+The result is stored with the scene's state as long as the scene does
+not change, and any other <code>reiwand-ctl</code> call sees it: there
+is no need to ask for <code>run</code> again after <code>shot</code>
+with <code>flashes</code>.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Argument</th>
+<th>Type</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>run</code></td>
+<td>yes/no</td>
+<td><code>true</code> measures now and answers with the result. If
+missing, it answers with the last one or with <code>null</code>.</td>
+</tr>
+<tr class="even">
+<td><code>from</code></td>
+<td>number</td>
+<td>Second where it starts. Default 0.</td>
+</tr>
+<tr class="odd">
+<td><code>seconds</code></td>
+<td>number</td>
+<td>How long it measures, from 0.1 to 60. Default 8.</td>
+</tr>
+<tr class="even">
+<td><code>fps</code></td>
+<td>integer</td>
+<td>Frames per second of the measurement, from 1 to 30. Default 15.</td>
+</tr>
+</tbody>
+</table>
+<p>The answer has: <code>flashing</code> (whether it went over the safe
+limit of 3 flashes per second), <code>rate</code> (the maximum flashes
+per second), <code>at</code> (the second of the first dangerous flash,
+or <code>null</code>), and <code>from</code>, <code>seconds</code> and
+<code>fps</code> of the measurement. If it fails,
+<code>{"error": ...}</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene add_layer <span class="st">&#39;{&quot;kind&quot;:&quot;solid&quot;}&#39;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene flashes <span class="st">&#39;{&quot;run&quot;:true,&quot;from&quot;:0,&quot;seconds&quot;:1,&quot;fps&quot;:5}&#39;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene flashes <span class="st">&#39;{}&#39;</span></span></code></pre></div>
+<p>The last line gives the measurement the previous one made; if the
+scene changes afterwards, it gives <code>null</code>.</p>
+<h3 id="keys-curves-and-triggers">Keys, curves and triggers<a class="anchor" href="#keys-curves-and-triggers" aria-label="Link to this section">#</a></h3>
+<h4 id="curves"><code>curves</code><a class="anchor" href="#curves" aria-label="Link to this section">#</a></h4>
+<p>Answers with the keys of an animated value, with their handles and
+with the curve already computed as points, to draw it or to review an
+easing.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Argument</th>
+<th>Type</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pointer</code></td>
+<td>text (required)</td>
+<td>Path of a value with keys, such as
+<code>/scene/layers/0/opacity</code>.</td>
+</tr>
+<tr class="even">
+<td><code>samples</code></td>
+<td>integer</td>
+<td>How many points to compute, from 2 to 512. Default 96.</td>
+</tr>
+<tr class="odd">
+<td><code>from</code></td>
+<td>number</td>
+<td>Second where the curve starts. Default, that of the first key.</td>
+</tr>
+<tr class="even">
+<td><code>to</code></td>
+<td>number</td>
+<td>Second where it ends. Default, that of the last key (at least 1 s
+after <code>from</code>).</td>
+</tr>
+<tr class="odd">
+<td><code>picked</code></td>
+<td>list of numbers</td>
+<td>Seconds of the picked keys, to compute the selection's bounds.</td>
+</tr>
+</tbody>
+</table>
+<p>The answer has: <code>pointer</code>, <code>kind</code> (the value's
+type, for example <code>float</code>), <code>unit</code>,
+<code>range</code> (from which second to which it was computed),
+<code>keys</code> (per key: <code>t</code>, <code>value</code>,
+<code>parts</code>, <code>ease</code>, and <code>in</code> and
+<code>out</code>, the handles, with their <code>dt</code> in seconds,
+their value <code>dv</code> and whether the user set them:
+<code>set</code>), <code>tracks</code> (per component of the value,
+<code>name</code>, <code>part</code> and <code>points</code>, the list
+of <code>[second, value]</code> pairs) and <code>bounds</code> (the
+bounds of all the values and of the picked ones). If the value has no
+keys, <code>{"error": ...}</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene add_layer <span class="st">&#39;{&quot;kind&quot;:&quot;image&quot;,&quot;file&quot;:&quot;picture.png&quot;,&quot;id&quot;:&quot;sky&quot;}&#39;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene keyframe <span class="st">&#39;{&quot;pointer&quot;:&quot;/scene/layers/0/opacity&quot;,&quot;time&quot;:0,&quot;value&quot;:0}&#39;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene keyframe <span class="st">&#39;{&quot;pointer&quot;:&quot;/scene/layers/0/opacity&quot;,&quot;time&quot;:2,&quot;value&quot;:1}&#39;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene curves <span class="st">&#39;{&quot;pointer&quot;:&quot;/scene/layers/0/opacity&quot;,&quot;samples&quot;:3}&#39;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene curves <span class="st">&#39;{&quot;pointer&quot;:&quot;/scene/layers/0/opacity&quot;,&quot;samples&quot;:3,&quot;picked&quot;:[2]}&#39;</span></span></code></pre></div>
+<p>The first of those queries gives, among other things,
+<code>"points": [[0.0, 0.0], [1.0, 0.5], [2.0, 1.0]]</code>.</p>
+<h4 id="key_clip"><code>key_clip</code><a class="anchor" href="#key_clip" aria-label="Link to this section">#</a></h4>
+<p>Turns keys into text that can be copied and pasted, or reads such a
+text and says which keys it carries. The text starts with
+<code>reiwand-keys:</code>.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Argument</th>
+<th>Type</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>copy</code></td>
+<td>list of objects</td>
+<td>What to copy: each with <code>pointer</code> (path of a value with
+keys) and <code>times</code> (the seconds of the keys).</td>
+</tr>
+<tr class="even">
+<td><code>read</code></td>
+<td>text</td>
+<td>A clipboard text. If you give it, the query reads it instead of
+copying.</td>
+</tr>
+</tbody>
+</table>
+<p>With <code>copy</code>, the answer has <code>picks</code> (each value
+with its <code>keys</code>) and <code>text</code>, the text for the
+clipboard. With <code>read</code>, the answer has <code>picks</code>
+with the keys the text carries, or <code>null</code> if the text is not
+a keys text. If a path has no keys, <code>{"error": ...}</code>. To
+paste keys there is a variant of the <code>edit_keys</code> action (see
+<a href="../actions.html">actions</a>).</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene add_layer <span class="st">&#39;{&quot;kind&quot;:&quot;image&quot;,&quot;file&quot;:&quot;picture.png&quot;,&quot;id&quot;:&quot;sky&quot;}&#39;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene keyframe <span class="st">&#39;{&quot;pointer&quot;:&quot;/scene/layers/0/opacity&quot;,&quot;time&quot;:0,&quot;value&quot;:0.2}&#39;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene keyframe <span class="st">&#39;{&quot;pointer&quot;:&quot;/scene/layers/0/opacity&quot;,&quot;time&quot;:1,&quot;value&quot;:1}&#39;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene key_clip <span class="st">&#39;{&quot;copy&quot;:[{&quot;pointer&quot;:&quot;/scene/layers/0/opacity&quot;,&quot;times&quot;:[0,1]}]}&#39;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene key_clip <span class="st">&#39;{&quot;read&quot;:&quot;reiwand-keys:{\&quot;picks\&quot;:[{\&quot;pointer\&quot;:\&quot;/scene/layers/0/opacity\&quot;,\&quot;keys\&quot;:[[0,0.2]]}]}&quot;}&#39;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene key_clip <span class="st">&#39;{&quot;read&quot;:&quot;hello&quot;}&#39;</span></span></code></pre></div>
+<p>The last query gives <code>{"picks": null}</code>.</p>
+<h4 id="fires"><code>fires</code><a class="anchor" href="#fires" aria-label="Link to this section">#</a></h4>
+<p>Answers with the timelines and sound layers that a trigger starts. It
+is for knowing what happens when an event sounds or something is
+pressed. The trigger is written as in <code>trigger</code> of the <a
+href="timeline-and-keys.html#timeline">Timeline and keys</a> action:
+<code>start</code>, <code>event:NAME</code>, <code>click:LAYER</code>,
+<code>prop:ID</code>...</p>
+<p>The argument is the trigger, as a JSON text in quotes.</p>
+<p>The answer has: <code>trigger</code>, <code>timelines</code> (ids of
+the timelines that have it as <code>trigger</code>) and
+<code>sounds</code> (ids of the sound layers whose <code>play_on</code>
+is that trigger).</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene timeline <span class="st">&#39;{&quot;id&quot;:&quot;one&quot;,&quot;add&quot;:true,&quot;add_events&quot;:[{&quot;t&quot;:1,&quot;name&quot;:&quot;boom&quot;}]}&#39;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene timeline <span class="st">&#39;{&quot;id&quot;:&quot;two&quot;,&quot;add&quot;:true,&quot;trigger&quot;:&quot;event:boom&quot;}&#39;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene add_layer <span class="st">&#39;{&quot;kind&quot;:&quot;sound&quot;,&quot;file&quot;:&quot;sound.ogg&quot;,&quot;id&quot;:&quot;voice&quot;}&#39;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene set <span class="st">&#39;{&quot;pointer&quot;:&quot;/scene/layers/0/play_on&quot;,&quot;value&quot;:&quot;event:boom&quot;}&#39;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene fires <span class="st">&#39;&quot;event:boom&quot;&#39;</span></span></code></pre></div>
+<p>The last query gives
+<code>{"sounds": ["voice"], "timelines": ["two"], "trigger": "event:boom"}</code>.</p>
+<h4 id="cues"><code>cues</code><a class="anchor" href="#cues" aria-label="Link to this section">#</a></h4>
+<p>Answers with every trigger that the timelines and sound layers of the
+scene start on, each as the <code>fires</code> query answers it, in the
+order of their names. The Inputs panel of the editor lists them with a
+button to fire each.</p>
+<p>The argument is an empty object.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene timeline <span class="st">&#39;{&quot;id&quot;:&quot;one&quot;,&quot;add&quot;:true,&quot;add_events&quot;:[{&quot;t&quot;:1,&quot;name&quot;:&quot;boom&quot;}]}&#39;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene timeline <span class="st">&#39;{&quot;id&quot;:&quot;two&quot;,&quot;add&quot;:true,&quot;trigger&quot;:&quot;event:boom&quot;}&#39;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene cues <span class="st">&#39;{}&#39;</span></span></code></pre></div>
+<p>The last query gives
+<code>[{"sounds": [], "timelines": ["two"], "trigger": "event:boom"}]</code>.</p>
+<h3 id="assets-and-media">Assets and media<a class="anchor" href="#assets-and-media" aria-label="Link to this section">#</a></h3>
+<h4 id="palette"><code>palette</code><a class="anchor" href="#palette" aria-label="Link to this section">#</a></h4>
+<p>Answers with an image's main colors, to get a palette that matches
+it.</p>
+<p>The argument is the id of an image asset, as a JSON text in
+quotes.</p>
+<p>The answer is a list of 5 <code>#rrggbb</code> colors, or
+<code>null</code> if the asset does not exist or is not a still
+image.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene import <span class="st">&#39;{&quot;file&quot;:&quot;picture.png&quot;}&#39;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene palette <span class="st">&#39;&quot;picture&quot;&#39;</span></span></code></pre></div>
+<h4 id="clocks"><code>clocks</code><a class="anchor" href="#clocks" aria-label="Link to this section">#</a></h4>
+<p>Answers with the video layers that have their own clock
+(<code>playback.own_clock</code>) and where each clock is at a second of
+the scene. It is for knowing which frame of its video each one would be
+at. It only counts the videos that have <code>own_clock</code> set to
+<code>true</code>.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Argument</th>
+<th>Type</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>time</code></td>
+<td>number</td>
+<td>Second of the scene. Default 0.</td>
+</tr>
+<tr class="even">
+<td><code>strip</code></td>
+<td>integer</td>
+<td>How many thumbnails to ask for from each video, spread over its
+length. Default 0, none.</td>
+</tr>
+</tbody>
+</table>
+<p>The answer has <code>time</code> and <code>clocks</code>, and each
+clock brings: <code>layer</code>, <code>pointer</code>,
+<code>videos</code>, <code>length</code> (the video's length in
+seconds), <code>start</code>, <code>end</code>, <code>rate</code>,
+<code>loop</code>, <code>playing</code>, <code>at</code> (the second of
+the video it is at) and <code>keyed</code> (whether the speed has keys).
+With <code>strip</code>, each clock also brings <code>strip</code>, a
+list of <code>{at, file}</code> with the thumbnail of each instant.</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene add_layer <span class="st">&#39;{&quot;kind&quot;:&quot;video&quot;,&quot;file&quot;:&quot;video.webm&quot;,&quot;id&quot;:&quot;clip&quot;}&#39;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene set <span class="st">&#39;{&quot;pointer&quot;:&quot;/scene/layers/0/playback&quot;,&quot;value&quot;:{&quot;own_clock&quot;:true,&quot;rate&quot;:2}}&#39;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene clocks <span class="st">&#39;{&quot;time&quot;:0.25}&#39;</span></span></code></pre></div>
+<h4 id="pools"><code>pools</code><a class="anchor" href="#pools" aria-label="Link to this section">#</a></h4>
+<p>Answers with the scene's shape pools, with the layers that draw them
+and the scripts that fill them. It is for checking that each pool has
+something that draws it and something that builds it. They are edited
+with the <a href="scripts-and-templates.html#pool">Scripts and
+templates</a> action.</p>
+<p>It takes no arguments: pass <code>{}</code> (or nothing).</p>
+<p>The answer has <code>limit</code> (how many pools fit, 16) and
+<code>pools</code>, and each pool brings: <code>id</code>,
+<code>pointer</code>, <code>max</code> (shapes),
+<code>max_vertices</code>, <code>texture</code>, <code>size</code>,
+<code>layers</code> (ids of the layers that draw it) and
+<code>scripts</code> (those that declare <code>geometry</code>).</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene pool <span class="st">&#39;{&quot;id&quot;:&quot;shapes&quot;,&quot;add&quot;:true}&#39;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene add_layer <span class="st">&#39;{&quot;kind&quot;:&quot;shapes&quot;,&quot;source&quot;:&quot;shapes&quot;,&quot;id&quot;:&quot;drawing&quot;}&#39;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene pools <span class="st">&#39;{}&#39;</span></span></code></pre></div>
+<h3 id="scripts-and-shaders">Scripts and shaders<a class="anchor" href="#scripts-and-shaders" aria-label="Link to this section">#</a></h3>
+<h4 id="script_uses"><code>script_uses</code><a class="anchor" href="#script_uses" aria-label="Link to this section">#</a></h4>
+<p>Says on which lines of the scene's scripts an id appears in quotes
+(single, double or template). It is for knowing which scripts still name
+a layer, a particle system or a template before renaming or removing it:
+the <code>rename</code> action does not rewrite scripts.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Argument</th>
+<th>Type</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>name</code></td>
+<td>text</td>
+<td>(required) The id that is searched for.</td>
+</tr>
+</tbody>
+</table>
+<p>The answer is a list of <code>{path, line}</code>: the script and the
+line number (from 1). It is an empty list if no script names it.</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">printf</span> <span class="st">&#39;layers.show(&quot;sky&quot;);\n&#39;</span> <span class="op">&gt;</span> one.js</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene import_script <span class="st">&#39;{&quot;file&quot;:&quot;one.js&quot;}&#39;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene script_uses <span class="st">&#39;{&quot;name&quot;:&quot;sky&quot;}&#39;</span></span></code></pre></div>
+<h4 id="uses"><code>uses</code><a class="anchor" href="#uses" aria-label="Link to this section">#</a></h4>
+<p>Answers, for each script in the scene, which parts of the engine it
+declares, which it detects in its code and which it still lacks
+declaring. It is for checking that the package asks for the permissions
+its scripts need. What is missing is fixed with the <a
+href="scripts-and-templates.html#uses">Scripts and templates</a>
+action.</p>
+<p>It takes no arguments: pass <code>{}</code>.</p>
+<p>The answer has <code>scripts</code>, and each script brings
+<code>path</code>, <code>pointer</code>, <code>declared</code>,
+<code>detected</code> and <code>missing</code>.</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene import_script <span class="st">&#39;{&quot;template&quot;:&quot;empty&quot;}&#39;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene script <span class="st">&#39;{&quot;write&quot;:{&quot;path&quot;:&quot;scripts/empty.js&quot;,&quot;text&quot;:&quot;export function update() { scene.bloom; }\n&quot;}}&#39;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene uses <span class="st">&#39;{}&#39;</span></span></code></pre></div>
+<p>The last query gives, for that script, <code>"declared": []</code>,
+<code>"detected": ["bloom"]</code> and
+<code>"missing": ["bloom"]</code>.</p>
+<h4 id="shader_source"><code>shader_source</code><a class="anchor" href="#shader_source" aria-label="Link to this section">#</a></h4>
+<p>Answers with the descriptor and the WGSL code of a package effect or
+material, and with what the editor needs to build its form. It is for
+reading what someone else wrote or what was created with <a
+href="shaders.html#shader">Shaders, undo and redo</a>.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Argument</th>
+<th>Type</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>effect</code></td>
+<td>text (required)</td>
+<td>Id of a package effect.</td>
+</tr>
+</tbody>
+</table>
+<p>The answer has: <code>effect</code>, <code>descriptor_path</code> and
+<code>wgsl_path</code> (where the files live), <code>descriptor</code>
+(the descriptor's text) and <code>parsed</code> (the descriptor already
+read), <code>wgsl</code> (the code), <code>stage</code>
+(<code>layer</code>, <code>material</code> or <code>particle</code>),
+<code>kinds</code> (the setting types that exist), <code>fields</code>
+(the fields that the <code>shader</code> action with <code>field</code>
+can change), <code>templates</code> (the templates of <code>new</code>)
+and <code>tools</code> (per setting, the editing tools it offers). If
+the effect is not the package's, <code>null</code>.</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene shader <span class="st">&#39;{&quot;new&quot;:{&quot;name&quot;:&quot;tone&quot;}}&#39;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene shader_source <span class="st">&#39;{&quot;effect&quot;:&quot;tone&quot;}&#39;</span></span></code></pre></div>
+<h4 id="shader_check"><code>shader_check</code><a class="anchor" href="#shader_check" aria-label="Link to this section">#</a></h4>
+<p>Checks a package effect the way whoever opens the package checks it,
+with its saved text or with new text you have not saved yet. It says
+whether it is valid and, if not, at which line and column the error
+is.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Argument</th>
+<th>Type</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>effect</code></td>
+<td>text (required)</td>
+<td>Id of a package effect.</td>
+</tr>
+<tr class="even">
+<td><code>wgsl</code></td>
+<td>text</td>
+<td>WGSL code to test instead of the saved one.</td>
+</tr>
+<tr class="odd">
+<td><code>descriptor</code></td>
+<td>text</td>
+<td>Descriptor, written as JSON text, to test instead of the saved
+one.</td>
+</tr>
+</tbody>
+</table>
+<p>The answer has: <code>effect</code>, <code>ok</code> (whether it is
+valid), <code>error</code> (the message, or <code>null</code>),
+<code>line</code> and <code>column</code> (where, or <code>null</code>),
+<code>stage</code>, <code>units</code> (the relative cost),
+<code>uses</code> (the parts of the engine it uses) and
+<code>handles</code> (the handles the canvas will offer).</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene shader <span class="st">&#39;{&quot;new&quot;:{&quot;name&quot;:&quot;tone&quot;}}&#39;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene shader_check <span class="st">&#39;{&quot;effect&quot;:&quot;tone&quot;}&#39;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene shader_check <span class="st">&#39;{&quot;effect&quot;:&quot;tone&quot;,&quot;wgsl&quot;:&quot;fn color_tone(color: vec4&lt;f32&gt;, uv: vec2&lt;f32&gt;) -&gt; vec4&lt;f32&gt; {\n    return colr;\n}\n&quot;}&#39;</span></span></code></pre></div>
+<p>The last query gives <code>"ok": false</code>, <code>"line": 2</code>
+and <code>"column": 12</code>, with the notice that <code>colr</code>
+does not exist.</p>
+<h3 id="package-review-and-signature">Package review and signature<a class="anchor" href="#package-review-and-signature" aria-label="Link to this section">#</a></h3>
+<h4 id="review"><code>review</code><a class="anchor" href="#review" aria-label="Link to this section">#</a></h4>
+<p>Answers with the package review as the editor sees it before
+publishing: the problems, what the package needs, on which platforms it
+plays and whether it is signed. It is the editor's problem list, with
+the same checks as <code>pack check</code>, plus the platform
+notices.</p>
+<p>It takes no arguments: pass <code>{}</code>.</p>
+<p>The answer has <code>findings</code> (each with <code>level</code>:
+<code>error</code>, <code>warning</code> or <code>note</code>;
+<code>pointer</code>, <code>file</code> and <code>message</code>),
+<code>needs</code> and <code>build_adds</code> (what the package needs
+and what the build adds to it), <code>platforms</code> (per platform,
+<code>refused</code> with the reason and <code>without</code> with what
+it lacks), <code>facets</code> and <code>signature</code>.</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene review <span class="st">&#39;{}&#39;</span></span></code></pre></div>
+<h4 id="signature"><code>signature</code><a class="anchor" href="#signature" aria-label="Link to this section">#</a></h4>
+<p>Says whether a package folder or a <code>.wpak</code> file is signed,
+and whether the signature is valid for some keys.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Argument</th>
+<th>Type</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>keys</code></td>
+<td>list of texts</td>
+<td>Trusted public keys. Without them, the signature is only reported,
+not verified.</td>
+</tr>
+<tr class="even">
+<td><code>path</code></td>
+<td>text</td>
+<td>Folder or <code>.wpak</code> file. Default, the scene's folder.</td>
+</tr>
+</tbody>
+</table>
+<p>The answer has <code>state</code>: <code>unsigned</code> (no
+signature), <code>unchecked</code> (there is a signature, but no keys
+were given; it brings <code>blocks</code>), <code>valid</code> (the
+signature is valid; it brings <code>signers</code>) or
+<code>invalid</code> (it brings <code>error</code>).</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene signature <span class="st">&#39;{}&#39;</span></span></code></pre></div>
+<h3 id="properties-and-presets">Properties and presets<a class="anchor" href="#properties-and-presets" aria-label="Link to this section">#</a></h3>
+<h4 id="tried"><code>tried</code><a class="anchor" href="#tried" aria-label="Link to this section">#</a></h4>
+<p>Answers with the user properties form as it looks when trying a
+preset or some values on top of the factory ones. It is for seeing which
+fields are shown and with which values without changing the scene. In
+the app, trying a preset on the preview.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Argument</th>
+<th>Type</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>preset</code></td>
+<td>text</td>
+<td>Id of a package preset.</td>
+</tr>
+<tr class="even">
+<td><code>values</code></td>
+<td>object</td>
+<td>Values that are tried on top, by property id.</td>
+</tr>
+<tr class="odd">
+<td><code>languages</code></td>
+<td>list of texts</td>
+<td>Languages of the labels.</td>
+</tr>
+</tbody>
+</table>
+<p>The answer has <code>fields</code> (each field with its
+<code>key</code>, <code>kind</code>, <code>label</code>, the limits,
+<code>value</code>, <code>visible</code>, <code>enabled</code>...),
+<code>presets</code> (the presets' names) and <code>values</code> (the
+resulting values, already fitted to each property's limits). Secret
+fields, shortcuts and buttons are not listed.</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene add_property <span class="st">&#39;{&quot;kind&quot;:&quot;slider&quot;,&quot;id&quot;:&quot;glow&quot;}&#39;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene tried <span class="st">&#39;{&quot;values&quot;:{&quot;glow&quot;:40}}&#39;</span></span></code></pre></div>
+<h4 id="levels"><code>levels</code><a class="anchor" href="#levels" aria-label="Link to this section">#</a></h4>
+<p>Says what value a property takes at each quality level and at which
+ones it has a value of its own. A level's own value goes in the
+property's <code>quality</code> field
+(<code>/manifest/properties/ID/quality/q1</code>) and is written with <a
+href="../actions-layers/before-you-start.html#set">Before you
+start</a>.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Argument</th>
+<th>Type</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>property</code></td>
+<td>text</td>
+<td>(required) Id of the property.</td>
+</tr>
+</tbody>
+</table>
+<p>The answer has <code>property</code>, <code>default</code> and
+<code>levels</code>, a list with a <code>{quality, value, own}</code>
+per level (<code>own</code> says whether the level sets the value
+itself). If the property does not exist, it is <code>null</code>.</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene add_property <span class="st">&#39;{&quot;kind&quot;:&quot;slider&quot;,&quot;id&quot;:&quot;glow&quot;}&#39;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene set <span class="st">&#39;{&quot;pointer&quot;:&quot;/manifest/properties/glow/quality/q1&quot;,&quot;value&quot;:20}&#39;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene levels <span class="st">&#39;{&quot;property&quot;:&quot;glow&quot;}&#39;</span></span></code></pre></div>
+<h4 id="base"><code>base</code><a class="anchor" href="#base" aria-label="Link to this section">#</a></h4>
+<p>For a preset package: answers with the properties of the package it
+applies to and the values the preset gives them. In the app, the preset
+package's form.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Argument</th>
+<th>Type</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>file</code></td>
+<td>text</td>
+<td>(required) Folder or <code>.wpak</code> file of the base
+package.</td>
+</tr>
+</tbody>
+</table>
+<p>The answer has <code>id</code>, <code>version</code>,
+<code>fields</code> (each property with its <code>key</code>,
+<code>title</code>, <code>range</code>, <code>default</code>, the
+preset's <code>value</code>, <code>set</code>, <code>pointer</code> and
+<code>widget</code>) and <code>files</code>. If the base package cannot
+be read, it is <code>null</code>.</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene new origin</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act origin add_property <span class="st">&#39;{&quot;kind&quot;:&quot;slider&quot;,&quot;id&quot;:&quot;glow&quot;}&#39;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene new my-scene <span class="at">--from</span> preset</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene base <span class="st">&#39;{&quot;file&quot;:&quot;origin&quot;}&#39;</span></span></code></pre></div>
+<h4 id="media"><code>media</code><a class="anchor" href="#media" aria-label="Link to this section">#</a></h4>
+<p>For an image or video package: answers with its file, its size and,
+if it is a video, its length. In the app, the media package's page.</p>
+<p>It takes no arguments: pass <code>{}</code>.</p>
+<p>The answer has <code>kind</code> (<code>image</code> or
+<code>video</code>), <code>entry</code> (the file that is expected),
+<code>present</code> (whether it exists), <code>bytes</code>,
+<code>file</code>, <code>size</code>, <code>length</code> and
+<code>aspect</code>. With another package type it is
+<code>null</code>.</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene new my-scene <span class="at">--from</span> image</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene media <span class="st">&#39;{}&#39;</span></span></code></pre></div>
+<h3 id="clocks-1">Clocks<a class="anchor" href="#clocks-1" aria-label="Link to this section">#</a></h3>
+<h4 id="clock_sample"><code>clock_sample</code><a class="anchor" href="#clock_sample" aria-label="Link to this section">#</a></h4>
+<p>Writes a clock pattern with the time of an instant and says when the
+text changes. It is for testing a pattern of a text layer with a
+clock.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Argument</th>
+<th>Type</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pattern</code></td>
+<td>text</td>
+<td>The pattern, for example <code>HH:mm</code>. See
+<code>clock_help</code>.</td>
+</tr>
+<tr class="even">
+<td><code>dates</code></td>
+<td>yes/no</td>
+<td><code>true</code> if the pattern is a date one. Default
+<code>false</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>lang</code></td>
+<td>text</td>
+<td>Language of the day and month names. Default <code>en</code>.</td>
+</tr>
+<tr class="even">
+<td><code>wall</code></td>
+<td>number</td>
+<td>Instant in seconds since 1970. Default, now.</td>
+</tr>
+</tbody>
+</table>
+<p>The answer has <code>text</code> (the pattern already written out)
+and <code>next</code> (the seconds left until it changes).</p>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene clock_sample <span class="st">&#39;{&quot;pattern&quot;:&quot;HH:mm&quot;,&quot;wall&quot;:0}&#39;</span></span></code></pre></div>
+<h4 id="clock_help"><code>clock_help</code><a class="anchor" href="#clock_help" aria-label="Link to this section">#</a></h4>
+<p>Lists the pieces that can be used in a clock pattern, with an example
+of each, and the numbers a clock gives.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Argument</th>
+<th>Type</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>lang</code></td>
+<td>text</td>
+<td>Language of the examples. Default <code>en</code>.</td>
+</tr>
+<tr class="even">
+<td><code>wall</code></td>
+<td>number</td>
+<td>Instant of the examples, in seconds since 1970. Default, now.</td>
+</tr>
+</tbody>
+</table>
+<p>The answer has <code>tokens</code> (each piece with
+<code>token</code>, <code>dates</code> and <code>sample</code>),
+<code>numbers</code> (the values <code>day</code>, <code>hour</code>,
+<code>minute</code>, <code>second</code>, <code>weekday</code> and
+<code>month</code> of the instant) and <code>quote</code> (the character
+that quotes literal text).</p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene clock_help <span class="st">&#39;{&quot;lang&quot;:&quot;en&quot;,&quot;wall&quot;:0}&#39;</span></span></code></pre></div>
+<h3 id="change-history">Change history<a class="anchor" href="#change-history" aria-label="Link to this section">#</a></h3>
+<h4 id="history"><code>history</code><a class="anchor" href="#history" aria-label="Link to this section">#</a></h4>
+<p>Answers with the steps that <code>undo</code> undoes and those that
+<code>redo</code> redoes. It is the history that the app's
+<strong>Undo</strong> and <strong>Redo</strong> hints show, and the one
+<code>scene history</code> lists.</p>
+<p>It takes no arguments: pass <code>{}</code>.</p>
+<p>The answer has <code>done</code> (the steps done, from oldest to
+newest), <code>undone</code> (the undone ones, the one <code>redo</code>
+redoes first), <code>undo</code> and <code>redo</code> (the next step of
+each, or <code>null</code>) and <code>dirty</code> (whether there are
+unsaved changes). Each step brings <code>label</code> (the action's
+name) and <code>text</code> (the name the editing person sees). The
+history is saved separately when the scene is saved, so another
+<code>reiwand-ctl</code> call sees it.</p>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene act my-scene add_layer <span class="st">&#39;{&quot;kind&quot;:&quot;solid&quot;,&quot;id&quot;:&quot;background&quot;}&#39;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reiwand-ctl</span> scene ask my-scene history <span class="st">&#39;{}&#39;</span></span></code></pre></div>
+    </article>
+    <nav class="near" aria-label="Pages around this one"><a class="previous" href="../../authoring/actions-time-and-package/shaders.html"><span>Previous</span>Shaders, undo and redo</a><a class="next" href="../../authoring/coverage.html"><span>Next</span>What each example shows</a></nav>
+    <p class="source"><a href="https://github.com/reiwand/reiwand/blob/master/docs/authoring/actions-time-and-package/queries.md">Edit or read this page as Markdown</a> · GPL-3.0-or-later</p>
+  </main>
+  <aside class="toc" aria-label="On this page"><ul>
+<li><a href="#queries" id="toc-queries">Queries</a>
+<ul>
+<li><a href="#before-you-start" id="toc-before-you-start">Before you
+start</a></li>
+<li><a href="#package-texts-credits-and-notices"
+id="toc-package-texts-credits-and-notices">Package texts, credits and
+notices</a></li>
+<li><a href="#keys-curves-and-triggers"
+id="toc-keys-curves-and-triggers">Keys, curves and triggers</a></li>
+<li><a href="#assets-and-media" id="toc-assets-and-media">Assets and
+media</a></li>
+<li><a href="#scripts-and-shaders" id="toc-scripts-and-shaders">Scripts
+and shaders</a></li>
+<li><a href="#package-review-and-signature"
+id="toc-package-review-and-signature">Package review and
+signature</a></li>
+<li><a href="#properties-and-presets"
+id="toc-properties-and-presets">Properties and presets</a></li>
+<li><a href="#clocks-1" id="toc-clocks-1">Clocks</a></li>
+<li><a href="#change-history" id="toc-change-history">Change
+history</a></li>
+</ul></li>
+</ul></aside>
+</div>
+</body>
+</html>

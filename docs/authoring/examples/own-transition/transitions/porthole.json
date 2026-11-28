@@ -1,0 +1,33 @@
+{
+  "audio": [],
+  "bounded": [],
+  "category": null,
+  "compose": false,
+  "cost": {
+    "passes": 1,
+    "scale": 1,
+    "taps": 1
+  },
+  "description": null,
+  "fuse": null,
+  "id": "porthole",
+  "lighter": null,
+  "mask_mode": "mix",
+  "min_fps": null,
+  "name": {"en": "Porthole"},
+  "options": [],
+  "pace": null,
+  "params": [
+    {"id": "edge", "type": "float", "channels": null, "help": {}, "label": {"en": "Edge"}, "max": 1, "min": 0, "paint": null, "prefill": 0.15, "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null},
+    {"id": "tint", "type": "color", "channels": null, "help": {}, "label": {"en": "Edge tint"}, "max": null, "min": null, "paint": null, "prefill": "#ffffff", "tool": null, "tools": [], "unit": null, "uses": null, "values": [], "waits_for": null, "yields_to": null}
+  ],
+  "passes": [],
+  "quality": {},
+  "reach": null,
+  "solve": null,
+  "stage": "transition",
+  "state": null,
+  "targets": {},
+  "uses": [],
+  "velocity": null
+}

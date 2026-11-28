@@ -1,0 +1,705 @@
+{
+  "assets": {
+    "day": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/day.jpg",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    },
+    "iris": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/iris.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    },
+    "mist": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/mist.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    },
+    "night": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/night.jpg",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    },
+    "puffs": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": true,
+      "mipmaps": null,
+      "path": "assets/puffs.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "repeat"
+    },
+    "sweep": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": true,
+      "mipmaps": null,
+      "path": "assets/sweep.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    },
+    "tree": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/tree.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    }
+  },
+  "canvas": {
+    "background": "#05060f",
+    "blend_space": "linear",
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "blend_gradient",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "map": "sweep",
+            "progress": {
+              "invert": false,
+              "keys": [
+                [
+                  0,
+                  0.0
+                ],
+                [
+                  3,
+                  0.0
+                ],
+                [
+                  17,
+                  1.0,
+                  "in_out_sine"
+                ],
+                [
+                  20,
+                  1.0
+                ]
+              ],
+              "timeline": "dusk"
+            },
+            "softness": 0.25,
+            "texture": "day"
+          }
+        },
+        {
+          "effect": "blend_texture",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "amount": 0.55,
+            "blend": "soft_light",
+            "offset": {
+              "invert": false,
+              "keys": [
+                [
+                  0,
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                [
+                  40,
+                  [
+                    1,
+                    0.25
+                  ]
+                ]
+              ],
+              "timeline": "breeze"
+            },
+            "scale": [
+              1.6,
+              1.6
+            ],
+            "texture": "puffs"
+          }
+        },
+        {
+          "effect": "reveal",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "center": [
+              0.72,
+              0.62
+            ],
+            "follow": true,
+            "invert": false,
+            "radius": 0.13,
+            "shape": 1,
+            "softness": 0.45,
+            "texture": "day"
+          }
+        },
+        {
+          "effect": "blur",
+          "enabled": true,
+          "mask": {
+            "channel": "a",
+            "feather": 0,
+            "invert": false,
+            "layer": "mist",
+            "strength": 1
+          },
+          "optional": false,
+          "params": {
+            "amount": 1,
+            "blend": "normal",
+            "radius": 10
+          }
+        }
+      ],
+      "id": "land",
+      "image": "night",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        1920,
+        1080
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          960,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "blend": "screen",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "mist",
+      "image": "mist",
+      "opacity": 0.18,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        2400,
+        600
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": {
+          "invert": false,
+          "keys": [
+            [
+              0,
+              [
+                760,
+                760
+              ]
+            ],
+            [
+              40,
+              [
+                1160,
+                780
+              ]
+            ]
+          ],
+          "timeline": "breeze"
+        },
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "tree",
+      "image": "tree",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        760,
+        1080
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          380,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#fff4d8",
+      "id": "white_left",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "ellipse": {
+          "size": [
+            40,
+            40
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          443,
+          246
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "iris",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "background": false,
+            "center": [
+              0.5,
+              0.5
+            ],
+            "follow": 0.08,
+            "range": 7,
+            "rate": 0.8,
+            "saccades": true
+          }
+        }
+      ],
+      "id": "iris_left",
+      "image": "iris",
+      "mask": {
+        "channel": "a",
+        "feather": 0.1,
+        "invert": false,
+        "shape": {
+          "ellipse": {
+            "size": [
+              36,
+              36
+            ]
+          }
+        },
+        "strength": 1
+      },
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        38,
+        38
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          443,
+          246
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": "#fff4d8",
+      "id": "white_right",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "ellipse": {
+          "size": [
+            40,
+            40
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          497,
+          246
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "iris",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "background": false,
+            "center": [
+              0.5,
+              0.5
+            ],
+            "follow": 0.08,
+            "range": 7,
+            "rate": 0.8,
+            "saccades": true
+          }
+        }
+      ],
+      "id": "iris_right",
+      "image": "iris",
+      "mask": {
+        "channel": "a",
+        "feather": 0.1,
+        "invert": false,
+        "shape": {
+          "ellipse": {
+            "size": [
+              36,
+              36
+            ]
+          }
+        },
+        "strength": 1
+      },
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        38,
+        38
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          497,
+          246
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "align": "center",
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#fff3dc",
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "dissolve",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "edge": 0.08,
+            "glow": "#ffb347",
+            "progress": {
+              "invert": false,
+              "keys": [
+                [
+                  0,
+                  0.0
+                ],
+                [
+                  3,
+                  0.0
+                ],
+                [
+                  8,
+                  1.0,
+                  "in_cubic"
+                ],
+                [
+                  9,
+                  1.0
+                ]
+              ],
+              "timeline": "title"
+            },
+            "size": 40
+          }
+        }
+      ],
+      "fallback": [],
+      "font": "sans-serif",
+      "id": "title",
+      "letter_spacing": 24,
+      "line_height": null,
+      "opacity": 1.0,
+      "padding": 0,
+      "parallax": [
+        0,
+        0
+      ],
+      "render": "auto",
+      "shadow": {
+        "blur": 24,
+        "color": "#00000080",
+        "offset": [
+          0,
+          6
+        ]
+      },
+      "size": 150,
+      "solid": false,
+      "text": "NIGHTFALL",
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          1010,
+          200
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "text",
+      "valign": "center",
+      "visible": true,
+      "wrap": null
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": [
+    {
+      "autoplay": true,
+      "delay": 0.0,
+      "duration": 20,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "dusk",
+      "loop": "pingpong",
+      "speed": 1.0,
+      "wrap": false
+    },
+    {
+      "autoplay": true,
+      "delay": 0.0,
+      "duration": 40,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "breeze",
+      "loop": "repeat",
+      "speed": 1.0,
+      "wrap": false
+    },
+    {
+      "autoplay": true,
+      "delay": 0.0,
+      "duration": 9,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "title",
+      "loop": "pingpong",
+      "speed": 1.0,
+      "wrap": false
+    }
+  ]
+}

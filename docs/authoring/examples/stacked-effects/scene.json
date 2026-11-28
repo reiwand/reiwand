@@ -1,0 +1,236 @@
+{
+  "assets": {
+    "sky": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/sky.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    },
+    "stain": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": true,
+      "mipmaps": null,
+      "path": "assets/stain.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    }
+  },
+  "canvas": {
+    "background": "#000000",
+    "blend_space": "linear",
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "color_adjust",
+          "enabled": {
+            "invert": false,
+            "prop": "color_vivid"
+          },
+          "name": "color",
+          "optional": false,
+          "params": {
+            "contrast": 1.15,
+            "exposure": 0.0,
+            "hue": 0.0,
+            "saturation": 1.8
+          }
+        },
+        {
+          "effect": "waves",
+          "enabled": true,
+          "mask": {
+            "channel": "r",
+            "feather": 0,
+            "invert": false,
+            "strength": 1,
+            "texture": "stain"
+          },
+          "optional": false,
+          "params": {
+            "amplitude": 10,
+            "angle2": 90.0,
+            "count": 1.0,
+            "direction": 0.0,
+            "frequency": 5,
+            "perspective": 0.0,
+            "phase": "",
+            "speed": 1.5
+          }
+        },
+        {
+          "effect": "blur",
+          "enabled": true,
+          "mask": {
+            "channel": "a",
+            "feather": 0.0,
+            "invert": true,
+            "shape": {
+              "rect": {
+                "radius": 0.0,
+                "size": [
+                  1920,
+                  260
+                ]
+              }
+            },
+            "strength": 0.8
+          },
+          "optional": true,
+          "params": {
+            "amount": 1.0,
+            "blend": "normal",
+            "radius": 6
+          }
+        }
+      ],
+      "id": "background",
+      "image": "sky",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        1920,
+        1080
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [
+        {
+          "effect": "bloom",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "capped": false,
+            "intensity": 0.8,
+            "knee": 0.5,
+            "levels": 1,
+            "limit": 1.0,
+            "radius": 24,
+            "saturation": 1.0,
+            "scatter": 0.5,
+            "threshold": 0.7,
+            "tint": "#ffffff",
+            "unit": 0
+          }
+        },
+        {
+          "effect": "vignette",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "center": [
+              0.5,
+              0.5
+            ],
+            "color": "#000010",
+            "intensity": 0.45,
+            "radius": 1.0,
+            "roundness": 1.0,
+            "softness": 0.65
+          }
+        },
+        {
+          "effect": "film_grain",
+          "enabled": true,
+          "optional": false,
+          "params": {
+            "amount": 0.04,
+            "bias": 0.0,
+            "blend": "overlay",
+            "fps": 12,
+            "mono": false,
+            "size": 1.5
+          }
+        }
+      ],
+      "id": "screen",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "redraw": false,
+      "rgb": false,
+      "size": "canvas",
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "adjustment",
+      "visible": true
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": []
+}

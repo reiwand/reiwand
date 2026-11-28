@@ -1,0 +1,58 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": "en",
+  "description": "",
+  "entry": "scene.json",
+  "id": "org.example.group-by-setting",
+  "inputs": [],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "photosensitive": false,
+  "platforms": [],
+  "presets": [],
+  "properties": {
+    "moment": {
+      "default": "auto",
+      "enabled_if": {},
+      "label": "Moment",
+      "options": [
+        {
+          "icon": null,
+          "label": "By the time of day",
+          "value": "auto"
+        },
+        {
+          "icon": null,
+          "label": "Day",
+          "value": "day"
+        },
+        {
+          "icon": null,
+          "label": "Night",
+          "value": "night"
+        }
+      ],
+      "order": 0,
+      "quality": {},
+      "type": "combo",
+      "visible_if": {}
+    }
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "Day or night",
+  "version": "1.0.0"
+}

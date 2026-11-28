@@ -1,0 +1,41 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": "en",
+  "description": "A harbour at sunset in five color treatments: a 3D lookup table, a colorize tint, posterize, local contrast and a pencil sketch, with a hot air balloon keyed out of a green screen and a light leak mixed in sRGB.",
+  "entry": "scene.json",
+  "id": "org.example.effects-color",
+  "inputs": [],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "photosensitive": false,
+  "platforms": [],
+  "presets": [],
+  "properties": {},
+  "requires": {
+    "engine": null,
+    "features": [
+      "capture",
+      "effect.local_contrast",
+      "effect.tint"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "Color effects",
+  "version": "0.1.0"
+}

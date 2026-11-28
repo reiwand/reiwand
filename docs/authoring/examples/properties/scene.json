@@ -1,0 +1,261 @@
+{
+  "assets": {
+    "sky": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/sky.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    }
+  },
+  "canvas": {
+    "background": "#101520",
+    "blend_space": "linear",
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "photo",
+      "image": {
+        "invert": false,
+        "prop": "picture"
+      },
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        1920,
+        1080
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "gallery",
+      "image": {
+        "invert": false,
+        "prop": "folder"
+      },
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        640,
+        360
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          1500,
+          800
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": {
+        "invert": false,
+        "prop": "show_gallery"
+      }
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "depth_test": false,
+      "effects": [],
+      "fill": {
+        "invert": false,
+        "prop": "color_disc"
+      },
+      "id": "disc",
+      "opacity": {
+        "invert": false,
+        "prop": "opacity",
+        "scale": 0.01
+      },
+      "parallax": [
+        0,
+        0
+      ],
+      "shape": {
+        "ellipse": {
+          "size": [
+            300,
+            300
+          ]
+        }
+      },
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          480,
+          540
+        ],
+        "rotation": 0.0,
+        "scale": {
+          "invert": false,
+          "keys": [
+            [
+              0,
+              [
+                1,
+                1
+              ]
+            ],
+            [
+              0.3,
+              [
+                1.5,
+                1.5
+              ],
+              "out_cubic"
+            ],
+            [
+              1,
+              [
+                1,
+                1
+              ],
+              "in_out_sine"
+            ]
+          ],
+          "timeline": "flash"
+        },
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "shape",
+      "visible": true
+    },
+    {
+      "align": "center",
+      "anchor": "top",
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "fallback": [],
+      "font": "sans-serif",
+      "id": "message",
+      "line_height": null,
+      "opacity": 1.0,
+      "padding": 0,
+      "parallax": [
+        0,
+        0
+      ],
+      "render": "auto",
+      "size": 72,
+      "solid": false,
+      "text": {
+        "invert": false,
+        "prop": "message"
+      },
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          0,
+          100
+        ],
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "text",
+      "valign": "center",
+      "visible": true,
+      "wrap": null
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": [
+    {
+      "autoplay": false,
+      "delay": 0.0,
+      "duration": 1,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "flash",
+      "loop": "once",
+      "speed": 1.0,
+      "trigger": "prop:flash",
+      "wrap": false
+    }
+  ]
+}

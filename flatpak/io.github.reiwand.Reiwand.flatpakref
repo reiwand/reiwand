@@ -1,0 +1,9 @@
+[Flatpak Ref]
+Name=io.github.reiwand.Reiwand
+Branch=master
+Title=Reiwand
+Url=https://reiwand.github.io/reiwand/flatpak/repo/
+SuggestRemoteName=reiwand
+RuntimeRepo=https://dl.flathub.org/repo/flathub.flatpakrepo
+IsRuntime=false
+GPGKey=mDMEawnjtBYJKwYBBAHaRw8BAQdATXns1iiqXn7ClPLNlQKb7c7/sxcOPu/vCNcCawdujUm0D1JlaXdhbmQgRmxhdHBha4iQBBMWCAA4FiEE//IbMtfQMLOEDWhE1yOg2gEvrZ0FAmsJ47QCGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQ1yOg2gEvrZ3rLQD/esOYvoHNMRMhr79xHXjpeNunaYl+6mjclLkCU2/+MDABAMR1HfrUXdx9Ob1eC0t7ifqEl8TVGiw+chKVLh919GoK

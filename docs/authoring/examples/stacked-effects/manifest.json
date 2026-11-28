@@ -1,0 +1,51 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": "en",
+  "description": "",
+  "entry": "scene.json",
+  "id": "org.example.stacked-effects",
+  "inputs": [],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "photosensitive": false,
+  "platforms": [],
+  "presets": [],
+  "properties": {
+    "color_vivid": {
+      "default": true,
+      "enabled_if": {},
+      "label": "Vivid colors",
+      "order": 0,
+      "quality": {},
+      "type": "bool",
+      "visible_if": {}
+    }
+  },
+  "requires": {
+    "engine": null,
+    "features": [
+      "effect_masks",
+      "mask_strength",
+      "scripts2"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "Stacked effects",
+  "version": "0.1.0"
+}

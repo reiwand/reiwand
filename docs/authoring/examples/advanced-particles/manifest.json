@@ -1,0 +1,46 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": "en",
+  "description": "",
+  "entry": "scene.json",
+  "id": "org.example.advanced-particles",
+  "inputs": [
+    "pointer"
+  ],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "photosensitive": false,
+  "platforms": [],
+  "presets": [],
+  "properties": {},
+  "requires": {
+    "engine": null,
+    "features": [
+      "inputs.pointer",
+      "oscillate_random",
+      "particle_children",
+      "particle_fields",
+      "particle_looks",
+      "particles2"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "Particles with children",
+  "version": "0.1.0"
+}

@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design guide · Reiwand</title>
+<link rel="stylesheet" href="../assets/site.css">
+<script defer src="../assets/search.js" data-root="../"></script>
+</head>
+<body class="page">
+<header class="bar">
+  <a class="brand" href="../index.html"><img class="mark" src="../assets/reiwand.svg" alt="" width="28" height="28">Reiwand <em>docs</em></a>
+  <label class="find"><span class="sr">Search the documentation</span>
+    <input type="search" id="find" placeholder="Search" autocomplete="off" spellcheck="false">
+    <kbd>/</kbd>
+  </label>
+  <a class="code" href="https://github.com/reiwand/reiwand">Source</a>
+</header>
+<div id="found" hidden></div>
+<div class="frame">
+  <nav class="side" aria-label="Documentation">
+    <details class="menu"><summary>Pages</summary><div><details><summary>Get started</summary><ul><li><a href="../user/index.html">Getting started</a></li></ul></details><details><summary>Using Reiwand</summary><ul><li><details class=sub><summary>Desktop app</summary><ul><li class=has><details><summary><a href="../user/app.html">The desktop app</a></summary><ul><li><a href="../user/app/library.html">Keys and the library</a></li><li><a href="../user/app/getting-wallpapers.html">Getting and making wallpapers</a></li><li><a href="../user/app/lists-and-tray.html">Lists, the preview and the tray</a></li><li><a href="../user/app/settings.html">Settings and permissions</a></li></ul></details></li><li><a href="../user/other-desktops.html">Sway, Hyprland, river, niri and COSMIC</a></li><li><a href="../user/keyboard-switching.html">Changing the wallpaper with the keyboard</a></li><li class=has><details><summary><a href="../user/packages.html">Packages: rating, languages and credits</a></summary><ul><li><a href="../user/packages/manifest.html">The package manifest</a></li><li><a href="../user/packages/ratings-and-search.html">Mature content, flashing and search</a></li><li><a href="../user/packages/assets-and-presets.html">Assets, presets and dependencies</a></li><li><a href="../user/packages/playback.html">Accent color, playback and shortcuts</a></li><li><a href="../user/packages/scene-features.html">Scene features</a></li><li><a href="../user/packages/timelines-and-sound.html">Timelines, sound and video clocks</a></li><li><a href="../user/packages/package-effects.html">Package effects</a></li><li><a href="../user/packages/built-in-effects.html">Built-in effects</a></li><li><a href="../user/packages/advanced-scenes.html">Advanced scenes</a></li><li><a href="../user/packages/meshes.html">Skeleton meshes</a></li><li><a href="../user/packages/particles.html">Particles</a></li><li><a href="../user/packages/lights.html">Lights</a></li><li><a href="../user/packages/models.html">3D models</a></li><li><a href="../user/packages/compatibility.html">Compatibility and versions</a></li></ul></details></li><li><a href="../user/web-wallpapers.html">Web wallpapers</a></li><li><a href="../user/rgb-lighting.html">RGB lighting</a></li><li><a href="../user/player.html">Media player</a></li><li class=has><details><summary><a href="../user/privacy.html">Privacy</a></summary><ul><li><a href="../user/privacy/network.html">Network and updates</a></li><li><a href="../user/privacy/stored-data.html">Stored data and secrets</a></li><li><a href="../user/privacy/scene-permissions.html">Scenes and what they can see</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Phone</summary><ul><li><a href="../user/phone.html">The phone app</a></li><li class=has><details><summary><a href="../user/android.html">Android</a></summary><ul><li><a href="../user/android/install.html">Installing on Android</a></li><li><a href="../user/android/library.html">The app and the library</a></li><li><a href="../user/android/images.html">Images and setting the wallpaper</a></li><li><a href="../user/android/lists.html">Lists</a></li><li><a href="../user/android/videos.html">Videos</a></li><li><a href="../user/android/parallax-depth.html">Parallax and depth</a></li><li><a href="../user/android/packages.html">Packages</a></li><li><a href="../user/android/scenes.html">Scenes</a></li><li><a href="../user/android/media-sound-touch.html">Media, sound and touch</a></li><li><a href="../user/android/settings.html">Settings</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Command line</summary><ul><li class=has><details><summary><a href="../user/command-line.html">Using it from the terminal</a></summary><ul><li><a href="../user/command-line/everyday-commands.html">Everyday commands</a></li><li><a href="../user/command-line/stepping-with-the-keyboard.html">Stepping through wallpapers with the keyboard</a></li><li><a href="../user/command-line/library-lists-and-packages.html">Library, lists and packages</a></li><li><a href="../user/command-line/scripts-jobs-and-output.html">Scripts, jobs and output</a></li><li><a href="../user/command-line/providers.html">Providers</a></li><li><a href="../user/command-line/repositories.html">Repositories</a></li><li><a href="../user/command-line/accounts-and-phone.html">Accounts and the phone&#x27;s repositories</a></li><li><a href="../user/command-line/frame-rate-and-automatic-quality.html">Frame rate and automatic scene quality</a></li><li><a href="../user/command-line/choosing-scene-quality.html">Choosing the scene quality</a></li><li><a href="../user/command-line/hdr-power-and-motion.html">HDR, power, motion and flashing</a></li><li><a href="../user/command-line/graphics-card.html">Choosing the graphics card</a></li><li><a href="../user/command-line/streams-and-video-decoding.html">Streams and video decoding</a></li><li><a href="../user/command-line/editing-images.html">Editing images</a></li><li><a href="../user/command-line/depth-and-parallax.html">Depth maps and parallax</a></li><li><a href="../user/command-line/parallax-layers.html">3D parallax layers</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Installation</summary><ul><li class=has><details><summary><a href="../user/installation.html">Installation (without root)</a></summary><ul><li><a href="../user/installation/appimage.html">Download and install the AppImage</a></li><li><a href="../user/installation/requirements.html">Requirements</a></li><li><a href="../user/installation/plasma.html">Setting up Plasma and the tray</a></li><li><a href="../user/installation/updates-and-versions.html">Updates and versions</a></li></ul></details></li><li><a href="../user/flatpak.html">Installation with Flatpak</a></li></ul></details></li></ul></details><details><summary>Your own server</summary><ul><li class=has><details><summary><a href="../user/server.html">Your own server</a></summary><ul><li><a href="../user/server/install.html">Installing the server</a></li><li><a href="../user/server/configuration.html">Image and configuration</a></li><li><a href="../user/server/https.html">HTTPS</a></li><li><a href="../user/server/backups-and-versions.html">Backups and data from another version</a></li><li><a href="../user/server/repositories-and-accounts.html">Repositories and accounts</a></li><li><a href="../user/server/uploads-and-catalog.html">Uploads and the catalog</a></li><li><a href="../user/server/taking-wallpapers-away.html">Taking a wallpaper away</a></li><li><a href="../user/server/author-keys.html">Author keys and package tools</a></li><li><a href="../user/server/static-repositories.html">Static repositories</a></li><li><a href="../user/server/moving-configuration.html">Moving the configuration to another computer</a></li><li><a href="../user/server/scenes.html">Scene properties</a></li><li><a href="../user/server/scene-sound-and-examples.html">Example scenes and sound</a></li></ul></details></li><li class=has><details><summary><a href="../specs/server.html">Self-hosted server</a></summary><ul><li><a href="../specs/server/running.html">Running</a></li><li><a href="../specs/server/conventions.html">Conventions and Discovery and health</a></li><li><a href="../specs/server/repository.html">Repository</a></li><li><a href="../specs/server/catalog.html">Catalog and Accounts</a></li><li><a href="../specs/server/uploads.html">Uploads</a></li><li><a href="../specs/server/moderation-and-administration.html">Moderation and administration</a></li><li><a href="../specs/server/legal-pages.html">Legal pages and Operating a public server</a></li></ul></details></li><li class=has><details><summary><a href="../specs/repo.html">Signed repositories</a></summary><ul><li><a href="../specs/repo/keys-and-roles.html">Keys and roles, Signature files, Layout and Identity and URL</a></li><li><a href="../specs/repo/formats.html">Formats and Package signatures</a></li><li><a href="../specs/repo/online-authors.html">Online authors, Operator workflow, Client update, Package installation, Broken repositories and Client storage</a></li><li><a href="../specs/repo/bundled-example-repository.html">Bundled example repository, Network interface and Adding a repository in the desktop app</a></li></ul></details></li></ul></details><details><summary>Creating wallpapers</summary><ul><li><details class=sub><summary>First scene</summary><ul><li><a href="../authoring/index.html">Creating scenes</a></li><li><a href="../authoring/start/first-scene.html">Your first scene</a></li><li class=has><details><summary><a href="../authoring/scene.html">The scene file</a></summary><ul><li><a href="../authoring/scene/folder.html">The folder, the clock and the assets</a></li><li><a href="../authoring/scene/canvas.html">The canvas</a></li><li><a href="../authoring/scene/cost.html">What a scene costs</a></li><li><a href="../authoring/scene/values.html">Values that move</a></li><li><a href="../authoring/scene/timelines-and-inputs.html">Timelines and inputs</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Layers</summary><ul><li class=has><details><summary><a href="../authoring/layers.html">Layers</a></summary><ul><li><a href="../authoring/layers/basics.html">Layer basics</a></li><li><a href="../authoring/layers/image-and-video.html">Image and video layers</a></li><li><a href="../authoring/layers/text.html">Text layer (text)</a></li><li><a href="../authoring/layers/shapes.html">Shape, solid and spectrum layers</a></li><li><a href="../authoring/layers/groups.html">Group and adjustment layers</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/properties.html">User properties</a></summary><ul><li><a href="../authoring/properties/declaring.html">Declaring properties</a></li><li><a href="../authoring/properties/behavior.html">Conditions, presets and translations</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/meshes.html">Meshes, bones and animation</a></summary><ul><li><a href="../authoring/meshes/layer-and-parts.html">The mesh layer and its parts</a></li><li><a href="../authoring/meshes/motion.html">Clips, bones and expressions</a></li><li><a href="../authoring/meshes/attaching.html">Attached layers and models</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/3d.html">Lights, 3D, camera and depth</a></summary><ul><li><a href="../authoring/3d/flat-lights.html">Lights on flat layers</a></li><li><a href="../authoring/3d/models.html">3D models</a></li><li><a href="../authoring/3d/lights-and-camera.html">Lights, shadows and the camera</a></li><li><a href="../authoring/3d/depth-and-hdr.html">Depth and bright colors</a></li></ul></details></li><li><a href="../authoring/transitions.html">Make and try your own transition</a></li></ul></details></li><li><details class=sub><summary>Effects</summary><ul><li class=has><details><summary><a href="../authoring/effects.html">Effects</a></summary><ul><li><a href="../authoring/effects/on-a-layer.html">Putting effects on a layer</a></li><li><a href="../authoring/effects/motion.html">Motion effects</a></li><li><a href="../authoring/effects/light-and-color.html">Light and color effects</a></li><li><a href="../authoring/effects/blur-and-style.html">Blur, distortion and style effects</a></li><li><a href="../authoring/effects/own-descriptor.html">Your own effect: the descriptor</a></li><li><a href="../authoring/effects/own-shader.html">Your own effect: the shader</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Particles and sound</summary><ul><li class=has><details><summary><a href="../authoring/particles-and-sound.html">Particles and sound</a></summary><ul><li><a href="../authoring/particles-and-sound/systems.html">Particle systems and emitters</a></li><li><a href="../authoring/particles-and-sound/motion.html">How particles start and move</a></li><li><a href="../authoring/particles-and-sound/drawing.html">How particles are drawn</a></li><li><a href="../authoring/particles-and-sound/control-points.html">Control points, children and depth</a></li><li><a href="../authoring/particles-and-sound/sound.html">Sound</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Scripts</summary><ul><li><a href="../authoring/scripts-guide.html">Guide for script authors</a></li><li class=has><details><summary><a href="../authoring/scripts.html">Scripts</a></summary><ul><li><a href="../authoring/scripts/basics.html">Script basics</a></li><li><a href="../authoring/scripts/exports-and-events.html">Exports, events and inputs</a></li><li><a href="../authoring/scripts/interface-scene.html">The scene from a script</a></li><li><a href="../authoring/scripts/interface-more.html">More of the script interface</a></li><li><a href="../authoring/scripts/testing.html">Test and debug</a></li><li><a href="../authoring/scripts/examples.html">Complete examples</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Web</summary><ul><li class=has><details><summary><a href="../authoring/web-wallpapers.html">Web wallpapers</a></summary><ul><li><a href="../authoring/web-wallpapers/basics.html">The minimum web wallpaper</a></li><li><a href="../authoring/web-wallpapers/interface.html">The page and the program</a></li><li><a href="../authoring/web-wallpapers/isolation.html">What a page may reach</a></li><li><a href="../authoring/web-wallpapers/phone-and-apps.html">Phones and existing applications</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Publishing</summary><ul><li class=has><details><summary><a href="../authoring/package.html">From the scene folder to a package that others install</a></summary><ul><li><a href="../authoring/package/manifest.html">The manifest</a></li><li><a href="../authoring/package/manifest-rights.html">Languages, licenses and ratings</a></li><li><a href="../authoring/package/checking.html">Previews and checking</a></li><li><a href="../authoring/package/signing.html">Packaging and signing</a></li><li><a href="../authoring/package/publishing.html">Publishing and copies</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/cli.html">The reiwand-ctl authoring commands</a></summary><ul><li><a href="../authoring/cli/create.html">Create, change and import</a></li><li><a href="../authoring/cli/view.html">Viewing the scene</a></li><li><a href="../authoring/cli/capture.html">Capture</a></li><li><a href="../authoring/cli/check-and-publish.html">Check, package and publish</a></li><li><a href="../authoring/cli/actions.html">The editor&#x27;s actions from the terminal</a></li></ul></details></li><li><a href="../authoring/provider-plugins.html">Provider plugins</a></li></ul></details></li><li><details class=sub><summary>The editor</summary><ul><li class=has><details><summary><a href="../authoring/editor.html">The scene editor: getting started, saving, undo, preview and shortcuts</a></summary><ul><li><a href="../authoring/editor/opening.html">The editor and its window</a></li><li><a href="../authoring/editor/creating-and-saving.html">Creating, saving and undoing</a></li><li><a href="../authoring/editor/checking-and-viewing.html">Problems and previews</a></li><li><a href="../authoring/editor/cost-and-package.html">Cost, the package and the image editor</a></li><li><a href="../authoring/editor/shortcuts.html">All keyboard shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-features.html">Scene editor</a></summary><ul><li><a href="../authoring/editor-features/parts.html">The parts of the editor</a></li><li><a href="../authoring/editor-features/package-and-assets.html">The package, properties and assets</a></li><li><a href="../authoring/editor-features/problems-and-masks.html">Problems and painted masks</a></li><li><a href="../authoring/editor-features/meshes.html">Meshes, clips and chains</a></li><li><a href="../authoring/editor-features/particles.html">Particle tools</a></li><li><a href="../authoring/editor-features/files-and-3d.html">Layers from files and 3D models</a></li><li><a href="../authoring/editor-features/fbx-and-obj.html">Converting FBX and OBJ models to glTF with Blender</a></li></ul></details></li><li><a href="../authoring/other-editor-packages.html">Web wallpapers and other packages in the editor</a></li><li class=has><details><summary><a href="../authoring/editor-canvas.html">Canvas, layers and inspector of the editor</a></summary><ul><li><a href="../authoring/editor-canvas/choosing-and-moving.html">Choosing and moving layers</a></li><li><a href="../authoring/editor-canvas/view-and-canvas.html">The view and the canvas</a></li><li><a href="../authoring/editor-canvas/layers.html">Adding and arranging layers</a></li><li><a href="../authoring/editor-canvas/inspector-and-assets.html">The inspector, templates and assets</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-drawing.html">Drawing in the editor: shapes, text, maps, sprites and depth</a></summary><ul><li><a href="../authoring/editor-drawing/shapes-and-text.html">Shapes, gradients and text</a></li><li><a href="../authoring/editor-drawing/fonts-and-maps.html">Fonts, light maps and sprite sheets</a></li><li><a href="../authoring/editor-drawing/depth.html">Depth maps and cuts</a></li><li><a href="../authoring/editor-drawing/regions.html">Regions and the parallax model</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-effects.html">Effects, masks and shaders in the scene editor</a></summary><ul><li><a href="../authoring/editor-effects/basics.html">Adding effects</a></li><li><a href="../authoring/editor-effects/catalog.html">The effect catalog and parameters</a></li><li><a href="../authoring/editor-effects/masks.html">Masks, maps and glow</a></li><li><a href="../authoring/editor-effects/adjust-and-cost.html">Adjustment layers, rest rules and cost</a></li><li><a href="../authoring/editor-effects/package-effects.html">Package effects and shaders</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-animation.html">Animation in the editor: timelines, keys, curves and clips</a></summary><ul><li><a href="../authoring/editor-animation/clips-and-videos.html">Clips and videos</a></li><li><a href="../authoring/editor-animation/keys.html">Keys and the time strip</a></li><li><a href="../authoring/editor-animation/timelines.html">Timelines, triggers and curves</a></li><li><a href="../authoring/editor-animation/sprites-and-rest.html">Sprites, rest rules and shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-particles-and-sound.html">Particles and sound in the editor</a></summary><ul><li><a href="../authoring/editor-particles-and-sound/systems-and-emitters.html">Particle systems and emitters</a></li><li><a href="../authoring/editor-particles-and-sound/starts-and-forces.html">How particles start and the forces</a></li><li><a href="../authoring/editor-particles-and-sound/colliders-and-look.html">Colliders, trails and the look</a></li><li><a href="../authoring/editor-particles-and-sound/sound.html">Sound layers and links</a></li><li><a href="../authoring/editor-particles-and-sound/sound-response.html">Sound levels and shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-meshes.html">Meshes, bones and expressions in the editor</a></summary><ul><li><a href="../authoring/editor-meshes/bones.html">Meshes and bones</a></li><li><a href="../authoring/editor-meshes/motion-and-shapes.html">Bone motion, blend shapes and parts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-3d.html">Editor: 3D, lights, camera and materials</a></summary><ul><li><a href="../authoring/editor-3d/models.html">Models and moving in 3D</a></li><li><a href="../authoring/editor-3d/camera-and-lights.html">The camera and lights</a></li><li><a href="../authoring/editor-3d/light-and-materials.html">Light, shadows and materials</a></li><li><a href="../authoring/editor-3d/animation-and-cost.html">3D animation and cost</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-properties.html">User properties and presets in the editor</a></summary><ul><li><a href="../authoring/editor-properties/adding.html">Adding properties</a></li><li><a href="../authoring/editor-properties/types-and-order.html">Other types and order</a></li><li><a href="../authoring/editor-properties/behavior.html">Following properties and conditions</a></li><li><a href="../authoring/editor-properties/presets.html">Translations and presets</a></li><li><a href="../authoring/editor-properties/preset-packages.html">Making a preset package</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Editor actions from the terminal</summary><ul><li><a href="../authoring/actions.html">Editor actions and queries from the command line</a></li><li class=has><details><summary><a href="../authoring/actions-layers.html">Actions: layers, assets and canvas</a></summary><ul><li><a href="../authoring/actions-layers/before-you-start.html">Before you start</a></li><li><a href="../authoring/actions-layers/layers.html">Layers</a></li><li><a href="../authoring/actions-layers/place-and-shape-a-layer.html">Place and shape a layer</a></li><li><a href="../authoring/actions-layers/assets.html">Assets</a></li><li><a href="../authoring/actions-layers/canvas.html">Canvas</a></li><li><a href="../authoring/actions-layers/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-effects.html">Actions: effects and masks</a></summary><ul><li><a href="../authoring/actions-effects/a-layer-s-effects.html">A layer&#x27;s effects</a></li><li><a href="../authoring/actions-effects/masks-and-painted-maps.html">Masks, painted maps and own transitions</a></li><li><a href="../authoring/actions-effects/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-meshes.html">Actions: meshes, bones and animation</a></summary><ul><li><a href="../authoring/actions-meshes/before-you-start-with-meshes-bones-and-a.html">Before you start and creating a mesh</a></li><li><a href="../authoring/actions-meshes/bones-and-weights.html">Bones and weights</a></li><li><a href="../authoring/actions-meshes/clips-and-keys.html">Clips and keys</a></li><li><a href="../authoring/actions-meshes/blend-shapes-and-expressions.html">Blend shapes and expressions</a></li><li><a href="../authoring/actions-meshes/kinematics-and-physics.html">Kinematics and physics</a></li><li><a href="../authoring/actions-meshes/parts-and-attachments.html">Parts and attachments</a></li><li><a href="../authoring/actions-meshes/play-and-blend-animations.html">Play and blend animations</a></li><li><a href="../authoring/actions-meshes/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-particles-and-lights.html">Actions: particles, lights and sound</a></summary><ul><li><a href="../authoring/actions-particles-and-lights/particles.html">Particles</a></li><li><a href="../authoring/actions-particles-and-lights/lights-and-ambient-light.html">Lights and ambient light</a></li><li><a href="../authoring/actions-particles-and-lights/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-3d.html">Actions: 3D scene</a></summary><ul><li><a href="../authoring/actions-3d/3d-scene-how-it-works.html">How 3D works, models and groups</a></li><li><a href="../authoring/actions-3d/3d-scene-materials.html">Materials</a></li><li><a href="../authoring/actions-3d/3d-scene-camera-and-view.html">Camera, view, lights and shadows</a></li><li><a href="../authoring/actions-3d/3d-scene-camera-paths.html">Camera paths and dragging handles</a></li><li><a href="../authoring/actions-3d/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-time-and-package.html">Actions: time, package, properties and scripts</a></summary><ul><li><a href="../authoring/actions-time-and-package/timeline-and-keys.html">Timeline and keys</a></li><li><a href="../authoring/actions-time-and-package/package.html">Package</a></li><li><a href="../authoring/actions-time-and-package/user-properties.html">User properties</a></li><li><a href="../authoring/actions-time-and-package/scripts-and-templates.html">Scripts and templates</a></li><li><a href="../authoring/actions-time-and-package/shaders.html">Shaders, undo and redo</a></li><li><a href="../authoring/actions-time-and-package/queries.html">Queries</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Examples</summary><ul><li class=has><details><summary><a href="../authoring/coverage.html">What each example shows</a></summary><ul><li><a href="../authoring/coverage/features.html">Features, effects, blends and layers</a></li><li><a href="../authoring/coverage/values-and-scripts.html">Values, triggers, files and scripts</a></li><li><a href="../authoring/coverage/scene.html">Everything else in scene.json</a></li></ul></details></li><li><a href="../authoring/examples/ORIGIN.html">Origin of the example files</a></li></ul></details></li></ul></details><details><summary>Reference</summary><ul><li><details class=sub><summary>Formats and interfaces</summary><ul><li class=has><details><summary><a href="../specs/scene.html">Scene format</a></summary><ul><li><a href="../specs/scene/every-value-is-written.html">Every value is written</a></li><li><a href="../specs/scene/canvas-clock-and-assets.html">Canvas, clock and assets</a></li><li><a href="../specs/scene/canvas-clock-and-assets-ktx2-textures.html">KTX2 textures</a></li><li><a href="../specs/scene/cost-and-frame-rate.html">Cost and frame rate</a></li><li><a href="../specs/scene/layers.html">Layers</a></li><li><a href="../specs/scene/layers-text.html">Text</a></li><li><a href="../specs/scene/layers-lights.html">Lights</a></li><li><a href="../specs/scene/layers-meshes.html">Meshes</a></li><li><a href="../specs/scene/layers-models-and-3d.html">Models and 3D</a></li><li><a href="../specs/scene/values.html">Values</a></li><li><a href="../specs/scene/effects.html">Effects</a></li><li><a href="../specs/scene/effects-writing-an-effect.html">Writing an effect</a></li><li><a href="../specs/scene/effects-package-effects.html">Package effects</a></li><li><a href="../specs/scene/effects-package-transitions.html">Package transitions</a></li><li><a href="../specs/scene/effects-newer-effects-and-parame.html">Newer effects and parameters</a></li><li><a href="../specs/scene/sound.html">Sound</a></li><li><a href="../specs/scene/particles.html">Particles</a></li><li><a href="../specs/scene/particles-newer-particle-fields.html">Newer particle fields</a></li><li><a href="../specs/scene/user-properties-and-presets.html">User properties and presets</a></li><li><a href="../specs/scene/inputs.html">Inputs</a></li><li><a href="../specs/scene/scripts.html">Scripts</a></li><li><a href="../specs/scene/scripts-the-reiwand-module.html">The reiwand module</a></li><li><a href="../specs/scene/scripts-parents-the-camera-shape.html">Parents, the camera, shapes, storage and folders</a></li><li><a href="../specs/scene/scripts-when-a-script-fails.html">When a script fails, Listening to the audio from a script and Script declarations</a></li><li><a href="../specs/scene/rebuilding-a-scene-by-hand.html">Rebuilding a scene by hand</a></li><li><a href="../specs/scene/rebuilding-a-scene-by-hand-porting-a-shader-to-wgsl.html">Porting a shader to WGSL</a></li></ul></details></li><li class=has><details><summary><a href="../specs/package.html">Packages</a></summary><ul><li><a href="../specs/package/versions.html">Versions and Manifest</a></li><li><a href="../specs/package/display-and-playback.html">Display and playback and Rating and photosensitivity</a></li><li><a href="../specs/package/inputs.html">Inputs</a></li><li><a href="../specs/package/features.html">Features</a></li><li><a href="../specs/package/profiles.html">Profiles, Platforms, Dependencies, Origin and Web pages</a></li><li><a href="../specs/package/presets.html">Presets, Shared resources, Languages and Markup</a></li><li><a href="../specs/package/facets-and-tags.html">Facets and tags</a></li></ul></details></li><li class=has><details><summary><a href="../specs/web.html">Web pages</a></summary><ul><li><a href="../specs/web/engine.html">Engine, Frames, Lifecycle and Session and the page&#x27;s view</a></li><li><a href="../specs/web/protocol.html">Protocol, Frame clock, Console of a preview and Sandbox</a></li><li><a href="../specs/web/privacy.html">Privacy and The page interface</a></li><li><a href="../specs/web/on-the-phone.html">On the phone</a></li></ul></details></li><li class=has><details><summary><a href="../specs/editor.html">Scene editor</a></summary><ul><li><a href="../specs/editor/document.html">Document and Operations</a></li><li><a href="../specs/editor/actions.html">Actions</a></li><li><a href="../specs/editor/actions-curve-editor.html">Curve editor</a></li><li><a href="../specs/editor/actions-from-the-command-line.html">Actions from the command line and Scripts and templates</a></li><li><a href="../specs/editor/package-effects-and-shaders.html">Package effects and shaders and History</a></li><li><a href="../specs/editor/inspector.html">Inspector</a></li><li><a href="../specs/editor/inspector-shapes-text-and-fonts.html">Shapes, text and fonts, Hearing, shaping and trying a binding and Sound layers</a></li><li><a href="../specs/editor/package-details.html">Package details</a></li><li><a href="../specs/editor/user-properties-and-presets.html">User properties and presets</a></li><li><a href="../specs/editor/user-properties-and-presets-mesh-layers.html">Mesh layers</a></li><li><a href="../specs/editor/user-properties-and-presets-particle-systems.html">Particle systems</a></li><li><a href="../specs/editor/user-properties-and-presets-lights.html">Lights</a></li><li><a href="../specs/editor/user-properties-and-presets-models-and-3d.html">Models and 3D</a></li><li><a href="../specs/editor/editor-frame.html">Editor frame</a></li><li><a href="../specs/editor/editor-layouts.html">Layouts</a></li><li><a href="../specs/editor/editor-panels.html">Editor panels</a></li><li><a href="../specs/editor/preview.html">Preview</a></li><li><a href="../specs/editor/pointer-areas-and-sound-bindings.html">Pointer areas and sound bindings and Shared parts</a></li><li><a href="../specs/editor/web-pages-and-other-packages.html">Web pages and other packages</a></li><li><a href="../specs/editor/web-pages-and-other-packages-preset-packages.html">Preset packages</a></li><li><a href="../specs/editor/starting-points-building-and-applying.html">Starting points, building and applying</a></li><li><a href="../specs/editor/picture-depth-tools.html">Picture depth tools</a></li><li><a href="../specs/editor/editor-keyboard-and-non-scene-packages.html">Editor keyboard and non-scene packages and The own transition of a scene</a></li></ul></details></li><li class=has><details><summary><a href="../specs/dbus.html">D-Bus interface</a></summary><ul><li><a href="../specs/dbus/conventions.html">Conventions, Errors and Streams and claims</a></li><li><a href="../specs/dbus/layer-shell-and-x11-outputs.html">Layer-shell and X11 outputs</a></li><li><a href="../specs/dbus/frame-rate.html">Frame rate and Video decoding</a></li><li><a href="../specs/dbus/stream-buffers.html">Stream buffers</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1.html">io.github.reiwand.Daemon1</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html">io.github.reiwand.Daemon1: ClearWallpaper to SetSceneProperty</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-listapplications-s-json.html">io.github.reiwand.Daemon1: ListApplications → to ShareSceneValues</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-setoption-s-key-s-value.html">io.github.reiwand.Daemon1: SetOption</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-reload.html">io.github.reiwand.Daemon1: Reload to Signal JobFinished</a></li><li><a href="../specs/dbus/io-github-reiwand-library1.html">io.github.reiwand.Library1</a></li><li><a href="../specs/dbus/io-github-reiwand-library1-renametag-s-from-s-to.html">io.github.reiwand.Library1: RenameTag to Signal ThumbnailReady</a></li><li><a href="../specs/dbus/io-github-reiwand-playlists1.html">io.github.reiwand.Playlists1</a></li><li><a href="../specs/dbus/io-github-reiwand-playlists1-history-s-output-u-limit.html">io.github.reiwand.Playlists1: History → to Signal BrowseChanged</a></li><li><a href="../specs/dbus/io-github-reiwand-profiles1.html">io.github.reiwand.Profiles1</a></li><li><a href="../specs/dbus/io-github-reiwand-providers1.html">io.github.reiwand.Providers1</a></li><li><a href="../specs/dbus/io-github-reiwand-providers1-clearcache-s-id.html">io.github.reiwand.Providers1: ClearCache to RemovePlugin</a></li><li><a href="../specs/dbus/io-github-reiwand-repos1.html">io.github.reiwand.Repos1</a></li><li><a href="../specs/dbus/io-github-reiwand-inputs1.html">io.github.reiwand.Inputs1</a></li><li><a href="../specs/dbus/io-github-reiwand-inputs1-decide-s-scene-s-key-as-.html">io.github.reiwand.Inputs1: Decide to Bands →</a></li><li><a href="../specs/dbus/io-github-reiwand-inputs1-touch-s-output-d-x-d-y-u.html">io.github.reiwand.Inputs1: Touch to SetPointer</a></li><li><a href="../specs/dbus/io-github-reiwand-rgb1.html">io.github.reiwand.Rgb1</a></li><li><a href="../specs/dbus/io-github-reiwand-publish1.html">io.github.reiwand.Publish1, io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li><li><a href="../specs/dbus/the-app-io-github-reiwand.html">The app: io.github.reiwand</a></li><li><a href="../specs/dbus/edits-and-spanning.html">Edits and spanning</a></li><li><a href="../specs/dbus/scenes.html">Scenes, Scene sound and Change notification</a></li><li><a href="../specs/dbus/jobs.html">Jobs and Thumbnails</a></li><li><a href="../specs/dbus/json-model.html">JSON model</a></li><li><a href="../specs/dbus/configuration-file.html">Configuration file</a></li></ul></details></li><li><a href="../specs/export.html">Export and import file (.reiwand)</a></li><li><a href="../specs/explicit-values.html">Explicit values</a></li><li><a href="../specs/provider-plugins.html">Provider plugins</a></li></ul></details></li><li><details class=sub><summary>The app and its screens</summary><ul><li class=has><details><summary><a href="../specs/library.html">Library of the desktop app</a></summary><ul><li><a href="../specs/library/shelf.html">Shelf</a></li><li><a href="../specs/library/see-all.html">See all, Several chosen, Damaged or missing file, No results and failures, First start, Options of a wallpaper, My presets, Permission question, Still on its poster and Damaged scene</a></li></ul></details></li><li><a href="../specs/create.html">Create page</a></li><li class=has><details><summary><a href="../specs/shell.html">Window of the desktop app</a></summary><ul><li><a href="../specs/shell/image-and-tones.html">Image and tones, Menu, Skeletons, Keyboard, Choosing files and folders, Notices, Size and What a page declares</a></li><li><a href="../specs/shell/low-band-of-the-title-screens.html">Low band of the title screens, Sources and Settings</a></li><li><a href="../specs/shell/private-mode.html">Private mode, Name of the screens, Now block, Lists and Third-party licenses</a></li></ul></details></li><li><a href="../specs/look.html">Look of the desktop app</a></li><li><a href="../specs/palette.html">Interface palette</a></li><li><a href="../specs/icon.html">Icon</a></li><li><a href="../specs/settings-pieces.html">Pieces for what is adjusted and for what each screen says</a></li><li><a href="../specs/choose-pieces.html">Pieces for choosing wallpapers</a></li><li><a href="../specs/phone-daily-use.html">Phone: daily use</a></li></ul></details></li></ul></details><details open><summary>Development</summary><ul><li><a href="../development/development.html">Development</a></li><li><a href="../development/design.html" aria-current=page>Design guide</a></li><li><a href="../development/qml.html">Known QML pitfalls</a></li><li><a href="../development/regression-net.html">Regression net</a></li><li><a href="../guidelines.html">Reiwand guidelines</a></li></ul></details><details><summary>Specifications</summary><ul><li><a href="../specs/dbus/edits-and-spanning/adjustments-and-spanning.html">Adjustments and spanning</a></li><li><a href="../specs/dbus/edits-and-spanning/depth.html">Depth maps and depth layers</a></li><li><a href="../specs/dbus/edits-and-spanning/edit-file.html">The edit file</a></li><li><a href="../specs/dbus/json-model/lists-providers-inputs.html">Lists, providers, inputs and accounts</a></li><li><a href="../specs/dbus/json-model/rules.html">The rules of the model</a></li><li><a href="../specs/dbus/json-model/state-jobs-library.html">State, jobs and the library</a></li><li><a href="../specs/editor/actions/animation-and-3d.html">Animation and 3D</a></li><li><a href="../specs/editor/actions/bones-clips-and-expressions.html">Bones, clips and expressions</a></li><li><a href="../specs/editor/actions/document-and-layers.html">Document and layers</a></li><li><a href="../specs/editor/actions/effects-and-layer-fields.html">Effects and layer fields</a></li><li><a href="../specs/editor/actions/keys-imports-and-effects.html">Keys, imports and effects</a></li><li><a href="../specs/editor/actions/kinematics-physics-and-parts.html">Kinematics, physics and parts</a></li><li><a href="../specs/editor/actions/lights-and-maps.html">Lights and maps</a></li><li><a href="../specs/editor/actions/manifest-canvas-timelines-and-media.html">Manifest, canvas, timelines and media</a></li><li><a href="../specs/editor/actions/media-assets-and-sprites.html">Media, assets, ids, keys and timelines</a></li><li><a href="../specs/editor/actions/particles.html">Particles</a></li><li><a href="../specs/editor/actions/scripts-templates-and-assets.html">Scripts, templates and assets</a></li><li><a href="../specs/editor/actions/translations-captures-and-properties.html">Translations, captures and properties</a></li><li><a href="../specs/editor/preview/outlines.html">Layer outlines on the canvas</a></li><li><a href="../specs/editor/preview/pictures-and-console.html">Pictures, clips and the console</a></li><li><a href="../specs/editor/preview/stream-and-level.html">The preview stream and its level</a></li><li><a href="../specs/scene/canvas-clock-and-assets/audio-media-fonts.html">Scene audio, media and fonts</a></li><li><a href="../specs/scene/canvas-clock-and-assets/main-fields.html">The main fields</a></li><li><a href="../specs/scene/canvas-clock-and-assets/newer-canvas-fields.html">Newer canvas fields</a></li><li><a href="../specs/scene/cost-and-frame-rate/drawing-less.html">Drawing less</a></li><li><a href="../specs/scene/cost-and-frame-rate/frame-cost-and-tier.html">The cost of a frame and the tier</a></li><li><a href="../specs/scene/cost-and-frame-rate/quality-levels.html">Quality levels and the budget</a></li><li><a href="../specs/scene/effects-package-effects/descriptor.html">The descriptor</a></li><li><a href="../specs/scene/effects-package-effects/passes-and-compiling.html">Passes, the check and compiling</a></li><li><a href="../specs/scene/effects-package-effects/running.html">Running package effects</a></li><li><a href="../specs/scene/layers-meshes/fields-and-clips.html">Mesh fields, clips and animation layers</a></li><li><a href="../specs/scene/layers-meshes/mesh-file.html">The mesh file</a></li><li><a href="../specs/scene/layers-meshes/reaching-and-swinging.html">Reaching and swinging</a></li><li><a href="../specs/scene/layers-models-and-3d/camera-and-animation.html">The 3D camera and animated models</a></li><li><a href="../specs/scene/layers-models-and-3d/lights-and-groups.html">Shadows, lights and 3D groups</a></li><li><a href="../specs/scene/layers-models-and-3d/model-and-materials.html">The model layer and materials</a></li><li><a href="../specs/scene/particles-newer-particle-fields/fields.html">The newer fields</a></li><li><a href="../specs/scene/particles-newer-particle-fields/look-and-births.html">Looks and births</a></li><li><a href="../specs/scene/particles-newer-particle-fields/shaders-colliders-limits.html">Shaders, colliders and limits</a></li><li><a href="../specs/scene/particles-newer-particle-fields/space-forces-children.html">Space, forces and children</a></li><li><a href="../specs/scene/values/newer-forms-and-media.html">Newer forms, events and media</a></li><li><a href="../specs/scene/values/sources-and-timelines.html">Sources, modifiers and timelines</a></li></ul></details></div></details>
+    <div class="wide"><details><summary>Get started</summary><ul><li><a href="../user/index.html">Getting started</a></li></ul></details><details><summary>Using Reiwand</summary><ul><li><details class=sub><summary>Desktop app</summary><ul><li class=has><details><summary><a href="../user/app.html">The desktop app</a></summary><ul><li><a href="../user/app/library.html">Keys and the library</a></li><li><a href="../user/app/getting-wallpapers.html">Getting and making wallpapers</a></li><li><a href="../user/app/lists-and-tray.html">Lists, the preview and the tray</a></li><li><a href="../user/app/settings.html">Settings and permissions</a></li></ul></details></li><li><a href="../user/other-desktops.html">Sway, Hyprland, river, niri and COSMIC</a></li><li><a href="../user/keyboard-switching.html">Changing the wallpaper with the keyboard</a></li><li class=has><details><summary><a href="../user/packages.html">Packages: rating, languages and credits</a></summary><ul><li><a href="../user/packages/manifest.html">The package manifest</a></li><li><a href="../user/packages/ratings-and-search.html">Mature content, flashing and search</a></li><li><a href="../user/packages/assets-and-presets.html">Assets, presets and dependencies</a></li><li><a href="../user/packages/playback.html">Accent color, playback and shortcuts</a></li><li><a href="../user/packages/scene-features.html">Scene features</a></li><li><a href="../user/packages/timelines-and-sound.html">Timelines, sound and video clocks</a></li><li><a href="../user/packages/package-effects.html">Package effects</a></li><li><a href="../user/packages/built-in-effects.html">Built-in effects</a></li><li><a href="../user/packages/advanced-scenes.html">Advanced scenes</a></li><li><a href="../user/packages/meshes.html">Skeleton meshes</a></li><li><a href="../user/packages/particles.html">Particles</a></li><li><a href="../user/packages/lights.html">Lights</a></li><li><a href="../user/packages/models.html">3D models</a></li><li><a href="../user/packages/compatibility.html">Compatibility and versions</a></li></ul></details></li><li><a href="../user/web-wallpapers.html">Web wallpapers</a></li><li><a href="../user/rgb-lighting.html">RGB lighting</a></li><li><a href="../user/player.html">Media player</a></li><li class=has><details><summary><a href="../user/privacy.html">Privacy</a></summary><ul><li><a href="../user/privacy/network.html">Network and updates</a></li><li><a href="../user/privacy/stored-data.html">Stored data and secrets</a></li><li><a href="../user/privacy/scene-permissions.html">Scenes and what they can see</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Phone</summary><ul><li><a href="../user/phone.html">The phone app</a></li><li class=has><details><summary><a href="../user/android.html">Android</a></summary><ul><li><a href="../user/android/install.html">Installing on Android</a></li><li><a href="../user/android/library.html">The app and the library</a></li><li><a href="../user/android/images.html">Images and setting the wallpaper</a></li><li><a href="../user/android/lists.html">Lists</a></li><li><a href="../user/android/videos.html">Videos</a></li><li><a href="../user/android/parallax-depth.html">Parallax and depth</a></li><li><a href="../user/android/packages.html">Packages</a></li><li><a href="../user/android/scenes.html">Scenes</a></li><li><a href="../user/android/media-sound-touch.html">Media, sound and touch</a></li><li><a href="../user/android/settings.html">Settings</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Command line</summary><ul><li class=has><details><summary><a href="../user/command-line.html">Using it from the terminal</a></summary><ul><li><a href="../user/command-line/everyday-commands.html">Everyday commands</a></li><li><a href="../user/command-line/stepping-with-the-keyboard.html">Stepping through wallpapers with the keyboard</a></li><li><a href="../user/command-line/library-lists-and-packages.html">Library, lists and packages</a></li><li><a href="../user/command-line/scripts-jobs-and-output.html">Scripts, jobs and output</a></li><li><a href="../user/command-line/providers.html">Providers</a></li><li><a href="../user/command-line/repositories.html">Repositories</a></li><li><a href="../user/command-line/accounts-and-phone.html">Accounts and the phone&#x27;s repositories</a></li><li><a href="../user/command-line/frame-rate-and-automatic-quality.html">Frame rate and automatic scene quality</a></li><li><a href="../user/command-line/choosing-scene-quality.html">Choosing the scene quality</a></li><li><a href="../user/command-line/hdr-power-and-motion.html">HDR, power, motion and flashing</a></li><li><a href="../user/command-line/graphics-card.html">Choosing the graphics card</a></li><li><a href="../user/command-line/streams-and-video-decoding.html">Streams and video decoding</a></li><li><a href="../user/command-line/editing-images.html">Editing images</a></li><li><a href="../user/command-line/depth-and-parallax.html">Depth maps and parallax</a></li><li><a href="../user/command-line/parallax-layers.html">3D parallax layers</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Installation</summary><ul><li class=has><details><summary><a href="../user/installation.html">Installation (without root)</a></summary><ul><li><a href="../user/installation/appimage.html">Download and install the AppImage</a></li><li><a href="../user/installation/requirements.html">Requirements</a></li><li><a href="../user/installation/plasma.html">Setting up Plasma and the tray</a></li><li><a href="../user/installation/updates-and-versions.html">Updates and versions</a></li></ul></details></li><li><a href="../user/flatpak.html">Installation with Flatpak</a></li></ul></details></li></ul></details><details><summary>Your own server</summary><ul><li class=has><details><summary><a href="../user/server.html">Your own server</a></summary><ul><li><a href="../user/server/install.html">Installing the server</a></li><li><a href="../user/server/configuration.html">Image and configuration</a></li><li><a href="../user/server/https.html">HTTPS</a></li><li><a href="../user/server/backups-and-versions.html">Backups and data from another version</a></li><li><a href="../user/server/repositories-and-accounts.html">Repositories and accounts</a></li><li><a href="../user/server/uploads-and-catalog.html">Uploads and the catalog</a></li><li><a href="../user/server/taking-wallpapers-away.html">Taking a wallpaper away</a></li><li><a href="../user/server/author-keys.html">Author keys and package tools</a></li><li><a href="../user/server/static-repositories.html">Static repositories</a></li><li><a href="../user/server/moving-configuration.html">Moving the configuration to another computer</a></li><li><a href="../user/server/scenes.html">Scene properties</a></li><li><a href="../user/server/scene-sound-and-examples.html">Example scenes and sound</a></li></ul></details></li><li class=has><details><summary><a href="../specs/server.html">Self-hosted server</a></summary><ul><li><a href="../specs/server/running.html">Running</a></li><li><a href="../specs/server/conventions.html">Conventions and Discovery and health</a></li><li><a href="../specs/server/repository.html">Repository</a></li><li><a href="../specs/server/catalog.html">Catalog and Accounts</a></li><li><a href="../specs/server/uploads.html">Uploads</a></li><li><a href="../specs/server/moderation-and-administration.html">Moderation and administration</a></li><li><a href="../specs/server/legal-pages.html">Legal pages and Operating a public server</a></li></ul></details></li><li class=has><details><summary><a href="../specs/repo.html">Signed repositories</a></summary><ul><li><a href="../specs/repo/keys-and-roles.html">Keys and roles, Signature files, Layout and Identity and URL</a></li><li><a href="../specs/repo/formats.html">Formats and Package signatures</a></li><li><a href="../specs/repo/online-authors.html">Online authors, Operator workflow, Client update, Package installation, Broken repositories and Client storage</a></li><li><a href="../specs/repo/bundled-example-repository.html">Bundled example repository, Network interface and Adding a repository in the desktop app</a></li></ul></details></li></ul></details><details><summary>Creating wallpapers</summary><ul><li><details class=sub><summary>First scene</summary><ul><li><a href="../authoring/index.html">Creating scenes</a></li><li><a href="../authoring/start/first-scene.html">Your first scene</a></li><li class=has><details><summary><a href="../authoring/scene.html">The scene file</a></summary><ul><li><a href="../authoring/scene/folder.html">The folder, the clock and the assets</a></li><li><a href="../authoring/scene/canvas.html">The canvas</a></li><li><a href="../authoring/scene/cost.html">What a scene costs</a></li><li><a href="../authoring/scene/values.html">Values that move</a></li><li><a href="../authoring/scene/timelines-and-inputs.html">Timelines and inputs</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Layers</summary><ul><li class=has><details><summary><a href="../authoring/layers.html">Layers</a></summary><ul><li><a href="../authoring/layers/basics.html">Layer basics</a></li><li><a href="../authoring/layers/image-and-video.html">Image and video layers</a></li><li><a href="../authoring/layers/text.html">Text layer (text)</a></li><li><a href="../authoring/layers/shapes.html">Shape, solid and spectrum layers</a></li><li><a href="../authoring/layers/groups.html">Group and adjustment layers</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/properties.html">User properties</a></summary><ul><li><a href="../authoring/properties/declaring.html">Declaring properties</a></li><li><a href="../authoring/properties/behavior.html">Conditions, presets and translations</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/meshes.html">Meshes, bones and animation</a></summary><ul><li><a href="../authoring/meshes/layer-and-parts.html">The mesh layer and its parts</a></li><li><a href="../authoring/meshes/motion.html">Clips, bones and expressions</a></li><li><a href="../authoring/meshes/attaching.html">Attached layers and models</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/3d.html">Lights, 3D, camera and depth</a></summary><ul><li><a href="../authoring/3d/flat-lights.html">Lights on flat layers</a></li><li><a href="../authoring/3d/models.html">3D models</a></li><li><a href="../authoring/3d/lights-and-camera.html">Lights, shadows and the camera</a></li><li><a href="../authoring/3d/depth-and-hdr.html">Depth and bright colors</a></li></ul></details></li><li><a href="../authoring/transitions.html">Make and try your own transition</a></li></ul></details></li><li><details class=sub><summary>Effects</summary><ul><li class=has><details><summary><a href="../authoring/effects.html">Effects</a></summary><ul><li><a href="../authoring/effects/on-a-layer.html">Putting effects on a layer</a></li><li><a href="../authoring/effects/motion.html">Motion effects</a></li><li><a href="../authoring/effects/light-and-color.html">Light and color effects</a></li><li><a href="../authoring/effects/blur-and-style.html">Blur, distortion and style effects</a></li><li><a href="../authoring/effects/own-descriptor.html">Your own effect: the descriptor</a></li><li><a href="../authoring/effects/own-shader.html">Your own effect: the shader</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Particles and sound</summary><ul><li class=has><details><summary><a href="../authoring/particles-and-sound.html">Particles and sound</a></summary><ul><li><a href="../authoring/particles-and-sound/systems.html">Particle systems and emitters</a></li><li><a href="../authoring/particles-and-sound/motion.html">How particles start and move</a></li><li><a href="../authoring/particles-and-sound/drawing.html">How particles are drawn</a></li><li><a href="../authoring/particles-and-sound/control-points.html">Control points, children and depth</a></li><li><a href="../authoring/particles-and-sound/sound.html">Sound</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Scripts</summary><ul><li><a href="../authoring/scripts-guide.html">Guide for script authors</a></li><li class=has><details><summary><a href="../authoring/scripts.html">Scripts</a></summary><ul><li><a href="../authoring/scripts/basics.html">Script basics</a></li><li><a href="../authoring/scripts/exports-and-events.html">Exports, events and inputs</a></li><li><a href="../authoring/scripts/interface-scene.html">The scene from a script</a></li><li><a href="../authoring/scripts/interface-more.html">More of the script interface</a></li><li><a href="../authoring/scripts/testing.html">Test and debug</a></li><li><a href="../authoring/scripts/examples.html">Complete examples</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Web</summary><ul><li class=has><details><summary><a href="../authoring/web-wallpapers.html">Web wallpapers</a></summary><ul><li><a href="../authoring/web-wallpapers/basics.html">The minimum web wallpaper</a></li><li><a href="../authoring/web-wallpapers/interface.html">The page and the program</a></li><li><a href="../authoring/web-wallpapers/isolation.html">What a page may reach</a></li><li><a href="../authoring/web-wallpapers/phone-and-apps.html">Phones and existing applications</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Publishing</summary><ul><li class=has><details><summary><a href="../authoring/package.html">From the scene folder to a package that others install</a></summary><ul><li><a href="../authoring/package/manifest.html">The manifest</a></li><li><a href="../authoring/package/manifest-rights.html">Languages, licenses and ratings</a></li><li><a href="../authoring/package/checking.html">Previews and checking</a></li><li><a href="../authoring/package/signing.html">Packaging and signing</a></li><li><a href="../authoring/package/publishing.html">Publishing and copies</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/cli.html">The reiwand-ctl authoring commands</a></summary><ul><li><a href="../authoring/cli/create.html">Create, change and import</a></li><li><a href="../authoring/cli/view.html">Viewing the scene</a></li><li><a href="../authoring/cli/capture.html">Capture</a></li><li><a href="../authoring/cli/check-and-publish.html">Check, package and publish</a></li><li><a href="../authoring/cli/actions.html">The editor&#x27;s actions from the terminal</a></li></ul></details></li><li><a href="../authoring/provider-plugins.html">Provider plugins</a></li></ul></details></li><li><details class=sub><summary>The editor</summary><ul><li class=has><details><summary><a href="../authoring/editor.html">The scene editor: getting started, saving, undo, preview and shortcuts</a></summary><ul><li><a href="../authoring/editor/opening.html">The editor and its window</a></li><li><a href="../authoring/editor/creating-and-saving.html">Creating, saving and undoing</a></li><li><a href="../authoring/editor/checking-and-viewing.html">Problems and previews</a></li><li><a href="../authoring/editor/cost-and-package.html">Cost, the package and the image editor</a></li><li><a href="../authoring/editor/shortcuts.html">All keyboard shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-features.html">Scene editor</a></summary><ul><li><a href="../authoring/editor-features/parts.html">The parts of the editor</a></li><li><a href="../authoring/editor-features/package-and-assets.html">The package, properties and assets</a></li><li><a href="../authoring/editor-features/problems-and-masks.html">Problems and painted masks</a></li><li><a href="../authoring/editor-features/meshes.html">Meshes, clips and chains</a></li><li><a href="../authoring/editor-features/particles.html">Particle tools</a></li><li><a href="../authoring/editor-features/files-and-3d.html">Layers from files and 3D models</a></li><li><a href="../authoring/editor-features/fbx-and-obj.html">Converting FBX and OBJ models to glTF with Blender</a></li></ul></details></li><li><a href="../authoring/other-editor-packages.html">Web wallpapers and other packages in the editor</a></li><li class=has><details><summary><a href="../authoring/editor-canvas.html">Canvas, layers and inspector of the editor</a></summary><ul><li><a href="../authoring/editor-canvas/choosing-and-moving.html">Choosing and moving layers</a></li><li><a href="../authoring/editor-canvas/view-and-canvas.html">The view and the canvas</a></li><li><a href="../authoring/editor-canvas/layers.html">Adding and arranging layers</a></li><li><a href="../authoring/editor-canvas/inspector-and-assets.html">The inspector, templates and assets</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-drawing.html">Drawing in the editor: shapes, text, maps, sprites and depth</a></summary><ul><li><a href="../authoring/editor-drawing/shapes-and-text.html">Shapes, gradients and text</a></li><li><a href="../authoring/editor-drawing/fonts-and-maps.html">Fonts, light maps and sprite sheets</a></li><li><a href="../authoring/editor-drawing/depth.html">Depth maps and cuts</a></li><li><a href="../authoring/editor-drawing/regions.html">Regions and the parallax model</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-effects.html">Effects, masks and shaders in the scene editor</a></summary><ul><li><a href="../authoring/editor-effects/basics.html">Adding effects</a></li><li><a href="../authoring/editor-effects/catalog.html">The effect catalog and parameters</a></li><li><a href="../authoring/editor-effects/masks.html">Masks, maps and glow</a></li><li><a href="../authoring/editor-effects/adjust-and-cost.html">Adjustment layers, rest rules and cost</a></li><li><a href="../authoring/editor-effects/package-effects.html">Package effects and shaders</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-animation.html">Animation in the editor: timelines, keys, curves and clips</a></summary><ul><li><a href="../authoring/editor-animation/clips-and-videos.html">Clips and videos</a></li><li><a href="../authoring/editor-animation/keys.html">Keys and the time strip</a></li><li><a href="../authoring/editor-animation/timelines.html">Timelines, triggers and curves</a></li><li><a href="../authoring/editor-animation/sprites-and-rest.html">Sprites, rest rules and shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-particles-and-sound.html">Particles and sound in the editor</a></summary><ul><li><a href="../authoring/editor-particles-and-sound/systems-and-emitters.html">Particle systems and emitters</a></li><li><a href="../authoring/editor-particles-and-sound/starts-and-forces.html">How particles start and the forces</a></li><li><a href="../authoring/editor-particles-and-sound/colliders-and-look.html">Colliders, trails and the look</a></li><li><a href="../authoring/editor-particles-and-sound/sound.html">Sound layers and links</a></li><li><a href="../authoring/editor-particles-and-sound/sound-response.html">Sound levels and shortcuts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-meshes.html">Meshes, bones and expressions in the editor</a></summary><ul><li><a href="../authoring/editor-meshes/bones.html">Meshes and bones</a></li><li><a href="../authoring/editor-meshes/motion-and-shapes.html">Bone motion, blend shapes and parts</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-3d.html">Editor: 3D, lights, camera and materials</a></summary><ul><li><a href="../authoring/editor-3d/models.html">Models and moving in 3D</a></li><li><a href="../authoring/editor-3d/camera-and-lights.html">The camera and lights</a></li><li><a href="../authoring/editor-3d/light-and-materials.html">Light, shadows and materials</a></li><li><a href="../authoring/editor-3d/animation-and-cost.html">3D animation and cost</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/editor-properties.html">User properties and presets in the editor</a></summary><ul><li><a href="../authoring/editor-properties/adding.html">Adding properties</a></li><li><a href="../authoring/editor-properties/types-and-order.html">Other types and order</a></li><li><a href="../authoring/editor-properties/behavior.html">Following properties and conditions</a></li><li><a href="../authoring/editor-properties/presets.html">Translations and presets</a></li><li><a href="../authoring/editor-properties/preset-packages.html">Making a preset package</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Editor actions from the terminal</summary><ul><li><a href="../authoring/actions.html">Editor actions and queries from the command line</a></li><li class=has><details><summary><a href="../authoring/actions-layers.html">Actions: layers, assets and canvas</a></summary><ul><li><a href="../authoring/actions-layers/before-you-start.html">Before you start</a></li><li><a href="../authoring/actions-layers/layers.html">Layers</a></li><li><a href="../authoring/actions-layers/place-and-shape-a-layer.html">Place and shape a layer</a></li><li><a href="../authoring/actions-layers/assets.html">Assets</a></li><li><a href="../authoring/actions-layers/canvas.html">Canvas</a></li><li><a href="../authoring/actions-layers/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-effects.html">Actions: effects and masks</a></summary><ul><li><a href="../authoring/actions-effects/a-layer-s-effects.html">A layer&#x27;s effects</a></li><li><a href="../authoring/actions-effects/masks-and-painted-maps.html">Masks, painted maps and own transitions</a></li><li><a href="../authoring/actions-effects/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-meshes.html">Actions: meshes, bones and animation</a></summary><ul><li><a href="../authoring/actions-meshes/before-you-start-with-meshes-bones-and-a.html">Before you start and creating a mesh</a></li><li><a href="../authoring/actions-meshes/bones-and-weights.html">Bones and weights</a></li><li><a href="../authoring/actions-meshes/clips-and-keys.html">Clips and keys</a></li><li><a href="../authoring/actions-meshes/blend-shapes-and-expressions.html">Blend shapes and expressions</a></li><li><a href="../authoring/actions-meshes/kinematics-and-physics.html">Kinematics and physics</a></li><li><a href="../authoring/actions-meshes/parts-and-attachments.html">Parts and attachments</a></li><li><a href="../authoring/actions-meshes/play-and-blend-animations.html">Play and blend animations</a></li><li><a href="../authoring/actions-meshes/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-particles-and-lights.html">Actions: particles, lights and sound</a></summary><ul><li><a href="../authoring/actions-particles-and-lights/particles.html">Particles</a></li><li><a href="../authoring/actions-particles-and-lights/lights-and-ambient-light.html">Lights and ambient light</a></li><li><a href="../authoring/actions-particles-and-lights/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-3d.html">Actions: 3D scene</a></summary><ul><li><a href="../authoring/actions-3d/3d-scene-how-it-works.html">How 3D works, models and groups</a></li><li><a href="../authoring/actions-3d/3d-scene-materials.html">Materials</a></li><li><a href="../authoring/actions-3d/3d-scene-camera-and-view.html">Camera, view, lights and shadows</a></li><li><a href="../authoring/actions-3d/3d-scene-camera-paths.html">Camera paths and dragging handles</a></li><li><a href="../authoring/actions-3d/queries.html">Queries</a></li></ul></details></li><li class=has><details><summary><a href="../authoring/actions-time-and-package.html">Actions: time, package, properties and scripts</a></summary><ul><li><a href="../authoring/actions-time-and-package/timeline-and-keys.html">Timeline and keys</a></li><li><a href="../authoring/actions-time-and-package/package.html">Package</a></li><li><a href="../authoring/actions-time-and-package/user-properties.html">User properties</a></li><li><a href="../authoring/actions-time-and-package/scripts-and-templates.html">Scripts and templates</a></li><li><a href="../authoring/actions-time-and-package/shaders.html">Shaders, undo and redo</a></li><li><a href="../authoring/actions-time-and-package/queries.html">Queries</a></li></ul></details></li></ul></details></li><li><details class=sub><summary>Examples</summary><ul><li class=has><details><summary><a href="../authoring/coverage.html">What each example shows</a></summary><ul><li><a href="../authoring/coverage/features.html">Features, effects, blends and layers</a></li><li><a href="../authoring/coverage/values-and-scripts.html">Values, triggers, files and scripts</a></li><li><a href="../authoring/coverage/scene.html">Everything else in scene.json</a></li></ul></details></li><li><a href="../authoring/examples/ORIGIN.html">Origin of the example files</a></li></ul></details></li></ul></details><details><summary>Reference</summary><ul><li><details class=sub><summary>Formats and interfaces</summary><ul><li class=has><details><summary><a href="../specs/scene.html">Scene format</a></summary><ul><li><a href="../specs/scene/every-value-is-written.html">Every value is written</a></li><li><a href="../specs/scene/canvas-clock-and-assets.html">Canvas, clock and assets</a></li><li><a href="../specs/scene/canvas-clock-and-assets-ktx2-textures.html">KTX2 textures</a></li><li><a href="../specs/scene/cost-and-frame-rate.html">Cost and frame rate</a></li><li><a href="../specs/scene/layers.html">Layers</a></li><li><a href="../specs/scene/layers-text.html">Text</a></li><li><a href="../specs/scene/layers-lights.html">Lights</a></li><li><a href="../specs/scene/layers-meshes.html">Meshes</a></li><li><a href="../specs/scene/layers-models-and-3d.html">Models and 3D</a></li><li><a href="../specs/scene/values.html">Values</a></li><li><a href="../specs/scene/effects.html">Effects</a></li><li><a href="../specs/scene/effects-writing-an-effect.html">Writing an effect</a></li><li><a href="../specs/scene/effects-package-effects.html">Package effects</a></li><li><a href="../specs/scene/effects-package-transitions.html">Package transitions</a></li><li><a href="../specs/scene/effects-newer-effects-and-parame.html">Newer effects and parameters</a></li><li><a href="../specs/scene/sound.html">Sound</a></li><li><a href="../specs/scene/particles.html">Particles</a></li><li><a href="../specs/scene/particles-newer-particle-fields.html">Newer particle fields</a></li><li><a href="../specs/scene/user-properties-and-presets.html">User properties and presets</a></li><li><a href="../specs/scene/inputs.html">Inputs</a></li><li><a href="../specs/scene/scripts.html">Scripts</a></li><li><a href="../specs/scene/scripts-the-reiwand-module.html">The reiwand module</a></li><li><a href="../specs/scene/scripts-parents-the-camera-shape.html">Parents, the camera, shapes, storage and folders</a></li><li><a href="../specs/scene/scripts-when-a-script-fails.html">When a script fails, Listening to the audio from a script and Script declarations</a></li><li><a href="../specs/scene/rebuilding-a-scene-by-hand.html">Rebuilding a scene by hand</a></li><li><a href="../specs/scene/rebuilding-a-scene-by-hand-porting-a-shader-to-wgsl.html">Porting a shader to WGSL</a></li></ul></details></li><li class=has><details><summary><a href="../specs/package.html">Packages</a></summary><ul><li><a href="../specs/package/versions.html">Versions and Manifest</a></li><li><a href="../specs/package/display-and-playback.html">Display and playback and Rating and photosensitivity</a></li><li><a href="../specs/package/inputs.html">Inputs</a></li><li><a href="../specs/package/features.html">Features</a></li><li><a href="../specs/package/profiles.html">Profiles, Platforms, Dependencies, Origin and Web pages</a></li><li><a href="../specs/package/presets.html">Presets, Shared resources, Languages and Markup</a></li><li><a href="../specs/package/facets-and-tags.html">Facets and tags</a></li></ul></details></li><li class=has><details><summary><a href="../specs/web.html">Web pages</a></summary><ul><li><a href="../specs/web/engine.html">Engine, Frames, Lifecycle and Session and the page&#x27;s view</a></li><li><a href="../specs/web/protocol.html">Protocol, Frame clock, Console of a preview and Sandbox</a></li><li><a href="../specs/web/privacy.html">Privacy and The page interface</a></li><li><a href="../specs/web/on-the-phone.html">On the phone</a></li></ul></details></li><li class=has><details><summary><a href="../specs/editor.html">Scene editor</a></summary><ul><li><a href="../specs/editor/document.html">Document and Operations</a></li><li><a href="../specs/editor/actions.html">Actions</a></li><li><a href="../specs/editor/actions-curve-editor.html">Curve editor</a></li><li><a href="../specs/editor/actions-from-the-command-line.html">Actions from the command line and Scripts and templates</a></li><li><a href="../specs/editor/package-effects-and-shaders.html">Package effects and shaders and History</a></li><li><a href="../specs/editor/inspector.html">Inspector</a></li><li><a href="../specs/editor/inspector-shapes-text-and-fonts.html">Shapes, text and fonts, Hearing, shaping and trying a binding and Sound layers</a></li><li><a href="../specs/editor/package-details.html">Package details</a></li><li><a href="../specs/editor/user-properties-and-presets.html">User properties and presets</a></li><li><a href="../specs/editor/user-properties-and-presets-mesh-layers.html">Mesh layers</a></li><li><a href="../specs/editor/user-properties-and-presets-particle-systems.html">Particle systems</a></li><li><a href="../specs/editor/user-properties-and-presets-lights.html">Lights</a></li><li><a href="../specs/editor/user-properties-and-presets-models-and-3d.html">Models and 3D</a></li><li><a href="../specs/editor/editor-frame.html">Editor frame</a></li><li><a href="../specs/editor/editor-layouts.html">Layouts</a></li><li><a href="../specs/editor/editor-panels.html">Editor panels</a></li><li><a href="../specs/editor/preview.html">Preview</a></li><li><a href="../specs/editor/pointer-areas-and-sound-bindings.html">Pointer areas and sound bindings and Shared parts</a></li><li><a href="../specs/editor/web-pages-and-other-packages.html">Web pages and other packages</a></li><li><a href="../specs/editor/web-pages-and-other-packages-preset-packages.html">Preset packages</a></li><li><a href="../specs/editor/starting-points-building-and-applying.html">Starting points, building and applying</a></li><li><a href="../specs/editor/picture-depth-tools.html">Picture depth tools</a></li><li><a href="../specs/editor/editor-keyboard-and-non-scene-packages.html">Editor keyboard and non-scene packages and The own transition of a scene</a></li></ul></details></li><li class=has><details><summary><a href="../specs/dbus.html">D-Bus interface</a></summary><ul><li><a href="../specs/dbus/conventions.html">Conventions, Errors and Streams and claims</a></li><li><a href="../specs/dbus/layer-shell-and-x11-outputs.html">Layer-shell and X11 outputs</a></li><li><a href="../specs/dbus/frame-rate.html">Frame rate and Video decoding</a></li><li><a href="../specs/dbus/stream-buffers.html">Stream buffers</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1.html">io.github.reiwand.Daemon1</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-clearwallpaper-s-output.html">io.github.reiwand.Daemon1: ClearWallpaper to SetSceneProperty</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-listapplications-s-json.html">io.github.reiwand.Daemon1: ListApplications → to ShareSceneValues</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-setoption-s-key-s-value.html">io.github.reiwand.Daemon1: SetOption</a></li><li><a href="../specs/dbus/io-github-reiwand-daemon1-reload.html">io.github.reiwand.Daemon1: Reload to Signal JobFinished</a></li><li><a href="../specs/dbus/io-github-reiwand-library1.html">io.github.reiwand.Library1</a></li><li><a href="../specs/dbus/io-github-reiwand-library1-renametag-s-from-s-to.html">io.github.reiwand.Library1: RenameTag to Signal ThumbnailReady</a></li><li><a href="../specs/dbus/io-github-reiwand-playlists1.html">io.github.reiwand.Playlists1</a></li><li><a href="../specs/dbus/io-github-reiwand-playlists1-history-s-output-u-limit.html">io.github.reiwand.Playlists1: History → to Signal BrowseChanged</a></li><li><a href="../specs/dbus/io-github-reiwand-profiles1.html">io.github.reiwand.Profiles1</a></li><li><a href="../specs/dbus/io-github-reiwand-providers1.html">io.github.reiwand.Providers1</a></li><li><a href="../specs/dbus/io-github-reiwand-providers1-clearcache-s-id.html">io.github.reiwand.Providers1: ClearCache to RemovePlugin</a></li><li><a href="../specs/dbus/io-github-reiwand-repos1.html">io.github.reiwand.Repos1</a></li><li><a href="../specs/dbus/io-github-reiwand-inputs1.html">io.github.reiwand.Inputs1</a></li><li><a href="../specs/dbus/io-github-reiwand-inputs1-decide-s-scene-s-key-as-.html">io.github.reiwand.Inputs1: Decide to Bands →</a></li><li><a href="../specs/dbus/io-github-reiwand-inputs1-touch-s-output-d-x-d-y-u.html">io.github.reiwand.Inputs1: Touch to SetPointer</a></li><li><a href="../specs/dbus/io-github-reiwand-rgb1.html">io.github.reiwand.Rgb1</a></li><li><a href="../specs/dbus/io-github-reiwand-publish1.html">io.github.reiwand.Publish1, io.github.reiwand.Carry1 and io.github.reiwand.Accounts1</a></li><li><a href="../specs/dbus/the-app-io-github-reiwand.html">The app: io.github.reiwand</a></li><li><a href="../specs/dbus/edits-and-spanning.html">Edits and spanning</a></li><li><a href="../specs/dbus/scenes.html">Scenes, Scene sound and Change notification</a></li><li><a href="../specs/dbus/jobs.html">Jobs and Thumbnails</a></li><li><a href="../specs/dbus/json-model.html">JSON model</a></li><li><a href="../specs/dbus/configuration-file.html">Configuration file</a></li></ul></details></li><li><a href="../specs/export.html">Export and import file (.reiwand)</a></li><li><a href="../specs/explicit-values.html">Explicit values</a></li><li><a href="../specs/provider-plugins.html">Provider plugins</a></li></ul></details></li><li><details class=sub><summary>The app and its screens</summary><ul><li class=has><details><summary><a href="../specs/library.html">Library of the desktop app</a></summary><ul><li><a href="../specs/library/shelf.html">Shelf</a></li><li><a href="../specs/library/see-all.html">See all, Several chosen, Damaged or missing file, No results and failures, First start, Options of a wallpaper, My presets, Permission question, Still on its poster and Damaged scene</a></li></ul></details></li><li><a href="../specs/create.html">Create page</a></li><li class=has><details><summary><a href="../specs/shell.html">Window of the desktop app</a></summary><ul><li><a href="../specs/shell/image-and-tones.html">Image and tones, Menu, Skeletons, Keyboard, Choosing files and folders, Notices, Size and What a page declares</a></li><li><a href="../specs/shell/low-band-of-the-title-screens.html">Low band of the title screens, Sources and Settings</a></li><li><a href="../specs/shell/private-mode.html">Private mode, Name of the screens, Now block, Lists and Third-party licenses</a></li></ul></details></li><li><a href="../specs/look.html">Look of the desktop app</a></li><li><a href="../specs/palette.html">Interface palette</a></li><li><a href="../specs/icon.html">Icon</a></li><li><a href="../specs/settings-pieces.html">Pieces for what is adjusted and for what each screen says</a></li><li><a href="../specs/choose-pieces.html">Pieces for choosing wallpapers</a></li><li><a href="../specs/phone-daily-use.html">Phone: daily use</a></li></ul></details></li></ul></details><details open><summary>Development</summary><ul><li><a href="../development/development.html">Development</a></li><li><a href="../development/design.html" aria-current=page>Design guide</a></li><li><a href="../development/qml.html">Known QML pitfalls</a></li><li><a href="../development/regression-net.html">Regression net</a></li><li><a href="../guidelines.html">Reiwand guidelines</a></li></ul></details><details><summary>Specifications</summary><ul><li><a href="../specs/dbus/edits-and-spanning/adjustments-and-spanning.html">Adjustments and spanning</a></li><li><a href="../specs/dbus/edits-and-spanning/depth.html">Depth maps and depth layers</a></li><li><a href="../specs/dbus/edits-and-spanning/edit-file.html">The edit file</a></li><li><a href="../specs/dbus/json-model/lists-providers-inputs.html">Lists, providers, inputs and accounts</a></li><li><a href="../specs/dbus/json-model/rules.html">The rules of the model</a></li><li><a href="../specs/dbus/json-model/state-jobs-library.html">State, jobs and the library</a></li><li><a href="../specs/editor/actions/animation-and-3d.html">Animation and 3D</a></li><li><a href="../specs/editor/actions/bones-clips-and-expressions.html">Bones, clips and expressions</a></li><li><a href="../specs/editor/actions/document-and-layers.html">Document and layers</a></li><li><a href="../specs/editor/actions/effects-and-layer-fields.html">Effects and layer fields</a></li><li><a href="../specs/editor/actions/keys-imports-and-effects.html">Keys, imports and effects</a></li><li><a href="../specs/editor/actions/kinematics-physics-and-parts.html">Kinematics, physics and parts</a></li><li><a href="../specs/editor/actions/lights-and-maps.html">Lights and maps</a></li><li><a href="../specs/editor/actions/manifest-canvas-timelines-and-media.html">Manifest, canvas, timelines and media</a></li><li><a href="../specs/editor/actions/media-assets-and-sprites.html">Media, assets, ids, keys and timelines</a></li><li><a href="../specs/editor/actions/particles.html">Particles</a></li><li><a href="../specs/editor/actions/scripts-templates-and-assets.html">Scripts, templates and assets</a></li><li><a href="../specs/editor/actions/translations-captures-and-properties.html">Translations, captures and properties</a></li><li><a href="../specs/editor/preview/outlines.html">Layer outlines on the canvas</a></li><li><a href="../specs/editor/preview/pictures-and-console.html">Pictures, clips and the console</a></li><li><a href="../specs/editor/preview/stream-and-level.html">The preview stream and its level</a></li><li><a href="../specs/scene/canvas-clock-and-assets/audio-media-fonts.html">Scene audio, media and fonts</a></li><li><a href="../specs/scene/canvas-clock-and-assets/main-fields.html">The main fields</a></li><li><a href="../specs/scene/canvas-clock-and-assets/newer-canvas-fields.html">Newer canvas fields</a></li><li><a href="../specs/scene/cost-and-frame-rate/drawing-less.html">Drawing less</a></li><li><a href="../specs/scene/cost-and-frame-rate/frame-cost-and-tier.html">The cost of a frame and the tier</a></li><li><a href="../specs/scene/cost-and-frame-rate/quality-levels.html">Quality levels and the budget</a></li><li><a href="../specs/scene/effects-package-effects/descriptor.html">The descriptor</a></li><li><a href="../specs/scene/effects-package-effects/passes-and-compiling.html">Passes, the check and compiling</a></li><li><a href="../specs/scene/effects-package-effects/running.html">Running package effects</a></li><li><a href="../specs/scene/layers-meshes/fields-and-clips.html">Mesh fields, clips and animation layers</a></li><li><a href="../specs/scene/layers-meshes/mesh-file.html">The mesh file</a></li><li><a href="../specs/scene/layers-meshes/reaching-and-swinging.html">Reaching and swinging</a></li><li><a href="../specs/scene/layers-models-and-3d/camera-and-animation.html">The 3D camera and animated models</a></li><li><a href="../specs/scene/layers-models-and-3d/lights-and-groups.html">Shadows, lights and 3D groups</a></li><li><a href="../specs/scene/layers-models-and-3d/model-and-materials.html">The model layer and materials</a></li><li><a href="../specs/scene/particles-newer-particle-fields/fields.html">The newer fields</a></li><li><a href="../specs/scene/particles-newer-particle-fields/look-and-births.html">Looks and births</a></li><li><a href="../specs/scene/particles-newer-particle-fields/shaders-colliders-limits.html">Shaders, colliders and limits</a></li><li><a href="../specs/scene/particles-newer-particle-fields/space-forces-children.html">Space, forces and children</a></li><li><a href="../specs/scene/values/newer-forms-and-media.html">Newer forms, events and media</a></li><li><a href="../specs/scene/values/sources-and-timelines.html">Sources, modifiers and timelines</a></li></ul></details></div>
+  </nav>
+  <main>
+    <p class="crumbs"><a href="../index.html">Docs</a><span>Development</span></p>
+    <article>
+<h1 id="design-guide">Design guide</h1>
+<p>How Reiwand looks and why. This page is for contributors who change
+the desktop app (QML), the phone app (Android, Kotlin) or the pages the
+server renders. The token tables are in <a
+href="../specs/look.html">Look of the desktop app</a> and the way the
+tones are derived is in <a href="../specs/palette.html">Interface
+palette</a>; this page does not repeat them. It gives the rules and says
+which piece to use.</p>
+<h2 id="the-idea">The idea<a class="anchor" href="#the-idea" aria-label="Link to this section">#</a></h2>
+<p>The window is the wallpaper you have on. The app is a title screen: a
+few confident words and a shelf of large covers over the living picture.
+The interface is always dark (the editor alone may be light, see
+Workbench). Every tone has a name and comes from the wallpaper in use,
+except four fixed ones. There is no blur, no glass and no decorative
+gradient: separation is a veil in the picture's own deepest tone or an
+opaque panel in that tone.</p>
+<ul>
+<li>Menus, titles and the main action in Red Hat Display; running text
+in Onest; icons are Phosphor.</li>
+<li>One lit thing per view. The accent is scarce. State is words plus
+icon plus colour.</li>
+<li>Flat tonal layers with soft dark shadows, not outlines around
+everything.</li>
+<li>The voice is the user's: words, not walls of options. The technical
+part sits behind "Details", "More" or "Advanced".</li>
+</ul>
+<h3 id="the-three-surfaces">The three surfaces<a class="anchor" href="#the-three-surfaces" aria-label="Link to this section">#</a></h3>
+<p>All three share the tone names, the two typefaces, the Phosphor
+icons, the 6 px radius, the 4/8/12/16 spacing rhythm, the one-lit-thing
+rule, the three state tones, the main button in the accent and the Frost
+keyboard focus ring.</p>
+<ul>
+<li><strong>Desktop</strong> (<code>apps/reiwand-app</code>). Three
+kinds of window, all full-bleed:
+<ul>
+<li><em>Title screens</em> (<code>TitleFrame</code>: Library, Explore,
+Lists, Sources, Create): menu words on the left over a veil, the
+wallpaper's title large at the top right, and a lower band with the type
+filter, the search and the shelf of covers. The focused cover is larger
+and fully lit.</li>
+<li><em>Options screens</em> (<code>OptionsFrame</code>: Settings,
+options of a wallpaper, list, source, Account): the picture shrinks to
+the strip of the menu and an opaque Night panel holds
+<code>ListRow</code>s, with sections and the key hints at its foot.</li>
+<li><em>Work surface</em> (<code>WorkFrame</code>: editor, review,
+publish): the picture becomes the canvas, the sides are Night panels.
+Authors only, desktop only.</li>
+<li><em>Small surfaces</em> (<code>SmallPanel</code>: tray, menu of one
+control, question, confirmation) are never a page; they open next to the
+control that opens them.</li>
+</ul></li>
+<li><strong>Phone</strong> (<code>android/app/src/main/kotlin</code>).
+User functions only, never authoring. The wallpaper is full screen, the
+title and controls sit in the upper third and the shelf sits above three
+tabs (<code>Tabs</code>: Library, Lists, Settings). Type follows the
+system text size, touch targets are 48 dp or more, text is 14 sp or
+more, <code>Sheet</code>s replace small panels, and there are no
+keyboard hints and no hover.</li>
+<li><strong>Server</strong> (<code>apps/reiwand-server</code>). Pages
+are plain HTML and one column (<code>--column</code>, 46 rem). There is
+no wallpaper in use: the head of the page (<code>.band</code>) takes the
+latest published cover under a veil, or the plain night ground
+(<code>.band.bare</code>, <code>f-none</code>) while the repository is
+empty. Sizes are in rem and fluid, nothing is icon-only, a confirmation
+is a state of the page and there are no keyboard hints.</li>
+</ul>
+<h2 id="colours">Colours<a class="anchor" href="#colours" aria-label="Link to this section">#</a></h2>
+<p>One deep family, one light family, one accent per wallpaper, four
+fixed colours. The default set below is what the code uses when no
+wallpaper gives its own (<code>Look.qml</code>, <code>Tones.NONE</code>
+on the phone, <code>:root</code> in <code>style.css</code>).</p>
+<table>
+<thead>
+<tr class="header">
+<th>Tone</th>
+<th>Hex</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Night</td>
+<td><code>#0a1322</code></td>
+<td>Page ground, panels, veils, text on lit rows and on the accent</td>
+</tr>
+<tr class="even">
+<td>High night</td>
+<td><code>#121e33</code></td>
+<td>Buttons at rest, fields, notices, key caps, second-level panels</td>
+</tr>
+<tr class="odd">
+<td>Night line</td>
+<td><code>#2a3a57</code></td>
+<td>1 px lines, rail tracks, pressed quiet button</td>
+</tr>
+<tr class="even">
+<td>Mist</td>
+<td><code>#b9c4d6</code></td>
+<td>Second-level text, captions, resting menu words and icons</td>
+</tr>
+<tr class="odd">
+<td>Low mist</td>
+<td><code>#8f9db4</code></td>
+<td>Muted and disabled text, always with its reason in words</td>
+</tr>
+<tr class="even">
+<td>Moon (accent)</td>
+<td><code>#9cc3f5</code></td>
+<td>Main button, mark of the current place, "In use"</td>
+</tr>
+<tr class="odd">
+<td>Deep moon</td>
+<td><code>#6f9fdc</code></td>
+<td>Pressed main button</td>
+</tr>
+<tr class="even">
+<td>Veil</td>
+<td>0.62 to 0.96</td>
+<td>Strength of the veil under text; a brighter picture needs more</td>
+</tr>
+<tr class="odd">
+<td>Frost</td>
+<td><code>#f4efe6</code></td>
+<td>Main text, focus ring, the lit row and the ring of the lit
+cover</td>
+</tr>
+<tr class="even">
+<td>Amber</td>
+<td><code>#f0c26b</code></td>
+<td>Warns of something that changes the experience</td>
+</tr>
+<tr class="odd">
+<td>Coral</td>
+<td><code>#ff9d8a</code></td>
+<td>An error or a destructive action</td>
+</tr>
+<tr class="even">
+<td>Sprout</td>
+<td><code>#8fd6a8</code></td>
+<td>Done, healthy</td>
+</tr>
+<tr class="odd">
+<td>Amber, Coral, Sprout deep</td>
+<td><code>#7a5200</code>, <code>#a8361f</code>,
+<code>#1d7040</code></td>
+<td>The three on Frost (6.0, 5.7, 5.3:1)</td>
+</tr>
+</tbody>
+</table>
+<p>The first eight change with the wallpaper
+(<code>reiwand-palette</code> derives them); Frost and the state tones
+never change.</p>
+<p>The same names are used on every surface: <code>Look.night</code>,
+<code>Tones.night</code> on the phone, <code>--night</code> on the
+server. The server spells the accent <code>--accent</code> and
+<code>--accent-deep</code>, and carries the veil as <code>--veil</code>
+plus <code>--night-rgb</code> (phone:
+<code>Tones.veiled(alpha)</code>).</p>
+<p>On the server the tones come from a generated stylesheet per cover
+(<code>band/sheet.rs</code>, <code>css</code>) and the class
+<code>f-none</code> (<code>frame.rs</code>, <code>NO_WALLPAPER</code>)
+is the fixed set. A veil or a shadow is always
+<code>rgb(var(--night-rgb) / alpha)</code>; never a loose black on the
+server.</p>
+<h3 id="rules">Rules<a class="anchor" href="#rules" aria-label="Link to this section">#</a></h3>
+<p><strong>The Own-Tones Rule.</strong> Every tone comes from the
+wallpaper in use and has a name. Do not add a colour to a page, a
+component or a Kotlin screen. If one is needed, it is a change to
+<code>reiwand-palette</code>. The phone and the server have no colours
+of their own.</p>
+<p><strong>The One-Lit-Thing Rule.</strong> One thing is lit per view:
+the focused cover (Frost ring, no dimming), the focused row (Frost
+ground, Night bold text) or the current tool. Everything else rests at
+Mist over Night. When two screens exist, the chosen one is marked, not
+lit.</p>
+<p><strong>The Scarce-Accent Rule.</strong> Moon appears in three places
+only: the mark of the current place, the main action and "In use". One
+main button per view (per state on the server). If the accent lands on a
+fourth thing, the first three lose their meaning.</p>
+<p><strong>The State-Tones Rule.</strong> Amber, Coral and Sprout are
+for state only, always with an icon and words beside them. They tint the
+icon, not large areas; the text stays Frost or Mist. Amber warns, Coral
+fails or destroys, Sprout confirms. On a lit row (Frost ground) use the
+deep variants: in QML ask <code>Tone.of(tone, lit, rest)</code>
+(<code>qml/Tone.qml</code>) instead of choosing the colour, and
+<code>Tone.icon(tone)</code> for the icon. In the server CSS the classes
+<code>.good</code>, <code>.notice</code> and <code>.bad</code> on
+<code>.status</code>, <code>.status-line</code>, <code>.note</code> and
+<code>.field.bad</code> do it.</p>
+<p><strong>The Coral-Confirm Rule.</strong> Only an irreversible action
+is confirmed, and its button is coral. What can be undone is not
+confirmed; it gets a notice with "Undo".</p>
+<ul>
+<li>Desktop: the main <code>Button</code> of a deletion carries
+<code>palette.highlight: Look.coral</code>;
+<code>SmallPanel { destructive: true }</code> does it for a
+confirmation.</li>
+<li>Phone: <code>Kind.Remove</code> in <code>Buttons.kt</code> (filled
+Coral, Night text, with its icon), the only main button of that
+sheet.</li>
+<li>Server: <code>.button.danger</code> (coral text on High night),
+inside <code>.confirm</code> in the lit row. A coral fill would not read
+on Frost.</li>
+<li>A destructive action that is only offered (it still leads to the
+confirmation) is coral words, never filled.</li>
+</ul>
+<p><strong>The Text-On-Deep Rule.</strong> Body text is at least 4.5:1.
+Text over a picture sits only inside a block with a veil:
+<code>BandVeil</code> and <code>TitleVeils</code> on the desktop, the
+title veil on the phone and <code>.band::before</code> on the server.
+The palette crate guarantees the ratios of the tones
+(<code>palette.md</code>); you guarantee that text is on Night or on a
+veil.</p>
+<p><strong>The No-Blur Rule.</strong> No blur, no
+<code>backdrop-filter</code>, no glass, no decorative gradient. Veils
+are gradients of Night with alpha, nothing else, and never over the
+whole picture on a title screen.</p>
+<p><strong>The Dim-Until-Lit Rule.</strong> Resting covers are dimmed
+(<code>Look.coverVeil</code>, 0.42); the lit cover loses the dimming and
+gains the ring and the big shadow.</p>
+<h2 id="typography">Typography<a class="anchor" href="#typography" aria-label="Link to this section">#</a></h2>
+<p>Red Hat Display (variable, <code>Look.titleFont</code>) carries
+menus, titles, buttons and the names of covers and rows: confident,
+tightly tracked (-0.02em to -0.03em at large sizes). Onest
+(<code>Look.textFont</code>) carries explanations, captions and values,
+with tabular figures. Both are self-hosted under the SIL OFL.</p>
+<h3
+id="desktop-scale-lookt-pixels-compact--normal--roomy-where-it-steps">Desktop
+scale (<code>Look.t*</code>, pixels; compact / normal / roomy where it
+steps)</h3>
+<p>Wallpaper title <code>tCover</code> 52 / 66 / 80 bold. Screen title
+and empty state <code>tPage</code> 42 / 50 / 58 bold. Large heading
+<code>tLarge</code> 26 / 34 / 38. Menu and title of the lit cover
+<code>tMenu</code>, <code>tFocus</code> 22 / 27 / 30 (bold when
+current). Row label <code>tRow</code> 20 / 22 / 24.
+<code>tSection</code> 20, <code>tAside</code> 16 or 18,
+<code>tFilter</code> 18. All of these are Red Hat Display. In Onest:
+<code>tExplain</code> 17, <code>tName</code> 16, <code>tBody</code> 15
+(running text), <code>tFoot</code> 13.5, <code>tKey</code> 12.5. The
+button is <code>tButton</code> 16.5, bold, Red Hat Display.</p>
+<p><code>Look.tier</code> steps by window height: <code>short</code> up
+to 680, <code>compact</code> up to 800, <code>roomy</code> from 1800 x
+1000, else <code>normal</code>. The window sets it and every measure
+that depends on it follows. A page never reads the window size to pick a
+font size.</p>
+<p>The editor's workbench is a tool surface and runs denser: while it is
+in view <code>Look.desk</code> is on and every type size follows
+(<code>tBody</code>, <code>tName</code>, <code>tButton</code>,
+<code>tRow</code>, <code>tSection</code>, <code>tFilter</code> 13,
+<code>tFoot</code>, <code>tAside</code>, <code>tExplain</code> 12,
+<code>tTool</code> 12.5, and the large ones capped at 13), with tool
+buttons 24 px, fields 26 px, controls and buttons 28 to 30 px and menu
+options 30 px. Its frame, tab strips, rows and blueprints take their
+measures from <code>DeskLook</code> (rows of 30 px, 13 px names, 12 px
+kinds).</p>
+<h3 id="phone-type-in-typekt-sp-follows-the-system-text-size">Phone
+(<code>Type</code> in <code>Type.kt</code>, sp, follows the system text
+size)<a class="anchor" href="#phone-type-in-typekt-sp-follows-the-system-text-size" aria-label="Link to this section">#</a></h3>
+<p><code>titleL</code> 50, <code>titleM</code> 32, <code>titleS</code>
+21, <code>empty</code> 26, <code>row</code> 17, <code>button</code> 16,
+<code>word</code> 16, <code>fold</code> 15.5, <code>group</code> 14,
+<code>tab</code> 14, <code>text</code> 15.5, <code>foot</code> 14,
+<code>digits</code> 44 (the pairing code). Leading is 1.45 for text and
+1.3 for titles. Never go below 14 sp, and check the screen at the
+largest system text size.</p>
+<h3 id="server-stylecss-rem-fluid">Server (<code>style.css</code>, rem,
+fluid)<a class="anchor" href="#server-stylecss-rem-fluid" aria-label="Link to this section">#</a></h3>
+<p><code>--t-cover</code> 3.5 (2.5 on phone widths),
+<code>--t-section</code> 2 (1.625), <code>--t-row</code> 1.3125
+(1.1875), <code>--t-large</code> 1.1875, <code>--t-text</code> 1.0625,
+<code>--t-foot</code> 0.9375, <code>--t-small</code> 0.8125. Body line
+height is 1.55. Text is limited to <code>--measure</code> (68ch).</p>
+<h3 id="rules-1">Rules<a class="anchor" href="#rules-1" aria-label="Link to this section">#</a></h3>
+<p><strong>The Line-Height Rule.</strong> Headings use
+<code>text-wrap: balance</code> and paragraphs <code>pretty</code>. Do
+not force <code>&lt;br&gt;</code>, and leave no lonely last word. Put a
+non-breaking space between a number and its unit
+(<code>2&amp;nbsp;GB</code>).</p>
+<p><strong>The Words-Not-Numbers Rule.</strong> Give values in words
+("Soft", "Medium", "Slow computer"), with the number inside the
+selector. Quality numbers, fingerprints, hashes, paths and variables
+never appear in the main view. They go behind "Details".</p>
+<h2 id="layout-and-spacing">Layout and spacing<a class="anchor" href="#layout-and-spacing" aria-label="Link to this section">#</a></h2>
+<p>Spacing is a scale and nothing else.</p>
+<ul>
+<li><strong>Desktop</strong>: <code>Look.e1</code> to <code>e8</code> =
+4, 8, 12, 16, 24, 32, 48, 64. <code>margin</code> 56,
+<code>menuWidth</code> 312, covers <code>cover</code> 256,
+<code>coverFocus</code> 420, <code>coverGrid</code> 232,
+<code>shelfGap</code> 28, always 16:9. <code>rowHeight</code> 74,
+<code>rowsWidth</code> 660 with an <code>explainWidth</code> column of
+300. <code>controlHeight</code> 40, <code>buttonHeight</code> 42,
+<code>toolHeight</code> 32. The shelf aligns the bottoms of the covers;
+do not align them by hand.</li>
+<li><strong>Phone</strong>: <code>Measure.e1</code> to <code>e10</code>
+= 4, 8, 12, 16, 20, 24, 32, 40 dp. Margin 20, touch 48, bar 64, row 64,
+option 56, field 52. Text over the picture sits only in the bands the
+title veil covers; the brightest point of a picture never sits under
+text.</li>
+<li><strong>Server</strong>: <code>--e-1</code> to <code>--e-9</code>
+(0.25 to 6 rem). One column of <code>--column</code>, section gap
+<code>--e-8</code> (<code>--e-7</code> on phone widths), head
+<code>--band</code> 23 rem (17 on phone widths), control height 3 rem.
+Forms are 32 rem wide with the label above and the help and error below;
+the reason a button is disabled sits beside it (<code>.why</code>).</li>
+</ul>
+<p><strong>The Size-From-Tokens Rule.</strong> Use the tokens for tone,
+size and space: <code>Look</code>, <code>Measure</code> and
+<code>Type</code>, or the <code>--</code> variables. A loose hex or
+pixel value in a page is a bug. If a value has no token and will be used
+twice, add the token. The only singletons beside <code>Look</code> are
+<code>PreviewLook</code> (measures of the switch-with-preview screen:
+reel of covers, badges, overlay timings) and <code>PublishLook</code>
+(the numbered steps and the width of the publish screen) and
+<code>DeskLook</code> (the frame of the editor's workbench); keep
+one-screen measures there.</p>
+<p><strong>Notices have one place per surface.</strong> They show one at
+a time: above the band on title screens, at the foot of the panel above
+the keys on options screens, top left of the work area on the work
+surface. Pages never position them (<code>OptionsFrame.noticeAt</code>,
+<code>WorkFrame.noticeAt</code>).</p>
+<h2 id="depth-shapes-and-icons">Depth, shapes and icons<a class="anchor" href="#depth-shapes-and-icons" aria-label="Link to this section">#</a></h2>
+<p>Depth is tonal layering: picture, veil, Night panel, High night
+element, Frost lit thing. Shadows are soft and dark, never coloured,
+never hard-offset.</p>
+<ul>
+<li>Use the <code>Shadow</code> piece (<code>qml/Shadow.qml</code>) as a
+child of an opaque background. Its <code>kind</code> is
+<code>cover</code> (every cover), <code>focus</code> (the lit cover),
+<code>row</code> (the lit row) or <code>panel</code> (small panel, menu,
+notice). It exists only when the window draws with the graphics card, so
+the surface must look right without it. <code>Photo</code> rounds covers
+(<code>corner</code>, <code>lowCorner</code>).</li>
+<li>On the server use <code>--shadow</code> (covers, notes, images) and
+<code>--shadow-row</code> (the lit row).</li>
+</ul>
+<p>Shapes are quiet and rectangular. <code>Look.radius</code> and
+<code>--radius</code> (6 px) for covers, buttons, rows, panels, notices
+and fields; <code>radiusSmall</code> (4) for small icons, close buttons
+and thumbnails; <code>keyRadius</code> (5) for key caps;
+<code>panelRadius</code> (10) for small panels and menus. The phone adds
+<code>rNotice</code> (10 dp) and <code>rSheet</code> (22 dp). Round
+shapes are rare: the logo moon, radio buttons and the selection badge of
+a chosen cover.</p>
+<p>A mark of place is a small bar (<code>markWidth</code> x
+<code>markHeight</code>, 16 x 4, 1 px radius) beside or under the
+current word; on the phone it sits on the top edge of the current tab. A
+focused thing gets a 2 px Frost outline with a 3 px gap
+(<code>ring</code>, <code>ringGap</code>), never a border. Lines are 1
+px Night line.</p>
+<p>Icons are Phosphor, in the <code>reiwand</code> icon theme: regular
+at rest, <code>-fill</code> when active or current, <code>-bold</code>
+in key hints. Every icon travels with a word, except "close" (give it an
+accessible name) and keys. A name the set lacks is not drawn, and the
+app tests fail on it (<code>look.md</code>, "Icons").</p>
+<p>Motion is <code>Look.pace</code> (180 ms) with
+<code>Look.paceCurve</code> on colour, background, shadow and position.
+On the server transitions are off under
+<code>prefers-reduced-motion: reduce</code>.</p>
+<h2 id="components">Components<a class="anchor" href="#components" aria-label="Link to this section">#</a></h2>
+<p>Use the piece, not a copy of its look. The properties named here are
+the real ones.</p>
+<h3 id="buttons">Buttons<a class="anchor" href="#buttons" aria-label="Link to this section">#</a></h3>
+<ul>
+<li><strong>Main</strong>: <code>Button { highlighted: true }</code>.
+Moon ground, Night text, Red Hat Display bold, 42 px. Pressed goes Deep
+moon and drops 1 px. Only one per view, with its <code>Enter</code> key
+hint beside it on the desktop. Phone: <code>Action</code>
+(<code>Kind.Main</code>) pinned at the bottom of a sheet or page.
+Server: <code>.button.primary</code>.</li>
+<li><strong>Quiet</strong>: the default <code>Button</code>, High night
+with a 1 px Night line border, bold title font. Phone
+<code>QuietAction</code>; server <code>.button</code>.</li>
+<li><strong>Word</strong>: <code>Button { flat: true }</code>, words
+only, underline on hover. Phone <code>WordAction</code>; server
+<code>.button.link</code>.</li>
+<li><strong>Remove</strong>: see the Coral-Confirm Rule.</li>
+<li><strong>Disabled</strong>: always with its reason in words. Hardware
+that was not found stays visible, grey, with "not detected".</li>
+<li><strong>Focus</strong>: keyboard focus is the Frost ring of the
+style, or <code>:focus-visible</code> / <code>.keyboard-focus</code> on
+the server. Never draw an outline of your own. Inside a clipped
+container leave <code>Look.ringRoom</code> so the ring is not cut.</li>
+</ul>
+<h3 id="menu-words-and-filters">Menu words and filters<a class="anchor" href="#menu-words-and-filters" aria-label="Link to this section">#</a></h3>
+<p><code>MenuWord</code>: Red Hat Display, Mist at rest, Frost and bold
+when current, with the accent mark on its left; Settings and Account sit
+apart. <code>Filter</code>: words with a small count, the current one
+with the mark under it. Phone <code>Tabs</code>: three tabs, the current
+one with the mark and a filled icon. Server <code>.nav</code>: the same
+words, with the mark under <code>.current</code>; "Sign out" is a form
+button.</p>
+<h3 id="cover">Cover<a class="anchor" href="#cover" aria-label="Link to this section">#</a></h3>
+<p><code>Cover</code> (<code>Cover.qml</code>): 16:9 <code>Photo</code>,
+High night ground, dimmed at rest, name in Red Hat Display.
+<code>lit: true</code> makes it larger, undimmed, ringed in Frost, with
+<code>Shadow { kind: "focus" }</code>, and the title, caption and "Set
+as wallpaper" (the main button) below it. "In use" is the small accent
+label inside the cover (<code>inUse</code>). <code>chosen</code> shows a
+round check badge. There is never a banner, a featured cover, a rating
+or a popularity badge. Phone: <code>Cover</code> and <code>Thumb</code>
+in <code>Cover.kt</code>.</p>
+<h3 id="rows">Rows<a class="anchor" href="#rows" aria-label="Link to this section">#</a></h3>
+<p><code>ListRow</code> (<code>ListRow.qml</code>) is one setting. Set
+<code>kind</code> for the value (words, switch, field, key capture,
+rail, arrows, a caret for a second level), <code>explain</code> for the
+column that opens beside the lit row, <code>off</code> for a disabled
+row, <code>status</code> and <code>statusTone</code> or
+<code>note</code> and <code>noteTone</code> for state. Resting: Night,
+Mist label. Hover: High night. Lit (<code>lit</code>, from
+<code>activeFocus</code>): Frost ground, Night bold text, deep state
+tones, <code>Shadow { kind: "row" }</code>. A disabled row is Low mist
+and still shows why. All rows share <code>rowHeight</code> and one
+midline; <code>reiwand-app --check</code> fails otherwise.</p>
+<p>Phone: <code>Setting</code>, <code>Group</code>, <code>Fold</code>,
+<code>Flip</code> and <code>Seam</code> in <code>Rows.kt</code>. Server
+<code>.rows &gt; .row</code> with <code>.row-name</code>,
+<code>.row-value</code>, <code>.row-action</code>: the name, the state
+in words (<code>.status</code>), a detail after a "·", and the button
+that fixes it beside it. <code>.row.lit</code> or
+<code>:focus-within</code> lights it and every child turns Night, except
+<code>.button.danger</code> (stays coral) and <code>pre.fact</code>
+(stays Mist).</p>
+<h3 id="panels-and-small-surfaces">Panels and small surfaces<a class="anchor" href="#panels-and-small-surfaces" aria-label="Link to this section">#</a></h3>
+<p>Opaque Night, 1 px line, <code>Shadow { kind: "panel" }</code>.
+<code>SmallPanel</code> has a cover header (<code>cover</code>),
+<code>title</code>, <code>text</code>, <code>primary</code> and
+<code>quiet</code> buttons and a <code>foot</code>. Menus and drop-downs
+use the style's <code>Menu</code> and <code>ComboBox</code> (38 px
+options, Night line, radius 10). On the phone use <code>Sheet</code>
+(handle, title, note, <code>SheetOption</code> with a mark when chosen)
+and <code>Question</code> for a question; there are no centred dialogs.
+On the server a confirmation is <code>.confirm</code> inside the lit
+row, with a line above.</p>
+<h3 id="workbench">Workbench<a class="anchor" href="#workbench" aria-label="Link to this section">#</a></h3>
+<p>The editor is a workbench of groups (<code>SceneGroup</code>): each
+holds panels as tabs on a strip, a panel moves by dragging its tab or
+from its menu, and the tabs that do not fit go to the strip's "⋯". Six
+factory layouts (Scene, Particles, Scripts, Simulation, Animation,
+Wallpaper; Ctrl+1 to Ctrl+6) hold only the panels of their kind of work,
+four to seven, and keep the rest closed: Window opens any of them where
+it usually sits (package pages that are not scenes start with every
+panel they have). The person's changes are kept per layout. Each layout
+is drawn as its <strong>blueprint</strong> (<code>SceneBlueprint</code>,
+from the same tree that builds it) beside its name in the top bar, in
+Window and in the list of layouts, and the zone a dragged tab will take
+is painted in the same language: no other picture names a layout. Below
+<code>DeskLook.folds</code> the left side folds into a rail of icons
+whose panel unfolds over the canvas; F11 enlarges the panel in focus and
+a panel can go to a window of its own.</p>
+<ul>
+<li><p><strong>Tones</strong>: while the editor is in view (a scene's or
+another package's) its tones come from the thumbnail of the package
+being edited, the app's own set when it has none, with the same names
+(<code>SceneEditorTones</code>, <code>Look.tone</code>); leaving it
+gives back the tones the app had. <strong>Light editor</strong> is an
+editor-only preference (<code>EditorLight</code>,
+<code>editor.conf</code>, <code>[look] light</code>), in the editor's
+View menu and in Settings › Wallpapers › Making wallpapers: the same
+hues as paper surfaces and ink text
+(<code>reiwand_palette::paper</code>, <code>Look.light</code>), every
+text tone at 4.5:1 or more on every surface; lit rows become ink on
+paper and the focus ring takes the text tone. The rest of the app stays
+dark. Build editor pieces from the tone names only, so they read in both
+sets; <code>SceneTonesCheck</code> turns the light set on and
+off.</p></li>
+<li><p><strong>Value rows</strong> (<code>SceneInput</code>,
+<code>SceneValueRow</code>): the name on the left, the editor beside it,
+the reset and keyframe buttons after it. On the workbench the names make
+one column (<code>DeskLook.label</code>, less the indent of a group), so
+editors start on one line; a row too narrow for it takes room from the
+name, never from the editor's floor.</p></li>
+<li><p><strong>Language rows</strong> (Texts and languages): the
+language is a column of its own and sits, like the remove button, on the
+first line of the field, whatever its height; a field keeps its width
+when the remove button is hidden.</p></li>
+<li><p><strong>Buttons in a row</strong> keep their place when they hide
+(opacity, not <code>visible</code>), so the eyes, locks and solos of the
+layers stay in columns.</p></li>
+<li><p><strong>Nothing sets the panel's width</strong>: a row never asks
+for more than a narrow panel has (wrap the words, fold a button to its
+icon) and nothing reads a width it sets itself, which loops on a
+fractional scale. Content keeps clear of an overlaid scroll bar
+(<code>ScrollColumn</code>).</p></li>
+<li><p><strong>Type</strong>: the window's title (15 px) is the largest;
+a panel's tab is 13 px and nothing inside a panel is larger: section
+heads 13 px semibold (<code>PanelHeading</code>), names, values and body
+13 px, secondary words 12 px. Controls with no size of their own follow
+it (the window's font while the workbench is in view);
+<code>SceneTypeCheck</code> fails on larger words in any panel of any
+layout.</p></li>
+<li><p><strong>Rows of names and controls</strong> in a panel use
+<code>SceneGrid</code> (two columns) or <code>SceneRowFit</code> (a
+row): their names wrap and their check boxes and drop-down lists narrow,
+down to a floor, before a control is pushed past the panel's
+edge.</p></li>
+<li><p><strong>Bars</strong> give up words in turn when short of room:
+the top bar's Undo and Redo, then the layout names, then the words of
+its buttons; the canvas bar's Test the pointer and Capture.</p></li>
+<li><p><strong>Focus</strong>: the item chosen is lit only in the group
+that has the keyboard, or had it last (<code>SceneFocus.group</code>);
+the other groups keep it marked in High night with a line
+(<code>marked</code> of the style's <code>ItemDelegate</code>, lit
+through <code>SceneFocus.lit</code>). The accent under the current tab
+is drawn only on that group. F6 and Shift+F6 go from group to group,
+Ctrl+Tab and Ctrl+Shift+Tab from tab to tab; on an edge the arrows move
+it 4 px, 40 px with Shift.</p></li>
+</ul>
+<p>Check each panel at 1600 x 900 and 1366 x 768, at scale 1 and 1.25
+(1280 and 1093 wide), in every layout and package page.</p>
+<h3 id="notices-state-empty-and-error">Notices, state, empty and
+error<a class="anchor" href="#notices-state-empty-and-error" aria-label="Link to this section">#</a></h3>
+<ul>
+<li><code>Toast</code> (<code>Toast.qml</code>): High night ground with
+a line, an icon in the state tone (<code>tone</code>), one line, an
+optional <code>action</code>, a close button. One visible at a time,
+never blocking. Phone: <code>NoticeAsk</code> in <code>Notice.kt</code>.
+Server <code>.note</code> with <code>.good</code>, <code>.notice</code>,
+<code>.bad</code>.</li>
+<li><code>StatusLine</code>: icon plus words (<code>tone</code>,
+<code>lit</code>). Server <code>.status</code> and
+<code>.status-line</code>.</li>
+<li><code>Note</code>, <code>SmallNote</code>: a quiet line under a row
+or a panel.</li>
+<li><code>Empty</code>: one big sentence and the first step as an
+action. Server <code>.empty</code>.</li>
+<li><code>Failure</code> and <code>Details</code>: what happened, what
+to do, one button that fixes it, the technical part behind "Details".
+Server <code>.more</code> (<code>.more.fix</code> for a fixing
+step).</li>
+<li><code>Progress</code>: words, a rail, and "Stop" when it can be
+stopped.</li>
+</ul>
+<h3 id="keys-and-fields">Keys and fields<a class="anchor" href="#keys-and-fields" aria-label="Link to this section">#</a></h3>
+<p><code>KeyCap</code> and <code>Hints</code> (pairs of keys and words)
+sit at the foot of the band or the panel. Only arrows, Enter, Esc and
+Tab; at most two hints on a title screen; Enter appears once, beside the
+main button.</p>
+<p>Desktop fields are the style's controls (<code>look.md</code>,
+"Controls"); a test fails if a screen uses a control the style does not
+draw. Server forms: <code>form.form</code>, <code>.field</code> (label
+above, <code>.help</code>, <code>.field-error</code>,
+<code>.field.bad</code>), <code>.checkbox</code>,
+<code>.choices &gt; .choice</code>, <code>.file</code> (the native input
+is never in view; a button plus <code>.file-name</code>),
+<code>.fact</code>, <code>.pairs</code> and <code>.copy</code> (a datum
+that selects whole with one click, and a "Copy" button). The only script
+the server serves is <code>assets/copy.js</code>; the page works without
+it.</p>
+<h2 id="do">Do<a class="anchor" href="#do" aria-label="Link to this section">#</a></h2>
+<ul>
+<li>Take every tone from the wallpaper in use, through
+<code>Look</code>, <code>Tones</code> or the CSS variables.</li>
+<li>Light one thing per view; give the accent to the current place, the
+main action and "In use".</li>
+<li>Keep one main button per view, and a disabled control with its
+reason in words beside it.</li>
+<li>Write state in words with an icon and its tone; use
+<code>Tone.of</code> on lit rows.</li>
+<li>Confirm only what cannot be undone, with the coral button; offer
+"Undo" for the rest.</li>
+<li>Say what happened, put the button that fixes it beside the message
+and fold the technical part behind "Details".</li>
+<li>Keep touch targets at 48 dp and text at 14 sp or more on the
+phone.</li>
+<li>Use the user's vocabulary: "Set as wallpaper", "In use", "Slow
+computer / Fast computer". "Repository" stays "repository"; a source is
+a place that gives pictures. "Author key" is the secret that signs and
+is never just "key"; "signing" is the act and its result. The server
+also speaks of People (who enters, invitations, accounts) and Review
+(what people upload); Administration is only the health of the
+server.</li>
+</ul>
+<h2 id="dont">Don't<a class="anchor" href="#dont" aria-label="Link to this section">#</a></h2>
+<ul>
+<li>Do not make it look like a store: no banners, featured covers,
+ratings, prices, download counts or autoplay carousels. The shelf is the
+person's own covers.</li>
+<li>Do not make it look like a technical panel: no ids, paths,
+fingerprints, hashes or <code>REIWAND_*</code> names in the main
+view.</li>
+<li>Do not wrap everything in a bordered card, or use loose colours or
+sizes in a page.</li>
+<li>Do not put an icon alone (except "close" and keys), or draw your own
+focus outline.</li>
+<li>Do not use keyboard hints or hover on the phone, or add authoring
+tools to it.</li>
+<li>Do not add an eyebrow or small-caps label above titles.</li>
+</ul>
+<h2 id="checking">Checking<a class="anchor" href="#checking" aria-label="Link to this section">#</a></h2>
+<p>Run <code>target/debug/reiwand-app --check</code> (it loads every QML
+file and checks row heights and focus rings). Look at the app with a
+bright wallpaper, a dark one and the "no wallpaper" set; test the phone
+at the largest system text size; load server pages with and without a
+cover, at phone width and with the keyboard only.</p>
+    </article>
+    <nav class="near" aria-label="Pages around this one"><a class="previous" href="../development/development.html"><span>Previous</span>Development</a><a class="next" href="../development/qml.html"><span>Next</span>Known QML pitfalls</a></nav>
+    <p class="source"><a href="https://github.com/reiwand/reiwand/blob/master/docs/development/design.md">Edit or read this page as Markdown</a> · GPL-3.0-or-later</p>
+  </main>
+  <aside class="toc" aria-label="On this page"><ul>
+<li><a href="#design-guide" id="toc-design-guide">Design guide</a>
+<ul>
+<li><a href="#the-idea" id="toc-the-idea">The idea</a>
+<ul>
+<li><a href="#the-three-surfaces" id="toc-the-three-surfaces">The three
+surfaces</a></li>
+</ul></li>
+<li><a href="#colours" id="toc-colours">Colours</a>
+<ul>
+<li><a href="#rules" id="toc-rules">Rules</a></li>
+</ul></li>
+<li><a href="#typography" id="toc-typography">Typography</a>
+<ul>
+<li><a
+href="#desktop-scale-lookt-pixels-compact--normal--roomy-where-it-steps"
+id="toc-desktop-scale-lookt-pixels-compact--normal--roomy-where-it-steps">Desktop
+scale (<code>Look.t*</code>, pixels; compact / normal / roomy where it
+steps)</a></li>
+<li><a href="#phone-type-in-typekt-sp-follows-the-system-text-size"
+id="toc-phone-type-in-typekt-sp-follows-the-system-text-size">Phone
+(<code>Type</code> in <code>Type.kt</code>, sp, follows the system text
+size)</a></li>
+<li><a href="#server-stylecss-rem-fluid"
+id="toc-server-stylecss-rem-fluid">Server (<code>style.css</code>, rem,
+fluid)</a></li>
+<li><a href="#rules-1" id="toc-rules-1">Rules</a></li>
+</ul></li>
+<li><a href="#layout-and-spacing" id="toc-layout-and-spacing">Layout and
+spacing</a></li>
+<li><a href="#depth-shapes-and-icons"
+id="toc-depth-shapes-and-icons">Depth, shapes and icons</a></li>
+<li><a href="#components" id="toc-components">Components</a>
+<ul>
+<li><a href="#buttons" id="toc-buttons">Buttons</a></li>
+<li><a href="#menu-words-and-filters"
+id="toc-menu-words-and-filters">Menu words and filters</a></li>
+<li><a href="#cover" id="toc-cover">Cover</a></li>
+<li><a href="#rows" id="toc-rows">Rows</a></li>
+<li><a href="#panels-and-small-surfaces"
+id="toc-panels-and-small-surfaces">Panels and small surfaces</a></li>
+<li><a href="#workbench" id="toc-workbench">Workbench</a></li>
+<li><a href="#notices-state-empty-and-error"
+id="toc-notices-state-empty-and-error">Notices, state, empty and
+error</a></li>
+<li><a href="#keys-and-fields" id="toc-keys-and-fields">Keys and
+fields</a></li>
+</ul></li>
+<li><a href="#do" id="toc-do">Do</a></li>
+<li><a href="#dont" id="toc-dont">Don't</a></li>
+<li><a href="#checking" id="toc-checking">Checking</a></li>
+</ul></li>
+</ul></aside>
+</div>
+</body>
+</html>

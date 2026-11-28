@@ -1,0 +1,49 @@
+{
+  "authors": [],
+  "changes": null,
+  "content": {
+    "descriptors": [],
+    "rating": "general"
+  },
+  "credits": [],
+  "default_locale": "en",
+  "description": "Light painting: three glowing points on arms that turn at different speeds draw spirals on a canvas that is never cleared, brighter than white with an AgX tone map and a wide glow, while the camera rolls and trembles and the parallax drifts.",
+  "entry": "scene.json",
+  "id": "org.example.canvas-extras",
+  "inputs": [
+    "pointer"
+  ],
+  "kind": "scene",
+  "license": "CC0-1.0",
+  "origin": {
+    "derived_from": [],
+    "kind": "original",
+    "provider": null,
+    "source_url": null
+  },
+  "photosensitive": false,
+  "platforms": [],
+  "presets": [],
+  "properties": {},
+  "requires": {
+    "engine": null,
+    "features": [
+      "bone_physics",
+      "camera",
+      "hdr",
+      "inputs.pointer",
+      "keep_frame",
+      "layer_color",
+      "parallax2",
+      "parallax_values",
+      "parent"
+    ],
+    "gpu": null,
+    "packages": []
+  },
+  "schema": "reiwand.wpak/3",
+  "strings": {},
+  "tags": [],
+  "title": "More canvas",
+  "version": "0.1.0"
+}

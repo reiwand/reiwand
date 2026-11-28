@@ -1,0 +1,236 @@
+{
+  "assets": {
+    "stone": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": false,
+      "mipmaps": null,
+      "path": "assets/stone.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    },
+    "relief": {
+      "animated": false,
+      "durations": [],
+      "face": null,
+      "filter": "linear",
+      "fps": null,
+      "frames": null,
+      "linear": true,
+      "mipmaps": null,
+      "path": "assets/relief.png",
+      "rects": [],
+      "shapes": {},
+      "wrap": "clamp"
+    }
+  },
+  "canvas": {
+    "ambient": "#10131f",
+    "background": "#000000",
+    "blend_space": "linear",
+    "clear": true,
+    "fit": "fill",
+    "hdr": false,
+    "size": [
+      1920,
+      1080
+    ],
+    "sky": "#202a44"
+  },
+  "clock": {
+    "max_fps": 60,
+    "poster_time": 0.0,
+    "seed": 0,
+    "step": 60
+  },
+  "effects": {},
+  "ext": {},
+  "layers": [
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffffff",
+      "depth_test": false,
+      "effects": [],
+      "id": "wall",
+      "image": "stone",
+      "lighting": {
+        "emissive": 0.0,
+        "normal": "relief",
+        "reflection": 0.0,
+        "roughness": 0.4,
+        "strength": 1
+      },
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "size": [
+        1920,
+        1080
+      ],
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "image",
+      "visible": true
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#ffd9a0",
+      "cone": [
+        30,
+        60
+      ],
+      "depth_test": false,
+      "effects": [],
+      "id": "lantern",
+      "intensity": 1.6,
+      "length": 256,
+      "light": "point",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "radius": 700,
+      "shadow_bias": 0.2,
+      "shadow_resolution": null,
+      "shadows": false,
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": {
+          "invert": false,
+          "keys": [
+            [
+              0,
+              [
+                400,
+                400
+              ]
+            ],
+            [
+              8,
+              [
+                1500,
+                700
+              ],
+              "in_out_sine"
+            ],
+            [
+              16,
+              [
+                400,
+                400
+              ],
+              "in_out_sine"
+            ]
+          ],
+          "timeline": "stroll"
+        },
+        "rotation": 0.0,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "light",
+      "visible": true,
+      "z": 160
+    },
+    {
+      "blend": "normal",
+      "blend_space": "canvas",
+      "cache": false,
+      "color": "#8fb4ff",
+      "cone": [
+        20,
+        45
+      ],
+      "depth_test": false,
+      "effects": [],
+      "id": "spotlight",
+      "intensity": 1.2,
+      "length": 256,
+      "light": "spot",
+      "opacity": 1.0,
+      "parallax": [
+        0,
+        0
+      ],
+      "radius": 900,
+      "shadow_bias": 0.2,
+      "shadow_resolution": null,
+      "shadows": false,
+      "solid": false,
+      "transform": {
+        "origin": "anchor",
+        "position": [
+          1500,
+          150
+        ],
+        "rotation": 20,
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "skew": [
+          0.0,
+          0.0
+        ]
+      },
+      "type": "light",
+      "visible": true,
+      "volumetric": {
+        "density": 0.25,
+        "samples": 16,
+        "shafts": 0.3
+      },
+      "z": 300
+    }
+  ],
+  "listens": [],
+  "particles": {},
+  "pools": {},
+  "schema": "reiwand.scene/2",
+  "scripts": [],
+  "templates": {},
+  "timelines": [
+    {
+      "autoplay": true,
+      "delay": 0.0,
+      "duration": 16,
+      "events": [],
+      "fps": null,
+      "frames": null,
+      "id": "stroll",
+      "loop": "repeat",
+      "speed": 1.0,
+      "wrap": false
+    }
+  ]
+}
