@@ -340,3 +340,9 @@ msgid ""
 msgstr ""
 "no le llegó nada durante un minuto, así que la subida se detuvo; no se "
 "publicó nada"
+
+msgid "Renders your wallpapers"
+msgstr "Dibuja tus fondos de pantalla"
+
+msgid "Draws the desktop wallpaper"
+msgstr "Dibuja el fondo del escritorio"

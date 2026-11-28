@@ -44,7 +44,13 @@ D-Bus services: run `reiwand --uninstall` first.
 
 The app shows up in the applications menu (`flatpak run io.github.reiwand.Reiwand` opens it from
 the terminal) and the tray icon opens it with *Open Reiwand* and *Settings…*, as in the
-installation without Flatpak. `reiwand-ctl` is inside too:
+installation without Flatpak.
+
+The service runs with no window, so the desktop lists it among the apps running in the
+background: in Plasma, a second Reiwand entry in the tray that says *Renders your wallpapers*.
+Every sandboxed app without a window is listed there and it cannot be left out; *Quit Reiwand* in
+it stops the service, and the wallpaper with it. To hide the entry, open the tray's *Entries*
+settings and set it to *Disabled*. `reiwand-ctl` is inside too:
 
 ```sh
 alias reiwand-ctl='flatpak run --command=reiwand-ctl io.github.reiwand.Reiwand'

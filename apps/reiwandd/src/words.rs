@@ -13,6 +13,16 @@ fn tr(text: &str) -> String {
     CATALOG.get(text).cloned().unwrap_or_else(|| text.to_owned())
 }
 
+/// The line Plasma (or another desktop) shows for the service in its list of apps running in the
+/// background, at most 96 characters (the Background portal's limit).
+pub fn background_status() -> String {
+    tr("Renders your wallpapers")
+}
+
+pub fn background_reason() -> String {
+    tr("Draws the desktop wallpaper")
+}
+
 pub fn too_old() -> String {
     tr("This server needs a newer version of Reiwand: update it on this computer to keep using the account.")
 }

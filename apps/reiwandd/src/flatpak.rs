@@ -20,6 +20,13 @@ trait Background {
         parent_window: &str,
         options: HashMap<&str, Variant<'_>>,
     ) -> zbus::Result<OwnedObjectPath>;
+
+    fn set_status(&self, options: HashMap<&str, Variant<'_>>) -> zbus::Result<()>;
+}
+
+/// The portal takes a status of at most 96 characters; a longer translation is cut at a character.
+fn status(text: &str) -> String {
+    text.chars().take(96).collect()
 }
 
 pub fn app_id() -> Option<String> {
@@ -36,13 +43,28 @@ pub fn host_path(path: &Path) -> PathBuf {
 }
 
 pub async fn request_background(connection: zbus::Connection) {
-    if app_id().is_none() {
-        return;
+    if app_id().is_some() {
+        ask(&connection).await;
     }
-    let options = HashMap::from([("reason", Variant::from("Draws the desktop wallpaper"))]);
-    let request = async { BackgroundProxy::new(&connection).await?.request_background("", options).await };
-    if let Err(e) = request.await {
+}
+
+/// Asks the Background portal to let the service run with no window, and sets the line the
+/// desktop shows for it.
+async fn ask(connection: &zbus::Connection) {
+    let reason = crate::words::background_reason();
+    let options = HashMap::from([("reason", Variant::from(reason.as_str()))]);
+    let portal = match BackgroundProxy::new(connection).await {
+        Ok(portal) => portal,
+        Err(e) => return tracing::warn!("cannot reach the background portal: {e}"),
+    };
+    if let Err(e) = portal.request_background("", options).await {
         tracing::warn!("cannot ask the background portal to keep reiwandd running: {e}");
+    }
+    // What the desktop's list of background apps says about the service (portal version 2 and later;
+    // an older portal leaves the line empty, as before).
+    let said = status(&crate::words::background_status());
+    if let Err(e) = portal.set_status(HashMap::from([("message", Variant::from(said.as_str()))])).await {
+        tracing::info!("the background portal takes no status line: {e}");
     }
 }
 
@@ -93,6 +115,56 @@ pub(crate) fn not_found(path: &std::path::Path) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    struct Portal(tokio::sync::mpsc::UnboundedSender<(String, String)>);
+
+    #[zbus::interface(name = "org.freedesktop.portal.Background")]
+    impl Portal {
+        fn request_background(
+            &self,
+            _parent: String,
+            options: HashMap<String, zbus::OwnedVariant>,
+        ) -> OwnedObjectPath {
+            let reason =
+                options.get("reason").and_then(|v| String::try_from(v.clone()).ok()).unwrap_or_default();
+            drop(self.0.send(("reason".into(), reason)));
+            OwnedObjectPath::try_from("/org/freedesktop/portal/desktop/request/1_1/t").unwrap()
+        }
+
+        fn set_status(&self, options: HashMap<String, zbus::OwnedVariant>) {
+            let said =
+                options.get("message").and_then(|v| String::try_from(v.clone()).ok()).unwrap_or_default();
+            drop(self.0.send(("message".into(), said)));
+        }
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn the_service_asks_to_run_in_the_background_and_says_what_it_does() {
+        use crate::confirm::tests::{connect, private_bus};
+        let Some(bus) = private_bus() else { return };
+        let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel();
+        let portal = connect(&bus.1).await;
+        portal.object_server().at("/org/freedesktop/portal/desktop", Portal(tx)).await.unwrap();
+        portal.request_name("org.freedesktop.portal.Desktop").await.unwrap();
+        ask(&connect(&bus.1).await).await;
+        let mut seen = HashMap::new();
+        while let Ok(Some((key, value))) =
+            tokio::time::timeout(std::time::Duration::from_secs(5), rx.recv()).await
+        {
+            seen.insert(key, value);
+            if seen.len() == 2 {
+                break;
+            }
+        }
+        assert_eq!(seen.get("reason").map(String::as_str), Some("Draws the desktop wallpaper"));
+        assert_eq!(seen.get("message").map(String::as_str), Some("Renders your wallpapers"));
+    }
+
+    #[test]
+    fn the_background_status_fits_the_portal() {
+        assert_eq!(status(&crate::words::background_status()), "Renders your wallpapers");
+        assert_eq!(status(&"é".repeat(120)).chars().count(), 96);
+    }
 
     #[test]
     fn a_replaced_zone_file_is_read_again() {
