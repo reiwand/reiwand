@@ -162,13 +162,16 @@ mod tests {
                 break;
             }
         }
-        assert_eq!(seen.get("reason").map(String::as_str), Some("Draws the desktop wallpaper"));
-        assert_eq!(seen.get("message").map(String::as_str), Some("Renders your wallpapers"));
+        // in the language of the desktop, whichever it is
+        assert_eq!(seen.get("reason"), Some(&crate::words::background_reason()));
+        assert_eq!(seen.get("message"), Some(&status(&crate::words::background_status())));
     }
 
     #[test]
     fn the_background_status_fits_the_portal() {
-        assert_eq!(status(&crate::words::background_status()), "Renders your wallpapers");
+        let said = crate::words::background_status();
+        assert!(said.chars().count() <= 96, "the status line fits the portal: {said}");
+        assert_eq!(status(&said), said);
         assert_eq!(status(&"é".repeat(120)).chars().count(), 96);
     }
 
