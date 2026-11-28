@@ -122,7 +122,7 @@ jobs:
         run: scripts/test-shards.sh check
 
       - name: Shell scripts
-        run: shellcheck apps/reiwand-server/skeleton.sh packaging/*.sh packaging/flatpak/*.sh scripts/*.sh
+        run: shellcheck apps/reiwand-server/skeleton.sh packaging/*/*.sh scripts/*.sh
 
       - name: Cache cleanup selection
         run: scripts/ci-cache-clean-test.sh
