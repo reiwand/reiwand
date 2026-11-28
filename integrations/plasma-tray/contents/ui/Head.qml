@@ -42,6 +42,24 @@ ColumnLayout {
         border.width: Look.line
         border.color: Look.nightLine
 
+        Command {
+            id: pauseProbe
+
+            visible: false
+            quiet: true
+            glyph: "pause-fill"
+            text: i18n("Pause")
+        }
+
+        Command {
+            id: resumeProbe
+
+            visible: false
+            quiet: true
+            glyph: "play-fill"
+            text: i18n("Resume")
+        }
+
         RowLayout {
             id: group
 
@@ -53,6 +71,8 @@ ColumnLayout {
                 id: pausing
 
                 Layout.fillHeight: true
+                // As wide as the longer of its two labels, so the volume beside it stays put on a pause.
+                Layout.preferredWidth: Math.max(pauseProbe.implicitWidth, resumeProbe.implicitWidth)
                 quiet: true
                 glyph: head.paused ? "play-fill" : "pause-fill"
                 text: head.paused ? i18n("Resume") : i18n("Pause")
