@@ -93,6 +93,11 @@ impl Exporter {
         self.shared.with_slot(output, |slot| slot.streaming.load(SeqCst)).unwrap_or(false)
     }
 
+    /// The last state PipeWire gave the stream of `output`, such as Paused or Streaming.
+    pub fn stream_state(&self, output: &str) -> Option<String> {
+        self.shared.with_slot(output, |slot| lock(&slot.state).clone())
+    }
+
     pub fn stream_info(&self, output: &str) -> Option<StreamInfo> {
         self.shared.with_slot(output, |slot| *lock(&slot.info)).flatten()
     }

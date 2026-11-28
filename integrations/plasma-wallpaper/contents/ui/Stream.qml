@@ -94,6 +94,11 @@ Item {
         view.active = true;
     }
 
+    // Connects again to the stream already given, as when the service announces it changed.
+    function reconnect() {
+        show(view.node, view.serial, true);
+    }
+
     function failed(reply) {
         requesting = false;
         if (owned !== output)
@@ -123,6 +128,10 @@ Item {
     Component.onDestruction: {
         lifetime.alive = false;
         release();
+    }
+
+    StreamWait {
+        stream: stream
     }
 
     Loader {

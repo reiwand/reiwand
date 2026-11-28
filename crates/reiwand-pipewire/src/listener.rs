@@ -31,6 +31,7 @@ pub fn listen(
         .add_local_listener::<()>()
         .state_changed(move |stream, _, old, new| {
             tracing::debug!(output = %output, "stream state {old:?} -> {new:?}");
+            *lock(&slot.state) = format!("{new:?}");
             let streaming = matches!(new, pw::stream::StreamState::Streaming);
             if slot.streaming.swap(streaming, SeqCst) != streaming {
                 shared.changed.store(true, SeqCst);
