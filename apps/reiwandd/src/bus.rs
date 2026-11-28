@@ -177,6 +177,7 @@ impl Daemon {
             transitions: st.config.own_transitions(),
             layer_shell: crate::layers::state(&st.config),
             plasma: crate::plasma::PLASMA.load(std::sync::atomic::Ordering::Relaxed),
+            flatpak_commit: crate::flatpak::commit(),
         };
         serde_json::to_string(&state).unwrap_or_default()
     }

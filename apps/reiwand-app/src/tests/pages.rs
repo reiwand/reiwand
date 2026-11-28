@@ -181,6 +181,13 @@ fn after_a_flatpak_update_the_tray_offers_one_restart_that_refreshes_plasma() {
         !script.contains("flatpak kill \" + APP"),
         "flatpak kill also ends the app and its unsaved edits"
     );
+    // only a newer version, and only for a service that runs in the Flatpak
+    assert!(
+        script.contains("flatpak === true")
+            && script.contains("(compare(installedVersion, running) ?? 0) > 0")
+    );
+    let daemon = read(&format!("{ui}/Daemon.qml"));
+    assert!(daemon.contains("Flatpak.newer(installed, current.version, current.flatpak_commit != null)"));
     // the probe needs Plasma5Support: only through a Loader, so the tray works without it
     let main = read(&format!("{ui}/main.qml"));
     assert!(main.contains("source: \"FlatpakProbe.qml\"") && !main.contains("plasma5support"));

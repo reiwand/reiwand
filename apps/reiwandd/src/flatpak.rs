@@ -33,6 +33,12 @@ pub fn app_id() -> Option<String> {
     std::env::var("FLATPAK_ID").ok().filter(|id| !id.is_empty())
 }
 
+/// The commit of the Flatpak deployment this process runs from (`app-commit` in `/.flatpak-info`).
+pub fn commit() -> Option<String> {
+    let info = app_id().and_then(|_| std::fs::read_to_string("/.flatpak-info").ok())?;
+    info.lines().find_map(|line| line.strip_prefix("app-commit=")).map(str::to_owned)
+}
+
 pub fn host_path(path: &Path) -> PathBuf {
     let info = app_id().and_then(|_| std::fs::read_to_string("/.flatpak-info").ok()).unwrap_or_default();
     let app = info.lines().find_map(|line| line.strip_prefix("app-path="));

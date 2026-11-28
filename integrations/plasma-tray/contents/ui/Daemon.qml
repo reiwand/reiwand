@@ -25,7 +25,7 @@ QtObject {
     // service and this tray both run the old one, so only this tells a newer one is ready.
     property string installed: ""
     property var probe: null
-    readonly property bool flatpakNewer: Flatpak.newer(installed, current.version)
+    readonly property bool flatpakNewer: Flatpak.newer(installed, current.version, current.flatpak_commit != null)
     readonly property string lastError: actionError || pollError
     readonly property var signatures: ({
             "Daemon1.SetWallpaper": "(sss)",

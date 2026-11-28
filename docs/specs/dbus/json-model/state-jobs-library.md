@@ -14,6 +14,7 @@ struct State {
     outputs: BTreeMap<String, OutputState>, previews: BTreeMap<String, PreviewState>, calibrating: bool, compute: bool,
     adapters: Vec<GpuAdapter>, gpu_warning: Option<String>, gpu_note: Option<String>, gpu_restart: bool,
     qualities: BTreeMap<String, String>, hdrs: BTreeMap<String, String>, layer_shell: LayerShellState,
+    flatpak_commit: Option<String>, // the Flatpak deployment it runs from; null outside a Flatpak
 }
 struct LayerShellState { namespace: Option<String>, from: String, restart: bool, ignored: Option<String> }
 struct GpuAdapter { name: String, kind: String, backend: String, used: bool, bus: String, compositor: bool }

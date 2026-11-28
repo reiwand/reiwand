@@ -23,11 +23,37 @@ function bare(version) {
     return String(version ?? "").split("+")[0];
 }
 
-// A newer Flatpak is installed while the service still runs another version (a build of one's own,
-// "-local", is never compared).
-function newer(installedVersion, running) {
-    const [mine, now] = [bare(installedVersion), bare(running)];
-    return mine !== "" && now !== "" && !now.endsWith("-local") && mine !== now;
+// Semantic version order (build metadata ignored): below 0, 0 or above 0; null when either is not a
+// version.
+function compare(a, b) {
+    const parse = v => /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/.exec(bare(v));
+    const [x, y] = [parse(a), parse(b)];
+    if (!x || !y)
+        return null;
+    for (let i = 1; i <= 3; i++) {
+        if (Number(x[i]) !== Number(y[i]))
+            return Number(x[i]) - Number(y[i]);
+    }
+    if (!x[4] || !y[4])
+        return (x[4] ? -1 : 0) + (y[4] ? 1 : 0);
+    const [p, q] = [x[4].split("."), y[4].split(".")];
+    for (let i = 0; i < Math.min(p.length, q.length); i++) {
+        const [m, n] = [/^\d+$/.test(p[i]), /^\d+$/.test(q[i])];
+        if (p[i] === q[i])
+            continue;
+        if (m && n)
+            return Number(p[i]) - Number(q[i]);
+        return m ? -1 : n ? 1 : (p[i] < q[i] ? -1 : 1);
+    }
+    return p.length - q.length;
+}
+
+// A newer Flatpak than the one the service runs from is installed. Only when the service runs in
+// the Flatpak (`flatpak`): another installation of Reiwand is not the Flatpak's to restart. A build
+// of one's own ("-local") is never compared.
+function newer(installedVersion, running, flatpak) {
+    const now = bare(running);
+    return flatpak === true && !now.endsWith("-local") && (compare(installedVersion, running) ?? 0) > 0;
 }
 
 // The processes of the old service: only reiwandd, since `flatpak kill` would also end the app and
