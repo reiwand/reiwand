@@ -37,3 +37,33 @@ fn previews_stay_in_memory_but_never_reach_the_saved_settings() {
     let saved = reiwand_core::Config::load(&path).unwrap();
     assert_eq!(saved.outputs.keys().collect::<Vec<_>>(), ["DP-1"]);
 }
+
+#[test]
+fn a_preview_that_leaves_an_effect_out_reports_it() {
+    let left = crate::compositor::OutputStatus {
+        left_out: vec!["the effect haze was left out: it is too slow for this graphics card".into()],
+        ..Default::default()
+    };
+    let status: std::collections::BTreeMap<_, _> = [("preview:7-0".to_owned(), left)].into();
+    let shown = super::previews(&status, |_| false);
+    assert_eq!(
+        shown.get("preview:7-0").map(|s| &s.left_out[..]),
+        Some(&["the effect haze was left out: it is too slow for this graphics card".to_owned()][..])
+    );
+}
+
+#[test]
+fn a_draft_reads_the_effects_of_its_folder() {
+    let dir =
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../docs/authoring/examples/own-effect");
+    let read = |name: &str| -> serde_json::Value {
+        serde_json::from_slice(&std::fs::read(dir.join(name)).unwrap()).unwrap()
+    };
+    let doc = serde_json::json!({ "manifest": read("manifest.json"), "scene": read("scene.json") });
+    let manifest = serde_json::from_value(doc["manifest"].clone()).unwrap();
+    let scene = super::pack::draft_scene(&dir.canonicalize().unwrap(), &doc, &manifest).unwrap();
+    assert!(
+        scene.shader("duotone").is_some() && scene.shader("haze").is_some(),
+        "the own effects are not read"
+    );
+}

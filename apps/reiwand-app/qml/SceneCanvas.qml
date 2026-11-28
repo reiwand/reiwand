@@ -186,4 +186,9 @@ ColumnLayout {
             }
         }
     }
+
+    SceneLeftOut {
+        Layout.fillWidth: true
+        page: canvas.page
+    }
 }
