@@ -350,9 +350,9 @@ jobs:
     name: Android APK
     needs: [version, android-native]
     if: needs.version.outputs.android == 'true'
-    # The signing key lives in the environment android-signing, which only master may use; other
-    # branches, pull requests and copies run without an environment and never see the key.
-    environment: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/master' && github.repository_owner == 'reiwand') && 'android-signing' || '' }}
+    # The signing keys live in the environment release, which only master may use; other
+    # branches, pull requests and copies run without an environment and never see them.
+    environment: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/master' && github.repository_owner == 'reiwand') && 'release' || '' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -573,6 +573,7 @@ jobs:
     name: Release
     if: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && github.event_name == 'push' && github.ref == 'refs/heads/master' }}
     needs: [version, build, qt, build-qt, package, android-native, android, rpm, server]
+    environment: ${{ (github.ref == 'refs/heads/master' && github.repository_owner == 'reiwand') && 'release' || '' }}
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -672,6 +673,7 @@ jobs:
     name: Flatpak repository on Pages
     needs: [version, release, flatpak]
     if: ${{ !cancelled() && needs.release.outputs.tag != '' && needs.flatpak.result == 'success' && github.repository_owner == 'reiwand' }}
+    environment: ${{ (github.ref == 'refs/heads/master' && github.repository_owner == 'reiwand') && 'release' || '' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     concurrency:
@@ -721,6 +723,7 @@ jobs:
     name: Sign and publish the version
     needs: [version, release, flatpak, flatpak-repo]
     if: ${{ !cancelled() && needs.release.outputs.tag != '' }}
+    environment: ${{ (github.ref == 'refs/heads/master' && github.repository_owner == 'reiwand') && 'release' || '' }}
     runs-on: ubuntu-24.04
     permissions:
       contents: write
