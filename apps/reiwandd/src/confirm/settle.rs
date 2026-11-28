@@ -7,6 +7,12 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Instant;
 
+/// Whether the question goes quiet for a while: after anything but an allow. A question the desktop
+/// refused to show (too many notifications at once) waits too, instead of being asked again at once.
+fn rests(answer: &zbus::Result<Option<bool>>) -> bool {
+    !matches!(answer, Ok(Some(true)))
+}
+
 pub(super) async fn ask_group(
     bus: zbus::Connection,
     hub: Arc<Hub>,
@@ -16,7 +22,7 @@ pub(super) async fn ask_group(
 ) {
     let answer = ask(&bus, crate::words::request_group(&title, &group)).await;
     let answer = answer.inspect_err(|e| tracing::warn!("cannot ask the user: {e}"));
-    let quiet = matches!(answer, Ok(None | Some(false)));
+    let quiet = rests(&answer);
     if let Ok(Some(allowed)) = answer {
         let (hub, path, scene, key, group) =
             (hub.clone(), path.clone(), scene.clone(), key.clone(), group.clone());
@@ -88,5 +94,20 @@ pub(crate) async fn decide(
         (false, _) => Err(lights()),
         (true, Some(quiet)) if !asking => Err(quiet),
         _ => Err(unconfirmed()),
+    }
+}
+
+#[cfg(test)]
+mod quiet {
+    use super::rests;
+
+    #[test]
+    fn only_an_allow_keeps_asking_and_a_refused_question_waits() {
+        assert!(!rests(&Ok(Some(true))));
+        assert!(rests(&Ok(Some(false))));
+        assert!(rests(&Ok(None)));
+        let refused =
+            zbus::Error::Failure("Created too many similar notifications in quick succession".into());
+        assert!(rests(&Err(refused)));
     }
 }
