@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
 const NEAR: u64 = RATE as u64 / 4;
+const ALIGNED: u64 = RATE as u64 / 25;
 const QUEUED: u32 = 8;
 const OPEN_WAIT: u64 = 5;
 
@@ -137,9 +138,7 @@ impl Feed {
             }
             let sample = self.sink.try_pull_sample(gst::ClockTime::ZERO)?;
             let buffer = sample.buffer()?;
-            let first = buffer
-                .pts()
-                .map_or(self.first + self.len(), |t| t.nseconds() * u64::from(RATE) / 1_000_000_000);
+            let first = self.place(buffer, end);
             if self.asked.is_some_and(|asked| first + NEAR < asked || first > asked + NEAR) {
                 continue;
             }
@@ -148,6 +147,21 @@ impl Feed {
             self.samples = map.as_chunks::<2>().0.iter().map(|b| i16::from_le_bytes(*b)).collect();
             (self.first, self.channels, self.asked) =
                 (first, channels.unwrap_or(1).clamp(1, 2) as usize, None);
+        }
+    }
+
+    /// Where a decoded buffer starts, in frames. Decoded sound is contiguous: a buffer starts where the
+    /// one before it ended, counted in frames. Its timestamp, which the decoder rounds to the
+    /// nanosecond, only places it after a seek, a discontinuity or when it is further away than an
+    /// audio sink would align (40 ms); placing every buffer by its timestamp leaves a frame out every
+    /// few buffers, a click.
+    fn place(&self, buffer: &gst::BufferRef, end: u64) -> u64 {
+        let stamped = buffer.pts().map(|t| t.nseconds() * u64::from(RATE) / 1_000_000_000);
+        let anew =
+            self.asked.is_some() || self.len() == 0 || buffer.flags().contains(gst::BufferFlags::DISCONT);
+        match stamped {
+            Some(at) if anew || at.abs_diff(end) > ALIGNED => at,
+            _ => end,
         }
     }
 

@@ -154,3 +154,39 @@ fn median(values: &[Duration]) -> Duration {
     sorted.sort();
     sorted[sorted.len() / 2]
 }
+
+fn ogg(dir: &Path) -> Option<PathBuf> {
+    use gstreamer::prelude::*;
+    gstreamer::init().ok()?;
+    let path = dir.join("tone.ogg");
+    let line = format!(
+        "audiotestsrc num-buffers=150 samplesperbuffer=1024 volume=0.5 ! audio/x-raw,rate=48000,channels=2 ! audioconvert ! vorbisenc ! oggmux ! filesink location={}",
+        path.display()
+    );
+    let pipeline = gstreamer::parse::launch(&line).ok()?;
+    pipeline.set_state(gstreamer::State::Playing).ok()?;
+    let bus = pipeline.bus()?;
+    bus.timed_pop_filtered(gstreamer::ClockTime::from_seconds(10), &[gstreamer::MessageType::Eos])?;
+    pipeline.set_state(gstreamer::State::Null).ok()?;
+    Some(path)
+}
+
+#[test]
+fn a_streamed_sound_plays_without_a_gap_between_its_buffers() {
+    let dir = tempfile::tempdir().unwrap();
+    let Some(file) = ogg(dir.path()) else { return required("no Vorbis encoder") };
+    let mut sound = Mix::new(&[track(&[3.0], true)]);
+    sound.load(0, 0, Source::Stream(Arc::new(Disk(file))));
+    sound.set(&[ON], 0.0);
+    assert!(wait(|| run(&mut sound, 480)[479][0] != 0), "the stream never played");
+    // Paced faster than real time, as the sound card asks, so the decoder keeps ahead.
+    let mut heard = Vec::new();
+    for _ in 0..100 {
+        heard.extend(run(&mut sound, 480));
+        std::thread::sleep(Duration::from_millis(5));
+    }
+    let bend =
+        heard.windows(3).map(|w| (i32::from(w[2][0]) - 2 * i32::from(w[1][0]) + i32::from(w[0][0])).abs());
+    let worst = bend.max().unwrap_or(0);
+    assert!(worst < 500, "a frame left out or doubled between two decoded buffers clicks: {worst}");
+}
