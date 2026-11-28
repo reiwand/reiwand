@@ -3,7 +3,7 @@ use pw::node::{Node, NodeChangeMask, NodeListener, NodeState};
 use pw::types::ObjectType;
 use std::cell::{Cell, RefCell};
 use std::collections::{BTreeSet, HashMap};
-use std::rc::{Rc, Weak};
+use std::rc::Rc;
 use std::sync::mpsc;
 use std::thread::JoinHandle;
 

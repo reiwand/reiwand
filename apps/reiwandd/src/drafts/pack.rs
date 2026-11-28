@@ -24,7 +24,7 @@ impl Daemon {
         manifest.check_properties().map_err(|e| invalid(e.to_string()))?;
         ensure!(manifest.kind == Kind::Scene, invalid("the manifest is not a scene manifest"));
         let dir = std::fs::canonicalize(dir).with_context(|| format!("cannot find {}", dir.display()))?;
-        let mut scene = draft_scene(&dir, &doc, &manifest)?;
+        let scene = draft_scene(&dir, &doc, &manifest)?;
         let facts = features::facts(&manifest, Some(&scene), None);
         features::playable(&manifest, &facts, Platform::Desktop).map_err(|e| invalid(e.to_string()))?;
         let file = |path: &str| in_folder(&dir, path);
