@@ -69,7 +69,9 @@ impl Slot {
         let opened = std::thread::Builder::new().name("reiwand-sound-feed".into()).spawn(move || {
             match Feed::start(&path, from) {
                 Ok(feed) => *lock(&filled) = Some(feed),
-                Err(e) => tracing::debug!(path = %path.display(), "cannot stream a sound: {e}"),
+                Err(e) => {
+                    tracing::warn!(path = %path.display(), "cannot stream a sound, it stays silent: {e}")
+                }
             }
         });
         opened.map(drop).unwrap_or_else(|e| tracing::warn!("cannot start streaming a sound: {e}"));
@@ -170,9 +172,14 @@ impl Feed {
         let pipeline = self.pipeline.downgrade();
         let sought = std::thread::Builder::new().name("reiwand-sound-seek".into()).spawn(move || {
             let flags = gst::SeekFlags::FLUSH | gst::SeekFlags::ACCURATE;
-            pipeline.upgrade().map(|p| p.seek_simple(flags, to_time(at)))
+            let sought = pipeline.upgrade().map(|p| p.seek_simple(flags, to_time(at)));
+            if let Some(Err(e)) = sought {
+                tracing::warn!(
+                    "cannot seek a streamed sound, it may stay silent until it is opened again: {e}"
+                );
+            }
         });
-        sought.map(drop).unwrap_or_else(|e| tracing::debug!("cannot seek a streamed sound: {e}"));
+        sought.map(drop).unwrap_or_else(|e| tracing::warn!("cannot seek a streamed sound: {e}"));
     }
 }
 
