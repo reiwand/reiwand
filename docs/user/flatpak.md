@@ -37,7 +37,9 @@ Flatpak cannot install the wallpaper plugin or the Plasma tray icon: the last co
 them with `kpackagetool6` from the files of the Flatpak itself and creates the folder where
 Flatpak mounts the shared edits, and leaves `~/.local/share/reiwand/edits/`, which Flatpak
 creates readable by everyone, for your user only (without `| sh` it only shows the commands). It
-has to be repeated after each update, and Plasma restarted. The plugin starts the daemon over
+has to be repeated after each update, and Plasma restarted: after a `flatpak update` (or an update in
+Discover) the tray says *A new version of Reiwand is installed* and *Restart Reiwand* does all of it
+at once (it copies the new plugin and tray, stops the old service and restarts Plasma). The plugin starts the daemon over
 D-Bus when it needs it; there is no systemd service. On ARM, install `./reiwand-aarch64.flatpak`.
 Do not install the Flatpak and the AppImage at the same time, because both register the same
 D-Bus services: run `reiwand --uninstall` first.

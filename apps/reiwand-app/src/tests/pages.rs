@@ -162,3 +162,30 @@ fn every_page_lines_its_content_up_with_its_title() {
         }
     }
 }
+
+#[test]
+fn after_a_flatpak_update_the_tray_offers_one_restart_that_refreshes_plasma() {
+    let ui = "../../integrations/plasma-tray/contents/ui";
+    let script = read(&format!("{ui}/flatpak.js"));
+    let manifest = read("../../packaging/flatpak/io.github.reiwand.Reiwand.yml");
+    assert!(
+        script.contains("const APP = \"io.github.reiwand.Reiwand\";")
+            && manifest.contains("io.github.reiwand.Reiwand")
+    );
+    for step in
+        ["systemd-run --user", "reiwand-plasma \" + APP + \" | sh", "kill $p", "restart plasma-plasmashell"]
+    {
+        assert!(script.contains(step), "the guided restart lacks {step}");
+    }
+    assert!(
+        !script.contains("flatpak kill \" + APP"),
+        "flatpak kill also ends the app and its unsaved edits"
+    );
+    // the probe needs Plasma5Support: only through a Loader, so the tray works without it
+    let main = read(&format!("{ui}/main.qml"));
+    assert!(main.contains("source: \"FlatpakProbe.qml\"") && !main.contains("plasma5support"));
+    let updated = read(&format!("{ui}/Updated.qml"));
+    assert!(
+        updated.contains("updated.daemon.probe.restart()") && updated.contains("daemon.stale || flatpak")
+    );
+}

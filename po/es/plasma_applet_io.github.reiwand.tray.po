@@ -827,3 +827,20 @@ msgstr "Reiniciar Plasma"
 #, kde-format
 msgid "Later"
 msgstr "Más tarde"
+
+msgid "Reiwand could not be restarted; log out and in again"
+msgstr "Reiwand no se pudo reiniciar; cierra la sesión y vuelve a entrar"
+
+msgid "A new version of Reiwand is installed"
+msgstr "Hay una versión nueva de Reiwand instalada"
+
+msgid ""
+"Reiwand %1 is installed, but %2 is still running. Restart it to use the new "
+"one: the wallpaper plugin and this tray are refreshed, and Plasma starts again."
+msgstr ""
+"Reiwand %1 está instalado, pero todavía corre la %2. Reinícialo para usar la "
+"nueva: se renuevan el complemento del fondo y esta bandeja, y Plasma vuelve a "
+"empezar."
+
+msgid "Restart Reiwand"
+msgstr "Reiniciar Reiwand"
