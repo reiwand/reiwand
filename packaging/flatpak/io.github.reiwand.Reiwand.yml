@@ -20,6 +20,7 @@ finish-args:
   - --socket=fallback-x11
   - --own-name=io.github.reiwand
   - --own-name=io.github.reiwand.Daemon
+  - --own-name=io.github.reiwand.Switcher
   - --talk-name=org.freedesktop.ScreenSaver
   - --talk-name=org.freedesktop.secrets
   - --talk-name=org.kde.KWin
