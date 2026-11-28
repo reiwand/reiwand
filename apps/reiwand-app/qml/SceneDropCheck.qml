@@ -41,7 +41,7 @@ QtObject {
             drop.spot = middle(target);
             if (drop.choice?.key !== target.key || !drop.zone)
                 fail(unit + " on the " + target.key + " target of " + group.panels + " painted no zone");
-            const [zone, next] = [drop.zone, drop.next];
+            const zone = drop.zone, next = drop.next;
             drop.settle(unit, next);
             checks.whole(layout, unit + " dropped on " + target.key + " of " + group.panels);
             const now = layout.groupOf(unit);

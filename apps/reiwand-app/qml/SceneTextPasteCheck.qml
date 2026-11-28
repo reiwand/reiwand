@@ -33,7 +33,8 @@ QtObject {
             clipboard.selectAll();
             clipboard.copy();
         };
-        let [input, text] = field();
+        let made = field();
+        let input = made[0], text = made[1];
         text.area.forceActiveFocus();
         if (!App.backend.claims(Qt.Key_V, Qt.ControlModifier))
             fail("the field does not take Ctrl+V before the window's shortcuts");
@@ -49,7 +50,9 @@ QtObject {
         if (text.area.wrapMode !== TextEdit.WrapAnywhere)
             fail("a megabyte with no space is not wrapped anywhere");
         input.destroy();
-        [input, text] = field();
+        made = field();
+        input = made[0];
+        text = made[1];
         copy("words wrap between them ".repeat(20));
         text.area.selectAll();
         text.paste();

@@ -75,7 +75,7 @@ Item {
     }
 
     function land() {
-        const [unit, next] = [carried, drop.next];
+        const unit = carried, next = drop.next;
         carried = "";
         if (next)
             Qt.callLater(settle, unit, next);

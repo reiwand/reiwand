@@ -78,7 +78,7 @@ SceneGrid {
             const cy = mid + (e.depth ?? 0) * u;
             const push = e.push ?? 0, deep = e.radius[2] > 0 ? push : 0;
             [1, e.inner ?? 0].filter((k, i) => !i || k > 0 || push <= 0).forEach((k, i) => {
-                const [w, h] = [(e.radius[0] * k + push) * u, (e.radius[2] * k + deep) * u];
+                const w = (e.radius[0] * k + push) * u, h = (e.radius[2] * k + deep) * u;
                 ctx.setLineDash(i ? [4, 4] : []);
                 ctx.beginPath();
                 ctx.ellipse(width / 2 - w, cy - h, 2 * w, 2 * h);

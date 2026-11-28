@@ -61,7 +61,7 @@ Item {
             if (e.kind === "sphere") {
                 const push = e.push ?? 0;
                 [1, e.inner].filter((k, i) => !i || k > 0 || push <= 0).forEach((k, i) => {
-                    const [w, h] = [(e.radius[0] * k + push) * e.scale, (e.radius[1] * k + push) * e.scale];
+                    const w = (e.radius[0] * k + push) * e.scale, h = (e.radius[1] * k + push) * e.scale;
                     ctx.setLineDash(i ? [4, 4] : []);
                     ctx.beginPath();
                     ctx.ellipse((e.center[0] - w) * r, (e.center[1] - h) * r, 2 * w * r, 2 * h * r);
