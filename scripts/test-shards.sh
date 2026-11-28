@@ -3,7 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 shards=(
   "reiwand-render reiwand-scene reiwand-core reiwand-ktx2 reiwand-depth reiwand-video reiwand-mix reiwand-audio reiwand-script reiwand-rgb reiwand-schedule reiwand-editor reiwand-type"
-  "reiwandd reiwand-ctl reiwand-web reiwand-pipewire reiwand-wayland"
+  "reiwandd reiwand-ctl reiwand-web reiwand-pipewire reiwand-wayland reiwand-plugin"
   "reiwand-app reiwand-palette reiwand-android reiwand-server reiwand-qr reiwand-account reiwand-sync reiwand-carry reiwand-library reiwand-format reiwand-providers reiwand-client reiwand-fill"
 )
 case ${1:?usage: $0 <shard number>|check} in
