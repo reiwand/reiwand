@@ -14,7 +14,12 @@ system tray and the desktop integration offer a subset.
 The daemon is D-Bus activatable (`packaging/dbus`) and runs as the systemd user unit
 `reiwandd.service`. In the Flatpak (`packaging/flatpak`) it owns the name through `--own-name`, so
 Flatpak exports the same activation file, starts the daemon with `flatpak run` and drops
-`SystemdService`; there is no systemd unit there. The name is owned without allowing
+`SystemdService`; there is no systemd unit there. Inside the Flatpak the daemon asks the Background
+portal (`org.freedesktop.portal.Background.RequestBackground`, reason "Draws the desktop wallpaper",
+no autostart) to run with no window, and sets its status line with `SetStatus` ("Renders your
+wallpapers", translated, at most 96 characters; an older portal without it is only logged): the
+desktop shows that line for the service in its list of background apps. Outside the Flatpak it does
+neither. The name is owned without allowing
 replacement. A second daemon checks the name before initializing the GPU and PipeWire and exits
 at once with an error saying that another reiwandd owns it.
 

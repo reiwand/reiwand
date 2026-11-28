@@ -112,10 +112,11 @@ estimate. It is best to connect adb over Wi-Fi so that the cable does not charge
 the measurement.
 
 The CI signs the APK with the first key of a PKCS12 keystore stored in base64 in the secret
-`ANDROID_KEYSTORE`, with its password in `ANDROID_KEYSTORE_PASSWORD`. Both are secrets of the
-environment `android-signing` (Settings, Environments), whose deployment branches are limited to
-`master`, and not secrets of the repository: only the `Android APK` job of a push to `master` of the
-main repository runs in that environment and passes them to its signing step, and GitHub refuses the
+`ANDROID_KEYSTORE`, with its password in `ANDROID_KEYSTORE_PASSWORD`. Both, with the Flatpak
+signing key `FLATPAK_GPG_PRIVATE_KEY`, are secrets of the environment `release` (Settings,
+Environments), whose deployment branches are limited to `master`, and not secrets of the repository
+or the organization: only the jobs that sign (`Android APK`, `Release`, the Flatpak repository and
+the Flatpak release) of `master` of the main repository run in that environment, and GitHub refuses the
 environment to a run of any other branch, even one whose workflow was changed to ask for it. Pull
 requests and other branches build with a temporary key and say so; on `master` of the main
 repository (what gets published) the job fails without the key. The keystore is removed from the

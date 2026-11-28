@@ -109,6 +109,7 @@ gstreamer = { version = "0.25", features = ["v1_18"] }
 gstreamer-app = "0.25"
 gstreamer-video = { version = "0.25", features = ["v1_18"] }
 gstreamer-allocators = "0.25"
+gstreamer-controller = "0.25"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["float_roundtrip"] }
 serde_path_to_error = "0.1.20"

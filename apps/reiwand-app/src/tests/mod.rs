@@ -11,6 +11,7 @@ mod depth;
 mod details;
 mod editor;
 mod fake;
+mod flatpak;
 mod following;
 mod gone;
 mod grid;

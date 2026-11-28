@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Reiwand\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-27 00:00+0000\n"
+"POT-Creation-Date: 2026-11-28 00:00+0000\n"
 "PO-Revision-Date: 2026-10-22 00:00+0000\n"
 "Last-Translator: Reiwand contributors\n"
 "Language-Team: Reiwand contributors\n"
@@ -188,13 +188,13 @@ msgstr "Los demás ajustes: en Ajustes… o con reiwand-ctl"
 
 #: integrations/plasma-tray/contents/ui/Head.qml
 #, kde-format
-msgid "Resume"
-msgstr "Reanudar"
+msgid "Pause"
+msgstr "Pausar"
 
 #: integrations/plasma-tray/contents/ui/Head.qml
 #, kde-format
-msgid "Pause"
-msgstr "Pausar"
+msgid "Resume"
+msgstr "Reanudar"
 
 #: integrations/plasma-tray/contents/ui/Head.qml
 #, kde-format
@@ -804,8 +804,24 @@ msgstr "Reproduciendo"
 
 #: integrations/plasma-tray/contents/ui/Updated.qml
 #, kde-format
+msgid "A new version of Reiwand is installed"
+msgstr "Hay una versión nueva de Reiwand instalada"
+
+#: integrations/plasma-tray/contents/ui/Updated.qml
+#, kde-format
 msgid "Reiwand was updated"
 msgstr "Reiwand se actualizó"
+
+#: integrations/plasma-tray/contents/ui/Updated.qml
+#, kde-format
+msgid ""
+"Reiwand %1 is installed, but %2 is still running. Restart it to use the new "
+"one: the wallpaper plugin and this tray are refreshed, and Plasma starts "
+"again."
+msgstr ""
+"Reiwand %1 está instalado, pero todavía corre la %2. Reinícialo para usar la "
+"nueva: se renuevan el complemento del fondo y esta bandeja, y Plasma vuelve "
+"a empezar."
 
 #: integrations/plasma-tray/contents/ui/Updated.qml
 #, kde-format
@@ -820,6 +836,11 @@ msgstr ""
 
 #: integrations/plasma-tray/contents/ui/Updated.qml
 #, kde-format
+msgid "Restart Reiwand"
+msgstr "Reiniciar Reiwand"
+
+#: integrations/plasma-tray/contents/ui/Updated.qml
+#, kde-format
 msgid "Restart Plasma"
 msgstr "Reiniciar Plasma"
 
@@ -827,3 +848,8 @@ msgstr "Reiniciar Plasma"
 #, kde-format
 msgid "Later"
 msgstr "Más tarde"
+
+#: integrations/plasma-tray/contents/ui/main.qml
+#, kde-format
+msgid "Reiwand could not be restarted; log out and in again"
+msgstr "Reiwand no se pudo reiniciar; cierra la sesión y vuelve a entrar"

@@ -45,6 +45,10 @@ model! {
         pub transitions: BTreeMap<String, String>,
         pub layer_shell: LayerShellState,
         pub plasma: bool,
+        /// The deployment of the Flatpak this daemon runs from, null outside one: how the tray knows an
+        /// installed Flatpak concerns the running service.
+        #[serde(deserialize_with = "crate::explicit::null")]
+        pub flatpak_commit: Option<String>,
     }
 
     pub struct OutputState {

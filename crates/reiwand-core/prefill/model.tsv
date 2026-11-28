@@ -125,6 +125,7 @@ State.battery_percent	value	null
 State.profile	value	null
 State.gpu_warning	value	null
 State.gpu_note	value	null
+State.flatpak_commit	value	null
 OutputState.image	value	null
 OutputState.still_reason	value	null
 OutputState.error	value	null

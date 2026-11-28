@@ -26,11 +26,13 @@ pub(crate) fn previews(
     drafted: impl Fn(&str) -> bool,
 ) -> std::collections::BTreeMap<String, reiwand_core::model::PreviewState> {
     let shown = status.iter().filter(|(name, s)| {
-        (virtual_output(name) || drafted(name)) && (s.error.is_some() || !s.console.is_empty())
+        (virtual_output(name) || drafted(name))
+            && (s.error.is_some() || !s.console.is_empty() || !s.left_out.is_empty())
     });
     let state = |s: &crate::compositor::OutputStatus| reiwand_core::model::PreviewState {
         error: s.error.clone(),
         console: s.console.clone(),
+        left_out: s.left_out.clone(),
     };
     shown.map(|(name, s)| (name.clone(), state(s))).collect()
 }

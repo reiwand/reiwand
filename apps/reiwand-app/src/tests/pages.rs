@@ -34,6 +34,11 @@ fn pages_match_the_window_the_launcher_and_the_tray() {
     assert!(read("qml/Main.qml").contains(&format!("names: [{names}]")));
     let desktop = read("../../packaging/desktop/io.github.reiwand.desktop");
     assert!(desktop.contains("Actions=settings;\n\n[Desktop Action settings]\n"));
+    assert!(desktop.contains("\nName=Reiwand\n"));
+    assert!(
+        read("../../packaging/flatpak/io.github.reiwand.Reiwand.metainfo.xml")
+            .contains("<name>Reiwand</name>")
+    );
     assert!(desktop.contains("\nExec=@BINDIR@/reiwand-app --page settings\n"));
     assert!(read("../../integrations/plasma-tray/contents/ui/Foot.qml").contains("openApp(\"settings\")"));
     assert_eq!([page(Some("settings")), page(Some("Settings")), page(None)], [Some("settings"), None, None]);

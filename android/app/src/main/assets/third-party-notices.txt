@@ -172,6 +172,8 @@ Packages
   gstreamer-app-sys 0.25.4
   gstreamer-base 0.25.4
   gstreamer-base-sys 0.25.4
+  gstreamer-controller 0.25.2
+  gstreamer-controller-sys 0.25.4
   gstreamer-sys 0.25.4
   gstreamer-video 0.25.4
   gstreamer-video-sys 0.25.4
@@ -692,6 +694,14 @@ Used by:
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
+  num_enum 0.7.6
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+  num_enum_derive 0.7.6
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
   owned_ttf_parser 0.25.1
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -716,6 +726,10 @@ Used by:
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
+  portable-atomic-util 0.2.8
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
   prettyplease 0.2.37
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -725,6 +739,10 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
   quote 1.0.47
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+  range-alloc 0.1.5
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
@@ -856,11 +874,23 @@ Used by:
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
+  wasm-streams 0.5.0
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
   wgpu 30.0.1
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
   wgpu-core 30.0.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+  wgpu-core-deps-apple 30.0.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+  wgpu-core-deps-emscripten 30.0.1
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
@@ -1058,6 +1088,11 @@ Apache License
 ========================================================================
 Used by:
   adler2 2.0.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
+  proc-macro-crate 3.5.0
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
@@ -1342,6 +1377,10 @@ Used by:
       Copyright (c) 2022-2026 The RustCrypto Project Developers
   const-oid 0.10.2
       Copyright (c) 2020-2026 The RustCrypto Project Developers
+  core-foundation 0.10.1
+      Copyright (c) 2012-2013 Mozilla Foundation
+  core-foundation-sys 0.8.7
+      Copyright (c) 2012-2013 Mozilla Foundation
   cpufeatures 0.2.17
       Copyright (c) 2020-2025 The RustCrypto Project Developers
   cpufeatures 0.3.1
@@ -1425,7 +1464,7 @@ Used by:
       Copyright (c) 2018-2024 The rust-random Project Developers
       Copyright (c) 2014 The Rust Project Developers
   getrandom 0.3.4
-      Copyright (c) 2018-2024 The rust-random Project Developers
+      Copyright (c) 2018-2025 The rust-random Project Developers
       Copyright (c) 2014 The Rust Project Developers
   getrandom 0.4.3
       Copyright (c) 2018-2026 The rust-random Project Developers
@@ -1447,6 +1486,8 @@ Used by:
   gstreamer-app-sys 0.25.4
   gstreamer-base 0.25.4
   gstreamer-base-sys 0.25.4
+  gstreamer-controller 0.25.2
+  gstreamer-controller-sys 0.25.4
   gstreamer-sys 0.25.4
   gstreamer-video 0.25.4
   gstreamer-video-sys 0.25.4
@@ -1460,6 +1501,7 @@ Used by:
       Copyright (c) 2016 Amanieu d'Antras
   heck 0.5.0
       Copyright (c) 2015 The Rust Project Developers
+  hermit-abi 0.5.3
   hmac 0.12.1
       Copyright (c) 2017 Artyom Pavlov
   http 1.5.0
@@ -1481,6 +1523,8 @@ Used by:
   hyper-util 0.1.21
       Copyright (c) 2023-2025 Sean McArthur
   iana-time-zone 0.1.65
+      Copyright (c) 2020 Andrew D. Straw
+  iana-time-zone-haiku 0.1.2
       Copyright (c) 2020 Andrew D. Straw
   idna 1.1.0
       Copyright (c) 2013-2025 The rust-url developers
@@ -1505,7 +1549,13 @@ Used by:
   itertools 0.15.0
       Copyright (c) 2015
   itoa 1.0.18
+  jni-sys 0.3.1
+      Copyright (c) 2015 The rust-jni-sys Developers
+  jni-sys 0.4.1
+      Copyright (c) 2015 The rust-jni-sys Developers
   jobserver 0.1.35
+      Copyright (c) 2014 Alex Crichton
+  js-sys 0.3.106
       Copyright (c) 2014 Alex Crichton
   khronos-egl 6.0.0
   kstring 2.0.5
@@ -1513,6 +1563,8 @@ Used by:
   lazy_static 1.5.1
   libc 0.2.191
       Copyright (c) The Rust Project Developers
+  libfuzzer-sys 0.4.13
+      Copyright (c) 2010 The Rust Project Developers
   libsqlite3-sys 0.38.2
       Copyright (c) 2014 The rusqlite developers
   linux-raw-sys 0.12.1
@@ -1556,6 +1608,8 @@ Used by:
       Copyright (c) 2014 The Rust Project Developers
   num_cpus 1.17.0
       Copyright (c) 2015-2025 Sean McArthur
+  num_enum 0.7.6
+  num_enum_derive 0.7.6
   oid-registry 0.8.1
       Copyright (c) 2017 Pierre Chifflier
   once_cell 1.21.4
@@ -1590,13 +1644,17 @@ Used by:
   poly1305 0.9.1
       Copyright (c) 2015-2026 The RustCrypto Project Developers
   portable-atomic 1.15.0
+  portable-atomic-util 0.2.8
   powerfmt 0.2.1
       Copyright (c) 2023 Jacob Pratt et al.
+  ppv-lite86 0.2.21
+      Copyright (c) 2019 The CryptoCorrosion Contributors
   presser 0.3.1
       Copyright (c) 2019 Embark Studios
   prettyplease 0.2.37
   primal-check 0.3.4
       Copyright (c) 2014 Huon Wilson
+  proc-macro-crate 3.5.0
   proc-macro2 1.0.107
   quick-error 2.0.1
       Copyright (c) 2015 The quick-error Developers
@@ -1616,6 +1674,9 @@ Used by:
   rand 0.9.5
       Copyright 2018 Developers of the Rand project
       Copyright (c) 2014 The Rust Project Developers
+  rand_chacha 0.9.0
+      Copyright 2018 Developers of the Rand project
+      Copyright (c) 2014 The Rust Project Developers
   rand_core 0.10.1
       Copyright (c) 2018-2026 The Rand Project Developers
   rand_core 0.6.4
@@ -1627,6 +1688,7 @@ Used by:
   rand_pcg 0.10.2
       Copyright (c) 2014-2017 Melissa O'Neill and PCG Project contributors
       Copyright 2018 Developers of the Rand project
+  raw-window-metal 1.1.0
   rawpointer 0.2.1
       Copyright (c) 2015
   rayon 1.12.0
@@ -1668,6 +1730,8 @@ Used by:
   rustversion 1.0.23
   salsa20 0.10.2
       Copyright (c) 2019 Eric McCorkle
+  schannel 0.1.30
+      Copyright (c) 2015 steffengy
   scoped-tls 1.0.1
       Copyright (c) 2014 Alex Crichton
   scopeguard 1.2.0
@@ -1701,6 +1765,7 @@ Used by:
       Copyright (c) 2006-2009 Graydon Hoare
   signal-hook-registry 1.4.8
       Copyright (c) 2017 tokio-jsonrpc developers
+  simd_cesu8 1.2.0
   siphasher 1.0.4
   slab 0.4.12
       Copyright (c) 2019 Carl Lerche
@@ -1791,7 +1856,11 @@ Used by:
       Copyright (c) 2017 Tim Visée
   want 0.3.2
       Copyright (c) 2018-2019 Sean McArthur
+  wasi 0.11.1+wasi-snapshot-preview1
+  wasip2 1.0.4+wasi-0.2.12
   wasm-bindgen 0.2.129
+      Copyright (c) 2014 Alex Crichton
+  wasm-bindgen-futures 0.4.79
       Copyright (c) 2014 Alex Crichton
   wasm-bindgen-macro 0.2.129
       Copyright (c) 2014 Alex Crichton
@@ -1799,10 +1868,14 @@ Used by:
       Copyright (c) 2014 Alex Crichton
   wasm-bindgen-shared 0.2.129
       Copyright (c) 2014 Alex Crichton
+  wasm-streams 0.5.0
   wayland-sys 0.31.11
       Copyright (c) 2015 Elinor Berger
+  web-sys 0.3.106
+      Copyright (c) 2014 Alex Crichton
   winnow 1.0.4
   wiremock 0.6.5
+  wit-bindgen 0.57.1
   x509-parser 0.18.1
       Copyright (c) 2017 Pierre Chifflier
   yasna 0.6.0
@@ -1865,6 +1938,11 @@ Used by:
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
   aligned 0.4.3
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
+  arbitrary 1.5.0
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
@@ -1935,6 +2013,7 @@ Used by:
       Copyright 2019-2026 Binomial LLC (original C++ transcoder)
       Copyright 2026 Marco Gomez (pure-Rust port)
   basisu_c_sys 0.9.1
+  basisu_wasm_libcxx 0.1.0
   better_scoped_tls 2.0.0
       Copyright 강동윤 <kdy1997.dev@gmail.com>
   bit-set 0.10.0
@@ -2049,6 +2128,16 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  core-foundation 0.10.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
+  core-foundation-sys 0.8.7
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
   cpufeatures 0.2.17
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -2114,6 +2203,9 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  dispatch2 0.3.1
+      Copyright Mads Marquart <mads@marquart.dk>
+      Copyright Mary <mary@mary.zone>
   displaydoc 0.2.7
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -2230,6 +2322,10 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  gl_generator 0.14.0
+      Copyright Brendan Zabarauskas <bjzaba@yahoo.com.au>
+      Copyright Corey Richardson
+      Copyright Arseny Kapoulkine
   glob 0.3.4
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -2265,6 +2361,11 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  gstreamer-controller 0.25.2
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
   gstreamer-video 0.25.4
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -2291,6 +2392,11 @@ Used by:
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
   heck 0.5.0
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
+  hermit-abi 0.5.3
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
@@ -2331,6 +2437,11 @@ Used by:
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
   iana-time-zone 0.1.65
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright 2020 Andrew Straw
+  iana-time-zone-haiku 0.1.2
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
@@ -2390,6 +2501,11 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  jni 0.22.4
+      Copyright jni team
+  jni-macros 0.22.4
+  jni-sys-macros 0.4.1
+      Copyright Robert Bragg <robert@sixbynine.org>
   jobserver 0.1.35
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -2400,12 +2516,27 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  js-sys 0.3.106
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
   khronos-egl 6.0.0
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  khronos_api 3.1.0
+      Copyright Brendan Zabarauskas <bjzaba@yahoo.com.au>
+      Copyright Corey Richardson
+      Copyright Arseny Kapoulkine
+      Copyright Pierre Krieger <pierre.krieger1708@gmail.com>
   lazy_static 1.5.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
+  libfuzzer-sys 0.4.13
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
@@ -2460,6 +2591,10 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  ndk 0.9.0
+      Copyright The Rust Mobile contributors
+  ndk-sys 0.6.0+11769913
+      Copyright The Rust Windowing contributors
   num-bigint 0.4.8
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -2495,6 +2630,11 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  objc2-core-foundation 0.3.2
+  objc2-core-graphics 0.3.2
+  objc2-io-surface 0.3.2
+  objc2-metal 0.3.2
+  objc2-quartz-core 0.3.2
   oid-registry 0.8.1
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -2582,6 +2722,11 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright 2023 Jacob Pratt et al.
+  ppv-lite86 0.2.21
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright 2019 The CryptoCorrosion Contributors
   presser 0.3.1
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -2612,6 +2757,13 @@ Used by:
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
   quinn-udp 0.5.16
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
+  r-efi 5.3.0
+  r-efi 6.0.0
+  raw-window-metal 1.1.0
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
@@ -2716,6 +2868,7 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  rustls-platform-verifier-android 0.2.0
   salsa20 0.10.2
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -2736,6 +2889,16 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  security-framework 3.7.0
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
+  security-framework-sys 2.17.0
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
   sha1 0.10.7
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -2752,6 +2915,11 @@ Used by:
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
   signal-hook-registry 1.4.8
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
+  simd_cesu8 1.2.0
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
@@ -2913,7 +3081,22 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  wasi 0.11.1+wasi-snapshot-preview1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
+  wasip2 1.0.4+wasi-0.2.12
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
   wasm-bindgen 0.2.129
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
+  wasm-bindgen-futures 0.4.79
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
@@ -2933,12 +3116,137 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  web-sys 0.3.106
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
+  web-time 1.1.0
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright 2023 dAxpeDDa
   weezl 0.1.12
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  windows 0.62.2
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows-collections 0.3.2
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows-core 0.62.2
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows-future 0.3.2
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows-implement 0.60.2
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows-interface 0.59.3
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows-link 0.2.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows-numerics 0.3.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows-result 0.4.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows-strings 0.5.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows-sys 0.52.0
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows-sys 0.61.2
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows-targets 0.52.6
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows-threading 0.2.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows_aarch64_gnullvm 0.52.6
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows_aarch64_msvc 0.52.6
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows_i686_gnu 0.52.6
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows_i686_gnullvm 0.52.6
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows_i686_msvc 0.52.6
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows_x86_64_gnu 0.52.6
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows_x86_64_gnullvm 0.52.6
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
+  windows_x86_64_msvc 0.52.6
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright (c) Microsoft Corporation.
   wiremock 0.6.5
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
+  wit-bindgen 0.57.1
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
@@ -3197,7 +3505,10 @@ limitations under the License.
 Used by:
   aho-corasick 1.1.5
   memchr 2.8.3
+  same-file 1.0.6
   termcolor 1.4.1
+  walkdir 2.5.0
+  winapi-util 0.1.11
 
 This project is dual-licensed under the Unlicense and MIT licenses.
 
@@ -3208,7 +3519,10 @@ Used by:
   aho-corasick 1.1.5
   byteorder-lite 0.1.0
   memchr 2.8.3
+  same-file 1.0.6
   termcolor 1.4.1
+  walkdir 2.5.0
+  winapi-util 0.1.11
 
 This is free and unencumbered software released into the public domain.
 
@@ -3249,12 +3563,16 @@ Used by:
       Copyright (c) 2015 Andrew Gallant
   color_quant 1.1.0
       Copyright (c) 2016 PistonDevelopers
+  combine 4.6.9
+      Copyright (c) 2015 Markus Westerlind
   crossbeam-deque 0.8.8
       Copyright (c) 2019 The Crossbeam Project Developers
   crossbeam-epoch 0.9.21
       Copyright (c) 2019 The Crossbeam Project Developers
   crossbeam-utils 0.8.23
       Copyright (c) 2019 The Crossbeam Project Developers
+  crunchy 0.2.4
+      Copyright 2017-2023 Eira Fransham.
   data-encoding 2.11.1
       Copyright (c) 2015-2020 Julien Cretin
       Copyright (c) 2017-2020 Google Inc.
@@ -3270,14 +3588,20 @@ Used by:
       Copyright (c) 2015 Austin Bonander
   muldiv 1.0.1
       Copyright (c) 2017 Sebastian Dröge <sebastian@centricular.com>.
+  nix 0.31.3
+      Copyright (c) 2015 Carl Lerche + nix-rust Authors
   pem 4.0.0
       Copyright (c) 2016 Jonathan Creekmore
   raw-cpuid 11.6.0
       Copyright (c) 2015 Gerd Zellweger
+  redox_users 0.5.3
+      Copyright (c) 2017 Jose Narvaez
   roxmltree 0.20.0
       Copyright (c) 2018 Yevhenii Reizner
   roxmltree 0.21.1
       Copyright (c) 2018 Yevhenii Reizner
+  same-file 1.0.6
+      Copyright (c) 2017 Andrew Gallant
   shlex 1.3.0
       Copyright (c) 2015 Nicholas Allegra (comex).
   shlex 2.0.1
@@ -3288,8 +3612,14 @@ Used by:
       Copyright (c) 2015 Andrew Gallant
   typenum 1.20.1
       Copyright (c) 2014 Paho Lurie-Gregg
+  walkdir 2.5.0
+      Copyright (c) 2015 Andrew Gallant
   weezl 0.1.12
       Copyright (c) HeroicKatora 2020
+  winapi-util 0.1.11
+      Copyright (c) 2017 Andrew Gallant
+  xml-rs 0.8.29
+      Copyright (c) 2014 Vladimir Matveev
   y4m 0.8.0
       Copyright (c) 2015-2019 PistonDevelopers
       Copyright (c) 2019 image-rs contributors
@@ -3321,6 +3651,8 @@ THE SOFTWARE.
 Used by:
   aligned-vec 0.6.4
       Copyright (c) 2022 sarah
+  arbitrary 1.5.0
+      Copyright (c) 2019 Manish Goregaokar
   arg_enum_proc_macro 0.3.4
       Copyright (c) 2018 Luca Barbato
   ascii 1.1.0
@@ -3334,8 +3666,11 @@ Used by:
       Copyright (c) 2019 Multimedia and Rust
   base64-simd 0.8.0
   basisu_c_sys 0.9.1
+  basisu_wasm_libcxx 0.1.0
   bitvec 1.1.1
       Copyright (c) 2018 myrrlyn (Alexander Payne)
+  block2 0.6.2
+      Copyright Mads Marquart <mads@marquart.dk>
   built 0.8.1
       Copyright (c) 2017-2023 Lukas Lueg
   castaway 0.2.4
@@ -3351,6 +3686,9 @@ Used by:
       Copyright (c) 2018 Sam Rijs, Alex Crichton and contributors
   ct-codecs 1.1.8
       Copyright (c) 2020-2026 Frank Denis
+  dispatch2 0.3.1
+      Copyright Mads Marquart <mads@marquart.dk>
+      Copyright Mary <mary@mary.zone>
   equator 0.4.2
       Copyright (c) 2023 sarah
   equator-macro 0.4.2
@@ -3365,8 +3703,17 @@ Used by:
   half 2.7.1
   image 0.25.10
   image-webp 0.2.4
+  interpolate_name 0.2.4
+      Copyright (c) 2018 Luca Barbato
+  jni 0.22.4
+      Copyright jni team
+  jni-macros 0.22.4
+  jni-sys-macros 0.4.1
+      Copyright Robert Bragg <robert@sixbynine.org>
   jpeg-decoder 0.3.2
       Copyright (c) 2016 The jpeg-decoder Developers
+  libredox 0.1.25
+      Copyright (c) 2023 4lDO2
   maybe-rayon 0.1.1
       Copyright (c) 2021 Joshua Holmer
   miniz_oxide 0.8.9
@@ -3383,8 +3730,22 @@ Used by:
       Copyright (c) 2025 The gfx-rs developers
   naga-types 30.0.1
       Copyright (c) 2025 The gfx-rs developers
+  ndk 0.9.0
+      Copyright The Rust Mobile contributors
+  ndk-sys 0.6.0+11769913
+      Copyright The Rust Windowing contributors
   noop_proc_macro 0.3.0
       Copyright (c) 2019 Luca Barbato
+  objc2 0.6.5
+      Copyright Mads Marquart <mads@marquart.dk>
+  objc2-core-foundation 0.3.2
+  objc2-core-graphics 0.3.2
+  objc2-encode 4.1.0
+      Copyright Mads Marquart <mads@marquart.dk>
+  objc2-foundation 0.3.2
+  objc2-io-surface 0.3.2
+  objc2-metal 0.3.2
+  objc2-quartz-core 0.3.2
   ort 2.0.0-rc.15
       Copyright (c) 2023-2026 pyke.io
       Copyright (c) 2020 Nicolas Bigaouette
@@ -3401,14 +3762,20 @@ Used by:
       Copyright (c) 2021 sarah
   pulp-wasm-simd-flag 0.1.1
       Copyright sarah quiñones <sarah@veganb.tw>
+  r-efi 5.3.0
+  r-efi 6.0.0
   radium 0.7.0
       Copyright (c) 2019 kneecaw (Nika Layzell)
+  range-alloc 0.1.5
+      Copyright (c) 2023 The gfx-rs developers
   raw-window-handle 0.6.2
       Copyright (c) 2019 Osspial
   realfft 3.5.0
       Copyright HEnquist <henrik.enquist@gmail.com>
   reborrow 0.5.5
       Copyright (c) 2022 sarah
+  redox_syscall 0.5.18
+      Copyright (c) 2017 Redox OS Developers
   rgb 0.8.53
       Copyright (c) 2019 Kornel
   rquickjs 0.14.0
@@ -3419,8 +3786,10 @@ Used by:
       Copyright K. <kayo@illumium.org>
   rquickjs-sys 0.14.0
       Copyright Mees Delzenne <mees.delzenne@gmail.com>
+  rsqlite-vfs 0.1.1
   rustls-platform-verifier 0.7.1
       Copyright (c) 2022 1Password
+  rustls-platform-verifier-android 0.2.0
   ruzstd 0.7.3
       Copyright (c) 2019 Moritz Borcherding
   safer-bytes 0.2.0
@@ -3433,6 +3802,8 @@ Used by:
   simd_helpers 0.1.0
       Copyright Luca Barbato <lu_zero@gentoo.org>
   simdutf8 0.1.5
+  sqlite-wasm-rs 0.5.5
+      Copyright (c) 2024 Spxg
   static_assertions 1.1.0
       Copyright (c) 2017 Nikolai Vazquez
   tap 1.0.1
@@ -3448,10 +3819,17 @@ Used by:
       Copyright (c) 2019 Manish Goregaokar
   ulid 3.0.0
       Copyright (c) 2017 Dylan Hart
+  valuable 0.1.1
   vsimd 0.8.0
+  web-time 1.1.0
+      Copyright (c) 2023 dAxpeDDa
   wgpu 30.0.1
       Copyright (c) 2025 The gfx-rs developers
   wgpu-core 30.0.1
+      Copyright (c) 2025 The gfx-rs developers
+  wgpu-core-deps-apple 30.0.1
+      Copyright (c) 2025 The gfx-rs developers
+  wgpu-core-deps-emscripten 30.0.1
       Copyright (c) 2025 The gfx-rs developers
   wgpu-core-deps-windows-linux-android 30.0.1
       Copyright (c) 2025 The gfx-rs developers
@@ -3515,6 +3893,79 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 ========================================================================
 Used by:
+  android_system_properties 0.1.6
+      Copyright 2016 Nicolas Silva
+  shlex 1.3.0
+      Copyright 2015 Nicholas Allegra (comex).
+  shlex 2.0.1
+      Copyright 2015 Nicholas Allegra (comex).
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+========================================================================
+Used by:
+  android_system_properties 0.1.6
+      Copyright (c) 2013 Nicolas Silva
+      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  deadpool 0.12.3
+      Copyright (c) 2019 Michael P. Jung
+      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  deadpool-runtime 0.1.4
+      Copyright (c) 2019 Michael P. Jung
+      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  phf 0.11.3
+      Copyright (c) 2014-2022 Steven Fackler, Yuki Okushi
+      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  phf_generator 0.11.3
+      Copyright (c) 2014-2022 Steven Fackler, Yuki Okushi
+      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  phf_macros 0.11.3
+      Copyright (c) 2014-2022 Steven Fackler, Yuki Okushi
+      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  phf_shared 0.11.3
+      Copyright (c) 2014-2022 Steven Fackler, Yuki Okushi
+      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  security-framework 3.7.0
+      Copyright (c) 2015 Steven Fackler
+      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  security-framework-sys 2.17.0
+      Copyright (c) 2015 Steven Fackler
+      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  version_check 0.9.5
+      Copyright (c) 2017-2018 Sergio Benitez
+      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+
+The MIT License (MIT)
+
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+========================================================================
+Used by:
   annotate-snippets 0.11.5
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -3560,11 +4011,26 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright {yyyy} {name of copyright owner}
+  glutin_wgl_sys 0.6.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright 2022 Kirill Chibisov
   ipnet 2.12.2
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright 2017 Juniper Networks, Inc.
+  jni-sys 0.3.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright {yyyy} {name of copyright owner}
+  jni-sys 0.4.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright {yyyy} {name of copyright owner}
   kstring 2.0.5
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -5313,49 +5779,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ========================================================================
 Used by:
-  deadpool 0.12.3
-      Copyright (c) 2019 Michael P. Jung
-      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-  deadpool-runtime 0.1.4
-      Copyright (c) 2019 Michael P. Jung
-      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-  phf 0.11.3
-      Copyright (c) 2014-2022 Steven Fackler, Yuki Okushi
-      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-  phf_generator 0.11.3
-      Copyright (c) 2014-2022 Steven Fackler, Yuki Okushi
-      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-  phf_macros 0.11.3
-      Copyright (c) 2014-2022 Steven Fackler, Yuki Okushi
-      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-  phf_shared 0.11.3
-      Copyright (c) 2014-2022 Steven Fackler, Yuki Okushi
-      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-  version_check 0.9.5
-      Copyright (c) 2017-2018 Sergio Benitez
-      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-
-The MIT License (MIT)
-
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-========================================================================
-Used by:
   dirs 7.0.0
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
@@ -6062,6 +6485,12 @@ Used by:
   gstreamer-base-sys 0.25.4
       Copyrights in the gstreamer-rs project are retained by their contributors. No
       copyright assignment is required to contribute to the gstreamer-rs project.
+  gstreamer-controller 0.25.2
+      Copyrights in the gstreamer-rs project are retained by their contributors. No
+      copyright assignment is required to contribute to the gstreamer-rs project.
+  gstreamer-controller-sys 0.25.4
+      Copyrights in the gstreamer-rs project are retained by their contributors. No
+      copyright assignment is required to contribute to the gstreamer-rs project.
   gstreamer-sys 0.25.4
       Copyrights in the gstreamer-rs project are retained by their contributors. No
       copyright assignment is required to contribute to the gstreamer-rs project.
@@ -6649,6 +7078,21 @@ Used by:
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
       Copyright [yyyy] [name of copyright owner]
+  wasi 0.11.1+wasi-snapshot-preview1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
+  wasip2 1.0.4+wasi-0.2.12
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
+  wit-bindgen 0.57.1
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
+      Copyright [yyyy] [name of copyright owner]
 
 Apache License
                            Version 2.0, January 2004
@@ -7053,6 +7497,40 @@ DEALINGS IN THE SOFTWARE.
 
 ========================================================================
 Used by:
+  num_enum 0.7.6
+      Copyright (c) 2018, Daniel Wagner-Hall
+  num_enum_derive 0.7.6
+      Copyright (c) 2018, Daniel Wagner-Hall
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of num_enum nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+========================================================================
+Used by:
   option-ext 0.2.0
       (c) under Patent Claims infringed by Covered Software in the absence of
 
@@ -7443,6 +7921,10 @@ Used by:
       copyright notice that is included in or attached to the work
       copyright license to reproduce, prepare Derivative Works of,
       (c) You must retain, in the Source form of any Derivative Works
+  rand_chacha 0.9.0
+      copyright notice that is included in or attached to the work
+      copyright license to reproduce, prepare Derivative Works of,
+      (c) You must retain, in the Source form of any Derivative Works
 
 Apache License
                         Version 2.0, January 2004
@@ -7627,6 +8109,9 @@ Used by:
       Copyrights in the Rand project are retained by their contributors. No
       copyright assignment is required to contribute to the Rand project.
   rand 0.9.5
+      Copyrights in the Rand project are retained by their contributors. No
+      copyright assignment is required to contribute to the Rand project.
+  rand_chacha 0.9.0
       Copyrights in the Rand project are retained by their contributors. No
       copyright assignment is required to contribute to the Rand project.
   rand_core 0.6.4
@@ -8493,25 +8978,6 @@ third-party/chromium/LICENSE.
 
 ========================================================================
 Used by:
-  shlex 1.3.0
-      Copyright 2015 Nicholas Allegra (comex).
-  shlex 2.0.1
-      Copyright 2015 Nicholas Allegra (comex).
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-========================================================================
-Used by:
   siphasher 1.0.4
       Copyright 2012-2016 The Rust Project Developers.
       Copyright 2016-2026 Frank Denis.
@@ -9115,6 +9581,74 @@ insights.
 
 ========================================================================
 Used by:
+  windows 0.62.2
+      Copyright (c) Microsoft Corporation.
+  windows-collections 0.3.2
+      Copyright (c) Microsoft Corporation.
+  windows-core 0.62.2
+      Copyright (c) Microsoft Corporation.
+  windows-future 0.3.2
+      Copyright (c) Microsoft Corporation.
+  windows-implement 0.60.2
+      Copyright (c) Microsoft Corporation.
+  windows-interface 0.59.3
+      Copyright (c) Microsoft Corporation.
+  windows-link 0.2.1
+      Copyright (c) Microsoft Corporation.
+  windows-numerics 0.3.1
+      Copyright (c) Microsoft Corporation.
+  windows-result 0.4.1
+      Copyright (c) Microsoft Corporation.
+  windows-strings 0.5.1
+      Copyright (c) Microsoft Corporation.
+  windows-sys 0.52.0
+      Copyright (c) Microsoft Corporation.
+  windows-sys 0.61.2
+      Copyright (c) Microsoft Corporation.
+  windows-targets 0.52.6
+      Copyright (c) Microsoft Corporation.
+  windows-threading 0.2.1
+      Copyright (c) Microsoft Corporation.
+  windows_aarch64_gnullvm 0.52.6
+      Copyright (c) Microsoft Corporation.
+  windows_aarch64_msvc 0.52.6
+      Copyright (c) Microsoft Corporation.
+  windows_i686_gnu 0.52.6
+      Copyright (c) Microsoft Corporation.
+  windows_i686_gnullvm 0.52.6
+      Copyright (c) Microsoft Corporation.
+  windows_i686_msvc 0.52.6
+      Copyright (c) Microsoft Corporation.
+  windows_x86_64_gnu 0.52.6
+      Copyright (c) Microsoft Corporation.
+  windows_x86_64_gnullvm 0.52.6
+      Copyright (c) Microsoft Corporation.
+  windows_x86_64_msvc 0.52.6
+      Copyright (c) Microsoft Corporation.
+
+MIT License
+
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+
+========================================================================
+Used by:
   zerocopy 0.8.63
       Copyright 2019 The Fuchsia Authors.
       copyright notice, this list of conditions and the following disclaimer
@@ -9173,95 +9707,6 @@ freely, subject to the following restrictions:
 ========================================================================
 Without a licence text: the crate is in no local registry, so neither its text nor its declared licence could be read (see each crate's own source):
   swc_sourcemap 10.0.4 (BSD-3-Clause)
-  android_system_properties 0.1.6
-  arbitrary 1.5.0
-  basisu_wasm_libcxx 0.1.0
-  block2 0.6.2
-  combine 4.6.9
-  core-foundation 0.10.1
-  core-foundation-sys 0.8.7
-  crunchy 0.2.4
-  dispatch2 0.3.1
-  gl_generator 0.14.0
-  glutin_wgl_sys 0.6.1
-  hermit-abi 0.5.3
-  iana-time-zone-haiku 0.1.2
-  interpolate_name 0.2.4
-  jni 0.22.4
-  jni-macros 0.22.4
-  jni-sys 0.3.1
-  jni-sys 0.4.1
-  jni-sys-macros 0.4.1
-  js-sys 0.3.106
-  khronos_api 3.1.0
-  libfuzzer-sys 0.4.13
-  libredox 0.1.25
-  ndk 0.9.0
-  ndk-sys 0.6.0+11769913
-  nix 0.31.3
-  num_enum 0.7.6
-  num_enum_derive 0.7.6
-  objc2 0.6.5
-  objc2-core-foundation 0.3.2
-  objc2-core-graphics 0.3.2
-  objc2-encode 4.1.0
-  objc2-foundation 0.3.2
-  objc2-io-surface 0.3.2
-  objc2-metal 0.3.2
-  objc2-quartz-core 0.3.2
-  portable-atomic-util 0.2.8
-  ppv-lite86 0.2.21
-  proc-macro-crate 3.5.0
-  r-efi 5.3.0
-  r-efi 6.0.0
-  rand_chacha 0.9.0
-  range-alloc 0.1.5
-  raw-window-metal 1.1.0
-  redox_syscall 0.5.18
-  redox_users 0.5.3
-  rsqlite-vfs 0.1.1
-  rustls-platform-verifier-android 0.2.0
-  same-file 1.0.6
-  schannel 0.1.30
-  security-framework 3.7.0
-  security-framework-sys 2.17.0
-  simd_cesu8 1.2.0
-  sqlite-wasm-rs 0.5.5
-  valuable 0.1.1
-  walkdir 2.5.0
-  wasi 0.11.1+wasi-snapshot-preview1
-  wasip2 1.0.4+wasi-0.2.12
-  wasm-bindgen-futures 0.4.79
-  wasm-streams 0.5.0
-  web-sys 0.3.106
-  web-time 1.1.0
-  wgpu-core-deps-apple 30.0.1
-  wgpu-core-deps-emscripten 30.0.1
-  winapi-util 0.1.11
-  windows 0.62.2
-  windows-collections 0.3.2
-  windows-core 0.62.2
-  windows-future 0.3.2
-  windows-implement 0.60.2
-  windows-interface 0.59.3
-  windows-link 0.2.1
-  windows-numerics 0.3.1
-  windows-result 0.4.1
-  windows-strings 0.5.1
-  windows-sys 0.52.0
-  windows-sys 0.61.2
-  windows-targets 0.52.6
-  windows-threading 0.2.1
-  windows_aarch64_gnullvm 0.52.6
-  windows_aarch64_msvc 0.52.6
-  windows_i686_gnu 0.52.6
-  windows_i686_gnullvm 0.52.6
-  windows_i686_msvc 0.52.6
-  windows_x86_64_gnu 0.52.6
-  windows_x86_64_gnullvm 0.52.6
-  windows_x86_64_msvc 0.52.6
-  wit-bindgen 0.57.1
-  xml-rs 0.8.29
 
 ========================================================================
 Android libraries (Apache License 2.0, text above):

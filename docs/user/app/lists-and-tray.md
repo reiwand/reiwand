@@ -72,3 +72,12 @@ service runs a newer version than the tray, the icon asks for attention and the 
 "Reiwand was updated", with "Restart Plasma" (which starts Plasma again with the new tray) and
 "Later" (which hides the notice until Plasma starts again). Logging out and in also loads the new
 tray.
+
+With the Flatpak, a `flatpak update` leaves the service running the old version too, so the tray
+also looks at the version installed (it runs `flatpak list` on the computer when it starts, when it
+opens and every 15 minutes). When a newer one is installed and the service runs from the
+Flatpak, the icon asks for attention and the panel says "A new version of Reiwand is installed",
+with "Restart Reiwand": it copies the new
+wallpaper plugin and tray into Plasma (`reiwand-plasma | sh`), stops the old service (only the
+service: an open app window and its edits stay) and restarts Plasma, which starts the new service.
+"Later" hides it as above. Without the Flatpak nothing of this runs.

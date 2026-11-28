@@ -1,5 +1,6 @@
 import QtQuick
 import org.kde.plasma.workspace.dbus as DBus
+import "flatpak.js" as Flatpak
 
 QtObject {
     id: daemon
@@ -20,6 +21,11 @@ QtObject {
         const mine = loaded.split("+")[0];
         return running !== "" && mine !== "" && !running.endsWith("-local") && running !== mine;
     }
+    // The Flatpak version installed on the host (empty without one): after `flatpak update` the
+    // service and this tray both run the old one, so only this tells a newer one is ready.
+    property string installed: ""
+    property var probe: null
+    readonly property bool flatpakNewer: Flatpak.newer(installed, current.version, current.flatpak_commit != null)
     readonly property string lastError: actionError || pollError
     readonly property var signatures: ({
             "Daemon1.SetWallpaper": "(sss)",

@@ -38,7 +38,7 @@ pub(crate) fn follow(daemon: &Arc<Daemon>) {
     };
     let (tx, rx) = watch::channel(false);
     let told = tx.clone();
-    match Others::watch(ours, move |playing| {
+    match Others::watch(ours, reiwand_video::stream_owner(), move |playing| {
         told.send_replace(playing);
     }) {
         Ok(others) => {

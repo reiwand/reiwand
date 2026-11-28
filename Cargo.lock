@@ -2093,6 +2093,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "gstreamer-controller"
+version = "0.25.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2d8c72be029c50abb50fed29e83105364b5cbcdb48c4fbf608826cd69d31458d"
+dependencies = [
+ "glib",
+ "gstreamer",
+ "gstreamer-controller-sys",
+]
+
+[[package]]
+name = "gstreamer-controller-sys"
+version = "0.25.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6d00dcc3d8d6055c10b691cf44790be166dc6a00f2b6f1dab677d75748b7ed25"
+dependencies = [
+ "glib-sys",
+ "gobject-sys",
+ "gstreamer-sys",
+ "libc",
+ "pkg-config",
+ "system-deps 9.0.0",
+]
+
+[[package]]
 name = "gstreamer-sys"
 version = "0.25.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4924,6 +4949,7 @@ dependencies = [
  "gstreamer",
  "gstreamer-allocators",
  "gstreamer-app",
+ "gstreamer-controller",
  "gstreamer-video",
  "reiwand-core",
  "reiwand-mix",

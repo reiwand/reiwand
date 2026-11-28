@@ -23,28 +23,11 @@ impl Daemon {
         ensure!(valid_id(&manifest.id), invalid("the manifest id is not a name like org.example.name"));
         manifest.check_properties().map_err(|e| invalid(e.to_string()))?;
         ensure!(manifest.kind == Kind::Scene, invalid("the manifest is not a scene manifest"));
-        let mut scene = Scene::load(&doc["scene"].to_string(), &manifest.properties)
-            .map_err(|e| invalid(e.to_string()))?;
-        scene.drafted();
+        let dir = std::fs::canonicalize(dir).with_context(|| format!("cannot find {}", dir.display()))?;
+        let scene = draft_scene(&dir, &doc, &manifest)?;
         let facts = features::facts(&manifest, Some(&scene), None);
         features::playable(&manifest, &facts, Platform::Desktop).map_err(|e| invalid(e.to_string()))?;
-        let dir = std::fs::canonicalize(dir).with_context(|| format!("cannot find {}", dir.display()))?;
-        let file = |path: &str| -> Result<PathBuf> {
-            check_path(path).map_err(|e| invalid(e.to_string()))?;
-            let found =
-                std::fs::canonicalize(dir.join(path)).map_err(|_| invalid(format!("{path} is missing")))?;
-            ensure!(
-                found.starts_with(&dir) && found.is_file(),
-                invalid(format!("{path} is not a file of the folder"))
-            );
-            Ok(found)
-        };
-        let read = |path: &str, max: usize| -> Result<Vec<u8>> {
-            let found = file(path)?;
-            ensure!(std::fs::metadata(&found)?.len() <= max as u64, invalid(format!("{path} is too large")));
-            Ok(std::fs::read(found)?)
-        };
-        scene.read_meshes(read).map_err(|e| invalid(e.to_string()))?;
+        let file = |path: &str| in_folder(&dir, path);
         let (mut assets, mut videos, mut sounds) = (SceneAssets::default(), Vec::new(), Vec::new());
         let (mut decoded, mut seconds, mut streamed, mut tables) = (0u64, 0f32, 0f32, 0u64);
         for (id, asset) in &scene.assets {
@@ -172,4 +155,31 @@ impl Daemon {
             wall_shift,
         })
     }
+}
+
+/// A file of the folder by its package path, never one outside it.
+fn in_folder(dir: &Path, path: &str) -> Result<PathBuf> {
+    check_path(path).map_err(|e| invalid(e.to_string()))?;
+    let found = std::fs::canonicalize(dir.join(path)).map_err(|_| invalid(format!("{path} is missing")))?;
+    ensure!(
+        found.starts_with(dir) && found.is_file(),
+        invalid(format!("{path} is not a file of the folder"))
+    );
+    Ok(found)
+}
+
+/// The scene of a draft with the package's own effects, transitions and models, read from the
+/// folder as an installed package reads them: without them the preview would leave out every
+/// imported effect and say nothing.
+pub(super) fn draft_scene(dir: &Path, doc: &Value, manifest: &Manifest) -> Result<Scene> {
+    let mut scene =
+        Scene::load(&doc["scene"].to_string(), &manifest.properties).map_err(|e| invalid(e.to_string()))?;
+    scene.drafted();
+    let read = |path: &str, max: usize| -> Result<Vec<u8>> {
+        let found = in_folder(dir, path)?;
+        ensure!(std::fs::metadata(&found)?.len() <= max as u64, invalid(format!("{path} is too large")));
+        Ok(std::fs::read(found)?)
+    };
+    scene.read_files(read).map_err(|e| invalid(e.to_string()))?;
+    Ok(scene)
 }

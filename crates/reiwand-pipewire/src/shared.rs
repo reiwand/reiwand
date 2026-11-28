@@ -14,6 +14,8 @@ pub struct Slot {
     frame: Mutex<Option<Arc<VideoFrame>>>,
     pub info: Mutex<Option<StreamInfo>>,
     pub streaming: AtomicBool,
+    /// The last state PipeWire gave the stream (Paused, Streaming…), for the logs.
+    pub state: Mutex<String>,
     pub dirty: AtomicBool,
     pub started: Mutex<Option<Instant>>,
     pub pool: Mutex<Pool>,

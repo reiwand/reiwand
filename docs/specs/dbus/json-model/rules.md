@@ -91,7 +91,8 @@ description of its own, `"sdr"`, or empty on streams), `max_cll` and `max_fall` 
 that description, `null` otherwise) and `reason`: `"auto"`, `"on"`, `"off"`, `"display"`
 (the screen, the desktop or the driver offers no HDR, with `auto` also when the desktop does not say the screen shows HDR, and always on streams), `"battery"` or
 `"quality"` (no scene with `canvas.hdr` and a tone map is shown, or it draws below `q3`). `previews` holds, only for the
-`preview:` outputs of the scene editor (which `outputs` leaves out) that have either, their `error` and the
-`console`: the last 50 lines their scripts wrote, as `<level> <module>: <text>`; other outputs have no
-console so that scripts that write often never wake the bus.
+`preview:` outputs of the scene editor (which `outputs` leaves out) that have any, their `error`, the
+`console`: the last 50 lines their scripts wrote, as `<level> <module>: <text>`, and `left_out`: the
+effects the preview leaves out, as `outputs[x].left_out` gives them; other outputs have no console so
+that scripts that write often never wake the bus.
 `transitions` maps every output that has its own `transition.kind.<output>`, connected or not, to that value. `transition` of an output tells: `choice` (the value in use there), `own` (its own `transition.kind.<output>` or `null`), `plays` (what played at the last change of wallpaper on it: `own`, `fade` or `none`) and `why`: `"own"` (the wallpaper's transition), `"chosen"` (the plain fade or the cut that was chosen, also a playlist with `transition_ms` `0`), `"reduced"` (less motion turned it into the plain fade), `"fallen"` (the wallpaper's transition could not be built or drawn, or was too costly for the quality, and the plain fade played), `"plain"` (neither wallpaper brings a transition) or `"cut"` (no change yet, or the screen could not fade). `reiwand-ctl config transition.kind` prints one line per output with its choice and why.

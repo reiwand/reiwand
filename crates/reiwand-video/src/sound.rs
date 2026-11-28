@@ -51,6 +51,12 @@ impl Soundtrack {
         playbin.set_property("mute", false);
         let piped = pipewire::sink(Some(LATENCY));
         piped.iter().for_each(|sink| playbin.set_property("audio-sink", sink));
+        // The sound pauses while its screen is covered. With GStreamer 1.26 the clock of the audio
+        // output runs on through a pause and then stands still for as long as it lasted, so after
+        // each cover the sound came back that much later; the system clock keeps time across pauses.
+        if let Some(pipeline) = playbin.downcast_ref::<gst::Pipeline>() {
+            pipeline.use_clock(Some(&gst::SystemClock::obtain()));
+        }
         let feed = mix.clone();
         playbin.connect("source-setup", false, move |args| {
             let source = args[1].get::<gst::Element>().ok()?.downcast::<AppSrc>().ok()?;
@@ -136,4 +142,13 @@ fn tighten(element: &gst::Element) {
         element.set_property("buffer-time", SINK_BUFFER);
         element.set_property("latency-time", SINK_PERIOD);
     }
+}
+
+#[cfg(test)]
+#[test]
+fn the_sound_keeps_the_time_of_the_system_clock_across_pauses() {
+    let Ok(sound) = Soundtrack::open(&Bank::new(Vec::new()), &[], &[], 0.0, |_| {}) else { return };
+    let pipeline = sound.pipe.playbin.downcast_ref::<gst::Pipeline>().expect("playbin is a pipeline");
+    assert!(pipeline.pipeline_flags().contains(gst::PipelineFlags::FIXED_CLOCK));
+    assert!(pipeline.pipeline_clock().is::<gst::SystemClock>());
 }

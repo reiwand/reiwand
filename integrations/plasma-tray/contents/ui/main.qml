@@ -11,7 +11,7 @@ PlasmoidItem {
     property var asked: ({})
 
     Plasmoid.icon: paused ? "io.github.reiwand-paused-symbolic" : "io.github.reiwand-symbolic"
-    Plasmoid.status: consent.ask.inputs.length > 0 || (daemon.stale && !daemon.later) ? PlasmaCore.Types.NeedsAttentionStatus : PlasmaCore.Types.ActiveStatus
+    Plasmoid.status: consent.ask.inputs.length > 0 || ((daemon.stale || daemon.flatpakNewer) && !daemon.later) ? PlasmaCore.Types.NeedsAttentionStatus : PlasmaCore.Types.ActiveStatus
     toolTipMainText: "Reiwand"
     toolTipSubText: daemon.lastError || (paused ? i18n("Paused") : i18n("Playing"))
     fullRepresentation: Panel {
@@ -22,8 +22,28 @@ PlasmoidItem {
         daemon.refresh();
     }
     onExpandedChanged: {
-        if (root.expanded)
+        if (root.expanded) {
             daemon.refresh();
+            daemon.probe?.check();
+        }
+    }
+
+    Loader {
+        source: "FlatpakProbe.qml"
+        onLoaded: {
+            item.listed.connect(version => root.daemon.installed = version);
+            item.failed.connect(error => root.daemon.actionError = error || i18n("Reiwand could not be restarted; log out and in again"));
+            root.daemon.probe = item;
+            item.check();
+        }
+    }
+
+    // A `flatpak update` runs on its own (Discover, a timer): look again now and then.
+    Timer {
+        interval: 15 * 60 * 1000
+        running: true
+        repeat: true
+        onTriggered: root.daemon.probe?.check()
     }
 
     DBus.SignalWatcher {

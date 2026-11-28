@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
 const NEAR: u64 = RATE as u64 / 4;
+const ALIGNED: u64 = RATE as u64 / 25;
 const QUEUED: u32 = 8;
 const OPEN_WAIT: u64 = 5;
 
@@ -68,7 +69,9 @@ impl Slot {
         let opened = std::thread::Builder::new().name("reiwand-sound-feed".into()).spawn(move || {
             match Feed::start(&path, from) {
                 Ok(feed) => *lock(&filled) = Some(feed),
-                Err(e) => tracing::debug!(path = %path.display(), "cannot stream a sound: {e}"),
+                Err(e) => {
+                    tracing::warn!(path = %path.display(), "cannot stream a sound, it stays silent: {e}")
+                }
             }
         });
         opened.map(drop).unwrap_or_else(|e| tracing::warn!("cannot start streaming a sound: {e}"));
@@ -137,9 +140,7 @@ impl Feed {
             }
             let sample = self.sink.try_pull_sample(gst::ClockTime::ZERO)?;
             let buffer = sample.buffer()?;
-            let first = buffer
-                .pts()
-                .map_or(self.first + self.len(), |t| t.nseconds() * u64::from(RATE) / 1_000_000_000);
+            let first = self.place(buffer, end);
             if self.asked.is_some_and(|asked| first + NEAR < asked || first > asked + NEAR) {
                 continue;
             }
@@ -151,14 +152,34 @@ impl Feed {
         }
     }
 
+    /// Where a decoded buffer starts, in frames. Decoded sound is contiguous: a buffer starts where the
+    /// one before it ended, counted in frames. Its timestamp, which the decoder rounds to the
+    /// nanosecond, only places it after a seek, a discontinuity or when it is further away than an
+    /// audio sink would align (40 ms); placing every buffer by its timestamp leaves a frame out every
+    /// few buffers, a click.
+    fn place(&self, buffer: &gst::BufferRef, end: u64) -> u64 {
+        let stamped = buffer.pts().map(|t| t.nseconds() * u64::from(RATE) / 1_000_000_000);
+        let anew =
+            self.asked.is_some() || self.len() == 0 || buffer.flags().contains(gst::BufferFlags::DISCONT);
+        match stamped {
+            Some(at) if anew || at.abs_diff(end) > ALIGNED => at,
+            _ => end,
+        }
+    }
+
     fn seek(&mut self, at: u64) {
         self.asked = Some(at);
         let pipeline = self.pipeline.downgrade();
         let sought = std::thread::Builder::new().name("reiwand-sound-seek".into()).spawn(move || {
             let flags = gst::SeekFlags::FLUSH | gst::SeekFlags::ACCURATE;
-            pipeline.upgrade().map(|p| p.seek_simple(flags, to_time(at)))
+            let sought = pipeline.upgrade().map(|p| p.seek_simple(flags, to_time(at)));
+            if let Some(Err(e)) = sought {
+                tracing::warn!(
+                    "cannot seek a streamed sound, it may stay silent until it is opened again: {e}"
+                );
+            }
         });
-        sought.map(drop).unwrap_or_else(|e| tracing::debug!("cannot seek a streamed sound: {e}"));
+        sought.map(drop).unwrap_or_else(|e| tracing::warn!("cannot seek a streamed sound: {e}"));
     }
 }
 

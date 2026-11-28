@@ -98,6 +98,8 @@ pub mod qobject {
         #[qinvokable]
         fn attach(self: Pin<&mut SceneEditor>, edge: u32);
         #[qinvokable]
+        fn restream(self: Pin<&mut SceneEditor>);
+        #[qinvokable]
         fn cover(self: Pin<&mut SceneEditor>, covered: bool);
         #[qinvokable]
         fn halve(self: Pin<&mut SceneEditor>, on: bool);
@@ -174,4 +176,6 @@ pub struct SceneEditorRust {
     pub attached: (u32, u32),
     pub edge: u32,
     pub stream_failed: bool,
+    /// Streams replaced by a newer one, let go once the canvas shows the newer one.
+    pub replaced: Vec<String>,
 }

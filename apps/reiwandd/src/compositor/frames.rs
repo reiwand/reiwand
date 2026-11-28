@@ -10,6 +10,7 @@ use std::sync::atomic::AtomicU64;
 use std::time::{Duration, Instant};
 
 mod draw;
+mod unseen;
 
 use draw::draw;
 
@@ -85,6 +86,7 @@ impl State {
             .chain(self.heard())
             .chain(self.page_due())
             .chain(self.starvation())
+            .chain(self.unseen_due())
             .chain(self.backdrops())
             .chain(self.outputs.values().filter_map(|o| o.passing.as_ref()?.until()))
             .chain(moving.and_then(|fps| self.motion.due(fps)))
@@ -94,6 +96,7 @@ impl State {
     pub(super) fn render_due(&mut self) {
         let (now, limits, transition) =
             (Instant::now(), self.relief_limits(), self.settings.transition.as_secs_f32());
+        self.check_unseen(now);
         let shared = (self.renderer, &*self.exporter, &self.players, self.power, limits);
         for (name, output) in &mut self.outputs {
             let (streaming, lights) = (shared.1.is_streaming(name), output.lights_only(name));

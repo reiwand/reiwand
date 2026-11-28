@@ -37,14 +37,22 @@ Flatpak cannot install the wallpaper plugin or the Plasma tray icon: the last co
 them with `kpackagetool6` from the files of the Flatpak itself and creates the folder where
 Flatpak mounts the shared edits, and leaves `~/.local/share/reiwand/edits/`, which Flatpak
 creates readable by everyone, for your user only (without `| sh` it only shows the commands). It
-has to be repeated after each update, and Plasma restarted. The plugin starts the daemon over
+has to be repeated after each update, and Plasma restarted: after a `flatpak update` (or an update in
+Discover) the tray says *A new version of Reiwand is installed* and *Restart Reiwand* does all of it
+at once (it copies the new plugin and tray, stops the old service and restarts Plasma). The plugin starts the daemon over
 D-Bus when it needs it; there is no systemd service. On ARM, install `./reiwand-aarch64.flatpak`.
 Do not install the Flatpak and the AppImage at the same time, because both register the same
 D-Bus services: run `reiwand --uninstall` first.
 
 The app shows up in the applications menu (`flatpak run io.github.reiwand.Reiwand` opens it from
 the terminal) and the tray icon opens it with *Open Reiwand* and *Settings…*, as in the
-installation without Flatpak. `reiwand-ctl` is inside too:
+installation without Flatpak.
+
+The service runs with no window, so the desktop lists it among the apps running in the
+background: in Plasma, a second Reiwand entry in the tray that says *Renders your wallpapers*.
+Every sandboxed app without a window is listed there and it cannot be left out; *Quit Reiwand* in
+it stops the service, and the wallpaper with it. To hide the entry, open the tray's *Entries*
+settings and set it to *Disabled*. `reiwand-ctl` is inside too:
 
 ```sh
 alias reiwand-ctl='flatpak run --command=reiwand-ctl io.github.reiwand.Reiwand'
