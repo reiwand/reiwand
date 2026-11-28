@@ -10,6 +10,8 @@ use std::sync::{Arc, LazyLock, Mutex};
 use std::time::{Duration, Instant};
 use zbus::{Variant, fdo};
 
+/// How long a close waits for the answer of the same click.
+const LATE: Duration = Duration::from_millis(300);
 const WAIT: Duration = Duration::from_secs(120);
 const QUIET: Duration = Duration::from_secs(600);
 const APP: &str = "io.github.reiwand";
@@ -57,15 +59,26 @@ pub(crate) async fn ask(
     let buttons = ["allow", allow.as_str(), "deny", deny.as_str()];
     let hints = HashMap::from([("desktop-entry", Variant::from(APP))]);
     let id = notes.notify("Reiwand", 0, APP, &summary, &body, &buttons, hints, 0).await?;
+    // Plasma sends ActionInvoked and NotificationClosed for the same click almost together: the
+    // answer is read first, and a close still waits a moment for an answer that comes after it.
     let answer = async {
         loop {
             tokio::select! {
+                biased;
                 Some(signal) = actions.next() => match signal.args() {
                     Ok(args) if args.id == id => return Some(args.action_key == "allow"),
                     _ => {}
                 },
                 Some(signal) = closed.next() => if signal.args().is_ok_and(|args| args.id == id) {
-                    return None;
+                    let late = async {
+                        while let Some(signal) = actions.next().await {
+                            if let Ok(args) = signal.args() && args.id == id {
+                                return Some(args.action_key == "allow");
+                            }
+                        }
+                        None
+                    };
+                    return tokio::time::timeout(LATE, late).await.ok().flatten();
                 },
                 else => return None,
             }
