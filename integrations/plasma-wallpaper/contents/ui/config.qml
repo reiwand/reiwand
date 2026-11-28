@@ -4,6 +4,10 @@ import QtQuick.Controls as QQC2
 import org.kde.plasma.workspace.dbus as DBus
 
 ColumnLayout {
+    // Plasma hands every wallpaper's settings page these two; this one keeps no settings of its own.
+    property var configDialog
+    property var wallpaperConfiguration
+
     QQC2.Label {
         Layout.fillWidth: true
         text: i18nd("plasma_wallpaper_io.github.reiwand", "Reiwand is managed from its app, its icon in the system tray or the reiwand-ctl command.")
