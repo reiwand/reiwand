@@ -4,6 +4,7 @@ mod bus;
 mod deep;
 mod dmabuf;
 mod feed;
+mod glide;
 mod listened;
 mod loading;
 mod outputs;

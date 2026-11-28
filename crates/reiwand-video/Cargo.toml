@@ -14,6 +14,7 @@ gstreamer.workspace = true
 gstreamer-app.workspace = true
 gstreamer-video.workspace = true
 gstreamer-allocators.workspace = true
+gstreamer-controller.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
 

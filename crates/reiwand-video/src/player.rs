@@ -1,4 +1,5 @@
 use crate::bus::Pipe;
+use crate::glide::Glide;
 use crate::{Cut, Error, Event, Options, Shared, Sink, local_uri, lock, make, pipewire, video_sink};
 use gstreamer as gst;
 use gstreamer::prelude::*;
@@ -10,6 +11,7 @@ pub struct Player {
     size: gst::Element,
     rate: gst::Element,
     audio: bool,
+    glide: Option<Glide>,
     shared: Shared,
     max_fps: u32,
     zero_copy: bool,
@@ -28,12 +30,21 @@ impl Player {
         let playbin = make("playbin")?;
         playbin.set_property("uri", &uri);
         playbin.set_property_from_str("flags", if audio { "video+audio+soft-volume" } else { "video" });
-        playbin.set_property("volume", options.volume.clamp(0.0, 1.0));
-        playbin.set_property("mute", options.muted);
         let piped = audio.then(|| pipewire::sink(None)).flatten();
         piped.iter().for_each(|sink| playbin.set_property("audio-sink", sink));
-        let tempo = audio.then(|| make("scaletempo").ok()).flatten();
-        tempo.iter().for_each(|tempo| playbin.set_property("audio-filter", tempo));
+        // The volume glides in the audio filter; the player's own volume would jump and click.
+        let start = if options.muted { 0.0 } else { options.volume };
+        let glide = audio.then(|| Glide::new(start).ok()).flatten();
+        match &glide {
+            Some((filter, _)) => playbin.set_property("audio-filter", filter),
+            None => {
+                playbin.set_property("volume", options.volume.clamp(0.0, 1.0));
+                playbin.set_property("mute", options.muted);
+                let tempo = audio.then(|| make("scaletempo").ok()).flatten();
+                tempo.iter().for_each(|tempo| playbin.set_property("audio-filter", tempo));
+            }
+        }
+        let glide = glide.map(|(_, glide)| glide);
         let shared = Shared { cut: Arc::new(options.cut.into()), ..Shared::default() };
         let watched = (shared.seen.clone(), shared.deep.clone());
         let (video_sink, size, rate, zero_copy) = video_sink::build(options, sink.clone(), watched)?;
@@ -54,7 +65,7 @@ impl Player {
         }
         let pipe = Pipe::start(playbin, (uri, shared.clone()), sink, audio)?;
         let max_fps = options.max_fps;
-        Ok(Self { pipe, size, rate, audio, shared, max_fps, zero_copy })
+        Ok(Self { pipe, size, rate, audio, glide, shared, max_fps, zero_copy })
     }
 
     pub fn set_cut(&mut self, cut: Cut) {
@@ -93,8 +104,13 @@ impl Player {
     }
 
     pub fn set_volume(&self, volume: f64, muted: bool) {
-        self.pipe.playbin.set_property("volume", volume.clamp(0.0, 1.0));
-        self.pipe.playbin.set_property("mute", muted);
+        match &self.glide {
+            Some(glide) => glide.set(if muted { 0.0 } else { volume }),
+            None => {
+                self.pipe.playbin.set_property("volume", volume.clamp(0.0, 1.0));
+                self.pipe.playbin.set_property("mute", muted);
+            }
+        }
     }
 
     pub fn seeks(&self) -> u64 {
